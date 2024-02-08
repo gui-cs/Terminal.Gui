@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>Definition to interact with the OS clipboard.</summary>
 public interface IClipboard {

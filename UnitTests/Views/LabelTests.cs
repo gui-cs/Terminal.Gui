@@ -3,23 +3,16 @@
 namespace Terminal.Gui.ViewsTests;
 
 public class LabelTests {
-    private readonly ITestOutputHelper _output;
     public LabelTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     [AutoInitShutdown]
     public void AutoSize_Stays_True_AnchorEnd () {
-        var label = new Label {
-                                  Y = Pos.Center (),
-                                  Text = "Say Hello 你",
-                                  AutoSize = true
-                              };
+        var label = new Label { Y = Pos.Center (), Text = "Say Hello 你", AutoSize = true };
         label.X = Pos.AnchorEnd () - Pos.Function (() => label.TextFormatter.Text.GetColumns ());
 
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
         Application.Top.Add (win);
 
@@ -55,16 +48,9 @@ public class LabelTests {
     [Fact]
     [AutoInitShutdown]
     public void AutoSize_Stays_True_Center () {
-        var label = new Label {
-                                  X = Pos.Center (),
-                                  Y = Pos.Center (),
-                                  Text = "Say Hello 你"
-                              };
+        var label = new Label { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
 
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
         Application.Top.Add (win);
 
@@ -100,16 +86,9 @@ public class LabelTests {
     [Fact]
     [AutoInitShutdown]
     public void AutoSize_Stays_True_With_EmptyText () {
-        var label = new Label {
-                                  X = Pos.Center (),
-                                  Y = Pos.Center (),
-                                  AutoSize = true
-                              };
+        var label = new Label { X = Pos.Center (), Y = Pos.Center (), AutoSize = true };
 
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
         Application.Top.Add (win);
 
@@ -132,7 +111,6 @@ public class LabelTests {
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
     }
 
-
     [Fact]
     [AutoInitShutdown]
     public void Constructors_Defaults () {
@@ -150,9 +128,7 @@ public class LabelTests {
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Application.End (rs);
 
-        label = new Label {
-                              Text = "Test"
-                          };
+        label = new Label { Text = "Test" };
         Assert.True (label.AutoSize);
         Assert.Equal ("Test", label.Text);
         Application.Top.Add (label);
@@ -166,7 +142,7 @@ Test
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Application.End (rs);
 
-        label = new Label { X= 3, Y = 4, Text= "Test"};
+        label = new Label { X = 3, Y = 4, Text = "Test" };
         Assert.Equal ("Test", label.Text);
         Application.Top.Add (label);
         rs = Application.Begin (Application.Top);
@@ -200,43 +176,47 @@ Test
         Assert.True (label.AutoSize);
 
         tf1.Draw (
-                  new Rect (new Point (0, 1), tf1Size),
-                  label.GetNormalColor (),
-                  label.ColorScheme.HotNormal,
-                  default (Rect),
-                  false);
+            new Rect (new Point (0, 1), tf1Size),
+            label.GetNormalColor (),
+            label.ColorScheme.HotNormal,
+            default (Rect),
+            false
+        );
 
         tf2.Draw (new Rect (new Point (0, 2), tf2Size), label.GetNormalColor (), label.ColorScheme.HotNormal);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 This label needs to be cleared before rewritten.                       
 This TextFormatter (tf1) without fill will not be cleared on rewritten.
 This TextFormatter (tf2) with fill will be cleared on rewritten.       
 ",
-                                                      _output);
+            _output
+        );
 
         label.Text = "This label is rewritten.";
         label.Draw ();
 
         tf1.Text = "This TextFormatter (tf1) is rewritten.";
         tf1.Draw (
-                  new Rect (new Point (0, 1), tf1Size),
-                  label.GetNormalColor (),
-                  label.ColorScheme.HotNormal,
-                  default (Rect),
-                  false);
+            new Rect (new Point (0, 1), tf1Size),
+            label.GetNormalColor (),
+            label.ColorScheme.HotNormal,
+            default (Rect),
+            false
+        );
 
         tf2.Text = "This TextFormatter (tf2) is rewritten.";
         tf2.Draw (new Rect (new Point (0, 2), tf2Size), label.GetNormalColor (), label.ColorScheme.HotNormal);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 This label is rewritten.                                               
 This TextFormatter (tf1) is rewritten.will not be cleared on rewritten.
 This TextFormatter (tf2) is rewritten.                                 
 ",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
@@ -256,16 +236,11 @@ Demo Simple Rune
         Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rect (0, 0, 16, 1), pos);
     }
-    
-    
 
     [Fact]
     [AutoInitShutdown]
     public void Label_Draw_Vertical_Simple_Runes () {
-        var label = new Label {
-                                  TextDirection = TextDirection.TopBottom_LeftRight,
-                                  Text = "Demo Simple Rune"
-                              };
+        var label = new Label { TextDirection = TextDirection.TopBottom_LeftRight, Text = "Demo Simple Rune" };
         Application.Top.Add (label);
         Application.Begin (Application.Top);
 
@@ -294,7 +269,7 @@ e
         Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rect (0, 0, 1, 16), pos);
     }
-    
+
     [Fact]
     [AutoInitShutdown]
     public void Label_Draw_Vertical_Wide_Runes () {
@@ -315,7 +290,7 @@ e
         Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rect (0, 0, 2, 7), pos);
     }
-    
+
     [Fact]
     [AutoInitShutdown]
     public void Label_HotKeyChanged_EventFires () {
@@ -354,7 +329,7 @@ e
         Assert.Equal (KeyCode.Null, args.OldKey);
         Assert.Equal (KeyCode.R, args.NewKey);
     }
-    
+
     [Fact]
     public void TestAssignTextToLabel () {
         View b = new Label { Text = "heya" };
@@ -372,10 +347,7 @@ e
     [AutoInitShutdown]
     public void Update_Only_On_Or_After_Initialize () {
         var label = new Label { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
         Application.Top.Add (win);
 
@@ -403,16 +375,8 @@ e
     [Fact]
     [AutoInitShutdown]
     public void Update_Parameterless_Only_On_Or_After_Initialize () {
-        var label = new Label {
-                                  X = Pos.Center (),
-                                  Y = Pos.Center (),
-                                  Text = "Say Hello 你",
-                                  AutoSize = true
-                              };
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
+        var label = new Label { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你", AutoSize = true };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
         Application.Top.Add (win);
 
@@ -437,5 +401,4 @@ e
         Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rect (0, 0, 30, 5), pos);
     }
-    
 }

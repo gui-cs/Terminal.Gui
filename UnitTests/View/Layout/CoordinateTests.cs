@@ -4,8 +4,8 @@ namespace Terminal.Gui.ViewTests;
 
 /// <summary>Tests for view coordinate mapping (e.g. <see cref="View.ScreenToFrame"/> etc...).</summary>
 public class CoordinateTests {
-    private readonly ITestOutputHelper _output;
     public CoordinateTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     /// <summary>
     ///     Tests that screen to bounds mapping works correctly when the view has no superview and there ARE Frames on the
@@ -22,12 +22,12 @@ public class CoordinateTests {
     [InlineData (1, 1, 11, 11, 9, 9)]
     public void ScreenToBounds_NoSuper_HasFrames (int viewX, int viewY, int x, int y, int expectedX, int expectedY) {
         var view = new View {
-                                X = viewX,
-                                Y = viewY,
-                                Width = 10,
-                                Height = 10,
-                                BorderStyle = LineStyle.Single
-                            };
+            X = viewX,
+            Y = viewY,
+            Width = 10,
+            Height = 10,
+            BorderStyle = LineStyle.Single
+        };
 
         Point actual = view.ScreenToBounds (x, y);
         Assert.Equal (expectedX, actual.X);
@@ -48,12 +48,7 @@ public class CoordinateTests {
     [InlineData (1, 1, 9, 9, 8, 8)]
     [InlineData (1, 1, 11, 11, 10, 10)] // it's ok for the view to return coordinates outside of its bounds
     public void ScreenToBounds_NoSuper_NoFrames (int viewX, int viewY, int x, int y, int expectedX, int expectedY) {
-        var view = new View {
-                                X = viewX,
-                                Y = viewY,
-                                Width = 10,
-                                Height = 10
-                            };
+        var view = new View { X = viewX, Y = viewY, Width = 10, Height = 10 };
 
         Point actual = view.ScreenToBounds (x, y);
         Assert.Equal (expectedX, actual.X);
@@ -72,18 +67,13 @@ public class CoordinateTests {
     [InlineData (1, 1, 11, 11, 9, 9)] // it's ok for the view to return coordinates outside of its bounds
     public void ScreenToBounds_SuperHasFrames (int viewX, int viewY, int x, int y, int expectedX, int expectedY) {
         var super = new View {
-                                 X = 0,
-                                 Y = 0,
-                                 Width = 10,
-                                 Height = 10,
-                                 BorderStyle = LineStyle.Single
-                             };
-        var view = new View {
-                                X = viewX,
-                                Y = viewY,
-                                Width = 5,
-                                Height = 5
-                            };
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 10,
+            BorderStyle = LineStyle.Single
+        };
+        var view = new View { X = viewX, Y = viewY, Width = 5, Height = 5 };
         super.Add (view);
 
         Point actual = view.ScreenToFrame (x, y);
@@ -102,18 +92,8 @@ public class CoordinateTests {
     [InlineData (1, 1, 9, 9, 8, 8)]
     [InlineData (1, 1, 11, 11, 10, 10)] // it's ok for the view to return coordinates outside of its bounds
     public void ScreenToBounds_SuperHasNoFrames (int viewX, int viewY, int x, int y, int expectedX, int expectedY) {
-        var super = new View {
-                                 X = 0,
-                                 Y = 0,
-                                 Width = 10,
-                                 Height = 10
-                             };
-        var view = new View {
-                                X = viewX,
-                                Y = viewY,
-                                Width = 5,
-                                Height = 5
-                            };
+        var super = new View { X = 0, Y = 0, Width = 10, Height = 10 };
+        var view = new View { X = viewX, Y = viewY, Width = 5, Height = 5 };
         super.Add (view);
 
         Point actual = view.ScreenToBounds (x, y);
@@ -136,12 +116,12 @@ public class CoordinateTests {
     [InlineData (1, 1, 11, 11, 10, 10)] // it's ok for the view to return coordinates outside of its bounds
     public void ScreenToView_NoSuper_HasFrames (int viewX, int viewY, int x, int y, int expectedX, int expectedY) {
         var view = new View {
-                                X = viewX,
-                                Y = viewY,
-                                Width = 10,
-                                Height = 10,
-                                BorderStyle = LineStyle.Single
-                            };
+            X = viewX,
+            Y = viewY,
+            Width = 10,
+            Height = 10,
+            BorderStyle = LineStyle.Single
+        };
 
         Point actual = view.ScreenToFrame (x, y);
         Assert.Equal (expectedX, actual.X);
@@ -162,12 +142,7 @@ public class CoordinateTests {
     [InlineData (1, 1, 9, 9, 8, 8)]
     [InlineData (1, 1, 11, 11, 10, 10)] // it's ok for the view to return coordinates outside of its bounds
     public void ScreenToView_NoSuper_NoFrames (int viewX, int viewY, int x, int y, int expectedX, int expectedY) {
-        var view = new View {
-                                X = viewX,
-                                Y = viewY,
-                                Width = 10,
-                                Height = 10
-                            };
+        var view = new View { X = viewX, Y = viewY, Width = 10, Height = 10 };
 
         Point actual = view.ScreenToFrame (x, y);
         Assert.Equal (expectedX, actual.X);
@@ -186,18 +161,13 @@ public class CoordinateTests {
     [InlineData (1, 1, 11, 11, 9, 9)] // it's ok for the view to return coordinates outside of its bounds
     public void ScreenToView_SuperHasFrames (int viewX, int viewY, int x, int y, int expectedX, int expectedY) {
         var super = new View {
-                                 X = 0,
-                                 Y = 0,
-                                 Width = 10,
-                                 Height = 10,
-                                 BorderStyle = LineStyle.Single
-                             };
-        var view = new View {
-                                X = viewX,
-                                Y = viewY,
-                                Width = 5,
-                                Height = 5
-                            };
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 10,
+            BorderStyle = LineStyle.Single
+        };
+        var view = new View { X = viewX, Y = viewY, Width = 5, Height = 5 };
         super.Add (view);
 
         Point actual = view.ScreenToFrame (x, y);
@@ -216,18 +186,8 @@ public class CoordinateTests {
     [InlineData (1, 1, 9, 9, 8, 8)]
     [InlineData (1, 1, 11, 11, 10, 10)] // it's ok for the view to return coordinates outside of its bounds
     public void ScreenToView_SuperHasNoFrames (int viewX, int viewY, int x, int y, int expectedX, int expectedY) {
-        var super = new View {
-                                 X = 0,
-                                 Y = 0,
-                                 Width = 10,
-                                 Height = 10
-                             };
-        var view = new View {
-                                X = viewX,
-                                Y = viewY,
-                                Width = 5,
-                                Height = 5
-                            };
+        var super = new View { X = 0, Y = 0, Width = 10, Height = 10 };
+        var view = new View { X = viewX, Y = viewY, Width = 5, Height = 5 };
         super.Add (view);
 
         Point actual = view.ScreenToFrame (x, y);

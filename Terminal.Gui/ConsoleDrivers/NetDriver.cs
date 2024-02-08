@@ -9,34 +9,6 @@ using static Terminal.Gui.NetEvents;
 namespace Terminal.Gui;
 
 class NetWinVTConsole {
-    private const uint DISABLE_NEWLINE_AUTO_RETURN = 8;
-    private const uint ENABLE_ECHO_INPUT = 4;
-    private const uint ENABLE_EXTENDED_FLAGS = 128;
-    private const uint ENABLE_INSERT_MODE = 32;
-    private const uint ENABLE_LINE_INPUT = 2;
-    private const uint ENABLE_LVB_GRID_WORLDWIDE = 10;
-    private const uint ENABLE_MOUSE_INPUT = 16;
-
-    // Input modes.
-    private const uint ENABLE_PROCESSED_INPUT = 1;
-
-    // Output modes.
-    private const uint ENABLE_PROCESSED_OUTPUT = 1;
-    private const uint ENABLE_QUICK_EDIT_MODE = 64;
-    private const uint ENABLE_VIRTUAL_TERMINAL_INPUT = 512;
-    private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4;
-    private const uint ENABLE_WINDOW_INPUT = 8;
-    private const uint ENABLE_WRAP_AT_EOL_OUTPUT = 2;
-    private const int STD_ERROR_HANDLE = -12;
-    private const int STD_INPUT_HANDLE = -10;
-    private const int STD_OUTPUT_HANDLE = -11;
-    private readonly nint _inputHandle;
-    private readonly nint _outputHandle;
-    private readonly nint _errorHandle;
-    private readonly uint _originalInputConsoleMode;
-    private readonly uint _originalOutputConsoleMode;
-    private readonly uint _originalErrorConsoleMode;
-
     public NetWinVTConsole () {
         _inputHandle = GetStdHandle (STD_INPUT_HANDLE);
         if (!GetConsoleMode (_inputHandle, out uint mode)) {
@@ -77,6 +49,34 @@ class NetWinVTConsole {
             }
         }
     }
+
+    private const int STD_ERROR_HANDLE = -12;
+    private const int STD_INPUT_HANDLE = -10;
+    private const int STD_OUTPUT_HANDLE = -11;
+    private const uint DISABLE_NEWLINE_AUTO_RETURN = 8;
+    private const uint ENABLE_ECHO_INPUT = 4;
+    private const uint ENABLE_EXTENDED_FLAGS = 128;
+    private const uint ENABLE_INSERT_MODE = 32;
+    private const uint ENABLE_LINE_INPUT = 2;
+    private const uint ENABLE_LVB_GRID_WORLDWIDE = 10;
+    private const uint ENABLE_MOUSE_INPUT = 16;
+
+    // Input modes.
+    private const uint ENABLE_PROCESSED_INPUT = 1;
+
+    // Output modes.
+    private const uint ENABLE_PROCESSED_OUTPUT = 1;
+    private const uint ENABLE_QUICK_EDIT_MODE = 64;
+    private const uint ENABLE_VIRTUAL_TERMINAL_INPUT = 512;
+    private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4;
+    private const uint ENABLE_WINDOW_INPUT = 8;
+    private const uint ENABLE_WRAP_AT_EOL_OUTPUT = 2;
+    private readonly nint _errorHandle;
+    private readonly nint _inputHandle;
+    private readonly nint _outputHandle;
+    private readonly uint _originalErrorConsoleMode;
+    private readonly uint _originalInputConsoleMode;
+    private readonly uint _originalOutputConsoleMode;
 
     public void Cleanup () {
         if (!SetConsoleMode (_inputHandle, _originalInputConsoleMode)) {
@@ -206,13 +206,15 @@ class NetEvents : IDisposable {
                         || (consoleKeyInfo.KeyChar != (char)KeyCode.Esc && _isEscSeq)) {
                         if (_cki == null && consoleKeyInfo.KeyChar != (char)KeyCode.Esc && _isEscSeq) {
                             _cki = EscSeqUtils.ResizeArray (
-                                                            new ConsoleKeyInfo (
-                                                                                (char)KeyCode.Esc,
-                                                                                0,
-                                                                                false,
-                                                                                false,
-                                                                                false),
-                                                            _cki);
+                                new ConsoleKeyInfo (
+                                    (char)KeyCode.Esc,
+                                    0,
+                                    false,
+                                    false,
+                                    false
+                                ),
+                                _cki
+                            );
                         }
 
                         _isEscSeq = true;
@@ -252,10 +254,10 @@ class NetEvents : IDisposable {
 
         void ProcessMapConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo) {
             _inputQueue.Enqueue (
-                                 new InputResult {
-                                                     EventType = EventType.Key,
-                                                     ConsoleKeyInfo = EscSeqUtils.MapConsoleKeyInfo (consoleKeyInfo)
-                                                 });
+                new InputResult {
+                    EventType = EventType.Key, ConsoleKeyInfo = EscSeqUtils.MapConsoleKeyInfo (consoleKeyInfo)
+                }
+            );
             _isEscSeq = false;
         }
     }
@@ -276,10 +278,11 @@ class NetEvents : IDisposable {
                 }
 
                 if (EnqueueWindowSizeEvent (
-                                            Math.Max (Console.WindowHeight, 0),
-                                            Math.Max (Console.WindowWidth, 0),
-                                            buffHeight,
-                                            buffWidth)) {
+                        Math.Max (Console.WindowHeight, 0),
+                        Math.Max (Console.WindowWidth, 0),
+                        buffHeight,
+                        buffWidth
+                    )) {
                     return;
                 }
             }
@@ -319,12 +322,10 @@ class NetEvents : IDisposable {
         int w = Math.Max (winWidth, 0);
         int h = Math.Max (winHeight, 0);
         _inputQueue.Enqueue (
-                             new InputResult {
-                                                 EventType = EventType.WindowSize,
-                                                 WindowSizeEvent = new WindowSizeEvent {
-                                                                       Size = new Size (w, h)
-                                                                   }
-                                             });
+            new InputResult {
+                EventType = EventType.WindowSize, WindowSizeEvent = new WindowSizeEvent { Size = new Size (w, h) }
+            }
+        );
 
         return true;
     }
@@ -338,20 +339,21 @@ class NetEvents : IDisposable {
     ) {
         // isMouse is true if it's CSI<, false otherwise
         EscSeqUtils.DecodeEscSeq (
-                                  EscSeqRequests,
-                                  ref newConsoleKeyInfo,
-                                  ref key,
-                                  cki,
-                                  ref mod,
-                                  out string c1Control,
-                                  out string code,
-                                  out string[] values,
-                                  out string terminating,
-                                  out bool isMouse,
-                                  out List<MouseFlags> mouseFlags,
-                                  out Point pos,
-                                  out bool isReq,
-                                  (f, p) => HandleMouseEvent (MapMouseFlags (f), p));
+            EscSeqRequests,
+            ref newConsoleKeyInfo,
+            ref key,
+            cki,
+            ref mod,
+            out string c1Control,
+            out string code,
+            out string[] values,
+            out string terminating,
+            out bool isMouse,
+            out List<MouseFlags> mouseFlags,
+            out Point pos,
+            out bool isReq,
+            (f, p) => HandleMouseEvent (MapMouseFlags (f), p)
+        );
 
         if (isMouse) {
             foreach (MouseFlags mf in mouseFlags) {
@@ -504,21 +506,14 @@ class NetEvents : IDisposable {
         switch (terminating) {
             // BUGBUG: I can't find where we send a request for cursor position (ESC[?6n), so I'm not sure if this is needed.
             case EscSeqUtils.CSI_RequestCursorPositionReport_Terminator:
-                var point = new Point {
-                                          X = int.Parse (values[1]) - 1,
-                                          Y = int.Parse (values[0]) - 1
-                                      };
+                var point = new Point { X = int.Parse (values[1]) - 1, Y = int.Parse (values[0]) - 1 };
                 if (_lastCursorPosition.Y != point.Y) {
                     _lastCursorPosition = point;
                     var eventType = EventType.WindowPosition;
-                    var winPositionEv = new WindowPositionEvent {
-                                                                    CursorPosition = point
-                                                                };
+                    var winPositionEv = new WindowPositionEvent { CursorPosition = point };
                     _inputQueue.Enqueue (
-                                         new InputResult {
-                                                             EventType = eventType,
-                                                             WindowPositionEvent = winPositionEv
-                                                         });
+                        new InputResult { EventType = eventType, WindowPositionEvent = winPositionEv }
+                    );
                 } else {
                     return;
                 }
@@ -529,10 +524,11 @@ class NetEvents : IDisposable {
                 switch (values[0]) {
                     case EscSeqUtils.CSI_ReportTerminalSizeInChars_ResponseValue:
                         EnqueueWindowSizeEvent (
-                                                Math.Max (int.Parse (values[1]), 0),
-                                                Math.Max (int.Parse (values[2]), 0),
-                                                Math.Max (int.Parse (values[1]), 0),
-                                                Math.Max (int.Parse (values[2]), 0));
+                            Math.Max (int.Parse (values[1]), 0),
+                            Math.Max (int.Parse (values[2]), 0),
+                            Math.Max (int.Parse (values[1]), 0),
+                            Math.Max (int.Parse (values[2]), 0)
+                        );
 
                         break;
                     default:
@@ -553,27 +549,18 @@ class NetEvents : IDisposable {
 
     private void EnqueueRequestResponseEvent (string c1Control, string code, string[] values, string terminating) {
         var eventType = EventType.RequestResponse;
-        var requestRespEv = new RequestResponseEvent {
-                                                         ResultTuple = (c1Control, code, values, terminating)
-                                                     };
+        var requestRespEv = new RequestResponseEvent { ResultTuple = (c1Control, code, values, terminating) };
         _inputQueue.Enqueue (
-                             new InputResult {
-                                                 EventType = eventType,
-                                                 RequestResponseEvent = requestRespEv
-                                             });
+            new InputResult { EventType = eventType, RequestResponseEvent = requestRespEv }
+        );
     }
 
     private void HandleMouseEvent (MouseButtonState buttonState, Point pos) {
-        var mouseEvent = new MouseEvent {
-                                            Position = pos,
-                                            ButtonState = buttonState
-                                        };
+        var mouseEvent = new MouseEvent { Position = pos, ButtonState = buttonState };
 
         _inputQueue.Enqueue (
-                             new InputResult {
-                                                 EventType = EventType.Mouse,
-                                                 MouseEvent = mouseEvent
-                                             });
+            new InputResult { EventType = EventType.Mouse, MouseEvent = mouseEvent }
+        );
 
         _inputReady.Set ();
     }
@@ -675,10 +662,7 @@ class NetEvents : IDisposable {
     }
 
     private void HandleKeyboardEvent (ConsoleKeyInfo cki) {
-        var inputResult = new InputResult {
-                                              EventType = EventType.Key,
-                                              ConsoleKeyInfo = cki
-                                          };
+        var inputResult = new InputResult { EventType = EventType.Key, ConsoleKeyInfo = cki };
 
         _inputQueue.Enqueue (inputResult);
     }
@@ -722,10 +706,10 @@ class NetDriver : ConsoleDriver {
 
     public bool IsWinPlatform { get; private set; }
 
-    public NetWinVTConsole NetWinConsole { get; private set; }
-
     public override bool SupportsTrueColor => (Environment.OSVersion.Platform == PlatformID.Unix)
                                               || (IsWinPlatform && Environment.OSVersion.Version.Build >= 14931);
+
+    public NetWinVTConsole NetWinConsole { get; private set; }
 
     public override void Refresh () {
         UpdateScreen ();
@@ -734,9 +718,8 @@ class NetDriver : ConsoleDriver {
 
     public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control) {
         var input = new InputResult {
-                                        EventType = EventType.Key,
-                                        ConsoleKeyInfo = new ConsoleKeyInfo (keyChar, key, shift, alt, control)
-                                    };
+            EventType = EventType.Key, ConsoleKeyInfo = new ConsoleKeyInfo (keyChar, key, shift, alt, control)
+        };
 
         try {
             ProcessInput (input);
@@ -812,22 +795,29 @@ class NetDriver : ConsoleDriver {
 
                         if (Force16Colors) {
                             output.Append (
-                                           EscSeqUtils.CSI_SetGraphicsRendition (
-                                            MapColors (
-                                                       (ConsoleColor)attr.Background.GetClosestNamedColor (),
-                                                       false),
-                                            MapColors ((ConsoleColor)attr.Foreground.GetClosestNamedColor ())));
+                                EscSeqUtils.CSI_SetGraphicsRendition (
+                                    MapColors (
+                                        (ConsoleColor)attr.Background.GetClosestNamedColor (),
+                                        false
+                                    ),
+                                    MapColors ((ConsoleColor)attr.Foreground.GetClosestNamedColor ())
+                                )
+                            );
                         } else {
                             output.Append (
-                                           EscSeqUtils.CSI_SetForegroundColorRGB (
-                                            attr.Foreground.R,
-                                            attr.Foreground.G,
-                                            attr.Foreground.B));
+                                EscSeqUtils.CSI_SetForegroundColorRGB (
+                                    attr.Foreground.R,
+                                    attr.Foreground.G,
+                                    attr.Foreground.B
+                                )
+                            );
                             output.Append (
-                                           EscSeqUtils.CSI_SetBackgroundColorRGB (
-                                            attr.Background.R,
-                                            attr.Background.G,
-                                            attr.Background.B));
+                                EscSeqUtils.CSI_SetBackgroundColorRGB (
+                                    attr.Background.R,
+                                    attr.Background.G,
+                                    attr.Background.B
+                                )
+                            );
                         }
                     }
 
@@ -1045,46 +1035,30 @@ class NetDriver : ConsoleDriver {
 
     // Cache the list of ConsoleColor values.
     private static readonly HashSet<int> ConsoleColorValues = new (
-                                                                   Enum.GetValues (typeof (ConsoleColor))
-                                                                       .OfType<ConsoleColor> ()
-                                                                       .Select (c => (int)c)
-                                                                  );
+        Enum.GetValues (typeof (ConsoleColor))
+            .OfType<ConsoleColor> ()
+            .Select (c => (int)c)
+    );
 
     // Dictionary for mapping ConsoleColor values to the values used by System.Net.Console.
     private static readonly Dictionary<ConsoleColor, int> colorMap = new () {
-                                                                                { ConsoleColor.Black, COLOR_BLACK },
-                                                                                { ConsoleColor.DarkBlue, COLOR_BLUE },
-                                                                                { ConsoleColor.DarkGreen, COLOR_GREEN },
-                                                                                { ConsoleColor.DarkCyan, COLOR_CYAN },
-                                                                                { ConsoleColor.DarkRed, COLOR_RED }, {
-                                                                                    ConsoleColor.DarkMagenta,
-                                                                                    COLOR_MAGENTA
-                                                                                }, {
-                                                                                    ConsoleColor.DarkYellow,
-                                                                                    COLOR_YELLOW
-                                                                                },
-                                                                                { ConsoleColor.Gray, COLOR_WHITE }, {
-                                                                                    ConsoleColor.DarkGray,
-                                                                                    COLOR_BRIGHT_BLACK
-                                                                                }, {
-                                                                                    ConsoleColor.Blue, COLOR_BRIGHT_BLUE
-                                                                                }, {
-                                                                                    ConsoleColor.Green,
-                                                                                    COLOR_BRIGHT_GREEN
-                                                                                }, {
-                                                                                    ConsoleColor.Cyan, COLOR_BRIGHT_CYAN
-                                                                                },
-                                                                                { ConsoleColor.Red, COLOR_BRIGHT_RED }, {
-                                                                                    ConsoleColor.Magenta,
-                                                                                    COLOR_BRIGHT_MAGENTA
-                                                                                }, {
-                                                                                    ConsoleColor.Yellow,
-                                                                                    COLOR_BRIGHT_YELLOW
-                                                                                }, {
-                                                                                    ConsoleColor.White,
-                                                                                    COLOR_BRIGHT_WHITE
-                                                                                }
-                                                                            };
+        { ConsoleColor.Black, COLOR_BLACK },
+        { ConsoleColor.DarkBlue, COLOR_BLUE },
+        { ConsoleColor.DarkGreen, COLOR_GREEN },
+        { ConsoleColor.DarkCyan, COLOR_CYAN },
+        { ConsoleColor.DarkRed, COLOR_RED },
+        { ConsoleColor.DarkMagenta, COLOR_MAGENTA },
+        { ConsoleColor.DarkYellow, COLOR_YELLOW },
+        { ConsoleColor.Gray, COLOR_WHITE },
+        { ConsoleColor.DarkGray, COLOR_BRIGHT_BLACK },
+        { ConsoleColor.Blue, COLOR_BRIGHT_BLUE },
+        { ConsoleColor.Green, COLOR_BRIGHT_GREEN },
+        { ConsoleColor.Cyan, COLOR_BRIGHT_CYAN },
+        { ConsoleColor.Red, COLOR_BRIGHT_RED },
+        { ConsoleColor.Magenta, COLOR_BRIGHT_MAGENTA },
+        { ConsoleColor.Yellow, COLOR_BRIGHT_YELLOW },
+        { ConsoleColor.White, COLOR_BRIGHT_WHITE }
+    };
 
     // Map a ConsoleColor to a platform dependent value.
     private int MapColors (ConsoleColor color, bool isForeground = true) {
@@ -1304,11 +1278,7 @@ class NetDriver : ConsoleDriver {
             mouseFlag |= MouseFlags.ButtonAlt;
         }
 
-        return new MouseEvent {
-                                  X = me.Position.X,
-                                  Y = me.Position.Y,
-                                  Flags = mouseFlag
-                              };
+        return new MouseEvent { X = me.Position.X, Y = me.Position.Y, Flags = mouseFlag };
     }
 
     #endregion Mouse Handling
@@ -1408,17 +1378,6 @@ class NetDriver : ConsoleDriver {
 /// </summary>
 /// <remarks>This implementation is used for NetDriver.</remarks>
 class NetMainLoop : IMainLoopDriver {
-    private readonly ManualResetEventSlim _eventReady = new (false);
-    private readonly CancellationTokenSource _inputHandlerTokenSource = new ();
-    private readonly Queue<InputResult?> _resultQueue = new ();
-    private readonly ManualResetEventSlim _waitForProbe = new (false);
-    private CancellationTokenSource _eventReadyTokenSource = new ();
-    private MainLoop _mainLoop;
-    internal NetEvents _netEvents;
-
-    /// <summary>Invoked when a Key is pressed.</summary>
-    internal Action<InputResult> ProcessInput;
-
     /// <summary>Initializes the class with the console driver.</summary>
     /// <remarks>Passing a consoleDriver is provided to capture windows resizing.</remarks>
     /// <param name="consoleDriver">The console driver used by this Net main loop.</param>
@@ -1430,6 +1389,18 @@ class NetMainLoop : IMainLoopDriver {
 
         _netEvents = new NetEvents (consoleDriver);
     }
+
+    private readonly CancellationTokenSource _inputHandlerTokenSource = new ();
+    private readonly ManualResetEventSlim _eventReady = new (false);
+    private readonly ManualResetEventSlim _waitForProbe = new (false);
+    private readonly Queue<InputResult?> _resultQueue = new ();
+
+    /// <summary>Invoked when a Key is pressed.</summary>
+    internal Action<InputResult> ProcessInput;
+
+    private CancellationTokenSource _eventReadyTokenSource = new ();
+    private MainLoop _mainLoop;
+    internal NetEvents _netEvents;
 
     void IMainLoopDriver.Setup (MainLoop mainLoop) {
         _mainLoop = mainLoop;

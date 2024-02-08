@@ -6,27 +6,6 @@ public partial class View {
     // The view-relative region that needs to be redrawn. Marked internal for unit tests.
     internal Rect _needsDisplayRect = Rect.Empty;
 
-    /// <summary>The color scheme for this view, if it is not defined, it returns the <see cref="SuperView"/>'s color scheme.</summary>
-    public virtual ColorScheme ColorScheme {
-        get {
-            if (_colorScheme == null) {
-                return SuperView?.ColorScheme;
-            }
-
-            return _colorScheme;
-        }
-        set {
-            if (_colorScheme != value) {
-                _colorScheme = value;
-                SetNeedsDisplay ();
-            }
-        }
-    }
-
-    /// <summary>The canvas that any line drawing that is to be shared by subviews of this view should add lines to.</summary>
-    /// <remarks><see cref="Border"/> adds border lines to this LineCanvas.</remarks>
-    public LineCanvas LineCanvas { get; } = new ();
-
     /// <summary>Gets or sets whether the view needs to be redrawn.</summary>
     public bool NeedsDisplay {
         get => _needsDisplayRect != Rect.Empty;
@@ -49,6 +28,27 @@ public partial class View {
     ///     called to render the borders.
     /// </summary>
     public virtual bool SuperViewRendersLineCanvas { get; set; } = false;
+
+    /// <summary>The color scheme for this view, if it is not defined, it returns the <see cref="SuperView"/>'s color scheme.</summary>
+    public virtual ColorScheme ColorScheme {
+        get {
+            if (_colorScheme == null) {
+                return SuperView?.ColorScheme;
+            }
+
+            return _colorScheme;
+        }
+        set {
+            if (_colorScheme != value) {
+                _colorScheme = value;
+                SetNeedsDisplay ();
+            }
+        }
+    }
+
+    /// <summary>The canvas that any line drawing that is to be shared by subviews of this view should add lines to.</summary>
+    /// <remarks><see cref="Border"/> adds border lines to this LineCanvas.</remarks>
+    public LineCanvas LineCanvas { get; } = new ();
 
     /// <summary>Displays the specified character in the specified column and row of the View.</summary>
     /// <param name="col">Column (view-relative).</param>
@@ -229,9 +229,11 @@ public partial class View {
         if (focused) {
             DrawHotString (text, scheme.HotFocus, scheme.Focus);
         } else {
-            DrawHotString (text,
-               Enabled ? scheme.HotNormal : scheme.Disabled,
-               Enabled ? scheme.Normal : scheme.Disabled);
+            DrawHotString (
+                text,
+                Enabled ? scheme.HotNormal : scheme.Disabled,
+                Enabled ? scheme.Normal : scheme.Disabled
+            );
         }
     }
 
@@ -334,11 +336,12 @@ public partial class View {
 
             // This should NOT clear 
             TextFormatter?.Draw (
-                                 BoundsToScreen (contentArea),
-                                 HasFocus ? GetFocusColor () : GetNormalColor (),
-                                 HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
-                                 Rect.Empty,
-                                 false);
+                BoundsToScreen (contentArea),
+                HasFocus ? GetFocusColor () : GetNormalColor (),
+                HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
+                Rect.Empty,
+                false
+            );
             SetSubViewNeedsDisplay ();
         }
 
@@ -346,11 +349,11 @@ public partial class View {
         // TODO: Implement OnDrawSubviews (cancelable);
         if (_subviews != null && SubViewNeedsDisplay) {
             IEnumerable<View> subviewsNeedingDraw = _subviews.Where (
-                                                                     view => view.Visible &&
-                                                                             (view.NeedsDisplay ||
-                                                                              view.SubViewNeedsDisplay ||
-                                                                              view.LayoutNeeded)
-                                                                    );
+                view => view.Visible &&
+                        (view.NeedsDisplay ||
+                         view.SubViewNeedsDisplay ||
+                         view.LayoutNeeded)
+            );
 
             foreach (View view in subviewsNeedingDraw) {
                 //view.Frame.IntersectsWith (bounds)) {

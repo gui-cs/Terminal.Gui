@@ -3,12 +3,10 @@ using System.IO.Abstractions;
 using Terminal.Gui.Resources;
 using static System.Environment;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Stores style settings for <see cref="FileDialog"/>.</summary>
 public class FileDialogStyle {
-    private readonly IFileSystem _fileSystem;
-
     /// <summary>Creates a new instance of the <see cref="FileDialogStyle"/> class.</summary>
     public FileDialogStyle (IFileSystem fileSystem) {
         _fileSystem = fileSystem;
@@ -17,26 +15,7 @@ public class FileDialogStyle {
         DateFormat = CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern;
     }
 
-    /// <summary>Gets or sets the text on the 'Cancel' button.</summary>
-    public string CancelButtonText { get; set; } = Strings.btnCancel;
-
-    /// <summary>
-    ///     Gets or sets the class thatis responsible for determining which color to use to represent files and
-    ///     directories when <see cref="UseColors"/> is <see langword="true"/>.
-    /// </summary>
-    public FileSystemColorProvider ColorProvider { get; set; } = new ();
-
-    /// <summary>
-    ///     Gets or sets the culture to use (e.g. for number formatting). Defaults to
-    ///     <see cref="CultureInfo.CurrentUICulture"/>.
-    /// </summary>
-    public CultureInfo Culture { get; set; } = CultureInfo.CurrentUICulture;
-
-    /// <summary>
-    ///     Gets or sets the format to use for date/times in the Modified column. Defaults to
-    ///     <see cref="DateTimeFormatInfo.SortableDateTimePattern"/> of the <see cref="CultureInfo.CurrentCulture"/>
-    /// </summary>
-    public string DateFormat { get; set; }
+    private readonly IFileSystem _fileSystem;
 
     /// <summary>
     ///     Gets or sets the default value to use for <see cref="UseColors"/>. This can be populated from .tui config
@@ -51,6 +30,53 @@ public class FileDialogStyle {
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool DefaultUseUnicodeCharacters { get; set; }
+
+    /// <summary>
+    ///     Gets or sets whether to flip the order of the Ok and Cancel buttons. Defaults to false (Ok button then Cancel
+    ///     button). Set to true to show Cancel button on left then Ok button instead.
+    /// </summary>
+    public bool FlipOkCancelButtonLayoutOrder { get; set; }
+
+    /// <summary>
+    ///     Gets or Sets a value indicating whether different colors should be used for different file types/directories.
+    ///     Defaults to false.
+    /// </summary>
+    public bool UseColors { get; set; } = DefaultUseColors;
+
+    /// <summary>Gets or sets whether to use advanced unicode characters which might not be installed on all users computers.</summary>
+    public bool UseUnicodeCharacters { get; set; } = DefaultUseUnicodeCharacters;
+
+    /// <summary>
+    ///     Gets or sets the culture to use (e.g. for number formatting). Defaults to
+    ///     <see cref="CultureInfo.CurrentUICulture"/>.
+    /// </summary>
+    public CultureInfo Culture { get; set; } = CultureInfo.CurrentUICulture;
+
+    /// <summary>
+    ///     Gets or sets the class thatis responsible for determining which color to use to represent files and
+    ///     directories when <see cref="UseColors"/> is <see langword="true"/>.
+    /// </summary>
+    public FileSystemColorProvider ColorProvider { get; set; } = new ();
+
+    /// <summary>Gets or sets the class responsible for determining which symbol to use to represent files and directories.</summary>
+    public FileSystemIconProvider IconProvider { get; set; } = new ();
+
+    /// <summary>
+    ///     Gets or Sets the method for getting the root tree objects that are displayed in the collapse-able tree in the
+    ///     <see cref="FileDialog"/>.  Defaults to all accessible <see cref="System.Environment.GetLogicalDrives"/> and unique
+    ///     <see cref="Environment.SpecialFolder"/>.
+    /// </summary>
+    /// <remarks>Must be configured before showing the dialog.</remarks>
+    public Func<Dictionary<IDirectoryInfo, string>> TreeRootGetter { get; set; }
+
+    /// <summary>Gets or sets the text on the 'Cancel' button.</summary>
+    public string CancelButtonText { get; set; } = Strings.btnCancel;
+
+    /// <summary>
+    ///     Gets or sets the format to use for date/times in the Modified column. Defaults to
+    ///     <see cref="DateTimeFormatInfo.SortableDateTimePattern"/> of the <see cref="CultureInfo.CurrentCulture"/>
+    /// </summary>
+    public string DateFormat { get; set; }
 
     /// <summary>
     ///     Gets or sets error message when user <see cref="OpenMode"/> is <see cref="OpenMode.File"/> and user enters the
@@ -85,15 +111,6 @@ public class FileDialogStyle {
     /// </summary>
     public string FileOrDirectoryMustExistFeedback { get; set; } = Strings.fdFileOrDirectoryMustExistFeedback;
 
-    /// <summary>
-    ///     Gets or sets whether to flip the order of the Ok and Cancel buttons. Defaults to false (Ok button then Cancel
-    ///     button). Set to true to show Cancel button on left then Ok button instead.
-    /// </summary>
-    public bool FlipOkCancelButtonLayoutOrder { get; set; }
-
-    /// <summary>Gets or sets the class responsible for determining which symbol to use to represent files and directories.</summary>
-    public FileSystemIconProvider IconProvider { get; set; } = new ();
-
     /// <summary>Gets or sets the header text displayed in the Modified column of the files table.</summary>
     public string ModifiedColumnName { get; set; } = Strings.fdModified;
 
@@ -109,31 +126,8 @@ public class FileDialogStyle {
     /// <summary>Gets or sets the header text displayed in the Size column of the files table.</summary>
     public string SizeColumnName { get; set; } = Strings.fdSize;
 
-    /// <summary>Gets the style settings for the table of files (in currently selected directory).</summary>
-    public TableStyle TableStyle { get; internal set; }
-
-    /// <summary>
-    ///     Gets or Sets the method for getting the root tree objects that are displayed in the collapse-able tree in the
-    ///     <see cref="FileDialog"/>.  Defaults to all accessible <see cref="System.Environment.GetLogicalDrives"/> and unique
-    ///     <see cref="Environment.SpecialFolder"/>.
-    /// </summary>
-    /// <remarks>Must be configured before showing the dialog.</remarks>
-    public Func<Dictionary<IDirectoryInfo, string>> TreeRootGetter { get; set; }
-
-    /// <summary>Gets the style settings for the collapse-able directory/places tree</summary>
-    public TreeStyle TreeStyle { get; internal set; }
-
     /// <summary>Gets or sets the header text displayed in the Type column of the files table.</summary>
     public string TypeColumnName { get; set; } = Strings.fdType;
-
-    /// <summary>
-    ///     Gets or Sets a value indicating whether different colors should be used for different file types/directories.
-    ///     Defaults to false.
-    /// </summary>
-    public bool UseColors { get; set; } = DefaultUseColors;
-
-    /// <summary>Gets or sets whether to use advanced unicode characters which might not be installed on all users computers.</summary>
-    public bool UseUnicodeCharacters { get; set; } = DefaultUseUnicodeCharacters;
 
     /// <summary>
     ///     Gets or sets error message when user attempts to select a file type that is not one of
@@ -141,8 +135,14 @@ public class FileDialogStyle {
     /// </summary>
     public string WrongFileTypeFeedback { get; set; } = Strings.fdWrongFileTypeFeedback;
 
+    /// <summary>Gets the style settings for the table of files (in currently selected directory).</summary>
+    public TableStyle TableStyle { get; internal set; }
+
+    /// <summary>Gets the style settings for the collapse-able directory/places tree</summary>
+    public TreeStyle TreeStyle { get; internal set; }
+
     private Dictionary<IDirectoryInfo, string> DefaultTreeRootGetter () {
-        Dictionary<IDirectoryInfo, string> roots = new Dictionary<IDirectoryInfo, string> ();
+        Dictionary<IDirectoryInfo, string> roots = new ();
         try {
             foreach (string d in GetLogicalDrives ()) {
                 IDirectoryInfo dir = _fileSystem.DirectoryInfo.New (d);

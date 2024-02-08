@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     <see cref="ISuggestionGenerator"/> which suggests from a collection of words those that match the
@@ -26,13 +26,13 @@ public class SingleWordSuggestionGenerator : ISuggestionGenerator {
         }
 
         return AllSuggestions.Where (
-                                     o =>
-                                         o.StartsWith (currentWord, StringComparison.CurrentCultureIgnoreCase) &&
-                                         !o.Equals (currentWord, StringComparison.CurrentCultureIgnoreCase)
-                                    )
-                             .Select (o => new Suggestion (currentWord.Length, o))
-                             .ToList ()
-                             .AsReadOnly ();
+                o =>
+                    o.StartsWith (currentWord, StringComparison.CurrentCultureIgnoreCase) &&
+                    !o.Equals (currentWord, StringComparison.CurrentCultureIgnoreCase)
+            )
+            .Select (o => new Suggestion (currentWord.Length, o))
+            .ToList ()
+            .AsReadOnly ();
     }
 
     /// <summary>

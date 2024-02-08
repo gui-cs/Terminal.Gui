@@ -26,68 +26,59 @@ public class TextViewAutocompletePopup : Scenario {
         var text = " jamp jemp jimp jomp jump";
 
         var menu = new MenuBar {
-                                   Menus =  [
-                                   new MenuBarItem ("_File", new[] {
-                                                                       _miMultiline =
-                                                                           new MenuItem (
-                                                                            "_Multiline",
-                                                                            "",
-                                                                            () => Multiline ())
-                                                                           { CheckType = MenuItemCheckStyle.Checked },
-                                                                       _miWrap = new MenuItem (
-                                                                            "_Word Wrap",
-                                                                            "",
-                                                                            () => WordWrap ())
-                                                                           { CheckType = MenuItemCheckStyle.Checked },
-                                                                       new ("_Quit", "", () => Quit ())
-                                                                   })
-                                       ]
-                               };
+            Menus = [
+                        new MenuBarItem (
+                            "_File",
+                            new[] {
+                                _miMultiline =
+                                    new MenuItem (
+                                        "_Multiline",
+                                        "",
+                                        () => Multiline ()
+                                    ) { CheckType = MenuItemCheckStyle.Checked },
+                                _miWrap = new MenuItem (
+                                    "_Word Wrap",
+                                    "",
+                                    () => WordWrap ()
+                                ) { CheckType = MenuItemCheckStyle.Checked },
+                                new ("_Quit", "", () => Quit ())
+                            }
+                        )
+                    ]
+        };
         Application.Top.Add (menu);
 
-        _textViewTopLeft = new TextView {
-                                            Width = width,
-                                            Height = _height,
-                                            Text = text
-                                        };
+        _textViewTopLeft = new TextView { Width = width, Height = _height, Text = text };
         _textViewTopLeft.DrawContent += TextViewTopLeft_DrawContent;
         Win.Add (_textViewTopLeft);
 
-        _textViewTopRight = new TextView {
-                                             X = Pos.AnchorEnd (width),
-                                             Width = width,
-                                             Height = _height,
-                                             Text = text
-                                         };
+        _textViewTopRight = new TextView { X = Pos.AnchorEnd (width), Width = width, Height = _height, Text = text };
         _textViewTopRight.DrawContent += TextViewTopRight_DrawContent;
         Win.Add (_textViewTopRight);
 
         _textViewBottomLeft = new TextView {
-                                               Y = Pos.AnchorEnd (_height),
-                                               Width = width,
-                                               Height = _height,
-                                               Text = text
-                                           };
+            Y = Pos.AnchorEnd (_height), Width = width, Height = _height, Text = text
+        };
         _textViewBottomLeft.DrawContent += TextViewBottomLeft_DrawContent;
         Win.Add (_textViewBottomLeft);
 
         _textViewBottomRight = new TextView {
-                                                X = Pos.AnchorEnd (width),
-                                                Y = Pos.AnchorEnd (_height),
-                                                Width = width,
-                                                Height = _height,
-                                                Text = text
-                                            };
+            X = Pos.AnchorEnd (width),
+            Y = Pos.AnchorEnd (_height),
+            Width = width,
+            Height = _height,
+            Text = text
+        };
         _textViewBottomRight.DrawContent += TextViewBottomRight_DrawContent;
         Win.Add (_textViewBottomRight);
 
         _textViewCentered = new TextView {
-                                             X = Pos.Center (),
-                                             Y = Pos.Center (),
-                                             Width = width,
-                                             Height = _height,
-                                             Text = text
-                                         };
+            X = Pos.Center (),
+            Y = Pos.Center (),
+            Width = width,
+            Height = _height,
+            Text = text
+        };
         _textViewCentered.DrawContent += TextViewCentered_DrawContent;
         Win.Add (_textViewCentered);
 
@@ -95,14 +86,16 @@ public class TextViewAutocompletePopup : Scenario {
         _miWrap.Checked = _textViewTopLeft.WordWrap;
 
         var statusBar = new StatusBar (
-                                       new[] {
-                                                 new (
-                                                      Application.QuitKey,
-                                                      $"{Application.QuitKey} to Quit",
-                                                      () => Quit ()),
-                                                 _siMultiline = new StatusItem (KeyCode.Null, "", null),
-                                                 _siWrap = new StatusItem (KeyCode.Null, "", null)
-                                             });
+            new[] {
+                new (
+                    Application.QuitKey,
+                    $"{Application.QuitKey} to Quit",
+                    () => Quit ()
+                ),
+                _siMultiline = new StatusItem (KeyCode.Null, "", null),
+                _siWrap = new StatusItem (KeyCode.Null, "", null)
+            }
+        );
         Application.Top.Add (statusBar);
 
         Win.LayoutStarted += Win_LayoutStarted;

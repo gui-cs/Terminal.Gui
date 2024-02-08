@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Terminal.Gui.ViewsTests; 
+namespace Terminal.Gui.ViewsTests;
 
 public class ProgressBarTests {
     [Fact]
@@ -13,8 +13,9 @@ public class ProgressBarTests {
         Assert.False (pb.CanFocus);
         Assert.Equal (0, pb.Fraction);
         Assert.Equal (
-                      new Attribute (Color.BrightGreen, Color.Gray),
-                      new Attribute (pb.ColorScheme.HotNormal.Foreground, pb.ColorScheme.HotNormal.Background));
+            new Attribute (Color.BrightGreen, Color.Gray),
+            new Attribute (pb.ColorScheme.HotNormal.Foreground, pb.ColorScheme.HotNormal.Background)
+        );
         Assert.Equal (Colors.ColorSchemes["Base"].Normal, pb.ColorScheme.Normal);
         Assert.Equal (1, pb.Height);
         Assert.Equal (ProgressBarStyle.Blocks, pb.ProgressBarStyle);
@@ -27,9 +28,7 @@ public class ProgressBarTests {
     public void Fraction_Redraw () {
         var driver = (FakeDriver)Application.Driver;
 
-        var pb = new ProgressBar {
-                                     Width = 5
-                                 };
+        var pb = new ProgressBar { Width = 5 };
 
         pb.BeginInit ();
         pb.EndInit ();
@@ -145,10 +144,8 @@ public class ProgressBarTests {
         var driver = (FakeDriver)Application.Driver;
 
         var pb = new ProgressBar {
-                                     Width = 15,
-                                     ProgressBarStyle = ProgressBarStyle.MarqueeBlocks,
-                                     BidirectionalMarquee = false
-                                 };
+            Width = 15, ProgressBarStyle = ProgressBarStyle.MarqueeBlocks, BidirectionalMarquee = false
+        };
 
         pb.BeginInit ();
         pb.EndInit ();
@@ -774,10 +771,7 @@ public class ProgressBarTests {
     public void Pulse_Redraw_BidirectionalMarquee_True_Default () {
         var driver = (FakeDriver)Application.Driver;
 
-        var pb = new ProgressBar {
-                                     Width = 15,
-                                     ProgressBarStyle = ProgressBarStyle.MarqueeBlocks
-                                 };
+        var pb = new ProgressBar { Width = 15, ProgressBarStyle = ProgressBarStyle.MarqueeBlocks };
 
         pb.BeginInit ();
         pb.EndInit ();

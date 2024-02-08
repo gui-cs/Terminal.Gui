@@ -4,7 +4,7 @@
 // <https://spectreconsole.net/best-practices>.
 //------------------------------------------------------------------------------
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>A <see cref="View"/> which displays (by default) a spinning line character.</summary>
 /// <remarks>
@@ -12,17 +12,6 @@ namespace Terminal.Gui;
 ///     <see cref="AutoSpin"/> to make the automate calls to <see cref="SpinnerView.AdvanceAnimation()"/>.
 /// </remarks>
 public class SpinnerView : View {
-    private const int DEFAULT_DELAY = 130;
-    private static readonly SpinnerStyle DEFAULT_STYLE = new SpinnerStyle.Line ();
-    private bool _bounce = DEFAULT_STYLE.SpinBounce;
-    private bool _bounceReverse;
-    private int _currentIdx;
-    private int _delay = DEFAULT_STYLE.SpinDelay;
-    private DateTime _lastRender = DateTime.MinValue;
-    private string[] _sequence = DEFAULT_STYLE.Sequence;
-    private SpinnerStyle _style = DEFAULT_STYLE;
-    private object _timeout;
-
     /// <summary>Creates a new instance of the <see cref="SpinnerView"/> class.</summary>
     public SpinnerView () {
         Width = 1;
@@ -34,6 +23,17 @@ public class SpinnerView : View {
 
         AdvanceAnimation ();
     }
+
+    private const int DEFAULT_DELAY = 130;
+    private static readonly SpinnerStyle DEFAULT_STYLE = new SpinnerStyle.Line ();
+    private bool _bounce = DEFAULT_STYLE.SpinBounce;
+    private bool _bounceReverse;
+    private DateTime _lastRender = DateTime.MinValue;
+    private int _currentIdx;
+    private int _delay = DEFAULT_STYLE.SpinDelay;
+    private object _timeout;
+    private SpinnerStyle _style = DEFAULT_STYLE;
+    private string[] _sequence = DEFAULT_STYLE.Sequence;
 
     /// <summary>
     ///     Gets or sets whether spinning should occur automatically or be manually triggered (e.g. from a background
@@ -59,14 +59,17 @@ public class SpinnerView : View {
     /// <summary>Gets whether the current spinner style contains only ASCII characters.  Also checks Custom sequences.</summary>
     public bool IsAsciiOnly => GetIsAsciiOnly ();
 
-    /// <summary>Gets or sets the animation frames used to animate the spinner.</summary>
-    public string[] Sequence { get => _sequence; set => SetSequence (value); }
-
     /// <summary>
     ///     Gets or sets whether spinner should go back and forth through the frames rather than going to the end and
     ///     starting again at the beginning.
     /// </summary>
     public bool SpinBounce { get => _bounce; set => SetBounce (value); }
+
+    /// <summary>
+    ///     Gets or sets whether spinner should go through the frames in reverse order. If SpinBounce is true, this sets
+    ///     the starting order.
+    /// </summary>
+    public bool SpinReverse { get; set; }
 
     /// <summary>Gets or sets the number of milliseconds to wait between characters in the animation.</summary>
     /// <remarks>
@@ -75,14 +78,11 @@ public class SpinnerView : View {
     /// </remarks>
     public int SpinDelay { get => _delay; set => SetDelay (value); }
 
-    /// <summary>
-    ///     Gets or sets whether spinner should go through the frames in reverse order. If SpinBounce is true, this sets
-    ///     the starting order.
-    /// </summary>
-    public bool SpinReverse { get; set; }
-
     /// <summary>Gets or sets the Style used to animate the spinner.</summary>
     public SpinnerStyle Style { get => _style; set => SetStyle (value); }
+
+    /// <summary>Gets or sets the animation frames used to animate the spinner.</summary>
+    public string[] Sequence { get => _sequence; set => SetSequence (value); }
 
     /// <summary>
     ///     Advances the animation frame and notifies main loop that repainting needs to happen. Repeated calls are
@@ -149,12 +149,13 @@ public class SpinnerView : View {
         }
 
         _timeout = Application.AddTimeout (
-                                           TimeSpan.FromMilliseconds (SpinDelay),
-                                           () => {
-                                               Application.Invoke (AdvanceAnimation);
+            TimeSpan.FromMilliseconds (SpinDelay),
+            () => {
+                Application.Invoke (AdvanceAnimation);
 
-                                               return true;
-                                           });
+                return true;
+            }
+        );
     }
 
     private bool GetIsAsciiOnly () {

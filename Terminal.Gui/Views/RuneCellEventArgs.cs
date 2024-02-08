@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>Args for events that relate to a specific <see cref="RuneCell"/>.</summary>
 public class RuneCellEventArgs {
@@ -12,15 +12,15 @@ public class RuneCellEventArgs {
         UnwrappedPosition = unwrappedPosition;
     }
 
-    /// <summary>The index of the RuneCell in the line.</summary>
-    public int Col { get; }
-
-    /// <summary>The list of runes the RuneCell is part of.</summary>
-    public List<RuneCell> Line { get; }
-
     /// <summary>
     ///     The unwrapped row and column index into the text containing the RuneCell. Unwrapped means the text without
     ///     word wrapping or other visual formatting having been applied.
     /// </summary>
     public (int Row, int Col) UnwrappedPosition { get; }
+
+    /// <summary>The index of the RuneCell in the line.</summary>
+    public int Col { get; }
+
+    /// <summary>The list of runes the RuneCell is part of.</summary>
+    public List<RuneCell> Line { get; }
 }

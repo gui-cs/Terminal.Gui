@@ -15,31 +15,66 @@ public class Sliders : Scenario {
 
         foreach (SliderType type in types) {
             var view = new Slider (options) {
-                                                Title = type.ToString (),
-                                                X = 0,
-                                                Y = prev == null ? 0 : Pos.Bottom (prev),
-                                                BorderStyle = LineStyle.Single,
-                                                Type = type,
-                                                AllowEmpty = true
-                                            };
+                Title = type.ToString (),
+                X = 0,
+                Y = prev == null ? 0 : Pos.Bottom (prev),
+                BorderStyle = LineStyle.Single,
+                Type = type,
+                AllowEmpty = true
+            };
             v.Add (view);
             prev = view;
         }
 
-        List<object> singleOptions = new List<object> {
-                                                          1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-                                                          19, 20, 21, 22,
-                                                          23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37,
-                                                          38, 39
-                                                      };
+        List<object> singleOptions = new() {
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39
+        };
         var single = new Slider (singleOptions) {
-                                                    Title = "Continuous",
-                                                    X = 0,
-                                                    Y = prev == null ? 0 : Pos.Bottom (prev),
-                                                    Type = SliderType.Single,
-                                                    BorderStyle = LineStyle.Single,
-                                                    AllowEmpty = false
-                                                };
+            Title = "Continuous",
+            X = 0,
+            Y = prev == null ? 0 : Pos.Bottom (prev),
+            Type = SliderType.Single,
+            BorderStyle = LineStyle.Single,
+            AllowEmpty = false
+        };
 
         single.LayoutStarted += (s, e) => {
             if (single.Orientation == Orientation.Horizontal) {
@@ -57,61 +92,67 @@ public class Sliders : Scenario {
 
         single.OptionsChanged += (s, e) => { single.Title = $"Continuous {e.Options.FirstOrDefault ().Key}"; };
 
-        List<object> oneOption = new List<object> { "The Only Option" };
+        List<object> oneOption = new() { "The Only Option" };
         var one = new Slider (oneOption) {
-                                             Title = "One Option",
-                                             X = 0,
-                                             Y = prev == null ? 0 : Pos.Bottom (single),
-                                             Type = SliderType.Single,
-                                             BorderStyle = LineStyle.Single,
-                                             AllowEmpty = false
-                                         };
+            Title = "One Option",
+            X = 0,
+            Y = prev == null ? 0 : Pos.Bottom (single),
+            Type = SliderType.Single,
+            BorderStyle = LineStyle.Single,
+            AllowEmpty = false
+        };
         v.Add (one);
     }
 
     public override void Setup () {
-        MakeSliders (Win, new List<object> { 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000 });
+        MakeSliders (
+            Win,
+            new List<object> {
+                500,
+                1000,
+                1500,
+                2000,
+                2500,
+                3000,
+                3500,
+                4000,
+                4500,
+                5000
+            }
+        );
         var configView = new FrameView {
-                                           Title = "Configuration",
-                                           X = Pos.Percent (50),
-                                           Y = 0,
-                                           Width = Dim.Fill (),
-                                           Height = Dim.Fill (),
-                                           ColorScheme = Colors.ColorSchemes["Dialog"]
-                                       };
+            Title = "Configuration",
+            X = Pos.Percent (50),
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            ColorScheme = Colors.ColorSchemes["Dialog"]
+        };
 
         Win.Add (configView);
 
         #region Config Slider
 
-        Slider<string> slider = new Slider<string> {
-                                                       Title = "Options",
-                                                       X = 0,
-                                                       Y = 0,
-                                                       Type = SliderType.Multiple,
-                                                       Width = Dim.Fill (),
-                                                       Height = 4,
-                                                       AllowEmpty = true,
-                                                       BorderStyle = LineStyle.Single
-                                                   };
+        Slider<string> slider = new() {
+            Title = "Options",
+            X = 0,
+            Y = 0,
+            Type = SliderType.Multiple,
+            Width = Dim.Fill (),
+            Height = 4,
+            AllowEmpty = true,
+            BorderStyle = LineStyle.Single
+        };
 
         slider.Style.SetChar.Attribute = new Attribute (Color.BrightGreen, Color.Black);
         slider.Style.LegendAttributes.SetAttribute = new Attribute (Color.Green, Color.Black);
 
         slider.Options = new List<SliderOption<string>> {
-                                                            new () {
-                                                                       Legend = "Legends"
-                                                                   },
-                                                            new () {
-                                                                       Legend = "RangeAllowSingle"
-                                                                   },
-                                                            new () {
-                                                                       Legend = "EndSpacing"
-                                                                   },
-                                                            new () {
-                                                                       Legend = "AutoSize"
-                                                                   }
-                                                        };
+            new () { Legend = "Legends" },
+            new () { Legend = "RangeAllowSingle" },
+            new () { Legend = "EndSpacing" },
+            new () { Legend = "AutoSize" }
+        };
 
         configView.Add (slider);
 
@@ -147,14 +188,14 @@ public class Sliders : Scenario {
 
         #region Slider Orientation Slider
 
-        Slider<string> slider_orientation_slider = new Slider<string> (new List<string> { "Horizontal", "Vertical" }) {
-                                                       Title = "Slider Orientation",
-                                                       X = 0,
-                                                       Y = Pos.Bottom (slider) + 1,
-                                                       Width = Dim.Fill (),
-                                                       Height = 4,
-                                                       BorderStyle = LineStyle.Single
-                                                   };
+        Slider<string> slider_orientation_slider = new (new List<string> { "Horizontal", "Vertical" }) {
+            Title = "Slider Orientation",
+            X = 0,
+            Y = Pos.Bottom (slider) + 1,
+            Width = Dim.Fill (),
+            Height = 4,
+            BorderStyle = LineStyle.Single
+        };
 
         slider_orientation_slider.SetOption (0);
 
@@ -211,14 +252,14 @@ public class Sliders : Scenario {
 
         #region Legends Orientation Slider
 
-        Slider<string> legends_orientation_slider = new Slider<string> (new List<string> { "Horizontal", "Vertical" }) {
-                                                        Title = "Legends Orientation",
-                                                        X = Pos.Center (),
-                                                        Y = Pos.Bottom (slider_orientation_slider) + 1,
-                                                        Width = Dim.Fill (),
-                                                        Height = 4,
-                                                        BorderStyle = LineStyle.Single
-                                                    };
+        Slider<string> legends_orientation_slider = new (new List<string> { "Horizontal", "Vertical" }) {
+            Title = "Legends Orientation",
+            X = Pos.Center (),
+            Y = Pos.Bottom (slider_orientation_slider) + 1,
+            Width = Dim.Fill (),
+            Height = 4,
+            BorderStyle = LineStyle.Single
+        };
 
         legends_orientation_slider.SetOption (0);
 
@@ -259,33 +300,35 @@ public class Sliders : Scenario {
             s.Style.RangeChar.Attribute = Win.GetNormalColor ();
         }
 
-        Slider<(Color, Color)> sliderFGColor = new Slider<(Color, Color)> {
-                                                                              Title = "FG Color",
-                                                                              X = 0,
-                                                                              Y = Pos.Bottom (
-                                                                               legends_orientation_slider) + 1,
-                                                                              Type = SliderType.Single,
-                                                                              BorderStyle = LineStyle.Single,
-                                                                              AllowEmpty = false,
-                                                                              Orientation = Orientation.Vertical,
-                                                                              LegendsOrientation =
-                                                                                  Orientation.Horizontal,
-                                                                              AutoSize = true
-                                                                          };
+        Slider<(Color, Color)> sliderFGColor = new() {
+            Title = "FG Color",
+            X = 0,
+            Y = Pos.Bottom (
+                    legends_orientation_slider
+                ) + 1,
+            Type = SliderType.Single,
+            BorderStyle = LineStyle.Single,
+            AllowEmpty = false,
+            Orientation = Orientation.Vertical,
+            LegendsOrientation =
+                Orientation.Horizontal,
+            AutoSize = true
+        };
 
         sliderFGColor.Style.SetChar.Attribute = new Attribute (Color.BrightGreen, Color.Black);
         sliderFGColor.Style.LegendAttributes.SetAttribute = new Attribute (Color.Green, Color.Blue);
 
-        List<SliderOption<(Color, Color)>> colorOptions = new List<SliderOption<(Color, Color)>> ();
+        List<SliderOption<(Color, Color)>> colorOptions = new ();
         foreach (ColorName colorIndex in Enum.GetValues<ColorName> ()) {
             var colorName = colorIndex.ToString ();
             colorOptions.Add (
-                              new SliderOption<(Color, Color)> {
-                                                                   Data = (new Color (colorIndex),
-                                                                           new Color (colorIndex)),
-                                                                   Legend = colorName,
-                                                                   LegendAbbr = (Rune)colorName[0]
-                                                               });
+                new SliderOption<(Color, Color)> {
+                    Data = (new Color (colorIndex),
+                            new Color (colorIndex)),
+                    Legend = colorName,
+                    LegendAbbr = (Rune)colorName[0]
+                }
+            );
         }
 
         sliderFGColor.Options = colorOptions;
@@ -298,16 +341,18 @@ public class Sliders : Scenario {
                 foreach (Slider s in Win.Subviews.OfType<Slider> ()) {
                     s.ColorScheme = new ColorScheme (s.ColorScheme);
                     s.ColorScheme = new ColorScheme (s.ColorScheme) {
-                                                                        Normal = new Attribute (
-                                                                         data.Item2,
-                                                                         s.ColorScheme.Normal.Background)
-                                                                    };
+                        Normal = new Attribute (
+                            data.Item2,
+                            s.ColorScheme.Normal.Background
+                        )
+                    };
 
                     s.Style.OptionChar.Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
                     s.Style.SetChar.Attribute = new Attribute (
-                                                               data.Item1,
-                                                               s.Style.SetChar.Attribute?.Background
-                                                               ?? s.ColorScheme.Normal.Background);
+                        data.Item1,
+                        s.Style.SetChar.Attribute?.Background
+                        ?? s.ColorScheme.Normal.Background
+                    );
                     s.Style.LegendAttributes.SetAttribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
                     s.Style.RangeChar.Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
                     s.Style.SpaceChar.Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
@@ -317,18 +362,18 @@ public class Sliders : Scenario {
             }
         };
 
-        Slider<(Color, Color)> sliderBGColor = new Slider<(Color, Color)> {
-                                                                              Title = "BG Color",
-                                                                              X = Pos.Right (sliderFGColor),
-                                                                              Y = Pos.Top (sliderFGColor),
-                                                                              Type = SliderType.Single,
-                                                                              BorderStyle = LineStyle.Single,
-                                                                              AllowEmpty = false,
-                                                                              Orientation = Orientation.Vertical,
-                                                                              LegendsOrientation =
-                                                                                  Orientation.Horizontal,
-                                                                              AutoSize = true
-                                                                          };
+        Slider<(Color, Color)> sliderBGColor = new() {
+            Title = "BG Color",
+            X = Pos.Right (sliderFGColor),
+            Y = Pos.Top (sliderFGColor),
+            Type = SliderType.Single,
+            BorderStyle = LineStyle.Single,
+            AllowEmpty = false,
+            Orientation = Orientation.Vertical,
+            LegendsOrientation =
+                Orientation.Horizontal,
+            AutoSize = true
+        };
 
         sliderBGColor.Style.SetChar.Attribute = new Attribute (Color.BrightGreen, Color.Black);
         sliderBGColor.Style.LegendAttributes.SetAttribute = new Attribute (Color.Green, Color.Blue);
@@ -343,10 +388,11 @@ public class Sliders : Scenario {
 
                 foreach (Slider s in Win.Subviews.OfType<Slider> ()) {
                     s.ColorScheme = new ColorScheme (s.ColorScheme) {
-                                                                        Normal = new Attribute (
-                                                                         s.ColorScheme.Normal.Foreground,
-                                                                         data.Item2)
-                                                                    };
+                        Normal = new Attribute (
+                            s.ColorScheme.Normal.Foreground,
+                            data.Item2
+                        )
+                    };
                 }
             }
         };

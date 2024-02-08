@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>Extension of <see cref="Stack{T}"/> helper to work with specific <see cref="IEqualityComparer{T}"/></summary>
 public static class StackExtensions {
@@ -28,7 +28,7 @@ public static class StackExtensions {
     public static Stack<T> FindDuplicates<T> (this Stack<T> stack, IEqualityComparer<T> comparer = null) {
         comparer = comparer ?? EqualityComparer<T>.Default;
 
-        Stack<T> dup = new Stack<T> ();
+        Stack<T> dup = new ();
         T[] stackArr = stack.ToArray ();
         for (var i = 0; i < stackArr.Length; i++) {
             T value = stackArr[i];
@@ -47,7 +47,7 @@ public static class StackExtensions {
     /// <typeparam name="T">The stack object type.</typeparam>
     /// <param name="stack">The stack object.</param>
     public static void MoveNext<T> (this Stack<T> stack) {
-        Stack<T> temp = new Stack<T> ();
+        Stack<T> temp = new ();
         T last = stack.Pop ();
         while (stack.Count > 0) {
             T value = stack.Pop ();
@@ -65,7 +65,7 @@ public static class StackExtensions {
     /// <typeparam name="T">The stack object type.</typeparam>
     /// <param name="stack">The stack object.</param>
     public static void MovePrevious<T> (this Stack<T> stack) {
-        Stack<T> temp = new Stack<T> ();
+        Stack<T> temp = new ();
         T first = default;
         while (stack.Count > 0) {
             T value = stack.Pop ();
@@ -100,7 +100,7 @@ public static class StackExtensions {
 
         comparer = comparer ?? EqualityComparer<T>.Default;
 
-        Stack<T> temp = new Stack<T> ();
+        Stack<T> temp = new ();
         var toMove = default (T);
         int stackCount = stack.Count;
         var count = 0;
@@ -142,7 +142,7 @@ public static class StackExtensions {
     ) {
         comparer = comparer ?? EqualityComparer<T>.Default;
 
-        Stack<T> temp = new Stack<T> ();
+        Stack<T> temp = new ();
         while (stack.Count > 0) {
             T value = stack.Pop ();
             if (comparer.Equals (value, valueToReplace)) {

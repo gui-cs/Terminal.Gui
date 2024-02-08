@@ -3,17 +3,12 @@
 namespace Terminal.Gui.ViewTests;
 
 public class AdornmentTests {
-    private readonly ITestOutputHelper _output;
     public AdornmentTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void BoundsToScreen_Uses_Parent_Not_SuperView () {
-        var parent = new View {
-                                  X = 1,
-                                  Y = 2,
-                                  Width = 10,
-                                  Height = 10
-                              };
+        var parent = new View { X = 1, Y = 2, Width = 10, Height = 10 };
 
         parent.BeginInit ();
         parent.EndInit ();
@@ -24,18 +19,13 @@ public class AdornmentTests {
         Assert.Equal (new Rect (0, 0, 10, 10), parent.Margin.Bounds);
 
         Assert.Null (parent.Margin.SuperView);
-        var boundsAsScreen = parent.Margin.BoundsToScreen (new Rect (1, 2, 5, 5));
+        Rect boundsAsScreen = parent.Margin.BoundsToScreen (new Rect (1, 2, 5, 5));
         Assert.Equal (new Rect (2, 4, 5, 5), boundsAsScreen);
     }
 
     [Fact]
     public void FrameToScreen_Uses_Parent_Not_SuperView () {
-        var parent = new View {
-                                  X = 1,
-                                  Y = 2,
-                                  Width = 10,
-                                  Height = 10
-                              };
+        var parent = new View { X = 1, Y = 2, Width = 10, Height = 10 };
 
         parent.BeginInit ();
         parent.EndInit ();
@@ -94,10 +84,7 @@ public class AdornmentTests {
 
     [Fact]
     public void Setting_Thickness_Changes_Parent_Bounds () {
-        var parent = new View {
-                                  Width = 10,
-                                  Height = 10
-                              };
+        var parent = new View { Width = 10, Height = 10 };
         parent.BeginInit ();
         parent.EndInit ();
 

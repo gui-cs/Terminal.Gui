@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Event arguments for the <see cref="Thickness"/> events.</summary>
 public class ThicknessEventArgs : EventArgs {

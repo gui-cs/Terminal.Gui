@@ -11,17 +11,6 @@ namespace Terminal.Gui;
 
 /// <summary>Provides a drop-down list of items the user can select from.</summary>
 public class ComboBox : View {
-    private readonly ComboListView _listview;
-    private readonly int _minimumHeight = 2;
-    private readonly TextField _search;
-    private readonly IList _searchset = new List<object> ();
-    private bool _autoHide = true;
-    private bool _hideDropdownListOnClick;
-    private int _lastSelectedItem = -1;
-    private int _selectedItem = -1;
-    private IListDataSource _source;
-    private string _text = "";
-
     /// <summary>Public constructor</summary>
     public ComboBox () {
         _search = new TextField ();
@@ -38,7 +27,8 @@ public class ComboBox : View {
         Initialized += (s, e) => ProcessLayout ();
 
         // On resize
-        LayoutComplete += (sender, a) => ProcessLayout ();;
+        LayoutComplete += (sender, a) => ProcessLayout ();
+        ;
 
         _listview.SelectedItemChanged += (sender, e) => {
             if (!HideDropdownListOnClick && _searchset.Count > 0) {
@@ -89,15 +79,16 @@ public class ComboBox : View {
         KeyBindings.Add (KeyCode.U | KeyCode.CtrlMask, Command.UnixEmulation);
     }
 
-    /// <inheritdoc/>
-    public new ColorScheme ColorScheme {
-        get => base.ColorScheme;
-        set {
-            _listview.ColorScheme = value;
-            base.ColorScheme = value;
-            SetNeedsDisplay ();
-        }
-    }
+    private readonly ComboListView _listview;
+    private readonly IList _searchset = new List<object> ();
+    private readonly int _minimumHeight = 2;
+    private readonly TextField _search;
+    private bool _autoHide = true;
+    private bool _hideDropdownListOnClick;
+    private IListDataSource _source;
+    private int _lastSelectedItem = -1;
+    private int _selectedItem = -1;
+    private string _text = "";
 
     /// <summary>Gets or sets if the drop-down list can be hide with a button click event.</summary>
     public bool HideDropdownListOnClick {
@@ -115,33 +106,19 @@ public class ComboBox : View {
             _search.ReadOnly = value;
             if (_search.ReadOnly) {
                 if (_search.ColorScheme != null) {
-                    _search.ColorScheme = new ColorScheme (_search.ColorScheme) {
-                                              Normal = _search.ColorScheme.Focus
-                                          };
+                    _search.ColorScheme = new ColorScheme (_search.ColorScheme) { Normal = _search.ColorScheme.Focus };
                 }
             }
         }
     }
 
-    /// <summary>Current search text</summary>
-    public string SearchText { get => _search.Text; set => SetSearchText (value); }
-
-    /// <summary>Gets the index of the currently selected item in the <see cref="Source"/></summary>
-    /// <value>The selected item or -1 none selected.</value>
-    public int SelectedItem {
-        get => _selectedItem;
+    /// <inheritdoc/>
+    public new ColorScheme ColorScheme {
+        get => base.ColorScheme;
         set {
-            if (_selectedItem != value && ((value == -1)
-                                           || (_source != null && value > -1 && value < _source.Count))) {
-                _selectedItem = _lastSelectedItem = value;
-                if (_selectedItem != -1) {
-                    SetValue (_source.ToList ()[_selectedItem].ToString (), true);
-                } else {
-                    SetValue ("", true);
-                }
-
-                OnSelectedChanged ();
-            }
+            _listview.ColorScheme = value;
+            base.ColorScheme = value;
+            SetNeedsDisplay ();
         }
     }
 
@@ -162,6 +139,28 @@ public class ComboBox : View {
             }
         }
     }
+
+    /// <summary>Gets the index of the currently selected item in the <see cref="Source"/></summary>
+    /// <value>The selected item or -1 none selected.</value>
+    public int SelectedItem {
+        get => _selectedItem;
+        set {
+            if (_selectedItem != value && ((value == -1)
+                                           || (_source != null && value > -1 && value < _source.Count))) {
+                _selectedItem = _lastSelectedItem = value;
+                if (_selectedItem != -1) {
+                    SetValue (_source.ToList ()[_selectedItem].ToString (), true);
+                } else {
+                    SetValue ("", true);
+                }
+
+                OnSelectedChanged ();
+            }
+        }
+    }
+
+    /// <summary>Current search text</summary>
+    public string SearchText { get => _search.Text; set => SetSearchText (value); }
 
     /// <summary>The currently selected list item</summary>
     public new string Text { get => _text; set => SetSearchText (value); }
@@ -339,9 +338,10 @@ public class ComboBox : View {
         }
 
         return Math.Min (
-                         Math.Max (Bounds.Height - 1, _minimumHeight - 1),
-                         _searchset?.Count > 0 ? _searchset.Count :
-                         IsShow ? Math.Max (Bounds.Height - 1, _minimumHeight - 1) : 0);
+            Math.Max (Bounds.Height - 1, _minimumHeight - 1),
+            _searchset?.Count > 0 ? _searchset.Count :
+            IsShow ? Math.Max (Bounds.Height - 1, _minimumHeight - 1) : 0
+        );
     }
 
     private bool CancelSelected () {
@@ -554,9 +554,10 @@ public class ComboBox : View {
             foreach (object item in _source.ToList ()) {
                 // Iterate to preserver object type and force deep copy
                 if (item.ToString ()
-                        .StartsWith (
-                                     _search.Text,
-                                     StringComparison.CurrentCultureIgnoreCase)) {
+                    .StartsWith (
+                        _search.Text,
+                        StringComparison.CurrentCultureIgnoreCase
+                    )) {
                     _searchset.Add (item);
                 }
             }
@@ -632,11 +633,6 @@ public class ComboBox : View {
     }
 
     private class ComboListView : ListView {
-        private ComboBox _container;
-        private bool _hideDropdownListOnClick;
-        private int _highlighted = -1;
-        private bool _isFocusing;
-
         public ComboListView (ComboBox container, bool hideDropdownListOnClick) {
             SetInitialProperties (container, hideDropdownListOnClick);
         }
@@ -645,6 +641,11 @@ public class ComboBox : View {
             Source = new ListWrapper (source);
             SetInitialProperties (container, hideDropdownListOnClick);
         }
+
+        private bool _hideDropdownListOnClick;
+        private bool _isFocusing;
+        private ComboBox _container;
+        private int _highlighted = -1;
 
         public bool HideDropdownListOnClick {
             get => _hideDropdownListOnClick;
@@ -729,11 +730,9 @@ public class ComboBox : View {
 
                     if (AllowsMarking) {
                         Driver.AddRune (
-                                        Source.IsMarked (item)
-                                            ? AllowsMultipleSelection ? Glyphs.Checked : Glyphs.Selected
-                                            : AllowsMultipleSelection
-                                                ? Glyphs.UnChecked
-                                                : Glyphs.UnSelected);
+                            Source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.Checked : Glyphs.Selected :
+                            AllowsMultipleSelection ? Glyphs.UnChecked : Glyphs.UnSelected
+                        );
                         Driver.AddRune ((Rune)' ');
                     }
 
@@ -780,8 +779,9 @@ public class ComboBox : View {
 
         private void SetInitialProperties (ComboBox container, bool hideDropdownListOnClick) {
             _container = container ?? throw new ArgumentNullException (
-                                                                       nameof (container),
-                                                                       "ComboBox container cannot be null.");
+                             nameof (container),
+                             "ComboBox container cannot be null."
+                         );
             HideDropdownListOnClick = hideDropdownListOnClick;
             AddCommand (Command.LineUp, () => _container.MoveUpList ());
         }

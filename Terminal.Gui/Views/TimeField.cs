@@ -12,14 +12,6 @@ namespace Terminal.Gui;
 /// <summary>Time editing <see cref="View"/></summary>
 /// <remarks>The <see cref="TimeField"/> <see cref="View"/> provides time editing functionality with mouse support.</remarks>
 public class TimeField : TextField {
-    private readonly int _longFieldLen = 8;
-    private readonly string _longFormat;
-    private readonly string _sepChar;
-    private readonly int _shortFieldLen = 5;
-    private readonly string _shortFormat;
-    private bool _isShort;
-    private TimeSpan _time;
-
     /// <summary>Initializes a new instance of <see cref="TimeField"/> using <see cref="LayoutStyle.Computed"/> positioning.</summary>
     public TimeField () {
         CultureInfo cultureInfo = CultureInfo.CurrentCulture;
@@ -33,19 +25,21 @@ public class TimeField : TextField {
 
         // Things this view knows how to do
         AddCommand (
-                    Command.DeleteCharRight,
-                    () => {
-                        DeleteCharRight ();
+            Command.DeleteCharRight,
+            () => {
+                DeleteCharRight ();
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.DeleteCharLeft,
-                    () => {
-                        DeleteCharLeft (false);
+            Command.DeleteCharLeft,
+            () => {
+                DeleteCharLeft (false);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (Command.LeftHome, () => MoveHome ());
         AddCommand (Command.Left, () => MoveLeft ());
         AddCommand (Command.RightEnd, () => MoveEnd ());
@@ -71,11 +65,13 @@ public class TimeField : TextField {
         KeyBindings.Add (Key.F.WithCtrl, Command.Right);
     }
 
-    /// <inheritdoc/>
-    public override int CursorPosition {
-        get => base.CursorPosition;
-        set => base.CursorPosition = Math.Max (Math.Min (value, FieldLength), 1);
-    }
+    private readonly int _longFieldLen = 8;
+    private readonly int _shortFieldLen = 5;
+    private readonly string _longFormat;
+    private readonly string _sepChar;
+    private readonly string _shortFormat;
+    private bool _isShort;
+    private TimeSpan _time;
 
     /// <summary>Get or sets whether <see cref="TimeField"/> uses the short or long time format.</summary>
     public bool IsShortFormat {
@@ -95,6 +91,12 @@ public class TimeField : TextField {
         }
     }
 
+    /// <inheritdoc/>
+    public override int CursorPosition {
+        get => base.CursorPosition;
+        set => base.CursorPosition = Math.Max (Math.Min (value, FieldLength), 1);
+    }
+
     /// <summary>Gets or sets the time of the <see cref="TimeField"/>.</summary>
     /// <remarks></remarks>
     public TimeSpan Time {
@@ -107,7 +109,7 @@ public class TimeField : TextField {
             TimeSpan oldTime = _time;
             _time = value;
             Text = " " + value.ToString (Format.Trim ());
-            DateTimeEventArgs<TimeSpan> args = new DateTimeEventArgs<TimeSpan> (oldTime, value, Format);
+            DateTimeEventArgs<TimeSpan> args = new (oldTime, value, Format);
             if (oldTime != value) {
                 OnTimeChanged (args);
             }
@@ -283,11 +285,10 @@ public class TimeField : TextField {
         List<Rune> newText = text.GetRange (0, CursorPosition);
         newText.Add (key);
         if (CursorPosition < FieldLength) {
-            newText =  [
-
-            .. newText,
-            .. text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))
-                ];
+            newText = [
+                          .. newText,
+                          .. text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))
+                      ];
         }
 
         return SetText (StringExtensions.ToString (newText));
@@ -303,7 +304,8 @@ public class TimeField : TextField {
         var isValidTime = true;
         int hour = int.Parse (vals[0]);
         int minute = int.Parse (vals[1]);
-        int second = _isShort ? 0 : vals.Length > 2 ? int.Parse (vals[2]) : 0;
+        int second = _isShort ? 0 :
+                     vals.Length > 2 ? int.Parse (vals[2]) : 0;
         if (hour < 0) {
             isValidTime = false;
             hour = 0;
@@ -339,11 +341,12 @@ public class TimeField : TextField {
                        : $" {hour,2:00}{_sepChar}{minute,2:00}{_sepChar}{second,2:00}";
 
         if (!TimeSpan.TryParseExact (
-                                     t.Trim (),
-                                     Format.Trim (),
-                                     CultureInfo.CurrentCulture,
-                                     TimeSpanStyles.None,
-                                     out TimeSpan result) ||
+                t.Trim (),
+                Format.Trim (),
+                CultureInfo.CurrentCulture,
+                TimeSpanStyles.None,
+                out TimeSpan result
+            ) ||
             !isValidTime) {
             return false;
         }
@@ -375,11 +378,12 @@ public class TimeField : TextField {
             }
 
             if (!TimeSpan.TryParseExact (
-                                         e.NewText.Trim (),
-                                         Format.Trim (),
-                                         CultureInfo.CurrentCulture,
-                                         TimeSpanStyles.None,
-                                         out TimeSpan result)) {
+                    e.NewText.Trim (),
+                    Format.Trim (),
+                    CultureInfo.CurrentCulture,
+                    TimeSpanStyles.None,
+                    out TimeSpan result
+                )) {
                 e.Cancel = true;
             }
 

@@ -21,6 +21,10 @@ namespace Terminal.Gui;
 public static class Clipboard {
     private static string _contents = string.Empty;
 
+    /// <summary>Returns true if the environmental dependencies are in place to interact with the OS clipboard.</summary>
+    /// <remarks></remarks>
+    public static bool IsSupported => Application.Driver.Clipboard.IsSupported;
+
     /// <summary>Gets (copies from) or sets (pastes to) the contents of the OS clipboard.</summary>
     public static string Contents {
         get {
@@ -58,10 +62,6 @@ public static class Clipboard {
             }
         }
     }
-
-    /// <summary>Returns true if the environmental dependencies are in place to interact with the OS clipboard.</summary>
-    /// <remarks></remarks>
-    public static bool IsSupported => Application.Driver.Clipboard.IsSupported;
 
     /// <summary>Copies the _contents of the OS clipboard to <paramref name="result"/> if possible.</summary>
     /// <param name="result">The _contents of the OS clipboard if successful, <see cref="string.Empty"/> if not.</param>
@@ -132,16 +132,16 @@ static class ClipboardProcessRunner {
         var output = string.Empty;
 
         using (var process = new Process {
-                                             StartInfo = new ProcessStartInfo {
-                                                                                  FileName = cmd,
-                                                                                  Arguments = arguments,
-                                                                                  RedirectStandardOutput = true,
-                                                                                  RedirectStandardError = true,
-                                                                                  RedirectStandardInput = true,
-                                                                                  UseShellExecute = false,
-                                                                                  CreateNoWindow = true
-                                                                              }
-                                         }) {
+                   StartInfo = new ProcessStartInfo {
+                       FileName = cmd,
+                       Arguments = arguments,
+                       RedirectStandardOutput = true,
+                       RedirectStandardError = true,
+                       RedirectStandardInput = true,
+                       UseShellExecute = false,
+                       CreateNoWindow = true
+                   }
+               }) {
             TaskCompletionSource<bool> eventHandled = new ();
             process.Start ();
             if (!string.IsNullOrEmpty (input)) {
@@ -161,9 +161,17 @@ static class ClipboardProcessRunner {
             }
 
             if (process.ExitCode > 0) {
-                output = $@"Process failed to run. Command line: {cmd} {arguments}.
-										Output: {output}
-										Error: {process.StandardError.ReadToEnd ()}";
+                output = $@"Process failed to run. Command line: {
+                    cmd
+                } {
+                    arguments
+                }.
+										Output: {
+                                            output
+                                        }
+										Error: {
+                                            process.StandardError.ReadToEnd ()
+                                        }";
             }
 
             return (process.ExitCode, output);

@@ -51,16 +51,9 @@ namespace Terminal.Gui;
 /// </code>
 /// </example>
 public class ThemeManager : IDictionary<string, ThemeScope> {
-    private static string _theme = string.Empty;
     static ThemeManager () { } // Make sure it's truly lazy
     private ThemeManager () { } // Prevent instantiation outside
-
-    /// <summary>Class is a singleton...</summary>
-    public static ThemeManager Instance { get; } = new ();
-
-    /// <summary>Gets or sets the currently selected theme. The value is persisted to the "Theme" property.</summary>
-    [JsonIgnore]
-    public string Theme { get => SelectedTheme; set => SelectedTheme = value; }
+    private static string _theme = string.Empty;
 
     /// <summary>Holds the <see cref="ThemeScope"/> definitions.</summary>
     [JsonInclude]
@@ -79,6 +72,13 @@ public class ThemeManager : IDictionary<string, ThemeScope> {
             //}
             Settings!["Themes"].PropertyValue = value;
     }
+
+    /// <summary>Gets or sets the currently selected theme. The value is persisted to the "Theme" property.</summary>
+    [JsonIgnore]
+    public string Theme { get => SelectedTheme; set => SelectedTheme = value; }
+
+    /// <summary>Class is a singleton...</summary>
+    public static ThemeManager Instance { get; } = new ();
 
     /// <summary>The currently selected theme. This is the internal version; see <see cref="Theme"/>.</summary>
     [JsonInclude]
@@ -106,8 +106,9 @@ public class ThemeManager : IDictionary<string, ThemeScope> {
         var theme = new ThemeScope ();
         theme.RetrieveValues ();
 
-        Themes = new Dictionary<string, ThemeScope> (StringComparer.InvariantCultureIgnoreCase)
-                 { { "Default", theme } };
+        Themes = new Dictionary<string, ThemeScope> (StringComparer.InvariantCultureIgnoreCase) {
+            { "Default", theme }
+        };
         SelectedTheme = "Default";
     }
 

@@ -5,7 +5,7 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>An <see cref="EventArgs"/> which allows passing a cancelable new text value event.</summary>
 public class TextChangingEventArgs : EventArgs {

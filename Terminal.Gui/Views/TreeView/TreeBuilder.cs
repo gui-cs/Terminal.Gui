@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>Abstract implementation of <see cref="ITreeBuilder{T}"/>.</summary>
 public abstract class TreeBuilder<T> : ITreeBuilder<T> {

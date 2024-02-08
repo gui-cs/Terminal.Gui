@@ -6,8 +6,6 @@ namespace Terminal.Gui;
 /// <summary>An exception thrown when something goes wrong when trying to parse a <see cref="Color"/>.</summary>
 /// <remarks>Contains additional information to help locate the problem. <br/> Not intended to be thrown by consumers.</remarks>
 public sealed class ColorParseException : FormatException {
-    internal const string DefaultMessage = "Failed to parse text as Color.";
-
     internal ColorParseException (string colorString, string? message, Exception? innerException = null) :
         base (message ?? DefaultMessage, innerException) {
         ColorString = colorString;
@@ -51,6 +49,12 @@ public sealed class ColorParseException : FormatException {
         Reason = reason;
     }
 
+    internal const string DefaultMessage = "Failed to parse text as Color.";
+
+    /// <summary>Gets the text that failed to parse, as a <see langword="string"/></summary>
+    /// <remarks>Is marked <see langword="required"/>, so must be set by a constructor or initializer.</remarks>
+    public string ColorString { get; }
+
     /// <summary>Gets the substring of <see cref="ColorString"/> caused this exception, as a <see langword="string"/></summary>
     /// <remarks>May be null or empty - only set if known.</remarks>
     public string? BadValue { get; }
@@ -58,10 +62,6 @@ public sealed class ColorParseException : FormatException {
     /// <summary>Gets the name of the color component corresponding to <see cref="BadValue"/>, if known.</summary>
     /// <remarks>May be null or empty - only set if known.</remarks>
     public string? BadValueName { get; }
-
-    /// <summary>Gets the text that failed to parse, as a <see langword="string"/></summary>
-    /// <remarks>Is marked <see langword="required"/>, so must be set by a constructor or initializer.</remarks>
-    public string ColorString { get; }
 
     /// <summary>Gets the reason that <see cref="BadValue"/> failed to parse, if known.</summary>
     /// <remarks>May be null or empty - only set if known.</remarks>

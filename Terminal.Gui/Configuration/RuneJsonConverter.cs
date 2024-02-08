@@ -22,11 +22,13 @@ class RuneJsonConverter : JsonConverter<Rune> {
                     || value.StartsWith ("\\U", StringComparison.OrdinalIgnoreCase)) {
                     // Handle encoded single char, surrogate pair, or combining mark + char
                     uint[] codePoints = Regex.Matches (value, @"(?:\\[uU]\+?|U\+)([0-9A-Fa-f]{1,8})")
-                                             .Select (
-                                                      match => uint.Parse (
-                                                                           match.Groups[1].Value,
-                                                                           NumberStyles.HexNumber))
-                                             .ToArray ();
+                        .Select (
+                            match => uint.Parse (
+                                match.Groups[1].Value,
+                                NumberStyles.HexNumber
+                            )
+                        )
+                        .ToArray ();
 
                     if ((codePoints.Length == 0) || (codePoints.Length > 2)) {
                         throw new JsonException ($"Invalid Rune: {value}.");

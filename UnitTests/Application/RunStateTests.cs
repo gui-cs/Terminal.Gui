@@ -1,7 +1,6 @@
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.ApplicationTests; 
+namespace Terminal.Gui.ApplicationTests;
 
 /// <summary>These tests focus on Application.RunState and the various ways it can be changed.</summary>
 public class RunStateTests {

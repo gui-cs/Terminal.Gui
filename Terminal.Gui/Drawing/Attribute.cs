@@ -87,8 +87,9 @@ public readonly struct Attribute : IEquatable<Attribute> {
     /// <param name="foregroundName">Foreground</param>
     /// <param name="backgroundName">Background</param>
     public Attribute (in ColorName foregroundName, in ColorName backgroundName) : this (
-                                                                                        new Color (foregroundName),
-                                                                                        new Color (backgroundName)) { }
+        new Color (foregroundName),
+        new Color (backgroundName)
+    ) { }
 
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="foregroundName">Foreground</param>

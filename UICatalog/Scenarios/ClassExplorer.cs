@@ -22,55 +22,44 @@ public class ClassExplorer : Scenario {
         Win.Height = Dim.Fill (1); // status bar
 
         var menu = new MenuBar {
-                                   Menus =  [
-                                   new MenuBarItem ("_File", new MenuItem[] {
-                                                                                new ("_Quit", "", () => Quit ())
-                                                                            }),
-                                   new MenuBarItem (
-                                                    "_View",
-                                                    new[] {
-                                                              _miShowPrivate =
-                                                                  new MenuItem (
-                                                                                "_Include Private",
-                                                                                "",
-                                                                                () => ShowPrivate ()) {
-                                                                      Checked = false,
-                                                                      CheckType = MenuItemCheckStyle.Checked
-                                                                  },
-                                                              new ("_Expand All", "", () => _treeView.ExpandAll ()),
-                                                              new ("_Collapse All", "", () => _treeView.CollapseAll ())
-                                                          }),
-                                   new MenuBarItem (
-                                                    "_Style",
-                                                    new[] {
-                                                              _highlightModelTextOnly = new MenuItem (
-                                                               "_Highlight Model Text Only",
-                                                               "",
-                                                               () => OnCheckHighlightModelTextOnly ()) {
-                                                                  CheckType = MenuItemCheckStyle.Checked
-                                                              }
-                                                          })
-                                       ]
-                               };
+            Menus = [
+                        new MenuBarItem ("_File", new MenuItem[] { new ("_Quit", "", () => Quit ()) }),
+                        new MenuBarItem (
+                            "_View",
+                            new[] {
+                                _miShowPrivate =
+                                    new MenuItem (
+                                        "_Include Private",
+                                        "",
+                                        () => ShowPrivate ()
+                                    ) { Checked = false, CheckType = MenuItemCheckStyle.Checked },
+                                new ("_Expand All", "", () => _treeView.ExpandAll ()),
+                                new ("_Collapse All", "", () => _treeView.CollapseAll ())
+                            }
+                        ),
+                        new MenuBarItem (
+                            "_Style",
+                            new[] {
+                                _highlightModelTextOnly = new MenuItem (
+                                    "_Highlight Model Text Only",
+                                    "",
+                                    () => OnCheckHighlightModelTextOnly ()
+                                ) { CheckType = MenuItemCheckStyle.Checked }
+                            }
+                        )
+                    ]
+        };
         Application.Top.Add (menu);
 
-        _treeView = new TreeView<object> {
-                                             X = 0,
-                                             Y = 1,
-                                             Width = Dim.Percent (50),
-                                             Height = Dim.Fill ()
-                                         };
+        _treeView = new TreeView<object> { X = 0, Y = 1, Width = Dim.Percent (50), Height = Dim.Fill () };
 
         var lblSearch = new Label { Text = "Search" };
-        var tfSearch = new TextField {
-                                         Width = 20,
-                                         X = Pos.Right (lblSearch)
-                                     };
+        var tfSearch = new TextField { Width = 20, X = Pos.Right (lblSearch) };
 
         Win.Add (lblSearch);
         Win.Add (tfSearch);
 
-        TreeViewTextFilter<object> filter = new TreeViewTextFilter<object> (_treeView);
+        TreeViewTextFilter<object> filter = new (_treeView);
         _treeView.Filter = filter;
         tfSearch.TextChanged += (s, e) => {
             filter.Text = tfSearch.Text;
@@ -86,12 +75,7 @@ public class ClassExplorer : Scenario {
 
         Win.Add (_treeView);
 
-        _textView = new TextView {
-                                     X = Pos.Right (_treeView),
-                                     Y = 0,
-                                     Width = Dim.Fill (),
-                                     Height = Dim.Fill ()
-                                 };
+        _textView = new TextView { X = Pos.Right (_treeView), Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
         Win.Add (_textView);
     }
@@ -107,10 +91,10 @@ public class ClassExplorer : Scenario {
             if (arg is Type t) {
                 // Note that here we cannot simply return the enum values as the same object cannot appear under multiple branches
                 return Enum.GetValues (typeof (Showable))
-                           .Cast<Showable> ()
+                    .Cast<Showable> ()
 
-                           // Although we new the Type every time the delegate is called state is preserved because the class has appropriate equality members
-                           .Select (v => new ShowForType (v, t));
+                    // Although we new the Type every time the delegate is called state is preserved because the class has appropriate equality members
+                    .Select (v => new ShowForType (v, t));
             }
 
             if (arg is ShowForType show) {
@@ -221,7 +205,7 @@ public class ClassExplorer : Scenario {
                     sb.AppendLine ($"Name:{ev.Name}");
                     sb.AppendLine ("Parameters:");
                     foreach (ParameterInfo parameter in ev.EventHandlerType.GetMethod ("Invoke")
-                                                          .GetParameters ()) {
+                                 .GetParameters ()) {
                         sb.AppendLine ($"  {parameter.ParameterType} {parameter.Name}");
                     }
                 }

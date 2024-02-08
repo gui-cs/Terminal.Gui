@@ -26,26 +26,26 @@ public class ProgressBarStyles : Scenario {
         ConfigurationManager.Apply ();
 
         var editor = new AdornmentsEditor {
-                                              Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
-                                              BorderStyle = LineStyle.Single
-                                          };
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}", BorderStyle = LineStyle.Single
+        };
         editor.ColorScheme = Colors.ColorSchemes[TopLevelColorScheme];
 
         const float fractionStep = 0.01F;
 
         var pbList = new ListView {
-                                      Title = "Focused ProgressBar",
-                                      Y = 0,
-                                      X = Pos.Center (),
-                                      Width = 30,
-                                      Height = 7,
-                                      BorderStyle = LineStyle.Single
-                                  };
+            Title = "Focused ProgressBar",
+            Y = 0,
+            X = Pos.Center (),
+            Width = 30,
+            Height = 7,
+            BorderStyle = LineStyle.Single
+        };
         pbList.SelectedItemChanged += (sender, e) => {
             editor.ViewToEdit = editor.Subviews.First (
-                                                       v =>
-                                                           v.GetType () == typeof (ProgressBar)
-                                                           && v.Title == (string)e.Value);
+                v =>
+                    v.GetType () == typeof (ProgressBar)
+                    && v.Title == (string)e.Value
+            );
         };
         editor.Add (pbList);
         pbList.SelectedItem = 0;
@@ -53,14 +53,9 @@ public class ProgressBarStyles : Scenario {
         #region ColorPicker
 
         ColorName ChooseColor (string text, ColorName colorName) {
-            var colorPicker = new ColorPicker {
-                                                  Title = text,
-                                                  SelectedColor = colorName
-                                              };
+            var colorPicker = new ColorPicker { Title = text, SelectedColor = colorName };
 
-            var dialog = new Dialog {
-                                        Title = text
-                                    };
+            var dialog = new Dialog { Title = text };
 
             dialog.LayoutComplete += (sender, args) => {
                 // TODO: Replace with Dim.Auto
@@ -83,42 +78,42 @@ public class ProgressBarStyles : Scenario {
         }
 
         var fgColorPickerBtn = new Button {
-                                              Text = "Foreground HotNormal Color",
-                                              X = Pos.Center (),
-                                              Y = Pos.Bottom (pbList)
-                                          };
+            Text = "Foreground HotNormal Color", X = Pos.Center (), Y = Pos.Bottom (pbList)
+        };
         editor.Add (fgColorPickerBtn);
         fgColorPickerBtn.Clicked += (s, e) => {
             ColorName newColor = ChooseColor (
-                                              fgColorPickerBtn.Text,
-                                              editor.ViewToEdit.ColorScheme.HotNormal.Foreground
-                                                    .GetClosestNamedColor ());
+                fgColorPickerBtn.Text,
+                editor.ViewToEdit.ColorScheme.HotNormal.Foreground
+                    .GetClosestNamedColor ()
+            );
             var cs = new ColorScheme (editor.ViewToEdit.ColorScheme) {
-                                                                         HotNormal = new Attribute (
-                                                                          newColor,
-                                                                          editor.ViewToEdit.ColorScheme.HotNormal
-                                                                              .Background)
-                                                                     };
+                HotNormal = new Attribute (
+                    newColor,
+                    editor.ViewToEdit.ColorScheme.HotNormal
+                        .Background
+                )
+            };
             editor.ViewToEdit.ColorScheme = cs;
         };
 
         var bgColorPickerBtn = new Button {
-                                              X = Pos.Center (),
-                                              Y = Pos.Bottom (fgColorPickerBtn),
-                                              Text = "Background HotNormal Color"
-                                          };
+            X = Pos.Center (), Y = Pos.Bottom (fgColorPickerBtn), Text = "Background HotNormal Color"
+        };
         editor.Add (bgColorPickerBtn);
         bgColorPickerBtn.Clicked += (s, e) => {
             ColorName newColor = ChooseColor (
-                                              fgColorPickerBtn.Text,
-                                              editor.ViewToEdit.ColorScheme.HotNormal.Background
-                                                    .GetClosestNamedColor ());
+                fgColorPickerBtn.Text,
+                editor.ViewToEdit.ColorScheme.HotNormal.Background
+                    .GetClosestNamedColor ()
+            );
             var cs = new ColorScheme (editor.ViewToEdit.ColorScheme) {
-                                                                         HotNormal = new Attribute (
-                                                                          editor.ViewToEdit.ColorScheme.HotNormal
-                                                                              .Foreground,
-                                                                          newColor)
-                                                                     };
+                HotNormal = new Attribute (
+                    editor.ViewToEdit.ColorScheme.HotNormal
+                        .Foreground,
+                    newColor
+                )
+            };
             editor.ViewToEdit.ColorScheme = cs;
         };
 
@@ -127,40 +122,36 @@ public class ProgressBarStyles : Scenario {
         List<ProgressBarFormat> pbFormatEnum =
             Enum.GetValues (typeof (ProgressBarFormat)).Cast<ProgressBarFormat> ().ToList ();
         var rbPBFormat = new RadioGroup {
-                                            BorderStyle = LineStyle.Single,
-                                            Title = "ProgressBarFormat",
-                                            X = Pos.Left (pbList),
-                                            Y = Pos.Bottom (bgColorPickerBtn) + 1,
-                                            RadioLabels = pbFormatEnum.Select (e => e.ToString ()).ToArray ()
-                                        };
+            BorderStyle = LineStyle.Single,
+            Title = "ProgressBarFormat",
+            X = Pos.Left (pbList),
+            Y = Pos.Bottom (bgColorPickerBtn) + 1,
+            RadioLabels = pbFormatEnum.Select (e => e.ToString ()).ToArray ()
+        };
         editor.Add (rbPBFormat);
 
-        var button = new Button {
-                                    X = Pos.Center (),
-                                    Y = Pos.Bottom (rbPBFormat) + 1,
-                                    Text = "Start timer"
-                                };
+        var button = new Button { X = Pos.Center (), Y = Pos.Bottom (rbPBFormat) + 1, Text = "Start timer" };
 
         editor.Add (button);
         var blocksPB = new ProgressBar {
-                                           Title = "Blocks",
-                                           X = Pos.Center (),
-                                           Y = Pos.Bottom (button) + 1,
-                                           Width = Dim.Width (pbList),
-                                           BorderStyle = LineStyle.Single,
-                                           CanFocus = true
-                                       };
+            Title = "Blocks",
+            X = Pos.Center (),
+            Y = Pos.Bottom (button) + 1,
+            Width = Dim.Width (pbList),
+            BorderStyle = LineStyle.Single,
+            CanFocus = true
+        };
         editor.Add (blocksPB);
 
         var continuousPB = new ProgressBar {
-                                               Title = "Continuous",
-                                               X = Pos.Center (),
-                                               Y = Pos.Bottom (blocksPB) + 1,
-                                               Width = Dim.Width (pbList),
-                                               ProgressBarStyle = ProgressBarStyle.Continuous,
-                                               BorderStyle = LineStyle.Single,
-                                               CanFocus = true
-                                           };
+            Title = "Continuous",
+            X = Pos.Center (),
+            Y = Pos.Bottom (blocksPB) + 1,
+            Width = Dim.Width (pbList),
+            ProgressBarStyle = ProgressBarStyle.Continuous,
+            BorderStyle = LineStyle.Single,
+            CanFocus = true
+        };
         editor.Add (continuousPB);
 
         button.Clicked += (s, e) => {
@@ -170,58 +161,57 @@ public class ProgressBarStyles : Scenario {
                 continuousPB.Fraction = 0;
                 float fractionSum = 0;
                 _fractionTimer = new Timer (
-                                            _ => {
-                                                fractionSum += fractionStep;
-                                                blocksPB.Fraction = fractionSum;
-                                                continuousPB.Fraction = fractionSum;
-                                                if (fractionSum > 1) {
-                                                    _fractionTimer.Dispose ();
-                                                    _fractionTimer = null;
-                                                    button.Enabled = true;
-                                                }
+                    _ => {
+                        fractionSum += fractionStep;
+                        blocksPB.Fraction = fractionSum;
+                        continuousPB.Fraction = fractionSum;
+                        if (fractionSum > 1) {
+                            _fractionTimer.Dispose ();
+                            _fractionTimer = null;
+                            button.Enabled = true;
+                        }
 
-                                                Application.Wakeup ();
-                                            },
-                                            null,
-                                            0,
-                                            _timerTick);
+                        Application.Wakeup ();
+                    },
+                    null,
+                    0,
+                    _timerTick
+                );
             }
         };
 
         var ckbBidirectional = new CheckBox {
-                                                X = Pos.Center (),
-                                                Y = Pos.Bottom (continuousPB) + 1,
-                                                Text = "BidirectionalMarquee",
-                                                Checked = true
-                                            };
+            X = Pos.Center (), Y = Pos.Bottom (continuousPB) + 1, Text = "BidirectionalMarquee", Checked = true
+        };
         editor.Add (ckbBidirectional);
 
         var marqueesBlocksPB = new ProgressBar {
-                                                   Title = "Marquee Blocks",
-                                                   X = Pos.Center (),
-                                                   Y = Pos.Bottom (ckbBidirectional) + 1,
-                                                   Width = Dim.Width (pbList),
-                                                   ProgressBarStyle = ProgressBarStyle.MarqueeBlocks,
-                                                   BorderStyle = LineStyle.Single,
-                                                   CanFocus = true
-                                               };
+            Title = "Marquee Blocks",
+            X = Pos.Center (),
+            Y = Pos.Bottom (ckbBidirectional) + 1,
+            Width = Dim.Width (pbList),
+            ProgressBarStyle = ProgressBarStyle.MarqueeBlocks,
+            BorderStyle = LineStyle.Single,
+            CanFocus = true
+        };
         editor.Add (marqueesBlocksPB);
 
         var marqueesContinuousPB = new ProgressBar {
-                                                       Title = "Marquee Continuous",
-                                                       X = Pos.Center (),
-                                                       Y = Pos.Bottom (marqueesBlocksPB) + 1,
-                                                       Width = Dim.Width (pbList),
-                                                       ProgressBarStyle = ProgressBarStyle.MarqueeContinuous,
-                                                       BorderStyle = LineStyle.Single,
-                                                       CanFocus = true
-                                                   };
+            Title = "Marquee Continuous",
+            X = Pos.Center (),
+            Y = Pos.Bottom (marqueesBlocksPB) + 1,
+            Width = Dim.Width (pbList),
+            ProgressBarStyle = ProgressBarStyle.MarqueeContinuous,
+            BorderStyle = LineStyle.Single,
+            CanFocus = true
+        };
         editor.Add (marqueesContinuousPB);
 
         pbList.SetSource (
-                          editor.Subviews.Where (v => v.GetType () == typeof (ProgressBar))
-                                .Select (v => v.Title)
-                                .ToList ());
+            editor.Subviews.Where (v => v.GetType () == typeof (ProgressBar))
+                .Select (v => v.Title)
+                .ToList ()
+        );
         pbList.SelectedItem = 0;
 
         rbPBFormat.SelectedItemChanged += (s, e) => {
@@ -237,16 +227,17 @@ public class ProgressBarStyles : Scenario {
         };
 
         _pulseTimer = new Timer (
-                                 _ => {
-                                     marqueesBlocksPB.Text =
-                                         marqueesContinuousPB.Text = DateTime.Now.TimeOfDay.ToString ();
-                                     marqueesBlocksPB.Pulse ();
-                                     marqueesContinuousPB.Pulse ();
-                                     Application.Wakeup ();
-                                 },
-                                 null,
-                                 0,
-                                 300);
+            _ => {
+                marqueesBlocksPB.Text =
+                    marqueesContinuousPB.Text = DateTime.Now.TimeOfDay.ToString ();
+                marqueesBlocksPB.Pulse ();
+                marqueesContinuousPB.Pulse ();
+                Application.Wakeup ();
+            },
+            null,
+            0,
+            300
+        );
 
         Application.Top.Unloaded += Top_Unloaded;
 

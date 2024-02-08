@@ -19,9 +19,6 @@ namespace Terminal.Gui;
 ///     </para>
 /// </remarks>
 public partial class Toplevel : View {
-    internal static Point? _dragPosition;
-    private Point _startGrabPoint;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="Toplevel"/> class with <see cref="LayoutStyle.Computed"/> layout,
     ///     defaulting to full screen. The <see cref="View.Width"/> and <see cref="View.Height"/> properties will be set to the
@@ -42,55 +39,62 @@ public partial class Toplevel : View {
 
         // Things this view knows how to do
         AddCommand (
-                    Command.QuitToplevel,
-                    () => {
-                        QuitToplevel ();
+            Command.QuitToplevel,
+            () => {
+                QuitToplevel ();
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.Suspend,
-                    () => {
-                        Driver.Suspend ();
-                        ;
+            Command.Suspend,
+            () => {
+                Driver.Suspend ();
+                ;
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.NextView,
-                    () => {
-                        MoveNextView ();
+            Command.NextView,
+            () => {
+                MoveNextView ();
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.PreviousView,
-                    () => {
-                        MovePreviousView ();
+            Command.PreviousView,
+            () => {
+                MovePreviousView ();
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.NextViewOrTop,
-                    () => {
-                        MoveNextViewOrTop ();
+            Command.NextViewOrTop,
+            () => {
+                MoveNextViewOrTop ();
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.PreviousViewOrTop,
-                    () => {
-                        MovePreviousViewOrTop ();
+            Command.PreviousViewOrTop,
+            () => {
+                MovePreviousViewOrTop ();
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.Refresh,
-                    () => {
-                        Application.Refresh ();
+            Command.Refresh,
+            () => {
+                Application.Refresh ();
 
-                        return true;
-                    });
+                return true;
+            }
+        );
 
         // Default keybindings for this view
         KeyBindings.Add (Application.QuitKey, Command.QuitToplevel);
@@ -118,6 +122,9 @@ public partial class Toplevel : View {
 #endif
     }
 
+    internal static Point? _dragPosition;
+    private Point _startGrabPoint;
+
     /// <summary>Gets or sets a value indicating whether this <see cref="Toplevel"/> can focus.</summary>
     /// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>
     public override bool CanFocus => SuperView == null ? true : base.CanFocus;
@@ -127,9 +134,6 @@ public partial class Toplevel : View {
     ///     <see langword="false"/>, otherwise.
     /// </summary>
     public bool IsLoaded { get; private set; }
-
-    /// <summary>Gets or sets the menu for this Toplevel.</summary>
-    public virtual MenuBar MenuBar { get; set; }
 
     /// <summary>
     ///     Determines whether the <see cref="Toplevel"/> is modal or not. If set to <c>false</c> (the default):
@@ -156,6 +160,9 @@ public partial class Toplevel : View {
     /// <summary>Gets or sets whether the main loop for this <see cref="Toplevel"/> is running or not.</summary>
     /// <remarks>Setting this property directly is discouraged. Use <see cref="Application.RequestStop"/> instead.</remarks>
     public bool Running { get; set; }
+
+    /// <summary>Gets or sets the menu for this Toplevel.</summary>
+    public virtual MenuBar MenuBar { get; set; }
 
     /// <summary>Gets or sets the status bar for this Toplevel.</summary>
     public virtual StatusBar StatusBar { get; set; }
@@ -258,17 +265,18 @@ public partial class Toplevel : View {
 
                 // BUGBUG: Assumes Frame == Border?
                 GetLocationThatFits (
-                                     this,
-                                     mouseEvent.X + (SuperView == null
-                                                         ? mouseEvent.OfX - _startGrabPoint.X
-                                                         : Frame.X - _startGrabPoint.X),
-                                     mouseEvent.Y + (SuperView == null
-                                                         ? mouseEvent.OfY - _startGrabPoint.Y
-                                                         : Frame.Y - _startGrabPoint.Y),
-                                     out nx,
-                                     out ny,
-                                     out _,
-                                     out _);
+                    this,
+                    mouseEvent.X + (SuperView == null
+                                        ? mouseEvent.OfX - _startGrabPoint.X
+                                        : Frame.X - _startGrabPoint.X),
+                    mouseEvent.Y + (SuperView == null
+                                        ? mouseEvent.OfY - _startGrabPoint.Y
+                                        : Frame.Y - _startGrabPoint.Y),
+                    out nx,
+                    out ny,
+                    out _,
+                    out _
+                );
 
                 _dragPosition = new Point (nx, ny);
                 X = nx;
@@ -415,13 +423,14 @@ public partial class Toplevel : View {
     /// <param name="top">The Toplevel to adjust.</param>
     public virtual void PositionToplevel (Toplevel top) {
         View superView = GetLocationThatFits (
-                                              top,
-                                              top.Frame.X,
-                                              top.Frame.Y,
-                                              out int nx,
-                                              out int ny,
-                                              out _,
-                                              out StatusBar sb);
+            top,
+            top.Frame.X,
+            top.Frame.Y,
+            out int nx,
+            out int ny,
+            out _,
+            out StatusBar sb
+        );
         var layoutSubviews = false;
         var maxWidth = 0;
         if (superView.Margin != null && superView == top.SuperView) {

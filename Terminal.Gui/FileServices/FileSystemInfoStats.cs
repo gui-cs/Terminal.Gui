@@ -2,28 +2,13 @@
 using System.IO.Abstractions;
 using Terminal.Gui.Resources;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 ///     Wrapper for <see cref="FileSystemInfo"/> that contains additional information (e.g. <see cref="IsParent"/>)
 ///     and helper methods.
 /// </summary>
 class FileSystemInfoStats {
-    /* ---- Colors used by the ls command line tool ----
-     *
-    * Blue: Directory
-    * Green: Executable or recognized data file
-    * Cyan (Sky Blue): Symbolic link file
-    * Yellow with black background: Device
-    * Magenta (Pink): Graphic image file
-    * Red: Archive file
-    * Red with black background: Broken link
-    */
-    private const long ByteConversion = 1024;
-    private static readonly List<string> ExecutableExtensions = new() { ".EXE", ".BAT" };
-    private static readonly List<string> ImageExtensions = new() { ".JPG", ".JPEG", ".JPE", ".BMP", ".GIF", ".PNG" };
-    private static readonly string[] SizeSuffixes = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
-
     /// <summary>Initializes a new instance of the <see cref="FileSystemInfoStats"/> class.</summary>
     /// <param name="fsi">The directory of path to wrap.</param>
     /// <param name="culture"></param>
@@ -42,10 +27,29 @@ class FileSystemInfoStats {
         }
     }
 
-    /// <summary>Gets the wrapped <see cref="FileSystemInfo"/> (directory or file).</summary>
-    public IFileSystemInfo FileSystemInfo { get; }
+    /* ---- Colors used by the ls command line tool ----
+     *
+     * Blue: Directory
+     * Green: Executable or recognized data file
+     * Cyan (Sky Blue): Symbolic link file
+     * Yellow with black background: Device
+     * Magenta (Pink): Graphic image file
+     * Red: Archive file
+     * Red with black background: Broken link
+     */
+    private const long ByteConversion = 1024;
+    private static readonly List<string> ExecutableExtensions = new () { ".EXE", ".BAT" };
 
-    public string HumanReadableLength { get; }
+    private static readonly List<string> ImageExtensions = new () {
+        ".JPG",
+        ".JPEG",
+        ".JPE",
+        ".BMP",
+        ".GIF",
+        ".PNG"
+    };
+
+    private static readonly string[] SizeSuffixes = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
 
     public bool IsDir { get; }
 
@@ -54,7 +58,12 @@ class FileSystemInfoStats {
 
     public DateTime? LastWriteTime { get; }
 
+    /// <summary>Gets the wrapped <see cref="FileSystemInfo"/> (directory or file).</summary>
+    public IFileSystemInfo FileSystemInfo { get; }
+
     public long MachineReadableLength { get; }
+
+    public string HumanReadableLength { get; }
 
     public string Name => IsParent ? ".." : FileSystemInfo.Name;
 
@@ -64,15 +73,17 @@ class FileSystemInfoStats {
         // TODO: handle linux executable status
         return FileSystemInfo is IFileSystemInfo f &&
                ExecutableExtensions.Contains (
-                                              f.Extension,
-                                              StringComparer.InvariantCultureIgnoreCase);
+                   f.Extension,
+                   StringComparer.InvariantCultureIgnoreCase
+               );
     }
 
     public bool IsImage () {
         return FileSystemInfo is IFileSystemInfo f &&
                ImageExtensions.Contains (
-                                         f.Extension,
-                                         StringComparer.InvariantCultureIgnoreCase);
+                   f.Extension,
+                   StringComparer.InvariantCultureIgnoreCase
+               );
     }
 
     private static string GetHumanReadableFileSize (long value, CultureInfo culture) {

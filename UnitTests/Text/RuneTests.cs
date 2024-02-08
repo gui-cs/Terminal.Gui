@@ -15,8 +15,8 @@ public class RuneTests {
 
     [Fact]
     public void Equals_ToRuneList () {
-        List<List<Rune>> a = new() { "First line.".ToRuneList () };
-        List<List<Rune>> b = new() { "First line.".ToRuneList (), "Second line.".ToRuneList () };
+        List<List<Rune>> a = new () { "First line.".ToRuneList () };
+        List<List<Rune>> b = new () { "First line.".ToRuneList (), "Second line.".ToRuneList () };
         List<Rune> c = new (a[0]);
         List<Rune> d = a[0];
 
@@ -67,25 +67,28 @@ public class RuneTests {
 
     [Theory]
     [InlineData (
-                    "\u2615\ufe0f",
-                    "☕️",
-                    2,
-                    2,
-                    2)] // \ufe0f forces it to be rendered as a colorful image as compared to a monochrome text variant.
+        "\u2615\ufe0f",
+        "☕️",
+        2,
+        2,
+        2
+    )] // \ufe0f forces it to be rendered as a colorful image as compared to a monochrome text variant.
     [InlineData (
-                    "\u1107\u1165\u11b8",
-                    "법",
-                    3,
-                    2,
-                    1)] // the letters 법 join to form the Korean word for "rice:" U+BC95 법 (read from top left to bottom right)
+        "\u1107\u1165\u11b8",
+        "법",
+        3,
+        2,
+        1
+    )] // the letters 법 join to form the Korean word for "rice:" U+BC95 법 (read from top left to bottom right)
     [InlineData ("\U0001F468\u200D\U0001F469\u200D\U0001F467", "👨‍👩‍👧", 8, 6, 8)] // Man, Woman and Girl emoji.
     [InlineData ("\u0915\u093f", "कि", 2, 2, 2)] // Hindi कि with DEVANAGARI LETTER KA and DEVANAGARI VOWEL SIGN I
     [InlineData (
-                    "\u0e4d\u0e32",
-                    "ํา",
-                    2,
-                    1,
-                    2)] // Decomposition: ํ (U+0E4D) - า (U+0E32) = U+0E33 ำ Thai Character Sara Am
+        "\u0e4d\u0e32",
+        "ํา",
+        2,
+        1,
+        2
+    )] // Decomposition: ํ (U+0E4D) - า (U+0E32) = U+0E33 ำ Thai Character Sara Am
     [InlineData ("\u0e33", "ำ", 1, 1, 1)] // Decomposition: ํ (U+0E4D) - า (U+0E32) = U+0E33 ำ Thai Character Sara Am
     public void GetColumns_String_Without_SurrogatePair (
         string code,
@@ -112,11 +115,12 @@ public class RuneTests {
     [InlineData (new[] { '\ud83c', '\udf39' }, "🌹", 2, 2, 4)] // 🌹 Rose
     [InlineData (new[] { '\uD83D', '\uDC7E' }, "👾", 2, 2, 4)] //   U+1F47E alien monster (CodepointWidth::Wide)
     [InlineData (
-                    new[] { '\uD83D', '\uDD1C' },
-                    "🔜",
-                    2,
-                    2,
-                    4)] //  🔜 Soon With Rightwards Arrow Above (CodepointWidth::Wide)
+        new[] { '\uD83D', '\uDD1C' },
+        "🔜",
+        2,
+        2,
+        4
+    )] //  🔜 Soon With Rightwards Arrow Above (CodepointWidth::Wide)
     public void GetColumns_Utf16_Encode (char[] code, string str, int columns, int stringLength, int utf8Length) {
         var rune = new Rune (code[0], code[1]);
         Assert.Equal (str, rune.ToString ());
@@ -194,22 +198,24 @@ public class RuneTests {
     // BUGBUG: These are CLEARLY wide glyphs, but GetColumns() returns 1
     // However, most terminals treat these as narrow and they overlap the next cell when drawn (including Windows Terminal)
     [InlineData (
-                    '\u1161',
-                    "ᅡ",
-                    1,
-                    1,
-                    3)] // ᅡ Hangul Jungseong A - Unicode Hangul Jamo for join with column width equal to 0 alone.
+        '\u1161',
+        "ᅡ",
+        1,
+        1,
+        3
+    )] // ᅡ Hangul Jungseong A - Unicode Hangul Jamo for join with column width equal to 0 alone.
     [InlineData ('\u2103', "℃", 1, 1, 3)] // ℃ Degree Celsius
     [InlineData ('\u2501', "━", 1, 1, 3)] // ━ Box Drawings Heavy Horizontal
     [InlineData ('\u25a0', "■", 1, 1, 3)] // ■ Black Square
     [InlineData ('\u25a1', "□", 1, 1, 3)] // □ White Square
     [InlineData ('\u277f', "❿", 1, 1, 3)] //Dingbat Negative Circled Number Ten - ❿ U+277f 
     [InlineData (
-                    '\u4dc0',
-                    "䷀",
-                    1,
-                    1,
-                    3)] // ䷀Hexagram For The Creative Heaven -  U+4dc0 - https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
+        '\u4dc0',
+        "䷀",
+        1,
+        1,
+        3
+    )] // ䷀Hexagram For The Creative Heaven -  U+4dc0 - https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
     [InlineData ('\ud7b0', "ힰ", 1, 1, 3)] // ힰ ┤Hangul Jungseong O-Yeo - ힰ U+d7b0')]
     [InlineData ('\uf61e', "", 1, 1, 3)] // Private Use Area
     [InlineData ('\u23f0', "⏰", 2, 1, 3)] // Alarm Clock - ⏰ U+23f0
@@ -256,11 +262,13 @@ public class RuneTests {
     [InlineData (0x00E9, false)] // Latin Small Letter E with Acute, Unicode U+00E9 é 
     [InlineData (0x0061, false)] // Latin Small Letter A is U+0061.
     [InlineData (
-                    '\uFE20',
-                    true)] // Combining Ligature Left Half - U+fe20 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
+        '\uFE20',
+        true
+    )] // Combining Ligature Left Half - U+fe20 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
     [InlineData (
-                    '\uFE21',
-                    true)] // Combining Ligature Right Half - U+fe21 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
+        '\uFE21',
+        true
+    )] // Combining Ligature Right Half - U+fe21 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
     public void IsCombiningMark (int codepoint, bool expected) {
         var rune = new Rune (codepoint);
         Assert.Equal (expected, rune.IsCombiningMark ());
@@ -273,9 +281,11 @@ public class RuneTests {
     [InlineData (0x0302)] // Combining Circumflex Accent
     [InlineData (0x0061)] // Combining ogonek (a small hook or comma shape)
     [InlineData (
-                    '\uFE20')] // Combining Ligature Left Half - U+fe20 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
+        '\uFE20'
+    )] // Combining Ligature Left Half - U+fe20 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
     [InlineData (
-                    '\uFE21')] // Combining Ligature Right Half - U+fe21 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
+        '\uFE21'
+    )] // Combining Ligature Right Half - U+fe21 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
     public void MakePrintable_Combining_Character_Is_Not_Printable (int code) {
         var rune = new Rune (code);
         Rune actual = rune.MakePrintable ();
@@ -304,20 +314,23 @@ public class RuneTests {
 
     [Theory]
     [InlineData (
-                    "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789",
-                    200,
-                    200,
-                    200)]
+        "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789",
+        200,
+        200,
+        200
+    )]
     [InlineData (
-                    "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\n",
-                    201,
-                    200,
-                    199)] // has a '\n' newline
+        "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\n",
+        201,
+        200,
+        199
+    )] // has a '\n' newline
     [InlineData (
-                    "\t01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\n",
-                    202,
-                    200,
-                    198)] // has a '\t' and a '\n' newline
+        "\t01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\n",
+        202,
+        200,
+        198
+    )] // has a '\t' and a '\n' newline
     public void Rune_ColumnWidth_Versus_String_ConsoleWidth (string text, int stringLength, int strCols, int runeCols) {
         Assert.Equal (stringLength, text.Length);
         Assert.Equal (stringLength, text.GetRuneCount ());
@@ -489,8 +502,9 @@ public class RuneTests {
                 Assert.Equal (r.GetColumns (), us.GetColumns ());
                 Assert.Equal (s.GetColumns (), us.GetColumns ());
                 Assert.Equal (
-                              1,
-                              us.GetRuneCount ()); // Here returns 1 because is a valid surrogate pair resulting in only rune >=U+10000..U+10FFFF
+                    1,
+                    us.GetRuneCount ()
+                ); // Here returns 1 because is a valid surrogate pair resulting in only rune >=U+10000..U+10FFFF
                 Assert.Equal (2, s.Length); // String always preserves the originals values of each surrogate pair
             }
         }
@@ -526,8 +540,9 @@ public class RuneTests {
                 Assert.Equal (r.GetColumns (), us.GetColumns ());
                 Assert.Equal (s.GetColumns (), us.GetColumns ());
                 Assert.Equal (
-                              1,
-                              us.GetRuneCount ()); // Here returns 1 because is a valid surrogate pair resulting in only rune >=U+10000..U+10FFFF
+                    1,
+                    us.GetRuneCount ()
+                ); // Here returns 1 because is a valid surrogate pair resulting in only rune >=U+10000..U+10FFFF
                 Assert.Equal (2, s.Length); // String always preserves the originals values of each surrogate pair
             }
         }
@@ -669,29 +684,31 @@ public class RuneTests {
 
     [Theory]
     [InlineData (
-                    '\u006f',
-                    '\u0302',
-                    "\u006f\u0302",
-                    1,
-                    0,
-                    2,
-                    "o",
-                    "̂",
-                    "ô",
-                    1,
-                    2)]
+        '\u006f',
+        '\u0302',
+        "\u006f\u0302",
+        1,
+        0,
+        2,
+        "o",
+        "̂",
+        "ô",
+        1,
+        2
+    )]
     [InlineData (
-                    '\u0065',
-                    '\u0301',
-                    "\u0065\u0301",
-                    1,
-                    0,
-                    2,
-                    "e",
-                    "́",
-                    "é",
-                    1,
-                    2)]
+        '\u0065',
+        '\u0301',
+        "\u0065\u0301",
+        1,
+        0,
+        2,
+        "e",
+        "́",
+        "é",
+        1,
+        2
+    )]
     public void Test_NonSpacingChar (
         int code1,
         int code2,
@@ -741,15 +758,17 @@ public class RuneTests {
                 Assert.Equal (us, s);
                 Assert.Equal (r.GetColumns (), us.GetColumns ());
                 Assert.Equal (
-                              us.GetRuneCount (),
-                              s.Length); // For not surrogate pairs string.RuneCount is always equal to String.Length
+                    us.GetRuneCount (),
+                    s.Length
+                ); // For not surrogate pairs string.RuneCount is always equal to String.Length
             } else {
                 Assert.Equal (r.ToString (), us);
                 Assert.Equal (us, s);
                 Assert.Equal (r.GetColumns (), us.GetColumns ());
                 Assert.Equal (
-                              1,
-                              us.GetRuneCount ()); // Here returns 1 because is a valid surrogate pair resulting in only rune >=U+10000..U+10FFFF
+                    1,
+                    us.GetRuneCount ()
+                ); // Here returns 1 because is a valid surrogate pair resulting in only rune >=U+10000..U+10FFFF
                 Assert.Equal (2, s.Length); // String always preserves the originals values of each surrogate pair
             }
 

@@ -23,37 +23,30 @@ public class Images : Scenario {
         Win.Add (lblDriverName);
 
         var cbSupportsTrueColor = new CheckBox {
-                                                   X = Pos.Right (lblDriverName) + 2,
-                                                   Y = 0,
-                                                   Checked = canTrueColor,
-                                                   CanFocus = false,
-                                                   Text = "supports true color "
-                                               };
+            X = Pos.Right (lblDriverName) + 2,
+            Y = 0,
+            Checked = canTrueColor,
+            CanFocus = false,
+            Text = "supports true color "
+        };
         Win.Add (cbSupportsTrueColor);
 
         var cbUseTrueColor = new CheckBox {
-                                              X = Pos.Right (cbSupportsTrueColor) + 2,
-                                              Y = 0,
-                                              Checked = !Application.Force16Colors,
-                                              Enabled = canTrueColor,
-                                              Text = "Use true color"
-                                          };
+            X = Pos.Right (cbSupportsTrueColor) + 2,
+            Y = 0,
+            Checked = !Application.Force16Colors,
+            Enabled = canTrueColor,
+            Text = "Use true color"
+        };
         cbUseTrueColor.Toggled += (_, evt) => Application.Force16Colors = !evt.NewValue ?? false;
         Win.Add (cbUseTrueColor);
 
-        var btnOpenImage = new Button {
-                                          X = Pos.Right (cbUseTrueColor) + 2,
-                                          Y = 0,
-                                          Text = "Open Image"
-                                      };
+        var btnOpenImage = new Button { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };
         Win.Add (btnOpenImage);
 
         var imageView = new ImageView {
-                                          X = 0,
-                                          Y = Pos.Bottom (lblDriverName),
-                                          Width = Dim.Fill (),
-                                          Height = Dim.Fill ()
-                                      };
+            X = 0, Y = Pos.Bottom (lblDriverName), Width = Dim.Fill (), Height = Dim.Fill ()
+        };
         Win.Add (imageView);
 
         btnOpenImage.Clicked += (_, _) => {
@@ -118,10 +111,12 @@ public class Images : Scenario {
                     Rgba32 rgb = _matchSize[x, y];
 
                     Attribute attr = _cache.GetOrAdd (
-                                                      rgb,
-                                                      rgb => new Attribute (
-                                                                            new Color (),
-                                                                            new Color (rgb.R, rgb.G, rgb.B)));
+                        rgb,
+                        rgb => new Attribute (
+                            new Color (),
+                            new Color (rgb.R, rgb.G, rgb.B)
+                        )
+                    );
 
                     Driver.SetAttribute (attr);
                     AddRune (x, y, (Rune)' ');

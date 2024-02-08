@@ -20,21 +20,18 @@ public class LabelsAsLabels : Scenario {
         // This is the default Label (IsDefault = true); if user presses ENTER in the TextField
         // the scenario will quit
         var defaultLabel = new Label {
-                                         X = Pos.Center (),
-                                         Y = Pos.Bottom (Win) - 3,
-                                         HotKeySpecifier = (Rune)'_',
-                                         CanFocus = true,
-                                         Text = "_Quit"
-                                     };
+            X = Pos.Center (),
+            Y = Pos.Bottom (Win) - 3,
+            HotKeySpecifier = (Rune)'_',
+            CanFocus = true,
+            Text = "_Quit"
+        };
         defaultLabel.Clicked += (s, e) => Application.RequestStop ();
         Win.Add (defaultLabel);
 
         var swapLabel = new Label {
-                                      X = 50,
-                                      HotKeySpecifier = (Rune)'_',
-                                      CanFocus = true,
-                                      Text = "S_wap Default (Absolute Layout)"
-                                  };
+            X = 50, HotKeySpecifier = (Rune)'_', CanFocus = true, Text = "S_wap Default (Absolute Layout)"
+        };
         swapLabel.Clicked += (s, e) => {
             //defaultLabel.IsDefault = !defaultLabel.IsDefault;
             //swapLabel.IsDefault = !swapLabel.IsDefault;
@@ -55,13 +52,13 @@ public class LabelsAsLabels : Scenario {
         Pos x = Pos.Right (colorLabelsLabel) + 2;
         foreach (KeyValuePair<string, ColorScheme> colorScheme in Colors.ColorSchemes) {
             var colorLabel = new Label {
-                                           ColorScheme = colorScheme.Value,
-                                           X = x,
-                                           Y = Pos.Y (colorLabelsLabel),
-                                           HotKeySpecifier = (Rune)'_',
-                                           CanFocus = true,
-                                           Text = $"{colorScheme.Key}"
-                                       };
+                ColorScheme = colorScheme.Value,
+                X = x,
+                Y = Pos.Y (colorLabelsLabel),
+                HotKeySpecifier = (Rune)'_',
+                CanFocus = true,
+                Text = $"{colorScheme.Key}"
+            };
             DoMessage (colorLabel, colorLabel.Text);
             Win.Add (colorLabel);
             x += colorLabel.Text.Length + 2;
@@ -71,56 +68,59 @@ public class LabelsAsLabels : Scenario {
 
         Label Label;
         Win.Add (
-                 Label = new Label {
-                                       X = 2,
-                                       Y = Pos.Bottom (colorLabelsLabel) + 1,
-                                       HotKeySpecifier = (Rune)'_',
-                                       CanFocus = true,
-                                       Text =
-                                           "A super long _Label that will probably expose a bug in clipping or wrapping of text. Will it?"
-                                   });
+            Label = new Label {
+                X = 2,
+                Y = Pos.Bottom (colorLabelsLabel) + 1,
+                HotKeySpecifier = (Rune)'_',
+                CanFocus = true,
+                Text =
+                    "A super long _Label that will probably expose a bug in clipping or wrapping of text. Will it?"
+            }
+        );
         DoMessage (Label, Label.Text);
 
         // Note the 'N' in 'Newline' will be the hotkey
         Win.Add (
-                 Label = new Label {
-                                       X = 2,
-                                       Y = Pos.Bottom (Label) + 1,
-                                       HotKeySpecifier = (Rune)'_',
-                                       CanFocus = true,
-                                       TextAlignment = TextAlignment.Centered,
-                                       VerticalTextAlignment = VerticalTextAlignment.Middle,
-                                       Text = "a Newline\nin the Label"
-                                   });
+            Label = new Label {
+                X = 2,
+                Y = Pos.Bottom (Label) + 1,
+                HotKeySpecifier = (Rune)'_',
+                CanFocus = true,
+                TextAlignment = TextAlignment.Centered,
+                VerticalTextAlignment = VerticalTextAlignment.Middle,
+                Text = "a Newline\nin the Label"
+            }
+        );
         Label.Clicked += (s, e) => MessageBox.Query ("Message", "Question?", "Yes", "No");
 
         var textChanger = new Label {
-                                        X = 2,
-                                        Y = Pos.Bottom (Label) + 1,
-                                        HotKeySpecifier = (Rune)'_',
-                                        CanFocus = true,
-                                        Text = "Te_xt Changer"
-                                    };
+            X = 2,
+            Y = Pos.Bottom (Label) + 1,
+            HotKeySpecifier = (Rune)'_',
+            CanFocus = true,
+            Text = "Te_xt Changer"
+        };
         Win.Add (textChanger);
         textChanger.Clicked += (s, e) => textChanger.Text += "!";
 
         Win.Add (
-                 Label = new Label {
-                                       X = Pos.Right (textChanger) + 2,
-                                       Y = Pos.Y (textChanger),
-                                       HotKeySpecifier = (Rune)'_',
-                                       CanFocus = true,
-                                       Text = "Lets see if this will move as \"Text Changer\" grows"
-                                   });
+            Label = new Label {
+                X = Pos.Right (textChanger) + 2,
+                Y = Pos.Y (textChanger),
+                HotKeySpecifier = (Rune)'_',
+                CanFocus = true,
+                Text = "Lets see if this will move as \"Text Changer\" grows"
+            }
+        );
 
         var removeLabel = new Label {
-                                        X = 2,
-                                        Y = Pos.Bottom (Label) + 1,
-                                        ColorScheme = Colors.ColorSchemes["Error"],
-                                        HotKeySpecifier = (Rune)'_',
-                                        CanFocus = true,
-                                        Text = "Remove this Label"
-                                    };
+            X = 2,
+            Y = Pos.Bottom (Label) + 1,
+            ColorScheme = Colors.ColorSchemes["Error"],
+            HotKeySpecifier = (Rune)'_',
+            CanFocus = true,
+            Text = "Remove this Label"
+        };
         Win.Add (removeLabel);
 
         // This in interesting test case because `moveBtn` and below are laid out relative to this one!
@@ -133,25 +133,25 @@ public class LabelsAsLabels : Scenario {
         };
 
         var computedFrame = new FrameView {
-                                              X = 0,
-                                              Y = Pos.Bottom (removeLabel) + 1,
-                                              Width = Dim.Percent (50),
-                                              Height = 5,
-                                              Title = "Computed Layout"
-                                          };
+            X = 0,
+            Y = Pos.Bottom (removeLabel) + 1,
+            Width = Dim.Percent (50),
+            Height = 5,
+            Title = "Computed Layout"
+        };
         Win.Add (computedFrame);
 
         // Demonstrates how changing the View.Frame property can move Views
         var moveBtn = new Label {
-                                    X = 0,
-                                    Y = Pos.Center () - 1,
-                                    AutoSize = false,
-                                    Width = 30,
-                                    ColorScheme = Colors.ColorSchemes["Error"],
-                                    HotKeySpecifier = (Rune)'_',
-                                    CanFocus = true,
-                                    Text = "Move This \u263b Label _via Pos"
-                                };
+            X = 0,
+            Y = Pos.Center () - 1,
+            AutoSize = false,
+            Width = 30,
+            ColorScheme = Colors.ColorSchemes["Error"],
+            HotKeySpecifier = (Rune)'_',
+            CanFocus = true,
+            Text = "Move This \u263b Label _via Pos"
+        };
         moveBtn.Clicked += (s, e) => {
             moveBtn.X = moveBtn.Frame.X + 5;
 
@@ -162,15 +162,15 @@ public class LabelsAsLabels : Scenario {
 
         // Demonstrates how changing the View.Frame property can SIZE Views (#583)
         var sizeBtn = new Label {
-                                    X = 0,
-                                    Y = Pos.Center () + 1,
-                                    AutoSize = false,
-                                    Width = 30,
-                                    ColorScheme = Colors.ColorSchemes["Error"],
-                                    HotKeySpecifier = (Rune)'_',
-                                    CanFocus = true,
-                                    Text = "Size This \u263a Label _via Pos"
-                                };
+            X = 0,
+            Y = Pos.Center () + 1,
+            AutoSize = false,
+            Width = 30,
+            ColorScheme = Colors.ColorSchemes["Error"],
+            HotKeySpecifier = (Rune)'_',
+            CanFocus = true,
+            Text = "Size This \u263a Label _via Pos"
+        };
         sizeBtn.Clicked += (s, e) => {
             sizeBtn.Width = sizeBtn.Frame.Width + 5;
 
@@ -179,63 +179,65 @@ public class LabelsAsLabels : Scenario {
         computedFrame.Add (sizeBtn);
 
         var absoluteFrame = new FrameView {
-                                              X = Pos.Right (computedFrame),
-                                              Y = Pos.Bottom (removeLabel) + 1,
-                                              Width = Dim.Fill (),
-                                              Height = 5,
-                                              Title = "Absolute Layout"
-                                          };
+            X = Pos.Right (computedFrame),
+            Y = Pos.Bottom (removeLabel) + 1,
+            Width = Dim.Fill (),
+            Height = 5,
+            Title = "Absolute Layout"
+        };
         Win.Add (absoluteFrame);
 
         // Demonstrates how changing the View.Frame property can move Views
         var moveBtnA = new Label {
-                                     ColorScheme = Colors.ColorSchemes["Error"],
-                                     HotKeySpecifier = (Rune)'_',
-                                     CanFocus = true,
-                                     Text = "Move This Label via Frame"
-                                 };
+            ColorScheme = Colors.ColorSchemes["Error"],
+            HotKeySpecifier = (Rune)'_',
+            CanFocus = true,
+            Text = "Move This Label via Frame"
+        };
         moveBtnA.Clicked += (s, e) => {
             moveBtnA.Frame = new Rect (
-                                       moveBtnA.Frame.X + 5,
-                                       moveBtnA.Frame.Y,
-                                       moveBtnA.Frame.Width,
-                                       moveBtnA.Frame.Height);
+                moveBtnA.Frame.X + 5,
+                moveBtnA.Frame.Y,
+                moveBtnA.Frame.Width,
+                moveBtnA.Frame.Height
+            );
         };
         absoluteFrame.Add (moveBtnA);
 
         // Demonstrates how changing the View.Frame property can SIZE Views (#583)
         var sizeBtnA = new Label {
-                                     Y = 2,
-                                     ColorScheme = Colors.ColorSchemes["Error"],
-                                     HotKeySpecifier = (Rune)'_',
-                                     CanFocus = true,
-                                     AutoSize = false,
-                                     Text = " ~  s  gui.cs   master ↑10 = Со_хранить"
-                                 };
+            Y = 2,
+            ColorScheme = Colors.ColorSchemes["Error"],
+            HotKeySpecifier = (Rune)'_',
+            CanFocus = true,
+            AutoSize = false,
+            Text = " ~  s  gui.cs   master ↑10 = Со_хранить"
+        };
         sizeBtnA.Clicked += (s, e) => {
             sizeBtnA.Frame = new Rect (
-                                       sizeBtnA.Frame.X,
-                                       sizeBtnA.Frame.Y,
-                                       sizeBtnA.Frame.Width + 5,
-                                       sizeBtnA.Frame.Height);
+                sizeBtnA.Frame.X,
+                sizeBtnA.Frame.Y,
+                sizeBtnA.Frame.Width + 5,
+                sizeBtnA.Frame.Height
+            );
         };
         absoluteFrame.Add (sizeBtnA);
 
         var label = new Label {
-                                  X = 2,
-                                  Y = Pos.Bottom (computedFrame) + 1,
-                                  HotKeySpecifier = (Rune)'_',
-                                  CanFocus = true,
-                                  Text = "Text Alignment (changes the four Labels above): "
-                              };
+            X = 2,
+            Y = Pos.Bottom (computedFrame) + 1,
+            HotKeySpecifier = (Rune)'_',
+            CanFocus = true,
+            Text = "Text Alignment (changes the four Labels above): "
+        };
         Win.Add (label);
 
         var radioGroup = new RadioGroup {
-                                            X = 4,
-                                            Y = Pos.Bottom (label) + 1,
-                                            SelectedItem = 2,
-                                            RadioLabels = new[] { "Left", "Right", "Centered", "Justified" }
-                                        };
+            X = 4,
+            Y = Pos.Bottom (label) + 1,
+            SelectedItem = 2,
+            RadioLabels = new[] { "Left", "Right", "Centered", "Justified" }
+        };
         Win.Add (radioGroup);
 
         // Demo changing hotkey
@@ -267,29 +269,29 @@ public class LabelsAsLabels : Scenario {
 
         var mhkb = "Click to Change th_is Label's Hotkey";
         var moveHotKeyBtn = new Label {
-                                          X = 2,
-                                          Y = Pos.Bottom (radioGroup) + 1,
-                                          AutoSize = false,
-                                          Width = Dim.Width (computedFrame) - 2,
-                                          ColorScheme = Colors.ColorSchemes["TopLevel"],
-                                          HotKeySpecifier = (Rune)'_',
-                                          CanFocus = true,
-                                          Text = mhkb
-                                      };
+            X = 2,
+            Y = Pos.Bottom (radioGroup) + 1,
+            AutoSize = false,
+            Width = Dim.Width (computedFrame) - 2,
+            ColorScheme = Colors.ColorSchemes["TopLevel"],
+            HotKeySpecifier = (Rune)'_',
+            CanFocus = true,
+            Text = mhkb
+        };
         moveHotKeyBtn.Clicked += (s, e) => { moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text); };
         Win.Add (moveHotKeyBtn);
 
         var muhkb = " ~  s  gui.cs   master ↑10 = Сохранить";
         var moveUnicodeHotKeyBtn = new Label {
-                                                 X = Pos.Left (absoluteFrame) + 1,
-                                                 Y = Pos.Bottom (radioGroup) + 1,
-                                                 AutoSize = false,
-                                                 Width = Dim.Width (absoluteFrame) - 2,
-                                                 ColorScheme = Colors.ColorSchemes["TopLevel"],
-                                                 HotKeySpecifier = (Rune)'_',
-                                                 CanFocus = true,
-                                                 Text = muhkb
-                                             };
+            X = Pos.Left (absoluteFrame) + 1,
+            Y = Pos.Bottom (radioGroup) + 1,
+            AutoSize = false,
+            Width = Dim.Width (absoluteFrame) - 2,
+            ColorScheme = Colors.ColorSchemes["TopLevel"],
+            HotKeySpecifier = (Rune)'_',
+            CanFocus = true,
+            Text = muhkb
+        };
         moveUnicodeHotKeyBtn.Clicked += (s, e) => {
             moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text);
         };

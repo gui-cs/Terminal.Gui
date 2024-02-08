@@ -8,7 +8,7 @@
 // Copyright (C) 2004 Novell, Inc.  http://www.novell.com 
 //
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Stores a set of four integers that represent the location and size of a rectangle</summary>
 public struct Rect {
@@ -60,10 +60,11 @@ public struct Rect {
         int bottom
     ) {
         return new Rect (
-                         left,
-                         top,
-                         right - left,
-                         bottom - top);
+            left,
+            top,
+            right - left,
+            bottom - top
+        );
     }
 
     /// <summary>Produces a new Rect by inflating an existing Rect by the specified coordinate values.</summary>
@@ -113,10 +114,11 @@ public struct Rect {
         }
 
         return FromLTRB (
-                         Math.Max (a.Left, b.Left),
-                         Math.Max (a.Top, b.Top),
-                         Math.Min (a.Right, b.Right),
-                         Math.Min (a.Bottom, b.Bottom));
+            Math.Max (a.Left, b.Left),
+            Math.Max (a.Top, b.Top),
+            Math.Min (a.Right, b.Right),
+            Math.Min (a.Bottom, b.Bottom)
+        );
     }
 
     /// <summary>Intersect Method</summary>

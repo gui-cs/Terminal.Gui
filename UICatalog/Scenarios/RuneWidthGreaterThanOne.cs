@@ -20,72 +20,60 @@ public class RuneWidthGreaterThanOne : Scenario {
         Application.Init ();
 
         var menu = new MenuBar {
-                                   Menus =  [
-                                   new MenuBarItem ("Padding", new MenuItem[] {
-                                                                                  new (
-                                                                                   "With Padding",
-                                                                                   "",
-                                                                                   () => _win.Padding.Thickness =
-                                                                                       new Thickness (1)),
-                                                                                  new (
-                                                                                   "Without Padding",
-                                                                                   "",
-                                                                                   () => _win.Padding.Thickness =
-                                                                                       new Thickness (0))
-                                                                              }),
-                                   new MenuBarItem (
-                                                    "BorderStyle",
-                                                    new MenuItem[] {
-                                                                       new (
-                                                                            "Single",
-                                                                            "",
-                                                                            () => _win.BorderStyle = LineStyle.Single),
-                                                                       new (
-                                                                            "None",
-                                                                            "",
-                                                                            () => _win.BorderStyle = LineStyle.None)
-                                                                   }),
-                                   new MenuBarItem (
-                                                    "Runes length",
-                                                    new MenuItem[] {
-                                                                       new ("Wide", "", WideRunes),
-                                                                       new ("Narrow", "", NarrowRunes),
-                                                                       new ("Mixed", "", MixedRunes)
-                                                                   })
-                                       ]
-                               };
+            Menus = [
+                        new MenuBarItem (
+                            "Padding",
+                            new MenuItem[] {
+                                new (
+                                    "With Padding",
+                                    "",
+                                    () => _win.Padding.Thickness =
+                                              new Thickness (1)
+                                ),
+                                new (
+                                    "Without Padding",
+                                    "",
+                                    () => _win.Padding.Thickness =
+                                              new Thickness (0)
+                                )
+                            }
+                        ),
+                        new MenuBarItem (
+                            "BorderStyle",
+                            new MenuItem[] {
+                                new (
+                                    "Single",
+                                    "",
+                                    () => _win.BorderStyle = LineStyle.Single
+                                ),
+                                new (
+                                    "None",
+                                    "",
+                                    () => _win.BorderStyle = LineStyle.None
+                                )
+                            }
+                        ),
+                        new MenuBarItem (
+                            "Runes length",
+                            new MenuItem[] {
+                                new ("Wide", "", WideRunes),
+                                new ("Narrow", "", NarrowRunes),
+                                new ("Mixed", "", MixedRunes)
+                            }
+                        )
+                    ]
+        };
 
         _label = new Label {
-                               X = Pos.Center (),
-                               Y = 1,
-                               ColorScheme = new ColorScheme {
-                                                                 Normal = Colors.ColorSchemes["Base"].Focus
-                                                             }
-                           };
-        _text = new TextField {
-                                  X = Pos.Center (),
-                                  Y = 3,
-                                  Width = 20
-                              };
-        _button = new Button {
-                                 X = Pos.Center (),
-                                 Y = 5
-                             };
-        _labelR = new Label {
-                                X = Pos.AnchorEnd (30),
-                                Y = 18
-                            };
+            X = Pos.Center (), Y = 1, ColorScheme = new ColorScheme { Normal = Colors.ColorSchemes["Base"].Focus }
+        };
+        _text = new TextField { X = Pos.Center (), Y = 3, Width = 20 };
+        _button = new Button { X = Pos.Center (), Y = 5 };
+        _labelR = new Label { X = Pos.AnchorEnd (30), Y = 18 };
         _labelV = new Label {
-                                TextDirection = TextDirection.TopBottom_LeftRight,
-                                X = Pos.AnchorEnd (30),
-                                Y = Pos.Bottom (_labelR)
-                            };
-        _win = new Window {
-                              X = 5,
-                              Y = 5,
-                              Width = Dim.Fill (22),
-                              Height = Dim.Fill (5)
-                          };
+            TextDirection = TextDirection.TopBottom_LeftRight, X = Pos.AnchorEnd (30), Y = Pos.Bottom (_labelR)
+        };
+        _win = new Window { X = 5, Y = 5, Width = Dim.Fill (22), Height = Dim.Fill (5) };
         _win.Add (_label, _text, _button, _labelR, _labelV);
         Application.Top.Add (menu, _win);
 

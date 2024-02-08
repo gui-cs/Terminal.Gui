@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary><see cref="EventArgs"/> for the <see cref="CheckBox.Toggled"/> event</summary>
 public class ToggleEventArgs : EventArgs {

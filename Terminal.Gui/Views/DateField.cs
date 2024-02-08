@@ -13,12 +13,6 @@ namespace Terminal.Gui;
 /// <summary>Simple Date editing <see cref="View"/></summary>
 /// <remarks>The <see cref="DateField"/> <see cref="View"/> provides date editing functionality with mouse support.</remarks>
 public class DateField : TextField {
-    private const string RightToLeftMark = "\u200f";
-    private readonly int _dateFieldLength = 12;
-    private DateTime _date;
-    private string _format;
-    private string _separator;
-
     /// <summary>Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Computed"/> layout.</summary>
     public DateField () : this (DateTime.MinValue) { }
 
@@ -28,6 +22,12 @@ public class DateField : TextField {
         Width = _dateFieldLength;
         SetInitialProperties (date);
     }
+
+    private const string RightToLeftMark = "\u200f";
+    private readonly int _dateFieldLength = 12;
+    private DateTime _date;
+    private string _format;
+    private string _separator;
 
     /// <summary>CultureInfo for date. The default is CultureInfo.CurrentCulture.</summary>
     public CultureInfo Culture {
@@ -42,12 +42,6 @@ public class DateField : TextField {
         }
     }
 
-    /// <inheritdoc/>
-    public override int CursorPosition {
-        get => base.CursorPosition;
-        set => base.CursorPosition = Math.Max (Math.Min (value, FormatLength), 1);
-    }
-
     /// <summary>Gets or sets the date of the <see cref="DateField"/>.</summary>
     /// <remarks></remarks>
     public DateTime Date {
@@ -60,12 +54,18 @@ public class DateField : TextField {
             DateTime oldData = _date;
             _date = value;
             Text = value.ToString (" " + StandardizeDateFormat (_format.Trim ()))
-                        .Replace (RightToLeftMark, "");
-            DateTimeEventArgs<DateTime> args = new DateTimeEventArgs<DateTime> (oldData, value, _format);
+                .Replace (RightToLeftMark, "");
+            DateTimeEventArgs<DateTime> args = new (oldData, value, _format);
             if (oldData != value) {
                 OnDateChanged (args);
             }
         }
+    }
+
+    /// <inheritdoc/>
+    public override int CursorPosition {
+        get => base.CursorPosition;
+        set => base.CursorPosition = Math.Max (Math.Min (value, FormatLength), 1);
     }
 
     private int FormatLength => StandardizeDateFormat (_format).Trim ().Length;
@@ -303,19 +303,21 @@ public class DateField : TextField {
 
         // Things this view knows how to do
         AddCommand (
-                    Command.DeleteCharRight,
-                    () => {
-                        DeleteCharRight ();
+            Command.DeleteCharRight,
+            () => {
+                DeleteCharRight ();
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.DeleteCharLeft,
-                    () => {
-                        DeleteCharLeft (false);
+            Command.DeleteCharLeft,
+            () => {
+                DeleteCharLeft (false);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (Command.LeftHome, () => MoveHome ());
         AddCommand (Command.Left, () => MoveLeft ());
         AddCommand (Command.RightEnd, () => MoveEnd ());
@@ -358,11 +360,10 @@ public class DateField : TextField {
         List<Rune> newText = text.GetRange (0, CursorPosition);
         newText.Add (key);
         if (CursorPosition < FormatLength) {
-            newText =  [
-
-            .. newText,
-            .. text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))
-                ];
+            newText = [
+                          .. newText,
+                          .. text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))
+                      ];
         }
 
         return SetText (StringExtensions.ToString (newText));

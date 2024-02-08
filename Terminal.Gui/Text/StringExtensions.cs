@@ -97,8 +97,8 @@ public static class StringExtensions {
         }
 
         return new StringBuilder (str.Length * n)
-               .Insert (0, str, n)
-               .ToString ();
+            .Insert (0, str, n)
+            .ToString ();
     }
 
     /// <summary>Converts the string into a <see cref="List{Rune}"/>.</summary>

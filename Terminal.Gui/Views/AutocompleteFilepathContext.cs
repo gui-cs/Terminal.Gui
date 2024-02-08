@@ -1,7 +1,7 @@
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 class AutocompleteFilepathContext : AutocompleteContext {
     public AutocompleteFilepathContext (string currentLine, int cursorPosition, FileDialogState state)
@@ -46,21 +46,24 @@ class FilepathSuggestionGenerator : ISuggestionGenerator {
         bool isWindows = RuntimeInformation.IsOSPlatform (OSPlatform.Windows);
 
         string[] suggestions = state.Children.Where (d => !d.IsParent)
-                                    .Select (
-                                             e => e.FileSystemInfo is IDirectoryInfo d
-                                                      ? d.Name + Path.DirectorySeparatorChar
-                                                      : e.FileSystemInfo.Name)
-                                    .ToArray ();
+            .Select (
+                e => e.FileSystemInfo is IDirectoryInfo d
+                         ? d.Name + Path.DirectorySeparatorChar
+                         : e.FileSystemInfo.Name
+            )
+            .ToArray ();
 
         string[] validSuggestions = suggestions
-                                    .Where (
-                                            s => s.StartsWith (
-                                                               term,
-                                                               isWindows
-                                                                   ? StringComparison.InvariantCultureIgnoreCase
-                                                                   : StringComparison.InvariantCulture))
-                                    .OrderBy (m => m.Length)
-                                    .ToArray ();
+            .Where (
+                s => s.StartsWith (
+                    term,
+                    isWindows
+                        ? StringComparison.InvariantCultureIgnoreCase
+                        : StringComparison.InvariantCulture
+                )
+            )
+            .OrderBy (m => m.Length)
+            .ToArray ();
 
         // nothing to suggest
         if ((validSuggestions.Length == 0) || (validSuggestions[0].Length == term.Length)) {
@@ -68,8 +71,9 @@ class FilepathSuggestionGenerator : ISuggestionGenerator {
         }
 
         return validSuggestions.Select (
-                                        f => new Suggestion (term.Length, f, f))
-                               .ToList ();
+                f => new Suggestion (term.Length, f, f)
+            )
+            .ToList ();
     }
 
     public bool IsWordChar (Rune rune) {

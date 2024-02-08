@@ -122,23 +122,6 @@ public class Key : EventArgs, IEquatable<Key> {
     }
 
     /// <summary>
-    ///     The key value as a Rune. This is the actual value of the key pressed, and is independent of the modifiers.
-    ///     Useful for determining if a key represents is a printable character.
-    /// </summary>
-    /// <remarks>
-    ///     <para>Keys with Ctrl or Alt modifiers will return <see langword="default"/>.</para>
-    ///     <para>
-    ///         If the key is a letter key (A-Z), the Rune will be the upper or lower case letter depending on whether
-    ///         <see cref="KeyCode.ShiftMask"/> is set.
-    ///     </para>
-    ///     <para>
-    ///         If the key is outside of the <see cref="KeyCode.CharMask"/> range, the returned Rune will be
-    ///         <see langword="default"/>.
-    ///     </para>
-    /// </remarks>
-    public Rune AsRune => ToRune (KeyCode);
-
-    /// <summary>
     ///     Indicates if the current Key event has already been processed and the driver should stop notifying any other
     ///     event subscriber. Its important to set this value to true specially when updating any View's layout from inside the
     ///     subscriber method.
@@ -176,16 +159,6 @@ public class Key : EventArgs, IEquatable<Key> {
     /// </summary>
     public bool IsValid => this != Empty && NoAlt.NoShift.NoCtrl != Empty;
 
-    /// <summary>The encoded key value.</summary>
-    /// <para>
-    ///     IMPORTANT: Lowercase alpha keys are encoded (in <see cref="Gui.KeyCode"/>) as values between 65 and 90
-    ///     corresponding to the un-shifted A to Z keys on a keyboard. Enum values are provided for these (e.g.
-    ///     <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.). Even though the values are the same as the ASCII values
-    ///     for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
-    /// </para>
-    /// <remarks>This property is the backing data for the <see cref="Key"/>. It is a <see cref="KeyCode"/> enum value.</remarks>
-    public KeyCode KeyCode { get; init; }
-
     /// <summary>
     ///     Helper for removing a shift modifier from a <see cref="Key"/>.
     ///     <code>
@@ -213,9 +186,6 @@ public class Key : EventArgs, IEquatable<Key> {
     /// </summary>
     public Key NoShift => new (KeyCode & ~KeyCode.ShiftMask);
 
-    /// <summary>Enables passing the key binding scope with the event. Default is <see cref="KeyBindingScope.Focused"/>.</summary>
-    public KeyBindingScope Scope { get; set; } = KeyBindingScope.Focused;
-
     /// <summary>
     ///     Helper for specifying a shifted <see cref="Key"/>.
     ///     <code>
@@ -239,6 +209,36 @@ public class Key : EventArgs, IEquatable<Key> {
     /// </code>
     /// </summary>
     public Key WithShift => new (KeyCode | KeyCode.ShiftMask);
+
+    /// <summary>Enables passing the key binding scope with the event. Default is <see cref="KeyBindingScope.Focused"/>.</summary>
+    public KeyBindingScope Scope { get; set; } = KeyBindingScope.Focused;
+
+    /// <summary>The encoded key value.</summary>
+    /// <para>
+    ///     IMPORTANT: Lowercase alpha keys are encoded (in <see cref="Gui.KeyCode"/>) as values between 65 and 90
+    ///     corresponding to the un-shifted A to Z keys on a keyboard. Enum values are provided for these (e.g.
+    ///     <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.). Even though the values are the same as the ASCII values
+    ///     for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
+    /// </para>
+    /// <remarks>This property is the backing data for the <see cref="Key"/>. It is a <see cref="KeyCode"/> enum value.</remarks>
+    public KeyCode KeyCode { get; init; }
+
+    /// <summary>
+    ///     The key value as a Rune. This is the actual value of the key pressed, and is independent of the modifiers.
+    ///     Useful for determining if a key represents is a printable character.
+    /// </summary>
+    /// <remarks>
+    ///     <para>Keys with Ctrl or Alt modifiers will return <see langword="default"/>.</para>
+    ///     <para>
+    ///         If the key is a letter key (A-Z), the Rune will be the upper or lower case letter depending on whether
+    ///         <see cref="KeyCode.ShiftMask"/> is set.
+    ///     </para>
+    ///     <para>
+    ///         If the key is outside of the <see cref="KeyCode.CharMask"/> range, the returned Rune will be
+    ///         <see langword="default"/>.
+    ///     </para>
+    /// </remarks>
+    public Rune AsRune => ToRune (KeyCode);
 
     /// <summary>
     ///     Tests if a KeyCode represents a key in the range of <see cref="KeyCode.A"/> to <see cref="KeyCode.Z"/>,
@@ -494,11 +494,10 @@ public class Key : EventArgs, IEquatable<Key> {
         return input;
     }
 
-    private static readonly Dictionary<string, KeyCode> _modifierDict = new (StringComparer.InvariantCultureIgnoreCase) {
-                                                                            { "Shift", KeyCode.ShiftMask },
-                                                                            { "Ctrl", KeyCode.CtrlMask },
-                                                                            { "Alt", KeyCode.AltMask }
-                                                                        };
+    private static readonly Dictionary<string, KeyCode> _modifierDict =
+        new (StringComparer.InvariantCultureIgnoreCase) {
+            { "Shift", KeyCode.ShiftMask }, { "Ctrl", KeyCode.CtrlMask }, { "Alt", KeyCode.AltMask }
+        };
 
     /// <summary>Converts the provided string to a new <see cref="Key"/> instance.</summary>
     /// <param name="text">
@@ -560,10 +559,11 @@ public class Key : EventArgs, IEquatable<Key> {
 
             // if it's a single digit int, treat it as such
             if (int.TryParse (
-                              partNotFound,
-                              NumberStyles.Integer,
-                              CultureInfo.InvariantCulture,
-                              out parsedInt)) {
+                    partNotFound,
+                    NumberStyles.Integer,
+                    CultureInfo.InvariantCulture,
+                    out parsedInt
+                )) {
                 keyCode = (KeyCode)((int)KeyCode.D0 + parsedInt);
             } else if (Enum.TryParse (partNotFound, false, out parsedKeyCode)) {
                 if (parsedKeyCode != KeyCode.Null) {
@@ -600,10 +600,11 @@ public class Key : EventArgs, IEquatable<Key> {
 
         // if it's a number int, treat it as a unicode value
         if (int.TryParse (
-                          partNotFound,
-                          NumberStyles.Number,
-                          CultureInfo.InvariantCulture,
-                          out parsedInt)) {
+                partNotFound,
+                NumberStyles.Number,
+                CultureInfo.InvariantCulture,
+                out parsedInt
+            )) {
             if (!Rune.IsValid (parsedInt)) {
                 return false;
             }

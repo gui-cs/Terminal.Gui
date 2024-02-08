@@ -5,8 +5,8 @@
 namespace Terminal.Gui.ViewTests;
 
 public class KeyboardEventTests {
-    private readonly ITestOutputHelper _output;
     public KeyboardEventTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     /// <summary>
     ///     This tests that when a new key down event is sent to the view the view will fire the 3 key-down related
@@ -114,17 +114,21 @@ public class KeyboardEventTests {
         //Assert.True (view.OnProcessKeyDownWasCalled);
 
         view.NewKeyDownEvent (
-                              new Key (
-                                       KeyCode.Null | (shift ? KeyCode.ShiftMask : 0) | (alt ? KeyCode.AltMask : 0)
-                                       | (control ? KeyCode.CtrlMask : 0)));
+            new Key (
+                KeyCode.Null | (shift ? KeyCode.ShiftMask : 0) | (alt ? KeyCode.AltMask : 0)
+                | (control ? KeyCode.CtrlMask : 0)
+            )
+        );
         Assert.True (keyPressed);
         Assert.True (view.OnKeyDownContinued);
         Assert.True (view.OnKeyPressedContinued);
 
         view.NewKeyUpEvent (
-                            new Key (
-                                     KeyCode.Null | (shift ? KeyCode.ShiftMask : 0) | (alt ? KeyCode.AltMask : 0)
-                                     | (control ? KeyCode.CtrlMask : 0)));
+            new Key (
+                KeyCode.Null | (shift ? KeyCode.ShiftMask : 0) | (alt ? KeyCode.AltMask : 0)
+                | (control ? KeyCode.CtrlMask : 0)
+            )
+        );
         Assert.True (keyUp);
         Assert.True (view.OnKeyUpContinued);
     }

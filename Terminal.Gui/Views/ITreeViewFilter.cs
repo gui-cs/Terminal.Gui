@@ -1,4 +1,4 @@
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Provides filtering for a <see cref="TreeView"/>.</summary>
 public interface ITreeViewFilter<T> where T : class {

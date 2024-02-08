@@ -6,7 +6,7 @@
 
 using System.ComponentModel;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Represents the size of a rectangular region with an ordered pair of width and height.</summary>
 public struct SizeF : IEquatable<SizeF> {

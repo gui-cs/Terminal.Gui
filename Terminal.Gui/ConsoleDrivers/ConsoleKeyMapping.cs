@@ -98,17 +98,17 @@ public static class ConsoleKeyMapping {
     }
 
     private class ScanCodeMapping : IEquatable<ScanCodeMapping> {
-        public readonly ConsoleModifiers Modifiers;
-        public readonly uint ScanCode;
-        public readonly uint UnicodeChar;
-        public readonly VK VirtualKey;
-
         public ScanCodeMapping (uint scanCode, VK virtualKey, ConsoleModifiers modifiers, uint unicodeChar) {
             ScanCode = scanCode;
             VirtualKey = virtualKey;
             Modifiers = modifiers;
             UnicodeChar = unicodeChar;
         }
+
+        public readonly ConsoleModifiers Modifiers;
+        public readonly uint ScanCode;
+        public readonly uint UnicodeChar;
+        public readonly VK VirtualKey;
 
         public bool Equals (ScanCodeMapping other) {
             return ScanCode.Equals (other.ScanCode) &&
@@ -180,30 +180,33 @@ public static class ConsoleKeyMapping {
             ScanCodeMapping scode = GetScanCode ("VirtualKey", keyValue, mod);
             if (scode != null) {
                 return new ConsoleKeyInfo (
-                                           (char)scode.UnicodeChar,
-                                           (ConsoleKey)scode.VirtualKey,
-                                           modifiers.HasFlag (ConsoleModifiers.Shift),
-                                           modifiers.HasFlag (ConsoleModifiers.Alt),
-                                           modifiers.HasFlag (ConsoleModifiers.Control));
+                    (char)scode.UnicodeChar,
+                    (ConsoleKey)scode.VirtualKey,
+                    modifiers.HasFlag (ConsoleModifiers.Shift),
+                    modifiers.HasFlag (ConsoleModifiers.Alt),
+                    modifiers.HasFlag (ConsoleModifiers.Control)
+                );
             }
         } else {
             uint keyChar = GetKeyCharFromUnicodeChar (keyValue, modifiers, out uint consoleKey, out _, isConsoleKey);
             if (consoleKey != 0) {
                 return new ConsoleKeyInfo (
-                                           (char)keyChar,
-                                           (ConsoleKey)consoleKey,
-                                           modifiers.HasFlag (ConsoleModifiers.Shift),
-                                           modifiers.HasFlag (ConsoleModifiers.Alt),
-                                           modifiers.HasFlag (ConsoleModifiers.Control));
+                    (char)keyChar,
+                    (ConsoleKey)consoleKey,
+                    modifiers.HasFlag (ConsoleModifiers.Shift),
+                    modifiers.HasFlag (ConsoleModifiers.Alt),
+                    modifiers.HasFlag (ConsoleModifiers.Control)
+                );
             }
         }
 
         return new ConsoleKeyInfo (
-                                   (char)keyValue,
-                                   ConsoleKey.None,
-                                   modifiers.HasFlag (ConsoleModifiers.Shift),
-                                   modifiers.HasFlag (ConsoleModifiers.Alt),
-                                   modifiers.HasFlag (ConsoleModifiers.Control));
+            (char)keyValue,
+            ConsoleKey.None,
+            modifiers.HasFlag (ConsoleModifiers.Shift),
+            modifiers.HasFlag (ConsoleModifiers.Alt),
+            modifiers.HasFlag (ConsoleModifiers.Control)
+        );
     }
 
     /// <summary>Map existing <see cref="KeyCode"/> modifiers to <see cref="ConsoleModifiers"/>.</summary>
@@ -264,11 +267,12 @@ public static class ConsoleKeyMapping {
         scanCode = 0;
         if (keyValue == 0) {
             return new ConsoleKeyInfo (
-                                       (char)keyValue,
-                                       ConsoleKey.None,
-                                       modifiers.HasFlag (ConsoleModifiers.Shift),
-                                       modifiers.HasFlag (ConsoleModifiers.Alt),
-                                       modifiers.HasFlag (ConsoleModifiers.Control));
+                (char)keyValue,
+                ConsoleKey.None,
+                modifiers.HasFlag (ConsoleModifiers.Shift),
+                modifiers.HasFlag (ConsoleModifiers.Alt),
+                modifiers.HasFlag (ConsoleModifiers.Control)
+            );
         }
 
         uint outputChar = keyValue;
@@ -294,11 +298,12 @@ public static class ConsoleKeyMapping {
         }
 
         return new ConsoleKeyInfo (
-                                   (char)outputChar,
-                                   (ConsoleKey)consoleKey,
-                                   modifiers.HasFlag (ConsoleModifiers.Shift),
-                                   modifiers.HasFlag (ConsoleModifiers.Alt),
-                                   modifiers.HasFlag (ConsoleModifiers.Control));
+            (char)outputChar,
+            (ConsoleKey)consoleKey,
+            modifiers.HasFlag (ConsoleModifiers.Shift),
+            modifiers.HasFlag (ConsoleModifiers.Alt),
+            modifiers.HasFlag (ConsoleModifiers.Control)
+        );
     }
 
     // Used only by unit tests
@@ -1264,922 +1269,1103 @@ public static class ConsoleKeyMapping {
 
     // BUGBUG: This database makes no sense. It is not possible to map a VK code to a character without knowing the keyboard layout
     //         It should be deleted.
-    private static readonly HashSet<ScanCodeMapping> _scanCodes = new() {
-                                                                            new ScanCodeMapping (
-                                                                             1,
-                                                                             VK.ESCAPE,
-                                                                             0,
-                                                                             '\u001B'), // Escape
-                                                                            new ScanCodeMapping (
-                                                                             1,
-                                                                             VK.ESCAPE,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\u001B'),
-                                                                            new ScanCodeMapping (
-                                                                             2,
-                                                                             (VK)'1',
-                                                                             0,
-                                                                             '1'), // D1
-                                                                            new ScanCodeMapping (
-                                                                             2,
-                                                                             (VK)'1',
-                                                                             ConsoleModifiers.Shift,
-                                                                             '!'),
-                                                                            new ScanCodeMapping (
-                                                                             3,
-                                                                             (VK)'2',
-                                                                             0,
-                                                                             '2'), // D2
-                                                                            new ScanCodeMapping (
-                                                                             3,
-                                                                             (VK)'2',
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\"'), // BUGBUG: This is true for Portugese keyboard, but not ENG (@) or DEU (")
-                                                                            new ScanCodeMapping (
-                                                                             3,
-                                                                             (VK)'2',
-                                                                             ConsoleModifiers.Alt
-                                                                             | ConsoleModifiers.Control,
-                                                                             '@'),
-                                                                            new ScanCodeMapping (
-                                                                             4,
-                                                                             (VK)'3',
-                                                                             0,
-                                                                             '3'), // D3
-                                                                            new ScanCodeMapping (
-                                                                             4,
-                                                                             (VK)'3',
-                                                                             ConsoleModifiers.Shift,
-                                                                             '#'),
-                                                                            new ScanCodeMapping (
-                                                                             4,
-                                                                             (VK)'3',
-                                                                             ConsoleModifiers.Alt
-                                                                             | ConsoleModifiers.Control,
-                                                                             '£'),
-                                                                            new ScanCodeMapping (
-                                                                             5,
-                                                                             (VK)'4',
-                                                                             0,
-                                                                             '4'), // D4
-                                                                            new ScanCodeMapping (
-                                                                             5,
-                                                                             (VK)'4',
-                                                                             ConsoleModifiers.Shift,
-                                                                             '$'),
-                                                                            new ScanCodeMapping (
-                                                                             5,
-                                                                             (VK)'4',
-                                                                             ConsoleModifiers.Alt
-                                                                             | ConsoleModifiers.Control,
-                                                                             '§'),
-                                                                            new ScanCodeMapping (
-                                                                             6,
-                                                                             (VK)'5',
-                                                                             0,
-                                                                             '5'), // D5
-                                                                            new ScanCodeMapping (
-                                                                             6,
-                                                                             (VK)'5',
-                                                                             ConsoleModifiers.Shift,
-                                                                             '%'),
-                                                                            new ScanCodeMapping (
-                                                                             6,
-                                                                             (VK)'5',
-                                                                             ConsoleModifiers.Alt
-                                                                             | ConsoleModifiers.Control,
-                                                                             '€'),
-                                                                            new ScanCodeMapping (
-                                                                             7,
-                                                                             (VK)'6',
-                                                                             0,
-                                                                             '6'), // D6
-                                                                            new ScanCodeMapping (
-                                                                             7,
-                                                                             (VK)'6',
-                                                                             ConsoleModifiers.Shift,
-                                                                             '&'),
-                                                                            new ScanCodeMapping (
-                                                                             8,
-                                                                             (VK)'7',
-                                                                             0,
-                                                                             '7'), // D7
-                                                                            new ScanCodeMapping (
-                                                                             8,
-                                                                             (VK)'7',
-                                                                             ConsoleModifiers.Shift,
-                                                                             '/'),
-                                                                            new ScanCodeMapping (
-                                                                             8,
-                                                                             (VK)'7',
-                                                                             ConsoleModifiers.Alt
-                                                                             | ConsoleModifiers.Control,
-                                                                             '{'),
-                                                                            new ScanCodeMapping (
-                                                                             9,
-                                                                             (VK)'8',
-                                                                             0,
-                                                                             '8'), // D8
-                                                                            new ScanCodeMapping (
-                                                                             9,
-                                                                             (VK)'8',
-                                                                             ConsoleModifiers.Shift,
-                                                                             '('),
-                                                                            new ScanCodeMapping (
-                                                                             9,
-                                                                             (VK)'8',
-                                                                             ConsoleModifiers.Alt
-                                                                             | ConsoleModifiers.Control,
-                                                                             '['),
-                                                                            new ScanCodeMapping (
-                                                                             10,
-                                                                             (VK)'9',
-                                                                             0,
-                                                                             '9'), // D9
-                                                                            new ScanCodeMapping (
-                                                                             10,
-                                                                             (VK)'9',
-                                                                             ConsoleModifiers.Shift,
-                                                                             ')'),
-                                                                            new ScanCodeMapping (
-                                                                             10,
-                                                                             (VK)'9',
-                                                                             ConsoleModifiers.Alt
-                                                                             | ConsoleModifiers.Control,
-                                                                             ']'),
-                                                                            new ScanCodeMapping (
-                                                                             11,
-                                                                             (VK)'0',
-                                                                             0,
-                                                                             '0'), // D0
-                                                                            new ScanCodeMapping (
-                                                                             11,
-                                                                             (VK)'0',
-                                                                             ConsoleModifiers.Shift,
-                                                                             '='),
-                                                                            new ScanCodeMapping (
-                                                                             11,
-                                                                             (VK)'0',
-                                                                             ConsoleModifiers.Alt
-                                                                             | ConsoleModifiers.Control,
-                                                                             '}'),
-                                                                            new ScanCodeMapping (
-                                                                             12,
-                                                                             VK.OEM_4,
-                                                                             0,
-                                                                             '\''), // Oem4
-                                                                            new ScanCodeMapping (
-                                                                             12,
-                                                                             VK.OEM_4,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '?'),
-                                                                            new ScanCodeMapping (
-                                                                             13,
-                                                                             VK.OEM_6,
-                                                                             0,
-                                                                             '+'), // Oem6
-                                                                            new ScanCodeMapping (
-                                                                             13,
-                                                                             VK.OEM_6,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '*'),
-                                                                            new ScanCodeMapping (
-                                                                             14,
-                                                                             VK.BACK,
-                                                                             0,
-                                                                             '\u0008'), // Backspace
-                                                                            new ScanCodeMapping (
-                                                                             14,
-                                                                             VK.BACK,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\u0008'),
-                                                                            new ScanCodeMapping (
-                                                                             15,
-                                                                             VK.TAB,
-                                                                             0,
-                                                                             '\u0009'), // Tab
-                                                                            new ScanCodeMapping (
-                                                                             15,
-                                                                             VK.TAB,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\u000F'),
-                                                                            new ScanCodeMapping (
-                                                                             16,
-                                                                             (VK)'Q',
-                                                                             0,
-                                                                             'q'), // Q
-                                                                            new ScanCodeMapping (
-                                                                             16,
-                                                                             (VK)'Q',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'Q'),
-                                                                            new ScanCodeMapping (
-                                                                             17,
-                                                                             (VK)'W',
-                                                                             0,
-                                                                             'w'), // W
-                                                                            new ScanCodeMapping (
-                                                                             17,
-                                                                             (VK)'W',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'W'),
-                                                                            new ScanCodeMapping (
-                                                                             18,
-                                                                             (VK)'E',
-                                                                             0,
-                                                                             'e'), // E
-                                                                            new ScanCodeMapping (
-                                                                             18,
-                                                                             (VK)'E',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'E'),
-                                                                            new ScanCodeMapping (
-                                                                             19,
-                                                                             (VK)'R',
-                                                                             0,
-                                                                             'r'), // R
-                                                                            new ScanCodeMapping (
-                                                                             19,
-                                                                             (VK)'R',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'R'),
-                                                                            new ScanCodeMapping (
-                                                                             20,
-                                                                             (VK)'T',
-                                                                             0,
-                                                                             't'), // T
-                                                                            new ScanCodeMapping (
-                                                                             20,
-                                                                             (VK)'T',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'T'),
-                                                                            new ScanCodeMapping (
-                                                                             21,
-                                                                             (VK)'Y',
-                                                                             0,
-                                                                             'y'), // Y
-                                                                            new ScanCodeMapping (
-                                                                             21,
-                                                                             (VK)'Y',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'Y'),
-                                                                            new ScanCodeMapping (
-                                                                             22,
-                                                                             (VK)'U',
-                                                                             0,
-                                                                             'u'), // U
-                                                                            new ScanCodeMapping (
-                                                                             22,
-                                                                             (VK)'U',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'U'),
-                                                                            new ScanCodeMapping (
-                                                                             23,
-                                                                             (VK)'I',
-                                                                             0,
-                                                                             'i'), // I
-                                                                            new ScanCodeMapping (
-                                                                             23,
-                                                                             (VK)'I',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'I'),
-                                                                            new ScanCodeMapping (
-                                                                             24,
-                                                                             (VK)'O',
-                                                                             0,
-                                                                             'o'), // O
-                                                                            new ScanCodeMapping (
-                                                                             24,
-                                                                             (VK)'O',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'O'),
-                                                                            new ScanCodeMapping (
-                                                                             25,
-                                                                             (VK)'P',
-                                                                             0,
-                                                                             'p'), // P
-                                                                            new ScanCodeMapping (
-                                                                             25,
-                                                                             (VK)'P',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'P'),
-                                                                            new ScanCodeMapping (
-                                                                             26,
-                                                                             VK.OEM_PLUS,
-                                                                             0,
-                                                                             '+'), // OemPlus
-                                                                            new ScanCodeMapping (
-                                                                             26,
-                                                                             VK.OEM_PLUS,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '*'),
-                                                                            new ScanCodeMapping (
-                                                                             26,
-                                                                             VK.OEM_PLUS,
-                                                                             ConsoleModifiers.Alt
-                                                                             | ConsoleModifiers.Control,
-                                                                             '¨'),
-                                                                            new ScanCodeMapping (
-                                                                             27,
-                                                                             VK.OEM_1,
-                                                                             0,
-                                                                             '´'), // Oem1
-                                                                            new ScanCodeMapping (
-                                                                             27,
-                                                                             VK.OEM_1,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '`'),
-                                                                            new ScanCodeMapping (
-                                                                             28,
-                                                                             VK.RETURN,
-                                                                             0,
-                                                                             '\u000D'), // Enter
-                                                                            new ScanCodeMapping (
-                                                                             28,
-                                                                             VK.RETURN,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\u000D'),
-                                                                            new ScanCodeMapping (
-                                                                             29,
-                                                                             VK.CONTROL,
-                                                                             0,
-                                                                             '\0'), // Control
-                                                                            new ScanCodeMapping (
-                                                                             29,
-                                                                             VK.CONTROL,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             30,
-                                                                             (VK)'A',
-                                                                             0,
-                                                                             'a'), // A
-                                                                            new ScanCodeMapping (
-                                                                             30,
-                                                                             (VK)'A',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'A'),
-                                                                            new ScanCodeMapping (
-                                                                             31,
-                                                                             (VK)'S',
-                                                                             0,
-                                                                             's'), // S
-                                                                            new ScanCodeMapping (
-                                                                             31,
-                                                                             (VK)'S',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'S'),
-                                                                            new ScanCodeMapping (
-                                                                             32,
-                                                                             (VK)'D',
-                                                                             0,
-                                                                             'd'), // D
-                                                                            new ScanCodeMapping (
-                                                                             32,
-                                                                             (VK)'D',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'D'),
-                                                                            new ScanCodeMapping (
-                                                                             33,
-                                                                             (VK)'F',
-                                                                             0,
-                                                                             'f'), // F
-                                                                            new ScanCodeMapping (
-                                                                             33,
-                                                                             (VK)'F',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'F'),
-                                                                            new ScanCodeMapping (
-                                                                             34,
-                                                                             (VK)'G',
-                                                                             0,
-                                                                             'g'), // G
-                                                                            new ScanCodeMapping (
-                                                                             34,
-                                                                             (VK)'G',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'G'),
-                                                                            new ScanCodeMapping (
-                                                                             35,
-                                                                             (VK)'H',
-                                                                             0,
-                                                                             'h'), // H
-                                                                            new ScanCodeMapping (
-                                                                             35,
-                                                                             (VK)'H',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'H'),
-                                                                            new ScanCodeMapping (
-                                                                             36,
-                                                                             (VK)'J',
-                                                                             0,
-                                                                             'j'), // J
-                                                                            new ScanCodeMapping (
-                                                                             36,
-                                                                             (VK)'J',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'J'),
-                                                                            new ScanCodeMapping (
-                                                                             37,
-                                                                             (VK)'K',
-                                                                             0,
-                                                                             'k'), // K
-                                                                            new ScanCodeMapping (
-                                                                             37,
-                                                                             (VK)'K',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'K'),
-                                                                            new ScanCodeMapping (
-                                                                             38,
-                                                                             (VK)'L',
-                                                                             0,
-                                                                             'l'), // L
-                                                                            new ScanCodeMapping (
-                                                                             38,
-                                                                             (VK)'L',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'L'),
-                                                                            new ScanCodeMapping (
-                                                                             39,
-                                                                             VK.OEM_3,
-                                                                             0,
-                                                                             '`'), // Oem3 (Backtick/Grave)
-                                                                            new ScanCodeMapping (
-                                                                             39,
-                                                                             VK.OEM_3,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '~'),
-                                                                            new ScanCodeMapping (
-                                                                             40,
-                                                                             VK.OEM_7,
-                                                                             0,
-                                                                             '\''), // Oem7 (Single Quote)
-                                                                            new ScanCodeMapping (
-                                                                             40,
-                                                                             VK.OEM_7,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\"'),
-                                                                            new ScanCodeMapping (
-                                                                             41,
-                                                                             VK.OEM_5,
-                                                                             0,
-                                                                             '\\'), // Oem5 (Backslash)
-                                                                            new ScanCodeMapping (
-                                                                             41,
-                                                                             VK.OEM_5,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '|'),
-                                                                            new ScanCodeMapping (
-                                                                             42,
-                                                                             VK.LSHIFT,
-                                                                             0,
-                                                                             '\0'), // Left Shift
-                                                                            new ScanCodeMapping (
-                                                                             42,
-                                                                             VK.LSHIFT,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             43,
-                                                                             VK.OEM_2,
-                                                                             0,
-                                                                             '/'), // Oem2 (Forward Slash)
-                                                                            new ScanCodeMapping (
-                                                                             43,
-                                                                             VK.OEM_2,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '?'),
-                                                                            new ScanCodeMapping (
-                                                                             44,
-                                                                             (VK)'Z',
-                                                                             0,
-                                                                             'z'), // Z
-                                                                            new ScanCodeMapping (
-                                                                             44,
-                                                                             (VK)'Z',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'Z'),
-                                                                            new ScanCodeMapping (
-                                                                             45,
-                                                                             (VK)'X',
-                                                                             0,
-                                                                             'x'), // X
-                                                                            new ScanCodeMapping (
-                                                                             45,
-                                                                             (VK)'X',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'X'),
-                                                                            new ScanCodeMapping (
-                                                                             46,
-                                                                             (VK)'C',
-                                                                             0,
-                                                                             'c'), // C
-                                                                            new ScanCodeMapping (
-                                                                             46,
-                                                                             (VK)'C',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'C'),
-                                                                            new ScanCodeMapping (
-                                                                             47,
-                                                                             (VK)'V',
-                                                                             0,
-                                                                             'v'), // V
-                                                                            new ScanCodeMapping (
-                                                                             47,
-                                                                             (VK)'V',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'V'),
-                                                                            new ScanCodeMapping (
-                                                                             48,
-                                                                             (VK)'B',
-                                                                             0,
-                                                                             'b'), // B
-                                                                            new ScanCodeMapping (
-                                                                             48,
-                                                                             (VK)'B',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'B'),
-                                                                            new ScanCodeMapping (
-                                                                             49,
-                                                                             (VK)'N',
-                                                                             0,
-                                                                             'n'), // N
-                                                                            new ScanCodeMapping (
-                                                                             49,
-                                                                             (VK)'N',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'N'),
-                                                                            new ScanCodeMapping (
-                                                                             50,
-                                                                             (VK)'M',
-                                                                             0,
-                                                                             'm'), // M
-                                                                            new ScanCodeMapping (
-                                                                             50,
-                                                                             (VK)'M',
-                                                                             ConsoleModifiers.Shift,
-                                                                             'M'),
-                                                                            new ScanCodeMapping (
-                                                                             51,
-                                                                             VK.OEM_COMMA,
-                                                                             0,
-                                                                             ','), // OemComma
-                                                                            new ScanCodeMapping (
-                                                                             51,
-                                                                             VK.OEM_COMMA,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '<'),
-                                                                            new ScanCodeMapping (
-                                                                             52,
-                                                                             VK.OEM_PERIOD,
-                                                                             0,
-                                                                             '.'), // OemPeriod
-                                                                            new ScanCodeMapping (
-                                                                             52,
-                                                                             VK.OEM_PERIOD,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '>'),
-                                                                            new ScanCodeMapping (
-                                                                             53,
-                                                                             VK.OEM_MINUS,
-                                                                             0,
-                                                                             '-'), // OemMinus
-                                                                            new ScanCodeMapping (
-                                                                             53,
-                                                                             VK.OEM_MINUS,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '_'),
-                                                                            new ScanCodeMapping (
-                                                                             54,
-                                                                             VK.RSHIFT,
-                                                                             0,
-                                                                             '\0'), // Right Shift
-                                                                            new ScanCodeMapping (
-                                                                             54,
-                                                                             VK.RSHIFT,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             55,
-                                                                             VK.PRINT,
-                                                                             0,
-                                                                             '\0'), // Print Screen
-                                                                            new ScanCodeMapping (
-                                                                             55,
-                                                                             VK.PRINT,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             56,
-                                                                             VK.LMENU,
-                                                                             0,
-                                                                             '\0'), // Alt
-                                                                            new ScanCodeMapping (
-                                                                             56,
-                                                                             VK.LMENU,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             57,
-                                                                             VK.SPACE,
-                                                                             0,
-                                                                             ' '), // Spacebar
-                                                                            new ScanCodeMapping (
-                                                                             57,
-                                                                             VK.SPACE,
-                                                                             ConsoleModifiers.Shift,
-                                                                             ' '),
-                                                                            new ScanCodeMapping (
-                                                                             58,
-                                                                             VK.CAPITAL,
-                                                                             0,
-                                                                             '\0'), // Caps Lock
-                                                                            new ScanCodeMapping (
-                                                                             58,
-                                                                             VK.CAPITAL,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             59,
-                                                                             VK.F1,
-                                                                             0,
-                                                                             '\0'), // F1
-                                                                            new ScanCodeMapping (
-                                                                             59,
-                                                                             VK.F1,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             60,
-                                                                             VK.F2,
-                                                                             0,
-                                                                             '\0'), // F2
-                                                                            new ScanCodeMapping (
-                                                                             60,
-                                                                             VK.F2,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             61,
-                                                                             VK.F3,
-                                                                             0,
-                                                                             '\0'), // F3
-                                                                            new ScanCodeMapping (
-                                                                             61,
-                                                                             VK.F3,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             62,
-                                                                             VK.F4,
-                                                                             0,
-                                                                             '\0'), // F4
-                                                                            new ScanCodeMapping (
-                                                                             62,
-                                                                             VK.F4,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             63,
-                                                                             VK.F5,
-                                                                             0,
-                                                                             '\0'), // F5
-                                                                            new ScanCodeMapping (
-                                                                             63,
-                                                                             VK.F5,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             64,
-                                                                             VK.F6,
-                                                                             0,
-                                                                             '\0'), // F6
-                                                                            new ScanCodeMapping (
-                                                                             64,
-                                                                             VK.F6,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             65,
-                                                                             VK.F7,
-                                                                             0,
-                                                                             '\0'), // F7
-                                                                            new ScanCodeMapping (
-                                                                             65,
-                                                                             VK.F7,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             66,
-                                                                             VK.F8,
-                                                                             0,
-                                                                             '\0'), // F8
-                                                                            new ScanCodeMapping (
-                                                                             66,
-                                                                             VK.F8,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             67,
-                                                                             VK.F9,
-                                                                             0,
-                                                                             '\0'), // F9
-                                                                            new ScanCodeMapping (
-                                                                             67,
-                                                                             VK.F9,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             68,
-                                                                             VK.F10,
-                                                                             0,
-                                                                             '\0'), // F10
-                                                                            new ScanCodeMapping (
-                                                                             68,
-                                                                             VK.F10,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             69,
-                                                                             VK.NUMLOCK,
-                                                                             0,
-                                                                             '\0'), // Num Lock
-                                                                            new ScanCodeMapping (
-                                                                             69,
-                                                                             VK.NUMLOCK,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             70,
-                                                                             VK.SCROLL,
-                                                                             0,
-                                                                             '\0'), // Scroll Lock
-                                                                            new ScanCodeMapping (
-                                                                             70,
-                                                                             VK.SCROLL,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             71,
-                                                                             VK.HOME,
-                                                                             0,
-                                                                             '\0'), // Home
-                                                                            new ScanCodeMapping (
-                                                                             71,
-                                                                             VK.HOME,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             72,
-                                                                             VK.UP,
-                                                                             0,
-                                                                             '\0'), // Up Arrow
-                                                                            new ScanCodeMapping (
-                                                                             72,
-                                                                             VK.UP,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             73,
-                                                                             VK.PRIOR,
-                                                                             0,
-                                                                             '\0'), // Page Up
-                                                                            new ScanCodeMapping (
-                                                                             73,
-                                                                             VK.PRIOR,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             74,
-                                                                             VK.SUBTRACT,
-                                                                             0,
-                                                                             '-'), // Subtract (Num Pad '-')
-                                                                            new ScanCodeMapping (
-                                                                             74,
-                                                                             VK.SUBTRACT,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '-'),
-                                                                            new ScanCodeMapping (
-                                                                             75,
-                                                                             VK.LEFT,
-                                                                             0,
-                                                                             '\0'), // Left Arrow
-                                                                            new ScanCodeMapping (
-                                                                             75,
-                                                                             VK.LEFT,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             76,
-                                                                             VK.CLEAR,
-                                                                             0,
-                                                                             '\0'), // Center key (Num Pad 5 with Num Lock off)
-                                                                            new ScanCodeMapping (
-                                                                             76,
-                                                                             VK.CLEAR,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             77,
-                                                                             VK.RIGHT,
-                                                                             0,
-                                                                             '\0'), // Right Arrow
-                                                                            new ScanCodeMapping (
-                                                                             77,
-                                                                             VK.RIGHT,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             78,
-                                                                             VK.ADD,
-                                                                             0,
-                                                                             '+'), // Add (Num Pad '+')
-                                                                            new ScanCodeMapping (
-                                                                             78,
-                                                                             VK.ADD,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '+'),
-                                                                            new ScanCodeMapping (
-                                                                             79,
-                                                                             VK.END,
-                                                                             0,
-                                                                             '\0'), // End
-                                                                            new ScanCodeMapping (
-                                                                             79,
-                                                                             VK.END,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             80,
-                                                                             VK.DOWN,
-                                                                             0,
-                                                                             '\0'), // Down Arrow
-                                                                            new ScanCodeMapping (
-                                                                             80,
-                                                                             VK.DOWN,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             81,
-                                                                             VK.NEXT,
-                                                                             0,
-                                                                             '\0'), // Page Down
-                                                                            new ScanCodeMapping (
-                                                                             81,
-                                                                             VK.NEXT,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             82,
-                                                                             VK.INSERT,
-                                                                             0,
-                                                                             '\0'), // Insert
-                                                                            new ScanCodeMapping (
-                                                                             82,
-                                                                             VK.INSERT,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             83,
-                                                                             VK.DELETE,
-                                                                             0,
-                                                                             '\0'), // Delete
-                                                                            new ScanCodeMapping (
-                                                                             83,
-                                                                             VK.DELETE,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             86,
-                                                                             VK.OEM_102,
-                                                                             0,
-                                                                             '<'), // OEM 102 (Typically '<' or '|' key next to Left Shift)
-                                                                            new ScanCodeMapping (
-                                                                             86,
-                                                                             VK.OEM_102,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '>'),
-                                                                            new ScanCodeMapping (
-                                                                             87,
-                                                                             VK.F11,
-                                                                             0,
-                                                                             '\0'), // F11
-                                                                            new ScanCodeMapping (
-                                                                             87,
-                                                                             VK.F11,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0'),
-                                                                            new ScanCodeMapping (
-                                                                             88,
-                                                                             VK.F12,
-                                                                             0,
-                                                                             '\0'), // F12
-                                                                            new ScanCodeMapping (
-                                                                             88,
-                                                                             VK.F12,
-                                                                             ConsoleModifiers.Shift,
-                                                                             '\0')
-                                                                        };
+    private static readonly HashSet<ScanCodeMapping> _scanCodes = new () {
+        new ScanCodeMapping (
+            1,
+            VK.ESCAPE,
+            0,
+            '\u001B'
+        ), // Escape
+        new ScanCodeMapping (
+            1,
+            VK.ESCAPE,
+            ConsoleModifiers.Shift,
+            '\u001B'
+        ),
+        new ScanCodeMapping (
+            2,
+            (VK)'1',
+            0,
+            '1'
+        ), // D1
+        new ScanCodeMapping (
+            2,
+            (VK)'1',
+            ConsoleModifiers.Shift,
+            '!'
+        ),
+        new ScanCodeMapping (
+            3,
+            (VK)'2',
+            0,
+            '2'
+        ), // D2
+        new ScanCodeMapping (
+            3,
+            (VK)'2',
+            ConsoleModifiers.Shift,
+            '\"'
+        ), // BUGBUG: This is true for Portugese keyboard, but not ENG (@) or DEU (")
+        new ScanCodeMapping (
+            3,
+            (VK)'2',
+            ConsoleModifiers.Alt
+            | ConsoleModifiers.Control,
+            '@'
+        ),
+        new ScanCodeMapping (
+            4,
+            (VK)'3',
+            0,
+            '3'
+        ), // D3
+        new ScanCodeMapping (
+            4,
+            (VK)'3',
+            ConsoleModifiers.Shift,
+            '#'
+        ),
+        new ScanCodeMapping (
+            4,
+            (VK)'3',
+            ConsoleModifiers.Alt
+            | ConsoleModifiers.Control,
+            '£'
+        ),
+        new ScanCodeMapping (
+            5,
+            (VK)'4',
+            0,
+            '4'
+        ), // D4
+        new ScanCodeMapping (
+            5,
+            (VK)'4',
+            ConsoleModifiers.Shift,
+            '$'
+        ),
+        new ScanCodeMapping (
+            5,
+            (VK)'4',
+            ConsoleModifiers.Alt
+            | ConsoleModifiers.Control,
+            '§'
+        ),
+        new ScanCodeMapping (
+            6,
+            (VK)'5',
+            0,
+            '5'
+        ), // D5
+        new ScanCodeMapping (
+            6,
+            (VK)'5',
+            ConsoleModifiers.Shift,
+            '%'
+        ),
+        new ScanCodeMapping (
+            6,
+            (VK)'5',
+            ConsoleModifiers.Alt
+            | ConsoleModifiers.Control,
+            '€'
+        ),
+        new ScanCodeMapping (
+            7,
+            (VK)'6',
+            0,
+            '6'
+        ), // D6
+        new ScanCodeMapping (
+            7,
+            (VK)'6',
+            ConsoleModifiers.Shift,
+            '&'
+        ),
+        new ScanCodeMapping (
+            8,
+            (VK)'7',
+            0,
+            '7'
+        ), // D7
+        new ScanCodeMapping (
+            8,
+            (VK)'7',
+            ConsoleModifiers.Shift,
+            '/'
+        ),
+        new ScanCodeMapping (
+            8,
+            (VK)'7',
+            ConsoleModifiers.Alt
+            | ConsoleModifiers.Control,
+            '{'
+        ),
+        new ScanCodeMapping (
+            9,
+            (VK)'8',
+            0,
+            '8'
+        ), // D8
+        new ScanCodeMapping (
+            9,
+            (VK)'8',
+            ConsoleModifiers.Shift,
+            '('
+        ),
+        new ScanCodeMapping (
+            9,
+            (VK)'8',
+            ConsoleModifiers.Alt
+            | ConsoleModifiers.Control,
+            '['
+        ),
+        new ScanCodeMapping (
+            10,
+            (VK)'9',
+            0,
+            '9'
+        ), // D9
+        new ScanCodeMapping (
+            10,
+            (VK)'9',
+            ConsoleModifiers.Shift,
+            ')'
+        ),
+        new ScanCodeMapping (
+            10,
+            (VK)'9',
+            ConsoleModifiers.Alt
+            | ConsoleModifiers.Control,
+            ']'
+        ),
+        new ScanCodeMapping (
+            11,
+            (VK)'0',
+            0,
+            '0'
+        ), // D0
+        new ScanCodeMapping (
+            11,
+            (VK)'0',
+            ConsoleModifiers.Shift,
+            '='
+        ),
+        new ScanCodeMapping (
+            11,
+            (VK)'0',
+            ConsoleModifiers.Alt
+            | ConsoleModifiers.Control,
+            '}'
+        ),
+        new ScanCodeMapping (
+            12,
+            VK.OEM_4,
+            0,
+            '\''
+        ), // Oem4
+        new ScanCodeMapping (
+            12,
+            VK.OEM_4,
+            ConsoleModifiers.Shift,
+            '?'
+        ),
+        new ScanCodeMapping (
+            13,
+            VK.OEM_6,
+            0,
+            '+'
+        ), // Oem6
+        new ScanCodeMapping (
+            13,
+            VK.OEM_6,
+            ConsoleModifiers.Shift,
+            '*'
+        ),
+        new ScanCodeMapping (
+            14,
+            VK.BACK,
+            0,
+            '\u0008'
+        ), // Backspace
+        new ScanCodeMapping (
+            14,
+            VK.BACK,
+            ConsoleModifiers.Shift,
+            '\u0008'
+        ),
+        new ScanCodeMapping (
+            15,
+            VK.TAB,
+            0,
+            '\u0009'
+        ), // Tab
+        new ScanCodeMapping (
+            15,
+            VK.TAB,
+            ConsoleModifiers.Shift,
+            '\u000F'
+        ),
+        new ScanCodeMapping (
+            16,
+            (VK)'Q',
+            0,
+            'q'
+        ), // Q
+        new ScanCodeMapping (
+            16,
+            (VK)'Q',
+            ConsoleModifiers.Shift,
+            'Q'
+        ),
+        new ScanCodeMapping (
+            17,
+            (VK)'W',
+            0,
+            'w'
+        ), // W
+        new ScanCodeMapping (
+            17,
+            (VK)'W',
+            ConsoleModifiers.Shift,
+            'W'
+        ),
+        new ScanCodeMapping (
+            18,
+            (VK)'E',
+            0,
+            'e'
+        ), // E
+        new ScanCodeMapping (
+            18,
+            (VK)'E',
+            ConsoleModifiers.Shift,
+            'E'
+        ),
+        new ScanCodeMapping (
+            19,
+            (VK)'R',
+            0,
+            'r'
+        ), // R
+        new ScanCodeMapping (
+            19,
+            (VK)'R',
+            ConsoleModifiers.Shift,
+            'R'
+        ),
+        new ScanCodeMapping (
+            20,
+            (VK)'T',
+            0,
+            't'
+        ), // T
+        new ScanCodeMapping (
+            20,
+            (VK)'T',
+            ConsoleModifiers.Shift,
+            'T'
+        ),
+        new ScanCodeMapping (
+            21,
+            (VK)'Y',
+            0,
+            'y'
+        ), // Y
+        new ScanCodeMapping (
+            21,
+            (VK)'Y',
+            ConsoleModifiers.Shift,
+            'Y'
+        ),
+        new ScanCodeMapping (
+            22,
+            (VK)'U',
+            0,
+            'u'
+        ), // U
+        new ScanCodeMapping (
+            22,
+            (VK)'U',
+            ConsoleModifiers.Shift,
+            'U'
+        ),
+        new ScanCodeMapping (
+            23,
+            (VK)'I',
+            0,
+            'i'
+        ), // I
+        new ScanCodeMapping (
+            23,
+            (VK)'I',
+            ConsoleModifiers.Shift,
+            'I'
+        ),
+        new ScanCodeMapping (
+            24,
+            (VK)'O',
+            0,
+            'o'
+        ), // O
+        new ScanCodeMapping (
+            24,
+            (VK)'O',
+            ConsoleModifiers.Shift,
+            'O'
+        ),
+        new ScanCodeMapping (
+            25,
+            (VK)'P',
+            0,
+            'p'
+        ), // P
+        new ScanCodeMapping (
+            25,
+            (VK)'P',
+            ConsoleModifiers.Shift,
+            'P'
+        ),
+        new ScanCodeMapping (
+            26,
+            VK.OEM_PLUS,
+            0,
+            '+'
+        ), // OemPlus
+        new ScanCodeMapping (
+            26,
+            VK.OEM_PLUS,
+            ConsoleModifiers.Shift,
+            '*'
+        ),
+        new ScanCodeMapping (
+            26,
+            VK.OEM_PLUS,
+            ConsoleModifiers.Alt
+            | ConsoleModifiers.Control,
+            '¨'
+        ),
+        new ScanCodeMapping (
+            27,
+            VK.OEM_1,
+            0,
+            '´'
+        ), // Oem1
+        new ScanCodeMapping (
+            27,
+            VK.OEM_1,
+            ConsoleModifiers.Shift,
+            '`'
+        ),
+        new ScanCodeMapping (
+            28,
+            VK.RETURN,
+            0,
+            '\u000D'
+        ), // Enter
+        new ScanCodeMapping (
+            28,
+            VK.RETURN,
+            ConsoleModifiers.Shift,
+            '\u000D'
+        ),
+        new ScanCodeMapping (
+            29,
+            VK.CONTROL,
+            0,
+            '\0'
+        ), // Control
+        new ScanCodeMapping (
+            29,
+            VK.CONTROL,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            30,
+            (VK)'A',
+            0,
+            'a'
+        ), // A
+        new ScanCodeMapping (
+            30,
+            (VK)'A',
+            ConsoleModifiers.Shift,
+            'A'
+        ),
+        new ScanCodeMapping (
+            31,
+            (VK)'S',
+            0,
+            's'
+        ), // S
+        new ScanCodeMapping (
+            31,
+            (VK)'S',
+            ConsoleModifiers.Shift,
+            'S'
+        ),
+        new ScanCodeMapping (
+            32,
+            (VK)'D',
+            0,
+            'd'
+        ), // D
+        new ScanCodeMapping (
+            32,
+            (VK)'D',
+            ConsoleModifiers.Shift,
+            'D'
+        ),
+        new ScanCodeMapping (
+            33,
+            (VK)'F',
+            0,
+            'f'
+        ), // F
+        new ScanCodeMapping (
+            33,
+            (VK)'F',
+            ConsoleModifiers.Shift,
+            'F'
+        ),
+        new ScanCodeMapping (
+            34,
+            (VK)'G',
+            0,
+            'g'
+        ), // G
+        new ScanCodeMapping (
+            34,
+            (VK)'G',
+            ConsoleModifiers.Shift,
+            'G'
+        ),
+        new ScanCodeMapping (
+            35,
+            (VK)'H',
+            0,
+            'h'
+        ), // H
+        new ScanCodeMapping (
+            35,
+            (VK)'H',
+            ConsoleModifiers.Shift,
+            'H'
+        ),
+        new ScanCodeMapping (
+            36,
+            (VK)'J',
+            0,
+            'j'
+        ), // J
+        new ScanCodeMapping (
+            36,
+            (VK)'J',
+            ConsoleModifiers.Shift,
+            'J'
+        ),
+        new ScanCodeMapping (
+            37,
+            (VK)'K',
+            0,
+            'k'
+        ), // K
+        new ScanCodeMapping (
+            37,
+            (VK)'K',
+            ConsoleModifiers.Shift,
+            'K'
+        ),
+        new ScanCodeMapping (
+            38,
+            (VK)'L',
+            0,
+            'l'
+        ), // L
+        new ScanCodeMapping (
+            38,
+            (VK)'L',
+            ConsoleModifiers.Shift,
+            'L'
+        ),
+        new ScanCodeMapping (
+            39,
+            VK.OEM_3,
+            0,
+            '`'
+        ), // Oem3 (Backtick/Grave)
+        new ScanCodeMapping (
+            39,
+            VK.OEM_3,
+            ConsoleModifiers.Shift,
+            '~'
+        ),
+        new ScanCodeMapping (
+            40,
+            VK.OEM_7,
+            0,
+            '\''
+        ), // Oem7 (Single Quote)
+        new ScanCodeMapping (
+            40,
+            VK.OEM_7,
+            ConsoleModifiers.Shift,
+            '\"'
+        ),
+        new ScanCodeMapping (
+            41,
+            VK.OEM_5,
+            0,
+            '\\'
+        ), // Oem5 (Backslash)
+        new ScanCodeMapping (
+            41,
+            VK.OEM_5,
+            ConsoleModifiers.Shift,
+            '|'
+        ),
+        new ScanCodeMapping (
+            42,
+            VK.LSHIFT,
+            0,
+            '\0'
+        ), // Left Shift
+        new ScanCodeMapping (
+            42,
+            VK.LSHIFT,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            43,
+            VK.OEM_2,
+            0,
+            '/'
+        ), // Oem2 (Forward Slash)
+        new ScanCodeMapping (
+            43,
+            VK.OEM_2,
+            ConsoleModifiers.Shift,
+            '?'
+        ),
+        new ScanCodeMapping (
+            44,
+            (VK)'Z',
+            0,
+            'z'
+        ), // Z
+        new ScanCodeMapping (
+            44,
+            (VK)'Z',
+            ConsoleModifiers.Shift,
+            'Z'
+        ),
+        new ScanCodeMapping (
+            45,
+            (VK)'X',
+            0,
+            'x'
+        ), // X
+        new ScanCodeMapping (
+            45,
+            (VK)'X',
+            ConsoleModifiers.Shift,
+            'X'
+        ),
+        new ScanCodeMapping (
+            46,
+            (VK)'C',
+            0,
+            'c'
+        ), // C
+        new ScanCodeMapping (
+            46,
+            (VK)'C',
+            ConsoleModifiers.Shift,
+            'C'
+        ),
+        new ScanCodeMapping (
+            47,
+            (VK)'V',
+            0,
+            'v'
+        ), // V
+        new ScanCodeMapping (
+            47,
+            (VK)'V',
+            ConsoleModifiers.Shift,
+            'V'
+        ),
+        new ScanCodeMapping (
+            48,
+            (VK)'B',
+            0,
+            'b'
+        ), // B
+        new ScanCodeMapping (
+            48,
+            (VK)'B',
+            ConsoleModifiers.Shift,
+            'B'
+        ),
+        new ScanCodeMapping (
+            49,
+            (VK)'N',
+            0,
+            'n'
+        ), // N
+        new ScanCodeMapping (
+            49,
+            (VK)'N',
+            ConsoleModifiers.Shift,
+            'N'
+        ),
+        new ScanCodeMapping (
+            50,
+            (VK)'M',
+            0,
+            'm'
+        ), // M
+        new ScanCodeMapping (
+            50,
+            (VK)'M',
+            ConsoleModifiers.Shift,
+            'M'
+        ),
+        new ScanCodeMapping (
+            51,
+            VK.OEM_COMMA,
+            0,
+            ','
+        ), // OemComma
+        new ScanCodeMapping (
+            51,
+            VK.OEM_COMMA,
+            ConsoleModifiers.Shift,
+            '<'
+        ),
+        new ScanCodeMapping (
+            52,
+            VK.OEM_PERIOD,
+            0,
+            '.'
+        ), // OemPeriod
+        new ScanCodeMapping (
+            52,
+            VK.OEM_PERIOD,
+            ConsoleModifiers.Shift,
+            '>'
+        ),
+        new ScanCodeMapping (
+            53,
+            VK.OEM_MINUS,
+            0,
+            '-'
+        ), // OemMinus
+        new ScanCodeMapping (
+            53,
+            VK.OEM_MINUS,
+            ConsoleModifiers.Shift,
+            '_'
+        ),
+        new ScanCodeMapping (
+            54,
+            VK.RSHIFT,
+            0,
+            '\0'
+        ), // Right Shift
+        new ScanCodeMapping (
+            54,
+            VK.RSHIFT,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            55,
+            VK.PRINT,
+            0,
+            '\0'
+        ), // Print Screen
+        new ScanCodeMapping (
+            55,
+            VK.PRINT,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            56,
+            VK.LMENU,
+            0,
+            '\0'
+        ), // Alt
+        new ScanCodeMapping (
+            56,
+            VK.LMENU,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            57,
+            VK.SPACE,
+            0,
+            ' '
+        ), // Spacebar
+        new ScanCodeMapping (
+            57,
+            VK.SPACE,
+            ConsoleModifiers.Shift,
+            ' '
+        ),
+        new ScanCodeMapping (
+            58,
+            VK.CAPITAL,
+            0,
+            '\0'
+        ), // Caps Lock
+        new ScanCodeMapping (
+            58,
+            VK.CAPITAL,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            59,
+            VK.F1,
+            0,
+            '\0'
+        ), // F1
+        new ScanCodeMapping (
+            59,
+            VK.F1,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            60,
+            VK.F2,
+            0,
+            '\0'
+        ), // F2
+        new ScanCodeMapping (
+            60,
+            VK.F2,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            61,
+            VK.F3,
+            0,
+            '\0'
+        ), // F3
+        new ScanCodeMapping (
+            61,
+            VK.F3,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            62,
+            VK.F4,
+            0,
+            '\0'
+        ), // F4
+        new ScanCodeMapping (
+            62,
+            VK.F4,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            63,
+            VK.F5,
+            0,
+            '\0'
+        ), // F5
+        new ScanCodeMapping (
+            63,
+            VK.F5,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            64,
+            VK.F6,
+            0,
+            '\0'
+        ), // F6
+        new ScanCodeMapping (
+            64,
+            VK.F6,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            65,
+            VK.F7,
+            0,
+            '\0'
+        ), // F7
+        new ScanCodeMapping (
+            65,
+            VK.F7,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            66,
+            VK.F8,
+            0,
+            '\0'
+        ), // F8
+        new ScanCodeMapping (
+            66,
+            VK.F8,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            67,
+            VK.F9,
+            0,
+            '\0'
+        ), // F9
+        new ScanCodeMapping (
+            67,
+            VK.F9,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            68,
+            VK.F10,
+            0,
+            '\0'
+        ), // F10
+        new ScanCodeMapping (
+            68,
+            VK.F10,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            69,
+            VK.NUMLOCK,
+            0,
+            '\0'
+        ), // Num Lock
+        new ScanCodeMapping (
+            69,
+            VK.NUMLOCK,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            70,
+            VK.SCROLL,
+            0,
+            '\0'
+        ), // Scroll Lock
+        new ScanCodeMapping (
+            70,
+            VK.SCROLL,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            71,
+            VK.HOME,
+            0,
+            '\0'
+        ), // Home
+        new ScanCodeMapping (
+            71,
+            VK.HOME,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            72,
+            VK.UP,
+            0,
+            '\0'
+        ), // Up Arrow
+        new ScanCodeMapping (
+            72,
+            VK.UP,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            73,
+            VK.PRIOR,
+            0,
+            '\0'
+        ), // Page Up
+        new ScanCodeMapping (
+            73,
+            VK.PRIOR,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            74,
+            VK.SUBTRACT,
+            0,
+            '-'
+        ), // Subtract (Num Pad '-')
+        new ScanCodeMapping (
+            74,
+            VK.SUBTRACT,
+            ConsoleModifiers.Shift,
+            '-'
+        ),
+        new ScanCodeMapping (
+            75,
+            VK.LEFT,
+            0,
+            '\0'
+        ), // Left Arrow
+        new ScanCodeMapping (
+            75,
+            VK.LEFT,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            76,
+            VK.CLEAR,
+            0,
+            '\0'
+        ), // Center key (Num Pad 5 with Num Lock off)
+        new ScanCodeMapping (
+            76,
+            VK.CLEAR,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            77,
+            VK.RIGHT,
+            0,
+            '\0'
+        ), // Right Arrow
+        new ScanCodeMapping (
+            77,
+            VK.RIGHT,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            78,
+            VK.ADD,
+            0,
+            '+'
+        ), // Add (Num Pad '+')
+        new ScanCodeMapping (
+            78,
+            VK.ADD,
+            ConsoleModifiers.Shift,
+            '+'
+        ),
+        new ScanCodeMapping (
+            79,
+            VK.END,
+            0,
+            '\0'
+        ), // End
+        new ScanCodeMapping (
+            79,
+            VK.END,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            80,
+            VK.DOWN,
+            0,
+            '\0'
+        ), // Down Arrow
+        new ScanCodeMapping (
+            80,
+            VK.DOWN,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            81,
+            VK.NEXT,
+            0,
+            '\0'
+        ), // Page Down
+        new ScanCodeMapping (
+            81,
+            VK.NEXT,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            82,
+            VK.INSERT,
+            0,
+            '\0'
+        ), // Insert
+        new ScanCodeMapping (
+            82,
+            VK.INSERT,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            83,
+            VK.DELETE,
+            0,
+            '\0'
+        ), // Delete
+        new ScanCodeMapping (
+            83,
+            VK.DELETE,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            86,
+            VK.OEM_102,
+            0,
+            '<'
+        ), // OEM 102 (Typically '<' or '|' key next to Left Shift)
+        new ScanCodeMapping (
+            86,
+            VK.OEM_102,
+            ConsoleModifiers.Shift,
+            '>'
+        ),
+        new ScanCodeMapping (
+            87,
+            VK.F11,
+            0,
+            '\0'
+        ), // F11
+        new ScanCodeMapping (
+            87,
+            VK.F11,
+            ConsoleModifiers.Shift,
+            '\0'
+        ),
+        new ScanCodeMapping (
+            88,
+            VK.F12,
+            0,
+            '\0'
+        ), // F12
+        new ScanCodeMapping (
+            88,
+            VK.F12,
+            ConsoleModifiers.Shift,
+            '\0'
+        )
+    };
 
     /// <summary>Decode a <see cref="ConsoleKeyInfo"/> that is using <see cref="ConsoleKey.Packet"/>.</summary>
     /// <param name="consoleKeyInfo">The console key info.</param>

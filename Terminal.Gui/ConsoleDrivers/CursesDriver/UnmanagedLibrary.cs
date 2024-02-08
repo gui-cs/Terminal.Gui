@@ -15,7 +15,7 @@
 #define GUICS
 using System.Runtime.InteropServices;
 
-namespace Unix.Terminal; 
+namespace Unix.Terminal;
 
 /// <summary>
 ///     Represents a dynamically loaded unmanaged library in a (partially) platform independent manner. First, the
@@ -209,9 +209,11 @@ class UnmanagedLibrary {
         }
 
         throw new FileNotFoundException (
-                                         string.Format (
-                                                        "Error loading native library. Not found in any of the possible locations: {0}",
-                                                        string.Join (",", libraryPathAlternatives)));
+            string.Format (
+                "Error loading native library. Not found in any of the possible locations: {0}",
+                string.Join (",", libraryPathAlternatives)
+            )
+        );
     }
 
     private static class Windows {
@@ -251,9 +253,10 @@ class UnmanagedLibrary {
         // Note: meaning of -1 stay the same even for non-single-file form factors.
         static CoreCLR () {
             NativeLibrary.SetDllImportResolver (
-                                                typeof (CoreCLR).Assembly,
-                                                (libraryName, assembly, searchPath) =>
-                                                    libraryName == "libcoreclr.so" ? -1 : nint.Zero);
+                typeof (CoreCLR).Assembly,
+                (libraryName, assembly, searchPath) =>
+                    libraryName == "libcoreclr.so" ? -1 : nint.Zero
+            );
         }
 
         [DllImport ("libcoreclr.so")] internal extern static nint dlopen (string filename, int flags);

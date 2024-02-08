@@ -4,7 +4,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Unix main loop, suitable for using on Posix systems</summary>
 /// <remarks>
@@ -34,20 +34,20 @@ class UnixMainLoop : IMainLoopDriver {
         PollNval = 32
     }
 
-    public const int KEY_RESIZE = unchecked ((int)0xffffffffffffffff);
-    private static readonly nint _ignore = Marshal.AllocHGlobal (1);
-    private readonly Dictionary<int, Watch> _descriptorWatchers = new ();
-    private readonly int[] _wakeUpPipes = new int [2];
-    private readonly CursesDriver _cursesDriver;
-    private MainLoop _mainLoop;
-    private bool _pollDirty = true;
-    private Pollfd[] _pollMap;
-    private bool _winChanged;
-
     public UnixMainLoop (ConsoleDriver consoleDriver = null) {
         // UnixDriver doesn't use the consoleDriver parameter, but the WindowsDriver does.
         _cursesDriver = (CursesDriver)Application.Driver;
     }
+
+    public const int KEY_RESIZE = unchecked ((int)0xffffffffffffffff);
+    private static readonly nint _ignore = Marshal.AllocHGlobal (1);
+    private readonly CursesDriver _cursesDriver;
+    private readonly Dictionary<int, Watch> _descriptorWatchers = new ();
+    private readonly int[] _wakeUpPipes = new int [2];
+    private bool _pollDirty = true;
+    private bool _winChanged;
+    private MainLoop _mainLoop;
+    private Pollfd[] _pollMap;
 
     void IMainLoopDriver.Wakeup () {
         if (!ConsoleDriver.RunningUnitTests) {
@@ -64,13 +64,14 @@ class UnixMainLoop : IMainLoopDriver {
         try {
             pipe (_wakeUpPipes);
             AddWatch (
-                      _wakeUpPipes[0],
-                      Condition.PollIn,
-                      ml => {
-                          read (_wakeUpPipes[0], _ignore, 1);
+                _wakeUpPipes[0],
+                Condition.PollIn,
+                ml => {
+                    read (_wakeUpPipes[0], _ignore, 1);
 
-                          return true;
-                      });
+                    return true;
+                }
+            );
         }
         catch (DllNotFoundException e) {
             throw new NotSupportedException ("libc not found", e);
@@ -187,8 +188,8 @@ class UnixMainLoop : IMainLoopDriver {
     }
 
     private class Watch {
-        public Func<MainLoop, bool> Callback;
         public Condition Condition;
+        public Func<MainLoop, bool> Callback;
         public int File;
     }
 }

@@ -13,29 +13,27 @@ public class TrueColors : Scenario {
         bool canTrueColor = Application.Driver.SupportsTrueColor;
 
         var lblDriverName = new Label {
-                                          X = x,
-                                          Y = y++,
-                                          Text = $"Current driver is {Application.Driver.GetType ().Name}"
-                                      };
+            X = x, Y = y++, Text = $"Current driver is {Application.Driver.GetType ().Name}"
+        };
         Win.Add (lblDriverName);
         y++;
 
         var cbSupportsTrueColor = new CheckBox {
-                                                   X = x,
-                                                   Y = y++,
-                                                   Checked = canTrueColor,
-                                                   CanFocus = false,
-                                                   Text = "Driver supports true color "
-                                               };
+            X = x,
+            Y = y++,
+            Checked = canTrueColor,
+            CanFocus = false,
+            Text = "Driver supports true color "
+        };
         Win.Add (cbSupportsTrueColor);
 
         var cbUseTrueColor = new CheckBox {
-                                              X = x,
-                                              Y = y++,
-                                              Checked = Application.Force16Colors,
-                                              Enabled = canTrueColor,
-                                              Text = "Force 16 colors"
-                                          };
+            X = x,
+            Y = y++,
+            Checked = Application.Force16Colors,
+            Enabled = canTrueColor,
+            Text = "Force 16 colors"
+        };
         cbUseTrueColor.Toggled += (_, evt) => { Application.Force16Colors = evt.NewValue ?? false; };
         Win.Add (cbUseTrueColor);
 
@@ -49,47 +47,23 @@ public class TrueColors : Scenario {
         SetupGradient ("Gray gradient", x, ref y, i => new Color (i, i, i));
 
         Win.Add (
-                 new Label {
-                               X = Pos.AnchorEnd (44),
-                               Y = 2,
-                               Text = "Mouse over to get the gradient view color:"
-                           });
+            new Label { X = Pos.AnchorEnd (44), Y = 2, Text = "Mouse over to get the gradient view color:" }
+        );
         Win.Add (
-                 new Label {
-                               X = Pos.AnchorEnd (44),
-                               Y = 4,
-                               Text = "Red:"
-                           });
+            new Label { X = Pos.AnchorEnd (44), Y = 4, Text = "Red:" }
+        );
         Win.Add (
-                 new Label {
-                               X = Pos.AnchorEnd (44),
-                               Y = 5,
-                               Text = "Green:"
-                           });
+            new Label { X = Pos.AnchorEnd (44), Y = 5, Text = "Green:" }
+        );
         Win.Add (
-                 new Label {
-                               X = Pos.AnchorEnd (44),
-                               Y = 6,
-                               Text = "Blue:"
-                           });
+            new Label { X = Pos.AnchorEnd (44), Y = 6, Text = "Blue:" }
+        );
 
-        var lblRed = new Label {
-                                   X = Pos.AnchorEnd (32),
-                                   Y = 4,
-                                   Text = "na"
-                               };
+        var lblRed = new Label { X = Pos.AnchorEnd (32), Y = 4, Text = "na" };
         Win.Add (lblRed);
-        var lblGreen = new Label {
-                                     X = Pos.AnchorEnd (32),
-                                     Y = 5,
-                                     Text = "na"
-                                 };
+        var lblGreen = new Label { X = Pos.AnchorEnd (32), Y = 5, Text = "na" };
         Win.Add (lblGreen);
-        var lblBlue = new Label {
-                                    X = Pos.AnchorEnd (32),
-                                    Y = 6,
-                                    Text = "na"
-                                };
+        var lblBlue = new Label { X = Pos.AnchorEnd (32), Y = 6, Text = "na" };
         Win.Add (lblBlue);
 
         Application.MouseEvent += (s, e) => {
@@ -103,24 +77,20 @@ public class TrueColors : Scenario {
     }
 
     private void SetupGradient (string name, int x, ref int y, Func<int, Color> colorFunc) {
-        var gradient = new Label {
-                                     X = x,
-                                     Y = y++,
-                                     Text = name
-                                 };
+        var gradient = new Label { X = x, Y = y++, Text = name };
         Win.Add (gradient);
         for (int dx = x, i = 0; i <= 256; i += 4) {
             var l = new Label {
-                                  X = dx++,
-                                  Y = y,
-                                  ColorScheme = new ColorScheme {
-                                                                    Normal = new Attribute (
-                                                                         colorFunc (Math.Clamp (i, 0, 255)),
-                                                                         colorFunc (Math.Clamp (i, 0, 255))
-                                                                        )
-                                                                },
-                                  Text = " "
-                              };
+                X = dx++,
+                Y = y,
+                ColorScheme = new ColorScheme {
+                    Normal = new Attribute (
+                        colorFunc (Math.Clamp (i, 0, 255)),
+                        colorFunc (Math.Clamp (i, 0, 255))
+                    )
+                },
+                Text = " "
+            };
             Win.Add (l);
         }
 

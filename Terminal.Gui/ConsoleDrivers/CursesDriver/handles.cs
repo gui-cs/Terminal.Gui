@@ -26,7 +26,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Unix.Terminal; 
+namespace Unix.Terminal;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public partial class Curses {
     public class Window {
@@ -77,8 +77,8 @@ public partial class Curses {
 
     // Currently unused, to do later
     internal class Screen {
-        public readonly nint Handle;
         internal Screen (nint handle) { Handle = handle; }
+        public readonly nint Handle;
     }
 
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

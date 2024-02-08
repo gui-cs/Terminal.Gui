@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>Event arguments for Title change events.</summary>
 public class TitleEventArgs : EventArgs {

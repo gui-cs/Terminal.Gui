@@ -5,8 +5,6 @@
 namespace Terminal.Gui.ApplicationTests;
 
 public class MouseTests {
-    private readonly ITestOutputHelper _output;
-
     public MouseTests (ITestOutputHelper output) {
         _output = output;
 #if DEBUG_IDISPOSABLE
@@ -14,6 +12,8 @@ public class MouseTests {
         RunState.Instances.Clear ();
 #endif
     }
+
+    private readonly ITestOutputHelper _output;
 
     #region mouse coordinate tests
 
@@ -38,11 +38,7 @@ public class MouseTests {
         int expectedY,
         bool expectedClicked
     ) {
-        var mouseEvent = new MouseEvent {
-                                            X = clickX,
-                                            Y = clickY,
-                                            Flags = MouseFlags.Button1Pressed
-                                        };
+        var mouseEvent = new MouseEvent { X = clickX, Y = clickY, Flags = MouseFlags.Button1Pressed };
         var mouseEventArgs = new MouseEventEventArgs (mouseEvent);
         var clicked = false;
 
@@ -113,11 +109,7 @@ public class MouseTests {
 
         Application.Begin (Application.Top);
 
-        var mouseEvent = new MouseEvent {
-                                            X = clickX,
-                                            Y = clickY,
-                                            Flags = MouseFlags.Button1Clicked
-                                        };
+        var mouseEvent = new MouseEvent { X = clickX, Y = clickY, Flags = MouseFlags.Button1Clicked };
         var mouseEventArgs = new MouseEventEventArgs (mouseEvent);
 
         Application.Top.MouseClick += (s, e) => {
@@ -201,12 +193,7 @@ public class MouseTests {
         Application.Top.Height = size.Height * 2;
         Application.Top.BorderStyle = LineStyle.None;
 
-        var view = new View {
-                                X = pos.X,
-                                Y = pos.Y,
-                                Width = size.Width,
-                                Height = size.Height
-                            };
+        var view = new View { X = pos.X, Y = pos.Y, Width = size.Width, Height = size.Height };
 
         // Give the view a border. With PR #2920, mouse clicks are only passed if they are inside the view's Bounds.
         view.BorderStyle = LineStyle.Single;
@@ -214,11 +201,7 @@ public class MouseTests {
 
         Application.Top.Add (view);
         Application.Begin (Application.Top);
-        var mouseEvent = new MouseEvent {
-                                            X = clickX,
-                                            Y = clickY,
-                                            Flags = MouseFlags.Button1Clicked
-                                        };
+        var mouseEvent = new MouseEvent { X = clickX, Y = clickY, Flags = MouseFlags.Button1Clicked };
         var mouseEventArgs = new MouseEventEventArgs (mouseEvent);
 
         view.MouseClick += (s, e) => {
@@ -239,11 +222,7 @@ public class MouseTests {
     [AutoInitShutdown]
     public void MouseGrabView_WithNullMouseEventView () {
         var tf = new TextField { Width = 10 };
-        var sv = new ScrollView {
-                                    Width = Dim.Fill (),
-                                    Height = Dim.Fill (),
-                                    ContentSize = new Size (100, 100)
-                                };
+        var sv = new ScrollView { Width = Dim.Fill (), Height = Dim.Fill (), ContentSize = new Size (100, 100) };
 
         sv.Add (tf);
         Application.Top.Add (sv);
@@ -257,12 +236,10 @@ public class MouseTests {
                 Assert.Null (Application.MouseGrabView);
 
                 Application.OnMouseEvent (
-                                          new MouseEventEventArgs (
-                                                                   new MouseEvent {
-                                                                       X = 5,
-                                                                       Y = 5,
-                                                                       Flags = MouseFlags.ReportMousePosition
-                                                                   }));
+                    new MouseEventEventArgs (
+                        new MouseEvent { X = 5, Y = 5, Flags = MouseFlags.ReportMousePosition }
+                    )
+                );
 
                 Assert.Equal (sv, Application.MouseGrabView);
 
@@ -275,32 +252,26 @@ public class MouseTests {
                 Assert.Null (Application.MouseGrabView);
 
                 Application.OnMouseEvent (
-                                          new MouseEventEventArgs (
-                                                                   new MouseEvent {
-                                                                       X = 5,
-                                                                       Y = 5,
-                                                                       Flags = MouseFlags.ReportMousePosition
-                                                                   }));
+                    new MouseEventEventArgs (
+                        new MouseEvent { X = 5, Y = 5, Flags = MouseFlags.ReportMousePosition }
+                    )
+                );
 
                 Assert.Null (Application.MouseGrabView);
 
                 Application.OnMouseEvent (
-                                          new MouseEventEventArgs (
-                                                                   new MouseEvent {
-                                                                       X = 40,
-                                                                       Y = 12,
-                                                                       Flags = MouseFlags.ReportMousePosition
-                                                                   }));
+                    new MouseEventEventArgs (
+                        new MouseEvent { X = 40, Y = 12, Flags = MouseFlags.ReportMousePosition }
+                    )
+                );
 
                 Assert.Null (Application.MouseGrabView);
 
                 Application.OnMouseEvent (
-                                          new MouseEventEventArgs (
-                                                                   new MouseEvent {
-                                                                       X = 0,
-                                                                       Y = 0,
-                                                                       Flags = MouseFlags.Button1Pressed
-                                                                   }));
+                    new MouseEventEventArgs (
+                        new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed }
+                    )
+                );
 
                 Assert.Null (Application.MouseGrabView);
 

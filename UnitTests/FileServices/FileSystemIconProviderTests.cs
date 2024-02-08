@@ -3,15 +3,12 @@ using System.IO.Abstractions.TestingHelpers;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Terminal.Gui.FileServicesTests; 
+namespace Terminal.Gui.FileServicesTests;
 
 public class FileSystemIconProviderTests {
     [Fact]
     public void FlagsShouldBeMutuallyExclusive () {
-        var p = new FileSystemIconProvider {
-                                               UseUnicodeCharacters = false,
-                                               UseNerdIcons = false
-                                           };
+        var p = new FileSystemIconProvider { UseUnicodeCharacters = false, UseNerdIcons = false };
 
         Assert.False (p.UseUnicodeCharacters);
         Assert.False (p.UseNerdIcons);
@@ -42,10 +39,11 @@ public class FileSystemIconProviderTests {
         Assert.Equal (IsWindows () ? new Rune ('\\') : new Rune ('/'), p.GetIcon (fs.DirectoryInfo.New (@"c:\")));
 
         Assert.Equal (
-                      new Rune (' '),
-                      p.GetIcon (
-                                 fs.FileInfo.New (GetFileSystemRoot () + @"myfile.txt"))
-                     );
+            new Rune (' '),
+            p.GetIcon (
+                fs.FileInfo.New (GetFileSystemRoot () + @"myfile.txt")
+            )
+        );
     }
 
     private string GetFileSystemRoot () { return IsWindows () ? @"c:\" : "/"; }

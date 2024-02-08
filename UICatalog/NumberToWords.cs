@@ -1,19 +1,34 @@
 ﻿using System;
 
-namespace UICatalog; 
+namespace UICatalog;
 
 public static class NumberToWords {
     private static readonly string[] tens = {
-                                                "", "", "Twenty", "Thirty", "Forty",
-                                                "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"
-                                            };
+        "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"
+    };
 
     private static readonly string[] units = {
-                                                 "Zero", "One", "Two", "Three",
-                                                 "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven",
-                                                 "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
-                                                 "Seventeen", "Eighteen", "Nineteen"
-                                             };
+        "Zero",
+        "One",
+        "Two",
+        "Three",
+        "Four",
+        "Five",
+        "Six",
+        "Seven",
+        "Eight",
+        "Nine",
+        "Ten",
+        "Eleven",
+        "Twelve",
+        "Thirteen",
+        "Fourteen",
+        "Fifteen",
+        "Sixteen",
+        "Seventeen",
+        "Eighteen",
+        "Nineteen"
+    };
 
     public static string Convert (long i) {
         if (i < 20) {

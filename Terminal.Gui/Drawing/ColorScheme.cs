@@ -14,12 +14,6 @@ namespace Terminal.Gui;
 /// </remarks>
 [JsonConverter (typeof (ColorSchemeJsonConverter))]
 public class ColorScheme : IEquatable<ColorScheme> {
-    private readonly Attribute _disabled;
-    private readonly Attribute _focus;
-    private readonly Attribute _hotFocus;
-    private readonly Attribute _hotNormal;
-    private readonly Attribute _normal;
-
     /// <summary>Creates a new instance set to the default colors (see <see cref="Attribute.Default"/>).</summary>
     public ColorScheme () : this (Attribute.Default) { }
 
@@ -46,6 +40,12 @@ public class ColorScheme : IEquatable<ColorScheme> {
         _disabled = attribute;
         _hotFocus = attribute;
     }
+
+    private readonly Attribute _disabled;
+    private readonly Attribute _focus;
+    private readonly Attribute _hotFocus;
+    private readonly Attribute _hotNormal;
+    private readonly Attribute _normal;
 
     /// <summary>The default foreground and background color for text when the view is disabled.</summary>
     public Attribute Disabled { get => _disabled; init => _disabled = value; }
@@ -171,10 +171,12 @@ public static class Colors {
     /// <summary>Resets the <see cref="ColorSchemes"/> dictionary to the default values.</summary>
     public static Dictionary<string, ColorScheme> Reset () {
         ColorSchemes ??= new Dictionary<string, ColorScheme> (
-                                                              5,
-                                                              CultureInfo.InvariantCulture.CompareInfo
-                                                                         .GetStringComparer (
-                                                                          CompareOptions.IgnoreCase));
+            5,
+            CultureInfo.InvariantCulture.CompareInfo
+                .GetStringComparer (
+                    CompareOptions.IgnoreCase
+                )
+        );
         ColorSchemes.Clear ();
         ColorSchemes.Add ("TopLevel", new ColorScheme ());
         ColorSchemes.Add ("Base", new ColorScheme ());

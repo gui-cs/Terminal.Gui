@@ -5,8 +5,6 @@
 ///     <see cref="TileView.RebuildForTileCount(int)"/> or <see cref="TileView.InsertTile(int)"/>.
 /// </summary>
 public class Tile {
-    private string _title = string.Empty;
-
     /// <summary>Creates a new instance of the <see cref="Tile"/> class.</summary>
     public Tile () {
         ContentView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
@@ -17,11 +15,7 @@ public class Tile {
         MinSize = 0;
     }
 
-    /// <summary>
-    ///     The <see cref="ContentView"/> that is contained in this <see cref="TileView"/>. Add new child views to this
-    ///     member for multiple <see cref="ContentView"/>s within the <see cref="Tile"/>.
-    /// </summary>
-    public View ContentView { get; internal set; }
+    private string _title = string.Empty;
 
     /// <summary>
     ///     Gets or Sets the minimum size you to allow when splitter resizing along parent
@@ -48,6 +42,12 @@ public class Tile {
             _title = value;
         }
     }
+
+    /// <summary>
+    ///     The <see cref="ContentView"/> that is contained in this <see cref="TileView"/>. Add new child views to this
+    ///     member for multiple <see cref="ContentView"/>s within the <see cref="Tile"/>.
+    /// </summary>
+    public View ContentView { get; internal set; }
 
     /// <summary>Called when the <see cref="Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.</summary>
     /// <param name="oldTitle">The <see cref="Title"/> that is/has been replaced.</param>

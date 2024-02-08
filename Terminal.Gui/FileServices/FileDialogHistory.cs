@@ -1,12 +1,12 @@
 ﻿using System.IO.Abstractions;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 class FileDialogHistory {
-    private readonly Stack<FileDialogState> back = new ();
-    private readonly FileDialog dlg;
-    private readonly Stack<FileDialogState> forward = new ();
     public FileDialogHistory (FileDialog dlg) { this.dlg = dlg; }
+    private readonly FileDialog dlg;
+    private readonly Stack<FileDialogState> back = new ();
+    private readonly Stack<FileDialogState> forward = new ();
 
     public bool Back () {
         IDirectoryInfo goTo = null;

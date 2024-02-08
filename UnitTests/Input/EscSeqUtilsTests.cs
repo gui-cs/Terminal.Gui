@@ -5,18 +5,18 @@ namespace Terminal.Gui.InputTests;
 
 public class EscSeqUtilsTests {
     private bool _actionStarted;
-    private MouseFlags _arg1;
-    private Point _arg2;
-    private string _c1Control, _code, _terminating;
-    private ConsoleKeyInfo[] _cki;
-    private EscSeqRequests _escSeqReqProc;
     private bool _isKeyMouse;
     private bool _isReq;
     private ConsoleKey _key;
-    private ConsoleModifiers _mod;
-    private List<MouseFlags> _mouseFlags;
     private ConsoleKeyInfo _newConsoleKeyInfo;
+    private ConsoleKeyInfo[] _cki;
+    private ConsoleModifiers _mod;
+    private EscSeqRequests _escSeqReqProc;
+    private List<MouseFlags> _mouseFlags;
+    private MouseFlags _arg1;
+    private Point _arg2;
     private Point _pos;
+    private string _c1Control, _code, _terminating;
     private string[] _values;
 
     [Fact]
@@ -26,20 +26,21 @@ public class EscSeqUtilsTests {
         _cki = new ConsoleKeyInfo[] { new ('\u001b', 0, false, false, false) };
         var expectedCki = new ConsoleKeyInfo ('\u001b', ConsoleKey.Escape, false, false, false);
         EscSeqUtils.DecodeEscSeq (
-                                  _escSeqReqProc,
-                                  ref _newConsoleKeyInfo,
-                                  ref _key,
-                                  _cki,
-                                  ref _mod,
-                                  out _c1Control,
-                                  out _code,
-                                  out _values,
-                                  out _terminating,
-                                  out _isKeyMouse,
-                                  out _mouseFlags,
-                                  out _pos,
-                                  out _isReq,
-                                  ProcessContinuousButtonPressed);
+            _escSeqReqProc,
+            ref _newConsoleKeyInfo,
+            ref _key,
+            _cki,
+            ref _mod,
+            out _c1Control,
+            out _code,
+            out _values,
+            out _terminating,
+            out _isKeyMouse,
+            out _mouseFlags,
+            out _pos,
+            out _isReq,
+            ProcessContinuousButtonPressed
+        );
         Assert.Null (_escSeqReqProc);
         Assert.Equal (expectedCki, _newConsoleKeyInfo);
         Assert.Equal (ConsoleKey.Escape, _key);
@@ -56,26 +57,24 @@ public class EscSeqUtilsTests {
         Assert.Equal (Point.Empty, _arg2);
 
         ClearAll ();
-        _cki = new ConsoleKeyInfo[] {
-                                        new ('\u001b', 0, false, false, false),
-                                        new ('\u0012', 0, false, false, false)
-                                    };
+        _cki = new ConsoleKeyInfo[] { new ('\u001b', 0, false, false, false), new ('\u0012', 0, false, false, false) };
         expectedCki = new ConsoleKeyInfo ('\u0012', ConsoleKey.R, false, true, true);
         EscSeqUtils.DecodeEscSeq (
-                                  _escSeqReqProc,
-                                  ref _newConsoleKeyInfo,
-                                  ref _key,
-                                  _cki,
-                                  ref _mod,
-                                  out _c1Control,
-                                  out _code,
-                                  out _values,
-                                  out _terminating,
-                                  out _isKeyMouse,
-                                  out _mouseFlags,
-                                  out _pos,
-                                  out _isReq,
-                                  ProcessContinuousButtonPressed);
+            _escSeqReqProc,
+            ref _newConsoleKeyInfo,
+            ref _key,
+            _cki,
+            ref _mod,
+            out _c1Control,
+            out _code,
+            out _values,
+            out _terminating,
+            out _isKeyMouse,
+            out _mouseFlags,
+            out _pos,
+            out _isReq,
+            ProcessContinuousButtonPressed
+        );
         Assert.Null (_escSeqReqProc);
         Assert.Equal (expectedCki, _newConsoleKeyInfo);
         Assert.Equal (ConsoleKey.R, _key);
@@ -92,26 +91,24 @@ public class EscSeqUtilsTests {
         Assert.Equal (Point.Empty, _arg2);
 
         ClearAll ();
-        _cki = new ConsoleKeyInfo[] {
-                                        new ('\u001b', 0, false, false, false),
-                                        new ('r', 0, false, false, false)
-                                    };
+        _cki = new ConsoleKeyInfo[] { new ('\u001b', 0, false, false, false), new ('r', 0, false, false, false) };
         expectedCki = new ConsoleKeyInfo ('R', ConsoleKey.R, false, true, false);
         EscSeqUtils.DecodeEscSeq (
-                                  _escSeqReqProc,
-                                  ref _newConsoleKeyInfo,
-                                  ref _key,
-                                  _cki,
-                                  ref _mod,
-                                  out _c1Control,
-                                  out _code,
-                                  out _values,
-                                  out _terminating,
-                                  out _isKeyMouse,
-                                  out _mouseFlags,
-                                  out _pos,
-                                  out _isReq,
-                                  ProcessContinuousButtonPressed);
+            _escSeqReqProc,
+            ref _newConsoleKeyInfo,
+            ref _key,
+            _cki,
+            ref _mod,
+            out _c1Control,
+            out _code,
+            out _values,
+            out _terminating,
+            out _isKeyMouse,
+            out _mouseFlags,
+            out _pos,
+            out _isReq,
+            ProcessContinuousButtonPressed
+        );
         Assert.Null (_escSeqReqProc);
         Assert.Equal (expectedCki, _newConsoleKeyInfo);
         Assert.Equal (ConsoleKey.R, _key);
@@ -130,26 +127,25 @@ public class EscSeqUtilsTests {
         // SS3
         ClearAll ();
         _cki = new ConsoleKeyInfo[] {
-                                        new ('\u001b', 0, false, false, false),
-                                        new ('O', 0, false, false, false),
-                                        new ('R', 0, false, false, false)
-                                    };
+            new ('\u001b', 0, false, false, false), new ('O', 0, false, false, false), new ('R', 0, false, false, false)
+        };
         expectedCki = new ConsoleKeyInfo ('\0', ConsoleKey.F3, false, false, false);
         EscSeqUtils.DecodeEscSeq (
-                                  _escSeqReqProc,
-                                  ref _newConsoleKeyInfo,
-                                  ref _key,
-                                  _cki,
-                                  ref _mod,
-                                  out _c1Control,
-                                  out _code,
-                                  out _values,
-                                  out _terminating,
-                                  out _isKeyMouse,
-                                  out _mouseFlags,
-                                  out _pos,
-                                  out _isReq,
-                                  ProcessContinuousButtonPressed);
+            _escSeqReqProc,
+            ref _newConsoleKeyInfo,
+            ref _key,
+            _cki,
+            ref _mod,
+            out _c1Control,
+            out _code,
+            out _values,
+            out _terminating,
+            out _isKeyMouse,
+            out _mouseFlags,
+            out _pos,
+            out _isReq,
+            ProcessContinuousButtonPressed
+        );
         Assert.Null (_escSeqReqProc);
         Assert.Equal (expectedCki, _newConsoleKeyInfo);
         Assert.Equal (ConsoleKey.F3, _key);
@@ -169,29 +165,30 @@ public class EscSeqUtilsTests {
         // CSI
         ClearAll ();
         _cki = new ConsoleKeyInfo[] {
-                                        new ('\u001b', 0, false, false, false),
-                                        new ('[', 0, false, false, false),
-                                        new ('1', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('2', 0, false, false, false),
-                                        new ('R', 0, false, false, false)
-                                    };
+            new ('\u001b', 0, false, false, false),
+            new ('[', 0, false, false, false),
+            new ('1', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('2', 0, false, false, false),
+            new ('R', 0, false, false, false)
+        };
         expectedCki = new ConsoleKeyInfo ('\0', ConsoleKey.F3, true, false, false);
         EscSeqUtils.DecodeEscSeq (
-                                  _escSeqReqProc,
-                                  ref _newConsoleKeyInfo,
-                                  ref _key,
-                                  _cki,
-                                  ref _mod,
-                                  out _c1Control,
-                                  out _code,
-                                  out _values,
-                                  out _terminating,
-                                  out _isKeyMouse,
-                                  out _mouseFlags,
-                                  out _pos,
-                                  out _isReq,
-                                  ProcessContinuousButtonPressed);
+            _escSeqReqProc,
+            ref _newConsoleKeyInfo,
+            ref _key,
+            _cki,
+            ref _mod,
+            out _c1Control,
+            out _code,
+            out _values,
+            out _terminating,
+            out _isKeyMouse,
+            out _mouseFlags,
+            out _pos,
+            out _isReq,
+            ProcessContinuousButtonPressed
+        );
         Assert.Null (_escSeqReqProc);
         Assert.Equal (expectedCki, _newConsoleKeyInfo);
         Assert.Equal (ConsoleKey.F3, _key);
@@ -211,29 +208,30 @@ public class EscSeqUtilsTests {
 
         ClearAll ();
         _cki = new ConsoleKeyInfo[] {
-                                        new ('\u001b', 0, false, false, false),
-                                        new ('[', 0, false, false, false),
-                                        new ('1', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('3', 0, false, false, false),
-                                        new ('R', 0, false, false, false)
-                                    };
+            new ('\u001b', 0, false, false, false),
+            new ('[', 0, false, false, false),
+            new ('1', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('3', 0, false, false, false),
+            new ('R', 0, false, false, false)
+        };
         expectedCki = new ConsoleKeyInfo ('\0', ConsoleKey.F3, false, true, false);
         EscSeqUtils.DecodeEscSeq (
-                                  _escSeqReqProc,
-                                  ref _newConsoleKeyInfo,
-                                  ref _key,
-                                  _cki,
-                                  ref _mod,
-                                  out _c1Control,
-                                  out _code,
-                                  out _values,
-                                  out _terminating,
-                                  out _isKeyMouse,
-                                  out _mouseFlags,
-                                  out _pos,
-                                  out _isReq,
-                                  ProcessContinuousButtonPressed);
+            _escSeqReqProc,
+            ref _newConsoleKeyInfo,
+            ref _key,
+            _cki,
+            ref _mod,
+            out _c1Control,
+            out _code,
+            out _values,
+            out _terminating,
+            out _isKeyMouse,
+            out _mouseFlags,
+            out _pos,
+            out _isReq,
+            ProcessContinuousButtonPressed
+        );
         Assert.Null (_escSeqReqProc);
         Assert.Equal (expectedCki, _newConsoleKeyInfo);
         Assert.Equal (ConsoleKey.F3, _key);
@@ -253,29 +251,30 @@ public class EscSeqUtilsTests {
 
         ClearAll ();
         _cki = new ConsoleKeyInfo[] {
-                                        new ('\u001b', 0, false, false, false),
-                                        new ('[', 0, false, false, false),
-                                        new ('1', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('4', 0, false, false, false),
-                                        new ('R', 0, false, false, false)
-                                    };
+            new ('\u001b', 0, false, false, false),
+            new ('[', 0, false, false, false),
+            new ('1', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('4', 0, false, false, false),
+            new ('R', 0, false, false, false)
+        };
         expectedCki = new ConsoleKeyInfo ('\0', ConsoleKey.F3, true, true, false);
         EscSeqUtils.DecodeEscSeq (
-                                  _escSeqReqProc,
-                                  ref _newConsoleKeyInfo,
-                                  ref _key,
-                                  _cki,
-                                  ref _mod,
-                                  out _c1Control,
-                                  out _code,
-                                  out _values,
-                                  out _terminating,
-                                  out _isKeyMouse,
-                                  out _mouseFlags,
-                                  out _pos,
-                                  out _isReq,
-                                  ProcessContinuousButtonPressed);
+            _escSeqReqProc,
+            ref _newConsoleKeyInfo,
+            ref _key,
+            _cki,
+            ref _mod,
+            out _c1Control,
+            out _code,
+            out _values,
+            out _terminating,
+            out _isKeyMouse,
+            out _mouseFlags,
+            out _pos,
+            out _isReq,
+            ProcessContinuousButtonPressed
+        );
         Assert.Null (_escSeqReqProc);
         Assert.Equal (expectedCki, _newConsoleKeyInfo);
         Assert.Equal (ConsoleKey.F3, _key);
@@ -295,29 +294,30 @@ public class EscSeqUtilsTests {
 
         ClearAll ();
         _cki = new ConsoleKeyInfo[] {
-                                        new ('\u001b', 0, false, false, false),
-                                        new ('[', 0, false, false, false),
-                                        new ('1', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('5', 0, false, false, false),
-                                        new ('R', 0, false, false, false)
-                                    };
+            new ('\u001b', 0, false, false, false),
+            new ('[', 0, false, false, false),
+            new ('1', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('5', 0, false, false, false),
+            new ('R', 0, false, false, false)
+        };
         expectedCki = new ConsoleKeyInfo ('\0', ConsoleKey.F3, false, false, true);
         EscSeqUtils.DecodeEscSeq (
-                                  _escSeqReqProc,
-                                  ref _newConsoleKeyInfo,
-                                  ref _key,
-                                  _cki,
-                                  ref _mod,
-                                  out _c1Control,
-                                  out _code,
-                                  out _values,
-                                  out _terminating,
-                                  out _isKeyMouse,
-                                  out _mouseFlags,
-                                  out _pos,
-                                  out _isReq,
-                                  ProcessContinuousButtonPressed);
+            _escSeqReqProc,
+            ref _newConsoleKeyInfo,
+            ref _key,
+            _cki,
+            ref _mod,
+            out _c1Control,
+            out _code,
+            out _values,
+            out _terminating,
+            out _isKeyMouse,
+            out _mouseFlags,
+            out _pos,
+            out _isReq,
+            ProcessContinuousButtonPressed
+        );
         Assert.Null (_escSeqReqProc);
         Assert.Equal (expectedCki, _newConsoleKeyInfo);
         Assert.Equal (ConsoleKey.F3, _key);
@@ -337,29 +337,30 @@ public class EscSeqUtilsTests {
 
         ClearAll ();
         _cki = new ConsoleKeyInfo[] {
-                                        new ('\u001b', 0, false, false, false),
-                                        new ('[', 0, false, false, false),
-                                        new ('1', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('6', 0, false, false, false),
-                                        new ('R', 0, false, false, false)
-                                    };
+            new ('\u001b', 0, false, false, false),
+            new ('[', 0, false, false, false),
+            new ('1', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('6', 0, false, false, false),
+            new ('R', 0, false, false, false)
+        };
         expectedCki = new ConsoleKeyInfo ('\0', ConsoleKey.F3, true, false, true);
         EscSeqUtils.DecodeEscSeq (
-                                  _escSeqReqProc,
-                                  ref _newConsoleKeyInfo,
-                                  ref _key,
-                                  _cki,
-                                  ref _mod,
-                                  out _c1Control,
-                                  out _code,
-                                  out _values,
-                                  out _terminating,
-                                  out _isKeyMouse,
-                                  out _mouseFlags,
-                                  out _pos,
-                                  out _isReq,
-                                  ProcessContinuousButtonPressed);
+            _escSeqReqProc,
+            ref _newConsoleKeyInfo,
+            ref _key,
+            _cki,
+            ref _mod,
+            out _c1Control,
+            out _code,
+            out _values,
+            out _terminating,
+            out _isKeyMouse,
+            out _mouseFlags,
+            out _pos,
+            out _isReq,
+            ProcessContinuousButtonPressed
+        );
         Assert.Null (_escSeqReqProc);
         Assert.Equal (expectedCki, _newConsoleKeyInfo);
         Assert.Equal (ConsoleKey.F3, _key);
@@ -379,29 +380,30 @@ public class EscSeqUtilsTests {
 
         ClearAll ();
         _cki = new ConsoleKeyInfo[] {
-                                        new ('\u001b', 0, false, false, false),
-                                        new ('[', 0, false, false, false),
-                                        new ('1', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('7', 0, false, false, false),
-                                        new ('R', 0, false, false, false)
-                                    };
+            new ('\u001b', 0, false, false, false),
+            new ('[', 0, false, false, false),
+            new ('1', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('7', 0, false, false, false),
+            new ('R', 0, false, false, false)
+        };
         expectedCki = new ConsoleKeyInfo ('\0', ConsoleKey.F3, false, true, true);
         EscSeqUtils.DecodeEscSeq (
-                                  _escSeqReqProc,
-                                  ref _newConsoleKeyInfo,
-                                  ref _key,
-                                  _cki,
-                                  ref _mod,
-                                  out _c1Control,
-                                  out _code,
-                                  out _values,
-                                  out _terminating,
-                                  out _isKeyMouse,
-                                  out _mouseFlags,
-                                  out _pos,
-                                  out _isReq,
-                                  ProcessContinuousButtonPressed);
+            _escSeqReqProc,
+            ref _newConsoleKeyInfo,
+            ref _key,
+            _cki,
+            ref _mod,
+            out _c1Control,
+            out _code,
+            out _values,
+            out _terminating,
+            out _isKeyMouse,
+            out _mouseFlags,
+            out _pos,
+            out _isReq,
+            ProcessContinuousButtonPressed
+        );
         Assert.Null (_escSeqReqProc);
         Assert.Equal (expectedCki, _newConsoleKeyInfo);
         Assert.Equal (ConsoleKey.F3, _key);
@@ -421,29 +423,30 @@ public class EscSeqUtilsTests {
 
         ClearAll ();
         _cki = new ConsoleKeyInfo[] {
-                                        new ('\u001b', 0, false, false, false),
-                                        new ('[', 0, false, false, false),
-                                        new ('1', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('8', 0, false, false, false),
-                                        new ('R', 0, false, false, false)
-                                    };
+            new ('\u001b', 0, false, false, false),
+            new ('[', 0, false, false, false),
+            new ('1', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('8', 0, false, false, false),
+            new ('R', 0, false, false, false)
+        };
         expectedCki = new ConsoleKeyInfo ('\0', ConsoleKey.F3, true, true, true);
         EscSeqUtils.DecodeEscSeq (
-                                  _escSeqReqProc,
-                                  ref _newConsoleKeyInfo,
-                                  ref _key,
-                                  _cki,
-                                  ref _mod,
-                                  out _c1Control,
-                                  out _code,
-                                  out _values,
-                                  out _terminating,
-                                  out _isKeyMouse,
-                                  out _mouseFlags,
-                                  out _pos,
-                                  out _isReq,
-                                  ProcessContinuousButtonPressed);
+            _escSeqReqProc,
+            ref _newConsoleKeyInfo,
+            ref _key,
+            _cki,
+            ref _mod,
+            out _c1Control,
+            out _code,
+            out _values,
+            out _terminating,
+            out _isKeyMouse,
+            out _mouseFlags,
+            out _pos,
+            out _isReq,
+            ProcessContinuousButtonPressed
+        );
         Assert.Null (_escSeqReqProc);
         Assert.Equal (expectedCki, _newConsoleKeyInfo);
         Assert.Equal (ConsoleKey.F3, _key);
@@ -463,32 +466,33 @@ public class EscSeqUtilsTests {
 
         ClearAll ();
         _cki = new ConsoleKeyInfo[] {
-                                        new ('\u001b', 0, false, false, false),
-                                        new ('[', 0, false, false, false),
-                                        new ('<', 0, false, false, false),
-                                        new ('0', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('2', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('3', 0, false, false, false),
-                                        new ('M', 0, false, false, false)
-                                    };
+            new ('\u001b', 0, false, false, false),
+            new ('[', 0, false, false, false),
+            new ('<', 0, false, false, false),
+            new ('0', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('2', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('3', 0, false, false, false),
+            new ('M', 0, false, false, false)
+        };
         expectedCki = default (ConsoleKeyInfo);
         EscSeqUtils.DecodeEscSeq (
-                                  _escSeqReqProc,
-                                  ref _newConsoleKeyInfo,
-                                  ref _key,
-                                  _cki,
-                                  ref _mod,
-                                  out _c1Control,
-                                  out _code,
-                                  out _values,
-                                  out _terminating,
-                                  out _isKeyMouse,
-                                  out _mouseFlags,
-                                  out _pos,
-                                  out _isReq,
-                                  ProcessContinuousButtonPressed);
+            _escSeqReqProc,
+            ref _newConsoleKeyInfo,
+            ref _key,
+            _cki,
+            ref _mod,
+            out _c1Control,
+            out _code,
+            out _values,
+            out _terminating,
+            out _isKeyMouse,
+            out _mouseFlags,
+            out _pos,
+            out _isReq,
+            ProcessContinuousButtonPressed
+        );
         Assert.Null (_escSeqReqProc);
         Assert.Equal (expectedCki, _newConsoleKeyInfo);
         Assert.Equal (0, (int)_key);
@@ -509,32 +513,33 @@ public class EscSeqUtilsTests {
 
         ClearAll ();
         _cki = new ConsoleKeyInfo[] {
-                                        new ('\u001b', 0, false, false, false),
-                                        new ('[', 0, false, false, false),
-                                        new ('<', 0, false, false, false),
-                                        new ('0', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('2', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('3', 0, false, false, false),
-                                        new ('m', 0, false, false, false)
-                                    };
+            new ('\u001b', 0, false, false, false),
+            new ('[', 0, false, false, false),
+            new ('<', 0, false, false, false),
+            new ('0', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('2', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('3', 0, false, false, false),
+            new ('m', 0, false, false, false)
+        };
         expectedCki = default (ConsoleKeyInfo);
         EscSeqUtils.DecodeEscSeq (
-                                  _escSeqReqProc,
-                                  ref _newConsoleKeyInfo,
-                                  ref _key,
-                                  _cki,
-                                  ref _mod,
-                                  out _c1Control,
-                                  out _code,
-                                  out _values,
-                                  out _terminating,
-                                  out _isKeyMouse,
-                                  out _mouseFlags,
-                                  out _pos,
-                                  out _isReq,
-                                  ProcessContinuousButtonPressed);
+            _escSeqReqProc,
+            ref _newConsoleKeyInfo,
+            ref _key,
+            _cki,
+            ref _mod,
+            out _c1Control,
+            out _code,
+            out _values,
+            out _terminating,
+            out _isKeyMouse,
+            out _mouseFlags,
+            out _pos,
+            out _isReq,
+            ProcessContinuousButtonPressed
+        );
         Assert.Null (_escSeqReqProc);
         Assert.Equal (expectedCki, _newConsoleKeyInfo);
         Assert.Equal (0, (int)_key);
@@ -549,8 +554,9 @@ public class EscSeqUtilsTests {
         Assert.True (_isKeyMouse);
         Assert.Equal (2, _mouseFlags.Count);
         Assert.Equal (
-                      new List<MouseFlags> { MouseFlags.Button1Released, MouseFlags.Button1Clicked },
-                      _mouseFlags);
+            new List<MouseFlags> { MouseFlags.Button1Released, MouseFlags.Button1Clicked },
+            _mouseFlags
+        );
         Assert.Equal (new Point (1, 2), _pos);
         Assert.False (_isReq);
         Assert.Equal (0, (int)_arg1);
@@ -558,32 +564,33 @@ public class EscSeqUtilsTests {
 
         ClearAll ();
         _cki = new ConsoleKeyInfo[] {
-                                        new ('\u001b', 0, false, false, false),
-                                        new ('[', 0, false, false, false),
-                                        new ('<', 0, false, false, false),
-                                        new ('0', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('2', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('3', 0, false, false, false),
-                                        new ('M', 0, false, false, false)
-                                    };
+            new ('\u001b', 0, false, false, false),
+            new ('[', 0, false, false, false),
+            new ('<', 0, false, false, false),
+            new ('0', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('2', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('3', 0, false, false, false),
+            new ('M', 0, false, false, false)
+        };
         expectedCki = default (ConsoleKeyInfo);
         EscSeqUtils.DecodeEscSeq (
-                                  _escSeqReqProc,
-                                  ref _newConsoleKeyInfo,
-                                  ref _key,
-                                  _cki,
-                                  ref _mod,
-                                  out _c1Control,
-                                  out _code,
-                                  out _values,
-                                  out _terminating,
-                                  out _isKeyMouse,
-                                  out _mouseFlags,
-                                  out _pos,
-                                  out _isReq,
-                                  ProcessContinuousButtonPressed);
+            _escSeqReqProc,
+            ref _newConsoleKeyInfo,
+            ref _key,
+            _cki,
+            ref _mod,
+            out _c1Control,
+            out _code,
+            out _values,
+            out _terminating,
+            out _isKeyMouse,
+            out _mouseFlags,
+            out _pos,
+            out _isReq,
+            ProcessContinuousButtonPressed
+        );
         Assert.Null (_escSeqReqProc);
         Assert.Equal (expectedCki, _newConsoleKeyInfo);
         Assert.Equal (0, (int)_key);
@@ -602,32 +609,33 @@ public class EscSeqUtilsTests {
 
         ClearAll ();
         _cki = new ConsoleKeyInfo[] {
-                                        new ('\u001b', 0, false, false, false),
-                                        new ('[', 0, false, false, false),
-                                        new ('<', 0, false, false, false),
-                                        new ('0', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('2', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('3', 0, false, false, false),
-                                        new ('M', 0, false, false, false)
-                                    };
+            new ('\u001b', 0, false, false, false),
+            new ('[', 0, false, false, false),
+            new ('<', 0, false, false, false),
+            new ('0', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('2', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('3', 0, false, false, false),
+            new ('M', 0, false, false, false)
+        };
         expectedCki = default (ConsoleKeyInfo);
         EscSeqUtils.DecodeEscSeq (
-                                  _escSeqReqProc,
-                                  ref _newConsoleKeyInfo,
-                                  ref _key,
-                                  _cki,
-                                  ref _mod,
-                                  out _c1Control,
-                                  out _code,
-                                  out _values,
-                                  out _terminating,
-                                  out _isKeyMouse,
-                                  out _mouseFlags,
-                                  out _pos,
-                                  out _isReq,
-                                  ProcessContinuousButtonPressed);
+            _escSeqReqProc,
+            ref _newConsoleKeyInfo,
+            ref _key,
+            _cki,
+            ref _mod,
+            out _c1Control,
+            out _code,
+            out _values,
+            out _terminating,
+            out _isKeyMouse,
+            out _mouseFlags,
+            out _pos,
+            out _isReq,
+            ProcessContinuousButtonPressed
+        );
         Assert.Null (_escSeqReqProc);
         Assert.Equal (expectedCki, _newConsoleKeyInfo);
         Assert.Equal (0, (int)_key);
@@ -644,50 +652,45 @@ public class EscSeqUtilsTests {
         Assert.Equal (new Point (1, 2), _pos);
         Assert.False (_isReq);
 
-        var view = new View {
-                                Width = Dim.Fill (),
-                                Height = Dim.Fill (),
-                                WantContinuousButtonPressed = true
-                            };
+        var view = new View { Width = Dim.Fill (), Height = Dim.Fill (), WantContinuousButtonPressed = true };
         Application.Top.Add (view);
         Application.Begin (Application.Top);
 
         Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent {
-                                                                              X = 0,
-                                                                              Y = 0,
-                                                                              Flags = 0
-                                                                          }));
+            new MouseEventEventArgs (
+                new MouseEvent { X = 0, Y = 0, Flags = 0 }
+            )
+        );
 
         ClearAll ();
         _cki = new ConsoleKeyInfo[] {
-                                        new ('\u001b', 0, false, false, false),
-                                        new ('[', 0, false, false, false),
-                                        new ('<', 0, false, false, false),
-                                        new ('0', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('2', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('3', 0, false, false, false),
-                                        new ('M', 0, false, false, false)
-                                    };
+            new ('\u001b', 0, false, false, false),
+            new ('[', 0, false, false, false),
+            new ('<', 0, false, false, false),
+            new ('0', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('2', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('3', 0, false, false, false),
+            new ('M', 0, false, false, false)
+        };
         expectedCki = default (ConsoleKeyInfo);
         EscSeqUtils.DecodeEscSeq (
-                                  _escSeqReqProc,
-                                  ref _newConsoleKeyInfo,
-                                  ref _key,
-                                  _cki,
-                                  ref _mod,
-                                  out _c1Control,
-                                  out _code,
-                                  out _values,
-                                  out _terminating,
-                                  out _isKeyMouse,
-                                  out _mouseFlags,
-                                  out _pos,
-                                  out _isReq,
-                                  ProcessContinuousButtonPressed);
+            _escSeqReqProc,
+            ref _newConsoleKeyInfo,
+            ref _key,
+            _cki,
+            ref _mod,
+            out _c1Control,
+            out _code,
+            out _values,
+            out _terminating,
+            out _isKeyMouse,
+            out _mouseFlags,
+            out _pos,
+            out _isReq,
+            ProcessContinuousButtonPressed
+        );
         Assert.Null (_escSeqReqProc);
         Assert.Equal (expectedCki, _newConsoleKeyInfo);
         Assert.Equal (0, (int)_key);
@@ -709,12 +712,10 @@ public class EscSeqUtilsTests {
                 // set Application.WantContinuousButtonPressedView to null
                 view.WantContinuousButtonPressed = false;
                 Application.OnMouseEvent (
-                                          new MouseEventEventArgs (
-                                                                   new MouseEvent {
-                                                                       X = 0,
-                                                                       Y = 0,
-                                                                       Flags = 0
-                                                                   }));
+                    new MouseEventEventArgs (
+                        new MouseEvent { X = 0, Y = 0, Flags = 0 }
+                    )
+                );
 
                 Application.RequestStop ();
             }
@@ -729,32 +730,33 @@ public class EscSeqUtilsTests {
 
         ClearAll ();
         _cki = new ConsoleKeyInfo[] {
-                                        new ('\u001b', 0, false, false, false),
-                                        new ('[', 0, false, false, false),
-                                        new ('<', 0, false, false, false),
-                                        new ('0', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('2', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('3', 0, false, false, false),
-                                        new ('m', 0, false, false, false)
-                                    };
+            new ('\u001b', 0, false, false, false),
+            new ('[', 0, false, false, false),
+            new ('<', 0, false, false, false),
+            new ('0', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('2', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('3', 0, false, false, false),
+            new ('m', 0, false, false, false)
+        };
         expectedCki = default (ConsoleKeyInfo);
         EscSeqUtils.DecodeEscSeq (
-                                  _escSeqReqProc,
-                                  ref _newConsoleKeyInfo,
-                                  ref _key,
-                                  _cki,
-                                  ref _mod,
-                                  out _c1Control,
-                                  out _code,
-                                  out _values,
-                                  out _terminating,
-                                  out _isKeyMouse,
-                                  out _mouseFlags,
-                                  out _pos,
-                                  out _isReq,
-                                  ProcessContinuousButtonPressed);
+            _escSeqReqProc,
+            ref _newConsoleKeyInfo,
+            ref _key,
+            _cki,
+            ref _mod,
+            out _c1Control,
+            out _code,
+            out _values,
+            out _terminating,
+            out _isKeyMouse,
+            out _mouseFlags,
+            out _pos,
+            out _isReq,
+            ProcessContinuousButtonPressed
+        );
         Assert.Null (_escSeqReqProc);
         Assert.Equal (expectedCki, _newConsoleKeyInfo);
         Assert.Equal (0, (int)_key);
@@ -780,35 +782,36 @@ public class EscSeqUtilsTests {
         _escSeqReqProc.Add ("t");
 
         _cki = new ConsoleKeyInfo[] {
-                                        new ('\u001b', 0, false, false, false),
-                                        new ('[', 0, false, false, false),
-                                        new ('8', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('1', 0, false, false, false),
-                                        new ('0', 0, false, false, false),
-                                        new (';', 0, false, false, false),
-                                        new ('2', 0, false, false, false),
-                                        new ('0', 0, false, false, false),
-                                        new ('t', 0, false, false, false)
-                                    };
+            new ('\u001b', 0, false, false, false),
+            new ('[', 0, false, false, false),
+            new ('8', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('1', 0, false, false, false),
+            new ('0', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('2', 0, false, false, false),
+            new ('0', 0, false, false, false),
+            new ('t', 0, false, false, false)
+        };
         expectedCki = default (ConsoleKeyInfo);
         Assert.Single (_escSeqReqProc.Statuses);
         Assert.Equal ("t", _escSeqReqProc.Statuses[^1].Terminator);
         EscSeqUtils.DecodeEscSeq (
-                                  _escSeqReqProc,
-                                  ref _newConsoleKeyInfo,
-                                  ref _key,
-                                  _cki,
-                                  ref _mod,
-                                  out _c1Control,
-                                  out _code,
-                                  out _values,
-                                  out _terminating,
-                                  out _isKeyMouse,
-                                  out _mouseFlags,
-                                  out _pos,
-                                  out _isReq,
-                                  ProcessContinuousButtonPressed);
+            _escSeqReqProc,
+            ref _newConsoleKeyInfo,
+            ref _key,
+            _cki,
+            ref _mod,
+            out _c1Control,
+            out _code,
+            out _values,
+            out _terminating,
+            out _isKeyMouse,
+            out _mouseFlags,
+            out _pos,
+            out _isReq,
+            ProcessContinuousButtonPressed
+        );
         Assert.Empty (_escSeqReqProc.Statuses);
         Assert.Equal (expectedCki, _newConsoleKeyInfo);
         Assert.Equal (0, (int)_key);
@@ -954,8 +957,9 @@ public class EscSeqUtilsTests {
         Assert.Equal (ConsoleModifiers.Shift | ConsoleModifiers.Control, EscSeqUtils.GetConsoleModifiers ("6"));
         Assert.Equal (ConsoleModifiers.Alt | ConsoleModifiers.Control, EscSeqUtils.GetConsoleModifiers ("7"));
         Assert.Equal (
-                      ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control,
-                      EscSeqUtils.GetConsoleModifiers ("8"));
+            ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control,
+            EscSeqUtils.GetConsoleModifiers ("8")
+        );
         Assert.Equal (0, (int)EscSeqUtils.GetConsoleModifiers (""));
     }
 
@@ -974,14 +978,14 @@ public class EscSeqUtilsTests {
     [Fact]
     public void GetKeyCharArray_Tests () {
         ConsoleKeyInfo[] cki = {
-                                   new ('\u001b', 0, false, false, false),
-                                   new ('[', 0, false, false, false),
-                                   new ('5', 0, false, false, false),
-                                   new (';', 0, false, false, false),
-                                   new ('1', 0, false, false, false),
-                                   new ('0', 0, false, false, false),
-                                   new ('r', 0, false, false, false)
-                               };
+            new ('\u001b', 0, false, false, false),
+            new ('[', 0, false, false, false),
+            new ('5', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('1', 0, false, false, false),
+            new ('0', 0, false, false, false),
+            new ('r', 0, false, false, false)
+        };
 
         Assert.Equal (new[] { '\u001b', '[', '5', ';', '1', '0', 'r' }, EscSeqUtils.GetKeyCharArray (cki));
     }
@@ -990,79 +994,80 @@ public class EscSeqUtilsTests {
     [AutoInitShutdown]
     public void GetMouse_Tests () {
         ConsoleKeyInfo[] cki = {
-                                   new ('\u001b', 0, false, false, false),
-                                   new ('[', 0, false, false, false),
-                                   new ('<', 0, false, false, false),
-                                   new ('0', 0, false, false, false),
-                                   new (';', 0, false, false, false),
-                                   new ('2', 0, false, false, false),
-                                   new (';', 0, false, false, false),
-                                   new ('3', 0, false, false, false),
-                                   new ('M', 0, false, false, false)
-                               };
+            new ('\u001b', 0, false, false, false),
+            new ('[', 0, false, false, false),
+            new ('<', 0, false, false, false),
+            new ('0', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('2', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('3', 0, false, false, false),
+            new ('M', 0, false, false, false)
+        };
         EscSeqUtils.GetMouse (cki, out List<MouseFlags> mouseFlags, out Point pos, ProcessContinuousButtonPressed);
         Assert.Equal (new List<MouseFlags> { MouseFlags.Button1Pressed }, mouseFlags);
         Assert.Equal (new Point (1, 2), pos);
 
         cki = new ConsoleKeyInfo[] {
-                                       new ('\u001b', 0, false, false, false),
-                                       new ('[', 0, false, false, false),
-                                       new ('<', 0, false, false, false),
-                                       new ('0', 0, false, false, false),
-                                       new (';', 0, false, false, false),
-                                       new ('2', 0, false, false, false),
-                                       new (';', 0, false, false, false),
-                                       new ('3', 0, false, false, false),
-                                       new ('m', 0, false, false, false)
-                                   };
+            new ('\u001b', 0, false, false, false),
+            new ('[', 0, false, false, false),
+            new ('<', 0, false, false, false),
+            new ('0', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('2', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('3', 0, false, false, false),
+            new ('m', 0, false, false, false)
+        };
         EscSeqUtils.GetMouse (cki, out mouseFlags, out pos, ProcessContinuousButtonPressed);
         Assert.Equal (2, mouseFlags.Count);
         Assert.Equal (
-                      new List<MouseFlags> { MouseFlags.Button1Released, MouseFlags.Button1Clicked },
-                      mouseFlags);
+            new List<MouseFlags> { MouseFlags.Button1Released, MouseFlags.Button1Clicked },
+            mouseFlags
+        );
         Assert.Equal (new Point (1, 2), pos);
 
         cki = new ConsoleKeyInfo[] {
-                                       new ('\u001b', 0, false, false, false),
-                                       new ('[', 0, false, false, false),
-                                       new ('<', 0, false, false, false),
-                                       new ('0', 0, false, false, false),
-                                       new (';', 0, false, false, false),
-                                       new ('2', 0, false, false, false),
-                                       new (';', 0, false, false, false),
-                                       new ('3', 0, false, false, false),
-                                       new ('M', 0, false, false, false)
-                                   };
+            new ('\u001b', 0, false, false, false),
+            new ('[', 0, false, false, false),
+            new ('<', 0, false, false, false),
+            new ('0', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('2', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('3', 0, false, false, false),
+            new ('M', 0, false, false, false)
+        };
         EscSeqUtils.GetMouse (cki, out mouseFlags, out pos, ProcessContinuousButtonPressed);
         Assert.Equal (new List<MouseFlags> { MouseFlags.Button1DoubleClicked }, mouseFlags);
         Assert.Equal (new Point (1, 2), pos);
 
         cki = new ConsoleKeyInfo[] {
-                                       new ('\u001b', 0, false, false, false),
-                                       new ('[', 0, false, false, false),
-                                       new ('<', 0, false, false, false),
-                                       new ('0', 0, false, false, false),
-                                       new (';', 0, false, false, false),
-                                       new ('2', 0, false, false, false),
-                                       new (';', 0, false, false, false),
-                                       new ('3', 0, false, false, false),
-                                       new ('M', 0, false, false, false)
-                                   };
+            new ('\u001b', 0, false, false, false),
+            new ('[', 0, false, false, false),
+            new ('<', 0, false, false, false),
+            new ('0', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('2', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('3', 0, false, false, false),
+            new ('M', 0, false, false, false)
+        };
         EscSeqUtils.GetMouse (cki, out mouseFlags, out pos, ProcessContinuousButtonPressed);
         Assert.Equal (new List<MouseFlags> { MouseFlags.Button1TripleClicked }, mouseFlags);
         Assert.Equal (new Point (1, 2), pos);
 
         cki = new ConsoleKeyInfo[] {
-                                       new ('\u001b', 0, false, false, false),
-                                       new ('[', 0, false, false, false),
-                                       new ('<', 0, false, false, false),
-                                       new ('0', 0, false, false, false),
-                                       new (';', 0, false, false, false),
-                                       new ('2', 0, false, false, false),
-                                       new (';', 0, false, false, false),
-                                       new ('3', 0, false, false, false),
-                                       new ('m', 0, false, false, false)
-                                   };
+            new ('\u001b', 0, false, false, false),
+            new ('[', 0, false, false, false),
+            new ('<', 0, false, false, false),
+            new ('0', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('2', 0, false, false, false),
+            new (';', 0, false, false, false),
+            new ('3', 0, false, false, false),
+            new ('m', 0, false, false, false)
+        };
         EscSeqUtils.GetMouse (cki, out mouseFlags, out pos, ProcessContinuousButtonPressed);
         Assert.Equal (new List<MouseFlags> { MouseFlags.Button1Released }, mouseFlags);
         Assert.Equal (new Point (1, 2), pos);

@@ -15,6 +15,9 @@ public class BarSeriesBar {
         Value = value;
     }
 
+    /// <summary>The value in graph space X/Y (depending on <see cref="Orientation"/>) to which the bar extends.</summary>
+    public float Value { get; }
+
     /// <summary>The color and character that will be rendered in the console when the bar extends over it</summary>
     public GraphCellToRender Fill { get; set; }
 
@@ -23,7 +26,4 @@ public class BarSeriesBar {
     ///     <see cref="BarSeries.DrawLabels"/> is false
     /// </summary>
     public string Text { get; set; }
-
-    /// <summary>The value in graph space X/Y (depending on <see cref="Orientation"/>) to which the bar extends.</summary>
-    public float Value { get; }
 }

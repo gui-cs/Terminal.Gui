@@ -3,8 +3,6 @@
 namespace Terminal.Gui.ApplicationTests;
 
 public class KeyboardTests {
-    private readonly ITestOutputHelper _output;
-
     public KeyboardTests (ITestOutputHelper output) {
         _output = output;
 #if DEBUG_IDISPOSABLE
@@ -12,6 +10,8 @@ public class KeyboardTests {
         RunState.Instances.Clear ();
 #endif
     }
+
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void AlternateForwardKey_AlternateBackwardKey_Tests () {
@@ -114,10 +114,22 @@ public class KeyboardTests {
     [AutoInitShutdown]
     public void EnsuresTopOnFront_CanFocus_False_By_Keyboard_And_Mouse () {
         Toplevel top = Application.Top;
-        var win = new Window { Title = "win", X = 0, Y = 0, Width = 20, Height = 10 };
+        var win = new Window {
+            Title = "win",
+            X = 0,
+            Y = 0,
+            Width = 20,
+            Height = 10
+        };
         var tf = new TextField { Width = 10 };
         win.Add (tf);
-        var win2 = new Window { Title = "win2", X = 22, Y = 0, Width = 20, Height = 10 };
+        var win2 = new Window {
+            Title = "win2",
+            X = 22,
+            Y = 0,
+            Width = 20,
+            Height = 10
+        };
         var tf2 = new TextField { Width = 10 };
         win2.Add (tf2);
         top.Add (win, win2);
@@ -165,10 +177,22 @@ public class KeyboardTests {
     [AutoInitShutdown]
     public void EnsuresTopOnFront_CanFocus_True_By_Keyboard_And_Mouse () {
         Toplevel top = Application.Top;
-        var win = new Window { Title = "win", X = 0, Y = 0, Width = 20, Height = 10 };
+        var win = new Window {
+            Title = "win",
+            X = 0,
+            Y = 0,
+            Width = 20,
+            Height = 10
+        };
         var tf = new TextField { Width = 10 };
         win.Add (tf);
-        var win2 = new Window { Title = "win2", X = 22, Y = 0, Width = 20, Height = 10 };
+        var win2 = new Window {
+            Title = "win2",
+            X = 22,
+            Y = 0,
+            Width = 20,
+            Height = 10
+        };
         var tf2 = new TextField { Width = 10 };
         win2.Add (tf2);
         top.Add (win, win2);
@@ -217,20 +241,24 @@ public class KeyboardTests {
         foreach (char c in input.Reverse ()) {
             if (char.IsLetter (c)) {
                 FakeConsole.MockKeyPresses.Push (
-                                                 new ConsoleKeyInfo (
-                                                                     c,
-                                                                     (ConsoleKey)char.ToUpper (c),
-                                                                     char.IsUpper (c),
-                                                                     false,
-                                                                     false));
+                    new ConsoleKeyInfo (
+                        c,
+                        (ConsoleKey)char.ToUpper (c),
+                        char.IsUpper (c),
+                        false,
+                        false
+                    )
+                );
             } else {
                 FakeConsole.MockKeyPresses.Push (
-                                                 new ConsoleKeyInfo (
-                                                                     c,
-                                                                     (ConsoleKey)c,
-                                                                     false,
-                                                                     false,
-                                                                     false));
+                    new ConsoleKeyInfo (
+                        c,
+                        (ConsoleKey)c,
+                        false,
+                        false,
+                        false
+                    )
+                );
             }
         }
 

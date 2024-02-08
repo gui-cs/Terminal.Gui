@@ -1,18 +1,12 @@
 using System.IO.Abstractions;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Determines which symbol to use to represent files and directories.</summary>
 public class FileSystemIconProvider {
     private readonly NerdFonts _nerd = new ();
     private bool _useNerdIcons = NerdFonts.Enable;
     private bool _useUnicodeCharacters;
-
-    /// <summary>
-    ///     Gets or sets the delegate to be used to determine opened state of directories when resolving
-    ///     <see cref="GetIcon(IFileSystemInfo)"/>.  Defaults to always false.
-    /// </summary>
-    public Func<IDirectoryInfo, bool> IsOpenGetter { get; set; } = d => false;
 
     /// <summary>
     ///     <para>
@@ -44,6 +38,12 @@ public class FileSystemIconProvider {
     }
 
     /// <summary>
+    ///     Gets or sets the delegate to be used to determine opened state of directories when resolving
+    ///     <see cref="GetIcon(IFileSystemInfo)"/>.  Defaults to always false.
+    /// </summary>
+    public Func<IDirectoryInfo, bool> IsOpenGetter { get; set; } = d => false;
+
+    /// <summary>
     ///     Returns the character to use to represent <paramref name="fileSystemInfo"/> or an empty space if no icon
     ///     should be used.
     /// </summary>
@@ -52,10 +52,11 @@ public class FileSystemIconProvider {
     public Rune GetIcon (IFileSystemInfo fileSystemInfo) {
         if (UseNerdIcons) {
             return new Rune (
-                             _nerd.GetNerdIcon (
-                                                fileSystemInfo,
-                                                fileSystemInfo is IDirectoryInfo dir ? IsOpenGetter (dir) : false
-                                               ));
+                _nerd.GetNerdIcon (
+                    fileSystemInfo,
+                    fileSystemInfo is IDirectoryInfo dir ? IsOpenGetter (dir) : false
+                )
+            );
         }
 
         if (fileSystemInfo is IDirectoryInfo) {

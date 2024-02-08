@@ -3,11 +3,11 @@ using System.IO.Abstractions.TestingHelpers;
 using System.Runtime.InteropServices;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.FileServicesTests; 
+namespace Terminal.Gui.FileServicesTests;
 
 public class FileDialogTests {
-    private readonly ITestOutputHelper output;
     public FileDialogTests (ITestOutputHelper output) { this.output = output; }
+    private readonly ITestOutputHelper output;
 
     [Theory]
     [AutoInitShutdown]
@@ -40,9 +40,9 @@ public class FileDialogTests {
         SendSlash ();
 
         Assert.Equal (
-                      new DirectoryInfo (Environment.CurrentDirectory + Path.DirectorySeparatorChar).FullName,
-                      new DirectoryInfo (dlg.Path + Path.DirectorySeparatorChar).FullName
-                     );
+            new DirectoryInfo (Environment.CurrentDirectory + Path.DirectorySeparatorChar).FullName,
+            new DirectoryInfo (dlg.Path + Path.DirectorySeparatorChar).FullName
+        );
 
         // continue typing the rest of the path
         Send ("bob");
@@ -195,19 +195,19 @@ public class FileDialogTests {
         Assert.False (dlg.Canceled);
 
         Assert.Multiple (
-                         () => {
-                             // Only the subfolder should be selected
-                             Assert.Single (dlg.MultiSelected);
-                             AssertIsTheSubfolder (dlg.Path);
-                             AssertIsTheSubfolder (dlg.MultiSelected.Single ());
-                         },
-                         () => {
-                             // Event should also agree with the final state
-                             Assert.NotNull (eventMultiSelected);
-                             Assert.Single (eventMultiSelected);
-                             AssertIsTheSubfolder (eventMultiSelected.Single ());
-                         }
-                        );
+            () => {
+                // Only the subfolder should be selected
+                Assert.Single (dlg.MultiSelected);
+                AssertIsTheSubfolder (dlg.Path);
+                AssertIsTheSubfolder (dlg.MultiSelected.Single ());
+            },
+            () => {
+                // Event should also agree with the final state
+                Assert.NotNull (eventMultiSelected);
+                Assert.Single (eventMultiSelected);
+                AssertIsTheSubfolder (eventMultiSelected.Single ());
+            }
+        );
     }
 
     [Theory]
@@ -242,19 +242,19 @@ public class FileDialogTests {
         Assert.False (dlg.Canceled);
 
         Assert.Multiple (
-                         () => {
-                             // Only the subfolder should be selected
-                             Assert.Single (dlg.MultiSelected);
-                             AssertIsTheSubfolder (dlg.Path);
-                             AssertIsTheSubfolder (dlg.MultiSelected.Single ());
-                         },
-                         () => {
-                             // Event should also agree with the final state
-                             Assert.NotNull (eventMultiSelected);
-                             Assert.Single (eventMultiSelected);
-                             AssertIsTheSubfolder (eventMultiSelected.Single ());
-                         }
-                        );
+            () => {
+                // Only the subfolder should be selected
+                Assert.Single (dlg.MultiSelected);
+                AssertIsTheSubfolder (dlg.Path);
+                AssertIsTheSubfolder (dlg.MultiSelected.Single ());
+            },
+            () => {
+                // Event should also agree with the final state
+                Assert.NotNull (eventMultiSelected);
+                Assert.Single (eventMultiSelected);
+                AssertIsTheSubfolder (eventMultiSelected.Single ());
+            }
+        );
     }
 
     [Fact]
@@ -394,7 +394,11 @@ public class FileDialogTests {
             @$"
 ┌─────────────────────────────────────────────────────────────────────────┐
 │/demo/                                                                   │
-│{CM.Glyphs.LeftBracket}▲{CM.Glyphs.RightBracket}                                                                      │
+│{
+    CM.Glyphs.LeftBracket
+}▲{
+    CM.Glyphs.RightBracket
+}                                                                      │
 │┌────────────┬──────────┬──────────────────────────────┬────────────────┐│
 ││Filename (▲)│Size      │Modified                      │Type            ││
 │├────────────┼──────────┼──────────────────────────────┼────────────────┤│
@@ -405,7 +409,23 @@ public class FileDialogTests {
 │                                                                         │
 │                                                                         │
 │                                                                         │
-│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                                 {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} OK {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
+│{
+    CM.Glyphs.LeftBracket
+} ►► {
+    CM.Glyphs.RightBracket
+} Enter Search                                 {
+    CM.Glyphs.LeftBracket
+}{
+    CM.Glyphs.LeftDefaultIndicator
+} OK {
+    CM.Glyphs.RightDefaultIndicator
+}{
+    CM.Glyphs.RightBracket
+} {
+    CM.Glyphs.LeftBracket
+} Cancel {
+    CM.Glyphs.RightBracket
+}  │
 └─────────────────────────────────────────────────────────────────────────┘
 ";
         TestHelpers.AssertDriverContentsAre (expected, output, ignoreLeadingWhitespace: true);
@@ -429,7 +449,11 @@ public class FileDialogTests {
             @$"
 ┌─────────────────────────────────────────────────────────────────────────┐
 │c:\demo\                                                                 │
-│{CM.Glyphs.LeftBracket}▲{CM.Glyphs.RightBracket}                                                                      │
+│{
+    CM.Glyphs.LeftBracket
+}▲{
+    CM.Glyphs.RightBracket
+}                                                                      │
 │┌────────────┬──────────┬──────────────────────────────┬────────────────┐│
 ││Filename (▲)│Size      │Modified                      │Type            ││
 │├────────────┼──────────┼──────────────────────────────┼────────────────┤│
@@ -440,7 +464,23 @@ public class FileDialogTests {
 ││mybinary.exe│7.00 B    │2001-01-01T11:44:42           │.exe            ││
 │                                                                         │
 │                                                                         │
-│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                                 {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} OK {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
+│{
+    CM.Glyphs.LeftBracket
+} ►► {
+    CM.Glyphs.RightBracket
+} Enter Search                                 {
+    CM.Glyphs.LeftBracket
+}{
+    CM.Glyphs.LeftDefaultIndicator
+} OK {
+    CM.Glyphs.RightDefaultIndicator
+}{
+    CM.Glyphs.RightBracket
+} {
+    CM.Glyphs.LeftBracket
+} Cancel {
+    CM.Glyphs.RightBracket
+}  │
 └─────────────────────────────────────────────────────────────────────────┘
 ";
         TestHelpers.AssertDriverContentsAre (expected, output, ignoreLeadingWhitespace: true);
@@ -491,30 +531,32 @@ public class FileDialogTests {
         fileSystem.MockTime (() => new DateTime (2010, 01, 01, 11, 12, 43));
 
         fileSystem.AddFile (
-                            @"/myfile.txt",
-                            new MockFileData ("Testing is meh.")
-                            { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) });
+            @"/myfile.txt",
+            new MockFileData ("Testing is meh.") { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) }
+        );
         fileSystem.AddFile (
-                            @"/demo/jQuery.js",
-                            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) });
+            @"/demo/jQuery.js",
+            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
+        );
         fileSystem.AddFile (
-                            @"/demo/image.gif",
-                            new MockFileData (new byte[] { 0x12, 0x34, 0x56, 0xd2 })
-                            { LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10) });
+            @"/demo/image.gif",
+            new MockFileData (new byte[] { 0x12, 0x34, 0x56, 0xd2 }) {
+                LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10)
+            }
+        );
 
         var m = (MockDirectoryInfo)fileSystem.DirectoryInfo.New (@"/demo/subfolder");
         m.Create ();
         m.LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10);
 
         fileSystem.AddFile (
-                            @"/demo/subfolder/image2.gif",
-                            new MockFileData (new byte[] { 0x12, 0x34, 0x56, 0xd2 })
-                            { LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10) });
+            @"/demo/subfolder/image2.gif",
+            new MockFileData (new byte[] { 0x12, 0x34, 0x56, 0xd2 }) {
+                LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10)
+            }
+        );
 
-        var fd = new FileDialog (fileSystem) {
-                                                 Height = 15,
-                                                 Width = 75
-                                             };
+        var fd = new FileDialog (fileSystem) { Height = 15, Width = 75 };
         fd.Path = @"/demo/";
         Begin (fd);
 
@@ -527,33 +569,36 @@ public class FileDialogTests {
         fileSystem.MockTime (() => new DateTime (2010, 01, 01, 11, 12, 43));
 
         fileSystem.AddFile (
-                            @"c:\myfile.txt",
-                            new MockFileData ("Testing is meh.")
-                            { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) });
+            @"c:\myfile.txt",
+            new MockFileData ("Testing is meh.") { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) }
+        );
         fileSystem.AddFile (
-                            @"c:\demo\jQuery.js",
-                            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) });
+            @"c:\demo\jQuery.js",
+            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
+        );
         fileSystem.AddFile (
-                            @"c:\demo\mybinary.exe",
-                            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) });
+            @"c:\demo\mybinary.exe",
+            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
+        );
         fileSystem.AddFile (
-                            @"c:\demo\image.gif",
-                            new MockFileData (new byte[] { 0x12, 0x34, 0x56, 0xd2 })
-                            { LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10) });
+            @"c:\demo\image.gif",
+            new MockFileData (new byte[] { 0x12, 0x34, 0x56, 0xd2 }) {
+                LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10)
+            }
+        );
 
         var m = (MockDirectoryInfo)fileSystem.DirectoryInfo.New (@"c:\demo\subfolder");
         m.Create ();
         m.LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10);
 
         fileSystem.AddFile (
-                            @"c:\demo\subfolder\image2.gif",
-                            new MockFileData (new byte[] { 0x12, 0x34, 0x56, 0xd2 })
-                            { LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10) });
+            @"c:\demo\subfolder\image2.gif",
+            new MockFileData (new byte[] { 0x12, 0x34, 0x56, 0xd2 }) {
+                LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10)
+            }
+        );
 
-        var fd = new FileDialog (fileSystem) {
-                                                 Height = 15,
-                                                 Width = 75
-                                             };
+        var fd = new FileDialog (fileSystem) { Height = 15, Width = 75 };
         fd.Path = @"c:\demo\";
         Begin (fd);
 

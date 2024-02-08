@@ -19,10 +19,7 @@ public class Animation : Scenario {
     public override void Setup () {
         base.Setup ();
 
-        var imageView = new ImageView {
-                                          Width = Dim.Fill (),
-                                          Height = Dim.Fill () - 2
-                                      };
+        var imageView = new ImageView { Width = Dim.Fill (), Height = Dim.Fill () - 2 };
 
         Win.Add (imageView);
 
@@ -30,9 +27,8 @@ public class Animation : Scenario {
         Win.Add (lbl);
 
         var lbl2 = new Label {
-                                 Y = Pos.AnchorEnd (1),
-                                 Text = "https://commons.wikimedia.org/wiki/File:Spinning_globe.gif"
-                             };
+            Y = Pos.AnchorEnd (1), Text = "https://commons.wikimedia.org/wiki/File:Spinning_globe.gif"
+        };
         Win.Add (lbl2);
 
         DirectoryInfo dir;
@@ -46,7 +42,8 @@ public class Animation : Scenario {
         }
 
         var f = new FileInfo (
-                              Path.Combine (dir.FullName, "Scenarios", "Spinning_globe_dark_small.gif"));
+            Path.Combine (dir.FullName, "Scenarios", "Spinning_globe_dark_small.gif")
+        );
         if (!f.Exists) {
             MessageBox.ErrorQuery ("Could not find gif", "Could not find " + f.FullName, "Ok");
 
@@ -56,18 +53,20 @@ public class Animation : Scenario {
         imageView.SetImage (Image.Load<Rgba32> (File.ReadAllBytes (f.FullName)));
 
         Task.Run (
-                  () => {
-                      while (!_isDisposed) {
-                          // When updating from a Thread/Task always use Invoke
-                          Application.Invoke (
-                                              () => {
-                                                  imageView.NextFrame ();
-                                                  imageView.SetNeedsDisplay ();
-                                              });
+            () => {
+                while (!_isDisposed) {
+                    // When updating from a Thread/Task always use Invoke
+                    Application.Invoke (
+                        () => {
+                            imageView.NextFrame ();
+                            imageView.SetNeedsDisplay ();
+                        }
+                    );
 
-                          Task.Delay (100).Wait ();
-                      }
-                  });
+                    Task.Delay (100).Wait ();
+                }
+            }
+        );
     }
 
     protected override void Dispose (bool disposing) {
@@ -79,21 +78,21 @@ public class Animation : Scenario {
 
     /// <summary>Renders an image as unicode Braille.</summary>
     public class BitmapToBraille {
-        public const int CHAR_HEIGHT = 4;
-        public const int CHAR_WIDTH = 2;
-
-        private const string CHARS =
-            " ⠁⠂⠃⠄⠅⠆⠇⡀⡁⡂⡃⡄⡅⡆⡇⠈⠉⠊⠋⠌⠍⠎⠏⡈⡉⡊⡋⡌⡍⡎⡏⠐⠑⠒⠓⠔⠕⠖⠗⡐⡑⡒⡓⡔⡕⡖⡗⠘⠙⠚⠛⠜⠝⠞⠟⡘⡙⡚⡛⡜⡝⡞⡟⠠⠡⠢⠣⠤⠥⠦⠧⡠⡡⡢⡣⡤⡥⡦⡧⠨⠩⠪⠫⠬⠭⠮⠯⡨⡩⡪⡫⡬⡭⡮⡯⠰⠱⠲⠳⠴⠵⠶⠷⡰⡱⡲⡳⡴⡵⡶⡷⠸⠹⠺⠻⠼⠽⠾⠿⡸⡹⡺⡻⡼⡽⡾⡿⢀⢁⢂⢃⢄⢅⢆⢇⣀⣁⣂⣃⣄⣅⣆⣇⢈⢉⢊⢋⢌⢍⢎⢏⣈⣉⣊⣋⣌⣍⣎⣏⢐⢑⢒⢓⢔⢕⢖⢗⣐⣑⣒⣓⣔⣕⣖⣗⢘⢙⢚⢛⢜⢝⢞⢟⣘⣙⣚⣛⣜⣝⣞⣟⢠⢡⢢⢣⢤⢥⢦⢧⣠⣡⣢⣣⣤⣥⣦⣧⢨⢩⢪⢫⢬⢭⢮⢯⣨⣩⣪⣫⣬⣭⣮⣯⢰⢱⢲⢳⢴⢵⢶⢷⣰⣱⣲⣳⣴⣵⣶⣷⢸⢹⢺⢻⢼⢽⢾⢿⣸⣹⣺⣻⣼⣽⣾⣿";
-
         public BitmapToBraille (int widthPixels, int heightPixels, Func<int, int, bool> pixelIsLit) {
             WidthPixels = widthPixels;
             HeightPixels = heightPixels;
             PixelIsLit = pixelIsLit;
         }
 
-        public int HeightPixels { get; }
+        public const int CHAR_HEIGHT = 4;
+        public const int CHAR_WIDTH = 2;
+
+        private const string CHARS =
+            " ⠁⠂⠃⠄⠅⠆⠇⡀⡁⡂⡃⡄⡅⡆⡇⠈⠉⠊⠋⠌⠍⠎⠏⡈⡉⡊⡋⡌⡍⡎⡏⠐⠑⠒⠓⠔⠕⠖⠗⡐⡑⡒⡓⡔⡕⡖⡗⠘⠙⠚⠛⠜⠝⠞⠟⡘⡙⡚⡛⡜⡝⡞⡟⠠⠡⠢⠣⠤⠥⠦⠧⡠⡡⡢⡣⡤⡥⡦⡧⠨⠩⠪⠫⠬⠭⠮⠯⡨⡩⡪⡫⡬⡭⡮⡯⠰⠱⠲⠳⠴⠵⠶⠷⡰⡱⡲⡳⡴⡵⡶⡷⠸⠹⠺⠻⠼⠽⠾⠿⡸⡹⡺⡻⡼⡽⡾⡿⢀⢁⢂⢃⢄⢅⢆⢇⣀⣁⣂⣃⣄⣅⣆⣇⢈⢉⢊⢋⢌⢍⢎⢏⣈⣉⣊⣋⣌⣍⣎⣏⢐⢑⢒⢓⢔⢕⢖⢗⣐⣑⣒⣓⣔⣕⣖⣗⢘⢙⢚⢛⢜⢝⢞⢟⣘⣙⣚⣛⣜⣝⣞⣟⢠⢡⢢⢣⢤⢥⢦⢧⣠⣡⣢⣣⣤⣥⣦⣧⢨⢩⢪⢫⢬⢭⢮⢯⣨⣩⣪⣫⣬⣭⣮⣯⢰⢱⢲⢳⢴⢵⢶⢷⣰⣱⣲⣳⣴⣵⣶⣷⢸⢹⢺⢻⢼⢽⢾⢿⣸⣹⣺⣻⣼⣽⣾⣿";
 
         public Func<int, int, bool> PixelIsLit { get; }
+
+        public int HeightPixels { get; }
 
         public int WidthPixels { get; }
 
@@ -137,12 +136,12 @@ public class Animation : Scenario {
     }
 
     private class ImageView : View {
-        private string[] brailleCache;
-        private int currentFrame;
-        private int frameCount;
         private Image<Rgba32>[] fullResImages;
         private Image<Rgba32>[] matchSizes;
+        private int currentFrame;
+        private int frameCount;
         private Rect oldSize = Rect.Empty;
+        private string[] brailleCache;
         public void NextFrame () { currentFrame = (currentFrame + 1) % frameCount; }
 
         public override void OnDrawContent (Rect contentArea) {
@@ -166,9 +165,11 @@ public class Animation : Scenario {
 
                 // generate one
                 matchSizes[currentFrame] = imgScaled = imgFull.Clone (
-                                                                      x => x.Resize (
-                                                                       newSize * BitmapToBraille.CHAR_HEIGHT,
-                                                                       newSize * BitmapToBraille.CHAR_HEIGHT));
+                                               x => x.Resize (
+                                                   newSize * BitmapToBraille.CHAR_HEIGHT,
+                                                   newSize * BitmapToBraille.CHAR_HEIGHT
+                                               )
+                                           );
             }
 
             if (braille == null) {
@@ -203,9 +204,10 @@ public class Animation : Scenario {
 
         private string GetBraille (Image<Rgba32> img) {
             var braille = new BitmapToBraille (
-                                               img.Width,
-                                               img.Height,
-                                               (x, y) => IsLit (img, x, y));
+                img.Width,
+                img.Height,
+                (x, y) => IsLit (img, x, y)
+            );
 
             return braille.GenerateImage ();
         }

@@ -6,8 +6,8 @@ using Console = Terminal.Gui.FakeConsole;
 namespace Terminal.Gui.ViewTests;
 
 public class NavigationTests {
-    private readonly ITestOutputHelper _output;
     public NavigationTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void BringSubviewForward_Subviews_vs_TabIndexes () {
@@ -374,7 +374,13 @@ public class NavigationTests {
     [AutoInitShutdown]
     public void CanFocus_Sets_To_False_With_Two_Views_Focus_Another_View_On_The_Same_Toplevel () {
         var view1 = new View { Id = "view1", Width = 10, Height = 1, CanFocus = true };
-        var view12 = new View { Id = "view12", Y = 5, Width = 10, Height = 1, CanFocus = true };
+        var view12 = new View {
+            Id = "view12",
+            Y = 5,
+            Width = 10,
+            Height = 1,
+            CanFocus = true
+        };
         var win1 = new Window { Id = "win1", Width = Dim.Percent (50), Height = Dim.Fill () };
         win1.Add (view1, view12);
         var view2 = new View { Id = "view2", Width = 20, Height = 2, CanFocus = true };
@@ -501,18 +507,12 @@ public class NavigationTests {
         var top = new Toplevel ();
 
         var win = new Window ();
-        var winSubview = new View {
-                                      CanFocus = true,
-                                      Text = "WindowSubview"
-                                  };
+        var winSubview = new View { CanFocus = true, Text = "WindowSubview" };
         win.Add (winSubview);
         top.Add (win);
 
         var frm = new FrameView ();
-        var frmSubview = new View {
-                                      CanFocus = true,
-                                      Text = "FrameSubview"
-                                  };
+        var frmSubview = new View { CanFocus = true, Text = "FrameSubview" };
         frm.Add (frmSubview);
         top.Add (frm);
 
@@ -536,7 +536,13 @@ public class NavigationTests {
         Toplevel top1 = Application.Top;
         var view1 = new View { Id = "view1", Width = 10, Height = 5, CanFocus = true };
         var top2 = new Toplevel { Id = "top2", Y = 1, Width = 10, Height = 5 };
-        var view2 = new View { Id = "view2", Y = 1, Width = 10, Height = 5, CanFocus = true };
+        var view2 = new View {
+            Id = "view2",
+            Y = 1,
+            Width = 10,
+            Height = 5,
+            CanFocus = true
+        };
         View view3 = null;
         var removed = false;
         view2.Enter += (s, e) => {
@@ -584,12 +590,14 @@ public class NavigationTests {
         var tfQuiting = false;
         var topQuiting = false;
         var sb = new StatusBar (
-                                new StatusItem[] {
-                                                     new (
-                                                          KeyCode.CtrlMask | KeyCode.Q,
-                                                          "~^Q~ Quit",
-                                                          () => sbQuiting = true)
-                                                 });
+            new StatusItem[] {
+                new (
+                    KeyCode.CtrlMask | KeyCode.Q,
+                    "~^Q~ Quit",
+                    () => sbQuiting = true
+                )
+            }
+        );
         var tf = new TextField ();
         tf.KeyDown += Tf_KeyPressed;
 
@@ -649,12 +657,14 @@ public class NavigationTests {
         var sbQuiting = false;
         var tfQuiting = false;
         var sb = new StatusBar (
-                                new StatusItem[] {
-                                                     new (
-                                                          KeyCode.CtrlMask | KeyCode.Q,
-                                                          "~^Q~ Quit",
-                                                          () => sbQuiting = true)
-                                                 });
+            new StatusItem[] {
+                new (
+                    KeyCode.CtrlMask | KeyCode.Q,
+                    "~^Q~ Quit",
+                    () => sbQuiting = true
+                )
+            }
+        );
         var tf = new TextField ();
         tf.KeyDown += Tf_KeyPressed;
 
@@ -747,7 +757,13 @@ public class NavigationTests {
     public void ScreenToView_ViewToScreen_FindDeepestView_Full_Top () {
         Toplevel top = Application.Current;
         top.BorderStyle = LineStyle.Single;
-        var view = new View { X = 3, Y = 2, Width = 10, Height = 1, Text = "0123456789" };
+        var view = new View {
+            X = 3,
+            Y = 2,
+            Width = 10,
+            Height = 1,
+            Text = "0123456789"
+        };
         top.Add (view);
 
         Application.Begin (top);
@@ -761,7 +777,7 @@ public class NavigationTests {
         Assert.Equal (new Rect (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
         Assert.Equal (new Rect (0, 0, 20, 10), top.Frame);
         _ = TestHelpers.AssertDriverContentsWithFrameAre (
-                                                          @"
+            @"
 ┌──────────────────┐
 │                  │
 │                  │
@@ -772,11 +788,12 @@ public class NavigationTests {
 │                  │
 │                  │
 └──────────────────┘",
-                                                          _output);
+            _output
+        );
 
         // top
         Assert.Equal (Point.Empty, top.ScreenToFrame (0, 0));
-        top.Margin.BoundsToScreen (0, 0, out var col, out var row);
+        top.Margin.BoundsToScreen (0, 0, out int col, out int row);
         Assert.Equal (0, col);
         Assert.Equal (0, row);
         top.Border.BoundsToScreen (0, 0, out col, out row);
@@ -871,8 +888,20 @@ public class NavigationTests {
     [Fact]
     [AutoInitShutdown]
     public void ScreenToView_ViewToScreen_FindDeepestView_Smaller_Top () {
-        var top = new Toplevel { X = 3, Y = 2, Width = 20, Height = 10, BorderStyle = LineStyle.Single };
-        var view = new View { X = 3, Y = 2, Width = 10, Height = 1, Text = "0123456789" };
+        var top = new Toplevel {
+            X = 3,
+            Y = 2,
+            Width = 20,
+            Height = 10,
+            BorderStyle = LineStyle.Single
+        };
+        var view = new View {
+            X = 3,
+            Y = 2,
+            Width = 10,
+            Height = 1,
+            Text = "0123456789"
+        };
         top.Add (view);
 
         Application.Begin (top);
@@ -887,7 +916,7 @@ public class NavigationTests {
         Assert.NotEqual (new Rect (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
         Assert.Equal (new Rect (3, 2, 20, 10), top.Frame);
         Rect frame = TestHelpers.AssertDriverContentsWithFrameAre (
-                                                                   @"
+            @"
    ┌──────────────────┐
    │                  │
    │                  │
@@ -898,7 +927,8 @@ public class NavigationTests {
    │                  │
    │                  │
    └──────────────────┘",
-                                                                   _output);
+            _output
+        );
 
         // mean the output started at col 3 and line 2
         // which result with a width of 23 and a height of 10 on the output
@@ -906,7 +936,7 @@ public class NavigationTests {
 
         // top
         Assert.Equal (new Point (-3, -2), top.ScreenToFrame (0, 0));
-        top.Margin.BoundsToScreen (-3, -2, out var col, out var row);
+        top.Margin.BoundsToScreen (-3, -2, out int col, out int row);
         Assert.Equal (0, col);
         Assert.Equal (0, row);
         top.Border.BoundsToScreen (-3, -2, out col, out row);

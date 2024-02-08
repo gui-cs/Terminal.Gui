@@ -29,7 +29,8 @@ public class RunState : IDisposable {
     protected virtual void Dispose (bool disposing) {
         if (Toplevel != null && disposing) {
             throw new InvalidOperationException (
-                                                 "You must clean up (Dispose) the Toplevel before calling Application.RunState.Dispose");
+                "You must clean up (Dispose) the Toplevel before calling Application.RunState.Dispose"
+            );
         }
     }
 

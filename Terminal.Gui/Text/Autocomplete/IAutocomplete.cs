@@ -1,15 +1,20 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 ///     Renders an overlay on another view at a given point that allows selecting from a range of 'autocomplete'
 ///     options.
 /// </summary>
 public interface IAutocomplete {
-    // TODO: Update to use Key instead of KeyCode
-    /// <summary>The key that the user can press to close the currently popped autocomplete menu</summary>
-    KeyCode CloseKey { get; set; }
+    /// <summary>The context used by the autocomplete menu.</summary>
+    AutocompleteContext Context { get; set; }
+
+    /// <summary>Gets or sets where the popup will be displayed.</summary>
+    bool PopupInsideContainer { get; set; }
+
+    /// <summary>True if the autocomplete should be considered open and visible</summary>
+    bool Visible { get; set; }
 
     /// <summary>
     ///     The colors to use to render the overlay. Accessing this property before the Application has been initialized
@@ -17,31 +22,14 @@ public interface IAutocomplete {
     /// </summary>
     ColorScheme ColorScheme { get; set; }
 
-    /// <summary>The context used by the autocomplete menu.</summary>
-    AutocompleteContext Context { get; set; }
-
-    /// <summary>The host control that will use autocomplete.</summary>
-    View HostControl { get; set; }
-
     /// <summary>The maximum number of visible rows in the autocomplete dropdown to render</summary>
     int MaxHeight { get; set; }
 
     /// <summary>The maximum width of the autocomplete dropdown</summary>
     int MaxWidth { get; set; }
 
-    /// <summary>Gets or sets where the popup will be displayed.</summary>
-    bool PopupInsideContainer { get; set; }
-
-    // TODO: Update to use Key instead of KeyCode
-    /// <summary>The key that the user can press to reopen the currently popped autocomplete menu</summary>
-    KeyCode Reopen { get; set; }
-
     /// <summary>The currently selected index into <see cref="Suggestions"/> that the user has highlighted</summary>
     int SelectedIdx { get; set; }
-
-    // TODO: Update to use Key instead of KeyCode
-    /// <summary>The key that the user must press to accept the currently selected autocomplete suggestion</summary>
-    KeyCode SelectionKey { get; set; }
 
     /// <summary>
     ///     Gets or Sets the class responsible for generating <see cref="Suggestions"/> based on a given
@@ -49,11 +37,23 @@ public interface IAutocomplete {
     /// </summary>
     ISuggestionGenerator SuggestionGenerator { get; set; }
 
+    // TODO: Update to use Key instead of KeyCode
+    /// <summary>The key that the user can press to close the currently popped autocomplete menu</summary>
+    KeyCode CloseKey { get; set; }
+
+    // TODO: Update to use Key instead of KeyCode
+    /// <summary>The key that the user can press to reopen the currently popped autocomplete menu</summary>
+    KeyCode Reopen { get; set; }
+
+    // TODO: Update to use Key instead of KeyCode
+    /// <summary>The key that the user must press to accept the currently selected autocomplete suggestion</summary>
+    KeyCode SelectionKey { get; set; }
+
     /// <summary>The strings that form the current list of suggestions to render based on what the user has typed so far.</summary>
     ReadOnlyCollection<Suggestion> Suggestions { get; set; }
 
-    /// <summary>True if the autocomplete should be considered open and visible</summary>
-    bool Visible { get; set; }
+    /// <summary>The host control that will use autocomplete.</summary>
+    View HostControl { get; set; }
 
     /// <summary>Clears <see cref="Suggestions"/></summary>
     void ClearSuggestions ();

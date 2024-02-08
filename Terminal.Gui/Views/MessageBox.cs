@@ -306,7 +306,7 @@ public static class MessageBox {
     ) {
         // Create button array for Dialog
         var count = 0;
-        List<Button> buttonList = new List<Button> ();
+        List<Button> buttonList = new ();
         if (buttons != null) {
             if (defaultButton > buttons.Length - 1) {
                 defaultButton = buttons.Length - 1;
@@ -372,10 +372,11 @@ public static class MessageBox {
             Rect maxBounds = d.SuperView?.Bounds ?? Application.Top.Bounds;
             if (wrapMessage) {
                 messageLabel.TextFormatter.Size = new Size (
-                                                            maxBounds.Size.Width
-                                                            - d.GetAdornmentsThickness ().Horizontal,
-                                                            maxBounds.Size.Height
-                                                            - d.GetAdornmentsThickness ().Vertical);
+                    maxBounds.Size.Width
+                    - d.GetAdornmentsThickness ().Horizontal,
+                    maxBounds.Size.Height
+                    - d.GetAdornmentsThickness ().Vertical
+                );
             }
 
             string msg = messageLabel.TextFormatter.Format ();
@@ -383,10 +384,12 @@ public static class MessageBox {
 
             // Ensure the width fits the text + buttons
             int newWidth = Math.Max (
-                                     width,
-                                     Math.Max (
-                                               messageSize.Width + d.GetAdornmentsThickness ().Horizontal,
-                                               d.GetButtonsWidth () + d.Buttons.Length + d.GetAdornmentsThickness ().Horizontal));
+                width,
+                Math.Max (
+                    messageSize.Width + d.GetAdornmentsThickness ().Horizontal,
+                    d.GetButtonsWidth () + d.Buttons.Length + d.GetAdornmentsThickness ().Horizontal
+                )
+            );
             if (newWidth > d.Frame.Width) {
                 d.Width = newWidth;
             }
@@ -397,10 +400,11 @@ public static class MessageBox {
             } else {
                 string lastLine = messageLabel.TextFormatter.GetLines ()[^1];
                 d.Height = Math.Max (
-                                     height,
-                                     messageSize.Height
-                                     + (lastLine.EndsWith ("\r\n") || lastLine.EndsWith ('\n') ? 1 : 2)
-                                     + d.GetAdornmentsThickness ().Vertical);
+                    height,
+                    messageSize.Height
+                    + (lastLine.EndsWith ("\r\n") || lastLine.EndsWith ('\n') ? 1 : 2)
+                    + d.GetAdornmentsThickness ().Vertical
+                );
             }
 
             d.SetRelativeLayout (d.SuperView?.Frame ?? Application.Top.Frame);

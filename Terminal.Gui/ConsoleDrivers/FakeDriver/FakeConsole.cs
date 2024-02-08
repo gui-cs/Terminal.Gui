@@ -718,13 +718,15 @@ public static class FakeConsole {
     /// <param name="key"></param>
     public static void PushMockKeyPress (KeyCode key) {
         MockKeyPresses.Push (
-                             new ConsoleKeyInfo (
-                                                 (char)(key & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask
-                                                        & ~KeyCode.AltMask),
-                                                 ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (key).Key,
-                                                 key.HasFlag (KeyCode.ShiftMask),
-                                                 key.HasFlag (KeyCode.AltMask),
-                                                 key.HasFlag (KeyCode.CtrlMask)));
+            new ConsoleKeyInfo (
+                (char)(key & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask
+                       & ~KeyCode.AltMask),
+                ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (key).Key,
+                key.HasFlag (KeyCode.ShiftMask),
+                key.HasFlag (KeyCode.AltMask),
+                key.HasFlag (KeyCode.CtrlMask)
+            )
+        );
     }
 
     //

@@ -3,25 +3,21 @@
 namespace Terminal.Gui.ViewTests;
 
 public class MarginTests {
-    private readonly ITestOutputHelper _output;
     public MarginTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     [SetupFakeDriver]
     public void Margin_Uses_SuperView_ColorScheme () {
         ((FakeDriver)Application.Driver).SetBufferSize (5, 5);
-        var view = new View {
-                                Height = 3,
-                                Width = 3
-                            };
+        var view = new View { Height = 3, Width = 3 };
         view.Margin.Thickness = new Thickness (1);
 
         var superView = new View ();
 
         superView.ColorScheme = new ColorScheme {
-                                                    Normal = new Attribute (Color.Red, Color.Green),
-                                                    Focus = new Attribute (Color.Green, Color.Red)
-                                                };
+            Normal = new Attribute (Color.Red, Color.Green), Focus = new Attribute (Color.Green, Color.Red)
+        };
 
         superView.Add (view);
         Assert.Equal (ColorName.Red, view.Margin.GetNormalColor ().Foreground.GetClosestNamedColor ());
@@ -36,11 +32,12 @@ public class MarginTests {
         ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
 
         TestHelpers.AssertDriverContentsAre (
-                                             @"
+            @"
 LTR
 L R
 BBB",
-                                             _output);
+            _output
+        );
         TestHelpers.AssertDriverAttributesAre ("0", null, superView.GetNormalColor ());
     }
 }

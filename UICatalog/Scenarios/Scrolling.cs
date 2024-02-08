@@ -15,59 +15,57 @@ public class Scrolling : Scenario {
         Win.Y = 1;
         Win.Width = Dim.Fill (1);
         Win.Height = Dim.Fill (1);
-        var label = new Label {
-                                  X = 0,
-                                  Y = 0
-                              };
+        var label = new Label { X = 0, Y = 0 };
         Win.Add (label);
 
         var scrollView = new ScrollView {
-                                            Id = "scrollView",
-                                            X = 2,
-                                            Y = Pos.Bottom (label) + 1,
-                                            Width = 50,
-                                            Height = 20,
-                                            ColorScheme = Colors.ColorSchemes["TopLevel"],
-                                            ContentSize = new Size (200, 100),
+            Id = "scrollView",
+            X = 2,
+            Y = Pos.Bottom (label) + 1,
+            Width = 50,
+            Height = 20,
+            ColorScheme = Colors.ColorSchemes["TopLevel"],
+            ContentSize = new Size (200, 100),
 
-                                            //ContentOffset = new Point (0, 0),
-                                            ShowVerticalScrollIndicator = true,
-                                            ShowHorizontalScrollIndicator = true
-                                        };
+            //ContentOffset = new Point (0, 0),
+            ShowVerticalScrollIndicator = true,
+            ShowHorizontalScrollIndicator = true
+        };
         label.Text =
             $"{scrollView}\nContentSize: {scrollView.ContentSize}\nContentOffset: {scrollView.ContentOffset}";
 
         const string rule = "0123456789";
 
         var horizontalRuler = new Label {
-                                            X = 0,
-                                            Y = 0,
-                                            AutoSize = false,
-                                            Width = Dim.Fill (),
-                                            Height = 2,
-                                            ColorScheme = Colors.ColorSchemes["Error"],
-                                        };
+            X = 0,
+            Y = 0,
+            AutoSize = false,
+            Width = Dim.Fill (),
+            Height = 2,
+            ColorScheme = Colors.ColorSchemes["Error"]
+        };
         scrollView.Add (horizontalRuler);
 
         const string vrule = "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
 
         var verticalRuler = new Label {
-                                          X = 0,
-                                          Y = 0,
-                                          AutoSize = false,
-                                          Width = 1,
-                                          Height = Dim.Fill (),
-                                          ColorScheme = Colors.ColorSchemes["Error"],
-                                      };
+            X = 0,
+            Y = 0,
+            AutoSize = false,
+            Width = 1,
+            Height = Dim.Fill (),
+            ColorScheme = Colors.ColorSchemes["Error"]
+        };
         scrollView.Add (verticalRuler);
 
         void Top_Loaded (object sender, EventArgs args) {
             horizontalRuler.Text =
                 rule.Repeat ((int)Math.Ceiling (horizontalRuler.Bounds.Width / (double)rule.Length))[
-                 ..horizontalRuler.Bounds.Width] +
+                    ..horizontalRuler.Bounds.Width] +
                 "\n" + "|         ".Repeat (
-                                            (int)Math.Ceiling (horizontalRuler.Bounds.Width / (double)rule.Length))[
-                 ..horizontalRuler.Bounds.Width];
+                    (int)Math.Ceiling (horizontalRuler.Bounds.Width / (double)rule.Length)
+                )[
+                    ..horizontalRuler.Bounds.Width];
             verticalRuler.Text =
                 vrule.Repeat ((int)Math.Ceiling (verticalRuler.Bounds.Height * 2 / (double)rule.Length))
                     [..(verticalRuler.Bounds.Height * 2)];
@@ -76,56 +74,52 @@ public class Scrolling : Scenario {
 
         Application.Top.Loaded += Top_Loaded;
 
-        var pressMeButton = new Button {
-                                           X = 3,
-                                           Y = 3,
-                                           Text = "Press me!"
-                                       };
+        var pressMeButton = new Button { X = 3, Y = 3, Text = "Press me!" };
         pressMeButton.Clicked += (s, e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
         scrollView.Add (pressMeButton);
 
         var aLongButton = new Button {
-                                         X = 3,
-                                         Y = 4,
-                                         AutoSize = false,
-                                         Width = Dim.Fill (3),
-                                         Text = "A very long button. Should be wide enough to demo clipping!"
-                                     };
+            X = 3,
+            Y = 4,
+            AutoSize = false,
+            Width = Dim.Fill (3),
+            Text = "A very long button. Should be wide enough to demo clipping!"
+        };
         aLongButton.Clicked += (s, e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
         scrollView.Add (aLongButton);
 
         scrollView.Add (
-                        new TextField {
-                                          X = 3,
-                                          Y = 5,
-                                          Width = 50,
-                                          ColorScheme = Colors.ColorSchemes["Dialog"],
-                                          Text = "This is a test of..."
-                                      });
+            new TextField {
+                X = 3,
+                Y = 5,
+                Width = 50,
+                ColorScheme = Colors.ColorSchemes["Dialog"],
+                Text = "This is a test of..."
+            }
+        );
 
         scrollView.Add (
-                        new TextField {
-                                          X = 3,
-                                          Y = 10,
-                                          Width = 50,
-                                          ColorScheme = Colors.ColorSchemes["Dialog"],
-                                          Text = "... the emergency broadcast system."
-                                      });
+            new TextField {
+                X = 3,
+                Y = 10,
+                Width = 50,
+                ColorScheme = Colors.ColorSchemes["Dialog"],
+                Text = "... the emergency broadcast system."
+            }
+        );
 
         scrollView.Add (
-                        new TextField {
-                                          X = 3,
-                                          Y = 99,
-                                          Width = 50,
-                                          ColorScheme = Colors.ColorSchemes["Dialog"],
-                                          Text = "Last line"
-                                      });
+            new TextField {
+                X = 3,
+                Y = 99,
+                Width = 50,
+                ColorScheme = Colors.ColorSchemes["Dialog"],
+                Text = "Last line"
+            }
+        );
 
         // Demonstrate AnchorEnd - Button is anchored to bottom/right
-        var anchorButton = new Button {
-                                          Y = Pos.AnchorEnd () - 1,
-                                          Text = "Bottom Right"
-                                      };
+        var anchorButton = new Button { Y = Pos.AnchorEnd () - 1, Text = "Bottom Right" };
 
         // TODO: Use Pos.Width instead of (Right-Left) when implemented (#502)
         anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
@@ -142,35 +136,29 @@ public class Scrolling : Scenario {
         Win.Add (scrollView);
 
         var hCheckBox = new CheckBox {
-                                         X = Pos.X (scrollView),
-                                         Y = Pos.Bottom (scrollView),
-                                         Text = "Horizontal Scrollbar",
-                                         Checked = scrollView.ShowHorizontalScrollIndicator
-                                     };
+            X = Pos.X (scrollView),
+            Y = Pos.Bottom (scrollView),
+            Text = "Horizontal Scrollbar",
+            Checked = scrollView.ShowHorizontalScrollIndicator
+        };
         Win.Add (hCheckBox);
 
         var vCheckBox = new CheckBox {
-                                         X = Pos.Right (hCheckBox) + 3,
-                                         Y = Pos.Bottom (scrollView),
-                                         Text = "Vertical Scrollbar",
-                                         Checked = scrollView.ShowVerticalScrollIndicator
-                                     };
+            X = Pos.Right (hCheckBox) + 3,
+            Y = Pos.Bottom (scrollView),
+            Text = "Vertical Scrollbar",
+            Checked = scrollView.ShowVerticalScrollIndicator
+        };
         Win.Add (vCheckBox);
 
         var t = "Auto Hide Scrollbars";
         var ahCheckBox = new CheckBox {
-                                          X = Pos.Left (scrollView),
-                                          Y = Pos.Bottom (hCheckBox),
-                                          Text = t,
-                                          Checked = scrollView.AutoHideScrollBars
-                                      };
+            X = Pos.Left (scrollView), Y = Pos.Bottom (hCheckBox), Text = t, Checked = scrollView.AutoHideScrollBars
+        };
         var k = "Keep Content Always In Viewport";
         var keepCheckBox = new CheckBox {
-                                            X = Pos.Left (scrollView),
-                                            Y = Pos.Bottom (ahCheckBox),
-                                            Text = k,
-                                            Checked = scrollView.AutoHideScrollBars
-                                        };
+            X = Pos.Left (scrollView), Y = Pos.Bottom (ahCheckBox), Text = k, Checked = scrollView.AutoHideScrollBars
+        };
         hCheckBox.Toggled += (s, e) => {
             if (ahCheckBox.Checked == false) {
                 scrollView.ShowHorizontalScrollIndicator = (bool)hCheckBox.Checked;
@@ -221,22 +209,18 @@ public class Scrolling : Scenario {
 
         var count = 0;
         var mousePos = new Label {
-                                     X = Pos.Right (scrollView) + 1,
-                                     Y = Pos.AnchorEnd (1),
-                                     AutoSize = false,
-                                     Width = 50,
-                                     Text = "Mouse: "
-                                 };
+            X = Pos.Right (scrollView) + 1,
+            Y = Pos.AnchorEnd (1),
+            AutoSize = false,
+            Width = 50,
+            Text = "Mouse: "
+        };
         Win.Add (mousePos);
         Application.MouseEvent += (sender, a) => {
             mousePos.Text = $"Mouse: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}";
         };
 
-        var progress = new ProgressBar {
-                                           X = Pos.Right (scrollView) + 1,
-                                           Y = Pos.AnchorEnd (2),
-                                           Width = 50
-                                       };
+        var progress = new ProgressBar { X = Pos.Right (scrollView) + 1, Y = Pos.AnchorEnd (2), Width = 50 };
         Win.Add (progress);
 
         var pulsing = true;
@@ -258,9 +242,9 @@ public class Scrolling : Scenario {
     }
 
     private class Box10x : View {
+        public Box10x (int x, int y) { Frame = new Rect (x, y, 20, 10); }
         private readonly int _h = 50;
         private readonly int _w = 40;
-        public Box10x (int x, int y) { Frame = new Rect (x, y, 20, 10); }
 
         public bool WantCursorPosition { get; set; } = false;
 
@@ -288,15 +272,14 @@ public class Scrolling : Scenario {
     }
 
     private class Filler : View {
-        private int _h = 50;
-        private int _w = 40;
-
         public Filler (Rect rect) {
             _w = rect.Width;
             _h = rect.Height;
             Frame = rect;
         }
 
+        private int _h = 50;
+        private int _w = 40;
         public Size GetContentSize () { return new Size (_w, _h); }
 
         public override void OnDrawContent (Rect contentArea) {

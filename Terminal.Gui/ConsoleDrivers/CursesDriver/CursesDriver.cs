@@ -13,9 +13,11 @@ class CursesDriver : ConsoleDriver {
     private CursorVisibility? _currentCursorVisibility;
     private CursorVisibility? _initialCursorVisibility;
     private MouseFlags _lastMouseFlags;
-    private UnixMainLoop _mainLoopDriver;
     private object _processInputToken;
+    private UnixMainLoop _mainLoopDriver;
     public Curses.Window _window;
+
+    public override bool SupportsTrueColor => false;
 
     public override int Cols {
         get => Curses.Cols;
@@ -32,8 +34,6 @@ class CursesDriver : ConsoleDriver {
             ClearContents ();
         }
     }
-
-    public override bool SupportsTrueColor => false;
 
     /// <inheritdoc/>
     public override bool EnsureCursorVisibility () { return false; }
@@ -135,9 +135,11 @@ class CursesDriver : ConsoleDriver {
 
         if (visibility != CursorVisibility.Invisible) {
             Console.Out.Write (
-                               EscSeqUtils.CSI_SetCursorStyle (
-                                                               (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24)
-                                                                           & 0xFF)));
+                EscSeqUtils.CSI_SetCursorStyle (
+                    (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24)
+                                                 & 0xFF)
+                )
+            );
         }
 
         _currentCursorVisibility = visibility;
@@ -293,13 +295,14 @@ class CursesDriver : ConsoleDriver {
             }
 
             _processInputToken = _mainLoopDriver?.AddWatch (
-                                                            0,
-                                                            UnixMainLoop.Condition.PollIn,
-                                                            x => {
-                                                                ProcessInput ();
+                0,
+                UnixMainLoop.Condition.PollIn,
+                x => {
+                    ProcessInput ();
 
-                                                                return true;
-                                                            });
+                    return true;
+                }
+            );
         }
 
         CurrentAttribute = new Attribute (ColorName.White, ColorName.Black);
@@ -356,10 +359,10 @@ class CursesDriver : ConsoleDriver {
                 while (wch2 == Curses.KeyMouse) {
                     Key kea = null;
                     ConsoleKeyInfo[] cki = {
-                                               new ((char)KeyCode.Esc, 0, false, false, false),
-                                               new ('[', 0, false, false, false),
-                                               new ('<', 0, false, false, false)
-                                           };
+                        new ((char)KeyCode.Esc, 0, false, false, false),
+                        new ('[', 0, false, false, false),
+                        new ('<', 0, false, false, false)
+                    };
                     code = 0;
                     HandleEscSeqResponse (ref code, ref k, ref wch2, ref kea, ref cki);
                 }
@@ -421,9 +424,8 @@ class CursesDriver : ConsoleDriver {
                     k = (KeyCode)((uint)KeyCode.AltMask + (uint)KeyCode.D0 + (wch2 - (uint)KeyCode.D0));
                 } else if (wch2 == Curses.KeyCSI) {
                     ConsoleKeyInfo[] cki = {
-                                               new ((char)KeyCode.Esc, 0, false, false, false),
-                                               new ('[', 0, false, false, false)
-                                           };
+                        new ((char)KeyCode.Esc, 0, false, false, false), new ('[', 0, false, false, false)
+                    };
                     HandleEscSeqResponse (ref code, ref k, ref wch2, ref key, ref cki);
 
                     return;
@@ -498,20 +500,21 @@ class CursesDriver : ConsoleDriver {
             var consoleKeyInfo = new ConsoleKeyInfo ((char)wch2, 0, false, false, false);
             if ((wch2 == 0) || (wch2 == 27) || (wch2 == Curses.KeyMouse)) {
                 EscSeqUtils.DecodeEscSeq (
-                                          null,
-                                          ref consoleKeyInfo,
-                                          ref ck,
-                                          cki,
-                                          ref mod,
-                                          out _,
-                                          out _,
-                                          out _,
-                                          out _,
-                                          out bool isKeyMouse,
-                                          out List<MouseFlags> mouseFlags,
-                                          out Point pos,
-                                          out _,
-                                          ProcessMouseEvent);
+                    null,
+                    ref consoleKeyInfo,
+                    ref ck,
+                    cki,
+                    ref mod,
+                    out _,
+                    out _,
+                    out _,
+                    out _,
+                    out bool isKeyMouse,
+                    out List<MouseFlags> mouseFlags,
+                    out Point pos,
+                    out _,
+                    ProcessMouseEvent
+                );
                 if (isKeyMouse) {
                     foreach (MouseFlags mf in mouseFlags) {
                         ProcessMouseEvent (mf, pos);
@@ -520,13 +523,15 @@ class CursesDriver : ConsoleDriver {
                     cki = null;
                     if (wch2 == 27) {
                         cki = EscSeqUtils.ResizeArray (
-                                                       new ConsoleKeyInfo (
-                                                                           (char)KeyCode.Esc,
-                                                                           0,
-                                                                           false,
-                                                                           false,
-                                                                           false),
-                                                       cki);
+                            new ConsoleKeyInfo (
+                                (char)KeyCode.Esc,
+                                0,
+                                false,
+                                false,
+                                false
+                            ),
+                            cki
+                        );
                     }
                 } else {
                     k = ConsoleKeyMapping.MapConsoleKeyInfoToKeyCode (consoleKeyInfo);
@@ -647,11 +652,7 @@ class CursesDriver : ConsoleDriver {
 
         _lastMouseFlags = mouseFlag;
 
-        var me = new MouseEvent {
-                                    Flags = mouseFlag,
-                                    X = pos.X,
-                                    Y = pos.Y
-                                };
+        var me = new MouseEvent { Flags = mouseFlag, X = pos.X, Y = pos.Y };
         OnMouseEvent (new MouseEventEventArgs (me));
     }
 
@@ -668,9 +669,10 @@ class CursesDriver : ConsoleDriver {
         Curses.InitColorPair (v, foreground, background);
 
         return new Attribute (
-                              Curses.ColorPair (v),
-                              CursesColorNumberToColorName (foreground),
-                              CursesColorNumberToColorName (background));
+            Curses.ColorPair (v),
+            CursesColorNumberToColorName (foreground),
+            CursesColorNumberToColorName (background)
+        );
     }
 
     /// <inheritdoc/>
@@ -682,14 +684,16 @@ class CursesDriver : ConsoleDriver {
     public override Attribute MakeColor (Color foreground, Color background) {
         if (!RunningUnitTests) {
             return MakeColor (
-                              ColorNameToCursesColorNumber (foreground.GetClosestNamedColor ()),
-                              ColorNameToCursesColorNumber (background.GetClosestNamedColor ()));
+                ColorNameToCursesColorNumber (foreground.GetClosestNamedColor ()),
+                ColorNameToCursesColorNumber (background.GetClosestNamedColor ())
+            );
         }
 
         return new Attribute (
-                              0,
-                              foreground,
-                              background);
+            0,
+            foreground,
+            background
+        );
     }
 
     private static short ColorNameToCursesColorNumber (ColorName color) {

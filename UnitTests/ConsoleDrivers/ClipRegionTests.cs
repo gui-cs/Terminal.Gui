@@ -6,12 +6,12 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.DriverTests;
 
 public class ClipRegionTests {
-    private readonly ITestOutputHelper output;
-
     public ClipRegionTests (ITestOutputHelper output) {
         ConsoleDriver.RunningUnitTests = true;
         this.output = output;
     }
+
+    private readonly ITestOutputHelper output;
 
     [Theory]
     [InlineData (typeof (FakeDriver))]

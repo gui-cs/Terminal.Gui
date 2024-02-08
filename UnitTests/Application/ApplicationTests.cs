@@ -5,8 +5,6 @@
 namespace Terminal.Gui.ApplicationTests;
 
 public class ApplicationTests {
-    private readonly ITestOutputHelper _output;
-
     public ApplicationTests (ITestOutputHelper output) {
         _output = output;
         ConsoleDriver.RunningUnitTests = true;
@@ -16,6 +14,8 @@ public class ApplicationTests {
         RunState.Instances.Clear ();
 #endif
     }
+
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void Begin_Null_Toplevel_Throws () {
@@ -222,10 +222,12 @@ public class ApplicationTests {
 
         Toplevel topLevel = null;
         Assert.Throws<InvalidOperationException> (
-                                                  () =>
-                                                      Application.InternalInit (
-                                                                                () => topLevel = new TestToplevel (),
-                                                                                new FakeDriver ()));
+            () =>
+                Application.InternalInit (
+                    () => topLevel = new TestToplevel (),
+                    new FakeDriver ()
+                )
+        );
         Shutdown ();
 
         Assert.Null (Application.Top);
@@ -613,11 +615,10 @@ public class ApplicationTests {
                 Application.Run (d);
             } else if (iteration < 3) {
                 Application.OnMouseEvent (
-                                          new MouseEventEventArgs (
-                                                                   new MouseEvent {
-                                                                       X = 0, Y = 0,
-                                                                       Flags = MouseFlags.ReportMousePosition
-                                                                   }));
+                    new MouseEventEventArgs (
+                        new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.ReportMousePosition }
+                    )
+                );
                 Assert.False (top.NeedsDisplay);
                 Assert.False (top.SubViewNeedsDisplay);
                 Assert.False (top.LayoutNeeded);
@@ -645,67 +646,74 @@ public class ApplicationTests {
         ((FakeDriver)Application.Driver).SetBufferSize (10, 10);
         RunState rs = Application.Begin (w);
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌───┐
 │   │
 │   │
 │   │
 └───┘",
-                                                      _output);
+            _output
+        );
 
-        Attribute[] attributes = new[] {
-                                           // 0
-                                           new (ColorName.White, ColorName.Black),
+        Attribute[] attributes = {
+            // 0
+            new (ColorName.White, ColorName.Black),
 
-                                           // 1
-                                           Colors.ColorSchemes["Base"].Normal
-                                       };
+            // 1
+            Colors.ColorSchemes["Base"].Normal
+        };
         TestHelpers.AssertDriverAttributesAre (
-                                               @"
+            @"
 1111100000
 1111100000
 1111100000
 1111100000
 1111100000
 ",
-                                               null,
-                                               attributes);
+            null,
+            attributes
+        );
 
         // TODO: In PR #2920 this breaks because the mouse is not grabbed anymore.
         // TODO: Move the mouse grap/drag mode from Toplevel to Border.
         Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent
-                                                           { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed }));
+            new MouseEventEventArgs (
+                new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed }
+            )
+        );
         Assert.Equal (w, Application.MouseGrabView);
 
         // Move down and to the right.
         Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent {
-                                                                              X = 1, Y = 1,
-                                                                              Flags = MouseFlags.Button1Pressed
-                                                                                  | MouseFlags.ReportMousePosition
-                                                                          }));
+            new MouseEventEventArgs (
+                new MouseEvent {
+                    X = 1,
+                    Y = 1,
+                    Flags = MouseFlags.Button1Pressed
+                            | MouseFlags.ReportMousePosition
+                }
+            )
+        );
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
  ┌───┐
  │   │
  │   │
  │   │
  └───┘",
-                                                      _output);
+            _output
+        );
 
         attributes = new[] {
-                               // 0
-                               new (ColorName.White, ColorName.Black),
+            // 0
+            new (ColorName.White, ColorName.Black),
 
-                               // 1
-                               Colors.ColorSchemes["Base"].Normal
-                           };
+            // 1
+            Colors.ColorSchemes["Base"].Normal
+        };
         TestHelpers.AssertDriverAttributesAre (
-                                               @"
+            @"
 0000000000
 0111110000
 0111110000
@@ -713,8 +721,9 @@ public class ApplicationTests {
 0111110000
 0111110000
 ",
-                                               null,
-                                               attributes);
+            null,
+            attributes
+        );
 
         Application.End (rs);
         Application.Shutdown ();

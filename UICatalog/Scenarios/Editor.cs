@@ -19,18 +19,18 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Files and IO")]
 [ScenarioCategory ("TextView")]
 public class Editor : Scenario {
-    private List<CultureInfo> _cultureInfos;
-    private string _fileName = "demo.txt";
     private bool _forceMinimumPosToZero = true;
     private bool _matchCase;
     private bool _matchWholeWord;
-    private MenuItem _miForceMinimumPosToZero;
-    private byte[] _originalText;
     private bool _saved = true;
+    private byte[] _originalText;
+    private List<CultureInfo> _cultureInfos;
+    private MenuItem _miForceMinimumPosToZero;
     private ScrollBarView _scrollBar;
-    private TabView _tabView;
+    private string _fileName = "demo.txt";
     private string _textToFind;
     private string _textToReplace;
+    private TabView _tabView;
     private TextView _textView;
     private Window _winDialog;
 
@@ -41,23 +41,23 @@ public class Editor : Scenario {
         ConfigurationManager.Apply ();
 
         Win = new Window {
-                             Title = _fileName ?? "Untitled",
-                             X = 0,
-                             Y = 1,
-                             Width = Dim.Fill (),
-                             Height = Dim.Fill (),
-                             ColorScheme = Colors.ColorSchemes[TopLevelColorScheme]
-                         };
+            Title = _fileName ?? "Untitled",
+            X = 0,
+            Y = 1,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            ColorScheme = Colors.ColorSchemes[TopLevelColorScheme]
+        };
         Application.Top.Add (Win);
 
         _textView = new TextView {
-                                     X = 0,
-                                     Y = 0,
-                                     Width = Dim.Fill (),
-                                     Height = Dim.Fill (),
-                                     BottomOffset = 1,
-                                     RightOffset = 1
-                                 };
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BottomOffset = 1,
+            RightOffset = 1
+        };
 
         CreateDemoFile (_fileName);
 
@@ -66,161 +66,176 @@ public class Editor : Scenario {
         Win.Add (_textView);
 
         var menu = new MenuBar {
-                                   Menus =  [
-                                   new MenuBarItem ("_File", new MenuItem[] {
-                                                                                new ("_New", "", () => New ()),
-                                                                                new ("_Open", "", () => Open ()),
-                                                                                new ("_Save", "", () => Save ()),
-                                                                                new ("_Save As", "", () => SaveAs ()),
-                                                                                new ("_Close", "", () => CloseFile ()),
-                                                                                null,
-                                                                                new ("_Quit", "", () => Quit ())
-                                                                            }),
-                                   new MenuBarItem (
-                                                    "_Edit",
-                                                    new MenuItem[] {
-                                                                       new (
-                                                                            "_Copy",
-                                                                            "",
-                                                                            () => Copy (),
-                                                                            null,
-                                                                            null,
-                                                                            KeyCode.CtrlMask | KeyCode.C),
-                                                                       new (
-                                                                            "C_ut",
-                                                                            "",
-                                                                            () => Cut (),
-                                                                            null,
-                                                                            null,
-                                                                            KeyCode.CtrlMask | KeyCode.W),
-                                                                       new (
-                                                                            "_Paste",
-                                                                            "",
-                                                                            () => Paste (),
-                                                                            null,
-                                                                            null,
-                                                                            KeyCode.CtrlMask | KeyCode.Y),
-                                                                       null,
-                                                                       new (
-                                                                            "_Find",
-                                                                            "",
-                                                                            () => Find (),
-                                                                            null,
-                                                                            null,
-                                                                            KeyCode.CtrlMask | KeyCode.S),
-                                                                       new (
-                                                                            "Find _Next",
-                                                                            "",
-                                                                            () => FindNext (),
-                                                                            null,
-                                                                            null,
-                                                                            KeyCode.CtrlMask | KeyCode.ShiftMask
-                                                                            | KeyCode.S),
-                                                                       new (
-                                                                            "Find P_revious",
-                                                                            "",
-                                                                            () => FindPrevious (),
-                                                                            null,
-                                                                            null,
-                                                                            KeyCode.CtrlMask | KeyCode.ShiftMask
-                                                                            | KeyCode.AltMask | KeyCode.S),
-                                                                       new (
-                                                                            "_Replace",
-                                                                            "",
-                                                                            () => Replace (),
-                                                                            null,
-                                                                            null,
-                                                                            KeyCode.CtrlMask | KeyCode.R),
-                                                                       new (
-                                                                            "Replace Ne_xt",
-                                                                            "",
-                                                                            () => ReplaceNext (),
-                                                                            null,
-                                                                            null,
-                                                                            KeyCode.CtrlMask | KeyCode.ShiftMask
-                                                                            | KeyCode.R),
-                                                                       new (
-                                                                            "Replace Pre_vious",
-                                                                            "",
-                                                                            () => ReplacePrevious (),
-                                                                            null,
-                                                                            null,
-                                                                            KeyCode.CtrlMask | KeyCode.ShiftMask
-                                                                            | KeyCode.AltMask | KeyCode.R),
-                                                                       new (
-                                                                            "Replace _All",
-                                                                            "",
-                                                                            () => ReplaceAll (),
-                                                                            null,
-                                                                            null,
-                                                                            KeyCode.CtrlMask | KeyCode.ShiftMask
-                                                                            | KeyCode.AltMask | KeyCode.A),
-                                                                       null,
-                                                                       new (
-                                                                            "_Select All",
-                                                                            "",
-                                                                            () => SelectAll (),
-                                                                            null,
-                                                                            null,
-                                                                            KeyCode.CtrlMask | KeyCode.T)
-                                                                   }),
-                                   new MenuBarItem ("_ScrollBarView", CreateKeepChecked ()),
-                                   new MenuBarItem ("_Cursor", CreateCursorRadio ()),
-                                   new MenuBarItem (
-                                                    "Forma_t",
-                                                    new[] {
-                                                              CreateWrapChecked (),
-                                                              CreateAutocomplete (),
-                                                              CreateAllowsTabChecked (),
-                                                              CreateReadOnlyChecked ()
-                                                          }),
-                                   new MenuBarItem (
-                                                    "_Responder",
-                                                    new[] {
-                                                              CreateCanFocusChecked (),
-                                                              CreateEnabledChecked (),
-                                                              CreateVisibleChecked ()
-                                                          }),
-                                   new MenuBarItem (
-                                                    "Conte_xtMenu",
-                                                    new[] {
-                                                              _miForceMinimumPosToZero = new MenuItem (
-                                                               "ForceMinimumPosTo_Zero",
-                                                               "",
-                                                               () => {
-                                                                   _miForceMinimumPosToZero.Checked =
-                                                                       _forceMinimumPosToZero =
-                                                                           !_forceMinimumPosToZero;
-                                                                   _textView.ContextMenu.ForceMinimumPosToZero =
-                                                                       _forceMinimumPosToZero;
-                                                               }) {
-                                                                      CheckType = MenuItemCheckStyle.Checked,
-                                                                      Checked = _forceMinimumPosToZero
-                                                                  },
-                                                              new MenuBarItem ("_Languages", GetSupportedCultures ())
-                                                          })
-                                       ]
-                               };
+            Menus = [
+                        new MenuBarItem (
+                            "_File",
+                            new MenuItem[] {
+                                new ("_New", "", () => New ()),
+                                new ("_Open", "", () => Open ()),
+                                new ("_Save", "", () => Save ()),
+                                new ("_Save As", "", () => SaveAs ()),
+                                new ("_Close", "", () => CloseFile ()),
+                                null,
+                                new ("_Quit", "", () => Quit ())
+                            }
+                        ),
+                        new MenuBarItem (
+                            "_Edit",
+                            new MenuItem[] {
+                                new (
+                                    "_Copy",
+                                    "",
+                                    () => Copy (),
+                                    null,
+                                    null,
+                                    KeyCode.CtrlMask | KeyCode.C
+                                ),
+                                new (
+                                    "C_ut",
+                                    "",
+                                    () => Cut (),
+                                    null,
+                                    null,
+                                    KeyCode.CtrlMask | KeyCode.W
+                                ),
+                                new (
+                                    "_Paste",
+                                    "",
+                                    () => Paste (),
+                                    null,
+                                    null,
+                                    KeyCode.CtrlMask | KeyCode.Y
+                                ),
+                                null,
+                                new (
+                                    "_Find",
+                                    "",
+                                    () => Find (),
+                                    null,
+                                    null,
+                                    KeyCode.CtrlMask | KeyCode.S
+                                ),
+                                new (
+                                    "Find _Next",
+                                    "",
+                                    () => FindNext (),
+                                    null,
+                                    null,
+                                    KeyCode.CtrlMask | KeyCode.ShiftMask
+                                                     | KeyCode.S
+                                ),
+                                new (
+                                    "Find P_revious",
+                                    "",
+                                    () => FindPrevious (),
+                                    null,
+                                    null,
+                                    KeyCode.CtrlMask | KeyCode.ShiftMask
+                                                     | KeyCode.AltMask | KeyCode.S
+                                ),
+                                new (
+                                    "_Replace",
+                                    "",
+                                    () => Replace (),
+                                    null,
+                                    null,
+                                    KeyCode.CtrlMask | KeyCode.R
+                                ),
+                                new (
+                                    "Replace Ne_xt",
+                                    "",
+                                    () => ReplaceNext (),
+                                    null,
+                                    null,
+                                    KeyCode.CtrlMask | KeyCode.ShiftMask
+                                                     | KeyCode.R
+                                ),
+                                new (
+                                    "Replace Pre_vious",
+                                    "",
+                                    () => ReplacePrevious (),
+                                    null,
+                                    null,
+                                    KeyCode.CtrlMask | KeyCode.ShiftMask
+                                                     | KeyCode.AltMask | KeyCode.R
+                                ),
+                                new (
+                                    "Replace _All",
+                                    "",
+                                    () => ReplaceAll (),
+                                    null,
+                                    null,
+                                    KeyCode.CtrlMask | KeyCode.ShiftMask
+                                                     | KeyCode.AltMask | KeyCode.A
+                                ),
+                                null,
+                                new (
+                                    "_Select All",
+                                    "",
+                                    () => SelectAll (),
+                                    null,
+                                    null,
+                                    KeyCode.CtrlMask | KeyCode.T
+                                )
+                            }
+                        ),
+                        new MenuBarItem ("_ScrollBarView", CreateKeepChecked ()),
+                        new MenuBarItem ("_Cursor", CreateCursorRadio ()),
+                        new MenuBarItem (
+                            "Forma_t",
+                            new[] {
+                                CreateWrapChecked (),
+                                CreateAutocomplete (),
+                                CreateAllowsTabChecked (),
+                                CreateReadOnlyChecked ()
+                            }
+                        ),
+                        new MenuBarItem (
+                            "_Responder",
+                            new[] { CreateCanFocusChecked (), CreateEnabledChecked (), CreateVisibleChecked () }
+                        ),
+                        new MenuBarItem (
+                            "Conte_xtMenu",
+                            new[] {
+                                _miForceMinimumPosToZero = new MenuItem (
+                                    "ForceMinimumPosTo_Zero",
+                                    "",
+                                    () => {
+                                        _miForceMinimumPosToZero.Checked =
+                                            _forceMinimumPosToZero =
+                                                !_forceMinimumPosToZero;
+                                        _textView.ContextMenu.ForceMinimumPosToZero =
+                                            _forceMinimumPosToZero;
+                                    }
+                                ) { CheckType = MenuItemCheckStyle.Checked, Checked = _forceMinimumPosToZero },
+                                new MenuBarItem ("_Languages", GetSupportedCultures ())
+                            }
+                        )
+                    ]
+        };
 
         Application.Top.Add (menu);
 
         var siCursorPosition = new StatusItem (KeyCode.Null, "", null);
 
         var statusBar = new StatusBar (
-                                       new[] {
-                                                 siCursorPosition,
-                                                 new (KeyCode.F2, "~F2~ Open", () => Open ()),
-                                                 new (KeyCode.F3, "~F3~ Save", () => Save ()),
-                                                 new (KeyCode.F4, "~F4~ Save As", () => SaveAs ()),
-                                                 new (
-                                                      Application.QuitKey,
-                                                      $"{Application.QuitKey} to Quit",
-                                                      () => Quit ()),
-                                                 new (
-                                                      KeyCode.Null,
-                                                      $"OS Clipboard IsSupported : {Clipboard.IsSupported}",
-                                                      null)
-                                             });
+            new[] {
+                siCursorPosition,
+                new (KeyCode.F2, "~F2~ Open", () => Open ()),
+                new (KeyCode.F3, "~F3~ Save", () => Save ()),
+                new (KeyCode.F4, "~F4~ Save As", () => SaveAs ()),
+                new (
+                    Application.QuitKey,
+                    $"{Application.QuitKey} to Quit",
+                    () => Quit ()
+                ),
+                new (
+                    KeyCode.Null,
+                    $"OS Clipboard IsSupported : {Clipboard.IsSupported}",
+                    null
+                )
+            }
+        );
 
         _textView.UnwrappedCursorPosition += (s, e) => {
             siCursorPosition.Title = $"Ln {e.Point.Y + 1}, Col {e.Point.X + 1}";
@@ -317,11 +332,12 @@ public class Editor : Scenario {
         Debug.Assert (_textView.IsDirty);
 
         int r = MessageBox.ErrorQuery (
-                                       "Save File",
-                                       $"Do you want save changes in {Win.Title}?",
-                                       "Yes",
-                                       "No",
-                                       "Cancel");
+            "Save File",
+            $"Do you want save changes in {Win.Title}?",
+            "Yes",
+            "No",
+            "Cancel"
+        );
         if (r == 0) {
             return Save ();
         }
@@ -367,34 +383,38 @@ public class Editor : Scenario {
         if (next) {
             if (!replace) {
                 found = _textView.FindNextText (
-                                                _textToFind,
-                                                out gaveFullTurn,
-                                                _matchCase,
-                                                _matchWholeWord);
+                    _textToFind,
+                    out gaveFullTurn,
+                    _matchCase,
+                    _matchWholeWord
+                );
             } else {
                 found = _textView.FindNextText (
-                                                _textToFind,
-                                                out gaveFullTurn,
-                                                _matchCase,
-                                                _matchWholeWord,
-                                                _textToReplace,
-                                                true);
+                    _textToFind,
+                    out gaveFullTurn,
+                    _matchCase,
+                    _matchWholeWord,
+                    _textToReplace,
+                    true
+                );
             }
         } else {
             if (!replace) {
                 found = _textView.FindPreviousText (
-                                                    _textToFind,
-                                                    out gaveFullTurn,
-                                                    _matchCase,
-                                                    _matchWholeWord);
+                    _textToFind,
+                    out gaveFullTurn,
+                    _matchCase,
+                    _matchWholeWord
+                );
             } else {
                 found = _textView.FindPreviousText (
-                                                    _textToFind,
-                                                    out gaveFullTurn,
-                                                    _matchCase,
-                                                    _matchWholeWord,
-                                                    _textToReplace,
-                                                    true);
+                    _textToFind,
+                    out gaveFullTurn,
+                    _matchCase,
+                    _matchWholeWord,
+                    _textToReplace,
+                    true
+                );
             }
         }
 
@@ -402,9 +422,10 @@ public class Editor : Scenario {
             MessageBox.Query ("Find", $"The following specified text was not found: '{_textToFind}'", "Ok");
         } else if (gaveFullTurn) {
             MessageBox.Query (
-                              "Find",
-                              $"No more occurrences were found for the following specified text: '{_textToFind}'",
-                              "Ok");
+                "Find",
+                $"No more occurrences were found for the following specified text: '{_textToFind}'",
+                "Ok"
+            );
         }
     }
 
@@ -415,9 +436,7 @@ public class Editor : Scenario {
     }
 
     private MenuItem CreateAllowsTabChecked () {
-        var item = new MenuItem {
-                                    Title = "Allows Tab"
-                                };
+        var item = new MenuItem { Title = "Allows Tab" };
         item.CheckType |= MenuItemCheckStyle.Checked;
         item.Checked = _textView.AllowsTab;
         item.Action += () => { _textView.AllowsTab = (bool)(item.Checked = !item.Checked); };
@@ -438,9 +457,9 @@ public class Editor : Scenario {
                 // setup autocomplete with all words currently in the editor
                 singleWordGenerator.AllSuggestions =
                     Regex.Matches (_textView.Text, "\\w+")
-                         .Select (s => s.Value)
-                         .Distinct ()
-                         .ToList ();
+                        .Select (s => s.Value)
+                        .Distinct ()
+                        .ToList ();
             } else {
                 singleWordGenerator.AllSuggestions.Clear ();
             }
@@ -450,9 +469,7 @@ public class Editor : Scenario {
     }
 
     private MenuItem CreateCanFocusChecked () {
-        var item = new MenuItem {
-                                    Title = "CanFocus"
-                                };
+        var item = new MenuItem { Title = "CanFocus" };
         item.CheckType |= MenuItemCheckStyle.Checked;
         item.Checked = _textView.CanFocus;
         item.Action += () => {
@@ -466,50 +483,58 @@ public class Editor : Scenario {
     }
 
     private MenuItem[] CreateCursorRadio () {
-        List<MenuItem> menuItems = new List<MenuItem> ();
+        List<MenuItem> menuItems = new ();
         menuItems.Add (
-                       new MenuItem ("_Invisible", "", () => SetCursor (CursorVisibility.Invisible)) {
-                           CheckType = MenuItemCheckStyle.Radio,
-                           Checked = _textView.DesiredCursorVisibility == CursorVisibility.Invisible
-                       });
+            new MenuItem ("_Invisible", "", () => SetCursor (CursorVisibility.Invisible)) {
+                CheckType = MenuItemCheckStyle.Radio,
+                Checked = _textView.DesiredCursorVisibility == CursorVisibility.Invisible
+            }
+        );
         menuItems.Add (
-                       new MenuItem ("_Box", "", () => SetCursor (CursorVisibility.Box)) {
-                           CheckType = MenuItemCheckStyle.Radio,
-                           Checked = _textView.DesiredCursorVisibility == CursorVisibility.Box
-                       });
+            new MenuItem ("_Box", "", () => SetCursor (CursorVisibility.Box)) {
+                CheckType = MenuItemCheckStyle.Radio,
+                Checked = _textView.DesiredCursorVisibility == CursorVisibility.Box
+            }
+        );
         menuItems.Add (
-                       new MenuItem ("_Underline", "", () => SetCursor (CursorVisibility.Underline)) {
-                           CheckType = MenuItemCheckStyle.Radio,
-                           Checked = _textView.DesiredCursorVisibility == CursorVisibility.Underline
-                       });
+            new MenuItem ("_Underline", "", () => SetCursor (CursorVisibility.Underline)) {
+                CheckType = MenuItemCheckStyle.Radio,
+                Checked = _textView.DesiredCursorVisibility == CursorVisibility.Underline
+            }
+        );
         menuItems.Add (new MenuItem ("", "", () => { }, () => false));
         menuItems.Add (new MenuItem ("xTerm :", "", () => { }, () => false));
         menuItems.Add (new MenuItem ("", "", () => { }, () => false));
         menuItems.Add (
-                       new MenuItem ("  _Default", "", () => SetCursor (CursorVisibility.Default)) {
-                           CheckType = MenuItemCheckStyle.Radio,
-                           Checked = _textView.DesiredCursorVisibility == CursorVisibility.Default
-                       });
+            new MenuItem ("  _Default", "", () => SetCursor (CursorVisibility.Default)) {
+                CheckType = MenuItemCheckStyle.Radio,
+                Checked = _textView.DesiredCursorVisibility == CursorVisibility.Default
+            }
+        );
         menuItems.Add (
-                       new MenuItem ("  _Vertical", "", () => SetCursor (CursorVisibility.Vertical)) {
-                           CheckType = MenuItemCheckStyle.Radio,
-                           Checked = _textView.DesiredCursorVisibility == CursorVisibility.Vertical
-                       });
+            new MenuItem ("  _Vertical", "", () => SetCursor (CursorVisibility.Vertical)) {
+                CheckType = MenuItemCheckStyle.Radio,
+                Checked = _textView.DesiredCursorVisibility == CursorVisibility.Vertical
+            }
+        );
         menuItems.Add (
-                       new MenuItem ("  V_ertical Fix", "", () => SetCursor (CursorVisibility.VerticalFix)) {
-                           CheckType = MenuItemCheckStyle.Radio,
-                           Checked = _textView.DesiredCursorVisibility == CursorVisibility.VerticalFix
-                       });
+            new MenuItem ("  V_ertical Fix", "", () => SetCursor (CursorVisibility.VerticalFix)) {
+                CheckType = MenuItemCheckStyle.Radio,
+                Checked = _textView.DesiredCursorVisibility == CursorVisibility.VerticalFix
+            }
+        );
         menuItems.Add (
-                       new MenuItem ("  B_ox Fix", "", () => SetCursor (CursorVisibility.BoxFix)) {
-                           CheckType = MenuItemCheckStyle.Radio,
-                           Checked = _textView.DesiredCursorVisibility == CursorVisibility.BoxFix
-                       });
+            new MenuItem ("  B_ox Fix", "", () => SetCursor (CursorVisibility.BoxFix)) {
+                CheckType = MenuItemCheckStyle.Radio,
+                Checked = _textView.DesiredCursorVisibility == CursorVisibility.BoxFix
+            }
+        );
         menuItems.Add (
-                       new MenuItem ("  U_nderline Fix", "", () => SetCursor (CursorVisibility.UnderlineFix)) {
-                           CheckType = MenuItemCheckStyle.Radio,
-                           Checked = _textView.DesiredCursorVisibility == CursorVisibility.UnderlineFix
-                       });
+            new MenuItem ("  U_nderline Fix", "", () => SetCursor (CursorVisibility.UnderlineFix)) {
+                CheckType = MenuItemCheckStyle.Radio,
+                Checked = _textView.DesiredCursorVisibility == CursorVisibility.UnderlineFix
+            }
+        );
 
         void SetCursor (CursorVisibility visibility) {
             _textView.DesiredCursorVisibility = visibility;
@@ -567,7 +592,12 @@ public class Editor : Scenario {
 
         for (var i = 0; i < 30; i++) {
             sb.Append (
-                       $"{i} - This is a test with a very long line and many lines to test the ScrollViewBar against the TextView. - {i}\n");
+                $"{
+                    i
+                } - This is a test with a very long line and many lines to test the ScrollViewBar against the TextView. - {
+                    i
+                }\n"
+            );
         }
 
         StreamWriter sw = File.CreateText (fileName);
@@ -576,9 +606,7 @@ public class Editor : Scenario {
     }
 
     private MenuItem CreateEnabledChecked () {
-        var item = new MenuItem {
-                                    Title = "Enabled"
-                                };
+        var item = new MenuItem { Title = "Enabled" };
         item.CheckType |= MenuItemCheckStyle.Checked;
         item.Checked = _textView.Enabled;
         item.Action += () => {
@@ -599,18 +627,13 @@ public class Editor : Scenario {
         }
 
         _winDialog = new Window {
-                                    Title = isFind ? "Find" : "Replace",
-                                    X = Win.Bounds.Width / 2 - 30,
-                                    Y = Win.Bounds.Height / 2 - 10,
-                                    ColorScheme = Colors.ColorSchemes["TopLevel"]
-                                };
+            Title = isFind ? "Find" : "Replace",
+            X = Win.Bounds.Width / 2 - 30,
+            Y = Win.Bounds.Height / 2 - 10,
+            ColorScheme = Colors.ColorSchemes["TopLevel"]
+        };
 
-        _tabView = new TabView {
-                                   X = 0,
-                                   Y = 0,
-                                   Width = Dim.Fill (),
-                                   Height = Dim.Fill ()
-                               };
+        _tabView = new TabView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
         _tabView.AddTab (new Tab { DisplayText = "Find", View = FindTab () }, isFind);
         View replace = ReplaceTab ();
@@ -638,9 +661,7 @@ public class Editor : Scenario {
     }
 
     private MenuItem CreateReadOnlyChecked () {
-        var item = new MenuItem {
-                                    Title = "Read Only"
-                                };
+        var item = new MenuItem { Title = "Read Only" };
         item.CheckType |= MenuItemCheckStyle.Checked;
         item.Checked = _textView.ReadOnly;
         item.Action += () => _textView.ReadOnly = (bool)(item.Checked = !item.Checked);
@@ -649,9 +670,7 @@ public class Editor : Scenario {
     }
 
     private MenuItem CreateVisibleChecked () {
-        var item = new MenuItem {
-                                    Title = "Visible"
-                                };
+        var item = new MenuItem { Title = "Visible" };
         item.CheckType |= MenuItemCheckStyle.Checked;
         item.Checked = _textView.Visible;
         item.Action += () => {
@@ -665,9 +684,7 @@ public class Editor : Scenario {
     }
 
     private MenuItem CreateWrapChecked () {
-        var item = new MenuItem {
-                                    Title = "Word Wrap"
-                                };
+        var item = new MenuItem { Title = "Word Wrap" };
         item.CheckType |= MenuItemCheckStyle.Checked;
         item.Checked = _textView.WordWrap;
         item.Action += () => {
@@ -710,46 +727,43 @@ public class Editor : Scenario {
         int lblWidth = "Replace:".Length;
 
         var label = new Label {
-                                  Y = 1,
-                                  Width = lblWidth,
-                                  TextAlignment = TextAlignment.Right,
-                                  AutoSize = false,
-                                  Text = "Find:"
-                              };
+            Y = 1,
+            Width = lblWidth,
+            TextAlignment = TextAlignment.Right,
+            AutoSize = false,
+            Text = "Find:"
+        };
         d.Add (label);
 
         SetFindText ();
         var txtToFind = new TextField {
-                                          X = Pos.Right (label) + 1,
-                                          Y = Pos.Top (label),
-                                          Width = 20,
-                                          Text = _textToFind
-                                      };
+            X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = 20, Text = _textToFind
+        };
         txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
         d.Add (txtToFind);
 
         var btnFindNext = new Button {
-                                         X = Pos.Right (txtToFind) + 1,
-                                         Y = Pos.Top (label),
-                                         Width = 20,
-                                         Enabled = !string.IsNullOrEmpty (txtToFind.Text),
-                                         TextAlignment = TextAlignment.Centered,
-                                         IsDefault = true,
-                                         AutoSize = false,
-                                         Text = "Find _Next"
-                                     };
+            X = Pos.Right (txtToFind) + 1,
+            Y = Pos.Top (label),
+            Width = 20,
+            Enabled = !string.IsNullOrEmpty (txtToFind.Text),
+            TextAlignment = TextAlignment.Centered,
+            IsDefault = true,
+            AutoSize = false,
+            Text = "Find _Next"
+        };
         btnFindNext.Clicked += (s, e) => FindNext ();
         d.Add (btnFindNext);
 
         var btnFindPrevious = new Button {
-                                             X = Pos.Right (txtToFind) + 1,
-                                             Y = Pos.Top (btnFindNext) + 1,
-                                             Width = 20,
-                                             Enabled = !string.IsNullOrEmpty (txtToFind.Text),
-                                             TextAlignment = TextAlignment.Centered,
-                                             AutoSize = false,
-                                             Text = "Find _Previous"
-                                         };
+            X = Pos.Right (txtToFind) + 1,
+            Y = Pos.Top (btnFindNext) + 1,
+            Width = 20,
+            Enabled = !string.IsNullOrEmpty (txtToFind.Text),
+            TextAlignment = TextAlignment.Centered,
+            AutoSize = false,
+            Text = "Find _Previous"
+        };
         btnFindPrevious.Clicked += (s, e) => FindPrevious ();
         d.Add (btnFindPrevious);
 
@@ -761,31 +775,25 @@ public class Editor : Scenario {
         };
 
         var btnCancel = new Button {
-                                       X = Pos.Right (txtToFind) + 1,
-                                       Y = Pos.Top (btnFindPrevious) + 2,
-                                       Width = 20,
-                                       TextAlignment = TextAlignment.Centered,
-                                       AutoSize = false,
-                                       Text = "Cancel"
-                                   };
+            X = Pos.Right (txtToFind) + 1,
+            Y = Pos.Top (btnFindPrevious) + 2,
+            Width = 20,
+            TextAlignment = TextAlignment.Centered,
+            AutoSize = false,
+            Text = "Cancel"
+        };
         btnCancel.Clicked += (s, e) => { DisposeWinDialog (); };
         d.Add (btnCancel);
 
         var ckbMatchCase = new CheckBox {
-                                            X = 0,
-                                            Y = Pos.Top (txtToFind) + 2,
-                                            Checked = _matchCase,
-                                            Text = "Match c_ase"
-                                        };
+            X = 0, Y = Pos.Top (txtToFind) + 2, Checked = _matchCase, Text = "Match c_ase"
+        };
         ckbMatchCase.Toggled += (s, e) => _matchCase = (bool)ckbMatchCase.Checked;
         d.Add (ckbMatchCase);
 
         var ckbMatchWholeWord = new CheckBox {
-                                                 X = 0,
-                                                 Y = Pos.Top (ckbMatchCase) + 1,
-                                                 Checked = _matchWholeWord,
-                                                 Text = "Match _whole word"
-                                             };
+            X = 0, Y = Pos.Top (ckbMatchCase) + 1, Checked = _matchWholeWord, Text = "Match _whole word"
+        };
         ckbMatchWholeWord.Toggled += (s, e) => _matchWholeWord = (bool)ckbMatchWholeWord.Checked;
         d.Add (ckbMatchWholeWord);
 
@@ -796,13 +804,11 @@ public class Editor : Scenario {
     }
 
     private MenuItem[] GetSupportedCultures () {
-        List<MenuItem> supportedCultures = new List<MenuItem> ();
+        List<MenuItem> supportedCultures = new ();
         int index = -1;
 
         foreach (CultureInfo c in _cultureInfos) {
-            var culture = new MenuItem {
-                                           CheckType = MenuItemCheckStyle.Checked
-                                       };
+            var culture = new MenuItem { CheckType = MenuItemCheckStyle.Checked };
             if (index == -1) {
                 culture.Title = "_English";
                 culture.Help = "en-US";
@@ -810,9 +816,7 @@ public class Editor : Scenario {
                 CreateAction (supportedCultures, culture);
                 supportedCultures.Add (culture);
                 index++;
-                culture = new MenuItem {
-                                           CheckType = MenuItemCheckStyle.Checked
-                                       };
+                culture = new MenuItem { CheckType = MenuItemCheckStyle.Checked };
             }
 
             culture.Title = $"_{c.Parent.EnglishName}";
@@ -863,16 +867,17 @@ public class Editor : Scenario {
             return;
         }
 
-        List<IAllowedType> aTypes = new List<IAllowedType> {
-                                                               new AllowedType (
-                                                                                "Text",
-                                                                                ".txt;.bin;.xml;.json",
-                                                                                ".txt",
-                                                                                ".bin",
-                                                                                ".xml",
-                                                                                ".json"),
-                                                               new AllowedTypeAny ()
-                                                           };
+        List<IAllowedType> aTypes = new() {
+            new AllowedType (
+                "Text",
+                ".txt;.bin;.xml;.json",
+                ".txt",
+                ".bin",
+                ".xml",
+                ".json"
+            ),
+            new AllowedTypeAny ()
+        };
         var d = new OpenDialog { Title = "Open", AllowedTypes = aTypes, AllowsMultipleSelection = false };
         Application.Run (d);
 
@@ -908,14 +913,16 @@ public class Editor : Scenario {
 
         if (_textView.ReplaceAllText (_textToFind, _matchCase, _matchWholeWord, _textToReplace)) {
             MessageBox.Query (
-                              "Replace All",
-                              $"All occurrences were replaced for the following specified text: '{_textToReplace}'",
-                              "Ok");
+                "Replace All",
+                $"All occurrences were replaced for the following specified text: '{_textToReplace}'",
+                "Ok"
+            );
         } else {
             MessageBox.Query (
-                              "Replace All",
-                              $"None of the following specified text was found: '{_textToFind}'",
-                              "Ok");
+                "Replace All",
+                $"None of the following specified text was found: '{_textToFind}'",
+                "Ok"
+            );
         }
     }
 
@@ -933,34 +940,31 @@ public class Editor : Scenario {
         int lblWidth = "Replace:".Length;
 
         var label = new Label {
-                                  Y = 1,
-                                  Width = lblWidth,
-                                  TextAlignment = TextAlignment.Right,
-                                  AutoSize = false,
-                                  Text = "Find:"
-                              };
+            Y = 1,
+            Width = lblWidth,
+            TextAlignment = TextAlignment.Right,
+            AutoSize = false,
+            Text = "Find:"
+        };
         d.Add (label);
 
         SetFindText ();
         var txtToFind = new TextField {
-                                          X = Pos.Right (label) + 1,
-                                          Y = Pos.Top (label),
-                                          Width = 20,
-                                          Text = _textToFind
-                                      };
+            X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = 20, Text = _textToFind
+        };
         txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
         d.Add (txtToFind);
 
         var btnFindNext = new Button {
-                                         X = Pos.Right (txtToFind) + 1,
-                                         Y = Pos.Top (label),
-                                         Width = 20,
-                                         Enabled = !string.IsNullOrEmpty (txtToFind.Text),
-                                         TextAlignment = TextAlignment.Centered,
-                                         IsDefault = true,
-                                         AutoSize = false,
-                                         Text = "Replace _Next"
-                                     };
+            X = Pos.Right (txtToFind) + 1,
+            Y = Pos.Top (label),
+            Width = 20,
+            Enabled = !string.IsNullOrEmpty (txtToFind.Text),
+            TextAlignment = TextAlignment.Centered,
+            IsDefault = true,
+            AutoSize = false,
+            Text = "Replace _Next"
+        };
         btnFindNext.Clicked += (s, e) => ReplaceNext ();
         d.Add (btnFindNext);
 
@@ -969,35 +973,32 @@ public class Editor : Scenario {
 
         SetFindText ();
         var txtToReplace = new TextField {
-                                             X = Pos.Right (label) + 1,
-                                             Y = Pos.Top (label),
-                                             Width = 20,
-                                             Text = _textToReplace
-                                         };
+            X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = 20, Text = _textToReplace
+        };
         txtToReplace.TextChanged += (s, e) => _textToReplace = txtToReplace.Text;
         d.Add (txtToReplace);
 
         var btnFindPrevious = new Button {
-                                             X = Pos.Right (txtToFind) + 1,
-                                             Y = Pos.Top (btnFindNext) + 1,
-                                             Width = 20,
-                                             Enabled = !string.IsNullOrEmpty (txtToFind.Text),
-                                             TextAlignment = TextAlignment.Centered,
-                                             AutoSize = false,
-                                             Text = "Replace _Previous"
-                                         };
+            X = Pos.Right (txtToFind) + 1,
+            Y = Pos.Top (btnFindNext) + 1,
+            Width = 20,
+            Enabled = !string.IsNullOrEmpty (txtToFind.Text),
+            TextAlignment = TextAlignment.Centered,
+            AutoSize = false,
+            Text = "Replace _Previous"
+        };
         btnFindPrevious.Clicked += (s, e) => ReplacePrevious ();
         d.Add (btnFindPrevious);
 
         var btnReplaceAll = new Button {
-                                           X = Pos.Right (txtToFind) + 1,
-                                           Y = Pos.Top (btnFindPrevious) + 1,
-                                           Width = 20,
-                                           Enabled = !string.IsNullOrEmpty (txtToFind.Text),
-                                           TextAlignment = TextAlignment.Centered,
-                                           AutoSize = false,
-                                           Text = "Replace _All"
-                                       };
+            X = Pos.Right (txtToFind) + 1,
+            Y = Pos.Top (btnFindPrevious) + 1,
+            Width = 20,
+            Enabled = !string.IsNullOrEmpty (txtToFind.Text),
+            TextAlignment = TextAlignment.Centered,
+            AutoSize = false,
+            Text = "Replace _All"
+        };
         btnReplaceAll.Clicked += (s, e) => ReplaceAll ();
         d.Add (btnReplaceAll);
 
@@ -1010,31 +1011,25 @@ public class Editor : Scenario {
         };
 
         var btnCancel = new Button {
-                                       X = Pos.Right (txtToFind) + 1,
-                                       Y = Pos.Top (btnReplaceAll) + 1,
-                                       Width = 20,
-                                       TextAlignment = TextAlignment.Centered,
-                                       AutoSize = false,
-                                       Text = "Cancel"
-                                   };
+            X = Pos.Right (txtToFind) + 1,
+            Y = Pos.Top (btnReplaceAll) + 1,
+            Width = 20,
+            TextAlignment = TextAlignment.Centered,
+            AutoSize = false,
+            Text = "Cancel"
+        };
         btnCancel.Clicked += (s, e) => { DisposeWinDialog (); };
         d.Add (btnCancel);
 
         var ckbMatchCase = new CheckBox {
-                                            X = 0,
-                                            Y = Pos.Top (txtToFind) + 2,
-                                            Checked = _matchCase,
-                                            Text = "Match c_ase"
-                                        };
+            X = 0, Y = Pos.Top (txtToFind) + 2, Checked = _matchCase, Text = "Match c_ase"
+        };
         ckbMatchCase.Toggled += (s, e) => _matchCase = (bool)ckbMatchCase.Checked;
         d.Add (ckbMatchCase);
 
         var ckbMatchWholeWord = new CheckBox {
-                                                 X = 0,
-                                                 Y = Pos.Top (ckbMatchCase) + 1,
-                                                 Checked = _matchWholeWord,
-                                                 Text = "Match _whole word"
-                                             };
+            X = 0, Y = Pos.Top (ckbMatchCase) + 1, Checked = _matchWholeWord, Text = "Match _whole word"
+        };
         ckbMatchWholeWord.Toggled += (s, e) => _matchWholeWord = (bool)ckbMatchWholeWord.Checked;
         d.Add (ckbMatchWholeWord);
 
@@ -1055,10 +1050,9 @@ public class Editor : Scenario {
     }
 
     private bool SaveAs () {
-        List<IAllowedType> aTypes = new List<IAllowedType> {
-                                                               new AllowedType ("Text Files", ".txt", ".bin", ".xml"),
-                                                               new AllowedTypeAny ()
-                                                           };
+        List<IAllowedType> aTypes = new() {
+            new AllowedType ("Text Files", ".txt", ".bin", ".xml"), new AllowedTypeAny ()
+        };
         var sd = new SaveDialog { Title = "Save file", AllowedTypes = aTypes };
 
         sd.Path = Path.Combine (sd.FileName, Win.Title);
@@ -1067,10 +1061,11 @@ public class Editor : Scenario {
         if (!sd.Canceled) {
             if (File.Exists (sd.Path)) {
                 if (MessageBox.Query (
-                                      "Save File",
-                                      "File already exists. Overwrite any way?",
-                                      "No",
-                                      "Ok") == 1) {
+                        "Save File",
+                        "File already exists. Overwrite any way?",
+                        "No",
+                        "Ok"
+                    ) == 1) {
                     return SaveFile (sd.FileName, sd.Path);
                 }
 
@@ -1109,11 +1104,8 @@ public class Editor : Scenario {
     private void SelectAll () { _textView.SelectAll (); }
 
     private void SetFindText () {
-        _textToFind = !string.IsNullOrEmpty (_textView.SelectedText)
-                          ? _textView.SelectedText
-                          : string.IsNullOrEmpty (_textToFind)
-                              ? ""
-                              : _textToFind;
+        _textToFind = !string.IsNullOrEmpty (_textView.SelectedText) ? _textView.SelectedText :
+                      string.IsNullOrEmpty (_textToFind) ? "" : _textToFind;
 
         _textToReplace = string.IsNullOrEmpty (_textToReplace) ? "" : _textToReplace;
     }

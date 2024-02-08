@@ -126,16 +126,19 @@ public readonly partial record struct Color {
 
                    // All other cases (formatString is not null here) - Delegate to formatProvider, first, and otherwise to invariant culture, and try to format the provided string from the channels
                    ({ }, _) => string.Format (
-                                              formatProvider ?? CultureInfo.InvariantCulture,
-                                              CompositeFormat.Parse (formatString),
-                                              R,
-                                              G,
-                                              B,
-                                              A),
+                       formatProvider ?? CultureInfo.InvariantCulture,
+                       CompositeFormat.Parse (formatString),
+                       R,
+                       G,
+                       B,
+                       A
+                   ),
                    _ => throw new InvalidOperationException (
-                                                             $"Unable to create string from Color with value {Argb}, using format string {formatString}")
+                            $"Unable to create string from Color with value {Argb}, using format string {formatString}"
+                        )
                } ?? throw new InvalidOperationException (
-                                                         $"Unable to create string from Color with value {Argb}, using format string {formatString}");
+                   $"Unable to create string from Color with value {Argb}, using format string {formatString}"
+               );
     }
 
     /// <inheritdoc/>
@@ -216,9 +219,10 @@ public readonly partial record struct Color {
         ArgumentException.ThrowIfNullOrWhiteSpace (text, nameof (text));
         if (text is { Length: < 3 } && formatProvider is null) {
             throw new ColorParseException (
-                                           text,
-                                           reason: "Provided text is too short to be any known color format.",
-                                           badValue: text);
+                text,
+                reason: "Provided text is too short to be any known color format.",
+                badValue: text
+            );
         }
 
         return Parse (text.AsSpan (), formatProvider ?? CultureInfo.InvariantCulture);
@@ -250,64 +254,76 @@ public readonly partial record struct Color {
         return text switch {
                    // Null string or empty span provided
                    { IsEmpty: true } when formatProvider is null => throw new ColorParseException (
-                                                                     in text,
-                                                                     "The text provided was null or empty.",
-                                                                     in text),
+                                                                        in text,
+                                                                        "The text provided was null or empty.",
+                                                                        in text
+                                                                    ),
 
                    // A valid ICustomColorFormatter was specified and the text wasn't null or empty
                    { IsEmpty: false } when formatProvider is ICustomColorFormatter f => f.Parse (text),
 
                    // Input string is only whitespace
                    { Length: > 0 } when text.IsWhiteSpace () => throw new ColorParseException (
-                                                                 in text,
-                                                                 "The text provided consisted of only whitespace characters.",
-                                                                 in text),
+                                                                    in text,
+                                                                    "The text provided consisted of only whitespace characters.",
+                                                                    in text
+                                                                ),
 
                    // Any string too short to possibly be any supported format.
                    { Length: > 0 and < 4 } => throw new ColorParseException (
-                                                                             in text,
-                                                                             "Text was too short to be any possible supported format.",
-                                                                             in text),
+                                                  in text,
+                                                  "Text was too short to be any possible supported format.",
+                                                  in text
+                                              ),
 
                    // The various hexadecimal cases
                    ['#', ..] hexString => hexString switch {
                                               // #RGB
                                               ['#', var rChar, var gChar, var bChar] chars when chars[1..]
                                                       .IsAllAsciiHexDigits () =>
-                                                  new Color (byte.Parse ([rChar, rChar], NumberStyles.HexNumber),
-                                              byte.Parse ([gChar, gChar], NumberStyles.HexNumber),
-                                              byte.Parse ([bChar, bChar], NumberStyles.HexNumber)),
+                                                  new Color (
+                                                      byte.Parse ([rChar, rChar], NumberStyles.HexNumber),
+                                                      byte.Parse ([gChar, gChar], NumberStyles.HexNumber),
+                                                      byte.Parse ([bChar, bChar], NumberStyles.HexNumber)
+                                                  ),
 
                                               // #ARGB
                                               ['#', var aChar, var rChar, var gChar, var bChar] chars when chars[1..]
                                                       .IsAllAsciiHexDigits () =>
-                                                  new Color (byte.Parse ([rChar, rChar], NumberStyles.HexNumber),
-                                              byte.Parse ([gChar, gChar], NumberStyles.HexNumber),
-                                              byte.Parse ([bChar, bChar], NumberStyles.HexNumber),
-                                              byte.Parse ([aChar, aChar], NumberStyles.HexNumber)),
+                                                  new Color (
+                                                      byte.Parse ([rChar, rChar], NumberStyles.HexNumber),
+                                                      byte.Parse ([gChar, gChar], NumberStyles.HexNumber),
+                                                      byte.Parse ([bChar, bChar], NumberStyles.HexNumber),
+                                                      byte.Parse ([aChar, aChar], NumberStyles.HexNumber)
+                                                  ),
 
                                               // #RRGGBB
                                               [
                                                       '#', var r1Char, var r2Char, var g1Char, var g2Char, var b1Char,
                                                       var b2Char
                                                   ] chars when chars[1..].IsAllAsciiHexDigits () =>
-                                                  new Color (byte.Parse ([r1Char, r2Char], NumberStyles.HexNumber),
-                                              byte.Parse ([g1Char, g2Char], NumberStyles.HexNumber),
-                                              byte.Parse ([b1Char, b2Char], NumberStyles.HexNumber)),
+                                                  new Color (
+                                                      byte.Parse ([r1Char, r2Char], NumberStyles.HexNumber),
+                                                      byte.Parse ([g1Char, g2Char], NumberStyles.HexNumber),
+                                                      byte.Parse ([b1Char, b2Char], NumberStyles.HexNumber)
+                                                  ),
 
                                               // #AARRGGBB
                                               [
                                                       '#', var a1Char, var a2Char, var r1Char, var r2Char, var g1Char,
                                                       var g2Char, var b1Char, var b2Char
                                                   ] chars when chars[1..].IsAllAsciiHexDigits () =>
-                                                  new Color (byte.Parse ([r1Char, r2Char], NumberStyles.HexNumber),
-                                              byte.Parse ([g1Char, g2Char], NumberStyles.HexNumber),
-                                              byte.Parse ([b1Char, b2Char], NumberStyles.HexNumber),
-                                              byte.Parse ([a1Char, a2Char], NumberStyles.HexNumber)),
+                                                  new Color (
+                                                      byte.Parse ([r1Char, r2Char], NumberStyles.HexNumber),
+                                                      byte.Parse ([g1Char, g2Char], NumberStyles.HexNumber),
+                                                      byte.Parse ([b1Char, b2Char], NumberStyles.HexNumber),
+                                                      byte.Parse ([a1Char, a2Char], NumberStyles.HexNumber)
+                                                  ),
                                               _ => throw new ColorParseException (
-                                                    in hexString,
-                                                    $"Color hex string {hexString} was not in a supported format",
-                                                    in hexString)
+                                                       in hexString,
+                                                       $"Color hex string {hexString} was not in a supported format",
+                                                       in hexString
+                                                   )
                                           },
 
                    // rgb(r,g,b) or rgb(r,g,b,a)
@@ -322,8 +338,7 @@ public readonly partial record struct Color {
 
                    // Any other input
                    _ => throw new ColorParseException (in text, "Text did not match any expected format.", in text, [])
-
-        };
+               };
 
         [Pure]
         [SkipLocalsInit]
@@ -331,49 +346,54 @@ public readonly partial record struct Color {
             ReadOnlySpan<char> valuesSubstring = originalString[startIndex..^1];
             Span<Range> valueRanges = stackalloc Range[4];
             int rangeCount = valuesSubstring.Split (
-                                                    valueRanges,
-                                                    ',',
-                                                    StringSplitOptions.RemoveEmptyEntries
-                                                    | StringSplitOptions.TrimEntries);
+                valueRanges,
+                ',',
+                StringSplitOptions.RemoveEmptyEntries
+                | StringSplitOptions.TrimEntries
+            );
 
             switch (rangeCount) {
                 case 3: {
                     // rgba(r,g,b)
                     ParseRgbValues (
-                                    in valuesSubstring,
-                                    in valueRanges,
-                                    in originalString,
-                                    out ReadOnlySpan<char> rSpan,
-                                    out ReadOnlySpan<char> gSpan,
-                                    out ReadOnlySpan<char> bSpan);
+                        in valuesSubstring,
+                        in valueRanges,
+                        in originalString,
+                        out ReadOnlySpan<char> rSpan,
+                        out ReadOnlySpan<char> gSpan,
+                        out ReadOnlySpan<char> bSpan
+                    );
 
                     return new Color (int.Parse (rSpan), int.Parse (gSpan), int.Parse (bSpan));
                 }
                 case 4: {
                     // rgba(r,g,b,a)
                     ParseRgbValues (
-                                    in valuesSubstring,
-                                    in valueRanges,
-                                    in originalString,
-                                    out ReadOnlySpan<char> rSpan,
-                                    out ReadOnlySpan<char> gSpan,
-                                    out ReadOnlySpan<char> bSpan);
+                        in valuesSubstring,
+                        in valueRanges,
+                        in originalString,
+                        out ReadOnlySpan<char> rSpan,
+                        out ReadOnlySpan<char> gSpan,
+                        out ReadOnlySpan<char> bSpan
+                    );
                     ReadOnlySpan<char> aSpan = valuesSubstring[valueRanges[3]];
                     if (!aSpan.IsAllAsciiDigits ()) {
                         throw new ColorParseException (
-                                                       in originalString,
-                                                       "Value was not composed entirely of decimal digits.",
-                                                       in aSpan,
-                                                       nameof (A));
+                            in originalString,
+                            "Value was not composed entirely of decimal digits.",
+                            in aSpan,
+                            nameof (A)
+                        );
                     }
 
                     return new Color (int.Parse (rSpan), int.Parse (gSpan), int.Parse (bSpan), int.Parse (aSpan));
                 }
                 default:
                     throw new ColorParseException (
-                                                   in originalString,
-                                                   $"Wrong number of values. Expected 3 or 4 decimal integers. Got {rangeCount}.",
-                                                   in originalString);
+                        in originalString,
+                        $"Wrong number of values. Expected 3 or 4 decimal integers. Got {rangeCount}.",
+                        in originalString
+                    );
             }
 
             [Pure]
@@ -389,28 +409,31 @@ public readonly partial record struct Color {
                 rSpan = valuesString[valueComponentRanges[0]];
                 if (!rSpan.IsAllAsciiDigits ()) {
                     throw new ColorParseException (
-                                                   in originalString,
-                                                   "Value was not composed entirely of decimal digits.",
-                                                   in rSpan,
-                                                   nameof (R));
+                        in originalString,
+                        "Value was not composed entirely of decimal digits.",
+                        in rSpan,
+                        nameof (R)
+                    );
                 }
 
                 gSpan = valuesString[valueComponentRanges[1]];
                 if (!gSpan.IsAllAsciiDigits ()) {
                     throw new ColorParseException (
-                                                   in originalString,
-                                                   "Value was not composed entirely of decimal digits.",
-                                                   in gSpan,
-                                                   nameof (G));
+                        in originalString,
+                        "Value was not composed entirely of decimal digits.",
+                        in gSpan,
+                        nameof (G)
+                    );
                 }
 
                 bSpan = valuesString[valueComponentRanges[2]];
                 if (!bSpan.IsAllAsciiDigits ()) {
                     throw new ColorParseException (
-                                                   in originalString,
-                                                   "Value was not composed entirely of decimal digits.",
-                                                   in bSpan,
-                                                   nameof (B));
+                        in originalString,
+                        "Value was not composed entirely of decimal digits.",
+                        in bSpan,
+                        nameof (B)
+                    );
                 }
             }
         }
@@ -419,7 +442,8 @@ public readonly partial record struct Color {
     /// <summary>Converts the provided <see langword="string"/> to a new <see cref="Color"/> value.</summary>
     /// <param name="text">
     ///     The text to analyze. Formats supported are "#RGB", "#RRGGBB", "#ARGB", "#AARRGGBB", "rgb(r,g,b)",
-    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="GetClosestNamedColor (Color)"/> string values.
+    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="GetClosestNamedColor (Color)"/> string
+    ///     values.
     /// </param>
     /// <param name="formatProvider">
     ///     Optional <see cref="IFormatProvider"/> to provide formatting services for the input text.
@@ -443,7 +467,8 @@ public readonly partial record struct Color {
     /// </summary>
     /// <param name="text">
     ///     The text to analyze. Formats supported are "#RGB", "#RRGGBB", "#ARGB", "#AARRGGBB", "rgb(r,g,b)",
-    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="GetClosestNamedColor (Color)"/> string values.
+    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="GetClosestNamedColor (Color)"/> string
+    ///     values.
     /// </param>
     /// <param name="formatProvider">
     ///     If specified and not <see langword="null"/>, will be passed to

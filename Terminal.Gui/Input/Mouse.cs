@@ -103,9 +103,6 @@ public enum MouseFlags {
 ///     MouseEvent argument.
 /// </remarks>
 public class MouseEvent {
-    /// <summary>Flags indicating the kind of mouse event that is being posted.</summary>
-    public MouseFlags Flags { get; set; }
-
     /// <summary>
     ///     Indicates if the current mouse event has already been processed and the driver should stop notifying any other
     ///     event subscriber. Its important to set this value to true specially when updating any View's layout from inside the
@@ -119,14 +116,17 @@ public class MouseEvent {
     /// <summary>The offset Y (column) location for the mouse event.</summary>
     public int OfY { get; set; }
 
-    /// <summary>The current view at the location for the mouse event.</summary>
-    public View View { get; set; }
-
     /// <summary>The X (column) location for the mouse event.</summary>
     public int X { get; set; }
 
     /// <summary>The Y (column) location for the mouse event.</summary>
     public int Y { get; set; }
+
+    /// <summary>Flags indicating the kind of mouse event that is being posted.</summary>
+    public MouseFlags Flags { get; set; }
+
+    /// <summary>The current view at the location for the mouse event.</summary>
+    public View View { get; set; }
 
     /// <summary>Returns a <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</summary>
     /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</returns>

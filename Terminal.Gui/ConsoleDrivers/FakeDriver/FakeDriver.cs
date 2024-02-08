@@ -45,8 +45,9 @@ public class FakeDriver : ConsoleDriver {
         Rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
         if (FakeBehaviors.UseFakeClipboard) {
             Clipboard = new FakeClipboard (
-                                           FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException,
-                                           FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse);
+                FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException,
+                FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse
+            );
         } else {
             if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
                 Clipboard = new WindowsClipboard ();
@@ -235,10 +236,11 @@ public class FakeDriver : ConsoleDriver {
                 return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Enter);
             case ConsoleKey.Spacebar:
                 return ConsoleKeyMapping.MapToKeyCodeModifiers (
-                                                                keyInfo.Modifiers,
-                                                                keyInfo.KeyChar == 0
-                                                                    ? KeyCode.Space
-                                                                    : (KeyCode)keyInfo.KeyChar);
+                    keyInfo.Modifiers,
+                    keyInfo.KeyChar == 0
+                        ? KeyCode.Space
+                        : (KeyCode)keyInfo.KeyChar
+                );
             case ConsoleKey.Backspace:
                 return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Backspace);
             case ConsoleKey.Delete:
@@ -417,10 +419,6 @@ public class FakeDriver : ConsoleDriver {
     #endregion
 
     public class FakeClipboard : ClipboardBase {
-        private string _contents = string.Empty;
-        private readonly bool _isSupportedAlwaysFalse;
-        public Exception FakeException;
-
         public FakeClipboard (
             bool fakeClipboardThrowsNotSupportedException = false,
             bool isSupportedAlwaysFalse = false
@@ -430,6 +428,10 @@ public class FakeDriver : ConsoleDriver {
                 FakeException = new NotSupportedException ("Fake clipboard exception");
             }
         }
+
+        private readonly bool _isSupportedAlwaysFalse;
+        public Exception FakeException;
+        private string _contents = string.Empty;
 
         public override bool IsSupported => !_isSupportedAlwaysFalse;
 

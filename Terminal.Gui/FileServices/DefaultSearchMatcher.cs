@@ -1,6 +1,6 @@
 ﻿using System.IO.Abstractions;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 class DefaultSearchMatcher : ISearchMatcher {
     private string[] terms;

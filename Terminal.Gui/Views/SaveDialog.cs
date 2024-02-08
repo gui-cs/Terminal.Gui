@@ -35,9 +35,8 @@ public class SaveDialog : FileDialog {
     /// <summary>Gets the default title for the <see cref="SaveDialog"/>.</summary>
     /// <returns></returns>
     protected override string GetDefaultTitle () {
-        List<string> titleParts =  [Strings.fdSave]
-
-        ;
+        List<string> titleParts = [Strings.fdSave]
+            ;
         if (MustExist) {
             titleParts.Add (Strings.fdExisting);
         }

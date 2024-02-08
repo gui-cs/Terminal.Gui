@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>Defines the standard set of glyphs used to draw checkboxes, lines, borders, etc...</summary>
 /// <remarks>

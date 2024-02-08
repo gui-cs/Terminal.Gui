@@ -4,64 +4,63 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.InputTests;
 
 public class KeyTests {
-    private readonly ITestOutputHelper _output;
     public KeyTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     // Via https://andrewlock.net/creating-parameterised-tests-in-xunit-with-inlinedata-classdata-and-memberdata/
     public static TheoryData<string, Key> ValidStrings =>
         new () {
-                   { "a", new Key (KeyCode.A) },
-                   { "Ctrl+A", new Key (KeyCode.A | KeyCode.CtrlMask) },
-                   { "Alt+A", new Key (KeyCode.A | KeyCode.AltMask) },
-                   { "Shift+A", new Key (KeyCode.A | KeyCode.ShiftMask) },
-                   { "A", new Key (KeyCode.A | KeyCode.ShiftMask) },
-                   { "â", new Key ((KeyCode)'â') },
-                   { "Shift+â", new Key ((KeyCode)'â' | KeyCode.ShiftMask) },
-                   { "Shift+Â", new Key ((KeyCode)'Â' | KeyCode.ShiftMask) },
-                   { "Ctrl+Shift+CursorUp", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.CursorUp) }, {
-                       "Ctrl+Alt+Shift+CursorUp",
-                       new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp)
-                   }, {
-                       "ctrl+alt+shift+cursorup",
-                       new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp)
-                   }, {
-                       "CTRL+ALT+SHIFT+CURSORUP",
-                       new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp)
-                   }, {
-                       "Ctrl+Alt+Shift+Delete",
-                       new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Delete)
-                   }, {
-                       "Ctrl+Alt+Shift+Enter",
-                       new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Enter)
-                   },
-                   { "Tab", new Key (KeyCode.Tab) },
-                   { "Shift+Tab", new Key (KeyCode.Tab | KeyCode.ShiftMask) },
-                   { "Ctrl+Tab", new Key (KeyCode.Tab | KeyCode.CtrlMask) },
-                   { "Alt+Tab", new Key (KeyCode.Tab | KeyCode.AltMask) },
-                   { "Ctrl+Shift+Tab", new Key (KeyCode.Tab | KeyCode.ShiftMask | KeyCode.CtrlMask) },
-                   { "Ctrl+Alt+Tab", new Key (KeyCode.Tab | KeyCode.AltMask | KeyCode.CtrlMask) },
-                   { "", new Key (KeyCode.Null) },
-                   { " ", new Key (KeyCode.Space) },
-                   { "Space", new Key (KeyCode.Space) },
-                   { "Shift+Space", new Key (KeyCode.Space | KeyCode.ShiftMask) },
-                   { "Ctrl+Space", new Key (KeyCode.Space | KeyCode.CtrlMask) },
-                   { "Alt+Space", new Key (KeyCode.Space | KeyCode.AltMask) },
-                   { "Shift+ ", new Key (KeyCode.Space | KeyCode.ShiftMask) },
-                   { "Ctrl+ ", new Key (KeyCode.Space | KeyCode.CtrlMask) },
-                   { "Alt+ ", new Key (KeyCode.Space | KeyCode.AltMask) },
-                   { "F1", new Key (KeyCode.F1) },
-                   { "0", new Key (KeyCode.D0) },
-                   { "9", new Key (KeyCode.D9) },
-                   { "D0", new Key (KeyCode.D0) },
-                   { "65", new Key (KeyCode.A | KeyCode.ShiftMask) },
-                   { "97", new Key (KeyCode.A) },
-                   { "Shift", new Key (KeyCode.ShiftMask) },
-                   { "Ctrl", new Key (KeyCode.CtrlMask) },
-                   { "Ctrl-A", new Key (KeyCode.A | KeyCode.CtrlMask) },
-                   { "Alt-A", new Key (KeyCode.A | KeyCode.AltMask) },
-                   { "A-Ctrl", new Key (KeyCode.A | KeyCode.CtrlMask) },
-                   { "Alt-A-Ctrl", new Key (KeyCode.A | KeyCode.CtrlMask | KeyCode.AltMask) }
-               };
+            { "a", new Key (KeyCode.A) },
+            { "Ctrl+A", new Key (KeyCode.A | KeyCode.CtrlMask) },
+            { "Alt+A", new Key (KeyCode.A | KeyCode.AltMask) },
+            { "Shift+A", new Key (KeyCode.A | KeyCode.ShiftMask) },
+            { "A", new Key (KeyCode.A | KeyCode.ShiftMask) },
+            { "â", new Key ((KeyCode)'â') },
+            { "Shift+â", new Key ((KeyCode)'â' | KeyCode.ShiftMask) },
+            { "Shift+Â", new Key ((KeyCode)'Â' | KeyCode.ShiftMask) },
+            { "Ctrl+Shift+CursorUp", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.CursorUp) }, {
+                "Ctrl+Alt+Shift+CursorUp",
+                new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp)
+            }, {
+                "ctrl+alt+shift+cursorup",
+                new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp)
+            }, {
+                "CTRL+ALT+SHIFT+CURSORUP",
+                new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp)
+            }, {
+                "Ctrl+Alt+Shift+Delete",
+                new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Delete)
+            }, {
+                "Ctrl+Alt+Shift+Enter", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Enter)
+            },
+            { "Tab", new Key (KeyCode.Tab) },
+            { "Shift+Tab", new Key (KeyCode.Tab | KeyCode.ShiftMask) },
+            { "Ctrl+Tab", new Key (KeyCode.Tab | KeyCode.CtrlMask) },
+            { "Alt+Tab", new Key (KeyCode.Tab | KeyCode.AltMask) },
+            { "Ctrl+Shift+Tab", new Key (KeyCode.Tab | KeyCode.ShiftMask | KeyCode.CtrlMask) },
+            { "Ctrl+Alt+Tab", new Key (KeyCode.Tab | KeyCode.AltMask | KeyCode.CtrlMask) },
+            { "", new Key (KeyCode.Null) },
+            { " ", new Key (KeyCode.Space) },
+            { "Space", new Key (KeyCode.Space) },
+            { "Shift+Space", new Key (KeyCode.Space | KeyCode.ShiftMask) },
+            { "Ctrl+Space", new Key (KeyCode.Space | KeyCode.CtrlMask) },
+            { "Alt+Space", new Key (KeyCode.Space | KeyCode.AltMask) },
+            { "Shift+ ", new Key (KeyCode.Space | KeyCode.ShiftMask) },
+            { "Ctrl+ ", new Key (KeyCode.Space | KeyCode.CtrlMask) },
+            { "Alt+ ", new Key (KeyCode.Space | KeyCode.AltMask) },
+            { "F1", new Key (KeyCode.F1) },
+            { "0", new Key (KeyCode.D0) },
+            { "9", new Key (KeyCode.D9) },
+            { "D0", new Key (KeyCode.D0) },
+            { "65", new Key (KeyCode.A | KeyCode.ShiftMask) },
+            { "97", new Key (KeyCode.A) },
+            { "Shift", new Key (KeyCode.ShiftMask) },
+            { "Ctrl", new Key (KeyCode.CtrlMask) },
+            { "Ctrl-A", new Key (KeyCode.A | KeyCode.CtrlMask) },
+            { "Alt-A", new Key (KeyCode.A | KeyCode.AltMask) },
+            { "A-Ctrl", new Key (KeyCode.A | KeyCode.CtrlMask) },
+            { "Alt-A-Ctrl", new Key (KeyCode.A | KeyCode.CtrlMask | KeyCode.AltMask) }
+        };
 
     [Theory]
     [InlineData ((KeyCode)'❿', '❿')]
@@ -344,8 +343,9 @@ public class KeyTests {
     [InlineData ((KeyCode)'\'', "\'")]
     [InlineData ((KeyCode)'ó', "ó")]
     [InlineData (
-                    (KeyCode)'Ó' | KeyCode.ShiftMask,
-                    "Shift+Ó")] // TODO: This is not correct, it should be Shift+ó or just Ó
+        (KeyCode)'Ó' | KeyCode.ShiftMask,
+        "Shift+Ó"
+    )] // TODO: This is not correct, it should be Shift+ó or just Ó
     [InlineData ((KeyCode)'Ó', "Ó")]
     [InlineData ((KeyCode)'ç' | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, "Ctrl+Alt+Shift+ç")]
     [InlineData ((KeyCode)'a', "a")] // 97 or Key.Space | Key.A

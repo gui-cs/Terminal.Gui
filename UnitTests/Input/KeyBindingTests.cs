@@ -3,8 +3,8 @@
 namespace Terminal.Gui.InputTests;
 
 public class KeyBindingTests {
-    private readonly ITestOutputHelper _output;
     public KeyBindingTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void Add_Empty_Throws () {
@@ -16,10 +16,7 @@ public class KeyBindingTests {
     [Fact]
     public void Add_Multiple_Adds () {
         var keyBindings = new KeyBindings ();
-        Command[] commands = new[] {
-                                       Command.Right,
-                                       Command.Left
-                                   };
+        Command[] commands = { Command.Right, Command.Left };
 
         keyBindings.Add (Key.A, commands);
         Command[] resultCommands = keyBindings.GetCommands (Key.A);
@@ -82,10 +79,7 @@ public class KeyBindingTests {
     [Fact]
     public void GetCommands_WithMultipleBindings_ReturnsCommands () {
         var keyBindings = new KeyBindings ();
-        Command[] commands = new[] {
-                                       Command.Right,
-                                       Command.Left
-                                   };
+        Command[] commands = { Command.Right, Command.Left };
         keyBindings.Add (Key.A, commands);
         keyBindings.Add (Key.B, commands);
         Command[] resultCommands = keyBindings.GetCommands (Key.A);
@@ -99,10 +93,7 @@ public class KeyBindingTests {
     [Fact]
     public void GetCommands_WithMultipleCommands_ReturnsCommands () {
         var keyBindings = new KeyBindings ();
-        Command[] commands = new[] {
-                                       Command.Right,
-                                       Command.Left
-                                   };
+        Command[] commands = { Command.Right, Command.Left };
         keyBindings.Add (Key.A, commands);
         Command[] resultCommands = keyBindings.GetCommands (Key.A);
         Assert.Contains (Command.Right, resultCommands);
@@ -112,16 +103,10 @@ public class KeyBindingTests {
     [Fact]
     public void GetKeyFromCommands_MultipleCommands () {
         var keyBindings = new KeyBindings ();
-        Command[] commands1 = new[] {
-                                        Command.Right,
-                                        Command.Left
-                                    };
+        Command[] commands1 = { Command.Right, Command.Left };
         keyBindings.Add (Key.A, commands1);
 
-        Command[] commands2 = new[] {
-                                        Command.LineUp,
-                                        Command.LineDown
-                                    };
+        Command[] commands2 = { Command.LineUp, Command.LineDown };
         keyBindings.Add (Key.B, commands2);
 
         Key key = keyBindings.GetKeyFromCommands (commands1);
@@ -193,10 +178,7 @@ public class KeyBindingTests {
     [InlineData (KeyBindingScope.Application)]
     public void Scope_Add_Adds (KeyBindingScope scope) {
         var keyBindings = new KeyBindings ();
-        Command[] commands = new[] {
-                                       Command.Right,
-                                       Command.Left
-                                   };
+        Command[] commands = { Command.Right, Command.Left };
 
         keyBindings.Add (Key.A, scope, commands);
         KeyBinding binding = keyBindings.Get (Key.A);
@@ -218,10 +200,7 @@ public class KeyBindingTests {
     [InlineData (KeyBindingScope.Application)]
     public void Scope_Get_Filters (KeyBindingScope scope) {
         var keyBindings = new KeyBindings ();
-        Command[] commands = new[] {
-                                       Command.Right,
-                                       Command.Left
-                                   };
+        Command[] commands = { Command.Right, Command.Left };
 
         keyBindings.Add (Key.A, scope, commands);
         KeyBinding binding = keyBindings.Get (Key.A);

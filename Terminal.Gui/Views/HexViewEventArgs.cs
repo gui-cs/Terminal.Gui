@@ -6,7 +6,7 @@
 // - Bug showing the last line
 // 
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Defines the event arguments for <see cref="HexView.PositionChanged"/> event.</summary>
 public class HexViewEventArgs : EventArgs {
@@ -23,11 +23,11 @@ public class HexViewEventArgs : EventArgs {
     /// <summary>The bytes length per line.</summary>
     public int BytesPerLine { get; private set; }
 
-    /// <summary>Gets the current cursor position starting at one for both, line and column.</summary>
-    public Point CursorPosition { get; private set; }
-
     /// <summary>Gets the current character position starting at one, related to the <see cref="Stream"/>.</summary>
     public long Position { get; private set; }
+
+    /// <summary>Gets the current cursor position starting at one for both, line and column.</summary>
+    public Point CursorPosition { get; private set; }
 }
 
 /// <summary>Defines the event arguments for <see cref="HexView.Edited"/> event.</summary>

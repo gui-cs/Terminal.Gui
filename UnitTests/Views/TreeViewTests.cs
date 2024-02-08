@@ -4,8 +4,8 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.ViewsTests;
 
 public class TreeViewTests {
-    private readonly ITestOutputHelper _output;
     public TreeViewTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     /// <summary>Tests that <see cref="TreeView.Expand(object)"/> results in a correct content height</summary>
     [Fact]
@@ -71,8 +71,9 @@ public class TreeViewTests {
         // Although expanded the bigger (longer) child node is not in the rendered area of the control
         Assert.Equal (9, tree.GetContentWidth (true));
         Assert.Equal (
-                      13,
-                      tree.GetContentWidth (false)); // If you ask for the global max width it includes the longer child
+            13,
+            tree.GetContentWidth (false)
+        ); // If you ask for the global max width it includes the longer child
 
         // Now that we have scrolled down 1 row we should see the big child
         tree.ScrollOffsetVertical = 1;
@@ -524,14 +525,15 @@ public class TreeViewTests {
 
         // change the children getter so that now cars can have wheels
         tree.TreeBuilder = new DelegateTreeBuilder<object> (
-                                                            o =>
+            o =>
 
-                                                                // factories have cars
-                                                                o is Factory
-                                                                    ? new object[] { c1, c2 }
+                // factories have cars
+                o is Factory
+                    ? new object[] { c1, c2 }
 
-                                                                    // cars have wheels
-                                                                    : new object[] { wheel });
+                    // cars have wheels
+                    : new object[] { wheel }
+        );
 
         // still cannot expand
         tree.Expand (c1);
@@ -570,14 +572,15 @@ public class TreeViewTests {
 
         // change the children getter so that now cars can have wheels
         tree.TreeBuilder = new DelegateTreeBuilder<object> (
-                                                            o =>
+            o =>
 
-                                                                // factories have cars
-                                                                o is Factory
-                                                                    ? new object[] { c1, c2 }
+                // factories have cars
+                o is Factory
+                    ? new object[] { c1, c2 }
 
-                                                                    // cars have wheels
-                                                                    : new object[] { wheel });
+                    // cars have wheels
+                    : new object[] { wheel }
+        );
 
         // still cannot expand
         tree.Expand (c1);
@@ -681,11 +684,11 @@ public class TreeViewTests {
     [Fact]
     [AutoInitShutdown]
     public void TestBottomlessTreeView_MaxDepth_3 () {
-        TreeView<string> tv = new() { Width = 20, Height = 10 };
+        TreeView<string> tv = new () { Width = 20, Height = 10 };
 
         tv.TreeBuilder = new DelegateTreeBuilder<string> (
-                                                          s => new[] { (int.Parse (s) + 1).ToString () }
-                                                         );
+            s => new[] { (int.Parse (s) + 1).ToString () }
+        );
 
         tv.AddObject ("1");
         tv.ColorScheme = new ColorScheme ();
@@ -695,32 +698,34 @@ public class TreeViewTests {
 
         // Nothing expanded
         TestHelpers.AssertDriverContentsAre (
-                                             @"└+1
+            @"└+1
 ",
-                                             _output);
+            _output
+        );
         tv.MaxDepth = 3;
         tv.ExpandAll ();
         tv.Draw ();
 
         // Normal drawing of the tree view
         TestHelpers.AssertDriverContentsAre (
-                                             @"    
+            @"    
 └-1
   └-2
     └-3
       └─4
 ",
-                                             _output);
+            _output
+        );
     }
 
     [Fact]
     [AutoInitShutdown]
     public void TestBottomlessTreeView_MaxDepth_5 () {
-        TreeView<string> tv = new() { Width = 20, Height = 10 };
+        TreeView<string> tv = new () { Width = 20, Height = 10 };
 
         tv.TreeBuilder = new DelegateTreeBuilder<string> (
-                                                          s => new[] { (int.Parse (s) + 1).ToString () }
-                                                         );
+            s => new[] { (int.Parse (s) + 1).ToString () }
+        );
 
         tv.AddObject ("1");
         tv.ColorScheme = new ColorScheme ();
@@ -730,9 +735,10 @@ public class TreeViewTests {
 
         // Nothing expanded
         TestHelpers.AssertDriverContentsAre (
-                                             @"└+1
+            @"└+1
 ",
-                                             _output);
+            _output
+        );
         tv.MaxDepth = 5;
         tv.ExpandAll ();
 
@@ -740,7 +746,7 @@ public class TreeViewTests {
 
         // Normal drawing of the tree view
         TestHelpers.AssertDriverContentsAre (
-                                             @"    
+            @"    
 └-1
   └-2
     └-3
@@ -748,7 +754,8 @@ public class TreeViewTests {
         └-5
           └─6
 ",
-                                             _output);
+            _output
+        );
         Assert.False (tv.CanExpand ("6"));
         Assert.False (tv.IsExpanded ("6"));
 
@@ -766,14 +773,15 @@ public class TreeViewTests {
 
         // Normal drawing of the tree view
         TestHelpers.AssertDriverContentsAre (
-                                             @"    
+            @"    
 └-1
   └-2
     └-3
       └-4
         └+5
 ",
-                                             _output);
+            _output
+        );
     }
 
     [Fact]
@@ -798,12 +806,13 @@ public class TreeViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsAre (
-                                             @"├-normal
+            @"├-normal
 │ ├─pink
 │ └─normal
 └─pink
 ",
-                                             _output);
+            _output
+        );
 
         Assert.Same (n1, tv.GetObjectOnRow (0));
         Assert.Same (n1_1, tv.GetObjectOnRow (1));
@@ -816,10 +825,11 @@ public class TreeViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsAre (
-                                             @"├+normal
+            @"├+normal
 └─pink
 ",
-                                             _output);
+            _output
+        );
 
         Assert.Same (n1, tv.GetObjectOnRow (0));
         Assert.Same (n2, tv.GetObjectOnRow (1));
@@ -849,12 +859,13 @@ public class TreeViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsAre (
-                                             @"├-normal
+            @"├-normal
 │ ├─pink
 │ └─normal
 └─pink
 ",
-                                             _output);
+            _output
+        );
 
         Assert.Equal (0, tv.GetObjectRow (n1));
         Assert.Equal (1, tv.GetObjectRow (n1_1));
@@ -867,10 +878,11 @@ public class TreeViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsAre (
-                                             @"├+normal
+            @"├+normal
 └─pink
 ",
-                                             _output);
+            _output
+        );
         Assert.Equal (0, tv.GetObjectRow (n1));
         Assert.Null (tv.GetObjectRow (n1_1));
         Assert.Null (tv.GetObjectRow (n1_2));
@@ -883,9 +895,10 @@ public class TreeViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsAre (
-                                             @"└─pink
+            @"└─pink
 ",
-                                             _output);
+            _output
+        );
         Assert.Equal (-1, tv.GetObjectRow (n1));
         Assert.Null (tv.GetObjectRow (n1_1));
         Assert.Null (tv.GetObjectRow (n1_2));
@@ -918,13 +931,14 @@ public class TreeViewTests {
 
         // Normal drawing of the tree view
         TestHelpers.AssertDriverContentsAre (
-                                             @"
+            @"
 ├-root one
 │ ├─leaf 1
 │ └─leaf 2
 └─root two
 ",
-                                             _output);
+            _output
+        );
         Assert.Equal (4, eventArgs.Count ());
 
         Assert.Equal (0, eventArgs[0].Y);
@@ -988,13 +1002,14 @@ public class TreeViewTests {
 
         // Normal drawing of the tree view
         TestHelpers.AssertDriverContentsAre (
-                                             @"
+            @"
 ├-root one
 FFFFFFFFFF
 │ └─leaf 2
 └─root two
 ",
-                                             _output);
+            _output
+        );
     }
 
     [Fact]
@@ -1026,12 +1041,13 @@ FFFFFFFFFF
 
         // Normal drawing of the tree view
         TestHelpers.AssertDriverContentsAre (
-                                             @"
+            @"
 ─leaf 1
 ─leaf 2
 oot two
 ",
-                                             _output);
+            _output
+        );
         Assert.Equal (3, eventArgs.Count ());
 
         Assert.Equal (0, eventArgs[0].Y);
@@ -1080,13 +1096,14 @@ oot two
 
         // Normal drawing of the tree view
         TestHelpers.AssertDriverContentsAre (
-                                             @"
+            @"
 ├-root one
 │ ├─leaf 1
 │ └─leaf 2
 └─root two
 ",
-                                             _output);
+            _output
+        );
         TreeViewTextFilter<ITreeNode> filter = new (tv);
         tv.Filter = filter;
 
@@ -1096,41 +1113,45 @@ oot two
 
         // Normal drawing of the tree view
         TestHelpers.AssertDriverContentsAre (
-                                             @"",
-                                             _output);
+            @"",
+            _output
+        );
 
         // Matches everything
         filter.Text = "root";
         tv.Draw ();
         TestHelpers.AssertDriverContentsAre (
-                                             @"
+            @"
 ├-root one
 │ ├─leaf 1
 │ └─leaf 2
 └─root two
 ",
-                                             _output);
+            _output
+        );
 
         // Matches 2 leaf nodes
         filter.Text = "leaf";
         tv.Draw ();
         TestHelpers.AssertDriverContentsAre (
-                                             @"
+            @"
 ├-root one
 │ ├─leaf 1
 │ └─leaf 2
 ",
-                                             _output);
+            _output
+        );
 
         // Matches 1 leaf nodes
         filter.Text = "leaf 1";
         tv.Draw ();
         TestHelpers.AssertDriverContentsAre (
-                                             @"
+            @"
 ├-root one
 │ ├─leaf 1
 ",
-                                             _output);
+            _output
+        );
     }
 
     [Fact]
@@ -1160,30 +1181,29 @@ oot two
 
         // Normal drawing of the tree view
         TestHelpers.AssertDriverContentsAre (
-                                             @"
+            @"
 ├-normal
 │ ├─pink
 │ └─normal
 └─pink
 ",
-                                             _output);
+            _output
+        );
 
         // Should all be the same color
         TestHelpers.AssertDriverAttributesAre (
-                                               @"
+            @"
 0000000000
 0000000000
 0000000000
 0000000000
 ",
-                                               Application.Driver,
-                                               tv.ColorScheme.Normal,
-                                               pink);
+            Application.Driver,
+            tv.ColorScheme.Normal,
+            pink
+        );
 
-        var pinkScheme = new ColorScheme {
-                                             Normal = pink,
-                                             Focus = hotpink
-                                         };
+        var pinkScheme = new ColorScheme { Normal = pink, Focus = hotpink };
 
         // and a delegate that uses the pink color scheme 
         // for nodes "pink"
@@ -1195,26 +1215,28 @@ oot two
 
         // Same text
         TestHelpers.AssertDriverContentsAre (
-                                             @"
+            @"
 ├-normal
 │ ├─pink
 │ └─normal
 └─pink
 ",
-                                             _output);
+            _output
+        );
 
         // but now the item (only not lines) appear
         // in pink when they are the word "pink"
         TestHelpers.AssertDriverAttributesAre (
-                                               @"
+            @"
 00000000
 00001111
 0000000000
 001111
 ",
-                                               Application.Driver,
-                                               tv.ColorScheme.Normal,
-                                               pink);
+            Application.Driver,
+            tv.ColorScheme.Normal,
+            pink
+        );
     }
 
     [Fact]
@@ -1267,9 +1289,7 @@ oot two
         car1 = new Car ();
         car2 = new Car ();
 
-        factory1 = new Factory {
-                                   Cars = new[] { car1, car2 }
-                               };
+        factory1 = new Factory { Cars = new[] { car1, car2 } };
 
         TreeView<object> tree = new (new DelegateTreeBuilder<object> (s => s is Factory f ? f.Cars : null));
         tree.AddObject (factory1);

@@ -63,19 +63,20 @@ class WindowsConsole {
             CharInfo[] ci = new CharInfo [charInfoBuffer.Length];
             foreach (ExtendedCharInfo info in charInfoBuffer) {
                 ci[i++] = new CharInfo {
-                                           Char = new CharUnion { UnicodeChar = info.Char },
-                                           Attributes =
-                                               (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor ()
-                                                        | ((int)info.Attribute.Background.GetClosestNamedColor () << 4))
-                                       };
+                    Char = new CharUnion { UnicodeChar = info.Char },
+                    Attributes =
+                        (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor ()
+                                 | ((int)info.Attribute.Background.GetClosestNamedColor () << 4))
+                };
             }
 
             result = WriteConsoleOutput (
-                                         _screenBuffer,
-                                         ci,
-                                         bufferSize,
-                                         new Coord { X = window.Left, Y = window.Top },
-                                         ref window);
+                _screenBuffer,
+                ci,
+                bufferSize,
+                new Coord { X = window.Left, Y = window.Top },
+                ref window
+            );
         } else {
             _stringBuilder.Clear ();
 
@@ -89,15 +90,19 @@ class WindowsConsole {
                 if (attr != prev) {
                     prev = attr;
                     _stringBuilder.Append (
-                                           EscSeqUtils.CSI_SetForegroundColorRGB (
-                                            attr.Foreground.R,
-                                            attr.Foreground.G,
-                                            attr.Foreground.B));
+                        EscSeqUtils.CSI_SetForegroundColorRGB (
+                            attr.Foreground.R,
+                            attr.Foreground.G,
+                            attr.Foreground.B
+                        )
+                    );
                     _stringBuilder.Append (
-                                           EscSeqUtils.CSI_SetBackgroundColorRGB (
-                                            attr.Background.R,
-                                            attr.Background.G,
-                                            attr.Background.B));
+                        EscSeqUtils.CSI_SetBackgroundColorRGB (
+                            attr.Background.R,
+                            attr.Background.G,
+                            attr.Background.B
+                        )
+                    );
                 }
 
                 if (info.Char != '\x1b') {
@@ -128,12 +133,12 @@ class WindowsConsole {
 
     public void ReadFromConsoleOutput (Size size, Coord coords, ref SmallRect window) {
         _screenBuffer = CreateConsoleScreenBuffer (
-                                                   DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
-                                                   ShareMode.FileShareRead | ShareMode.FileShareWrite,
-                                                   nint.Zero,
-                                                   1,
-                                                   nint.Zero
-                                                  );
+            DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
+            ShareMode.FileShareRead | ShareMode.FileShareWrite,
+            nint.Zero,
+            1,
+            nint.Zero
+        );
         if (_screenBuffer == INVALID_HANDLE_VALUE) {
             int err = Marshal.GetLastWin32Error ();
 
@@ -221,9 +226,8 @@ class WindowsConsole {
 
         if ((_currentCursorVisibility.HasValue == false) || (_currentCursorVisibility.Value != visibility)) {
             var info = new ConsoleCursorInfo {
-                                                 dwSize = (uint)visibility & 0x00FF,
-                                                 bVisible = ((uint)visibility & 0xFF00) != 0
-                                             };
+                dwSize = (uint)visibility & 0x00FF, bVisible = ((uint)visibility & 0xFF00) != 0
+            };
 
             if (!SetConsoleCursorInfo (_screenBuffer, ref info)) {
                 return false;
@@ -272,8 +276,9 @@ class WindowsConsole {
         }
 
         var sz = new Size (
-                           csbi.srWindow.Right - csbi.srWindow.Left + 1,
-                           csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
+            csbi.srWindow.Right - csbi.srWindow.Left + 1,
+            csbi.srWindow.Bottom - csbi.srWindow.Top + 1
+        );
         position = new Point (csbi.srWindow.Left, csbi.srWindow.Top);
 
         return sz;
@@ -287,8 +292,9 @@ class WindowsConsole {
         }
 
         var sz = new Size (
-                           csbi.srWindow.Right - csbi.srWindow.Left + 1,
-                           csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
+            csbi.srWindow.Right - csbi.srWindow.Left + 1,
+            csbi.srWindow.Bottom - csbi.srWindow.Top + 1
+        );
         position = new Point (csbi.srWindow.Left, csbi.srWindow.Top);
 
         return sz;
@@ -343,8 +349,9 @@ class WindowsConsole {
         }
 
         var sz = new Size (
-                           csbi.srWindow.Right - csbi.srWindow.Left + 1,
-                           Math.Max (csbi.srWindow.Bottom - csbi.srWindow.Top + 1, 0));
+            csbi.srWindow.Right - csbi.srWindow.Left + 1,
+            Math.Max (csbi.srWindow.Bottom - csbi.srWindow.Top + 1, 0)
+        );
         position = new Point (csbi.srWindow.Left, csbi.srWindow.Top);
         SetConsoleOutputWindow (csbi);
         var winRect = new SmallRect (0, 0, (short)(sz.Width - 1), (short)Math.Max (sz.Height - 1, 0));
@@ -403,7 +410,19 @@ class WindowsConsole {
 
         public override readonly string ToString () {
             return
-                $"[KeyEventRecord({(bKeyDown ? "down" : "up")},{wRepeatCount},{wVirtualKeyCode},{wVirtualScanCode},{new Rune (UnicodeChar).MakePrintable ()},{dwControlKeyState})]";
+                $"[KeyEventRecord({
+                    (bKeyDown ? "down" : "up")
+                },{
+                    wRepeatCount
+                },{
+                    wVirtualKeyCode
+                },{
+                    wVirtualScanCode
+                },{
+                    new Rune (UnicodeChar).MakePrintable ()
+                },{
+                    dwControlKeyState
+                })]";
         }
     }
 
@@ -742,10 +761,11 @@ class WindowsConsole {
         nint pRecord = Marshal.AllocHGlobal (Marshal.SizeOf<InputRecord> () * bufferSize);
         try {
             ReadConsoleInput (
-                              _inputHandle,
-                              pRecord,
-                              bufferSize,
-                              out uint numberEventsRead);
+                _inputHandle,
+                pRecord,
+                bufferSize,
+                out uint numberEventsRead
+            );
 
             return numberEventsRead == 0
                        ? null
@@ -850,20 +870,6 @@ class WindowsConsole {
 }
 
 class WindowsDriver : ConsoleDriver {
-    private readonly bool _isWindowsTerminal;
-    private CursorVisibility _cachedCursorVisibility;
-    private WindowsConsole.SmallRect _damageRegion;
-    private bool _isButtonDoubleClicked;
-    private bool _isButtonPressed;
-    private bool _isButtonReleased;
-    private bool _isOneFingerDoubleClicked;
-    private WindowsConsole.ButtonState? _lastMouseButtonPressed;
-    private WindowsMainLoop _mainLoopDriver;
-    private WindowsConsole.ExtendedCharInfo[] _outputBuffer;
-    private Point? _point;
-    private Point _pointMove;
-    private bool _processButtonClick;
-
     public WindowsDriver () {
         if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
             WinConsole = new WindowsConsole ();
@@ -882,6 +888,20 @@ class WindowsDriver : ConsoleDriver {
             Force16Colors = true;
         }
     }
+
+    private readonly bool _isWindowsTerminal;
+    private bool _isButtonDoubleClicked;
+    private bool _isButtonPressed;
+    private bool _isButtonReleased;
+    private bool _isOneFingerDoubleClicked;
+    private bool _processButtonClick;
+    private WindowsConsole.ButtonState? _lastMouseButtonPressed;
+    private CursorVisibility _cachedCursorVisibility;
+    private WindowsConsole.ExtendedCharInfo[] _outputBuffer;
+    private Point _pointMove;
+    private Point? _point;
+    private WindowsConsole.SmallRect _damageRegion;
+    private WindowsMainLoop _mainLoopDriver;
 
     public override bool SupportsTrueColor =>
         RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931 && _isWindowsTerminal);
@@ -914,22 +934,23 @@ class WindowsDriver : ConsoleDriver {
         }
 
         var cKeyInfo = new ConsoleKeyInfo (
-                                           keyEvent.UnicodeChar,
-                                           (ConsoleKey)keyEvent.wVirtualKeyCode,
-                                           mod.HasFlag (ConsoleModifiers.Shift),
-                                           mod.HasFlag (ConsoleModifiers.Alt),
-                                           mod.HasFlag (ConsoleModifiers.Control));
+            keyEvent.UnicodeChar,
+            (ConsoleKey)keyEvent.wVirtualKeyCode,
+            mod.HasFlag (ConsoleModifiers.Shift),
+            mod.HasFlag (ConsoleModifiers.Alt),
+            mod.HasFlag (ConsoleModifiers.Control)
+        );
         cKeyInfo = DecodeVKPacketToKConsoleKeyInfo (cKeyInfo);
         uint scanCode = GetScanCodeFromConsoleKeyInfo (cKeyInfo);
 
         return new WindowsConsole.KeyEventRecord {
-                                                     UnicodeChar = cKeyInfo.KeyChar,
-                                                     bKeyDown = keyEvent.bKeyDown,
-                                                     dwControlKeyState = keyEvent.dwControlKeyState,
-                                                     wRepeatCount = keyEvent.wRepeatCount,
-                                                     wVirtualKeyCode = (VK)cKeyInfo.Key,
-                                                     wVirtualScanCode = (ushort)scanCode
-                                                 };
+            UnicodeChar = cKeyInfo.KeyChar,
+            bKeyDown = keyEvent.bKeyDown,
+            dwControlKeyState = keyEvent.dwControlKeyState,
+            wRepeatCount = keyEvent.wRepeatCount,
+            wVirtualKeyCode = (VK)cKeyInfo.Key,
+            wVirtualScanCode = (ushort)scanCode
+        };
     }
 
     /// <inheritdoc/>
@@ -952,13 +973,9 @@ class WindowsDriver : ConsoleDriver {
     }
 
     public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control) {
-        var input = new WindowsConsole.InputRecord {
-                                                       EventType = WindowsConsole.EventType.Key
-                                                   };
+        var input = new WindowsConsole.InputRecord { EventType = WindowsConsole.EventType.Key };
 
-        var keyEvent = new WindowsConsole.KeyEventRecord {
-                                                             bKeyDown = true
-                                                         };
+        var keyEvent = new WindowsConsole.KeyEventRecord { bKeyDown = true };
         var controlKey = new WindowsConsole.ControlKeyState ();
         if (shift) {
             controlKey |= WindowsConsole.ControlKeyState.ShiftPressed;
@@ -1050,10 +1067,7 @@ class WindowsDriver : ConsoleDriver {
         }
 
         SetCursorVisibility (_cachedCursorVisibility);
-        var position = new WindowsConsole.Coord {
-                                                    X = (short)Col,
-                                                    Y = (short)Row
-                                                };
+        var position = new WindowsConsole.Coord { X = (short)Col, Y = (short)Row };
         WinConsole?.SetCursorPosition (position);
     }
 
@@ -1063,10 +1077,7 @@ class WindowsDriver : ConsoleDriver {
             return;
         }
 
-        var bufferCoords = new WindowsConsole.Coord {
-                                                        X = (short)Clip.Width,
-                                                        Y = (short)Clip.Height
-                                                    };
+        var bufferCoords = new WindowsConsole.Coord { X = (short)Clip.Width, Y = (short)Clip.Height };
 
         for (var row = 0; row < Rows; row++) {
             if (!_dirtyLines[row]) {
@@ -1102,19 +1113,15 @@ class WindowsDriver : ConsoleDriver {
             }
         }
 
-        _damageRegion = new WindowsConsole.SmallRect {
-                                                         Top = 0,
-                                                         Left = 0,
-                                                         Bottom = (short)Rows,
-                                                         Right = (short)Cols
-                                                     };
+        _damageRegion = new WindowsConsole.SmallRect { Top = 0, Left = 0, Bottom = (short)Rows, Right = (short)Cols };
 
         if (!RunningUnitTests && WinConsole != null && !WinConsole.WriteToConsole (
-             new Size (Cols, Rows),
-             _outputBuffer,
-             bufferCoords,
-             _damageRegion,
-             Force16Colors)) {
+                new Size (Cols, Rows),
+                _outputBuffer,
+                bufferCoords,
+                _damageRegion,
+                Force16Colors
+            )) {
             int err = Marshal.GetLastWin32Error ();
             if (err != 0) {
                 throw new Win32Exception (err);
@@ -1165,7 +1172,8 @@ class WindowsDriver : ConsoleDriver {
                 // We are being run in an environment that does not support a console
                 // such as a unit test, or a pipe.
                 Debug.WriteLine (
-                                 $"Likely running unit tests. Setting WinConsole to null so we can test it elsewhere. Exception: {e}");
+                    $"Likely running unit tests. Setting WinConsole to null so we can test it elsewhere. Exception: {e}"
+                );
                 WinConsole = null;
             }
         }
@@ -1174,12 +1182,7 @@ class WindowsDriver : ConsoleDriver {
 
         _outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
         Clip = new Rect (0, 0, Cols, Rows);
-        _damageRegion = new WindowsConsole.SmallRect {
-                                                         Top = 0,
-                                                         Left = 0,
-                                                         Bottom = (short)Rows,
-                                                         Right = (short)Cols
-                                                     };
+        _damageRegion = new WindowsConsole.SmallRect { Top = 0, Left = 0, Bottom = (short)Rows, Right = (short)Cols };
 
         ClearContents ();
 
@@ -1223,13 +1226,16 @@ class WindowsDriver : ConsoleDriver {
                 OnMouseEvent (new MouseEventEventArgs (me));
                 if (_processButtonClick) {
                     OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent {
-                                                                              X = me.X,
-                                                                              Y = me.Y,
-                                                                              Flags = ProcessButtonClick (
-                                                                               inputEvent.MouseEvent)
-                                                                          }));
+                        new MouseEventEventArgs (
+                            new MouseEvent {
+                                X = me.X,
+                                Y = me.Y,
+                                Flags = ProcessButtonClick (
+                                    inputEvent.MouseEvent
+                                )
+                            }
+                        )
+                    );
                 }
 
                 break;
@@ -1265,8 +1271,9 @@ class WindowsDriver : ConsoleDriver {
 
         if (!RunningUnitTests) {
             Size newSize = WinConsole.SetConsoleWindow (
-                                                        (short)Math.Max (w, 16),
-                                                        (short)Math.Max (e.Size.Height, 0));
+                (short)Math.Max (w, 16),
+                (short)Math.Max (e.Size.Height, 0)
+            );
 
             Cols = newSize.Width;
             Rows = newSize.Height;
@@ -1476,10 +1483,7 @@ class WindowsDriver : ConsoleDriver {
                 break;
         }
 
-        _point = new Point {
-                               X = mouseEvent.MousePosition.X,
-                               Y = mouseEvent.MousePosition.Y
-                           };
+        _point = new Point { X = mouseEvent.MousePosition.X, Y = mouseEvent.MousePosition.Y };
         _lastMouseButtonPressed = null;
         _isButtonReleased = false;
         _processButtonClick = false;
@@ -1499,11 +1503,7 @@ class WindowsDriver : ConsoleDriver {
     private async Task ProcessContinuousButtonPressedAsync (MouseFlags mouseFlag) {
         while (_isButtonPressed) {
             await Task.Delay (100);
-            var me = new MouseEvent {
-                                        X = _pointMove.X,
-                                        Y = _pointMove.Y,
-                                        Flags = mouseFlag
-                                    };
+            var me = new MouseEvent { X = _pointMove.X, Y = _pointMove.Y, Flags = mouseFlag };
 
             View view = Application.WantContinuousButtonPressedView;
             if (view == null) {
@@ -1519,12 +1519,7 @@ class WindowsDriver : ConsoleDriver {
     private void ResizeScreen () {
         _outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
         Clip = new Rect (0, 0, Cols, Rows);
-        _damageRegion = new WindowsConsole.SmallRect {
-                                                         Top = 0,
-                                                         Left = 0,
-                                                         Bottom = (short)Rows,
-                                                         Right = (short)Cols
-                                                     };
+        _damageRegion = new WindowsConsole.SmallRect { Top = 0, Left = 0, Bottom = (short)Rows, Right = (short)Cols };
         _dirtyLines = new bool [Rows];
 
         WinConsole?.ForceRefreshCursorVisibility ();
@@ -1556,11 +1551,12 @@ class WindowsDriver : ConsoleDriver {
 
         if (_isButtonDoubleClicked || _isOneFingerDoubleClicked) {
             Application.MainLoop.AddIdle (
-                                          () => {
-                                              Task.Run (async () => await ProcessButtonDoubleClickedAsync ());
+                () => {
+                    Task.Run (async () => await ProcessButtonDoubleClickedAsync ());
 
-                                              return false;
-                                          });
+                    return false;
+                }
+            );
         }
 
         // The ButtonState member of the MouseEvent structure has bit corresponding to each mouse button.
@@ -1575,10 +1571,7 @@ class WindowsDriver : ConsoleDriver {
             _isButtonReleased = false;
         }
 
-        var p = new Point {
-                              X = mouseEvent.MousePosition.X,
-                              Y = mouseEvent.MousePosition.Y
-                          };
+        var p = new Point { X = mouseEvent.MousePosition.X, Y = mouseEvent.MousePosition.Y };
 
         if ((mouseEvent.ButtonState != 0 && mouseEvent.EventFlags == 0 && _lastMouseButtonPressed == null
              && !_isButtonDoubleClicked) ||
@@ -1616,13 +1609,15 @@ class WindowsDriver : ConsoleDriver {
 
             if ((mouseFlag & MouseFlags.ReportMousePosition) == 0) {
                 Application.MainLoop.AddIdle (
-                                              () => {
-                                                  Task.Run (
-                                                            async () =>
-                                                                await ProcessContinuousButtonPressedAsync (mouseFlag));
+                    () => {
+                        Task.Run (
+                            async () =>
+                                await ProcessContinuousButtonPressedAsync (mouseFlag)
+                        );
 
-                                                  return false;
-                                              });
+                        return false;
+                    }
+                );
             }
         } else if (_lastMouseButtonPressed != null && mouseEvent.EventFlags == 0
                                                    && !_isButtonReleased && !_isButtonDoubleClicked
@@ -1744,35 +1739,32 @@ class WindowsDriver : ConsoleDriver {
         //System.Diagnostics.Debug.WriteLine (
         //	$"point.X:{(point != null ? ((Point)point).X : -1)};point.Y:{(point != null ? ((Point)point).Y : -1)}");
 
-        return new MouseEvent {
-                                  X = mouseEvent.MousePosition.X,
-                                  Y = mouseEvent.MousePosition.Y,
-                                  Flags = mouseFlag
-                              };
+        return new MouseEvent { X = mouseEvent.MousePosition.X, Y = mouseEvent.MousePosition.Y, Flags = mouseFlag };
     }
 }
 
 /// <summary>Mainloop intended to be used with the <see cref="WindowsDriver"/>, and can only be used on Windows.</summary>
 /// <remarks>This implementation is used for WindowsDriver.</remarks>
 class WindowsMainLoop : IMainLoopDriver {
-    private readonly ConsoleDriver _consoleDriver;
-    private readonly ManualResetEventSlim _eventReady = new (false);
-
-    // The records that we keep fetching
-    private readonly Queue<WindowsConsole.InputRecord[]> _resultQueue = new ();
-    private readonly ManualResetEventSlim _waitForProbe = new (false);
-    private readonly WindowsConsole _winConsole;
-    private CancellationTokenSource _eventReadyTokenSource = new ();
-    private readonly CancellationTokenSource _inputHandlerTokenSource = new ();
-    private MainLoop _mainLoop;
-
-    /// <summary>Invoked when the window is changed.</summary>
-    public EventHandler<SizeChangedEventArgs> WinChanged;
-
     public WindowsMainLoop (ConsoleDriver consoleDriver = null) {
         _consoleDriver = consoleDriver ?? throw new ArgumentNullException (nameof (consoleDriver));
         _winConsole = ((WindowsDriver)consoleDriver).WinConsole;
     }
+
+    private readonly CancellationTokenSource _inputHandlerTokenSource = new ();
+    private readonly ConsoleDriver _consoleDriver;
+    private readonly ManualResetEventSlim _eventReady = new (false);
+    private readonly ManualResetEventSlim _waitForProbe = new (false);
+
+    // The records that we keep fetching
+    private readonly Queue<WindowsConsole.InputRecord[]> _resultQueue = new ();
+    private readonly WindowsConsole _winConsole;
+    private CancellationTokenSource _eventReadyTokenSource = new ();
+
+    /// <summary>Invoked when the window is changed.</summary>
+    public EventHandler<SizeChangedEventArgs> WinChanged;
+
+    private MainLoop _mainLoop;
 
     void IMainLoopDriver.Setup (MainLoop mainLoop) {
         _mainLoop = mainLoop;
@@ -1905,8 +1897,8 @@ class WindowsMainLoop : IMainLoopDriver {
 }
 
 class WindowsClipboard : ClipboardBase {
-    private const uint _cfUnicodeText = 13;
     public WindowsClipboard () { IsSupported = IsClipboardFormatAvailable (_cfUnicodeText); }
+    private const uint _cfUnicodeText = 13;
 
     public override bool IsSupported { get; }
 
@@ -2005,6 +1997,10 @@ class WindowsClipboard : ClipboardBase {
     [return: MarshalAs (UnmanagedType.Bool)]
     private extern static bool IsClipboardFormatAvailable (uint format);
 
+    [DllImport ("user32.dll", SetLastError = true)]
+    [return: MarshalAs (UnmanagedType.Bool)]
+    private extern static bool OpenClipboard (nint hWndNewOwner);
+
     private void OpenClipboard () {
         var num = 10;
         while (true) {
@@ -2019,10 +2015,6 @@ class WindowsClipboard : ClipboardBase {
             Thread.Sleep (100);
         }
     }
-
-    [DllImport ("user32.dll", SetLastError = true)]
-    [return: MarshalAs (UnmanagedType.Bool)]
-    private extern static bool OpenClipboard (nint hWndNewOwner);
 
     [DllImport ("user32.dll", SetLastError = true)]
     private extern static nint SetClipboardData (uint uFormat, nint data);

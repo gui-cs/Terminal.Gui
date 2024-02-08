@@ -14,9 +14,6 @@ public class TableStyle {
     /// </summary>
     public bool AlwaysUseNormalColorForVerticalCellLines { get; set; } = false;
 
-    /// <summary>Collection of columns for which you want special rendering (e.g. custom column lengths, text alignment etc)</summary>
-    public Dictionary<int, ColumnStyle> ColumnStyles { get; set; } = new ();
-
     /// <summary>
     ///     Determines rendering when the last column in the table is visible but it's content or
     ///     <see cref="ColumnStyle.MaxWidth"/> is less than the remaining space in the control.  True (the default) will expand
@@ -31,13 +28,6 @@ public class TableStyle {
     ///     the appearance of a cursor for when the <see cref="ConsoleDriver"/> doesn't otherwise show this
     /// </summary>
     public bool InvertSelectedCellFirstCharacter { get; set; } = false;
-
-    /// <summary>
-    ///     Delegate for coloring specific rows in a different color.  For cell color
-    ///     <see cref="ColumnStyle.ColorGetter"/>
-    /// </summary>
-    /// <value></value>
-    public RowColorGetterDelegate RowColorGetter { get; set; }
 
     /// <summary>
     ///     Gets or sets a flag indicating whether to render headers of a <see cref="TableView"/>. Defaults to
@@ -86,6 +76,16 @@ public class TableStyle {
     ///     <para>If false then scroll offset is set to the currently selected column (i.e. PageRight).</para>
     /// </summary>
     public bool SmoothHorizontalScrolling { get; set; } = true;
+
+    /// <summary>Collection of columns for which you want special rendering (e.g. custom column lengths, text alignment etc)</summary>
+    public Dictionary<int, ColumnStyle> ColumnStyles { get; set; } = new ();
+
+    /// <summary>
+    ///     Delegate for coloring specific rows in a different color.  For cell color
+    ///     <see cref="ColumnStyle.ColorGetter"/>
+    /// </summary>
+    /// <value></value>
+    public RowColorGetterDelegate RowColorGetter { get; set; }
 
     /// <summary>
     ///     Returns the entry from <see cref="ColumnStyles"/> for the given <paramref name="col"/> or null if no custom

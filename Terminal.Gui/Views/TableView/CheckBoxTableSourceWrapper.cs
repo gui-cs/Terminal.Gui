@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     <see cref="ITableSource"/> for a <see cref="TableView"/> which adds a checkbox column as an additional column
@@ -9,8 +9,6 @@
 ///     Data in the wrapped source can be dynamic (change over time).
 /// </remarks>
 public abstract class CheckBoxTableSourceWrapperBase : ITableSource {
-    private readonly TableView tableView;
-
     /// <summary>
     ///     Creates a new instance of the class presenting the data in <paramref name="toWrap"/> plus an additional
     ///     checkbox column.
@@ -29,6 +27,14 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource {
         tableView.MouseClick += TableView_MouseClick;
         tableView.CellToggled += TableView_CellToggled;
     }
+
+    private readonly TableView tableView;
+
+    /// <summary>Gets or sets whether to only allow a single row to be toggled at once (Radio button).</summary>
+    public bool UseRadioButtons { get; set; }
+
+    /// <summary>Gets the <see cref="ITableSource"/> that this instance is wrapping.</summary>
+    public ITableSource Wrapping { get; }
 
     /// <summary>
     ///     Gets or sets the character to use for checked entries. Defaults to <see cref="GlyphDefinitions.Checked"/>
@@ -51,12 +57,6 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource {
     ///     Gets or sets the character to use for UnChecked entries. Defaults to <see cref="GlyphDefinitions.UnChecked"/>
     /// </summary>
     public Rune UnCheckedRune { get; set; } = Glyphs.UnChecked;
-
-    /// <summary>Gets or sets whether to only allow a single row to be toggled at once (Radio button).</summary>
-    public bool UseRadioButtons { get; set; }
-
-    /// <summary>Gets the <see cref="ITableSource"/> that this instance is wrapping.</summary>
-    public ITableSource Wrapping { get; }
 
     /// <inheritdoc/>
     public object this [int row, int col] {

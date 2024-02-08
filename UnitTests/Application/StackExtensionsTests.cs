@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.ApplicationTests; 
+﻿namespace Terminal.Gui.ApplicationTests;
 
 public class StackExtensionsTests {
     [Fact]
@@ -156,7 +156,7 @@ public class StackExtensionsTests {
         Stack<Toplevel> Toplevels = CreateToplevels ();
 
         // Only allows unique keys
-        HashSet<int> hCodes = new HashSet<int> ();
+        HashSet<int> hCodes = new ();
 
         foreach (Toplevel top in Toplevels) {
             Assert.True (hCodes.Add (top.GetHashCode ()));
@@ -164,7 +164,7 @@ public class StackExtensionsTests {
     }
 
     private Stack<Toplevel> CreateToplevels () {
-        Stack<Toplevel> Toplevels = new Stack<Toplevel> ();
+        Stack<Toplevel> Toplevels = new ();
 
         Toplevels.Push (new Toplevel { Id = "Top" });
         Toplevels.Push (new Window { Id = "w1" });

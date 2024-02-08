@@ -14,30 +14,6 @@
 ///     user, set <see cref="View.Enabled"/>.
 /// </remarks>
 public class WizardStep : FrameView {
-    ///// <summary>
-    ///// The title of the <see cref="WizardStep"/>. 
-    ///// </summary>
-    ///// <remarks>The Title is only displayed when the <see cref="Wizard"/> is used as a modal pop-up (see <see cref="Wizard.Modal"/>.</remarks>
-    //public new string Title {
-    //	// BUGBUG: v2 - No need for this as View now has Title w/ notifications.
-    //	get => title;
-    //	set {
-    //		if (!OnTitleChanging (title, value)) {
-    //			var old = title;
-    //			title = value;
-    //			OnTitleChanged (old, title);
-    //		}
-    //		base.Title = value;
-    //		SetNeedsDisplay ();
-    //	}
-    //}
-
-    //private string title = string.Empty;
-
-    // The contentView works like the ContentView in FrameView.
-    private readonly View _contentView = new () { Id = "WizardContentView" };
-    private readonly TextView _helpTextView = new ();
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="Wizard"/> class using <see cref="LayoutStyle.Computed"/>
     ///     positioning.
@@ -98,6 +74,30 @@ public class WizardStep : FrameView {
         //base.Add (scrollBar);
         ShowHide ();
     }
+
+    private readonly TextView _helpTextView = new ();
+    ///// <summary>
+    ///// The title of the <see cref="WizardStep"/>. 
+    ///// </summary>
+    ///// <remarks>The Title is only displayed when the <see cref="Wizard"/> is used as a modal pop-up (see <see cref="Wizard.Modal"/>.</remarks>
+    //public new string Title {
+    //	// BUGBUG: v2 - No need for this as View now has Title w/ notifications.
+    //	get => title;
+    //	set {
+    //		if (!OnTitleChanging (title, value)) {
+    //			var old = title;
+    //			title = value;
+    //			OnTitleChanged (old, title);
+    //		}
+    //		base.Title = value;
+    //		SetNeedsDisplay ();
+    //	}
+    //}
+
+    //private string title = string.Empty;
+
+    // The contentView works like the ContentView in FrameView.
+    private readonly View _contentView = new () { Id = "WizardContentView" };
 
     /// <summary>Sets or gets the text for the back button. The back button will only be visible on steps after the first step.</summary>
     /// <remarks>The default text is "Back"</remarks>

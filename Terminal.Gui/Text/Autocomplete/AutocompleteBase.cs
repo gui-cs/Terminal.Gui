@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 ///     Abstract implementation of <see cref="IAutocomplete"/> allows for tailoring how autocomplete is

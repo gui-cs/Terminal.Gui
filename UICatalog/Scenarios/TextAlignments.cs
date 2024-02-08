@@ -24,40 +24,36 @@ public class TextAlignments : Scenario {
 
         foreach (TextAlignment alignment in alignments) {
             singleLines[(int)alignment] = new Label {
-                                                        TextAlignment = alignment,
-                                                        X = 1,
-                                                        AutoSize = false,
-                                                        Width = Dim.Fill (1),
-                                                        Height = 1,
-                                                        ColorScheme = Colors.ColorSchemes["Dialog"],
-                                                        Text = txt
-                                                    };
+                TextAlignment = alignment,
+                X = 1,
+                AutoSize = false,
+                Width = Dim.Fill (1),
+                Height = 1,
+                ColorScheme = Colors.ColorSchemes["Dialog"],
+                Text = txt
+            };
             multipleLines[(int)alignment] = new Label {
-                                                          TextAlignment = alignment,
-                                                          X = 1,
-                                                          AutoSize = false,
-                                                          Width = Dim.Fill (1),
-                                                          Height = multiLineHeight,
-                                                          ColorScheme = Colors.ColorSchemes["Dialog"],
-                                                          Text = txt
-                                                      };
+                TextAlignment = alignment,
+                X = 1,
+                AutoSize = false,
+                Width = Dim.Fill (1),
+                Height = multiLineHeight,
+                ColorScheme = Colors.ColorSchemes["Dialog"],
+                Text = txt
+            };
         }
 
         // Add a label & text field so we can demo IsDefault
-        var editLabel = new Label {
-                                      X = 0,
-                                      Y = 0,
-                                      Text = "Text:"
-                                  };
+        var editLabel = new Label { X = 0, Y = 0, Text = "Text:" };
         Win.Add (editLabel);
         var edit = new TextView {
-                                    X = Pos.Right (editLabel) + 1,
-                                    Y = Pos.Y (editLabel),
-                                    Width = Dim.Fill ("Text:".Length + "  Unicode Sample".Length + 2),
-                                    Height = 4,
-                                    ColorScheme = Colors.ColorSchemes["TopLevel"],
-                                    Text = txt
-                                };
+            X = Pos.Right (editLabel) + 1,
+            Y = Pos.Y (editLabel),
+            Width = Dim.Fill ("Text:".Length + "  Unicode Sample".Length + 2),
+            Height = 4,
+            ColorScheme = Colors.ColorSchemes["TopLevel"],
+            Text = txt
+        };
         edit.TextChanged += (s, e) => {
             foreach (TextAlignment alignment in alignments) {
                 singleLines[(int)alignment].Text = edit.Text;
@@ -66,19 +62,11 @@ public class TextAlignments : Scenario {
         };
         Win.Add (edit);
 
-        var unicodeSample = new Button {
-                                           X = Pos.Right (edit) + 1,
-                                           Y = 0,
-                                           Text = "Unicode Sample"
-                                       };
+        var unicodeSample = new Button { X = Pos.Right (edit) + 1, Y = 0, Text = "Unicode Sample" };
         unicodeSample.Clicked += (s, e) => { edit.Text = unicodeSampleText; };
         Win.Add (unicodeSample);
 
-        var update = new Button {
-                                    X = Pos.Right (edit) + 1,
-                                    Y = Pos.Bottom (edit) - 1,
-                                    Text = "_Update"
-                                };
+        var update = new Button { X = Pos.Right (edit) + 1, Y = Pos.Bottom (edit) - 1, Text = "_Update" };
         update.Clicked += (s, e) => {
             foreach (TextAlignment alignment in alignments) {
                 singleLines[(int)alignment].Text = edit.Text;
@@ -88,18 +76,14 @@ public class TextAlignments : Scenario {
         Win.Add (update);
 
         var enableHotKeyCheckBox = new CheckBox {
-                                                    X = 0,
-                                                    Y = Pos.Bottom (edit),
-                                                    Text = "Enable Hotkey (_)",
-                                                    Checked = false
-                                                };
+            X = 0, Y = Pos.Bottom (edit), Text = "Enable Hotkey (_)", Checked = false
+        };
 
         Win.Add (enableHotKeyCheckBox);
 
         var label = new Label {
-                                  Y = Pos.Bottom (enableHotKeyCheckBox) + 1,
-                                  Text = "Demonstrating single-line (should clip):"
-                              };
+            Y = Pos.Bottom (enableHotKeyCheckBox) + 1, Text = "Demonstrating single-line (should clip):"
+        };
         Win.Add (label);
         foreach (TextAlignment alignment in alignments) {
             label = new Label { Y = Pos.Bottom (label), Text = $"{alignment}:" };

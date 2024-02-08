@@ -32,11 +32,11 @@ public class MenuOpenedEventArgs : EventArgs {
         MenuItem = menuItem;
     }
 
-    /// <summary>Gets the <see cref="MenuItem"/> being opened.</summary>
-    public MenuItem MenuItem { get; }
-
     /// <summary>The parent of <see cref="MenuItem"/>. Will be null if menu opening is the root.</summary>
     public MenuBarItem Parent { get; }
+
+    /// <summary>Gets the <see cref="MenuItem"/> being opened.</summary>
+    public MenuItem MenuItem { get; }
 }
 
 /// <summary>An <see cref="EventArgs"/> which allows passing a cancelable menu closing event.</summary>
@@ -57,12 +57,12 @@ public class MenuClosingEventArgs : EventArgs {
     /// </summary>
     public bool Cancel { get; set; }
 
-    /// <summary>The current <see cref="MenuBarItem"/> parent.</summary>
-    public MenuBarItem CurrentMenu { get; }
-
     /// <summary>Indicates whether the current menu is a sub-menu.</summary>
     public bool IsSubMenu { get; }
 
     /// <summary>Indicates whether the current menu will reopen.</summary>
     public bool Reopen { get; }
+
+    /// <summary>The current <see cref="MenuBarItem"/> parent.</summary>
+    public MenuBarItem CurrentMenu { get; }
 }

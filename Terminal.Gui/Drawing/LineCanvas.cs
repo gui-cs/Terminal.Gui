@@ -1,5 +1,5 @@
 ﻿#nullable enable
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Defines the style of lines for a <see cref="LineCanvas"/>.</summary>
 public enum LineStyle {
@@ -48,25 +48,6 @@ public enum LineStyle {
 
 /// <summary>Facilitates box drawing and line intersection detection and rendering.  Does not support diagonal lines.</summary>
 public class LineCanvas : IDisposable {
-    private Rect _cachedBounds;
-    private readonly List<StraightLine> _lines = new ();
-
-    private readonly Dictionary<IntersectionRuneType, IntersectionRuneResolver> runeResolvers = new() {
-        { IntersectionRuneType.ULCorner, new ULIntersectionRuneResolver () },
-        { IntersectionRuneType.URCorner, new URIntersectionRuneResolver () },
-        { IntersectionRuneType.LLCorner, new LLIntersectionRuneResolver () },
-        { IntersectionRuneType.LRCorner, new LRIntersectionRuneResolver () },
-
-        { IntersectionRuneType.TopTee, new TopTeeIntersectionRuneResolver () },
-        { IntersectionRuneType.LeftTee, new LeftTeeIntersectionRuneResolver () },
-        { IntersectionRuneType.RightTee, new RightTeeIntersectionRuneResolver () },
-        { IntersectionRuneType.BottomTee, new BottomTeeIntersectionRuneResolver () },
-
-        { IntersectionRuneType.Cross, new CrossIntersectionRuneResolver () }
-
-        // TODO: Add other resolvers
-    };
-
     /// <summary>Creates a new instance.</summary>
     public LineCanvas () {
         // TODO: Refactor ConfigurationManager to not use an event handler for this.
@@ -78,6 +59,26 @@ public class LineCanvas : IDisposable {
     /// <summary>Creates a new instance with the given <paramref name="lines"/>.</summary>
     /// <param name="lines">Initial lines for the canvas.</param>
     public LineCanvas (IEnumerable<StraightLine> lines) : this () { _lines = lines.ToList (); }
+
+    private readonly Dictionary<IntersectionRuneType, IntersectionRuneResolver> runeResolvers = new () {
+        { IntersectionRuneType.ULCorner, new ULIntersectionRuneResolver () },
+        { IntersectionRuneType.URCorner, new URIntersectionRuneResolver () },
+        { IntersectionRuneType.LLCorner, new LLIntersectionRuneResolver () },
+        { IntersectionRuneType.LRCorner, new LRIntersectionRuneResolver () },
+        { IntersectionRuneType.TopTee, new TopTeeIntersectionRuneResolver () },
+        { IntersectionRuneType.LeftTee, new LeftTeeIntersectionRuneResolver () },
+        { IntersectionRuneType.RightTee, new RightTeeIntersectionRuneResolver () },
+        { IntersectionRuneType.BottomTee, new BottomTeeIntersectionRuneResolver () },
+        { IntersectionRuneType.Cross, new CrossIntersectionRuneResolver () }
+
+        // TODO: Add other resolvers
+    };
+
+    private readonly List<StraightLine> _lines = new ();
+    private Rect _cachedBounds;
+
+    /// <summary>Gets the lines in the canvas.</summary>
+    public IReadOnlyCollection<StraightLine> Lines => _lines.AsReadOnly ();
 
     /// <summary>
     ///     Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the line that is
@@ -112,9 +113,6 @@ public class LineCanvas : IDisposable {
             return _cachedBounds;
         }
     }
-
-    /// <summary>Gets the lines in the canvas.</summary>
-    public IReadOnlyCollection<StraightLine> Lines => _lines.AsReadOnly ();
 
     /// <inheritdoc/>
     public void Dispose () { Applied -= ConfigurationManager_Applied; }
@@ -175,15 +173,15 @@ public class LineCanvas : IDisposable {
     /// </summary>
     /// <returns>A map of all the points within the canvas.</returns>
     public Dictionary<Point, Cell> GetCellMap () {
-        Dictionary<Point, Cell> map = new Dictionary<Point, Cell> ();
+        Dictionary<Point, Cell> map = new ();
 
         // walk through each pixel of the bitmap
         for (int y = Bounds.Y; y < Bounds.Y + Bounds.Height; y++) {
             for (int x = Bounds.X; x < Bounds.X + Bounds.Width; x++) {
                 IntersectionDefinition?[] intersects = _lines
-                                                       .Select (l => l.Intersects (x, y))
-                                                       .Where (i => i != null)
-                                                       .ToArray ();
+                    .Select (l => l.Intersects (x, y))
+                    .Where (i => i != null)
+                    .ToArray ();
 
                 Cell? cell = GetCellForIntersects (Application.Driver, intersects);
 
@@ -206,15 +204,15 @@ public class LineCanvas : IDisposable {
     /// <param name="inArea">A rectangle to constrain the search by.</param>
     /// <returns>A map of the points within the canvas that intersect with <paramref name="inArea"/>.</returns>
     public Dictionary<Point, Rune> GetMap (Rect inArea) {
-        Dictionary<Point, Rune> map = new Dictionary<Point, Rune> ();
+        Dictionary<Point, Rune> map = new ();
 
         // walk through each pixel of the bitmap
         for (int y = inArea.Y; y < inArea.Y + inArea.Height; y++) {
             for (int x = inArea.X; x < inArea.X + inArea.Width; x++) {
                 IntersectionDefinition?[] intersects = _lines
-                                                       .Select (l => l.Intersects (x, y))
-                                                       .Where (i => i != null)
-                                                       .ToArray ();
+                    .Select (l => l.Intersects (x, y))
+                    .Where (i => i != null)
+                    .ToArray ();
 
                 Rune? rune = GetRuneForIntersects (Application.Driver, intersects);
 
@@ -349,11 +347,13 @@ public class LineCanvas : IDisposable {
         // TODO: Remove these once we have all of the below ported to IntersectionRuneResolvers
         bool useDouble = intersects.Any (i => i?.Line.Style == LineStyle.Double);
         bool useDashed = intersects.Any (
-                                         i => (i?.Line.Style == LineStyle.Dashed)
-                                              || (i?.Line.Style == LineStyle.RoundedDashed));
+            i => (i?.Line.Style == LineStyle.Dashed)
+                 || (i?.Line.Style == LineStyle.RoundedDashed)
+        );
         bool useDotted = intersects.Any (
-                                         i => (i?.Line.Style == LineStyle.Dotted)
-                                              || (i?.Line.Style == LineStyle.RoundedDotted));
+            i => (i?.Line.Style == LineStyle.Dotted)
+                 || (i?.Line.Style == LineStyle.RoundedDotted)
+        );
 
         // horiz and vert lines same as Single for Rounded
         bool useThick = intersects.Any (i => i?.Line.Style == LineStyle.Heavy);
@@ -404,48 +404,50 @@ public class LineCanvas : IDisposable {
 
             default:
                 throw new Exception (
-                                     "Could not find resolver or switch case for " + nameof (runeType) + ":"
-                                     + runeType);
+                    "Could not find resolver or switch case for " + nameof (runeType) + ":"
+                    + runeType
+                );
         }
     }
 
     private IntersectionRuneType GetRuneTypeForIntersects (IntersectionDefinition?[] intersects) {
-        HashSet<IntersectionType> set = new HashSet<IntersectionType> (intersects.Select (i => i!.Type));
+        HashSet<IntersectionType> set = new (intersects.Select (i => i!.Type));
 
         #region Cross Conditions
 
         if (Has (
-                 set,
-                 IntersectionType.PassOverHorizontal,
-                 IntersectionType.PassOverVertical
-                )) {
+                set,
+                IntersectionType.PassOverHorizontal,
+                IntersectionType.PassOverVertical
+            )) {
             return IntersectionRuneType.Cross;
         }
 
         if (Has (
-                 set,
-                 IntersectionType.PassOverVertical,
-                 IntersectionType.StartLeft,
-                 IntersectionType.StartRight
-                )) {
+                set,
+                IntersectionType.PassOverVertical,
+                IntersectionType.StartLeft,
+                IntersectionType.StartRight
+            )) {
             return IntersectionRuneType.Cross;
         }
 
         if (Has (
-                 set,
-                 IntersectionType.PassOverHorizontal,
-                 IntersectionType.StartUp,
-                 IntersectionType.StartDown
-                )) {
+                set,
+                IntersectionType.PassOverHorizontal,
+                IntersectionType.StartUp,
+                IntersectionType.StartDown
+            )) {
             return IntersectionRuneType.Cross;
         }
 
         if (Has (
-                 set,
-                 IntersectionType.StartLeft,
-                 IntersectionType.StartRight,
-                 IntersectionType.StartUp,
-                 IntersectionType.StartDown)) {
+                set,
+                IntersectionType.StartLeft,
+                IntersectionType.StartRight,
+                IntersectionType.StartUp,
+                IntersectionType.StartDown
+            )) {
             return IntersectionRuneType.Cross;
         }
 
@@ -454,30 +456,34 @@ public class LineCanvas : IDisposable {
         #region Corner Conditions
 
         if (Exactly (
-                     set,
-                     IntersectionType.StartRight,
-                     IntersectionType.StartDown)) {
+                set,
+                IntersectionType.StartRight,
+                IntersectionType.StartDown
+            )) {
             return IntersectionRuneType.ULCorner;
         }
 
         if (Exactly (
-                     set,
-                     IntersectionType.StartLeft,
-                     IntersectionType.StartDown)) {
+                set,
+                IntersectionType.StartLeft,
+                IntersectionType.StartDown
+            )) {
             return IntersectionRuneType.URCorner;
         }
 
         if (Exactly (
-                     set,
-                     IntersectionType.StartUp,
-                     IntersectionType.StartLeft)) {
+                set,
+                IntersectionType.StartUp,
+                IntersectionType.StartLeft
+            )) {
             return IntersectionRuneType.LRCorner;
         }
 
         if (Exactly (
-                     set,
-                     IntersectionType.StartUp,
-                     IntersectionType.StartRight)) {
+                set,
+                IntersectionType.StartUp,
+                IntersectionType.StartRight
+            )) {
             return IntersectionRuneType.LLCorner;
         }
 
@@ -486,62 +492,70 @@ public class LineCanvas : IDisposable {
         #region T Conditions
 
         if (Has (
-                 set,
-                 IntersectionType.PassOverHorizontal,
-                 IntersectionType.StartDown)) {
+                set,
+                IntersectionType.PassOverHorizontal,
+                IntersectionType.StartDown
+            )) {
             return IntersectionRuneType.TopTee;
         }
 
         if (Has (
-                 set,
-                 IntersectionType.StartRight,
-                 IntersectionType.StartLeft,
-                 IntersectionType.StartDown)) {
+                set,
+                IntersectionType.StartRight,
+                IntersectionType.StartLeft,
+                IntersectionType.StartDown
+            )) {
             return IntersectionRuneType.TopTee;
         }
 
         if (Has (
-                 set,
-                 IntersectionType.PassOverHorizontal,
-                 IntersectionType.StartUp)) {
+                set,
+                IntersectionType.PassOverHorizontal,
+                IntersectionType.StartUp
+            )) {
             return IntersectionRuneType.BottomTee;
         }
 
         if (Has (
-                 set,
-                 IntersectionType.StartRight,
-                 IntersectionType.StartLeft,
-                 IntersectionType.StartUp)) {
+                set,
+                IntersectionType.StartRight,
+                IntersectionType.StartLeft,
+                IntersectionType.StartUp
+            )) {
             return IntersectionRuneType.BottomTee;
         }
 
         if (Has (
-                 set,
-                 IntersectionType.PassOverVertical,
-                 IntersectionType.StartRight)) {
+                set,
+                IntersectionType.PassOverVertical,
+                IntersectionType.StartRight
+            )) {
             return IntersectionRuneType.LeftTee;
         }
 
         if (Has (
-                 set,
-                 IntersectionType.StartRight,
-                 IntersectionType.StartDown,
-                 IntersectionType.StartUp)) {
+                set,
+                IntersectionType.StartRight,
+                IntersectionType.StartDown,
+                IntersectionType.StartUp
+            )) {
             return IntersectionRuneType.LeftTee;
         }
 
         if (Has (
-                 set,
-                 IntersectionType.PassOverVertical,
-                 IntersectionType.StartLeft)) {
+                set,
+                IntersectionType.PassOverVertical,
+                IntersectionType.StartLeft
+            )) {
             return IntersectionRuneType.RightTee;
         }
 
         if (Has (
-                 set,
-                 IntersectionType.StartLeft,
-                 IntersectionType.StartDown,
-                 IntersectionType.StartUp)) {
+                set,
+                IntersectionType.StartLeft,
+                IntersectionType.StartDown,
+                IntersectionType.StartUp
+            )) {
             return IntersectionRuneType.RightTee;
         }
 
@@ -596,6 +610,7 @@ public class LineCanvas : IDisposable {
     }
 
     private abstract class IntersectionRuneResolver {
+        public IntersectionRuneResolver () { SetGlyphs (); }
         internal Rune _doubleBoth;
         internal Rune _doubleH;
         internal Rune _doubleV;
@@ -604,36 +619,40 @@ public class LineCanvas : IDisposable {
         internal Rune _thickBoth;
         internal Rune _thickH;
         internal Rune _thickV;
-        public IntersectionRuneResolver () { SetGlyphs (); }
 
         public Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition?[] intersects) {
             bool useRounded = intersects.Any (
-                                              i => i?.Line.Length != 0 && (
-                                                                              (i?.Line.Style == LineStyle.Rounded)
-                                                                              || (i?.Line.Style
-                                                                                          == LineStyle.RoundedDashed)
-                                                                              || (i?.Line.Style
-                                                                                          == LineStyle.RoundedDotted)));
+                i => i?.Line.Length != 0 && (
+                                                (i?.Line.Style == LineStyle.Rounded)
+                                                || (i?.Line.Style
+                                                    == LineStyle.RoundedDashed)
+                                                || (i?.Line.Style
+                                                    == LineStyle.RoundedDotted))
+            );
 
             // Note that there aren't any glyphs for intersections of double lines with heavy lines
 
             bool doubleHorizontal = intersects.Any (
-                                                    l => l?.Line.Orientation == Orientation.Horizontal
-                                                         && l.Line.Style == LineStyle.Double);
+                l => l?.Line.Orientation == Orientation.Horizontal
+                     && l.Line.Style == LineStyle.Double
+            );
             bool doubleVertical = intersects.Any (
-                                                  l => l?.Line.Orientation == Orientation.Vertical
-                                                       && l.Line.Style == LineStyle.Double);
+                l => l?.Line.Orientation == Orientation.Vertical
+                     && l.Line.Style == LineStyle.Double
+            );
 
             bool thickHorizontal = intersects.Any (
-                                                   l => l?.Line.Orientation == Orientation.Horizontal && (
-                                                            (l.Line.Style == LineStyle.Heavy)
-                                                            || (l.Line.Style == LineStyle.HeavyDashed)
-                                                            || (l.Line.Style == LineStyle.HeavyDotted)));
+                l => l?.Line.Orientation == Orientation.Horizontal && (
+                                                                          (l.Line.Style == LineStyle.Heavy)
+                                                                          || (l.Line.Style == LineStyle.HeavyDashed)
+                                                                          || (l.Line.Style == LineStyle.HeavyDotted))
+            );
             bool thickVertical = intersects.Any (
-                                                 l => l?.Line.Orientation == Orientation.Vertical && (
-                                                          (l.Line.Style == LineStyle.Heavy)
-                                                          || (l.Line.Style == LineStyle.HeavyDashed)
-                                                          || (l.Line.Style == LineStyle.HeavyDotted)));
+                l => l?.Line.Orientation == Orientation.Vertical && (
+                                                                        (l.Line.Style == LineStyle.Heavy)
+                                                                        || (l.Line.Style == LineStyle.HeavyDashed)
+                                                                        || (l.Line.Style == LineStyle.HeavyDotted))
+            );
 
             if (doubleHorizontal) {
                 return doubleVertical ? _doubleBoth : _doubleH;
@@ -760,14 +779,14 @@ class IntersectionDefinition {
         Line = line;
     }
 
-    /// <summary>The line that intersects <see cref="Point"/></summary>
-    internal StraightLine Line { get; }
+    /// <summary>Defines how <see cref="Line"/> position relates to <see cref="Point"/>.</summary>
+    internal IntersectionType Type { get; }
 
     /// <summary>The point at which the intersection happens</summary>
     internal Point Point { get; }
 
-    /// <summary>Defines how <see cref="Line"/> position relates to <see cref="Point"/>.</summary>
-    internal IntersectionType Type { get; }
+    /// <summary>The line that intersects <see cref="Point"/></summary>
+    internal StraightLine Line { get; }
 }
 
 /// <summary>The type of Rune that we will use before considering double width, curved borders etc</summary>

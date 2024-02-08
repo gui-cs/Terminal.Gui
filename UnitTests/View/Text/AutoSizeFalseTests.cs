@@ -4,8 +4,8 @@ namespace Terminal.Gui.ViewTests;
 
 /// <summary>Tests of the  <see cref="View.Text"/> property with <see cref="View.AutoSize"/> set to false.</summary>
 public class AutoSizeFalseTests {
-    private readonly ITestOutputHelper _output;
     public AutoSizeFalseTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void AutoSize_False_Equal_Before_And_After_IsInitialized_With_Different_Orders () {
@@ -14,26 +14,26 @@ public class AutoSizeFalseTests {
         var view2 = new View { Text = "Say Hello view2 你", AutoSize = false, Width = 10, Height = 5 };
         var view3 = new View { AutoSize = false, Width = 10, Height = 5, Text = "Say Hello view3 你" };
         var view4 = new View {
-                                 Text = "Say Hello view4 你",
-                                 AutoSize = false,
-                                 Width = 10,
-                                 Height = 5,
-                                 TextDirection = TextDirection.TopBottom_LeftRight
-                             };
+            Text = "Say Hello view4 你",
+            AutoSize = false,
+            Width = 10,
+            Height = 5,
+            TextDirection = TextDirection.TopBottom_LeftRight
+        };
         var view5 = new View {
-                                 Text = "Say Hello view5 你",
-                                 AutoSize = false,
-                                 Width = 10,
-                                 Height = 5,
-                                 TextDirection = TextDirection.TopBottom_LeftRight
-                             };
+            Text = "Say Hello view5 你",
+            AutoSize = false,
+            Width = 10,
+            Height = 5,
+            TextDirection = TextDirection.TopBottom_LeftRight
+        };
         var view6 = new View {
-                                 AutoSize = false,
-                                 Width = 10,
-                                 Height = 5,
-                                 TextDirection = TextDirection.TopBottom_LeftRight,
-                                 Text = "Say Hello view6 你"
-                             };
+            AutoSize = false,
+            Width = 10,
+            Height = 5,
+            TextDirection = TextDirection.TopBottom_LeftRight,
+            Text = "Say Hello view6 你"
+        };
         top.Add (view1, view2, view3, view4, view5, view6);
 
         Assert.False (view1.IsInitialized);
@@ -139,7 +139,7 @@ public class AutoSizeFalseTests {
 
     [Fact]
     public void AutoSize_False_ResizeView_With_Dim_Fill_After_IsInitialized () {
-        var super = new View {Frame = new Rect (0, 0, 30, 80)};
+        var super = new View { Frame = new Rect (0, 0, 30, 80) };
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
         super.Add (view);
         Assert.False (view.AutoSize);
@@ -162,10 +162,7 @@ public class AutoSizeFalseTests {
     [Fact]
     [SetupFakeDriver]
     public void AutoSize_False_Setting_AutoSize_False_Keeps_Dims () {
-        var super = new View {
-                                 Width = 10,
-                                 Height = 10
-                             };
+        var super = new View { Width = 10, Height = 10 };
         var view = new View ();
         view.Width = 2;
         view.Height = 1;
@@ -201,10 +198,7 @@ public class AutoSizeFalseTests {
 
     [Fact]
     public void AutoSize_False_Text_Does_Not_Change_Size () {
-        var view = new View {
-                                Width = Dim.Fill (),
-                                Height = Dim.Fill ()
-                            };
+        var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
 
         view.SetRelativeLayout (new Rect (0, 0, 10, 4));
         Assert.Equal (new Rect (0, 0, 10, 4), view.Frame);
@@ -229,15 +223,8 @@ public class AutoSizeFalseTests {
     [SetupFakeDriver]
     public void AutoSize_False_View_IsEmpty_False_Return_Null_Lines () {
         var text = "Views";
-        var view = new View {
-                                Width = Dim.Fill () - text.Length,
-                                Height = 1,
-                                Text = text
-                            };
-        var frame = new FrameView {
-                                      Width = Dim.Fill (),
-                                      Height = Dim.Fill ()
-                                  };
+        var view = new View { Width = Dim.Fill () - text.Length, Height = 1, Text = text };
+        var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
         frame.Add (view);
 
         ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
@@ -294,31 +281,23 @@ public class AutoSizeFalseTests {
         var top = new View { Width = 32, Height = 32 };
 
         var text = $"First line{Environment.NewLine}Second line";
-        var horizontalView = new View {
-                                          Width = 20,
-                                          Height = 1,
-                                          Text = text
-                                      };
+        var horizontalView = new View { Width = 20, Height = 1, Text = text };
 
         // Autosize is off, so we have to explicitly set TextFormatter.Size
         horizontalView.TextFormatter.Size = new Size (20, 1);
 
         var verticalView = new View {
-                                        Y = 3,
-                                        Height = 20,
-                                        Width = 1,
-                                        Text = text,
-                                        TextDirection = TextDirection.TopBottom_LeftRight
-                                    };
+            Y = 3,
+            Height = 20,
+            Width = 1,
+            Text = text,
+            TextDirection = TextDirection.TopBottom_LeftRight
+        };
 
         // Autosize is off, so we have to explicitly set TextFormatter.Size
         verticalView.TextFormatter.Size = new Size (1, 20);
 
-        var frame = new FrameView {
-                                      Width = Dim.Fill (),
-                                      Height = Dim.Fill (),
-                                      Text = "Window"
-                                  };
+        var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), Text = "Window" };
         frame.Add (horizontalView, verticalView);
         top.Add (frame);
         top.BeginInit ();

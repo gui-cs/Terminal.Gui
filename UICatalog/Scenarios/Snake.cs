@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Snake", "The game of apple eating.")]
 [ScenarioCategory ("Colors")]
@@ -21,32 +21,30 @@ public class Snake : Scenario {
 
         state.Reset (60, 20);
 
-        var snakeView = new SnakeView (state) {
-                                                  Width = state.Width,
-                                                  Height = state.Height
-                                              };
+        var snakeView = new SnakeView (state) { Width = state.Width, Height = state.Height };
 
         Win.Add (snakeView);
 
         var sw = new Stopwatch ();
 
         Task.Run (
-                  () => {
-                      while (!isDisposed) {
-                          sw.Restart ();
+            () => {
+                while (!isDisposed) {
+                    sw.Restart ();
 
-                          if (state.AdvanceState ()) {
-                              // When updating from a Thread/Task always use Invoke
-                              Application.Invoke (() => { snakeView.SetNeedsDisplay (); });
-                          }
+                    if (state.AdvanceState ()) {
+                        // When updating from a Thread/Task always use Invoke
+                        Application.Invoke (() => { snakeView.SetNeedsDisplay (); });
+                    }
 
-                          long wait = state.SleepAfterAdvancingState - sw.ElapsedMilliseconds;
+                    long wait = state.SleepAfterAdvancingState - sw.ElapsedMilliseconds;
 
-                          if (wait > 0) {
-                              Task.Delay ((int)wait).Wait ();
-                          }
-                      }
-                  });
+                    if (wait > 0) {
+                        Task.Delay ((int)wait).Wait ();
+                    }
+                }
+            }
+        );
     }
 
     protected override void Dispose (bool disposing) {
@@ -68,23 +66,23 @@ public class Snake : Scenario {
         public const int StartingSpeed = 50;
         private int step;
 
-        /// <summary>Current position of the Apple that the snake has to eat.</summary>
-        public Point Apple { get; private set; }
-
         public Direction CurrentDirection { get; private set; }
-
-        /// <summary>Position of the snakes head</summary>
-        public Point Head => Snake.Last ();
-
-        public int Height { get; private set; }
 
         public Direction PlannedDirection { get; set; }
 
+        public int Height { get; private set; }
+
         public int SleepAfterAdvancingState { get; private set; } = StartingSpeed;
+
+        public int Width { get; private set; }
 
         public List<Point> Snake { get; private set; }
 
-        public int Width { get; private set; }
+        /// <summary>Current position of the Apple that the snake has to eat.</summary>
+        public Point Apple { get; private set; }
+
+        /// <summary>Position of the snakes head</summary>
+        public Point Head => Snake.Last ();
 
         public void GrowSnake () {
             Point tail = Snake.First ();
@@ -249,10 +247,6 @@ public class Snake : Scenario {
     }
 
     private class SnakeView : View {
-        private readonly Rune _appleRune;
-        private readonly Attribute red = new (Color.Red, Color.Black);
-        private readonly Attribute white = new (Color.White, Color.Black);
-
         public SnakeView (SnakeState state) {
             _appleRune = CM.Glyphs.Apple;
             if (!Driver.IsRuneSupported (_appleRune)) {
@@ -263,13 +257,17 @@ public class Snake : Scenario {
             CanFocus = true;
 
             ColorScheme = new ColorScheme {
-                                              Normal = white,
-                                              Focus = white,
-                                              HotNormal = white,
-                                              HotFocus = white,
-                                              Disabled = white
-                                          };
+                Normal = white,
+                Focus = white,
+                HotNormal = white,
+                HotFocus = white,
+                Disabled = white
+            };
         }
+
+        private readonly Attribute red = new (Color.Red, Color.Black);
+        private readonly Attribute white = new (Color.White, Color.Black);
+        private readonly Rune _appleRune;
 
         public SnakeState State { get; }
 
@@ -291,17 +289,15 @@ public class Snake : Scenario {
                 Point pt2 = State.Snake[i];
 
                 Orientation orientation = pt1.X == pt2.X ? Orientation.Vertical : Orientation.Horizontal;
-                int length = orientation == Orientation.Horizontal
-                                 ? pt1.X > pt2.X ? 2 : -2
-                                 : pt1.Y > pt2.Y
-                                     ? 2
-                                     : -2;
+                int length = orientation == Orientation.Horizontal ? pt1.X > pt2.X ? 2 : -2 :
+                             pt1.Y > pt2.Y ? 2 : -2;
 
                 canvas.AddLine (
-                                pt2,
-                                length,
-                                orientation,
-                                LineStyle.Single);
+                    pt2,
+                    length,
+                    orientation,
+                    LineStyle.Single
+                );
             }
 
             foreach (KeyValuePair<Point, Rune> p in canvas.GetMap (Bounds)) {

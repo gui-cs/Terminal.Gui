@@ -9,11 +9,13 @@ public class SettingsScopeTests {
         // arrange
         Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, ((Key)Settings["Application.QuitKey"].PropertyValue).KeyCode);
         Assert.Equal (
-                      KeyCode.PageDown | KeyCode.CtrlMask,
-                      ((Key)Settings["Application.AlternateForwardKey"].PropertyValue).KeyCode);
+            KeyCode.PageDown | KeyCode.CtrlMask,
+            ((Key)Settings["Application.AlternateForwardKey"].PropertyValue).KeyCode
+        );
         Assert.Equal (
-                      KeyCode.PageUp | KeyCode.CtrlMask,
-                      ((Key)Settings["Application.AlternateBackwardKey"].PropertyValue).KeyCode);
+            KeyCode.PageUp | KeyCode.CtrlMask,
+            ((Key)Settings["Application.AlternateBackwardKey"].PropertyValue).KeyCode
+        );
         Assert.False ((bool)Settings["Application.IsMouseDisabled"].PropertyValue);
 
         // act

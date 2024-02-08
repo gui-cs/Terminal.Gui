@@ -15,7 +15,8 @@ class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT : Scope<sc
     public override scopeT Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
         if (reader.TokenType != JsonTokenType.StartObject) {
             throw new JsonException (
-                                     $"Expected a JSON object (\"{{ \"propName\" : ... }}\"), but got \"{reader.TokenType}\".");
+                $"Expected a JSON object (\"{{ \"propName\" : ... }}\"), but got \"{reader.TokenType}\"."
+            );
         }
 
         var scope = (scopeT)Activator.CreateInstance (typeof (scopeT))!;
@@ -46,17 +47,20 @@ class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT : Scope<sc
                     }
 
                     var readHelper = Activator.CreateInstance (
-                                                               (Type?)typeof (ReadHelper<>).MakeGenericType (
-                                                                typeof (scopeT),
-                                                                propertyType!)!,
-                                                               converter) as ReadHelper;
+                                         (Type?)typeof (ReadHelper<>).MakeGenericType (
+                                             typeof (scopeT),
+                                             propertyType!
+                                         )!,
+                                         converter
+                                     ) as ReadHelper;
                     try {
                         scope![propertyName].PropertyValue = readHelper?.Read (ref reader, propertyType!, options);
                     }
                     catch (NotSupportedException e) {
                         throw new JsonException (
-                                                 $"Error reading property \"{propertyName}\" of type \"{propertyType?.Name}\".",
-                                                 e);
+                            $"Error reading property \"{propertyName}\" of type \"{propertyType?.Name}\".",
+                            e
+                        );
                     }
                 } else {
                     try {
@@ -71,30 +75,32 @@ class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT : Scope<sc
                 // It is not a config property. Maybe it's just a property on the Scope with [JsonInclude]
                 // like ScopeSettings.$schema...
                 PropertyInfo? property = scope!.GetType ()
-                                               .GetProperties ()
-                                               .Where (
-                                                       p => {
-                                                           var jia =
-                                                               p.GetCustomAttribute (typeof (JsonIncludeAttribute)) as
-                                                                   JsonIncludeAttribute;
-                                                           if (jia != null) {
-                                                               var jpna =
-                                                                   p.GetCustomAttribute (
-                                                                        typeof (JsonPropertyNameAttribute)) as
-                                                                       JsonPropertyNameAttribute;
-                                                               if (jpna?.Name == propertyName) {
-                                                                   // Bit of a hack, modifying propertyName in an enumerator...
-                                                                   propertyName = p.Name;
+                    .GetProperties ()
+                    .Where (
+                        p => {
+                            var jia =
+                                p.GetCustomAttribute (typeof (JsonIncludeAttribute)) as
+                                    JsonIncludeAttribute;
+                            if (jia != null) {
+                                var jpna =
+                                    p.GetCustomAttribute (
+                                            typeof (JsonPropertyNameAttribute)
+                                        ) as
+                                        JsonPropertyNameAttribute;
+                                if (jpna?.Name == propertyName) {
+                                    // Bit of a hack, modifying propertyName in an enumerator...
+                                    propertyName = p.Name;
 
-                                                                   return true;
-                                                               }
+                                    return true;
+                                }
 
-                                                               return p.Name == propertyName;
-                                                           }
+                                return p.Name == propertyName;
+                            }
 
-                                                           return false;
-                                                       })
-                                               .FirstOrDefault ();
+                            return false;
+                        }
+                    )
+                    .FirstOrDefault ();
 
                 if (property != null) {
                     PropertyInfo prop = scope.GetType ().GetProperty (propertyName!)!;
@@ -113,10 +119,11 @@ class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT : Scope<sc
         writer.WriteStartObject ();
 
         IEnumerable<PropertyInfo> properties = scope!.GetType ()
-                                                     .GetProperties ()
-                                                     .Where (
-                                                             p => p.GetCustomAttribute (typeof (JsonIncludeAttribute))
-                                                                  != null);
+            .GetProperties ()
+            .Where (
+                p => p.GetCustomAttribute (typeof (JsonIncludeAttribute))
+                     != null
+            );
         foreach (PropertyInfo p in properties) {
             writer.WritePropertyName (ConfigProperty.GetJsonPropertyName (p));
             JsonSerializer.Serialize (writer, scope.GetType ().GetProperty (p.Name)?.GetValue (scope), options);
@@ -124,13 +131,15 @@ class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT : Scope<sc
 
         foreach (KeyValuePair<string, ConfigProperty> p in from p in scope
                                                                .Where (
-                                                                       cp =>
-                                                                           cp.Value.PropertyInfo?.GetCustomAttribute (
-                                                                                typeof (
-                                                                                    SerializableConfigurationProperty))
-                                                                               is
-                                                                               SerializableConfigurationProperty scp
-                                                                           && scp?.Scope == typeof (scopeT))
+                                                                   cp =>
+                                                                       cp.Value.PropertyInfo?.GetCustomAttribute (
+                                                                               typeof (
+                                                                                   SerializableConfigurationProperty)
+                                                                           )
+                                                                           is
+                                                                           SerializableConfigurationProperty scp
+                                                                       && scp?.Scope == typeof (scopeT)
+                                                               )
                                                            where p.Value.PropertyValue != null
                                                            select p) {
             writer.WritePropertyName (p.Key);
@@ -149,8 +158,8 @@ class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT : Scope<sc
 
                 if (p.Value.PropertyValue != null) {
                     converter.GetType ()
-                             .GetMethod ("Write")
-                             ?.Invoke (converter, new[] { writer, p.Value.PropertyValue, options });
+                        .GetMethod ("Write")
+                        ?.Invoke (converter, new[] { writer, p.Value.PropertyValue, options });
                 }
             } else {
                 JsonSerializer.Serialize (writer, p.Value.PropertyValue, options);
@@ -166,11 +175,11 @@ class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT : Scope<sc
     }
 
     internal class ReadHelper<converterT> : ReadHelper {
-        private readonly ReadDelegate _readDelegate;
-
         public ReadHelper (object converter) {
             _readDelegate = (ReadDelegate)Delegate.CreateDelegate (typeof (ReadDelegate), converter, "Read");
         }
+
+        private readonly ReadDelegate _readDelegate;
 
         public override object? Read (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options) {
             return _readDelegate.Invoke (ref reader, type, options);

@@ -1,12 +1,6 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 class FileDialogTableSource : ITableSource {
-    private readonly int currentSortColumn;
-    private readonly bool currentSortIsAsc;
-    private readonly FileDialog dlg;
-    private readonly FileDialogState state;
-    private readonly FileDialogStyle style;
-
     public FileDialogTableSource (
         FileDialog dlg,
         FileDialogState state,
@@ -21,6 +15,11 @@ class FileDialogTableSource : ITableSource {
         this.state = state;
     }
 
+    private readonly bool currentSortIsAsc;
+    private readonly FileDialog dlg;
+    private readonly FileDialogState state;
+    private readonly FileDialogStyle style;
+    private readonly int currentSortColumn;
     public object this [int row, int col] => GetColumnValue (col, state.Children[row]);
 
     public int Rows => state.Children.Count ();
@@ -28,11 +27,11 @@ class FileDialogTableSource : ITableSource {
     public int Columns => 4;
 
     public string[] ColumnNames => new[] {
-                                             MaybeAddSortArrows (style.FilenameColumnName, 0),
-                                             MaybeAddSortArrows (style.SizeColumnName, 1),
-                                             MaybeAddSortArrows (style.ModifiedColumnName, 2),
-                                             MaybeAddSortArrows (style.TypeColumnName, 3)
-                                         };
+        MaybeAddSortArrows (style.FilenameColumnName, 0),
+        MaybeAddSortArrows (style.SizeColumnName, 1),
+        MaybeAddSortArrows (style.ModifiedColumnName, 2),
+        MaybeAddSortArrows (style.TypeColumnName, 3)
+    };
 
     internal static object GetRawColumnValue (int col, FileSystemInfoStats stats) {
         switch (col) {

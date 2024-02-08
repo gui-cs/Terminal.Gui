@@ -117,12 +117,13 @@ public class Responder : IDisposable {
     /// <returns><see langword="true"/> if it's overridden, <see langword="false"/> otherwise.</returns>
     internal static bool IsOverridden (Responder subclass, string method) {
         MethodInfo m = subclass.GetType ()
-                               .GetMethod (
-                                           method,
-                                           BindingFlags.Instance
-                                           | BindingFlags.Public
-                                           | BindingFlags.NonPublic
-                                           | BindingFlags.DeclaredOnly);
+            .GetMethod (
+                method,
+                BindingFlags.Instance
+                | BindingFlags.Public
+                | BindingFlags.NonPublic
+                | BindingFlags.DeclaredOnly
+            );
         if (m == null) {
             return false;
         }

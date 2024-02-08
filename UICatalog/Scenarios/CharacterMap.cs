@@ -117,20 +117,22 @@ public class CharacterMap : Scenario {
         _categoryList.Initialized += _categoryList_Initialized;
 
         var menu = new MenuBar {
-            Menus =  [
-            new MenuBarItem ("_File",
-            new MenuItem[] {
-                new (
-                    "_Quit",
-                    $"{Application.QuitKey}",
-                    () => Application.RequestStop ()
-                )
-            }),
-            new MenuBarItem (
-                    "_Options",
-                    new[] { CreateMenuShowWidth () }
-                )
-                ]
+            Menus = [
+                        new MenuBarItem (
+                            "_File",
+                            new MenuItem[] {
+                                new (
+                                    "_Quit",
+                                    $"{Application.QuitKey}",
+                                    () => Application.RequestStop ()
+                                )
+                            }
+                        ),
+                        new MenuBarItem (
+                            "_Options",
+                            new[] { CreateMenuShowWidth () }
+                        )
+                    ]
         };
         Application.Top.Add (menu);
     }
@@ -724,8 +726,7 @@ class CharMap : ScrollView {
             Y = Pos.Center (),
             Height = 7,
             Width = 50,
-            Buttons =  [new Button { Text = "Cancel"
-        }]
+            Buttons = [new Button { Text = "Cancel" }]
         };
         var errorLabel = new Label {
             Text = UcdApiClient.BaseUrl,
@@ -789,7 +790,7 @@ class CharMap : ScrollView {
             var copyCP = new Button { Text = "Copy Code _Point" };
             var cancel = new Button { Text = "Cancel" };
 
-            var dlg = new Dialog { Title = title, Buttons =  [copyGlyph, copyCP, cancel] };
+            var dlg = new Dialog { Title = title, Buttons = [copyGlyph, copyCP, cancel] };
 
             copyGlyph.Clicked += (s, a) => {
                 CopyGlyph ();
@@ -940,51 +941,51 @@ class UnicodeRange {
             select new UnicodeRange (urange.FirstCodePoint, urange.FirstCodePoint + urange.Length, name);
 
         // .NET 8.0 only supports BMP in UnicodeRanges: https://learn.microsoft.com/en-us/dotnet/api/system.text.unicode.unicoderanges?view=net-8.0
-        List<UnicodeRange> nonBmpRanges = new() {
-            new (
+        List<UnicodeRange> nonBmpRanges = new () {
+            new UnicodeRange (
                 0x1F130,
                 0x1F149,
                 "Squared Latin Capital Letters"
             ),
-            new (
+            new UnicodeRange (
                 0x12400,
                 0x1240f,
                 "Cuneiform Numbers and Punctuation"
             ),
-            new (0x10000, 0x1007F, "Linear B Syllabary"),
-            new (0x10080, 0x100FF, "Linear B Ideograms"),
-            new (0x10100, 0x1013F, "Aegean Numbers"),
-            new (0x10300, 0x1032F, "Old Italic"),
-            new (0x10330, 0x1034F, "Gothic"),
-            new (0x10380, 0x1039F, "Ugaritic"),
-            new (0x10400, 0x1044F, "Deseret"),
-            new (0x10450, 0x1047F, "Shavian"),
-            new (0x10480, 0x104AF, "Osmanya"),
-            new (0x10800, 0x1083F, "Cypriot Syllabary"),
-            new (
+            new UnicodeRange (0x10000, 0x1007F, "Linear B Syllabary"),
+            new UnicodeRange (0x10080, 0x100FF, "Linear B Ideograms"),
+            new UnicodeRange (0x10100, 0x1013F, "Aegean Numbers"),
+            new UnicodeRange (0x10300, 0x1032F, "Old Italic"),
+            new UnicodeRange (0x10330, 0x1034F, "Gothic"),
+            new UnicodeRange (0x10380, 0x1039F, "Ugaritic"),
+            new UnicodeRange (0x10400, 0x1044F, "Deseret"),
+            new UnicodeRange (0x10450, 0x1047F, "Shavian"),
+            new UnicodeRange (0x10480, 0x104AF, "Osmanya"),
+            new UnicodeRange (0x10800, 0x1083F, "Cypriot Syllabary"),
+            new UnicodeRange (
                 0x1D000,
                 0x1D0FF,
                 "Byzantine Musical Symbols"
             ),
-            new (0x1D100, 0x1D1FF, "Musical Symbols"),
-            new (0x1D300, 0x1D35F, "Tai Xuan Jing Symbols"),
-            new (
+            new UnicodeRange (0x1D100, 0x1D1FF, "Musical Symbols"),
+            new UnicodeRange (0x1D300, 0x1D35F, "Tai Xuan Jing Symbols"),
+            new UnicodeRange (
                 0x1D400,
                 0x1D7FF,
                 "Mathematical Alphanumeric Symbols"
             ),
-            new (0x1F600, 0x1F532, "Emojis Symbols"),
-            new (
+            new UnicodeRange (0x1F600, 0x1F532, "Emojis Symbols"),
+            new UnicodeRange (
                 0x20000,
                 0x2A6DF,
                 "CJK Unified Ideographs Extension B"
             ),
-            new (
+            new UnicodeRange (
                 0x2F800,
                 0x2FA1F,
                 "CJK Compatibility Ideographs Supplement"
             ),
-            new (0xE0000, 0xE007F, "Tags")
+            new UnicodeRange (0xE0000, 0xE007F, "Tags")
         };
 
         return ranges.Concat (nonBmpRanges).OrderBy (r => r.Category).ToList ();

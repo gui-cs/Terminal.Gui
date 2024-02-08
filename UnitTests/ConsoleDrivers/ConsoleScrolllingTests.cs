@@ -6,12 +6,12 @@ using Console = Terminal.Gui.FakeConsole;
 namespace Terminal.Gui.DriverTests;
 
 public class ConsoleScrollingTests {
-    private readonly ITestOutputHelper output;
-
     public ConsoleScrollingTests (ITestOutputHelper output) {
         ConsoleDriver.RunningUnitTests = true;
         this.output = output;
     }
+
+    private readonly ITestOutputHelper output;
 
     [Theory]
     [InlineData (typeof (FakeDriver))]

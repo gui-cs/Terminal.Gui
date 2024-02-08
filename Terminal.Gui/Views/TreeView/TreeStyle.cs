@@ -1,21 +1,9 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>Defines rendering options that affect how the tree is displayed.</summary>
 public class TreeStyle {
-    /// <summary>
-    ///     Symbol to use for branch nodes that can be collapsed (are currently expanded). Defaults to '-'. Set to null to
-    ///     hide.
-    /// </summary>
-    public Rune? CollapseableSymbol { get; set; } = Glyphs.Collapse;
-
     /// <summary>Set to <see langword="true"/> to highlight expand/collapse symbols in hot key color.</summary>
     public bool ColorExpandSymbol { get; set; }
-
-    /// <summary>
-    ///     Symbol to use for branch nodes that can be expanded to indicate this to the user. Defaults to '+'. Set to null
-    ///     to hide.
-    /// </summary>
-    public Rune? ExpandableSymbol { get; set; } = Glyphs.Expand;
 
     /// <summary>
     ///     Set to <see langword="true"/> to cause the selected item to be rendered with only the
@@ -40,4 +28,16 @@ public class TreeStyle {
     /// </summary>
     /// <value></value>
     public bool ShowBranchLines { get; set; } = true;
+
+    /// <summary>
+    ///     Symbol to use for branch nodes that can be collapsed (are currently expanded). Defaults to '-'. Set to null to
+    ///     hide.
+    /// </summary>
+    public Rune? CollapseableSymbol { get; set; } = Glyphs.Collapse;
+
+    /// <summary>
+    ///     Symbol to use for branch nodes that can be expanded to indicate this to the user. Defaults to '+'. Set to null
+    ///     to hide.
+    /// </summary>
+    public Rune? ExpandableSymbol { get; set; } = Glyphs.Expand;
 }

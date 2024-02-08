@@ -18,29 +18,24 @@ public class MultiColouredTable : Scenario {
         Win.Y = 1; // menu
         Win.Height = Dim.Fill (1); // status bar
 
-        _tableView = new TableViewColors {
-                                             X = 0,
-                                             Y = 0,
-                                             Width = Dim.Fill (),
-                                             Height = Dim.Fill (1)
-                                         };
+        _tableView = new TableViewColors { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
         var menu = new MenuBar {
-                                   Menus =  [
-                                   new MenuBarItem ("_File", new MenuItem[] {
-                                                                                new ("_Quit", "", () => Quit ())
-                                                                            })
-                                       ]
-                               };
+            Menus = [
+                        new MenuBarItem ("_File", new MenuItem[] { new ("_Quit", "", () => Quit ()) })
+                    ]
+        };
         Application.Top.Add (menu);
 
         var statusBar = new StatusBar (
-                                       new StatusItem[] {
-                                                            new (
-                                                                 Application.QuitKey,
-                                                                 $"{Application.QuitKey} to Quit",
-                                                                 () => Quit ())
-                                                        });
+            new StatusItem[] {
+                new (
+                    Application.QuitKey,
+                    $"{Application.QuitKey} to Quit",
+                    () => Quit ()
+                )
+            }
+        );
         Application.Top.Add (statusBar);
 
         Win.Add (_tableView);
@@ -59,11 +54,11 @@ public class MultiColouredTable : Scenario {
         dt.Rows.Add (DBNull.Value, DBNull.Value);
 
         _tableView.ColorScheme = new ColorScheme {
-                                                     Disabled = Win.ColorScheme.Disabled,
-                                                     HotFocus = Win.ColorScheme.HotFocus,
-                                                     Focus = Win.ColorScheme.Focus,
-                                                     Normal = new Attribute (Color.DarkGray, Color.Black)
-                                                 };
+            Disabled = Win.ColorScheme.Disabled,
+            HotFocus = Win.ColorScheme.HotFocus,
+            Focus = Win.ColorScheme.Focus,
+            Normal = new Attribute (Color.DarkGray, Color.Black)
+        };
 
         _tableView.Table = new DataTableSource (_table = dt);
     }
@@ -98,20 +93,11 @@ public class MultiColouredTable : Scenario {
         };
         var cancel = new Button { Text = "Cancel" };
         cancel.Clicked += (s, e) => { Application.RequestStop (); };
-        var d = new Dialog { Title = title, Buttons =  [ok, cancel] };
+        var d = new Dialog { Title = title, Buttons = [ok, cancel] };
 
-        var lbl = new Label {
-                                X = 0,
-                                Y = 1,
-                                Text = label
-                            };
+        var lbl = new Label { X = 0, Y = 1, Text = label };
 
-        var tf = new TextField {
-                                   Text = initialText,
-                                   X = 0,
-                                   Y = 2,
-                                   Width = Dim.Fill ()
-                               };
+        var tf = new TextField { Text = initialText, X = 0, Y = 2, Width = Dim.Fill () };
 
         d.Add (lbl, tf);
         tf.SetFocus ();
@@ -144,16 +130,20 @@ public class MultiColouredTable : Scenario {
                             break;
                         case 1:
                             Driver.SetAttribute (
-                                                 new Attribute (
-                                                                Color.BrightRed,
-                                                                cellColor.Background));
+                                new Attribute (
+                                    Color.BrightRed,
+                                    cellColor.Background
+                                )
+                            );
 
                             break;
                         case 2:
                             Driver.SetAttribute (
-                                                 new Attribute (
-                                                                Color.BrightYellow,
-                                                                cellColor.Background));
+                                new Attribute (
+                                    Color.BrightYellow,
+                                    cellColor.Background
+                                )
+                            );
 
                             break;
                         case 3:
@@ -162,23 +152,29 @@ public class MultiColouredTable : Scenario {
                             break;
                         case 4:
                             Driver.SetAttribute (
-                                                 new Attribute (
-                                                                Color.BrightGreen,
-                                                                cellColor.Background));
+                                new Attribute (
+                                    Color.BrightGreen,
+                                    cellColor.Background
+                                )
+                            );
 
                             break;
                         case 5:
                             Driver.SetAttribute (
-                                                 new Attribute (
-                                                                Color.BrightBlue,
-                                                                cellColor.Background));
+                                new Attribute (
+                                    Color.BrightBlue,
+                                    cellColor.Background
+                                )
+                            );
 
                             break;
                         case 6:
                             Driver.SetAttribute (
-                                                 new Attribute (
-                                                                Color.BrightCyan,
-                                                                cellColor.Background));
+                                new Attribute (
+                                    Color.BrightCyan,
+                                    cellColor.Background
+                                )
+                            );
 
                             break;
                         case 7:

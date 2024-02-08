@@ -16,8 +16,6 @@ namespace Terminal.Gui;
 // as a pair, and b) all unit test functions should be atomic..
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class AutoInitShutdownAttribute : BeforeAfterTestAttribute {
-    private readonly Type _driverType;
-
     /// <summary>
     ///     Initializes a [AutoInitShutdown] attribute, which determines if/how Application.Init and Application.Shutdown
     ///     are automatically called Before/After a test runs.
@@ -59,6 +57,8 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute {
         FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
         ConfigurationManager.Locations = configLocation;
     }
+
+    private readonly Type _driverType;
 
     private bool AutoInit { get; }
 
@@ -139,8 +139,8 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute {
 
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class TestDateAttribute : BeforeAfterTestAttribute {
-    private readonly CultureInfo _currentCulture = CultureInfo.CurrentCulture;
     public TestDateAttribute () { CultureInfo.CurrentCulture = CultureInfo.InvariantCulture; }
+    private readonly CultureInfo _currentCulture = CultureInfo.CurrentCulture;
 
     public override void After (MethodInfo methodUnderTest) {
         CultureInfo.CurrentCulture = _currentCulture;
@@ -191,14 +191,28 @@ partial class TestHelpers {
                 switch (match.Count) {
                     case 0:
                         throw new Exception (
-                                             $"{DriverContentsToString (driver)}\n" +
-                                             $"Expected Attribute {val} (PlatformColor = {val.Value.PlatformColor}) at Contents[{line},{c}] {contents[line, c]} ((PlatformColor = {contents[line, c].Attribute.Value.PlatformColor}) was not found.\n"
-                                             +
-                                             $"  Expected: {string.Join (",", expectedAttributes.Select (c => c))}\n" +
-                                             $"  But Was: <not found>");
+                            $"{DriverContentsToString (driver)}\n" +
+                            $"Expected Attribute {
+                                val
+                            } (PlatformColor = {
+                                val.Value.PlatformColor
+                            }) at Contents[{
+                                line
+                            },{
+                                c
+                            }] {
+                                contents[line, c]
+                            } ((PlatformColor = {
+                                contents[line, c].Attribute.Value.PlatformColor
+                            }) was not found.\n"
+                            +
+                            $"  Expected: {string.Join (",", expectedAttributes.Select (c => c))}\n" +
+                            $"  But Was: <not found>"
+                        );
                     case > 1:
                         throw new ArgumentException (
-                                                     $"Bad value for expectedColors, {match.Count} Attributes had the same Value");
+                            $"Bad value for expectedColors, {match.Count} Attributes had the same Value"
+                        );
                 }
 
                 char colorUsed = Array.IndexOf (expectedAttributes, match[0]).ToString ()[0];
@@ -206,11 +220,12 @@ partial class TestHelpers {
 
                 if (colorUsed != userExpected) {
                     throw new Exception (
-                                         $"{DriverContentsToString (driver)}\n" +
-                                         $"Unexpected Attribute at Contents[{line},{c}] {contents[line, c]}.\n" +
-                                         $"  Expected: {userExpected} ({expectedAttributes[int.Parse (userExpected.ToString ())]})\n"
-                                         +
-                                         $"  But Was:   {colorUsed} ({val})\n");
+                        $"{DriverContentsToString (driver)}\n" +
+                        $"Unexpected Attribute at Contents[{line},{c}] {contents[line, c]}.\n" +
+                        $"  Expected: {userExpected} ({expectedAttributes[int.Parse (userExpected.ToString ())]})\n"
+                        +
+                        $"  But Was:   {colorUsed} ({val})\n"
+                    );
                 }
             }
 
@@ -437,11 +452,12 @@ partial class TestHelpers {
     /// <returns>List of View objects</returns>
     public static List<View> GetAllViews () {
         return typeof (View).Assembly.GetTypes ()
-                            .Where (
-                                    type => type.IsClass && !type.IsAbstract && type.IsPublic
-                                            && type.IsSubclassOf (typeof (View)))
-                            .Select (type => GetTypeInitializer (type, type.GetConstructor (Array.Empty<Type> ())))
-                            .ToList ();
+            .Where (
+                type => type.IsClass && !type.IsAbstract && type.IsPublic
+                        && type.IsSubclassOf (typeof (View))
+            )
+            .Select (type => GetTypeInitializer (type, type.GetConstructor (Array.Empty<Type> ())))
+            .ToList ();
     }
 
     /// <summary>

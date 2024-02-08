@@ -16,7 +16,7 @@ public static partial class Application {
     public static List<Toplevel> OverlappedChildren {
         get {
             if (OverlappedTop != null) {
-                List<Toplevel> _overlappedChildren = new List<Toplevel> ();
+                List<Toplevel> _overlappedChildren = new ();
                 foreach (Toplevel top in _topLevels) {
                     if (top != OverlappedTop && !top.Modal) {
                         _overlappedChildren.Add (top);

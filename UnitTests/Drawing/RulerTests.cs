@@ -7,8 +7,8 @@
 namespace Terminal.Gui.DrawingTests;
 
 public class RulerTests {
-    private readonly ITestOutputHelper _output;
     public RulerTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void Attribute_set () {
@@ -42,12 +42,7 @@ public class RulerTests {
         var len = 15;
 
         // Add a frame so we can see the ruler
-        var f = new FrameView {
-                                  X = 0,
-                                  Y = 0,
-                                  Width = Dim.Fill (),
-                                  Height = Dim.Fill ()
-                              };
+        var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
         Application.Top.Add (f);
         Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (len + 5, 5);
@@ -59,49 +54,53 @@ public class RulerTests {
         r.Length = len;
         r.Draw (new Point (0, 0));
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 |123456789|1234────┐
 │                  │
 │                  │
 │                  │
 └──────────────────┘",
-                                                      _output);
+            _output
+        );
 
         // Postive offset
         Application.Refresh ();
         r.Draw (new Point (1, 1));
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌──────────────────┐
 │|123456789|1234   │
 │                  │
 │                  │
 └──────────────────┘",
-                                                      _output);
+            _output
+        );
 
         // Negative offset
         Application.Refresh ();
         r.Draw (new Point (-1, 1));
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌──────────────────┐
 123456789|1234     │
 │                  │
 │                  │
 └──────────────────┘",
-                                                      _output);
+            _output
+        );
 
         // Clip
         Application.Refresh ();
         r.Draw (new Point (10, 1));
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌──────────────────┐
 │         |123456789
 │                  │
 │                  │
 └──────────────────┘",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
@@ -110,12 +109,7 @@ public class RulerTests {
         var len = 15;
 
         // Add a frame so we can see the ruler
-        var f = new FrameView {
-                                  X = 0,
-                                  Y = 0,
-                                  Width = Dim.Fill (),
-                                  Height = Dim.Fill ()
-                              };
+        var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
         Application.Top.Add (f);
         Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (len + 5, 5);
@@ -127,25 +121,27 @@ public class RulerTests {
         r.Length = len;
         r.Draw (new Point (0, 0), 1);
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 123456789|12345────┐
 │                  │
 │                  │
 │                  │
 └──────────────────┘",
-                                                      _output);
+            _output
+        );
 
         Application.Refresh ();
         r.Length = len;
         r.Draw (new Point (1, 0), 1);
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌123456789|12345───┐
 │                  │
 │                  │
 │                  │
 └──────────────────┘",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
@@ -154,12 +150,7 @@ public class RulerTests {
         var len = 15;
 
         // Add a frame so we can see the ruler
-        var f = new FrameView {
-                                  X = 0,
-                                  Y = 0,
-                                  Width = Dim.Fill (),
-                                  Height = Dim.Fill ()
-                              };
+        var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
         Application.Top.Add (f);
         Application.Begin (Application.Top);
@@ -171,7 +162,7 @@ public class RulerTests {
         r.Length = len;
         r.Draw (new Point (0, 0));
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 -───┐
 1   │
 2   │
@@ -192,13 +183,14 @@ public class RulerTests {
 │   │
 │   │
 └───┘",
-                                                      _output);
+            _output
+        );
 
         // Postive offset
         Application.Refresh ();
         r.Draw (new Point (1, 1));
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌───┐
 │-  │
 │1  │
@@ -219,13 +211,14 @@ public class RulerTests {
 │   │
 │   │
 └───┘",
-                                                      _output);
+            _output
+        );
 
         // Negative offset
         Application.Refresh ();
         r.Draw (new Point (1, -1));
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌1──┐
 │2  │
 │3  │
@@ -246,13 +239,14 @@ public class RulerTests {
 │   │
 │   │
 └───┘",
-                                                      _output);
+            _output
+        );
 
         // Clip
         Application.Refresh ();
         r.Draw (new Point (1, 10));
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌───┐
 │   │
 │   │
@@ -273,7 +267,8 @@ public class RulerTests {
 │7  │
 │8  │
 └9──┘",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
@@ -282,12 +277,7 @@ public class RulerTests {
         var len = 15;
 
         // Add a frame so we can see the ruler
-        var f = new FrameView {
-                                  X = 0,
-                                  Y = 0,
-                                  Width = Dim.Fill (),
-                                  Height = Dim.Fill ()
-                              };
+        var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
         Application.Top.Add (f);
         Application.Begin (Application.Top);
@@ -299,7 +289,7 @@ public class RulerTests {
         r.Length = len;
         r.Draw (new Point (0, 0), 1);
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 1───┐
 2   │
 3   │
@@ -320,13 +310,14 @@ public class RulerTests {
 │   │
 │   │
 └───┘",
-                                                      _output);
+            _output
+        );
 
         Application.Refresh ();
         r.Length = len;
         r.Draw (new Point (0, 1), 1);
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌───┐
 1   │
 2   │
@@ -347,7 +338,8 @@ public class RulerTests {
 │   │
 │   │
 └───┘",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]

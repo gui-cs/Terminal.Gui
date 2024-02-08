@@ -4,10 +4,6 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.ViewsTests;
 
 public class TreeTableSourceTests : IDisposable {
-    private readonly Rune _origChecked;
-    private readonly Rune _origUnchecked;
-    private readonly ITestOutputHelper _output;
-
     public TreeTableSourceTests (ITestOutputHelper output) {
         _output = output;
 
@@ -16,6 +12,10 @@ public class TreeTableSourceTests : IDisposable {
         ConfigurationManager.Glyphs.Checked = new Rune ('☑');
         ConfigurationManager.Glyphs.UnChecked = new Rune ('☐');
     }
+
+    private readonly ITestOutputHelper _output;
+    private readonly Rune _origChecked;
+    private readonly Rune _origUnchecked;
 
     public void Dispose () {
         ConfigurationManager.Glyphs.Checked = _origChecked;
@@ -231,50 +231,39 @@ public class TreeTableSourceTests : IDisposable {
         tree.AspectGetter = d => d.Name;
 
         tree.TreeBuilder = new DelegateTreeBuilder<IDescribedThing> (
-                                                                     d => d is Road r
-                                                                              ? r.Traffic
-                                                                              : Enumerable.Empty<IDescribedThing> ()
-                                                                    );
+            d => d is Road r
+                     ? r.Traffic
+                     : Enumerable.Empty<IDescribedThing> ()
+        );
 
         tree.AddObject (
-                        new Road {
-                                     Name = "Lost Highway",
-                                     Description = "Exciting night road",
-                                     Traffic = new List<Car> {
-                                                                 new() {
-                                                                           Name = "Ford Trans-Am",
-                                                                           Description = "Talking thunderbird car"
-                                                                       },
-                                                                 new() {
-                                                                           Name = "DeLorean",
-                                                                           Description = "Time travelling car"
-                                                                       }
-                                                             }
-                                 });
+            new Road {
+                Name = "Lost Highway",
+                Description = "Exciting night road",
+                Traffic = new List<Car> {
+                    new () { Name = "Ford Trans-Am", Description = "Talking thunderbird car" },
+                    new () { Name = "DeLorean", Description = "Time travelling car" }
+                }
+            }
+        );
 
         tree.AddObject (
-                        new Road {
-                                     Name = "Route 66",
-                                     Description = "Great race course",
-                                     Traffic = new List<Car> {
-                                                                 new() {
-                                                                           Name = "Pink Compact",
-                                                                           Description = "Penelope Pitstop's car"
-                                                                       },
-                                                                 new() {
-                                                                           Name = "Mean Machine",
-                                                                           Description = "Dick Dastardly's car"
-                                                                       }
-                                                             }
-                                 });
+            new Road {
+                Name = "Route 66",
+                Description = "Great race course",
+                Traffic = new List<Car> {
+                    new () { Name = "Pink Compact", Description = "Penelope Pitstop's car" },
+                    new () { Name = "Mean Machine", Description = "Dick Dastardly's car" }
+                }
+            }
+        );
 
         tableView.Table = new TreeTableSource<IDescribedThing> (
-                                                                tableView,
-                                                                "Name",
-                                                                tree,
-                                                                new Dictionary<string, Func<IDescribedThing, object>> {
-                                                                    { "Description", d => d.Description }
-                                                                });
+            tableView,
+            "Name",
+            tree,
+            new Dictionary<string, Func<IDescribedThing, object>> { { "Description", d => d.Description } }
+        );
 
         tableView.BeginInit ();
         tableView.EndInit ();

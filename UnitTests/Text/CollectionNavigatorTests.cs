@@ -3,29 +3,21 @@
 namespace Terminal.Gui.TextTests;
 
 public class CollectionNavigatorTests {
+    public CollectionNavigatorTests (ITestOutputHelper output) { _output = output; }
+
     private static readonly string[] simpleStrings = {
-                                                         "appricot", // 0
-                                                         "arm", // 1
-                                                         "bat", // 2
-                                                         "batman", // 3
-                                                         "candle" // 4
-                                                     };
+        "appricot", // 0
+        "arm", // 1
+        "bat", // 2
+        "batman", // 3
+        "candle" // 4
+    };
 
     private readonly ITestOutputHelper _output;
-    public CollectionNavigatorTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     public void AtSymbol () {
-        var strings = new[] {
-                                "appricot",
-                                "arm",
-                                "ta",
-                                "@bob",
-                                "@bb",
-                                "text",
-                                "egg",
-                                "candle"
-                            };
+        var strings = new[] { "appricot", "arm", "ta", "@bob", "@bb", "text", "egg", "candle" };
 
         var n = new CollectionNavigator (strings);
         Assert.Equal (3, n.GetNextMatchingItem (0, '@'));
@@ -54,14 +46,7 @@ public class CollectionNavigatorTests {
 
     [Fact]
     public void Delay () {
-        var strings = new[] {
-                                "$$",
-                                "$100.00",
-                                "$101.00",
-                                "$101.10",
-                                "$200.00",
-                                "appricot"
-                            };
+        var strings = new[] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "appricot" };
         var current = 0;
         var n = new CollectionNavigator (strings);
 
@@ -101,15 +86,7 @@ public class CollectionNavigatorTests {
 
     [Fact]
     public void FullText () {
-        var strings = new[] {
-                                "appricot",
-                                "arm",
-                                "ta",
-                                "target",
-                                "text",
-                                "egg",
-                                "candle"
-                            };
+        var strings = new[] { "appricot", "arm", "ta", "target", "text", "egg", "candle" };
 
         var n = new CollectionNavigator (strings);
         var current = 0;
@@ -149,17 +126,7 @@ public class CollectionNavigatorTests {
 
     [Fact]
     public void MinimizeMovement_False_ShouldMoveIfMultipleMatches () {
-        var strings = new[] {
-                                "$$",
-                                "$100.00",
-                                "$101.00",
-                                "$101.10",
-                                "$200.00",
-                                "appricot",
-                                "c",
-                                "car",
-                                "cart"
-                            };
+        var strings = new[] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "appricot", "c", "car", "cart" };
         var current = 0;
         var n = new CollectionNavigator (strings);
         Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$$"));
@@ -194,17 +161,7 @@ public class CollectionNavigatorTests {
 
     [Fact]
     public void MinimizeMovement_True_ShouldStayOnCurrentIfMultipleMatches () {
-        var strings = new[] {
-                                "$$",
-                                "$100.00",
-                                "$101.00",
-                                "$101.10",
-                                "$200.00",
-                                "appricot",
-                                "c",
-                                "car",
-                                "cart"
-                            };
+        var strings = new[] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "appricot", "c", "car", "cart" };
         var current = 0;
         var n = new CollectionNavigator (strings);
         Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$$", true));
@@ -222,15 +179,7 @@ public class CollectionNavigatorTests {
 
     [Fact]
     public void MutliKeySearchPlusWrongKeyStays () {
-        var strings = new[] {
-                                "a",
-                                "c",
-                                "can",
-                                "candle",
-                                "candy",
-                                "yellow",
-                                "zebra"
-                            };
+        var strings = new[] { "a", "c", "can", "candle", "candy", "yellow", "zebra" };
         var current = 0;
         var n = new CollectionNavigator (strings);
 
@@ -288,14 +237,7 @@ public class CollectionNavigatorTests {
 
     [Fact]
     public void Symbols () {
-        var strings = new[] {
-                                "$$",
-                                "$100.00",
-                                "$101.00",
-                                "$101.10",
-                                "$200.00",
-                                "appricot"
-                            };
+        var strings = new[] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "appricot" };
         var current = 0;
         var n = new CollectionNavigator (strings);
         Assert.Equal (strings.IndexOf ("appricot"), current = n.GetNextMatchingItem (current, 'a'));
@@ -332,16 +274,7 @@ public class CollectionNavigatorTests {
 
     [Fact]
     public void Unicode () {
-        var strings = new[] {
-                                "appricot",
-                                "arm",
-                                "ta",
-                                "丗丙业丞",
-                                "丗丙丛",
-                                "text",
-                                "egg",
-                                "candle"
-                            };
+        var strings = new[] { "appricot", "arm", "ta", "丗丙业丞", "丗丙丛", "text", "egg", "candle" };
 
         var n = new CollectionNavigator (strings);
         var current = 0;
@@ -368,27 +301,23 @@ public class CollectionNavigatorTests {
 
     [Fact]
     public void Word () {
-        var strings = new[] {
-                                "appricot",
-                                "arm",
-                                "bat",
-                                "batman",
-                                "bates hotel",
-                                "candle"
-                            };
+        var strings = new[] { "appricot", "arm", "bat", "batman", "bates hotel", "candle" };
         var current = 0;
         var n = new CollectionNavigator (strings);
         Assert.Equal (strings.IndexOf ("bat"), current = n.GetNextMatchingItem (current, 'b')); // match bat
         Assert.Equal (strings.IndexOf ("bat"), current = n.GetNextMatchingItem (current, 'a')); // match bat
         Assert.Equal (strings.IndexOf ("bat"), current = n.GetNextMatchingItem (current, 't')); // match bat
         Assert.Equal (
-                      strings.IndexOf ("bates hotel"),
-                      current = n.GetNextMatchingItem (current, 'e')); // match bates hotel
+            strings.IndexOf ("bates hotel"),
+            current = n.GetNextMatchingItem (current, 'e')
+        ); // match bates hotel
         Assert.Equal (
-                      strings.IndexOf ("bates hotel"),
-                      current = n.GetNextMatchingItem (current, 's')); // match bates hotel
+            strings.IndexOf ("bates hotel"),
+            current = n.GetNextMatchingItem (current, 's')
+        ); // match bates hotel
         Assert.Equal (
-                      strings.IndexOf ("bates hotel"),
-                      current = n.GetNextMatchingItem (current, ' ')); // match bates hotel
+            strings.IndexOf ("bates hotel"),
+            current = n.GetNextMatchingItem (current, ' ')
+        ); // match bates hotel
     }
 }

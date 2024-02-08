@@ -1,15 +1,15 @@
 ﻿using System.Text.Json;
 using static Terminal.Gui.ConfigurationManager;
 
-namespace Terminal.Gui.ConfigurationTests; 
+namespace Terminal.Gui.ConfigurationTests;
 
 public class ThemeScopeTests {
     public static readonly JsonSerializerOptions _jsonOptions = new () {
-                                                                           Converters = {
-                                                                               //new AttributeJsonConverter (),
-                                                                               //new ColorJsonConverter ()
-                                                                           }
-                                                                       };
+        Converters = {
+            //new AttributeJsonConverter (),
+            //new ColorJsonConverter ()
+        }
+    };
 
     [Fact]
     public void AllThemesPresent () {

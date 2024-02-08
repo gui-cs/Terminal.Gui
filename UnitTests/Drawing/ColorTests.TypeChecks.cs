@@ -15,8 +15,9 @@ public partial class ColorTests {
     [Trait ("Category", "Type Checks")]
     [Trait ("Category", "Change Control")]
     [MemberData (
-                    nameof (ColorTestsTheoryDataGenerators.ColorName_HasCorrectOrdinals),
-                    MemberType = typeof (ColorTestsTheoryDataGenerators))]
+        nameof (ColorTestsTheoryDataGenerators.ColorName_HasCorrectOrdinals),
+        MemberType = typeof (ColorTestsTheoryDataGenerators)
+    )]
     public void ColorName_HasCorrectOrdinals (ColorName cname, int ordinal) { Assert.Equal ((int)cname, ordinal); }
 
     [Fact]
@@ -86,12 +87,13 @@ public partial class ColorTests {
     [CombinatorialData]
     public void Implements_Expected_Interfaces (
         [CombinatorialValues (
-                                 typeof (IEquatable<Color>),
-                                 typeof (ISpanParsable<Color>),
-                                 typeof (IUtf8SpanParsable<Color>),
-                                 typeof (ISpanFormattable),
-                                 typeof (IUtf8SpanFormattable),
-                                 typeof (IMinMaxValue<Color>))]
+            typeof (IEquatable<Color>),
+            typeof (ISpanParsable<Color>),
+            typeof (IUtf8SpanParsable<Color>),
+            typeof (ISpanFormattable),
+            typeof (IUtf8SpanFormattable),
+            typeof (IMinMaxValue<Color>)
+        )]
         Type expectedInterface
     ) {
         Assert.Contains (expectedInterface, typeof (Color).GetInterfaces ());
@@ -113,9 +115,8 @@ public partial class ColorTests {
 
 public static partial class ColorTestsTheoryDataGenerators {
     public static TheoryData<ColorName, int> ColorName_HasCorrectOrdinals () {
-        TheoryData<ColorName, int> data =  []
-
-        ;
+        TheoryData<ColorName, int> data = []
+            ;
         data.Add (ColorName.Black, 0);
         data.Add (ColorName.Blue, 1);
         data.Add (ColorName.Green, 2);

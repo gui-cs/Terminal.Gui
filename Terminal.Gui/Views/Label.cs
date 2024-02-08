@@ -16,17 +16,18 @@ public class Label : View {
 
         // Things this view knows how to do
         AddCommand (
-                    Command.Default,
-                    () => {
-                        // BUGBUG: This is a hack, but it does work.
-                        bool can = CanFocus;
-                        CanFocus = true;
-                        SetFocus ();
-                        SuperView.FocusNext ();
-                        CanFocus = can;
+            Command.Default,
+            () => {
+                // BUGBUG: This is a hack, but it does work.
+                bool can = CanFocus;
+                CanFocus = true;
+                SetFocus ();
+                SuperView.FocusNext ();
+                CanFocus = can;
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (Command.Accept, () => AcceptKey ());
 
         // Default key bindings for this view

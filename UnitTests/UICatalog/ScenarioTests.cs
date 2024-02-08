@@ -4,14 +4,14 @@ using Xunit.Abstractions;
 namespace UICatalog.Tests;
 
 public class ScenarioTests {
-    private readonly ITestOutputHelper _output;
-
     public ScenarioTests (ITestOutputHelper output) {
 #if DEBUG_IDISPOSABLE
         Responder.Instances.Clear ();
 #endif
         _output = output;
     }
+
+    private readonly ITestOutputHelper _output;
 
     /// <summary>
     ///     <para>This runs through all Scenarios defined in UI Catalog, calling Init, Setup, and Run.</para>
@@ -54,7 +54,14 @@ public class ScenarioTests {
 
                     // See #2474 for why this is commented out
                     Assert.Fail (
-                                 $"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms. Force quit.");
+                        $"'{
+                            scenario.GetName ()
+                        }' failed to Quit with {
+                            Application.QuitKey
+                        } after {
+                            abortTime
+                        }ms. Force quit."
+                    );
                 }
 
                 return false;
@@ -113,68 +120,64 @@ public class ScenarioTests {
         RadioGroup _hRadioGroup;
         TextField _hText;
         var _hVal = 0;
-        List<string> posNames = new() { "Factor", "AnchorEnd", "Center", "Absolute" };
-        List<string> dimNames = new() { "Factor", "Fill", "Absolute" };
+        List<string> posNames = new () { "Factor", "AnchorEnd", "Center", "Absolute" };
+        List<string> dimNames = new () { "Factor", "Fill", "Absolute" };
 
         Application.Init (new FakeDriver ());
 
         Toplevel Top = Application.Top;
 
         _viewClasses = GetAllViewClassesCollection ()
-                       .OrderBy (t => t.Name)
-                       .Select (t => new KeyValuePair<string, Type> (t.Name, t))
-                       .ToDictionary (t => t.Key, t => t.Value);
+            .OrderBy (t => t.Name)
+            .Select (t => new KeyValuePair<string, Type> (t.Name, t))
+            .ToDictionary (t => t.Key, t => t.Value);
 
         _leftPane = new Window {
-                                   Title = "Classes",
-                                   X = 0,
-                                   Y = 0,
-                                   Width = 15,
-                                   Height = Dim.Fill (1), // for status bar
-                                   CanFocus = false,
-                                   ColorScheme = Colors.ColorSchemes["TopLevel"]
-                               };
+            Title = "Classes",
+            X = 0,
+            Y = 0,
+            Width = 15,
+            Height = Dim.Fill (1), // for status bar
+            CanFocus = false,
+            ColorScheme = Colors.ColorSchemes["TopLevel"]
+        };
 
         _classListView = new ListView {
-                                          X = 0,
-                                          Y = 0,
-                                          Width = Dim.Fill (),
-                                          Height = Dim.Fill (),
-                                          AllowsMarking = false,
-                                          ColorScheme = Colors.ColorSchemes["TopLevel"],
-                                          Source = new ListWrapper (_viewClasses.Keys.ToList ())
-                                      };
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            AllowsMarking = false,
+            ColorScheme = Colors.ColorSchemes["TopLevel"],
+            Source = new ListWrapper (_viewClasses.Keys.ToList ())
+        };
         _leftPane.Add (_classListView);
 
         _settingsPane = new FrameView {
-                                          X = Pos.Right (_leftPane),
-                                          Y = 0, // for menu
-                                          Width = Dim.Fill (),
-                                          Height = 10,
-                                          CanFocus = false,
-                                          ColorScheme = Colors.ColorSchemes["TopLevel"],
-                                          Title = "Settings"
-                                      };
+            X = Pos.Right (_leftPane),
+            Y = 0, // for menu
+            Width = Dim.Fill (),
+            Height = 10,
+            CanFocus = false,
+            ColorScheme = Colors.ColorSchemes["TopLevel"],
+            Title = "Settings"
+        };
         _computedCheckBox = new CheckBox { X = 0, Y = 0, Text = "Computed Layout", Checked = true };
         _settingsPane.Add (_computedCheckBox);
 
         var radioItems = new[] { "Percent(x)", "AnchorEnd(x)", "Center", "At(x)" };
         _locationFrame = new FrameView {
-                                           X = Pos.Left (_computedCheckBox),
-                                           Y = Pos.Bottom (_computedCheckBox),
-                                           Height = 3 + radioItems.Length,
-                                           Width = 36,
-                                           Title = "Location (Pos)"
-                                       };
+            X = Pos.Left (_computedCheckBox),
+            Y = Pos.Bottom (_computedCheckBox),
+            Height = 3 + radioItems.Length,
+            Width = 36,
+            Title = "Location (Pos)"
+        };
         _settingsPane.Add (_locationFrame);
 
         var label = new Label { X = 0, Y = 0, Text = "x:" };
         _locationFrame.Add (label);
-        _xRadioGroup = new RadioGroup {
-                                          X = 0,
-                                          Y = Pos.Bottom (label),
-                                          RadioLabels = radioItems
-                                      };
+        _xRadioGroup = new RadioGroup { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
         _xText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_xVal}" };
         _locationFrame.Add (_xText);
 
@@ -185,29 +188,21 @@ public class ScenarioTests {
         _locationFrame.Add (label);
         _yText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_yVal}" };
         _locationFrame.Add (_yText);
-        _yRadioGroup = new RadioGroup {
-                                          X = Pos.X (label),
-                                          Y = Pos.Bottom (label),
-                                          RadioLabels = radioItems
-                                      };
+        _yRadioGroup = new RadioGroup { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
         _locationFrame.Add (_yRadioGroup);
 
         _sizeFrame = new FrameView {
-                                       X = Pos.Right (_locationFrame),
-                                       Y = Pos.Y (_locationFrame),
-                                       Height = 3 + radioItems.Length,
-                                       Width = 40,
-                                       Title = "Size (Dim)"
-                                   };
+            X = Pos.Right (_locationFrame),
+            Y = Pos.Y (_locationFrame),
+            Height = 3 + radioItems.Length,
+            Width = 40,
+            Title = "Size (Dim)"
+        };
 
         radioItems = new[] { "Percent(width)", "Fill(width)", "Sized(width)" };
         label = new Label { X = 0, Y = 0, Text = "width:" };
         _sizeFrame.Add (label);
-        _wRadioGroup = new RadioGroup {
-                                          X = 0,
-                                          Y = Pos.Bottom (label),
-                                          RadioLabels = radioItems
-                                      };
+        _wRadioGroup = new RadioGroup { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
         _wText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_wVal}" };
         _sizeFrame.Add (_wText);
         _sizeFrame.Add (_wRadioGroup);
@@ -218,22 +213,18 @@ public class ScenarioTests {
         _hText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_hVal}" };
         _sizeFrame.Add (_hText);
 
-        _hRadioGroup = new RadioGroup {
-                                          X = Pos.X (label),
-                                          Y = Pos.Bottom (label),
-                                          RadioLabels = radioItems
-                                      };
+        _hRadioGroup = new RadioGroup { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
         _sizeFrame.Add (_hRadioGroup);
 
         _settingsPane.Add (_sizeFrame);
 
         _hostPane = new FrameView {
-                                      X = Pos.Right (_leftPane),
-                                      Y = Pos.Bottom (_settingsPane),
-                                      Width = Dim.Fill (),
-                                      Height = Dim.Fill (1), // + 1 for status bar
-                                      ColorScheme = Colors.ColorSchemes["Dialog"]
-                                  };
+            X = Pos.Right (_leftPane),
+            Y = Pos.Bottom (_settingsPane),
+            Width = Dim.Fill (),
+            Height = Dim.Fill (1), // + 1 for status bar
+            ColorScheme = Colors.ColorSchemes["Dialog"]
+        };
 
         _classListView.OpenSelectedItem += (s, a) => { _settingsPane.SetFocus (); };
         _classListView.SelectedItemChanged += (s, args) => {
@@ -310,8 +301,9 @@ public class ScenarioTests {
             if (iterations < _viewClasses.Count) {
                 _classListView.MoveDown ();
                 Assert.Equal (
-                              _curView.GetType ().Name,
-                              _viewClasses.Values.ToArray ()[_classListView.SelectedItem].Name);
+                    _curView.GetType ().Name,
+                    _viewClasses.Values.ToArray ()[_classListView.SelectedItem].Name
+                );
             } else {
                 Application.RequestStop ();
             }
@@ -431,10 +423,11 @@ public class ScenarioTests {
         List<Type> GetAllViewClassesCollection () {
             List<Type> types = new ();
             foreach (Type type in typeof (View).Assembly.GetTypes ()
-                                               .Where (
-                                                       myType =>
-                                                           myType.IsClass && !myType.IsAbstract && myType.IsPublic &&
-                                                           myType.IsSubclassOf (typeof (View)))) {
+                         .Where (
+                             myType =>
+                                 myType.IsClass && !myType.IsAbstract && myType.IsPublic &&
+                                 myType.IsSubclassOf (typeof (View))
+                         )) {
                 types.Add (type);
             }
 

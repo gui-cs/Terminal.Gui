@@ -1,10 +1,10 @@
 ﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests; 
+namespace Terminal.Gui.ViewsTests;
 
 public class SpinnerViewTests {
-    private readonly ITestOutputHelper output;
     public SpinnerViewTests (ITestOutputHelper output) { this.output = output; }
+    private readonly ITestOutputHelper output;
 
     [Theory]
     [AutoInitShutdown]

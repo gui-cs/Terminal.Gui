@@ -1,7 +1,6 @@
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.ApplicationTests; 
+namespace Terminal.Gui.ApplicationTests;
 
 public class SyncrhonizationContextTests {
     [Fact]
@@ -23,20 +22,22 @@ public class SyncrhonizationContextTests {
 
         var success = false;
         Task.Run (
-                  () => {
-                      Thread.Sleep (1_000);
+            () => {
+                Thread.Sleep (1_000);
 
-                      // non blocking
-                      context.Post (
-                                    delegate {
-                                        success = true;
+                // non blocking
+                context.Post (
+                    delegate {
+                        success = true;
 
-                                        // then tell the application to quit
-                                        Application.Invoke (() => Application.RequestStop ());
-                                    },
-                                    null);
-                      Assert.False (success);
-                  });
+                        // then tell the application to quit
+                        Application.Invoke (() => Application.RequestStop ());
+                    },
+                    null
+                );
+                Assert.False (success);
+            }
+        );
 
         // blocks here until the RequestStop is processed at the end of the test
         Application.Run ();
@@ -50,20 +51,22 @@ public class SyncrhonizationContextTests {
 
         var success = false;
         Task.Run (
-                  () => {
-                      Thread.Sleep (1_000);
+            () => {
+                Thread.Sleep (1_000);
 
-                      // blocking
-                      context.Send (
-                                    delegate {
-                                        success = true;
+                // blocking
+                context.Send (
+                    delegate {
+                        success = true;
 
-                                        // then tell the application to quit
-                                        Application.Invoke (() => Application.RequestStop ());
-                                    },
-                                    null);
-                      Assert.True (success);
-                  });
+                        // then tell the application to quit
+                        Application.Invoke (() => Application.RequestStop ());
+                    },
+                    null
+                );
+                Assert.True (success);
+            }
+        );
 
         // blocks here until the RequestStop is processed at the end of the test
         Application.Run ();

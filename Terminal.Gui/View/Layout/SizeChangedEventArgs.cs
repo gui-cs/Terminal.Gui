@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>Args for events about Size (e.g. Resized)</summary>
 public class SizeChangedEventArgs : EventArgs {

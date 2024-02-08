@@ -87,13 +87,6 @@ public interface IListDataSource {
 ///     </para>
 /// </remarks>
 public class ListView : View {
-    private bool _allowsMarking;
-    private bool _allowsMultipleSelection = true;
-    private int _lastSelectedItem = -1;
-    private int _selected = -1;
-    private IListDataSource _source;
-    private int _top, _left;
-
     /// <summary>
     ///     Initializes a new instance of <see cref="ListView"/>. Set the <see cref="Source"/> property to display
     ///     something.
@@ -131,6 +124,13 @@ public class ListView : View {
 
         KeyBindings.Add (KeyCode.Enter, Command.OpenSelectedItem);
     }
+
+    private bool _allowsMarking;
+    private bool _allowsMultipleSelection = true;
+    private IListDataSource _source;
+    private int _lastSelectedItem = -1;
+    private int _selected = -1;
+    private int _top, _left;
 
     /// <summary>Gets or sets whether this <see cref="ListView"/> allows items to be marked.</summary>
     /// <value>Set to <see langword="true"/> to allow marking elements of the list.</value>
@@ -179,6 +179,21 @@ public class ListView : View {
     /// </summary>
     public CollectionNavigator KeystrokeNavigator { get; } = new ();
 
+    /// <summary>Gets or sets the <see cref="IListDataSource"/> backing this <see cref="ListView"/>, enabling custom rendering.</summary>
+    /// <value>The source.</value>
+    /// <remarks>Use <see cref="SetSource"/> to set a new <see cref="IList"/> source.</remarks>
+    public IListDataSource Source {
+        get => _source;
+        set {
+            _source = value;
+            KeystrokeNavigator.Collection = _source?.ToList ();
+            _top = 0;
+            _selected = -1;
+            _lastSelectedItem = -1;
+            SetNeedsDisplay ();
+        }
+    }
+
     /// <summary>Gets or sets the leftmost column that is currently visible (when scrolling horizontally).</summary>
     /// <value>The left position.</value>
     public int LeftItem {
@@ -215,21 +230,6 @@ public class ListView : View {
 
             _selected = value;
             OnSelectedChanged ();
-        }
-    }
-
-    /// <summary>Gets or sets the <see cref="IListDataSource"/> backing this <see cref="ListView"/>, enabling custom rendering.</summary>
-    /// <value>The source.</value>
-    /// <remarks>Use <see cref="SetSource"/> to set a new <see cref="IList"/> source.</remarks>
-    public IListDataSource Source {
-        get => _source;
-        set {
-            _source = value;
-            KeystrokeNavigator.Collection = _source?.ToList ();
-            _top = 0;
-            _selected = -1;
-            _lastSelectedItem = -1;
-            SetNeedsDisplay ();
         }
     }
 
@@ -530,8 +530,8 @@ public class ListView : View {
         for (var row = 0; row < f.Height; row++, item++) {
             bool isSelected = item == _selected;
 
-            Attribute newcolor = focused ? isSelected ? ColorScheme.Focus : GetNormalColor ()
-                                 : isSelected ? ColorScheme.HotNormal : GetNormalColor ();
+            Attribute newcolor = focused ? isSelected ? ColorScheme.Focus : GetNormalColor () :
+                                 isSelected ? ColorScheme.HotNormal : GetNormalColor ();
 
             if (newcolor != current) {
                 Driver.SetAttribute (newcolor);
@@ -553,11 +553,9 @@ public class ListView : View {
 
                 if (_allowsMarking) {
                     Driver.AddRune (
-                                    _source.IsMarked (item)
-                                        ? AllowsMultipleSelection ? Glyphs.Checked : Glyphs.Selected
-                                        : AllowsMultipleSelection
-                                            ? Glyphs.UnChecked
-                                            : Glyphs.UnSelected);
+                        _source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.Checked : Glyphs.Selected :
+                        AllowsMultipleSelection ? Glyphs.UnChecked : Glyphs.UnSelected
+                    );
                     Driver.AddRune ((Rune)' ');
                 }
 
@@ -705,18 +703,19 @@ public class ListView : View {
     /// </remarks>
     public Task SetSourceAsync (IList source) {
         return Task.Factory.StartNew (
-                                      () => {
-                                          if (source == null && ((Source == null) || !(Source is ListWrapper))) {
-                                              Source = null;
-                                          } else {
-                                              Source = new ListWrapper (source);
-                                          }
+            () => {
+                if (source == null && ((Source == null) || !(Source is ListWrapper))) {
+                    Source = null;
+                } else {
+                    Source = new ListWrapper (source);
+                }
 
-                                          return source;
-                                      },
-                                      CancellationToken.None,
-                                      TaskCreationOptions.DenyChildAttach,
-                                      TaskScheduler.Default);
+                return source;
+            },
+            CancellationToken.None,
+            TaskCreationOptions.DenyChildAttach,
+            TaskScheduler.Default
+        );
     }
 
     private void ListView_LayoutStarted (object sender, LayoutEventArgs e) { EnsureSelectedItemVisible (); }
@@ -727,10 +726,6 @@ public class ListView : View {
 ///     using <see cref="object.ToString()"/>.
 /// </summary>
 public class ListWrapper : IListDataSource {
-    private readonly int _count;
-    private readonly BitArray _marks;
-    private readonly IList _source;
-
     /// <inheritdoc/>
     public ListWrapper (IList source) {
         if (source != null) {
@@ -740,6 +735,10 @@ public class ListWrapper : IListDataSource {
             Length = GetMaxLengthItem ();
         }
     }
+
+    private readonly BitArray _marks;
+    private readonly IList _source;
+    private readonly int _count;
 
     /// <inheritdoc/>
     public int Count => _source != null ? _source.Count : 0;

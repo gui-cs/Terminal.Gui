@@ -1,7 +1,7 @@
 using System.IO.Abstractions;
 using Terminal.Gui.Resources;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Default file operation handlers using modal dialogs.</summary>
 public class DefaultFileOperations : IFileOperations {
@@ -16,10 +16,11 @@ public class DefaultFileOperations : IFileOperations {
         string adjective = d.Name;
 
         int result = MessageBox.Query (
-                                       string.Format (Strings.fdDeleteTitle, adjective),
-                                       string.Format (Strings.fdDeleteBody, adjective),
-                                       Strings.btnYes,
-                                       Strings.btnNo);
+            string.Format (Strings.fdDeleteTitle, adjective),
+            string.Format (Strings.fdDeleteBody, adjective),
+            Strings.btnYes,
+            Strings.btnNo
+        );
 
         try {
             if (result == 0) {
@@ -52,9 +53,11 @@ public class DefaultFileOperations : IFileOperations {
                     if (toRename is IFileInfo f) {
                         IFileInfo newLocation =
                             fileSystem.FileInfo.New (
-                                                     Path.Combine (
-                                                                   f.Directory.FullName,
-                                                                   newName));
+                                Path.Combine (
+                                    f.Directory.FullName,
+                                    newName
+                                )
+                            );
                         f.MoveTo (newLocation.FullName);
 
                         return newLocation;
@@ -63,9 +66,11 @@ public class DefaultFileOperations : IFileOperations {
 
                         IDirectoryInfo newLocation =
                             fileSystem.DirectoryInfo.New (
-                                                          Path.Combine (
-                                                                        d.Parent.FullName,
-                                                                        newName));
+                                Path.Combine (
+                                    d.Parent.FullName,
+                                    newName
+                                )
+                            );
                         d.MoveTo (newLocation.FullName);
 
                         return newLocation;
@@ -87,7 +92,8 @@ public class DefaultFileOperations : IFileOperations {
                 try {
                     IDirectoryInfo newDir =
                         fileSystem.DirectoryInfo.New (
-                                                      Path.Combine (inDirectory.FullName, named));
+                            Path.Combine (inDirectory.FullName, named)
+                        );
                     newDir.Create ();
 
                     return newDir;
@@ -103,10 +109,7 @@ public class DefaultFileOperations : IFileOperations {
 
     private bool Prompt (string title, string defaultText, out string result) {
         var confirm = false;
-        var btnOk = new Button {
-                                   IsDefault = true,
-                                   Text = Strings.btnOk
-                               };
+        var btnOk = new Button { IsDefault = true, Text = Strings.btnOk };
         btnOk.Clicked += (s, e) => {
             confirm = true;
             Application.RequestStop ();
@@ -118,18 +121,10 @@ public class DefaultFileOperations : IFileOperations {
         };
 
         var lbl = new Label { Text = Strings.fdRenamePrompt };
-        var tf = new TextField {
-                                   X = Pos.Right (lbl),
-                                   Width = Dim.Fill (),
-                                   Text = defaultText
-                               };
+        var tf = new TextField { X = Pos.Right (lbl), Width = Dim.Fill (), Text = defaultText };
         tf.SelectAll ();
 
-        var dlg = new Dialog {
-                                 Title = title,
-                                 Width = Dim.Percent (50),
-                                 Height = 4
-                             };
+        var dlg = new Dialog { Title = title, Width = Dim.Percent (50), Height = 4 };
         dlg.Add (lbl);
         dlg.Add (tf);
 

@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.ViewsTests; 
+﻿namespace Terminal.Gui.ViewsTests;
 
 public class LineViewTests {
     [Fact]

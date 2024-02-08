@@ -6,14 +6,10 @@ namespace Terminal.Gui.ApplicationTests;
 
 /// <summary>Tests MainLoop using the FakeMainLoop.</summary>
 public class MainLoopTests {
-    private static readonly ManualResetEventSlim _wakeUp = new (false);
+    private static bool taskCompleted;
     private static Button btn;
-    private static string cancel;
-    private static string clickMe;
     private static int four;
     private static int one;
-    private static string pewPew;
-    private static bool taskCompleted;
 
     // TODO: EventsPending tests
     // - wait = true
@@ -25,6 +21,10 @@ public class MainLoopTests {
     private static int total;
     private static int two;
     private static int zero;
+    private static readonly ManualResetEventSlim _wakeUp = new (false);
+    private static string cancel;
+    private static string clickMe;
+    private static string pewPew;
 
     public static IEnumerable<object[]> TestAddIdle {
         get {
@@ -293,9 +293,9 @@ public class MainLoopTests {
         };
 
         Parallel.Invoke (
-                         () => token1 = ml.AddTimeout (TimeSpan.FromMilliseconds (ms), callback),
-                         () => token2 = ml.AddTimeout (TimeSpan.FromMilliseconds (ms), callback)
-                        );
+            () => token1 = ml.AddTimeout (TimeSpan.FromMilliseconds (ms), callback),
+            () => token2 = ml.AddTimeout (TimeSpan.FromMilliseconds (ms), callback)
+        );
         ml.Run ();
         Assert.NotNull (token1);
         Assert.NotNull (token2);
@@ -537,10 +537,8 @@ public class MainLoopTests {
         Assert.Empty (mainloop._timeouts);
         Assert.Empty (mainloop._idleHandlers);
         Assert.NotNull (
-                        new Timeout {
-                                        Span = new TimeSpan (),
-                                        Callback = () => true
-                                    });
+            new Timeout { Span = new TimeSpan (), Callback = () => true }
+        );
     }
 
     [Fact]
@@ -668,18 +666,20 @@ public class MainLoopTests {
 
     private static void Launch (Random r, TextField tf, int target) {
         Task.Run (
-                  () => {
-                      Thread.Sleep (r.Next (2, 4));
-                      Application.Invoke (
-                                          () => {
-                                              tf.Text = $"index{r.Next ()}";
-                                              Interlocked.Increment (ref tbCounter);
-                                              if (target == tbCounter) {
-                                                  // On last increment wake up the check
-                                                  _wakeUp.Set ();
-                                              }
-                                          });
-                  });
+            () => {
+                Thread.Sleep (r.Next (2, 4));
+                Application.Invoke (
+                    () => {
+                        tf.Text = $"index{r.Next ()}";
+                        Interlocked.Increment (ref tbCounter);
+                        if (target == tbCounter) {
+                            // On last increment wake up the check
+                            _wakeUp.Set ();
+                        }
+                    }
+                );
+            }
+        );
     }
 
     private async static void RunAsyncTest (object sender, EventArgs e) {
@@ -691,31 +691,33 @@ public class MainLoopTests {
         btn.SetNeedsDisplay ();
 
         await Task.Run (
-                        () => {
-                            try {
-                                Assert.Equal (cancel, btn.Text);
-                                Assert.Equal (one, total);
+                () => {
+                    try {
+                        Assert.Equal (cancel, btn.Text);
+                        Assert.Equal (one, total);
 
-                                RunSql ();
-                            }
-                            finally {
-                                SetReadyToRun ();
-                            }
-                        })
-                  .ContinueWith (
-                                 async (s, e) => {
-                                     await Task.Delay (1000);
-                                     Assert.Equal (clickMe, btn.Text);
-                                     Assert.Equal (three, total);
+                        RunSql ();
+                    }
+                    finally {
+                        SetReadyToRun ();
+                    }
+                }
+            )
+            .ContinueWith (
+                async (s, e) => {
+                    await Task.Delay (1000);
+                    Assert.Equal (clickMe, btn.Text);
+                    Assert.Equal (three, total);
 
-                                     Interlocked.Increment (ref total);
+                    Interlocked.Increment (ref total);
 
-                                     Assert.Equal (clickMe, btn.Text);
-                                     Assert.Equal (four, total);
+                    Assert.Equal (clickMe, btn.Text);
+                    Assert.Equal (four, total);
 
-                                     taskCompleted = true;
-                                 },
-                                 TaskScheduler.FromCurrentSynchronizationContext ());
+                    taskCompleted = true;
+                },
+                TaskScheduler.FromCurrentSynchronizationContext ()
+            );
     }
 
     private static void RunSql () {
@@ -724,11 +726,12 @@ public class MainLoopTests {
         Assert.Equal (one, total);
 
         Application.Invoke (
-                            () => {
-                                btn.Text = "Pew Pew";
-                                Interlocked.Increment (ref total);
-                                btn.SetNeedsDisplay ();
-                            });
+            () => {
+                btn.Text = "Pew Pew";
+                Interlocked.Increment (ref total);
+                btn.SetNeedsDisplay ();
+            }
+        );
     }
 
     private static void RunTest (Random r, TextField tf, int numPasses, int numIncrements, int pollMs) {
@@ -747,8 +750,9 @@ public class MainLoopTests {
                     Application.Invoke (() => Application.RequestStop ());
 
                     throw new TimeoutException (
-                                                $"Timeout: Increment lost. tbCounter ({tbCounter}) didn't " +
-                                                $"change after waiting {pollMs} ms. Failed to reach {(j + 1) * numIncrements} on pass {j + 1}");
+                        $"Timeout: Increment lost. tbCounter ({tbCounter}) didn't " +
+                        $"change after waiting {pollMs} ms. Failed to reach {(j + 1) * numIncrements} on pass {j + 1}"
+                    );
                 }
             }
 
@@ -764,28 +768,22 @@ public class MainLoopTests {
         Assert.Equal (two, total);
 
         Application.Invoke (
-                            () => {
-                                btn.Text = "Click Me";
-                                Interlocked.Increment (ref total);
-                                btn.SetNeedsDisplay ();
-                            });
+            () => {
+                btn.Text = "Click Me";
+                Interlocked.Increment (ref total);
+                btn.SetNeedsDisplay ();
+            }
+        );
     }
 
     private static void StartWindow () {
-        var startWindow = new Window {
-                                         Modal = true
-                                     };
+        var startWindow = new Window { Modal = true };
 
-        btn = new Button {
-                             Text = "Click Me"
-                         };
+        btn = new Button { Text = "Click Me" };
 
         btn.Clicked += RunAsyncTest;
 
-        var totalbtn = new Button {
-                                      X = Pos.Right (btn),
-                                      Text = "total"
-                                  };
+        var totalbtn = new Button { X = Pos.Right (btn), Text = "total" };
 
         totalbtn.Clicked += (s, e) => { MessageBox.Query ("Count", $"Count is {total}", "Ok"); };
 
@@ -801,8 +799,8 @@ public class MainLoopTests {
     }
 
     private class MillisecondTolerance : IEqualityComparer<TimeSpan> {
-        private readonly int _tolerance;
         public MillisecondTolerance (int tolerance) { _tolerance = tolerance; }
+        private readonly int _tolerance;
         public bool Equals (TimeSpan x, TimeSpan y) { return Math.Abs (x.Milliseconds - y.Milliseconds) <= _tolerance; }
         public int GetHashCode (TimeSpan obj) { return obj.GetHashCode (); }
     }

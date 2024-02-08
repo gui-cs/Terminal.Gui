@@ -26,15 +26,6 @@ namespace Terminal.Gui;
 ///     <para>Control the first byte shown by setting the <see cref="DisplayStart"/> property to an offset in the stream.</para>
 /// </remarks>
 public class HexView : View {
-    private const int bsize = 4;
-    private const int displayWidth = 9;
-    private int bpl;
-    private CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
-    private long displayStart, pos;
-    private SortedDictionary<long, byte> edits = new ();
-    private bool firstNibble, leftSide;
-    private Stream source;
-
     /// <summary>Initializes a <see cref="HexView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
     /// <param name="source">
     ///     The <see cref="Stream"/> to view and edit as hex, this <see cref="Stream"/> must support seeking,
@@ -60,8 +51,9 @@ public class HexView : View {
         AddCommand (Command.EndOfLine, () => MoveEndOfLine ());
         AddCommand (Command.StartOfPage, () => MoveUp (bytesPerLine * ((int)(position - displayStart) / bytesPerLine)));
         AddCommand (
-                    Command.EndOfPage,
-                    () => MoveDown (bytesPerLine * (Frame.Height - 1 - (int)(position - displayStart) / bytesPerLine)));
+            Command.EndOfPage,
+            () => MoveDown (bytesPerLine * (Frame.Height - 1 - (int)(position - displayStart) / bytesPerLine))
+        );
 
         // Default keybindings for this view
         KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
@@ -89,30 +81,21 @@ public class HexView : View {
     /// <summary>Initializes a <see cref="HexView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
     public HexView () : this (new MemoryStream ()) { }
 
+    private const int bsize = 4;
+    private const int displayWidth = 9;
+    private bool firstNibble, leftSide;
+    private CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
+    private int bpl;
+    private long displayStart, pos;
+    private SortedDictionary<long, byte> edits = new ();
+    private Stream source;
+
     /// <summary>
     ///     Gets or sets whether this <see cref="HexView"/> allow editing of the <see cref="Stream"/> of the underlying
     ///     <see cref="Stream"/>.
     /// </summary>
     /// <value><c>true</c> if allow edits; otherwise, <c>false</c>.</value>
     public bool AllowEdits { get; set; } = true;
-
-    /// <summary>The bytes length per line.</summary>
-    public int BytesPerLine => bytesPerLine;
-
-    /// <summary>Gets the current cursor position starting at one for both, line and column.</summary>
-    public Point CursorPosition {
-        get {
-            if (!IsInitialized) {
-                return new Point (0, 0);
-            }
-
-            var delta = (int)position;
-            int line = delta / bytesPerLine + 1;
-            int item = delta % bytesPerLine + 1;
-
-            return new Point (item, line);
-        }
-    }
 
     /// <summary>Get / Set the wished cursor when the field is focused</summary>
     public CursorVisibility DesiredCursorVisibility {
@@ -125,6 +108,16 @@ public class HexView : View {
             desiredCursorVisibility = value;
         }
     }
+
+    /// <summary>The bytes length per line.</summary>
+    public int BytesPerLine => bytesPerLine;
+
+    /// <summary>
+    ///     Gets a <see cref="SortedDictionary{TKey, TValue}"/> describing the edits done to the <see cref="HexView"/>.
+    ///     Each Key indicates an offset where an edit was made and the Value is the changed byte.
+    /// </summary>
+    /// <value>The edits.</value>
+    public IReadOnlyDictionary<long, byte> Edits => edits;
 
     /// <summary>
     ///     Sets or gets the offset into the <see cref="Stream"/> that will displayed at the top of the
@@ -140,15 +133,23 @@ public class HexView : View {
         }
     }
 
-    /// <summary>
-    ///     Gets a <see cref="SortedDictionary{TKey, TValue}"/> describing the edits done to the <see cref="HexView"/>.
-    ///     Each Key indicates an offset where an edit was made and the Value is the changed byte.
-    /// </summary>
-    /// <value>The edits.</value>
-    public IReadOnlyDictionary<long, byte> Edits => edits;
-
     /// <summary>Gets the current character position starting at one, related to the <see cref="Stream"/>.</summary>
     public long Position => position + 1;
+
+    /// <summary>Gets the current cursor position starting at one for both, line and column.</summary>
+    public Point CursorPosition {
+        get {
+            if (!IsInitialized) {
+                return new Point (0, 0);
+            }
+
+            var delta = (int)position;
+            int line = delta / bytesPerLine + 1;
+            int item = delta % bytesPerLine + 1;
+
+            return new Point (item, line);
+        }
+    }
 
     /// <summary>
     ///     Sets or gets the <see cref="Stream"/> the <see cref="HexView"/> is operating on; the stream must support

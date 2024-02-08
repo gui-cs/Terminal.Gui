@@ -1,14 +1,11 @@
 ﻿using System.Text;
 
-namespace Terminal.Gui.ViewsTests; 
+namespace Terminal.Gui.ViewsTests;
 
 public class HexViewTests {
     [Fact]
     public void AllowEdits_Edits_ApplyEdits () {
-        var hv = new HexView (LoadStream (true)) {
-                                                     Width = 20,
-                                                     Height = 20
-                                                 };
+        var hv = new HexView (LoadStream (true)) { Width = 20, Height = 20 };
 
         // Needed because HexView relies on LayoutComplete to calc sizes
         hv.LayoutSubviews ();
@@ -166,10 +163,7 @@ public class HexViewTests {
 
     [Fact]
     public void DisplayStart_Source () {
-        var hv = new HexView (LoadStream (true)) {
-                                                     Width = 20,
-                                                     Height = 20
-                                                 };
+        var hv = new HexView (LoadStream (true)) { Width = 20, Height = 20 };
 
         // Needed because HexView relies on LayoutComplete to calc sizes
         hv.LayoutSubviews ();
@@ -404,8 +398,8 @@ public class HexViewTests {
     }
 
     private class NonSeekableStream : Stream {
-        private readonly Stream m_stream;
         public NonSeekableStream (Stream baseStream) { m_stream = baseStream; }
+        private readonly Stream m_stream;
 
         public override bool CanRead => m_stream.CanRead;
 

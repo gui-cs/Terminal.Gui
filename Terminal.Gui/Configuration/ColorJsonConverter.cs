@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Json converter for the <see cref="Color"/> class.</summary>
 class ColorJsonConverter : JsonConverter<Color> {

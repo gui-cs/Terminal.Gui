@@ -15,29 +15,29 @@ public class AllViewsTester : Scenario {
 
     // TODO: This is missing some
     private readonly List<string> _posNames = new () { "Factor", "AnchorEnd", "Center", "Absolute" };
-    private ListView _classListView;
     private CheckBox _computedCheckBox;
-    private View _curView;
+    private Dictionary<string, Type> _viewClasses;
     private FrameView _hostPane;
-    private RadioGroup _hRadioGroup;
-    private TextField _hText;
-    private int _hVal;
     private FrameView _leftPane;
     private FrameView _locationFrame;
 
     // Settings
     private FrameView _settingsPane;
     private FrameView _sizeFrame;
-    private Dictionary<string, Type> _viewClasses;
-    private RadioGroup _wRadioGroup;
-    private TextField _wText;
+    private int _hVal;
     private int _wVal;
-    private RadioGroup _xRadioGroup;
-    private TextField _xText;
     private int _xVal;
-    private RadioGroup _yRadioGroup;
-    private TextField _yText;
     private int _yVal;
+    private ListView _classListView;
+    private RadioGroup _hRadioGroup;
+    private RadioGroup _wRadioGroup;
+    private RadioGroup _xRadioGroup;
+    private RadioGroup _yRadioGroup;
+    private TextField _hText;
+    private TextField _wText;
+    private TextField _xText;
+    private TextField _yText;
+    private View _curView;
 
     public override void Init () {
         // Don't create a sub-win (Scenario.Win); just use Application.Top
@@ -48,52 +48,60 @@ public class AllViewsTester : Scenario {
     }
 
     public override void Setup () {
-        var statusBar = new StatusBar (new StatusItem[] {
-                                                            new (Application.QuitKey,
-                                                                 $"{Application.QuitKey} to Quit",
-                                                                 () => Quit ()),
-                                                            new (KeyCode.F2,
-                                                                 "~F2~ Toggle Frame Ruler",
-                                                                 () => {
-                                                                     ConsoleDriver.Diagnostics ^=
-                                                                         ConsoleDriver.DiagnosticFlags.FrameRuler;
-                                                                     Application.Top.SetNeedsDisplay ();
-                                                                 }),
-                                                            new (KeyCode.F3,
-                                                                 "~F3~ Toggle Frame Padding",
-                                                                 () => {
-                                                                     ConsoleDriver.Diagnostics ^=
-                                                                         ConsoleDriver.DiagnosticFlags.FramePadding;
-                                                                     Application.Top.SetNeedsDisplay ();
-                                                                 })
-                                                        });
+        var statusBar = new StatusBar (
+            new StatusItem[] {
+                new (
+                    Application.QuitKey,
+                    $"{Application.QuitKey} to Quit",
+                    () => Quit ()
+                ),
+                new (
+                    KeyCode.F2,
+                    "~F2~ Toggle Frame Ruler",
+                    () => {
+                        ConsoleDriver.Diagnostics ^=
+                            ConsoleDriver.DiagnosticFlags.FrameRuler;
+                        Application.Top.SetNeedsDisplay ();
+                    }
+                ),
+                new (
+                    KeyCode.F3,
+                    "~F3~ Toggle Frame Padding",
+                    () => {
+                        ConsoleDriver.Diagnostics ^=
+                            ConsoleDriver.DiagnosticFlags.FramePadding;
+                        Application.Top.SetNeedsDisplay ();
+                    }
+                )
+            }
+        );
         Application.Top.Add (statusBar);
 
         _viewClasses = GetAllViewClassesCollection ()
-                       .OrderBy (t => t.Name)
-                       .Select (t => new KeyValuePair<string, Type> (t.Name, t))
-                       .ToDictionary (t => t.Key, t => t.Value);
+            .OrderBy (t => t.Name)
+            .Select (t => new KeyValuePair<string, Type> (t.Name, t))
+            .ToDictionary (t => t.Key, t => t.Value);
 
         _leftPane = new FrameView {
-                                      X = 0,
-                                      Y = 0,
-                                      Width = 15,
-                                      Height = Dim.Fill (1), // for status bar
-                                      CanFocus = false,
-                                      ColorScheme = Colors.ColorSchemes["TopLevel"],
-                                      Title = "Classes"
-                                  };
+            X = 0,
+            Y = 0,
+            Width = 15,
+            Height = Dim.Fill (1), // for status bar
+            CanFocus = false,
+            ColorScheme = Colors.ColorSchemes["TopLevel"],
+            Title = "Classes"
+        };
 
         _classListView = new ListView {
-                                          X = 0,
-                                          Y = 0,
-                                          Width = Dim.Fill (),
-                                          Height = Dim.Fill (),
-                                          AllowsMarking = false,
-                                          ColorScheme = Colors.ColorSchemes["TopLevel"],
-                                          SelectedItem = 0,
-                                          Source = new ListWrapper (_viewClasses.Keys.ToList ())
-                                      };
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            AllowsMarking = false,
+            ColorScheme = Colors.ColorSchemes["TopLevel"],
+            SelectedItem = 0,
+            Source = new ListWrapper (_viewClasses.Keys.ToList ())
+        };
         _classListView.OpenSelectedItem += (s, a) => { _settingsPane.SetFocus (); };
         _classListView.SelectedItemChanged += (s, args) => {
             // Remove existing class, if any
@@ -110,14 +118,14 @@ public class AllViewsTester : Scenario {
         _leftPane.Add (_classListView);
 
         _settingsPane = new FrameView {
-                                          X = Pos.Right (_leftPane),
-                                          Y = 0, // for menu
-                                          Width = Dim.Fill (),
-                                          Height = 10,
-                                          CanFocus = false,
-                                          ColorScheme = Colors.ColorSchemes["TopLevel"],
-                                          Title = "Settings"
-                                      };
+            X = Pos.Right (_leftPane),
+            Y = 0, // for menu
+            Width = Dim.Fill (),
+            Height = 10,
+            CanFocus = false,
+            ColorScheme = Colors.ColorSchemes["TopLevel"],
+            Title = "Settings"
+        };
         _computedCheckBox = new CheckBox { X = 0, Y = 0, Text = "_Computed Layout", Checked = true };
         _computedCheckBox.Toggled += (s, e) => {
             if (_curView != null) {
@@ -128,12 +136,12 @@ public class AllViewsTester : Scenario {
 
         string[] radioItems = { "_Percent(x)", "_AnchorEnd(x)", "_Center", "A_t(x)" };
         _locationFrame = new FrameView {
-                                           X = Pos.Left (_computedCheckBox),
-                                           Y = Pos.Bottom (_computedCheckBox),
-                                           Height = 3 + radioItems.Length,
-                                           Width = 36,
-                                           Title = "Location (Pos)"
-                                       };
+            X = Pos.Left (_computedCheckBox),
+            Y = Pos.Bottom (_computedCheckBox),
+            Height = 3 + radioItems.Length,
+            Width = 36,
+            Title = "Location (Pos)"
+        };
         _settingsPane.Add (_locationFrame);
 
         var label = new Label { X = 0, Y = 0, Text = "X:" };
@@ -169,12 +177,12 @@ public class AllViewsTester : Scenario {
         _locationFrame.Add (_yRadioGroup);
 
         _sizeFrame = new FrameView {
-                                       X = Pos.Right (_locationFrame),
-                                       Y = Pos.Y (_locationFrame),
-                                       Height = 3 + radioItems.Length,
-                                       Width = 40,
-                                       Title = "Size (Dim)"
-                                   };
+            X = Pos.Right (_locationFrame),
+            Y = Pos.Y (_locationFrame),
+            Height = 3 + radioItems.Length,
+            Width = 40,
+            Title = "Size (Dim)"
+        };
 
         radioItems = new[] { "_Percent(width)", "_Fill(width)", "_Sized(width)" };
         label = new Label { X = 0, Y = 0, Text = "Width:" };
@@ -234,12 +242,12 @@ public class AllViewsTester : Scenario {
         _settingsPane.Add (_sizeFrame);
 
         _hostPane = new FrameView {
-                                      X = Pos.Right (_leftPane),
-                                      Y = Pos.Bottom (_settingsPane),
-                                      Width = Dim.Fill (),
-                                      Height = Dim.Fill (1), // + 1 for status bar
-                                      ColorScheme = Colors.ColorSchemes["Dialog"]
-                                  };
+            X = Pos.Right (_leftPane),
+            Y = Pos.Bottom (_settingsPane),
+            Width = Dim.Fill (),
+            Height = Dim.Fill (1), // + 1 for status bar
+            ColorScheme = Colors.ColorSchemes["Dialog"]
+        };
 
         Application.Top.Add (_leftPane, _settingsPane, _hostPane);
 
@@ -368,9 +376,11 @@ public class AllViewsTester : Scenario {
     private List<Type> GetAllViewClassesCollection () {
         List<Type> types = new ();
         foreach (Type type in typeof (View).Assembly.GetTypes ()
-                                           .Where (myType =>
-                                                       myType.IsClass && !myType.IsAbstract && myType.IsPublic &&
-                                                       myType.IsSubclassOf (typeof (View)))) {
+                     .Where (
+                         myType =>
+                             myType.IsClass && !myType.IsAbstract && myType.IsPublic &&
+                             myType.IsSubclassOf (typeof (View))
+                     )) {
             types.Add (type);
         }
 

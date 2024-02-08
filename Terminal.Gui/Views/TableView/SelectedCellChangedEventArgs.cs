@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>Defines the event arguments for <see cref="TableView.SelectedCellChanged"/></summary>
 public class SelectedCellChangedEventArgs : EventArgs {

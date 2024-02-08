@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>Event args for events which relate to a single <see cref="Point"/></summary>
 public class PointEventArgs : EventArgs {

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 ///     Describes the thickness of a frame around a rectangle. Four <see cref="int"/> values describe the
@@ -15,22 +15,6 @@ namespace Terminal.Gui;
 ///     <para>Use the helper API (<see cref="Draw(Rect, string)"/> to draw the frame with the specified thickness.</para>
 /// </remarks>
 public class Thickness : IEquatable<Thickness> {
-    /// <summary>Gets or sets the width of the lower side of the rectangle.</summary>
-    [JsonInclude]
-    public int Bottom;
-
-    /// <summary>Gets or sets the width of the left side of the rectangle.</summary>
-    [JsonInclude]
-    public int Left;
-
-    /// <summary>Gets or sets the width of the right side of the rectangle.</summary>
-    [JsonInclude]
-    public int Right;
-
-    /// <summary>Gets or sets the width of the upper side of the rectangle.</summary>
-    [JsonInclude]
-    public int Top;
-
     /// <summary>Initializes a new instance of the <see cref="Thickness"/> class with all widths set to 0.</summary>
     public Thickness () { }
 
@@ -53,9 +37,21 @@ public class Thickness : IEquatable<Thickness> {
         Bottom = bottom;
     }
 
-    // TODO: add operator overloads
-    /// <summary>Gets an empty thickness.</summary>
-    public static Thickness Empty => new (0);
+    /// <summary>Gets or sets the width of the lower side of the rectangle.</summary>
+    [JsonInclude]
+    public int Bottom;
+
+    /// <summary>Gets or sets the width of the left side of the rectangle.</summary>
+    [JsonInclude]
+    public int Left;
+
+    /// <summary>Gets or sets the width of the right side of the rectangle.</summary>
+    [JsonInclude]
+    public int Right;
+
+    /// <summary>Gets or sets the width of the upper side of the rectangle.</summary>
+    [JsonInclude]
+    public int Top;
 
     /// <summary>
     ///     Gets the total width of the left and right sides of the rectangle. Sets the width of the left and rigth sides
@@ -68,6 +64,10 @@ public class Thickness : IEquatable<Thickness> {
     ///     sides of the rectangle to half the specified value.
     /// </summary>
     public int Vertical { get => Top + Bottom; set => Top = Bottom = value / 2; }
+
+    // TODO: add operator overloads
+    /// <summary>Gets an empty thickness.</summary>
+    public static Thickness Empty => new (0);
 
     // IEquitable
     /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
@@ -141,23 +141,27 @@ public class Thickness : IEquatable<Thickness> {
         // Draw the Right side			
         if (Right > 0) {
             Application.Driver.FillRect (
-                                         new Rect (
-                                                   Math.Max (0, rect.X + rect.Width - Right),
-                                                   rect.Y,
-                                                   Math.Min (rect.Width, Right),
-                                                   rect.Height),
-                                         rightChar);
+                new Rect (
+                    Math.Max (0, rect.X + rect.Width - Right),
+                    rect.Y,
+                    Math.Min (rect.Width, Right),
+                    rect.Height
+                ),
+                rightChar
+            );
         }
 
         // Draw the Bottom side
         if (Bottom > 0) {
             Application.Driver.FillRect (
-                                         new Rect (
-                                                   rect.X,
-                                                   rect.Y + Math.Max (0, rect.Height - Bottom),
-                                                   rect.Width,
-                                                   Bottom),
-                                         bottomChar);
+                new Rect (
+                    rect.X,
+                    rect.Y + Math.Max (0, rect.Height - Bottom),
+                    rect.Width,
+                    Bottom
+                ),
+                bottomChar
+            );
         }
 
         // TODO: This should be moved to LineCanvas as a new LineStyle.Ruler
@@ -190,10 +194,10 @@ public class Thickness : IEquatable<Thickness> {
             == ConsoleDriver.DiagnosticFlags.FramePadding) {
             // Draw the diagnostics label on the bottom
             var tf = new TextFormatter {
-                                           Text = label == null ? string.Empty : $"{label} {this}",
-                                           Alignment = TextAlignment.Centered,
-                                           VerticalAlignment = VerticalTextAlignment.Bottom
-                                       };
+                Text = label == null ? string.Empty : $"{label} {this}",
+                Alignment = TextAlignment.Centered,
+                VerticalAlignment = VerticalTextAlignment.Bottom
+            };
             tf.Draw (rect, Application.Driver.CurrentAttribute, Application.Driver.CurrentAttribute, rect, false);
         }
 

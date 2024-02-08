@@ -25,8 +25,10 @@ public partial class ColorTests {
     [Theory]
     [CombinatorialData]
     public void GeneratedEqualityOperators_BehaveAsExpected (
-        [CombinatorialValues (0, short.MaxValue, int.MaxValue, uint.MaxValue)] uint u1,
-        [CombinatorialValues (0, short.MaxValue, int.MaxValue, uint.MaxValue)] uint u2
+        [CombinatorialValues (0, short.MaxValue, int.MaxValue, uint.MaxValue)]
+        uint u1,
+        [CombinatorialValues (0, short.MaxValue, int.MaxValue, uint.MaxValue)]
+        uint u2
     ) {
         Color color1 = u1;
         Color color2 = u2;
@@ -52,8 +54,9 @@ public partial class ColorTests {
     [Theory]
     [Trait ("Category", "Operators")]
     [MemberData (
-                    nameof (ColorTestsTheoryDataGenerators.ExplicitOperator_FromColorName_RoundTripsCorrectly),
-                    MemberType = typeof (ColorTestsTheoryDataGenerators))]
+        nameof (ColorTestsTheoryDataGenerators.ExplicitOperator_FromColorName_RoundTripsCorrectly),
+        MemberType = typeof (ColorTestsTheoryDataGenerators)
+    )]
     public void ImplicitOperator_FromColorName_ReturnsCorrectColorValue (ColorName cname, Color expectedColor) {
         Color color = cname;
 
@@ -164,9 +167,8 @@ public partial class ColorTests {
 
 public static partial class ColorTestsTheoryDataGenerators {
     public static TheoryData<ColorName, Color> ExplicitOperator_FromColorName_RoundTripsCorrectly () {
-        TheoryData<ColorName, Color> data =  []
-
-        ;
+        TheoryData<ColorName, Color> data = []
+            ;
         data.Add (ColorName.Black, new Color (12, 12, 12));
         data.Add (ColorName.Blue, new Color (0, 55, 218));
         data.Add (ColorName.Green, new Color (19, 161, 14));
@@ -188,39 +190,50 @@ public static partial class ColorTestsTheoryDataGenerators {
     }
 
     public static TheoryData<FieldInfo, int> Fields_At_Expected_Offsets () {
-        TheoryData<FieldInfo, int> data =  []
-
-        ;
+        TheoryData<FieldInfo, int> data = []
+            ;
         data.Add (
-                  typeof (Color).GetField (
-                                           "Argb",
-                                           BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding),
-                  0);
+            typeof (Color).GetField (
+                "Argb",
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding
+            ),
+            0
+        );
         data.Add (
-                  typeof (Color).GetField (
-                                           "Rgba",
-                                           BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding),
-                  0);
+            typeof (Color).GetField (
+                "Rgba",
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding
+            ),
+            0
+        );
         data.Add (
-                  typeof (Color).GetField (
-                                           "B",
-                                           BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding),
-                  0);
+            typeof (Color).GetField (
+                "B",
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding
+            ),
+            0
+        );
         data.Add (
-                  typeof (Color).GetField (
-                                           "G",
-                                           BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding),
-                  1);
+            typeof (Color).GetField (
+                "G",
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding
+            ),
+            1
+        );
         data.Add (
-                  typeof (Color).GetField (
-                                           "R",
-                                           BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding),
-                  2);
+            typeof (Color).GetField (
+                "R",
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding
+            ),
+            2
+        );
         data.Add (
-                  typeof (Color).GetField (
-                                           "A",
-                                           BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding),
-                  3);
+            typeof (Color).GetField (
+                "A",
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding
+            ),
+            3
+        );
 
         return data;
     }

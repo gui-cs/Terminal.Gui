@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 class DictionaryJsonConverter<T> : JsonConverter<Dictionary<string, T>> {
     public override Dictionary<string, T> Read (
@@ -13,7 +13,7 @@ class DictionaryJsonConverter<T> : JsonConverter<Dictionary<string, T>> {
             throw new JsonException ($"Expected a JSON array (\"[ {{ ... }} ]\"), but got \"{reader.TokenType}\".");
         }
 
-        Dictionary<string, T> dictionary = new Dictionary<string, T> ();
+        Dictionary<string, T> dictionary = new ();
         while (reader.Read ()) {
             if (reader.TokenType == JsonTokenType.StartObject) {
                 reader.Read ();

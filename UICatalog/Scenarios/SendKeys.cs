@@ -7,54 +7,25 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Mouse and Keyboard")]
 public class SendKeys : Scenario {
     public override void Setup () {
-        var label = new Label {
-                                  X = Pos.Center (),
-                                  Y = Pos.Center () - 6,
-                                  Text = "Insert the text to send:"
-                              };
+        var label = new Label { X = Pos.Center (), Y = Pos.Center () - 6, Text = "Insert the text to send:" };
         Win.Add (label);
 
-        var txtInput = new TextField {
-                                         X = Pos.Center (),
-                                         Y = Pos.Center () - 5,
-                                         Width = 20,
-                                         Text = "MockKeyPresses"
-                                     };
+        var txtInput = new TextField { X = Pos.Center (), Y = Pos.Center () - 5, Width = 20, Text = "MockKeyPresses" };
         Win.Add (txtInput);
 
-        var ckbShift = new CheckBox {
-                                        X = Pos.Center (),
-                                        Y = Pos.Center () - 4,
-                                        Text = "Shift"
-                                    };
+        var ckbShift = new CheckBox { X = Pos.Center (), Y = Pos.Center () - 4, Text = "Shift" };
         Win.Add (ckbShift);
 
-        var ckbAlt = new CheckBox {
-                                      X = Pos.Center (),
-                                      Y = Pos.Center () - 3,
-                                      Text = "Alt"
-                                  };
+        var ckbAlt = new CheckBox { X = Pos.Center (), Y = Pos.Center () - 3, Text = "Alt" };
         Win.Add (ckbAlt);
 
-        var ckbControl = new CheckBox {
-                                          X = Pos.Center (),
-                                          Y = Pos.Center () - 2,
-                                          Text = "Control"
-                                      };
+        var ckbControl = new CheckBox { X = Pos.Center (), Y = Pos.Center () - 2, Text = "Control" };
         Win.Add (ckbControl);
 
-        label = new Label {
-                              X = Pos.Center (),
-                              Y = Pos.Center () + 1,
-                              Text = "Result keys:"
-                          };
+        label = new Label { X = Pos.Center (), Y = Pos.Center () + 1, Text = "Result keys:" };
         Win.Add (label);
 
-        var txtResult = new TextField {
-                                          X = Pos.Center (),
-                                          Y = Pos.Center () + 2,
-                                          Width = 20
-                                      };
+        var txtResult = new TextField { X = Pos.Center (), Y = Pos.Center () + 2, Width = 20 };
         Win.Add (txtResult);
 
         var rKeys = "";
@@ -81,26 +52,13 @@ public class SendKeys : Scenario {
             }
         };
 
-        var lblShippedKeys = new Label {
-                                           X = Pos.Center (),
-                                           Y = Pos.Center () + 3,
-                                           AutoSize = true
-                                       };
+        var lblShippedKeys = new Label { X = Pos.Center (), Y = Pos.Center () + 3, AutoSize = true };
         Win.Add (lblShippedKeys);
 
-        var lblShippedControlKeys = new Label {
-                                                  X = Pos.Center (),
-                                                  Y = Pos.Center () + 5,
-                                                  AutoSize = true
-                                              };
+        var lblShippedControlKeys = new Label { X = Pos.Center (), Y = Pos.Center () + 5, AutoSize = true };
         Win.Add (lblShippedControlKeys);
 
-        var button = new Button {
-                                    X = Pos.Center (),
-                                    Y = Pos.Center () + 7,
-                                    IsDefault = true,
-                                    Text = "Process keys"
-                                };
+        var button = new Button { X = Pos.Center (), Y = Pos.Center () + 7, IsDefault = true, Text = "Process keys" };
         Win.Add (button);
 
         void ProcessInput () {
@@ -116,11 +74,12 @@ public class SendKeys : Scenario {
                                     ? (ConsoleKey)char.ToUpper (r)
                                     : (ConsoleKey)r;
                 Application.Driver.SendKeys (
-                                             r,
-                                             ck,
-                                             (bool)ckbShift.Checked,
-                                             (bool)ckbAlt.Checked,
-                                             (bool)ckbControl.Checked);
+                    r,
+                    ck,
+                    (bool)ckbShift.Checked,
+                    (bool)ckbAlt.Checked,
+                    (bool)ckbControl.Checked
+                );
             }
 
             lblShippedKeys.Text = rKeys;

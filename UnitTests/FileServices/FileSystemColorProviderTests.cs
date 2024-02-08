@@ -1,4 +1,4 @@
-namespace Terminal.Gui.FileServicesTests; 
+namespace Terminal.Gui.FileServicesTests;
 
 public class FileSystemColorProviderTests {
     [Fact]

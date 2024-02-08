@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Shared abstract class to enforce rules from the implementation of the <see cref="IClipboard"/> interface.</summary>
 public abstract class ClipboardBase : IClipboard {

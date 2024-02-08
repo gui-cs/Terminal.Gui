@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>Event arguments for events about <see cref="RunState"/></summary>
 public class RunStateEventArgs : EventArgs {

@@ -6,8 +6,8 @@ namespace Terminal.Gui.ViewsTests;
 #region Helper Classes
 
 class FakeHAxis : HorizontalAxis {
-    public List<Point> DrawAxisLinePoints = new ();
     public List<int> LabelPoints = new ();
+    public List<Point> DrawAxisLinePoints = new ();
 
     public override void DrawAxisLabel (GraphView graph, int screenPosition, string text) {
         base.DrawAxisLabel (graph, screenPosition, text);
@@ -21,8 +21,8 @@ class FakeHAxis : HorizontalAxis {
 }
 
 class FakeVAxis : VerticalAxis {
-    public List<Point> DrawAxisLinePoints = new ();
     public List<int> LabelPoints = new ();
+    public List<Point> DrawAxisLinePoints = new ();
 
     public override void DrawAxisLabel (GraphView graph, int screenPosition, string text) {
         base.DrawAxisLabel (graph, screenPosition, text);
@@ -94,8 +94,9 @@ public class GraphViewTests {
             // that the test that didn't shutdown won't be the one currently running it will
             // be the last one
             throw new Exception (
-                                 "A test did not call shutdown correctly.  Test stack trace was:" +
-                                 LastInitFakeDriver);
+                "A test did not call shutdown correctly.  Test stack trace was:" +
+                LastInitFakeDriver
+            );
         }
 
         driver.Init ();
@@ -136,30 +137,38 @@ public class GraphViewTests {
                 var epsilon = 0.0001f;
 
                 Point p = gv.GraphSpaceToScreen (
-                                                 new PointF (
-                                                             graphSpace.Left + epsilon,
-                                                             graphSpace.Top + epsilon));
+                    new PointF (
+                        graphSpace.Left + epsilon,
+                        graphSpace.Top + epsilon
+                    )
+                );
                 Assert.Equal (x, p.X);
                 Assert.Equal (y, p.Y);
 
                 p = gv.GraphSpaceToScreen (
-                                           new PointF (
-                                                       graphSpace.Right - epsilon,
-                                                       graphSpace.Top + epsilon));
+                    new PointF (
+                        graphSpace.Right - epsilon,
+                        graphSpace.Top + epsilon
+                    )
+                );
                 Assert.Equal (x, p.X);
                 Assert.Equal (y, p.Y);
 
                 p = gv.GraphSpaceToScreen (
-                                           new PointF (
-                                                       graphSpace.Left + epsilon,
-                                                       graphSpace.Bottom - epsilon));
+                    new PointF (
+                        graphSpace.Left + epsilon,
+                        graphSpace.Bottom - epsilon
+                    )
+                );
                 Assert.Equal (x, p.X);
                 Assert.Equal (y, p.Y);
 
                 p = gv.GraphSpaceToScreen (
-                                           new PointF (
-                                                       graphSpace.Right - epsilon,
-                                                       graphSpace.Bottom - epsilon));
+                    new PointF (
+                        graphSpace.Right - epsilon,
+                        graphSpace.Bottom - epsilon
+                    )
+                );
                 Assert.Equal (x, p.X);
                 Assert.Equal (y, p.Y);
             }
@@ -421,10 +430,11 @@ public class SeriesTests {
         var graphScreenBounds = Rect.Empty;
 
         var series = new FakeSeries (
-                                     (v, s, g) => {
-                                         graphScreenBounds = s;
-                                         fullGraphBounds = g;
-                                     });
+            (v, s, g) => {
+                graphScreenBounds = s;
+                fullGraphBounds = g;
+            }
+        );
         gv.Series.Add (series);
 
         gv.LayoutSubviews ();
@@ -473,10 +483,11 @@ public class SeriesTests {
         var graphScreenBounds = Rect.Empty;
 
         var series = new FakeSeries (
-                                     (v, s, g) => {
-                                         graphScreenBounds = s;
-                                         fullGraphBounds = g;
-                                     });
+            (v, s, g) => {
+                graphScreenBounds = s;
+                fullGraphBounds = g;
+            }
+        );
 
         gv.Series.Add (series);
 
@@ -508,13 +519,13 @@ public class SeriesTests {
     }
 
     private class FakeSeries : ISeries {
-        private readonly Action<GraphView, Rect, RectangleF> _drawSeries;
-
         public FakeSeries (
             Action<GraphView, Rect, RectangleF> drawSeries
         ) {
             _drawSeries = drawSeries;
         }
+
+        private readonly Action<GraphView, Rect, RectangleF> _drawSeries;
 
         public void DrawSeries (GraphView graph, Rect bounds, RectangleF graphBounds) {
             _drawSeries (graph, bounds, graphBounds);
@@ -523,8 +534,8 @@ public class SeriesTests {
 }
 
 public class MultiBarSeriesTests {
-    private readonly ITestOutputHelper _output;
     public MultiBarSeriesTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void MultiBarSeries_BarSpacing () {
@@ -548,17 +559,16 @@ public class MultiBarSeriesTests {
         var ex = Assert.Throws<ArgumentException> (() => series.AddBars ("Cars", (Rune)'#', 1));
 
         Assert.Equal (
-                      "Number of values must match the number of bars per category (Parameter 'values')",
-                      ex.Message);
+            "Number of values must match the number of bars per category (Parameter 'values')",
+            ex.Message
+        );
     }
 
     [Fact]
     public void MultiBarSeriesColors_RightNumber () {
         Attribute[] colors = {
-                                 new (Color.Green, Color.Black),
-                                 new (Color.Green, Color.White),
-                                 new (Color.BrightYellow, Color.White)
-                             };
+            new (Color.Green, Color.Black), new (Color.Green, Color.White), new (Color.BrightYellow, Color.White)
+        };
 
         // user passes 3 colors and asks for 3 bars
         var series = new MultiBarSeries (3, 7, 1, colors);
@@ -573,15 +583,14 @@ public class MultiBarSeriesTests {
 
     [Fact]
     public void MultiBarSeriesColors_WrongNumber () {
-        Attribute[] colors = {
-                                 new (Color.Green, Color.Black)
-                             };
+        Attribute[] colors = { new (Color.Green, Color.Black) };
 
         // user passes 1 color only but asks for 5 bars
         var ex = Assert.Throws<ArgumentException> (() => new MultiBarSeries (5, 7, 1, colors));
         Assert.Equal (
-                      "Number of colors must match the number of bars (Parameter 'numberOfBarsPerCategory')",
-                      ex.Message);
+            "Number of colors must match the number of bars (Parameter 'numberOfBarsPerCategory')",
+            ex.Message
+        );
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -684,11 +693,13 @@ public class BarSeriesTests {
 
         // 1 bar that is very wide (100 graph units horizontally = screen pos 50 but bounded by screen)
         barSeries.Bars.Add (
-                            new BarSeriesBar ("hi1", new GraphCellToRender ((Rune)'.'), 100));
+            new BarSeriesBar ("hi1", new GraphCellToRender ((Rune)'.'), 100)
+        );
 
         // 1 bar that is shorter
         barSeries.Bars.Add (
-                            new BarSeriesBar ("hi2", new GraphCellToRender ((Rune)'.'), 5));
+            new BarSeriesBar ("hi2", new GraphCellToRender ((Rune)'.'), 5)
+        );
 
         // redraw graph
         graph.Draw ();
@@ -743,9 +754,11 @@ public class BarSeriesTests {
         barSeries.BarEvery = 1f;
 
         barSeries.Bars.Add (
-                            new BarSeriesBar ("hi1", new GraphCellToRender ((Rune)'.'), 100));
+            new BarSeriesBar ("hi1", new GraphCellToRender ((Rune)'.'), 100)
+        );
         barSeries.Bars.Add (
-                            new BarSeriesBar ("hi2", new GraphCellToRender ((Rune)'.'), 100));
+            new BarSeriesBar ("hi2", new GraphCellToRender ((Rune)'.'), 100)
+        );
 
         barSeries.Orientation = Orientation.Vertical;
 
@@ -831,11 +844,11 @@ public class BarSeriesTests {
     }
 
     private class FakeBarSeries : BarSeries {
+        public GraphCellToRender FinalColor { get; private set; }
+
         public List<Point> BarScreenEnds { get; } = new ();
 
         public List<Point> BarScreenStarts { get; } = new ();
-
-        public GraphCellToRender FinalColor { get; private set; }
 
         protected override GraphCellToRender AdjustColor (GraphCellToRender graphCellToRender) {
             return FinalColor = base.AdjustColor (graphCellToRender);
@@ -1021,8 +1034,8 @@ public class AxisTests {
 }
 
 public class TextAnnotationTests {
-    private readonly ITestOutputHelper _output;
     public TextAnnotationTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Theory]
     [InlineData (null)]
@@ -1032,10 +1045,8 @@ public class TextAnnotationTests {
         GraphView gv = GraphViewTests.GetGraph ();
 
         gv.Annotations.Add (
-                            new TextAnnotation {
-                                                   Text = whitespace,
-                                                   GraphPosition = new PointF (4, 2)
-                                               });
+            new TextAnnotation { Text = whitespace, GraphPosition = new PointF (4, 2) }
+        );
 
         // add a point a bit further along the graph so if the whitespace were rendered
         // the test would pick it up (AssertDriverContentsAre ignores trailing whitespace on lines)
@@ -1048,7 +1059,9 @@ public class TextAnnotationTests {
         var expected =
             @$"
  │
- ┤      {CM.Glyphs.Dot}
+ ┤      {
+     CM.Glyphs.Dot
+ }
  ┤
 0┼┬┬┬┬┬┬┬┬
  0    5";
@@ -1064,10 +1077,8 @@ public class TextAnnotationTests {
         GraphView gv = GraphViewTests.GetGraph ();
 
         gv.Annotations.Add (
-                            new TextAnnotation {
-                                                   Text = "hey!",
-                                                   GraphPosition = new PointF (2, 2)
-                                               });
+            new TextAnnotation { Text = "hey!", GraphPosition = new PointF (2, 2) }
+        );
 
         gv.LayoutSubviews ();
         gv.Draw ();
@@ -1109,10 +1120,10 @@ public class TextAnnotationTests {
         GraphView gv = GraphViewTests.GetGraph ();
 
         gv.Annotations.Add (
-                            new TextAnnotation {
-                                                   Text = "hey there partner hows it going boy its great",
-                                                   GraphPosition = new PointF (2, 2)
-                                               });
+            new TextAnnotation {
+                Text = "hey there partner hows it going boy its great", GraphPosition = new PointF (2, 2)
+            }
+        );
 
         gv.LayoutSubviews ();
         gv.Draw ();
@@ -1140,10 +1151,10 @@ public class TextAnnotationTests {
         GraphView gv = GraphViewTests.GetGraph ();
 
         gv.Annotations.Add (
-                            new TextAnnotation {
-                                                   Text = "hey there partner hows it going boy its great",
-                                                   GraphPosition = new PointF (9, 2)
-                                               });
+            new TextAnnotation {
+                Text = "hey there partner hows it going boy its great", GraphPosition = new PointF (9, 2)
+            }
+        );
 
         gv.LayoutSubviews ();
         gv.Draw ();
@@ -1168,10 +1179,8 @@ public class TextAnnotationTests {
         GraphView gv = GraphViewTests.GetGraph ();
 
         gv.Annotations.Add (
-                            new TextAnnotation {
-                                                   Text = "hey!",
-                                                   ScreenPosition = new Point (3, 1)
-                                               });
+            new TextAnnotation { Text = "hey!", ScreenPosition = new Point (3, 1) }
+        );
         gv.LayoutSubviews ();
         gv.Draw ();
 
@@ -1225,8 +1234,8 @@ public class TextAnnotationTests {
 }
 
 public class LegendTests {
-    private readonly ITestOutputHelper _output;
     public LegendTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void Constructors_Defaults () {
@@ -1300,61 +1309,8 @@ public class LegendTests {
 }
 
 public class PathAnnotationTests {
-    private readonly ITestOutputHelper _output;
     public PathAnnotationTests (ITestOutputHelper output) { _output = output; }
-
-    [Theory]
-    [InlineData (true)]
-    [InlineData (false)]
-    public void ViewChangeText_RendersCorrectly (bool useFill) {
-        var driver = new FakeDriver ();
-        Application.Init (driver);
-        driver.Init ();
-
-        // create a wide window
-        var mount = new View {
-                                 Width = 100,
-                                 Height = 100
-                             };
-
-        try {
-            // Create a view with a short text 
-            var view = new View { Text = "ff", Width = 2, Height = 1 };
-
-            // Specify that the label should be very wide
-            if (useFill) {
-                view.Width = Dim.Fill ();
-            } else {
-                view.Width = 100;
-            }
-
-            //put label into view
-            mount.Add (view);
-
-            //putting mount into Toplevel since changing size
-            //also change AutoSize to false
-            Application.Top.Add (mount);
-            Application.Begin (Application.Top);
-
-            // render view
-            view.ColorScheme = new ColorScheme ();
-            Assert.Equal (1, view.Height);
-            mount.Draw ();
-
-            // should have the initial text
-            TestHelpers.AssertDriverContentsAre ("ff", null);
-
-            // change the text and redraw
-            view.Text = "ff1234";
-            mount.Draw ();
-
-            // should have the new text rendered
-            TestHelpers.AssertDriverContentsAre ("ff1234", null);
-        }
-        finally {
-            Application.Shutdown ();
-        }
-    }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void MarginBottom_BiggerThanHeight_ExpectBlankGraph () {
@@ -1363,9 +1319,8 @@ public class PathAnnotationTests {
         gv.MarginBottom = 20;
 
         gv.Series.Add (
-                       new ScatterSeries {
-                                             Points = { new PointF (1, 1), new PointF (5, 0) }
-                                         });
+            new ScatterSeries { Points = { new PointF (1, 1), new PointF (5, 0) } }
+        );
 
         gv.LayoutSubviews ();
         gv.Draw ();
@@ -1388,9 +1343,8 @@ public class PathAnnotationTests {
         gv.MarginLeft = 20;
 
         gv.Series.Add (
-                       new ScatterSeries {
-                                             Points = { new PointF (1, 1), new PointF (5, 0) }
-                                         });
+            new ScatterSeries { Points = { new PointF (1, 1), new PointF (5, 0) } }
+        );
 
         gv.LayoutSubviews ();
         gv.Draw ();
@@ -1470,22 +1424,68 @@ public class PathAnnotationTests {
         Application.Shutdown ();
     }
 
+    [Theory]
+    [InlineData (true)]
+    [InlineData (false)]
+    public void ViewChangeText_RendersCorrectly (bool useFill) {
+        var driver = new FakeDriver ();
+        Application.Init (driver);
+        driver.Init ();
+
+        // create a wide window
+        var mount = new View { Width = 100, Height = 100 };
+
+        try {
+            // Create a view with a short text 
+            var view = new View { Text = "ff", Width = 2, Height = 1 };
+
+            // Specify that the label should be very wide
+            if (useFill) {
+                view.Width = Dim.Fill ();
+            } else {
+                view.Width = 100;
+            }
+
+            //put label into view
+            mount.Add (view);
+
+            //putting mount into Toplevel since changing size
+            //also change AutoSize to false
+            Application.Top.Add (mount);
+            Application.Begin (Application.Top);
+
+            // render view
+            view.ColorScheme = new ColorScheme ();
+            Assert.Equal (1, view.Height);
+            mount.Draw ();
+
+            // should have the initial text
+            TestHelpers.AssertDriverContentsAre ("ff", null);
+
+            // change the text and redraw
+            view.Text = "ff1234";
+            mount.Draw ();
+
+            // should have the new text rendered
+            TestHelpers.AssertDriverContentsAre ("ff1234", null);
+        }
+        finally {
+            Application.Shutdown ();
+        }
+    }
+
     [Fact]
     public void XAxisLabels_With_MarginLeft () {
         GraphViewTests.InitFakeDriver ();
-        var gv = new GraphView {
-                                   ColorScheme = new ColorScheme (),
-                                   Bounds = new Rect (0, 0, 10, 7)
-                               };
+        var gv = new GraphView { ColorScheme = new ColorScheme (), Bounds = new Rect (0, 0, 10, 7) };
 
         gv.CellSize = new PointF (1, 0.5f);
         gv.AxisY.Increment = 1;
         gv.AxisY.ShowLabelsEvery = 1;
 
         gv.Series.Add (
-                       new ScatterSeries {
-                                             Points = { new PointF (1, 1), new PointF (5, 0) }
-                                         });
+            new ScatterSeries { Points = { new PointF (1, 1), new PointF (5, 0) } }
+        );
 
         // reserve 3 cells of the left for the margin
         gv.MarginLeft = 3;
@@ -1499,9 +1499,13 @@ public class PathAnnotationTests {
    │
   2┤
    │
-  1┤{CM.Glyphs.Dot}
+  1┤{
+      CM.Glyphs.Dot
+  }
    │ 
-  0┼┬┬┬┬{CM.Glyphs.Dot}┬
+  0┼┬┬┬┬{
+      CM.Glyphs.Dot
+  }┬
    0    5
          
           ";
@@ -1514,19 +1518,15 @@ public class PathAnnotationTests {
     [Fact]
     public void YAxisLabels_With_MarginBottom () {
         GraphViewTests.InitFakeDriver ();
-        var gv = new GraphView {
-                                   ColorScheme = new ColorScheme (),
-                                   Bounds = new Rect (0, 0, 10, 7)
-                               };
+        var gv = new GraphView { ColorScheme = new ColorScheme (), Bounds = new Rect (0, 0, 10, 7) };
 
         gv.CellSize = new PointF (1, 0.5f);
         gv.AxisY.Increment = 1;
         gv.AxisY.ShowLabelsEvery = 1;
 
         gv.Series.Add (
-                       new ScatterSeries {
-                                             Points = { new PointF (1, 1), new PointF (5, 0) }
-                                         });
+            new ScatterSeries { Points = { new PointF (1, 1), new PointF (5, 0) } }
+        );
 
         // reserve 3 cells of the console for the margin
         gv.MarginBottom = 3;
@@ -1538,9 +1538,13 @@ public class PathAnnotationTests {
         var expected =
             @$"
  │
-1┤{CM.Glyphs.Dot}
+1┤{
+    CM.Glyphs.Dot
+}
  │ 
-0┼┬┬┬┬{CM.Glyphs.Dot}┬┬┬
+0┼┬┬┬┬{
+    CM.Glyphs.Dot
+}┬┬┬
  0    5   
           
           ";

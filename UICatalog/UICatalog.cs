@@ -341,53 +341,55 @@ class UICatalogApp {
             _themeMenuItems = CreateThemeMenuItems ();
             _themeMenuBarItem = new MenuBarItem ("_Themes", _themeMenuItems);
             MenuBar = new MenuBar {
-                Menus =  [
-                new MenuBarItem ("_File",
-                new MenuItem[] {
-                    new (
-                        "_Quit",
-                        "Quit UI Catalog",
-                        RequestStop
-                    )
-                }),
-                _themeMenuBarItem,
-                new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems ()),
-                new MenuBarItem (
-                        "_Help",
-                        new MenuItem[] {
-                            new (
-                                "_Documentation",
-                                "",
-                                () => OpenUrl ("https://gui-cs.github.io/Terminal.GuiV2Docs"),
-                                null,
-                                null,
-                                (KeyCode)Key.F1
+                Menus = [
+                            new MenuBarItem (
+                                "_File",
+                                new MenuItem[] {
+                                    new (
+                                        "_Quit",
+                                        "Quit UI Catalog",
+                                        RequestStop
+                                    )
+                                }
                             ),
-                            new (
-                                "_README",
-                                "",
-                                () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"),
-                                null,
-                                null,
-                                (KeyCode)Key.F2
-                            ),
-                            new (
-                                "_About...",
-                                "About UI Catalog",
-                                () => MessageBox.Query (
-                                    "About UI Catalog",
-                                    _aboutMessage!.ToString (),
-                                    0,
-                                    false,
-                                    "_Ok"
-                                ),
-                                null,
-                                null,
-                                (KeyCode)Key.A.WithCtrl
+                            _themeMenuBarItem,
+                            new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems ()),
+                            new MenuBarItem (
+                                "_Help",
+                                new MenuItem[] {
+                                    new (
+                                        "_Documentation",
+                                        "",
+                                        () => OpenUrl ("https://gui-cs.github.io/Terminal.GuiV2Docs"),
+                                        null,
+                                        null,
+                                        (KeyCode)Key.F1
+                                    ),
+                                    new (
+                                        "_README",
+                                        "",
+                                        () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"),
+                                        null,
+                                        null,
+                                        (KeyCode)Key.F2
+                                    ),
+                                    new (
+                                        "_About...",
+                                        "About UI Catalog",
+                                        () => MessageBox.Query (
+                                            "About UI Catalog",
+                                            _aboutMessage!.ToString (),
+                                            0,
+                                            false,
+                                            "_Ok"
+                                        ),
+                                        null,
+                                        null,
+                                        (KeyCode)Key.A.WithCtrl
+                                    )
+                                }
                             )
-                        }
-                    )
-                    ]
+                        ]
             };
 
             DriverName = new StatusItem (Key.Empty, "Driver:", null);

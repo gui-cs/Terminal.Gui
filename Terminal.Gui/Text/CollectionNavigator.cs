@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <inheritdoc/>
 /// <remarks>This implementation is based on a static <see cref="Collection"/> of objects.</remarks>

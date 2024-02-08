@@ -6,7 +6,7 @@
 
 using System.ComponentModel;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Stores the location and size of a rectangular region.</summary>
 public struct RectangleF : IEquatable<RectangleF> {

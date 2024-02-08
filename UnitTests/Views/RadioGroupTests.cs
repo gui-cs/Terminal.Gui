@@ -3,8 +3,8 @@
 namespace Terminal.Gui.ViewsTests;
 
 public class RadioGroupTests {
-    private readonly ITestOutputHelper _output;
     public RadioGroupTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void Constructors_Defaults () {
@@ -21,27 +21,20 @@ public class RadioGroupTests {
         Assert.Equal (0, rg.SelectedItem);
 
         rg = new RadioGroup {
-                                X = 1,
-                                Y = 2,
-                                Width = 20,
-                                Height = 5,
-                                RadioLabels = new[] { "Test" }
-                            };
+            X = 1,
+            Y = 2,
+            Width = 20,
+            Height = 5,
+            RadioLabels = new[] { "Test" }
+        };
         Assert.True (rg.CanFocus);
         Assert.Single (rg.RadioLabels);
         Assert.Equal (new Rect (1, 2, 20, 5), rg.Frame);
         Assert.Equal (0, rg.SelectedItem);
 
-        rg = new RadioGroup {
-                                X = 1,
-                                Y = 2,
-                                RadioLabels = new[] { "Test" }
-                            };
+        rg = new RadioGroup { X = 1, Y = 2, RadioLabels = new[] { "Test" } };
 
-        var view = new View {
-                                Width = 30,
-                                Height = 40
-                            };
+        var view = new View { Width = 30, Height = 40 };
         view.Add (rg);
         view.BeginInit ();
         view.EndInit ();
@@ -137,10 +130,7 @@ public class RadioGroupTests {
     [AutoInitShutdown]
     public void Orientation_Width_Height_Vertical_Horizontal_Space () {
         var rg = new RadioGroup { RadioLabels = new[] { "Test", "New Test 你" } };
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (rg);
         Application.Top.Add (win);
 
@@ -155,8 +145,12 @@ public class RadioGroupTests {
         Assert.Equal (2, rg.Frame.Height);
         var expected = @$"
 ┌────────────────────────────┐
-│{CM.Glyphs.Selected} Test                      │
-│{CM.Glyphs.UnSelected} New Test 你               │
+│{
+    CM.Glyphs.Selected
+} Test                      │
+│{
+    CM.Glyphs.UnSelected
+} New Test 你               │
 │                            │
 └────────────────────────────┘
 ";
@@ -176,7 +170,11 @@ public class RadioGroupTests {
 
         expected = @$"
 ┌────────────────────────────┐
-│{CM.Glyphs.Selected} Test  {CM.Glyphs.UnSelected} New Test 你       │
+│{
+    CM.Glyphs.Selected
+} Test  {
+    CM.Glyphs.UnSelected
+} New Test 你       │
 │                            │
 │                            │
 └────────────────────────────┘
@@ -196,7 +194,11 @@ public class RadioGroupTests {
         Assert.Equal (1, rg.Height);
         expected = @$"
 ┌────────────────────────────┐
-│{CM.Glyphs.Selected} Test    {CM.Glyphs.UnSelected} New Test 你     │
+│{
+    CM.Glyphs.Selected
+} Test    {
+    CM.Glyphs.UnSelected
+} New Test 你     │
 │                            │
 │                            │
 └────────────────────────────┘

@@ -108,10 +108,14 @@ public partial class ColorTests {
     [Theory]
     [CombinatorialData]
     public void Constructor_WithInt32RGBAValues_AllValuesCorrect (
-        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int r,
-        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int g,
-        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int b,
-        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int a
+        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)]
+        int r,
+        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)]
+        int g,
+        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)]
+        int b,
+        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)]
+        int a
     ) {
         var color = new Color (r, g, b, a);
 
@@ -126,9 +130,12 @@ public partial class ColorTests {
     [Theory]
     [CombinatorialData]
     public void Constructor_WithInt32RGBValues_AllValuesCorrect (
-        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int r,
-        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int g,
-        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int b
+        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)]
+        int r,
+        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)]
+        int g,
+        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)]
+        int b
     ) {
         var color = new Color (r, g, b);
 
@@ -143,7 +150,8 @@ public partial class ColorTests {
     [Theory]
     [CombinatorialData]
     public void Constructor_WithString_EmptyOrWhitespace_ThrowsArgumentException (
-        [CombinatorialValues ("", "\t", " ", "\r", "\r\n", "\n", "   ")] string badString
+        [CombinatorialValues ("", "\t", " ", "\r", "\r\n", "\n", "   ")]
+        string badString
     ) {
         Assert.Throws<ArgumentException> (() => Color.Parse (badString));
     }

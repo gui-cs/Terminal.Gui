@@ -1,156 +1,169 @@
-﻿namespace Terminal.Gui.TypeTests; 
+﻿namespace Terminal.Gui.TypeTests;
 
 public class RectTests {
     [Theory]
 
     // Empty
     [InlineData (
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0)]
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+    )]
     [InlineData (
-                    0,
-                    0,
-                    0,
-                    0,
-                    1,
-                    0,
-                    -1,
-                    0,
-                    2,
-                    0)]
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        -1,
+        0,
+        2,
+        0
+    )]
     [InlineData (
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    1,
-                    0,
-                    -1,
-                    0,
-                    2)]
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        -1,
+        0,
+        2
+    )]
     [InlineData (
-                    0,
-                    0,
-                    0,
-                    0,
-                    1,
-                    1,
-                    -1,
-                    -1,
-                    2,
-                    2)]
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        -1,
+        -1,
+        2,
+        2
+    )]
     [InlineData (
-                    0,
-                    0,
-                    0,
-                    0,
-                    -1,
-                    -1, // Throws
-                    0,
-                    0,
-                    0,
-                    0)]
+        0,
+        0,
+        0,
+        0,
+        -1,
+        -1, // Throws
+        0,
+        0,
+        0,
+        0
+    )]
 
     // Zero location, Size of 1
     [InlineData (
-                    0,
-                    0,
-                    1,
-                    1,
-                    0,
-                    0,
-                    0,
-                    0,
-                    1,
-                    1)]
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1
+    )]
     [InlineData (
-                    0,
-                    0,
-                    1,
-                    1,
-                    1,
-                    0,
-                    -1,
-                    0,
-                    3,
-                    1)]
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        -1,
+        0,
+        3,
+        1
+    )]
     [InlineData (
-                    0,
-                    0,
-                    1,
-                    1,
-                    0,
-                    1,
-                    0,
-                    -1,
-                    1,
-                    3)]
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        0,
+        -1,
+        1,
+        3
+    )]
     [InlineData (
-                    0,
-                    0,
-                    1,
-                    1,
-                    1,
-                    1,
-                    -1,
-                    -1,
-                    3,
-                    3)]
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        -1,
+        -1,
+        3,
+        3
+    )]
 
     // Positive location, Size of 1
     [InlineData (
-                    1,
-                    1,
-                    1,
-                    1,
-                    0,
-                    0,
-                    1,
-                    1,
-                    1,
-                    1)]
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1
+    )]
     [InlineData (
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    0,
-                    0,
-                    1,
-                    3,
-                    1)]
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        1,
+        3,
+        1
+    )]
     [InlineData (
-                    1,
-                    1,
-                    1,
-                    1,
-                    0,
-                    1,
-                    1,
-                    0,
-                    1,
-                    3)]
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        1,
+        3
+    )]
     [InlineData (
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    0,
-                    0,
-                    3,
-                    3)]
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        3,
+        3
+    )]
     public void Inflate (
         int x,
         int y,
@@ -310,62 +323,27 @@ public class RectTests {
 
     [Fact]
     public void Rect_SetsValue () {
-        var rect = new Rect {
-                                X = 0,
-                                Y = 0
-                            };
+        var rect = new Rect { X = 0, Y = 0 };
         Assert.True (rect.IsEmpty);
 
-        rect = new Rect {
-                            X = -1,
-                            Y = -2
-                        };
+        rect = new Rect { X = -1, Y = -2 };
         Assert.False (rect.IsEmpty);
 
-        rect = new Rect {
-                            Width = 3,
-                            Height = 4
-                        };
+        rect = new Rect { Width = 3, Height = 4 };
         Assert.False (rect.IsEmpty);
 
-        rect = new Rect {
-                            X = -1,
-                            Y = -2,
-                            Width = 3,
-                            Height = 4
-                        };
+        rect = new Rect { X = -1, Y = -2, Width = 3, Height = 4 };
         Assert.False (rect.IsEmpty);
 
-        Action action = () => {
-            rect = new Rect {
-                                X = -1,
-                                Y = -2,
-                                Width = -3,
-                                Height = 4
-                            };
-        };
+        Action action = () => { rect = new Rect { X = -1, Y = -2, Width = -3, Height = 4 }; };
         var ex = Assert.Throws<ArgumentException> (action);
         Assert.Equal ("Width must be greater or equal to 0.", ex.Message);
 
-        action = () => {
-            rect = new Rect {
-                                X = -1,
-                                Y = -2,
-                                Width = 3,
-                                Height = -4
-                            };
-        };
+        action = () => { rect = new Rect { X = -1, Y = -2, Width = 3, Height = -4 }; };
         ex = Assert.Throws<ArgumentException> (action);
         Assert.Equal ("Height must be greater or equal to 0.", ex.Message);
 
-        action = () => {
-            rect = new Rect {
-                                X = -1,
-                                Y = -2,
-                                Width = -3,
-                                Height = -4
-                            };
-        };
+        action = () => { rect = new Rect { X = -1, Y = -2, Width = -3, Height = -4 }; };
         ex = Assert.Throws<ArgumentException> (action);
         Assert.Equal ("Width must be greater or equal to 0.", ex.Message);
     }

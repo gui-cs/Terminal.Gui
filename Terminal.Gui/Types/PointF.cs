@@ -6,7 +6,7 @@
 
 using System.ComponentModel;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Represents an ordered pair of x and y coordinates that define a point in a two-dimensional plane.</summary>
 public struct PointF : IEquatable<PointF> {

@@ -45,22 +45,24 @@
 using System.Runtime.InteropServices;
 using Terminal.Gui;
 
-namespace Unix.Terminal; 
+namespace Unix.Terminal;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 public partial class Curses {
     // We encode ESC + char (what Alt-char generates) as 0x2000 + char
     public const int KeyAlt = 0x2000;
+    private static char[] r = new char [1];
+    private static int lines, cols;
     private static nint curses_handle, curscr_ptr, lines_ptr, cols_ptr;
+    private static nint stdscr;
+    private static NativeMethods methods;
 
     // If true, uses the DllImport into "ncurses", otherwise "libncursesw.so.5"
     //static bool use_naked_driver;
     private static UnmanagedLibrary curses_library;
-    private static int lines, cols;
     private static Window main_window;
-    private static NativeMethods methods;
-    private static char[] r = new char [1];
-    private static nint stdscr;
+
+    public static bool HasColors => methods.has_colors ();
 
     public static int ColorPairs => methods.COLOR_PAIRS ();
 
@@ -71,8 +73,6 @@ public partial class Curses {
             // For unit tests
             cols = value;
     }
-
-    public static bool HasColors => methods.has_colors ();
 
     public static int Lines {
         get => lines;
@@ -201,10 +201,11 @@ public partial class Curses {
         catch (DllNotFoundException) {
             endwin ();
             Console.Error.WriteLine (
-                                     "Unable to find the @MONO_CURSES@ native library\n" +
-                                     "this is different than the managed mono-curses.dll\n\n" +
-                                     "Typically you need to install to a LD_LIBRARY_PATH directory\n" +
-                                     "or DYLD_LIBRARY_PATH directory or run /sbin/ldconfig");
+                "Unable to find the @MONO_CURSES@ native library\n" +
+                "this is different than the managed mono-curses.dll\n\n" +
+                "Typically you need to install to a LD_LIBRARY_PATH directory\n" +
+                "or DYLD_LIBRARY_PATH directory or run /sbin/ldconfig"
+            );
             Environment.Exit (1);
         }
 
@@ -546,84 +547,6 @@ class Delegates {
 }
 
 class NativeMethods {
-    public readonly Delegates.addch addch;
-    public readonly Delegates.addwstr addwstr;
-    public readonly Delegates.attroff attroff;
-
-    //public readonly Delegates.wechochar wechochar;
-    public readonly Delegates.attron attron;
-    public readonly Delegates.attrset attrset;
-    public readonly Delegates.cbreak cbreak;
-    public readonly Delegates.clearok clearok;
-    public readonly Delegates.COLOR_PAIRS COLOR_PAIRS;
-    public readonly Delegates.curs_set curs_set;
-    public readonly Delegates.curses_version curses_version;
-    public readonly Delegates.def_prog_mode def_prog_mode;
-    public readonly Delegates.def_shell_mode def_shell_mode;
-    public readonly Delegates.doupdate doupdate;
-    public readonly Delegates.echo echo;
-    public readonly Delegates.echochar echochar;
-    public readonly Delegates.endwin endwin;
-    public readonly Delegates.flushinp flushinp;
-    public readonly Delegates.get_wch get_wch;
-    public readonly Delegates.getch getch;
-    public readonly Delegates.getmouse getmouse;
-    public readonly Delegates.halfdelay halfdelay;
-    public readonly Delegates.has_colors has_colors;
-    public readonly Delegates.idcok idcok;
-    public readonly Delegates.idlok idlok;
-    public readonly Delegates.immedok immedok;
-    public readonly Delegates.init_pair init_pair;
-    public readonly Delegates.initscr initscr;
-    public readonly Delegates.intrflush intrflush;
-    public readonly Delegates.is_term_resized is_term_resized;
-    public readonly Delegates.isendwin isendwin;
-    public readonly Delegates.keypad keypad;
-    public readonly Delegates.leaveok leaveok;
-    public readonly Delegates.meta meta;
-    public readonly Delegates.mouseinterval mouseinterval;
-    public readonly Delegates.mousemask mousemask;
-    public readonly Delegates.move move;
-    public readonly Delegates.mvaddch mvaddch;
-    public readonly Delegates.mvaddwstr mvaddwstr;
-    public readonly Delegates.mvgetch mvgetch;
-    public readonly Delegates.nl nl;
-    public readonly Delegates.nocbreak nocbreak;
-    public readonly Delegates.noecho noecho;
-    public readonly Delegates.nonl nonl;
-    public readonly Delegates.noqiflush noqiflush;
-    public readonly Delegates.noraw noraw;
-    public readonly Delegates.notimeout notimeout;
-    public readonly Delegates.qiflush qiflush;
-    public readonly Delegates.raw raw;
-    public readonly Delegates.redrawwin redrawwin;
-    public readonly Delegates.refresh refresh;
-    public readonly Delegates.reset_prog_mode reset_prog_mode;
-    public readonly Delegates.reset_shell_mode reset_shell_mode;
-    public readonly Delegates.resetty resetty;
-    public readonly Delegates.resize_term resize_term;
-    public readonly Delegates.resizeterm resizeterm;
-    public readonly Delegates.savetty savetty;
-    public readonly Delegates.scrollok scrollok;
-    public readonly Delegates.set_escdelay set_escdelay;
-    public readonly Delegates.setscrreg setscrreg;
-    public readonly Delegates.start_color start_color;
-    public readonly Delegates.timeout timeout;
-    public readonly Delegates.typeahead typeahead;
-    public readonly Delegates.ungetch ungetch;
-    public readonly Delegates.ungetmouse ungetmouse;
-    public readonly Delegates.use_default_colors use_default_colors;
-    public readonly Delegates.use_env use_env;
-    public readonly Delegates.waddch waddch;
-    public readonly Delegates.wmove wmove;
-
-    //public readonly Delegates.wredrawwin wredrawwin;
-    public readonly Delegates.wnoutrefresh wnoutrefresh;
-    public readonly Delegates.wrefresh wrefresh;
-    public readonly Delegates.wsetscrreg wsetscrreg;
-    public readonly Delegates.wtimeout wtimeout;
-    public UnmanagedLibrary UnmanagedLibrary;
-
     public NativeMethods (UnmanagedLibrary lib) {
         UnmanagedLibrary = lib;
         initscr = lib.GetNativeMethodDelegate<Delegates.initscr> ("initscr");
@@ -701,6 +624,84 @@ class NativeMethods {
         set_escdelay = lib.GetNativeMethodDelegate<Delegates.set_escdelay> ("set_escdelay");
         curses_version = lib.GetNativeMethodDelegate<Delegates.curses_version> ("curses_version");
     }
+
+    public readonly Delegates.addch addch;
+    public readonly Delegates.addwstr addwstr;
+    public readonly Delegates.attroff attroff;
+
+    //public readonly Delegates.wechochar wechochar;
+    public readonly Delegates.attron attron;
+    public readonly Delegates.attrset attrset;
+    public readonly Delegates.cbreak cbreak;
+    public readonly Delegates.clearok clearok;
+    public readonly Delegates.COLOR_PAIRS COLOR_PAIRS;
+    public readonly Delegates.curs_set curs_set;
+    public readonly Delegates.curses_version curses_version;
+    public readonly Delegates.def_prog_mode def_prog_mode;
+    public readonly Delegates.def_shell_mode def_shell_mode;
+    public readonly Delegates.doupdate doupdate;
+    public readonly Delegates.echo echo;
+    public readonly Delegates.echochar echochar;
+    public readonly Delegates.endwin endwin;
+    public readonly Delegates.flushinp flushinp;
+    public readonly Delegates.get_wch get_wch;
+    public readonly Delegates.getch getch;
+    public readonly Delegates.getmouse getmouse;
+    public readonly Delegates.halfdelay halfdelay;
+    public readonly Delegates.has_colors has_colors;
+    public readonly Delegates.idcok idcok;
+    public readonly Delegates.idlok idlok;
+    public readonly Delegates.immedok immedok;
+    public readonly Delegates.init_pair init_pair;
+    public readonly Delegates.initscr initscr;
+    public readonly Delegates.intrflush intrflush;
+    public readonly Delegates.is_term_resized is_term_resized;
+    public readonly Delegates.isendwin isendwin;
+    public readonly Delegates.keypad keypad;
+    public readonly Delegates.leaveok leaveok;
+    public readonly Delegates.meta meta;
+    public readonly Delegates.mouseinterval mouseinterval;
+    public readonly Delegates.mousemask mousemask;
+    public readonly Delegates.move move;
+    public readonly Delegates.mvaddch mvaddch;
+    public readonly Delegates.mvaddwstr mvaddwstr;
+    public readonly Delegates.mvgetch mvgetch;
+    public readonly Delegates.nl nl;
+    public readonly Delegates.nocbreak nocbreak;
+    public readonly Delegates.noecho noecho;
+    public readonly Delegates.nonl nonl;
+    public readonly Delegates.noqiflush noqiflush;
+    public readonly Delegates.noraw noraw;
+    public readonly Delegates.notimeout notimeout;
+    public readonly Delegates.qiflush qiflush;
+    public readonly Delegates.raw raw;
+    public readonly Delegates.redrawwin redrawwin;
+    public readonly Delegates.refresh refresh;
+    public readonly Delegates.reset_prog_mode reset_prog_mode;
+    public readonly Delegates.reset_shell_mode reset_shell_mode;
+    public readonly Delegates.resetty resetty;
+    public readonly Delegates.resize_term resize_term;
+    public readonly Delegates.resizeterm resizeterm;
+    public readonly Delegates.savetty savetty;
+    public readonly Delegates.scrollok scrollok;
+    public readonly Delegates.set_escdelay set_escdelay;
+    public readonly Delegates.setscrreg setscrreg;
+    public readonly Delegates.start_color start_color;
+    public readonly Delegates.timeout timeout;
+    public readonly Delegates.typeahead typeahead;
+    public readonly Delegates.ungetch ungetch;
+    public readonly Delegates.ungetmouse ungetmouse;
+    public readonly Delegates.use_default_colors use_default_colors;
+    public readonly Delegates.use_env use_env;
+    public readonly Delegates.waddch waddch;
+    public readonly Delegates.wmove wmove;
+
+    //public readonly Delegates.wredrawwin wredrawwin;
+    public readonly Delegates.wnoutrefresh wnoutrefresh;
+    public readonly Delegates.wrefresh wrefresh;
+    public readonly Delegates.wsetscrreg wsetscrreg;
+    public readonly Delegates.wtimeout wtimeout;
+    public UnmanagedLibrary UnmanagedLibrary;
 }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 #pragma warning restore CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.

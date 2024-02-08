@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Configuration Editor", "Edits Terminal.Gui Config Files.")]
 [ScenarioCategory ("TabView")]
@@ -12,14 +12,15 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Files and IO")]
 [ScenarioCategory ("TextView")]
 public class ConfigurationEditor : Scenario {
-    private static ColorScheme _editorColorScheme = new() {
-                                                              Normal = new Attribute (Color.Red, Color.White),
-                                                              Focus = new Attribute (Color.Red, Color.Black),
-                                                              HotFocus = new Attribute (Color.BrightRed, Color.Black),
-                                                              HotNormal = new Attribute (Color.Magenta, Color.White)
-                                                          };
-
     private static Action _editorColorSchemeChanged;
+
+    private static ColorScheme _editorColorScheme = new () {
+        Normal = new Attribute (Color.Red, Color.White),
+        Focus = new Attribute (Color.Red, Color.Black),
+        HotFocus = new Attribute (Color.BrightRed, Color.Black),
+        HotNormal = new Attribute (Color.Magenta, Color.White)
+    };
+
     private StatusItem _lenStatusItem;
     private TileView _tileView;
 
@@ -48,25 +49,24 @@ public class ConfigurationEditor : Scenario {
 
     public override void Setup () {
         _tileView = new TileView (0) {
-                                         Width = Dim.Fill (),
-                                         Height = Dim.Fill (1),
-                                         Orientation = Orientation.Vertical,
-                                         LineStyle = LineStyle.Single
-                                     };
+            Width = Dim.Fill (), Height = Dim.Fill (1), Orientation = Orientation.Vertical, LineStyle = LineStyle.Single
+        };
 
         Application.Top.Add (_tileView);
 
         _lenStatusItem = new StatusItem (KeyCode.CharMask, "Len: ", null);
         var statusBar = new StatusBar (
-                                       new[] {
-                                                 new (
-                                                      Application.QuitKey,
-                                                      $"{Application.QuitKey} Quit",
-                                                      () => Quit ()),
-                                                 new (KeyCode.F5, "~F5~ Reload", () => Reload ()),
-                                                 new (KeyCode.CtrlMask | KeyCode.S, "~^S~ Save", () => Save ()),
-                                                 _lenStatusItem
-                                             });
+            new[] {
+                new (
+                    Application.QuitKey,
+                    $"{Application.QuitKey} Quit",
+                    () => Quit ()
+                ),
+                new (KeyCode.F5, "~F5~ Reload", () => Reload ()),
+                new (KeyCode.CtrlMask | KeyCode.S, "~^S~ Save", () => Save ()),
+                _lenStatusItem
+            }
+        );
 
         Application.Top.Add (statusBar);
 
@@ -85,9 +85,7 @@ public class ConfigurationEditor : Scenario {
     }
 
     private void Open () {
-        var subMenu = new MenuBarItem {
-                                          Title = "_View"
-                                      };
+        var subMenu = new MenuBarItem { Title = "_View" };
 
         foreach (string configFile in ConfigurationManager.Settings.Sources) {
             var homeDir = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}";
@@ -97,13 +95,13 @@ public class ConfigurationEditor : Scenario {
             tile.Title = configFile.StartsWith ("resource://") ? fileInfo.Name : configFile;
 
             var textView = new ConfigTextView {
-                                                  X = 0,
-                                                  Y = 0,
-                                                  Width = Dim.Fill (),
-                                                  Height = Dim.Fill (),
-                                                  FileInfo = fileInfo,
-                                                  Tile = tile
-                                              };
+                X = 0,
+                Y = 0,
+                Width = Dim.Fill (),
+                Height = Dim.Fill (),
+                FileInfo = fileInfo,
+                Tile = tile
+            };
 
             tile.ContentView.Add (textView);
 
@@ -120,11 +118,12 @@ public class ConfigurationEditor : Scenario {
             var editor = tile.ContentView.Subviews[0] as ConfigTextView;
             if (editor.IsDirty) {
                 int result = MessageBox.Query (
-                                               "Save Changes",
-                                               $"Save changes to {editor.FileInfo.FullName}",
-                                               "Yes",
-                                               "No",
-                                               "Cancel");
+                    "Save Changes",
+                    $"Save changes to {editor.FileInfo.FullName}",
+                    "Yes",
+                    "No",
+                    "Cancel"
+                );
                 if ((result == -1) || (result == 2)) {
                     // user cancelled
                 }
@@ -172,8 +171,8 @@ public class ConfigurationEditor : Scenario {
 
             if (assembly != null) {
                 string name = assembly
-                              .GetManifestResourceNames ()
-                              .FirstOrDefault (x => x.EndsWith ("config.json"));
+                    .GetManifestResourceNames ()
+                    .FirstOrDefault (x => x.EndsWith ("config.json"));
                 using Stream stream = assembly.GetManifestResourceStream (name);
                 using var reader = new StreamReader (stream);
                 Text = reader.ReadToEnd ();

@@ -4,8 +4,8 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.ViewsTests;
 
 public class RuneCellTests {
-    private readonly ITestOutputHelper _output;
     public RuneCellTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void Constructor_Defaults () {
@@ -19,9 +19,8 @@ public class RuneCellTests {
     public void Equals_False () {
         var rc1 = new RuneCell ();
         var rc2 = new RuneCell {
-                                   Rune = new Rune ('a'),
-                                   ColorScheme = new ColorScheme { Normal = new Attribute (Color.Red) }
-                               };
+            Rune = new Rune ('a'), ColorScheme = new ColorScheme { Normal = new Attribute (Color.Red) }
+        };
         Assert.False (rc1.Equals (rc2));
         Assert.False (rc2.Equals (rc1));
 
@@ -50,7 +49,7 @@ public class RuneCellTests {
     [Fact]
     [AutoInitShutdown]
     public void RuneCell_LoadRuneCells_InheritsPreviousColorScheme () {
-        List<RuneCell> runeCells = new List<RuneCell> ();
+        List<RuneCell> runeCells = new ();
         foreach (KeyValuePair<string, ColorScheme> color in Colors.ColorSchemes) {
             string csName = color.Key;
             foreach (Rune rune in csName.EnumerateRunes ()) {
@@ -73,22 +72,22 @@ Menu
 Error   ";
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
 
-        Attribute[] attributes = new[] {
-                                           // 0
-                                           Colors.ColorSchemes["TopLevel"].Focus,
+        Attribute[] attributes = {
+            // 0
+            Colors.ColorSchemes["TopLevel"].Focus,
 
-                                           // 1
-                                           Colors.ColorSchemes["Base"].Focus,
+            // 1
+            Colors.ColorSchemes["Base"].Focus,
 
-                                           // 2
-                                           Colors.ColorSchemes["Dialog"].Focus,
+            // 2
+            Colors.ColorSchemes["Dialog"].Focus,
 
-                                           // 3
-                                           Colors.ColorSchemes["Menu"].Focus,
+            // 3
+            Colors.ColorSchemes["Menu"].Focus,
 
-                                           // 4
-                                           Colors.ColorSchemes["Error"].Focus
-                                       };
+            // 4
+            Colors.ColorSchemes["Error"].Focus
+        };
         var expectedColor = @"
 0000000000
 1111000000
@@ -135,8 +134,9 @@ Dialogror ";
         tv.SelectionStartColumn = 0;
         tv.SelectionStartRow = 0;
         Assert.Equal (
-                      $"TopLevel{Environment.NewLine}Base{Environment.NewLine}Dialog{Environment.NewLine}",
-                      tv.SelectedText);
+            $"TopLevel{Environment.NewLine}Base{Environment.NewLine}Dialog{Environment.NewLine}",
+            tv.SelectedText
+        );
         tv.Copy ();
         tv.Selecting = false;
         tv.CursorPosition = new Point (2, 4);
@@ -169,12 +169,12 @@ ror       ";
     [Fact]
     [AutoInitShutdown]
     public void RuneCell_LoadRuneCells_Without_ColorScheme_Is_Never_Null () {
-        List<RuneCell> cells = new List<RuneCell> {
-                                                      new () { Rune = new Rune ('T') },
-                                                      new () { Rune = new Rune ('e') },
-                                                      new () { Rune = new Rune ('s') },
-                                                      new () { Rune = new Rune ('t') }
-                                                  };
+        List<RuneCell> cells = new() {
+            new () { Rune = new Rune ('T') },
+            new () { Rune = new Rune ('e') },
+            new () { Rune = new Rune ('s') },
+            new () { Rune = new Rune ('t') }
+        };
         TextView tv = CreateTextView ();
         Application.Top.Add (tv);
         tv.Load (cells);
@@ -191,12 +191,14 @@ ror       ";
     [AutoInitShutdown]
     public void RuneCellEventArgs_WordWrap_True () {
         var eventCount = 0;
-        List<List<RuneCell>> text = new List<List<RuneCell>> {
-                                                                 TextModel.ToRuneCells (
-                                                                  "This is the first line.".ToRunes ()),
-                                                                 TextModel.ToRuneCells (
-                                                                  "This is the second line.".ToRunes ())
-                                                             };
+        List<List<RuneCell>> text = new() {
+            TextModel.ToRuneCells (
+                "This is the first line.".ToRunes ()
+            ),
+            TextModel.ToRuneCells (
+                "This is the second line.".ToRunes ()
+            )
+        };
         TextView tv = CreateTextView ();
         tv.DrawNormalColor += _textView_DrawColor;
         tv.DrawReadOnlyColor += _textView_DrawColor;
@@ -213,17 +215,18 @@ ror       ";
         Application.Top.Add (tv);
         Application.Begin (Application.Top);
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 This is the first line. 
 This is the second line.",
-                                                      _output);
+            _output
+        );
 
         tv.Width = 10;
         tv.Height = 25;
         tv.WordWrap = true;
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 This is
 the    
 first  
@@ -232,7 +235,8 @@ This is
 the    
 second 
 line.  ",
-                                                      _output);
+            _output
+        );
 
         Assert.Equal (eventCount, (text[0].Count + text[1].Count) * 2);
     }
@@ -241,13 +245,13 @@ line.  ",
     public void ToString_Override () {
         var rc1 = new RuneCell ();
         var rc2 = new RuneCell {
-                                   Rune = new Rune ('a'),
-                                   ColorScheme = new ColorScheme { Normal = new Attribute (Color.Red) }
-                               };
+            Rune = new Rune ('a'), ColorScheme = new ColorScheme { Normal = new Attribute (Color.Red) }
+        };
         Assert.Equal ("U+0000 '\0'; null", rc1.ToString ());
         Assert.Equal (
-                      "U+0061 'a'; Normal: [Red,Red]; Focus: [White,Black]; HotNormal: [White,Black]; HotFocus: [White,Black]; Disabled: [White,Black]",
-                      rc2.ToString ());
+            "U+0061 'a'; Normal: [Red,Red]; Focus: [White,Black]; HotNormal: [White,Black]; HotFocus: [White,Black]; Disabled: [White,Black]",
+            rc2.ToString ()
+        );
     }
 
     // TODO: Move the tests below to View or Color - they test ColorScheme, not RuneCell primitives.

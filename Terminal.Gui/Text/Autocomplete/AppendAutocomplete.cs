@@ -1,26 +1,26 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     Autocomplete for a <see cref="TextField"/> which shows suggestions within the box. Displayed suggestions can
 ///     be completed using the tab key.
 /// </summary>
 public class AppendAutocomplete : AutocompleteBase {
-    private bool _suspendSuggestions;
-    private TextField textField;
-
     /// <summary>Creates a new instance of the <see cref="AppendAutocomplete"/> class.</summary>
     public AppendAutocomplete (TextField textField) {
         this.textField = textField;
         SelectionKey = KeyCode.Tab;
 
         ColorScheme = new ColorScheme {
-                                          Normal = new Attribute (Color.DarkGray, Color.Black),
-                                          Focus = new Attribute (Color.DarkGray, Color.Black),
-                                          HotNormal = new Attribute (Color.DarkGray, Color.Black),
-                                          HotFocus = new Attribute (Color.DarkGray, Color.Black),
-                                          Disabled = new Attribute (Color.DarkGray, Color.Black)
-                                      };
+            Normal = new Attribute (Color.DarkGray, Color.Black),
+            Focus = new Attribute (Color.DarkGray, Color.Black),
+            HotNormal = new Attribute (Color.DarkGray, Color.Black),
+            HotFocus = new Attribute (Color.DarkGray, Color.Black),
+            Disabled = new Attribute (Color.DarkGray, Color.Black)
+        };
     }
+
+    private bool _suspendSuggestions;
+    private TextField textField;
 
     /// <summary>
     ///     The color used for rendering the appended text. Note that only <see cref="ColorScheme.Normal"/> is used and
@@ -88,9 +88,11 @@ public class AppendAutocomplete : AutocompleteBase {
 
         // draw it like its selected even though its not
         Application.Driver.SetAttribute (
-                                         new Attribute (
-                                                        ColorScheme.Normal.Foreground,
-                                                        textField.ColorScheme.Focus.Background));
+            new Attribute (
+                ColorScheme.Normal.Foreground,
+                textField.ColorScheme.Focus.Background
+            )
+        );
         textField.Move (textField.Text.Length, 0);
 
         Suggestion suggestion = Suggestions.ElementAt (SelectedIdx);
@@ -101,9 +103,9 @@ public class AppendAutocomplete : AutocompleteBase {
 
         if (spaceAvailable < spaceRequired) {
             fragment = new string (
-                                   fragment.TakeWhile (c => (spaceAvailable -= ((Rune)c).GetColumns ()) >= 0)
-                                           .ToArray ()
-                                  );
+                fragment.TakeWhile (c => (spaceAvailable -= ((Rune)c).GetColumns ()) >= 0)
+                    .ToArray ()
+            );
         }
 
         Application.Driver.AddStr (fragment);

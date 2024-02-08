@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     Specifies the event arguments for <see cref="Terminal.Gui.MouseEvent"/>. This is a higher-level construct than

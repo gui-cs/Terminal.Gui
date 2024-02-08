@@ -14,21 +14,12 @@ public class Buttons : Scenario {
         Win.Add (editLabel);
 
         // Add a TextField using Absolute layout. 
-        var edit = new TextField {
-                                     X = 31,
-                                     Width = 15,
-                                     HotKey = Key.Y.WithAlt
-                                 };
+        var edit = new TextField { X = 31, Width = 15, HotKey = Key.Y.WithAlt };
         Win.Add (edit);
 
         // This is the default button (IsDefault = true); if user presses ENTER in the TextField
         // the scenario will quit
-        var defaultButton = new Button {
-                                           X = Pos.Center (),
-                                           Y = Pos.AnchorEnd (1),
-                                           IsDefault = true,
-                                           Text = "_Quit"
-                                       };
+        var defaultButton = new Button { X = Pos.Center (), Y = Pos.AnchorEnd (1), IsDefault = true, Text = "_Quit" };
         defaultButton.Clicked += (s, e) => Application.RequestStop ();
         Win.Add (defaultButton);
 
@@ -55,13 +46,13 @@ public class Buttons : Scenario {
         Pos x = Pos.Right (colorButtonsLabel) + 2;
         foreach (KeyValuePair<string, ColorScheme> colorScheme in Colors.ColorSchemes) {
             var colorButton = new Button {
-                                             ColorScheme = colorScheme.Value,
-                                             X = Pos.Right (prev) + 2,
+                ColorScheme = colorScheme.Value,
+                X = Pos.Right (prev) + 2,
 
-                                             //X = x,
-                                             Y = Pos.Y (colorButtonsLabel),
-                                             Text = $"_{colorScheme.Key}"
-                                         };
+                //X = x,
+                Y = Pos.Y (colorButtonsLabel),
+                Text = $"_{colorScheme.Key}"
+            };
             DoMessage (colorButton, colorButton.Text);
             Win.Add (colorButton);
             prev = colorButton;
@@ -72,44 +63,36 @@ public class Buttons : Scenario {
 
         Button button;
         Win.Add (
-                 button = new Button {
-                                         X = 2,
-                                         Y = Pos.Bottom (colorButtonsLabel) + 1,
-                                         Text =
-                                             "A super l_öng Button that will probably expose a bug in clipping or wrapping of text. Will it?"
-                                     });
+            button = new Button {
+                X = 2,
+                Y = Pos.Bottom (colorButtonsLabel) + 1,
+                Text =
+                    "A super l_öng Button that will probably expose a bug in clipping or wrapping of text. Will it?"
+            }
+        );
         DoMessage (button, button.Text);
 
         // Note the 'N' in 'Newline' will be the hotkey
         Win.Add (
-                 button = new Button {
-                                         X = 2,
-                                         Y = Pos.Bottom (button) + 1,
-                                         Text = "a Newline\nin the button"
-                                     });
+            button = new Button { X = 2, Y = Pos.Bottom (button) + 1, Text = "a Newline\nin the button" }
+        );
         button.Clicked += (s, e) => MessageBox.Query ("Message", "Question?", "Yes", "No");
 
-        var textChanger = new Button {
-                                         X = 2,
-                                         Y = Pos.Bottom (button) + 1,
-                                         Text = "Te_xt Changer"
-                                     };
+        var textChanger = new Button { X = 2, Y = Pos.Bottom (button) + 1, Text = "Te_xt Changer" };
         Win.Add (textChanger);
         textChanger.Clicked += (s, e) => textChanger.Text += "!";
 
         Win.Add (
-                 button = new Button {
-                                         X = Pos.Right (textChanger) + 2,
-                                         Y = Pos.Y (textChanger),
-                                         Text = "Lets see if this will move as \"Text Changer\" grows"
-                                     });
+            button = new Button {
+                X = Pos.Right (textChanger) + 2,
+                Y = Pos.Y (textChanger),
+                Text = "Lets see if this will move as \"Text Changer\" grows"
+            }
+        );
 
         var removeButton = new Button {
-                                          X = 2,
-                                          Y = Pos.Bottom (button) + 1,
-                                          ColorScheme = Colors.ColorSchemes["Error"],
-                                          Text = "Remove this button"
-                                      };
+            X = 2, Y = Pos.Bottom (button) + 1, ColorScheme = Colors.ColorSchemes["Error"], Text = "Remove this button"
+        };
         Win.Add (removeButton);
 
         // This in interesting test case because `moveBtn` and below are laid out relative to this one!
@@ -121,24 +104,24 @@ public class Buttons : Scenario {
         };
 
         var computedFrame = new FrameView {
-                                              X = 0,
-                                              Y = Pos.Bottom (removeButton) + 1,
-                                              Width = Dim.Percent (50),
-                                              Height = 5,
-                                              Title = "Computed Layout"
-                                          };
+            X = 0,
+            Y = Pos.Bottom (removeButton) + 1,
+            Width = Dim.Percent (50),
+            Height = 5,
+            Title = "Computed Layout"
+        };
         Win.Add (computedFrame);
 
         // Demonstrates how changing the View.Frame property can move Views
         var moveBtn = new Button {
-                                     X = 0,
-                                     Y = Pos.Center () - 1,
-                                     AutoSize = false,
-                                     Width = 30,
-                                     Height = 1,
-                                     ColorScheme = Colors.ColorSchemes["Error"],
-                                     Text = "Move This \u263b Button v_ia Pos"
-                                 };
+            X = 0,
+            Y = Pos.Center () - 1,
+            AutoSize = false,
+            Width = 30,
+            Height = 1,
+            ColorScheme = Colors.ColorSchemes["Error"],
+            Text = "Move This \u263b Button v_ia Pos"
+        };
         moveBtn.Clicked += (s, e) => {
             moveBtn.X = moveBtn.Frame.X + 5;
 
@@ -149,14 +132,14 @@ public class Buttons : Scenario {
 
         // Demonstrates how changing the View.Frame property can SIZE Views (#583)
         var sizeBtn = new Button {
-                                     X = 0,
-                                     Y = Pos.Center () + 1,
-                                     AutoSize = false,
-                                     Width = 30,
-                                     Height = 1,
-                                     ColorScheme = Colors.ColorSchemes["Error"],
-                                     Text = "Size This \u263a Button _via Pos"
-                                 };
+            X = 0,
+            Y = Pos.Center () + 1,
+            AutoSize = false,
+            Width = 30,
+            Height = 1,
+            ColorScheme = Colors.ColorSchemes["Error"],
+            Text = "Size This \u263a Button _via Pos"
+        };
         sizeBtn.Clicked += (s, e) => {
             sizeBtn.Width = sizeBtn.Frame.Width + 5;
 
@@ -165,56 +148,51 @@ public class Buttons : Scenario {
         computedFrame.Add (sizeBtn);
 
         var absoluteFrame = new FrameView {
-                                              X = Pos.Right (computedFrame),
-                                              Y = Pos.Bottom (removeButton) + 1,
-                                              Width = Dim.Fill (),
-                                              Height = 5,
-                                              Title = "Absolute Layout"
-                                          };
+            X = Pos.Right (computedFrame),
+            Y = Pos.Bottom (removeButton) + 1,
+            Width = Dim.Fill (),
+            Height = 5,
+            Title = "Absolute Layout"
+        };
         Win.Add (absoluteFrame);
 
         // Demonstrates how changing the View.Frame property can move Views
-        var moveBtnA = new Button {
-                                      ColorScheme = Colors.ColorSchemes["Error"],
-                                      Text = "Move This Button via Frame"
-                                  };
+        var moveBtnA = new Button { ColorScheme = Colors.ColorSchemes["Error"], Text = "Move This Button via Frame" };
         moveBtnA.Clicked += (s, e) => {
             moveBtnA.Frame = new Rect (
-                                       moveBtnA.Frame.X + 5,
-                                       moveBtnA.Frame.Y,
-                                       moveBtnA.Frame.Width,
-                                       moveBtnA.Frame.Height);
+                moveBtnA.Frame.X + 5,
+                moveBtnA.Frame.Y,
+                moveBtnA.Frame.Width,
+                moveBtnA.Frame.Height
+            );
         };
         absoluteFrame.Add (moveBtnA);
 
         // Demonstrates how changing the View.Frame property can SIZE Views (#583)
         var sizeBtnA = new Button {
-                                      Y = 2,
-                                      ColorScheme = Colors.ColorSchemes["Error"],
-                                      Text = " ~  s  gui.cs   master ↑_10 = Сохранить"
-                                  };
+            Y = 2, ColorScheme = Colors.ColorSchemes["Error"], Text = " ~  s  gui.cs   master ↑_10 = Сохранить"
+        };
         sizeBtnA.Clicked += (s, e) => {
             sizeBtnA.Frame = new Rect (
-                                       sizeBtnA.Frame.X,
-                                       sizeBtnA.Frame.Y,
-                                       sizeBtnA.Frame.Width + 5,
-                                       sizeBtnA.Frame.Height);
+                sizeBtnA.Frame.X,
+                sizeBtnA.Frame.Y,
+                sizeBtnA.Frame.Width + 5,
+                sizeBtnA.Frame.Height
+            );
         };
         absoluteFrame.Add (sizeBtnA);
 
         var label = new Label {
-                                  X = 2,
-                                  Y = Pos.Bottom (computedFrame) + 1,
-                                  Text = "Text Alignment (changes the four buttons above): "
-                              };
+            X = 2, Y = Pos.Bottom (computedFrame) + 1, Text = "Text Alignment (changes the four buttons above): "
+        };
         Win.Add (label);
 
         var radioGroup = new RadioGroup {
-                                            X = 4,
-                                            Y = Pos.Bottom (label) + 1,
-                                            SelectedItem = 2,
-                                            RadioLabels = new[] { "Left", "Right", "Centered", "Justified" }
-                                        };
+            X = 4,
+            Y = Pos.Bottom (label) + 1,
+            SelectedItem = 2,
+            RadioLabels = new[] { "Left", "Right", "Centered", "Justified" }
+        };
         Win.Add (radioGroup);
 
         // Demo changing hotkey
@@ -246,28 +224,28 @@ public class Buttons : Scenario {
 
         var mhkb = "Click to Change th_is Button's Hotkey";
         var moveHotKeyBtn = new Button {
-                                           X = 2,
-                                           Y = Pos.Bottom (radioGroup) + 1,
-                                           AutoSize = false,
-                                           Height = 1,
-                                           Width = Dim.Width (computedFrame) - 2,
-                                           ColorScheme = Colors.ColorSchemes["TopLevel"],
-                                           Text = mhkb
-                                       };
+            X = 2,
+            Y = Pos.Bottom (radioGroup) + 1,
+            AutoSize = false,
+            Height = 1,
+            Width = Dim.Width (computedFrame) - 2,
+            ColorScheme = Colors.ColorSchemes["TopLevel"],
+            Text = mhkb
+        };
         moveHotKeyBtn.Clicked += (s, e) => { moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text); };
         Win.Add (moveHotKeyBtn);
 
         var muhkb = " ~  s  gui.cs   master ↑10 = Сохранить";
         var moveUnicodeHotKeyBtn = new Button {
-                                                  X = Pos.Left (absoluteFrame) + 1,
-                                                  Y = Pos.Bottom (radioGroup) + 1,
-                                                  AutoSize = false,
-                                                  Height = 1,
-                                                  Width = Dim.Width (absoluteFrame) -
-                                                          2, // BUGBUG: Not always the width isn't calculated correctly.
-                                                  ColorScheme = Colors.ColorSchemes["TopLevel"],
-                                                  Text = muhkb
-                                              };
+            X = Pos.Left (absoluteFrame) + 1,
+            Y = Pos.Bottom (radioGroup) + 1,
+            AutoSize = false,
+            Height = 1,
+            Width = Dim.Width (absoluteFrame) -
+                    2, // BUGBUG: Not always the width isn't calculated correctly.
+            ColorScheme = Colors.ColorSchemes["TopLevel"],
+            Text = muhkb
+        };
         moveUnicodeHotKeyBtn.Clicked += (s, e) => {
             moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text);
         };

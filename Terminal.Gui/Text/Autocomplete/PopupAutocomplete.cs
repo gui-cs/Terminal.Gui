@@ -1,18 +1,18 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     Renders an overlay on another view at a given point that allows selecting from a range of 'autocomplete'
 ///     options.
 /// </summary>
 public abstract class PopupAutocomplete : AutocompleteBase {
-    private bool closed;
-    private ColorScheme colorScheme;
-    private View hostControl;
-    private View top, popup;
-    private int toRenderLength;
-
     /// <summary>Creates a new instance of the <see cref="PopupAutocomplete"/> class.</summary>
     public PopupAutocomplete () { PopupInsideContainer = true; }
+
+    private bool closed;
+    private ColorScheme colorScheme;
+    private int toRenderLength;
+    private View hostControl;
+    private View top, popup;
 
     /// <summary>
     ///     The colors to use to render the overlay. Accessing this property before the Application has been initialized
@@ -29,6 +29,12 @@ public abstract class PopupAutocomplete : AutocompleteBase {
         set => colorScheme = value;
     }
 
+    /// <summary>
+    ///     When more suggestions are available than can be rendered the user can scroll down the dropdown list. This
+    ///     indicates how far down they have gone
+    /// </summary>
+    public virtual int ScrollOffset { get; set; }
+
     /// <summary>The host control to handle.</summary>
     public override View HostControl {
         get => hostControl;
@@ -42,12 +48,6 @@ public abstract class PopupAutocomplete : AutocompleteBase {
             }
         }
     }
-
-    /// <summary>
-    ///     When more suggestions are available than can be rendered the user can scroll down the dropdown list. This
-    ///     indicates how far down they have gone
-    /// </summary>
-    public virtual int ScrollOffset { get; set; }
 
     private Point? LastPopupPos { get; set; }
 
@@ -295,12 +295,14 @@ public abstract class PopupAutocomplete : AutocompleteBase {
 
         if (PopupInsideContainer) {
             popup.Frame = new Rect (
-                                    new Point (HostControl.Frame.X + renderAt.X, HostControl.Frame.Y + renderAt.Y),
-                                    new Size (width, height));
+                new Point (HostControl.Frame.X + renderAt.X, HostControl.Frame.Y + renderAt.Y),
+                new Size (width, height)
+            );
         } else {
             popup.Frame = new Rect (
-                                    new Point (HostControl.Frame.X + renderAt.X, renderAt.Y),
-                                    new Size (width, height));
+                new Point (HostControl.Frame.X + renderAt.X, renderAt.Y),
+                new Size (width, height)
+            );
         }
 
         popup.Move (0, 0);
@@ -430,9 +432,7 @@ public abstract class PopupAutocomplete : AutocompleteBase {
 
     private void ManipulatePopup () {
         if (Visible && popup == null) {
-            popup = new Popup (this) {
-                                         Frame = Rect.Empty
-                                     };
+            popup = new Popup (this) { Frame = Rect.Empty };
             top?.Add (popup);
         }
 
@@ -462,14 +462,13 @@ public abstract class PopupAutocomplete : AutocompleteBase {
     }
 
     private class Popup : View {
-        private readonly PopupAutocomplete autocomplete;
-
         public Popup (PopupAutocomplete autocomplete) {
             this.autocomplete = autocomplete;
             CanFocus = true;
             WantMousePositionReports = true;
         }
 
+        private readonly PopupAutocomplete autocomplete;
         public override bool MouseEvent (MouseEvent mouseEvent) { return autocomplete.MouseEvent (mouseEvent); }
 
         public override void OnDrawContent (Rect contentArea) {

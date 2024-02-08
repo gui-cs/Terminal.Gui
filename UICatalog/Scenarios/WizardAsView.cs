@@ -9,44 +9,48 @@ public class WizardAsView : Scenario {
         Application.Init ();
 
         var menu = new MenuBar {
-                                   Menus =  [
-                                   new MenuBarItem ("_File", new MenuItem[] {
-                                                                                new (
-                                                                                 "_Restart Configuration...",
-                                                                                 "",
-                                                                                 () => MessageBox.Query (
-                                                                                  "Wizaard",
-                                                                                  "Are you sure you want to reset the Wizard and start over?",
-                                                                                  "Ok",
-                                                                                  "Cancel")),
-                                                                                new (
-                                                                                 "Re_boot Server...",
-                                                                                 "",
-                                                                                 () => MessageBox.Query (
-                                                                                  "Wizaard",
-                                                                                  "Are you sure you want to reboot the server start over?",
-                                                                                  "Ok",
-                                                                                  "Cancel")),
-                                                                                new (
-                                                                                 "_Shutdown Server...",
-                                                                                 "",
-                                                                                 () => MessageBox.Query (
-                                                                                  "Wizaard",
-                                                                                  "Are you sure you want to cancel setup and shutdown?",
-                                                                                  "Ok",
-                                                                                  "Cancel"))
-                                                                            })
-                                       ]
-                               };
+            Menus = [
+                        new MenuBarItem (
+                            "_File",
+                            new MenuItem[] {
+                                new (
+                                    "_Restart Configuration...",
+                                    "",
+                                    () => MessageBox.Query (
+                                        "Wizaard",
+                                        "Are you sure you want to reset the Wizard and start over?",
+                                        "Ok",
+                                        "Cancel"
+                                    )
+                                ),
+                                new (
+                                    "Re_boot Server...",
+                                    "",
+                                    () => MessageBox.Query (
+                                        "Wizaard",
+                                        "Are you sure you want to reboot the server start over?",
+                                        "Ok",
+                                        "Cancel"
+                                    )
+                                ),
+                                new (
+                                    "_Shutdown Server...",
+                                    "",
+                                    () => MessageBox.Query (
+                                        "Wizaard",
+                                        "Are you sure you want to cancel setup and shutdown?",
+                                        "Ok",
+                                        "Cancel"
+                                    )
+                                )
+                            }
+                        )
+                    ]
+        };
         Application.Top.Add (menu);
 
         // No need for a Title because the border is disabled
-        var wizard = new Wizard {
-                                    X = 0,
-                                    Y = 0,
-                                    Width = Dim.Fill (),
-                                    Height = Dim.Fill ()
-                                };
+        var wizard = new Wizard { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
         // Set Mdoal to false to cause the Wizard class to render without a frame and
         // behave like an non-modal View (vs. a modal/pop-up Window).
@@ -91,16 +95,15 @@ public class WizardAsView : Scenario {
 
         var buttonLbl = new Label { Text = "Second Step Button: ", X = 0, Y = 0 };
         var button = new Button {
-                                    Text = "Press Me to Rename Step",
-                                    X = Pos.Right (buttonLbl),
-                                    Y = Pos.Top (buttonLbl)
-                                };
+            Text = "Press Me to Rename Step", X = Pos.Right (buttonLbl), Y = Pos.Top (buttonLbl)
+        };
         button.Clicked += (s, e) => {
             secondStep.Title = "2nd Step";
             MessageBox.Query (
-                              "Wizard Scenario",
-                              "This Wizard Step's title was changed to '2nd Step'",
-                              "Ok");
+                "Wizard Scenario",
+                "This Wizard Step's title was changed to '2nd Step'",
+                "Ok"
+            );
         };
         secondStep.Add (buttonLbl, button);
         var lbl = new Label { Text = "First Name: ", X = Pos.Left (buttonLbl), Y = Pos.Bottom (buttonLbl) };

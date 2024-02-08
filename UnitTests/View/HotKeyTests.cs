@@ -4,8 +4,8 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.ViewTests;
 
 public class HotKeyTests {
-    private readonly ITestOutputHelper _output;
     public HotKeyTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Theory]
     [InlineData (KeyCode.A)]
@@ -73,10 +73,7 @@ public class HotKeyTests {
     [InlineData (KeyCode.CtrlMask, false)]
     [InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask, false)]
     public void KeyPress_Runs_Default_HotKey_Command (KeyCode mask, bool expected) {
-        var view = new View {
-                                HotKeySpecifier = (Rune)'^',
-                                Text = "^Test"
-                            };
+        var view = new View { HotKeySpecifier = (Rune)'^', Text = "^Test" };
         view.CanFocus = true;
         Assert.False (view.HasFocus);
         view.NewKeyDownEvent (new Key (KeyCode.T | mask));
@@ -98,10 +95,7 @@ public class HotKeyTests {
 
     [Fact]
     public void ProcessKeyDown_Invokes_HotKey_Command_With_SuperView () {
-        var view = new View {
-                                HotKeySpecifier = (Rune)'^',
-                                Text = "^Test"
-                            };
+        var view = new View { HotKeySpecifier = (Rune)'^', Text = "^Test" };
 
         var superView = new View ();
         superView.Add (view);
@@ -221,17 +215,19 @@ public class HotKeyTests {
         view.HotKey = KeyCode.A | KeyCode.AltMask;
         Assert.Throws<ArgumentException> (() => view.HotKey = KeyCode.A | KeyCode.CtrlMask);
         Assert.Throws<ArgumentException> (
-                                          () =>
-                                              view.HotKey =
-                                                  KeyCode.A | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask);
+            () =>
+                view.HotKey =
+                    KeyCode.A | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask
+        );
 
         // All others must not have Ctrl (Alt is assumed)
         view.HotKey = KeyCode.D1 | KeyCode.AltMask;
         Assert.Throws<ArgumentException> (() => view.HotKey = KeyCode.D1 | KeyCode.CtrlMask);
         Assert.Throws<ArgumentException> (
-                                          () =>
-                                              view.HotKey =
-                                                  KeyCode.D1 | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask);
+            () =>
+                view.HotKey =
+                    KeyCode.D1 | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask
+        );
 
         // Shift is ok (e.g. this is '!')
         view.HotKey = KeyCode.D1 | KeyCode.ShiftMask;
@@ -266,10 +262,7 @@ public class HotKeyTests {
     // BUGBUG: '!' should be supported. Line 968 of TextFormatter filters on char.IsLetterOrDigit 
     //[InlineData ("Test^!", (Key)'!')]
     public void Text_Change_Sets_HotKey (string text, KeyCode expectedHotKey) {
-        var view = new View {
-                                HotKeySpecifier = new Rune ('^'),
-                                Text = "^Hello"
-                            };
+        var view = new View { HotKeySpecifier = new Rune ('^'), Text = "^Hello" };
         Assert.Equal (KeyCode.H, view.HotKey);
 
         view.Text = text;
@@ -279,10 +272,7 @@ public class HotKeyTests {
     [Theory]
     [InlineData ("^Test")]
     public void Text_Empty_Sets_HotKey_To_Null (string text) {
-        var view = new View {
-                                HotKeySpecifier = (Rune)'^',
-                                Text = text
-                            };
+        var view = new View { HotKeySpecifier = (Rune)'^', Text = text };
 
         Assert.Equal (text, view.Text);
         Assert.Equal (KeyCode.T, view.HotKey);

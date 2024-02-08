@@ -6,8 +6,8 @@ namespace Terminal.Gui;
 /// <summary>A clipboard implementation for Linux. This implementation uses the xclip command to access the clipboard.</summary>
 /// <remarks>If xclip is not installed, this implementation will not work.</remarks>
 class CursesClipboard : ClipboardBase {
-    private string _xclipPath = string.Empty;
     public CursesClipboard () { IsSupported = CheckSupport (); }
+    private string _xclipPath = string.Empty;
 
     public override bool IsSupported { get; }
 
@@ -74,6 +74,21 @@ class CursesClipboard : ClipboardBase {
 ///     copy/paste. The existance of the Mac pbcopy and pbpaste commands is used to determine if copy/paste is supported.
 /// </summary>
 class MacOSXClipboard : ClipboardBase {
+    public MacOSXClipboard () {
+        _utfTextType = objc_msgSend (
+            objc_msgSend (_nsString, _allocRegister),
+            _initWithUtf8Register,
+            "public.utf8-plain-text"
+        );
+        _nsStringPboardType = objc_msgSend (
+            objc_msgSend (_nsString, _allocRegister),
+            _initWithUtf8Register,
+            "NSStringPboardType"
+        );
+        _generalPasteboard = objc_msgSend (_nsPasteboard, _generalPasteboardRegister);
+        IsSupported = CheckSupport ();
+    }
+
     private readonly nint _allocRegister = sel_registerName ("alloc");
     private readonly nint _clearContentsRegister = sel_registerName ("clearContents");
     private readonly nint _generalPasteboard;
@@ -86,19 +101,6 @@ class MacOSXClipboard : ClipboardBase {
     private readonly nint _stringForTypeRegister = sel_registerName ("stringForType:");
     private readonly nint _utf8Register = sel_registerName ("UTF8String");
     private readonly nint _utfTextType;
-
-    public MacOSXClipboard () {
-        _utfTextType = objc_msgSend (
-                                     objc_msgSend (_nsString, _allocRegister),
-                                     _initWithUtf8Register,
-                                     "public.utf8-plain-text");
-        _nsStringPboardType = objc_msgSend (
-                                            objc_msgSend (_nsString, _allocRegister),
-                                            _initWithUtf8Register,
-                                            "NSStringPboardType");
-        _generalPasteboard = objc_msgSend (_nsPasteboard, _generalPasteboardRegister);
-        IsSupported = CheckSupport ();
-    }
 
     public override bool IsSupported { get; }
 
@@ -192,8 +194,9 @@ class WSLClipboard : ClipboardBase {
         }
 
         (int exitCode, string output) = ClipboardProcessRunner.Process (
-                                                                        _powershellPath,
-                                                                        $"-noprofile -command \"Set-Clipboard -Value \\\"{text}\\\"\"");
+            _powershellPath,
+            $"-noprofile -command \"Set-Clipboard -Value \\\"{text}\\\"\""
+        );
         if (exitCode == 0) {
             if (Application.Driver is CursesDriver) {
                 Curses.raw ();

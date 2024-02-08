@@ -8,7 +8,7 @@
 // Copyright (C) 2004 Novell, Inc. http://www.novell.com
 //
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Stores an ordered pair of integers, which specify a Height and Width.</summary>
 public struct Size {
@@ -22,8 +22,9 @@ public struct Size {
     /// <remarks>Addition of two Size structures.</remarks>
     public static Size operator + (Size sz1, Size sz2) {
         return new Size (
-                         sz1.Width + sz2.Width,
-                         sz1.Height + sz2.Height);
+            sz1.Width + sz2.Width,
+            sz1.Height + sz2.Height
+        );
     }
 
     /// <summary>Equality Operator</summary>
@@ -53,8 +54,9 @@ public struct Size {
     /// <remarks>Subtracts two Size structures.</remarks>
     public static Size operator - (Size sz1, Size sz2) {
         return new Size (
-                         sz1.Width - sz2.Width,
-                         sz1.Height - sz2.Height);
+            sz1.Width - sz2.Width,
+            sz1.Height - sz2.Height
+        );
     }
 
     /// <summary>Size to Point Conversion</summary>
@@ -142,8 +144,9 @@ public struct Size {
     /// <param name="sz2">The second Size structure to add.</param>
     public static Size Add (Size sz1, Size sz2) {
         return new Size (
-                         sz1.Width + sz2.Width,
-                         sz1.Height + sz2.Height);
+            sz1.Width + sz2.Width,
+            sz1.Height + sz2.Height
+        );
     }
 
     /// <summary>Subtracts the width and height of one Size structure to the width and height of another Size structure.</summary>
@@ -152,7 +155,8 @@ public struct Size {
     /// <param name="sz2">The second Size structure to subtract.</param>
     public static Size Subtract (Size sz1, Size sz2) {
         return new Size (
-                         sz1.Width - sz2.Width,
-                         sz1.Height - sz2.Height);
+            sz1.Width - sz2.Width,
+            sz1.Height - sz2.Height
+        );
     }
 }

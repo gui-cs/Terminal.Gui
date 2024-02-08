@@ -1,11 +1,8 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary><see cref="ITableSource"/> implementation that wraps arbitrary data.</summary>
 /// <typeparam name="T"></typeparam>
 public class EnumerableTableSource<T> : IEnumerableTableSource<T> {
-    private readonly T[] data;
-    private readonly Dictionary<string, Func<T, object>> lamdas;
-
     /// <summary>Creates a new instance of the class that presents <paramref name="data"/> collection as a table.</summary>
     /// <remarks>
     ///     The elements of the <paramref name="data"/> collection are recorded during construction (immutable) but the
@@ -29,6 +26,9 @@ public class EnumerableTableSource<T> : IEnumerableTableSource<T> {
         ColumnNames = columnDefinitions.Keys.ToArray ();
         lamdas = columnDefinitions;
     }
+
+    private readonly Dictionary<string, Func<T, object>> lamdas;
+    private readonly T[] data;
 
     /// <summary>Gets the object collection hosted by this wrapper.</summary>
     public IReadOnlyCollection<T> Data => data.AsReadOnly ();

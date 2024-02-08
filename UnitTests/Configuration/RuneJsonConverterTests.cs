@@ -33,9 +33,11 @@ public class RunJsonConverterTests {
 
         // Assert
         Assert.Throws<JsonException> (
-                                      () => JsonSerializer.Deserialize<Rune> (
-                                                                              json,
-                                                                              ConfigurationManager._serializerOptions));
+            () => JsonSerializer.Deserialize<Rune> (
+                json,
+                ConfigurationManager._serializerOptions
+            )
+        );
     }
 
     [Theory]

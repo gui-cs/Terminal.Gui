@@ -1,15 +1,12 @@
 ﻿using System.Text.Json;
 using static Terminal.Gui.ConfigurationManager;
 
-namespace Terminal.Gui.ConfigurationTests; 
+namespace Terminal.Gui.ConfigurationTests;
 
 public class ThemeTests {
-    public static readonly JsonSerializerOptions _jsonOptions = new() {
-                                                                          Converters = {
-                                                                              new AttributeJsonConverter (),
-                                                                              new ColorJsonConverter ()
-                                                                          }
-                                                                      };
+    public static readonly JsonSerializerOptions _jsonOptions = new () {
+        Converters = { new AttributeJsonConverter (), new ColorJsonConverter () }
+    };
 
     [Fact]
     public void TestApply () {
@@ -43,16 +40,16 @@ public class ThemeTests {
 
         var colorScheme = new ColorScheme { Normal = new Attribute (Color.Red, Color.Green) };
 
-        theme["ColorSchemes"].PropertyValue = new Dictionary<string, ColorScheme> {
-                                                  { "test", colorScheme }
-                                              };
+        theme["ColorSchemes"].PropertyValue = new Dictionary<string, ColorScheme> { { "test", colorScheme } };
 
         Assert.Equal (
-                      new Color (Color.Red),
-                      ((Dictionary<string, ColorScheme>)theme["ColorSchemes"].PropertyValue)["test"].Normal.Foreground);
+            new Color (Color.Red),
+            ((Dictionary<string, ColorScheme>)theme["ColorSchemes"].PropertyValue)["test"].Normal.Foreground
+        );
         Assert.Equal (
-                      new Color (Color.Green),
-                      ((Dictionary<string, ColorScheme>)theme["ColorSchemes"].PropertyValue)["test"].Normal.Background);
+            new Color (Color.Green),
+            ((Dictionary<string, ColorScheme>)theme["ColorSchemes"].PropertyValue)["test"].Normal.Background
+        );
 
         // Act
         Themes.Theme = "testTheme";
@@ -78,8 +75,9 @@ public class ThemeTests {
         var deserialized = JsonSerializer.Deserialize<ThemeScope> (json, _jsonOptions);
 
         Assert.Equal (
-                      Dialog.ButtonAlignments.Right,
-                      (Dialog.ButtonAlignments)deserialized["Dialog.DefaultButtonAlignment"].PropertyValue);
+            Dialog.ButtonAlignments.Right,
+            (Dialog.ButtonAlignments)deserialized["Dialog.DefaultButtonAlignment"].PropertyValue
+        );
     }
 
     [Fact]
@@ -99,14 +97,14 @@ public class ThemeTests {
 
         var newTheme = new ThemeScope ();
         var colorScheme = new ColorScheme {
-                                              // note: ColorScheme's can't be partial; default for each attribute
-                                              // is always White/Black
-                                              Normal = new Attribute (Color.Red, Color.Green),
-                                              Focus = new Attribute (Color.Cyan, Color.BrightCyan),
-                                              HotNormal = new Attribute (Color.Yellow, Color.BrightYellow),
-                                              HotFocus = new Attribute (Color.Green, Color.BrightGreen),
-                                              Disabled = new Attribute (Color.Gray, Color.DarkGray)
-                                          };
+            // note: ColorScheme's can't be partial; default for each attribute
+            // is always White/Black
+            Normal = new Attribute (Color.Red, Color.Green),
+            Focus = new Attribute (Color.Cyan, Color.BrightCyan),
+            HotNormal = new Attribute (Color.Yellow, Color.BrightYellow),
+            HotFocus = new Attribute (Color.Green, Color.BrightGreen),
+            Disabled = new Attribute (Color.Gray, Color.DarkGray)
+        };
 
         newTheme["ColorSchemes"].PropertyValue = Colors.Reset ();
         Assert.Equal (5, Colors.ColorSchemes.Count);
@@ -135,14 +133,14 @@ public class ThemeTests {
         Assert.NotEmpty (theme);
 
         var colorScheme = new ColorScheme {
-                                              // note: ColorScheme's can't be partial; default for each attribute
-                                              // is always White/Black
-                                              Normal = new Attribute (Color.Red, Color.Green),
-                                              Focus = new Attribute (Color.Cyan, Color.BrightCyan),
-                                              HotNormal = new Attribute (Color.Yellow, Color.BrightYellow),
-                                              HotFocus = new Attribute (Color.Green, Color.BrightGreen),
-                                              Disabled = new Attribute (Color.Gray, Color.DarkGray)
-                                          };
+            // note: ColorScheme's can't be partial; default for each attribute
+            // is always White/Black
+            Normal = new Attribute (Color.Red, Color.Green),
+            Focus = new Attribute (Color.Cyan, Color.BrightCyan),
+            HotNormal = new Attribute (Color.Yellow, Color.BrightYellow),
+            HotFocus = new Attribute (Color.Green, Color.BrightGreen),
+            Disabled = new Attribute (Color.Gray, Color.DarkGray)
+        };
         theme["ColorSchemes"].PropertyValue = Colors.Reset ();
         ((Dictionary<string, ColorScheme>)theme["ColorSchemes"].PropertyValue)["test"] = colorScheme;
 
@@ -154,13 +152,12 @@ public class ThemeTests {
         // Change just Normal
         var newTheme = new ThemeScope ();
         var newColorScheme = new ColorScheme {
-                                                 Normal = new Attribute (Color.Blue, Color.BrightBlue),
-
-                                                 Focus = colorScheme.Focus,
-                                                 HotNormal = colorScheme.HotNormal,
-                                                 HotFocus = colorScheme.HotFocus,
-                                                 Disabled = colorScheme.Disabled
-                                             };
+            Normal = new Attribute (Color.Blue, Color.BrightBlue),
+            Focus = colorScheme.Focus,
+            HotNormal = colorScheme.HotNormal,
+            HotFocus = colorScheme.HotFocus,
+            Disabled = colorScheme.Disabled
+        };
         newTheme["ColorSchemes"].PropertyValue = Colors.Reset ();
         ((Dictionary<string, ColorScheme>)newTheme["ColorSchemes"].PropertyValue)["test"] = newColorScheme;
 

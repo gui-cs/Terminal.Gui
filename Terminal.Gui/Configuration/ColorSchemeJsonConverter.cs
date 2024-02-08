@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Implements a JSON converter for <see cref="ColorScheme"/>.</summary>
 class ColorSchemeJsonConverter : JsonConverter<ColorScheme> {
@@ -33,12 +33,12 @@ class ColorSchemeJsonConverter : JsonConverter<ColorScheme> {
         while (reader.Read ()) {
             if (reader.TokenType == JsonTokenType.EndObject) {
                 var colorScheme = new ColorScheme {
-                                                      Normal = normal,
-                                                      Focus = focus,
-                                                      HotNormal = hotNormal,
-                                                      HotFocus = hotFocus,
-                                                      Disabled = disabled
-                                                  };
+                    Normal = normal,
+                    Focus = focus,
+                    HotNormal = hotNormal,
+                    HotFocus = hotFocus,
+                    Disabled = disabled
+                };
 
                 return colorScheme;
             }

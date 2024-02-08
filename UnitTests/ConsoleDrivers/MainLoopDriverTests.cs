@@ -49,12 +49,13 @@ public class MainLoopDriverTests {
         var callbackInvoked = false;
 
         object token = mainLoop.AddTimeout (
-                                            TimeSpan.FromMilliseconds (100),
-                                            () => {
-                                                callbackInvoked = true;
+            TimeSpan.FromMilliseconds (100),
+            () => {
+                callbackInvoked = true;
 
-                                                return false;
-                                            });
+                return false;
+            }
+        );
 
         Assert.NotNull (token);
         mainLoop.RunIteration (); // Run an iteration to process the timeout

@@ -4,8 +4,8 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.ViewsTests;
 
 public class AllViewsTests {
-    private readonly ITestOutputHelper _output;
     public AllViewsTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void AllViews_Center_Properly () {
@@ -31,12 +31,7 @@ public class AllViewsTests {
             view.Width = 10;
             view.Height = 10;
 
-            var frame = new View {
-                                     X = 0,
-                                     Y = 0,
-                                     Width = 50,
-                                     Height = 50
-                                 };
+            var frame = new View { X = 0, Y = 0, Width = 50, Height = 50 };
             frame.Add (view);
             frame.BeginInit ();
             frame.EndInit ();
@@ -47,11 +42,13 @@ public class AllViewsTests {
             int expectedY = (frame.Frame.Height - view.Frame.Height) / 2;
 
             Assert.True (
-                         view.Frame.Left == expectedX,
-                         $"{view} did not center horizontally. Expected: {expectedX}. Actual: {view.Frame.Left}");
+                view.Frame.Left == expectedX,
+                $"{view} did not center horizontally. Expected: {expectedX}. Actual: {view.Frame.Left}"
+            );
             Assert.True (
-                         view.Frame.Top == expectedY,
-                         $"{view} did not center vertically. Expected: {expectedY}. Actual: {view.Frame.Top}");
+                view.Frame.Top == expectedY,
+                $"{view} did not center vertically. Expected: {expectedY}. Actual: {view.Frame.Top}"
+            );
             Application.Shutdown ();
         }
     }
@@ -79,12 +76,12 @@ public class AllViewsTests {
             vType.Height = 1;
 
             var view = new View {
-                                    X = 0,
-                                    Y = 1,
-                                    Width = 10,
-                                    Height = 1,
-                                    CanFocus = true
-                                };
+                X = 0,
+                Y = 1,
+                Width = 10,
+                Height = 1,
+                CanFocus = true
+            };
             var vTypeEnter = 0;
             var vTypeLeave = 0;
             var viewEnter = 0;
@@ -138,10 +135,11 @@ public class AllViewsTests {
 
     public static List<Type> GetAllViewClasses () {
         return typeof (View).Assembly.GetTypes ()
-                            .Where (
-                                    myType => myType.IsClass && !myType.IsAbstract && myType.IsPublic
-                                              && myType.IsSubclassOf (typeof (View)))
-                            .ToList ();
+            .Where (
+                myType => myType.IsClass && !myType.IsAbstract && myType.IsPublic
+                          && myType.IsSubclassOf (typeof (View))
+            )
+            .ToList ();
     }
 
     //[Fact]

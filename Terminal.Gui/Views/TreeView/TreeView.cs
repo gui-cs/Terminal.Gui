@@ -43,33 +43,6 @@ public class TreeView : TreeView<ITreeNode> {
 /// </summary>
 public class TreeView<T> : View, ITreeView where T : class {
     /// <summary>
-    ///     Error message to display when the control is not properly initialized at draw time (nodes added but no tree
-    ///     builder set).
-    /// </summary>
-    public static string NoBuilderError = "ERROR: TreeBuilder Not Set";
-
-    /// <summary>Secondary selected regions of tree when <see cref="MultiSelect"/> is true.</summary>
-    private readonly Stack<TreeSelection<T>> multiSelectedRegions = new ();
-
-    /// <summary>Cached result of <see cref="BuildLineMap"/></summary>
-    private IReadOnlyCollection<Branch<T>> cachedLineMap;
-
-    private CursorVisibility desiredCursorVisibility = CursorVisibility.Invisible;
-
-    /// <summary>
-    ///     Interface for filtering which lines of the tree are displayed e.g. to provide text searching.  Defaults to
-    ///     <see langword="null"/> (no filtering).
-    /// </summary>
-    public ITreeViewFilter<T> Filter = null;
-
-    private KeyCode objectActivationKey = KeyCode.Enter;
-    private int scrollOffsetHorizontal;
-    private int scrollOffsetVertical;
-
-    /// <summary>private variable for <see cref="SelectedObject"/></summary>
-    private T selectedObject;
-
-    /// <summary>
     ///     Creates a new tree view with absolute positioning. Use <see cref="AddObjects(IEnumerable{T})"/> to set set
     ///     root objects for the tree. Children will not be rendered until you set <see cref="TreeBuilder"/>.
     /// </summary>
@@ -78,148 +51,168 @@ public class TreeView<T> : View, ITreeView where T : class {
 
         // Things this view knows how to do
         AddCommand (
-                    Command.PageUp,
-                    () => {
-                        MovePageUp ();
+            Command.PageUp,
+            () => {
+                MovePageUp ();
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.PageDown,
-                    () => {
-                        MovePageDown ();
+            Command.PageDown,
+            () => {
+                MovePageDown ();
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.PageUpExtend,
-                    () => {
-                        MovePageUp (true);
+            Command.PageUpExtend,
+            () => {
+                MovePageUp (true);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.PageDownExtend,
-                    () => {
-                        MovePageDown (true);
+            Command.PageDownExtend,
+            () => {
+                MovePageDown (true);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.Expand,
-                    () => {
-                        Expand ();
+            Command.Expand,
+            () => {
+                Expand ();
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.ExpandAll,
-                    () => {
-                        ExpandAll (SelectedObject);
+            Command.ExpandAll,
+            () => {
+                ExpandAll (SelectedObject);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.Collapse,
-                    () => {
-                        CursorLeft (false);
+            Command.Collapse,
+            () => {
+                CursorLeft (false);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.CollapseAll,
-                    () => {
-                        CursorLeft (true);
+            Command.CollapseAll,
+            () => {
+                CursorLeft (true);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.LineUp,
-                    () => {
-                        AdjustSelection (-1);
+            Command.LineUp,
+            () => {
+                AdjustSelection (-1);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.LineUpExtend,
-                    () => {
-                        AdjustSelection (-1, true);
+            Command.LineUpExtend,
+            () => {
+                AdjustSelection (-1, true);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.LineUpToFirstBranch,
-                    () => {
-                        AdjustSelectionToBranchStart ();
+            Command.LineUpToFirstBranch,
+            () => {
+                AdjustSelectionToBranchStart ();
 
-                        return true;
-                    });
-
-        AddCommand (
-                    Command.LineDown,
-                    () => {
-                        AdjustSelection (1);
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.LineDownExtend,
-                    () => {
-                        AdjustSelection (1, true);
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.LineDownToLastBranch,
-                    () => {
-                        AdjustSelectionToBranchEnd ();
-
-                        return true;
-                    });
+                return true;
+            }
+        );
 
         AddCommand (
-                    Command.TopHome,
-                    () => {
-                        GoToFirst ();
+            Command.LineDown,
+            () => {
+                AdjustSelection (1);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.BottomEnd,
-                    () => {
-                        GoToEnd ();
+            Command.LineDownExtend,
+            () => {
+                AdjustSelection (1, true);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.SelectAll,
-                    () => {
-                        SelectAll ();
+            Command.LineDownToLastBranch,
+            () => {
+                AdjustSelectionToBranchEnd ();
 
-                        return true;
-                    });
+                return true;
+            }
+        );
 
         AddCommand (
-                    Command.ScrollUp,
-                    () => {
-                        ScrollUp ();
+            Command.TopHome,
+            () => {
+                GoToFirst ();
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.ScrollDown,
-                    () => {
-                        ScrollDown ();
+            Command.BottomEnd,
+            () => {
+                GoToEnd ();
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.Accept,
-                    () => {
-                        ActivateSelectedObjectIfAny ();
+            Command.SelectAll,
+            () => {
+                SelectAll ();
 
-                        return true;
-                    });
+                return true;
+            }
+        );
+
+        AddCommand (
+            Command.ScrollUp,
+            () => {
+                ScrollUp ();
+
+                return true;
+            }
+        );
+        AddCommand (
+            Command.ScrollDown,
+            () => {
+                ScrollDown ();
+
+                return true;
+            }
+        );
+        AddCommand (
+            Command.Accept,
+            () => {
+                ActivateSelectedObjectIfAny ();
+
+                return true;
+            }
+        );
 
         // Default keybindings for this view
         KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
@@ -251,9 +244,32 @@ public class TreeView<T> : View, ITreeView where T : class {
     /// </summary>
     public TreeView (ITreeBuilder<T> builder) : this () { TreeBuilder = builder; }
 
-    /// <summary>True makes a letter key press navigate to the next visible branch that begins with that letter/digit.</summary>
-    /// <value></value>
-    public bool AllowLetterBasedNavigation { get; set; } = true;
+    /// <summary>
+    ///     Error message to display when the control is not properly initialized at draw time (nodes added but no tree
+    ///     builder set).
+    /// </summary>
+    public static string NoBuilderError = "ERROR: TreeBuilder Not Set";
+
+    /// <summary>Secondary selected regions of tree when <see cref="MultiSelect"/> is true.</summary>
+    private readonly Stack<TreeSelection<T>> multiSelectedRegions = new ();
+
+    private CursorVisibility desiredCursorVisibility = CursorVisibility.Invisible;
+    private int scrollOffsetHorizontal;
+    private int scrollOffsetVertical;
+
+    /// <summary>Cached result of <see cref="BuildLineMap"/></summary>
+    private IReadOnlyCollection<Branch<T>> cachedLineMap;
+
+    /// <summary>
+    ///     Interface for filtering which lines of the tree are displayed e.g. to provide text searching.  Defaults to
+    ///     <see langword="null"/> (no filtering).
+    /// </summary>
+    public ITreeViewFilter<T> Filter = null;
+
+    private KeyCode objectActivationKey = KeyCode.Enter;
+
+    /// <summary>private variable for <see cref="SelectedObject"/></summary>
+    private T selectedObject;
 
     /// <summary>
     ///     Returns the string representation of model objects hosted in the tree. Default implementation is to call
@@ -262,14 +278,19 @@ public class TreeView<T> : View, ITreeView where T : class {
     /// <value></value>
     public AspectGetterDelegate<T> AspectGetter { get; set; } = o => o.ToString () ?? "";
 
-    /// <summary>
-    ///     Delegate for multi colored tree views. Return the <see cref="ColorScheme"/> to use for each passed object or
-    ///     null to use the default.
-    /// </summary>
-    public Func<T, ColorScheme> ColorGetter { get; set; }
+    /// <summary>True makes a letter key press navigate to the next visible branch that begins with that letter/digit.</summary>
+    /// <value></value>
+    public bool AllowLetterBasedNavigation { get; set; } = true;
 
-    /// <summary>The current number of rows in the tree (ignoring the controls bounds).</summary>
-    public int ContentHeight => BuildLineMap ().Count ();
+    /// <summary>True to allow multiple objects to be selected at once.</summary>
+    /// <value></value>
+    public bool MultiSelect { get; set; } = true;
+
+    /// <summary>
+    ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="Objects"/> collection as the user
+    ///     types.
+    /// </summary>
+    public CollectionNavigator KeystrokeNavigator { get; } = new ();
 
     /// <summary>
     ///     Get / Set the wished cursor when the tree is focused. Only applies when <see cref="MultiSelect"/> is true.
@@ -288,39 +309,19 @@ public class TreeView<T> : View, ITreeView where T : class {
     }
 
     /// <summary>
-    ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="Objects"/> collection as the user
-    ///     types.
+    ///     Delegate for multi colored tree views. Return the <see cref="ColorScheme"/> to use for each passed object or
+    ///     null to use the default.
     /// </summary>
-    public CollectionNavigator KeystrokeNavigator { get; } = new ();
-
-    /// <summary>Maximum number of nodes that can be expanded in any given branch.</summary>
-    public int MaxDepth { get; set; } = 100;
-
-    /// <summary>True to allow multiple objects to be selected at once.</summary>
-    /// <value></value>
-    public bool MultiSelect { get; set; } = true;
-
-    /// <summary>
-    ///     Mouse event to trigger <see cref="TreeView{T}.ObjectActivated"/>. Defaults to double click (
-    ///     <see cref="MouseFlags.Button1DoubleClicked"/>). Set to null to disable this feature.
-    /// </summary>
-    /// <value></value>
-    public MouseFlags? ObjectActivationButton { get; set; } = MouseFlags.Button1DoubleClicked;
-
-    // TODO: Update to use Key instead of KeyCode
-    /// <summary>Key which when pressed triggers <see cref="TreeView{T}.ObjectActivated"/>. Defaults to Enter.</summary>
-    public KeyCode ObjectActivationKey {
-        get => objectActivationKey;
-        set {
-            if (objectActivationKey != value) {
-                KeyBindings.Replace (ObjectActivationKey, value);
-                objectActivationKey = value;
-            }
-        }
-    }
+    public Func<T, ColorScheme> ColorGetter { get; set; }
 
     /// <summary>The root objects in the tree, note that this collection is of root objects only.</summary>
     public IEnumerable<T> Objects => roots.Keys;
+
+    /// <summary>The current number of rows in the tree (ignoring the controls bounds).</summary>
+    public int ContentHeight => BuildLineMap ().Count ();
+
+    /// <summary>Maximum number of nodes that can be expanded in any given branch.</summary>
+    public int MaxDepth { get; set; } = 100;
 
     /// <summary>The amount of tree view that has been scrolled to the right (horizontally).</summary>
     /// <remarks>
@@ -339,6 +340,29 @@ public class TreeView<T> : View, ITreeView where T : class {
     /// </remarks>
     public int ScrollOffsetVertical { get => scrollOffsetVertical; set => scrollOffsetVertical = Math.Max (0, value); }
 
+    /// <summary>Determines how sub branches of the tree are dynamically built at runtime as the user expands root nodes.</summary>
+    /// <value></value>
+    public ITreeBuilder<T> TreeBuilder { get; set; }
+
+    // TODO: Update to use Key instead of KeyCode
+    /// <summary>Key which when pressed triggers <see cref="TreeView{T}.ObjectActivated"/>. Defaults to Enter.</summary>
+    public KeyCode ObjectActivationKey {
+        get => objectActivationKey;
+        set {
+            if (objectActivationKey != value) {
+                KeyBindings.Replace (ObjectActivationKey, value);
+                objectActivationKey = value;
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Mouse event to trigger <see cref="TreeView{T}.ObjectActivated"/>. Defaults to double click (
+    ///     <see cref="MouseFlags.Button1DoubleClicked"/>). Set to null to disable this feature.
+    /// </summary>
+    /// <value></value>
+    public MouseFlags? ObjectActivationButton { get; set; } = MouseFlags.Button1DoubleClicked;
+
     /// <summary>
     ///     The currently selected object in the tree. When <see cref="MultiSelect"/> is true this is the object at which
     ///     the cursor is at.
@@ -354,10 +378,6 @@ public class TreeView<T> : View, ITreeView where T : class {
             }
         }
     }
-
-    /// <summary>Determines how sub branches of the tree are dynamically built at runtime as the user expands root nodes.</summary>
-    /// <value></value>
-    public ITreeBuilder<T> TreeBuilder { get; set; }
 
     /// <summary>
     ///     Map of root objects to the branches under them. All objects have a <see cref="Branch{T}"/> even if that branch
@@ -740,8 +760,8 @@ public class TreeView<T> : View, ITreeView where T : class {
     }
 
     /// <summary>
-    ///     Returns the object in the tree list that is currently visible. at the provided row. Returns null if no object is at
-    ///     that location.
+    ///     Returns the object in the tree list that is currently visible. at the provided row. Returns null if no object
+    ///     is at that location.
     ///     <remarks></remarks>
     ///     If you have screen coordinates then use <see cref="View.ScreenToFrame"/> to translate these into the client area of
     ///     the <see cref="TreeView{T}"/>.
@@ -1361,8 +1381,6 @@ public class TreeView<T> : View, ITreeView where T : class {
 }
 
 class TreeSelection<T> where T : class {
-    private readonly HashSet<T> included = new ();
-
     /// <summary>Creates a new selection between two branches in the tree</summary>
     /// <param name="from"></param>
     /// <param name="toIndex"></param>
@@ -1381,6 +1399,8 @@ class TreeSelection<T> where T : class {
             included.Add (alsoInclude.Model);
         }
     }
+
+    private readonly HashSet<T> included = new ();
 
     public Branch<T> Origin { get; }
 

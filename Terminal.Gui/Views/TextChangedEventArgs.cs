@@ -5,7 +5,7 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Event args for the <see cref="TextField.TextChanged"/> event</summary>
 public class TextChangedEventArgs : EventArgs {

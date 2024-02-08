@@ -1,4 +1,4 @@
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 ///     <see cref="ITreeViewFilter{T}"/> implementation which searches the <see cref="TreeView{T}.AspectGetter"/> of
@@ -6,9 +6,6 @@ namespace Terminal.Gui;
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public class TreeViewTextFilter<T> : ITreeViewFilter<T> where T : class {
-    private readonly TreeView<T> _forTree;
-    private string text;
-
     /// <summary>
     ///     Creates a new instance of the filter for use with <paramref name="forTree"/>. Set <see cref="Text"/> to begin
     ///     filtering.
@@ -19,8 +16,8 @@ public class TreeViewTextFilter<T> : ITreeViewFilter<T> where T : class {
         _forTree = forTree ?? throw new ArgumentNullException (nameof (forTree));
     }
 
-    /// <summary>The case sensitivity of the search match. Defaults to <see cref="StringComparison.OrdinalIgnoreCase"/>.</summary>
-    public StringComparison Comparer { get; set; } = StringComparison.OrdinalIgnoreCase;
+    private readonly TreeView<T> _forTree;
+    private string text;
 
     /// <summary>The text that will be searched for in the <see cref="TreeView{T}"/></summary>
     public string Text {
@@ -30,6 +27,9 @@ public class TreeViewTextFilter<T> : ITreeViewFilter<T> where T : class {
             RefreshTreeView ();
         }
     }
+
+    /// <summary>The case sensitivity of the search match. Defaults to <see cref="StringComparison.OrdinalIgnoreCase"/>.</summary>
+    public StringComparison Comparer { get; set; } = StringComparison.OrdinalIgnoreCase;
 
     /// <summary>
     ///     Returns <typeparamref name="T"/> if there is no <see cref="Text"/> or the text matches the

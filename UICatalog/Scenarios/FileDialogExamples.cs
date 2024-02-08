@@ -54,11 +54,8 @@ public class FileDialogExamples : Scenario {
         x = 24;
 
         Win.Add (
-                 new LineView (Orientation.Vertical) {
-                                                         X = x++,
-                                                         Y = 1,
-                                                         Height = 4
-                                                     });
+            new LineView (Orientation.Vertical) { X = x++, Y = 1, Height = 4 }
+        );
         Win.Add (new Label { X = x++, Y = y++, Text = "Caption" });
 
         _rgCaption = new RadioGroup { X = x, Y = y };
@@ -69,11 +66,8 @@ public class FileDialogExamples : Scenario {
         x = 34;
 
         Win.Add (
-                 new LineView (Orientation.Vertical) {
-                                                         X = x++,
-                                                         Y = 1,
-                                                         Height = 4
-                                                     });
+            new LineView (Orientation.Vertical) { X = x++, Y = 1, Height = 4 }
+        );
         Win.Add (new Label { X = x++, Y = y++, Text = "OpenMode" });
 
         _rgOpenMode = new RadioGroup { X = x, Y = y };
@@ -84,11 +78,8 @@ public class FileDialogExamples : Scenario {
         x = 48;
 
         Win.Add (
-                 new LineView (Orientation.Vertical) {
-                                                         X = x++,
-                                                         Y = 1,
-                                                         Height = 4
-                                                     });
+            new LineView (Orientation.Vertical) { X = x++, Y = 1, Height = 4 }
+        );
         Win.Add (new Label { X = x++, Y = y++, Text = "Icons" });
 
         _rgIcons = new RadioGroup { X = x, Y = y };
@@ -102,11 +93,8 @@ public class FileDialogExamples : Scenario {
         x = 24;
 
         Win.Add (
-                 new LineView (Orientation.Vertical) {
-                                                         X = x++,
-                                                         Y = y + 1,
-                                                         Height = 4
-                                                     });
+            new LineView (Orientation.Vertical) { X = x++, Y = y + 1, Height = 4 }
+        );
         Win.Add (new Label { X = x++, Y = y++, Text = "Allowed" });
 
         _rgAllowedTypes = new RadioGroup { X = x, Y = y };
@@ -117,11 +105,8 @@ public class FileDialogExamples : Scenario {
         x = 45;
 
         Win.Add (
-                 new LineView (Orientation.Vertical) {
-                                                         X = x++,
-                                                         Y = y + 1,
-                                                         Height = 4
-                                                     });
+            new LineView (Orientation.Vertical) { X = x++, Y = y + 1, Height = 4 }
+        );
         Win.Add (new Label { X = x++, Y = y++, Text = "Buttons" });
 
         Win.Add (new Label { X = x, Y = y++, Text = "Ok Text:" });
@@ -133,11 +118,7 @@ public class FileDialogExamples : Scenario {
         _cbFlipButtonOrder = new CheckBox { X = x, Y = y++, Text = "Flip Order" };
         Win.Add (_cbFlipButtonOrder);
 
-        var btn = new Button {
-                                 X = 1,
-                                 Y = 9,
-                                 Text = "Run Dialog"
-                             };
+        var btn = new Button { X = 1, Y = 9, Text = "Run Dialog" };
 
         SetupHandler (btn);
         Win.Add (btn);
@@ -154,11 +135,12 @@ public class FileDialogExamples : Scenario {
 
     private void CreateDialog () {
         var fd = new FileDialog {
-                                    OpenMode = Enum.Parse<OpenMode> (
-                                                                     _rgOpenMode.RadioLabels[_rgOpenMode.SelectedItem]),
-                                    MustExist = _cbMustExist.Checked ?? false,
-                                    AllowsMultipleSelection = _cbAllowMultipleSelection.Checked ?? false
-                                };
+            OpenMode = Enum.Parse<OpenMode> (
+                _rgOpenMode.RadioLabels[_rgOpenMode.SelectedItem]
+            ),
+            MustExist = _cbMustExist.Checked ?? false,
+            AllowsMultipleSelection = _cbAllowMultipleSelection.Checked ?? false
+        };
 
         fd.Style.OkButtonText = _rgCaption.RadioLabels[_rgCaption.SelectedItem];
 
@@ -211,20 +193,23 @@ public class FileDialogExamples : Scenario {
 
         if (fd.Canceled) {
             MessageBox.Query (
-                              "Canceled",
-                              "You canceled navigation and did not pick anything",
-                              "Ok");
+                "Canceled",
+                "You canceled navigation and did not pick anything",
+                "Ok"
+            );
         } else if (_cbAllowMultipleSelection.Checked ?? false) {
             MessageBox.Query (
-                              "Chosen!",
-                              "You chose:" + Environment.NewLine +
-                              string.Join (Environment.NewLine, fd.MultiSelected.Select (m => m)),
-                              "Ok");
+                "Chosen!",
+                "You chose:" + Environment.NewLine +
+                string.Join (Environment.NewLine, fd.MultiSelected.Select (m => m)),
+                "Ok"
+            );
         } else {
             MessageBox.Query (
-                              "Chosen!",
-                              "You chose:" + Environment.NewLine + fd.Path,
-                              "Ok");
+                "Chosen!",
+                "You chose:" + Environment.NewLine + fd.Path,
+                "Ok"
+            );
         }
     }
 

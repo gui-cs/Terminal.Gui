@@ -36,15 +36,15 @@ public abstract class ConsoleDriver {
     // This is in addition to the dirty flag on each cell.
     internal bool[] _dirtyLines;
 
-    /// <summary>Gets the dimensions of the terminal.</summary>
-    public Rect Bounds => new (0, 0, Cols, Rows);
-
     /// <summary>
-    ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
-    ///     to.
+    ///     The contents of the application output. The driver outputs this buffer to the terminal when
+    ///     <see cref="UpdateScreen"/> is called.
+    ///     <remarks>The format of the array is rows, columns. The first index is the row, the second index is the column.</remarks>
     /// </summary>
-    /// <value>The rectangle describing the bounds of <see cref="Clip"/>.</value>
-    public Rect Clip { get; set; }
+    public Cell[,] Contents { get; internal set; }
+
+    /// <summary>Set flags to enable/disable <see cref="ConsoleDriver"/> diagnostics.</summary>
+    public static DiagnosticFlags Diagnostics { get; set; }
 
     /// <summary>Get the operating system clipboard.</summary>
     public IClipboard Clipboard { get; internal set; }
@@ -63,16 +63,6 @@ public abstract class ConsoleDriver {
             ClearContents ();
         }
     }
-
-    /// <summary>
-    ///     The contents of the application output. The driver outputs this buffer to the terminal when
-    ///     <see cref="UpdateScreen"/> is called.
-    ///     <remarks>The format of the array is rows, columns. The first index is the row, the second index is the column.</remarks>
-    /// </summary>
-    public Cell[,] Contents { get; internal set; }
-
-    /// <summary>Set flags to enable/disable <see cref="ConsoleDriver"/> diagnostics.</summary>
-    public static DiagnosticFlags Diagnostics { get; set; }
 
     /// <summary>The leftmost column in the terminal.</summary>
     public virtual int Left { get; internal set; } = 0;
@@ -94,6 +84,16 @@ public abstract class ConsoleDriver {
 
     /// <summary>The topmost row in the terminal.</summary>
     public virtual int Top { get; internal set; } = 0;
+
+    /// <summary>Gets the dimensions of the terminal.</summary>
+    public Rect Bounds => new (0, 0, Cols, Rows);
+
+    /// <summary>
+    ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
+    ///     to.
+    /// </summary>
+    /// <value>The rectangle describing the bounds of <see cref="Clip"/>.</value>
+    public Rect Clip { get; set; }
 
     /// <summary>
     ///     Set this to true in any unit tests that attempt to test drivers other than FakeDriver.
@@ -282,10 +282,8 @@ public abstract class ConsoleDriver {
                 for (var row = 0; row < Rows; row++) {
                     for (var c = 0; c < Cols; c++) {
                         Contents[row, c] = new Cell {
-                                                        Rune = (Rune)' ',
-                                                        Attribute = new Attribute (Color.White, Color.Black),
-                                                        IsDirty = true
-                                                    };
+                            Rune = (Rune)' ', Attribute = new Attribute (Color.White, Color.Black), IsDirty = true
+                        };
                         _dirtyLines[row] = true;
                     }
                 }
@@ -467,10 +465,10 @@ public abstract class ConsoleDriver {
     public virtual Attribute MakeColor (Color foreground, Color background) {
         // Encode the colors into the int value.
         return new Attribute (
-                              -1, // only used by cursesdriver!
-                              foreground,
-                              background
-                             );
+            -1, // only used by cursesdriver!
+            foreground,
+            background
+        );
     }
 
     #endregion

@@ -8,8 +8,8 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.DrawingTests;
 
 public class ThicknessTests {
-    private readonly ITestOutputHelper _output;
     public ThicknessTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void Constructor_Defaults () {
@@ -58,25 +58,28 @@ public class ThicknessTests {
         var r = new Rect (5, 5, 40, 15);
         ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FramePadding;
         Application.Driver.FillRect (
-                                     new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows),
-                                     (Rune)' ');
+            new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows),
+            (Rune)' '
+        );
         t.Draw (r, "Test");
         ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
        Test (Left=0,Top=0,Right=0,Bottom=0)",
-                                                      _output);
+            _output
+        );
 
         t = new Thickness (1, 1, 1, 1);
         r = new Rect (5, 5, 40, 15);
         ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FramePadding;
         Application.Driver.FillRect (
-                                     new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows),
-                                     (Rune)' ');
+            new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows),
+            (Rune)' '
+        );
         t.Draw (r, "Test");
         ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
      TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
      T                                      T
      T                                      T
@@ -92,18 +95,20 @@ public class ThicknessTests {
      T                                      T
      T                                      T
      TTTest (Left=1,Top=1,Right=1,Bottom=1)TT",
-                                                      _output);
+            _output
+        );
 
         t = new Thickness (1, 2, 3, 4);
         r = new Rect (5, 5, 40, 15);
         ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FramePadding;
         Application.Driver.FillRect (
-                                     new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows),
-                                     (Rune)' ');
+            new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows),
+            (Rune)' '
+        );
         t.Draw (r, "Test");
         ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
      TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
      TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
      T                                    TTT
@@ -119,18 +124,20 @@ public class ThicknessTests {
      TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
      TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
      TTTest (Left=1,Top=2,Right=3,Bottom=4)TT",
-                                                      _output);
+            _output
+        );
 
         t = new Thickness (-1, 1, 1, 1);
         r = new Rect (5, 5, 40, 15);
         ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FramePadding;
         Application.Driver.FillRect (
-                                     new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows),
-                                     (Rune)' ');
+            new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows),
+            (Rune)' '
+        );
         t.Draw (r, "Test");
         ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
      TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
                                             T
                                             T
@@ -146,19 +153,15 @@ public class ThicknessTests {
                                             T
                                             T
      TTest (Left=-1,Top=1,Right=1,Bottom=1)TT",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
     [AutoInitShutdown]
     public void DrawTests_Ruler () {
         // Add a frame so we can see the ruler
-        var f = new FrameView {
-                                  X = 0,
-                                  Y = 0,
-                                  Width = Dim.Fill (),
-                                  Height = Dim.Fill ()
-                              };
+        var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
         Application.Top.Add (f);
         Application.Begin (Application.Top);
@@ -171,7 +174,7 @@ public class ThicknessTests {
         t.Draw (r, "Test");
         ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
         TestHelpers.AssertDriverContentsAre (
-                                             @"
+            @"
 ┌───────────────────────────────────────────┐
 │                                           │
 │                                           │
@@ -192,7 +195,8 @@ public class ThicknessTests {
 │                                           │
 │                                           │
 └───────────────────────────────────────────┘",
-                                             _output);
+            _output
+        );
 
         t = new Thickness (1, 1, 1, 1);
         r = new Rect (1, 1, 40, 15);
@@ -201,7 +205,7 @@ public class ThicknessTests {
         t.Draw (r, "Test");
         ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
         TestHelpers.AssertDriverContentsAre (
-                                             @"
+            @"
 ┌───────────────────────────────────────────┐
 │|123456789|123456789|123456789|123456789   │
 │1                                      1   │
@@ -222,7 +226,8 @@ public class ThicknessTests {
 │                                           │
 │                                           │
 └───────────────────────────────────────────┘",
-                                             _output);
+            _output
+        );
 
         t = new Thickness (1, 2, 3, 4);
         r = new Rect (2, 2, 40, 15);
@@ -231,7 +236,7 @@ public class ThicknessTests {
         t.Draw (r, "Test");
         ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌───────────────────────────────────────────┐
 │                                           │
 │ |123456789|123456789|123456789|123456789  │
@@ -252,7 +257,8 @@ public class ThicknessTests {
 │                                           │
 │                                           │
 └───────────────────────────────────────────┘",
-                                                      _output);
+            _output
+        );
 
         t = new Thickness (-1, 1, 1, 1);
         r = new Rect (5, 5, 40, 15);
@@ -261,7 +267,7 @@ public class ThicknessTests {
         t.Draw (r, "Test");
         ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌───────────────────────────────────────────┐
 │                                           │
 │                                           │
@@ -282,7 +288,8 @@ public class ThicknessTests {
 │                                           2
 │                                           3
 └────|123456789|123456789|123456789|123456789",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]

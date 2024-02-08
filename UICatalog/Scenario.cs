@@ -109,11 +109,12 @@ public class Scenario : IDisposable {
     ///     https://stackoverflow.com/questions/5411694/get-all-inherited-classes-of-an-abstract-class
     /// </summary>
     public static List<Scenario> GetScenarios () {
-        List<Scenario> objects = new List<Scenario> ();
+        List<Scenario> objects = new ();
         foreach (Type type in typeof (Scenario).Assembly.ExportedTypes
-                                               .Where (
-                                                       myType => myType.IsClass && !myType.IsAbstract
-                                                                 && myType.IsSubclassOf (typeof (Scenario)))) {
+                     .Where (
+                         myType => myType.IsClass && !myType.IsAbstract
+                                                  && myType.IsSubclassOf (typeof (Scenario))
+                     )) {
             var scenario = (Scenario)Activator.CreateInstance (type);
             objects.Add (scenario);
             _maxScenarioNameLen = Math.Max (_maxScenarioNameLen, scenario.GetName ().Length + 1);
@@ -144,13 +145,13 @@ public class Scenario : IDisposable {
         ConfigurationManager.Apply ();
 
         Win = new Window {
-                             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
-                             X = 0,
-                             Y = 0,
-                             Width = Dim.Fill (),
-                             Height = Dim.Fill (),
-                             ColorScheme = Colors.ColorSchemes[TopLevelColorScheme]
-                         };
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            ColorScheme = Colors.ColorSchemes[TopLevelColorScheme]
+        };
         Application.Top.Add (Win);
     }
 
@@ -192,15 +193,16 @@ public class Scenario : IDisposable {
 
     /// <summary>Returns a list of all Categories set by all of the <see cref="Scenario"/>s defined in the project.</summary>
     internal static List<string> GetAllCategories () {
-        List<string> categories = new List<string> ();
+        List<string> categories = new ();
         foreach (Type type in typeof (Scenario).Assembly.GetTypes ()
-                                               .Where (
-                                                       myType => myType.IsClass && !myType.IsAbstract
-                                                                 && myType.IsSubclassOf (typeof (Scenario)))) {
+                     .Where (
+                         myType => myType.IsClass && !myType.IsAbstract
+                                                  && myType.IsSubclassOf (typeof (Scenario))
+                     )) {
             List<System.Attribute> attrs = System.Attribute.GetCustomAttributes (type).ToList ();
             categories = categories
-                         .Union (attrs.Where (a => a is ScenarioCategory).Select (a => ((ScenarioCategory)a).Name))
-                         .ToList ();
+                .Union (attrs.Where (a => a is ScenarioCategory).Select (a => ((ScenarioCategory)a).Name))
+                .ToList ();
         }
 
         // Sort
@@ -225,10 +227,10 @@ public class Scenario : IDisposable {
         /// <returns>list of category names</returns>
         public static List<string> GetCategories (Type t) {
             return GetCustomAttributes (t)
-                   .ToList ()
-                   .Where (a => a is ScenarioCategory)
-                   .Select (a => ((ScenarioCategory)a).Name)
-                   .ToList ();
+                .ToList ()
+                .Where (a => a is ScenarioCategory)
+                .Select (a => ((ScenarioCategory)a).Name)
+                .ToList ();
         }
 
         /// <summary>Static helper function to get the <see cref="Scenario"/> Name given a Type</summary>

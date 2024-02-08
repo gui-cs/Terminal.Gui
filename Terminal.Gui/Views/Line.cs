@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>Draws a single line using the <see cref="LineStyle"/> specified by <see cref="View.BorderStyle"/>.</summary>
 public class Line : View {
@@ -18,10 +18,11 @@ public class Line : View {
 
         lc = SuperView?.LineCanvas;
         lc.AddLine (
-                    screenBounds.Location,
-                    Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height,
-                    Orientation,
-                    BorderStyle);
+            screenBounds.Location,
+            Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height,
+            Orientation,
+            BorderStyle
+        );
 
         return true;
     }

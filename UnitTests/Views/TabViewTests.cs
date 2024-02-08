@@ -4,8 +4,8 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.ViewsTests;
 
 public class TabViewTests {
-    private readonly ITestOutputHelper _output;
     public TabViewTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void AddTab_SameTabMoreThanOnce () {
@@ -116,14 +116,15 @@ public class TabViewTests {
         Assert.Equal ("TabRowView", tabRow.GetType ().Name);
 
         TestHelpers.AssertDriverContentsAre (
-                                             @"
+            @"
 ╭────┬────╮
 │Tab1│Tab2│
 │    ╰────┴────────╮
 │hi                │
 └──────────────────┘
 ",
-                                             _output);
+            _output
+        );
 
         Tab clicked = null;
 
@@ -137,11 +138,8 @@ public class TabViewTests {
         // Waving mouse around does not trigger click
         for (var i = 0; i < 100; i++) {
             args = new MouseEventEventArgs (
-                                            new MouseEvent {
-                                                               X = i,
-                                                               Y = 1,
-                                                               Flags = MouseFlags.ReportMousePosition
-                                                           });
+                new MouseEvent { X = i, Y = 1, Flags = MouseFlags.ReportMousePosition }
+            );
             Application.OnMouseEvent (args);
             Application.Refresh ();
             Assert.Null (clicked);
@@ -149,11 +147,8 @@ public class TabViewTests {
         }
 
         args = new MouseEventEventArgs (
-                                        new MouseEvent {
-                                                           X = 3,
-                                                           Y = 1,
-                                                           Flags = MouseFlags.Button1Clicked
-                                                       });
+            new MouseEvent { X = 3, Y = 1, Flags = MouseFlags.Button1Clicked }
+        );
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Equal (tab1, clicked);
@@ -161,11 +156,8 @@ public class TabViewTests {
 
         // Click to tab2
         args = new MouseEventEventArgs (
-                                        new MouseEvent {
-                                                           X = 6,
-                                                           Y = 1,
-                                                           Flags = MouseFlags.Button1Clicked
-                                                       });
+            new MouseEvent { X = 6, Y = 1, Flags = MouseFlags.Button1Clicked }
+        );
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Equal (tab2, clicked);
@@ -178,11 +170,8 @@ public class TabViewTests {
         };
 
         args = new MouseEventEventArgs (
-                                        new MouseEvent {
-                                                           X = 3,
-                                                           Y = 1,
-                                                           Flags = MouseFlags.Button1Clicked
-                                                       });
+            new MouseEvent { X = 3, Y = 1, Flags = MouseFlags.Button1Clicked }
+        );
         Application.OnMouseEvent (args);
         Application.Refresh ();
 
@@ -191,11 +180,8 @@ public class TabViewTests {
         Assert.Equal (tab2, tv.SelectedTab);
 
         args = new MouseEventEventArgs (
-                                        new MouseEvent {
-                                                           X = 12,
-                                                           Y = 1,
-                                                           Flags = MouseFlags.Button1Clicked
-                                                       });
+            new MouseEvent { X = 12, Y = 1, Flags = MouseFlags.Button1Clicked }
+        );
         Application.OnMouseEvent (args);
         Application.Refresh ();
 
@@ -220,14 +206,15 @@ public class TabViewTests {
         Assert.Equal ("TabRowView", tabRow.GetType ().Name);
 
         TestHelpers.AssertDriverContentsAre (
-                                             @"
+            @"
 ╭────╮
 │Tab1│
 │    ╰►
 │hi   │
 └─────┘
 ",
-                                             _output);
+            _output
+        );
 
         Tab clicked = null;
 
@@ -246,11 +233,8 @@ public class TabViewTests {
 
         // Click the right arrow
         var args = new MouseEventEventArgs (
-                                            new MouseEvent {
-                                                               X = 6,
-                                                               Y = 2,
-                                                               Flags = MouseFlags.Button1Clicked
-                                                           });
+            new MouseEvent { X = 6, Y = 2, Flags = MouseFlags.Button1Clicked }
+        );
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Null (clicked);
@@ -258,22 +242,20 @@ public class TabViewTests {
         Assert.Equal (tab2, newChanged);
         Assert.Equal (tab2, tv.SelectedTab);
         TestHelpers.AssertDriverContentsAre (
-                                             @"
+            @"
 ╭────╮
 │Tab2│
 ◄    ╰╮
 │hi2  │
 └─────┘
 ",
-                                             _output);
+            _output
+        );
 
         // Click the left arrow
         args = new MouseEventEventArgs (
-                                        new MouseEvent {
-                                                           X = 0,
-                                                           Y = 2,
-                                                           Flags = MouseFlags.Button1Clicked
-                                                       });
+            new MouseEvent { X = 0, Y = 2, Flags = MouseFlags.Button1Clicked }
+        );
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Null (clicked);
@@ -281,14 +263,15 @@ public class TabViewTests {
         Assert.Equal (tab1, newChanged);
         Assert.Equal (tab1, tv.SelectedTab);
         TestHelpers.AssertDriverContentsAre (
-                                             @"
+            @"
 ╭────╮
 │Tab1│
 │    ╰►
 │hi   │
 └─────┘
 ",
-                                             _output);
+            _output
+        );
     }
 
     [Fact]
@@ -310,7 +293,7 @@ public class TabViewTests {
         Assert.Equal ("TabRowView", tabRow.GetType ().Name);
 
         TestHelpers.AssertDriverContentsAre (
-                                             @"
+            @"
 ┌───────┐
 │╭────╮ │
 ││Tab1│ │
@@ -319,7 +302,8 @@ public class TabViewTests {
 │└─────┘│
 └───────┘
 ",
-                                             _output);
+            _output
+        );
 
         Tab clicked = null;
 
@@ -338,11 +322,8 @@ public class TabViewTests {
 
         // Click the right arrow
         var args = new MouseEventEventArgs (
-                                            new MouseEvent {
-                                                               X = 7,
-                                                               Y = 3,
-                                                               Flags = MouseFlags.Button1Clicked
-                                                           });
+            new MouseEvent { X = 7, Y = 3, Flags = MouseFlags.Button1Clicked }
+        );
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Null (clicked);
@@ -350,7 +331,7 @@ public class TabViewTests {
         Assert.Equal (tab2, newChanged);
         Assert.Equal (tab2, tv.SelectedTab);
         TestHelpers.AssertDriverContentsAre (
-                                             @"
+            @"
 ┌───────┐
 │╭────╮ │
 ││Tab2│ │
@@ -359,15 +340,13 @@ public class TabViewTests {
 │└─────┘│
 └───────┘
 ",
-                                             _output);
+            _output
+        );
 
         // Click the left arrow
         args = new MouseEventEventArgs (
-                                        new MouseEvent {
-                                                           X = 1,
-                                                           Y = 3,
-                                                           Flags = MouseFlags.Button1Clicked
-                                                       });
+            new MouseEvent { X = 1, Y = 3, Flags = MouseFlags.Button1Clicked }
+        );
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Null (clicked);
@@ -375,7 +354,7 @@ public class TabViewTests {
         Assert.Equal (tab1, newChanged);
         Assert.Equal (tab1, tv.SelectedTab);
         TestHelpers.AssertDriverContentsAre (
-                                             @"
+            @"
 ┌───────┐
 │╭────╮ │
 ││Tab1│ │
@@ -384,7 +363,8 @@ public class TabViewTests {
 │└─────┘│
 └───────┘
 ",
-                                             _output);
+            _output
+        );
     }
 
     [Fact]
@@ -395,7 +375,13 @@ public class TabViewTests {
         tv.Width = 7;
         tv.Height = 5;
 
-        var btn = new Button { Y = Pos.Bottom (tv) + 1, AutoSize = false, Height = 1, Width = 7, Text = "Ok" };
+        var btn = new Button {
+            Y = Pos.Bottom (tv) + 1,
+            AutoSize = false,
+            Height = 1,
+            Width = 7,
+            Text = "Ok"
+        };
 
         Toplevel top = Application.Top;
         top.Add (tv, btn);
@@ -609,13 +595,14 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ││ 
 │╰►
 │h│
 │ │
 └─┘",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
@@ -631,13 +618,14 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 │T│ 
 │ ╰►
 │hi│
 │  │
 └──┘",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
@@ -659,26 +647,28 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 │12│13│   
 │  ╰──┴──╮
 │hi      │
 │        │
 └────────┘",
-                                                      _output);
+            _output
+        );
 
         tv.SelectedTab = tab2;
 
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 │12│13│   
 ├──╯  ╰──╮
 │hi2     │
 │        │
 └────────┘",
-                                                      _output);
+            _output
+        );
 
         tv.SelectedTab = tab1;
 
@@ -689,26 +679,28 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 │1234567│ 
 │       ╰►
 │hi      │
 │        │
 └────────┘",
-                                                      _output);
+            _output
+        );
 
         //switch to tab2
         tv.SelectedTab = tab2;
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 │13│      
 ◄  ╰─────╮
 │hi2     │
 │        │
 └────────┘",
-                                                      _output);
+            _output
+        );
 
         // now make both tabs too long
         tab1.DisplayText = "12345678910";
@@ -717,13 +709,14 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 │abcdefg│ 
 ◄       ╰╮
 │hi2     │
 │        │
 └────────┘",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
@@ -739,13 +732,14 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌─┐
 │h│
 │ │
 │╭►
 ││ ",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
@@ -761,13 +755,14 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌──┐
 │hi│
 │  │
 │ ╭►
 │T│ ",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
@@ -789,26 +784,28 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌────────┐
 │hi      │
 │        │
 │  ╭──┬──╯
 │12│13│   ",
-                                                      _output);
+            _output
+        );
 
         tv.SelectedTab = tab2;
 
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌────────┐
 │hi2     │
 │        │
 ├──╮  ╭──╯
 │12│13│   ",
-                                                      _output);
+            _output
+        );
 
         tv.SelectedTab = tab1;
 
@@ -819,26 +816,28 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌────────┐
 │hi      │
 │        │
 │       ╭►
 │1234567│ ",
-                                                      _output);
+            _output
+        );
 
         //switch to tab2
         tv.SelectedTab = tab2;
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌────────┐
 │hi2     │
 │        │
 ◄  ╭─────╯
 │13│      ",
-                                                      _output);
+            _output
+        );
 
         // now make both tabs too long
         tab1.DisplayText = "12345678910";
@@ -847,13 +846,14 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌────────┐
 │hi2     │
 │        │
 ◄       ╭╯
 │abcdefg│ ",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
@@ -867,13 +867,14 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ╭╮ 
 ││ 
 │╰►
 │h│
 └─┘",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
@@ -887,13 +888,14 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ╭─╮ 
 │T│ 
 │ ╰►
 │hi│
 └──┘",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
@@ -913,26 +915,28 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ╭──┬──╮   
 │12│13│   
 │  ╰──┴──╮
 │hi      │
 └────────┘",
-                                                      _output);
+            _output
+        );
 
         tv.SelectedTab = tab2;
 
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ╭──┬──╮   
 │12│13│   
 ├──╯  ╰──╮
 │hi2     │
 └────────┘",
-                                                      _output);
+            _output
+        );
 
         tv.SelectedTab = tab1;
 
@@ -943,26 +947,28 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ╭───────╮ 
 │1234567│ 
 │       ╰►
 │hi      │
 └────────┘",
-                                                      _output);
+            _output
+        );
 
         //switch to tab2
         tv.SelectedTab = tab2;
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ╭──╮      
 │13│      
 ◄  ╰─────╮
 │hi2     │
 └────────┘",
-                                                      _output);
+            _output
+        );
 
         // now make both tabs too long
         tab1.DisplayText = "12345678910";
@@ -971,13 +977,14 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ╭───────╮ 
 │abcdefg│ 
 ◄       ╰╮
 │hi2     │
 └────────┘",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
@@ -996,26 +1003,28 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ╭────╮              
 │Tab0│              
 │    ╰─────────────►
 │hi                │
 └──────────────────┘",
-                                                      _output);
+            _output
+        );
 
         tv.SelectedTab = tab2;
 
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ╭──────────────╮    
 │Les Misérables│    
 ◄              ╰───╮
 │hi2               │
 └──────────────────┘",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
@@ -1031,13 +1040,14 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌─┐
 │h│
 │╭►
 ││ 
 ╰╯ ",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
@@ -1053,13 +1063,14 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌──┐
 │hi│
 │ ╭►
 │T│ 
 ╰─╯ ",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
@@ -1081,13 +1092,14 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌────────┐
 │hi      │
 │  ╭──┬──╯
 │12│13│   
 ╰──┴──╯   ",
-                                                      _output);
+            _output
+        );
 
         // Test first tab name too long
         tab1.DisplayText = "12345678910";
@@ -1096,26 +1108,28 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌────────┐
 │hi      │
 │       ╭►
 │1234567│ 
 ╰───────╯ ",
-                                                      _output);
+            _output
+        );
 
         //switch to tab2
         tv.SelectedTab = tab2;
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌────────┐
 │hi2     │
 ◄  ╭─────╯
 │13│      
 ╰──╯      ",
-                                                      _output);
+            _output
+        );
 
         // now make both tabs too long
         tab1.DisplayText = "12345678910";
@@ -1124,13 +1138,14 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌────────┐
 │hi2     │
 ◄       ╭╯
 │abcdefg│ 
 ╰───────╯ ",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
@@ -1151,26 +1166,28 @@ public class TabViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌──────────────────┐
 │hi                │
 │    ╭─────────────►
 │Tab0│              
 ╰────╯              ",
-                                                      _output);
+            _output
+        );
 
         tv.SelectedTab = tab2;
 
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌──────────────────┐
 │hi2               │
 ◄              ╭───╯
 │Les Misérables│    
 ╰──────────────╯    ",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
@@ -1238,8 +1255,9 @@ public class TabViewTests {
         tv.EndInit ();
         tv.ColorScheme = new ColorScheme ();
         tv.AddTab (
-                   tab1 = new Tab { DisplayText = "Tab1", View = new TextField { Width = 2, Text = "hi" } },
-                   false);
+            tab1 = new Tab { DisplayText = "Tab1", View = new TextField { Width = 2, Text = "hi" } },
+            false
+        );
         tv.AddTab (tab2 = new Tab { DisplayText = "Tab2", View = new Label { Text = "hi2" } }, false);
 
         return tv;

@@ -7,13 +7,13 @@ public class TextValidateField_NET_Provider_Tests {
     [Fact]
     public void Backspace_Key_Deletes_Previous_Character () {
         var field = new TextValidateField {
-                                              TextAlignment = TextAlignment.Centered,
-                                              Width = 20,
+            TextAlignment = TextAlignment.Centered,
+            Width = 20,
 
-                                              //                                             ****
-                                              //                                          0123456789
-                                              Provider = new NetMaskedTextProvider ("--(0000)--") { Text = "1234" }
-                                          };
+            //                                             ****
+            //                                          0123456789
+            Provider = new NetMaskedTextProvider ("--(0000)--") { Text = "1234" }
+        };
 
         // Go to the end.
         field.NewKeyDownEvent (new Key (KeyCode.End));
@@ -39,13 +39,13 @@ public class TextValidateField_NET_Provider_Tests {
     [Fact]
     public void Changing_The_Mask_Tries_To_Keep_The_Previous_Text () {
         var field = new TextValidateField {
-                                              TextAlignment = TextAlignment.Left,
-                                              Width = 30,
+            TextAlignment = TextAlignment.Left,
+            Width = 30,
 
-                                              //                                             ****
-                                              //                                          0123456789
-                                              Provider = new NetMaskedTextProvider ("--(0000)--")
-                                          };
+            //                                             ****
+            //                                          0123456789
+            Provider = new NetMaskedTextProvider ("--(0000)--")
+        };
 
         field.Text = "1234";
         Assert.Equal ("--(1234)--", field.Text);
@@ -73,13 +73,13 @@ public class TextValidateField_NET_Provider_Tests {
     [Fact]
     public void Delete_Key_Doesnt_Move_Cursor () {
         var field = new TextValidateField {
-                                              TextAlignment = TextAlignment.Centered,
-                                              Width = 20,
+            TextAlignment = TextAlignment.Centered,
+            Width = 20,
 
-                                              //                                             ****
-                                              //                                          0123456789
-                                              Provider = new NetMaskedTextProvider ("--(0000)--") { Text = "1234" }
-                                          };
+            //                                             ****
+            //                                          0123456789
+            Provider = new NetMaskedTextProvider ("--(0000)--") { Text = "1234" }
+        };
 
         Assert.Equal ("--(1234)--", field.Provider.DisplayText);
         Assert.True (field.IsValid);
@@ -105,13 +105,13 @@ public class TextValidateField_NET_Provider_Tests {
     [Fact]
     public void End_Key_Last_Editable_Character () {
         var field = new TextValidateField {
-                                              TextAlignment = TextAlignment.Centered,
-                                              Width = 20,
+            TextAlignment = TextAlignment.Centered,
+            Width = 20,
 
-                                              //                                             *
-                                              //                                          0123456789
-                                              Provider = new NetMaskedTextProvider ("--(0000)--")
-                                          };
+            //                                             *
+            //                                          0123456789
+            Provider = new NetMaskedTextProvider ("--(0000)--")
+        };
 
         field.NewKeyDownEvent (new Key (KeyCode.End));
 
@@ -125,13 +125,13 @@ public class TextValidateField_NET_Provider_Tests {
     [Fact]
     public void Home_Key_First_Editable_Character () {
         var field = new TextValidateField {
-                                              TextAlignment = TextAlignment.Centered,
-                                              Width = 20,
+            TextAlignment = TextAlignment.Centered,
+            Width = 20,
 
-                                              //                                             *
-                                              //                                          0123456789
-                                              Provider = new NetMaskedTextProvider ("--(0000)--")
-                                          };
+            //                                             *
+            //                                          0123456789
+            Provider = new NetMaskedTextProvider ("--(0000)--")
+        };
 
         field.NewKeyDownEvent (new Key (KeyCode.CursorRight));
         field.NewKeyDownEvent (new Key (KeyCode.CursorRight));
@@ -147,13 +147,13 @@ public class TextValidateField_NET_Provider_Tests {
     [Fact]
     public void Initial_Value_Bigger_Than_Mask_Discarded () {
         var field = new TextValidateField {
-                                              TextAlignment = TextAlignment.Centered,
-                                              Width = 20,
+            TextAlignment = TextAlignment.Centered,
+            Width = 20,
 
-                                              //                                             ****
-                                              //                                          0123456789
-                                              Provider = new NetMaskedTextProvider ("--(0000)--") { Text = "12345" }
-                                          };
+            //                                             ****
+            //                                          0123456789
+            Provider = new NetMaskedTextProvider ("--(0000)--") { Text = "12345" }
+        };
 
         Assert.Equal ("--(____)--", field.Provider.DisplayText);
         Assert.Equal ("--(    )--", field.Text);
@@ -163,13 +163,13 @@ public class TextValidateField_NET_Provider_Tests {
     [Fact]
     public void Initial_Value_Exact_Valid () {
         var field = new TextValidateField {
-                                              TextAlignment = TextAlignment.Centered,
-                                              Width = 20,
+            TextAlignment = TextAlignment.Centered,
+            Width = 20,
 
-                                              //                                             ****
-                                              //                                          0123456789
-                                              Provider = new NetMaskedTextProvider ("--(0000)--") { Text = "1234" }
-                                          };
+            //                                             ****
+            //                                          0123456789
+            Provider = new NetMaskedTextProvider ("--(0000)--") { Text = "1234" }
+        };
 
         Assert.Equal ("--(1234)--", field.Text);
         Assert.True (field.IsValid);
@@ -178,13 +178,13 @@ public class TextValidateField_NET_Provider_Tests {
     [Fact]
     public void Initial_Value_Smaller_Than_Mask_Accepted () {
         var field = new TextValidateField {
-                                              TextAlignment = TextAlignment.Centered,
-                                              Width = 20,
+            TextAlignment = TextAlignment.Centered,
+            Width = 20,
 
-                                              //                                             ****
-                                              //                                          0123456789
-                                              Provider = new NetMaskedTextProvider ("--(0000)--") { Text = "123" }
-                                          };
+            //                                             ****
+            //                                          0123456789
+            Provider = new NetMaskedTextProvider ("--(0000)--") { Text = "123" }
+        };
 
         Assert.Equal ("--(123_)--", field.Provider.DisplayText);
         Assert.Equal ("--(123 )--", field.Text);
@@ -194,13 +194,13 @@ public class TextValidateField_NET_Provider_Tests {
     [Fact]
     public void Initialized_With_Cursor_On_First_Editable_Character () {
         var field = new TextValidateField {
-                                              TextAlignment = TextAlignment.Centered,
-                                              Width = 20,
+            TextAlignment = TextAlignment.Centered,
+            Width = 20,
 
-                                              //                                             *
-                                              //                                          0123456789
-                                              Provider = new NetMaskedTextProvider ("--(0000)--")
-                                          };
+            //                                             *
+            //                                          0123456789
+            Provider = new NetMaskedTextProvider ("--(0000)--")
+        };
 
         field.NewKeyDownEvent (new Key (KeyCode.D1));
 
@@ -211,13 +211,13 @@ public class TextValidateField_NET_Provider_Tests {
     [Fact]
     public void Input_Ilegal_Character () {
         var field = new TextValidateField {
-                                              TextAlignment = TextAlignment.Centered,
-                                              Width = 20,
+            TextAlignment = TextAlignment.Centered,
+            Width = 20,
 
-                                              //                                             *
-                                              //                                          0123456789
-                                              Provider = new NetMaskedTextProvider ("--(0000)--")
-                                          };
+            //                                             *
+            //                                          0123456789
+            Provider = new NetMaskedTextProvider ("--(0000)--")
+        };
 
         field.NewKeyDownEvent (new Key (KeyCode.A));
 
@@ -229,13 +229,13 @@ public class TextValidateField_NET_Provider_Tests {
     [Fact]
     public void Insert_Skips_Non_Editable_Characters () {
         var field = new TextValidateField {
-                                              TextAlignment = TextAlignment.Centered,
-                                              Width = 20,
+            TextAlignment = TextAlignment.Centered,
+            Width = 20,
 
-                                              //                                             ** **
-                                              //                                          01234567890
-                                              Provider = new NetMaskedTextProvider ("--(00-00)--")
-                                          };
+            //                                             ** **
+            //                                          01234567890
+            Provider = new NetMaskedTextProvider ("--(00-00)--")
+        };
 
         field.NewKeyDownEvent (new Key (KeyCode.D1));
         Assert.Equal ("--(1_-__)--", field.Provider.DisplayText);
@@ -257,13 +257,13 @@ public class TextValidateField_NET_Provider_Tests {
     [Fact]
     public void Left_Key_Stops_In_First_Editable_Character () {
         var field = new TextValidateField {
-                                              TextAlignment = TextAlignment.Centered,
-                                              Width = 20,
+            TextAlignment = TextAlignment.Centered,
+            Width = 20,
 
-                                              //                                             *
-                                              //                                          0123456789
-                                              Provider = new NetMaskedTextProvider ("--(0000)--")
-                                          };
+            //                                             *
+            //                                          0123456789
+            Provider = new NetMaskedTextProvider ("--(0000)--")
+        };
 
         for (var i = 0; i < 10; i++) {
             field.NewKeyDownEvent (new Key (KeyCode.CursorLeft));
@@ -279,13 +279,13 @@ public class TextValidateField_NET_Provider_Tests {
     [Fact]
     public void MouseClick_Right_X_Greater_Than_Text_Width_Goes_To_Last_Editable_Position () {
         var field = new TextValidateField {
-                                              TextAlignment = TextAlignment.Left,
-                                              Width = 30,
+            TextAlignment = TextAlignment.Left,
+            Width = 30,
 
-                                              //                                             ****
-                                              //                                          0123456789
-                                              Provider = new NetMaskedTextProvider ("--(0000)--")
-                                          };
+            //                                             ****
+            //                                          0123456789
+            Provider = new NetMaskedTextProvider ("--(0000)--")
+        };
 
         field.NewKeyDownEvent (new Key (KeyCode.D1));
 
@@ -307,10 +307,8 @@ public class TextValidateField_NET_Provider_Tests {
         var wasTextChanged = false;
 
         var field = new TextValidateField {
-                                              TextAlignment = TextAlignment.Left,
-                                              Width = 30,
-                                              Provider = new NetMaskedTextProvider ("--(0000)--")
-                                          };
+            TextAlignment = TextAlignment.Left, Width = 30, Provider = new NetMaskedTextProvider ("--(0000)--")
+        };
 
         field.Provider.TextChanged += (sender, e) => wasTextChanged = true;
 
@@ -325,13 +323,13 @@ public class TextValidateField_NET_Provider_Tests {
     [Fact]
     public void Right_Key_Stops_In_Last_Editable_Character () {
         var field = new TextValidateField {
-                                              TextAlignment = TextAlignment.Centered,
-                                              Width = 20,
+            TextAlignment = TextAlignment.Centered,
+            Width = 20,
 
-                                              //                                             *
-                                              //                                          0123456789
-                                              Provider = new NetMaskedTextProvider ("--(0000)--")
-                                          };
+            //                                             *
+            //                                          0123456789
+            Provider = new NetMaskedTextProvider ("--(0000)--")
+        };
 
         for (var i = 0; i < 10; i++) {
             field.NewKeyDownEvent (new Key (KeyCode.CursorRight));
@@ -347,13 +345,13 @@ public class TextValidateField_NET_Provider_Tests {
     [Fact]
     public void Set_Text_After_Initialization () {
         var field = new TextValidateField {
-                                              TextAlignment = TextAlignment.Left,
-                                              Width = 30,
+            TextAlignment = TextAlignment.Left,
+            Width = 30,
 
-                                              //                                             ****
-                                              //                                          0123456789
-                                              Provider = new NetMaskedTextProvider ("--(0000)--")
-                                          };
+            //                                             ****
+            //                                          0123456789
+            Provider = new NetMaskedTextProvider ("--(0000)--")
+        };
 
         field.Text = "1234";
 
@@ -364,13 +362,13 @@ public class TextValidateField_NET_Provider_Tests {
     [Fact]
     public void When_Valid_Is_Valid_True () {
         var field = new TextValidateField {
-                                              TextAlignment = TextAlignment.Centered,
-                                              Width = 20,
+            TextAlignment = TextAlignment.Centered,
+            Width = 20,
 
-                                              //                                             ****
-                                              //                                          0123456789
-                                              Provider = new NetMaskedTextProvider ("--(0000)--")
-                                          };
+            //                                             ****
+            //                                          0123456789
+            Provider = new NetMaskedTextProvider ("--(0000)--")
+        };
 
         field.NewKeyDownEvent (new Key (KeyCode.D1));
         Assert.Equal ("--(1   )--", field.Text);
@@ -395,10 +393,8 @@ public class TextValidateField_Regex_Provider_Tests {
     public void End_Key_End_Of_Input () {
         // Exactly 5 numbers
         var field = new TextValidateField {
-                                              Width = 20,
-                                              Provider = new TextRegexProvider ("^[0-9]{5}$")
-                                                         { ValidateOnInput = false }
-                                          };
+            Width = 20, Provider = new TextRegexProvider ("^[0-9]{5}$") { ValidateOnInput = false }
+        };
 
         for (var i = 0; i < 4; i++) {
             field.NewKeyDownEvent (new Key (KeyCode.D0));
@@ -430,10 +426,7 @@ public class TextValidateField_Regex_Provider_Tests {
     public void Home_Key_First_Editable_Character () {
         // Range 0 to 1000
         // Accepts 001 too.
-        var field = new TextValidateField {
-                                              Width = 20,
-                                              Provider = new TextRegexProvider ("^[0-9]?[0-9]?[0-9]|1000$")
-                                          };
+        var field = new TextValidateField { Width = 20, Provider = new TextRegexProvider ("^[0-9]?[0-9]?[0-9]|1000$") };
 
         field.NewKeyDownEvent (new Key (KeyCode.D1));
         field.NewKeyDownEvent (new Key (KeyCode.D0));
@@ -455,10 +448,7 @@ public class TextValidateField_Regex_Provider_Tests {
 
     [Fact]
     public void Input_With_Validate_On_Input_Set_Text () {
-        var field = new TextValidateField {
-                                              Width = 20,
-                                              Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$")
-                                          };
+        var field = new TextValidateField { Width = 20, Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$") };
 
         // Input dosen't validates the pattern.
         field.NewKeyDownEvent (new Key (KeyCode.D1));
@@ -479,10 +469,8 @@ public class TextValidateField_Regex_Provider_Tests {
     [Fact]
     public void Input_Without_Validate_On_Input () {
         var field = new TextValidateField {
-                                              Width = 20,
-                                              Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$")
-                                                         { ValidateOnInput = false }
-                                          };
+            Width = 20, Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false }
+        };
 
         field.NewKeyDownEvent (new Key (KeyCode.D1));
         Assert.Equal ("1", field.Text);
@@ -504,11 +492,10 @@ public class TextValidateField_Regex_Provider_Tests {
     [Fact]
     public void Left_Key_Stops_At_Start_And_Insert () {
         var field = new TextValidateField {
-                                              TextAlignment = TextAlignment.Centered,
-                                              Width = 20,
-                                              Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$")
-                                                         { ValidateOnInput = false }
-                                          };
+            TextAlignment = TextAlignment.Centered,
+            Width = 20,
+            Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false }
+        };
 
         field.Text = "123";
 
@@ -537,10 +524,7 @@ public class TextValidateField_Regex_Provider_Tests {
         }
 
         try {
-            var field = new TextValidateField {
-                                                  Width = 20,
-                                                  Provider = new TextRegexProvider (mask)
-                                              };
+            var field = new TextValidateField { Width = 20, Provider = new TextRegexProvider (mask) };
         }
         catch (RegexParseException ex) {
             Assert.True (true, ex.Message);
@@ -556,11 +540,10 @@ public class TextValidateField_Regex_Provider_Tests {
         var wasTextChanged = false;
 
         var field = new TextValidateField {
-                                              TextAlignment = TextAlignment.Centered,
-                                              Width = 20,
-                                              Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$")
-                                                         { ValidateOnInput = false }
-                                          };
+            TextAlignment = TextAlignment.Centered,
+            Width = 20,
+            Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false }
+        };
 
         field.Provider.TextChanged += (sender, e) => wasTextChanged = true;
 
@@ -575,11 +558,10 @@ public class TextValidateField_Regex_Provider_Tests {
     [Fact]
     public void Right_Key_Stops_At_End_And_Insert () {
         var field = new TextValidateField {
-                                              TextAlignment = TextAlignment.Centered,
-                                              Width = 20,
-                                              Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$")
-                                                         { ValidateOnInput = false }
-                                          };
+            TextAlignment = TextAlignment.Centered,
+            Width = 20,
+            Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false }
+        };
 
         field.Text = "123";
 
@@ -599,10 +581,7 @@ public class TextValidateField_Regex_Provider_Tests {
 
     [Fact]
     public void Text_With_All_Charset () {
-        var field = new TextValidateField {
-                                              Width = 20,
-                                              Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$")
-                                          };
+        var field = new TextValidateField { Width = 20, Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$") };
 
         var text = "";
         for (var i = 0; i < 255; i++) {

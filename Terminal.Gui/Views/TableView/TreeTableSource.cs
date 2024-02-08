@@ -3,10 +3,6 @@ namespace Terminal.Gui;
 /// <summary>An <see cref="ITableSource"/> with expandable rows.</summary>
 /// <typeparam name="T"></typeparam>
 public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T : class {
-    private readonly Dictionary<string, Func<T, object>> _lamdas;
-    private readonly TableView _tableView;
-    private readonly TreeView<T> _tree;
-
     /// <summary>
     ///     Creates a new instance of <see cref="TreeTableSource{T}"/> presenting the given <paramref name="tree"/>. This
     ///     source should only be used with <paramref name="table"/>.
@@ -47,6 +43,10 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 
         _lamdas = subsequentColumns;
     }
+
+    private readonly Dictionary<string, Func<T, object>> _lamdas;
+    private readonly TableView _tableView;
+    private readonly TreeView<T> _tree;
 
     /// <inheritdoc/>
     public void Dispose () {

@@ -20,105 +20,112 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Top Level Windows")]
 [ScenarioCategory ("Files and IO")]
 public class CsvEditor : Scenario {
-    private string _currentFile;
     private DataTable _currentTable;
     private MenuItem _miCentered;
     private MenuItem _miLeft;
     private MenuItem _miRight;
-    private TextField _selectedCellLabel;
+    private string _currentFile;
     private TableView _tableView;
+    private TextField _selectedCellLabel;
 
     public override void Setup () {
         Win.Title = GetName ();
         Win.Y = 1; // menu
         Win.Height = Dim.Fill (1); // status bar
 
-        _tableView = new TableView {
-                                       X = 0,
-                                       Y = 0,
-                                       Width = Dim.Fill (),
-                                       Height = Dim.Fill (1)
-                                   };
+        _tableView = new TableView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
         var fileMenu = new MenuBarItem (
-                                        "_File",
-                                        new MenuItem[] {
-                                                           new ("_Open CSV", "", () => Open ()),
-                                                           new ("_Save", "", () => Save ()),
-                                                           new ("_Quit", "Quits The App", () => Quit ())
-                                                       });
+            "_File",
+            new MenuItem[] {
+                new ("_Open CSV", "", () => Open ()),
+                new ("_Save", "", () => Save ()),
+                new ("_Quit", "Quits The App", () => Quit ())
+            }
+        );
 
         //fileMenu.Help = "Help";
         var menu = new MenuBar {
-                                   Menus =  [
-                                   fileMenu,
-                                   new MenuBarItem (
-                                                    "_Edit",
-                                                    new MenuItem[] {
-                                                                       new ("_New Column", "", () => AddColumn ()),
-                                                                       new ("_New Row", "", () => AddRow ()),
-                                                                       new (
-                                                                            "_Rename Column",
-                                                                            "",
-                                                                            () => RenameColumn ()),
-                                                                       new ("_Delete Column", "", () => DeleteColum ()),
-                                                                       new ("_Move Column", "", () => MoveColumn ()),
-                                                                       new ("_Move Row", "", () => MoveRow ()),
-                                                                       new ("_Sort Asc", "", () => Sort (true)),
-                                                                       new ("_Sort Desc", "", () => Sort (false))
-                                                                   }),
-                                   new MenuBarItem (
-                                                    "_View",
-                                                    new[] {
-                                                              _miLeft = new MenuItem (
-                                                               "_Align Left",
-                                                               "",
-                                                               () => Align (TextAlignment.Left)),
-                                                              _miRight = new MenuItem (
-                                                               "_Align Right",
-                                                               "",
-                                                               () => Align (TextAlignment.Right)),
-                                                              _miCentered = new MenuItem (
-                                                               "_Align Centered",
-                                                               "",
-                                                               () => Align (TextAlignment.Centered)),
+            Menus = [
+                        fileMenu,
+                        new MenuBarItem (
+                            "_Edit",
+                            new MenuItem[] {
+                                new ("_New Column", "", () => AddColumn ()),
+                                new ("_New Row", "", () => AddRow ()),
+                                new (
+                                    "_Rename Column",
+                                    "",
+                                    () => RenameColumn ()
+                                ),
+                                new ("_Delete Column", "", () => DeleteColum ()),
+                                new ("_Move Column", "", () => MoveColumn ()),
+                                new ("_Move Row", "", () => MoveRow ()),
+                                new ("_Sort Asc", "", () => Sort (true)),
+                                new ("_Sort Desc", "", () => Sort (false))
+                            }
+                        ),
+                        new MenuBarItem (
+                            "_View",
+                            new[] {
+                                _miLeft = new MenuItem (
+                                    "_Align Left",
+                                    "",
+                                    () => Align (TextAlignment.Left)
+                                ),
+                                _miRight = new MenuItem (
+                                    "_Align Right",
+                                    "",
+                                    () => Align (TextAlignment.Right)
+                                ),
+                                _miCentered = new MenuItem (
+                                    "_Align Centered",
+                                    "",
+                                    () => Align (TextAlignment.Centered)
+                                ),
 
-                                                              // Format requires hard typed data table, when we read a CSV everything is untyped (string) so this only works for new columns in this demo
-                                                              _miCentered = new MenuItem (
-                                                               "_Set Format Pattern",
-                                                               "",
-                                                               () => SetFormat ())
-                                                          })
-                                       ]
-                               };
+                                // Format requires hard typed data table, when we read a CSV everything is untyped (string) so this only works for new columns in this demo
+                                _miCentered = new MenuItem (
+                                    "_Set Format Pattern",
+                                    "",
+                                    () => SetFormat ()
+                                )
+                            }
+                        )
+                    ]
+        };
         Application.Top.Add (menu);
 
         var statusBar = new StatusBar (
-                                       new StatusItem[] {
-                                                            new (
-                                                                 KeyCode.CtrlMask | KeyCode.O,
-                                                                 "~^O~ Open",
-                                                                 () => Open ()),
-                                                            new (
-                                                                 KeyCode.CtrlMask | KeyCode.S,
-                                                                 "~^S~ Save",
-                                                                 () => Save ()),
-                                                            new (
-                                                                 Application.QuitKey,
-                                                                 $"{Application.QuitKey} to Quit",
-                                                                 () => Quit ())
-                                                        });
+            new StatusItem[] {
+                new (
+                    KeyCode.CtrlMask | KeyCode.O,
+                    "~^O~ Open",
+                    () => Open ()
+                ),
+                new (
+                    KeyCode.CtrlMask | KeyCode.S,
+                    "~^S~ Save",
+                    () => Save ()
+                ),
+                new (
+                    Application.QuitKey,
+                    $"{Application.QuitKey} to Quit",
+                    () => Quit ()
+                )
+            }
+        );
         Application.Top.Add (statusBar);
 
         Win.Add (_tableView);
 
         _selectedCellLabel = new TextField {
-                                               X = 0,
-                                               Y = Pos.Bottom (_tableView),
-                                               Text = "0,0",
-                                               Width = Dim.Fill (),
-                                               TextAlignment = TextAlignment.Right
-                                           };
+            X = 0,
+            Y = Pos.Bottom (_tableView),
+            Text = "0,0",
+            Width = Dim.Fill (),
+            TextAlignment = TextAlignment.Right
+        };
         _selectedCellLabel.TextChanged += SelectedCellLabel_TextChanged;
 
         Win.Add (_selectedCellLabel);
@@ -139,17 +146,19 @@ public class CsvEditor : Scenario {
             var col = new DataColumn (colName);
 
             int newColIdx = Math.Min (
-                                      Math.Max (0, _tableView.SelectedColumn + 1),
-                                      _tableView.Table.Columns);
+                Math.Max (0, _tableView.SelectedColumn + 1),
+                _tableView.Table.Columns
+            );
 
             int result = MessageBox.Query (
-                                           "Column Type",
-                                           "Pick a data type for the column",
-                                           "Date",
-                                           "Integer",
-                                           "Double",
-                                           "Text",
-                                           "Cancel");
+                "Column Type",
+                "Pick a data type for the column",
+                "Date",
+                "Integer",
+                "Double",
+                "Text",
+                "Cancel"
+            );
 
             if ((result <= -1) || (result >= 4)) {
                 return;
@@ -265,20 +274,11 @@ public class CsvEditor : Scenario {
         };
         var cancel = new Button { Text = "Cancel" };
         cancel.Clicked += (s, e) => { Application.RequestStop (); };
-        var d = new Dialog { Title = title, Buttons =  [ok, cancel] };
+        var d = new Dialog { Title = title, Buttons = [ok, cancel] };
 
-        var lbl = new Label {
-                                X = 0,
-                                Y = 1,
-                                Text = label
-                            };
+        var lbl = new Label { X = 0, Y = 1, Text = label };
 
-        var tf = new TextField {
-                                   Text = initialText,
-                                   X = 0,
-                                   Y = 2,
-                                   Width = Dim.Fill ()
-                               };
+        var tf = new TextField { Text = initialText, X = 0, Y = 2, Width = Dim.Fill () };
 
         d.Add (lbl, tf);
         tf.SetFocus ();
@@ -306,8 +306,9 @@ public class CsvEditor : Scenario {
 
             if (GetText ("Move Column", "New Index:", currentCol.Ordinal.ToString (), out string newOrdinal)) {
                 int newIdx = Math.Min (
-                                       Math.Max (0, int.Parse (newOrdinal)),
-                                       _tableView.Table.Columns - 1);
+                    Math.Max (0, int.Parse (newOrdinal)),
+                    _tableView.Table.Columns - 1
+                );
 
                 currentCol.SetOrdinal (newIdx);
 
@@ -392,9 +393,8 @@ public class CsvEditor : Scenario {
 
     private void Open () {
         var ofd = new FileDialog {
-                                     AllowedTypes = new List<IAllowedType>
-                                                    { new AllowedType ("Comma Separated Values", ".csv") }
-                                 };
+            AllowedTypes = new List<IAllowedType> { new AllowedType ("Comma Separated Values", ".csv") }
+        };
         ofd.Style.OkButtonText = "Open";
 
         Application.Run (ofd);
@@ -438,9 +438,10 @@ public class CsvEditor : Scenario {
         }
         catch (Exception ex) {
             MessageBox.ErrorQuery (
-                                   "Open Failed",
-                                   $"Error on line {lineNumber}{Environment.NewLine}{ex.Message}",
-                                   "Ok");
+                "Open Failed",
+                $"Error on line {lineNumber}{Environment.NewLine}{ex.Message}",
+                "Ok"
+            );
         }
     }
 
@@ -467,8 +468,9 @@ public class CsvEditor : Scenario {
         }
 
         using var writer = new CsvWriter (
-                                          new StreamWriter (File.OpenWrite (_currentFile)),
-                                          CultureInfo.InvariantCulture);
+            new StreamWriter (File.OpenWrite (_currentFile)),
+            CultureInfo.InvariantCulture
+        );
 
         foreach (string col in _currentTable.Columns.Cast<DataColumn> ().Select (c => c.ColumnName)) {
             writer.WriteField (col);
@@ -508,9 +510,10 @@ public class CsvEditor : Scenario {
 
         if (col.DataType == typeof (string)) {
             MessageBox.ErrorQuery (
-                                   "Cannot Format Column",
-                                   "String columns cannot be Formatted, try adding a new column to the table with a date/numerical Type",
-                                   "Ok");
+                "Cannot Format Column",
+                "String columns cannot be Formatted, try adding a new column to the table with a date/numerical Type",
+                "Ok"
+            );
 
             return;
         }
@@ -577,9 +580,9 @@ public class CsvEditor : Scenario {
             if (_tableView.FullRowSelect) {
                 // Delete button deletes all rows when in full row mode
                 foreach (int toRemove in _tableView.GetAllSelectedCells ()
-                                                   .Select (p => p.Y)
-                                                   .Distinct ()
-                                                   .OrderByDescending (i => i)) {
+                             .Select (p => p.Y)
+                             .Distinct ()
+                             .OrderByDescending (i => i)) {
                     _currentTable.Rows.RemoveAt (toRemove);
                 }
             } else {

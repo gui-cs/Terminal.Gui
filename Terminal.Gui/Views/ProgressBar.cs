@@ -34,19 +34,19 @@ public enum ProgressBarFormat {
 ///     </para>
 /// </remarks>
 public class ProgressBar : View {
-    private int[] _activityPos;
-    private bool _bidirectionalMarquee = true;
-    private int _delta;
-    private float _fraction;
-    private bool _isActivity;
-    private ProgressBarStyle _progressBarStyle;
-    private Rune _segmentCharacter = Glyphs.BlocksMeterSegment;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="ProgressBar"/> class, starts in percentage mode and uses relative
     ///     layout.
     /// </summary>
     public ProgressBar () { SetInitialProperties (); }
+
+    private bool _bidirectionalMarquee = true;
+    private bool _isActivity;
+    private float _fraction;
+    private int _delta;
+    private int[] _activityPos;
+    private ProgressBarStyle _progressBarStyle;
+    private Rune _segmentCharacter = Glyphs.BlocksMeterSegment;
 
     /// <summary>
     ///     Specifies if the <see cref="ProgressBarStyle.MarqueeBlocks"/> or the
@@ -152,21 +152,19 @@ public class ProgressBar : View {
         }
 
         if (ProgressBarFormat != ProgressBarFormat.Simple && !_isActivity) {
-            var tf = new TextFormatter {
-                                           Alignment = TextAlignment.Centered,
-                                           Text = Text
-                                       };
+            var tf = new TextFormatter { Alignment = TextAlignment.Centered, Text = Text };
             var attr = new Attribute (ColorScheme.HotNormal.Foreground, ColorScheme.HotNormal.Background);
             if (_fraction > .5) {
                 attr = new Attribute (ColorScheme.HotNormal.Background, ColorScheme.HotNormal.Foreground);
             }
 
             tf?.Draw (
-                      BoundsToScreen (Bounds),
-                      attr,
-                      ColorScheme.Normal,
-                      SuperView?.BoundsToScreen (SuperView.Bounds) ?? default (Rect),
-                      false);
+                BoundsToScreen (Bounds),
+                attr,
+                ColorScheme.Normal,
+                SuperView?.BoundsToScreen (SuperView.Bounds) ?? default (Rect),
+                false
+            );
         }
     }
 
@@ -230,8 +228,8 @@ public class ProgressBar : View {
 
     private void ProgressBar_Initialized (object sender, EventArgs e) {
         ColorScheme = new ColorScheme (ColorScheme ?? SuperView?.ColorScheme ?? Colors.ColorSchemes["Base"]) {
-                          HotNormal = new Attribute (Color.BrightGreen, Color.Gray)
-                      };
+            HotNormal = new Attribute (Color.BrightGreen, Color.Gray)
+        };
     }
 
     private void ProgressBar_LayoutStarted (object sender, EventArgs e) {

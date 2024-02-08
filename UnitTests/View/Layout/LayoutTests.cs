@@ -5,8 +5,8 @@
 namespace Terminal.Gui.ViewTests;
 
 public class LayoutTests {
-    private readonly ITestOutputHelper _output;
     public LayoutTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     // Tested in AbsoluteLayoutTests.cs
     // public void Pos_Dim_Are_Null_If_Not_Initialized_On_Constructor_IsAdded_False ()
@@ -24,17 +24,11 @@ public class LayoutTests {
     [InlineData (9)]
     [InlineData (10)]
     public void Dim_CenteredSubView_85_Percent_Height (int height) {
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
 
         var subview = new Window {
-                                     X = Pos.Center (),
-                                     Y = Pos.Center (),
-                                     Width = Dim.Percent (85),
-                                     Height = Dim.Percent (85)
-                                 };
+            X = Pos.Center (), Y = Pos.Center (), Width = Dim.Percent (85), Height = Dim.Percent (85)
+        };
 
         win.Add (subview);
 
@@ -172,17 +166,11 @@ public class LayoutTests {
     [InlineData (9)]
     [InlineData (10)]
     public void Dim_CenteredSubView_85_Percent_Width (int width) {
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
 
         var subview = new Window {
-                                     X = Pos.Center (),
-                                     Y = Pos.Center (),
-                                     Width = Dim.Percent (85),
-                                     Height = Dim.Percent (85)
-                                 };
+            X = Pos.Center (), Y = Pos.Center (), Width = Dim.Percent (85), Height = Dim.Percent (85)
+        };
 
         win.Add (subview);
 
@@ -323,11 +311,7 @@ public class LayoutTests {
     [Fact]
     [AutoInitShutdown]
     public void DimFill_SizedCorrectly () {
-        var view = new View {
-                                Width = Dim.Fill (),
-                                Height = Dim.Fill (),
-                                BorderStyle = LineStyle.Single
-                            };
+        var view = new View { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
         Application.Top.Add (view);
         RunState rs = Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (32, 5);
@@ -375,12 +359,7 @@ public class LayoutTests {
 
         Toplevel top = Application.Top;
 
-        var view = new View {
-                                Y = -2,
-                                Height = 10,
-                                TextDirection = TextDirection.TopBottom_LeftRight,
-                                Text = "view"
-                            };
+        var view = new View { Y = -2, Height = 10, TextDirection = TextDirection.TopBottom_LeftRight, Text = "view" };
         top.Add (view);
 
         Application.Iteration += (s, a) => {
@@ -400,11 +379,17 @@ public class LayoutTests {
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
     }
-    
+
     [Fact]
     public void LayoutSubviews_No_SuperView () {
         var root = new View ();
-        var first = new View { Id = "first", X = 1, Y = 2, Height = 3, Width = 4 };
+        var first = new View {
+            Id = "first",
+            X = 1,
+            Y = 2,
+            Height = 3,
+            Width = 4
+        };
         root.Add (first);
 
         var second = new View { Id = "second" };
@@ -426,7 +411,13 @@ public class LayoutTests {
         var root = new View ();
         top.Add (root);
 
-        var first = new View { Id = "first", X = 1, Y = 2, Height = 3, Width = 4 };
+        var first = new View {
+            Id = "first",
+            X = 1,
+            Y = 2,
+            Height = 3,
+            Width = 4
+        };
         root.Add (first);
 
         var second = new View { Id = "second" };
@@ -465,15 +456,9 @@ public class LayoutTests {
 
         Toplevel t = Application.Top;
 
-        var w = new Window {
-                               X = Pos.Left (t) + 2,
-                               Y = Pos.At (2)
-                           };
+        var w = new Window { X = Pos.Left (t) + 2, Y = Pos.At (2) };
 
-        var v = new View {
-                             X = Pos.Center (),
-                             Y = Pos.Percent (10)
-                         };
+        var v = new View { X = Pos.Center (), Y = Pos.Percent (10) };
 
         w.Add (v);
         t.Add (w);
@@ -510,7 +495,7 @@ public class LayoutTests {
         RunState rs = Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ┌──────────────────┐
 │view1             │
 │                  │
@@ -521,7 +506,8 @@ public class LayoutTests {
 │                  │
 │                  │
 └──────────────────┘",
-                                                      _output);
+            _output
+        );
         Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
         Assert.Equal (new Rect (0, 0, 5, 1), view1.Frame);
         Assert.Equal (new Rect (0, 0, 20, 10), win1.Frame);
@@ -531,12 +517,10 @@ public class LayoutTests {
         var foundView = View.FindDeepestView (top, 9, 4, out int rx, out int ry);
         Assert.Equal (foundView, view2);
         Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent {
-                                                                              X = 9,
-                                                                              Y = 4,
-                                                                              Flags = MouseFlags.Button1Clicked
-                                                                          }));
+            new MouseEventEventArgs (
+                new MouseEvent { X = 9, Y = 4, Flags = MouseFlags.Button1Clicked }
+            )
+        );
         Assert.True (clicked);
 
         Application.End (rs);
@@ -546,19 +530,10 @@ public class LayoutTests {
     public void PosCombine_Refs_SuperView_Throws () {
         Application.Init (new FakeDriver ());
 
-        var w = new Window {
-                               X = Pos.Left (Application.Top) + 2,
-                               Y = Pos.Top (Application.Top) + 2
-                           };
+        var w = new Window { X = Pos.Left (Application.Top) + 2, Y = Pos.Top (Application.Top) + 2 };
         var f = new FrameView ();
-        var v1 = new View {
-                              X = Pos.Left (w) + 2,
-                              Y = Pos.Top (w) + 2
-                          };
-        var v2 = new View {
-                              X = Pos.Left (v1) + 2,
-                              Y = Pos.Top (v1) + 2
-                          };
+        var v1 = new View { X = Pos.Left (w) + 2, Y = Pos.Top (w) + 2 };
+        var v2 = new View { X = Pos.Left (v1) + 2, Y = Pos.Top (v1) + 2 };
 
         f.Add (v1, v2);
         w.Add (f);
@@ -623,16 +598,9 @@ public class LayoutTests {
     [Fact]
     [AutoInitShutdown]
     public void TrySetHeight_ForceValidatePosDim () {
-        var top = new View {
-                               X = 0,
-                               Y = 0,
-                               Height = 20
-                           };
+        var top = new View { X = 0, Y = 0, Height = 20 };
 
-        var v = new View {
-                             Height = Dim.Fill (),
-                             ValidatePosDim = true
-                         };
+        var v = new View { Height = Dim.Fill (), ValidatePosDim = true };
         top.Add (v);
 
         Assert.False (v.TrySetHeight (10, out int rHeight));
@@ -660,16 +628,9 @@ public class LayoutTests {
     [Fact]
     [AutoInitShutdown]
     public void TrySetWidth_ForceValidatePosDim () {
-        var top = new View {
-                               X = 0,
-                               Y = 0,
-                               Width = 80
-                           };
+        var top = new View { X = 0, Y = 0, Width = 80 };
 
-        var v = new View {
-                             Width = Dim.Fill (),
-                             ValidatePosDim = true
-                         };
+        var v = new View { Width = Dim.Fill (), ValidatePosDim = true };
         top.Add (v);
 
         Assert.False (v.TrySetWidth (70, out int rWidth));

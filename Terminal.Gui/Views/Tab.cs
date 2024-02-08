@@ -2,13 +2,13 @@
 
 /// <summary>A single tab in a <see cref="TabView"/>.</summary>
 public class Tab : View {
-    private string _displayText;
-
     /// <summary>Creates a new unamed tab with no controls inside.</summary>
     public Tab () {
         BorderStyle = LineStyle.Rounded;
         CanFocus = true;
     }
+
+    private string _displayText;
 
     /// <summary>The text to display in a <see cref="TabView"/>.</summary>
     /// <value></value>

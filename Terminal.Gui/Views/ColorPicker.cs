@@ -14,6 +14,9 @@ public class ColorEventArgs : EventArgs {
 
 /// <summary>The <see cref="ColorPicker"/> <see cref="View"/> Color picker.</summary>
 public class ColorPicker : View {
+    /// <summary>Initializes a new instance of <see cref="ColorPicker"/>.</summary>
+    public ColorPicker () { SetInitialProperties (); }
+
     /// <summary>Columns of color boxes</summary>
     private readonly int _cols = 8;
 
@@ -24,8 +27,19 @@ public class ColorPicker : View {
     private int _boxWidth = 4;
     private int _selectColorIndex = (int)Color.Black;
 
-    /// <summary>Initializes a new instance of <see cref="ColorPicker"/>.</summary>
-    public ColorPicker () { SetInitialProperties (); }
+    /// <summary>Selected color.</summary>
+    public ColorName SelectedColor {
+        get => (ColorName)_selectColorIndex;
+        set {
+            var prev = (ColorName)_selectColorIndex;
+            _selectColorIndex = (int)value;
+            ColorChanged?.Invoke (
+                this,
+                new ColorEventArgs { PreviousColor = new Color (prev), Color = new Color (value) }
+            );
+            SetNeedsDisplay ();
+        }
+    }
 
     /// <summary>Height of a color box</summary>
     public int BoxHeight {
@@ -55,22 +69,6 @@ public class ColorPicker : View {
         set {
             int colorIndex = value.Y * _cols + value.X;
             SelectedColor = (ColorName)colorIndex;
-        }
-    }
-
-    /// <summary>Selected color.</summary>
-    public ColorName SelectedColor {
-        get => (ColorName)_selectColorIndex;
-        set {
-            var prev = (ColorName)_selectColorIndex;
-            _selectColorIndex = (int)value;
-            ColorChanged?.Invoke (
-                                  this,
-                                  new ColorEventArgs {
-                                                         PreviousColor = new Color (prev),
-                                                         Color = new Color (value)
-                                                     });
-            SetNeedsDisplay ();
         }
     }
 
@@ -203,17 +201,19 @@ public class ColorPicker : View {
         } else {
             lc.AddLine (rect.Location, rect.Width, Orientation.Horizontal, LineStyle.Dotted);
             lc.AddLine (
-                        new Point (rect.Location.X, rect.Location.Y + rect.Height - 1),
-                        rect.Width,
-                        Orientation.Horizontal,
-                        LineStyle.Dotted);
+                new Point (rect.Location.X, rect.Location.Y + rect.Height - 1),
+                rect.Width,
+                Orientation.Horizontal,
+                LineStyle.Dotted
+            );
 
             lc.AddLine (rect.Location, rect.Height, Orientation.Vertical, LineStyle.Dotted);
             lc.AddLine (
-                        new Point (rect.Location.X + rect.Width - 1, rect.Location.Y),
-                        rect.Height,
-                        Orientation.Vertical,
-                        LineStyle.Dotted);
+                new Point (rect.Location.X + rect.Width - 1, rect.Location.Y),
+                rect.Height,
+                Orientation.Vertical,
+                LineStyle.Dotted
+            );
         }
 
         foreach (KeyValuePair<Point, Rune> p in lc.GetMap ()) {

@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Terminal.Gui;
 
@@ -119,16 +118,6 @@ public partial class View : Responder, ISupportInitializeNotification {
     /// <summary>Gets or sets whether a view is cleared if the <see cref="Visible"/> property is <see langword="false"/>.</summary>
     public bool ClearOnVisibleFalse { get; set; } = true;
 
-    /// <summary>Gets or sets arbitrary data for the view.</summary>
-    /// <remarks>This property is not used internally.</remarks>
-    public object Data { get; set; }
-
-    /// <summary>
-    ///     Points to the current driver in use by the view, it is a convenience property for simplifying the development
-    ///     of new views.
-    /// </summary>
-    public static ConsoleDriver Driver => Application.Driver;
-
     /// <inheritdoc/>
     public override bool Enabled {
         get => base.Enabled;
@@ -164,6 +153,39 @@ public partial class View : Responder, ISupportInitializeNotification {
         }
     }
 
+    /// <inheritdoc/>
+    /// >
+    public override bool Visible {
+        get => base.Visible;
+        set {
+            if (base.Visible != value) {
+                base.Visible = value;
+                if (!value) {
+                    if (HasFocus) {
+                        SetHasFocus (false, this);
+                    }
+
+                    if (ClearOnVisibleFalse) {
+                        Clear ();
+                    }
+                }
+
+                OnVisibleChanged ();
+                SetNeedsDisplay ();
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Points to the current driver in use by the view, it is a convenience property for simplifying the development
+    ///     of new views.
+    /// </summary>
+    public static ConsoleDriver Driver => Application.Driver;
+
+    /// <summary>Gets or sets arbitrary data for the view.</summary>
+    /// <remarks>This property is not used internally.</remarks>
+    public object Data { get; set; }
+
     /// <summary>Gets or sets an identifier for the view;</summary>
     /// <value>The identifier.</value>
     /// <remarks>The id should be unique across all Views that share a SuperView.</remarks>
@@ -187,29 +209,6 @@ public partial class View : Responder, ISupportInitializeNotification {
                 }
 #endif // DEBUG
                 OnTitleChanged (old, _title);
-            }
-        }
-    }
-
-    /// <inheritdoc/>
-    /// >
-    public override bool Visible {
-        get => base.Visible;
-        set {
-            if (base.Visible != value) {
-                base.Visible = value;
-                if (!value) {
-                    if (HasFocus) {
-                        SetHasFocus (false, this);
-                    }
-
-                    if (ClearOnVisibleFalse) {
-                        Clear ();
-                    }
-                }
-
-                OnVisibleChanged ();
-                SetNeedsDisplay ();
             }
         }
     }
@@ -314,7 +313,6 @@ public partial class View : Responder, ISupportInitializeNotification {
     ///     </para>
     /// </remarks>
     public View () {
-
         TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
         TextDirection = TextDirection.LeftRight_TopBottom;
         Text = string.Empty;

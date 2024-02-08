@@ -19,44 +19,6 @@ namespace Terminal.Gui;
 [StructLayout (LayoutKind.Explicit)]
 public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Color>, ISpanFormattable,
                                               IUtf8SpanFormattable, IMinMaxValue<Color> {
-    /// <summary>The value of the alpha channel component</summary>
-    /// <remarks>
-    ///     The alpha channel is not currently supported, so the value of the alpha channel bits will not affect
-    ///     rendering.
-    /// </remarks>
-    [JsonIgnore]
-    [field: FieldOffset (3)]
-    public readonly byte A;
-
-    /// <summary>The value of this <see cref="Color"/> as a <see langword="uint"/> in ARGB32 format.</summary>
-    /// <remarks>
-    ///     The alpha channel is not currently supported, so the value of the alpha channel bits will not affect
-    ///     rendering.
-    /// </remarks>
-    [JsonIgnore]
-    [field: FieldOffset (0)]
-    public readonly uint Argb;
-
-    /// <summary>The value of the blue color component.</summary>
-    [JsonIgnore]
-    [field: FieldOffset (0)]
-    public readonly byte B;
-
-    /// <summary>The value of the green color component.</summary>
-    [JsonIgnore]
-    [field: FieldOffset (1)]
-    public readonly byte G;
-
-    /// <summary>The value of the red color component.</summary>
-    [JsonIgnore]
-    [field: FieldOffset (2)]
-    public readonly byte R;
-
-    /// <summary>The value of this <see cref="Color"/> encoded as a signed 32-bit integer in ARGB32 format.</summary>
-    [JsonIgnore]
-    [field: FieldOffset (0)]
-    public readonly int Rgba;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="Color"/> <see langword="struct"/> using the supplied component
     ///     values.
@@ -125,6 +87,44 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     /// <summary>Initializes a new instance of the <see cref="Color"/> with all channels set to 0.</summary>
     public Color () { Argb = 0u; }
 
+    /// <summary>The value of the alpha channel component</summary>
+    /// <remarks>
+    ///     The alpha channel is not currently supported, so the value of the alpha channel bits will not affect
+    ///     rendering.
+    /// </remarks>
+    [JsonIgnore]
+    [field: FieldOffset (3)]
+    public readonly byte A;
+
+    /// <summary>The value of the blue color component.</summary>
+    [JsonIgnore]
+    [field: FieldOffset (0)]
+    public readonly byte B;
+
+    /// <summary>The value of the green color component.</summary>
+    [JsonIgnore]
+    [field: FieldOffset (1)]
+    public readonly byte G;
+
+    /// <summary>The value of the red color component.</summary>
+    [JsonIgnore]
+    [field: FieldOffset (2)]
+    public readonly byte R;
+
+    /// <summary>The value of this <see cref="Color"/> encoded as a signed 32-bit integer in ARGB32 format.</summary>
+    [JsonIgnore]
+    [field: FieldOffset (0)]
+    public readonly int Rgba;
+
+    /// <summary>The value of this <see cref="Color"/> as a <see langword="uint"/> in ARGB32 format.</summary>
+    /// <remarks>
+    ///     The alpha channel is not currently supported, so the value of the alpha channel bits will not affect
+    ///     rendering.
+    /// </remarks>
+    [JsonIgnore]
+    [field: FieldOffset (0)]
+    public readonly uint Argb;
+
     /// <summary>Gets or sets the 3-byte/6-character hexadecimal value for each of the legacy 16-color values.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
     public static Dictionary<ColorName, string> Colors {
@@ -141,7 +141,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
             static Color GetColorToNameMapKey (KeyValuePair<ColorName, string> kvp) { return new Color (kvp.Value); }
 
             static ColorName GetColorToNameMapValue (KeyValuePair<ColorName, string> kvp) {
-                return Enum.TryParse<ColorName> (kvp.Key.ToString (), true, out ColorName colorName)
+                return Enum.TryParse (kvp.Key.ToString (), true, out ColorName colorName)
                            ? colorName
                            : throw new ArgumentException ($"Invalid color name: {kvp.Key}");
             }
@@ -153,8 +153,8 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///     return the closest 16 color match to the true color when no exact value is found.
     /// </summary>
     /// <remarks>
-    ///     Get returns the <see cref="GetClosestNamedColor (Color)"/> of the closest 24-bit color value. Set sets the RGB value
-    ///     using a hard-coded map.
+    ///     Get returns the <see cref="GetClosestNamedColor (Color)"/> of the closest 24-bit color value. Set sets the RGB
+    ///     value using a hard-coded map.
     /// </remarks>
     public AnsiColorCode GetAnsiColorCode () {
         return ColorExtensions.ColorNameToAnsiColorMap[GetClosestNamedColor ()];
@@ -165,8 +165,8 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///     will return the closest 16 color match to the true color when no exact value is found.
     /// </summary>
     /// <remarks>
-    ///     Get returns the <see cref="GetClosestNamedColor (Color)"/> of the closest 24-bit color value. Set sets the RGB value
-    ///     using a hard-coded map.
+    ///     Get returns the <see cref="GetClosestNamedColor (Color)"/> of the closest 24-bit color value. Set sets the RGB
+    ///     value using a hard-coded map.
     /// </remarks>
     public ColorName GetClosestNamedColor () { return GetClosestNamedColor (this); }
 
@@ -175,8 +175,8 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///     <paramref name="namedColor"/>.
     /// </summary>
     /// <param name="namedColor">
-    ///     The <see cref="GetClosestNamedColor (Color)"/> to check if this <see cref="Color"/> is closer to than
-    ///     any other configured named color.
+    ///     The <see cref="GetClosestNamedColor (Color)"/> to check if this <see cref="Color"/> is closer
+    ///     to than any other configured named color.
     /// </param>
     /// <returns>
     ///     <see langword="true"/> if the closest named color is the provided value. <br/> <see langword="false"/> if any
@@ -199,8 +199,8 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///     <paramref name="namedColor"/>.
     /// </param>
     /// <param name="namedColor">
-    ///     The <see cref="GetClosestNamedColor (Color)"/> to check if this <see cref="Color"/> is closer to than
-    ///     any other configured named color.
+    ///     The <see cref="GetClosestNamedColor (Color)"/> to check if this <see cref="Color"/> is closer
+    ///     to than any other configured named color.
     /// </param>
     /// <returns>
     ///     <see langword="true"/> if the closest named color to <paramref name="color"/> is the provided value. <br/>

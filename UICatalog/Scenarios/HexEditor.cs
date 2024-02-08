@@ -11,12 +11,12 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Top Level Windows")]
 [ScenarioCategory ("Files and IO")]
 public class HexEditor : Scenario {
-    private string _fileName = "demo.bin";
+    private bool _saved = true;
     private HexView _hexView;
     private MenuItem _miAllowEdits;
-    private bool _saved = true;
-    private StatusItem _siPositionChanged;
     private StatusBar _statusBar;
+    private StatusItem _siPositionChanged;
+    private string _fileName = "demo.bin";
 
     public override void Setup () {
         Win.Title = GetName () + "-" + _fileName ?? "Untitled";
@@ -25,61 +25,73 @@ public class HexEditor : Scenario {
 
         //CreateUnicodeDemoFile (_fileName);
 
-        _hexView = new HexView (LoadFile ()) {
-                                                 X = 0,
-                                                 Y = 0,
-                                                 Width = Dim.Fill (),
-                                                 Height = Dim.Fill ()
-                                             };
+        _hexView = new HexView (LoadFile ()) { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
         _hexView.Edited += _hexView_Edited;
         _hexView.PositionChanged += _hexView_PositionChanged;
         Win.Add (_hexView);
 
         var menu = new MenuBar {
-                                   Menus =  [
-                                   new MenuBarItem ("_File", new MenuItem[] {
-                                                                                new ("_New", "", () => New ()),
-                                                                                new ("_Open", "", () => Open ()),
-                                                                                new ("_Save", "", () => Save ()),
-                                                                                null,
-                                                                                new ("_Quit", "", () => Quit ())
-                                                                            }),
-                                   new MenuBarItem (
-                                                    "_Edit",
-                                                    new MenuItem[] {
-                                                                       new ("_Copy", "", () => Copy ()),
-                                                                       new ("C_ut", "", () => Cut ()),
-                                                                       new ("_Paste", "", () => Paste ())
-                                                                   }),
-                                   new MenuBarItem (
-                                                    "_Options",
-                                                    new[] {
-                                                              _miAllowEdits = new MenuItem (
-                                                                               "_AllowEdits",
-                                                                               "",
-                                                                               () => ToggleAllowEdits ()) {
-                                                                                  Checked = _hexView.AllowEdits,
-                                                                                  CheckType = MenuItemCheckStyle
-                                                                                      .Checked
-                                                                              }
-                                                          })
-                                       ]
-                               };
+            Menus = [
+                        new MenuBarItem (
+                            "_File",
+                            new MenuItem[] {
+                                new ("_New", "", () => New ()),
+                                new ("_Open", "", () => Open ()),
+                                new ("_Save", "", () => Save ()),
+                                null,
+                                new ("_Quit", "", () => Quit ())
+                            }
+                        ),
+                        new MenuBarItem (
+                            "_Edit",
+                            new MenuItem[] {
+                                new ("_Copy", "", () => Copy ()),
+                                new ("C_ut", "", () => Cut ()),
+                                new ("_Paste", "", () => Paste ())
+                            }
+                        ),
+                        new MenuBarItem (
+                            "_Options",
+                            new[] {
+                                _miAllowEdits = new MenuItem (
+                                    "_AllowEdits",
+                                    "",
+                                    () => ToggleAllowEdits ()
+                                ) {
+                                    Checked = _hexView.AllowEdits,
+                                    CheckType = MenuItemCheckStyle
+                                        .Checked
+                                }
+                            }
+                        )
+                    ]
+        };
         Application.Top.Add (menu);
 
         _statusBar = new StatusBar (
-                                    new[] {
-                                              new (KeyCode.F2, "~F2~ Open", () => Open ()),
-                                              new (KeyCode.F3, "~F3~ Save", () => Save ()),
-                                              new (
-                                                   Application.QuitKey,
-                                                   $"{Application.QuitKey} to Quit",
-                                                   () => Quit ()),
-                                              _siPositionChanged = new StatusItem (
-                                               KeyCode.Null,
-                                               $"Position: {_hexView.Position} Line: {_hexView.CursorPosition.Y} Col: {_hexView.CursorPosition.X} Line length: {_hexView.BytesPerLine}",
-                                               () => { })
-                                          });
+            new[] {
+                new (KeyCode.F2, "~F2~ Open", () => Open ()),
+                new (KeyCode.F3, "~F3~ Save", () => Save ()),
+                new (
+                    Application.QuitKey,
+                    $"{Application.QuitKey} to Quit",
+                    () => Quit ()
+                ),
+                _siPositionChanged = new StatusItem (
+                    KeyCode.Null,
+                    $"Position: {
+                        _hexView.Position
+                    } Line: {
+                        _hexView.CursorPosition.Y
+                    } Col: {
+                        _hexView.CursorPosition.X
+                    } Line length: {
+                        _hexView.BytesPerLine
+                    }",
+                    () => { }
+                )
+            }
+        );
         Application.Top.Add (_statusBar);
     }
 
@@ -87,7 +99,15 @@ public class HexEditor : Scenario {
 
     private void _hexView_PositionChanged (object sender, HexViewEventArgs obj) {
         _siPositionChanged.Title =
-            $"Position: {obj.Position} Line: {obj.CursorPosition.Y} Col: {obj.CursorPosition.X} Line length: {obj.BytesPerLine}";
+            $"Position: {
+                obj.Position
+            } Line: {
+                obj.CursorPosition.Y
+            } Col: {
+                obj.CursorPosition.X
+            } Line length: {
+                obj.BytesPerLine
+            }";
         _statusBar.SetNeedsDisplay ();
     }
 
@@ -122,10 +142,11 @@ public class HexEditor : Scenario {
         var stream = new MemoryStream ();
         if (!_saved && _hexView != null && _hexView.Edits.Count > 0) {
             if (MessageBox.ErrorQuery (
-                                       "Save",
-                                       "The changes were not saved. Want to open without saving?",
-                                       "Yes",
-                                       "No") == 1) {
+                    "Save",
+                    "The changes were not saved. Want to open without saving?",
+                    "Yes",
+                    "No"
+                ) == 1) {
                 return _hexView.Source;
             }
 

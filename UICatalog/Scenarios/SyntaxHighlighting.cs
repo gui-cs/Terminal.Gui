@@ -17,79 +17,79 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("TextView")]
 public class SyntaxHighlighting : Scenario {
     private readonly HashSet<string> _keywords = new (StringComparer.CurrentCultureIgnoreCase) {
-                                                     "select",
-                                                     "distinct",
-                                                     "top",
-                                                     "from",
-                                                     "create",
-                                                     "CIPHER",
-                                                     "CLASS_ORIGIN",
-                                                     "CLIENT",
-                                                     "CLOSE",
-                                                     "COALESCE",
-                                                     "CODE",
-                                                     "COLUMNS",
-                                                     "COLUMN_FORMAT",
-                                                     "COLUMN_NAME",
-                                                     "COMMENT",
-                                                     "COMMIT",
-                                                     "COMPACT",
-                                                     "COMPLETION",
-                                                     "COMPRESSED",
-                                                     "COMPRESSION",
-                                                     "CONCURRENT",
-                                                     "CONNECT",
-                                                     "CONNECTION",
-                                                     "CONSISTENT",
-                                                     "CONSTRAINT_CATALOG",
-                                                     "CONSTRAINT_SCHEMA",
-                                                     "CONSTRAINT_NAME",
-                                                     "CONTAINS",
-                                                     "CONTEXT",
-                                                     "CONTRIBUTORS",
-                                                     "COPY",
-                                                     "CPU",
-                                                     "CURSOR_NAME",
-                                                     "primary",
-                                                     "key",
-                                                     "insert",
-                                                     "alter",
-                                                     "add",
-                                                     "update",
-                                                     "set",
-                                                     "delete",
-                                                     "truncate",
-                                                     "as",
-                                                     "order",
-                                                     "by",
-                                                     "asc",
-                                                     "desc",
-                                                     "between",
-                                                     "where",
-                                                     "and",
-                                                     "or",
-                                                     "not",
-                                                     "limit",
-                                                     "null",
-                                                     "is",
-                                                     "drop",
-                                                     "database",
-                                                     "table",
-                                                     "having",
-                                                     "in",
-                                                     "join",
-                                                     "on",
-                                                     "union",
-                                                     "exists"
-                                                 };
+        "select",
+        "distinct",
+        "top",
+        "from",
+        "create",
+        "CIPHER",
+        "CLASS_ORIGIN",
+        "CLIENT",
+        "CLOSE",
+        "COALESCE",
+        "CODE",
+        "COLUMNS",
+        "COLUMN_FORMAT",
+        "COLUMN_NAME",
+        "COMMENT",
+        "COMMIT",
+        "COMPACT",
+        "COMPLETION",
+        "COMPRESSED",
+        "COMPRESSION",
+        "CONCURRENT",
+        "CONNECT",
+        "CONNECTION",
+        "CONSISTENT",
+        "CONSTRAINT_CATALOG",
+        "CONSTRAINT_SCHEMA",
+        "CONSTRAINT_NAME",
+        "CONTAINS",
+        "CONTEXT",
+        "CONTRIBUTORS",
+        "COPY",
+        "CPU",
+        "CURSOR_NAME",
+        "primary",
+        "key",
+        "insert",
+        "alter",
+        "add",
+        "update",
+        "set",
+        "delete",
+        "truncate",
+        "as",
+        "order",
+        "by",
+        "asc",
+        "desc",
+        "between",
+        "where",
+        "and",
+        "or",
+        "not",
+        "limit",
+        "null",
+        "is",
+        "drop",
+        "database",
+        "table",
+        "having",
+        "in",
+        "join",
+        "on",
+        "union",
+        "exists"
+    };
 
     private readonly string _path = "RuneCells.rce";
     private ColorScheme _blue;
     private ColorScheme _green;
     private ColorScheme _magenta;
+    private ColorScheme _white;
     private MenuItem _miWrap;
     private TextView _textView;
-    private ColorScheme _white;
 
     /// <summary>Reads an object instance from an Json file.
     ///     <para>Object type must have a parameterless constructor.</para>
@@ -116,54 +116,58 @@ public class SyntaxHighlighting : Scenario {
         Win.Title = GetName ();
 
         var menu = new MenuBar {
-                                   Menus =  [
-                                   new MenuBarItem ("_TextView", new[] {
-                                                                           _miWrap = new MenuItem (
-                                                                            "_Word Wrap",
-                                                                            "",
-                                                                            () => WordWrap ()) {
-                                                                               CheckType = MenuItemCheckStyle
-                                                                                   .Checked
-                                                                           },
-                                                                           null,
-                                                                           new (
-                                                                                "_Syntax Highlighting",
-                                                                                "",
-                                                                                () => ApplySyntaxHighlighting ()),
-                                                                           null,
-                                                                           new (
-                                                                                "_Load Rune Cells",
-                                                                                "",
-                                                                                () => ApplyLoadRuneCells ()),
-                                                                           new (
-                                                                                "_Save Rune Cells",
-                                                                                "",
-                                                                                () => SaveRuneCells ()),
-                                                                           null,
-                                                                           new ("_Quit", "", () => Quit ())
-                                                                       })
-                                       ]
-                               };
+            Menus = [
+                        new MenuBarItem (
+                            "_TextView",
+                            new[] {
+                                _miWrap = new MenuItem (
+                                    "_Word Wrap",
+                                    "",
+                                    () => WordWrap ()
+                                ) {
+                                    CheckType = MenuItemCheckStyle
+                                        .Checked
+                                },
+                                null,
+                                new (
+                                    "_Syntax Highlighting",
+                                    "",
+                                    () => ApplySyntaxHighlighting ()
+                                ),
+                                null,
+                                new (
+                                    "_Load Rune Cells",
+                                    "",
+                                    () => ApplyLoadRuneCells ()
+                                ),
+                                new (
+                                    "_Save Rune Cells",
+                                    "",
+                                    () => SaveRuneCells ()
+                                ),
+                                null,
+                                new ("_Quit", "", () => Quit ())
+                            }
+                        )
+                    ]
+        };
         Application.Top.Add (menu);
 
-        _textView = new TextView {
-                                     X = 0,
-                                     Y = 0,
-                                     Width = Dim.Fill (),
-                                     Height = Dim.Fill ()
-                                 };
+        _textView = new TextView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
         ApplySyntaxHighlighting ();
 
         Win.Add (_textView);
 
         var statusBar = new StatusBar (
-                                       new StatusItem[] {
-                                                            new (
-                                                                 Application.QuitKey,
-                                                                 $"{Application.QuitKey} to Quit",
-                                                                 () => Quit ())
-                                                        });
+            new StatusItem[] {
+                new (
+                    Application.QuitKey,
+                    $"{Application.QuitKey} to Quit",
+                    () => Quit ()
+                )
+            }
+        );
 
         Application.Top.Add (statusBar);
     }
@@ -204,7 +208,7 @@ public class SyntaxHighlighting : Scenario {
     private void ApplyLoadRuneCells () {
         ClearAllEvents ();
 
-        List<RuneCell> runeCells = new List<RuneCell> ();
+        List<RuneCell> runeCells = new ();
         foreach (KeyValuePair<string, ColorScheme> color in Colors.ColorSchemes) {
             string csName = color.Key;
             foreach (Rune rune in csName.EnumerateRunes ()) {
@@ -238,8 +242,8 @@ public class SyntaxHighlighting : Scenario {
             "/*Query to select:\nLots of data*/\nSELECT TOP 100 * \nfrom\n MyDb.dbo.Biochemistry where TestCode = 'blah';";
 
         _textView.Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator {
-                                                         AllSuggestions = _keywords.ToList ()
-                                                     };
+            AllSuggestions = _keywords.ToList ()
+        };
 
         _textView.TextChanged += (s, e) => HighlightTextBasedOnKeywords ();
         _textView.DrawContent += (s, e) => HighlightTextBasedOnKeywords ();
@@ -258,7 +262,7 @@ public class SyntaxHighlighting : Scenario {
 
     private void HighlightTextBasedOnKeywords () {
         // Comment blocks, quote blocks etc
-        Dictionary<Rune, ColorScheme> blocks = new Dictionary<Rune, ColorScheme> ();
+        Dictionary<Rune, ColorScheme> blocks = new ();
 
         var comments = new Regex (@"/\*.*?\*/", RegexOptions.Singleline);
         MatchCollection commentMatches = comments.Matches (_textView.Text);
@@ -297,8 +301,9 @@ public class SyntaxHighlighting : Scenario {
 
     private string IdxToWord (List<Rune> line, int idx) {
         string[] words = Regex.Split (
-                                      new string (line.Select (r => (char)r.Value).ToArray ()),
-                                      "\\b");
+            new string (line.Select (r => (char)r.Value).ToArray ()),
+            "\\b"
+        );
 
         var count = 0;
         string current = null;
@@ -356,19 +361,22 @@ public static class EventExtensions {
         while (type != null) {
             /* Find events defined as field */
             eventFieldInfo = type.GetField (
-                                            eventName,
-                                            BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public |
-                                            BindingFlags.NonPublic);
+                eventName,
+                BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public |
+                BindingFlags.NonPublic
+            );
             if (eventFieldInfo != null && ((eventFieldInfo.FieldType == typeof (MulticastDelegate)) ||
                                            eventFieldInfo.FieldType.IsSubclassOf (
-                                            typeof (MulticastDelegate)))) {
+                                               typeof (MulticastDelegate)
+                                           ))) {
                 break;
             }
 
             /* Find events defined as property { add; remove; } */
             eventFieldInfo = type.GetField (
-                                            "EVENT_" + eventName.ToUpper (),
-                                            BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic);
+                "EVENT_" + eventName.ToUpper (),
+                BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic
+            );
             if (eventFieldInfo != null) {
                 isEventProperty = true;
 
@@ -408,7 +416,7 @@ public static class EventExtensions {
         }
 
         PropertyInfo propertyInfo = objType.GetProperties (BindingFlags.NonPublic | BindingFlags.Instance)
-                                           .FirstOrDefault (p => p.Name == "Events" && p.PropertyType == typeof (T));
+            .FirstOrDefault (p => p.Name == "Events" && p.PropertyType == typeof (T));
         if (propertyInfo == null) {
             return;
         }

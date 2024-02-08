@@ -11,7 +11,7 @@
 using System.Globalization;
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Represents an ordered pair of integer x- and y-coordinates that defines a point in a two-dimensional plane.</summary>
 public struct Point {
@@ -127,9 +127,10 @@ public struct Point {
     /// <remarks>Formats the Point as a string in coordinate notation.</remarks>
     public override string ToString () {
         return string.Format (
-                              "{{X={0},Y={1}}}",
-                              X.ToString (CultureInfo.InvariantCulture),
-                              Y.ToString (CultureInfo.InvariantCulture));
+            "{{X={0},Y={1}}}",
+            X.ToString (CultureInfo.InvariantCulture),
+            Y.ToString (CultureInfo.InvariantCulture)
+        );
     }
 
     /// <summary>Adds the specified Size to the specified Point.</summary>

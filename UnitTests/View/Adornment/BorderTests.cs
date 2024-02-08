@@ -3,23 +3,18 @@
 namespace Terminal.Gui.ViewTests;
 
 public class BorderTests {
-    private readonly ITestOutputHelper _output;
     public BorderTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     [SetupFakeDriver]
     public void Border_Parent_HasFocus_Title_Uses_FocusAttribute () {
-        var view = new View {
-                                Title = "A",
-                                Height = 2,
-                                Width = 5
-                            };
+        var view = new View { Title = "A", Height = 2, Width = 5 };
         view.Border.Thickness = new Thickness (0, 1, 0, 0);
         view.Border.LineStyle = LineStyle.Single;
         view.ColorScheme = new ColorScheme {
-                                               Normal = new Attribute (Color.Red, Color.Green),
-                                               Focus = new Attribute (Color.Green, Color.Red)
-                                           };
+            Normal = new Attribute (Color.Red, Color.Green), Focus = new Attribute (Color.Green, Color.Red)
+        };
         Assert.NotEqual (view.ColorScheme.Normal.Foreground, view.ColorScheme.Focus.Foreground);
         Assert.Equal (ColorName.Red, view.Border.GetNormalColor ().Foreground.GetClosestNamedColor ());
         Assert.Equal (ColorName.Green, view.Border.GetFocusColor ().Foreground.GetClosestNamedColor ());
@@ -45,17 +40,12 @@ public class BorderTests {
     [Fact]
     [SetupFakeDriver]
     public void Border_Uses_Parent_ColorScheme () {
-        var view = new View {
-                                Title = "A",
-                                Height = 2,
-                                Width = 5
-                            };
+        var view = new View { Title = "A", Height = 2, Width = 5 };
         view.Border.Thickness = new Thickness (0, 1, 0, 0);
         view.Border.LineStyle = LineStyle.Single;
         view.ColorScheme = new ColorScheme {
-                                               Normal = new Attribute (Color.Red, Color.Green),
-                                               Focus = new Attribute (Color.Green, Color.Red)
-                                           };
+            Normal = new Attribute (Color.Red, Color.Green), Focus = new Attribute (Color.Green, Color.Red)
+        };
         Assert.Equal (ColorName.Red, view.Border.GetNormalColor ().Foreground.GetClosestNamedColor ());
         Assert.Equal (ColorName.Green, view.Border.GetFocusColor ().Foreground.GetClosestNamedColor ());
         Assert.Equal (view.GetNormalColor (), view.Border.GetNormalColor ());
@@ -85,11 +75,8 @@ public class BorderTests {
     [InlineData (10)]
     public void Border_With_Title_Border_Double_Thickness_Top_Four_Size_Width (int width) {
         var win = new Window {
-                                 Title = "1234",
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill (),
-                                 BorderStyle = LineStyle.Double
-                             };
+            Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Double
+        };
         win.Border.Thickness.Top = 4;
 
         RunState rs = Application.Begin (win);
@@ -208,11 +195,8 @@ public class BorderTests {
     [InlineData (10)]
     public void Border_With_Title_Border_Double_Thickness_Top_Three_Size_Width (int width) {
         var win = new Window {
-                                 Title = "1234",
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill (),
-                                 BorderStyle = LineStyle.Double
-                             };
+            Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Double
+        };
         win.Border.Thickness.Top = 3;
 
         RunState rs = Application.Begin (win);
@@ -331,11 +315,8 @@ public class BorderTests {
     [InlineData (10)]
     public void Border_With_Title_Border_Double_Thickness_Top_Two_Size_Width (int width) {
         var win = new Window {
-                                 Title = "1234",
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill (),
-                                 BorderStyle = LineStyle.Double
-                             };
+            Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Double
+        };
         win.Border.Thickness.Top = 2;
 
         RunState rs = Application.Begin (win);
@@ -446,11 +427,7 @@ public class BorderTests {
     [InlineData (2)]
     [InlineData (3)]
     public void Border_With_Title_Size_Height (int height) {
-        var win = new Window {
-                                 Title = "1234",
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
+        var win = new Window { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill () };
 
         RunState rs = Application.Begin (win);
         var firstIteration = false;
@@ -509,11 +486,7 @@ public class BorderTests {
     [InlineData (9)]
     [InlineData (10)]
     public void Border_With_Title_Size_Width (int width) {
-        var win = new Window {
-                                 Title = "1234",
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
+        var win = new Window { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill () };
 
         RunState rs = Application.Begin (win);
         var firstIteration = false;
@@ -625,28 +598,23 @@ public class BorderTests {
         int expectedScreenY
     ) {
         var superSuper = new View {
-                                      X = superOffset,
-                                      Y = superOffset,
-                                      Width = 30,
-                                      Height = 30,
-                                      BorderStyle = LineStyle.Single
-                                  };
+            X = superOffset,
+            Y = superOffset,
+            Width = 30,
+            Height = 30,
+            BorderStyle = LineStyle.Single
+        };
 
         var super = new View {
-                                 X = superOffset,
-                                 Y = superOffset,
-                                 Width = 20,
-                                 Height = 20,
-                                 BorderStyle = LineStyle.Single
-                             };
+            X = superOffset,
+            Y = superOffset,
+            Width = 20,
+            Height = 20,
+            BorderStyle = LineStyle.Single
+        };
         superSuper.Add (super);
 
-        var view = new View {
-                                X = frameX,
-                                Y = frameY,
-                                Width = 10,
-                                Height = 10
-                            };
+        var view = new View { X = frameX, Y = frameY, Width = 10, Height = 10 };
         super.Add (view);
         var expected = new Rect (expectedScreenX, expectedScreenY, 10, 10);
         Rect actual = view.FrameToScreen ();
@@ -669,19 +637,14 @@ public class BorderTests {
         int expectedScreenY
     ) {
         var super = new View {
-                                 X = superOffset,
-                                 Y = superOffset,
-                                 Width = 20,
-                                 Height = 20,
-                                 BorderStyle = LineStyle.Single
-                             };
+            X = superOffset,
+            Y = superOffset,
+            Width = 20,
+            Height = 20,
+            BorderStyle = LineStyle.Single
+        };
 
-        var view = new View {
-                                X = frameX,
-                                Y = frameY,
-                                Width = 10,
-                                Height = 10
-                            };
+        var view = new View { X = frameX, Y = frameY, Width = 10, Height = 10 };
         super.Add (view);
         var expected = new Rect (expectedScreenX, expectedScreenY, 10, 10);
         Rect actual = view.FrameToScreen ();
@@ -693,10 +656,7 @@ public class BorderTests {
     public void HasSuperView () {
         Application.Top.BorderStyle = LineStyle.Double;
 
-        var frame = new FrameView {
-                                      Width = Dim.Fill (),
-                                      Height = Dim.Fill ()
-                                  };
+        var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
         Application.Top.Add (frame);
         RunState rs = Application.Begin (Application.Top);
@@ -720,11 +680,7 @@ public class BorderTests {
     public void HasSuperView_Title () {
         Application.Top.BorderStyle = LineStyle.Double;
 
-        var frame = new FrameView {
-                                      Title = "1234",
-                                      Width = Dim.Fill (),
-                                      Height = Dim.Fill ()
-                                  };
+        var frame = new FrameView { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill () };
 
         Application.Top.Add (frame);
         RunState rs = Application.Begin (Application.Top);
@@ -745,10 +701,7 @@ public class BorderTests {
     [Fact]
     [AutoInitShutdown]
     public void NoSuperView () {
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
 
         RunState rs = Application.Begin (win);
         var firstIteration = false;

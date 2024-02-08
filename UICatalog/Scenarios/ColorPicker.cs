@@ -7,20 +7,20 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Colors")]
 [ScenarioCategory ("Controls")]
 public class ColorPickers : Scenario {
-    /// <summary>Background color Label.</summary>
-    private Label _backgroundColorLabel;
-
-    /// <summary>Demo label.</summary>
-    private View _demoView;
-
-    /// <summary>Foreground color label.</summary>
-    private Label _foregroundColorLabel;
-
     /// <summary>Background ColorPicker.</summary>
     private ColorPicker backgroundColorPicker;
 
     /// <summary>Foreground ColorPicker.</summary>
     private ColorPicker foregroundColorPicker;
+
+    /// <summary>Background color Label.</summary>
+    private Label _backgroundColorLabel;
+
+    /// <summary>Foreground color label.</summary>
+    private Label _foregroundColorLabel;
+
+    /// <summary>Demo label.</summary>
+    private View _demoView;
 
     /// <summary>Setup the scenario.</summary>
     public override void Setup () {
@@ -28,28 +28,24 @@ public class ColorPickers : Scenario {
         Win.Title = GetName ();
 
         // Foreground ColorPicker.
-        foregroundColorPicker = new ColorPicker {
-                                                    Title = "Foreground Color",
-                                                    BorderStyle = LineStyle.Single
-                                                };
+        foregroundColorPicker = new ColorPicker { Title = "Foreground Color", BorderStyle = LineStyle.Single };
         foregroundColorPicker.ColorChanged += ForegroundColor_ColorChanged;
         Win.Add (foregroundColorPicker);
 
         _foregroundColorLabel = new Label {
-                                              X = Pos.Left (foregroundColorPicker),
-                                              Y = Pos.Bottom (foregroundColorPicker) + 1
-                                          };
+            X = Pos.Left (foregroundColorPicker), Y = Pos.Bottom (foregroundColorPicker) + 1
+        };
         Win.Add (_foregroundColorLabel);
 
         // Background ColorPicker.
         backgroundColorPicker = new ColorPicker {
-                                                    Title = "Background Color",
-                                                    Y = Pos.Center (),
-                                                    X = Pos.Center (),
-                                                    BoxHeight = 1,
-                                                    BoxWidth = 4,
-                                                    BorderStyle = LineStyle.Single
-                                                };
+            Title = "Background Color",
+            Y = Pos.Center (),
+            X = Pos.Center (),
+            BoxHeight = 1,
+            BoxWidth = 4,
+            BorderStyle = LineStyle.Single
+        };
 
         //backgroundColorPicker.X = Pos.AnchorEnd () - (Pos.Right (backgroundColorPicker) - Pos.Left (backgroundColorPicker));
         backgroundColorPicker.ColorChanged += BackgroundColor_ColorChanged;
@@ -62,16 +58,16 @@ public class ColorPickers : Scenario {
 
         // Demo Label.
         _demoView = new View {
-                                 Title = "Color Sample",
-                                 Text = "Lorem Ipsum",
-                                 TextAlignment = TextAlignment.Centered,
-                                 VerticalTextAlignment = VerticalTextAlignment.Middle,
-                                 BorderStyle = LineStyle.Heavy,
-                                 X = Pos.Center (),
-                                 Y = Pos.Center (),
-                                 Height = 5,
-                                 Width = 20
-                             };
+            Title = "Color Sample",
+            Text = "Lorem Ipsum",
+            TextAlignment = TextAlignment.Centered,
+            VerticalTextAlignment = VerticalTextAlignment.Middle,
+            BorderStyle = LineStyle.Heavy,
+            X = Pos.Center (),
+            Y = Pos.Center (),
+            Height = 5,
+            Width = 20
+        };
         Win.Add (_demoView);
 
         // Set default colors.
@@ -103,9 +99,10 @@ public class ColorPickers : Scenario {
     /// <summary>Update Demo Label.</summary>
     private void UpdateDemoLabel () {
         _demoView.ColorScheme = new ColorScheme {
-                                                    Normal = new Attribute (
-                                                                            foregroundColorPicker.SelectedColor,
-                                                                            backgroundColorPicker.SelectedColor)
-                                                };
+            Normal = new Attribute (
+                foregroundColorPicker.SelectedColor,
+                backgroundColorPicker.SelectedColor
+            )
+        };
     }
 }

@@ -11,19 +11,19 @@ namespace Terminal.Gui;
 
 /// <summary>The <see cref="DatePicker"/> <see cref="View"/> Date Picker.</summary>
 public class DatePicker : View {
-    private TableView _calendar;
-    private DateTime _date = DateTime.Now;
-    private DateField _dateField;
-    private Label _dateLabel;
-    private Button _nextMonthButton;
-    private Button _previousMonthButton;
-    private DataTable _table;
-
     /// <summary>Initializes a new instance of <see cref="DatePicker"/>.</summary>
     public DatePicker () { SetInitialProperties (_date); }
 
     /// <summary>Initializes a new instance of <see cref="DatePicker"/> with the specified date.</summary>
     public DatePicker (DateTime date) { SetInitialProperties (date); }
+
+    private Button _nextMonthButton;
+    private Button _previousMonthButton;
+    private DataTable _table;
+    private DateField _dateField;
+    private DateTime _date = DateTime.Now;
+    private Label _dateLabel;
+    private TableView _calendar;
 
     /// <summary>CultureInfo for date. The default is CultureInfo.CurrentCulture.</summary>
     public CultureInfo Culture {
@@ -123,12 +123,13 @@ public class DatePicker : View {
             string abbreviatedDayName =
                 CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedDayName ((DayOfWeek)i);
             _calendar.Style.ColumnStyles.Add (
-                                              i,
-                                              new ColumnStyle {
-                                                                  MaxWidth = abbreviatedDayName.Length,
-                                                                  MinWidth = abbreviatedDayName.Length,
-                                                                  MinAcceptableWidth = abbreviatedDayName.Length
-                                                              });
+                i,
+                new ColumnStyle {
+                    MaxWidth = abbreviatedDayName.Length,
+                    MinWidth = abbreviatedDayName.Length,
+                    MinAcceptableWidth = abbreviatedDayName.Length
+                }
+            );
             _table.Columns.Add (abbreviatedDayName);
         }
 
@@ -154,40 +155,36 @@ public class DatePicker : View {
         Title = "Date Picker";
         BorderStyle = LineStyle.Single;
         Date = date;
-        _dateLabel = new Label {
-                                   X = 0,
-                                   Y = 0,
-                                   Text = "Date: "
-                               };
+        _dateLabel = new Label { X = 0, Y = 0, Text = "Date: " };
 
         _dateField = new DateField (DateTime.Now) {
-                                                      X = Pos.Right (_dateLabel),
-                                                      Y = 0,
-                                                      Width = Dim.Fill (1),
-                                                      Height = 1,
-                                                      Culture = Culture
-                                                  };
+            X = Pos.Right (_dateLabel),
+            Y = 0,
+            Width = Dim.Fill (1),
+            Height = 1,
+            Culture = Culture
+        };
 
         _calendar = new TableView {
-                                      X = 0,
-                                      Y = Pos.Bottom (_dateLabel),
-                                      Height = 11,
-                                      Style = new TableStyle {
-                                                                 ShowHeaders = true,
-                                                                 ShowHorizontalBottomline = true,
-                                                                 ShowVerticalCellLines = true,
-                                                                 ExpandLastColumn = true
-                                                             }
-                                  };
+            X = 0,
+            Y = Pos.Bottom (_dateLabel),
+            Height = 11,
+            Style = new TableStyle {
+                ShowHeaders = true,
+                ShowHorizontalBottomline = true,
+                ShowVerticalCellLines = true,
+                ExpandLastColumn = true
+            }
+        };
 
         _previousMonthButton = new Button {
-                                              AutoSize = false,
-                                              X = Pos.Center () - 4,
-                                              Y = Pos.Bottom (_calendar) - 1,
-                                              Height = 1,
-                                              Width = CalculateCalendarWidth () / 2,
-                                              Text = GetBackButtonText ()
-                                          };
+            AutoSize = false,
+            X = Pos.Center () - 4,
+            Y = Pos.Bottom (_calendar) - 1,
+            Height = 1,
+            Width = CalculateCalendarWidth () / 2,
+            Text = GetBackButtonText ()
+        };
 
         _previousMonthButton.Clicked += (sender, e) => {
             Date = _date.AddMonths (-1);
@@ -196,13 +193,13 @@ public class DatePicker : View {
         };
 
         _nextMonthButton = new Button {
-                                          AutoSize = false,
-                                          X = Pos.Right (_previousMonthButton) + 2,
-                                          Y = Pos.Bottom (_calendar) - 1,
-                                          Height = 1,
-                                          Width = CalculateCalendarWidth () / 2,
-                                          Text = GetBackButtonText ()
-                                      };
+            AutoSize = false,
+            X = Pos.Right (_previousMonthButton) + 2,
+            Y = Pos.Bottom (_calendar) - 1,
+            Height = 1,
+            Width = CalculateCalendarWidth () / 2,
+            Text = GetBackButtonText ()
+        };
 
         _nextMonthButton.Clicked += (sender, e) => {
             Date = _date.AddMonths (1);

@@ -4,11 +4,11 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.ViewsTests;
 
 public class ViewDisposalTest {
-    private readonly ITestOutputHelper _output;
+    public ViewDisposalTest (ITestOutputHelper output) { _output = output; }
 #nullable enable
     private readonly Dictionary<Type, object?[]?> _special_params = new ();
 #nullable restore
-    public ViewDisposalTest (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     [AutoInitShutdown]
@@ -74,13 +74,14 @@ public class ViewDisposalTest {
 
         // Filter all types that can be instantiated, are public, arent generic,  aren't the view type itself, but derive from view
         foreach (Type type in Assembly.GetAssembly (typeof (View))
-                                      .GetTypes ()
-                                      .Where (
-                                              T => { //body of anonymous check function
-                                                  return !T.IsAbstract && T.IsPublic && T.IsClass
-                                                         && T.IsAssignableTo (typeof (View))
-                                                         && !T.IsGenericType && !(T == typeof (View));
-                                              })) //end of body of anonymous check function
+                     .GetTypes ()
+                     .Where (
+                         T => { //body of anonymous check function
+                             return !T.IsAbstract && T.IsPublic && T.IsClass
+                                    && T.IsAssignableTo (typeof (View))
+                                    && !T.IsGenericType && !(T == typeof (View));
+                         }
+                     )) //end of body of anonymous check function
         { //body of the foreach loop
             _output.WriteLine ($"Found Type {type.Name}");
             Assert.DoesNotContain (type, valid);

@@ -98,9 +98,7 @@ public class DateFieldTests {
     [Fact]
     [TestDate]
     public void KeyBindings_Command () {
-        var df = new DateField (DateTime.Parse ("12/12/1971")) {
-                                                                   ReadOnly = true
-                                                               };
+        var df = new DateField (DateTime.Parse ("12/12/1971")) { ReadOnly = true };
         Assert.True (df.NewKeyDownEvent (new Key (KeyCode.Delete)));
         Assert.Equal (" 12/12/1971", df.Text);
         df.ReadOnly = false;
@@ -144,9 +142,9 @@ public class DateFieldTests {
     [TestDate]
     public void Typing_With_Selection_Normalize_Format () {
         var df = new DateField (DateTime.Parse ("12/12/1971")) {
-                                                                   // Start selection at before the first separator /
-                                                                   CursorPosition = 2
-                                                               };
+            // Start selection at before the first separator /
+            CursorPosition = 2
+        };
 
         // Now select the separator /
         Assert.True (df.NewKeyDownEvent (new Key (KeyCode.CursorRight | KeyCode.ShiftMask)));
@@ -248,9 +246,9 @@ public class DateFieldTests {
         CultureInfo cultureBackup = CultureInfo.CurrentCulture;
         CultureInfo.CurrentCulture = new CultureInfo ("pt-PT");
         var df = new DateField (DateTime.Parse ("12/12/1971")) {
-                                                                   // Move to the first 2
-                                                                   CursorPosition = 2
-                                                               };
+            // Move to the first 2
+            CursorPosition = 2
+        };
 
         // Type 3 over the separator
         Assert.True (df.NewKeyDownEvent (new Key (KeyCode.D3)));

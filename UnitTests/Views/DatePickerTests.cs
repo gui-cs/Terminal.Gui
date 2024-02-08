@@ -30,9 +30,7 @@ public class DatePickerTests {
 
     [Fact]
     public void DatePicker_SetDate_ShouldChangeText () {
-        var datePicker = new DatePicker {
-                                            Culture = CultureInfo.GetCultureInfo ("en-GB")
-                                        };
+        var datePicker = new DatePicker { Culture = CultureInfo.GetCultureInfo ("en-GB") };
         var newDate = new DateTime (2024, 1, 15);
         string format = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
 

@@ -13,14 +13,14 @@ namespace Terminal.Gui {
     namespace TextValidateProviders {
         /// <summary>TextValidateField Providers Interface. All TextValidateField are created with a ITextValidateProvider.</summary>
         public interface ITextValidateProvider {
-            /// <summary>Gets the formatted string for display.</summary>
-            string DisplayText { get; }
-
             /// <summary>Set that this provider uses a fixed width. e.g. Masked ones are fixed.</summary>
             bool Fixed { get; }
 
             /// <summary>True if the input is valid, otherwise false.</summary>
             bool IsValid { get; }
+
+            /// <summary>Gets the formatted string for display.</summary>
+            string DisplayText { get; }
 
             /// <summary>Set the input text and get the current value.</summary>
             string Text { get; set; }
@@ -97,10 +97,10 @@ namespace Terminal.Gui {
         ///     </para>
         /// </summary>
         public class NetMaskedTextProvider : ITextValidateProvider {
-            private MaskedTextProvider _provider;
-
             /// <summary>Empty Constructor</summary>
             public NetMaskedTextProvider (string mask) { Mask = mask; }
+
+            private MaskedTextProvider _provider;
 
             /// <summary>Mask property</summary>
             public string Mask {
@@ -209,12 +209,15 @@ namespace Terminal.Gui {
 
         /// <summary>Regex Provider for TextValidateField.</summary>
         public class TextRegexProvider : ITextValidateProvider {
-            private List<Rune> _pattern;
-            private Regex _regex;
-            private List<Rune> _text;
-
             /// <summary>Empty Constructor.</summary>
             public TextRegexProvider (string pattern) { Pattern = pattern; }
+
+            private List<Rune> _pattern;
+            private List<Rune> _text;
+            private Regex _regex;
+
+            /// <summary>When true, validates with the regex pattern on each input, preventing the input if it's not valid.</summary>
+            public bool ValidateOnInput { get; set; } = true;
 
             /// <summary>Regex pattern property.</summary>
             public string Pattern {
@@ -225,9 +228,6 @@ namespace Terminal.Gui {
                     SetupText ();
                 }
             }
-
-            /// <summary>When true, validates with the regex pattern on each input, preventing the input if it's not valid.</summary>
-            public bool ValidateOnInput { get; set; } = true;
 
             /// <inheritdoc/>
             public event EventHandler<TextChangedEventArgs> TextChanged;
@@ -341,10 +341,6 @@ namespace Terminal.Gui {
 
     /// <summary>Text field that validates input through a  <see cref="ITextValidateProvider"/></summary>
     public class TextValidateField : View {
-        private readonly int _defaultLength = 10;
-        private int _cursorPosition;
-        private ITextValidateProvider _provider;
-
         /// <summary>
         ///     Initializes a new instance of the <see cref="TextValidateField"/> class using
         ///     <see cref="LayoutStyle.Computed"/> positioning.
@@ -355,47 +351,53 @@ namespace Terminal.Gui {
 
             // Things this view knows how to do
             AddCommand (
-                        Command.LeftHome,
-                        () => {
-                            HomeKeyHandler ();
+                Command.LeftHome,
+                () => {
+                    HomeKeyHandler ();
 
-                            return true;
-                        });
+                    return true;
+                }
+            );
             AddCommand (
-                        Command.RightEnd,
-                        () => {
-                            EndKeyHandler ();
+                Command.RightEnd,
+                () => {
+                    EndKeyHandler ();
 
-                            return true;
-                        });
+                    return true;
+                }
+            );
             AddCommand (
-                        Command.DeleteCharRight,
-                        () => {
-                            DeleteKeyHandler ();
+                Command.DeleteCharRight,
+                () => {
+                    DeleteKeyHandler ();
 
-                            return true;
-                        });
+                    return true;
+                }
+            );
             AddCommand (
-                        Command.DeleteCharLeft,
-                        () => {
-                            BackspaceKeyHandler ();
+                Command.DeleteCharLeft,
+                () => {
+                    BackspaceKeyHandler ();
 
-                            return true;
-                        });
+                    return true;
+                }
+            );
             AddCommand (
-                        Command.Left,
-                        () => {
-                            CursorLeft ();
+                Command.Left,
+                () => {
+                    CursorLeft ();
 
-                            return true;
-                        });
+                    return true;
+                }
+            );
             AddCommand (
-                        Command.Right,
-                        () => {
-                            CursorRight ();
+                Command.Right,
+                () => {
+                    CursorRight ();
 
-                            return true;
-                        });
+                    return true;
+                }
+            );
 
             // Default keybindings for this view
             KeyBindings.Add (KeyCode.Home, Command.LeftHome);
@@ -408,6 +410,10 @@ namespace Terminal.Gui {
             KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
             KeyBindings.Add (KeyCode.CursorRight, Command.Right);
         }
+
+        private readonly int _defaultLength = 10;
+        private int _cursorPosition;
+        private ITextValidateProvider _provider;
 
         /// <summary>This property returns true if the input is valid.</summary>
         public virtual bool IsValid {

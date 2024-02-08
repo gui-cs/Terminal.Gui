@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 #nullable enable
 /// <summary>Describes a series of data that can be rendered into a <see cref="GraphView"/>></summary>
 public interface ISeries {
@@ -41,8 +41,6 @@ public class ScatterSeries : ISeries {
 
 /// <summary>Collection of <see cref="BarSeries"/> in which bars are clustered by category</summary>
 public class MultiBarSeries : ISeries {
-    private readonly BarSeries[] subSeries;
-
     /// <summary>Creates a new series of clustered bars.</summary>
     /// <param name="numberOfBarsPerCategory">Each category has this many bars</param>
     /// <param name="barsEvery">How far appart to put each category (in graph space)</param>
@@ -59,8 +57,9 @@ public class MultiBarSeries : ISeries {
 
         if (colors != null && colors.Length != numberOfBarsPerCategory) {
             throw new ArgumentException (
-                                         "Number of colors must match the number of bars",
-                                         nameof (numberOfBarsPerCategory));
+                "Number of colors must match the number of bars",
+                nameof (numberOfBarsPerCategory)
+            );
         }
 
         for (var i = 0; i < numberOfBarsPerCategory; i++) {
@@ -78,6 +77,8 @@ public class MultiBarSeries : ISeries {
 
         Spacing = spacing;
     }
+
+    private readonly BarSeries[] subSeries;
 
     /// <summary>
     ///     The number of units of graph space between bars.  Should be less than <see cref="BarSeries.BarEvery"/>
@@ -107,34 +108,37 @@ public class MultiBarSeries : ISeries {
     public void AddBars (string label, Rune fill, params float[] values) {
         if (values.Length != subSeries.Length) {
             throw new ArgumentException (
-                                         "Number of values must match the number of bars per category",
-                                         nameof (values));
+                "Number of values must match the number of bars per category",
+                nameof (values)
+            );
         }
 
         for (var i = 0; i < values.Length; i++) {
             subSeries[i]
                 .Bars.Add (
-                           new BarSeriesBar (
-                                             label,
-                                             new GraphCellToRender (fill),
-                                             values[i]));
+                    new BarSeriesBar (
+                        label,
+                        new GraphCellToRender (fill),
+                        values[i]
+                    )
+                );
         }
     }
 }
 
 /// <summary>Series of bars positioned at regular intervals</summary>
 public class BarSeries : ISeries {
+    /// <summary>Overrides the <see cref="BarSeriesBar.Fill"/> with a fixed color</summary>
+    public Attribute? OverrideBarColor { get; set; }
+
+    /// <summary>True to draw <see cref="BarSeriesBar.Text"/> along the axis under the bar.  Defaults to true.</summary>
+    public bool DrawLabels { get; set; } = true;
+
     /// <summary>
     ///     Determines the spacing of bars along the axis. Defaults to 1 i.e. every 1 unit of graph space a bar is
     ///     rendered.  Note that you should also consider <see cref="GraphView.CellSize"/> when changing this.
     /// </summary>
     public float BarEvery { get; set; } = 1;
-
-    /// <summary>Ordered collection of graph bars to position along axis</summary>
-    public List<BarSeriesBar> Bars { get; set; } = new ();
-
-    /// <summary>True to draw <see cref="BarSeriesBar.Text"/> along the axis under the bar.  Defaults to true.</summary>
-    public bool DrawLabels { get; set; } = true;
 
     /// <summary>
     ///     The number of units of graph space along the axis before rendering the first bar (and subsequent bars - see
@@ -142,11 +146,11 @@ public class BarSeries : ISeries {
     /// </summary>
     public float Offset { get; set; }
 
+    /// <summary>Ordered collection of graph bars to position along axis</summary>
+    public List<BarSeriesBar> Bars { get; set; } = new ();
+
     /// <summary>Direction bars protrude from the corresponding axis. Defaults to vertical</summary>
     public Orientation Orientation { get; set; } = Orientation.Vertical;
-
-    /// <summary>Overrides the <see cref="BarSeriesBar.Fill"/> with a fixed color</summary>
-    public Attribute? OverrideBarColor { get; set; }
 
     /// <summary>Draws bars that are currently in the <paramref name="drawBounds"/></summary>
     /// <param name="graph"></param>

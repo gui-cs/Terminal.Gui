@@ -23,14 +23,14 @@ public class ComputedLayout : Scenario {
         // Demonstrate using Dim to create a horizontal ruler that always measures the parent window's width
         const string rule = "|123456789";
         var horizontalRuler = new Label {
-                                            AutoSize = false,
-                                            X = 0,
-                                            Y = 0,
-                                            Width = Dim.Fill (),
-                                            Height = 1,
-                                            ColorScheme = Colors.ColorSchemes["Error"],
-                                            Text = rule
-                                        };
+            AutoSize = false,
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = 1,
+            ColorScheme = Colors.ColorSchemes["Error"],
+            Text = rule
+        };
 
         Application.Top.Add (horizontalRuler);
 
@@ -38,19 +38,19 @@ public class ComputedLayout : Scenario {
         const string vrule = "|\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
 
         var verticalRuler = new Label {
-                                          AutoSize = false,
-                                          X = 0,
-                                          Y = 0,
-                                          Width = 1,
-                                          Height = Dim.Fill (),
-                                          ColorScheme = Colors.ColorSchemes["Error"],
-                                          Text = vrule
-                                      };
+            AutoSize = false,
+            X = 0,
+            Y = 0,
+            Width = 1,
+            Height = Dim.Fill (),
+            ColorScheme = Colors.ColorSchemes["Error"],
+            Text = vrule
+        };
 
         Application.Top.LayoutComplete += (s, a) => {
             horizontalRuler.Text =
                 rule.Repeat ((int)Math.Ceiling (horizontalRuler.Bounds.Width / (double)rule.Length))[
-                 ..horizontalRuler.Bounds.Width];
+                    ..horizontalRuler.Bounds.Width];
             verticalRuler.Text =
                 vrule.Repeat ((int)Math.Ceiling (verticalRuler.Bounds.Height * 2 / (double)rule.Length))
                     [..(verticalRuler.Bounds.Height * 2)];
@@ -79,42 +79,50 @@ public class ComputedLayout : Scenario {
         var txt = "Resize the terminal to see computed layout in action.";
         List<Label> labelList = new ();
         labelList.Add (new Label { Text = "The lines below show different TextAlignments" });
-        labelList.Add (new Label {
-                                     TextAlignment = TextAlignment.Left,
-                                     AutoSize = false,
-                                     Width = Dim.Fill (),
-                                     X = 0,
-                                     Y = Pos.Bottom (labelList.LastOrDefault ()),
-                                     ColorScheme = Colors.ColorSchemes["Dialog"],
-                                     Text = $"{i++}-{txt}"
-                                 });
-        labelList.Add (new Label {
-                                     TextAlignment = TextAlignment.Right,
-                                     AutoSize = false,
-                                     Width = Dim.Fill (),
-                                     X = 0,
-                                     Y = Pos.Bottom (labelList.LastOrDefault ()),
-                                     ColorScheme = Colors.ColorSchemes["Dialog"],
-                                     Text = $"{i++}-{txt}"
-                                 });
-        labelList.Add (new Label {
-                                     TextAlignment = TextAlignment.Centered,
-                                     AutoSize = false,
-                                     Width = Dim.Fill (),
-                                     X = 0,
-                                     Y = Pos.Bottom (labelList.LastOrDefault ()),
-                                     ColorScheme = Colors.ColorSchemes["Dialog"],
-                                     Text = $"{i++}-{txt}"
-                                 });
-        labelList.Add (new Label {
-                                     TextAlignment = TextAlignment.Justified,
-                                     AutoSize = false,
-                                     Width = Dim.Fill (),
-                                     X = 0,
-                                     Y = Pos.Bottom (labelList.LastOrDefault ()),
-                                     ColorScheme = Colors.ColorSchemes["Dialog"],
-                                     Text = $"{i++}-{txt}"
-                                 });
+        labelList.Add (
+            new Label {
+                TextAlignment = TextAlignment.Left,
+                AutoSize = false,
+                Width = Dim.Fill (),
+                X = 0,
+                Y = Pos.Bottom (labelList.LastOrDefault ()),
+                ColorScheme = Colors.ColorSchemes["Dialog"],
+                Text = $"{i++}-{txt}"
+            }
+        );
+        labelList.Add (
+            new Label {
+                TextAlignment = TextAlignment.Right,
+                AutoSize = false,
+                Width = Dim.Fill (),
+                X = 0,
+                Y = Pos.Bottom (labelList.LastOrDefault ()),
+                ColorScheme = Colors.ColorSchemes["Dialog"],
+                Text = $"{i++}-{txt}"
+            }
+        );
+        labelList.Add (
+            new Label {
+                TextAlignment = TextAlignment.Centered,
+                AutoSize = false,
+                Width = Dim.Fill (),
+                X = 0,
+                Y = Pos.Bottom (labelList.LastOrDefault ()),
+                ColorScheme = Colors.ColorSchemes["Dialog"],
+                Text = $"{i++}-{txt}"
+            }
+        );
+        labelList.Add (
+            new Label {
+                TextAlignment = TextAlignment.Justified,
+                AutoSize = false,
+                Width = Dim.Fill (),
+                X = 0,
+                Y = Pos.Bottom (labelList.LastOrDefault ()),
+                ColorScheme = Colors.ColorSchemes["Dialog"],
+                Text = $"{i++}-{txt}"
+            }
+        );
         subWin.Add (labelList.ToArray ());
 
         var frameView = new FrameView { X = 2, Y = Pos.Bottom (subWin), Width = 30, Height = 7 };
@@ -126,51 +134,56 @@ public class ComputedLayout : Scenario {
         i = 1;
         labelList = new List<Label> ();
         labelList.Add (new Label { Text = "The lines below show different TextAlignments" });
-        labelList.Add (new Label {
-                                     TextAlignment = TextAlignment.Left,
-                                     AutoSize = false,
-                                     Width = Dim.Fill (),
-                                     X = 0,
-                                     Y = Pos.Bottom (labelList.LastOrDefault ()),
-                                     ColorScheme = Colors.ColorSchemes["Dialog"],
-                                     Text = $"{i++}-{txt}"
-                                 });
-        labelList.Add (new Label {
-                                     TextAlignment = TextAlignment.Right,
-                                     AutoSize = false,
-                                     Width = Dim.Fill (),
-                                     X = 0,
-                                     Y = Pos.Bottom (labelList.LastOrDefault ()),
-                                     ColorScheme = Colors.ColorSchemes["Dialog"],
-                                     Text = $"{i++}-{txt}"
-                                 });
-        labelList.Add (new Label {
-                                     TextAlignment = TextAlignment.Centered,
-                                     AutoSize = false,
-                                     Width = Dim.Fill (),
-                                     X = 0,
-                                     Y = Pos.Bottom (labelList.LastOrDefault ()),
-                                     ColorScheme = Colors.ColorSchemes["Dialog"],
-                                     Text = $"{i++}-{txt}"
-                                 });
-        labelList.Add (new Label {
-                                     TextAlignment = TextAlignment.Justified,
-                                     AutoSize = false,
-                                     Width = Dim.Fill (),
-                                     X = 0,
-                                     Y = Pos.Bottom (labelList.LastOrDefault ()),
-                                     ColorScheme = Colors.ColorSchemes["Dialog"],
-                                     Text = $"{i++}-{txt}"
-                                 });
+        labelList.Add (
+            new Label {
+                TextAlignment = TextAlignment.Left,
+                AutoSize = false,
+                Width = Dim.Fill (),
+                X = 0,
+                Y = Pos.Bottom (labelList.LastOrDefault ()),
+                ColorScheme = Colors.ColorSchemes["Dialog"],
+                Text = $"{i++}-{txt}"
+            }
+        );
+        labelList.Add (
+            new Label {
+                TextAlignment = TextAlignment.Right,
+                AutoSize = false,
+                Width = Dim.Fill (),
+                X = 0,
+                Y = Pos.Bottom (labelList.LastOrDefault ()),
+                ColorScheme = Colors.ColorSchemes["Dialog"],
+                Text = $"{i++}-{txt}"
+            }
+        );
+        labelList.Add (
+            new Label {
+                TextAlignment = TextAlignment.Centered,
+                AutoSize = false,
+                Width = Dim.Fill (),
+                X = 0,
+                Y = Pos.Bottom (labelList.LastOrDefault ()),
+                ColorScheme = Colors.ColorSchemes["Dialog"],
+                Text = $"{i++}-{txt}"
+            }
+        );
+        labelList.Add (
+            new Label {
+                TextAlignment = TextAlignment.Justified,
+                AutoSize = false,
+                Width = Dim.Fill (),
+                X = 0,
+                Y = Pos.Bottom (labelList.LastOrDefault ()),
+                ColorScheme = Colors.ColorSchemes["Dialog"],
+                Text = $"{i++}-{txt}"
+            }
+        );
         frameView.Add (labelList.ToArray ());
         Application.Top.Add (frameView);
 
         frameView = new FrameView {
-                                      X = Pos.Right (frameView),
-                                      Y = Pos.Top (frameView),
-                                      Width = Dim.Fill (),
-                                      Height = 7
-                                  };
+            X = Pos.Right (frameView), Y = Pos.Top (frameView), Width = Dim.Fill (), Height = 7
+        };
         frameView.Initialized += (sender, args) => {
             var fv = sender as FrameView;
             fv.Title =
@@ -180,21 +193,21 @@ public class ComputedLayout : Scenario {
 
         // Demonstrate Dim & Pos using percentages - a TextField that is 30% height and 80% wide
         var textView = new TextView {
-                                        X = Pos.Center (),
-                                        Y = Pos.Percent (50),
-                                        Width = Dim.Percent (80),
-                                        Height = Dim.Percent (10),
-                                        ColorScheme = Colors.ColorSchemes["TopLevel"]
-                                    };
+            X = Pos.Center (),
+            Y = Pos.Percent (50),
+            Width = Dim.Percent (80),
+            Height = Dim.Percent (10),
+            ColorScheme = Colors.ColorSchemes["TopLevel"]
+        };
         textView.Text =
             "This TextView should horizontally & vertically centered and \n10% of the screeen height, and 80% of its width.";
         Application.Top.Add (textView);
 
         var oddballButton = new Button {
-                                           Text = "These buttons demo convoluted PosCombine scenarios",
-                                           X = Pos.Center (),
-                                           Y = Pos.Bottom (textView) + 1
-                                       };
+            Text = "These buttons demo convoluted PosCombine scenarios",
+            X = Pos.Center (),
+            Y = Pos.Bottom (textView) + 1
+        };
         Application.Top.Add (oddballButton);
 
         #region Issue2358
@@ -220,46 +233,44 @@ public class ComputedLayout : Scenario {
         // This demonstrates nonsense: it the same as using Pos.AnchorEnd (100/2=50 + 100/2=50 = 100 - 50)
         // The `- Pos.Percent(5)` is there so at least something is visible
         oddballButton = new Button {
-                                       Text = "Center + Center - Percent(50)",
-                                       X = Pos.Center () + Pos.Center () - Pos.Percent (50),
-                                       Y = Pos.Bottom (oddballButton)
-                                   };
+            Text = "Center + Center - Percent(50)",
+            X = Pos.Center () + Pos.Center () - Pos.Percent (50),
+            Y = Pos.Bottom (oddballButton)
+        };
         Application.Top.Add (oddballButton);
 
         // This demonstrates nonsense: it the same as using Pos.AnchorEnd (100/2=50 + 100/2=50 = 100 - 50)
         // The `- Pos.Percent(5)` is there so at least something is visible
         oddballButton = new Button {
-                                       Text = "Percent(50) + Center - Percent(50)",
-                                       X = Pos.Percent (50) + Pos.Center () - Pos.Percent (50),
-                                       Y = Pos.Bottom (oddballButton)
-                                   };
+            Text = "Percent(50) + Center - Percent(50)",
+            X = Pos.Percent (50) + Pos.Center () - Pos.Percent (50),
+            Y = Pos.Bottom (oddballButton)
+        };
         Application.Top.Add (oddballButton);
 
         // This demonstrates nonsense: it the same as using Pos.AnchorEnd (100/2=50 + 100/2=50 = 100 - 50)
         // The `- Pos.Percent(5)` is there so at least something is visible
         oddballButton = new Button {
-                                       Text = "Center + Percent(50) - Percent(50)",
-                                       X = Pos.Center () + Pos.Percent (50) - Pos.Percent (50),
-                                       Y = Pos.Bottom (oddballButton)
-                                   };
+            Text = "Center + Percent(50) - Percent(50)",
+            X = Pos.Center () + Pos.Percent (50) - Pos.Percent (50),
+            Y = Pos.Bottom (oddballButton)
+        };
         Application.Top.Add (oddballButton);
 
         #endregion
 
         // This demonstrates nonsense: Same as At(0)
         oddballButton = new Button {
-                                       Text = "Center - Center - Percent(50)",
-                                       X = Pos.Center () + Pos.Center () - Pos.Percent (50),
-                                       Y = Pos.Bottom (oddballButton)
-                                   };
+            Text = "Center - Center - Percent(50)",
+            X = Pos.Center () + Pos.Center () - Pos.Percent (50),
+            Y = Pos.Bottom (oddballButton)
+        };
         Application.Top.Add (oddballButton);
 
         // This demonstrates combining Percents)
         oddballButton = new Button {
-                                       Text = "Percent(40) + Percent(10)",
-                                       X = Pos.Percent (40) + Pos.Percent (10),
-                                       Y = Pos.Bottom (oddballButton)
-                                   };
+            Text = "Percent(40) + Percent(10)", X = Pos.Percent (40) + Pos.Percent (10), Y = Pos.Bottom (oddballButton)
+        };
         Application.Top.Add (oddballButton);
 
         // Demonstrate AnchorEnd - Button is anchored to bottom/right
@@ -278,34 +289,34 @@ public class ComputedLayout : Scenario {
         // Demonstrate AnchorEnd(n) 
         // This is intentionally convoluted to illustrate potential bugs.
         var anchorEndLabel1 = new Label {
-                                            Text = "This Label should be the 2nd to last line (AnchorEnd (2)).",
-                                            TextAlignment = TextAlignment.Centered,
-                                            ColorScheme = Colors.ColorSchemes["Menu"],
-                                            AutoSize = false,
-                                            Width = Dim.Fill (5),
-                                            X = 5,
-                                            Y = Pos.AnchorEnd (2)
-                                        };
+            Text = "This Label should be the 2nd to last line (AnchorEnd (2)).",
+            TextAlignment = TextAlignment.Centered,
+            ColorScheme = Colors.ColorSchemes["Menu"],
+            AutoSize = false,
+            Width = Dim.Fill (5),
+            X = 5,
+            Y = Pos.AnchorEnd (2)
+        };
         Application.Top.Add (anchorEndLabel1);
 
         // Demonstrate DimCombine (via AnchorEnd(n) - 1)
         // This is intentionally convoluted to illustrate potential bugs.
         var anchorEndLabel2 = new TextField {
-                                                Text =
-                                                    "This TextField should be the 3rd to last line (AnchorEnd (2) - 1).",
-                                                TextAlignment = TextAlignment.Left,
-                                                ColorScheme = Colors.ColorSchemes["Menu"],
-                                                AutoSize = false,
-                                                Width = Dim.Fill (5),
-                                                X = 5,
-                                                Y = Pos.AnchorEnd (2) - 1 // Pos.Combine
-                                            };
+            Text =
+                "This TextField should be the 3rd to last line (AnchorEnd (2) - 1).",
+            TextAlignment = TextAlignment.Left,
+            ColorScheme = Colors.ColorSchemes["Menu"],
+            AutoSize = false,
+            Width = Dim.Fill (5),
+            X = 5,
+            Y = Pos.AnchorEnd (2) - 1 // Pos.Combine
+        };
         Application.Top.Add (anchorEndLabel2);
 
         // Show positioning vertically using Pos.AnchorEnd via Pos.Combine
         var leftButton = new Button {
-                                        Text = "Left", Y = Pos.AnchorEnd () - 1 // Pos.Combine
-                                    };
+            Text = "Left", Y = Pos.AnchorEnd () - 1 // Pos.Combine
+        };
         leftButton.Clicked += (s, e) => {
             // This demonstrates how to have a dynamically sized button
             // Each time the button is clicked the button's text gets longer
@@ -317,8 +328,8 @@ public class ComputedLayout : Scenario {
 
         // show positioning vertically using Pos.AnchorEnd
         var centerButton = new Button {
-                                          Text = "Center", X = Pos.Center (), Y = Pos.AnchorEnd (1) // Pos.AnchorEnd(1)
-                                      };
+            Text = "Center", X = Pos.Center (), Y = Pos.AnchorEnd (1) // Pos.AnchorEnd(1)
+        };
         centerButton.Clicked += (s, e) => {
             // This demonstrates how to have a dynamically sized button
             // Each time the button is clicked the button's text gets longer

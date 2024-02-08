@@ -6,9 +6,9 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.ViewsTests;
 
 public class TextFieldTests {
+    public TextFieldTests (ITestOutputHelper output) { _output = output; }
     private static TextField _textField;
     private readonly ITestOutputHelper _output;
-    public TextFieldTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [AutoInitShutdown]
@@ -19,39 +19,40 @@ public class TextFieldTests {
         Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ắ",
-                                                      _output);
+            _output
+        );
 
         tf.Text = "\u1eaf";
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ắ",
-                                                      _output);
+            _output
+        );
 
         tf.Text = "\u0103\u0301";
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ắ",
-                                                      _output);
+            _output
+        );
 
         tf.Text = "\u0061\u0306\u0301";
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 ắ",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
     [AutoInitShutdown]
     public void Adjust_First () {
-        var tf = new TextField {
-                                   Width = Dim.Fill (),
-                                   Text = "This is a test."
-                               };
+        var tf = new TextField { Width = Dim.Fill (), Text = "This is a test." };
         Application.Top.Add (tf);
         Application.Begin (Application.Top);
 
@@ -91,18 +92,10 @@ public class TextFieldTests {
     [TextFieldTestsAutoInitShutdown]
     public void CanFocus_False_Wont_Focus_With_Mouse () {
         Toplevel top = Application.Top;
-        var tf = new TextField {
-                                   Width = Dim.Fill (),
-                                   CanFocus = false,
-                                   ReadOnly = true,
-                                   Text = "some text"
-                               };
+        var tf = new TextField { Width = Dim.Fill (), CanFocus = false, ReadOnly = true, Text = "some text" };
         var fv = new FrameView {
-                                   Width = Dim.Fill (),
-                                   Height = Dim.Fill (),
-                                   CanFocus = false,
-                                   Title = "I shouldn't get focus"
-                               };
+            Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = false, Title = "I shouldn't get focus"
+        };
         fv.Add (tf);
         top.Add (fv);
 
@@ -114,11 +107,8 @@ public class TextFieldTests {
         Assert.False (fv.HasFocus);
 
         tf.MouseEvent (
-                       new MouseEvent {
-                                          X = 1,
-                                          Y = 0,
-                                          Flags = MouseFlags.Button1DoubleClicked
-                                      });
+            new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
+        );
 
         Assert.Null (tf.SelectedText);
         Assert.False (tf.CanFocus);
@@ -130,11 +120,8 @@ public class TextFieldTests {
         fv.CanFocus = true;
         tf.CanFocus = true;
         tf.MouseEvent (
-                       new MouseEvent {
-                                          X = 1,
-                                          Y = 0,
-                                          Flags = MouseFlags.Button1DoubleClicked
-                                      });
+            new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
+        );
 
         Assert.Equal ("some ", tf.SelectedText);
         Assert.True (tf.CanFocus);
@@ -144,11 +131,8 @@ public class TextFieldTests {
 
         fv.CanFocus = false;
         tf.MouseEvent (
-                       new MouseEvent {
-                                          X = 1,
-                                          Y = 0,
-                                          Flags = MouseFlags.Button1DoubleClicked
-                                      });
+            new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
+        );
 
         Assert.Equal ("some ", tf.SelectedText); // Setting CanFocus to false don't change the SelectedText
         Assert.False (tf.CanFocus);
@@ -332,8 +316,9 @@ public class TextFieldTests {
         _textField.SelectAll ();
         _textField.Cut ();
         Assert.Equal (
-                      "TextField with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!",
-                      Application.Driver.Clipboard.GetClipboardData ());
+            "TextField with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!",
+            Application.Driver.Clipboard.GetClipboardData ()
+        );
         Assert.Equal (string.Empty, _textField.Text);
         _textField.Paste ();
         Assert.Equal ("TextField with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!", _textField.Text);
@@ -460,13 +445,10 @@ public class TextFieldTests {
         // Delete word with accented char
         tf.Text = "Les Misérables movie.";
         Assert.True (
-                     tf.MouseEvent (
-                                    new MouseEvent {
-                                                       X = 7,
-                                                       Y = 1,
-                                                       Flags = MouseFlags.Button1DoubleClicked,
-                                                       View = tf
-                                                   }));
+            tf.MouseEvent (
+                new MouseEvent { X = 7, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
+            )
+        );
         Assert.Equal ("Misérables ", tf.SelectedText);
         Assert.Equal (11, tf.SelectedLength);
         Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Delete)));
@@ -775,12 +757,7 @@ public class TextFieldTests {
     [Fact]
     [AutoInitShutdown]
     public void ScrollOffset_Initialize () {
-        var tf = new TextField {
-                                   X = 1,
-                                   Y = 1,
-                                   Width = 20,
-                                   Text = "Testing Scrolls."
-                               };
+        var tf = new TextField { X = 1, Y = 1, Width = 20, Text = "Testing Scrolls." };
         tf.BeginInit ();
         tf.EndInit ();
 
@@ -803,12 +780,13 @@ public class TextFieldTests {
         Application.Top.Add (_textField);
         RunState rs = Application.Begin (Application.Top);
 
-        Attribute[] attributes = new[] {
-                                           _textField.ColorScheme.Focus,
-                                           new (
-                                                _textField.ColorScheme.Focus.Background,
-                                                _textField.ColorScheme.Focus.Foreground)
-                                       };
+        Attribute[] attributes = {
+            _textField.ColorScheme.Focus,
+            new (
+                _textField.ColorScheme.Focus.Background,
+                _textField.ColorScheme.Focus.Foreground
+            )
+        };
 
         //                                             TAB to jump between text fields.
         TestHelpers.AssertDriverAttributesAre ("0000000", Application.Driver, attributes);
@@ -902,20 +880,14 @@ public class TextFieldTests {
         Application.Top.Add (tf);
         Application.Begin (Application.Top);
 
-        var mouseEvent = new MouseEvent {
-                                            Flags = MouseFlags.Button1Clicked,
-                                            View = tf
-                                        };
+        var mouseEvent = new MouseEvent { Flags = MouseFlags.Button1Clicked, View = tf };
 
         Application.OnMouseEvent (new MouseEventEventArgs (mouseEvent));
         Assert.Equal (1, clickCounter);
 
         // Get a fresh instance that represents a right click.
         // Should be ignored because of SuppressRightClick callback
-        mouseEvent = new MouseEvent {
-                                        Flags = MouseFlags.Button3Clicked,
-                                        View = tf
-                                    };
+        mouseEvent = new MouseEvent { Flags = MouseFlags.Button3Clicked, View = tf };
         Application.OnMouseEvent (new MouseEventEventArgs (mouseEvent));
         Assert.Equal (1, clickCounter);
 
@@ -923,10 +895,7 @@ public class TextFieldTests {
 
         // Get a fresh instance that represents a right click.
         // Should no longer be ignored as the callback was removed
-        mouseEvent = new MouseEvent {
-                                        Flags = MouseFlags.Button3Clicked,
-                                        View = tf
-                                    };
+        mouseEvent = new MouseEvent { Flags = MouseFlags.Button3Clicked, View = tf };
 
         // In #3183 OnMouseClicked is no longer called before MouseEvent().
         // This call causes the context menu to pop, and MouseEvent() returns true.
@@ -1004,25 +973,14 @@ public class TextFieldTests {
     [Fact]
     [TextFieldTestsAutoInitShutdown]
     public void TextField_SpaceHandling () {
-        var tf = new TextField {
-                                   Width = 10,
-                                   Text = " "
-                               };
+        var tf = new TextField { Width = 10, Text = " " };
 
-        var ev = new MouseEvent {
-                                    X = 0,
-                                    Y = 0,
-                                    Flags = MouseFlags.Button1DoubleClicked
-                                };
+        var ev = new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1DoubleClicked };
 
         tf.MouseEvent (ev);
         Assert.Equal (1, tf.SelectedLength);
 
-        ev = new MouseEvent {
-                                X = 1,
-                                Y = 0,
-                                Flags = MouseFlags.Button1DoubleClicked
-                            };
+        ev = new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked };
 
         tf.MouseEvent (ev);
         Assert.Equal (1, tf.SelectedLength);
@@ -1227,9 +1185,11 @@ public class TextFieldTests {
 
         while (_textField.CursorPosition > 0) {
             _textField.NewKeyDownEvent (
-                                        new Key (
-                                                 KeyCode.CursorLeft | KeyCode.CtrlMask |
-                                                 KeyCode.ShiftMask));
+                new Key (
+                    KeyCode.CursorLeft | KeyCode.CtrlMask |
+                    KeyCode.ShiftMask
+                )
+            );
             switch (iteration) {
                 case 0:
                     Assert.Equal (31, _textField.CursorPosition);
@@ -1296,9 +1256,11 @@ public class TextFieldTests {
 
         while (_textField.CursorPosition > 0) {
             _textField.NewKeyDownEvent (
-                                        new Key (
-                                                 KeyCode.CursorLeft | KeyCode.CtrlMask |
-                                                 KeyCode.ShiftMask));
+                new Key (
+                    KeyCode.CursorLeft | KeyCode.CtrlMask |
+                    KeyCode.ShiftMask
+                )
+            );
             switch (iteration) {
                 case 0:
                     Assert.Equal (7, _textField.CursorPosition);
@@ -1381,23 +1343,17 @@ public class TextFieldTests {
         Assert.Equal ("m", runes[idx].ToString ());
 
         Assert.True (
-                     tf.MouseEvent (
-                                    new MouseEvent {
-                                                       X = idx,
-                                                       Y = 1,
-                                                       Flags = MouseFlags.Button1DoubleClicked,
-                                                       View = tf
-                                                   }));
+            tf.MouseEvent (
+                new MouseEvent { X = idx, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
+            )
+        );
         Assert.Equal ("movie.", tf.SelectedText);
 
         Assert.True (
-                     tf.MouseEvent (
-                                    new MouseEvent {
-                                                       X = idx + 1,
-                                                       Y = 1,
-                                                       Flags = MouseFlags.Button1DoubleClicked,
-                                                       View = tf
-                                                   }));
+            tf.MouseEvent (
+                new MouseEvent { X = idx + 1, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
+            )
+        );
         Assert.Equal ("movie.", tf.SelectedText);
     }
 
@@ -1562,7 +1518,8 @@ public class TextFieldTests {
 
         while (_textField.CursorPosition < _textField.Text.Length) {
             _textField.NewKeyDownEvent (
-                                        new Key (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask));
+                new Key (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask)
+            );
             switch (iteration) {
                 case 0:
                     Assert.Equal (4, _textField.CursorPosition);
@@ -1622,7 +1579,8 @@ public class TextFieldTests {
 
         while (_textField.CursorPosition < _textField.Text.Length) {
             _textField.NewKeyDownEvent (
-                                        new Key (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask));
+                new Key (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask)
+            );
             switch (iteration) {
                 case 0:
                     Assert.Equal (12, _textField.CursorPosition);
@@ -1667,34 +1625,32 @@ public class TextFieldTests {
         Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 Les Misérables",
-                                                      _output);
+            _output
+        );
 
         tf.Text = "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables";
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 Les Misérables",
-                                                      _output);
+            _output
+        );
 
         // incorrect order will result with a wrong accent place
         tf.Text = "Les Mis" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "erables";
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 Les Miśerables",
-                                                      _output);
+            _output
+        );
     }
 
     private TextField GetTextFieldsInView () {
-        var tf = new TextField {
-                                   Width = 10
-                               };
-        var tf2 = new TextField {
-                                    Y = 1,
-                                    Width = 10
-                                };
+        var tf = new TextField { Width = 10 };
+        var tf2 = new TextField { Y = 1, Width = 10 };
 
         Toplevel top = Application.Top;
         top.Add (tf);
@@ -1737,13 +1693,13 @@ Les Miśerables",
 
             //Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
             _textField = new TextField {
-                                           ColorScheme = new ColorScheme (Colors.ColorSchemes["Base"]),
+                ColorScheme = new ColorScheme (Colors.ColorSchemes["Base"]),
 
-                                           //                1         2         3 
-                                           //      01234567890123456789012345678901=32 (Length)
-                                           Text = "TAB to jump between text fields.",
-                                           Width = 32
-                                       };
+                //                1         2         3 
+                //      01234567890123456789012345678901=32 (Length)
+                Text = "TAB to jump between text fields.",
+                Width = 32
+            };
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>Describes a mouse event over a specific <see cref="Tab"/> in a <see cref="TabView"/>.</summary>
 public class TabMouseEventArgs : EventArgs {

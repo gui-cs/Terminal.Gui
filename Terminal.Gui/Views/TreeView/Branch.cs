@@ -1,8 +1,6 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 class Branch<T> where T : class {
-    private readonly TreeView<T> tree;
-
     /// <summary>
     ///     Declares a new branch of <paramref name="tree"/> in which the users object <paramref name="model"/> is
     ///     presented.
@@ -20,6 +18,14 @@ class Branch<T> where T : class {
         }
     }
 
+    private readonly TreeView<T> tree;
+
+    /// <summary>True if the branch is expanded to reveal child branches.</summary>
+    public bool IsExpanded { get; set; }
+
+    /// <summary>The parent <see cref="Branch{T}"/> or null if it is a root.</summary>
+    public Branch<T> Parent { get; }
+
     /// <summary>
     ///     The children of the current branch.  This is null until the first call to <see cref="FetchChildren"/> to avoid
     ///     enumerating the entire underlying hierarchy.
@@ -29,14 +35,8 @@ class Branch<T> where T : class {
     /// <summary>The depth of the current branch.  Depth of 0 indicates root level branches.</summary>
     public int Depth { get; }
 
-    /// <summary>True if the branch is expanded to reveal child branches.</summary>
-    public bool IsExpanded { get; set; }
-
     /// <summary>The users object that is being displayed by this branch of the tree.</summary>
     public T Model { get; private set; }
-
-    /// <summary>The parent <see cref="Branch{T}"/> or null if it is a root.</summary>
-    public Branch<T> Parent { get; }
 
     /// <summary>
     ///     Returns true if the current branch can be expanded according to the <see cref="TreeBuilder{T}"/> or cached
@@ -68,7 +68,7 @@ class Branch<T> where T : class {
     /// <param name="y"></param>
     /// <param name="availableWidth"></param>
     public virtual void Draw (ConsoleDriver driver, ColorScheme colorScheme, int y, int availableWidth) {
-        List<RuneCell> cells = new List<RuneCell> ();
+        List<RuneCell> cells = new ();
         int? indexOfExpandCollapseSymbol = null;
         int indexOfModelText;
 
@@ -149,8 +149,9 @@ class Branch<T> where T : class {
         if (lineBody.EnumerateRunes ().Sum (l => l.GetColumns ()) > availableWidth) {
             // remaining space is zero and truncate the line
             lineBody = new string (
-                                   lineBody.TakeWhile (c => (availableWidth -= ((Rune)c).GetColumns ()) >= 0)
-                                           .ToArray ());
+                lineBody.TakeWhile (c => (availableWidth -= ((Rune)c).GetColumns ()) >= 0)
+                    .ToArray ()
+            );
             availableWidth = 0;
         } else {
             // line is short so remaining width will be whatever comes after the line body
@@ -180,21 +181,22 @@ class Branch<T> where T : class {
         if (availableWidth > 0) {
             attr = symbolColor;
             cells.AddRange (
-                            Enumerable.Repeat (
-                                               NewRuneCell (attr, new Rune (' ')),
-                                               availableWidth
-                                              ));
+                Enumerable.Repeat (
+                    NewRuneCell (attr, new Rune (' ')),
+                    availableWidth
+                )
+            );
         }
 
-        DrawTreeViewLineEventArgs<T> e = new DrawTreeViewLineEventArgs<T> {
-                                                                              Model = Model,
-                                                                              Y = y,
-                                                                              RuneCells = cells,
-                                                                              Tree = tree,
-                                                                              IndexOfExpandCollapseSymbol =
-                                                                                  indexOfExpandCollapseSymbol,
-                                                                              IndexOfModelText = indexOfModelText
-                                                                          };
+        DrawTreeViewLineEventArgs<T> e = new() {
+            Model = Model,
+            Y = y,
+            RuneCells = cells,
+            Tree = tree,
+            IndexOfExpandCollapseSymbol =
+                indexOfExpandCollapseSymbol,
+            IndexOfModelText = indexOfModelText
+        };
         tree.OnDrawLine (e);
 
         if (!e.Handled) {
@@ -437,9 +439,6 @@ class Branch<T> where T : class {
     }
 
     private static RuneCell NewRuneCell (Attribute attr, Rune r) {
-        return new RuneCell {
-                                Rune = r,
-                                ColorScheme = new ColorScheme (attr)
-                            };
+        return new RuneCell { Rune = r, ColorScheme = new ColorScheme (attr) };
     }
 }

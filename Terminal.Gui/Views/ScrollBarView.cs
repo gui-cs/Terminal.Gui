@@ -16,21 +16,6 @@ namespace Terminal.Gui;
 ///     <para>If the region to display the scrollbar is larger than three characters, arrow indicators are drawn.</para>
 /// </remarks>
 public class ScrollBarView : View {
-    private bool _autoHideScrollBars = true;
-    private View _contentBottomRightCorner;
-    private bool _hosted;
-    private bool _keepContentAlwaysInViewport = true;
-    private int _lastLocation = -1;
-    private ScrollBarView _otherScrollBarView;
-    private int _posBarOffset;
-    private int _posBottomTee;
-    private int _posLeftTee;
-    private int _posRightTee;
-    private int _posTopTee;
-    private bool _showScrollIndicator;
-    private int _size, _position;
-    private bool _vertical;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using
     ///     <see cref="LayoutStyle.Computed"/> layout.
@@ -80,14 +65,14 @@ public class ScrollBarView : View {
         AutoHideScrollBars = true;
         if (showBothScrollIndicator) {
             OtherScrollBarView = new ScrollBarView {
-                                                       IsVertical = !isVertical,
-                                                       ColorScheme = host.ColorScheme,
-                                                       Host = host,
-                                                       CanFocus = false,
-                                                       Enabled = host.Enabled,
-                                                       Visible = host.Visible,
-                                                       OtherScrollBarView = this
-                                                   };
+                IsVertical = !isVertical,
+                ColorScheme = host.ColorScheme,
+                Host = host,
+                CanFocus = false,
+                Enabled = host.Enabled,
+                Visible = host.Visible,
+                OtherScrollBarView = this
+            };
             OtherScrollBarView._hosted = true;
             OtherScrollBarView.X = OtherScrollBarView.IsVertical ? Pos.Right (host) - 1 : Pos.Left (host);
             OtherScrollBarView.Y = OtherScrollBarView.IsVertical ? Pos.Top (host) : Pos.Bottom (host) - 1;
@@ -100,6 +85,21 @@ public class ScrollBarView : View {
         ClearOnVisibleFalse = false;
     }
 
+    private bool _autoHideScrollBars = true;
+    private bool _hosted;
+    private bool _keepContentAlwaysInViewport = true;
+    private bool _showScrollIndicator;
+    private bool _vertical;
+    private int _lastLocation = -1;
+    private int _posBarOffset;
+    private int _posBottomTee;
+    private int _posLeftTee;
+    private int _posRightTee;
+    private int _posTopTee;
+    private int _size, _position;
+    private ScrollBarView _otherScrollBarView;
+    private View _contentBottomRightCorner;
+
     /// <summary>If true the vertical/horizontal scroll bars won't be showed if it's not needed.</summary>
     public bool AutoHideScrollBars {
         get => _autoHideScrollBars;
@@ -110,10 +110,6 @@ public class ScrollBarView : View {
             }
         }
     }
-
-    // BUGBUG: v2 - for consistency this should be named "Parent" not "Host"
-    /// <summary>Get or sets the view that host this <see cref="ScrollBarView"/></summary>
-    public View Host { get; internal set; }
 
     /// <summary>If set to <c>true</c> this is a vertical scrollbar, otherwise, the scrollbar is horizontal.</summary>
     public bool IsVertical {
@@ -157,32 +153,6 @@ public class ScrollBarView : View {
         }
     }
 
-    /// <summary>Represent a vertical or horizontal ScrollBarView other than this.</summary>
-    public ScrollBarView OtherScrollBarView {
-        get => _otherScrollBarView;
-        set {
-            if (value != null && ((value.IsVertical && _vertical) || (!value.IsVertical && !_vertical))) {
-                throw new ArgumentException (
-                                             $"There is already a {(_vertical ? "vertical" : "horizontal")} ScrollBarView.");
-            }
-
-            _otherScrollBarView = value;
-        }
-    }
-
-    /// <summary>The position, relative to <see cref="Size"/>, to set the scrollbar at.</summary>
-    /// <value>The position.</value>
-    public int Position {
-        get => _position;
-        set {
-            _position = value;
-            if (IsInitialized) {
-                // We're not initialized so we can't do anything fancy. Just cache value.
-                SetPosition (value);
-            }
-        }
-    }
-
     // BUGBUG: v2 - Why can't we get rid of this and just use Visible?
     /// <summary>Gets or sets the visibility for the vertical or horizontal scroll indicator.</summary>
     /// <value><c>true</c> if show vertical or horizontal scroll indicator; otherwise, <c>false</c>.</value>
@@ -208,6 +178,19 @@ public class ScrollBarView : View {
         }
     }
 
+    /// <summary>The position, relative to <see cref="Size"/>, to set the scrollbar at.</summary>
+    /// <value>The position.</value>
+    public int Position {
+        get => _position;
+        set {
+            _position = value;
+            if (IsInitialized) {
+                // We're not initialized so we can't do anything fancy. Just cache value.
+                SetPosition (value);
+            }
+        }
+    }
+
     /// <summary>The size of content the scrollbar represents.</summary>
     /// <value>The size.</value>
     /// <remarks>
@@ -225,6 +208,24 @@ public class ScrollBarView : View {
             }
         }
     }
+
+    /// <summary>Represent a vertical or horizontal ScrollBarView other than this.</summary>
+    public ScrollBarView OtherScrollBarView {
+        get => _otherScrollBarView;
+        set {
+            if (value != null && ((value.IsVertical && _vertical) || (!value.IsVertical && !_vertical))) {
+                throw new ArgumentException (
+                    $"There is already a {(_vertical ? "vertical" : "horizontal")} ScrollBarView."
+                );
+            }
+
+            _otherScrollBarView = value;
+        }
+    }
+
+    // BUGBUG: v2 - for consistency this should be named "Parent" not "Host"
+    /// <summary>Get or sets the view that host this <see cref="ScrollBarView"/></summary>
+    public View Host { get; internal set; }
 
     private bool _showBothScrollIndicator => OtherScrollBarView?._showScrollIndicator == true && _showScrollIndicator;
 
@@ -298,8 +299,9 @@ public class ScrollBarView : View {
 
             if ((_lastLocation > -1) || (location >= posTopLeftTee && location <= posBottomRightTee &&
                                          mouseEvent.Flags.HasFlag (
-                                                                   MouseFlags.Button1Pressed |
-                                                                   MouseFlags.ReportMousePosition))) {
+                                             MouseFlags.Button1Pressed |
+                                             MouseFlags.ReportMousePosition
+                                         ))) {
                 if (_lastLocation == -1) {
                     _lastLocation = location;
                     _posBarOffset = _keepContentAlwaysInViewport
@@ -654,9 +656,7 @@ public class ScrollBarView : View {
             ((_contentBottomRightCorner == null && OtherScrollBarView == null) ||
              (_contentBottomRightCorner == null && OtherScrollBarView != null &&
               OtherScrollBarView._contentBottomRightCorner == null))) {
-            _contentBottomRightCorner = new ContentBottomRightCorner {
-                                                                         Visible = Host.Visible
-                                                                     };
+            _contentBottomRightCorner = new ContentBottomRightCorner { Visible = Host.Visible };
             if (_hosted) {
                 Host.SuperView.Add (_contentBottomRightCorner);
                 _contentBottomRightCorner.X = Pos.Right (Host) - 1;
@@ -746,7 +746,8 @@ public class ScrollBarView : View {
         }
 
         if (_showBothScrollIndicator) {
-            Width = _vertical ? 1 : Host != SuperView ? Dim.Width (Host) - 1 : Dim.Fill () - 1;
+            Width = _vertical ? 1 :
+                    Host != SuperView ? Dim.Width (Host) - 1 : Dim.Fill () - 1;
             Height = _vertical ? Host != SuperView ? Dim.Height (Host) - 1 : Dim.Fill () - 1 : 1;
 
             _otherScrollBarView.Width = _otherScrollBarView._vertical ? 1 :
@@ -755,7 +756,8 @@ public class ScrollBarView : View {
                                              ? Host != SuperView ? Dim.Height (Host) - 1 : Dim.Fill () - 1
                                              : 1;
         } else if (_showScrollIndicator) {
-            Width = _vertical ? 1 : Host != SuperView ? Dim.Width (Host) : Dim.Fill ();
+            Width = _vertical ? 1 :
+                    Host != SuperView ? Dim.Width (Host) : Dim.Fill ();
             Height = _vertical ? Host != SuperView ? Dim.Height (Host) : Dim.Fill () : 1;
         } else if (_otherScrollBarView?._showScrollIndicator == true) {
             _otherScrollBarView.Width = _otherScrollBarView._vertical ? 1 :

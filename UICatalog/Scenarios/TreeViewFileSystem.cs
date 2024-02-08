@@ -39,155 +39,134 @@ public class TreeViewFileSystem : Scenario {
         Win.Height = Dim.Fill ();
 
         var menu = new MenuBar {
-                                   Menus =  [
-                                   new MenuBarItem ("_File", new MenuItem[] {
-                                                                                new (
-                                                                                 "_Quit",
-                                                                                 $"{Application.QuitKey}",
-                                                                                 () => Quit ())
-                                                                            }),
-                                   new MenuBarItem (
-                                                    "_View",
-                                                    new[] {
-                                                              _miFullPaths =
-                                                                  new MenuItem ("_Full Paths", "", () => SetFullName ()) {
-                                                                      Checked = false,
-                                                                      CheckType = MenuItemCheckStyle.Checked
-                                                                  },
-                                                              _miMultiSelect = new MenuItem (
-                                                                                "_Multi Select",
-                                                                                "",
-                                                                                () => SetMultiSelect ()) {
-                                                                                   Checked = true,
-                                                                                   CheckType = MenuItemCheckStyle
-                                                                                       .Checked
-                                                                               }
-                                                          }),
-                                   new MenuBarItem (
-                                                    "_Style",
-                                                    new[] {
-                                                              _miShowLines =
-                                                                  new MenuItem ("_Show Lines", "", () => ShowLines ()) {
-                                                                      Checked = true,
-                                                                      CheckType = MenuItemCheckStyle.Checked
-                                                                  },
-                                                              null /*separator*/,
-                                                              _miPlusMinus =
-                                                                  new MenuItem (
-                                                                                "_Plus Minus Symbols",
-                                                                                "+ -",
-                                                                                () => SetExpandableSymbols (
-                                                                                 (Rune)'+',
-                                                                                 (Rune)'-')) {
-                                                                      Checked = true,
-                                                                      CheckType = MenuItemCheckStyle.Radio
-                                                                  },
-                                                              _miArrowSymbols =
-                                                                  new MenuItem (
-                                                                                "_Arrow Symbols",
-                                                                                "> v",
-                                                                                () => SetExpandableSymbols (
-                                                                                 (Rune)'>',
-                                                                                 (Rune)'v')) {
-                                                                      Checked = false,
-                                                                      CheckType = MenuItemCheckStyle.Radio
-                                                                  },
-                                                              _miNoSymbols =
-                                                                  new MenuItem (
-                                                                                "_No Symbols",
-                                                                                "",
-                                                                                () => SetExpandableSymbols (
-                                                                                 default (Rune),
-                                                                                 null)) {
-                                                                      Checked = false,
-                                                                      CheckType = MenuItemCheckStyle.Radio
-                                                                  },
-                                                              null /*separator*/,
-                                                              _miColoredSymbols =
-                                                                  new MenuItem (
-                                                                                "_Colored Symbols",
-                                                                                "",
-                                                                                () => ShowColoredExpandableSymbols ()) {
-                                                                      Checked = false,
-                                                                      CheckType = MenuItemCheckStyle.Checked
-                                                                  },
-                                                              _miInvertSymbols =
-                                                                  new MenuItem (
-                                                                                "_Invert Symbols",
-                                                                                "",
-                                                                                () => InvertExpandableSymbols ()) {
-                                                                      Checked = false,
-                                                                      CheckType = MenuItemCheckStyle.Checked
-                                                                  },
-                                                              null /*separator*/,
-                                                              _miBasicIcons =
-                                                                  new MenuItem ("_Basic Icons", null, SetNoIcons) {
-                                                                      Checked = false,
-                                                                      CheckType = MenuItemCheckStyle.Radio
-                                                                  },
-                                                              _miUnicodeIcons =
-                                                                  new MenuItem ("_Unicode Icons", null, SetUnicodeIcons) {
-                                                                      Checked = false,
-                                                                      CheckType = MenuItemCheckStyle.Radio
-                                                                  },
-                                                              _miNerdIcons =
-                                                                  new MenuItem ("_Nerd Icons", null, SetNerdIcons) {
-                                                                      Checked = false,
-                                                                      CheckType = MenuItemCheckStyle.Radio
-                                                                  },
-                                                              null /*separator*/,
-                                                              _miLeaveLastRow =
-                                                                  new MenuItem (
-                                                                                "_Leave Last Row",
-                                                                                "",
-                                                                                () => SetLeaveLastRow ()) {
-                                                                      Checked = true,
-                                                                      CheckType = MenuItemCheckStyle.Checked
-                                                                  },
-                                                              _miHighlightModelTextOnly =
-                                                                  new MenuItem (
-                                                                                "_Highlight Model Text Only",
-                                                                                "",
-                                                                                () => SetCheckHighlightModelTextOnly ()) {
-                                                                      Checked = false,
-                                                                      CheckType = MenuItemCheckStyle.Checked
-                                                                  },
-                                                              null /*separator*/,
-                                                              _miCustomColors =
-                                                                  new MenuItem (
-                                                                                "C_ustom Colors Hidden Files",
-                                                                                "Yellow/Red",
-                                                                                () => SetCustomColors ()) {
-                                                                      Checked = false,
-                                                                      CheckType = MenuItemCheckStyle.Checked
-                                                                  },
-                                                              null /*separator*/,
-                                                              _miCursor = new MenuItem (
-                                                                           "Curs_or (MultiSelect only)",
-                                                                           "",
-                                                                           () => SetCursor ()) {
-                                                                              Checked = false,
-                                                                              CheckType = MenuItemCheckStyle.Checked
-                                                                          }
-                                                          })
-                                       ]
-                               };
+            Menus = [
+                        new MenuBarItem (
+                            "_File",
+                            new MenuItem[] {
+                                new (
+                                    "_Quit",
+                                    $"{Application.QuitKey}",
+                                    () => Quit ()
+                                )
+                            }
+                        ),
+                        new MenuBarItem (
+                            "_View",
+                            new[] {
+                                _miFullPaths =
+                                    new MenuItem ("_Full Paths", "", () => SetFullName ()) {
+                                        Checked = false, CheckType = MenuItemCheckStyle.Checked
+                                    },
+                                _miMultiSelect = new MenuItem (
+                                    "_Multi Select",
+                                    "",
+                                    () => SetMultiSelect ()
+                                ) {
+                                    Checked = true,
+                                    CheckType = MenuItemCheckStyle
+                                        .Checked
+                                }
+                            }
+                        ),
+                        new MenuBarItem (
+                            "_Style",
+                            new[] {
+                                _miShowLines =
+                                    new MenuItem ("_Show Lines", "", () => ShowLines ()) {
+                                        Checked = true, CheckType = MenuItemCheckStyle.Checked
+                                    },
+                                null /*separator*/,
+                                _miPlusMinus =
+                                    new MenuItem (
+                                        "_Plus Minus Symbols",
+                                        "+ -",
+                                        () => SetExpandableSymbols (
+                                            (Rune)'+',
+                                            (Rune)'-'
+                                        )
+                                    ) { Checked = true, CheckType = MenuItemCheckStyle.Radio },
+                                _miArrowSymbols =
+                                    new MenuItem (
+                                        "_Arrow Symbols",
+                                        "> v",
+                                        () => SetExpandableSymbols (
+                                            (Rune)'>',
+                                            (Rune)'v'
+                                        )
+                                    ) { Checked = false, CheckType = MenuItemCheckStyle.Radio },
+                                _miNoSymbols =
+                                    new MenuItem (
+                                        "_No Symbols",
+                                        "",
+                                        () => SetExpandableSymbols (
+                                            default (Rune),
+                                            null
+                                        )
+                                    ) { Checked = false, CheckType = MenuItemCheckStyle.Radio },
+                                null /*separator*/,
+                                _miColoredSymbols =
+                                    new MenuItem (
+                                        "_Colored Symbols",
+                                        "",
+                                        () => ShowColoredExpandableSymbols ()
+                                    ) { Checked = false, CheckType = MenuItemCheckStyle.Checked },
+                                _miInvertSymbols =
+                                    new MenuItem (
+                                        "_Invert Symbols",
+                                        "",
+                                        () => InvertExpandableSymbols ()
+                                    ) { Checked = false, CheckType = MenuItemCheckStyle.Checked },
+                                null /*separator*/,
+                                _miBasicIcons =
+                                    new MenuItem ("_Basic Icons", null, SetNoIcons) {
+                                        Checked = false, CheckType = MenuItemCheckStyle.Radio
+                                    },
+                                _miUnicodeIcons =
+                                    new MenuItem ("_Unicode Icons", null, SetUnicodeIcons) {
+                                        Checked = false, CheckType = MenuItemCheckStyle.Radio
+                                    },
+                                _miNerdIcons =
+                                    new MenuItem ("_Nerd Icons", null, SetNerdIcons) {
+                                        Checked = false, CheckType = MenuItemCheckStyle.Radio
+                                    },
+                                null /*separator*/,
+                                _miLeaveLastRow =
+                                    new MenuItem (
+                                        "_Leave Last Row",
+                                        "",
+                                        () => SetLeaveLastRow ()
+                                    ) { Checked = true, CheckType = MenuItemCheckStyle.Checked },
+                                _miHighlightModelTextOnly =
+                                    new MenuItem (
+                                        "_Highlight Model Text Only",
+                                        "",
+                                        () => SetCheckHighlightModelTextOnly ()
+                                    ) { Checked = false, CheckType = MenuItemCheckStyle.Checked },
+                                null /*separator*/,
+                                _miCustomColors =
+                                    new MenuItem (
+                                        "C_ustom Colors Hidden Files",
+                                        "Yellow/Red",
+                                        () => SetCustomColors ()
+                                    ) { Checked = false, CheckType = MenuItemCheckStyle.Checked },
+                                null /*separator*/,
+                                _miCursor = new MenuItem (
+                                    "Curs_or (MultiSelect only)",
+                                    "",
+                                    () => SetCursor ()
+                                ) { Checked = false, CheckType = MenuItemCheckStyle.Checked }
+                            }
+                        )
+                    ]
+        };
         Application.Top.Add (menu);
 
-        _treeViewFiles = new TreeView<IFileSystemInfo> {
-                                                           X = 0,
-                                                           Y = 0,
-                                                           Width = Dim.Percent (50),
-                                                           Height = Dim.Fill ()
-                                                       };
+        _treeViewFiles = new TreeView<IFileSystemInfo> { X = 0, Y = 0, Width = Dim.Percent (50), Height = Dim.Fill () };
         _treeViewFiles.DrawLine += TreeViewFiles_DrawLine;
 
         _detailsFrame = new DetailsFrame (_iconProvider) {
-                                                             X = Pos.Right (_treeViewFiles),
-                                                             Y = 0,
-                                                             Width = Dim.Fill (),
-                                                             Height = Dim.Fill ()
-                                                         };
+            X = Pos.Right (_treeViewFiles), Y = 0, Width = Dim.Fill (), Height = Dim.Fill ()
+        };
 
         Win.Add (_detailsFrame);
         _treeViewFiles.MouseClick += TreeViewFiles_MouseClick;
@@ -239,26 +218,30 @@ public class TreeViewFileSystem : Scenario {
             _treeViewFiles.ColorGetter = m => {
                 if (m is IDirectoryInfo && m.Attributes.HasFlag (FileAttributes.Hidden)) {
                     return new ColorScheme {
-                                               Focus = new Attribute (
-                                                                      Color.BrightRed,
-                                                                      _treeViewFiles.ColorScheme.Focus.Background),
-                                               Normal = new Attribute (
-                                                                       Color.BrightYellow,
-                                                                       _treeViewFiles.ColorScheme.Normal.Background)
-                                           };
+                        Focus = new Attribute (
+                            Color.BrightRed,
+                            _treeViewFiles.ColorScheme.Focus.Background
+                        ),
+                        Normal = new Attribute (
+                            Color.BrightYellow,
+                            _treeViewFiles.ColorScheme.Normal.Background
+                        )
+                    };
 
                     ;
                 }
 
                 if (m is IFileInfo && m.Attributes.HasFlag (FileAttributes.Hidden)) {
                     return new ColorScheme {
-                                               Focus = new Attribute (
-                                                                      Color.BrightRed,
-                                                                      _treeViewFiles.ColorScheme.Focus.Background),
-                                               Normal = new Attribute (
-                                                                       Color.BrightYellow,
-                                                                       _treeViewFiles.ColorScheme.Normal.Background)
-                                           };
+                        Focus = new Attribute (
+                            Color.BrightRed,
+                            _treeViewFiles.ColorScheme.Focus.Background
+                        ),
+                        Normal = new Attribute (
+                            Color.BrightYellow,
+                            _treeViewFiles.ColorScheme.Normal.Background
+                        )
+                    };
 
                     ;
                 }
@@ -379,8 +362,8 @@ public class TreeViewFileSystem : Scenario {
         menu.Position = screenPoint;
 
         menu.MenuItems = new MenuBarItem (
-                                          new[]
-                                          { new MenuItem ("Properties", null, () => ShowPropertiesOf (forObject)) });
+            new[] { new MenuItem ("Properties", null, () => ShowPropertiesOf (forObject)) }
+        );
 
         Application.Invoke (menu.Show);
     }
@@ -401,10 +384,11 @@ public class TreeViewFileSystem : Scenario {
                 if (e.IndexOfModelText > 0 && e.IndexOfModelText < e.RuneCells.Count) {
                     RuneCell cell = e.RuneCells[e.IndexOfModelText];
                     cell.ColorScheme = new ColorScheme (
-                                                        new Attribute (
-                                                                       Color.BrightYellow,
-                                                                       cell.ColorScheme.Normal.Background)
-                                                       );
+                        new Attribute (
+                            Color.BrightYellow,
+                            cell.ColorScheme.Normal.Background
+                        )
+                    );
                 }
             }
         }
@@ -427,10 +411,12 @@ public class TreeViewFileSystem : Scenario {
             }
 
             ShowContextMenu (
-                             new Point (
-                                        5 + _treeViewFiles.Frame.X,
-                                        location.Value + _treeViewFiles.Frame.Y + 2),
-                             selected);
+                new Point (
+                    5 + _treeViewFiles.Frame.X,
+                    location.Value + _treeViewFiles.Frame.Y + 2
+                ),
+                selected
+            );
         }
     }
 
@@ -445,10 +431,12 @@ public class TreeViewFileSystem : Scenario {
             }
 
             ShowContextMenu (
-                             new Point (
-                                        obj.MouseEvent.X + _treeViewFiles.Frame.X,
-                                        obj.MouseEvent.Y + _treeViewFiles.Frame.Y + 2),
-                             rightClicked);
+                new Point (
+                    obj.MouseEvent.X + _treeViewFiles.Frame.X,
+                    obj.MouseEvent.Y + _treeViewFiles.Frame.Y + 2
+                ),
+                rightClicked
+            );
         }
     }
 
@@ -464,15 +452,15 @@ public class TreeViewFileSystem : Scenario {
     }
 
     private class DetailsFrame : FrameView {
-        private readonly FileSystemIconProvider _iconProvider;
-        private IFileSystemInfo _fileInfo;
-
         public DetailsFrame (FileSystemIconProvider iconProvider) {
             Title = "Details";
             Visible = true;
             CanFocus = true;
             _iconProvider = iconProvider;
         }
+
+        private readonly FileSystemIconProvider _iconProvider;
+        private IFileSystemInfo _fileInfo;
 
         public IFileSystemInfo FileInfo {
             get => _fileInfo;

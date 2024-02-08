@@ -4,8 +4,8 @@ namespace Terminal.Gui.ViewTests;
 
 /// <summary>Tests View BeginInit/EndInit/Initialized functionality.</summary>
 public class InitTests {
-    private readonly ITestOutputHelper _output;
     public InitTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     // Test behavior of calling BeginInit multiple times
     [Fact]

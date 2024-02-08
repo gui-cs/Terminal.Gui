@@ -3,8 +3,8 @@
 namespace Terminal.Gui.DriverTests;
 
 public class KeyCodeTests {
-    private readonly ITestOutputHelper _output;
     public KeyCodeTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void Key_Enum_Ambiguity_Check () {
@@ -149,8 +149,9 @@ public class KeyCodeTests {
 
         // This will be well compared, because the SimpleHighValueEnum.Last have a high value.
         Assert.Equal (
-                      FlaggedHighValueEnum.Three | FlaggedHighValueEnum.Last,
-                      flagged); // As it is flagged shows as bitwise.
+            FlaggedHighValueEnum.Three | FlaggedHighValueEnum.Last,
+            flagged
+        ); // As it is flagged shows as bitwise.
         Assert.Equal ("Three, Last", flagged.ToString ()); // As it is flagged shows as bitwise.
         Assert.False (flagged == (FlaggedHighValueEnum.Zero | FlaggedHighValueEnum.Last));
         Assert.False (flagged == (FlaggedHighValueEnum.One | FlaggedHighValueEnum.Last));

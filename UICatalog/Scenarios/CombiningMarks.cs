@@ -1,6 +1,6 @@
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Combining Marks", "Illustrates how Unicode Combining Marks work (or don't).")]
 [ScenarioCategory ("Text and Formatting")]

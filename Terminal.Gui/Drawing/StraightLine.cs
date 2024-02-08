@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 #nullable enable
 
 // TODO: Add events that notify when StraightLine changes to enable dynamic layout
@@ -30,14 +30,14 @@ public class StraightLine {
     /// <summary>Gets or sets the length of the line.</summary>
     public int Length { get; set; }
 
+    /// <summary>Gets or sets the line style of the line (e.g. dotted, double).</summary>
+    public LineStyle Style { get; set; }
+
     /// <summary>Gets or sets the orientation (horizontal or vertical) of the line.</summary>
     public Orientation Orientation { get; set; }
 
     /// <summary>Gets or sets where the line begins.</summary>
     public Point Start { get; set; }
-
-    /// <summary>Gets or sets the line style of the line (e.g. dotted, double).</summary>
-    public LineStyle Style { get; set; }
 
     /// <summary>
     ///     Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the line that is
@@ -71,7 +71,8 @@ public class StraightLine {
     }
 
     private bool EndsAt (int x, int y) {
-        int sub = Length == 0 ? 0 : Length > 0 ? 1 : -1;
+        int sub = Length == 0 ? 0 :
+                  Length > 0 ? 1 : -1;
         if (Orientation == Orientation.Horizontal) {
             return Start.X + Length - sub == x && Start.Y == y;
         }
@@ -98,21 +99,22 @@ public class StraightLine {
 
         if (StartsAt (x, y)) {
             return new IntersectionDefinition (
-                                               Start,
-                                               GetTypeByLength (
-                                                                IntersectionType.StartLeft,
-                                                                IntersectionType.PassOverHorizontal,
-                                                                IntersectionType.StartRight),
-                                               this
-                                              );
+                Start,
+                GetTypeByLength (
+                    IntersectionType.StartLeft,
+                    IntersectionType.PassOverHorizontal,
+                    IntersectionType.StartRight
+                ),
+                this
+            );
         }
 
         if (EndsAt (x, y)) {
             return new IntersectionDefinition (
-                                               Start,
-                                               Length < 0 ? IntersectionType.StartRight : IntersectionType.StartLeft,
-                                               this
-                                              );
+                Start,
+                Length < 0 ? IntersectionType.StartRight : IntersectionType.StartLeft,
+                this
+            );
         }
 
         int xmin = Math.Min (Start.X, Start.X + Length);
@@ -120,10 +122,10 @@ public class StraightLine {
 
         if (xmin < x && xmax > x) {
             return new IntersectionDefinition (
-                                               new Point (x, y),
-                                               IntersectionType.PassOverHorizontal,
-                                               this
-                                              );
+                new Point (x, y),
+                IntersectionType.PassOverHorizontal,
+                this
+            );
         }
 
         return null;
@@ -136,21 +138,22 @@ public class StraightLine {
 
         if (StartsAt (x, y)) {
             return new IntersectionDefinition (
-                                               Start,
-                                               GetTypeByLength (
-                                                                IntersectionType.StartUp,
-                                                                IntersectionType.PassOverVertical,
-                                                                IntersectionType.StartDown),
-                                               this
-                                              );
+                Start,
+                GetTypeByLength (
+                    IntersectionType.StartUp,
+                    IntersectionType.PassOverVertical,
+                    IntersectionType.StartDown
+                ),
+                this
+            );
         }
 
         if (EndsAt (x, y)) {
             return new IntersectionDefinition (
-                                               Start,
-                                               Length < 0 ? IntersectionType.StartDown : IntersectionType.StartUp,
-                                               this
-                                              );
+                Start,
+                Length < 0 ? IntersectionType.StartDown : IntersectionType.StartUp,
+                this
+            );
         }
 
         int ymin = Math.Min (Start.Y, Start.Y + Length);
@@ -158,10 +161,10 @@ public class StraightLine {
 
         if (ymin < y && ymax > y) {
             return new IntersectionDefinition (
-                                               new Point (x, y),
-                                               IntersectionType.PassOverVertical,
-                                               this
-                                              );
+                new Point (x, y),
+                IntersectionType.PassOverVertical,
+                this
+            );
         }
 
         return null;

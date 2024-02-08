@@ -8,13 +8,11 @@ class KeyCodeJsonConverter : JsonConverter<KeyCode> {
         if (reader.TokenType == JsonTokenType.StartObject) {
             var key = KeyCode.Null;
             Dictionary<string, KeyCode> modifierDict =
-                new Dictionary<string, KeyCode> (StringComparer.InvariantCultureIgnoreCase) {
-                    { "Shift", KeyCode.ShiftMask },
-                    { "Ctrl", KeyCode.CtrlMask },
-                    { "Alt", KeyCode.AltMask }
+                new (StringComparer.InvariantCultureIgnoreCase) {
+                    { "Shift", KeyCode.ShiftMask }, { "Ctrl", KeyCode.CtrlMask }, { "Alt", KeyCode.AltMask }
                 };
 
-            List<KeyCode> modifiers = new List<KeyCode> ();
+            List<KeyCode> modifiers = new ();
 
             while (reader.Read ()) {
                 if (reader.TokenType == JsonTokenType.EndObject) {
@@ -39,7 +37,8 @@ class KeyCodeJsonConverter : JsonConverter<KeyCode> {
 
                                 if (key == KeyCode.Null) {
                                     throw new JsonException (
-                                                             $"The value \"{reader.GetString ()}\" is not a valid Key.");
+                                        $"The value \"{reader.GetString ()}\" is not a valid Key."
+                                    );
                                 }
                             } else if (reader.TokenType == JsonTokenType.Number) {
                                 try {
@@ -72,7 +71,8 @@ class KeyCodeJsonConverter : JsonConverter<KeyCode> {
                                 }
                             } else {
                                 throw new JsonException (
-                                                         $"Expected an array of modifiers, but got \"{reader.TokenType}\".");
+                                    $"Expected an array of modifiers, but got \"{reader.TokenType}\"."
+                                );
                             }
 
                             break;
@@ -103,13 +103,11 @@ class KeyCodeJsonConverter : JsonConverter<KeyCode> {
             writer.WriteNumber ("Key", (uint)(value & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask & ~KeyCode.AltMask));
         }
 
-        Dictionary<string, KeyCode> modifierDict = new Dictionary<string, KeyCode> {
-                                                       { "Shift", KeyCode.ShiftMask },
-                                                       { "Ctrl", KeyCode.CtrlMask },
-                                                       { "Alt", KeyCode.AltMask }
-                                                   };
+        Dictionary<string, KeyCode> modifierDict = new() {
+            { "Shift", KeyCode.ShiftMask }, { "Ctrl", KeyCode.CtrlMask }, { "Alt", KeyCode.AltMask }
+        };
 
-        List<string> modifiers = new List<string> ();
+        List<string> modifiers = new ();
         foreach (KeyValuePair<string, KeyCode> pair in modifierDict) {
             if ((value & pair.Value) == pair.Value) {
                 modifiers.Add (pair.Key);

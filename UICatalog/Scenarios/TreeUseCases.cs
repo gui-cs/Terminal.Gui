@@ -16,39 +16,43 @@ public class TreeUseCases : Scenario {
         Win.Height = Dim.Fill (1); // status bar
 
         var menu = new MenuBar {
-                                   Menus =  [
-                                   new MenuBarItem ("_File", new MenuItem[] {
-                                                                                new ("_Quit", "", () => Quit ())
-                                                                            }),
-                                   new MenuBarItem (
-                                                    "_Scenarios",
-                                                    new MenuItem[] {
-                                                                       new (
-                                                                            "_Simple Nodes",
-                                                                            "",
-                                                                            () => LoadSimpleNodes ()),
-                                                                       new ("_Rooms", "", () => LoadRooms ()),
-                                                                       new (
-                                                                            "_Armies With Builder",
-                                                                            "",
-                                                                            () => LoadArmies (false)),
-                                                                       new (
-                                                                            "_Armies With Delegate",
-                                                                            "",
-                                                                            () => LoadArmies (true))
-                                                                   })
-                                       ]
-                               };
+            Menus = [
+                        new MenuBarItem ("_File", new MenuItem[] { new ("_Quit", "", () => Quit ()) }),
+                        new MenuBarItem (
+                            "_Scenarios",
+                            new MenuItem[] {
+                                new (
+                                    "_Simple Nodes",
+                                    "",
+                                    () => LoadSimpleNodes ()
+                                ),
+                                new ("_Rooms", "", () => LoadRooms ()),
+                                new (
+                                    "_Armies With Builder",
+                                    "",
+                                    () => LoadArmies (false)
+                                ),
+                                new (
+                                    "_Armies With Delegate",
+                                    "",
+                                    () => LoadArmies (true)
+                                )
+                            }
+                        )
+                    ]
+        };
 
         Application.Top.Add (menu);
 
         var statusBar = new StatusBar (
-                                       new StatusItem[] {
-                                                            new (
-                                                                 Application.QuitKey,
-                                                                 $"{Application.QuitKey} to Quit",
-                                                                 () => Quit ())
-                                                        });
+            new StatusItem[] {
+                new (
+                    Application.QuitKey,
+                    $"{Application.QuitKey} to Quit",
+                    () => Quit ()
+                )
+            }
+        );
 
         Application.Top.Add (statusBar);
 
@@ -58,32 +62,24 @@ public class TreeUseCases : Scenario {
 
     private void LoadArmies (bool useDelegate) {
         var army1 = new Army {
-                                 Designation = "3rd Infantry",
-                                 Units = new List<Unit> {
-                                                            new () { Name = "Orc" },
-                                                            new () { Name = "Troll" },
-                                                            new () { Name = "Goblin" }
-                                                        }
-                             };
+            Designation = "3rd Infantry",
+            Units = new List<Unit> { new () { Name = "Orc" }, new () { Name = "Troll" }, new () { Name = "Goblin" } }
+        };
 
         if (_currentTree != null) {
             Win.Remove (_currentTree);
             _currentTree.Dispose ();
         }
 
-        TreeView<GameObject> tree = new TreeView<GameObject> {
-                                                                 X = 0,
-                                                                 Y = 0,
-                                                                 Width = 40,
-                                                                 Height = 20
-                                                             };
+        TreeView<GameObject> tree = new() { X = 0, Y = 0, Width = 40, Height = 20 };
 
         if (useDelegate) {
             tree.TreeBuilder = new DelegateTreeBuilder<GameObject> (
-                                                                    o =>
-                                                                        o is Army a
-                                                                            ? a.Units
-                                                                            : Enumerable.Empty<GameObject> ());
+                o =>
+                    o is Army a
+                        ? a.Units
+                        : Enumerable.Empty<GameObject> ()
+            );
         } else {
             tree.TreeBuilder = new GameObjectTreeBuilder ();
         }
@@ -97,25 +93,18 @@ public class TreeUseCases : Scenario {
 
     private void LoadRooms () {
         var myHouse = new House {
-                                    Address = "23 Nowhere Street",
-                                    Rooms = new List<Room> {
-                                                               new () { Name = "Ballroom" },
-                                                               new () { Name = "Bedroom 1" },
-                                                               new () { Name = "Bedroom 2" }
-                                                           }
-                                };
+            Address = "23 Nowhere Street",
+            Rooms = new List<Room> {
+                new () { Name = "Ballroom" }, new () { Name = "Bedroom 1" }, new () { Name = "Bedroom 2" }
+            }
+        };
 
         if (_currentTree != null) {
             Win.Remove (_currentTree);
             _currentTree.Dispose ();
         }
 
-        var tree = new TreeView {
-                                    X = 0,
-                                    Y = 0,
-                                    Width = 40,
-                                    Height = 20
-                                };
+        var tree = new TreeView { X = 0, Y = 0, Width = 40, Height = 20 };
 
         Win.Add (tree);
 
@@ -130,12 +119,7 @@ public class TreeUseCases : Scenario {
             _currentTree.Dispose ();
         }
 
-        var tree = new TreeView {
-                                    X = 0,
-                                    Y = 0,
-                                    Width = 40,
-                                    Height = 20
-                                };
+        var tree = new TreeView { X = 0, Y = 0, Width = 40, Height = 20 };
 
         Win.Add (tree);
 
@@ -156,9 +140,9 @@ public class TreeUseCases : Scenario {
     private void Quit () { Application.RequestStop (); }
 
     private class Army : GameObject {
-        public string Designation { get; set; }
-
         public List<Unit> Units { get; set; }
+
+        public string Designation { get; set; }
 
         public override string ToString () { return Designation; }
     }
@@ -181,13 +165,13 @@ public class TreeUseCases : Scenario {
 
     // Your data class
     private class House : TreeNode {
-        // Your properties
-        public string Address { get; set; }
-
         // ITreeNode member:
         public override IList<ITreeNode> Children => Rooms.Cast<ITreeNode> ().ToList ();
 
         public List<Room> Rooms { get; set; }
+
+        // Your properties
+        public string Address { get; set; }
 
         public override string Text { get => Address; set => Address = value; }
     }

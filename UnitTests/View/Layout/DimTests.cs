@@ -8,8 +8,6 @@ using Console = Terminal.Gui.FakeConsole;
 namespace Terminal.Gui.ViewTests;
 
 public class DimTests {
-    private readonly ITestOutputHelper _output;
-
     public DimTests (ITestOutputHelper output) {
         _output = output;
         Console.OutputEncoding = Encoding.Default;
@@ -19,6 +17,8 @@ public class DimTests {
         Thread.CurrentThread.CurrentCulture = culture;
         Thread.CurrentThread.CurrentUICulture = culture;
     }
+
+    private readonly ITestOutputHelper _output;
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // A new test that does not depend on Application is needed.
@@ -70,16 +70,12 @@ public class DimTests {
     [Fact]
     [TestRespondersDisposed]
     public void Dim_Referencing_SuperView_Does_Not_Throw () {
-        var super = new View {
-                                 Width = 10,
-                                 Height = 10,
-                                 Text = "super"
-                             };
+        var super = new View { Width = 10, Height = 10, Text = "super" };
         var view = new View {
-                                Width = Dim.Width (super), // this is allowed
-                                Height = Dim.Height (super), // this is allowed
-                                Text = "view"
-                            };
+            Width = Dim.Width (super), // this is allowed
+            Height = Dim.Height (super), // this is allowed
+            Text = "view"
+        };
 
         super.Add (view);
         super.BeginInit ();
@@ -100,7 +96,7 @@ public class DimTests {
         var view = new View { X = 0, Y = 0, Width = 20, Height = 0 };
         var field = new TextField { X = 0, Y = Pos.Bottom (view), Width = 20 };
         var count = 20;
-        List<Label> listLabels = new List<Label> ();
+        List<Label> listLabels = new ();
 
         for (var i = 0; i < count; i++) {
             field.Text = $"Label {i}";
@@ -152,21 +148,13 @@ public class DimTests {
     [Fact]
     [TestRespondersDisposed]
     public void Dim_SyperView_Referencing_SubView_Throws () {
-        var super = new View {
-                                 Width = 10,
-                                 Height = 10,
-                                 Text = "super"
-                             };
-        var view2 = new View {
-                                 Width = 10,
-                                 Height = 10,
-                                 Text = "view2"
-                             };
+        var super = new View { Width = 10, Height = 10, Text = "super" };
+        var view2 = new View { Width = 10, Height = 10, Text = "view2" };
         var view = new View {
-                                Width = Dim.Width (view2), // this is not allowed
-                                Height = Dim.Height (view2), // this is not allowed
-                                Text = "view"
-                            };
+            Width = Dim.Width (view2), // this is not allowed
+            Height = Dim.Height (view2), // this is not allowed
+            Text = "view"
+        };
 
         view.Add (view2);
         super.Add (view);
@@ -185,15 +173,8 @@ public class DimTests {
         Dim_Validation_Do_Not_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute () {
         var t = new View { Width = 80, Height = 25, Text = "top" };
 
-        var w = new Window {
-                               Width = Dim.Fill (),
-                               Height = Dim.Sized (10)
-                           };
-        var v = new View {
-                             Width = Dim.Width (w) - 2,
-                             Height = Dim.Percent (10),
-                             Text = "v"
-                         };
+        var w = new Window { Width = Dim.Fill (), Height = Dim.Sized (10) };
+        var v = new View { Width = Dim.Width (w) - 2, Height = Dim.Percent (10), Text = "v" };
 
         w.Add (v);
         t.Add (w);
@@ -223,7 +204,13 @@ public class DimTests {
     public void Dim_Validation_Do_Not_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Null () {
         var t = new View { Width = 80, Height = 25, Text = "top" };
 
-        var w = new Window { X = 1, Y = 2, Width = 4, Height = 5, Title = "w" };
+        var w = new Window {
+            X = 1,
+            Y = 2,
+            Width = 4,
+            Height = 5,
+            Title = "w"
+        };
         t.Add (w);
         t.LayoutSubviews ();
 
@@ -240,18 +227,18 @@ public class DimTests {
         var t = new View { Width = 80, Height = 25, Text = "top" };
 
         var w = new Window {
-                               Width = Dim.Width (t) - 2, // 78
-                               Height = Dim.Height (t) - 2 // 23
-                           };
+            Width = Dim.Width (t) - 2, // 78
+            Height = Dim.Height (t) - 2 // 23
+        };
         var f = new FrameView ();
         var v1 = new View {
-                              Width = Dim.Width (w) - 2, // 76
-                              Height = Dim.Height (w) - 2 // 21
-                          };
+            Width = Dim.Width (w) - 2, // 76
+            Height = Dim.Height (w) - 2 // 21
+        };
         var v2 = new View {
-                              Width = Dim.Width (v1) - 2, // 74
-                              Height = Dim.Height (v1) - 2 // 19
-                          };
+            Width = Dim.Width (v1) - 2, // 74
+            Height = Dim.Height (v1) - 2 // 19
+        };
 
         f.Add (v1, v2);
         w.Add (f);
@@ -307,18 +294,18 @@ public class DimTests {
         var t = new View { Width = 80, Height = 25 };
 
         var w = new Window {
-                               Width = Dim.Width (t) - 2, // 78
-                               Height = Dim.Height (t) - 2 // 23
-                           };
+            Width = Dim.Width (t) - 2, // 78
+            Height = Dim.Height (t) - 2 // 23
+        };
         var f = new FrameView ();
         var v1 = new View {
-                              Width = Dim.Width (w) - 2, // 76
-                              Height = Dim.Height (w) - 2 // 21
-                          };
+            Width = Dim.Width (w) - 2, // 76
+            Height = Dim.Height (w) - 2 // 21
+        };
         var v2 = new View {
-                              Width = Dim.Width (v1) - 2, // 74
-                              Height = Dim.Height (v1) - 2 // 19
-                          };
+            Width = Dim.Width (v1) - 2, // 74
+            Height = Dim.Height (v1) - 2 // 19
+        };
 
         f.Add (v1, v2);
         w.Add (f);
@@ -352,18 +339,15 @@ public class DimTests {
     [InlineData (50, true)]
     [InlineData (50, false)]
     public void DimPercentPlusOne (int startingDistance, bool testHorizontal) {
-        var container = new View {
-                                     Width = 100,
-                                     Height = 100
-                                 };
+        var container = new View { Width = 100, Height = 100 };
 
         var label = new Label {
-                                  AutoSize = false,
-                                  X = testHorizontal ? startingDistance : 0,
-                                  Y = testHorizontal ? 0 : startingDistance,
-                                  Width = testHorizontal ? Dim.Percent (50) + 1 : 1,
-                                  Height = testHorizontal ? 1 : Dim.Percent (50) + 1
-                              };
+            AutoSize = false,
+            X = testHorizontal ? startingDistance : 0,
+            Y = testHorizontal ? 0 : startingDistance,
+            Width = testHorizontal ? Dim.Percent (50) + 1 : 1,
+            Height = testHorizontal ? 1 : Dim.Percent (50) + 1
+        };
 
         container.Add (label);
         Application.Top.Add (container);
@@ -498,80 +482,77 @@ public class DimTests {
         // Testing with the Button because it properly handles the Dim class.
         Toplevel t = Application.Top;
 
-        var w = new Window {
-                               Width = 100,
-                               Height = 100
-                           };
+        var w = new Window { Width = 100, Height = 100 };
 
         var f1 = new FrameView {
-                                   X = 0,
-                                   Y = 0,
-                                   Width = Dim.Percent (50),
-                                   Height = 5,
-                                   Title = "f1"
-                               };
+            X = 0,
+            Y = 0,
+            Width = Dim.Percent (50),
+            Height = 5,
+            Title = "f1"
+        };
 
         var f2 = new FrameView {
-                                   X = Pos.Right (f1),
-                                   Y = 0,
-                                   Width = Dim.Fill (),
-                                   Height = 5,
-                                   Title = "f2"
-                               };
+            X = Pos.Right (f1),
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = 5,
+            Title = "f2"
+        };
 
         var v1 = new Button {
-                                AutoSize = false,
-                                X = Pos.X (f1) + 2,
-                                Y = Pos.Bottom (f1) + 2,
-                                Width = Dim.Width (f1) - 2,
-                                Height = Dim.Fill () - 2,
-                                ValidatePosDim = true,
-                                Text = "v1"
-                            };
+            AutoSize = false,
+            X = Pos.X (f1) + 2,
+            Y = Pos.Bottom (f1) + 2,
+            Width = Dim.Width (f1) - 2,
+            Height = Dim.Fill () - 2,
+            ValidatePosDim = true,
+            Text = "v1"
+        };
 
         var v2 = new Button {
-                                AutoSize = false,
-                                X = Pos.X (f2) + 2,
-                                Y = Pos.Bottom (f2) + 2,
-                                Width = Dim.Width (f2) - 2,
-                                Height = Dim.Fill () - 2,
-                                ValidatePosDim = true,
-                                Text = "v2"
-                            };
+            AutoSize = false,
+            X = Pos.X (f2) + 2,
+            Y = Pos.Bottom (f2) + 2,
+            Width = Dim.Width (f2) - 2,
+            Height = Dim.Fill () - 2,
+            ValidatePosDim = true,
+            Text = "v2"
+        };
 
         var v3 = new Button {
-                                AutoSize = false,
-                                Width = Dim.Percent (10),
-                                Height = Dim.Percent (10),
-                                ValidatePosDim = true,
-                                Text = "v3"
-                            };
+            AutoSize = false,
+            Width = Dim.Percent (10),
+            Height = Dim.Percent (10),
+            ValidatePosDim = true,
+            Text = "v3"
+        };
 
         var v4 = new Button {
-                                AutoSize = false,
-                                Width = Dim.Sized (50),
-                                Height = Dim.Sized (50),
-                                ValidatePosDim = true,
-                                Text = "v4"
-                            };
+            AutoSize = false,
+            Width = Dim.Sized (50),
+            Height = Dim.Sized (50),
+            ValidatePosDim = true,
+            Text = "v4"
+        };
 
         var v5 = new Button {
-                                AutoSize = false,
-                                Width = Dim.Width (v1) - Dim.Width (v3),
-                                Height = Dim.Height (v1) - Dim.Height (v3),
-                                ValidatePosDim = true,
-                                Text = "v5"
-                            };
+            AutoSize = false,
+            Width = Dim.Width (v1) - Dim.Width (v3),
+            Height = Dim.Height (v1) - Dim.Height (v3),
+            ValidatePosDim = true,
+            Text = "v5"
+        };
 
         var v6 = new Button {
-                                AutoSize = false,
-                                X = Pos.X (f2),
-                                Y = Pos.Bottom (f2) + 2,
-                                Width = Dim.Percent (20, true),
-                                Height = Dim.Percent (20, true),
-                                ValidatePosDim = true,
-                                Text = "v6"
-                            };
+            AutoSize = false,
+            X = Pos.X (f2),
+            Y = Pos.Bottom (f2) + 2,
+            Width = Dim.Percent (20, true),
+            Height = Dim.Percent (20, true),
+            ValidatePosDim = true,
+            Text = "v6"
+        };
 
         w.Add (f1, f2, v1, v2, v3, v4, v5, v6);
         t.Add (w);
@@ -598,8 +579,9 @@ public class DimTests {
             Assert.Equal (89, v1.Frame.Height); // 98-5-2-2=89
 
             Assert.Equal (
-                          "Combine(View(Width,FrameView(f2)(49,0,49,5))-Absolute(2))",
-                          v2.Width.ToString ());
+                "Combine(View(Width,FrameView(f2)(49,0,49,5))-Absolute(2))",
+                v2.Width.ToString ()
+            );
             Assert.Equal ("Combine(Fill(0)-Absolute(2))", v2.Height.ToString ());
             Assert.Equal (47, v2.Frame.Width); // 49-2=47
             Assert.Equal (89, v2.Frame.Height); // 98-5-2-2=89
@@ -615,11 +597,13 @@ public class DimTests {
             Assert.Equal (50, v4.Frame.Height);
 
             Assert.Equal (
-                          "Combine(View(Width,Button(v1)(2,7,47,89))-View(Width,Button(v3)(0,0,9,9)))",
-                          v5.Width.ToString ());
+                "Combine(View(Width,Button(v1)(2,7,47,89))-View(Width,Button(v3)(0,0,9,9)))",
+                v5.Width.ToString ()
+            );
             Assert.Equal (
-                          "Combine(View(Height,Button(v1)(2,7,47,89))-View(Height,Button(v3)(0,0,9,9)))",
-                          v5.Height.ToString ());
+                "Combine(View(Height,Button(v1)(2,7,47,89))-View(Height,Button(v3)(0,0,9,9)))",
+                v5.Height.ToString ()
+            );
             Assert.Equal (38, v5.Frame.Width); // 47-9=38
             Assert.Equal (80, v5.Frame.Height); // 89-9=80
 
@@ -658,8 +642,9 @@ public class DimTests {
 
             v2.Text = "Button2";
             Assert.Equal (
-                          "Combine(View(Width,FrameView(f2)(99,0,99,5))-Absolute(2))",
-                          v2.Width.ToString ());
+                "Combine(View(Width,FrameView(f2)(99,0,99,5))-Absolute(2))",
+                v2.Width.ToString ()
+            );
             Assert.Equal ("Combine(Fill(0)-Absolute(2))", v2.Height.ToString ());
             Assert.Equal (97, v2.Frame.Width); // 99-2=97
             Assert.Equal (189, v2.Frame.Height); // 198-2-7=189
@@ -668,9 +653,10 @@ public class DimTests {
             Assert.Equal ("Factor(0.1,False)", v3.Width.ToString ());
             Assert.Equal ("Factor(0.1,False)", v3.Height.ToString ());
             Assert.Equal (
-                          19,
-                          v3.Frame
-                            .Width); // 198*10%=19 * Percent is related to the super-view if it isn't null otherwise the view width
+                19,
+                v3.Frame
+                    .Width
+            ); // 198*10%=19 * Percent is related to the super-view if it isn't null otherwise the view width
             Assert.Equal (19, v3.Frame.Height); // 199*10%=19
 
             v4.Text = "Button4";
@@ -687,11 +673,13 @@ public class DimTests {
 
             v5.Text = "Button5";
             Assert.Equal (
-                          "Combine(View(Width,Button(v1)(2,7,97,189))-View(Width,Button(v3)(0,0,19,19)))",
-                          v5.Width.ToString ());
+                "Combine(View(Width,Button(v1)(2,7,97,189))-View(Width,Button(v3)(0,0,19,19)))",
+                v5.Width.ToString ()
+            );
             Assert.Equal (
-                          "Combine(View(Height,Button(v1)(2,7,97,189))-View(Height,Button(v3)(0,0,19,19)))",
-                          v5.Height.ToString ());
+                "Combine(View(Height,Button(v1)(2,7,97,189))-View(Height,Button(v3)(0,0,19,19)))",
+                v5.Height.ToString ()
+            );
             Assert.Equal (78, v5.Frame.Width); // 97-9=78
             Assert.Equal (170, v5.Frame.Height); // 189-19=170
 
@@ -782,23 +770,14 @@ public class DimTests {
     public void PosCombine_View_Not_Added_Throws () {
         var t = new View { Width = 80, Height = 50 };
 
-        var super = new View {
-                                 Width = Dim.Width (t) - 2,
-                                 Height = Dim.Height (t) - 2
-                             };
+        var super = new View { Width = Dim.Width (t) - 2, Height = Dim.Height (t) - 2 };
         t.Add (super);
 
         var sub = new View ();
         super.Add (sub);
 
-        var v1 = new View {
-                              Width = Dim.Width (super) - 2,
-                              Height = Dim.Height (super) - 2
-                          };
-        var v2 = new View {
-                              Width = Dim.Width (v1) - 2,
-                              Height = Dim.Height (v1) - 2
-                          };
+        var v1 = new View { Width = Dim.Width (super) - 2, Height = Dim.Height (super) - 2 };
+        var v2 = new View { Width = Dim.Width (v1) - 2, Height = Dim.Height (v1) - 2 };
         sub.Add (v1);
 
         // v2 not added to sub; should cause exception on Layout since it's referenced by sub.

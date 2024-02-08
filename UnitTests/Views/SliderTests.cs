@@ -69,22 +69,16 @@ public class SliderOptionTests {
 
     [Fact]
     public void SliderOption_ToString_WhenPopulated_WithInt () {
-        SliderOption<int> sliderOption = new() {
-                                                   Legend = "Lord flibble",
-                                                   LegendAbbr = new Rune ('l'),
-                                                   Data = 1
-                                               };
+        SliderOption<int> sliderOption = new () { Legend = "Lord flibble", LegendAbbr = new Rune ('l'), Data = 1 };
 
         Assert.Equal ("{Legend=Lord flibble, LegendAbbr=l, Data=1}", sliderOption.ToString ());
     }
 
     [Fact]
     public void SliderOption_ToString_WhenPopulated_WithSizeF () {
-        SliderOption<SizeF> sliderOption = new() {
-                                                     Legend = "Lord flibble",
-                                                     LegendAbbr = new Rune ('l'),
-                                                     Data = new SizeF (32, 11)
-                                                 };
+        SliderOption<SizeF> sliderOption = new () {
+            Legend = "Lord flibble", LegendAbbr = new Rune ('l'), Data = new SizeF (32, 11)
+        };
 
         Assert.Equal ("{Legend=Lord flibble, LegendAbbr=l, Data={Width=32, Height=11}}", sliderOption.ToString ());
     }
@@ -153,7 +147,7 @@ public class SliderTests {
     [Fact]
     public void Constructor_With_Options () {
         // Arrange
-        List<int> options = new() { 1, 2, 3 };
+        List<int> options = new () { 1, 2, 3 };
 
         // Act
         Slider<int> slider = new (options);
@@ -204,9 +198,8 @@ public class SliderTests {
 
         // Create args with cancel set to false
         cancel = false;
-        SliderEventArgs<int> args = new (new Dictionary<int, SliderOption<int>> (), newFocusedOption) {
-                                        Cancel = cancel
-                                    };
+        SliderEventArgs<int> args =
+            new (new Dictionary<int, SliderOption<int>> (), newFocusedOption) { Cancel = cancel };
         Assert.Equal (0, slider.FocusedOption);
 
         // Act
@@ -219,8 +212,8 @@ public class SliderTests {
         // Create args with cancel set to true
         cancel = true;
         args = new SliderEventArgs<int> (new Dictionary<int, SliderOption<int>> (), newFocusedOption) {
-                   Cancel = cancel
-               };
+            Cancel = cancel
+        };
 
         // Act
         slider.OnOptionFocused (2, args);
@@ -263,9 +256,7 @@ public class SliderTests {
     [Fact]
     public void Set_Should_Not_UnSetFocusedOption_When_EmptyNotAllowed () {
         // Arrange
-        Slider<int> slider = new (new List<int> { 1, 2, 3, 4 }) {
-                                                                    AllowEmpty = false
-                                                                };
+        Slider<int> slider = new (new List<int> { 1, 2, 3, 4 }) { AllowEmpty = false };
         slider.AutoSize = true;
 
         Assert.NotEmpty (slider.GetSetOptions ());

@@ -33,12 +33,12 @@ public class StatusItem {
     /// <value>Function to determine if the action is can be executed or not.</value>
     public Func<bool> CanExecute { get; set; }
 
+    /// <summary>Gets the global shortcut to invoke the action on the menu.</summary>
+    public Key Shortcut { get; set; }
+
     /// <summary>Gets or sets arbitrary data for the status item.</summary>
     /// <remarks>This property is not used internally.</remarks>
     public object Data { get; set; }
-
-    /// <summary>Gets the global shortcut to invoke the action on the menu.</summary>
-    public Key Shortcut { get; set; }
 
     /// <summary>Gets or sets the title.</summary>
     /// <value>The title.</value>
@@ -64,10 +64,6 @@ public class StatusItem {
 ///     new instance of a status bar.
 /// </summary>
 public class StatusBar : View {
-    private static Rune _shortcutDelimiter = (Rune)'=';
-    private StatusItem[] _items = { };
-    private StatusItem _itemToInvoke;
-
     /// <summary>Initializes a new instance of the <see cref="StatusBar"/> class.</summary>
     public StatusBar () : this (new StatusItem[] { }) { }
 
@@ -91,6 +87,20 @@ public class StatusBar : View {
         AddCommand (Command.Accept, InvokeItem);
     }
 
+    private static Rune _shortcutDelimiter = (Rune)'=';
+    private StatusItem _itemToInvoke;
+    private StatusItem[] _items = { };
+
+    /// <summary>Gets or sets shortcut delimiter separator. The default is "-".</summary>
+    public static Rune ShortcutDelimiter {
+        get => _shortcutDelimiter;
+        set {
+            if (_shortcutDelimiter != value) {
+                _shortcutDelimiter = value == default (Rune) ? (Rune)'=' : value;
+            }
+        }
+    }
+
     /// <summary>The items that compose the <see cref="StatusBar"/></summary>
     public StatusItem[] Items {
         get => _items;
@@ -106,21 +116,11 @@ public class StatusBar : View {
         }
     }
 
-    /// <summary>Gets or sets shortcut delimiter separator. The default is "-".</summary>
-    public static Rune ShortcutDelimiter {
-        get => _shortcutDelimiter;
-        set {
-            if (_shortcutDelimiter != value) {
-                _shortcutDelimiter = value == default (Rune) ? (Rune)'=' : value;
-            }
-        }
-    }
-
     /// <summary>Inserts a <see cref="StatusItem"/> in the specified index of <see cref="Items"/>.</summary>
     /// <param name="index">The zero-based index at which item should be inserted.</param>
     /// <param name="item">The item to insert.</param>
     public void AddItemAt (int index, StatusItem item) {
-        List<StatusItem> itemsList = new List<StatusItem> (Items);
+        List<StatusItem> itemsList = new (Items);
         itemsList.Insert (index, item);
         Items = itemsList.ToArray ();
         SetNeedsDisplay ();
@@ -215,7 +215,7 @@ public class StatusBar : View {
     /// <param name="index">The zero-based index of the item to remove.</param>
     /// <returns>The <see cref="StatusItem"/> removed.</returns>
     public StatusItem RemoveItem (int index) {
-        List<StatusItem> itemsList = new List<StatusItem> (Items);
+        List<StatusItem> itemsList = new (Items);
         StatusItem item = itemsList[index];
         itemsList.RemoveAt (index);
         Items = itemsList.ToArray ();
@@ -265,11 +265,12 @@ public class StatusBar : View {
         }
 
         Application.MainLoop.AddIdle (
-                                      () => {
-                                          action ();
+            () => {
+                action ();
 
-                                          return false;
-                                      });
+                return false;
+            }
+        );
     }
 
     private Attribute ToggleScheme (Attribute scheme) {

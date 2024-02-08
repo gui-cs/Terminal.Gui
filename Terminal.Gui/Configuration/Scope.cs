@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.Reflection;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 ///     Defines a configuration settings scope. Classes that inherit from this abstract class can be used to define
@@ -42,8 +42,9 @@ public class Scope<T> : Dictionary<string, ConfigProperty> { //, IScope<Scope<T>
     internal virtual bool Apply () {
         var set = false;
         foreach (KeyValuePair<string, ConfigProperty> p in this.Where (
-                                                                       t => t.Value != null
-                                                                            && t.Value.PropertyValue != null)) {
+                     t => t.Value != null
+                          && t.Value.PropertyValue != null
+                 )) {
             if (p.Value.Apply ()) {
                 set = true;
             }
@@ -54,9 +55,11 @@ public class Scope<T> : Dictionary<string, ConfigProperty> { //, IScope<Scope<T>
 
     private IEnumerable<KeyValuePair<string, ConfigProperty>> GetScopeProperties () {
         return _allConfigProperties!.Where (
-                                            cp =>
-                                                (cp.Value.PropertyInfo?.GetCustomAttribute (
-                                                      typeof (SerializableConfigurationProperty))
-                                                     as SerializableConfigurationProperty)?.Scope == GetType ());
+            cp =>
+                (cp.Value.PropertyInfo?.GetCustomAttribute (
+                         typeof (SerializableConfigurationProperty)
+                     )
+                     as SerializableConfigurationProperty)?.Scope == GetType ()
+        );
     }
 }

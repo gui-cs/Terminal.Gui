@@ -26,17 +26,6 @@ namespace Terminal.Gui;
 ///     <para>Use the</para>
 /// </remarks>
 public class ScrollView : View {
-    private readonly ContentView _contentView;
-    private readonly ScrollBarView _horizontal;
-    private readonly ScrollBarView _vertical;
-    private bool _autoHideScrollBars = true;
-    private View _contentBottomRightCorner;
-    private Point _contentOffset;
-    private Size _contentSize;
-    private bool _keepContentAlwaysInViewport = true;
-    private bool _showHorizontalScrollIndicator;
-    private bool _showVerticalScrollIndicator;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="Gui.ScrollView"/> class using <see cref="LayoutStyle.Computed"/>
     ///     positioning.
@@ -44,24 +33,24 @@ public class ScrollView : View {
     public ScrollView () {
         _contentView = new ContentView ();
         _vertical = new ScrollBarView {
-                                          X = Pos.AnchorEnd (1),
-                                          Y = 0,
-                                          Width = 1,
-                                          Height = Dim.Fill (_showHorizontalScrollIndicator ? 1 : 0),
-                                          Size = 1,
-                                          IsVertical = true,
-                                          Host = this
-                                      };
+            X = Pos.AnchorEnd (1),
+            Y = 0,
+            Width = 1,
+            Height = Dim.Fill (_showHorizontalScrollIndicator ? 1 : 0),
+            Size = 1,
+            IsVertical = true,
+            Host = this
+        };
 
         _horizontal = new ScrollBarView {
-                                            X = 0,
-                                            Y = Pos.AnchorEnd (1),
-                                            Width = Dim.Fill (_showVerticalScrollIndicator ? 1 : 0),
-                                            Height = 1,
-                                            Size = 1,
-                                            IsVertical = false,
-                                            Host = this
-                                        };
+            X = 0,
+            Y = Pos.AnchorEnd (1),
+            Width = Dim.Fill (_showVerticalScrollIndicator ? 1 : 0),
+            Height = 1,
+            Size = 1,
+            IsVertical = false,
+            Host = this
+        };
 
         _vertical.OtherScrollBarView = _horizontal;
         _horizontal.OtherScrollBarView = _vertical;
@@ -126,6 +115,17 @@ public class ScrollView : View {
         };
     }
 
+    private readonly ContentView _contentView;
+    private readonly ScrollBarView _horizontal;
+    private readonly ScrollBarView _vertical;
+    private bool _autoHideScrollBars = true;
+    private bool _keepContentAlwaysInViewport = true;
+    private bool _showHorizontalScrollIndicator;
+    private bool _showVerticalScrollIndicator;
+    private Point _contentOffset;
+    private Size _contentSize;
+    private View _contentBottomRightCorner;
+
     /// <summary>If true the vertical/horizontal scroll bars won't be showed if it's not needed.</summary>
     public bool AutoHideScrollBars {
         get => _autoHideScrollBars;
@@ -145,38 +145,6 @@ public class ScrollView : View {
         }
     }
 
-    /// <summary>Represents the top left corner coordinate that is displayed by the scrollview</summary>
-    /// <value>The content offset.</value>
-    public Point ContentOffset {
-        get => _contentOffset;
-        set {
-            if (!IsInitialized) {
-                // We're not initialized so we can't do anything fancy. Just cache value.
-                _contentOffset = new Point (-Math.Abs (value.X), -Math.Abs (value.Y));
-                ;
-
-                return;
-            }
-
-            SetContentOffset (value);
-        }
-    }
-
-    /// <summary>Represents the contents of the data shown inside the scrollview</summary>
-    /// <value>The size of the content.</value>
-    public Size ContentSize {
-        get => _contentSize;
-        set {
-            if (_contentSize != value) {
-                _contentSize = value;
-                _contentView.Frame = new Rect (_contentOffset, value);
-                _vertical.Size = _contentSize.Height;
-                _horizontal.Size = _contentSize.Width;
-                SetNeedsDisplay ();
-            }
-        }
-    }
-
     /// <summary>Get or sets if the view-port is kept always visible in the area of this <see cref="ScrollView"/></summary>
     public bool KeepContentAlwaysInViewport {
         get => _keepContentAlwaysInViewport;
@@ -188,17 +156,19 @@ public class ScrollView : View {
                 Point p = default;
                 if (value && -_contentOffset.X + Bounds.Width > _contentSize.Width) {
                     p = new Point (
-                                   _contentSize.Width - Bounds.Width +
-                                   (_showVerticalScrollIndicator ? 1 : 0),
-                                   -_contentOffset.Y);
+                        _contentSize.Width - Bounds.Width +
+                        (_showVerticalScrollIndicator ? 1 : 0),
+                        -_contentOffset.Y
+                    );
                 }
 
                 if (value && -_contentOffset.Y + Bounds.Height > _contentSize.Height) {
                     if (p == default (Point)) {
                         p = new Point (
-                                       -_contentOffset.X,
-                                       _contentSize.Height - Bounds.Height +
-                                       (_showHorizontalScrollIndicator ? 1 : 0));
+                            -_contentOffset.X,
+                            _contentSize.Height - Bounds.Height +
+                            (_showHorizontalScrollIndicator ? 1 : 0)
+                        );
                     } else {
                         p.Y = _contentSize.Height - Bounds.Height +
                               (_showHorizontalScrollIndicator ? 1 : 0);
@@ -265,6 +235,38 @@ public class ScrollView : View {
             }
 
             _horizontal.Width = Dim.Fill (_showVerticalScrollIndicator ? 1 : 0);
+        }
+    }
+
+    /// <summary>Represents the top left corner coordinate that is displayed by the scrollview</summary>
+    /// <value>The content offset.</value>
+    public Point ContentOffset {
+        get => _contentOffset;
+        set {
+            if (!IsInitialized) {
+                // We're not initialized so we can't do anything fancy. Just cache value.
+                _contentOffset = new Point (-Math.Abs (value.X), -Math.Abs (value.Y));
+                ;
+
+                return;
+            }
+
+            SetContentOffset (value);
+        }
+    }
+
+    /// <summary>Represents the contents of the data shown inside the scrollview</summary>
+    /// <value>The size of the content.</value>
+    public Size ContentSize {
+        get => _contentSize;
+        set {
+            if (_contentSize != value) {
+                _contentSize = value;
+                _contentView.Frame = new Rect (_contentOffset, value);
+                _vertical.Size = _contentSize.Height;
+                _horizontal.Size = _contentSize.Width;
+                SetNeedsDisplay ();
+            }
         }
     }
 

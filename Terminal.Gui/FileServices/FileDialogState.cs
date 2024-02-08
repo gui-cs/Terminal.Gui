@@ -1,10 +1,8 @@
 ﻿using System.IO.Abstractions;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 class FileDialogState {
-    protected readonly FileDialog Parent;
-
     public FileDialogState (IDirectoryInfo dir, FileDialog parent) {
         Directory = dir;
         Parent = parent;
@@ -13,14 +11,16 @@ class FileDialogState {
         RefreshChildren ();
     }
 
+    protected readonly FileDialog Parent;
+
+    public FileSystemInfoStats Selected { get; set; }
+
     public FileSystemInfoStats[] Children { get; internal set; }
 
     public IDirectoryInfo Directory { get; }
 
     /// <summary>Gets what was entered in the path text box of the dialog when the state was active.</summary>
     public string Path { get; }
-
-    public FileSystemInfoStats Selected { get; set; }
 
     protected virtual IEnumerable<FileSystemInfoStats> GetChildren (IDirectoryInfo dir) {
         try {
@@ -29,21 +29,22 @@ class FileDialogState {
             // if directories only
             if (Parent.OpenMode == OpenMode.Directory) {
                 children = dir.GetDirectories ()
-                              .Select (e => new FileSystemInfoStats (e, Parent.Style.Culture))
-                              .ToList ();
+                    .Select (e => new FileSystemInfoStats (e, Parent.Style.Culture))
+                    .ToList ();
             } else {
                 children = dir.GetFileSystemInfos ()
-                              .Select (e => new FileSystemInfoStats (e, Parent.Style.Culture))
-                              .ToList ();
+                    .Select (e => new FileSystemInfoStats (e, Parent.Style.Culture))
+                    .ToList ();
             }
 
             // if only allowing specific file types
             if (Parent.AllowedTypes.Any () && Parent.OpenMode == OpenMode.File) {
                 children = children.Where (
-                                           c => c.IsDir ||
-                                                (c.FileSystemInfo is IFileInfo f
-                                                 && Parent.IsCompatibleWithAllowedExtensions (f)))
-                                   .ToList ();
+                        c => c.IsDir ||
+                             (c.FileSystemInfo is IFileInfo f
+                              && Parent.IsCompatibleWithAllowedExtensions (f))
+                    )
+                    .ToList ();
             }
 
             // if theres a UI filter in place too

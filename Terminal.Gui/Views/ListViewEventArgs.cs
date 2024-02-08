@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary><see cref="EventArgs"/> for <see cref="ListView"/> events.</summary>
 public class ListViewItemEventArgs : EventArgs {
@@ -23,9 +23,9 @@ public class ListViewRowEventArgs : EventArgs {
     /// <param name="row"></param>
     public ListViewRowEventArgs (int row) { Row = row; }
 
-    /// <summary>The current row being rendered.</summary>
-    public int Row { get; }
-
     /// <summary>The <see cref="Attribute"/> used by current row or null to maintain the current attribute.</summary>
     public Attribute? RowAttribute { get; set; }
+
+    /// <summary>The current row being rendered.</summary>
+    public int Row { get; }
 }

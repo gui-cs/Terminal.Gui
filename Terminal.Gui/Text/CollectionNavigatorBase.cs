@@ -14,8 +14,11 @@ public abstract class CollectionNavigatorBase {
     private DateTime _lastKeystroke = DateTime.Now;
     private string _searchString = "";
 
-    /// <summary>The comparer function to use when searching the collection.</summary>
-    public StringComparer Comparer { get; set; } = StringComparer.InvariantCultureIgnoreCase;
+    /// <summary>
+    ///     Gets or sets the number of milliseconds to delay before clearing the search string. The delay is reset on each
+    ///     call to <see cref="GetNextMatchingItem(int, char)"/>. The default is 500ms.
+    /// </summary>
+    public int TypingDelay { get; set; } = 500;
 
     /// <summary>
     ///     Gets the current search string. This includes the set of keystrokes that have been pressed since the last
@@ -29,11 +32,8 @@ public abstract class CollectionNavigatorBase {
         }
     }
 
-    /// <summary>
-    ///     Gets or sets the number of milliseconds to delay before clearing the search string. The delay is reset on each
-    ///     call to <see cref="GetNextMatchingItem(int, char)"/>. The default is 500ms.
-    /// </summary>
-    public int TypingDelay { get; set; } = 500;
+    /// <summary>The comparer function to use when searching the collection.</summary>
+    public StringComparer Comparer { get; set; } = StringComparer.InvariantCultureIgnoreCase;
 
     /// <summary>
     ///     Gets the index of the next item in the collection that matches the current <see cref="SearchString"/> plus the
@@ -64,11 +64,12 @@ public abstract class CollectionNavigatorBase {
             }
 
             int idxCandidate = GetNextMatchingItem (
-                                                    currentIndex,
-                                                    candidateState,
+                currentIndex,
+                candidateState,
 
-                                                    // prefer not to move if there are multiple characters e.g. "ca" + 'r' should stay on "car" and not jump to "cart"
-                                                    candidateState.Length > 1);
+                // prefer not to move if there are multiple characters e.g. "ca" + 'r' should stay on "car" and not jump to "cart"
+                candidateState.Length > 1
+            );
 
             if (idxCandidate != -1) {
                 // found "dd" so candidate search string is accepted

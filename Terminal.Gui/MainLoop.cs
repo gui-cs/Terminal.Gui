@@ -7,7 +7,7 @@
 
 using System.Collections.ObjectModel;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Interface to create a platform specific <see cref="MainLoop"/> driver.</summary>
 interface IMainLoopDriver {
@@ -36,13 +36,6 @@ interface IMainLoopDriver {
 ///     on Windows.
 /// </remarks>
 class MainLoop : IDisposable {
-    /// <summary>The idle handlers and lock that must be held while manipulating them</summary>
-    private readonly object _idleHandlersLock = new ();
-
-    private readonly object _timeoutsLockToken = new ();
-    internal List<Func<bool>> _idleHandlers = new ();
-    internal SortedList<long, Timeout> _timeouts = new ();
-
     /// <summary>Creates a new MainLoop.</summary>
     /// <remarks>Use <see cref="Dispose"/> to release resources.</remarks>
     /// <param name="driver">
@@ -54,6 +47,20 @@ class MainLoop : IDisposable {
         driver.Setup (this);
     }
 
+    /// <summary>The idle handlers and lock that must be held while manipulating them</summary>
+    private readonly object _idleHandlersLock = new ();
+
+    private readonly object _timeoutsLockToken = new ();
+    internal List<Func<bool>> _idleHandlers = new ();
+    internal SortedList<long, Timeout> _timeouts = new ();
+
+    /// <summary>Used for unit tests.</summary>
+    internal bool Running { get; set; }
+
+    /// <summary>The current <see cref="IMainLoopDriver"/> in use.</summary>
+    /// <value>The main loop driver.</value>
+    internal IMainLoopDriver MainLoopDriver { get; private set; }
+
     /// <summary>Gets a copy of the list of all idle handlers.</summary>
     internal ReadOnlyCollection<Func<bool>> IdleHandlers {
         get {
@@ -62,13 +69,6 @@ class MainLoop : IDisposable {
             }
         }
     }
-
-    /// <summary>The current <see cref="IMainLoopDriver"/> in use.</summary>
-    /// <value>The main loop driver.</value>
-    internal IMainLoopDriver MainLoopDriver { get; private set; }
-
-    /// <summary>Used for unit tests.</summary>
-    internal bool Running { get; set; }
 
     /// <summary>
     ///     Gets the list of all timeouts sorted by the <see cref="TimeSpan"/> time ticks. A shorter limit time can be
@@ -118,10 +118,7 @@ class MainLoop : IDisposable {
             throw new ArgumentNullException (nameof (callback));
         }
 
-        var timeout = new Timeout {
-                                      Span = time,
-                                      Callback = callback
-                                  };
+        var timeout = new Timeout { Span = time, Callback = callback };
         AddTimeout (time, timeout);
 
         return timeout;

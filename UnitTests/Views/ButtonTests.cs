@@ -3,8 +3,8 @@
 namespace Terminal.Gui.ViewsTests;
 
 public class ButtonTests {
-    private readonly ITestOutputHelper _output;
     public ButtonTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     [AutoInitShutdown]
@@ -14,81 +14,64 @@ public class ButtonTests {
         var lblWidth = 8;
 
         var view = new View {
-                                  Y = 1,
-                                  Width = lblWidth,
-                                  Height = 1,
-                                  TextAlignment = TextAlignment.Right,
-                                  Text = "Find:"
-                              };
+            Y = 1,
+            Width = lblWidth,
+            Height = 1,
+            TextAlignment = TextAlignment.Right,
+            Text = "Find:"
+        };
         tab.Add (view);
 
         var txtToFind = new TextField {
-                                          X = Pos.Right (view) + 1,
-                                          Y = Pos.Top (view),
-                                          Width = 20,
-                                          Text = "Testing buttons."
-                                      };
+            X = Pos.Right (view) + 1, Y = Pos.Top (view), Width = 20, Text = "Testing buttons."
+        };
         tab.Add (txtToFind);
 
         var btnFindNext = new Button {
-                                         AutoSize = false,
-                                         X = Pos.Right (txtToFind) + 1,
-                                         Y = Pos.Top (view),
-                                         Width = 20,
-                                         Enabled = !string.IsNullOrEmpty (txtToFind.Text),
-                                         TextAlignment = TextAlignment.Centered,
-                                         IsDefault = true,
-                                         Text = "Find _Next"
-                                     };
+            AutoSize = false,
+            X = Pos.Right (txtToFind) + 1,
+            Y = Pos.Top (view),
+            Width = 20,
+            Enabled = !string.IsNullOrEmpty (txtToFind.Text),
+            TextAlignment = TextAlignment.Centered,
+            IsDefault = true,
+            Text = "Find _Next"
+        };
         tab.Add (btnFindNext);
 
         var btnFindPrevious = new Button {
-                                             AutoSize = false,
-                                             X = Pos.Right (txtToFind) + 1,
-                                             Y = Pos.Top (btnFindNext) + 1,
-                                             Width = 20,
-                                             Enabled = !string.IsNullOrEmpty (txtToFind.Text),
-                                             TextAlignment = TextAlignment.Centered,
-                                             Text = "Find _Previous"
-                                         };
+            AutoSize = false,
+            X = Pos.Right (txtToFind) + 1,
+            Y = Pos.Top (btnFindNext) + 1,
+            Width = 20,
+            Enabled = !string.IsNullOrEmpty (txtToFind.Text),
+            TextAlignment = TextAlignment.Centered,
+            Text = "Find _Previous"
+        };
         tab.Add (btnFindPrevious);
 
         var btnCancel = new Button {
-                                       AutoSize = false,
-                                       X = Pos.Right (txtToFind) + 1,
-                                       Y = Pos.Top (btnFindPrevious) + 2,
-                                       Width = 20,
-                                       TextAlignment = TextAlignment.Centered,
-                                       Text = "Cancel"
-                                   };
+            AutoSize = false,
+            X = Pos.Right (txtToFind) + 1,
+            Y = Pos.Top (btnFindPrevious) + 2,
+            Width = 20,
+            TextAlignment = TextAlignment.Centered,
+            Text = "Cancel"
+        };
         tab.Add (btnCancel);
 
-        var ckbMatchCase = new CheckBox {
-                                            X = 0,
-                                            Y = Pos.Top (txtToFind) + 2,
-                                            Checked = true,
-                                            Text = "Match c_ase"
-                                        };
+        var ckbMatchCase = new CheckBox { X = 0, Y = Pos.Top (txtToFind) + 2, Checked = true, Text = "Match c_ase" };
         tab.Add (ckbMatchCase);
 
         var ckbMatchWholeWord = new CheckBox {
-                                                 X = 0,
-                                                 Y = Pos.Top (ckbMatchCase) + 1,
-                                                 Checked = false,
-                                                 Text = "Match _whole word"
-                                             };
+            X = 0, Y = Pos.Top (ckbMatchCase) + 1, Checked = false, Text = "Match _whole word"
+        };
         tab.Add (ckbMatchWholeWord);
 
-        var tabView = new TabView {
-                                      Width = Dim.Fill (),
-                                      Height = Dim.Fill ()
-                                  };
+        var tabView = new TabView { Width = Dim.Fill (), Height = Dim.Fill () };
         tabView.AddTab (new Tab { DisplayText = "Find", View = tab }, true);
 
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
 
         tab.Width = view.Width + txtToFind.Width + btnFindNext.Width + 2;
         tab.Height = btnFindNext.Height + btnFindPrevious.Height + btnCancel.Height + 4;
@@ -114,7 +97,15 @@ public class ButtonTests {
         Assert.Equal (new Rect (0, 3, 12, 1), ckbMatchCase.Frame);
         Assert.Equal (new Rect (0, 4, 18, 1), ckbMatchWholeWord.Frame);
         var btn1 =
-            $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Find Next {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
+            $"{
+                CM.Glyphs.LeftBracket
+            }{
+                CM.Glyphs.LeftDefaultIndicator
+            } Find Next {
+                CM.Glyphs.RightDefaultIndicator
+            }{
+                CM.Glyphs.RightBracket
+            }";
         var btn2 = $"{CM.Glyphs.LeftBracket} Find Previous {CM.Glyphs.RightBracket}";
         var btn3 = $"{CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}";
         var expected = @$"
@@ -123,10 +114,20 @@ public class ButtonTests {
 ││Find│                                              │
 ││    ╰─────────────────────────────────────────────╮│
 ││                                                  ││
-││   Find: Testing buttons.       {btn1}   ││
-││                               {btn2}  ││
-││{CM.Glyphs.Checked} Match case                                      ││
-││{CM.Glyphs.UnChecked} Match whole word                 {btn3}     ││
+││   Find: Testing buttons.       {
+    btn1
+}   ││
+││                               {
+    btn2
+}  ││
+││{
+    CM.Glyphs.Checked
+} Match case                                      ││
+││{
+    CM.Glyphs.UnChecked
+} Match whole word                 {
+    btn3
+}     ││
 │└──────────────────────────────────────────────────┘│
 └────────────────────────────────────────────────────┘
 ";
@@ -137,20 +138,13 @@ public class ButtonTests {
     [Fact]
     [AutoInitShutdown]
     public void AutoSize_Stays_True_AnchorEnd () {
-        var btn = new Button {
-                                 Y = Pos.Center (),
-                                 Text = "Say Hello 你",
-                                 AutoSize = true
-                             };
+        var btn = new Button { Y = Pos.Center (), Text = "Say Hello 你", AutoSize = true };
         var btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
 
         btn.X = Pos.AnchorEnd () - Pos.Function (() => btn.TextFormatter.Text.GetColumns ());
         btn.X = Pos.AnchorEnd () - Pos.Function (() => btn.TextFormatter.Text.GetColumns ());
 
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (btn);
         Application.Top.Add (win);
 
@@ -162,7 +156,9 @@ public class ButtonTests {
         var expected = @$"
 ┌────────────────────────────┐
 │                            │
-│            {btnTxt}│
+│            {
+    btnTxt
+}│
 │                            │
 └────────────────────────────┘
 ";
@@ -177,7 +173,9 @@ public class ButtonTests {
         expected = @$"
 ┌────────────────────────────┐
 │                            │
-│    {btnTxt}│
+│    {
+    btnTxt
+}│
 │                            │
 └────────────────────────────┘
 ";
@@ -188,16 +186,9 @@ public class ButtonTests {
     [Fact]
     [AutoInitShutdown]
     public void AutoSize_Stays_True_Center () {
-        var btn = new Button {
-                                 X = Pos.Center (),
-                                 Y = Pos.Center (),
-                                 Text = "Say Hello 你"
-                             };
+        var btn = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
 
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (btn);
         Application.Top.Add (win);
 
@@ -209,7 +200,11 @@ public class ButtonTests {
         var expected = @$"
 ┌────────────────────────────┐
 │                            │
-│      {CM.Glyphs.LeftBracket} Say Hello 你 {CM.Glyphs.RightBracket}      │
+│      {
+    CM.Glyphs.LeftBracket
+} Say Hello 你 {
+    CM.Glyphs.RightBracket
+}      │
 │                            │
 └────────────────────────────┘
 ";
@@ -223,7 +218,11 @@ public class ButtonTests {
         expected = @$"
 ┌────────────────────────────┐
 │                            │
-│  {CM.Glyphs.LeftBracket} Say Hello 你 changed {CM.Glyphs.RightBracket}  │
+│  {
+    CM.Glyphs.LeftBracket
+} Say Hello 你 changed {
+    CM.Glyphs.RightBracket
+}  │
 │                            │
 └────────────────────────────┘
 ";
@@ -234,16 +233,9 @@ public class ButtonTests {
     [Fact]
     [AutoInitShutdown]
     public void AutoSize_Stays_True_With_EmptyText () {
-        var btn = new Button {
-                                 X = Pos.Center (),
-                                 Y = Pos.Center (),
-                                 AutoSize = true
-                             };
+        var btn = new Button { X = Pos.Center (), Y = Pos.Center (), AutoSize = true };
 
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (btn);
         Application.Top.Add (win);
 
@@ -261,7 +253,11 @@ public class ButtonTests {
         var expected = @$"
 ┌────────────────────────────┐
 │                            │
-│      {CM.Glyphs.LeftBracket} Say Hello 你 {CM.Glyphs.RightBracket}      │
+│      {
+    CM.Glyphs.LeftBracket
+} Say Hello 你 {
+    CM.Glyphs.RightBracket
+}      │
 │                            │
 └────────────────────────────┘
 ";
@@ -276,21 +272,21 @@ public class ButtonTests {
 
         var top = new View { Width = 20, Height = 5 };
         var btn1 = new Button {
-                                  AutoSize = false,
-                                  X = Pos.Center (),
-                                  Y = Pos.Center (),
-                                  Width = 16,
-                                  Height = 1,
-                                  Text = "Open me!"
-                              };
+            AutoSize = false,
+            X = Pos.Center (),
+            Y = Pos.Center (),
+            Width = 16,
+            Height = 1,
+            Text = "Open me!"
+        };
         var btn2 = new Button {
-                                  AutoSize = false,
-                                  X = Pos.Center (),
-                                  Y = Pos.Center () + 1,
-                                  Width = 16,
-                                  Height = 1,
-                                  Text = "Close me!"
-                              };
+            AutoSize = false,
+            X = Pos.Center (),
+            Y = Pos.Center () + 1,
+            Width = 16,
+            Height = 1,
+            Text = "Close me!"
+        };
         top.Add (btn1, btn2);
         top.BeginInit ();
         top.EndInit ();
@@ -299,10 +295,23 @@ public class ButtonTests {
         Assert.Equal ("{Width=16, Height=1}", btn1.TextFormatter.Size.ToString ());
         Assert.Equal ("{Width=16, Height=1}", btn2.TextFormatter.Size.ToString ());
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @$"
-    {CM.Glyphs.LeftBracket} {btn1.Text} {CM.Glyphs.RightBracket}
-   {CM.Glyphs.LeftBracket} {btn2.Text} {CM.Glyphs.RightBracket}",
-                                                      _output);
+            @$"
+    {
+        CM.Glyphs.LeftBracket
+    } {
+        btn1.Text
+    } {
+        CM.Glyphs.RightBracket
+    }
+   {
+       CM.Glyphs.LeftBracket
+   } {
+       btn2.Text
+   } {
+       CM.Glyphs.RightBracket
+   }",
+            _output
+        );
     }
 
     [Fact]
@@ -381,7 +390,11 @@ public class ButtonTests {
         btn.Draw ();
 
         var expected = @$"
-{CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}
+{
+    CM.Glyphs.LeftBracket
+}  {
+    CM.Glyphs.RightBracket
+}
 ";
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
@@ -393,8 +406,17 @@ public class ButtonTests {
         Assert.Equal ("_Test", btn.Text);
 
         Assert.Equal (
-                      $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Test {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}",
-                      btn.TextFormatter.Format ());
+            $"{
+                CM.Glyphs.LeftBracket
+            }{
+                CM.Glyphs.LeftDefaultIndicator
+            } Test {
+                CM.Glyphs.RightDefaultIndicator
+            }{
+                CM.Glyphs.RightBracket
+            }",
+            btn.TextFormatter.Format ()
+        );
         Assert.True (btn.IsDefault);
         Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
         Assert.True (btn.CanFocus);
@@ -409,8 +431,17 @@ public class ButtonTests {
         Assert.Equal (Key.A, btn.HotKey);
 
         Assert.Equal (
-                      $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} abc {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}",
-                      btn.TextFormatter.Format ());
+            $"{
+                CM.Glyphs.LeftBracket
+            }{
+                CM.Glyphs.LeftDefaultIndicator
+            } abc {
+                CM.Glyphs.RightDefaultIndicator
+            }{
+                CM.Glyphs.RightBracket
+            }",
+            btn.TextFormatter.Format ()
+        );
         Assert.True (btn.IsDefault);
         Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
@@ -420,7 +451,15 @@ public class ButtonTests {
         btn.Draw ();
 
         expected = @$"
- {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} abc {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}
+ {
+     CM.Glyphs.LeftBracket
+ }{
+     CM.Glyphs.LeftDefaultIndicator
+ } abc {
+     CM.Glyphs.RightDefaultIndicator
+ }{
+     CM.Glyphs.RightBracket
+ }
 ";
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
@@ -607,15 +646,8 @@ public class ButtonTests {
     [Fact]
     [AutoInitShutdown]
     public void Update_Only_On_Or_After_Initialize () {
-        var btn = new Button {
-                                 X = Pos.Center (),
-                                 Y = Pos.Center (),
-                                 Text = "Say Hello 你"
-                             };
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
+        var btn = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (btn);
         Application.Top.Add (win);
 
@@ -635,7 +667,9 @@ public class ButtonTests {
         var expected = @$"
 ┌────────────────────────────┐
 │                            │
-│      {btnTxt}      │
+│      {
+    btnTxt
+}      │
 │                            │
 └────────────────────────────┘
 ";
@@ -647,15 +681,8 @@ public class ButtonTests {
     [Fact]
     [AutoInitShutdown]
     public void Update_Parameterless_Only_On_Or_After_Initialize () {
-        var btn = new Button {
-                                 X = Pos.Center (),
-                                 Y = Pos.Center (),
-                                 Text = "Say Hello 你"
-                             };
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
+        var btn = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (btn);
         Application.Top.Add (win);
 
@@ -675,7 +702,9 @@ public class ButtonTests {
         var expected = @$"
 ┌────────────────────────────┐
 │                            │
-│      {btnTxt}      │
+│      {
+    btnTxt
+}      │
 │                            │
 └────────────────────────────┘
 ";

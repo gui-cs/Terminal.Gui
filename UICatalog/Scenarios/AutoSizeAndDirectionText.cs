@@ -11,44 +11,42 @@ public class AutoSizeAndDirectionText : Scenario {
         ColorScheme color = Colors.ColorSchemes["Dialog"];
 
         var labelH = new Label {
-                                   X = 1,
-                                   Y = 1,
-                                //    Width = 11,
-                                //    Height = 1,
-                                   ColorScheme = color,
-                                   Text = text,
-                                   TextDirection = TextDirection.LeftRight_TopBottom
-                               };
+            X = 1,
+            Y = 1,
+
+            //    Width = 11,
+            //    Height = 1,
+            ColorScheme = color,
+            Text = text,
+            TextDirection = TextDirection.LeftRight_TopBottom
+        };
         Win.Add (labelH);
 
         var labelV = new Label {
-                                   X = 70,
-                                   Y = 1,
-                                //    Width = 1,
-                                //    Height = 11,
-                                   ColorScheme = color,
-                                   Text = text,
-                                   TextDirection = TextDirection.TopBottom_LeftRight
-                               };
+            X = 70,
+            Y = 1,
+
+            //    Width = 1,
+            //    Height = 11,
+            ColorScheme = color,
+            Text = text,
+            TextDirection = TextDirection.TopBottom_LeftRight
+        };
         Win.Add (labelV);
 
         var editText = new TextView {
-                                        X = Pos.Center (),
-                                        Y = Pos.Center (),
-                                        Width = 20,
-                                        Height = 5,
-                                        Text = text
-                                    };
+            X = Pos.Center (),
+            Y = Pos.Center (),
+            Width = 20,
+            Height = 5,
+            Text = text
+        };
 
         editText.SetFocus ();
 
         Win.Add (editText);
 
-        var ckbDirection = new CheckBox {
-                                            Text = "Toggle Direction",
-                                            X = Pos.Center (),
-                                            Y = Pos.Center () + 3
-                                        };
+        var ckbDirection = new CheckBox { Text = "Toggle Direction", X = Pos.Center (), Y = Pos.Center () + 3 };
         ckbDirection.Toggled += (s, e) => {
             if (labelH.TextDirection == TextDirection.LeftRight_TopBottom) {
                 labelH.TextDirection = TextDirection.TopBottom_LeftRight;
@@ -61,30 +59,23 @@ public class AutoSizeAndDirectionText : Scenario {
         Win.Add (ckbDirection);
 
         var ckbAutoSize = new CheckBox {
-                                           Text = "Auto Size",
-                                           X = Pos.Center (),
-                                           Y = Pos.Center () + 5,
-                                           Checked = labelH.AutoSize = labelV.AutoSize
-                                       };
+            Text = "Auto Size", X = Pos.Center (), Y = Pos.Center () + 5, Checked = labelH.AutoSize = labelV.AutoSize
+        };
         ckbAutoSize.Toggled += (s, e) => labelH.AutoSize = labelV.AutoSize = (bool)ckbAutoSize.Checked;
         Win.Add (ckbAutoSize);
 
         var ckbPreserveTrailingSpaces = new CheckBox {
-                                                         Text = "Preserve Trailing Spaces",
-                                                         X = Pos.Center (),
-                                                         Y = Pos.Center () + 7,
-                                                         Checked = labelH.PreserveTrailingSpaces =
-                                                                       labelV.PreserveTrailingSpaces
-                                                     };
+            Text = "Preserve Trailing Spaces",
+            X = Pos.Center (),
+            Y = Pos.Center () + 7,
+            Checked = labelH.PreserveTrailingSpaces =
+                          labelV.PreserveTrailingSpaces
+        };
         ckbPreserveTrailingSpaces.Toggled += (s, e) =>
             labelH.PreserveTrailingSpaces = labelV.PreserveTrailingSpaces = (bool)ckbPreserveTrailingSpaces.Checked;
         Win.Add (ckbPreserveTrailingSpaces);
 
-        var ckbWideText = new CheckBox {
-                                           Text = "Use wide runes",
-                                           X = Pos.Center (),
-                                           Y = Pos.Center () + 9
-                                       };
+        var ckbWideText = new CheckBox { Text = "Use wide runes", X = Pos.Center (), Y = Pos.Center () + 9 };
         ckbWideText.Toggled += (s, e) => {
             if (ckbWideText.Checked == true) {
                 labelH.Text = labelV.Text = editText.Text = wideText;

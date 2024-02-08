@@ -3,8 +3,8 @@
 namespace Terminal.Gui.DialogTests;
 
 public class WizardTests {
-    private readonly ITestOutputHelper _output;
     public WizardTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     // =========== Wizard Tests
     [Fact]
@@ -398,19 +398,55 @@ public class WizardTests {
         var btnBack = string.Empty; // $"{CM.Glyphs.LeftBracket} {btnBackText} {CM.Glyphs.RightBracket}";
         var btnNextText = "Finish"; // "Next";
         var btnNext =
-            $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} {btnNextText} {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
+            $"{
+                CM.Glyphs.LeftBracket
+            }{
+                CM.Glyphs.LeftDefaultIndicator
+            } {
+                btnNextText
+            } {
+                CM.Glyphs.RightDefaultIndicator
+            }{
+                CM.Glyphs.RightBracket
+            }";
 
         var topRow =
-            $"{CM.Glyphs.ULCornerDbl}╡{title} - {stepTitle}╞{new string (CM.Glyphs.HLineDbl.ToString ()[0], width - title.Length - stepTitle.Length - 7)}{CM.Glyphs.URCornerDbl}";
+            $"{
+                CM.Glyphs.ULCornerDbl
+            }╡{
+                title
+            } - {
+                stepTitle
+            }╞{
+                new string (CM.Glyphs.HLineDbl.ToString ()[0], width - title.Length - stepTitle.Length - 7)
+            }{
+                CM.Glyphs.URCornerDbl
+            }";
         var row2 = $"{CM.Glyphs.VLineDbl}{new string (' ', width - 2)}{CM.Glyphs.VLineDbl}";
         string row3 = row2;
         string row4 = row3;
         var separatorRow =
             $"{CM.Glyphs.VLineDbl}{new string (CM.Glyphs.HLine.ToString ()[0], width - 2)}{CM.Glyphs.VLineDbl}";
         var buttonRow =
-            $"{CM.Glyphs.VLineDbl}{btnBack}{new string (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{CM.Glyphs.VLineDbl}";
+            $"{
+                CM.Glyphs.VLineDbl
+            }{
+                btnBack
+            }{
+                new string (' ', width - btnBack.Length - btnNext.Length - 2)
+            }{
+                btnNext
+            }{
+                CM.Glyphs.VLineDbl
+            }";
         var bottomRow =
-            $"{CM.Glyphs.LLCornerDbl}{new string (CM.Glyphs.HLineDbl.ToString ()[0], width - 2)}{CM.Glyphs.LRCornerDbl}";
+            $"{
+                CM.Glyphs.LLCornerDbl
+            }{
+                new string (CM.Glyphs.HLineDbl.ToString ()[0], width - 2)
+            }{
+                CM.Glyphs.LRCornerDbl
+            }";
 
         var wizard = new Wizard { Title = title, Width = width, Height = height };
         wizard.AddStep (new WizardStep { Title = stepTitle });
@@ -421,8 +457,9 @@ public class WizardTests {
         Application.RunIteration (ref runstate, ref firstIteration);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      $"{topRow}\n{row2}\n{row3}\n{row4}\n{separatorRow}\n{buttonRow}\n{bottomRow}",
-                                                      _output);
+            $"{topRow}\n{row2}\n{row3}\n{row4}\n{separatorRow}\n{buttonRow}\n{bottomRow}",
+            _output
+        );
         Application.End (runstate);
     }
 
@@ -442,10 +479,30 @@ public class WizardTests {
 
         var btnNextText = "Finish";
         var btnNext =
-            $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} {btnNextText} {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
+            $"{
+                CM.Glyphs.LeftBracket
+            }{
+                CM.Glyphs.LeftDefaultIndicator
+            } {
+                btnNextText
+            } {
+                CM.Glyphs.RightDefaultIndicator
+            }{
+                CM.Glyphs.RightBracket
+            }";
 
         var topRow =
-            $"{CM.Glyphs.ULCornerDbl}╡{title}{stepTitle}╞{new string (CM.Glyphs.HLineDbl.ToString ()[0], width - title.Length - stepTitle.Length - 4)}{CM.Glyphs.URCornerDbl}";
+            $"{
+                CM.Glyphs.ULCornerDbl
+            }╡{
+                title
+            }{
+                stepTitle
+            }╞{
+                new string (CM.Glyphs.HLineDbl.ToString ()[0], width - title.Length - stepTitle.Length - 4)
+            }{
+                CM.Glyphs.URCornerDbl
+            }";
         var separatorRow =
             $"{CM.Glyphs.VLineDbl}{new string (CM.Glyphs.HLine.ToString ()[0], width - 2)}{CM.Glyphs.VLineDbl}";
 
@@ -455,15 +512,22 @@ public class WizardTests {
 
         //var buttonRow = $"{CM.Glyphs.VDLine}{new String (' ', width - btnNext.Length - 2)}{btnNext}{CM.Glyphs.VDLine}";
         var bottomRow =
-            $"{CM.Glyphs.LLCornerDbl}{new string (CM.Glyphs.HLineDbl.ToString ()[0], width - 2)}{CM.Glyphs.LRCornerDbl}";
+            $"{
+                CM.Glyphs.LLCornerDbl
+            }{
+                new string (CM.Glyphs.HLineDbl.ToString ()[0], width - 2)
+            }{
+                CM.Glyphs.LRCornerDbl
+            }";
 
         var wizard = new Wizard { Title = title, Width = width, Height = height };
         wizard.AddStep (new WizardStep { Title = "ABCD" });
 
         Application.End (Application.Begin (wizard));
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      $"{topRow}\n{separatorRow}\n{buttonRow}\n{bottomRow}",
-                                                      _output);
+            $"{topRow}\n{separatorRow}\n{buttonRow}\n{bottomRow}",
+            _output
+        );
     }
 
     [Fact]
@@ -577,24 +641,61 @@ public class WizardTests {
         var btnBack = $"{CM.Glyphs.LeftBracket} {btnBackText} {CM.Glyphs.RightBracket}";
         var btnNextText = "Finish";
         var btnNext =
-            $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} {btnNextText} {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
+            $"{
+                CM.Glyphs.LeftBracket
+            }{
+                CM.Glyphs.LeftDefaultIndicator
+            } {
+                btnNextText
+            } {
+                CM.Glyphs.RightDefaultIndicator
+            }{
+                CM.Glyphs.RightBracket
+            }";
 
         var topRow =
-            $"{CM.Glyphs.ULCornerDbl}╡{title}{stepTitle}╞{new string (CM.Glyphs.HLineDbl.ToString ()[0], width - title.Length - stepTitle.Length - 4)}{CM.Glyphs.URCornerDbl}";
+            $"{
+                CM.Glyphs.ULCornerDbl
+            }╡{
+                title
+            }{
+                stepTitle
+            }╞{
+                new string (CM.Glyphs.HLineDbl.ToString ()[0], width - title.Length - stepTitle.Length - 4)
+            }{
+                CM.Glyphs.URCornerDbl
+            }";
         var row2 = $"{CM.Glyphs.VLineDbl}{new string (' ', width - 2)}{CM.Glyphs.VLineDbl}";
         string row3 = row2;
         var separatorRow =
             $"{CM.Glyphs.VLineDbl}{new string (CM.Glyphs.HLine.ToString ()[0], width - 2)}{CM.Glyphs.VLineDbl}";
         var buttonRow =
-            $"{CM.Glyphs.VLineDbl}{btnBack}{new string (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{CM.Glyphs.VLineDbl}";
+            $"{
+                CM.Glyphs.VLineDbl
+            }{
+                btnBack
+            }{
+                new string (' ', width - btnBack.Length - btnNext.Length - 2)
+            }{
+                btnNext
+            }{
+                CM.Glyphs.VLineDbl
+            }";
         var bottomRow =
-            $"{CM.Glyphs.LLCornerDbl}{new string (CM.Glyphs.HLineDbl.ToString ()[0], width - 2)}{CM.Glyphs.LRCornerDbl}";
+            $"{
+                CM.Glyphs.LLCornerDbl
+            }{
+                new string (CM.Glyphs.HLineDbl.ToString ()[0], width - 2)
+            }{
+                CM.Glyphs.LRCornerDbl
+            }";
 
         var wizard = new Wizard { Title = title, Width = width, Height = height };
         RunState runstate = Application.Begin (wizard);
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      $"{topRow}\n{row2}\n{row3}\n{separatorRow}\n{buttonRow}\n{bottomRow}",
-                                                      _output);
+            $"{topRow}\n{row2}\n{row3}\n{separatorRow}\n{buttonRow}\n{bottomRow}",
+            _output
+        );
         Application.End (runstate);
     }
 

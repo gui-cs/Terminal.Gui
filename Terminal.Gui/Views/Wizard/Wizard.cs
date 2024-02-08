@@ -50,28 +50,6 @@ namespace Terminal.Gui;
 /// </code>
 /// </example>
 public class Wizard : Dialog {
-    private readonly LinkedList<WizardStep> _steps = new ();
-    private WizardStep _currentStep;
-    private bool _finishedPressed;
-
-    ///// <summary>
-    ///// The title of the Wizard, shown at the top of the Wizard with " - currentStep.Title" appended.
-    ///// </summary>
-    ///// <remarks>
-    ///// The Title is only displayed when the <see cref="Wizard"/> <see cref="Wizard.Modal"/> is set to <c>false</c>.
-    ///// </remarks>
-    //public new string Title {
-    //	get {
-    //		// The base (Dialog) Title holds the full title ("Wizard Title - Step Title")
-    //		return base.Title;
-    //	}
-    //	set {
-    //		wizardTitle = value;
-    //		base.Title = $"{wizardTitle}{(steps.Count > 0 && currentStep != null ? " - " + currentStep.Title : string.Empty)}";
-    //	}
-    //}
-    private string _wizardTitle = string.Empty;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="Wizard"/> class using <see cref="LayoutStyle.Computed"/>
     ///     positioning.
@@ -87,9 +65,7 @@ public class Wizard : Dialog {
         BorderStyle = LineStyle.Double;
 
         //// Add a horiz separator
-        var separator = new LineView (Orientation.Horizontal) {
-                                                                  Y = Pos.AnchorEnd (2)
-                                                              };
+        var separator = new LineView (Orientation.Horizontal) { Y = Pos.AnchorEnd (2) };
         Add (separator);
 
         // BUGBUG: Space is to work around https://github.com/gui-cs/Terminal.Gui/issues/1812
@@ -115,15 +91,27 @@ public class Wizard : Dialog {
         SetNeedsLayout ();
     }
 
-    /// <summary>
-    ///     If the <see cref="CurrentStep"/> is not the first step in the wizard, this button causes the
-    ///     <see cref="MovingBack"/> event to be fired and the wizard moves to the previous step.
-    /// </summary>
-    /// <remarks>Use the <see cref="MovingBack"></see> event to be notified when the user attempts to go back.</remarks>
-    public Button BackButton { get; }
+    private readonly LinkedList<WizardStep> _steps = new ();
+    private bool _finishedPressed;
 
-    /// <summary>Gets or sets the currently active <see cref="WizardStep"/>.</summary>
-    public WizardStep CurrentStep { get => _currentStep; set => GoToStep (value); }
+    ///// <summary>
+    ///// The title of the Wizard, shown at the top of the Wizard with " - currentStep.Title" appended.
+    ///// </summary>
+    ///// <remarks>
+    ///// The Title is only displayed when the <see cref="Wizard"/> <see cref="Wizard.Modal"/> is set to <c>false</c>.
+    ///// </remarks>
+    //public new string Title {
+    //	get {
+    //		// The base (Dialog) Title holds the full title ("Wizard Title - Step Title")
+    //		return base.Title;
+    //	}
+    //	set {
+    //		wizardTitle = value;
+    //		base.Title = $"{wizardTitle}{(steps.Count > 0 && currentStep != null ? " - " + currentStep.Title : string.Empty)}";
+    //	}
+    //}
+    private string _wizardTitle = string.Empty;
+    private WizardStep _currentStep;
 
     /// <summary>
     ///     Determines whether the <see cref="Wizard"/> is displayed as modal pop-up or not. The default is
@@ -170,6 +158,13 @@ public class Wizard : Dialog {
     }
 
     /// <summary>
+    ///     If the <see cref="CurrentStep"/> is not the first step in the wizard, this button causes the
+    ///     <see cref="MovingBack"/> event to be fired and the wizard moves to the previous step.
+    /// </summary>
+    /// <remarks>Use the <see cref="MovingBack"></see> event to be notified when the user attempts to go back.</remarks>
+    public Button BackButton { get; }
+
+    /// <summary>
     ///     If the <see cref="CurrentStep"/> is the last step in the wizard, this button causes the <see cref="Finished"/>
     ///     event to be fired and the wizard to close. If the step is not the last step, the <see cref="MovingNext"/> event
     ///     will be fired and the wizard will move next step.
@@ -179,6 +174,9 @@ public class Wizard : Dialog {
     ///     attempts go to the next step or finish the wizard.
     /// </remarks>
     public Button NextFinishButton { get; }
+
+    /// <summary>Gets or sets the currently active <see cref="WizardStep"/>.</summary>
+    public WizardStep CurrentStep { get => _currentStep; set => GoToStep (value); }
 
     /// <summary>
     ///     Adds a step to the wizard. The Next and Back buttons navigate through the added steps in the order they were

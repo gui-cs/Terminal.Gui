@@ -74,8 +74,9 @@ public partial class ColorTests {
 
     [Theory]
     [MemberData (
-                    nameof (ColorTestsTheoryDataGenerators.TryParse_string_Returns_False_For_Invalid_Inputs),
-                    MemberType = typeof (ColorTestsTheoryDataGenerators))]
+        nameof (ColorTestsTheoryDataGenerators.TryParse_string_Returns_False_For_Invalid_Inputs),
+        MemberType = typeof (ColorTestsTheoryDataGenerators)
+    )]
     public void TryParse_string_Returns_False_For_Invalid_Inputs (string? input) {
         bool tryParseStatus = Color.TryParse (input, out Color? color);
         Assert.False (tryParseStatus);
@@ -84,8 +85,9 @@ public partial class ColorTests {
 
     [Theory]
     [MemberData (
-                    nameof (ColorTestsTheoryDataGenerators.TryParse_string_Returns_True_For_Valid_Inputs),
-                    MemberType = typeof (ColorTestsTheoryDataGenerators))]
+        nameof (ColorTestsTheoryDataGenerators.TryParse_string_Returns_True_For_Valid_Inputs),
+        MemberType = typeof (ColorTestsTheoryDataGenerators)
+    )]
     public void TryParse_string_Returns_True_For_Valid_Inputs (string input, int expectedColorArgb) {
         bool tryParseStatus = Color.TryParse (input, out Color? color);
         Assert.True (tryParseStatus);
@@ -97,11 +99,10 @@ public partial class ColorTests {
 
 public static partial class ColorTestsTheoryDataGenerators {
     public static TheoryData<string?> TryParse_string_Returns_False_For_Invalid_Inputs () {
-        TheoryData<string?> values =  [
-            null
-        ]
-
-        ;
+        TheoryData<string?> values = [
+                                         null
+                                     ]
+            ;
         for (var i = char.MinValue; i < 255; i++) {
             if (!char.IsAsciiDigit (i)) {
                 values.Add ($"rgb({i},{i},{i})");
@@ -124,9 +125,8 @@ public static partial class ColorTestsTheoryDataGenerators {
     }
 
     public static TheoryData<string?, int> TryParse_string_Returns_True_For_Valid_Inputs () {
-        TheoryData<string?, int> values =  []
-
-        ;
+        TheoryData<string?, int> values = []
+            ;
         for (byte i = 16; i < 224; i += 32) {
             // Using this so the span only has to be written one way.
             int expectedRgb = BinaryPrimitives.ReadInt32LittleEndian ([(byte)(i + 16), i, (byte)(i - 16), 255]);
@@ -141,26 +141,29 @@ public static partial class ColorTestsTheoryDataGenerators {
 
         for (byte i = 1; i < 0xE; i++) {
             values.Add (
-                        $"#{i - 1:X0}{i:X0}{i + 1:X0}",
-                        BinaryPrimitives.ReadInt32LittleEndian (
-                            [
-
-                             // Have to stick the least significant 4 bits in the most significant 4 bits to duplicate the hex values
-                             // Breaking this out just so it's easier to see.
-                             (byte)((i + 1) | ((i + 1) << 4)),
-                             (byte)(i | (i << 4)),
-                             (byte)((i - 1) | ((i - 1) << 4)),
-                             255
-                            ]));
+                $"#{i - 1:X0}{i:X0}{i + 1:X0}",
+                BinaryPrimitives.ReadInt32LittleEndian (
+                    [
+                        // Have to stick the least significant 4 bits in the most significant 4 bits to duplicate the hex values
+                        // Breaking this out just so it's easier to see.
+                        (byte)((i + 1) | ((i + 1) << 4)),
+                        (byte)(i | (i << 4)),
+                        (byte)((i - 1) | ((i - 1) << 4)),
+                        255
+                    ]
+                )
+            );
             values.Add (
-                        $"#{i:X0}{i - 1:X0}{i:X0}{i + 1:X0}",
-                        BinaryPrimitives.ReadInt32LittleEndian (
-                            [
-                             (byte)((i + 1) | ((i + 1) << 4)),
-                             (byte)(i | (i << 4)),
-                             (byte)((i - 1) | ((i - 1) << 4)),
-                             (byte)(i | (i << 4))
-                            ]));
+                $"#{i:X0}{i - 1:X0}{i:X0}{i + 1:X0}",
+                BinaryPrimitives.ReadInt32LittleEndian (
+                    [
+                        (byte)((i + 1) | ((i + 1) << 4)),
+                        (byte)(i | (i << 4)),
+                        (byte)((i - 1) | ((i - 1) << 4)),
+                        (byte)(i | (i << 4))
+                    ]
+                )
+            );
         }
 
         return values;

@@ -26,13 +26,13 @@ public class TextFormatterDemo : Scenario {
             "Τὴ γλῶσσα μοῦ ἔδωσαν ἑλληνικὴ\nτὸ σπίτι φτωχικὸ στὶς ἀμμουδιὲς τοῦ Ὁμήρου.\nΜονάχη ἔγνοια ἡ γλῶσσα μου στὶς ἀμμουδιὲς τοῦ Ὁμήρου.";
 
         var blockText = new Label {
-                                      ColorScheme = Colors.ColorSchemes["TopLevel"],
-                                      X = 0,
-                                      Y = 0,
-                                      AutoSize = false,
-                                      Height = 10,
-                                      Width = Dim.Fill (),
-                                  };
+            ColorScheme = Colors.ColorSchemes["TopLevel"],
+            X = 0,
+            Y = 0,
+            AutoSize = false,
+            Height = 10,
+            Width = Dim.Fill ()
+        };
 
         var block = new StringBuilder ();
         block.AppendLine ("  ▄████  █    ██  ██▓      ▄████▄    ██████ ");
@@ -49,11 +49,11 @@ public class TextFormatterDemo : Scenario {
         Win.Add (blockText);
 
         var unicodeCheckBox = new CheckBox {
-                                               X = 0,
-                                               Y = Pos.Bottom (blockText) + 1,
-                                               Text = "Unicode",
-                                               Checked = Application.Top.HotKeySpecifier == (Rune)' '
-                                           };
+            X = 0,
+            Y = Pos.Bottom (blockText) + 1,
+            Text = "Unicode",
+            Checked = Application.Top.HotKeySpecifier == (Rune)' '
+        };
 
         Win.Add (unicodeCheckBox);
 
@@ -65,28 +65,28 @@ public class TextFormatterDemo : Scenario {
 
         foreach (TextAlignment alignment in alignments) {
             singleLines[(int)alignment] = new Label {
-                                                        TextAlignment = alignment,
-                                                        X = 0,
-                                                        AutoSize = false,
-                                                        Width = Dim.Fill (),
-                                                        Height = 1,
-                                                        ColorScheme = Colors.ColorSchemes["Dialog"],
-                                                        Text = text
-                                                    };
+                TextAlignment = alignment,
+                X = 0,
+                AutoSize = false,
+                Width = Dim.Fill (),
+                Height = 1,
+                ColorScheme = Colors.ColorSchemes["Dialog"],
+                Text = text
+            };
             multipleLines[(int)alignment] = new Label {
-                                                          TextAlignment = alignment,
-                                                          X = 0,
-                                                          AutoSize = false,
-                                                          Width = Dim.Fill (),
-                                                          Height = multiLineHeight,
-                                                          ColorScheme = Colors.ColorSchemes["Dialog"],
-                                                          Text = text
-                                                      };
+                TextAlignment = alignment,
+                X = 0,
+                AutoSize = false,
+                Width = Dim.Fill (),
+                Height = multiLineHeight,
+                ColorScheme = Colors.ColorSchemes["Dialog"],
+                Text = text
+            };
         }
 
         var label = new Label {
-                                  Y = Pos.Bottom (unicodeCheckBox) + 1, Text = "Demonstrating multi-line and word wrap:"
-                              };
+            Y = Pos.Bottom (unicodeCheckBox) + 1, Text = "Demonstrating multi-line and word wrap:"
+        };
         Win.Add (label);
         foreach (TextAlignment alignment in alignments) {
             label = new Label { Y = Pos.Bottom (label), Text = $"{alignment}:" };

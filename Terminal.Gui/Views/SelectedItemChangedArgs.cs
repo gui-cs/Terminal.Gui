@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>Event arguments for the SelectedItemChagned event.</summary>
 public class SelectedItemChangedArgs : EventArgs {

@@ -47,8 +47,8 @@ public class OpenDialog : FileDialog {
     /// <summary>Returns the selected files, or an empty list if nothing has been selected</summary>
     /// <value>The file paths.</value>
     public IReadOnlyList<string> FilePaths =>
-        Canceled ? Enumerable.Empty<string> ().ToList ().AsReadOnly ()
-        : AllowsMultipleSelection ? MultiSelected : new ReadOnlyCollection<string> (new[] { Path });
+        Canceled ? Enumerable.Empty<string> ().ToList ().AsReadOnly () :
+        AllowsMultipleSelection ? MultiSelected : new ReadOnlyCollection<string> (new[] { Path });
 
     /// <inheritdoc/>
     public override OpenMode OpenMode {

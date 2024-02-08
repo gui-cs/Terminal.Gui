@@ -1,7 +1,14 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>Renders a continuous line with grid line ticks and labels</summary>
 public abstract class Axis {
+    /// <summary>Populates base properties and sets the read only <see cref="Orientation"/></summary>
+    /// <param name="orientation"></param>
+    protected Axis (Orientation orientation) {
+        Orientation = orientation;
+        LabelGetter = DefaultLabelGetter;
+    }
+
     /// <summary>Default value for <see cref="ShowLabelsEvery"/></summary>
     private const uint DefaultShowLabelsEvery = 5;
 
@@ -11,12 +18,8 @@ public abstract class Axis {
     /// </summary>
     public LabelGetterDelegate LabelGetter;
 
-    /// <summary>Populates base properties and sets the read only <see cref="Orientation"/></summary>
-    /// <param name="orientation"></param>
-    protected Axis (Orientation orientation) {
-        Orientation = orientation;
-        LabelGetter = DefaultLabelGetter;
-    }
+    /// <summary>True to render axis.  Defaults to true</summary>
+    public bool Visible { get; set; } = true;
 
     /// <summary>Number of units of graph space between ticks on axis. 0 for no ticks</summary>
     /// <value></value>
@@ -29,17 +32,14 @@ public abstract class Axis {
     /// <value></value>
     public Orientation Orientation { get; }
 
-    /// <summary>The number of <see cref="Increment"/> before an label is added. 0 = never show labels</summary>
-    public uint ShowLabelsEvery { get; set; } = DefaultShowLabelsEvery;
-
     /// <summary>
     ///     Displayed below/to left of labels (see <see cref="Orientation"/>). If text is not visible, check
     ///     <see cref="GraphView.MarginBottom"/> / <see cref="GraphView.MarginLeft"/>
     /// </summary>
     public string Text { get; set; }
 
-    /// <summary>True to render axis.  Defaults to true</summary>
-    public bool Visible { get; set; } = true;
+    /// <summary>The number of <see cref="Increment"/> before an label is added. 0 = never show labels</summary>
+    public uint ShowLabelsEvery { get; set; } = DefaultShowLabelsEvery;
 
     /// <summary>
     ///     Draws a custom label <paramref name="text"/> at <paramref name="screenPosition"/> units along the axis (X or Y
@@ -418,8 +418,6 @@ public class VerticalAxis : Axis {
 
 /// <summary>A location on an axis of a <see cref="GraphView"/> that may or may not have a label associated with it</summary>
 public class AxisIncrementToRender {
-    private string _text = "";
-
     /// <summary>Describe a new section of an axis that requires an axis increment symbol and/or label</summary>
     /// <param name="orientation"></param>
     /// <param name="screen"></param>
@@ -430,14 +428,16 @@ public class AxisIncrementToRender {
         Value = value;
     }
 
-    /// <summary>Direction of the parent axis</summary>
-    public Orientation Orientation { get; }
+    private string _text = "";
+
+    /// <summary>The value at this position on the axis in graph space</summary>
+    public float Value { get; }
 
     /// <summary>The screen location (X or Y depending on <see cref="Orientation"/>) that the increment will be rendered at</summary>
     public int ScreenLocation { get; }
 
-    /// <summary>The value at this position on the axis in graph space</summary>
-    public float Value { get; }
+    /// <summary>Direction of the parent axis</summary>
+    public Orientation Orientation { get; }
 
     /// <summary>The text (if any) that should be displayed at this axis increment</summary>
     /// <value></value>

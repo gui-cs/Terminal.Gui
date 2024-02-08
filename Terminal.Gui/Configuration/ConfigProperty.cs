@@ -16,9 +16,6 @@ namespace Terminal.Gui;
 ///     attribute.
 /// </remarks>
 public class ConfigProperty {
-    /// <summary>Describes the property.</summary>
-    public PropertyInfo? PropertyInfo { get; set; }
-
     /// <summary>
     ///     Holds the property's value as it was either read from the class's implementation or from a config file. If the
     ///     property has not been set (e.g. because no configuration file specified a value), this will be
@@ -29,6 +26,9 @@ public class ConfigProperty {
     ///     of the object that are non-null).
     /// </remarks>
     public object? PropertyValue { get; set; }
+
+    /// <summary>Describes the property.</summary>
+    public PropertyInfo? PropertyInfo { get; set; }
 
     /// <summary>Applies the <see cref="PropertyValue"/> to the property described by <see cref="PropertyInfo"/>.</summary>
     /// <returns></returns>
@@ -47,8 +47,9 @@ public class ConfigProperty {
 
                     // Handle the inner exception here
                     throw new JsonException (
-                                             $"Error Applying Configuration Change: {innerException.Message}",
-                                             innerException);
+                        $"Error Applying Configuration Change: {innerException.Message}",
+                        innerException
+                    );
                 }
 
                 // Handle the outer exception or rethrow it if needed
@@ -56,8 +57,9 @@ public class ConfigProperty {
             }
             catch (ArgumentException ae) {
                 throw new JsonException (
-                                         $"Error Applying Configuration Change ({PropertyInfo?.Name}): {ae.Message}",
-                                         ae);
+                    $"Error Applying Configuration Change ({PropertyInfo?.Name}): {ae.Message}",
+                    ae
+                );
             }
         }
 
@@ -91,7 +93,14 @@ public class ConfigProperty {
         Type? ut = Nullable.GetUnderlyingType (PropertyInfo!.PropertyType);
         if (source.GetType () != PropertyInfo!.PropertyType && ut != null && source.GetType () != ut) {
             throw new ArgumentException (
-                                         $"The source object ({PropertyInfo!.DeclaringType}.{PropertyInfo!.Name}) is not of type {PropertyInfo!.PropertyType}.");
+                $"The source object ({
+                    PropertyInfo!.DeclaringType
+                }.{
+                    PropertyInfo!.Name
+                }) is not of type {
+                    PropertyInfo!.PropertyType
+                }."
+            );
         }
 
         if (PropertyValue != null) {

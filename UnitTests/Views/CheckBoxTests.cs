@@ -3,8 +3,8 @@
 namespace Terminal.Gui.ViewsTests;
 
 public class CheckBoxTests {
-    private readonly ITestOutputHelper _output;
     public CheckBoxTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     [AutoInitShutdown]
@@ -25,9 +25,12 @@ public class CheckBoxTests {
         Assert.Null (checkBox.Checked);
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @$"
-{CM.Glyphs.NullChecked} Check this out 你",
-                                                      _output);
+            @$"
+{
+    CM.Glyphs.NullChecked
+} Check this out 你",
+            _output
+        );
         Assert.True (checkBox.MouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
         Assert.True (checkBox.Checked);
         Assert.True (checkBox.NewKeyDownEvent (new Key (KeyCode.Space)));
@@ -42,18 +45,11 @@ public class CheckBoxTests {
     [Fact]
     [AutoInitShutdown]
     public void AutoSize_Stays_True_AnchorEnd_With_HotKeySpecifier () {
-        var checkBox = new CheckBox {
-                                        Y = Pos.Center (),
-                                        Text = "C_heck this out 你"
-                                    };
+        var checkBox = new CheckBox { Y = Pos.Center (), Text = "C_heck this out 你" };
         checkBox.X = Pos.AnchorEnd () -
                      Pos.Function (() => checkBox.GetSizeNeededForTextWithoutHotKey ().Width);
 
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill (),
-                                 Title = "Test Demo 你"
-                             };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
         Application.Top.Add (win);
 
@@ -64,7 +60,9 @@ public class CheckBoxTests {
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│         {CM.Glyphs.UnChecked} Check this out 你│
+│         {
+    CM.Glyphs.UnChecked
+} Check this out 你│
 │                            │
 └────────────────────────────┘
 ";
@@ -78,7 +76,9 @@ public class CheckBoxTests {
         expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {CM.Glyphs.UnChecked} Check this out 你 changed│
+│ {
+    CM.Glyphs.UnChecked
+} Check this out 你 changed│
 │                            │
 └────────────────────────────┘
 ";
@@ -89,18 +89,11 @@ public class CheckBoxTests {
     [Fact]
     [AutoInitShutdown]
     public void AutoSize_Stays_True_AnchorEnd_Without_HotKeySpecifier () {
-        var checkBox = new CheckBox {
-                                        Y = Pos.Center (),
-                                        Text = "Check this out 你"
-                                    };
+        var checkBox = new CheckBox { Y = Pos.Center (), Text = "Check this out 你" };
         checkBox.X = Pos.AnchorEnd () -
                      Pos.Function (() => checkBox.GetSizeNeededForTextWithoutHotKey ().Width);
 
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill (),
-                                 Title = "Test Demo 你"
-                             };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
         Application.Top.Add (win);
 
@@ -111,7 +104,9 @@ public class CheckBoxTests {
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│         {CM.Glyphs.UnChecked} Check this out 你│
+│         {
+    CM.Glyphs.UnChecked
+} Check this out 你│
 │                            │
 └────────────────────────────┘
 ";
@@ -125,7 +120,9 @@ public class CheckBoxTests {
         expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {CM.Glyphs.UnChecked} Check this out 你 changed│
+│ {
+    CM.Glyphs.UnChecked
+} Check this out 你 changed│
 │                            │
 └────────────────────────────┘
 ";
@@ -136,16 +133,8 @@ public class CheckBoxTests {
     [Fact]
     [AutoInitShutdown]
     public void AutoSize_StaysVisible () {
-        var checkBox = new CheckBox {
-                                        X = 1,
-                                        Y = Pos.Center (),
-                                        Text = "Check this out 你"
-                                    };
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill (),
-                                 Title = "Test Demo 你"
-                             };
+        var checkBox = new CheckBox { X = 1, Y = Pos.Center (), Text = "Check this out 你" };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
         Application.Top.Add (win);
 
@@ -213,7 +202,7 @@ public class CheckBoxTests {
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rect (0, 0, 30, 5), pos);
     }
-    
+
     [Fact]
     public void Constructors_Defaults () {
         var ckb = new CheckBox ();
@@ -225,7 +214,7 @@ public class CheckBoxTests {
         Assert.True (ckb.CanFocus);
         Assert.Equal (new Rect (0, 0, 2, 1), ckb.Frame);
 
-        ckb = new CheckBox {Text = "Test", Checked = true };
+        ckb = new CheckBox { Text = "Test", Checked = true };
         Assert.True (ckb.AutoSize);
         Assert.True (ckb.Checked);
         Assert.False (ckb.AllowNullChecked);
@@ -234,7 +223,7 @@ public class CheckBoxTests {
         Assert.True (ckb.CanFocus);
         Assert.Equal (new Rect (0, 0, 6, 1), ckb.Frame);
 
-        ckb = new CheckBox {Text = "Test", X = 1, Y = 2 };
+        ckb = new CheckBox { Text = "Test", X = 1, Y = 2 };
         Assert.True (ckb.AutoSize);
         Assert.False (ckb.Checked);
         Assert.False (ckb.AllowNullChecked);
@@ -299,7 +288,9 @@ public class CheckBoxTests {
         Application.Refresh ();
 
         var expected = @$"
-{CM.Glyphs.Checked} Test
+{
+    CM.Glyphs.Checked
+} Test
 ";
 
         Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
@@ -310,18 +301,14 @@ public class CheckBoxTests {
     [AutoInitShutdown]
     public void TextAlignment_Centered () {
         var checkBox = new CheckBox {
-                                        X = 1,
-                                        Y = Pos.Center (),
-                                        Text = "Check this out 你",
-                                        TextAlignment = TextAlignment.Centered,
-                                        AutoSize = false,
-                                        Width = 25
-                                    };
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill (),
-                                 Title = "Test Demo 你"
-                             };
+            X = 1,
+            Y = Pos.Center (),
+            Text = "Check this out 你",
+            TextAlignment = TextAlignment.Centered,
+            AutoSize = false,
+            Width = 25
+        };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
         Application.Top.Add (win);
 
@@ -336,7 +323,9 @@ public class CheckBoxTests {
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│    {CM.Glyphs.UnChecked} Check this out 你     │
+│    {
+    CM.Glyphs.UnChecked
+} Check this out 你     │
 │                            │
 └────────────────────────────┘
 ";
@@ -349,7 +338,9 @@ public class CheckBoxTests {
         expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│    {CM.Glyphs.Checked} Check this out 你     │
+│    {
+    CM.Glyphs.Checked
+} Check this out 你     │
 │                            │
 └────────────────────────────┘
 ";
@@ -362,26 +353,22 @@ public class CheckBoxTests {
     [AutoInitShutdown]
     public void TextAlignment_Justified () {
         var checkBox1 = new CheckBox {
-                                         X = 1,
-                                         Y = Pos.Center (),
-                                         Text = "Check first out 你",
-                                         TextAlignment = TextAlignment.Justified,
-                                         AutoSize = false,
-                                         Width = 25
-                                     };
+            X = 1,
+            Y = Pos.Center (),
+            Text = "Check first out 你",
+            TextAlignment = TextAlignment.Justified,
+            AutoSize = false,
+            Width = 25
+        };
         var checkBox2 = new CheckBox {
-                                         X = 1,
-                                         Y = Pos.Bottom (checkBox1),
-                                         Text = "Check second out 你",
-                                         TextAlignment = TextAlignment.Justified,
-                                         AutoSize = false,
-                                         Width = 25
-                                     };
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill (),
-                                 Title = "Test Demo 你"
-                             };
+            X = 1,
+            Y = Pos.Bottom (checkBox1),
+            Text = "Check second out 你",
+            TextAlignment = TextAlignment.Justified,
+            AutoSize = false,
+            Width = 25
+        };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox1, checkBox2);
         Application.Top.Add (win);
 
@@ -398,8 +385,12 @@ public class CheckBoxTests {
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {CM.Glyphs.UnChecked}   Check  first  out  你  │
-│ {CM.Glyphs.UnChecked}  Check  second  out  你  │
+│ {
+    CM.Glyphs.UnChecked
+}   Check  first  out  你  │
+│ {
+    CM.Glyphs.UnChecked
+}  Check  second  out  你  │
 │                            │
 └────────────────────────────┘
 ";
@@ -417,8 +408,12 @@ public class CheckBoxTests {
         expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {CM.Glyphs.Checked}   Check  first  out  你  │
-│ {CM.Glyphs.Checked}  Check  second  out  你  │
+│ {
+    CM.Glyphs.Checked
+}   Check  first  out  你  │
+│ {
+    CM.Glyphs.Checked
+}  Check  second  out  你  │
 │                            │
 └────────────────────────────┘
 ";
@@ -431,17 +426,13 @@ public class CheckBoxTests {
     [AutoInitShutdown]
     public void TextAlignment_Left () {
         var checkBox = new CheckBox {
-                                        X = 1,
-                                        Y = Pos.Center (),
-                                        Text = "Check this out 你",
-                                        AutoSize = false,
-                                        Width = 25
-                                    };
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill (),
-                                 Title = "Test Demo 你"
-                             };
+            X = 1,
+            Y = Pos.Center (),
+            Text = "Check this out 你",
+            AutoSize = false,
+            Width = 25
+        };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
         Application.Top.Add (win);
 
@@ -455,7 +446,9 @@ public class CheckBoxTests {
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {CM.Glyphs.UnChecked} Check this out 你        │
+│ {
+    CM.Glyphs.UnChecked
+} Check this out 你        │
 │                            │
 └────────────────────────────┘
 ";
@@ -468,7 +461,9 @@ public class CheckBoxTests {
         expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {CM.Glyphs.Checked} Check this out 你        │
+│ {
+    CM.Glyphs.Checked
+} Check this out 你        │
 │                            │
 └────────────────────────────┘
 ";
@@ -481,18 +476,14 @@ public class CheckBoxTests {
     [AutoInitShutdown]
     public void TextAlignment_Right () {
         var checkBox = new CheckBox {
-                                        X = 1,
-                                        Y = Pos.Center (),
-                                        Text = "Check this out 你",
-                                        TextAlignment = TextAlignment.Right,
-                                        AutoSize = false,
-                                        Width = 25
-                                    };
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill (),
-                                 Title = "Test Demo 你"
-                             };
+            X = 1,
+            Y = Pos.Center (),
+            Text = "Check this out 你",
+            TextAlignment = TextAlignment.Right,
+            AutoSize = false,
+            Width = 25
+        };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
         Application.Top.Add (win);
 
@@ -507,7 +498,9 @@ public class CheckBoxTests {
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│       Check this out 你 {CM.Glyphs.UnChecked}  │
+│       Check this out 你 {
+    CM.Glyphs.UnChecked
+}  │
 │                            │
 └────────────────────────────┘
 ";
@@ -520,7 +513,9 @@ public class CheckBoxTests {
         expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│       Check this out 你 {CM.Glyphs.Checked}  │
+│       Check this out 你 {
+    CM.Glyphs.Checked
+}  │
 │                            │
 └────────────────────────────┘
 ";

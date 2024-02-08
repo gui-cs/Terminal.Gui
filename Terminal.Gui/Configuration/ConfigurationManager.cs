@@ -82,29 +82,27 @@ public static class ConfigurationManager {
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
     internal static Dictionary<string, ConfigProperty>? _allConfigProperties;
 
-    private static readonly string _configFilename = "config.json";
-
     internal static readonly JsonSerializerOptions _serializerOptions = new () {
-                                                                                   ReadCommentHandling =
-                                                                                       JsonCommentHandling.Skip,
-                                                                                   PropertyNameCaseInsensitive = true,
-                                                                                   DefaultIgnoreCondition =
-                                                                                       JsonIgnoreCondition
-                                                                                           .WhenWritingNull,
-                                                                                   WriteIndented = true,
-                                                                                   Converters = {
-                                                                                       // We override the standard Rune converter to support specifying Glyphs in
-                                                                                       // a flexible way
-                                                                                       new RuneJsonConverter (),
+        ReadCommentHandling =
+            JsonCommentHandling.Skip,
+        PropertyNameCaseInsensitive = true,
+        DefaultIgnoreCondition =
+            JsonIgnoreCondition
+                .WhenWritingNull,
+        WriteIndented = true,
+        Converters = {
+            // We override the standard Rune converter to support specifying Glyphs in
+            // a flexible way
+            new RuneJsonConverter (),
 
-                                                                                       // Override Key to support "Ctrl+Q" format.
-                                                                                       new KeyJsonConverter ()
-                                                                                   },
+            // Override Key to support "Ctrl+Q" format.
+            new KeyJsonConverter ()
+        },
 
-                                                                                   // Enables Key to be "Ctrl+Q" vs "Ctrl\u002BQ"
-                                                                                   Encoder = JavaScriptEncoder
-                                                                                       .UnsafeRelaxedJsonEscaping
-                                                                               };
+        // Enables Key to be "Ctrl+Q" vs "Ctrl\u002BQ"
+        Encoder = JavaScriptEncoder
+            .UnsafeRelaxedJsonEscaping
+    };
 
     /// <summary>The backing property for <see cref="Settings"/>.</summary>
     /// <remarks>
@@ -113,15 +111,27 @@ public static class ConfigurationManager {
     /// </remarks>
     private static SettingsScope? _settings;
 
+    private static readonly string _configFilename = "config.json";
     internal static StringBuilder jsonErrors = new ();
-
-    /// <summary>Name of the running application. By default this property is set to the application's assembly name.</summary>
-    public static string AppName { get; set; } = Assembly.GetEntryAssembly ()?.FullName?.Split (',')[0]?.Trim ()!;
 
     /// <summary>Application-specific configuration settings scope.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
     [JsonPropertyName ("AppSettings")]
     public static AppScope? AppSettings { get; set; }
+
+    /// <summary>
+    ///     Gets or sets whether the <see cref="ConfigurationManager"/> should throw an exception if it encounters an
+    ///     error on deserialization. If <see langword="false"/> (the default), the error is logged and printed to the console
+    ///     when <see cref="Application.Shutdown"/> is called.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static bool? ThrowOnJsonErrors { get; set; } = false;
+
+    /// <summary>
+    ///     Gets and sets the locations where <see cref="ConfigurationManager"/> will look for config files. The value is
+    ///     <see cref="ConfigLocations.All"/>.
+    /// </summary>
+    public static ConfigLocations Locations { get; set; } = ConfigLocations.All;
 
     /// <summary>
     ///     The set of glyphs used to draw checkboxes, lines, borders, etc...See also
@@ -132,12 +142,6 @@ public static class ConfigurationManager {
     public static GlyphDefinitions Glyphs { get; set; } = new ();
 
     /// <summary>
-    ///     Gets and sets the locations where <see cref="ConfigurationManager"/> will look for config files. The value is
-    ///     <see cref="ConfigLocations.All"/>.
-    /// </summary>
-    public static ConfigLocations Locations { get; set; } = ConfigLocations.All;
-
-    /// <summary>
     ///     The root object of Terminal.Gui configuration settings / JSON schema. Contains only properties with the
     ///     <see cref="SettingsScope"/> attribute value.
     /// </summary>
@@ -145,7 +149,8 @@ public static class ConfigurationManager {
         get {
             if (_settings == null) {
                 throw new InvalidOperationException (
-                                                     "ConfigurationManager has not been initialized. Call ConfigurationManager.Reset() before accessing the Settings property.");
+                    "ConfigurationManager has not been initialized. Call ConfigurationManager.Reset() before accessing the Settings property."
+                );
             }
 
             return _settings;
@@ -153,19 +158,14 @@ public static class ConfigurationManager {
         set => _settings = value!;
     }
 
+    /// <summary>Name of the running application. By default this property is set to the application's assembly name.</summary>
+    public static string AppName { get; set; } = Assembly.GetEntryAssembly ()?.FullName?.Split (',')[0]?.Trim ()!;
+
     /// <summary>
     ///     The root object of Terminal.Gui themes manager. Contains only properties with the <see cref="ThemeScope"/>
     ///     attribute value.
     /// </summary>
     public static ThemeManager? Themes => ThemeManager.Instance;
-
-    /// <summary>
-    ///     Gets or sets whether the <see cref="ConfigurationManager"/> should throw an exception if it encounters an
-    ///     error on deserialization. If <see langword="false"/> (the default), the error is logged and printed to the console
-    ///     when <see cref="Application.Shutdown"/> is called.
-    /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static bool? ThrowOnJsonErrors { get; set; } = false;
 
     /// <summary>Event fired when an updated configuration has been applied to the application.</summary>
     public static event EventHandler<ConfigurationManagerEventArgs>? Applied;
@@ -224,33 +224,33 @@ public static class ConfigurationManager {
         // LibraryResources is always loaded by Reset
         if (Locations == ConfigLocations.All) {
             string? embeddedStylesResourceName = Assembly.GetEntryAssembly ()
-                                                         ?
-                                                         .GetManifestResourceNames ()
-                                                         .FirstOrDefault (x => x.EndsWith (_configFilename));
+                ?
+                .GetManifestResourceNames ()
+                .FirstOrDefault (x => x.EndsWith (_configFilename));
             if (string.IsNullOrEmpty (embeddedStylesResourceName)) {
                 embeddedStylesResourceName = _configFilename;
             }
 
             Settings = Settings?
 
-                       // Global current directory
-                       .Update ($"./.tui/{_configFilename}")
-                       ?
+                // Global current directory
+                .Update ($"./.tui/{_configFilename}")
+                ?
 
-                       // Global home directory
-                       .Update ($"~/.tui/{_configFilename}")
-                       ?
+                // Global home directory
+                .Update ($"~/.tui/{_configFilename}")
+                ?
 
-                       // App resources
-                       .UpdateFromResource (Assembly.GetEntryAssembly ()!, embeddedStylesResourceName!)
-                       ?
+                // App resources
+                .UpdateFromResource (Assembly.GetEntryAssembly ()!, embeddedStylesResourceName!)
+                ?
 
-                       // App current directory
-                       .Update ($"./.tui/{AppName}.{_configFilename}")
-                       ?
+                // App current directory
+                .Update ($"./.tui/{AppName}.{_configFilename}")
+                ?
 
-                       // App home directory
-                       .Update ($"~/.tui/{AppName}.{_configFilename}");
+                // App home directory
+                .Update ($"~/.tui/{AppName}.{_configFilename}");
         }
     }
 
@@ -280,7 +280,8 @@ public static class ConfigurationManager {
     public static void PrintJsonErrors () {
         if (jsonErrors.Length > 0) {
             Console.WriteLine (
-                               @"Terminal.Gui ConfigurationManager encountered the following errors while deserializing configuration files:");
+                @"Terminal.Gui ConfigurationManager encountered the following errors while deserializing configuration files:"
+            );
             Console.WriteLine (jsonErrors.ToString ());
         }
     }
@@ -306,8 +307,9 @@ public static class ConfigurationManager {
         // To enable some unit tests, we only load from resources if the flag is set
         if (Locations.HasFlag (ConfigLocations.DefaultOnly)) {
             Settings.UpdateFromResource (
-                                         typeof (ConfigurationManager).Assembly,
-                                         $"Terminal.Gui.Resources.{_configFilename}");
+                typeof (ConfigurationManager).Assembly,
+                $"Terminal.Gui.Resources.{_configFilename}"
+            );
         }
 
         Apply ();
@@ -447,9 +449,11 @@ public static class ConfigurationManager {
         IEnumerable<Type> types = from assembly in AppDomain.CurrentDomain.GetAssemblies ()
                                   from type in assembly.GetTypes ()
                                   where type.GetProperties ()
-                                            .Any (
-                                                  prop => prop.GetCustomAttribute (
-                                                           typeof (SerializableConfigurationProperty)) != null)
+                                      .Any (
+                                          prop => prop.GetCustomAttribute (
+                                                      typeof (SerializableConfigurationProperty)
+                                                  ) != null
+                                      )
                                   select type;
 
         foreach (Type? classWithConfig in types) {
@@ -461,14 +465,17 @@ public static class ConfigurationManager {
 
         foreach (PropertyInfo? p in from c in classesWithConfigProps
                                     let props = c.Value
-                                                 .GetProperties (
-                                                                 BindingFlags.Instance | BindingFlags.Static
-                                                                 | BindingFlags.NonPublic | BindingFlags.Public)
-                                                 .Where (
-                                                         prop =>
-                                                             prop.GetCustomAttribute (
-                                                                  typeof (SerializableConfigurationProperty)) is
-                                                                 SerializableConfigurationProperty)
+                                        .GetProperties (
+                                            BindingFlags.Instance | BindingFlags.Static
+                                                                  | BindingFlags.NonPublic | BindingFlags.Public
+                                        )
+                                        .Where (
+                                            prop =>
+                                                prop.GetCustomAttribute (
+                                                        typeof (SerializableConfigurationProperty)
+                                                    ) is
+                                                    SerializableConfigurationProperty
+                                        )
                                     let enumerable = props
                                     from p in enumerable
                                     select p) {
@@ -477,25 +484,29 @@ public static class ConfigurationManager {
                 if (p.GetGetMethod (true)!.IsStatic) {
                     // If the class name is omitted, JsonPropertyName is allowed. 
                     _allConfigProperties!.Add (
-                                               scp.OmitClassName
-                                                   ? ConfigProperty.GetJsonPropertyName (p)
-                                                   : $"{p.DeclaringType?.Name}.{p.Name}",
-                                               new ConfigProperty {
-                                                                      PropertyInfo = p,
-                                                                      PropertyValue = null
-                                                                  });
+                        scp.OmitClassName
+                            ? ConfigProperty.GetJsonPropertyName (p)
+                            : $"{p.DeclaringType?.Name}.{p.Name}",
+                        new ConfigProperty { PropertyInfo = p, PropertyValue = null }
+                    );
                 } else {
                     throw new Exception (
-                                         $"Property {p.Name} in class {p.DeclaringType?.Name} is not static. All SerializableConfigurationProperty properties must be static.");
+                        $"Property {
+                            p.Name
+                        } in class {
+                            p.DeclaringType?.Name
+                        } is not static. All SerializableConfigurationProperty properties must be static."
+                    );
                 }
             }
         }
 
         _allConfigProperties = _allConfigProperties!.OrderBy (x => x.Key)
-                                                    .ToDictionary (
-                                                                   x => x.Key,
-                                                                   x => x.Value,
-                                                                   StringComparer.InvariantCultureIgnoreCase);
+            .ToDictionary (
+                x => x.Key,
+                x => x.Value,
+                StringComparer.InvariantCultureIgnoreCase
+            );
 
         Debug.WriteLine ($"ConfigManager.Initialize found {_allConfigProperties.Count} properties:");
 

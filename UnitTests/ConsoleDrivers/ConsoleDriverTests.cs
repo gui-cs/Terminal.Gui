@@ -6,12 +6,12 @@ using Console = Terminal.Gui.FakeConsole;
 namespace Terminal.Gui.DriverTests;
 
 public class ConsoleDriverTests {
-    private readonly ITestOutputHelper _output;
-
     public ConsoleDriverTests (ITestOutputHelper output) {
         ConsoleDriver.RunningUnitTests = true;
         _output = output;
     }
+
+    private readonly ITestOutputHelper _output;
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
@@ -33,7 +33,7 @@ public class ConsoleDriverTests {
         Application.Init (driver);
 
         var text = "MockKeyPresses";
-        Stack<ConsoleKeyInfo> mKeys = new Stack<ConsoleKeyInfo> ();
+        Stack<ConsoleKeyInfo> mKeys = new ();
         foreach (char r in text.Reverse ()) {
             ConsoleKey ck = char.IsLetter (r) ? (ConsoleKey)char.ToUpper (r) : (ConsoleKey)r;
             var cki = new ConsoleKeyInfo (r, ck, false, false, false);
@@ -43,9 +43,7 @@ public class ConsoleDriverTests {
         Console.MockKeyPresses = mKeys;
 
         Toplevel top = Application.Top;
-        var view = new View {
-                                CanFocus = true
-                            };
+        var view = new View { CanFocus = true };
         var rText = "";
         var idx = 0;
 
@@ -79,9 +77,7 @@ public class ConsoleDriverTests {
         Application.Init (driver);
 
         Toplevel top = Application.Top;
-        var view = new View {
-                                CanFocus = true
-                            };
+        var view = new View { CanFocus = true };
         var count = 0;
         var wasKeyPressed = false;
 

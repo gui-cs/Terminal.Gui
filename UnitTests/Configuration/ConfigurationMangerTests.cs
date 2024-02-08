@@ -5,12 +5,9 @@ using static Terminal.Gui.ConfigurationManager;
 namespace Terminal.Gui.ConfigurationTests;
 
 public class ConfigurationManagerTests {
-    public static readonly JsonSerializerOptions _jsonOptions = new() {
-                                                                          Converters = {
-                                                                              new AttributeJsonConverter (),
-                                                                              new ColorJsonConverter ()
-                                                                          }
-                                                                      };
+    public static readonly JsonSerializerOptions _jsonOptions = new () {
+        Converters = { new AttributeJsonConverter (), new ColorJsonConverter () }
+    };
 
     [Fact]
     public void Apply_FiresApplied () {
@@ -98,31 +95,32 @@ public class ConfigurationManagerTests {
         Assert.Equal (colorschemeSrc, colorschemeCopy);
 
         // Dictionaries
-        Dictionary<string, Attribute> dictDest = new Dictionary<string, Attribute>
-                                                 { { "Disabled", new Attribute (Color.Black) } };
-        Dictionary<string, Attribute> dictSrc = new Dictionary<string, Attribute>
-                                                { { "Disabled", new Attribute (Color.White) } };
+        Dictionary<string, Attribute> dictDest = new() { { "Disabled", new Attribute (Color.Black) } };
+        Dictionary<string, Attribute> dictSrc = new() { { "Disabled", new Attribute (Color.White) } };
         Dictionary<string, Attribute> dictCopy = (Dictionary<string, Attribute>)DeepMemberwiseCopy (dictSrc, dictDest);
         Assert.Equal (dictSrc, dictCopy);
 
         dictDest = new Dictionary<string, Attribute> { { "Disabled", new Attribute (Color.Black) } };
-        dictSrc = new Dictionary<string, Attribute>
-                  { { "Disabled", new Attribute (Color.White) }, { "Normal", new Attribute (Color.Blue) } };
+        dictSrc = new Dictionary<string, Attribute> {
+            { "Disabled", new Attribute (Color.White) }, { "Normal", new Attribute (Color.Blue) }
+        };
         dictCopy = (Dictionary<string, Attribute>)DeepMemberwiseCopy (dictSrc, dictDest);
         Assert.Equal (dictSrc, dictCopy);
 
         // src adds an item
         dictDest = new Dictionary<string, Attribute> { { "Disabled", new Attribute (Color.Black) } };
-        dictSrc = new Dictionary<string, Attribute>
-                  { { "Disabled", new Attribute (Color.White) }, { "Normal", new Attribute (Color.Blue) } };
+        dictSrc = new Dictionary<string, Attribute> {
+            { "Disabled", new Attribute (Color.White) }, { "Normal", new Attribute (Color.Blue) }
+        };
         dictCopy = (Dictionary<string, Attribute>)DeepMemberwiseCopy (dictSrc, dictDest);
         Assert.Equal (2, dictCopy.Count);
         Assert.Equal (dictSrc["Disabled"], dictCopy["Disabled"]);
         Assert.Equal (dictSrc["Normal"], dictCopy["Normal"]);
 
         // src updates only one item
-        dictDest = new Dictionary<string, Attribute>
-                   { { "Disabled", new Attribute (Color.Black) }, { "Normal", new Attribute (Color.White) } };
+        dictDest = new Dictionary<string, Attribute> {
+            { "Disabled", new Attribute (Color.Black) }, { "Normal", new Attribute (Color.White) }
+        };
         dictSrc = new Dictionary<string, Attribute> { { "Disabled", new Attribute (Color.White) } };
         dictCopy = (Dictionary<string, Attribute>)DeepMemberwiseCopy (dictSrc, dictDest);
         Assert.Equal (2, dictCopy.Count);
@@ -148,11 +146,13 @@ public class ConfigurationManagerTests {
             // assert
             Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, ((Key)Settings["Application.QuitKey"].PropertyValue).KeyCode);
             Assert.Equal (
-                          KeyCode.PageDown | KeyCode.CtrlMask,
-                          ((Key)Settings["Application.AlternateForwardKey"].PropertyValue).KeyCode);
+                KeyCode.PageDown | KeyCode.CtrlMask,
+                ((Key)Settings["Application.AlternateForwardKey"].PropertyValue).KeyCode
+            );
             Assert.Equal (
-                          KeyCode.PageUp | KeyCode.CtrlMask,
-                          ((Key)Settings["Application.AlternateBackwardKey"].PropertyValue).KeyCode);
+                KeyCode.PageUp | KeyCode.CtrlMask,
+                ((Key)Settings["Application.AlternateBackwardKey"].PropertyValue).KeyCode
+            );
             Assert.False ((bool)Settings["Application.IsMouseDisabled"].PropertyValue);
         }
 
@@ -359,14 +359,20 @@ public class ConfigurationManagerTests {
 
         // test that all ConfigProperites have our attribute
         Assert.All (
-                    Settings,
-                    item => Assert.NotEmpty (
-                                             item.Value.PropertyInfo.CustomAttributes.Where (
-                                              a => a.AttributeType == typeof (SerializableConfigurationProperty))));
+            Settings,
+            item => Assert.NotEmpty (
+                item.Value.PropertyInfo.CustomAttributes.Where (
+                    a => a.AttributeType == typeof (SerializableConfigurationProperty)
+                )
+            )
+        );
         Assert.Empty (
-                      Settings.Where (
-                                      cp => cp.Value.PropertyInfo.GetCustomAttribute (
-                                             typeof (SerializableConfigurationProperty)) == null));
+            Settings.Where (
+                cp => cp.Value.PropertyInfo.GetCustomAttribute (
+                          typeof (SerializableConfigurationProperty)
+                      ) == null
+            )
+        );
 
         // Application is a static class
         PropertyInfo pi = typeof (Application).GetProperty ("QuitKey");

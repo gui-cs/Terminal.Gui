@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>Args <see cref="Application.GrabMouse"/> related events.</summary>
 public class GrabMouseEventArgs : EventArgs {

@@ -3,18 +3,15 @@
 namespace Terminal.Gui.ViewsTests;
 
 public class TileViewTests {
-    private readonly ITestOutputHelper _output;
     public TileViewTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     [AutoInitShutdown]
     public void Test_SplitTop_WholeBottom () {
         var tileView = new TileView (2) {
-                                            Width = 20,
-                                            Height = 10,
-                                            Orientation = Orientation.Horizontal,
-                                            LineStyle = LineStyle.Single
-                                        };
+            Width = 20, Height = 10, Orientation = Orientation.Horizontal, LineStyle = LineStyle.Single
+        };
 
         Assert.True (tileView.TrySplitTile (0, 2, out TileView top));
 
@@ -754,11 +751,12 @@ public class TileViewTests {
         // but I still want my view in the first tile
         tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
         Assert.Multiple (
-                         () => Assert.Equal (0, myReusableView.DisposalCount),
-                         () => {
-                             tv.Dispose ();
-                             Assert.True (myReusableView.DisposalCount >= 1);
-                         });
+            () => Assert.Equal (0, myReusableView.DisposalCount),
+            () => {
+                tv.Dispose ();
+                Assert.True (myReusableView.DisposalCount >= 1);
+            }
+        );
     }
 
     [Fact]
@@ -778,11 +776,12 @@ public class TileViewTests {
         // but I still want my view in the first tile
         tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
         Assert.Multiple (
-                         () => Assert.Equal (0, myReusableView.DisposalCount),
-                         () => {
-                             tv.Dispose ();
-                             Assert.Equal (1, myReusableView.DisposalCount);
-                         });
+            () => Assert.Equal (0, myReusableView.DisposalCount),
+            () => {
+                tv.Dispose ();
+                Assert.Equal (1, myReusableView.DisposalCount);
+            }
+        );
     }
 
     [Theory]
@@ -803,11 +802,12 @@ public class TileViewTests {
         // but I still want my view in the first tile
         tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
         Assert.Multiple (
-                         () => Assert.Equal (0, myReusableView.DisposalCount),
-                         () => {
-                             tv.Dispose ();
-                             Assert.True (myReusableView.DisposalCount >= 1);
-                         });
+            () => Assert.Equal (0, myReusableView.DisposalCount),
+            () => {
+                tv.Dispose ();
+                Assert.True (myReusableView.DisposalCount >= 1);
+            }
+        );
     }
 
     [Fact]
@@ -1486,11 +1486,8 @@ public class TileViewTests {
     [AutoInitShutdown]
     public void TestNestedNonRoots_OnlyOneRoot_OnlyRootCanHaveBorders () {
         var tv = new TileView {
-                                  Width = 10,
-                                  Height = 5,
-                                  ColorScheme = new ColorScheme (),
-                                  LineStyle = LineStyle.Single
-                              };
+            Width = 10, Height = 5, ColorScheme = new ColorScheme (), LineStyle = LineStyle.Single
+        };
 
         tv.TrySplitTile (1, 2, out TileView tv2);
         tv2.ColorScheme = new ColorScheme ();
@@ -1531,18 +1528,15 @@ public class TileViewTests {
     [AutoInitShutdown]
     public void TestNestedRoots_BothRoots_BothCanHaveBorders () {
         var tv = new TileView {
-                                  Width = 10,
-                                  Height = 5,
-                                  ColorScheme = new ColorScheme (),
-                                  LineStyle = LineStyle.Single
-                              };
+            Width = 10, Height = 5, ColorScheme = new ColorScheme (), LineStyle = LineStyle.Single
+        };
         var tv2 = new TileView {
-                                   Width = Dim.Fill (),
-                                   Height = Dim.Fill (),
-                                   ColorScheme = new ColorScheme (),
-                                   LineStyle = LineStyle.Single,
-                                   Orientation = Orientation.Horizontal
-                               };
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            ColorScheme = new ColorScheme (),
+            LineStyle = LineStyle.Single,
+            Orientation = Orientation.Horizontal
+        };
 
         Assert.True (tv.IsRootTileView ());
         tv.Tiles.ElementAt (1).ContentView.Add (tv2);
@@ -1589,8 +1583,9 @@ public class TileViewTests {
         // Also not allowed because this results in a PosCombine
         ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Percent (50) - 1));
         Assert.Equal (
-                      "Only Percent and Absolute values are supported. Passed value was PosCombine",
-                      ex.Message);
+            "Only Percent and Absolute values are supported. Passed value was PosCombine",
+            ex.Message
+        );
     }
 
     [Fact]
@@ -2162,46 +2157,33 @@ public class TileViewTests {
 
     private TileView Get5x1TilesView (bool border = true) {
         var tv = new TileView (5) {
-                                      Width = 25,
-                                      Height = 4,
-                                      ColorScheme = new ColorScheme (),
-                                      LineStyle = LineStyle.Single
-                                  };
+            Width = 25, Height = 4, ColorScheme = new ColorScheme (), LineStyle = LineStyle.Single
+        };
 
         if (!border) {
             tv.LineStyle = LineStyle.None;
         }
 
         tv.Tiles.ElementAt (0)
-          .ContentView.Add (
-                            new Label {
-                                          AutoSize = false, Width = Dim.Fill (), Height = 1,
-                                          Text = new string ('1', 100)
-                                      });
+            .ContentView.Add (
+                new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('1', 100) }
+            );
         tv.Tiles.ElementAt (1)
-          .ContentView.Add (
-                            new Label {
-                                          AutoSize = false, Width = Dim.Fill (), Height = 1,
-                                          Text = new string ('2', 100)
-                                      });
+            .ContentView.Add (
+                new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('2', 100) }
+            );
         tv.Tiles.ElementAt (2)
-          .ContentView.Add (
-                            new Label {
-                                          AutoSize = false, Width = Dim.Fill (), Height = 1,
-                                          Text = new string ('3', 100)
-                                      });
+            .ContentView.Add (
+                new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('3', 100) }
+            );
         tv.Tiles.ElementAt (3)
-          .ContentView.Add (
-                            new Label {
-                                          AutoSize = false, Width = Dim.Fill (), Height = 1,
-                                          Text = new string ('4', 100)
-                                      });
+            .ContentView.Add (
+                new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('4', 100) }
+            );
         tv.Tiles.ElementAt (4)
-          .ContentView.Add (
-                            new Label {
-                                          AutoSize = false, Width = Dim.Fill (), Height = 1,
-                                          Text = new string ('5', 100)
-                                      });
+            .ContentView.Add (
+                new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('5', 100) }
+            );
 
         Application.Top.Add (tv);
         tv.BeginInit ();
@@ -2233,10 +2215,7 @@ public class TileViewTests {
     /// <param name="withBorder"></param>
     /// <returns></returns>
     private TileView GetNestedContainer3Right1Down (bool withBorder, bool withTitles = false, int split = 2) {
-        var container = new TileView (3) {
-                                             Width = 20,
-                                             Height = 10
-                                         };
+        var container = new TileView (3) { Width = 20, Height = 10 };
         container.LineStyle = withBorder ? LineStyle.Single : LineStyle.None;
 
         Assert.True (container.TrySplitTile (split, 2, out TileView newContainer));
@@ -2256,18 +2235,21 @@ public class TileViewTests {
             }
 
             tile.ContentView.Add (
-                                  new TextView {
-                                                   Width = Dim.Fill (),
-                                                   Height = Dim.Fill (),
-                                                   Text =
-                                                       string.Join (
-                                                                    '\n',
-                                                                    Enumerable.Repeat (
-                                                                               new string (i.ToString ()[0], 100),
-                                                                               10)
-                                                                              .ToArray ()),
-                                                   WordWrap = false
-                                               });
+                new TextView {
+                    Width = Dim.Fill (),
+                    Height = Dim.Fill (),
+                    Text =
+                        string.Join (
+                            '\n',
+                            Enumerable.Repeat (
+                                    new string (i.ToString ()[0], 100),
+                                    10
+                                )
+                                .ToArray ()
+                        ),
+                    WordWrap = false
+                }
+            );
         }
 
         newContainer.ColorScheme = new ColorScheme ();
@@ -2280,37 +2262,38 @@ public class TileViewTests {
     }
 
     private TileView GetTileView (int width, int height, bool withBorder = false) {
-        var container = new TileView {
-                                         Width = width,
-                                         Height = height
-                                     };
+        var container = new TileView { Width = width, Height = height };
 
         container.LineStyle = withBorder ? LineStyle.Single : LineStyle.None;
 
         container.Tiles.ElementAt (0)
-                 .ContentView.Add (
-                                   new Label {
-                                               AutoSize = false,Width = Dim.Fill (), Height = 1,
-                                                 Text = new string ('1', 100)
-                                             });
+            .ContentView.Add (
+                new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('1', 100) }
+            );
         container.Tiles.ElementAt (0)
-                 .ContentView.Add (
-                                   new Label {
-                                                 AutoSize = false, Width = Dim.Fill (), Height = 1, Y = 1,
-                                                 Text = new string ('1', 100)
-                                             });
+            .ContentView.Add (
+                new Label {
+                    AutoSize = false,
+                    Width = Dim.Fill (),
+                    Height = 1,
+                    Y = 1,
+                    Text = new string ('1', 100)
+                }
+            );
         container.Tiles.ElementAt (1)
-                 .ContentView.Add (
-                                   new Label {
-                                                 AutoSize = false, Width = Dim.Fill (), Height = 1,
-                                                 Text = new string ('2', 100)
-                                             });
+            .ContentView.Add (
+                new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('2', 100) }
+            );
         container.Tiles.ElementAt (1)
-                 .ContentView.Add (
-                                   new Label {
-                                                 AutoSize = false, Width = Dim.Fill (), Height = 1,  Y = 1,
-                                                 Text = new string ('2', 100)
-                                             });
+            .ContentView.Add (
+                new Label {
+                    AutoSize = false,
+                    Width = Dim.Fill (),
+                    Height = 1,
+                    Y = 1,
+                    Text = new string ('2', 100)
+                }
+            );
 
         container.Tiles.ElementAt (0).MinSize = 0;
         container.Tiles.ElementAt (1).MinSize = 0;

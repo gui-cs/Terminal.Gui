@@ -4,23 +4,19 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.TextTests;
 
 public class AutocompleteTests {
-    private readonly ITestOutputHelper _output;
     public AutocompleteTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     [AutoInitShutdown]
     public void CursorLeft_CursorRight_Mouse_Button_Pressed_Does_Not_Show_Popup () {
-        var tv = new TextView {
-                                  Width = 50,
-                                  Height = 5,
-                                  Text = "This a long line and against TextView."
-                              };
+        var tv = new TextView { Width = 50, Height = 5, Text = "This a long line and against TextView." };
 
         var g = (SingleWordSuggestionGenerator)tv.Autocomplete.SuggestionGenerator;
         g.AllSuggestions = Regex.Matches (tv.Text, "\\w+")
-                                .Select (s => s.Value)
-                                .Distinct ()
-                                .ToList ();
+            .Select (s => s.Value)
+            .Distinct ()
+            .ToList ();
         Toplevel top = Application.Top;
         top.Add (tv);
         Application.Begin (top);
@@ -30,108 +26,113 @@ public class AutocompleteTests {
             Application.Refresh ();
             if ((i < 4) || (i > 5)) {
                 TestHelpers.AssertDriverContentsWithFrameAre (
-                                                              @"
+                    @"
 This a long line and against TextView.",
-                                                              _output);
+                    _output
+                );
             } else {
                 TestHelpers.AssertDriverContentsWithFrameAre (
-                                                              @"
+                    @"
 This a long line and against TextView.
      and                              
      against                          ",
-                                                              _output);
+                    _output
+                );
             }
         }
 
         Assert.True (
-                     tv.MouseEvent (
-                                    new MouseEvent {
-                                                       X = 6,
-                                                       Y = 0,
-                                                       Flags = MouseFlags.Button1Pressed
-                                                   }));
+            tv.MouseEvent (
+                new MouseEvent { X = 6, Y = 0, Flags = MouseFlags.Button1Pressed }
+            )
+        );
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 This a long line and against TextView.
      and                              
      against                          ",
-                                                      _output);
+            _output
+        );
 
         Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.G)));
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 This ag long line and against TextView.
      against                           ",
-                                                      _output);
+            _output
+        );
 
         Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 This ag long line and against TextView.
      against                           ",
-                                                      _output);
+            _output
+        );
 
         Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 This ag long line and against TextView.
      against                           ",
-                                                      _output);
+            _output
+        );
 
         Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 This ag long line and against TextView.",
-                                                      _output);
+            _output
+        );
 
         for (var i = 0; i < 3; i++) {
             Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
             Application.Refresh ();
             TestHelpers.AssertDriverContentsWithFrameAre (
-                                                          @"
+                @"
 This ag long line and against TextView.
      against                           ",
-                                                          _output);
+                _output
+            );
         }
 
         Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace)));
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 This a long line and against TextView.
      and                              
      against                          ",
-                                                      _output);
+            _output
+        );
 
         Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.N)));
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 This an long line and against TextView.
      and                               ",
-                                                      _output);
+            _output
+        );
 
         Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
 This an long line and against TextView.",
-                                                      _output);
+            _output
+        );
     }
 
     [Fact]
     [AutoInitShutdown]
     public void KeyBindings_Command () {
-        var tv = new TextView {
-                                  Width = 10,
-                                  Height = 2,
-                                  Text = " Fortunately super feature."
-                              };
+        var tv = new TextView { Width = 10, Height = 2, Text = " Fortunately super feature." };
         Toplevel top = Application.Top;
         top.Add (tv);
         Application.Begin (top);
@@ -142,9 +143,9 @@ This an long line and against TextView.",
 
         Assert.Empty (g.AllSuggestions);
         g.AllSuggestions = Regex.Matches (tv.Text, "\\w+")
-                                .Select (s => s.Value)
-                                .Distinct ()
-                                .ToList ();
+            .Select (s => s.Value)
+            .Distinct ()
+            .ToList ();
         Assert.Equal (3, g.AllSuggestions.Count);
         Assert.Equal ("Fortunately", g.AllSuggestions[0]);
         Assert.Equal ("super", g.AllSuggestions[1]);
@@ -222,20 +223,19 @@ This an long line and against TextView.",
     [Fact]
     public void Test_GenerateSuggestions_Simple () {
         var ac = new TextViewAutocomplete ();
-        ((SingleWordSuggestionGenerator)ac.SuggestionGenerator).AllSuggestions = new List<string> {
-            "fish",
-            "const",
-            "Cobble"
-        };
+        ((SingleWordSuggestionGenerator)ac.SuggestionGenerator).AllSuggestions =
+            new List<string> { "fish", "const", "Cobble" };
 
         var tv = new TextView ();
         tv.InsertText ("co");
 
         ac.HostControl = tv;
         ac.GenerateSuggestions (
-                                new AutocompleteContext (
-                                                         TextModel.ToRuneCellList (tv.Text),
-                                                         2));
+            new AutocompleteContext (
+                TextModel.ToRuneCellList (tv.Text),
+                2
+            )
+        );
 
         Assert.Equal (2, ac.Suggestions.Count);
         Assert.Equal ("const", ac.Suggestions[0].Title);
@@ -252,9 +252,8 @@ This an long line and against TextView.",
 
         // allocate a new custom scheme
         tv.Autocomplete.ColorScheme = new ColorScheme {
-                                                          Normal = new Attribute (Color.Black, Color.Blue),
-                                                          Focus = new Attribute (Color.Black, Color.Cyan)
-                                                      };
+            Normal = new Attribute (Color.Black, Color.Blue), Focus = new Attribute (Color.Black, Color.Cyan)
+        };
 
         // should be separate instance
         Assert.NotSame (Colors.ColorSchemes["Menu"], tv.Autocomplete.ColorScheme);

@@ -1,6 +1,6 @@
 using System.Data;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Delegate for providing color to <see cref="TableView"/> cells based on the value being rendered</summary>
 /// <param name="args">Contains information about the cell for which color is needed</param>
@@ -17,25 +17,6 @@ public delegate ColorScheme RowColorGetterDelegate (RowColorGetterArgs args);
 ///     <a href="../docs/tableview.md">See TableView Deep Dive for more information</a>.
 /// </summary>
 public class TableView : View {
-    /// <summary>
-    ///     The default maximum cell width for <see cref="TableView.MaxCellWidth"/> and <see cref="ColumnStyle.MaxWidth"/>
-    /// </summary>
-    public const int DefaultMaxCellWidth = 100;
-
-    /// <summary>The default minimum cell width for <see cref="ColumnStyle.MinAcceptableWidth"/></summary>
-    public const int DefaultMinAcceptableWidth = 100;
-
-    // TODO: Update to use Key instead of KeyCode
-    private KeyCode cellActivationKey = KeyCode.Enter;
-    private int columnOffset;
-    private int rowOffset;
-    private Point? scrollLeftPoint;
-    private Point? scrollRightPoint;
-    private int selectedColumn;
-    private int selectedRow;
-    private TableStyle style = new ();
-    private ITableSource table;
-
     /// <summary>Initializes a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
     /// <param name="table">The table to display in the control</param>
     public TableView (ITableSource table) : this () { Table = table; }
@@ -51,169 +32,192 @@ public class TableView : View {
 
         // Things this view knows how to do
         AddCommand (
-                    Command.Right,
-                    () => {
-                        ChangeSelectionByOffset (1, 0, false);
+            Command.Right,
+            () => {
+                ChangeSelectionByOffset (1, 0, false);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.Left,
-                    () => {
-                        ChangeSelectionByOffset (-1, 0, false);
+            Command.Left,
+            () => {
+                ChangeSelectionByOffset (-1, 0, false);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.LineUp,
-                    () => {
-                        ChangeSelectionByOffset (0, -1, false);
+            Command.LineUp,
+            () => {
+                ChangeSelectionByOffset (0, -1, false);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.LineDown,
-                    () => {
-                        ChangeSelectionByOffset (0, 1, false);
+            Command.LineDown,
+            () => {
+                ChangeSelectionByOffset (0, 1, false);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.PageUp,
-                    () => {
-                        PageUp (false);
+            Command.PageUp,
+            () => {
+                PageUp (false);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.PageDown,
-                    () => {
-                        PageDown (false);
+            Command.PageDown,
+            () => {
+                PageDown (false);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.LeftHome,
-                    () => {
-                        ChangeSelectionToStartOfRow (false);
+            Command.LeftHome,
+            () => {
+                ChangeSelectionToStartOfRow (false);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.RightEnd,
-                    () => {
-                        ChangeSelectionToEndOfRow (false);
+            Command.RightEnd,
+            () => {
+                ChangeSelectionToEndOfRow (false);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.TopHome,
-                    () => {
-                        ChangeSelectionToStartOfTable (false);
+            Command.TopHome,
+            () => {
+                ChangeSelectionToStartOfTable (false);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.BottomEnd,
-                    () => {
-                        ChangeSelectionToEndOfTable (false);
+            Command.BottomEnd,
+            () => {
+                ChangeSelectionToEndOfTable (false);
 
-                        return true;
-                    });
-
-        AddCommand (
-                    Command.RightExtend,
-                    () => {
-                        ChangeSelectionByOffset (1, 0, true);
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.LeftExtend,
-                    () => {
-                        ChangeSelectionByOffset (-1, 0, true);
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.LineUpExtend,
-                    () => {
-                        ChangeSelectionByOffset (0, -1, true);
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.LineDownExtend,
-                    () => {
-                        ChangeSelectionByOffset (0, 1, true);
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.PageUpExtend,
-                    () => {
-                        PageUp (true);
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.PageDownExtend,
-                    () => {
-                        PageDown (true);
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.LeftHomeExtend,
-                    () => {
-                        ChangeSelectionToStartOfRow (true);
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.RightEndExtend,
-                    () => {
-                        ChangeSelectionToEndOfRow (true);
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.TopHomeExtend,
-                    () => {
-                        ChangeSelectionToStartOfTable (true);
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.BottomEndExtend,
-                    () => {
-                        ChangeSelectionToEndOfTable (true);
-
-                        return true;
-                    });
+                return true;
+            }
+        );
 
         AddCommand (
-                    Command.SelectAll,
-                    () => {
-                        SelectAll ();
+            Command.RightExtend,
+            () => {
+                ChangeSelectionByOffset (1, 0, true);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
         AddCommand (
-                    Command.Accept,
-                    () => {
-                        OnCellActivated (new CellActivatedEventArgs (Table, SelectedColumn, SelectedRow));
+            Command.LeftExtend,
+            () => {
+                ChangeSelectionByOffset (-1, 0, true);
 
-                        return true;
-                    });
+                return true;
+            }
+        );
+        AddCommand (
+            Command.LineUpExtend,
+            () => {
+                ChangeSelectionByOffset (0, -1, true);
+
+                return true;
+            }
+        );
+        AddCommand (
+            Command.LineDownExtend,
+            () => {
+                ChangeSelectionByOffset (0, 1, true);
+
+                return true;
+            }
+        );
+        AddCommand (
+            Command.PageUpExtend,
+            () => {
+                PageUp (true);
+
+                return true;
+            }
+        );
+        AddCommand (
+            Command.PageDownExtend,
+            () => {
+                PageDown (true);
+
+                return true;
+            }
+        );
+        AddCommand (
+            Command.LeftHomeExtend,
+            () => {
+                ChangeSelectionToStartOfRow (true);
+
+                return true;
+            }
+        );
+        AddCommand (
+            Command.RightEndExtend,
+            () => {
+                ChangeSelectionToEndOfRow (true);
+
+                return true;
+            }
+        );
+        AddCommand (
+            Command.TopHomeExtend,
+            () => {
+                ChangeSelectionToStartOfTable (true);
+
+                return true;
+            }
+        );
+        AddCommand (
+            Command.BottomEndExtend,
+            () => {
+                ChangeSelectionToEndOfTable (true);
+
+                return true;
+            }
+        );
 
         AddCommand (
-                    Command.ToggleChecked,
-                    () => {
-                        ToggleCurrentCellSelection ();
+            Command.SelectAll,
+            () => {
+                SelectAll ();
 
-                        return true;
-                    });
+                return true;
+            }
+        );
+        AddCommand (
+            Command.Accept,
+            () => {
+                OnCellActivated (new CellActivatedEventArgs (Table, SelectedColumn, SelectedRow));
+
+                return true;
+            }
+        );
+
+        AddCommand (
+            Command.ToggleChecked,
+            () => {
+                ToggleCurrentCellSelection ();
+
+                return true;
+            }
+        );
 
         // Default keybindings for this view
         KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
@@ -242,21 +246,38 @@ public class TableView : View {
         KeyBindings.Add (CellActivationKey, Command.Accept);
     }
 
-    // TODO: Update to use Key instead of KeyCode
-    /// <summary>The key which when pressed should trigger <see cref="CellActivated"/> event.  Defaults to Enter.</summary>
-    public KeyCode CellActivationKey {
-        get => cellActivationKey;
-        set {
-            if (cellActivationKey != value) {
-                KeyBindings.Replace (cellActivationKey, value);
+    /// <summary>
+    ///     The default maximum cell width for <see cref="TableView.MaxCellWidth"/> and <see cref="ColumnStyle.MaxWidth"/>
+    /// </summary>
+    public const int DefaultMaxCellWidth = 100;
 
-                // of API user is mixing and matching old and new methods of keybinding then they may have lost
-                // the old binding (e.g. with ClearKeybindings) so KeyBindings.Replace alone will fail
-                KeyBindings.Add (value, Command.Accept);
-                cellActivationKey = value;
-            }
-        }
-    }
+    /// <summary>The default minimum cell width for <see cref="ColumnStyle.MinAcceptableWidth"/></summary>
+    public const int DefaultMinAcceptableWidth = 100;
+
+    private int columnOffset;
+    private int rowOffset;
+    private int selectedColumn;
+    private int selectedRow;
+    private ITableSource table;
+
+    // TODO: Update to use Key instead of KeyCode
+    private KeyCode cellActivationKey = KeyCode.Enter;
+    private Point? scrollLeftPoint;
+    private Point? scrollRightPoint;
+    private TableStyle style = new ();
+
+    /// <summary>True to select the entire row at once.  False to select individual cells.  Defaults to false</summary>
+    public bool FullRowSelect { get; set; }
+
+    /// <summary>True to allow regions to be selected</summary>
+    /// <value></value>
+    public bool MultiSelect { get; set; } = true;
+
+    /// <summary>
+    ///     The symbol to add after each cell value and header value to visually seperate values (if not using vertical
+    ///     gridlines)
+    /// </summary>
+    public char SeparatorSymbol { get; set; } = ' ';
 
     /// <summary>Navigator for cycling the selected item in the table by typing. Set to null to disable this feature.</summary>
     public CollectionNavigatorBase CollectionNavigator { get; set; }
@@ -273,9 +294,6 @@ public class TableView : View {
         set => columnOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Columns - 1, value));
     }
 
-    /// <summary>True to select the entire row at once.  False to select individual cells.  Defaults to false</summary>
-    public bool FullRowSelect { get; set; }
-
     /// <summary>
     ///     The maximum number of characters to render in any given column.  This prevents one long column from pushing
     ///     out all the others
@@ -284,20 +302,6 @@ public class TableView : View {
 
     /// <summary>The minimum number of characters to render in any given column.</summary>
     public int MinCellWidth { get; set; }
-
-    /// <summary>True to allow regions to be selected</summary>
-    /// <value></value>
-    public bool MultiSelect { get; set; } = true;
-
-    /// <summary>
-    ///     When <see cref="MultiSelect"/> is enabled this property contain all rectangles of selected cells.  Rectangles
-    ///     describe column/rows selected in <see cref="Table"/> (not screen coordinates)
-    /// </summary>
-    /// <returns></returns>
-    public Stack<TableSelection> MultiSelectedRegions { get; } = new ();
-
-    /// <summary>The text representation that should be rendered for cells with the value <see cref="DBNull.Value"/></summary>
-    public string NullSymbol { get; set; } = "-";
 
     /// <summary>
     ///     Vertical scroll offset.  The index of the first row in <see cref="Table"/> to display in the first non header
@@ -319,12 +323,14 @@ public class TableView : View {
 
             if (oldValue != selectedColumn) {
                 OnSelectedCellChanged (
-                                       new SelectedCellChangedEventArgs (
-                                                                         Table,
-                                                                         oldValue,
-                                                                         SelectedColumn,
-                                                                         SelectedRow,
-                                                                         SelectedRow));
+                    new SelectedCellChangedEventArgs (
+                        Table,
+                        oldValue,
+                        SelectedColumn,
+                        SelectedRow,
+                        SelectedRow
+                    )
+                );
             }
         }
     }
@@ -339,28 +345,15 @@ public class TableView : View {
 
             if (oldValue != selectedRow) {
                 OnSelectedCellChanged (
-                                       new SelectedCellChangedEventArgs (
-                                                                         Table,
-                                                                         SelectedColumn,
-                                                                         SelectedColumn,
-                                                                         oldValue,
-                                                                         selectedRow));
+                    new SelectedCellChangedEventArgs (
+                        Table,
+                        SelectedColumn,
+                        SelectedColumn,
+                        oldValue,
+                        selectedRow
+                    )
+                );
             }
-        }
-    }
-
-    /// <summary>
-    ///     The symbol to add after each cell value and header value to visually seperate values (if not using vertical
-    ///     gridlines)
-    /// </summary>
-    public char SeparatorSymbol { get; set; } = ' ';
-
-    /// <summary>Contains options for changing how the table is rendered</summary>
-    public TableStyle Style {
-        get => style;
-        set {
-            style = value;
-            Update ();
         }
     }
 
@@ -369,6 +362,41 @@ public class TableView : View {
         get => table;
         set {
             table = value;
+            Update ();
+        }
+    }
+
+    // TODO: Update to use Key instead of KeyCode
+    /// <summary>The key which when pressed should trigger <see cref="CellActivated"/> event.  Defaults to Enter.</summary>
+    public KeyCode CellActivationKey {
+        get => cellActivationKey;
+        set {
+            if (cellActivationKey != value) {
+                KeyBindings.Replace (cellActivationKey, value);
+
+                // of API user is mixing and matching old and new methods of keybinding then they may have lost
+                // the old binding (e.g. with ClearKeybindings) so KeyBindings.Replace alone will fail
+                KeyBindings.Add (value, Command.Accept);
+                cellActivationKey = value;
+            }
+        }
+    }
+
+    /// <summary>
+    ///     When <see cref="MultiSelect"/> is enabled this property contain all rectangles of selected cells.  Rectangles
+    ///     describe column/rows selected in <see cref="Table"/> (not screen coordinates)
+    /// </summary>
+    /// <returns></returns>
+    public Stack<TableSelection> MultiSelectedRegions { get; } = new ();
+
+    /// <summary>The text representation that should be rendered for cells with the value <see cref="DBNull.Value"/></summary>
+    public string NullSymbol { get; set; } = "-";
+
+    /// <summary>Contains options for changing how the table is rendered</summary>
+    public TableStyle Style {
+        get => style;
+        set {
+            style = value;
             Update ();
         }
     }
@@ -572,16 +600,17 @@ public class TableView : View {
 
             // ensure region's origin exists
             region.Origin = new Point (
-                                       Math.Max (Math.Min (region.Origin.X, Table.Columns - 1), 0),
-                                       Math.Max (Math.Min (region.Origin.Y, Table.Rows - 1), 0));
+                Math.Max (Math.Min (region.Origin.X, Table.Columns - 1), 0),
+                Math.Max (Math.Min (region.Origin.Y, Table.Rows - 1), 0)
+            );
 
             // ensure regions do not go over edge of table bounds
             region.Rect = Rect.FromLTRB (
-                                         region.Rect.Left,
-                                         region.Rect.Top,
-                                         Math.Max (Math.Min (region.Rect.Right, Table.Columns), 0),
-                                         Math.Max (Math.Min (region.Rect.Bottom, Table.Rows), 0)
-                                        );
+                region.Rect.Left,
+                region.Rect.Top,
+                Math.Max (Math.Min (region.Rect.Right, Table.Columns), 0),
+                Math.Max (Math.Min (region.Rect.Bottom, Table.Rows), 0)
+            );
 
             MultiSelectedRegions.Push (region);
         }
@@ -599,7 +628,7 @@ public class TableView : View {
 
         EnsureValidSelection ();
 
-        HashSet<Point> toReturn = new HashSet<Point> ();
+        HashSet<Point> toReturn = new ();
 
         // If there are one or more rectangular selections
         if (MultiSelect && MultiSelectedRegions.Any ()) {
@@ -953,9 +982,11 @@ public class TableView : View {
 
         // Create a single region over entire table, set the origin of the selection to the active cell so that a followup spread selection e.g. shift-right behaves properly
         MultiSelectedRegions.Push (
-                                   new TableSelection (
-                                                       new Point (SelectedColumn, SelectedRow),
-                                                       new Rect (0, 0, Table.Columns, table.Rows)));
+            new TableSelection (
+                new Point (SelectedColumn, SelectedRow),
+                new Rect (0, 0, Table.Columns, table.Rows)
+            )
+        );
         Update ();
     }
 
@@ -1106,10 +1137,11 @@ public class TableView : View {
         for (int i = RowOffset; i < RowOffset + rowsToRender && i < Table.Rows; i++) {
             //expand required space if cell is bigger than the last biggest cell or header
             spaceRequired = Math.Max (
-                                      spaceRequired,
-                                      GetRepresentation (Table[i, col], colStyle)
-                                          .EnumerateRunes ()
-                                          .Sum (c => c.GetColumns ()));
+                spaceRequired,
+                GetRepresentation (Table[i, col], colStyle)
+                    .EnumerateRunes ()
+                    .Sum (c => c.GetColumns ())
+            );
         }
 
         // Don't require more space than the style allows
@@ -1145,7 +1177,7 @@ public class TableView : View {
             return Enumerable.Empty<ColumnToRender> ();
         }
 
-        List<ColumnToRender> toReturn = new List<ColumnToRender> ();
+        List<ColumnToRender> toReturn = new ();
         var usedSpace = 0;
 
         //if horizontal space is required at the start of the line (before the first header)
@@ -1282,8 +1314,8 @@ public class TableView : View {
 
         // Rect class is inclusive of Top Left but exclusive of Bottom Right so extend by 1
         return new TableSelection (new Point (pt1X, pt1Y), new Rect (left, top, right - left + 1, bot - top + 1)) {
-                   IsToggled = toggle
-               };
+            IsToggled = toggle
+        };
     }
 
     /// <summary>Returns a single point as a <see cref="TableSelection"/></summary>
@@ -1481,8 +1513,8 @@ public class TableView : View {
 
     private void RenderHeaderUnderline (int row, int availableWidth, ColumnToRender[] columnsToRender) {
         /*
-        *  First lets work out if we should be rendering scroll indicators
-        */
+         *  First lets work out if we should be rendering scroll indicators
+         */
 
         // are there are visible columns to the left that have been pushed
         // off the screen due to horizontal scrolling?
@@ -1507,8 +1539,8 @@ public class TableView : View {
         }
 
         /*
-        *  Now lets draw the line itself
-        */
+         *  Now lets draw the line itself
+         */
 
         // Renders a line below the table headers (when visible) like:
         // ├──────────┼───────────┼───────────────────┼──────────┼────────┼─────────────┤
@@ -1565,7 +1597,8 @@ public class TableView : View {
         bool focused = HasFocus;
 
         ColorScheme rowScheme = Style.RowColorGetter?.Invoke (
-                                                              new RowColorGetterArgs (Table, rowToRender))
+                                    new RowColorGetterArgs (Table, rowToRender)
+                                )
                                 ?? ColorScheme;
 
         //start by clearing the entire line
@@ -1606,13 +1639,15 @@ public class TableView : View {
             if (colorSchemeGetter != null) {
                 // user has a delegate for defining row color per cell, call it
                 scheme = colorSchemeGetter (
-                                            new CellColorGetterArgs (
-                                                                     Table,
-                                                                     rowToRender,
-                                                                     current.Column,
-                                                                     val,
-                                                                     representation,
-                                                                     rowScheme));
+                    new CellColorGetterArgs (
+                        Table,
+                        rowToRender,
+                        current.Column,
+                        val,
+                        representation,
+                        rowScheme
+                    )
+                );
 
                 // if users custom color getter returned null, use the row scheme
                 if (scheme == null) {
@@ -1701,8 +1736,9 @@ public class TableView : View {
         return (Table == null) ||
                (Table.Columns <= 0) ||
                Enumerable.Range (0, Table.Columns)
-                         .All (
-                               c => (Style.GetColumnStyleIfAny (c)?.Visible ?? true) == false);
+                   .All (
+                       c => (Style.GetColumnStyleIfAny (c)?.Visible ?? true) == false
+                   );
     }
 
     private void ToggleCurrentCellSelection () {
@@ -1739,13 +1775,14 @@ public class TableView : View {
             } else {
                 // Toggle on a single cell selection
                 MultiSelectedRegions.Push (
-                                           CreateTableSelection (
-                                                                 selectedColumn,
-                                                                 SelectedRow,
-                                                                 selectedColumn,
-                                                                 selectedRow,
-                                                                 true)
-                                          );
+                    CreateTableSelection (
+                        selectedColumn,
+                        SelectedRow,
+                        selectedColumn,
+                        selectedRow,
+                        true
+                    )
+                );
             }
         }
     }
@@ -1795,8 +1832,9 @@ public class TableView : View {
 
         // value is too wide
         return new string (
-                           representation.TakeWhile (c => (availableHorizontalSpace -= ((Rune)c).GetColumns ()) > 0)
-                                         .ToArray ());
+            representation.TakeWhile (c => (availableHorizontalSpace -= ((Rune)c).GetColumns ()) > 0)
+                .ToArray ()
+        );
     }
 
     private bool TryGetNearestVisibleColumn (
@@ -1815,8 +1853,8 @@ public class TableView : View {
         // get the column visibility by index (if no style visible is true)
         bool[] columnVisibility =
             Enumerable.Range (0, Table.Columns)
-                      .Select (c => Style.GetColumnStyleIfAny (c)?.Visible ?? true)
-                      .ToArray ();
+                .Select (c => Style.GetColumnStyleIfAny (c)?.Visible ?? true)
+                .ToArray ();
 
         // column is visible
         if (columnVisibility[columnIndex]) {
@@ -1881,16 +1919,16 @@ public class TableView : View {
         SelectedColumn = col;
         SelectedRow = row;
         MultiSelectedRegions.Push (
-                                   CreateTableSelection (col, row)
-                                  );
+            CreateTableSelection (col, row)
+        );
 
         // if the old cell was not part of a rectangular select
         // or otherwise selected we need to retain it in the selection
 
         if (!IsSelected (oldColumn, oldRow)) {
             MultiSelectedRegions.Push (
-                                       CreateTableSelection (oldColumn, oldRow)
-                                      );
+                CreateTableSelection (oldColumn, oldRow)
+            );
         }
     }
 
@@ -1903,11 +1941,11 @@ public class TableView : View {
             IsVeryLast = isVeryLast;
         }
 
-        /// <summary>The column to render</summary>
-        public int Column { get; set; }
-
         /// <summary>True if this column is the very last column in the <see cref="Table"/> (not just the last visible column)</summary>
         public bool IsVeryLast { get; }
+
+        /// <summary>The column to render</summary>
+        public int Column { get; set; }
 
         /// <summary>
         ///     The width that the column should occupy as calculated by <see cref="CalculateViewport(Rect, int)"/>.  Note

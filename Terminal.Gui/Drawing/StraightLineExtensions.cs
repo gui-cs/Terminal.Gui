@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>Extension methods for <see cref="StraightLine"/> (including collections).</summary>
 public static class StraightLineExtensions {
@@ -17,7 +17,7 @@ public static class StraightLineExtensions {
         int length,
         Orientation orientation
     ) {
-        List<StraightLine> toReturn = new List<StraightLine> ();
+        List<StraightLine> toReturn = new ();
         if (length == 0) {
             return collection;
         }
@@ -132,8 +132,9 @@ public static class StraightLineExtensions {
     /// <returns>The new line</returns>
     private static StraightLine CreateLineFromDiff (StraightLine l, int from, int length) {
         var start = new Point (
-                               l.Orientation == Orientation.Horizontal ? from : l.Start.X,
-                               l.Orientation == Orientation.Horizontal ? l.Start.Y : from);
+            l.Orientation == Orientation.Horizontal ? from : l.Start.X,
+            l.Orientation == Orientation.Horizontal ? l.Start.Y : from
+        );
 
         return new StraightLine (start, length, l.Orientation, l.Style, l.Attribute);
     }

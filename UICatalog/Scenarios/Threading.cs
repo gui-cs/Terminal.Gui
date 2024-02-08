@@ -9,31 +9,29 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("Threading", "Demonstration of how to use threading in different ways")]
 [ScenarioCategory ("Threading")]
 public class Threading : Scenario {
-    readonly List<string> _log = [];
-    Action _action;
-    Button _btnActionCancel;
-
-    CancellationTokenSource _cancellationTokenSource;
-    EventHandler _handler;
-
-    ListView _itemsList;
-    Action _lambda;
-    ListView _logJob;
-    Action _sync;
+    private readonly List<string> _log = [];
+    private Action _action;
+    private Action _lambda;
+    private Action _sync;
+    private Button _btnActionCancel;
+    private CancellationTokenSource _cancellationTokenSource;
+    private EventHandler _handler;
+    private ListView _itemsList;
+    private ListView _logJob;
 
     public override void Setup () {
         _action = LoadData;
         _lambda = async () => {
             _itemsList.Source = null;
             LogJob ("Loading task lambda");
-            var items = await LoadDataAsync ();
+            List<string> items = await LoadDataAsync ();
             LogJob ("Returning from task lambda");
             await _itemsList.SetSourceAsync (items);
         };
         _handler = async (s, e) => {
             _itemsList.Source = null;
             LogJob ("Loading task handler");
-            var items = await LoadDataAsync ();
+            List<string> items = await LoadDataAsync ();
             LogJob ("Returning from task handler");
             await _itemsList.SetSourceAsync (items);
         };
@@ -49,11 +47,7 @@ public class Threading : Scenario {
         _btnActionCancel = new Button { X = 1, Y = 1, Text = "Cancelable Load Items" };
         _btnActionCancel.Clicked += (s, e) => Application.Invoke (CallLoadItemsAsync);
 
-        Win.Add (new Label {
-            X = Pos.X (_btnActionCancel),
-            Y = Pos.Y (_btnActionCancel) + 4,
-            Text = "Data Items:"
-        });
+        Win.Add (new Label { X = Pos.X (_btnActionCancel), Y = Pos.Y (_btnActionCancel) + 4, Text = "Data Items:" });
 
         _itemsList = new ListView {
             X = Pos.X (_btnActionCancel),
@@ -63,11 +57,7 @@ public class Threading : Scenario {
             ColorScheme = Colors.ColorSchemes["TopLevel"]
         };
 
-        Win.Add (new Label {
-            X = Pos.Right (_itemsList) + 10,
-            Y = Pos.Y (_btnActionCancel) + 4,
-            Text = "Task Logs:"
-        });
+        Win.Add (new Label { X = Pos.Right (_itemsList) + 10, Y = Pos.Y (_btnActionCancel) + 4, Text = "Task Logs:" });
 
         _logJob = new ListView {
             X = Pos.Right (_itemsList) + 10,
@@ -98,8 +88,19 @@ public class Threading : Scenario {
         var btnQuit = new Button { X = 80, Y = 22, Text = "Quit" };
         btnQuit.Clicked += (s, e) => Application.RequestStop ();
 
-        Win.Add (_itemsList, _btnActionCancel, _logJob, text, btnAction, btnLambda, btnHandler, btnSync,
-            btnMethod, btnClearData, btnQuit);
+        Win.Add (
+            _itemsList,
+            _btnActionCancel,
+            _logJob,
+            text,
+            btnAction,
+            btnLambda,
+            btnHandler,
+            btnSync,
+            btnMethod,
+            btnClearData,
+            btnQuit
+        );
 
         void Top_Loaded (object sender, EventArgs args) {
             _btnActionCancel.SetFocus ();
@@ -109,56 +110,7 @@ public class Threading : Scenario {
         Application.Top.Loaded += Top_Loaded;
     }
 
-    async void LoadData () {
-        _itemsList.Source = null;
-        LogJob ("Loading task");
-        var items = await LoadDataAsync ();
-        LogJob ("Returning from task");
-        await _itemsList.SetSourceAsync (items);
-    }
-
-    void LogJob (string job) {
-        _log.Add (job);
-        _logJob.MoveDown ();
-    }
-
-    async Task<List<string>> LoadDataAsync () {
-        _itemsList.Source = null;
-        LogJob ("Starting delay");
-        await Task.Delay (3000);
-        LogJob ("Finished delay");
-        return [
-            "One",
-            "Two",
-            "Three",
-            "Four",
-            "Five",
-            "Six",
-            "Seven",
-            "Eight",
-            "Nine",
-            "Ten",
-            "Four",
-            "Five",
-            "Six",
-            "Seven",
-            "Eight",
-            "Nine",
-            "Ten"
-        ];
-    }
-
-    async Task MethodAsync () {
-        _itemsList.Source = null;
-        LogJob ("Loading task method");
-        List<string> items = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
-        await Task.Delay (3000);
-        LogJob ("Returning from task method");
-        await _itemsList.SetSourceAsync (items);
-        _itemsList.SetNeedsDisplay ();
-    }
-
-    async void CallLoadItemsAsync () {
+    private async void CallLoadItemsAsync () {
         _cancellationTokenSource = new CancellationTokenSource ();
         _itemsList.Source = null;
         LogJob ("Clicked the button");
@@ -175,13 +127,15 @@ public class Threading : Scenario {
             }
 
             LogJob ($"Calling task Thread:{Thread.CurrentThread.ManagedThreadId} {DateTime.Now}");
-            var items = await Task.Run (LoadItemsAsync, _cancellationTokenSource.Token);
+            List<string> items = await Task.Run (LoadItemsAsync, _cancellationTokenSource.Token);
             if (!_cancellationTokenSource.IsCancellationRequested) {
                 LogJob (
-                    $"Returned from task Thread:{Thread.CurrentThread.ManagedThreadId} {DateTime.Now}");
+                    $"Returned from task Thread:{Thread.CurrentThread.ManagedThreadId} {DateTime.Now}"
+                );
                 await _itemsList.SetSourceAsync (items);
                 LogJob (
-                    $"Finished populate list view Thread:{Thread.CurrentThread.ManagedThreadId} {DateTime.Now}");
+                    $"Finished populate list view Thread:{Thread.CurrentThread.ManagedThreadId} {DateTime.Now}"
+                );
                 _btnActionCancel.Text = "Cancelable Load Items";
             } else {
                 LogJob ("Task was canceled!");
@@ -192,11 +146,62 @@ public class Threading : Scenario {
         }
     }
 
-    async Task<List<string>> LoadItemsAsync () {
+    private async void LoadData () {
+        _itemsList.Source = null;
+        LogJob ("Loading task");
+        List<string> items = await LoadDataAsync ();
+        LogJob ("Returning from task");
+        await _itemsList.SetSourceAsync (items);
+    }
+
+    private async Task<List<string>> LoadDataAsync () {
+        _itemsList.Source = null;
+        LogJob ("Starting delay");
+        await Task.Delay (3000);
+        LogJob ("Finished delay");
+
+        return [
+                   "One",
+                   "Two",
+                   "Three",
+                   "Four",
+                   "Five",
+                   "Six",
+                   "Seven",
+                   "Eight",
+                   "Nine",
+                   "Ten",
+                   "Four",
+                   "Five",
+                   "Six",
+                   "Seven",
+                   "Eight",
+                   "Nine",
+                   "Ten"
+               ];
+    }
+
+    private async Task<List<string>> LoadItemsAsync () {
         // Do something that takes lot of times.
         LogJob ($"Starting delay Thread:{Thread.CurrentThread.ManagedThreadId} {DateTime.Now}");
         await Task.Delay (5000);
         LogJob ($"Finished delay Thread:{Thread.CurrentThread.ManagedThreadId} {DateTime.Now}");
+
         return ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+    }
+
+    private void LogJob (string job) {
+        _log.Add (job);
+        _logJob.MoveDown ();
+    }
+
+    private async Task MethodAsync () {
+        _itemsList.Source = null;
+        LogJob ("Loading task method");
+        List<string> items = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+        await Task.Delay (3000);
+        LogJob ("Returning from task method");
+        await _itemsList.SetSourceAsync (items);
+        _itemsList.SetNeedsDisplay ();
     }
 }

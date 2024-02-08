@@ -23,17 +23,17 @@ public class SliderOption<T> {
         Data = data;
     }
 
-    /// <summary>Custom data of the option.</summary>
-    public T Data { get; set; }
-
-    /// <summary>Legend of the option.</summary>
-    public string Legend { get; set; }
-
     /// <summary>
     ///     Abbreviation of the Legend. When the <see cref="Slider{T}.InnerSpacing"/> too small to fit
     ///     <see cref="Legend"/>.
     /// </summary>
     public Rune LegendAbbr { get; set; }
+
+    /// <summary>Legend of the option.</summary>
+    public string Legend { get; set; }
+
+    /// <summary>Custom data of the option.</summary>
+    public T Data { get; set; }
 
     /// <summary>Event fired when the an option has changed.</summary>
     public event EventHandler<SliderOptionEventArgs> Changed;
@@ -123,9 +123,6 @@ public class SliderStyle {
     /// <summary>The glyph and the attribute used for the end of ranges on the slider.</summary>
     public Cell EndRangeChar { get; set; }
 
-    /// <summary>Legend attributes</summary>
-    public SliderAttributes LegendAttributes { get; set; }
-
     /// <summary>The glyph and the attribute used for each option (tick) on the slider.</summary>
     public Cell OptionChar { get; set; }
 
@@ -140,21 +137,24 @@ public class SliderStyle {
 
     /// <summary>The glyph and the attribute used for the start of ranges on the slider.</summary>
     public Cell StartRangeChar { get; set; }
+
+    /// <summary>Legend attributes</summary>
+    public SliderAttributes LegendAttributes { get; set; }
 }
 
 /// <summary>All <see cref="Slider{T}"/> configuration are grouped in this class.</summary>
 class SliderConfiguration {
     internal bool _allowEmpty;
     internal bool _autoSize;
-    internal int _endSpacing;
-    internal int _innerSpacing;
-    internal Orientation _legendsOrientation = Orientation.Horizontal;
     internal bool _rangeAllowSingle;
     internal bool _showEndSpacing;
     internal bool _showLegends;
     internal bool _showLegendsAbbr;
-    internal Orientation _sliderOrientation = Orientation.Horizontal;
+    internal int _endSpacing;
+    internal int _innerSpacing;
     internal int _startSpacing;
+    internal Orientation _legendsOrientation = Orientation.Horizontal;
+    internal Orientation _sliderOrientation = Orientation.Horizontal;
     internal SliderType _type = SliderType.Single;
 }
 
@@ -172,11 +172,11 @@ public class SliderEventArgs<T> : EventArgs {
     /// <summary>If set to true, the focus operation will be canceled, if applicable.</summary>
     public bool Cancel { get; set; }
 
-    /// <summary>Gets or sets the index of the option that is focused.</summary>
-    public int Focused { get; set; }
-
     /// <summary>Gets/sets whether the option is set or not.</summary>
     public Dictionary<int, SliderOption<T>> Options { get; set; }
+
+    /// <summary>Gets or sets the index of the option that is focused.</summary>
+    public int Focused { get; set; }
 }
 
 /// <summary><see cref="EventArgs"/> for <see cref="Orientation"/> events.</summary>
@@ -213,10 +213,9 @@ public class Slider : Slider<object> {
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public class Slider<T> : View {
-    private readonly SliderConfiguration _config = new ();
-
     // List of the current set options.
     private readonly List<int> _setOptions = new ();
+    private readonly SliderConfiguration _config = new ();
 
     // Options
     private List<SliderOption<T>> _options;
@@ -310,19 +309,21 @@ public class Slider<T> : View {
             SetInitialProperties (null, orientation);
         } else {
             SetInitialProperties (
-                                  options.Select (
-                                                  e => {
-                                                      var legend = e.ToString ();
+                options.Select (
+                        e => {
+                            var legend = e.ToString ();
 
-                                                      return new SliderOption<T> {
-                                                                 Data = e,
-                                                                 Legend = legend,
-                                                                 LegendAbbr =
-                                                                     (Rune)(legend?.Length > 0 ? legend[0] : ' ')
-                                                             };
-                                                  })
-                                         .ToList (),
-                                  orientation);
+                            return new SliderOption<T> {
+                                Data = e,
+                                Legend = legend,
+                                LegendAbbr =
+                                    (Rune)(legend?.Length > 0 ? legend[0] : ' ')
+                            };
+                        }
+                    )
+                    .ToList (),
+                orientation
+            );
         }
     }
 
@@ -668,24 +669,32 @@ public class Slider<T> : View {
 
         if (_config._sliderOrientation == Orientation.Horizontal) {
             Bounds = new Rect (
-                               Bounds.Location,
-                               new Size (
-                                         int.Min (
-                                                  SuperView.Bounds.Width - GetAdornmentsThickness ().Horizontal,
-                                                  CalcBestLength ()),
-                                         int.Min (
-                                                  SuperView.Bounds.Height - GetAdornmentsThickness ().Vertical,
-                                                  CalcThickness ())));
+                Bounds.Location,
+                new Size (
+                    int.Min (
+                        SuperView.Bounds.Width - GetAdornmentsThickness ().Horizontal,
+                        CalcBestLength ()
+                    ),
+                    int.Min (
+                        SuperView.Bounds.Height - GetAdornmentsThickness ().Vertical,
+                        CalcThickness ()
+                    )
+                )
+            );
         } else {
             Bounds = new Rect (
-                               Bounds.Location,
-                               new Size (
-                                         int.Min (
-                                                  SuperView.Bounds.Width - GetAdornmentsThickness ().Horizontal,
-                                                  CalcThickness ()),
-                                         int.Min (
-                                                  SuperView.Bounds.Height - GetAdornmentsThickness ().Vertical,
-                                                  CalcBestLength ())));
+                Bounds.Location,
+                new Size (
+                    int.Min (
+                        SuperView.Bounds.Width - GetAdornmentsThickness ().Horizontal,
+                        CalcThickness ()
+                    ),
+                    int.Min (
+                        SuperView.Bounds.Height - GetAdornmentsThickness ().Vertical,
+                        CalcBestLength ()
+                    )
+                )
+            );
         }
     }
 
@@ -927,9 +936,10 @@ public class Slider<T> : View {
         // Left Spacing
         if (_config._showEndSpacing && _config._startSpacing > 0) {
             Driver?.SetAttribute (
-                                  isSet && _config._type == SliderType.LeftRange
-                                      ? Style.RangeChar.Attribute ?? normalAttr
-                                      : Style.SpaceChar.Attribute ?? normalAttr);
+                isSet && _config._type == SliderType.LeftRange
+                    ? Style.RangeChar.Attribute ?? normalAttr
+                    : Style.SpaceChar.Attribute ?? normalAttr
+            );
             Rune rune = isSet && _config._type == SliderType.LeftRange ? Style.RangeChar.Rune : Style.SpaceChar.Rune;
 
             for (var i = 0; i < _config._startSpacing; i++) {
@@ -984,11 +994,9 @@ public class Slider<T> : View {
 
                 // Draw Option
                 Driver?.SetAttribute (
-                                      isSet && _setOptions.Contains (i)
-                                          ? Style.SetChar.Attribute ?? setAtrr
-                                          : drawRange
-                                              ? Style.RangeChar.Attribute ?? setAtrr
-                                              : Style.OptionChar.Attribute ?? normalAttr);
+                    isSet && _setOptions.Contains (i) ? Style.SetChar.Attribute ?? setAtrr :
+                    drawRange ? Style.RangeChar.Attribute ?? setAtrr : Style.OptionChar.Attribute ?? normalAttr
+                );
 
                 // Note(jmperricone): Maybe only for curses, windows inverts actual colors, while curses inverts bg with fg.
                 //if (Application.Driver is CursesDriver) {
@@ -1018,9 +1026,10 @@ public class Slider<T> : View {
                 if (_config._showEndSpacing || (i < _options.Count - 1)) {
                     // Skip if is the Last Spacing.
                     Driver?.SetAttribute (
-                                          drawRange && isSet
-                                              ? Style.RangeChar.Attribute ?? setAtrr
-                                              : Style.SpaceChar.Attribute ?? normalAttr);
+                        drawRange && isSet
+                            ? Style.RangeChar.Attribute ?? setAtrr
+                            : Style.SpaceChar.Attribute ?? normalAttr
+                    );
                     for (var s = 0; s < _config._innerSpacing; s++) {
                         MoveAndAdd (x, y, drawRange && isSet ? Style.RangeChar.Rune : Style.SpaceChar.Rune);
                         if (isVertical) {
@@ -1038,9 +1047,10 @@ public class Slider<T> : View {
         // Right Spacing
         if (_config._showEndSpacing) {
             Driver?.SetAttribute (
-                                  isSet && _config._type == SliderType.RightRange
-                                      ? Style.RangeChar.Attribute ?? normalAttr
-                                      : Style.SpaceChar.Attribute ?? normalAttr);
+                isSet && _config._type == SliderType.RightRange
+                    ? Style.RangeChar.Attribute ?? normalAttr
+                    : Style.SpaceChar.Attribute ?? normalAttr
+            );
             Rune rune = isSet && _config._type == SliderType.RightRange ? Style.RangeChar.Rune : Style.SpaceChar.Rune;
             for (var i = 0; i < remaining; i++) {
                 MoveAndAdd (x, y, rune);
@@ -1564,10 +1574,12 @@ public class Slider<T> : View {
     internal bool ExtendPlus () {
         int next = FocusedOption < _options.Count - 1 ? FocusedOption + 1 : FocusedOption;
         if (next != FocusedOption && !OnOptionFocused (
-                                                       next,
-                                                       new SliderEventArgs<T> (
-                                                                               GetSetOptionDictionary (),
-                                                                               FocusedOption))) {
+                next,
+                new SliderEventArgs<T> (
+                    GetSetOptionDictionary (),
+                    FocusedOption
+                )
+            )) {
             SetFocusedOption ();
         }
 
@@ -1619,10 +1631,12 @@ public class Slider<T> : View {
     internal bool ExtendMinus () {
         int prev = FocusedOption > 0 ? FocusedOption - 1 : FocusedOption;
         if (prev != FocusedOption && !OnOptionFocused (
-                                                       prev,
-                                                       new SliderEventArgs<T> (
-                                                                               GetSetOptionDictionary (),
-                                                                               FocusedOption))) {
+                prev,
+                new SliderEventArgs<T> (
+                    GetSetOptionDictionary (),
+                    FocusedOption
+                )
+            )) {
             SetFocusedOption ();
         }
 
@@ -1637,8 +1651,9 @@ public class Slider<T> : View {
 
     internal bool MovePlus () {
         bool cancelled = OnOptionFocused (
-                                          FocusedOption + 1,
-                                          new SliderEventArgs<T> (GetSetOptionDictionary (), FocusedOption));
+            FocusedOption + 1,
+            new SliderEventArgs<T> (GetSetOptionDictionary (), FocusedOption)
+        );
         if (cancelled) {
             return false;
         }
@@ -1652,8 +1667,9 @@ public class Slider<T> : View {
 
     internal bool MoveMinus () {
         bool cancelled = OnOptionFocused (
-                                          FocusedOption - 1,
-                                          new SliderEventArgs<T> (GetSetOptionDictionary (), FocusedOption));
+            FocusedOption - 1,
+            new SliderEventArgs<T> (GetSetOptionDictionary (), FocusedOption)
+        );
         if (cancelled) {
             return false;
         }

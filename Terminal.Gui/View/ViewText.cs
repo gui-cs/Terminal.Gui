@@ -170,8 +170,9 @@ public partial class View {
     /// <returns></returns>
     internal Size GetSizeNeededForTextWithoutHotKey () {
         return new Size (
-                         TextFormatter.Size.Width - GetHotKeySpecifierLength (),
-                         TextFormatter.Size.Height - GetHotKeySpecifierLength (false));
+            TextFormatter.Size.Width - GetHotKeySpecifierLength (),
+            TextFormatter.Size.Height - GetHotKeySpecifierLength (false)
+        );
     }
 
     /// <summary>
@@ -197,15 +198,17 @@ public partial class View {
         }
 
         TextFormatter.Size = new Size (
-                                       Bounds.Size.Width + GetHotKeySpecifierLength (),
-                                       Bounds.Size.Height + GetHotKeySpecifierLength (false));
+            Bounds.Size.Width + GetHotKeySpecifierLength (),
+            Bounds.Size.Height + GetHotKeySpecifierLength (false)
+        );
     }
 
     private bool IsValidAutoSize (out Size autoSize) {
         Rect rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
         autoSize = new Size (
-                             rect.Size.Width - GetHotKeySpecifierLength (),
-                             rect.Size.Height - GetHotKeySpecifierLength (false));
+            rect.Size.Width - GetHotKeySpecifierLength (),
+            rect.Size.Height - GetHotKeySpecifierLength (false)
+        );
 
         return !((ValidatePosDim && (!(Width is Dim.DimAbsolute) || !(Height is Dim.DimAbsolute))) ||
                  (_frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength ()) ||

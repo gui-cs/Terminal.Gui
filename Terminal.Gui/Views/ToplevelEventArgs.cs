@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>Args for events that relate to a specific <see cref="Toplevel"/>.</summary>
 public class ToplevelEventArgs : EventArgs {

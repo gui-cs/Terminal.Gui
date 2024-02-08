@@ -4,11 +4,11 @@
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace Terminal.Gui.ViewTests; 
+namespace Terminal.Gui.ViewTests;
 
 public class TitleTests {
-    private readonly ITestOutputHelper output;
     public TitleTests (ITestOutputHelper output) { this.output = output; }
+    private readonly ITestOutputHelper output;
 
     [Fact]
     public void Set_Title_Fires_TitleChanged () {

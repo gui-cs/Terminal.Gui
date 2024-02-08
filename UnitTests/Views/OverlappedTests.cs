@@ -3,8 +3,6 @@
 namespace Terminal.Gui.ViewsTests;
 
 public class OverlappedTests {
-    private readonly ITestOutputHelper _output;
-
     public OverlappedTests (ITestOutputHelper output) {
         _output = output;
 #if DEBUG_IDISPOSABLE
@@ -12,6 +10,8 @@ public class OverlappedTests {
         RunState.Instances.Clear ();
 #endif
     }
+
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     [AutoInitShutdown]
@@ -333,8 +333,9 @@ public class OverlappedTests {
                 Assert.Equal (iterations, Application.OverlappedChildren.Count);
                 for (var i = 0; i < iterations; i++) {
                     Assert.Equal (
-                                  (iterations - i + (iterations == 4 && i == 0 ? 2 : 1)).ToString (),
-                                  Application.OverlappedChildren[i].Id);
+                        (iterations - i + (iterations == 4 && i == 0 ? 2 : 1)).ToString (),
+                        Application.OverlappedChildren[i].Id
+                    );
                 }
             }
 
@@ -698,22 +699,23 @@ public class OverlappedTests {
         var firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
  ┌───┐
  │   │
  │   │
  │   │
  └───┘",
-                                                      _output);
-        Attribute[] attributes = new[] {
-                                           // 0
-                                           Colors.ColorSchemes["TopLevel"].Normal,
+            _output
+        );
+        Attribute[] attributes = {
+            // 0
+            Colors.ColorSchemes["TopLevel"].Normal,
 
-                                           // 1
-                                           Colors.ColorSchemes["Base"].Normal
-                                       };
+            // 1
+            Colors.ColorSchemes["Base"].Normal
+        };
         TestHelpers.AssertDriverAttributesAre (
-                                               @"
+            @"
 0000000000
 0111110000
 0111110000
@@ -724,35 +726,41 @@ public class OverlappedTests {
 0000000000
 0000000000
 0000000000",
-                                               null,
-                                               attributes);
+            null,
+            attributes
+        );
 
         Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent
-                                                           { X = 1, Y = 1, Flags = MouseFlags.Button1Pressed }));
+            new MouseEventEventArgs (
+                new MouseEvent { X = 1, Y = 1, Flags = MouseFlags.Button1Pressed }
+            )
+        );
         Assert.Equal (win2, Application.MouseGrabView);
         Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent {
-                                                                              X = 2, Y = 2,
-                                                                              Flags = MouseFlags.Button1Pressed
-                                                                                  | MouseFlags.ReportMousePosition
-                                                                          }));
+            new MouseEventEventArgs (
+                new MouseEvent {
+                    X = 2,
+                    Y = 2,
+                    Flags = MouseFlags.Button1Pressed
+                            | MouseFlags.ReportMousePosition
+                }
+            )
+        );
 
         // Need to fool MainLoop into thinking it's running
         Application.MainLoop.Running = true;
         Application.RunIteration (ref rs, ref firstIteration);
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+            @"
   ┌───┐
   │   │
   │   │
   │   │
   └───┘",
-                                                      _output);
+            _output
+        );
         TestHelpers.AssertDriverAttributesAre (
-                                               @"
+            @"
 0000000000
 0000000000
 0011111000
@@ -763,8 +771,9 @@ public class OverlappedTests {
 0000000000
 0000000000
 0000000000",
-                                               null,
-                                               attributes);
+            null,
+            attributes
+        );
 
         Application.Shutdown ();
     }

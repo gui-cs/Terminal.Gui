@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.TypeTests; 
+﻿namespace Terminal.Gui.TypeTests;
 
 public class PointTests {
     [Fact]
@@ -37,22 +37,13 @@ public class PointTests {
 
     [Fact]
     public void Point_SetsValue () {
-        var point = new Point {
-                                  X = 0,
-                                  Y = 0
-                              };
+        var point = new Point { X = 0, Y = 0 };
         Assert.True (point.IsEmpty);
 
-        point = new Point {
-                              X = 1,
-                              Y = 2
-                          };
+        point = new Point { X = 1, Y = 2 };
         Assert.False (point.IsEmpty);
 
-        point = new Point {
-                              X = -1,
-                              Y = -2
-                          };
+        point = new Point { X = -1, Y = -2 };
         Assert.False (point.IsEmpty);
     }
 

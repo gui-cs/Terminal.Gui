@@ -1,26 +1,13 @@
 ﻿using System.Collections;
 using System.Data;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 ///     <see cref="ITableSource"/> implementation that wraps a <see cref="System.Collections.IList"/>.  This class is
 ///     mutable: changes are permitted to the wrapped <see cref="IList"/>.
 /// </summary>
 public class ListTableSource : ITableSource {
-    private Rect _lastBounds;
-    private IList _lastList;
-    private int _lastMaxCellWidth;
-    private int _lastMinCellWidth;
-    private ListColumnStyle _lastStyle;
-    private readonly TableView _tableView;
-
-    /// <summary>The list this source wraps.</summary>
-    public IList List;
-
-    /// <summary>The style this source uses.</summary>
-    public ListColumnStyle Style;
-
     /// <summary>
     ///     Creates a new columned list table instance based on the data in <paramref name="list"/> and dimensions from
     ///     <paramref name="tableView"/>.
@@ -42,11 +29,26 @@ public class ListTableSource : ITableSource {
     /// <inheritdoc/>
     public ListTableSource (IList list, TableView tableView) : this (list, tableView, new ListColumnStyle ()) { }
 
-    /// <summary>The number of items in the IList source</summary>
-    public int Count => List.Count;
+    private readonly TableView _tableView;
+    private IList _lastList;
+
+    /// <summary>The list this source wraps.</summary>
+    public IList List;
+
+    private int _lastMaxCellWidth;
+    private int _lastMinCellWidth;
+    private ListColumnStyle _lastStyle;
+
+    /// <summary>The style this source uses.</summary>
+    public ListColumnStyle Style;
+
+    private Rect _lastBounds;
 
     /// <summary>The data table this source wraps.</summary>
     public DataTable DataTable { get; private set; }
+
+    /// <summary>The number of items in the IList source</summary>
+    public int Count => List.Count;
 
     /// <inheritdoc/>
     public object this [int row, int col] {

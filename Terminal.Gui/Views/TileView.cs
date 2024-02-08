@@ -1,22 +1,35 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     A <see cref="View"/> consisting of a moveable bar that divides the display area into resizeable
 ///     <see cref="Tiles"/>.
 /// </summary>
 public class TileView : View {
-    private Orientation _orientation = Orientation.Vertical;
-    private List<Pos> _splitterDistances;
-    private List<TileViewLineView> _splitterLines;
-    private List<Tile> _tiles;
-    private TileView parentTileView;
-
     /// <summary>Creates a new instance of the <see cref="TileView"/> class with 2 tiles (i.e. left and right).</summary>
     public TileView () : this (2) { }
 
     /// <summary>Creates a new instance of the <see cref="TileView"/> class with <paramref name="tiles"/> number of tiles.</summary>
     /// <param name="tiles"></param>
     public TileView (int tiles) { RebuildForTileCount (tiles); }
+
+    private List<Pos> _splitterDistances;
+    private List<Tile> _tiles;
+    private List<TileViewLineView> _splitterLines;
+    private Orientation _orientation = Orientation.Vertical;
+    private TileView parentTileView;
+
+    /// <summary>The splitter locations. Note that there will be N-1 splitters where N is the number of <see cref="Tiles"/>.</summary>
+    public IReadOnlyCollection<Pos> SplitterDistances => _splitterDistances.AsReadOnly ();
+
+    /// <summary>The sub sections hosted by the view</summary>
+    public IReadOnlyCollection<Tile> Tiles => _tiles.AsReadOnly ();
+
+    // TODO: Update to use Key instead of KeyCode
+    /// <summary>
+    ///     The keyboard key that the user can press to toggle resizing of splitter lines.  Mouse drag splitting is always
+    ///     enabled.
+    /// </summary>
+    public KeyCode ToggleResizable { get; set; } = KeyCode.CtrlMask | KeyCode.F10;
 
     /// <summary>The line style to use when drawing the splitter lines.</summary>
     public LineStyle LineStyle { get; set; } = LineStyle.None;
@@ -31,19 +44,6 @@ public class TileView : View {
             }
         }
     }
-
-    /// <summary>The splitter locations. Note that there will be N-1 splitters where N is the number of <see cref="Tiles"/>.</summary>
-    public IReadOnlyCollection<Pos> SplitterDistances => _splitterDistances.AsReadOnly ();
-
-    /// <summary>The sub sections hosted by the view</summary>
-    public IReadOnlyCollection<Tile> Tiles => _tiles.AsReadOnly ();
-
-    // TODO: Update to use Key instead of KeyCode
-    /// <summary>
-    ///     The keyboard key that the user can press to toggle resizing of splitter lines.  Mouse drag splitting is always
-    ///     enabled.
-    /// </summary>
-    public KeyCode ToggleResizable { get; set; } = KeyCode.CtrlMask | KeyCode.F10;
 
     /// <summary>
     ///     Returns the immediate parent <see cref="TileView"/> of this. Note that in case of deep nesting this might not
@@ -140,10 +140,11 @@ public class TileView : View {
 
         if (HasBorder ()) {
             contentArea = new Rect (
-                                    contentArea.X + 1,
-                                    contentArea.Y + 1,
-                                    Math.Max (0, contentArea.Width - 2),
-                                    Math.Max (0, contentArea.Height - 2));
+                contentArea.X + 1,
+                contentArea.Y + 1,
+                Math.Max (0, contentArea.Width - 2),
+                Math.Max (0, contentArea.Height - 2)
+            );
         }
 
         Setup (contentArea);
@@ -172,15 +173,17 @@ public class TileView : View {
                 lc.AddLine (new Point (0, 0), Bounds.Height, Orientation.Vertical, LineStyle);
 
                 lc.AddLine (
-                            new Point (Bounds.Width - 1, Bounds.Height - 1),
-                            -Bounds.Width,
-                            Orientation.Horizontal,
-                            LineStyle);
+                    new Point (Bounds.Width - 1, Bounds.Height - 1),
+                    -Bounds.Width,
+                    Orientation.Horizontal,
+                    LineStyle
+                );
                 lc.AddLine (
-                            new Point (Bounds.Width - 1, Bounds.Height - 1),
-                            -Bounds.Height,
-                            Orientation.Vertical,
-                            LineStyle);
+                    new Point (Bounds.Width - 1, Bounds.Height - 1),
+                    -Bounds.Height,
+                    Orientation.Vertical,
+                    LineStyle
+                );
             }
 
             foreach (TileViewLineView line in allLines) {
@@ -359,7 +362,8 @@ public class TileView : View {
     public bool SetSplitterPos (int idx, Pos value) {
         if (!(value is Pos.PosAbsolute) && !(value is Pos.PosFactor)) {
             throw new ArgumentException (
-                                         $"Only Percent and Absolute values are supported. Passed value was {value.GetType ().Name}");
+                $"Only Percent and Absolute values are supported. Passed value was {value.GetType ().Name}"
+            );
         }
 
         int fullSpace = _orientation == Orientation.Vertical ? Bounds.Width : Bounds.Height;
@@ -409,10 +413,8 @@ public class TileView : View {
         }
 
         var newContainer = new TileView (numberOfPanels) {
-                                                             Width = Dim.Fill (),
-                                                             Height = Dim.Fill (),
-                                                             parentTileView = this
-                                                         };
+            Width = Dim.Fill (), Height = Dim.Fill (), parentTileView = this
+        };
 
         // Take everything out of the View we are moving
         View[] childViews = toMove.Subviews.ToArray ();
@@ -704,9 +706,9 @@ public class TileView : View {
 
         public int Depth { get; }
 
-        public TileView Parent { get; }
-
         public Tile Tile { get; }
+
+        public TileView Parent { get; }
 
         /// <summary>
         ///     Translates the <see cref="Tile"/> title location from its local coordinate space
@@ -735,10 +737,6 @@ public class TileView : View {
     }
 
     private class TileViewLineView : LineView {
-        private Pos dragOrignalPos;
-        private Point? dragPosition;
-        public Point? moveRuneRenderLocation;
-
         public TileViewLineView (TileView parent, int idx) {
             CanFocus = false;
             TabStop = true;
@@ -758,6 +756,10 @@ public class TileView : View {
             KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
             KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
         }
+
+        private Point? dragPosition;
+        public Point? moveRuneRenderLocation;
+        private Pos dragOrignalPos;
 
         public int Idx { get; }
 
@@ -785,8 +787,9 @@ public class TileView : View {
 
                     if (Orientation == Orientation.Horizontal) { } else {
                         moveRuneRenderLocation = new Point (
-                                                            0,
-                                                            Math.Max (1, Math.Min (Bounds.Height - 2, mouseEvent.Y)));
+                            0,
+                            Math.Max (1, Math.Min (Bounds.Height - 2, mouseEvent.Y))
+                        );
                     }
                 }
 
@@ -821,8 +824,9 @@ public class TileView : View {
 
                 //Driver.UncookMouse ();
                 FinalisePosition (
-                                  dragOrignalPos,
-                                  Orientation == Orientation.Horizontal ? Y : X);
+                    dragOrignalPos,
+                    Orientation == Orientation.Horizontal ? Y : X
+                );
                 dragPosition = null;
                 moveRuneRenderLocation = null;
             }
@@ -919,9 +923,10 @@ public class TileView : View {
 
         private Pos Offset (Pos pos, int delta) {
             int posAbsolute = pos.Anchor (
-                                          Orientation == Orientation.Horizontal
-                                              ? Parent.Bounds.Height
-                                              : Parent.Bounds.Width);
+                Orientation == Orientation.Horizontal
+                    ? Parent.Bounds.Height
+                    : Parent.Bounds.Width
+            );
 
             return posAbsolute + delta;
         }

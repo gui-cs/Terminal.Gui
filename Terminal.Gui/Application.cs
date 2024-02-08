@@ -26,9 +26,6 @@ public static partial class Application {
     // For Unit testing - ignores UseSystemConsole
     internal static bool _forceFakeConsole;
 
-    /// <summary>Gets the <see cref="ConsoleDriver"/> that has been selected. See also <see cref="ForceDriver"/>.</summary>
-    public static ConsoleDriver Driver { get; internal set; }
-
     /// <summary>
     ///     Gets or sets whether <see cref="Application.Driver"/> will be forced to output only the 16 colors defined in
     ///     <see cref="ColorName"/>. The default is <see langword="false"/>, meaning 24-bit (TrueColor) colors will be output
@@ -36,6 +33,12 @@ public static partial class Application {
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool Force16Colors { get; set; }
+
+    /// <summary>Gets the <see cref="ConsoleDriver"/> that has been selected. See also <see cref="ForceDriver"/>.</summary>
+    public static ConsoleDriver Driver { get; internal set; }
+
+    /// <summary>Gets all cultures supported by the application without the invariant language.</summary>
+    public static List<CultureInfo> SupportedCultures { get; private set; }
 
     /// <summary>
     ///     Forces the use of the specified driver (one of "fake", "ansi", "curses", "net", or "windows"). If not
@@ -47,9 +50,6 @@ public static partial class Application {
     /// </remarks>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     public static string ForceDriver { get; set; } = string.Empty;
-
-    /// <summary>Gets all cultures supported by the application without the invariant language.</summary>
-    public static List<CultureInfo> SupportedCultures { get; private set; }
 
     internal static List<CultureInfo> GetSupportedCultures () {
         CultureInfo[] culture = CultureInfo.GetCultures (CultureTypes.AllCultures);
@@ -65,11 +65,11 @@ public static partial class Application {
 
         // Return all culture for which satellite folder found with culture code.
         return culture.Where (
-                              cultureInfo =>
-                                  Directory.Exists (Path.Combine (assemblyLocation, cultureInfo.Name)) &&
-                                  File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
-                             )
-                      .ToList ();
+                cultureInfo =>
+                    Directory.Exists (Path.Combine (assemblyLocation, cultureInfo.Name)) &&
+                    File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
+            )
+            .ToList ();
     }
 
     // IMPORTANT: Ensure all property/fields are reset here. See Init_ResetState_Resets_Properties unit test.
@@ -241,7 +241,12 @@ public static partial class Application {
                     Driver = (ConsoleDriver)Activator.CreateInstance (driverType);
                 } else {
                     throw new ArgumentException (
-                                                 $"Invalid driver name: {ForceDriver}. Valid names are {string.Join (", ", drivers.Select (t => t.Name))}");
+                        $"Invalid driver name: {
+                            ForceDriver
+                        }. Valid names are {
+                            string.Join (", ", drivers.Select (t => t.Name))
+                        }"
+                    );
                 }
             }
         }
@@ -255,8 +260,9 @@ public static partial class Application {
             // if running in unit tests.
             // In this case, we want to throw a more specific exception.
             throw new InvalidOperationException (
-                                                 "Unable to initialize the console. This can happen if the console is already in use by another process or in unit tests.",
-                                                 ex);
+                "Unable to initialize the console. This can happen if the console is already in use by another process or in unit tests.",
+                ex
+            );
         }
 
         Driver.SizeChanged += (s, args) => OnSizeChanging (args);
@@ -486,7 +492,8 @@ public static partial class Application {
             } else {
                 // This code path should be impossible because Init(null, null) will select the platform default driver
                 throw new InvalidOperationException (
-                                                     "Init() completed without a driver being set (this should be impossible); Run<T>() cannot be called.");
+                    "Init() completed without a driver being set (this should be impossible); Run<T>() cannot be called."
+                );
             }
         } else {
             // Init() has NOT been called.
@@ -545,14 +552,14 @@ public static partial class Application {
                 End (runState);
             }
 #if !DEBUG
+            }
+            catch (Exception error) {
+                if (errorHandler == null) {
+                    throw;
                 }
-                catch (Exception error) {
-                    if (errorHandler == null) {
-                        throw;
-                    }
 
-                    resume = errorHandler (error);
-                }
+                resume = errorHandler (error);
+            }
 #endif
         }
     }
@@ -583,11 +590,12 @@ public static partial class Application {
     /// <param name="action">the action to be invoked on the main processing thread.</param>
     public static void Invoke (Action action) {
         MainLoop?.AddIdle (
-                           () => {
-                               action ();
+            () => {
+                action ();
 
-                               return false;
-                           });
+                return false;
+            }
+        );
     }
 
     // TODO: Determine if this is really needed. The only code that calls WakeUp I can find
@@ -637,11 +645,12 @@ public static partial class Application {
 
         public override void Post (SendOrPostCallback d, object state) {
             MainLoop.AddIdle (
-                              () => {
-                                  d (state);
+                () => {
+                    d (state);
 
-                                  return false;
-                              });
+                    return false;
+                }
+            );
         }
 
         //_mainLoop.Driver.Wakeup ();
@@ -651,10 +660,11 @@ public static partial class Application {
             } else {
                 var wasExecuted = false;
                 Invoke (
-                        () => {
-                            d (state);
-                            wasExecuted = true;
-                        });
+                    () => {
+                        d (state);
+                        wasExecuted = true;
+                    }
+                );
                 while (!wasExecuted) {
                     Thread.Sleep (15);
                 }
@@ -1215,13 +1225,13 @@ public static partial class Application {
             // The coordinates are relative to the Bounds of the view that grabbed the mouse.
             Point newxy = MouseGrabView.ScreenToFrame (a.MouseEvent.X, a.MouseEvent.Y);
             var nme = new MouseEvent {
-                                         X = newxy.X,
-                                         Y = newxy.Y,
-                                         Flags = a.MouseEvent.Flags,
-                                         OfX = a.MouseEvent.X - newxy.X,
-                                         OfY = a.MouseEvent.Y - newxy.Y,
-                                         View = view
-                                     };
+                X = newxy.X,
+                Y = newxy.Y,
+                Flags = a.MouseEvent.Flags,
+                OfX = a.MouseEvent.X - newxy.X,
+                OfY = a.MouseEvent.Y - newxy.Y,
+                View = view
+            };
             if (OutsideRect (new Point (nme.X, nme.Y), MouseGrabView.Bounds)) {
                 // The mouse has moved outside the bounds of the the view that
                 // grabbed the mouse, so we tell the view that last got 
@@ -1253,13 +1263,13 @@ public static partial class Application {
             if (frame?.Thickness.Contains (frame.FrameToScreen (), a.MouseEvent.X, a.MouseEvent.Y) ?? false) {
                 Point boundsPoint = frame.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
                 var me = new MouseEvent {
-                                            X = boundsPoint.X,
-                                            Y = boundsPoint.Y,
-                                            Flags = a.MouseEvent.Flags,
-                                            OfX = boundsPoint.X,
-                                            OfY = boundsPoint.Y,
-                                            View = frame
-                                        };
+                    X = boundsPoint.X,
+                    Y = boundsPoint.Y,
+                    Flags = a.MouseEvent.Flags,
+                    OfX = boundsPoint.X,
+                    OfY = boundsPoint.Y,
+                    View = frame
+                };
                 frame.OnMouseEvent (me);
 
                 return true;
@@ -1281,13 +1291,13 @@ public static partial class Application {
                     // drag handling is handled in Toplevel (See Issue #2537)
 
                     var me = new MouseEvent {
-                                                X = screenX,
-                                                Y = screenY,
-                                                Flags = a.MouseEvent.Flags,
-                                                OfX = screenX,
-                                                OfY = screenY,
-                                                View = view
-                                            };
+                        X = screenX,
+                        Y = screenY,
+                        Flags = a.MouseEvent.Flags,
+                        OfX = screenX,
+                        OfY = screenY,
+                        View = view
+                    };
 
                     if (_mouseEnteredView == null) {
                         _mouseEnteredView = view;
@@ -1323,13 +1333,13 @@ public static partial class Application {
             if (bounds.Contains (a.MouseEvent.X, a.MouseEvent.Y)) {
                 Point boundsPoint = view.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
                 var me = new MouseEvent {
-                                            X = boundsPoint.X,
-                                            Y = boundsPoint.Y,
-                                            Flags = a.MouseEvent.Flags,
-                                            OfX = boundsPoint.X,
-                                            OfY = boundsPoint.Y,
-                                            View = view
-                                        };
+                    X = boundsPoint.X,
+                    Y = boundsPoint.Y,
+                    Flags = a.MouseEvent.Flags,
+                    OfX = boundsPoint.X,
+                    OfY = boundsPoint.Y,
+                    View = view
+                };
 
                 if (_mouseEnteredView == null) {
                     _mouseEnteredView = view;
@@ -1472,10 +1482,12 @@ public static partial class Application {
         // Invoke any Global KeyBindings
         foreach (Toplevel topLevel in _topLevels.ToList ()) {
             foreach (View view in topLevel.Subviews.Where (
-                                                           v => v.KeyBindings.TryGet (
-                                                            keyEvent.KeyCode,
-                                                            KeyBindingScope.Application,
-                                                            out KeyBinding _))) {
+                         v => v.KeyBindings.TryGet (
+                             keyEvent.KeyCode,
+                             KeyBindingScope.Application,
+                             out KeyBinding _
+                         )
+                     )) {
                 if (view.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.Application, out KeyBinding _)) {
                     keyEvent.Scope = KeyBindingScope.Application;
                     bool? handled = view.OnInvokingKeyBindings (keyEvent);

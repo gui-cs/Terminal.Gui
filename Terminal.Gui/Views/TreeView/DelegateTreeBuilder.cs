@@ -1,10 +1,7 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>Implementation of <see cref="ITreeBuilder{T}"/> that uses user defined functions</summary>
 public class DelegateTreeBuilder<T> : TreeBuilder<T> {
-    private readonly Func<T, bool> canExpand;
-    private readonly Func<T, IEnumerable<T>> childGetter;
-
     /// <summary>
     ///     Constructs an implementation of <see cref="ITreeBuilder{T}"/> that calls the user defined method
     ///     <paramref name="childGetter"/> to determine children
@@ -24,6 +21,9 @@ public class DelegateTreeBuilder<T> : TreeBuilder<T> {
         this.childGetter = childGetter;
         this.canExpand = canExpand;
     }
+
+    private readonly Func<T, bool> canExpand;
+    private readonly Func<T, IEnumerable<T>> childGetter;
 
     /// <summary>Returns whether a node can be expanded based on the delegate passed during construction</summary>
     /// <param name="toExpand"></param>

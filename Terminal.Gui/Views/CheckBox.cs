@@ -2,12 +2,6 @@
 
 /// <summary>The <see cref="CheckBox"/> <see cref="View"/> shows an on/off toggle that the user can set</summary>
 public class CheckBox : View {
-    private readonly Rune _charChecked;
-    private readonly Rune _charNullChecked;
-    private readonly Rune _charUnChecked;
-    private bool _allowNullChecked;
-    private bool? _checked = false;
-
     /// <summary>
     ///     Initializes a new instance of <see cref="CheckBox"/> based on the given text, using
     ///     <see cref="LayoutStyle.Computed"/> layout.
@@ -20,27 +14,34 @@ public class CheckBox : View {
 
         // Ensures a height of 1 if AutoSize is set to false
         Height = 1;
-        
+
         CanFocus = true;
         AutoSize = true;
 
         // Things this view knows how to do
         AddCommand (Command.ToggleChecked, () => ToggleChecked ());
         AddCommand (
-                    Command.Accept,
-                    () => {
-                        if (!HasFocus) {
-                            SetFocus ();
-                        }
+            Command.Accept,
+            () => {
+                if (!HasFocus) {
+                    SetFocus ();
+                }
 
-                        ToggleChecked ();
+                ToggleChecked ();
 
-                        return true;
-                    });
+                return true;
+            }
+        );
 
         // Default keybindings for this view
         KeyBindings.Add (Key.Space, Command.ToggleChecked);
     }
+
+    private readonly Rune _charChecked;
+    private readonly Rune _charNullChecked;
+    private readonly Rune _charUnChecked;
+    private bool _allowNullChecked;
+    private bool? _checked = false;
 
     /// <summary>
     ///     If <see langword="true"/> allows <see cref="Checked"/> to be null, true or false. If <see langword="false"/>

@@ -139,7 +139,7 @@ public class KeyBindings {
     /// <param name="command"></param>
     public void Clear (params Command[] command) {
         foreach (KeyValuePair<Key, KeyBinding> kvp in Bindings.Where (kvp => kvp.Value.Commands.SequenceEqual (command))
-                                                              .ToArray ()) {
+                     .ToArray ()) {
             Bindings.Remove (kvp.Key);
         }
     }

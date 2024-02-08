@@ -1,19 +1,20 @@
 ﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests; 
+namespace Terminal.Gui.ViewsTests;
 
 public class StatusBarTests {
-    private readonly ITestOutputHelper output;
     public StatusBarTests (ITestOutputHelper output) { this.output = output; }
+    private readonly ITestOutputHelper output;
 
     [Fact]
     public void AddItemAt_RemoveItem_Replacing () {
         var sb = new StatusBar (
-                                new StatusItem[] {
-                                                     new (KeyCode.CtrlMask | KeyCode.Q, "~^O~ Open", null),
-                                                     new (KeyCode.CtrlMask | KeyCode.Q, "~^S~ Save", null),
-                                                     new (KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null)
-                                                 });
+            new StatusItem[] {
+                new (KeyCode.CtrlMask | KeyCode.Q, "~^O~ Open", null),
+                new (KeyCode.CtrlMask | KeyCode.Q, "~^S~ Save", null),
+                new (KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null)
+            }
+        );
 
         sb.AddItemAt (2, new StatusItem (KeyCode.CtrlMask | KeyCode.Q, "~^C~ Close", null));
 
@@ -40,18 +41,21 @@ public class StatusBarTests {
     public void CanExecute_ProcessHotKey () {
         Window win = null;
         var statusBar = new StatusBar (
-                                       new StatusItem[] {
-                                                            new (
-                                                                 KeyCode.CtrlMask | KeyCode.N,
-                                                                 "~^N~ New",
-                                                                 New,
-                                                                 CanExecuteNew),
-                                                            new (
-                                                                 KeyCode.CtrlMask | KeyCode.C,
-                                                                 "~^C~ Close",
-                                                                 Close,
-                                                                 CanExecuteClose)
-                                                        });
+            new StatusItem[] {
+                new (
+                    KeyCode.CtrlMask | KeyCode.N,
+                    "~^N~ New",
+                    New,
+                    CanExecuteNew
+                ),
+                new (
+                    KeyCode.CtrlMask | KeyCode.C,
+                    "~^C~ Close",
+                    Close,
+                    CanExecuteClose
+                )
+            }
+        );
         Toplevel top = Application.Top;
         top.Add (statusBar);
 
@@ -80,16 +84,19 @@ public class StatusBarTests {
     [AutoInitShutdown]
     public void Redraw_Output () {
         var sb = new StatusBar (
-                                new StatusItem[] {
-                                                     new (KeyCode.CtrlMask | KeyCode.O, "~^O~ Open", null),
-                                                     new (Application.QuitKey, $"{Application.QuitKey} to Quit!", null)
-                                                 });
+            new StatusItem[] {
+                new (KeyCode.CtrlMask | KeyCode.O, "~^O~ Open", null),
+                new (Application.QuitKey, $"{Application.QuitKey} to Quit!", null)
+            }
+        );
         Application.Top.Add (sb);
 
         sb.OnDrawContent (sb.Bounds);
 
         var expected = @$"
-^O Open {CM.Glyphs.VLine} Ctrl+Q to Quit!
+^O Open {
+    CM.Glyphs.VLine
+} Ctrl+Q to Quit!
 ";
         TestHelpers.AssertDriverContentsAre (expected, output);
     }
@@ -98,15 +105,18 @@ public class StatusBarTests {
     [AutoInitShutdown]
     public void Redraw_Output_CTRLQ () {
         var sb = new StatusBar (
-                                new StatusItem[] {
-                                                     new (KeyCode.CtrlMask | KeyCode.O, "~CTRL-O~ Open", null),
-                                                     new (KeyCode.CtrlMask | KeyCode.Q, "~CTRL-Q~ Quit", null)
-                                                 });
+            new StatusItem[] {
+                new (KeyCode.CtrlMask | KeyCode.O, "~CTRL-O~ Open", null),
+                new (KeyCode.CtrlMask | KeyCode.Q, "~CTRL-Q~ Quit", null)
+            }
+        );
         Application.Top.Add (sb);
         sb.OnDrawContent (sb.Bounds);
 
         var expected = @$"
-CTRL-O Open {CM.Glyphs.VLine} CTRL-Q Quit
+CTRL-O Open {
+    CM.Glyphs.VLine
+} CTRL-Q Quit
 ";
 
         TestHelpers.AssertDriverContentsAre (expected, output);
@@ -117,12 +127,14 @@ CTRL-O Open {CM.Glyphs.VLine} CTRL-Q Quit
     public void Run_Action_With_Key_And_Mouse () {
         var msg = "";
         var sb = new StatusBar (
-                                new StatusItem[] {
-                                                     new (
-                                                          Application.QuitKey,
-                                                          $"{Application.QuitKey} to Quit",
-                                                          () => msg = "Quiting...")
-                                                 });
+            new StatusItem[] {
+                new (
+                    Application.QuitKey,
+                    $"{Application.QuitKey} to Quit",
+                    () => msg = "Quiting..."
+                )
+            }
+        );
         Application.Top.Add (sb);
 
         var iteration = 0;

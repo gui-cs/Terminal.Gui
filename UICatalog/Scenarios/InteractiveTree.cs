@@ -15,43 +15,41 @@ public class InteractiveTree : Scenario {
         Win.Height = Dim.Fill (1); // status bar
 
         var menu = new MenuBar {
-                                   Menus =  [
-                                   new MenuBarItem ("_File", new MenuItem[] {
-                                                                                new ("_Quit", "", Quit)
-                                                                            })
-                                       ]
-                               };
+            Menus = [
+                        new MenuBarItem ("_File", new MenuItem[] { new ("_Quit", "", Quit) })
+                    ]
+        };
         Application.Top.Add (menu);
 
-        _treeView = new TreeView {
-                                     X = 0,
-                                     Y = 0,
-                                     Width = Dim.Fill (),
-                                     Height = Dim.Fill (1)
-                                 };
+        _treeView = new TreeView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (1) };
         _treeView.KeyDown += TreeView_KeyPress;
 
         Win.Add (_treeView);
 
         var statusBar = new StatusBar (
-                                       new StatusItem[] {
-                                                            new (
-                                                                 Application.QuitKey,
-                                                                 $"{Application.QuitKey} to Quit",
-                                                                 Quit),
-                                                            new (
-                                                                 KeyCode.CtrlMask | KeyCode.C,
-                                                                 "~^C~ Add Child",
-                                                                 AddChildNode),
-                                                            new (
-                                                                 KeyCode.CtrlMask | KeyCode.T,
-                                                                 "~^T~ Add Root",
-                                                                 AddRootNode),
-                                                            new (
-                                                                 KeyCode.CtrlMask | KeyCode.R,
-                                                                 "~^R~ Rename Node",
-                                                                 RenameNode)
-                                                        });
+            new StatusItem[] {
+                new (
+                    Application.QuitKey,
+                    $"{Application.QuitKey} to Quit",
+                    Quit
+                ),
+                new (
+                    KeyCode.CtrlMask | KeyCode.C,
+                    "~^C~ Add Child",
+                    AddChildNode
+                ),
+                new (
+                    KeyCode.CtrlMask | KeyCode.T,
+                    "~^T~ Add Root",
+                    AddRootNode
+                ),
+                new (
+                    KeyCode.CtrlMask | KeyCode.R,
+                    "~^R~ Rename Node",
+                    RenameNode
+                )
+            }
+        );
         Application.Top.Add (statusBar);
     }
 
@@ -82,20 +80,11 @@ public class InteractiveTree : Scenario {
         };
         var cancel = new Button { Text = "Cancel" };
         cancel.Clicked += (s, e) => Application.RequestStop ();
-        var d = new Dialog { Title = title, Buttons =  [ok, cancel] };
+        var d = new Dialog { Title = title, Buttons = [ok, cancel] };
 
-        var lbl = new Label {
-                                X = 0,
-                                Y = 1,
-                                Text = label
-                            };
+        var lbl = new Label { X = 0, Y = 1, Text = label };
 
-        var tf = new TextField {
-                                   Text = initialText,
-                                   X = 0,
-                                   Y = 2,
-                                   Width = Dim.Fill ()
-                               };
+        var tf = new TextField { Text = initialText, X = 0, Y = 2, Width = Dim.Fill () };
 
         d.Add (lbl, tf);
         tf.SetFocus ();
@@ -138,9 +127,10 @@ public class InteractiveTree : Scenario {
 
                 if (parent == null) {
                     MessageBox.ErrorQuery (
-                                           "Could not delete",
-                                           $"Parent of '{toDelete}' was unexpectedly null",
-                                           "Ok");
+                        "Could not delete",
+                        $"Parent of '{toDelete}' was unexpectedly null",
+                        "Ok"
+                    );
                 } else {
                     //update the model
                     parent.Children.Remove (toDelete);

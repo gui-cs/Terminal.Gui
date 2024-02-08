@@ -6,7 +6,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace Unix.Terminal; 
+namespace Unix.Terminal;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public partial class Curses {
     public const int A_NORMAL = 0x0;

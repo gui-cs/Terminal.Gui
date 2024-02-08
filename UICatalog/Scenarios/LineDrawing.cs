@@ -10,18 +10,9 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Drawing")]
 public class LineDrawing : Scenario {
     public override void Setup () {
-        var canvas = new DrawingArea {
-                                         X = 0,
-                                         Y = 0,
-                                         Width = Dim.Fill (),
-                                         Height = Dim.Fill ()
-                                     };
+        var canvas = new DrawingArea { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
-        var tools = new ToolsView {
-                                      Title = "Tools",
-                                      X = Pos.Right (canvas) - 20,
-                                      Y = 2
-                                  };
+        var tools = new ToolsView { Title = "Tools", X = Pos.Right (canvas) - 20, Y = 2 };
 
         tools.ColorChanged += c => canvas.SetColor (c);
         tools.SetStyle += b => canvas.LineStyle = b;
@@ -34,12 +25,12 @@ public class LineDrawing : Scenario {
     }
 
     private class DrawingArea : View {
+        public DrawingArea () { AddLayer (); }
         private readonly List<LineCanvas> _layers = new ();
         private readonly Stack<StraightLine> _undoHistory = new ();
         private Color _currentColor = new (Color.White);
         private LineCanvas _currentLayer;
         private StraightLine _currentLine;
-        public DrawingArea () { AddLayer (); }
 
         public LineStyle LineStyle { get; set; }
 
@@ -86,11 +77,12 @@ public class LineDrawing : Scenario {
                 if (_currentLine == null) {
                     // Mouse pressed down
                     _currentLine = new StraightLine (
-                                                     new Point (mouseEvent.X, mouseEvent.Y),
-                                                     0,
-                                                     Orientation.Vertical,
-                                                     LineStyle,
-                                                     new Attribute (_currentColor, GetNormalColor ().Background));
+                        new Point (mouseEvent.X, mouseEvent.Y),
+                        0,
+                        Orientation.Vertical,
+                        LineStyle,
+                        new Attribute (_currentColor, GetNormalColor ().Background)
+                    );
 
                     _currentLayer.AddLine (_currentLine);
                 } else {
@@ -130,11 +122,12 @@ public class LineDrawing : Scenario {
                         _layers.Remove (_currentLayer);
 
                         _currentLayer = new LineCanvas (
-                                                        _currentLayer.Lines.Exclude (
-                                                         _currentLine.Start,
-                                                         _currentLine.Length,
-                                                         _currentLine.Orientation)
-                                                       );
+                            _currentLayer.Lines.Exclude (
+                                _currentLine.Start,
+                                _currentLine.Length,
+                                _currentLine.Orientation
+                            )
+                        );
 
                         _layers.Insert (idx, _currentLayer);
                     }
@@ -157,43 +150,32 @@ public class LineDrawing : Scenario {
     }
 
     private class ToolsView : Window {
-        private Button _addLayerBtn;
-        private ColorPicker _colorPicker;
-        private RadioGroup _stylePicker;
-
         public ToolsView () {
             BorderStyle = LineStyle.Dotted;
             Border.Thickness = new Thickness (1, 2, 1, 1);
             Initialized += ToolsView_Initialized;
         }
 
+        private Button _addLayerBtn;
+        private ColorPicker _colorPicker;
+        private RadioGroup _stylePicker;
+
         public event Action AddLayer;
 
         public override void BeginInit () {
             base.BeginInit ();
 
-            _colorPicker = new ColorPicker {
-                                               X = 0,
-                                               Y = 0,
-                                               BoxHeight = 1,
-                                               BoxWidth = 2
-                                           };
+            _colorPicker = new ColorPicker { X = 0, Y = 0, BoxHeight = 1, BoxWidth = 2 };
 
             _colorPicker.ColorChanged += (s, a) => ColorChanged?.Invoke (a.Color);
 
             _stylePicker = new RadioGroup {
-                                              X = 0,
-                                              Y = Pos.Bottom (_colorPicker),
-                                              RadioLabels = Enum.GetNames (typeof (LineStyle)).ToArray ()
-                                          };
+                X = 0, Y = Pos.Bottom (_colorPicker), RadioLabels = Enum.GetNames (typeof (LineStyle)).ToArray ()
+            };
             _stylePicker.SelectedItemChanged += (s, a) => { SetStyle?.Invoke ((LineStyle)a.SelectedItem); };
             _stylePicker.SelectedItem = 1;
 
-            _addLayerBtn = new Button {
-                                          Text = "New Layer",
-                                          X = Pos.Center (),
-                                          Y = Pos.Bottom (_stylePicker)
-                                      };
+            _addLayerBtn = new Button { Text = "New Layer", X = Pos.Center (), Y = Pos.Bottom (_stylePicker) };
 
             _addLayerBtn.Clicked += (s, a) => AddLayer?.Invoke ();
             Add (_colorPicker, _stylePicker, _addLayerBtn);
