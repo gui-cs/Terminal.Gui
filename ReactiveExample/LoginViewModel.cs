@@ -3,7 +3,6 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using System.Text;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -34,8 +33,8 @@ namespace ReactiveExample {
 					!string.IsNullOrEmpty (password));
 			
 			_isValid = canLogin.ToProperty (this, x => x.IsValid);
-			Login = ReactiveCommand.CreateFromTask (
-				() => Task.Delay (TimeSpan.FromSeconds (1)),
+			Login = ReactiveCommand.CreateFromTask<EventArgs> (
+				e => Task.Delay (TimeSpan.FromSeconds (1)),
 				canLogin);
 			
 			_usernameLength = this
@@ -47,7 +46,7 @@ namespace ReactiveExample {
 				.Select (password => password.Length)
 				.ToProperty (this, x => x.PasswordLength);
 			
-			Clear = ReactiveCommand.Create (() => { });
+			Clear = ReactiveCommand.Create<EventArgs> (e => { });
 			Clear.Subscribe (unit => {
 				Username = string.Empty;
 				Password = string.Empty;
@@ -67,10 +66,10 @@ namespace ReactiveExample {
 		public int PasswordLength => _passwordLength.Value;
 
 		[IgnoreDataMember]
-		public ReactiveCommand<Unit, Unit> Login { get; }
+		public ReactiveCommand<EventArgs, Unit> Login { get; }
 		
 		[IgnoreDataMember]
-		public ReactiveCommand<Unit, Unit> Clear { get; }
+		public ReactiveCommand<EventArgs, Unit> Clear { get; }
 		
 		[IgnoreDataMember]
 		public bool IsValid => _isValid.Value;
