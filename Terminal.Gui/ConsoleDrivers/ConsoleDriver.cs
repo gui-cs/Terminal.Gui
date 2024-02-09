@@ -20,8 +20,8 @@ public abstract class ConsoleDriver {
         Off = 0b_0000_0000,
 
         /// <summary>
-        ///     When enabled, <see cref="View.OnDrawAdornments"/> will draw a ruler in the frame for any side with a padding
-        ///     value greater than 0.
+        ///     When enabled, <see cref="View.OnDrawAdornments"/> will draw a ruler in the frame for any side with a padding value
+        ///     greater than 0.
         /// </summary>
         FrameRuler = 0b_0000_0001,
 
@@ -109,9 +109,9 @@ public abstract class ConsoleDriver {
     /// <summary>Adds the specified rune to the display at the current cursor position.</summary>
     /// <remarks>
     ///     <para>
-    ///         When the method returns, <see cref="Col"/> will be incremented by the number of columns
-    ///         <paramref name="rune"/> required, even if the new column value is outside of the <see cref="Clip"/> or screen
-    ///         dimensions defined by <see cref="Cols"/>.
+    ///         When the method returns, <see cref="Col"/> will be incremented by the number of columns <paramref name="rune"/>
+    ///         required, even if the new column value is outside of the <see cref="Clip"/> or screen dimensions defined by
+    ///         <see cref="Cols"/>.
     ///     </para>
     ///     <para>
     ///         If <paramref name="rune"/> requires more than one column, and <see cref="Col"/> plus the number of columns
@@ -245,9 +245,9 @@ public abstract class ConsoleDriver {
     /// <summary>Adds the <paramref name="str"/> to the display at the cursor position.</summary>
     /// <remarks>
     ///     <para>
-    ///         When the method returns, <see cref="Col"/> will be incremented by the number of columns
-    ///         <paramref name="str"/> required, unless the new column value is outside of the <see cref="Clip"/> or screen
-    ///         dimensions defined by <see cref="Cols"/>.
+    ///         When the method returns, <see cref="Col"/> will be incremented by the number of columns <paramref name="str"/>
+    ///         required, unless the new column value is outside of the <see cref="Clip"/> or screen dimensions defined by
+    ///         <see cref="Cols"/>.
     ///     </para>
     ///     <para>If <paramref name="str"/> requires more columns than are available, the output will be clipped.</para>
     /// </remarks>
@@ -310,8 +310,8 @@ public abstract class ConsoleDriver {
     }
 
     /// <summary>
-    ///     Fills the specified rectangle with the specified <see langword="char"/>. This method is a convenience method
-    ///     that calls <see cref="FillRect(Rect, Rune)"/>.
+    ///     Fills the specified rectangle with the specified <see langword="char"/>. This method is a convenience method that
+    ///     calls <see cref="FillRect(Rect, Rune)"/>.
     /// </summary>
     /// <param name="rect"></param>
     /// <param name="c"></param>
@@ -324,7 +324,7 @@ public abstract class ConsoleDriver {
 
     /// <summary>Returns the name of the driver and relevant library version information.</summary>
     /// <returns></returns>
-    public virtual string GetVersionInfo () { return GetType ().Name; }
+    public virtual string GetVersionInfo () => GetType ().Name;
 
     /// <summary>Tests if the specified rune is supported by the driver.</summary>
     /// <param name="rune"></param>
@@ -332,7 +332,7 @@ public abstract class ConsoleDriver {
     ///     <see langword="true"/> if the rune can be properly presented; <see langword="false"/> if the driver does not
     ///     support displaying this rune.
     /// </returns>
-    public virtual bool IsRuneSupported (Rune rune) { return Rune.IsValid (rune.Value); }
+    public virtual bool IsRuneSupported (Rune rune) => Rune.IsValid (rune.Value);
 
     /// <summary>Tests whether the specified coordinate are valid for drawing.</summary>
     /// <param name="col">The column.</param>
@@ -341,15 +341,13 @@ public abstract class ConsoleDriver {
     ///     <see langword="false"/> if the coordinate is outside of the screen bounds or outside of <see cref="Clip"/>.
     ///     <see langword="true"/> otherwise.
     /// </returns>
-    public bool IsValidLocation (int col, int row) {
-        return col >= 0 && row >= 0 &&
-               col < Cols && row < Rows &&
-               Clip.Contains (col, row);
-    }
+    public bool IsValidLocation (int col, int row) => col >= 0 && row >= 0 &&
+                                                      col < Cols && row < Rows &&
+                                                      Clip.Contains (col, row);
 
     /// <summary>
-    ///     Updates <see cref="Col"/> and <see cref="Row"/> to the specified column and row in <see cref="Contents"/>.
-    ///     Used by <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
+    ///     Updates <see cref="Col"/> and <see cref="Row"/> to the specified column and row in <see cref="Contents"/>. Used by
+    ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
     /// </summary>
     /// <remarks>
     ///     <para>This does not move the cursor on the screen, it only updates the internal state of the driver.</para>
@@ -407,8 +405,8 @@ public abstract class ConsoleDriver {
     public virtual bool SupportsTrueColor => true;
 
     /// <summary>
-    ///     Gets or sets whether the <see cref="ConsoleDriver"/> should use 16 colors instead of the default TrueColors.
-    ///     See <see cref="Application.Force16Colors"/> to change this setting via <see cref="ConfigurationManager"/>.
+    ///     Gets or sets whether the <see cref="ConsoleDriver"/> should use 16 colors instead of the default TrueColors. See
+    ///     <see cref="Application.Force16Colors"/> to change this setting via <see cref="ConfigurationManager"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -454,7 +452,7 @@ public abstract class ConsoleDriver {
 
     /// <summary>Gets the current <see cref="Attribute"/>.</summary>
     /// <returns>The current attribute.</returns>
-    public Attribute GetAttribute () { return CurrentAttribute; }
+    public Attribute GetAttribute () => CurrentAttribute;
 
     // TODO: This is only overridden by CursesDriver. Once CursesDriver supports 24-bit color, this virtual method can be
     // removed (and Attribute can lose the platformColor property).
@@ -462,14 +460,14 @@ public abstract class ConsoleDriver {
     /// <param name="foreground">The foreground color.</param>
     /// <param name="background">The background color.</param>
     /// <returns>The attribute for the foreground and background colors.</returns>
-    public virtual Attribute MakeColor (Color foreground, Color background) {
+    public virtual Attribute MakeColor (Color foreground, Color background) =>
+
         // Encode the colors into the int value.
-        return new Attribute (
+        new (
             -1, // only used by cursesdriver!
             foreground,
             background
         );
-    }
 
     #endregion
 
@@ -494,8 +492,8 @@ public abstract class ConsoleDriver {
 
     /// <summary>Called when a key is released. Fires the <see cref="KeyUp"/> event.</summary>
     /// <remarks>
-    ///     Drivers that do not support key release events will calls this method after <see cref="OnKeyDown"/> processing
-    ///     is complete.
+    ///     Drivers that do not support key release events will calls this method after <see cref="OnKeyDown"/> processing is
+    ///     complete.
     /// </remarks>
     /// <param name="a"></param>
     public void OnKeyUp (Key a) { KeyUp?.Invoke (this, a); }
@@ -520,8 +518,8 @@ public abstract class ConsoleDriver {
 
 /// <summary>Terminal Cursor Visibility settings.</summary>
 /// <remarks>
-///     Hex value are set as 0xAABBCCDD where : AA stand for the TERMINFO DECSUSR parameter value to be used under
-///     Linux and MacOS BB stand for the NCurses curs_set parameter value to be used under Linux and MacOS CC stand for the
+///     Hex value are set as 0xAABBCCDD where : AA stand for the TERMINFO DECSUSR parameter value to be used under Linux
+///     and MacOS BB stand for the NCurses curs_set parameter value to be used under Linux and MacOS CC stand for the
 ///     CONSOLE_CURSOR_INFO.bVisible parameter value to be used under Windows DD stand for the CONSOLE_CURSOR_INFO.dwSize
 ///     parameter value to be used under Windows
 /// </remarks>
@@ -563,9 +561,9 @@ public enum CursorVisibility {
 ///     The <see cref="KeyCode"/> enumeration encodes key information from <see cref="ConsoleDriver"/>s and provides a
 ///     consistent way for application code to specify keys and receive key events.
 ///     <para>
-///         The <see cref="Key"/> class provides a higher-level abstraction, with helper methods and properties for
-///         common operations. For example, <see cref="Key.IsAlt"/> and <see cref="Key.IsCtrl"/> provide a convenient way
-///         to check whether the Alt or Ctrl modifier keys were pressed when a key was pressed.
+///         The <see cref="Key"/> class provides a higher-level abstraction, with helper methods and properties for common
+///         operations. For example, <see cref="Key.IsAlt"/> and <see cref="Key.IsCtrl"/> provide a convenient way to check
+///         whether the Alt or Ctrl modifier keys were pressed when a key was pressed.
 ///     </para>
 /// </summary>
 /// <remarks>
@@ -605,26 +603,26 @@ public enum KeyCode : uint {
     CharMask = 0x_f_ffff,
 
     /// <summary>
-    ///     If the <see cref="SpecialMask"/> is set, then the value is that of the special mask, otherwise, the value is
-    ///     in the the lower bits (as extracted by <see cref="CharMask"/>).
+    ///     If the <see cref="SpecialMask"/> is set, then the value is that of the special mask, otherwise, the value is in the
+    ///     the lower bits (as extracted by <see cref="CharMask"/>).
     /// </summary>
     SpecialMask = 0x_fff0_0000,
 
     /// <summary>
-    ///     When this value is set, the Key encodes the sequence Shift-KeyValue. The actual value must be extracted by
-    ///     removing the ShiftMask.
+    ///     When this value is set, the Key encodes the sequence Shift-KeyValue. The actual value must be extracted by removing
+    ///     the ShiftMask.
     /// </summary>
     ShiftMask = 0x_1000_0000,
 
     /// <summary>
-    ///     When this value is set, the Key encodes the sequence Alt-KeyValue. The actual value must be extracted by
-    ///     removing the AltMask.
+    ///     When this value is set, the Key encodes the sequence Alt-KeyValue. The actual value must be extracted by removing
+    ///     the AltMask.
     /// </summary>
     AltMask = 0x_8000_0000,
 
     /// <summary>
-    ///     When this value is set, the Key encodes the sequence Ctrl-KeyValue. The actual value must be extracted by
-    ///     removing the CtrlMask.
+    ///     When this value is set, the Key encodes the sequence Ctrl-KeyValue. The actual value must be extracted by removing
+    ///     the CtrlMask.
     /// </summary>
     CtrlMask = 0x_4000_0000,
 

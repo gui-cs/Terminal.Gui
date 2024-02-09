@@ -106,7 +106,7 @@ public static class EscSeqUtils {
     /// <summary>ESC [ x J - Clears part of the screen. See <see cref="ClearScreenOptions"/>.</summary>
     /// <param name="option"></param>
     /// <returns></returns>
-    public static string CSI_ClearScreen (ClearScreenOptions option) { return $"{CSI}{(int)option}J"; }
+    public static string CSI_ClearScreen (ClearScreenOptions option) => $"{CSI}{(int)option}J";
 
     /// <summary>Decodes an ANSI escape sequence.</summary>
     /// <param name="escSeqRequests">The <see cref="EscSeqRequests"/> which may contain a request.</param>
@@ -430,7 +430,7 @@ public static class EscSeqUtils {
     /// <param name="kChar">The array with all chars.</param>
     /// <returns>The c1Control returned by <see cref="GetC1ControlChar(char)"/>, code, values and terminating.</returns>
     public static (string c1Control, string code, string[] values, string terminating) GetEscapeResult (char[] kChar) {
-        if ((kChar == null) || (kChar.Length == 0)) {
+        if (kChar == null || kChar.Length == 0) {
             return (null, null, null, null);
         }
 
@@ -458,7 +458,7 @@ public static class EscSeqUtils {
                 values[valueIdx] += c.ToString ();
             } else if (c == ';') {
                 valueIdx++;
-            } else if ((valueIdx == nSep - 1) || (i == kChar.Length - 1)) {
+            } else if (valueIdx == nSep - 1 || i == kChar.Length - 1) {
                 terminating += c.ToString ();
             } else {
                 code += c.ToString ();
@@ -523,7 +523,7 @@ public static class EscSeqUtils {
                 foundPoint++;
             } else if (foundPoint > 0 && c != 'm' && c != 'M') {
                 value += c.ToString ();
-            } else if ((c == 'm') || (c == 'M')) {
+            } else if (c == 'm' || c == 'M') {
                 //pos.Y = int.Parse (value) + Console.WindowTop - 1;
                 pos.Y = int.Parse (value) - 1;
 
@@ -737,10 +737,10 @@ public static class EscSeqUtils {
         }
 
         if ((!isButtonClicked && !isButtonDoubleClicked
-                              && ((buttonState == MouseFlags.Button1Pressed)
-                                  || (buttonState == MouseFlags.Button2Pressed) ||
-                                  (buttonState == MouseFlags.Button3Pressed)
-                                  || (buttonState == MouseFlags.Button4Pressed)) && lastMouseButtonPressed == null) ||
+                              && (buttonState == MouseFlags.Button1Pressed
+                                  || buttonState == MouseFlags.Button2Pressed ||
+                                  buttonState == MouseFlags.Button3Pressed
+                                  || buttonState == MouseFlags.Button4Pressed) && lastMouseButtonPressed == null) ||
             (isButtonPressed && lastMouseButtonPressed != null
                              && buttonState.HasFlag (MouseFlags.ReportMousePosition))) {
             mouseFlags[0] = buttonState;
@@ -765,17 +765,17 @@ public static class EscSeqUtils {
             } else if (mouseFlags[0] == MouseFlags.ReportMousePosition) {
                 isButtonPressed = false;
             }
-        } else if (isButtonDoubleClicked && ((buttonState == MouseFlags.Button1Pressed)
-                                             || (buttonState == MouseFlags.Button2Pressed) ||
-                                             (buttonState == MouseFlags.Button3Pressed)
-                                             || (buttonState == MouseFlags.Button4Pressed))) {
+        } else if (isButtonDoubleClicked && (buttonState == MouseFlags.Button1Pressed
+                                             || buttonState == MouseFlags.Button2Pressed ||
+                                             buttonState == MouseFlags.Button3Pressed
+                                             || buttonState == MouseFlags.Button4Pressed)) {
             mouseFlags[0] = GetButtonTripleClicked (buttonState);
             isButtonDoubleClicked = false;
             isButtonTripleClicked = true;
-        } else if (isButtonClicked && ((buttonState == MouseFlags.Button1Pressed)
-                                       || (buttonState == MouseFlags.Button2Pressed) ||
-                                       (buttonState == MouseFlags.Button3Pressed)
-                                       || (buttonState == MouseFlags.Button4Pressed))) {
+        } else if (isButtonClicked && (buttonState == MouseFlags.Button1Pressed
+                                       || buttonState == MouseFlags.Button2Pressed ||
+                                       buttonState == MouseFlags.Button3Pressed
+                                       || buttonState == MouseFlags.Button4Pressed)) {
             mouseFlags[0] = GetButtonDoubleClicked (buttonState);
             isButtonClicked = false;
             isButtonDoubleClicked = true;
@@ -800,10 +800,10 @@ public static class EscSeqUtils {
 
         //} 
         else if (!isButtonClicked && !isButtonDoubleClicked
-                                  && ((buttonState == MouseFlags.Button1Released)
-                                      || (buttonState == MouseFlags.Button2Released) ||
-                                      (buttonState == MouseFlags.Button3Released)
-                                      || (buttonState == MouseFlags.Button4Released))) {
+                                  && (buttonState == MouseFlags.Button1Released
+                                      || buttonState == MouseFlags.Button2Released ||
+                                      buttonState == MouseFlags.Button3Released
+                                      || buttonState == MouseFlags.Button4Released)) {
             mouseFlags[0] = buttonState;
             isButtonPressed = false;
 
@@ -1023,17 +1023,17 @@ public static class EscSeqUtils {
         return mf;
     }
 
-    private async static Task ProcessButtonClickedAsync () {
+    private static async Task ProcessButtonClickedAsync () {
         await Task.Delay (300);
         isButtonClicked = false;
     }
 
-    private async static Task ProcessButtonDoubleClickedAsync () {
+    private static async Task ProcessButtonDoubleClickedAsync () {
         await Task.Delay (300);
         isButtonDoubleClicked = false;
     }
 
-    private async static Task ProcessContinuousButtonPressedAsync (
+    private static async Task ProcessContinuousButtonPressedAsync (
         MouseFlags mouseFlag,
         Action<MouseFlags, Point> continuousButtonPressedHandler
     ) {
@@ -1085,7 +1085,7 @@ public static class EscSeqUtils {
     public static readonly string CSI_RestoreCursorPosition = CSI + "8";
 
     /// <summary>ESC [ 8 ; height ; width t - Set Terminal Window Size https://terminalguide.namepad.de/seq/csi_st-8/</summary>
-    public static string CSI_SetTerminalWindowSize (int height, int width) { return $"{CSI}8;{height};{width}t"; }
+    public static string CSI_SetTerminalWindowSize (int height, int width) => $"{CSI}8;{height};{width}t";
 
     //ESC [ < n > A - CUU - Cursor Up       Cursor up by < n >
     //ESC [ < n > B - CUD - Cursor Down     Cursor down by < n >
@@ -1097,13 +1097,13 @@ public static class EscSeqUtils {
     //ESC [ < n > d - VPA - Vertical Line Position Absolute Cursor moves to the < n > th position vertically in the current column
 
     /// <summary>
-    ///     ESC [ y ; x H - CUP Cursor Position - Cursor moves to x ; y coordinate within the viewport, where x is the
-    ///     column of the y line
+    ///     ESC [ y ; x H - CUP Cursor Position - Cursor moves to x ; y coordinate within the viewport, where x is the column
+    ///     of the y line
     /// </summary>
     /// <param name="row">Origin is (1,1).</param>
     /// <param name="col">Origin is (1,1).</param>
     /// <returns></returns>
-    public static string CSI_SetCursorPosition (int row, int col) { return $"{CSI}{row};{col}H"; }
+    public static string CSI_SetCursorPosition (int row, int col) => $"{CSI}{row};{col}H";
 
     //ESC [ <y> ; <x> f - HVP     Horizontal Vertical Position* Cursor moves to<x>; <y> coordinate within the viewport, where <x> is the column of the<y> line
     //ESC [ s - ANSISYSSC       Save Cursor – Ansi.sys emulation	**With no parameters, performs a save cursor operation like DECSC
@@ -1148,45 +1148,41 @@ public static class EscSeqUtils {
     /// <summary>ESC [ n SP q - Select Cursor Style (DECSCUSR) https://terminalguide.namepad.de/seq/csi_sq_t_space/</summary>
     /// <param name="style"></param>
     /// <returns></returns>
-    public static string CSI_SetCursorStyle (DECSCUSR_Style style) { return $"{CSI}{(int)style} q"; }
+    public static string CSI_SetCursorStyle (DECSCUSR_Style style) => $"{CSI}{(int)style} q";
 
     #endregion
 
     #region Colors
 
     /// <summary>
-    ///     ESC [ (n) m - SGR - Set Graphics Rendition - Set the format of the screen and text as specified by (n) This
-    ///     command is special in that the (n) position can accept between 0 and 16 parameters separated by semicolons. When no
+    ///     ESC [ (n) m - SGR - Set Graphics Rendition - Set the format of the screen and text as specified by (n) This command
+    ///     is special in that the (n) position can accept between 0 and 16 parameters separated by semicolons. When no
     ///     parameters are specified, it is treated the same as a single 0 parameter.
     ///     https://terminalguide.namepad.de/seq/csi_sm/
     /// </summary>
-    public static string CSI_SetGraphicsRendition (params int[] parameters) {
-        return $"{CSI}{string.Join (";", parameters)}m";
-    }
+    public static string CSI_SetGraphicsRendition (params int[] parameters) => $"{CSI}{string.Join (";", parameters)}m";
 
     /// <summary>ESC [ (n) m - Uses <see cref="CSI_SetGraphicsRendition(int[])"/> to set the foreground color.</summary>
     /// <param name="code">One of the 16 color codes.</param>
     /// <returns></returns>
-    public static string CSI_SetForegroundColor (AnsiColorCode code) { return CSI_SetGraphicsRendition ((int)code); }
+    public static string CSI_SetForegroundColor (AnsiColorCode code) => CSI_SetGraphicsRendition ((int)code);
 
     /// <summary>ESC [ (n) m - Uses <see cref="CSI_SetGraphicsRendition(int[])"/> to set the background color.</summary>
     /// <param name="code">One of the 16 color codes.</param>
     /// <returns></returns>
-    public static string CSI_SetBackgroundColor (AnsiColorCode code) {
-        return CSI_SetGraphicsRendition ((int)code + 10);
-    }
+    public static string CSI_SetBackgroundColor (AnsiColorCode code) => CSI_SetGraphicsRendition ((int)code + 10);
 
     /// <summary>ESC[38;5;{id}m - Set foreground color (256 colors)</summary>
-    public static string CSI_SetForegroundColor256 (int color) { return $"{CSI}38;5;{color}m"; }
+    public static string CSI_SetForegroundColor256 (int color) => $"{CSI}38;5;{color}m";
 
     /// <summary>ESC[48;5;{id}m - Set background color (256 colors)</summary>
-    public static string CSI_SetBackgroundColor256 (int color) { return $"{CSI}48;5;{color}m"; }
+    public static string CSI_SetBackgroundColor256 (int color) => $"{CSI}48;5;{color}m";
 
     /// <summary>ESC[38;2;{r};{g};{b}m	Set foreground color as RGB.</summary>
-    public static string CSI_SetForegroundColorRGB (int r, int g, int b) { return $"{CSI}38;2;{r};{g};{b}m"; }
+    public static string CSI_SetForegroundColorRGB (int r, int g, int b) => $"{CSI}38;2;{r};{g};{b}m";
 
     /// <summary>ESC[48;2;{r};{g};{b}m	Set background color as RGB.</summary>
-    public static string CSI_SetBackgroundColorRGB (int r, int g, int b) { return $"{CSI}48;2;{r};{g};{b}m"; }
+    public static string CSI_SetBackgroundColorRGB (int r, int g, int b) => $"{CSI}48;2;{r};{g};{b}m";
 
     #endregion
 
@@ -1211,8 +1207,8 @@ public static class EscSeqUtils {
     public static readonly string CSI_SendDeviceAttributes = CSI + "0c";
 
     /// <summary>
-    ///     ESC [ > 0 c - Send Device Attributes (Secondary DA) Windows Terminal v1.18+ emits: "\x1b[>0;10;1c" (vt100,
-    ///     firmware version 1.0, vt220)
+    ///     ESC [ > 0 c - Send Device Attributes (Secondary DA) Windows Terminal v1.18+ emits: "\x1b[>0;10;1c" (vt100, firmware
+    ///     version 1.0, vt220)
     /// </summary>
     public static readonly string CSI_SendDeviceAttributes2 = CSI + ">0c";
 
@@ -1229,8 +1225,8 @@ public static class EscSeqUtils {
     public const string CSI_ReportTerminalSizeInChars_Terminator = "t";
 
     /// <summary>
-    ///     The value of the response to <see cref="CSI_ReportTerminalSizeInChars"/> indicating value 1 and 2 are the
-    ///     terminal size in chars.
+    ///     The value of the response to <see cref="CSI_ReportTerminalSizeInChars"/> indicating value 1 and 2 are the terminal
+    ///     size in chars.
     /// </summary>
     public const string CSI_ReportTerminalSizeInChars_ResponseValue = "8";
 

@@ -56,8 +56,8 @@ public class MouseTests {
     }
 
     /// <summary>
-    ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. No frames;
-    ///     Frame == Bounds
+    ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. No frames; Frame
+    ///     == Bounds
     /// </summary>
     [AutoInitShutdown]
     [Theory]
@@ -123,8 +123,8 @@ public class MouseTests {
     }
 
     /// <summary>
-    ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. With
-    ///     Frames; Frame != Bounds
+    ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. With Frames;
+    ///     Frame != Bounds
     /// </summary>
     [AutoInitShutdown]
     [Theory]

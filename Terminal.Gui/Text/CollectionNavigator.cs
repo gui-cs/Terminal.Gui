@@ -16,8 +16,8 @@ public class CollectionNavigator : CollectionNavigatorBase {
     public IList Collection { get; set; }
 
     /// <inheritdoc/>
-    protected override object ElementAt (int idx) { return Collection[idx]; }
+    protected override object ElementAt (int idx) => Collection[idx];
 
     /// <inheritdoc/>
-    protected override int GetCollectionLength () { return Collection.Count; }
+    protected override int GetCollectionLength () => Collection.Count;
 }

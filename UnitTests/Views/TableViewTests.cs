@@ -22,7 +22,7 @@ public class TableViewTests {
         return list.ToArray ();
     }
 
-    public static DataTableSource BuildTable (int cols, int rows) { return BuildTable (cols, rows, out _); }
+    public static DataTableSource BuildTable (int cols, int rows) => BuildTable (cols, rows, out _);
 
     /// <summary>Builds a simple table of string columns with the requested number of columns and rows</summary>
     /// <param name="cols"></param>
@@ -3094,8 +3094,10 @@ A B C
         tv.ColorScheme = Colors.ColorSchemes["TopLevel"];
         tv.Bounds = new Rect (0, 0, 25, 6);
 
-        List<PickablePet> pets = new() {
-            new (false, "Tammy", "Cat"), new (false, "Tibbles", "Cat"), new (false, "Ripper", "Dog")
+        List<PickablePet> pets = new () {
+            new PickablePet (false, "Tammy", "Cat"),
+            new PickablePet (false, "Tibbles", "Cat"),
+            new PickablePet (false, "Ripper", "Dog")
         };
 
         tv.Table = source = new EnumerableTableSource<PickablePet> (
@@ -3110,7 +3112,7 @@ A B C
         return tv;
     }
 
-    private TableView GetTwoRowSixColumnTable () { return GetTwoRowSixColumnTable (out _); }
+    private TableView GetTwoRowSixColumnTable () => GetTwoRowSixColumnTable (out _);
 
     private TableView GetTwoRowSixColumnTable (out DataTable dt) {
         var tableView = new TableView ();
@@ -3139,7 +3141,7 @@ A B C
         return tableView;
     }
 
-    private TableView SetUpMiniTable () { return SetUpMiniTable (out _); }
+    private TableView SetUpMiniTable () => SetUpMiniTable (out _);
 
     private TableView SetUpMiniTable (out DataTable dt) {
         var tv = new TableView ();
@@ -3171,9 +3173,7 @@ A B C
         }
 
         public bool IsPicked { get; set; }
-
         public string Kind { get; }
-
         public string Name { get; }
     }
 }

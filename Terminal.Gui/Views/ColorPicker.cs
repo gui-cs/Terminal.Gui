@@ -82,7 +82,7 @@ public class ColorPicker : View {
         }
 
         SetFocus ();
-        if ((me.X > Bounds.Width) || (me.Y > Bounds.Height)) {
+        if (me.X > Bounds.Width || me.Y > Bounds.Height) {
             return true;
         }
 

@@ -2,7 +2,6 @@
 
 /// <summary>
 ///     <para>Describes an overlay element that is rendered either before or after a series.</para>
-/// 
 ///     <para>
 ///         Annotations can be positioned either in screen space (e.g. a legend) or in graph space (e.g. a line showing
 ///         high point)
@@ -33,8 +32,8 @@ public class TextAnnotation : IAnnotation {
     public Point? ScreenPosition { get; set; }
 
     /// <summary>
-    ///     The location in graph space to draw the <see cref="Text"/>.  This annotation will only show if the point is in
-    ///     the current viewable area of the graph presented in the <see cref="GraphView"/>
+    ///     The location in graph space to draw the <see cref="Text"/>.  This annotation will only show if the point is in the
+    ///     current viewable area of the graph presented in the <see cref="GraphView"/>
     /// </summary>
     public PointF GraphPosition { get; set; }
 
@@ -98,8 +97,8 @@ public class LegendAnnotation : View, IAnnotation {
 
     /// <summary>Creates a new empty legend at the given screen coordinates.</summary>
     /// <param name="legendBounds">
-    ///     Defines the area available for the legend to render in (within the graph).  This is in
-    ///     screen units (i.e. not graph space)
+    ///     Defines the area available for the legend to render in (within the graph).  This is in screen units (i.e. not graph
+    ///     space)
     /// </param>
     public LegendAnnotation (Rect legendBounds) {
         X = legendBounds.X;

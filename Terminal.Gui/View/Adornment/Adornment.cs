@@ -29,8 +29,8 @@ public class Adornment : View {
     private Thickness _thickness = Thickness.Empty;
 
     /// <summary>
-    ///     Adornments only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas, so setting this
-    ///     property throws an <see cref="InvalidOperationException"/>.
+    ///     Adornments only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas, so setting this property
+    ///     throws an <see cref="InvalidOperationException"/>.
     /// </summary>
     public override bool SuperViewRendersLineCanvas {
         get => false; // throw new NotImplementedException ();
@@ -67,7 +67,10 @@ public class Adornment : View {
     ///     Adornments cannot be used as sub-views (see <see cref="Parent"/>); this method always throws an
     ///     <see cref="InvalidOperationException"/>. TODO: Are we sure?
     /// </summary>
-    public override View SuperView { get => null; set => throw new NotImplementedException (); }
+    public override View SuperView {
+        get => null;
+        set => throw new NotImplementedException ();
+    }
 
     /// <inheritdoc/>
     public override void BoundsToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true) {
@@ -100,7 +103,7 @@ public class Adornment : View {
 
     /// <summary>Does nothing for Adornment</summary>
     /// <returns></returns>
-    public override bool OnDrawAdornments () { return false; }
+    public override bool OnDrawAdornments () => false;
 
     /// <summary>Redraws the Adornments that comprise the <see cref="Adornment"/>.</summary>
     public override void OnDrawContent (Rect contentArea) {
@@ -130,7 +133,7 @@ public class Adornment : View {
 
     /// <summary>Does nothing for Adornment</summary>
     /// <returns></returns>
-    public override bool OnRenderLineCanvas () { return false; }
+    public override bool OnRenderLineCanvas () => false;
 
     /// <summary>Called whenever the <see cref="Thickness"/> property changes.</summary>
     public virtual void OnThicknessChanged (Thickness previousThickness) {
@@ -143,10 +146,9 @@ public class Adornment : View {
     /// <summary>Fired whenever the <see cref="Thickness"/> property changes.</summary>
     public event EventHandler<ThicknessEventArgs> ThicknessChanged;
 
-    internal override Adornment CreateAdornment (Type adornmentType) {
+    internal override Adornment CreateAdornment (Type adornmentType) =>
         /* Do nothing - Adornments do not have Adornments */
-        return null;
-    }
+        null;
 
     internal override void LayoutAdornments () {
         /* Do nothing - Adornments do not have Adornments */

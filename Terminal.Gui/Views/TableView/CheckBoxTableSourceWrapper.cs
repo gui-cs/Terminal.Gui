@@ -1,17 +1,17 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     <see cref="ITableSource"/> for a <see cref="TableView"/> which adds a checkbox column as an additional column
-///     in the table.
+///     <see cref="ITableSource"/> for a <see cref="TableView"/> which adds a checkbox column as an additional column in
+///     the table.
 /// </summary>
 /// <remarks>
-///     This class wraps another <see cref="ITableSource"/> and dynamically serves its rows/cols plus an extra column.
-///     Data in the wrapped source can be dynamic (change over time).
+///     This class wraps another <see cref="ITableSource"/> and dynamically serves its rows/cols plus an extra column. Data
+///     in the wrapped source can be dynamic (change over time).
 /// </remarks>
 public abstract class CheckBoxTableSourceWrapperBase : ITableSource {
     /// <summary>
-    ///     Creates a new instance of the class presenting the data in <paramref name="toWrap"/> plus an additional
-    ///     checkbox column.
+    ///     Creates a new instance of the class presenting the data in <paramref name="toWrap"/> plus an additional checkbox
+    ///     column.
     /// </summary>
     /// <param name="tableView">
     ///     The <see cref="TableView"/> this source will be used with. This is required for event
@@ -36,9 +36,7 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource {
     /// <summary>Gets the <see cref="ITableSource"/> that this instance is wrapping.</summary>
     public ITableSource Wrapping { get; }
 
-    /// <summary>
-    ///     Gets or sets the character to use for checked entries. Defaults to <see cref="GlyphDefinitions.Checked"/>
-    /// </summary>
+    /// <summary>Gets or sets the character to use for checked entries. Defaults to <see cref="GlyphDefinitions.Checked"/></summary>
     public Rune CheckedRune { get; set; } = Glyphs.Checked;
 
     /// <summary>
@@ -48,14 +46,12 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource {
     public Rune RadioCheckedRune { get; set; } = Glyphs.Selected;
 
     /// <summary>
-    ///     Gets or sets the character to use for unchecked entries when <see cref="UseRadioButtons"/> is true. Defaults
-    ///     to <see cref="GlyphDefinitions.UnSelected"/>
+    ///     Gets or sets the character to use for unchecked entries when <see cref="UseRadioButtons"/> is true. Defaults to
+    ///     <see cref="GlyphDefinitions.UnSelected"/>
     /// </summary>
     public Rune RadioUnCheckedRune { get; set; } = Glyphs.UnSelected;
 
-    /// <summary>
-    ///     Gets or sets the character to use for UnChecked entries. Defaults to <see cref="GlyphDefinitions.UnChecked"/>
-    /// </summary>
+    /// <summary>Gets or sets the character to use for UnChecked entries. Defaults to <see cref="GlyphDefinitions.UnChecked"/></summary>
     public Rune UnCheckedRune { get; set; } = Glyphs.UnChecked;
 
     /// <inheritdoc/>
@@ -98,8 +94,8 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource {
     protected abstract bool IsChecked (int row);
 
     /// <summary>
-    ///     Called when the 'toggled all' action is performed. This should change state from 'some selected' to 'all
-    ///     selected' or clear selection if all area already selected.
+    ///     Called when the 'toggled all' action is performed. This should change state from 'some selected' to 'all selected'
+    ///     or clear selection if all area already selected.
     /// </summary>
     protected abstract void ToggleAllRows ();
 

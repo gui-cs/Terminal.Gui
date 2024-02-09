@@ -8,7 +8,7 @@ using static Terminal.Gui.NetEvents;
 
 namespace Terminal.Gui;
 
-class NetWinVTConsole {
+internal class NetWinVTConsole {
     public NetWinVTConsole () {
         _inputHandle = GetStdHandle (STD_INPUT_HANDLE);
         if (!GetConsoleMode (_inputHandle, out uint mode)) {
@@ -92,13 +92,13 @@ class NetWinVTConsole {
         }
     }
 
-    [DllImport ("kernel32.dll")] private extern static bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
-    [DllImport ("kernel32.dll")] private extern static uint GetLastError ();
-    [DllImport ("kernel32.dll", SetLastError = true)] private extern static nint GetStdHandle (int nStdHandle);
-    [DllImport ("kernel32.dll")] private extern static bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
+    [DllImport ("kernel32.dll")] private static extern bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
+    [DllImport ("kernel32.dll")] private static extern uint GetLastError ();
+    [DllImport ("kernel32.dll", SetLastError = true)] private static extern nint GetStdHandle (int nStdHandle);
+    [DllImport ("kernel32.dll")] private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
 }
 
-class NetEvents : IDisposable {
+internal class NetEvents : IDisposable {
     private readonly ManualResetEventSlim _inputReady = new (false);
     private CancellationTokenSource _inputReadyCancellationTokenSource;
     private readonly ManualResetEventSlim _waitForStart = new (false);
@@ -633,7 +633,7 @@ class NetEvents : IDisposable {
         public WindowPositionEvent WindowPositionEvent;
         public RequestResponseEvent RequestResponseEvent;
 
-        public override readonly string ToString () {
+        public readonly override string ToString () {
             return EventType switch {
                        EventType.Key => ToString (ConsoleKeyInfo),
                        EventType.Mouse => MouseEvent.ToString (),
@@ -685,7 +685,7 @@ class NetEvents : IDisposable {
     }
 }
 
-class NetDriver : ConsoleDriver {
+internal class NetDriver : ConsoleDriver {
     private const int COLOR_BLACK = 30;
     private const int COLOR_BLUE = 34;
     private const int COLOR_BRIGHT_BLACK = 90;
@@ -703,10 +703,9 @@ class NetDriver : ConsoleDriver {
     private const int COLOR_WHITE = 37;
     private const int COLOR_YELLOW = 33;
     private NetMainLoop _mainLoopDriver;
-
     public bool IsWinPlatform { get; private set; }
 
-    public override bool SupportsTrueColor => (Environment.OSVersion.Platform == PlatformID.Unix)
+    public override bool SupportsTrueColor => Environment.OSVersion.Platform == PlatformID.Unix
                                               || (IsWinPlatform && Environment.OSVersion.Version.Build >= 14931);
 
     public NetWinVTConsole NetWinConsole { get; private set; }
@@ -734,8 +733,8 @@ class NetDriver : ConsoleDriver {
     #endregion
 
     public override void UpdateScreen () {
-        if (RunningUnitTests || _winSizeChanging || (Console.WindowHeight < 1) || (Contents.Length != Rows * Cols)
-            || (Rows != Console.WindowHeight)) {
+        if (RunningUnitTests || _winSizeChanging || Console.WindowHeight < 1 || Contents.Length != Rows * Cols
+            || Rows != Console.WindowHeight) {
             return;
         }
 
@@ -884,7 +883,7 @@ class NetDriver : ConsoleDriver {
 
     internal override MainLoop Init () {
         PlatformID p = Environment.OSVersion.Platform;
-        if ((p == PlatformID.Win32NT) || (p == PlatformID.Win32S) || (p == PlatformID.Win32Windows)) {
+        if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
             IsWinPlatform = true;
             try {
                 NetWinConsole = new NetWinVTConsole ();
@@ -985,7 +984,7 @@ class NetDriver : ConsoleDriver {
 
     #region Size and Position Handling
 
-    volatile private bool _winSizeChanging;
+    private volatile bool _winSizeChanging;
 
     private void SetWindowPosition (int col, int row) {
         if (!RunningUnitTests) {
@@ -1061,9 +1060,8 @@ class NetDriver : ConsoleDriver {
     };
 
     // Map a ConsoleColor to a platform dependent value.
-    private int MapColors (ConsoleColor color, bool isForeground = true) {
-        return colorMap.TryGetValue (color, out int colorValue) ? colorValue + (isForeground ? 0 : 10) : 0;
-    }
+    private int MapColors (ConsoleColor color, bool isForeground = true) =>
+        colorMap.TryGetValue (color, out int colorValue) ? colorValue + (isForeground ? 0 : 10) : 0;
 
     ///// <remarks>
     ///// In the NetDriver, colors are encoded as an int. 
@@ -1373,11 +1371,11 @@ class NetDriver : ConsoleDriver {
 }
 
 /// <summary>
-///     Mainloop intended to be used with the .NET System.Console API, and can be used on Windows and Unix, it is
-///     cross platform but lacks things like file descriptor monitoring.
+///     Mainloop intended to be used with the .NET System.Console API, and can be used on Windows and Unix, it is cross
+///     platform but lacks things like file descriptor monitoring.
 /// </summary>
 /// <remarks>This implementation is used for NetDriver.</remarks>
-class NetMainLoop : IMainLoopDriver {
+internal class NetMainLoop : IMainLoopDriver {
     /// <summary>Initializes the class with the console driver.</summary>
     /// <remarks>Passing a consoleDriver is provided to capture windows resizing.</remarks>
     /// <param name="consoleDriver">The console driver used by this Net main loop.</param>
@@ -1431,7 +1429,7 @@ class NetMainLoop : IMainLoopDriver {
         }
 
         if (!_eventReadyTokenSource.IsCancellationRequested) {
-            return (_resultQueue.Count > 0) || _mainLoop.CheckTimersAndIdleHandlers (out _);
+            return _resultQueue.Count > 0 || _mainLoop.CheckTimersAndIdleHandlers (out _);
         }
 
         _eventReadyTokenSource.Dispose ();

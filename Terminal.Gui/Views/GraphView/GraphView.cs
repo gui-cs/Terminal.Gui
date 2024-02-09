@@ -104,8 +104,8 @@ public class GraphView : View {
     public uint MarginBottom { get; set; }
 
     /// <summary>
-    ///     Amount of space to leave on left of the graph. Graph content (<see cref="Series"/>) will not be rendered in
-    ///     margins but axis labels may be. Use <see cref="Padding"/> to add a margin outside of the GraphView.
+    ///     Amount of space to leave on left of the graph. Graph content (<see cref="Series"/>) will not be rendered in margins
+    ///     but axis labels may be. Use <see cref="Padding"/> to add a margin outside of the GraphView.
     /// </summary>
     public uint MarginLeft { get; set; }
 
@@ -159,25 +159,23 @@ public class GraphView : View {
 
     /// <summary>Calculates the screen location for a given point in graph space. Bear in mind these may be off screen.</summary>
     /// <param name="location">
-    ///     Point in graph space that may or may not be represented in the visible area of graph currently
-    ///     presented.  E.g. 0,0 for origin.
+    ///     Point in graph space that may or may not be represented in the visible area of graph currently presented.  E.g. 0,0
+    ///     for origin.
     /// </param>
     /// <returns>
-    ///     Screen position (Column/Row) which would be used to render the graph <paramref name="location"/>. Note that
-    ///     this can be outside the current content area of the view.
+    ///     Screen position (Column/Row) which would be used to render the graph <paramref name="location"/>. Note that this
+    ///     can be outside the current content area of the view.
     /// </returns>
-    public Point GraphSpaceToScreen (PointF location) {
-        return new Point (
-            (int)((location.X - ScrollOffset.X) / CellSize.X) + (int)MarginLeft,
+    public Point GraphSpaceToScreen (PointF location) => new (
+        (int)((location.X - ScrollOffset.X) / CellSize.X) + (int)MarginLeft,
 
-            // screen coordinates are top down while graph coordinates are bottom up
-            Bounds.Height - 1 - (int)MarginBottom - (int)((location.Y - ScrollOffset.Y) / CellSize.Y)
-        );
-    }
+        // screen coordinates are top down while graph coordinates are bottom up
+        Bounds.Height - 1 - (int)MarginBottom - (int)((location.Y - ScrollOffset.Y) / CellSize.Y)
+    );
 
     ///<inheritdoc/>
     public override void OnDrawContent (Rect contentArea) {
-        if ((CellSize.X == 0) || (CellSize.Y == 0)) {
+        if (CellSize.X == 0 || CellSize.Y == 0) {
             throw new Exception ($"{nameof (CellSize)} cannot be 0");
         }
 
@@ -201,7 +199,7 @@ public class GraphView : View {
         int graphScreenHeight = Bounds.Height - (int)MarginBottom;
 
         // if the margins take up the full draw bounds don't render
-        if ((graphScreenWidth < 0) || (graphScreenHeight < 0)) {
+        if (graphScreenWidth < 0 || graphScreenHeight < 0) {
             return;
         }
 
@@ -262,8 +260,8 @@ public class GraphView : View {
     public void PageUp () { Scroll (0, CellSize.Y * Bounds.Height); }
 
     /// <summary>
-    ///     Clears all settings configured on the graph and resets all properties to default values (
-    ///     <see cref="CellSize"/>, <see cref="ScrollOffset"/> etc) .
+    ///     Clears all settings configured on the graph and resets all properties to default values ( <see cref="CellSize"/>,
+    ///     <see cref="ScrollOffset"/> etc) .
     /// </summary>
     public void Reset () {
         ScrollOffset = new PointF (0, 0);
@@ -280,14 +278,12 @@ public class GraphView : View {
     /// <param name="col"></param>
     /// <param name="row"></param>
     /// <returns></returns>
-    public RectangleF ScreenToGraphSpace (int col, int row) {
-        return new RectangleF (
-            ScrollOffset.X + (col - MarginLeft) * CellSize.X,
-            ScrollOffset.Y + (Bounds.Height - (row + MarginBottom + 1)) * CellSize.Y,
-            CellSize.X,
-            CellSize.Y
-        );
-    }
+    public RectangleF ScreenToGraphSpace (int col, int row) => new (
+        ScrollOffset.X + (col - MarginLeft) * CellSize.X,
+        ScrollOffset.Y + (Bounds.Height - (row + MarginBottom + 1)) * CellSize.Y,
+        CellSize.X,
+        CellSize.Y
+    );
 
     /// <summary>Returns the section of the graph that is represented by the screen area.</summary>
     /// <param name="screenArea"></param>

@@ -33,8 +33,8 @@ namespace Terminal.Gui;
 ///     Settings are applied using the following precedence (higher precedence settings overwrite lower precedence
 ///     settings):
 ///     <para>
-///         1. Application configuration found in the users's home directory (<c>~/.tui/appname.config.json</c>) --
-///         Highest precedence
+///         1. Application configuration found in the users's home directory (<c>~/.tui/appname.config.json</c>) -- Highest
+///         precedence
 ///     </para>
 ///     <para>
 ///         2. Application configuration found in the directory the app was launched from (
@@ -57,14 +57,14 @@ public static class ConfigurationManager {
     public enum ConfigLocations {
         /// <summary>No configuration will be loaded.</summary>
         /// <remarks>
-        ///     Used for development and testing only. For Terminal,Gui to function properly, at least
-        ///     <see cref="DefaultOnly"/> should be set.
+        ///     Used for development and testing only. For Terminal,Gui to function properly, at least <see cref="DefaultOnly"/>
+        ///     should be set.
         /// </remarks>
         None = 0,
 
         /// <summary>
-        ///     Global configuration in <c>Terminal.Gui.dll</c>'s resources (<c>Terminal.Gui.Resources.config.json</c>) --
-        ///     Lowest Precedence.
+        ///     Global configuration in <c>Terminal.Gui.dll</c>'s resources (<c>Terminal.Gui.Resources.config.json</c>) -- Lowest
+        ///     Precedence.
         /// </summary>
         DefaultOnly,
 
@@ -83,12 +83,9 @@ public static class ConfigurationManager {
     internal static Dictionary<string, ConfigProperty>? _allConfigProperties;
 
     internal static readonly JsonSerializerOptions _serializerOptions = new () {
-        ReadCommentHandling =
-            JsonCommentHandling.Skip,
+        ReadCommentHandling = JsonCommentHandling.Skip,
         PropertyNameCaseInsensitive = true,
-        DefaultIgnoreCondition =
-            JsonIgnoreCondition
-                .WhenWritingNull,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         WriteIndented = true,
         Converters = {
             // We override the standard Rune converter to support specifying Glyphs in
@@ -100,14 +97,13 @@ public static class ConfigurationManager {
         },
 
         // Enables Key to be "Ctrl+Q" vs "Ctrl\u002BQ"
-        Encoder = JavaScriptEncoder
-            .UnsafeRelaxedJsonEscaping
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
 
     /// <summary>The backing property for <see cref="Settings"/>.</summary>
     /// <remarks>
-    ///     Is <see langword="null"/> until <see cref="Reset"/> is called. Gets set to a new instance by deserialization
-    ///     (see <see cref="Load"/>).
+    ///     Is <see langword="null"/> until <see cref="Reset"/> is called. Gets set to a new instance by deserialization (see
+    ///     <see cref="Load"/>).
     /// </remarks>
     private static SettingsScope? _settings;
 
@@ -120,9 +116,9 @@ public static class ConfigurationManager {
     public static AppScope? AppSettings { get; set; }
 
     /// <summary>
-    ///     Gets or sets whether the <see cref="ConfigurationManager"/> should throw an exception if it encounters an
-    ///     error on deserialization. If <see langword="false"/> (the default), the error is logged and printed to the console
-    ///     when <see cref="Application.Shutdown"/> is called.
+    ///     Gets or sets whether the <see cref="ConfigurationManager"/> should throw an exception if it encounters an error on
+    ///     deserialization. If <see langword="false"/> (the default), the error is logged and printed to the console when
+    ///     <see cref="Application.Shutdown"/> is called.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool? ThrowOnJsonErrors { get; set; } = false;
@@ -205,9 +201,8 @@ public static class ConfigurationManager {
     }
 
     /// <summary>
-    ///     Loads all settings found in the various configuration storage locations to the
-    ///     <see cref="ConfigurationManager"/>. Optionally, resets all settings attributed with
-    ///     <see cref="SerializableConfigurationProperty"/> to the defaults.
+    ///     Loads all settings found in the various configuration storage locations to the <see cref="ConfigurationManager"/>.
+    ///     Optionally, resets all settings attributed with <see cref="SerializableConfigurationProperty"/> to the defaults.
     /// </summary>
     /// <remarks>Use <see cref="Apply"/> to cause the loaded settings to be applied to the running application.</remarks>
     /// <param name="reset">
@@ -326,8 +321,8 @@ public static class ConfigurationManager {
     }
 
     /// <summary>
-    ///     System.Text.Json does not support copying a deserialized object to an existing instance. To work around this,
-    ///     we implement a 'deep, memberwise copy' method.
+    ///     System.Text.Json does not support copying a deserialized object to an existing instance. To work around this, we
+    ///     implement a 'deep, memberwise copy' method.
     /// </summary>
     /// <remarks>TOOD: When System.Text.Json implements `PopulateObject` revisit https://github.com/dotnet/corefx/issues/37627</remarks>
     /// <param name="source"></param>
@@ -355,7 +350,7 @@ public static class ConfigurationManager {
         }
 
         // If value type, just use copy constructor.
-        if (source.GetType ().IsValueType || (source.GetType () == typeof (string))) {
+        if (source.GetType ().IsValueType || source.GetType () == typeof (string)) {
             return source;
         }
 
@@ -406,8 +401,8 @@ public static class ConfigurationManager {
     }
 
     /// <summary>
-    ///     Retrieves the hard coded default settings from the Terminal.Gui library implementation. Used in development of
-    ///     the library to generate the default configuration file. Before calling Application.Init, make sure
+    ///     Retrieves the hard coded default settings from the Terminal.Gui library implementation. Used in development of the
+    ///     library to generate the default configuration file. Before calling Application.Init, make sure
     ///     <see cref="Locations"/> is set to <see cref="ConfigLocations.None"/>.
     /// </summary>
     /// <remarks>
@@ -435,8 +430,8 @@ public static class ConfigurationManager {
     }
 
     /// <summary>
-    ///     Initializes the internal state of ConfigurationManager. Nominally called once as part of application startup
-    ///     to initialize global state. Also called from some Unit Tests to ensure correctness (e.g. Reset()).
+    ///     Initializes the internal state of ConfigurationManager. Nominally called once as part of application startup to
+    ///     initialize global state. Also called from some Unit Tests to ensure correctness (e.g. Reset()).
     /// </summary>
     internal static void Initialize () {
         _allConfigProperties = new Dictionary<string, ConfigProperty> ();

@@ -227,6 +227,6 @@ public class FileDialogExamples : Scenario {
     private class CaseSensitiveSearchMatcher : ISearchMatcher {
         private string _terms;
         public void Initialize (string terms) { _terms = terms; }
-        public bool IsMatch (IFileSystemInfo f) { return f.Name.Contains (_terms, StringComparison.CurrentCulture); }
+        public bool IsMatch (IFileSystemInfo f) => f.Name.Contains (_terms, StringComparison.CurrentCulture);
     }
 }

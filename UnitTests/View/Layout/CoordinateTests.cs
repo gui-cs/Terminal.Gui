@@ -35,8 +35,8 @@ public class CoordinateTests {
     }
 
     /// <summary>
-    ///     Tests that screen to bounds mapping works correctly when the view has no superview and there are no Frames on
-    ///     the view.
+    ///     Tests that screen to bounds mapping works correctly when the view has no superview and there are no Frames on the
+    ///     view.
     /// </summary>
     [Theory]
     [InlineData (0, 0, 0, 0, 0, 0)]

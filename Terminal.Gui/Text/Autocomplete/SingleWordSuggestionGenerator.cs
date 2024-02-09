@@ -36,22 +36,21 @@ public class SingleWordSuggestionGenerator : ISuggestionGenerator {
     }
 
     /// <summary>
-    ///     Return true if the given symbol should be considered part of a word and can be contained in matches. Base
-    ///     behavior is to use <see cref="char.IsLetterOrDigit(char)"/>
+    ///     Return true if the given symbol should be considered part of a word and can be contained in matches. Base behavior
+    ///     is to use <see cref="char.IsLetterOrDigit(char)"/>
     /// </summary>
     /// <param name="rune">The rune.</param>
     /// <returns></returns>
-    public virtual bool IsWordChar (Rune rune) { return char.IsLetterOrDigit ((char)rune.Value); }
+    public virtual bool IsWordChar (Rune rune) => char.IsLetterOrDigit ((char)rune.Value);
 
     /// <summary>
     ///     <para>
     ///         Given a <paramref name="line"/> of characters, returns the word which ends at <paramref name="idx"/> or null.
     ///         Also returns null if the <paramref name="idx"/> is positioned in the middle of a word.
     ///     </para>
-    /// 
     ///     <para>
-    ///         Use this method to determine whether autocomplete should be shown when the cursor is at a given point in a
-    ///         line and to get the word from which suggestions should be generated. Use the <paramref name="columnOffset"/> to
+    ///         Use this method to determine whether autocomplete should be shown when the cursor is at a given point in a line
+    ///         and to get the word from which suggestions should be generated. Use the <paramref name="columnOffset"/> to
     ///         indicate if search the word at left (negative), at right (positive) or at the current column (zero) which is
     ///         the default.
     ///     </para>

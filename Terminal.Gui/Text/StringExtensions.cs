@@ -54,7 +54,7 @@ public static class StringExtensions {
     /// <remarks>This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.</remarks>
     /// <param name="str">The string to count.</param>
     /// <returns></returns>
-    public static int GetRuneCount (this string str) { return str.EnumerateRunes ().Count (); }
+    public static int GetRuneCount (this string str) => str.EnumerateRunes ().Count ();
 
     /// <summary>
     ///     Determines if this <see cref="ReadOnlySpan{T}"/> of <see langword="char"/> is composed entirely of ASCII
@@ -65,9 +65,8 @@ public static class StringExtensions {
     ///     A <see langword="bool"/> indicating if all elements of the <see cref="ReadOnlySpan{T}"/> are ASCII digits (
     ///     <see langword="true"/>) or not (<see langword="false"/>
     /// </returns>
-    public static bool IsAllAsciiDigits (this ReadOnlySpan<char> stringSpan) {
-        return stringSpan.ToString ().All (char.IsAsciiDigit);
-    }
+    public static bool IsAllAsciiDigits (this ReadOnlySpan<char> stringSpan) =>
+        stringSpan.ToString ().All (char.IsAsciiDigit);
 
     /// <summary>
     ///     Determines if this <see cref="ReadOnlySpan{T}"/> of <see langword="char"/> is composed entirely of ASCII
@@ -78,9 +77,8 @@ public static class StringExtensions {
     ///     A <see langword="bool"/> indicating if all elements of the <see cref="ReadOnlySpan{T}"/> are ASCII digits (
     ///     <see langword="true"/>) or not (<see langword="false"/>
     /// </returns>
-    public static bool IsAllAsciiHexDigits (this ReadOnlySpan<char> stringSpan) {
-        return stringSpan.ToString ().All (char.IsAsciiHexDigit);
-    }
+    public static bool IsAllAsciiHexDigits (this ReadOnlySpan<char> stringSpan) =>
+        stringSpan.ToString ().All (char.IsAsciiHexDigit);
 
     /// <summary>Repeats the string <paramref name="n"/> times.</summary>
     /// <remarks>This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.</remarks>
@@ -92,7 +90,7 @@ public static class StringExtensions {
             return null;
         }
 
-        if (string.IsNullOrEmpty (str) || (n == 1)) {
+        if (string.IsNullOrEmpty (str) || n == 1) {
             return str;
         }
 
@@ -105,13 +103,13 @@ public static class StringExtensions {
     /// <remarks>This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.</remarks>
     /// <param name="str">The string to convert.</param>
     /// <returns></returns>
-    public static List<Rune> ToRuneList (this string str) { return str.EnumerateRunes ().ToList (); }
+    public static List<Rune> ToRuneList (this string str) => str.EnumerateRunes ().ToList ();
 
     /// <summary>Converts the string into a <see cref="Rune"/> array.</summary>
     /// <remarks>This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.</remarks>
     /// <param name="str">The string to convert.</param>
     /// <returns></returns>
-    public static Rune[] ToRunes (this string str) { return str.EnumerateRunes ().ToArray (); }
+    public static Rune[] ToRunes (this string str) => str.EnumerateRunes ().ToArray ();
 
     /// <summary>Converts a <see cref="Rune"/> generic collection into a string.</summary>
     /// <param name="runes">The enumerable rune to convert.</param>

@@ -16,7 +16,7 @@ public class MainLoopTests {
     // - wait = false
 
     // TODO: Add IMainLoop tests
-    volatile private static int tbCounter;
+    private static volatile int tbCounter;
     private static int three;
     private static int total;
     private static int two;
@@ -467,7 +467,7 @@ public class MainLoopTests {
         var ml = new MainLoop (new FakeMainLoop ());
         TimeSpan ms = TimeSpan.FromMilliseconds (50);
 
-        static bool Callback () { return false; }
+        static bool Callback () => false;
 
         _ = ml.AddTimeout (ms, Callback);
         bool retVal = ml.CheckTimersAndIdleHandlers (out int waitTimeOut);
@@ -483,7 +483,7 @@ public class MainLoopTests {
         var ml = new MainLoop (new FakeMainLoop ());
         TimeSpan ms = TimeSpan.FromMilliseconds (50);
 
-        static bool Callback () { return false; }
+        static bool Callback () => false;
 
         _ = ml.AddTimeout (ms, Callback);
         _ = ml.AddTimeout (ms, Callback);
@@ -682,7 +682,7 @@ public class MainLoopTests {
         );
     }
 
-    private async static void RunAsyncTest (object sender, EventArgs e) {
+    private static async void RunAsyncTest (object sender, EventArgs e) {
         Assert.Equal (clickMe, btn.Text);
         Assert.Equal (zero, total);
 
@@ -801,13 +801,13 @@ public class MainLoopTests {
     private class MillisecondTolerance : IEqualityComparer<TimeSpan> {
         public MillisecondTolerance (int tolerance) { _tolerance = tolerance; }
         private readonly int _tolerance;
-        public bool Equals (TimeSpan x, TimeSpan y) { return Math.Abs (x.Milliseconds - y.Milliseconds) <= _tolerance; }
-        public int GetHashCode (TimeSpan obj) { return obj.GetHashCode (); }
+        public bool Equals (TimeSpan x, TimeSpan y) => Math.Abs (x.Milliseconds - y.Milliseconds) <= _tolerance;
+        public int GetHashCode (TimeSpan obj) => obj.GetHashCode ();
     }
 
     private class TestMainloop : IMainLoopDriver {
         private MainLoop mainLoop;
-        public bool EventsPending () { throw new NotImplementedException (); }
+        public bool EventsPending () => throw new NotImplementedException ();
         public void Iteration () { throw new NotImplementedException (); }
         public void TearDown () { throw new NotImplementedException (); }
         public void Setup (MainLoop mainLoop) { this.mainLoop = mainLoop; }

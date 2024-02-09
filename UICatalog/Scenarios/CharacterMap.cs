@@ -17,8 +17,8 @@ using static Terminal.Gui.SpinnerStyle;
 namespace UICatalog.Scenarios;
 
 /// <summary>
-///     This Scenario demonstrates building a custom control (a class deriving from View) that: - Provides a
-///     "Character Map" application (like Windows' charmap.exe). - Helps test unicode character rendering in Terminal.Gui -
+///     This Scenario demonstrates building a custom control (a class deriving from View) that: - Provides a "Character
+///     Map" application (like Windows' charmap.exe). - Helps test unicode character rendering in Terminal.Gui -
 ///     Illustrates how to use ScrollView to do infinite scrolling
 /// </summary>
 [ScenarioMetadata ("Character Map", "Unicode viewer demonstrating the ScrollView control.")]
@@ -250,7 +250,7 @@ public class CharacterMap : Scenario {
     }
 }
 
-class CharMap : ScrollView {
+internal class CharMap : ScrollView {
     public CharMap () {
         ColorScheme = Colors.ColorSchemes["Dialog"];
         CanFocus = true;
@@ -432,9 +432,7 @@ class CharMap : ScrollView {
     }
 
     private static int RowLabelWidth => $"U+{MaxCodePoint:x5}".Length + 1;
-
     private static int RowWidth => RowLabelWidth + COLUMN_WIDTH * 16;
-
     public event EventHandler<ListViewItemEventArgs> Hover;
 
     public override void OnDrawContent (Rect contentArea) {
@@ -462,7 +460,7 @@ class CharMap : ScrollView {
 
     //public void CharMap_DrawContent (object s, DrawEventArgs a)
     public override void OnDrawContentComplete (Rect contentArea) {
-        if ((contentArea.Height == 0) || (contentArea.Width == 0)) {
+        if (contentArea.Height == 0 || contentArea.Width == 0) {
             return;
         }
 
@@ -544,7 +542,7 @@ class CharMap : ScrollView {
                 int width = rune.GetColumns ();
 
                 // are we at first row of the row?
-                if (!ShowGlyphWidths || ((y - ContentOffset.Y) % _rowHeight > 0)) {
+                if (!ShowGlyphWidths || (y - ContentOffset.Y) % _rowHeight > 0) {
                     if (width > 0) {
                         Driver.AddRune (rune);
                     } else {
@@ -585,7 +583,7 @@ class CharMap : ScrollView {
                     ? ColorScheme.HotFocus
                     : ColorScheme.HotNormal
             );
-            if (!ShowGlyphWidths || ((y - ContentOffset.Y) % _rowHeight > 0)) {
+            if (!ShowGlyphWidths || (y - ContentOffset.Y) % _rowHeight > 0) {
                 Driver.AddStr ($"U+{val / 16:x5}_ ");
             } else {
                 Driver.AddStr (new string (' ', RowLabelWidth));
@@ -653,7 +651,7 @@ class CharMap : ScrollView {
 
         if (me.Y > 0) { }
 
-        if ((me.X < RowLabelWidth) || (me.X > RowLabelWidth + 16 * COLUMN_WIDTH - 1)) {
+        if (me.X < RowLabelWidth || me.X > RowLabelWidth + 16 * COLUMN_WIDTH - 1) {
             me.X = Cursor.X;
         }
 
@@ -918,7 +916,7 @@ public class UcdApiClient {
     }
 }
 
-class UnicodeRange {
+internal class UnicodeRange {
     public UnicodeRange (int start, int end, string category) {
         Start = start;
         End = end;

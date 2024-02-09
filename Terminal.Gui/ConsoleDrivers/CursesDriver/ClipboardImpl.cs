@@ -5,10 +5,9 @@ namespace Terminal.Gui;
 
 /// <summary>A clipboard implementation for Linux. This implementation uses the xclip command to access the clipboard.</summary>
 /// <remarks>If xclip is not installed, this implementation will not work.</remarks>
-class CursesClipboard : ClipboardBase {
+internal class CursesClipboard : ClipboardBase {
     public CursesClipboard () { IsSupported = CheckSupport (); }
     private string _xclipPath = string.Empty;
-
     public override bool IsSupported { get; }
 
     protected override string GetClipboardDataImpl () {
@@ -70,10 +69,10 @@ class CursesClipboard : ClipboardBase {
 }
 
 /// <summary>
-///     A clipboard implementation for MacOSX. This implementation uses the Mac clipboard API (via P/Invoke) to
-///     copy/paste. The existance of the Mac pbcopy and pbpaste commands is used to determine if copy/paste is supported.
+///     A clipboard implementation for MacOSX. This implementation uses the Mac clipboard API (via P/Invoke) to copy/paste.
+///     The existance of the Mac pbcopy and pbpaste commands is used to determine if copy/paste is supported.
 /// </summary>
-class MacOSXClipboard : ClipboardBase {
+internal class MacOSXClipboard : ClipboardBase {
     public MacOSXClipboard () {
         _utfTextType = objc_msgSend (
             objc_msgSend (_nsString, _allocRegister),
@@ -101,7 +100,6 @@ class MacOSXClipboard : ClipboardBase {
     private readonly nint _stringForTypeRegister = sel_registerName ("stringForType:");
     private readonly nint _utf8Register = sel_registerName ("UTF8String");
     private readonly nint _utfTextType;
-
     public override bool IsSupported { get; }
 
     protected override string GetClipboardDataImpl () {
@@ -127,7 +125,7 @@ class MacOSXClipboard : ClipboardBase {
 
     private bool CheckSupport () {
         (int exitCode, string result) = ClipboardProcessRunner.Bash ("which pbcopy", waitForOutput: true);
-        if ((exitCode != 0) || !result.FileExists ()) {
+        if (exitCode != 0 || !result.FileExists ()) {
             return false;
         }
 
@@ -137,32 +135,31 @@ class MacOSXClipboard : ClipboardBase {
     }
 
     [DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
-    private extern static nint objc_getClass (string className);
+    private static extern nint objc_getClass (string className);
 
     [DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
-    private extern static nint objc_msgSend (nint receiver, nint selector);
+    private static extern nint objc_msgSend (nint receiver, nint selector);
 
     [DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
-    private extern static nint objc_msgSend (nint receiver, nint selector, string arg1);
+    private static extern nint objc_msgSend (nint receiver, nint selector, string arg1);
 
     [DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
-    private extern static nint objc_msgSend (nint receiver, nint selector, nint arg1);
+    private static extern nint objc_msgSend (nint receiver, nint selector, nint arg1);
 
     [DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
-    private extern static nint objc_msgSend (nint receiver, nint selector, nint arg1, nint arg2);
+    private static extern nint objc_msgSend (nint receiver, nint selector, nint arg1, nint arg2);
 
     [DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
-    private extern static nint sel_registerName (string selectorName);
+    private static extern nint sel_registerName (string selectorName);
 }
 
 /// <summary>
-///     A clipboard implementation for Linux, when running under WSL. This implementation uses the Windows clipboard
-///     to store the data, and uses Windows' powershell.exe (launched via WSL interop services) to set/get the Windows
+///     A clipboard implementation for Linux, when running under WSL. This implementation uses the Windows clipboard to
+///     store the data, and uses Windows' powershell.exe (launched via WSL interop services) to set/get the Windows
 ///     clipboard.
 /// </summary>
-class WSLClipboard : ClipboardBase {
+internal class WSLClipboard : ClipboardBase {
     private static string _powershellPath = string.Empty;
-
     public override bool IsSupported => CheckSupport ();
 
     protected override string GetClipboardDataImpl () {

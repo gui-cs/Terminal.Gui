@@ -12,9 +12,7 @@ public class Suggestion {
         Title = title ?? replacement;
     }
 
-    /// <summary>
-    ///     The number of characters to remove at the current cursor position before adding the <see cref="Replacement"/>
-    /// </summary>
+    /// <summary>The number of characters to remove at the current cursor position before adding the <see cref="Replacement"/></summary>
     public int Remove { get; }
 
     /// <summary>The replacement text that will be added</summary>

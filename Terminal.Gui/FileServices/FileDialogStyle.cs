@@ -18,8 +18,8 @@ public class FileDialogStyle {
     private readonly IFileSystem _fileSystem;
 
     /// <summary>
-    ///     Gets or sets the default value to use for <see cref="UseColors"/>. This can be populated from .tui config
-    ///     files via <see cref="ConfigurationManager"/>
+    ///     Gets or sets the default value to use for <see cref="UseColors"/>. This can be populated from .tui config files via
+    ///     <see cref="ConfigurationManager"/>
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool DefaultUseColors { get; set; }
@@ -53,8 +53,8 @@ public class FileDialogStyle {
     public CultureInfo Culture { get; set; } = CultureInfo.CurrentUICulture;
 
     /// <summary>
-    ///     Gets or sets the class thatis responsible for determining which color to use to represent files and
-    ///     directories when <see cref="UseColors"/> is <see langword="true"/>.
+    ///     Gets or sets the class thatis responsible for determining which color to use to represent files and directories
+    ///     when <see cref="UseColors"/> is <see langword="true"/>.
     /// </summary>
     public FileSystemColorProvider ColorProvider { get; set; } = new ();
 
@@ -79,8 +79,8 @@ public class FileDialogStyle {
     public string DateFormat { get; set; }
 
     /// <summary>
-    ///     Gets or sets error message when user <see cref="OpenMode"/> is <see cref="OpenMode.File"/> and user enters the
-    ///     name of an existing directory (File system cannot have a folder with the same name as a file).
+    ///     Gets or sets error message when user <see cref="OpenMode"/> is <see cref="OpenMode.File"/> and user enters the name
+    ///     of an existing directory (File system cannot have a folder with the same name as a file).
     /// </summary>
     public string DirectoryAlreadyExistsFeedback { get; set; } = Strings.fdDirectoryAlreadyExistsFeedback;
 
@@ -91,8 +91,8 @@ public class FileDialogStyle {
     public string DirectoryMustExistFeedback { get; set; } = Strings.fdDirectoryMustExistFeedback;
 
     /// <summary>
-    ///     Gets or sets error message when user <see cref="OpenMode"/> is <see cref="OpenMode.Directory"/> and user
-    ///     enters the name of an existing file (File system cannot have a folder with the same name as a file).
+    ///     Gets or sets error message when user <see cref="OpenMode"/> is <see cref="OpenMode.Directory"/> and user enters the
+    ///     name of an existing file (File system cannot have a folder with the same name as a file).
     /// </summary>
     public string FileAlreadyExistsFeedback { get; set; } = Strings.fdFileAlreadyExistsFeedback;
 

@@ -8,13 +8,11 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Layout")]
 public class WindowsAndFrameViews : Scenario {
     public override void Setup () {
-        static int About () {
-            return MessageBox.Query (
-                "About UI Catalog",
-                "UI Catalog is a comprehensive sample library for Terminal.Gui",
-                "Ok"
-            );
-        }
+        static int About () => MessageBox.Query (
+            "About UI Catalog",
+            "UI Catalog is a comprehensive sample library for Terminal.Gui",
+            "Ok"
+        );
 
         var margin = 2;
         var padding = 1;

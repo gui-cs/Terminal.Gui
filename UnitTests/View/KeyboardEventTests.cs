@@ -9,8 +9,8 @@ public class KeyboardEventTests {
     private readonly ITestOutputHelper _output;
 
     /// <summary>
-    ///     This tests that when a new key down event is sent to the view the view will fire the 3 key-down related
-    ///     events: KeyDown, InvokingKeyBindings, and ProcessKeyDown. Note that KeyUp is independent.
+    ///     This tests that when a new key down event is sent to the view the view will fire the 3 key-down related events:
+    ///     KeyDown, InvokingKeyBindings, and ProcessKeyDown. Note that KeyUp is independent.
     /// </summary>
     [Fact]
     public void AllViews_KeyDown_All_EventsFire () {
@@ -390,17 +390,11 @@ public class KeyboardEventTests {
     /// <summary>A view that overrides the OnKey* methods so we can test that they are called.</summary>
     public class OnKeyTestView : View {
         public OnKeyTestView () { CanFocus = true; }
-
         public bool CancelVirtualMethods { set; private get; }
-
         public bool OnInvokingKeyBindingsContinued { get; set; }
-
         public bool OnKeyDownContinued { get; set; }
-
         public bool OnKeyPressedContinued { get; set; }
-
         public bool OnKeyUpContinued { get; set; }
-
         public override string Text { get; set; }
 
         public override bool? OnInvokingKeyBindings (Key keyEvent) {

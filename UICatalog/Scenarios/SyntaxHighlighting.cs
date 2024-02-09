@@ -258,7 +258,7 @@ public class SyntaxHighlighting : Scenario {
         _textView.InheritsPreviousColorScheme = false;
     }
 
-    private bool ContainsPosition (Match m, int pos) { return pos >= m.Index && pos < m.Index + m.Length; }
+    private bool ContainsPosition (Match m, int pos) => pos >= m.Index && pos < m.Index + m.Length;
 
     private void HighlightTextBasedOnKeywords () {
         // Comment blocks, quote blocks etc
@@ -365,7 +365,7 @@ public static class EventExtensions {
                 BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public |
                 BindingFlags.NonPublic
             );
-            if (eventFieldInfo != null && ((eventFieldInfo.FieldType == typeof (MulticastDelegate)) ||
+            if (eventFieldInfo != null && (eventFieldInfo.FieldType == typeof (MulticastDelegate) ||
                                            eventFieldInfo.FieldType.IsSubclassOf (
                                                typeof (MulticastDelegate)
                                            ))) {

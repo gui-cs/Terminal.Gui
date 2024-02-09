@@ -6,9 +6,8 @@ public class TreeStyle {
     public bool ColorExpandSymbol { get; set; }
 
     /// <summary>
-    ///     Set to <see langword="true"/> to cause the selected item to be rendered with only the
-    ///     <see cref="Branch{T}.Model"/> text to be highlighted. If <see langword="false"/> (the default), the entire row will
-    ///     be highlighted.
+    ///     Set to <see langword="true"/> to cause the selected item to be rendered with only the <see cref="Branch{T}.Model"/>
+    ///     text to be highlighted. If <see langword="false"/> (the default), the entire row will be highlighted.
     /// </summary>
     public bool HighlightModelTextOnly { get; set; } = false;
 
@@ -23,8 +22,8 @@ public class TreeStyle {
     public bool LeaveLastRow { get; set; }
 
     /// <summary>
-    ///     <see langword="true"/> to render vertical lines under expanded nodes to show which node belongs to which
-    ///     parent. <see langword="false"/> to use only whitespace.
+    ///     <see langword="true"/> to render vertical lines under expanded nodes to show which node belongs to which parent.
+    ///     <see langword="false"/> to use only whitespace.
     /// </summary>
     /// <value></value>
     public bool ShowBranchLines { get; set; } = true;
@@ -36,8 +35,8 @@ public class TreeStyle {
     public Rune? CollapseableSymbol { get; set; } = Glyphs.Collapse;
 
     /// <summary>
-    ///     Symbol to use for branch nodes that can be expanded to indicate this to the user. Defaults to '+'. Set to null
-    ///     to hide.
+    ///     Symbol to use for branch nodes that can be expanded to indicate this to the user. Defaults to '+'. Set to null to
+    ///     hide.
     /// </summary>
     public Rune? ExpandableSymbol { get; set; } = Glyphs.Expand;
 }

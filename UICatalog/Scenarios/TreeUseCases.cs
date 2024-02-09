@@ -71,7 +71,7 @@ public class TreeUseCases : Scenario {
             _currentTree.Dispose ();
         }
 
-        TreeView<GameObject> tree = new() { X = 0, Y = 0, Width = 40, Height = 20 };
+        TreeView<GameObject> tree = new () { X = 0, Y = 0, Width = 40, Height = 20 };
 
         if (useDelegate) {
             tree.TreeBuilder = new DelegateTreeBuilder<GameObject> (
@@ -141,18 +141,15 @@ public class TreeUseCases : Scenario {
 
     private class Army : GameObject {
         public List<Unit> Units { get; set; }
-
         public string Designation { get; set; }
-
-        public override string ToString () { return Designation; }
+        public override string ToString () => Designation;
     }
 
     private abstract class GameObject { }
 
     private class GameObjectTreeBuilder : ITreeBuilder<GameObject> {
         public bool SupportsCanExpand => true;
-
-        public bool CanExpand (GameObject model) { return model is Army; }
+        public bool CanExpand (GameObject model) => model is Army;
 
         public IEnumerable<GameObject> GetChildren (GameObject model) {
             if (model is Army a) {
@@ -167,24 +164,28 @@ public class TreeUseCases : Scenario {
     private class House : TreeNode {
         // ITreeNode member:
         public override IList<ITreeNode> Children => Rooms.Cast<ITreeNode> ().ToList ();
-
         public List<Room> Rooms { get; set; }
 
         // Your properties
         public string Address { get; set; }
 
-        public override string Text { get => Address; set => Address = value; }
+        public override string Text {
+            get => Address;
+            set => Address = value;
+        }
     }
 
     private class Room : TreeNode {
         public string Name { get; set; }
 
-        public override string Text { get => Name; set => Name = value; }
+        public override string Text {
+            get => Name;
+            set => Name = value;
+        }
     }
 
     private class Unit : GameObject {
         public string Name { get; set; }
-
-        public override string ToString () { return Name; }
+        public override string ToString () => Name;
     }
 }

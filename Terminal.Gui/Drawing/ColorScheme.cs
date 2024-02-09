@@ -7,9 +7,8 @@ namespace Terminal.Gui;
 /// <summary>Defines a standard set of <see cref="Attribute"/>s for common visible elements in a <see cref="View"/>.</summary>
 /// <remarks>
 ///     <para>
-///         ColorScheme objects are immutable. Once constructed, the properties cannot be changed. To change a
-///         ColorScheme, create a new one with the desired values, using the <see cref="ColorScheme(ColorScheme)"/>
-///         constructor.
+///         ColorScheme objects are immutable. Once constructed, the properties cannot be changed. To change a ColorScheme,
+///         create a new one with the desired values, using the <see cref="ColorScheme(ColorScheme)"/> constructor.
 ///     </para>
 /// </remarks>
 [JsonConverter (typeof (ColorSchemeJsonConverter))]
@@ -48,36 +47,51 @@ public class ColorScheme : IEquatable<ColorScheme> {
     private readonly Attribute _normal;
 
     /// <summary>The default foreground and background color for text when the view is disabled.</summary>
-    public Attribute Disabled { get => _disabled; init => _disabled = value; }
+    public Attribute Disabled {
+        get => _disabled;
+        init => _disabled = value;
+    }
 
     /// <summary>The foreground and background color for text when the view has the focus.</summary>
-    public Attribute Focus { get => _focus; init => _focus = value; }
+    public Attribute Focus {
+        get => _focus;
+        init => _focus = value;
+    }
 
     /// <summary>The foreground and background color for for text in a focused view that indicates a <see cref="View.HotKey"/>.</summary>
-    public Attribute HotFocus { get => _hotFocus; init => _hotFocus = value; }
+    public Attribute HotFocus {
+        get => _hotFocus;
+        init => _hotFocus = value;
+    }
 
     /// <summary>The foreground and background color for text in a non-focused view that indicates a <see cref="View.HotKey"/>.</summary>
-    public Attribute HotNormal { get => _hotNormal; init => _hotNormal = value; }
+    public Attribute HotNormal {
+        get => _hotNormal;
+        init => _hotNormal = value;
+    }
 
     /// <summary>The foreground and background color for text when the view is not focused, hot, or disabled.</summary>
-    public Attribute Normal { get => _normal; init => _normal = value; }
+    public Attribute Normal {
+        get => _normal;
+        init => _normal = value;
+    }
 
     /// <summary>Compares two <see cref="ColorScheme"/> objects for equality.</summary>
     /// <param name="other"></param>
     /// <returns>true if the two objects are equal</returns>
-    public bool Equals (ColorScheme? other) {
-        return other is { } &&
-               EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
-               EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
-               EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
-               EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
-               EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
-    }
+    public bool Equals (ColorScheme? other) => other is { } &&
+                                               EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
+                                               EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
+                                               EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal)
+                                               &&
+                                               EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus)
+                                               &&
+                                               EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
 
     /// <summary>Compares two <see cref="ColorScheme"/> objects for equality.</summary>
     /// <param name="obj"></param>
     /// <returns>true if the two objects are equal</returns>
-    public override bool Equals (object? obj) { return Equals (obj as ColorScheme); }
+    public override bool Equals (object? obj) => Equals (obj as ColorScheme);
 
     /// <summary>Returns a hashcode for this instance.</summary>
     /// <returns>hashcode for this instance</returns>
@@ -96,20 +110,18 @@ public class ColorScheme : IEquatable<ColorScheme> {
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns><c>true</c> if the two objects are equivalent</returns>
-    public static bool operator == (ColorScheme left, ColorScheme right) {
-        return EqualityComparer<ColorScheme>.Default.Equals (left, right);
-    }
+    public static bool operator == (ColorScheme left, ColorScheme right) =>
+        EqualityComparer<ColorScheme>.Default.Equals (left, right);
 
     /// <summary>Compares two <see cref="ColorScheme"/> objects for inequality.</summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns><c>true</c> if the two objects are not equivalent</returns>
-    public static bool operator != (ColorScheme left, ColorScheme right) { return !(left == right); }
+    public static bool operator != (ColorScheme left, ColorScheme right) => !(left == right);
 
     /// <inheritdoc/>
-    public override string ToString () {
-        return $"Normal: {Normal}; Focus: {Focus}; HotNormal: {HotNormal}; HotFocus: {HotFocus}; Disabled: {Disabled}";
-    }
+    public override string ToString () =>
+        $"Normal: {Normal}; Focus: {Focus}; HotNormal: {HotNormal}; HotFocus: {HotFocus}; Disabled: {Disabled}";
 }
 
 /// <summary>
@@ -196,6 +208,6 @@ public static class Colors {
             return false;
         }
 
-        public int GetHashCode (string obj) { return obj.ToLowerInvariant ().GetHashCode (); }
+        public int GetHashCode (string obj) => obj.ToLowerInvariant ().GetHashCode ();
     }
 }

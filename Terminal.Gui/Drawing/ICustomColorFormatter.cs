@@ -4,9 +4,9 @@ namespace Terminal.Gui;
 /// <summary>An interface to support custom formatting and parsing of <see cref="Color"/> values.</summary>
 public interface ICustomColorFormatter : IFormatProvider, ICustomFormatter {
     /// <summary>
-    ///     A method that returns a <see langword="string"/> based on the <paramref name="formatString"/> specified and
-    ///     the byte parameters <paramref name="r"/>, <paramref name="g"/>, <paramref name="b"/>, and <paramref name="a"/>,
-    ///     which are provided by <see cref="Color"/>
+    ///     A method that returns a <see langword="string"/> based on the <paramref name="formatString"/> specified and the
+    ///     byte parameters <paramref name="r"/>, <paramref name="g"/>, <paramref name="b"/>, and <paramref name="a"/>, which
+    ///     are provided by <see cref="Color"/>
     /// </summary>
     /// <param name="formatString"></param>
     /// <param name="r"></param>

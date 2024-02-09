@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
-class KeyCodeJsonConverter : JsonConverter<KeyCode> {
+internal class KeyCodeJsonConverter : JsonConverter<KeyCode> {
     public override KeyCode Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
         if (reader.TokenType == JsonTokenType.StartObject) {
             var key = KeyCode.Null;
@@ -103,7 +103,7 @@ class KeyCodeJsonConverter : JsonConverter<KeyCode> {
             writer.WriteNumber ("Key", (uint)(value & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask & ~KeyCode.AltMask));
         }
 
-        Dictionary<string, KeyCode> modifierDict = new() {
+        Dictionary<string, KeyCode> modifierDict = new () {
             { "Shift", KeyCode.ShiftMask }, { "Ctrl", KeyCode.CtrlMask }, { "Alt", KeyCode.AltMask }
         };
 

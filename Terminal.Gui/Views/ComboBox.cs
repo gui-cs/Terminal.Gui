@@ -145,7 +145,7 @@ public class ComboBox : View {
     public int SelectedItem {
         get => _selectedItem;
         set {
-            if (_selectedItem != value && ((value == -1)
+            if (_selectedItem != value && (value == -1
                                            || (_source != null && value > -1 && value < _source.Count))) {
                 _selectedItem = _lastSelectedItem = value;
                 if (_selectedItem != -1) {
@@ -160,14 +160,20 @@ public class ComboBox : View {
     }
 
     /// <summary>Current search text</summary>
-    public string SearchText { get => _search.Text; set => SetSearchText (value); }
+    public string SearchText {
+        get => _search.Text;
+        set => SetSearchText (value);
+    }
 
     /// <summary>The currently selected list item</summary>
-    public new string Text { get => _text; set => SetSearchText (value); }
+    public new string Text {
+        get => _text;
+        set => SetSearchText (value);
+    }
 
     /// <summary>
-    ///     Collapses the drop down list.  Returns true if the state chagned or false if it was already collapsed and no
-    ///     action was taken
+    ///     Collapses the drop down list.  Returns true if the state chagned or false if it was already collapsed and no action
+    ///     was taken
     /// </summary>
     public virtual bool Collapse () {
         if (!IsShow) {
@@ -184,8 +190,8 @@ public class ComboBox : View {
     public event EventHandler Collapsed;
 
     /// <summary>
-    ///     Expands the drop down list.  Returns true if the state chagned or false if it was already expanded and no
-    ///     action was taken
+    ///     Expands the drop down list.  Returns true if the state chagned or false if it was already expanded and no action
+    ///     was taken
     /// </summary>
     public virtual bool Expand () {
         if (IsShow) {
@@ -333,7 +339,7 @@ public class ComboBox : View {
     /// <summary>Internal height of dynamic search list</summary>
     /// <returns></returns>
     private int CalculatetHeight () {
-        if (!IsInitialized || (Bounds.Height == 0)) {
+        if (!IsInitialized || Bounds.Height == 0) {
             return 0;
         }
 
@@ -395,7 +401,7 @@ public class ComboBox : View {
         return -1;
     }
 
-    private bool HasItems () { return Source?.Count > 0; }
+    private bool HasItems () => Source?.Count > 0;
 
     /// <summary>Hide the search list</summary>
     /// Consider making public
@@ -496,7 +502,7 @@ public class ComboBox : View {
     }
 
     private void ProcessLayout () {
-        if (Bounds.Height < _minimumHeight && ((Height == null) || Height is Dim.DimAbsolute)) {
+        if (Bounds.Height < _minimumHeight && (Height == null || Height is Dim.DimAbsolute)) {
             Height = _minimumHeight;
         }
 
@@ -575,7 +581,7 @@ public class ComboBox : View {
         IsShow = false;
         _listview.TabStop = false;
 
-        if ((_listview.Source.Count == 0) || ((_searchset?.Count ?? 0) == 0)) {
+        if (_listview.Source.Count == 0 || (_searchset?.Count ?? 0) == 0) {
             _text = "";
             HideList ();
             IsShow = false;
@@ -716,7 +722,7 @@ public class ComboBox : View {
                 }
 
                 Move (0, row);
-                if ((Source == null) || (item >= Source.Count)) {
+                if (Source == null || item >= Source.Count) {
                     for (var c = 0; c < f.Width; c++) {
                         Driver.AddRune ((Rune)' ');
                     }

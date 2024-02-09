@@ -10,8 +10,8 @@ namespace Terminal.Gui;
 /// <summary>Button is a <see cref="View"/> that provides an item that invokes raises the <see cref="Clicked"/> event.</summary>
 /// <remarks>
 ///     <para>
-///         Provides a button showing text that raises the <see cref="Clicked"/> event when clicked on with a mouse or
-///         when the user presses SPACE, ENTER, or the <see cref="View.HotKey"/>. The hot key is the first letter or digit
+///         Provides a button showing text that raises the <see cref="Clicked"/> event when clicked on with a mouse or when
+///         the user presses SPACE, ENTER, or the <see cref="View.HotKey"/>. The hot key is the first letter or digit
 ///         following the first underscore ('_') in the button text.
 ///     </para>
 ///     <para>Use <see cref="View.HotKeySpecifier"/> to change the hot key specifier from the default of ('_').</para>
@@ -79,8 +79,8 @@ public class Button : View {
     public bool NoPadding { get; set; }
 
     /// <summary>
-    ///     The event fired when the user clicks the primary mouse button within the Bounds of this <see cref="View"/> or
-    ///     if the user presses the action key while this view is focused. (TODO: IsDefault)
+    ///     The event fired when the user clicks the primary mouse button within the Bounds of this <see cref="View"/> or if
+    ///     the user presses the action key while this view is focused. (TODO: IsDefault)
     /// </summary>
     /// <remarks>
     ///     Client code can hook up to this event, it is raised when the button is activated either with the mouse or the

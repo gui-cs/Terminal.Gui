@@ -5,10 +5,10 @@ using Terminal.Gui.Resources;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Wrapper for <see cref="FileSystemInfo"/> that contains additional information (e.g. <see cref="IsParent"/>)
-///     and helper methods.
+///     Wrapper for <see cref="FileSystemInfo"/> that contains additional information (e.g. <see cref="IsParent"/>) and
+///     helper methods.
 /// </summary>
-class FileSystemInfoStats {
+internal class FileSystemInfoStats {
     /// <summary>Initializes a new instance of the <see cref="FileSystemInfoStats"/> class.</summary>
     /// <param name="fsi">The directory of path to wrap.</param>
     /// <param name="culture"></param>
@@ -50,7 +50,6 @@ class FileSystemInfoStats {
     };
 
     private static readonly string[] SizeSuffixes = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
-
     public bool IsDir { get; }
 
     /// <summary>Gets or Sets a value indicating whether this instance represents the parent of the current state (i.e. "..").</summary>
@@ -62,29 +61,24 @@ class FileSystemInfoStats {
     public IFileSystemInfo FileSystemInfo { get; }
 
     public long MachineReadableLength { get; }
-
     public string HumanReadableLength { get; }
-
     public string Name => IsParent ? ".." : FileSystemInfo.Name;
-
     public string Type { get; }
 
-    public bool IsExecutable () {
-        // TODO: handle linux executable status
-        return FileSystemInfo is IFileSystemInfo f &&
-               ExecutableExtensions.Contains (
-                   f.Extension,
-                   StringComparer.InvariantCultureIgnoreCase
-               );
-    }
+    public bool IsExecutable () =>
 
-    public bool IsImage () {
-        return FileSystemInfo is IFileSystemInfo f &&
-               ImageExtensions.Contains (
-                   f.Extension,
-                   StringComparer.InvariantCultureIgnoreCase
-               );
-    }
+        // TODO: handle linux executable status
+        FileSystemInfo is IFileSystemInfo f &&
+        ExecutableExtensions.Contains (
+            f.Extension,
+            StringComparer.InvariantCultureIgnoreCase
+        );
+
+    public bool IsImage () => FileSystemInfo is IFileSystemInfo f &&
+                              ImageExtensions.Contains (
+                                  f.Extension,
+                                  StringComparer.InvariantCultureIgnoreCase
+                              );
 
     private static string GetHumanReadableFileSize (long value, CultureInfo culture) {
         if (value < 0) {

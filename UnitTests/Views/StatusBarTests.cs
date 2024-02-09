@@ -59,11 +59,11 @@ public class StatusBarTests {
         Toplevel top = Application.Top;
         top.Add (statusBar);
 
-        bool CanExecuteNew () { return win == null; }
+        bool CanExecuteNew () => win == null;
 
         void New () { win = new Window (); }
 
-        bool CanExecuteClose () { return win != null; }
+        bool CanExecuteClose () => win != null;
 
         void Close () { win = null; }
 

@@ -6593,7 +6593,7 @@ This is the second line.
         _textView.SelectionStartColumn = 0;
         _textView.SelectionStartRow = 0;
 
-        Attribute[] attributes = new[] {
+        Attribute[] attributes = {
             _textView.ColorScheme.Focus,
             new (_textView.ColorScheme.Focus.Background, _textView.ColorScheme.Focus.Foreground)
         };
@@ -6980,7 +6980,7 @@ TAB to jump between text field",
         var tv = new TextView { Width = 10, Height = 10 };
         tv.InsertText ("\r\naaa\r\nbbb");
         PlatformID p = Environment.OSVersion.Platform;
-        if ((p == PlatformID.Win32NT) || (p == PlatformID.Win32S) || (p == PlatformID.Win32Windows)) {
+        if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
             Assert.Equal ("\r\naaa\r\nbbb", tv.Text);
         } else {
             Assert.Equal ("\naaa\nbbb", tv.Text);
@@ -7051,7 +7051,7 @@ TAB to jump between text field",
         var tv = new TextView { Width = 10, Height = 10 };
         tv.InsertText ("\naaa\nbbb");
         PlatformID p = Environment.OSVersion.Platform;
-        if ((p == PlatformID.Win32NT) || (p == PlatformID.Win32S) || (p == PlatformID.Win32Windows)) {
+        if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
             Assert.Equal ("\r\naaa\r\nbbb", tv.Text);
         } else {
             Assert.Equal ("\naaa\nbbb", tv.Text);
@@ -8516,7 +8516,7 @@ line.
 
     private int GetLeftCol (int start) {
         string[] lines = _textView.Text.Split (Environment.NewLine);
-        if ((lines == null) || (lines.Length == 0)) {
+        if (lines == null || lines.Length == 0) {
             return 0;
         }
 
@@ -8552,7 +8552,7 @@ line.
             }
 
             if ((cCol < line.Length && col > 0 && start < cCol && col == start) ||
-                (cCol - col == width - 1)) {
+                cCol - col == width - 1) {
                 break;
             }
 

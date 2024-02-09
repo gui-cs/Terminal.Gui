@@ -13,8 +13,8 @@ public class RuneCellEventArgs {
     }
 
     /// <summary>
-    ///     The unwrapped row and column index into the text containing the RuneCell. Unwrapped means the text without
-    ///     word wrapping or other visual formatting having been applied.
+    ///     The unwrapped row and column index into the text containing the RuneCell. Unwrapped means the text without word
+    ///     wrapping or other visual formatting having been applied.
     /// </summary>
     public (int Row, int Col) UnwrappedPosition { get; }
 

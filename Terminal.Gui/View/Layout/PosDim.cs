@@ -1,10 +1,10 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     Describes the position of a <see cref="View"/> which can be an absolute value, a percentage, centered, or
-///     relative to the ending dimension. Integer values are implicitly convertible to an absolute <see cref="Pos"/>. These
-///     objects are created using the static methods Percent, AnchorEnd, and Center. The <see cref="Pos"/> objects can be
-///     combined with the addition and subtraction operators.
+///     Describes the position of a <see cref="View"/> which can be an absolute value, a percentage, centered, or relative
+///     to the ending dimension. Integer values are implicitly convertible to an absolute <see cref="Pos"/>. These objects
+///     are created using the static methods Percent, AnchorEnd, and Center. The <see cref="Pos"/> objects can be combined
+///     with the addition and subtraction operators.
 /// </summary>
 /// <remarks>
 ///     <para>Use the <see cref="Pos"/> objects on the X or Y properties of a view to control the position.</para>
@@ -28,8 +28,8 @@
 ///                     <see cref="Pos.Function(Func{int})"/>
 ///                 </term>
 ///                 <description>
-///                     Creates a <see cref="Pos"/> object that computes the position by executing the provided
-///                     function. The function will be called every time the position is needed.
+///                     Creates a <see cref="Pos"/> object that computes the position by executing the provided function.
+///                     The function will be called every time the position is needed.
 ///                 </description>
 ///             </item>
 ///             <item>
@@ -46,8 +46,8 @@
 ///                     <see cref="Pos.Anchor(int)"/>
 ///                 </term>
 ///                 <description>
-///                     Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom) of
-///                     the dimension, useful to flush the layout from the right or bottom.
+///                     Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom) of the
+///                     dimension, useful to flush the layout from the right or bottom.
 ///                 </description>
 ///             </item>
 ///             <item>
@@ -119,14 +119,13 @@
 ///                     specified <see cref="View"/>
 ///                 </description>
 ///             </item>
-/// 
 ///         </list>
 ///     </para>
 /// </remarks>
 public class Pos {
     /// <summary>
-    ///     Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom) of the dimension, useful
-    ///     to flush the layout from the right or bottom.
+    ///     Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom) of the dimension, useful to
+    ///     flush the layout from the right or bottom.
     /// </summary>
     /// <returns>The <see cref="Pos"/> object anchored to the end (the bottom or the right side).</returns>
     /// <param name="offset">The view will be shifted left or up by the amount specified.</param>
@@ -149,7 +148,7 @@ public class Pos {
     /// <summary>Creates a <see cref="Pos"/> object that is an absolute position based on the specified integer value.</summary>
     /// <returns>The Absolute <see cref="Pos"/>.</returns>
     /// <param name="n">The value to convert to the <see cref="Pos"/>.</param>
-    public static Pos At (int n) { return new PosAbsolute (n); }
+    public static Pos At (int n) => new PosAbsolute (n);
 
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that tracks the Bottom (Y+Height) coordinate of the specified
@@ -157,7 +156,7 @@ public class Pos {
     /// </summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Bottom (View view) { return new PosView (view, 3); }
+    public static Pos Bottom (View view) => new PosView (view, 3);
 
     /// <summary>Creates a <see cref="Pos"/> object that can be used to center the <see cref="View"/>.</summary>
     /// <returns>The center Pos.</returns>
@@ -173,7 +172,7 @@ public class Pos {
     ///  };
     ///  </code>
     /// </example>
-    public static Pos Center () { return new PosCenter (); }
+    public static Pos Center () => new PosCenter ();
 
     /// <summary>Determines whether the specified object is equal to the current object.</summary>
     /// <param name="other">The object to compare with the current object. </param>
@@ -181,24 +180,24 @@ public class Pos {
     ///     <see langword="true"/> if the specified object  is equal to the current object; otherwise,
     ///     <see langword="false"/>.
     /// </returns>
-    public override bool Equals (object other) { return other is Pos abs && abs == this; }
+    public override bool Equals (object other) => other is Pos abs && abs == this;
 
     /// <summary>
-    ///     Creates a <see cref="Pos"/> object that computes the position by executing the provided function. The function
-    ///     will be called every time the position is needed.
+    ///     Creates a <see cref="Pos"/> object that computes the position by executing the provided function. The function will
+    ///     be called every time the position is needed.
     /// </summary>
     /// <param name="function">The function to be executed.</param>
     /// <returns>The <see cref="Pos"/> returned from the function.</returns>
-    public static Pos Function (Func<int> function) { return new PosFunc (function); }
+    public static Pos Function (Func<int> function) => new PosFunc (function);
 
     /// <summary>Serves as the default hash function. </summary>
     /// <returns>A hash code for the current object.</returns>
-    public override int GetHashCode () { return Anchor (0).GetHashCode (); }
+    public override int GetHashCode () => Anchor (0).GetHashCode ();
 
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.</summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Left (View view) { return new PosView (view, 0); }
+    public static Pos Left (View view) => new PosView (view, 0);
 
     /// <summary>Adds a <see cref="Terminal.Gui.Pos"/> to a <see cref="Terminal.Gui.Pos"/>, yielding a new <see cref="Pos"/>.</summary>
     /// <param name="left">The first <see cref="Terminal.Gui.Pos"/> to add.</param>
@@ -218,7 +217,7 @@ public class Pos {
     /// <summary>Creates an Absolute <see cref="Pos"/> from the specified integer value.</summary>
     /// <returns>The Absolute <see cref="Pos"/>.</returns>
     /// <param name="n">The value to convert to the <see cref="Pos"/> .</param>
-    public static implicit operator Pos (int n) { return new PosAbsolute (n); }
+    public static implicit operator Pos (int n) => new PosAbsolute (n);
 
     /// <summary>
     ///     Subtracts a <see cref="Terminal.Gui.Pos"/> from a <see cref="Terminal.Gui.Pos"/>, yielding a new
@@ -267,24 +266,24 @@ public class Pos {
     /// </summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Right (View view) { return new PosView (view, 2); }
+    public static Pos Right (View view) => new PosView (view, 2);
 
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.</summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Top (View view) { return new PosView (view, 1); }
+    public static Pos Top (View view) => new PosView (view, 1);
 
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.</summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos X (View view) { return new PosView (view, 0); }
+    public static Pos X (View view) => new PosView (view, 0);
 
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.</summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Y (View view) { return new PosView (view, 1); }
+    public static Pos Y (View view) => new PosView (view, 1);
 
-    internal virtual int Anchor (int width) { return 0; }
+    internal virtual int Anchor (int width) => 0;
 
     private static void SetPosCombine (Pos left, PosCombine newPos) {
         var view = left as PosView;
@@ -296,28 +295,24 @@ public class Pos {
     internal class PosAbsolute : Pos {
         public PosAbsolute (int n) { _n = n; }
         private readonly int _n;
-        public override bool Equals (object other) { return other is PosAbsolute abs && abs._n == _n; }
-        public override int GetHashCode () { return _n.GetHashCode (); }
-        public override string ToString () { return $"Absolute({_n})"; }
-        internal override int Anchor (int width) { return _n; }
+        public override bool Equals (object other) => other is PosAbsolute abs && abs._n == _n;
+        public override int GetHashCode () => _n.GetHashCode ();
+        public override string ToString () => $"Absolute({_n})";
+        internal override int Anchor (int width) => _n;
     }
 
     internal class PosAnchorEnd : Pos {
         public PosAnchorEnd (int offset) { _offset = offset; }
         private readonly int _offset;
-
-        public override bool Equals (object other) {
-            return other is PosAnchorEnd anchorEnd && anchorEnd._offset == _offset;
-        }
-
-        public override int GetHashCode () { return _offset.GetHashCode (); }
-        public override string ToString () { return $"AnchorEnd({_offset})"; }
-        internal override int Anchor (int width) { return width - _offset; }
+        public override bool Equals (object other) => other is PosAnchorEnd anchorEnd && anchorEnd._offset == _offset;
+        public override int GetHashCode () => _offset.GetHashCode ();
+        public override string ToString () => $"AnchorEnd({_offset})";
+        internal override int Anchor (int width) => width - _offset;
     }
 
     internal class PosCenter : Pos {
-        public override string ToString () { return "Center"; }
-        internal override int Anchor (int width) { return width / 2; }
+        public override string ToString () => "Center";
+        internal override int Anchor (int width) => width / 2;
     }
 
     internal class PosCombine : Pos {
@@ -329,7 +324,7 @@ public class Pos {
 
         internal bool _add;
         internal Pos _left, _right;
-        public override string ToString () { return $"Combine({_left}{(_add ? '+' : '-')}{_right})"; }
+        public override string ToString () => $"Combine({_left}{(_add ? '+' : '-')}{_right})";
 
         internal override int Anchor (int width) {
             int la = _left.Anchor (width);
@@ -345,20 +340,20 @@ public class Pos {
     internal class PosFactor : Pos {
         public PosFactor (float n) { _factor = n; }
         private readonly float _factor;
-        public override bool Equals (object other) { return other is PosFactor f && f._factor == _factor; }
-        public override int GetHashCode () { return _factor.GetHashCode (); }
-        public override string ToString () { return $"Factor({_factor})"; }
-        internal override int Anchor (int width) { return (int)(width * _factor); }
+        public override bool Equals (object other) => other is PosFactor f && f._factor == _factor;
+        public override int GetHashCode () => _factor.GetHashCode ();
+        public override string ToString () => $"Factor({_factor})";
+        internal override int Anchor (int width) => (int)(width * _factor);
     }
 
     // Helper class to provide dynamic value by the execution of a function that returns an integer.
     internal class PosFunc : Pos {
         public PosFunc (Func<int> n) { _function = n; }
         private readonly Func<int> _function;
-        public override bool Equals (object other) { return other is PosFunc f && f._function () == _function (); }
-        public override int GetHashCode () { return _function.GetHashCode (); }
-        public override string ToString () { return $"PosFunc({_function ()})"; }
-        internal override int Anchor (int width) { return _function (); }
+        public override bool Equals (object other) => other is PosFunc f && f._function () == _function ();
+        public override int GetHashCode () => _function.GetHashCode ();
+        public override string ToString () => $"PosFunc({_function ()})";
+        internal override int Anchor (int width) => _function ();
     }
 
     internal class PosView : Pos {
@@ -369,8 +364,8 @@ public class Pos {
 
         private readonly int side;
         public readonly View Target;
-        public override bool Equals (object other) { return other is PosView abs && abs.Target == Target; }
-        public override int GetHashCode () { return Target.GetHashCode (); }
+        public override bool Equals (object other) => other is PosView abs && abs.Target == Target;
+        public override int GetHashCode () => Target.GetHashCode ();
 
         public override string ToString () {
             string tside;
@@ -419,14 +414,14 @@ public class Pos {
 
 /// <summary>
 ///     <para>
-///         A Dim object describes the dimensions of a <see cref="View"/>. Dim is the type of the
-///         <see cref="View.Width"/> and <see cref="View.Height"/> properties of <see cref="View"/>. Dim objects enable
-///         Computed Layout (see <see cref="LayoutStyle.Computed"/>) to automatically manage the dimensions of a view.
+///         A Dim object describes the dimensions of a <see cref="View"/>. Dim is the type of the <see cref="View.Width"/>
+///         and <see cref="View.Height"/> properties of <see cref="View"/>. Dim objects enable Computed Layout (see
+///         <see cref="LayoutStyle.Computed"/>) to automatically manage the dimensions of a view.
 ///     </para>
 ///     <para>
-///         Integer values are implicitly convertible to an absolute <see cref="Dim"/>. These objects are created using
-///         the static methods described below. The <see cref="Dim"/> objects can be combined with the addition and
-///         subtraction operators.
+///         Integer values are implicitly convertible to an absolute <see cref="Dim"/>. These objects are created using the
+///         static methods described below. The <see cref="Dim"/> objects can be combined with the addition and subtraction
+///         operators.
 ///     </para>
 /// </summary>
 /// <remarks>
@@ -440,8 +435,8 @@ public class Pos {
 ///                     <see cref="Dim.Function(Func{int})"/>
 ///                 </term>
 ///                 <description>
-///                     Creates a <see cref="Dim"/> object that computes the dimension by executing the provided
-///                     function. The function will be called every time the dimension is needed.
+///                     Creates a <see cref="Dim"/> object that computes the dimension by executing the provided function.
+///                     The function will be called every time the dimension is needed.
 ///                 </description>
 ///             </item>
 ///             <item>
@@ -491,7 +486,7 @@ public class Dim {
     ///     <see langword="true"/> if the specified object  is equal to the current object; otherwise,
     ///     <see langword="false"/>.
     /// </returns>
-    public override bool Equals (object other) { return other is Dim abs && abs == this; }
+    public override bool Equals (object other) => other is Dim abs && abs == this;
 
     /// <summary>
     ///     Creates a <see cref="Dim"/> object that fills the dimension, leaving the specified number of columns for a
@@ -499,24 +494,24 @@ public class Dim {
     /// </summary>
     /// <returns>The Fill dimension.</returns>
     /// <param name="margin">Margin to use.</param>
-    public static Dim Fill (int margin = 0) { return new DimFill (margin); }
+    public static Dim Fill (int margin = 0) => new DimFill (margin);
 
     /// <summary>
-    ///     Creates a function <see cref="Dim"/> object that computes the dimension by executing the provided function.
-    ///     The function will be called every time the dimension is needed.
+    ///     Creates a function <see cref="Dim"/> object that computes the dimension by executing the provided function. The
+    ///     function will be called every time the dimension is needed.
     /// </summary>
     /// <param name="function">The function to be executed.</param>
     /// <returns>The <see cref="Dim"/> returned from the function.</returns>
-    public static Dim Function (Func<int> function) { return new DimFunc (function); }
+    public static Dim Function (Func<int> function) => new DimFunc (function);
 
     /// <summary>Serves as the default hash function. </summary>
     /// <returns>A hash code for the current object.</returns>
-    public override int GetHashCode () { return Anchor (0).GetHashCode (); }
+    public override int GetHashCode () => Anchor (0).GetHashCode ();
 
     /// <summary>Creates a <see cref="Dim"/> object that tracks the Height of the specified <see cref="View"/>.</summary>
     /// <returns>The height <see cref="Dim"/> of the other <see cref="View"/>.</returns>
     /// <param name="view">The view that will be tracked.</param>
-    public static Dim Height (View view) { return new DimView (view, 0); }
+    public static Dim Height (View view) => new DimView (view, 0);
 
     /// <summary>Adds a <see cref="Terminal.Gui.Dim"/> to a <see cref="Terminal.Gui.Dim"/>, yielding a new <see cref="Dim"/>.</summary>
     /// <param name="left">The first <see cref="Terminal.Gui.Dim"/> to add.</param>
@@ -536,7 +531,7 @@ public class Dim {
     /// <summary>Creates an Absolute <see cref="Dim"/> from the specified integer value.</summary>
     /// <returns>The Absolute <see cref="Dim"/>.</returns>
     /// <param name="n">The value to convert to the pos.</param>
-    public static implicit operator Dim (int n) { return new DimAbsolute (n); }
+    public static implicit operator Dim (int n) => new DimAbsolute (n);
 
     /// <summary>
     ///     Subtracts a <see cref="Terminal.Gui.Dim"/> from a <see cref="Terminal.Gui.Dim"/>, yielding a new
@@ -560,8 +555,8 @@ public class Dim {
     /// <returns>The percent <see cref="Dim"/> object.</returns>
     /// <param name="n">A value between 0 and 100 representing the percentage.</param>
     /// <param name="r">
-    ///     If <c>true</c> the Percent is computed based on the remaining space after the X/Y anchor positions. If
-    ///     <c>false</c> is computed based on the whole original space.
+    ///     If <c>true</c> the Percent is computed based on the remaining space after the X/Y anchor positions. If <c>false</c>
+    ///     is computed based on the whole original space.
     /// </param>
     /// <example>
     ///     This initializes a <see cref="TextField"/>that is centered horizontally, is 50% of the way down, is 30% the height,
@@ -586,14 +581,14 @@ public class Dim {
     /// <summary>Creates an Absolute <see cref="Dim"/> from the specified integer value.</summary>
     /// <returns>The Absolute <see cref="Dim"/>.</returns>
     /// <param name="n">The value to convert to the <see cref="Dim"/>.</param>
-    public static Dim Sized (int n) { return new DimAbsolute (n); }
+    public static Dim Sized (int n) => new DimAbsolute (n);
 
     /// <summary>Creates a <see cref="Dim"/> object that tracks the Width of the specified <see cref="View"/>.</summary>
     /// <returns>The width <see cref="Dim"/> of the other <see cref="View"/>.</returns>
     /// <param name="view">The view that will be tracked.</param>
-    public static Dim Width (View view) { return new DimView (view, 1); }
+    public static Dim Width (View view) => new DimView (view, 1);
 
-    internal virtual int Anchor (int width) { return 0; }
+    internal virtual int Anchor (int width) => 0;
 
     // BUGBUG: newPos is never used.
     private static void SetDimCombine (Dim left, DimCombine newPos) { (left as DimView)?.Target.SetNeedsLayout (); }
@@ -601,10 +596,10 @@ public class Dim {
     internal class DimAbsolute : Dim {
         public DimAbsolute (int n) { _n = n; }
         private readonly int _n;
-        public override bool Equals (object other) { return other is DimAbsolute abs && abs._n == _n; }
-        public override int GetHashCode () { return _n.GetHashCode (); }
-        public override string ToString () { return $"Absolute({_n})"; }
-        internal override int Anchor (int width) { return _n; }
+        public override bool Equals (object other) => other is DimAbsolute abs && abs._n == _n;
+        public override int GetHashCode () => _n.GetHashCode ();
+        public override string ToString () => $"Absolute({_n})";
+        internal override int Anchor (int width) => _n;
     }
 
     internal class DimCombine : Dim {
@@ -616,7 +611,7 @@ public class Dim {
 
         internal bool _add;
         internal Dim _left, _right;
-        public override string ToString () { return $"Combine({_left}{(_add ? '+' : '-')}{_right})"; }
+        public override string ToString () => $"Combine({_left}{(_add ? '+' : '-')}{_right})";
 
         internal override int Anchor (int width) {
             int la = _left.Anchor (width);
@@ -638,33 +633,32 @@ public class Dim {
         private readonly bool _remaining;
         private readonly float _factor;
 
-        public override bool Equals (object other) {
-            return other is DimFactor f && f._factor == _factor && f._remaining == _remaining;
-        }
+        public override bool Equals (object other) =>
+            other is DimFactor f && f._factor == _factor && f._remaining == _remaining;
 
-        public override int GetHashCode () { return _factor.GetHashCode (); }
-        public bool IsFromRemaining () { return _remaining; }
-        public override string ToString () { return $"Factor({_factor},{_remaining})"; }
-        internal override int Anchor (int width) { return (int)(width * _factor); }
+        public override int GetHashCode () => _factor.GetHashCode ();
+        public bool IsFromRemaining () => _remaining;
+        public override string ToString () => $"Factor({_factor},{_remaining})";
+        internal override int Anchor (int width) => (int)(width * _factor);
     }
 
     internal class DimFill : Dim {
         public DimFill (int margin) { _margin = margin; }
         private readonly int _margin;
-        public override bool Equals (object other) { return other is DimFill fill && fill._margin == _margin; }
-        public override int GetHashCode () { return _margin.GetHashCode (); }
-        public override string ToString () { return $"Fill({_margin})"; }
-        internal override int Anchor (int width) { return width - _margin; }
+        public override bool Equals (object other) => other is DimFill fill && fill._margin == _margin;
+        public override int GetHashCode () => _margin.GetHashCode ();
+        public override string ToString () => $"Fill({_margin})";
+        internal override int Anchor (int width) => width - _margin;
     }
 
     // Helper class to provide dynamic value by the execution of a function that returns an integer.
     internal class DimFunc : Dim {
         public DimFunc (Func<int> n) { _function = n; }
         private readonly Func<int> _function;
-        public override bool Equals (object other) { return other is DimFunc f && f._function () == _function (); }
-        public override int GetHashCode () { return _function.GetHashCode (); }
-        public override string ToString () { return $"DimFunc({_function ()})"; }
-        internal override int Anchor (int width) { return _function (); }
+        public override bool Equals (object other) => other is DimFunc f && f._function () == _function ();
+        public override int GetHashCode () => _function.GetHashCode ();
+        public override string ToString () => $"DimFunc({_function ()})";
+        internal override int Anchor (int width) => _function ();
     }
 
     internal class DimView : Dim {
@@ -674,11 +668,9 @@ public class Dim {
         }
 
         private readonly int _side;
-
         public View Target { get; init; }
-
-        public override bool Equals (object other) { return other is DimView abs && abs.Target == Target; }
-        public override int GetHashCode () { return Target.GetHashCode (); }
+        public override bool Equals (object other) => other is DimView abs && abs.Target == Target;
+        public override int GetHashCode () => Target.GetHashCode ();
 
         public override string ToString () {
             if (Target == null) {

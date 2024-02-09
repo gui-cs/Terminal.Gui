@@ -117,7 +117,6 @@ public class TimeField : TextField {
     }
 
     private int FieldLength => _isShort ? _shortFieldLen : _longFieldLen;
-
     private string Format => _isShort ? _shortFormat : _longFormat;
 
     /// <inheritdoc/>
@@ -176,8 +175,8 @@ public class TimeField : TextField {
     /// <summary>TimeChanged event, raised when the Date has changed.</summary>
     /// <remarks>This event is raised when the <see cref="Time"/> changes.</remarks>
     /// <remarks>
-    ///     The passed <see cref="EventArgs"/> is a <see cref="DateTimeEventArgs{T}"/> containing the old value, new
-    ///     value, and format string.
+    ///     The passed <see cref="EventArgs"/> is a <see cref="DateTimeEventArgs{T}"/> containing the old value, new value, and
+    ///     format string.
     /// </remarks>
     public event EventHandler<DateTimeEventArgs<TimeSpan>> TimeChanged;
 

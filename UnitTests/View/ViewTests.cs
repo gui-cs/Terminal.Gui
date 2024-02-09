@@ -1310,13 +1310,9 @@ At 0,0
 
     public class DerivedView : View {
         public DerivedView () { CanFocus = true; }
-
         public bool IsKeyDown { get; set; }
-
         public bool IsKeyPress { get; set; }
-
         public bool IsKeyUp { get; set; }
-
         public override string Text { get; set; }
 
         public override void OnDrawContent (Rect contentArea) {

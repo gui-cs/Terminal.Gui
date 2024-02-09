@@ -1,8 +1,8 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     MessageBox displays a modal message to the user, with a title, a message and a series of options that the user
-///     can choose from.
+///     MessageBox displays a modal message to the user, with a title, a message and a series of options that the user can
+///     choose from.
 /// </summary>
 /// <para>
 ///     The difference between the <see cref="Query(string, string, string[])"/> and
@@ -24,8 +24,8 @@
 /// </example>
 public static class MessageBox {
     /// <summary>
-    ///     The index of the selected button, or -1 if the user pressed ESC to close the dialog. This is useful for web
-    ///     based console where by default there is no SynchronizationContext or TaskScheduler.
+    ///     The index of the selected button, or -1 if the user pressed ESC to close the dialog. This is useful for web based
+    ///     console where by default there is no SynchronizationContext or TaskScheduler.
     /// </summary>
     public static int Clicked { get; private set; } = -1;
 
@@ -37,8 +37,8 @@ public static class MessageBox {
     public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
 
     /// <summary>
-    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show
-    ///     to the user.
+    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show to
+    ///     the user.
     /// </summary>
     /// <returns>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</returns>
     /// <param name="width">Width for the window.</param>
@@ -47,32 +47,30 @@ public static class MessageBox {
     /// <param name="message">Message to display, might contain multiple lines.</param>
     /// <param name="buttons">Array of buttons to add.</param>
     /// <remarks>
-    ///     Use <see cref="ErrorQuery(string, string, string[])"/> instead; it automatically sizes the MessageBox based on
-    ///     the contents.
+    ///     Use <see cref="ErrorQuery(string, string, string[])"/> instead; it automatically sizes the MessageBox based on the
+    ///     contents.
     /// </remarks>
-    public static int ErrorQuery (int width, int height, string title, string message, params string[] buttons) {
-        return QueryFull (true, width, height, title, message, 0, true, buttons);
-    }
+    public static int ErrorQuery (int width, int height, string title, string message, params string[] buttons) =>
+        QueryFull (true, width, height, title, message, 0, true, buttons);
 
     /// <summary>
-    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show
-    ///     to the user.
+    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show to
+    ///     the user.
     /// </summary>
     /// <returns>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</returns>
     /// <param name="title">Title for the query.</param>
     /// <param name="message">Message to display, might contain multiple lines.</param>
     /// <param name="buttons">Array of buttons to add.</param>
     /// <remarks>
-    ///     The message box will be vertically and horizontally centered in the container and the size will be
-    ///     automatically determined from the size of the title, message. and buttons.
+    ///     The message box will be vertically and horizontally centered in the container and the size will be automatically
+    ///     determined from the size of the title, message. and buttons.
     /// </remarks>
-    public static int ErrorQuery (string title, string message, params string[] buttons) {
-        return QueryFull (true, 0, 0, title, message, 0, true, buttons);
-    }
+    public static int ErrorQuery (string title, string message, params string[] buttons) =>
+        QueryFull (true, 0, 0, title, message, 0, true, buttons);
 
     /// <summary>
-    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show
-    ///     to the user.
+    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show to
+    ///     the user.
     /// </summary>
     /// <returns>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</returns>
     /// <param name="width">Width for the window.</param>
@@ -82,8 +80,8 @@ public static class MessageBox {
     /// <param name="defaultButton">Index of the default button.</param>
     /// <param name="buttons">Array of buttons to add.</param>
     /// <remarks>
-    ///     Use <see cref="ErrorQuery(string, string, string[])"/> instead; it automatically sizes the MessageBox based on
-    ///     the contents.
+    ///     Use <see cref="ErrorQuery(string, string, string[])"/> instead; it automatically sizes the MessageBox based on the
+    ///     contents.
     /// </remarks>
     public static int ErrorQuery (
         int width,
@@ -92,13 +90,11 @@ public static class MessageBox {
         string message,
         int defaultButton = 0,
         params string[] buttons
-    ) {
-        return QueryFull (true, width, height, title, message, defaultButton, true, buttons);
-    }
+    ) => QueryFull (true, width, height, title, message, defaultButton, true, buttons);
 
     /// <summary>
-    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show
-    ///     to the user.
+    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show to
+    ///     the user.
     /// </summary>
     /// <returns>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</returns>
     /// <param name="title">Title for the query.</param>
@@ -106,16 +102,15 @@ public static class MessageBox {
     /// <param name="defaultButton">Index of the default button.</param>
     /// <param name="buttons">Array of buttons to add.</param>
     /// <remarks>
-    ///     The message box will be vertically and horizontally centered in the container and the size will be
-    ///     automatically determined from the size of the title, message. and buttons.
+    ///     The message box will be vertically and horizontally centered in the container and the size will be automatically
+    ///     determined from the size of the title, message. and buttons.
     /// </remarks>
-    public static int ErrorQuery (string title, string message, int defaultButton = 0, params string[] buttons) {
-        return QueryFull (true, 0, 0, title, message, defaultButton, true, buttons);
-    }
+    public static int ErrorQuery (string title, string message, int defaultButton = 0, params string[] buttons) =>
+        QueryFull (true, 0, 0, title, message, defaultButton, true, buttons);
 
     /// <summary>
-    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show
-    ///     to the user.
+    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show to
+    ///     the user.
     /// </summary>
     /// <returns>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</returns>
     /// <param name="width">Width for the window.</param>
@@ -126,8 +121,8 @@ public static class MessageBox {
     /// <param name="wrapMessagge">If wrap the message or not.</param>
     /// <param name="buttons">Array of buttons to add.</param>
     /// <remarks>
-    ///     Use <see cref="ErrorQuery(string, string, string[])"/> instead; it automatically sizes the MessageBox based on
-    ///     the contents.
+    ///     Use <see cref="ErrorQuery(string, string, string[])"/> instead; it automatically sizes the MessageBox based on the
+    ///     contents.
     /// </remarks>
     public static int ErrorQuery (
         int width,
@@ -137,13 +132,11 @@ public static class MessageBox {
         int defaultButton = 0,
         bool wrapMessagge = true,
         params string[] buttons
-    ) {
-        return QueryFull (true, width, height, title, message, defaultButton, wrapMessagge, buttons);
-    }
+    ) => QueryFull (true, width, height, title, message, defaultButton, wrapMessagge, buttons);
 
     /// <summary>
-    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show
-    ///     to the user.
+    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show to
+    ///     the user.
     /// </summary>
     /// <returns>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</returns>
     /// <param name="title">Title for the query.</param>
@@ -152,8 +145,8 @@ public static class MessageBox {
     /// <param name="wrapMessagge">If wrap the message or not.</param>
     /// <param name="buttons">Array of buttons to add.</param>
     /// <remarks>
-    ///     The message box will be vertically and horizontally centered in the container and the size will be
-    ///     automatically determined from the size of the title, message. and buttons.
+    ///     The message box will be vertically and horizontally centered in the container and the size will be automatically
+    ///     determined from the size of the title, message. and buttons.
     /// </remarks>
     public static int ErrorQuery (
         string title,
@@ -161,13 +154,11 @@ public static class MessageBox {
         int defaultButton = 0,
         bool wrapMessagge = true,
         params string[] buttons
-    ) {
-        return QueryFull (true, 0, 0, title, message, defaultButton, wrapMessagge, buttons);
-    }
+    ) => QueryFull (true, 0, 0, title, message, defaultButton, wrapMessagge, buttons);
 
     /// <summary>
-    ///     Presents a normal <see cref="MessageBox"/> with the specified title and message and a list of buttons to show
-    ///     to the user.
+    ///     Presents a normal <see cref="MessageBox"/> with the specified title and message and a list of buttons to show to
+    ///     the user.
     /// </summary>
     /// <returns>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</returns>
     /// <param name="width">Width for the window.</param>
@@ -179,29 +170,27 @@ public static class MessageBox {
     ///     Use <see cref="Query(string, string, string[])"/> instead; it automatically sizes the MessageBox based on the
     ///     contents.
     /// </remarks>
-    public static int Query (int width, int height, string title, string message, params string[] buttons) {
-        return QueryFull (false, width, height, title, message, 0, true, buttons);
-    }
+    public static int Query (int width, int height, string title, string message, params string[] buttons) =>
+        QueryFull (false, width, height, title, message, 0, true, buttons);
 
     /// <summary>
-    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show
-    ///     to the user.
+    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show to
+    ///     the user.
     /// </summary>
     /// <returns>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</returns>
     /// <param name="title">Title for the query.</param>
     /// <param name="message">Message to display, might contain multiple lines.</param>
     /// <param name="buttons">Array of buttons to add.</param>
     /// <remarks>
-    ///     The message box will be vertically and horizontally centered in the container and the size will be
-    ///     automatically determined from the size of the message and buttons.
+    ///     The message box will be vertically and horizontally centered in the container and the size will be automatically
+    ///     determined from the size of the message and buttons.
     /// </remarks>
-    public static int Query (string title, string message, params string[] buttons) {
-        return QueryFull (false, 0, 0, title, message, 0, true, buttons);
-    }
+    public static int Query (string title, string message, params string[] buttons) =>
+        QueryFull (false, 0, 0, title, message, 0, true, buttons);
 
     /// <summary>
-    ///     Presents a normal <see cref="MessageBox"/> with the specified title and message and a list of buttons to show
-    ///     to the user.
+    ///     Presents a normal <see cref="MessageBox"/> with the specified title and message and a list of buttons to show to
+    ///     the user.
     /// </summary>
     /// <returns>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</returns>
     /// <param name="width">Width for the window.</param>
@@ -221,13 +210,11 @@ public static class MessageBox {
         string message,
         int defaultButton = 0,
         params string[] buttons
-    ) {
-        return QueryFull (false, width, height, title, message, defaultButton, true, buttons);
-    }
+    ) => QueryFull (false, width, height, title, message, defaultButton, true, buttons);
 
     /// <summary>
-    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show
-    ///     to the user.
+    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show to
+    ///     the user.
     /// </summary>
     /// <returns>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</returns>
     /// <param name="title">Title for the query.</param>
@@ -235,16 +222,15 @@ public static class MessageBox {
     /// <param name="defaultButton">Index of the default button.</param>
     /// <param name="buttons">Array of buttons to add.</param>
     /// <remarks>
-    ///     The message box will be vertically and horizontally centered in the container and the size will be
-    ///     automatically determined from the size of the message and buttons.
+    ///     The message box will be vertically and horizontally centered in the container and the size will be automatically
+    ///     determined from the size of the message and buttons.
     /// </remarks>
-    public static int Query (string title, string message, int defaultButton = 0, params string[] buttons) {
-        return QueryFull (false, 0, 0, title, message, defaultButton, true, buttons);
-    }
+    public static int Query (string title, string message, int defaultButton = 0, params string[] buttons) =>
+        QueryFull (false, 0, 0, title, message, defaultButton, true, buttons);
 
     /// <summary>
-    ///     Presents a normal <see cref="MessageBox"/> with the specified title and message and a list of buttons to show
-    ///     to the user.
+    ///     Presents a normal <see cref="MessageBox"/> with the specified title and message and a list of buttons to show to
+    ///     the user.
     /// </summary>
     /// <returns>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</returns>
     /// <param name="width">Width for the window.</param>
@@ -266,13 +252,11 @@ public static class MessageBox {
         int defaultButton = 0,
         bool wrapMessagge = true,
         params string[] buttons
-    ) {
-        return QueryFull (false, width, height, title, message, defaultButton, wrapMessagge, buttons);
-    }
+    ) => QueryFull (false, width, height, title, message, defaultButton, wrapMessagge, buttons);
 
     /// <summary>
-    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show
-    ///     to the user.
+    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show to
+    ///     the user.
     /// </summary>
     /// <returns>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</returns>
     /// <param name="title">Title for the query.</param>
@@ -281,8 +265,8 @@ public static class MessageBox {
     /// <param name="wrapMessage">If wrap the message or not.</param>
     /// <param name="buttons">Array of buttons to add.</param>
     /// <remarks>
-    ///     The message box will be vertically and horizontally centered in the container and the size will be
-    ///     automatically determined from the size of the message and buttons.
+    ///     The message box will be vertically and horizontally centered in the container and the size will be automatically
+    ///     determined from the size of the message and buttons.
     /// </remarks>
     public static int Query (
         string title,
@@ -290,9 +274,7 @@ public static class MessageBox {
         int defaultButton = 0,
         bool wrapMessage = true,
         params string[] buttons
-    ) {
-        return QueryFull (false, 0, 0, title, message, defaultButton, wrapMessage, buttons);
-    }
+    ) => QueryFull (false, 0, 0, title, message, defaultButton, wrapMessage, buttons);
 
     private static int QueryFull (
         bool useErrorColors,
@@ -364,7 +346,7 @@ public static class MessageBox {
         d.Add (messageLabel);
 
         d.Loaded += (s, e) => {
-            if ((width != 0) || (height != 0)) {
+            if (width != 0 || height != 0) {
                 return;
             }
 

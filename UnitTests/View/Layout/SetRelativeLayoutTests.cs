@@ -381,7 +381,7 @@ public class SetRelativeLayoutTests {
         var view = new View { Text = "abc", AutoSize = true }; // BUGBUG: AutoSize or Width must be set
         view.X = Pos.AnchorEnd () - Pos.Function (GetViewWidth);
 
-        int GetViewWidth () { return view.Frame.Width; }
+        int GetViewWidth () => view.Frame.Width;
 
         // view will be 3 chars wide. It's X will be 27 (30 - 3).
         // BUGBUG: IsInitialized need to be true before calculate

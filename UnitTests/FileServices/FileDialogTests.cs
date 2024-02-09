@@ -516,7 +516,7 @@ public class FileDialogTests {
         Application.Begin (dlg);
     }
 
-    private FileDialog GetDialog () { return IsWindows () ? GetWindowsDialog () : GetLinuxDialog (); }
+    private FileDialog GetDialog () => IsWindows () ? GetWindowsDialog () : GetLinuxDialog ();
 
     private FileDialog GetInitializedFileDialog () {
         var dlg = new FileDialog ();
@@ -634,7 +634,7 @@ public class FileDialogTests {
                 Assert.Equal (@"/bob/fish", tb.Text);
             }*/
 
-    private bool IsWindows () { return RuntimeInformation.IsOSPlatform (OSPlatform.Windows); }
+    private bool IsWindows () => RuntimeInformation.IsOSPlatform (OSPlatform.Windows);
 
     private void Send (char ch, ConsoleKey ck, bool shift = false, bool alt = false, bool control = false) {
         Application.Driver.SendKeys (ch, ck, shift, alt, control);

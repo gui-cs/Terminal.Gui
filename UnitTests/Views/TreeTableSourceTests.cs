@@ -278,21 +278,17 @@ public class TreeTableSourceTests : IDisposable {
 
     private class Car : IDescribedThing {
         public string Name { get; set; }
-
         public string Description { get; set; }
     }
 
     private interface IDescribedThing {
         string Description { get; }
-
         string Name { get; }
     }
 
     private class Road : IDescribedThing {
         public List<Car> Traffic { get; set; }
-
         public string Name { get; set; }
-
         public string Description { get; set; }
     }
 }

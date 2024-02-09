@@ -245,10 +245,8 @@ public class Scrolling : Scenario {
         public Box10x (int x, int y) { Frame = new Rect (x, y, 20, 10); }
         private readonly int _h = 50;
         private readonly int _w = 40;
-
         public bool WantCursorPosition { get; set; } = false;
-
-        public Size GetContentSize () { return new Size (_w, _h); }
+        public Size GetContentSize () => new (_w, _h);
 
         public override void OnDrawContent (Rect contentArea) {
             //Point pos = new Point (region.X, region.Y);
@@ -280,7 +278,7 @@ public class Scrolling : Scenario {
 
         private int _h = 50;
         private int _w = 40;
-        public Size GetContentSize () { return new Size (_w, _h); }
+        public Size GetContentSize () => new (_w, _h);
 
         public override void OnDrawContent (Rect contentArea) {
             Driver.SetAttribute (ColorScheme.Focus);

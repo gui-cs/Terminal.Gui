@@ -1,8 +1,8 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     Describes the current state of a <see cref="View"/> which is proposing autocomplete. Suggestions are based on
-///     this state.
+///     Describes the current state of a <see cref="View"/> which is proposing autocomplete. Suggestions are based on this
+///     state.
 /// </summary>
 public class AutocompleteContext {
     /// <summary>Creates a new instance of the <see cref="AutocompleteContext"/> class</summary>

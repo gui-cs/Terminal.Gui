@@ -109,7 +109,7 @@ public class PosTests {
 
         Button btn = null;
 
-        int Btn_Width () { return btn?.Bounds.Width ?? 0; }
+        int Btn_Width () => btn?.Bounds.Width ?? 0;
 
         btn = new Button { Text = "Ok", X = Pos.AnchorEnd () - Pos.Function (Btn_Width) };
 

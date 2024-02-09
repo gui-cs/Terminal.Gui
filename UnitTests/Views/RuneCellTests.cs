@@ -169,11 +169,11 @@ ror       ";
     [Fact]
     [AutoInitShutdown]
     public void RuneCell_LoadRuneCells_Without_ColorScheme_Is_Never_Null () {
-        List<RuneCell> cells = new() {
-            new () { Rune = new Rune ('T') },
-            new () { Rune = new Rune ('e') },
-            new () { Rune = new Rune ('s') },
-            new () { Rune = new Rune ('t') }
+        List<RuneCell> cells = new () {
+            new RuneCell { Rune = new Rune ('T') },
+            new RuneCell { Rune = new Rune ('e') },
+            new RuneCell { Rune = new Rune ('s') },
+            new RuneCell { Rune = new Rune ('t') }
         };
         TextView tv = CreateTextView ();
         Application.Top.Add (tv);
@@ -191,7 +191,7 @@ ror       ";
     [AutoInitShutdown]
     public void RuneCellEventArgs_WordWrap_True () {
         var eventCount = 0;
-        List<List<RuneCell>> text = new() {
+        List<List<RuneCell>> text = new () {
             TextModel.ToRuneCells (
                 "This is the first line.".ToRunes ()
             ),
@@ -255,5 +255,5 @@ line.  ",
     }
 
     // TODO: Move the tests below to View or Color - they test ColorScheme, not RuneCell primitives.
-    private TextView CreateTextView () { return new TextView { Width = 30, Height = 10 }; }
+    private TextView CreateTextView () => new() { Width = 30, Height = 10 };
 }

@@ -22,10 +22,10 @@ public partial class View {
     public bool SubViewNeedsDisplay { get; private set; }
 
     /// <summary>
-    ///     Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for rendering any border
-    ///     lines. If <see langword="true"/> the rendering of any borders drawn by this Frame will be done by it's parent's
-    ///     SuperView. If <see langword="false"/> (the default) this View's <see cref="OnDrawAdornments"/> method will be
-    ///     called to render the borders.
+    ///     Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for rendering any border lines.
+    ///     If <see langword="true"/> the rendering of any borders drawn by this Frame will be done by it's parent's SuperView.
+    ///     If <see langword="false"/> (the default) this View's <see cref="OnDrawAdornments"/> method will be called to render
+    ///     the borders.
     /// </summary>
     public virtual bool SuperViewRendersLineCanvas { get; set; } = false;
 
@@ -55,11 +55,11 @@ public partial class View {
     /// <param name="row">Row (view-relative).</param>
     /// <param name="ch">Ch.</param>
     public void AddRune (int col, int row, Rune ch) {
-        if ((row < 0) || (col < 0)) {
+        if (row < 0 || col < 0) {
             return;
         }
 
-        if ((row > _frame.Height - 1) || (col > _frame.Width - 1)) {
+        if (row > _frame.Height - 1 || col > _frame.Width - 1) {
             return;
         }
 
@@ -129,8 +129,8 @@ public partial class View {
     ///         was set globally on the driver.
     ///     </para>
     ///     <para>
-    ///         Overrides of <see cref="OnDrawContent(Rect)"/> must ensure they do not set <c>Driver.Clip</c> to a clip
-    ///         region larger than the <ref name="Bounds"/> property, as this will cause the driver to clip the entire region.
+    ///         Overrides of <see cref="OnDrawContent(Rect)"/> must ensure they do not set <c>Driver.Clip</c> to a clip region
+    ///         larger than the <ref name="Bounds"/> property, as this will cause the driver to clip the entire region.
     ///     </para>
     /// </remarks>
     public void Draw () {
@@ -287,7 +287,7 @@ public partial class View {
     /// <param name="col">The column to move to, in view-relative coordinates.</param>
     /// <param name="row">the row to move to, in view-relative coordinates.</param>
     public void Move (int col, int row) {
-        if ((Driver == null) || (Driver?.Rows == 0)) {
+        if (Driver == null || Driver?.Rows == 0) {
             return;
         }
 
@@ -438,8 +438,8 @@ public partial class View {
 
     /// <summary>Sets the area of this view needing to be redrawn to <see cref="Bounds"/>.</summary>
     /// <remarks>
-    ///     If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), this method
-    ///     does nothing.
+    ///     If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), this method does
+    ///     nothing.
     /// </remarks>
     public void SetNeedsDisplay () {
         if (IsInitialized) {
@@ -472,10 +472,10 @@ public partial class View {
 
         _superView?.SetSubViewNeedsDisplay ();
 
-        if ((_needsDisplayRect.X < Bounds.X) ||
-            (_needsDisplayRect.Y < Bounds.Y) ||
-            (_needsDisplayRect.Width > Bounds.Width) ||
-            (_needsDisplayRect.Height > Bounds.Height)) {
+        if (_needsDisplayRect.X < Bounds.X ||
+            _needsDisplayRect.Y < Bounds.Y ||
+            _needsDisplayRect.Width > Bounds.Width ||
+            _needsDisplayRect.Height > Bounds.Height) {
             Margin?.SetNeedsDisplay (Margin.Bounds);
             Border?.SetNeedsDisplay (Border.Bounds);
             Padding?.SetNeedsDisplay (Padding.Bounds);

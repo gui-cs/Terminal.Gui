@@ -5,9 +5,9 @@ namespace Terminal.Gui;
 
 /// <summary>Attributes represent how text is styled when displayed in the terminal.</summary>
 /// <remarks>
-///     <see cref="Attribute"/> provides a platform independent representation of colors (and someday other forms of
-///     text styling). They encode both the foreground and the background color and are used in the
-///     <see cref="ColorScheme"/> class to define color schemes that can be used in an application.
+///     <see cref="Attribute"/> provides a platform independent representation of colors (and someday other forms of text
+///     styling). They encode both the foreground and the background color and are used in the <see cref="ColorScheme"/>
+///     class to define color schemes that can be used in an application.
 /// </remarks>
 [JsonConverter (typeof (AttributeJsonConverter))]
 public readonly struct Attribute : IEquatable<Attribute> {
@@ -112,30 +112,28 @@ public readonly struct Attribute : IEquatable<Attribute> {
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns></returns>
-    public static bool operator == (Attribute left, Attribute right) { return left.Equals (right); }
+    public static bool operator == (Attribute left, Attribute right) => left.Equals (right);
 
     /// <summary>Compares two attributes for inequality.</summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns></returns>
-    public static bool operator != (Attribute left, Attribute right) { return !(left == right); }
+    public static bool operator != (Attribute left, Attribute right) => !(left == right);
 
     /// <inheritdoc/>
-    public override bool Equals (object? obj) { return obj is Attribute other && Equals (other); }
+    public override bool Equals (object? obj) => obj is Attribute other && Equals (other);
 
     /// <inheritdoc/>
-    public bool Equals (Attribute other) {
-        return PlatformColor == other.PlatformColor &&
-               Foreground == other.Foreground &&
-               Background == other.Background;
-    }
+    public bool Equals (Attribute other) => PlatformColor == other.PlatformColor &&
+                                            Foreground == other.Foreground &&
+                                            Background == other.Background;
 
     /// <inheritdoc/>
-    public override int GetHashCode () { return HashCode.Combine (PlatformColor, Foreground, Background); }
+    public override int GetHashCode () => HashCode.Combine (PlatformColor, Foreground, Background);
 
     /// <inheritdoc/>
-    public override string ToString () {
+    public override string ToString () =>
+
         // Note: Unit tests are dependent on this format
-        return $"[{Foreground},{Background}]";
-    }
+        $"[{Foreground},{Background}]";
 }

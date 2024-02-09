@@ -24,7 +24,7 @@ public class AutocompleteTests {
         for (var i = 0; i < 7; i++) {
             Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
             Application.Refresh ();
-            if ((i < 4) || (i > 5)) {
+            if (i < 4 || i > 5) {
                 TestHelpers.AssertDriverContentsWithFrameAre (
                     @"
 This a long line and against TextView.",

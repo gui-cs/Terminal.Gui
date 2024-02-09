@@ -130,5 +130,5 @@ public class MouseEvent {
 
     /// <summary>Returns a <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</summary>
     /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</returns>
-    public override string ToString () { return $"({X},{Y}):{Flags}"; }
+    public override string ToString () => $"({X},{Y}):{Flags}";
 }

@@ -6,8 +6,8 @@ using System.Text.Json.Serialization;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Holds a property's value and the <see cref="PropertyInfo"/> that allows <see cref="ConfigurationManager"/> to
-///     get and set the property's value.
+///     Holds a property's value and the <see cref="PropertyInfo"/> that allows <see cref="ConfigurationManager"/> to get
+///     and set the property's value.
 /// </summary>
 /// <remarks>
 ///     Configuration properties must be <see langword="public"/> and <see langword="static"/> and have the
@@ -22,8 +22,8 @@ public class ConfigProperty {
     ///     <see langword="null"/>.
     /// </summary>
     /// <remarks>
-    ///     On <see langword="set"/>, performs a sparse-copy of the new value to the existing value (only copies elements
-    ///     of the object that are non-null).
+    ///     On <see langword="set"/>, performs a sparse-copy of the new value to the existing value (only copies elements of
+    ///     the object that are non-null).
     /// </remarks>
     public object? PropertyValue { get; set; }
 

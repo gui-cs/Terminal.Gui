@@ -156,7 +156,6 @@ public class ListViewWithSelection : Scenario {
         }
 
         public int Count => Scenarios != null ? Scenarios.Count : 0;
-
         public int Length { get; private set; }
 
         public void Render (
@@ -185,7 +184,7 @@ public class ListViewWithSelection : Scenario {
             }
         }
 
-        public IList ToList () { return Scenarios; }
+        public IList ToList () => Scenarios;
 
         private int GetMaxLengthItem () {
             if (scenarios?.Count == 0) {

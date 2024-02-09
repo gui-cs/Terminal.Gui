@@ -60,7 +60,7 @@ public class ListTableSource : ITableSource {
                 idx = row * Columns + col;
             }
 
-            if ((idx < 0) || (idx >= Count)) {
+            if (idx < 0 || idx >= Count) {
                 return null;
             }
 
@@ -106,7 +106,7 @@ public class ListTableSource : ITableSource {
     /// <summary>Returns the size in characters of the longest value read from <see cref="ListTableSource.List"/></summary>
     /// <returns></returns>
     private int CalculateMaxLength () {
-        if ((List == null) || (Count == 0)) {
+        if (List == null || Count == 0) {
             return 0;
         }
 
@@ -148,10 +148,10 @@ public class ListTableSource : ITableSource {
 
     private void TableView_DrawContent (object sender, DrawEventArgs e) {
         if (!_tableView.Bounds.Equals (_lastBounds) ||
-            (_tableView.MaxCellWidth != _lastMaxCellWidth) ||
-            (_tableView.MinCellWidth != _lastMinCellWidth) ||
-            (Style != _lastStyle) ||
-            (List != _lastList)) {
+            _tableView.MaxCellWidth != _lastMaxCellWidth ||
+            _tableView.MinCellWidth != _lastMinCellWidth ||
+            Style != _lastStyle ||
+            List != _lastList) {
             DataTable = CreateTable (CalculateColumns ());
         }
 

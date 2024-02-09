@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-class FileDialogHistory {
+internal class FileDialogHistory {
     public FileDialogHistory (FileDialog dlg) { this.dlg = dlg; }
     private readonly FileDialog dlg;
     private readonly Stack<FileDialogState> back = new ();
@@ -37,9 +37,9 @@ class FileDialogHistory {
         return true;
     }
 
-    internal bool CanBack () { return back.Count > 0; }
-    internal bool CanForward () { return forward.Count > 0; }
-    internal bool CanUp () { return dlg.State?.Directory.Parent != null; }
+    internal bool CanBack () => back.Count > 0;
+    internal bool CanForward () => forward.Count > 0;
+    internal bool CanUp () => dlg.State?.Directory.Parent != null;
     internal void ClearForward () { forward.Clear (); }
 
     internal bool Forward () {
@@ -58,7 +58,7 @@ class FileDialogHistory {
         }
 
         // if changing to a new directory push onto the Back history
-        if ((back.Count == 0) || (back.Peek ().Directory.FullName != state.Directory.FullName)) {
+        if (back.Count == 0 || back.Peek ().Directory.FullName != state.Directory.FullName) {
             back.Push (state);
             if (clearForward) {
                 ClearForward ();

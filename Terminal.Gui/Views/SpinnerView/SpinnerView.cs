@@ -60,14 +60,17 @@ public class SpinnerView : View {
     public bool IsAsciiOnly => GetIsAsciiOnly ();
 
     /// <summary>
-    ///     Gets or sets whether spinner should go back and forth through the frames rather than going to the end and
-    ///     starting again at the beginning.
+    ///     Gets or sets whether spinner should go back and forth through the frames rather than going to the end and starting
+    ///     again at the beginning.
     /// </summary>
-    public bool SpinBounce { get => _bounce; set => SetBounce (value); }
+    public bool SpinBounce {
+        get => _bounce;
+        set => SetBounce (value);
+    }
 
     /// <summary>
-    ///     Gets or sets whether spinner should go through the frames in reverse order. If SpinBounce is true, this sets
-    ///     the starting order.
+    ///     Gets or sets whether spinner should go through the frames in reverse order. If SpinBounce is true, this sets the
+    ///     starting order.
     /// </summary>
     public bool SpinReverse { get; set; }
 
@@ -76,17 +79,26 @@ public class SpinnerView : View {
     ///     This is the maximum speed the spinner will rotate at.  You still need to call
     ///     <see cref="SpinnerView.AdvanceAnimation()"/> or <see cref="SpinnerView.AutoSpin"/> to advance/start animation.
     /// </remarks>
-    public int SpinDelay { get => _delay; set => SetDelay (value); }
+    public int SpinDelay {
+        get => _delay;
+        set => SetDelay (value);
+    }
 
     /// <summary>Gets or sets the Style used to animate the spinner.</summary>
-    public SpinnerStyle Style { get => _style; set => SetStyle (value); }
+    public SpinnerStyle Style {
+        get => _style;
+        set => SetStyle (value);
+    }
 
     /// <summary>Gets or sets the animation frames used to animate the spinner.</summary>
-    public string[] Sequence { get => _sequence; set => SetSequence (value); }
+    public string[] Sequence {
+        get => _sequence;
+        set => SetSequence (value);
+    }
 
     /// <summary>
-    ///     Advances the animation frame and notifies main loop that repainting needs to happen. Repeated calls are
-    ///     ignored based on <see cref="SpinDelay"/>.
+    ///     Advances the animation frame and notifies main loop that repainting needs to happen. Repeated calls are ignored
+    ///     based on <see cref="SpinDelay"/>.
     /// </summary>
     /// <remarks>Ensure this method is called on the main UI thread e.g. via <see cref="Application.Invoke"/></remarks>
     public void AdvanceAnimation () {

@@ -122,9 +122,9 @@ public static class StraightLineExtensions {
     }
 
     /// <summary>
-    ///     Creates a new line which is part of <paramref name="l"/> from the point on the varying axis
-    ///     <paramref name="from"/> to <paramref name="length"/>.  Horizontal lines have points that vary by x while vertical
-    ///     lines have points that vary by y
+    ///     Creates a new line which is part of <paramref name="l"/> from the point on the varying axis <paramref name="from"/>
+    ///     to <paramref name="length"/>.  Horizontal lines have points that vary by x while vertical lines have points that
+    ///     vary by y
     /// </summary>
     /// <param name="l">Line to create sub part from</param>
     /// <param name="from">Point on varying axis to start at</param>

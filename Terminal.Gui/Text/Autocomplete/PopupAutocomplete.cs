@@ -15,8 +15,8 @@ public abstract class PopupAutocomplete : AutocompleteBase {
     private View top, popup;
 
     /// <summary>
-    ///     The colors to use to render the overlay. Accessing this property before the Application has been initialized
-    ///     will cause an error
+    ///     The colors to use to render the overlay. Accessing this property before the Application has been initialized will
+    ///     cause an error
     /// </summary>
     public override ColorScheme ColorScheme {
         get {
@@ -30,8 +30,8 @@ public abstract class PopupAutocomplete : AutocompleteBase {
     }
 
     /// <summary>
-    ///     When more suggestions are available than can be rendered the user can scroll down the dropdown list. This
-    ///     indicates how far down they have gone
+    ///     When more suggestions are available than can be rendered the user can scroll down the dropdown list. This indicates
+    ///     how far down they have gone
     /// </summary>
     public virtual int ScrollOffset { get; set; }
 
@@ -108,7 +108,7 @@ public abstract class PopupAutocomplete : AutocompleteBase {
             return false;
         }
 
-        if ((popup == null) || (Suggestions.Count == 0)) {
+        if (popup == null || Suggestions.Count == 0) {
             ManipulatePopup ();
 
             return false;
@@ -142,8 +142,8 @@ public abstract class PopupAutocomplete : AutocompleteBase {
     }
 
     /// <summary>
-    ///     Handle key events before <see cref="HostControl"/> e.g. to make key events like up/down apply to the
-    ///     autocomplete control instead of changing the cursor position in the underlying text view.
+    ///     Handle key events before <see cref="HostControl"/> e.g. to make key events like up/down apply to the autocomplete
+    ///     control instead of changing the cursor position in the underlying text view.
     /// </summary>
     /// <param name="a">The key event.</param>
     /// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
@@ -162,7 +162,7 @@ public abstract class PopupAutocomplete : AutocompleteBase {
             return ReopenSuggestions ();
         }
 
-        if (closed || (Suggestions.Count == 0)) {
+        if (closed || Suggestions.Count == 0) {
             Visible = false;
             if (!closed) {
                 Close ();
@@ -214,7 +214,7 @@ public abstract class PopupAutocomplete : AutocompleteBase {
     public override void RenderOverlay (Point renderAt) {
         if (!Context.Canceled && Suggestions.Count > 0 && !Visible && HostControl?.HasFocus == true) {
             ProcessKey (new Key ((KeyCode)Suggestions[0].Title[0]));
-        } else if (!Visible || (HostControl?.HasFocus == false) || (Suggestions.Count == 0)) {
+        } else if (!Visible || HostControl?.HasFocus == false || Suggestions.Count == 0) {
             LastPopupPos = null;
             Visible = false;
             if (Suggestions.Count == 0) {
@@ -322,9 +322,7 @@ public abstract class PopupAutocomplete : AutocompleteBase {
         }
     }
 
-    /// <summary>
-    ///     Closes the Autocomplete context menu if it is showing and <see cref="IAutocomplete.ClearSuggestions"/>
-    /// </summary>
+    /// <summary>Closes the Autocomplete context menu if it is showing and <see cref="IAutocomplete.ClearSuggestions"/></summary>
     protected void Close () {
         ClearSuggestions ();
         Visible = false;
@@ -469,7 +467,7 @@ public abstract class PopupAutocomplete : AutocompleteBase {
         }
 
         private readonly PopupAutocomplete autocomplete;
-        public override bool MouseEvent (MouseEvent mouseEvent) { return autocomplete.MouseEvent (mouseEvent); }
+        public override bool MouseEvent (MouseEvent mouseEvent) => autocomplete.MouseEvent (mouseEvent);
 
         public override void OnDrawContent (Rect contentArea) {
             if (autocomplete.LastPopupPos == null) {

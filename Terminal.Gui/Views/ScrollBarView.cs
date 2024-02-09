@@ -17,8 +17,8 @@ namespace Terminal.Gui;
 /// </remarks>
 public class ScrollBarView : View {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using
-    ///     <see cref="LayoutStyle.Computed"/> layout.
+    ///     Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using <see cref="LayoutStyle.Computed"/>
+    ///     layout.
     /// </summary>
     public ScrollBarView () {
         WantContinuousButtonPressed = true;
@@ -29,8 +29,8 @@ public class ScrollBarView : View {
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using
-    ///     <see cref="LayoutStyle.Computed"/> layout.
+    ///     Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using <see cref="LayoutStyle.Computed"/>
+    ///     layout.
     /// </summary>
     /// <param name="host">The view that will host this scrollbar.</param>
     /// <param name="isVertical">If set to <c>true</c> this is a vertical scrollbar, otherwise, the scrollbar is horizontal.</param>
@@ -262,7 +262,7 @@ public class ScrollBarView : View {
         int pos = Position;
 
         if (mouseEvent.Flags != MouseFlags.Button1Released &&
-            ((Application.MouseGrabView == null) || (Application.MouseGrabView != this))) {
+            (Application.MouseGrabView == null || Application.MouseGrabView != this)) {
             Application.GrabMouse (this);
         } else if (mouseEvent.Flags == MouseFlags.Button1Released && Application.MouseGrabView != null &&
                    Application.MouseGrabView == this) {
@@ -273,10 +273,10 @@ public class ScrollBarView : View {
         }
 
         if (_showScrollIndicator &&
-            ((mouseEvent.Flags == MouseFlags.WheeledDown) ||
-             (mouseEvent.Flags == MouseFlags.WheeledUp) ||
-             (mouseEvent.Flags == MouseFlags.WheeledRight) ||
-             (mouseEvent.Flags == MouseFlags.WheeledLeft))) {
+            (mouseEvent.Flags == MouseFlags.WheeledDown ||
+             mouseEvent.Flags == MouseFlags.WheeledUp ||
+             mouseEvent.Flags == MouseFlags.WheeledRight ||
+             mouseEvent.Flags == MouseFlags.WheeledLeft)) {
             return Host.MouseEvent (mouseEvent);
         }
 
@@ -297,11 +297,11 @@ public class ScrollBarView : View {
             //	b1 = Math.Max (b1 - 1, 0);
             //}
 
-            if ((_lastLocation > -1) || (location >= posTopLeftTee && location <= posBottomRightTee &&
-                                         mouseEvent.Flags.HasFlag (
-                                             MouseFlags.Button1Pressed |
-                                             MouseFlags.ReportMousePosition
-                                         ))) {
+            if (_lastLocation > -1 || (location >= posTopLeftTee && location <= posBottomRightTee &&
+                                       mouseEvent.Flags.HasFlag (
+                                           MouseFlags.Button1Pressed |
+                                           MouseFlags.ReportMousePosition
+                                       ))) {
                 if (_lastLocation == -1) {
                     _lastLocation = location;
                     _posBarOffset = _keepContentAlwaysInViewport
@@ -367,15 +367,15 @@ public class ScrollBarView : View {
 
     /// <inheritdoc/>
     public override void OnDrawContent (Rect contentArea) {
-        if ((ColorScheme == null) || ((!_showScrollIndicator || (Size == 0)) && AutoHideScrollBars && Visible)) {
-            if ((!_showScrollIndicator || (Size == 0)) && AutoHideScrollBars && Visible) {
+        if (ColorScheme == null || ((!_showScrollIndicator || Size == 0) && AutoHideScrollBars && Visible)) {
+            if ((!_showScrollIndicator || Size == 0) && AutoHideScrollBars && Visible) {
                 ShowHideScrollBars (false);
             }
 
             return;
         }
 
-        if ((Size == 0) || (_vertical && Bounds.Height == 0) || (!_vertical && Bounds.Width == 0)) {
+        if (Size == 0 || (_vertical && Bounds.Height == 0) || (!_vertical && Bounds.Width == 0)) {
             return;
         }
 
@@ -430,7 +430,7 @@ public class ScrollBarView : View {
                 var hasBottomTee = false;
                 for (var y = 0; y < bh; y++) {
                     Move (col, y + 1);
-                    if (((y < by1) || (y > by2)) &&
+                    if ((y < by1 || y > by2) &&
                         ((_position > 0 && !hasTopTee) || (hasTopTee && hasBottomTee))) {
                         special = Glyphs.Stipple;
                     } else {
@@ -443,8 +443,8 @@ public class ScrollBarView : View {
                                 hasTopTee = true;
                                 _posTopTee = y;
                                 special = Glyphs.TopTee;
-                            } else if (((_position == 0 && y == bh - 1) || (y >= by2) ||
-                                        (by2 == 0)) && !hasBottomTee) {
+                            } else if (((_position == 0 && y == bh - 1) || y >= by2 ||
+                                        by2 == 0) && !hasBottomTee) {
                                 hasBottomTee = true;
                                 _posBottomTee = y;
                                 special = Glyphs.BottomTee;
@@ -500,8 +500,8 @@ public class ScrollBarView : View {
                 var hasDiamond = false;
                 var hasRightTee = false;
                 for (var x = 0; x < bw; x++) {
-                    if (((x < bx1) || (x >= bx2 + 1)) && ((_position > 0 && !hasLeftTee) ||
-                                                          (hasLeftTee && hasRightTee))) {
+                    if ((x < bx1 || x >= bx2 + 1) && ((_position > 0 && !hasLeftTee) ||
+                                                      (hasLeftTee && hasRightTee))) {
                         special = Glyphs.Stipple;
                     } else {
                         if (x != bx2 && x > 1 && bx2 - bx1 == 0 && bx1 < bw - 1 && hasLeftTee &&
@@ -513,8 +513,8 @@ public class ScrollBarView : View {
                                 hasLeftTee = true;
                                 _posLeftTee = x;
                                 special = Glyphs.LeftTee;
-                            } else if (((_position == 0 && x == bw - 1) || (x >= bx2) ||
-                                        (bx2 == 0)) && !hasRightTee) {
+                            } else if (((_position == 0 && x == bw - 1) || x >= bx2 ||
+                                        bx2 == 0) && !hasRightTee) {
                                 hasRightTee = true;
                                 _posRightTee = x;
                                 special = Glyphs.RightTee;
@@ -567,7 +567,7 @@ public class ScrollBarView : View {
     private bool CheckBothScrollBars (ScrollBarView scrollBarView, bool pending = false) {
         int barsize = scrollBarView._vertical ? scrollBarView.Bounds.Height : scrollBarView.Bounds.Width;
 
-        if ((barsize == 0) || (barsize >= scrollBarView._size)) {
+        if (barsize == 0 || barsize >= scrollBarView._size) {
             if (scrollBarView._showScrollIndicator) {
                 scrollBarView.ShowScrollIndicator = false;
             }
@@ -635,10 +635,10 @@ public class ScrollBarView : View {
     //}
 
     private void ContentBottomRightCorner_MouseClick (object sender, MouseEventEventArgs me) {
-        if ((me.MouseEvent.Flags == MouseFlags.WheeledDown) ||
-            (me.MouseEvent.Flags == MouseFlags.WheeledUp) ||
-            (me.MouseEvent.Flags == MouseFlags.WheeledRight) ||
-            (me.MouseEvent.Flags == MouseFlags.WheeledLeft)) {
+        if (me.MouseEvent.Flags == MouseFlags.WheeledDown ||
+            me.MouseEvent.Flags == MouseFlags.WheeledUp ||
+            me.MouseEvent.Flags == MouseFlags.WheeledRight ||
+            me.MouseEvent.Flags == MouseFlags.WheeledLeft) {
             MouseEvent (me.MouseEvent);
         } else if (me.MouseEvent.Flags == MouseFlags.Button1Clicked) {
             Host.SetFocus ();

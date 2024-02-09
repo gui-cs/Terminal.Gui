@@ -170,8 +170,7 @@ public partial class Curses {
 
     // see #949
     public static int LC_ALL { get; }
-
     static Curses () { LC_ALL = RuntimeInformation.IsOSPlatform (OSPlatform.OSX) ? 0 : 6; }
-    public static int ColorPair (int n) { return 0 + n * 256; }
+    public static int ColorPair (int n) => 0 + n * 256;
 }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

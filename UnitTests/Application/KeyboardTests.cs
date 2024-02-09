@@ -421,9 +421,7 @@ public class KeyboardTests {
         }
 
         public bool ApplicationCommand { get; set; }
-
         public bool FocusedCommand { get; set; }
-
         public bool HotKeyCommand { get; set; }
     }
 }

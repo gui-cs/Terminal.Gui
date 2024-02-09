@@ -603,7 +603,7 @@ public static class FakeConsole {
     // Returns:
     //	The standard error stream.
     /// <summary></summary>
-    public static Stream OpenStandardError () { throw new NotImplementedException (); }
+    public static Stream OpenStandardError () => throw new NotImplementedException ();
 
     //
     // Summary:
@@ -620,7 +620,7 @@ public static class FakeConsole {
     //	T:System.ArgumentOutOfRangeException:
     //	bufferSize is less than or equal to zero.
     /// <summary></summary>
-    public static Stream OpenStandardError (int bufferSize) { throw new NotImplementedException (); }
+    public static Stream OpenStandardError (int bufferSize) => throw new NotImplementedException ();
 
     //
     // Summary:
@@ -637,7 +637,7 @@ public static class FakeConsole {
     //	T:System.ArgumentOutOfRangeException:
     //	bufferSize is less than or equal to zero.
     /// <summary></summary>
-    public static Stream OpenStandardInput (int bufferSize) { throw new NotImplementedException (); }
+    public static Stream OpenStandardInput (int bufferSize) => throw new NotImplementedException ();
 
     //
     // Summary:
@@ -646,7 +646,7 @@ public static class FakeConsole {
     // Returns:
     //	The standard input stream.
     /// <summary></summary>
-    public static Stream OpenStandardInput () { throw new NotImplementedException (); }
+    public static Stream OpenStandardInput () => throw new NotImplementedException ();
 
     //
     // Summary:
@@ -663,7 +663,7 @@ public static class FakeConsole {
     //	T:System.ArgumentOutOfRangeException:
     //	bufferSize is less than or equal to zero.
     /// <summary></summary>
-    public static Stream OpenStandardOutput (int bufferSize) { throw new NotImplementedException (); }
+    public static Stream OpenStandardOutput (int bufferSize) => throw new NotImplementedException ();
 
     //
     // Summary:
@@ -672,7 +672,7 @@ public static class FakeConsole {
     // Returns:
     //	The standard output stream.
     /// <summary></summary>
-    public static Stream OpenStandardOutput () { throw new NotImplementedException (); }
+    public static Stream OpenStandardOutput () => throw new NotImplementedException ();
 
     //
     // Summary:
@@ -686,7 +686,7 @@ public static class FakeConsole {
     //	T:System.IO.IOException:
     //	An I/O error occurred.
     /// <summary></summary>
-    public static int Read () { throw new NotImplementedException (); }
+    public static int Read () => throw new NotImplementedException ();
 
     //
     // Summary:
@@ -746,7 +746,7 @@ public static class FakeConsole {
     //	The System.Console.In property is redirected from some stream other than the
     //	console.
     /// <summary></summary>
-    public static ConsoleKeyInfo ReadKey () { throw new NotImplementedException (); }
+    public static ConsoleKeyInfo ReadKey () => throw new NotImplementedException ();
 
     //
     // Summary:
@@ -766,7 +766,7 @@ public static class FakeConsole {
     //	T:System.ArgumentOutOfRangeException:
     //	The number of characters in the next line of characters is greater than System.Int32.MaxValue.
     /// <summary></summary>
-    public static string ReadLine () { throw new NotImplementedException (); }
+    public static string ReadLine () => throw new NotImplementedException ();
 
     //
     // Summary:

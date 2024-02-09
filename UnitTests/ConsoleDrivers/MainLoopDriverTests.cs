@@ -194,7 +194,7 @@ public class MainLoopDriverTests {
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
 
-        bool IdleHandler () { return false; }
+        bool IdleHandler () => false;
 
         Func<bool> token = mainLoop.AddIdle (IdleHandler);
         bool result = mainLoop.RemoveIdle (token);

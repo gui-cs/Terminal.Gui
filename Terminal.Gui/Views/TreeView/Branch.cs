@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui;
 
-class Branch<T> where T : class {
+internal class Branch<T> where T : class {
     /// <summary>
     ///     Declares a new branch of <paramref name="tree"/> in which the users object <paramref name="model"/> is
     ///     presented.
@@ -39,8 +39,8 @@ class Branch<T> where T : class {
     public T Model { get; private set; }
 
     /// <summary>
-    ///     Returns true if the current branch can be expanded according to the <see cref="TreeBuilder{T}"/> or cached
-    ///     children already fetched.
+    ///     Returns true if the current branch can be expanded according to the <see cref="TreeBuilder{T}"/> or cached children
+    ///     already fetched.
     /// </summary>
     /// <returns></returns>
     public bool CanExpand () {
@@ -188,7 +188,7 @@ class Branch<T> where T : class {
             );
         }
 
-        DrawTreeViewLineEventArgs<T> e = new() {
+        DrawTreeViewLineEventArgs<T> e = new () {
             Model = Model,
             Y = y,
             RuneCells = cells,
@@ -238,8 +238,8 @@ class Branch<T> where T : class {
     }
 
     /// <summary>
-    ///     Returns an appropriate symbol for displaying next to the string representation of the <see cref="Model"/>
-    ///     object to indicate whether it <see cref="IsExpanded"/> or not (or it is a leaf).
+    ///     Returns an appropriate symbol for displaying next to the string representation of the <see cref="Model"/> object to
+    ///     indicate whether it <see cref="IsExpanded"/> or not (or it is a leaf).
     /// </summary>
     /// <param name="driver"></param>
     /// <returns></returns>
@@ -258,8 +258,8 @@ class Branch<T> where T : class {
     }
 
     /// <summary>
-    ///     Returns the width of the line including prefix and the results of <see cref="TreeView{T}.AspectGetter"/> (the
-    ///     line body).
+    ///     Returns the width of the line including prefix and the results of <see cref="TreeView{T}.AspectGetter"/> (the line
+    ///     body).
     /// </summary>
     /// <returns></returns>
     public virtual int GetWidth (ConsoleDriver driver) {
@@ -336,8 +336,8 @@ class Branch<T> where T : class {
     }
 
     /// <summary>
-    ///     Gets all characters to render prior to the current branches line.  This includes indentation whitespace and
-    ///     any tree branches (if enabled).
+    ///     Gets all characters to render prior to the current branches line.  This includes indentation whitespace and any
+    ///     tree branches (if enabled).
     /// </summary>
     /// <param name="driver"></param>
     /// <returns></returns>
@@ -370,8 +370,8 @@ class Branch<T> where T : class {
     }
 
     /// <summary>
-    ///     Returns true if the given x offset on the branch line is the +/- symbol.  Returns false if not showing
-    ///     expansion symbols or leaf node etc.
+    ///     Returns true if the given x offset on the branch line is the +/- symbol.  Returns false if not showing expansion
+    ///     symbols or leaf node etc.
     /// </summary>
     /// <param name="driver"></param>
     /// <param name="x"></param>
@@ -438,7 +438,6 @@ class Branch<T> where T : class {
         return Parent.ChildBranches.Values.LastOrDefault () == this;
     }
 
-    private static RuneCell NewRuneCell (Attribute attr, Rune r) {
-        return new RuneCell { Rune = r, ColorScheme = new ColorScheme (attr) };
-    }
+    private static RuneCell NewRuneCell (Attribute attr, Rune r) =>
+        new() { Rune = r, ColorScheme = new ColorScheme (attr) };
 }

@@ -121,11 +121,11 @@ public class MenuBarTests {
         Toplevel top = Application.Top;
         top.Add (menu);
 
-        bool CanExecuteNew () { return win == null; }
+        bool CanExecuteNew () => win == null;
 
         void New () { win = new Window (); }
 
-        bool CanExecuteClose () { return win != null; }
+        bool CanExecuteClose () => win != null;
 
         void Close () { win = null; }
 
@@ -3274,31 +3274,25 @@ Edit
             }
         }
 
-        public string ExpectedBottomRow (int i) {
-            return
-                $"{
-                    CM.Glyphs.LLCorner
-                }{
-                    new string (CM.Glyphs.HLine.ToString ()[0], Menus[i].Children[0].TitleLength + 3)
-                }{
-                    CM.Glyphs.LRCorner
-                }  \n";
-        }
+        public string ExpectedBottomRow (int i) => $"{
+            CM.Glyphs.LLCorner
+        }{
+            new string (CM.Glyphs.HLine.ToString ()[0], Menus[i].Children[0].TitleLength + 3)
+        }{
+            CM.Glyphs.LRCorner
+        }  \n";
 
         // The 3 spaces at end are a result of Menu.cs line 1062 where `pos` is calculated (` + spacesAfterTitle`)
-        public string ExpectedMenuItemRow (int i) {
-            return $"{CM.Glyphs.VLine} {Menus[i].Children[0].Title}  {CM.Glyphs.VLine}   \n";
-        }
+        public string ExpectedMenuItemRow (int i) =>
+            $"{CM.Glyphs.VLine} {Menus[i].Children[0].Title}  {CM.Glyphs.VLine}   \n";
 
         // The full expected string for an open sub menu
-        public string ExpectedSubMenuOpen (int i) {
-            return ClosedMenuText +
-                   (Menus[i].Children.Length > 0
-                        ? ExpectedPadding (i) + ExpectedTopRow (i) +
-                          ExpectedPadding (i) + ExpectedMenuItemRow (i) +
-                          ExpectedPadding (i) + ExpectedBottomRow (i)
-                        : "");
-        }
+        public string ExpectedSubMenuOpen (int i) => ClosedMenuText +
+                                                     (Menus[i].Children.Length > 0
+                                                          ? ExpectedPadding (i) + ExpectedTopRow (i) +
+                                                            ExpectedPadding (i) + ExpectedMenuItemRow (i) +
+                                                            ExpectedPadding (i) + ExpectedBottomRow (i)
+                                                          : "");
 
         // Define expected menu frame
         // "┌──────┐"
@@ -3307,16 +3301,13 @@ Edit
         // 
         // The width of the Frame is determined in Menu.cs line 144, where `Width` is calculated
         //   1 space before the Title and 2 spaces after the Title/Check/Help
-        public string ExpectedTopRow (int i) {
-            return
-                $"{
-                    CM.Glyphs.ULCorner
-                }{
-                    new string (CM.Glyphs.HLine.ToString ()[0], Menus[i].Children[0].TitleLength + 3)
-                }{
-                    CM.Glyphs.URCorner
-                }  \n";
-        }
+        public string ExpectedTopRow (int i) => $"{
+            CM.Glyphs.ULCorner
+        }{
+            new string (CM.Glyphs.HLine.ToString ()[0], Menus[i].Children[0].TitleLength + 3)
+        }{
+            CM.Glyphs.URCorner
+        }  \n";
 
         // Padding for the X of the sub menu Frame
         // Menu.cs - Line 1239 in `internal void OpenMenu` is where the Menu is created

@@ -35,8 +35,8 @@ public enum KeyBindingScope {
     ///     commands.
     /// </summary>
     /// <remarks>
-    ///     Application-scoped key bindings are only invoked if the key down event was not handled by the focused view or
-    ///     any of its subviews, and if the key down event was not bound to a <see cref="View.HotKey"/>.
+    ///     Application-scoped key bindings are only invoked if the key down event was not handled by the focused view or any
+    ///     of its subviews, and if the key down event was not bound to a <see cref="View.HotKey"/>.
     /// </remarks>
     Application
 }
@@ -76,22 +76,22 @@ public class KeyBindings {
     ///     </para>
     /// </summary>
     /// <remarks>
-    ///     Commands are only ever applied to the current <see cref="View"/> (i.e. this feature cannot be used to switch
-    ///     focus to another view and perform multiple commands there).
+    ///     Commands are only ever applied to the current <see cref="View"/> (i.e. this feature cannot be used to switch focus
+    ///     to another view and perform multiple commands there).
     /// </remarks>
     /// <param name="key">The key to check.</param>
     /// <param name="scope">The scope for the command.</param>
     /// <param name="commands">
-    ///     The command to invoked on the <see cref="View"/> when <paramref name="key"/> is pressed. When
-    ///     multiple commands are provided,they will be applied in sequence. The bound <paramref name="key"/> strike will be
-    ///     consumed if any took effect.
+    ///     The command to invoked on the <see cref="View"/> when <paramref name="key"/> is pressed. When multiple commands are
+    ///     provided,they will be applied in sequence. The bound <paramref name="key"/> strike will be consumed if any took
+    ///     effect.
     /// </param>
     public void Add (Key key, KeyBindingScope scope, params Command[] commands) {
         if (commands.Length == 0) {
             throw new ArgumentException (@"At least one command must be specified", nameof (commands));
         }
 
-        if ((key == null) || !key.IsValid) {
+        if (key == null || !key.IsValid) {
             //throw new ArgumentException ("Invalid Key", nameof (commands));
             return;
         }
@@ -118,14 +118,14 @@ public class KeyBindings {
     ///     </para>
     /// </summary>
     /// <remarks>
-    ///     Commands are only ever applied to the current <see cref="View"/> (i.e. this feature cannot be used to switch
-    ///     focus to another view and perform multiple commands there).
+    ///     Commands are only ever applied to the current <see cref="View"/> (i.e. this feature cannot be used to switch focus
+    ///     to another view and perform multiple commands there).
     /// </remarks>
     /// <param name="key">The key to check.</param>
     /// <param name="commands">
-    ///     The command to invoked on the <see cref="View"/> when <paramref name="key"/> is pressed. When
-    ///     multiple commands are provided,they will be applied in sequence. The bound <paramref name="key"/> strike will be
-    ///     consumed if any took effect.
+    ///     The command to invoked on the <see cref="View"/> when <paramref name="key"/> is pressed. When multiple commands are
+    ///     provided,they will be applied in sequence. The bound <paramref name="key"/> strike will be consumed if any took
+    ///     effect.
     /// </param>
     public void Add (Key key, params Command[] commands) { Add (key, KeyBindingScope.Focused, commands); }
 
@@ -133,8 +133,8 @@ public class KeyBindings {
     public void Clear () { Bindings.Clear (); }
 
     /// <summary>
-    ///     Removes all key bindings that trigger the given command set. Views can have multiple different keys bound to
-    ///     the same command sets and this method will clear all of them.
+    ///     Removes all key bindings that trigger the given command set. Views can have multiple different keys bound to the
+    ///     same command sets and this method will clear all of them.
     /// </summary>
     /// <param name="command"></param>
     public void Clear (params Command[] command) {
@@ -147,15 +147,14 @@ public class KeyBindings {
     /// <summary>Gets the <see cref="KeyBinding"/> for the specified <see cref="Key"/>.</summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public KeyBinding Get (Key key) { return TryGet (key, out KeyBinding binding) ? binding : null; }
+    public KeyBinding Get (Key key) => TryGet (key, out KeyBinding binding) ? binding : null;
 
     /// <summary>Gets the <see cref="KeyBinding"/> for the specified <see cref="Key"/>.</summary>
     /// <param name="key"></param>
     /// <param name="scope"></param>
     /// <returns></returns>
-    public KeyBinding Get (Key key, KeyBindingScope scope) {
-        return TryGet (key, scope, out KeyBinding binding) ? binding : null;
-    }
+    public KeyBinding Get (Key key, KeyBindingScope scope) =>
+        TryGet (key, scope, out KeyBinding binding) ? binding : null;
 
     /// <summary>Gets the array of <see cref="Command"/>s bound to <paramref name="key"/> if it exists.</summary>
     /// <param name="key">The key to check.</param>
@@ -202,8 +201,8 @@ public class KeyBindings {
     /// <remarks></remarks>
     /// <param name="key">The key to check.</param>
     /// <param name="binding">
-    ///     When this method returns, contains the commands bound with the specified Key, if the Key is
-    ///     found; otherwise, null. This parameter is passed uninitialized.
+    ///     When this method returns, contains the commands bound with the specified Key, if the Key is found; otherwise, null.
+    ///     This parameter is passed uninitialized.
     /// </param>
     /// <returns><see langword="true"/> if the Key is bound; otherwise <see langword="false"/>.</returns>
     public bool TryGet (Key key, out KeyBinding binding) {
@@ -221,8 +220,8 @@ public class KeyBindings {
     /// <param name="key">The key to check.</param>
     /// <param name="scope">the scope to filter on</param>
     /// <param name="binding">
-    ///     When this method returns, contains the commands bound with the specified Key, if the Key is
-    ///     found; otherwise, null. This parameter is passed uninitialized.
+    ///     When this method returns, contains the commands bound with the specified Key, if the Key is found; otherwise, null.
+    ///     This parameter is passed uninitialized.
     /// </param>
     /// <returns><see langword="true"/> if the Key is bound; otherwise <see langword="false"/>.</returns>
     public bool TryGet (Key key, KeyBindingScope scope, out KeyBinding binding) {

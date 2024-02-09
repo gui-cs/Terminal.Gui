@@ -41,12 +41,12 @@ public static partial class Application {
     public static List<CultureInfo> SupportedCultures { get; private set; }
 
     /// <summary>
-    ///     Forces the use of the specified driver (one of "fake", "ansi", "curses", "net", or "windows"). If not
-    ///     specified, the driver is selected based on the platform.
+    ///     Forces the use of the specified driver (one of "fake", "ansi", "curses", "net", or "windows"). If not specified,
+    ///     the driver is selected based on the platform.
     /// </summary>
     /// <remarks>
-    ///     Note, <see cref="Application.Init(ConsoleDriver, string)"/> will override this configuration setting if called
-    ///     with either `driver` or `driverName` specified.
+    ///     Note, <see cref="Application.Init(ConsoleDriver, string)"/> will override this configuration setting if called with
+    ///     either `driver` or `driverName` specified.
     /// </remarks>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     public static string ForceDriver { get; set; } = string.Empty;
@@ -165,13 +165,13 @@ public static partial class Application {
     ///     <see cref="Init(ConsoleDriver, string)"/>.
     /// </para>
     /// <param name="driver">
-    ///     The <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or
-    ///     <paramref name="driverName"/> are specified the default driver for the platform will be used.
+    ///     The <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are
+    ///     specified the default driver for the platform will be used.
     /// </param>
     /// <param name="driverName">
-    ///     The short name (e.g. "net", "windows", "ansi", "fake", or "curses") of the
-    ///     <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are
-    ///     specified the default driver for the platform will be used.
+    ///     The short name (e.g. "net", "windows", "ansi", "fake", or "curses") of the <see cref="ConsoleDriver"/> to use. If
+    ///     neither <paramref name="driver"/> or <paramref name="driverName"/> are specified the default driver for the
+    ///     platform will be used.
     /// </param>
     public static void Init (ConsoleDriver driver = null, string driverName = null) {
         InternalInit (() => new Toplevel (), driver, driverName);
@@ -229,7 +229,7 @@ public static partial class Application {
         if (Driver == null) {
             PlatformID p = Environment.OSVersion.Platform;
             if (string.IsNullOrEmpty (ForceDriver)) {
-                if ((p == PlatformID.Win32NT) || (p == PlatformID.Win32S) || (p == PlatformID.Win32Windows)) {
+                if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
                     Driver = new WindowsDriver ();
                 } else {
                     Driver = new CursesDriver ();
@@ -324,17 +324,17 @@ public static partial class Application {
     ///     created in <see cref="Begin(Toplevel)"/> and this event will be fired before that function exits.
     /// </summary>
     /// <remarks>
-    ///     If <see cref="EndAfterFirstIteration"/> is <see langword="true"/> callers to <see cref="Begin(Toplevel)"/>
-    ///     must also subscribe to <see cref="NotifyStopRunState"/> and manually dispose of the <see cref="RunState"/> token
-    ///     when the application is done.
+    ///     If <see cref="EndAfterFirstIteration"/> is <see langword="true"/> callers to <see cref="Begin(Toplevel)"/> must
+    ///     also subscribe to <see cref="NotifyStopRunState"/> and manually dispose of the <see cref="RunState"/> token when
+    ///     the application is done.
     /// </remarks>
     public static event EventHandler<RunStateEventArgs> NotifyNewRunState;
 
     /// <summary>Notify that a existent <see cref="RunState"/> is stopping (<see cref="End(RunState)"/> was called).</summary>
     /// <remarks>
-    ///     If <see cref="EndAfterFirstIteration"/> is <see langword="true"/> callers to <see cref="Begin(Toplevel)"/>
-    ///     must also subscribe to <see cref="NotifyStopRunState"/> and manually dispose of the <see cref="RunState"/> token
-    ///     when the application is done.
+    ///     If <see cref="EndAfterFirstIteration"/> is <see langword="true"/> callers to <see cref="Begin(Toplevel)"/> must
+    ///     also subscribe to <see cref="NotifyStopRunState"/> and manually dispose of the <see cref="RunState"/> token when
+    ///     the application is done.
     /// </remarks>
     public static event EventHandler<ToplevelEventArgs> NotifyStopRunState;
 
@@ -345,9 +345,9 @@ public static partial class Application {
     /// </returns>
     /// <param name="Toplevel">The <see cref="Toplevel"/> to prepare execution for.</param>
     /// <remarks>
-    ///     This method prepares the provided <see cref="Toplevel"/> for running with the focus, it adds this to the list
-    ///     of <see cref="Toplevel"/>s, lays out the Subviews, focuses the first element, and draws the <see cref="Toplevel"/>
-    ///     in the screen. This is usually followed by executing the <see cref="RunLoop"/> method, and then the
+    ///     This method prepares the provided <see cref="Toplevel"/> for running with the focus, it adds this to the list of
+    ///     <see cref="Toplevel"/>s, lays out the Subviews, focuses the first element, and draws the <see cref="Toplevel"/> in
+    ///     the screen. This is usually followed by executing the <see cref="RunLoop"/> method, and then the
     ///     <see cref="End(RunState)"/> method upon termination which will undo these changes.
     /// </remarks>
     public static RunState Begin (Toplevel Toplevel) {
@@ -406,12 +406,12 @@ public static partial class Application {
             }
         }
 
-        if ((Top == null) || Toplevel.IsOverlappedContainer) {
+        if (Top == null || Toplevel.IsOverlappedContainer) {
             Top = Toplevel;
         }
 
         var refreshDriver = true;
-        if ((OverlappedTop == null) || Toplevel.IsOverlappedContainer || (Current?.Modal == false && Toplevel.Modal)
+        if (OverlappedTop == null || Toplevel.IsOverlappedContainer || (Current?.Modal == false && Toplevel.Modal)
             || (Current?.Modal == false && !Toplevel.Modal) || (Current?.Modal == true && Toplevel.Modal)) {
             if (Toplevel.Visible) {
                 Current = Toplevel;
@@ -469,8 +469,8 @@ public static partial class Application {
     /// <remarks>See <see cref="Run(Toplevel, Func{Exception, bool})"/> for more details.</remarks>
     /// <param name="errorHandler"></param>
     /// <param name="driver">
-    ///     The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the platform will
-    ///     be used (<see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>). Must be
+    ///     The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the platform will be used (
+    ///     <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>). Must be
     ///     <see langword="null"/> if <see cref="Init"/> has already been called.
     /// </param>
     public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
@@ -505,8 +505,8 @@ public static partial class Application {
     /// <summary>Runs the main loop on the given <see cref="Toplevel"/> container.</summary>
     /// <remarks>
     ///     <para>
-    ///         This method is used to start processing events for the main application, but it is also used to run other
-    ///         modal <see cref="View"/>s such as <see cref="Dialog"/> boxes.
+    ///         This method is used to start processing events for the main application, but it is also used to run other modal
+    ///         <see cref="View"/>s such as <see cref="Dialog"/> boxes.
     ///     </para>
     ///     <para>
     ///         To make a <see cref="Run(Toplevel, Func{Exception, bool})"/> stop execution, call
@@ -566,13 +566,11 @@ public static partial class Application {
 
     /// <summary>Adds a timeout to the application.</summary>
     /// <remarks>
-    ///     When time specified passes, the callback will be invoked. If the callback returns true, the timeout will be
-    ///     reset, repeating the invocation. If it returns false, the timeout will stop and be removed. The returned value is a
-    ///     token that can be used to stop the timeout by calling <see cref="RemoveTimeout(object)"/>.
+    ///     When time specified passes, the callback will be invoked. If the callback returns true, the timeout will be reset,
+    ///     repeating the invocation. If it returns false, the timeout will stop and be removed. The returned value is a token
+    ///     that can be used to stop the timeout by calling <see cref="RemoveTimeout(object)"/>.
     /// </remarks>
-    public static object AddTimeout (TimeSpan time, Func<bool> callback) {
-        return MainLoop?.AddTimeout (time, callback);
-    }
+    public static object AddTimeout (TimeSpan time, Func<bool> callback) => MainLoop?.AddTimeout (time, callback);
 
     /// <summary>Removes a previously scheduled timeout</summary>
     /// <remarks>The token parameter is the value returned by <see cref="AddTimeout"/>.</remarks>
@@ -584,7 +582,7 @@ public static partial class Application {
     /// This method also returns
     /// <c>false</c>
     /// if the timeout is not found.
-    public static bool RemoveTimeout (object token) { return MainLoop?.RemoveTimeout (token) ?? false; }
+    public static bool RemoveTimeout (object token) => MainLoop?.RemoveTimeout (token) ?? false;
 
     /// <summary>Runs <paramref name="action"/> on the thread that is processing events</summary>
     /// <param name="action">the action to be invoked on the main processing thread.</param>
@@ -631,8 +629,8 @@ public static partial class Application {
     internal static MainLoop MainLoop { get; private set; }
 
     /// <summary>
-    ///     Set to true to cause <see cref="End"/> to be called after the first iteration. Set to false (the default) to
-    ///     cause the application to continue running until Application.RequestStop () is called.
+    ///     Set to true to cause <see cref="End"/> to be called after the first iteration. Set to false (the default) to cause
+    ///     the application to continue running until Application.RequestStop () is called.
     /// </summary>
     public static bool EndAfterFirstIteration { get; set; }
 
@@ -641,7 +639,7 @@ public static partial class Application {
     // users use async/await on their code
     //
     private class MainLoopSyncContext : SynchronizationContext {
-        public override SynchronizationContext CreateCopy () { return new MainLoopSyncContext (); }
+        public override SynchronizationContext CreateCopy () => new MainLoopSyncContext ();
 
         public override void Post (SendOrPostCallback d, object state) {
             MainLoop.AddIdle (
@@ -703,8 +701,8 @@ public static partial class Application {
     /// <summary>Run one application iteration.</summary>
     /// <param name="state">The state returned by <see cref="Begin(Toplevel)"/>.</param>
     /// <param name="firstIteration">
-    ///     Set to <see langword="true"/> if this is the first run loop iteration. Upon return, it
-    ///     will be set to <see langword="false"/> if at least one iteration happened.
+    ///     Set to <see langword="true"/> if this is the first run loop iteration. Upon return, it will be set to
+    ///     <see langword="false"/> if at least one iteration happened.
     /// </param>
     public static void RunIteration (ref RunState state, ref bool firstIteration) {
         if (MainLoop.Running && MainLoop.EventsPending ()) {
@@ -741,8 +739,8 @@ public static partial class Application {
         }
 
         if (_topLevels.Count == 1 && state.Toplevel == Top
-                                  && ((Driver.Cols != state.Toplevel.Frame.Width)
-                                      || (Driver.Rows != state.Toplevel.Frame.Height))
+                                  && (Driver.Cols != state.Toplevel.Frame.Width
+                                      || Driver.Rows != state.Toplevel.Frame.Height)
                                   && (state.Toplevel.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay
                                                                   || state.Toplevel.LayoutNeeded)) {
             state.Toplevel.Clear (Driver.Bounds);
@@ -776,12 +774,12 @@ public static partial class Application {
     ///     </para>
     /// </remarks>
     public static void RequestStop (Toplevel top = null) {
-        if ((OverlappedTop == null) || (top == null) || (OverlappedTop == null && top != null)) {
+        if (OverlappedTop == null || top == null || (OverlappedTop == null && top != null)) {
             top = Current;
         }
 
         if (OverlappedTop != null && top.IsOverlappedContainer && top?.Running == true
-            && ((Current?.Modal == false) || (Current?.Modal == true && Current?.Running == false))) {
+            && (Current?.Modal == false || (Current?.Modal == true && Current?.Running == false))) {
             OverlappedTop.RequestStop ();
         } else if (OverlappedTop != null && top != Current && Current?.Running == true && Current?.Modal == true
                    && top.Modal && top.Running) {
@@ -820,7 +818,7 @@ public static partial class Application {
             OnNotifyStopRunState (Current);
         } else {
             Toplevel currentTop;
-            if ((top == Current) || (Current?.Modal == true && !top.Modal)) {
+            if (top == Current || (Current?.Modal == true && !top.Modal)) {
                 currentTop = Current;
             } else {
                 currentTop = top;
@@ -928,7 +926,7 @@ public static partial class Application {
     public static Toplevel Current { get; private set; }
 
     private static void EnsureModalOrVisibleAlwaysOnTop (Toplevel Toplevel) {
-        if (!Toplevel.Running || (Toplevel == Current && Toplevel.Visible) || (OverlappedTop == null)
+        if (!Toplevel.Running || (Toplevel == Current && Toplevel.Visible) || OverlappedTop == null
             || _topLevels.Peek ().Modal) {
             return;
         }
@@ -1094,8 +1092,8 @@ public static partial class Application {
     public static View WantContinuousButtonPressedView { get; private set; }
 
     /// <summary>
-    ///     Gets the view that grabbed the mouse (e.g. for dragging). When this is set, all mouse events will be routed to
-    ///     this view until the view calls <see cref="UngrabMouse"/> or the mouse is released.
+    ///     Gets the view that grabbed the mouse (e.g. for dragging). When this is set, all mouse events will be routed to this
+    ///     view until the view calls <see cref="UngrabMouse"/> or the mouse is released.
     /// </summary>
     public static View MouseGrabView { get; private set; }
 
@@ -1112,8 +1110,8 @@ public static partial class Application {
     public static event EventHandler<ViewEventArgs> UnGrabbedMouse;
 
     /// <summary>
-    ///     Grabs the mouse, forcing all mouse events to be routed to the specified view until <see cref="UngrabMouse"/>
-    ///     is called.
+    ///     Grabs the mouse, forcing all mouse events to be routed to the specified view until <see cref="UngrabMouse"/> is
+    ///     called.
     /// </summary>
     /// <param name="view">View that will receive all mouse events until <see cref="UngrabMouse"/> is invoked.</param>
     public static void GrabMouse (View view) {
@@ -1183,8 +1181,8 @@ public static partial class Application {
     /// <summary>Event fired when a mouse move or click occurs. Coordinates are screen relative.</summary>
     /// <remarks>
     ///     <para>
-    ///         Use this event to receive mouse events in screen coordinates. Use <see cref="Responder.MouseEvent"/> to
-    ///         receive mouse events relative to a <see cref="View"/>'s bounds.
+    ///         Use this event to receive mouse events in screen coordinates. Use <see cref="Responder.MouseEvent"/> to receive
+    ///         mouse events relative to a <see cref="View"/>'s bounds.
     ///     </para>
     ///     <para>The <see cref="MouseEvent.View"/> will contain the <see cref="View"/> that contains the mouse coordinates.</para>
     /// </remarks>
@@ -1194,9 +1192,7 @@ public static partial class Application {
     /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
     /// <param name="a">The mouse event with coordinates relative to the screen.</param>
     public static void OnMouseEvent (MouseEventEventArgs a) {
-        static bool OutsideRect (Point p, Rect r) {
-            return (p.X < 0) || (p.X > r.Right) || (p.Y < 0) || (p.Y > r.Bottom);
-        }
+        static bool OutsideRect (Point p, Rect r) => p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom;
 
         if (IsMouseDisabled) {
             return;
@@ -1247,7 +1243,7 @@ public static partial class Application {
             }
         }
 
-        if (((view == null) || (view == OverlappedTop)) &&
+        if ((view == null || view == OverlappedTop) &&
             Current is { Modal: false } && OverlappedTop != null &&
             a.MouseEvent.Flags != MouseFlags.ReportMousePosition &&
             a.MouseEvent.Flags != 0) {
@@ -1452,9 +1448,9 @@ public static partial class Application {
     public static event EventHandler<Key> KeyDown;
 
     /// <summary>
-    ///     Called by the <see cref="ConsoleDriver"/> when the user presses a key. Fires the <see cref="KeyDown"/> event
-    ///     then calls <see cref="View.NewKeyDownEvent"/> on all top level views. Called after <see cref="OnKeyDown"/> and
-    ///     before <see cref="OnKeyUp"/>.
+    ///     Called by the <see cref="ConsoleDriver"/> when the user presses a key. Fires the <see cref="KeyDown"/> event then
+    ///     calls <see cref="View.NewKeyDownEvent"/> on all top level views. Called after <see cref="OnKeyDown"/> and before
+    ///     <see cref="OnKeyUp"/>.
     /// </summary>
     /// <remarks>Can be used to simulate key press events.</remarks>
     /// <param name="keyEvent"></param>
@@ -1516,8 +1512,8 @@ public static partial class Application {
     public static event EventHandler<Key> KeyUp;
 
     /// <summary>
-    ///     Called by the <see cref="ConsoleDriver"/> when the user releases a key. Fires the <see cref="KeyUp"/> event
-    ///     then calls <see cref="View.NewKeyUpEvent"/> on all top level views. Called after <see cref="OnKeyDown"/>.
+    ///     Called by the <see cref="ConsoleDriver"/> when the user releases a key. Fires the <see cref="KeyUp"/> event then
+    ///     calls <see cref="View.NewKeyUpEvent"/> on all top level views. Called after <see cref="OnKeyDown"/>.
     /// </summary>
     /// <remarks>Can be used to simulate key press events.</remarks>
     /// <param name="a"></param>

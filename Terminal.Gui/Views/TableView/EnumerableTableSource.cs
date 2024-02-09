@@ -46,8 +46,8 @@ public class EnumerableTableSource<T> : IEnumerableTableSource<T> {
     public string[] ColumnNames { get; }
 
     /// <inheritdoc/>
-    public IEnumerable<T> GetAllObjects () { return Data; }
+    public IEnumerable<T> GetAllObjects () => Data;
 
     /// <inheritdoc/>
-    public T GetObjectOnRow (int row) { return Data.ElementAt (row); }
+    public T GetObjectOnRow (int row) => Data.ElementAt (row);
 }

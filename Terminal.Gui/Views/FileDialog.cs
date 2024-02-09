@@ -5,8 +5,8 @@ using Terminal.Gui.Resources;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Modal dialog for selecting files/directories. Has auto-complete and expandable navigation pane (Recent, Root
-///     drives etc).
+///     Modal dialog for selecting files/directories. Has auto-complete and expandable navigation pane (Recent, Root drives
+///     etc).
 /// </summary>
 public class FileDialog : Dialog {
     /// <summary>Initializes a new instance of the <see cref="FileDialog"/> class.</summary>
@@ -264,14 +264,17 @@ public class FileDialog : Dialog {
     ///     Gets or Sets a value indicating whether to allow selecting multiple existing files/directories. Defaults to
     ///     false.
     /// </summary>
-    public bool AllowsMultipleSelection { get => _tableView.MultiSelect; set => _tableView.MultiSelect = value; }
+    public bool AllowsMultipleSelection {
+        get => _tableView.MultiSelect;
+        set => _tableView.MultiSelect = value;
+    }
 
     /// <summary>Gets a value indicating whether the <see cref="FileDialog"/> was closed without confirming a selection.</summary>
     public bool Canceled { get; private set; } = true;
 
     /// <summary>
-    ///     True if the file/folder must exist already to be selected. This prevents user from entering the name of
-    ///     something that doesn't exist. Defaults to false.
+    ///     True if the file/folder must exist already to be selected. This prevents user from entering the name of something
+    ///     that doesn't exist. Defaults to false.
     /// </summary>
     public bool MustExist { get; set; }
 
@@ -285,12 +288,10 @@ public class FileDialog : Dialog {
     public IAllowedType CurrentFilter { get; private set; }
 
     /// <summary>
-    ///     Gets or sets behavior of the <see cref="FileDialog"/> when the user attempts to delete a selected file(s).
-    ///     Set to null to prevent deleting.
+    ///     Gets or sets behavior of the <see cref="FileDialog"/> when the user attempts to delete a selected file(s). Set to
+    ///     null to prevent deleting.
     /// </summary>
-    /// <remarks>
-    ///     Ensure you use a try/catch block with appropriate error handling (e.g. showing a <see cref="MessageBox"/>
-    /// </remarks>
+    /// <remarks>Ensure you use a try/catch block with appropriate error handling (e.g. showing a <see cref="MessageBox"/></remarks>
     public IFileOperations FileOperationsHandler { get; set; } = new DefaultFileOperations ();
 
     /// <summary>The maximum number of results that will be collected when searching before stopping.</summary>
@@ -307,18 +308,18 @@ public class FileDialog : Dialog {
         = Enumerable.Empty<string> ().ToList ().AsReadOnly ();
 
     /// <summary>
-    ///     Defines how the dialog matches files/folders when using the search box. Provide a custom implementation if you
-    ///     want to tailor how matching is performed.
+    ///     Defines how the dialog matches files/folders when using the search box. Provide a custom implementation if you want
+    ///     to tailor how matching is performed.
     /// </summary>
     public ISearchMatcher SearchMatcher { get; set; } = new DefaultSearchMatcher ();
 
     /// <summary>
-    ///     Gets or Sets a collection of file types that the user can/must select. Only applies when
-    ///     <see cref="OpenMode"/> is <see cref="OpenMode.File"/> or <see cref="OpenMode.Mixed"/>.
+    ///     Gets or Sets a collection of file types that the user can/must select. Only applies when <see cref="OpenMode"/> is
+    ///     <see cref="OpenMode.File"/> or <see cref="OpenMode.Mixed"/>.
     /// </summary>
     /// <remarks>
-    ///     <see cref="AllowedTypeAny"/> adds the option to select any type (*.*). If this collection is empty then any
-    ///     type is supported and no Types drop-down is shown.
+    ///     <see cref="AllowedTypeAny"/> adds the option to select any type (*.*). If this collection is empty then any type is
+    ///     supported and no Types drop-down is shown.
     /// </remarks>
     public List<IAllowedType> AllowedTypes { get; set; } = [];
 
@@ -344,8 +345,8 @@ public class FileDialog : Dialog {
     internal FileDialogState State { get; private set; }
 
     /// <summary>
-    ///     Event fired when user attempts to confirm a selection (or multi selection). Allows you to cancel the selection
-    ///     or undertake alternative behavior e.g. open a dialog "File already exists, Overwrite? yes/no".
+    ///     Event fired when user attempts to confirm a selection (or multi selection). Allows you to cancel the selection or
+    ///     undertake alternative behavior e.g. open a dialog "File already exists, Overwrite? yes/no".
     /// </summary>
     public event EventHandler<FilesSelectedEventArgs> FilesSelected;
 
@@ -772,10 +773,10 @@ public class FileDialog : Dialog {
         Application.RequestStop ();
     }
 
-    private string GetBackButtonText () { return Glyphs.LeftArrow + "-"; }
+    private string GetBackButtonText () => Glyphs.LeftArrow + "-";
 
     private IFileSystemInfo[] GetFocusedFiles () {
-        if (!_tableView.HasFocus || !_tableView.CanFocus || (FileOperationsHandler == null)) {
+        if (!_tableView.HasFocus || !_tableView.CanFocus || FileOperationsHandler == null) {
             return null;
         }
 
@@ -794,7 +795,7 @@ public class FileDialog : Dialog {
             .ToArray ();
     }
 
-    private string GetForwardButtonText () { return "-" + Glyphs.RightArrow; }
+    private string GetForwardButtonText () => "-" + Glyphs.RightArrow;
 
     private string GetProposedNewSortOrder (int clickedCol, out bool isAsc) {
         // work out new sort order
@@ -809,13 +810,11 @@ public class FileDialog : Dialog {
         return string.Format (Strings.fdCtxSortAsc, _tableView.Table.ColumnNames[clickedCol]);
     }
 
-    private string GetToggleSplitterText (bool isExpanded) {
-        return isExpanded
-                   ? new string ((char)Glyphs.LeftArrow.Value, 2)
-                   : new string ((char)Glyphs.RightArrow.Value, 2);
-    }
+    private string GetToggleSplitterText (bool isExpanded) => isExpanded
+                                                                  ? new string ((char)Glyphs.LeftArrow.Value, 2)
+                                                                  : new string ((char)Glyphs.RightArrow.Value, 2);
 
-    private string GetUpButtonText () { return Style.UseUnicodeCharacters ? "◭" : "▲"; }
+    private string GetUpButtonText () => Style.UseUnicodeCharacters ? "◭" : "▲";
 
     private void HideColumn (int clickedCol) {
         ColumnStyle style = _tableView.Style.GetOrCreateColumnStyle (clickedCol);
@@ -1068,7 +1067,7 @@ public class FileDialog : Dialog {
     //			return base.OnHotKey (keyEvent);
     //		}
     private void RestartSearch () {
-        if (_disposed || (State?.Directory == null)) {
+        if (_disposed || State?.Directory == null) {
             return;
         }
 
@@ -1077,7 +1076,7 @@ public class FileDialog : Dialog {
         }
 
         // user is clearing search terms
-        if ((_tbFind.Text == null) || (_tbFind.Text.Length == 0)) {
+        if (_tbFind.Text == null || _tbFind.Text.Length == 0) {
             // Wait for search cancellation (if any) to finish
             // then push the current dir state
             lock (_onlyOneSearchLock) {
@@ -1090,7 +1089,7 @@ public class FileDialog : Dialog {
         PushState (new SearchState (State?.Directory, this, _tbFind.Text), true);
     }
 
-    private FileSystemInfoStats RowToStats (int rowIndex) { return State?.Children[rowIndex]; }
+    private FileSystemInfoStats RowToStats (int rowIndex) => State?.Children[rowIndex];
 
     private void ShowCellContextMenu (Point? clickedCell, MouseEventEventArgs e) {
         if (clickedCell == null) {
@@ -1154,9 +1153,8 @@ public class FileDialog : Dialog {
         return _fileSystem.DirectoryInfo.New (path);
     }
 
-    private static string StripArrows (string columnName) {
-        return columnName.Replace (" (▼)", string.Empty).Replace (" (▲)", string.Empty);
-    }
+    private static string StripArrows (string columnName) =>
+        columnName.Replace (" (▼)", string.Empty).Replace (" (▲)", string.Empty);
 
     private void SuppressIfBadChar (Key k) {
         // don't let user type bad letters
@@ -1198,7 +1196,7 @@ public class FileDialog : Dialog {
     }
 
     private void TableView_SelectedCellChanged (object sender, SelectedCellChangedEventArgs obj) {
-        if (!_tableView.HasFocus || (obj.NewRow == -1) || (obj.Table.Rows == 0)) {
+        if (!_tableView.HasFocus || obj.NewRow == -1 || obj.Table.Rows == 0) {
             return;
         }
 
@@ -1312,7 +1310,7 @@ public class FileDialog : Dialog {
             return val.ToString ().Trim ('.');
         }
 
-        protected override int GetCollectionLength () { return _fileDialog.State?.Children.Length ?? 0; }
+        protected override int GetCollectionLength () => _fileDialog.State?.Children.Length ?? 0;
     }
 
     /// <summary>State representing a recursive search from <see cref="FileDialogState.Directory"/> downwards.</summary>

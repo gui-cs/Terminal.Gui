@@ -50,13 +50,9 @@ public class DynamicMenuBar : Scenario {
         private readonly IValueConverter _valueConverter;
         private readonly object _sourceDataContext;
         private readonly PropertyInfo _sourceBindingProperty;
-
         public string SourcePropertyName { get; }
-
         public string TargetPropertyName { get; }
-
         public View Source { get; }
-
         public View Target { get; }
 
         private void UpdateTarget () {
@@ -222,7 +218,7 @@ public class DynamicMenuBar : Scenario {
                     TextShortcut.Enabled =
                         CkbIsTopLevel.Checked == false && CkbSubMenu.Checked == false;
                 } else {
-                    if ((_menuItem == null && !_hasParent) || (_menuItem.Parent == null)) {
+                    if ((_menuItem == null && !_hasParent) || _menuItem.Parent == null) {
                         CkbSubMenu.Checked = true;
                         CkbSubMenu.SetNeedsDisplay ();
                         TextShortcut.Enabled = false;
@@ -268,21 +264,13 @@ public class DynamicMenuBar : Scenario {
 
         private bool _hasParent;
         private MenuItem _menuItem;
-
         public CheckBox CkbIsTopLevel { get; }
-
         public CheckBox CkbNullCheck { get; }
-
         public CheckBox CkbSubMenu { get; }
-
         public RadioGroup RbChkStyle { get; }
-
         public TextField TextHelp { get; }
-
         public TextField TextShortcut { get; }
-
         public TextField TextTitle { get; }
-
         public TextView TextAction { get; }
 
         public Action CreateAction (MenuItem menuItem, DynamicMenuItem item) {
@@ -442,13 +430,13 @@ public class DynamicMenuBar : Scenario {
                 }
             }
 
-            return (v == null) || !(v is DynamicMenuItem item) ? string.Empty : item.Action;
+            return v == null || !(v is DynamicMenuItem item) ? string.Empty : item.Action;
         }
 
         private bool HasSubMenus (MenuItem menuItem) {
             var menuBarItem = menuItem as MenuBarItem;
             if (menuBarItem != null && menuBarItem.Children != null &&
-                ((menuBarItem.Children.Length > 0) || (menuBarItem.Action == null))) {
+                (menuBarItem.Children.Length > 0 || menuBarItem.Action == null)) {
                 return true;
             }
 
@@ -458,7 +446,7 @@ public class DynamicMenuBar : Scenario {
         private bool IsTopLevel (MenuItem menuItem) {
             var topLevel = menuItem as MenuBarItem;
             if (topLevel != null && topLevel.Parent == null &&
-                ((topLevel.Children == null) || (topLevel.Children.Length == 0)) && topLevel.Action != null) {
+                (topLevel.Children == null || topLevel.Children.Length == 0) && topLevel.Action != null) {
                 return true;
             }
 
@@ -862,7 +850,7 @@ public class DynamicMenuBar : Scenario {
             };
 
             _btnRemoveMenuBar.Clicked += (s, e) => {
-                if ((_menuBar == null) || (_menuBar.Menus.Length == 0)) {
+                if (_menuBar == null || _menuBar.Menus.Length == 0) {
                     return;
                 }
 
@@ -1072,34 +1060,24 @@ public class DynamicMenuBar : Scenario {
         private MenuBar _menuBar;
         private MenuItem _currentEditMenuBarItem;
         private MenuItem _currentMenuBarItem;
-
         public DynamicMenuItemModel DataContext { get; set; }
     }
 
     public class DynamicMenuItem {
         public bool AllowNullChecked { get; set; }
-
         public bool HasSubMenu { get; set; }
-
         public bool IsTopLevel { get; set; }
-
         public MenuItemCheckStyle CheckStyle { get; set; }
-
         public string Action { get; set; } = string.Empty;
-
         public string Help { get; set; } = string.Empty;
-
         public string Shortcut { get; set; }
-
         public string Title { get; set; } = "_New";
     }
 
     public class DynamicMenuItemList {
         public MenuItem MenuItem { get; set; }
-
         public string Title { get; set; }
-
-        public override string ToString () { return $"{Title}, {MenuItem}"; }
+        public override string ToString () => $"{Title}, {MenuItem}";
     }
 
     public class DynamicMenuItemModel : INotifyPropertyChanged {
@@ -1154,8 +1132,7 @@ public class DynamicMenuBar : Scenario {
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        public string GetPropertyName ([CallerMemberName] string propertyName = null) { return propertyName; }
+        public string GetPropertyName ([CallerMemberName] string propertyName = null) => propertyName;
     }
 
     public interface IValueConverter {
@@ -1163,7 +1140,7 @@ public class DynamicMenuBar : Scenario {
     }
 
     public class ListWrapperConverter : IValueConverter {
-        public object Convert (object value, object parameter = null) { return new ListWrapper ((IList)value); }
+        public object Convert (object value, object parameter = null) => new ListWrapper ((IList)value);
     }
 
     public class UStringValueConverter : IValueConverter {

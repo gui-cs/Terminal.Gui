@@ -278,6 +278,6 @@ public class ResponderTests {
     }
 
     public class DerivedView : View {
-        public override bool OnKeyDown (Key keyEvent) { return true; }
+        public override bool OnKeyDown (Key keyEvent) => true;
     }
 }

@@ -15,7 +15,7 @@ public class CheckBoxTableSourceWrapperByIndex : CheckBoxTableSourceWrapperBase 
     protected override void ClearAllToggles () { CheckedRows.Clear (); }
 
     /// <inheritdoc/>
-    protected override bool IsChecked (int row) { return CheckedRows.Contains (row); }
+    protected override bool IsChecked (int row) => CheckedRows.Contains (row);
 
     /// <inheritdoc/>
     protected override void ToggleAllRows () {

@@ -56,8 +56,8 @@ public partial class View {
     ///         <see cref="AddKeyBindingsForHotKey"/>.
     ///     </para>
     ///     <para>
-    ///         By default, when the HotKey is set to <see cref="Key.A"/> through <see cref="KeyCode.Z"/> key bindings will
-    ///         be added for both the un-shifted and shifted versions. This means if the HotKey is <see cref="Key.A"/>, key
+    ///         By default, when the HotKey is set to <see cref="Key.A"/> through <see cref="KeyCode.Z"/> key bindings will be
+    ///         added for both the un-shifted and shifted versions. This means if the HotKey is <see cref="Key.A"/>, key
     ///         bindings for <c>Key.A</c> and <c>Key.A.WithShift</c> will be added. This behavior can be overriden by
     ///         overriding <see cref="AddKeyBindingsForHotKey"/>.
     ///     </para>
@@ -82,8 +82,8 @@ public partial class View {
     }
 
     /// <summary>
-    ///     Adds key bindings for the specified HotKey. Useful for views that contain multiple items that each have their
-    ///     own HotKey such as <see cref="RadioGroup"/>.
+    ///     Adds key bindings for the specified HotKey. Useful for views that contain multiple items that each have their own
+    ///     HotKey such as <see cref="RadioGroup"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -91,9 +91,9 @@ public partial class View {
     ///         (e.g. <c>Key.D3.WithAlt</c> This behavior can be overriden by overriding <see cref="AddKeyBindingsForHotKey"/>.
     ///     </para>
     ///     <para>
-    ///         By default, when <paramref name="hotKey"/> is <see cref="Key.A"/> through <see cref="Key.Z"/> key bindings
-    ///         will be added for both the un-shifted and shifted versions. This means if the HotKey is <see cref="Key.A"/>,
-    ///         key bindings for <c>Key.A</c> and <c>Key.A.WithShift</c> will be added. This behavior can be overriden by
+    ///         By default, when <paramref name="hotKey"/> is <see cref="Key.A"/> through <see cref="Key.Z"/> key bindings will
+    ///         be added for both the un-shifted and shifted versions. This means if the HotKey is <see cref="Key.A"/>, key
+    ///         bindings for <c>Key.A</c> and <c>Key.A.WithShift</c> will be added. This behavior can be overriden by
     ///         overriding <see cref="AddKeyBindingsForHotKey"/>.
     ///     </para>
     ///     <para>
@@ -113,7 +113,7 @@ public partial class View {
         Key newKey = hotKey;
 
         Key baseKey = newKey.NoAlt.NoShift.NoCtrl;
-        if (newKey != Key.Empty && ((baseKey == Key.Space) || Rune.IsControl (baseKey.AsRune))) {
+        if (newKey != Key.Empty && (baseKey == Key.Space || Rune.IsControl (baseKey.AsRune))) {
             throw new ArgumentException (@$"HotKey must be a printable (and non-space) key ({hotKey}).");
         }
 
@@ -188,7 +188,7 @@ public partial class View {
     }
 
     private void SetHotKey () {
-        if ((TextFormatter == null) || (HotKeySpecifier == new Rune ('\xFFFF'))) {
+        if (TextFormatter == null || HotKeySpecifier == new Rune ('\xFFFF')) {
             return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
         }
 
@@ -228,7 +228,7 @@ public partial class View {
                 return;
             }
 
-            if ((SuperView?._tabIndexes == null) || (SuperView?._tabIndexes.Count == 1)) {
+            if (SuperView?._tabIndexes == null || SuperView?._tabIndexes.Count == 1) {
                 _tabIndex = 0;
 
                 return;
@@ -252,7 +252,7 @@ public partial class View {
     private int GetTabIndex (int idx) {
         var i = 0;
         foreach (View v in SuperView._tabIndexes) {
-            if ((v._tabIndex == -1) || (v == this)) {
+            if (v._tabIndex == -1 || v == this) {
                 continue;
             }
 
@@ -277,9 +277,9 @@ public partial class View {
     private bool _tabStop = true;
 
     /// <summary>
-    ///     Gets or sets whether the view is a stop-point for keyboard navigation of focus. Will be <see langword="true"/>
-    ///     only if the <see cref="CanFocus"/> is also <see langword="true"/>. Set to <see langword="false"/> to prevent the
-    ///     view from being a stop-point for keyboard navigation.
+    ///     Gets or sets whether the view is a stop-point for keyboard navigation of focus. Will be <see langword="true"/> only
+    ///     if the <see cref="CanFocus"/> is also <see langword="true"/>. Set to <see langword="false"/> to prevent the view
+    ///     from being a stop-point for keyboard navigation.
     /// </summary>
     /// <remarks>
     ///     The default keyboard navigation keys are <c>Key.Tab</c> and <c>Key>Tab.WithShift</c>. These can be changed by
@@ -361,13 +361,13 @@ public partial class View {
     }
 
     /// <summary>
-    ///     Low-level API called when the user presses a key, allowing a view to pre-process the key down event. This is
-    ///     called from <see cref="NewKeyDownEvent"/> before <see cref="OnInvokingKeyBindings"/>.
+    ///     Low-level API called when the user presses a key, allowing a view to pre-process the key down event. This is called
+    ///     from <see cref="NewKeyDownEvent"/> before <see cref="OnInvokingKeyBindings"/>.
     /// </summary>
     /// <param name="keyEvent">Contains the details about the key that produced the event.</param>
     /// <returns>
-    ///     <see langword="false"/> if the key press was not handled. <see langword="true"/> if the keypress was handled
-    ///     and no other view should see it.
+    ///     <see langword="false"/> if the key press was not handled. <see langword="true"/> if the keypress was handled and no
+    ///     other view should see it.
     /// </returns>
     /// <remarks>
     ///     <para>
@@ -384,9 +384,9 @@ public partial class View {
     }
 
     /// <summary>
-    ///     Invoked when the user presses a key, allowing subscribers to pre-process the key down event. This is fired
-    ///     from <see cref="OnKeyDown"/> before <see cref="OnInvokingKeyBindings"/>. Set <see cref="Key.Handled"/> to true to
-    ///     stop the key from being processed by other views.
+    ///     Invoked when the user presses a key, allowing subscribers to pre-process the key down event. This is fired from
+    ///     <see cref="OnKeyDown"/> before <see cref="OnInvokingKeyBindings"/>. Set <see cref="Key.Handled"/> to true to stop
+    ///     the key from being processed by other views.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -398,13 +398,13 @@ public partial class View {
     public event EventHandler<Key> KeyDown;
 
     /// <summary>
-    ///     Low-level API called when the user presses a key, allowing views do things during key down events. This is
-    ///     called from <see cref="NewKeyDownEvent"/> after <see cref="OnInvokingKeyBindings"/>.
+    ///     Low-level API called when the user presses a key, allowing views do things during key down events. This is called
+    ///     from <see cref="NewKeyDownEvent"/> after <see cref="OnInvokingKeyBindings"/>.
     /// </summary>
     /// <param name="keyEvent">Contains the details about the key that produced the event.</param>
     /// <returns>
-    ///     <see langword="false"/> if the key press was not handled. <see langword="true"/> if the keypress was handled
-    ///     and no other view should see it.
+    ///     <see langword="false"/> if the key press was not handled. <see langword="true"/> if the keypress was handled and no
+    ///     other view should see it.
     /// </returns>
     /// <remarks>
     ///     <para>
@@ -421,10 +421,10 @@ public partial class View {
     ///         KeyUp events.
     ///     </para>
     /// </remarks>
-    public virtual bool OnProcessKeyDown (Key keyEvent) {
+    public virtual bool OnProcessKeyDown (Key keyEvent) =>
+
         //ProcessKeyDown?.Invoke (this, keyEvent);
-        return keyEvent.Handled;
-    }
+        keyEvent.Handled;
 
     /// <summary>
     ///     Invoked when the users presses a key, allowing subscribers to do things during key down events. Set
@@ -433,8 +433,8 @@ public partial class View {
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         SubViews can use the <see cref="ProcessKeyDown"/> of their super view override the default behavior of when
-    ///         key bindings are invoked.
+    ///         SubViews can use the <see cref="ProcessKeyDown"/> of their super view override the default behavior of when key
+    ///         bindings are invoked.
     ///     </para>
     ///     <para>
     ///         Not all terminals support distinct key up notifications; applications should avoid depending on distinct
@@ -449,8 +449,8 @@ public partial class View {
     #region KeyUp Event
 
     /// <summary>
-    ///     If the view is enabled, processes a new key up event and returns <see langword="true"/> if the event was
-    ///     handled. Called before <see cref="NewKeyDownEvent"/>.
+    ///     If the view is enabled, processes a new key up event and returns <see langword="true"/> if the event was handled.
+    ///     Called before <see cref="NewKeyDownEvent"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -521,8 +521,8 @@ public partial class View {
     ///     Invoked when a key is released. Set <see cref="Key.Handled"/> to true to stop the key up event from being processed
     ///     by other views.
     ///     <remarks>
-    ///         Not all terminals support key distinct down/up notifications, Applications should avoid depending on
-    ///         distinct KeyDown and KeyUp events and instead should use <see cref="KeyDown"/>.
+    ///         Not all terminals support key distinct down/up notifications, Applications should avoid depending on distinct
+    ///         KeyDown and KeyUp events and instead should use <see cref="KeyDown"/>.
     ///         <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     ///     </remarks>
     /// </summary>
@@ -540,8 +540,8 @@ public partial class View {
     private Dictionary<Command, Func<bool?>> CommandImplementations { get; } = new ();
 
     /// <summary>
-    ///     Low-level API called when a user presses a key; invokes any key bindings set on the view. This is called
-    ///     during <see cref="NewKeyDownEvent"/> after <see cref="OnKeyDown"/> has returned.
+    ///     Low-level API called when a user presses a key; invokes any key bindings set on the view. This is called during
+    ///     <see cref="NewKeyDownEvent"/> after <see cref="OnKeyDown"/> has returned.
     /// </summary>
     /// <remarks>
     ///     <para>Fires the <see cref="InvokingKeyBindings"/> event.</para>
@@ -549,13 +549,13 @@ public partial class View {
     /// </remarks>
     /// <param name="keyEvent">Contains the details about the key that produced the event.</param>
     /// <returns>
-    ///     <see langword="false"/> if the key press was not handled. <see langword="true"/> if the keypress was handled
-    ///     and no other view should see it.
+    ///     <see langword="false"/> if the key press was not handled. <see langword="true"/> if the keypress was handled and no
+    ///     other view should see it.
     /// </returns>
     public virtual bool? OnInvokingKeyBindings (Key keyEvent) {
         // fire event
         // BUGBUG: KeyEventArgs doesn't include scope, so the event never sees it.
-        if ((keyEvent.Scope == KeyBindingScope.Application) || (keyEvent.Scope == KeyBindingScope.HotKey)) {
+        if (keyEvent.Scope == KeyBindingScope.Application || keyEvent.Scope == KeyBindingScope.HotKey) {
             InvokingKeyBindings?.Invoke (this, keyEvent);
             if (keyEvent.Handled) {
                 return true;
@@ -597,8 +597,8 @@ public partial class View {
     }
 
     /// <summary>
-    ///     Invoked when a key is pressed that may be mapped to a key binding. Set <see cref="Key.Handled"/> to true to
-    ///     stop the key from being processed by other views.
+    ///     Invoked when a key is pressed that may be mapped to a key binding. Set <see cref="Key.Handled"/> to true to stop
+    ///     the key from being processed by other views.
     /// </summary>
     public event EventHandler<Key> InvokingKeyBindings;
 
@@ -608,9 +608,9 @@ public partial class View {
     /// </summary>
     /// <param name="keyEvent">The key event passed.</param>
     /// <returns>
-    ///     <see langword="null"/> if no command was bound the <paramref name="keyEvent"/>. <see langword="true"/> if
-    ///     commands were invoked and at least one handled the command. <see langword="false"/> if commands were invoked and at
-    ///     none handled the command.
+    ///     <see langword="null"/> if no command was bound the <paramref name="keyEvent"/>. <see langword="true"/> if commands
+    ///     were invoked and at least one handled the command. <see langword="false"/> if commands were invoked and at none
+    ///     handled the command.
     /// </returns>
     protected bool? InvokeKeyBindings (Key keyEvent) {
         bool? toReturn = null;
@@ -650,8 +650,8 @@ public partial class View {
     /// <summary>Invokes the specified command.</summary>
     /// <param name="command"></param>
     /// <returns>
-    ///     <see langword="null"/> if no command was found. <see langword="true"/> if the command was invoked and it
-    ///     handled the command. <see langword="false"/> if the command was invoked and it did not handle the command.
+    ///     <see langword="null"/> if no command was found. <see langword="true"/> if the command was invoked and it handled
+    ///     the command. <see langword="false"/> if the command was invoked and it did not handle the command.
     /// </returns>
     public bool? InvokeCommand (Command command) {
         if (!CommandImplementations.ContainsKey (command)) {
@@ -663,8 +663,8 @@ public partial class View {
 
     /// <summary>
     ///     <para>
-    ///         Sets the function that will be invoked for a <see cref="Command"/>. Views should call
-    ///         <see cref="AddCommand"/> for each command they support.
+    ///         Sets the function that will be invoked for a <see cref="Command"/>. Views should call <see cref="AddCommand"/>
+    ///         for each command they support.
     ///     </para>
     ///     <para>
     ///         If <see cref="AddCommand"/> has already been called for <paramref name="command"/> <paramref name="f"/> will
@@ -684,7 +684,7 @@ public partial class View {
 
     /// <summary>Returns all commands that are supported by this <see cref="View"/>.</summary>
     /// <returns></returns>
-    public IEnumerable<Command> GetSupportedCommands () { return CommandImplementations.Keys; }
+    public IEnumerable<Command> GetSupportedCommands () => CommandImplementations.Keys;
 
     // TODO: Add GetKeysBoundToCommand() - given a Command, return all Keys that would invoke it
 

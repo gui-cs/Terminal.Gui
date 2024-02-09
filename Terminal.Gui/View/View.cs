@@ -42,39 +42,39 @@ namespace Terminal.Gui;
 ///         more subviews, can respond to user input and render themselves on the screen.
 ///     </para>
 ///     <para>
-///         View supports two layout styles: <see cref="LayoutStyle.Absolute"/> or <see cref="LayoutStyle.Computed"/>.
-///         The style is determined by the values of <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and
+///         View supports two layout styles: <see cref="LayoutStyle.Absolute"/> or <see cref="LayoutStyle.Computed"/>. The
+///         style is determined by the values of <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and
 ///         <see cref="Height"/>. If any of these is set to non-absolute <see cref="Pos"/> or <see cref="Dim"/> object,
 ///         then the layout style is <see cref="LayoutStyle.Computed"/>. Otherwise it is <see cref="LayoutStyle.Absolute"/>
 ///         .
 ///     </para>
 ///     <para>
-///         To create a View using Absolute layout, call a constructor that takes a Rect parameter to specify the
-///         absolute position and size or simply set <see cref="View.Frame "/>). To create a View using Computed layout use
-///         a constructor that does not take a Rect parameter and set the X, Y, Width and Height properties on the view to
+///         To create a View using Absolute layout, call a constructor that takes a Rect parameter to specify the absolute
+///         position and size or simply set <see cref="View.Frame "/>). To create a View using Computed layout use a
+///         constructor that does not take a Rect parameter and set the X, Y, Width and Height properties on the view to
 ///         non-absolute values. Both approaches use coordinates that are relative to the <see cref="Bounds"/> of the
 ///         <see cref="SuperView"/> the View is added to.
 ///     </para>
 ///     <para>
-///         Computed layout is more flexible and supports dynamic console apps where controls adjust layout as the
-///         terminal resizes or other Views change size or position. The <see cref="X"/>, <see cref="Y"/>,
-///         <see cref="Width"/>, and <see cref="Height"/> properties are <see cref="Dim"/> and <see cref="Pos"/> objects
-///         that dynamically update the position of a view. The X and Y properties are of type <see cref="Pos"/> and you
-///         can use either absolute positions, percentages, or anchor points. The Width and Height properties are of type
-///         <see cref="Dim"/> and can use absolute position, percentages, and anchors. These are useful as they will take
-///         care of repositioning views when view's adornments are resized or if the terminal size changes.
+///         Computed layout is more flexible and supports dynamic console apps where controls adjust layout as the terminal
+///         resizes or other Views change size or position. The <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and
+///         <see cref="Height"/> properties are <see cref="Dim"/> and <see cref="Pos"/> objects that dynamically update the
+///         position of a view. The X and Y properties are of type <see cref="Pos"/> and you can use either absolute
+///         positions, percentages, or anchor points. The Width and Height properties are of type <see cref="Dim"/> and can
+///         use absolute position, percentages, and anchors. These are useful as they will take care of repositioning views
+///         when view's adornments are resized or if the terminal size changes.
 ///     </para>
 ///     <para>
-///         Absolute layout requires specifying coordinates and sizes of Views explicitly, and the View will typically
-///         stay in a fixed position and size. To change the position and size use the <see cref="Frame"/> property.
+///         Absolute layout requires specifying coordinates and sizes of Views explicitly, and the View will typically stay
+///         in a fixed position and size. To change the position and size use the <see cref="Frame"/> property.
 ///     </para>
 ///     <para>
-///         Subviews (child views) can be added to a View by calling the <see cref="Add(View)"/> method. The container of
-///         a View can be accessed with the <see cref="SuperView"/> property.
+///         Subviews (child views) can be added to a View by calling the <see cref="Add(View)"/> method. The container of a
+///         View can be accessed with the <see cref="SuperView"/> property.
 ///     </para>
 ///     <para>
-///         To flag a region of the View's <see cref="Bounds"/> to be redrawn call <see cref="SetNeedsDisplay(Rect)"/>.
-///         To flag the entire view for redraw call <see cref="SetNeedsDisplay()"/>.
+///         To flag a region of the View's <see cref="Bounds"/> to be redrawn call <see cref="SetNeedsDisplay(Rect)"/>. To
+///         flag the entire view for redraw call <see cref="SetNeedsDisplay()"/>.
 ///     </para>
 ///     <para>
 ///         The <see cref="LayoutSubviews"/> method is invoked when the size or layout of a view has changed. The default
@@ -99,8 +99,8 @@ namespace Terminal.Gui;
 ///         when the view is added to a <see cref="SuperView"/>.
 ///     </para>
 ///     <para>
-///         If first-run-only initialization is preferred, overrides to <see cref="ISupportInitializeNotification"/> can
-///         be implemented, in which case the <see cref="ISupportInitialize"/> methods will only be called if
+///         If first-run-only initialization is preferred, overrides to <see cref="ISupportInitializeNotification"/> can be
+///         implemented, in which case the <see cref="ISupportInitialize"/> methods will only be called if
 ///         <see cref="ISupportInitializeNotification.IsInitialized"/> is <see langword="false"/>. This allows proper
 ///         <see cref="View"/> inheritance hierarchies to override base class layout code optimally by doing so only on
 ///         first run, instead of on every run.
@@ -124,7 +124,7 @@ public partial class View : Responder, ISupportInitializeNotification {
         set {
             if (base.Enabled != value) {
                 if (value) {
-                    if ((SuperView == null) || (SuperView?.Enabled == true)) {
+                    if (SuperView == null || SuperView?.Enabled == true) {
                         base.Enabled = value;
                     }
                 } else {
@@ -177,8 +177,8 @@ public partial class View : Responder, ISupportInitializeNotification {
     }
 
     /// <summary>
-    ///     Points to the current driver in use by the view, it is a convenience property for simplifying the development
-    ///     of new views.
+    ///     Points to the current driver in use by the view, it is a convenience property for simplifying the development of
+    ///     new views.
     /// </summary>
     public static ConsoleDriver Driver => Application.Driver;
 
@@ -228,8 +228,8 @@ public partial class View : Responder, ISupportInitializeNotification {
     }
 
     /// <summary>
-    ///     Called before the <see cref="View.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can
-    ///     be cancelled.
+    ///     Called before the <see cref="View.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can be
+    ///     cancelled.
     /// </summary>
     /// <param name="oldTitle">The <see cref="View.Title"/> that is/has been replaced.</param>
     /// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
@@ -248,14 +248,14 @@ public partial class View : Responder, ISupportInitializeNotification {
     public event EventHandler<TitleEventArgs> TitleChanged;
 
     /// <summary>
-    ///     Event fired when the <see cref="View.Title"/> is changing. Set <see cref="TitleEventArgs.Cancel"/> to `true`
-    ///     to cancel the Title change.
+    ///     Event fired when the <see cref="View.Title"/> is changing. Set <see cref="TitleEventArgs.Cancel"/> to `true` to
+    ///     cancel the Title change.
     /// </summary>
     public event EventHandler<TitleEventArgs> TitleChanging;
 
     /// <summary>Pretty prints the View</summary>
     /// <returns></returns>
-    public override string ToString () { return $"{GetType ().Name}({Id}){Frame}"; }
+    public override string ToString () => $"{GetType ().Name}({Id}){Frame}";
 
     /// <summary>Event fired when the <see cref="Visible"/> value is being changed.</summary>
     public event EventHandler VisibleChanged;
@@ -307,8 +307,8 @@ public partial class View : Responder, ISupportInitializeNotification {
     ///     </para>
     ///     <para>If <see cref="Height"/> is greater than one, word wrapping is provided.</para>
     ///     <para>
-    ///         This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>.
-    ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
+    ///         This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>. Use
+    ///         <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
     ///         control the size and location of the view, changing it to  <see cref="LayoutStyle.Computed"/>.
     ///     </para>
     /// </remarks>
@@ -329,8 +329,8 @@ public partial class View : Responder, ISupportInitializeNotification {
     }
 
     /// <summary>
-    ///     Get or sets if  the <see cref="View"/> has been initialized (via <see cref="ISupportInitialize.BeginInit"/>
-    ///     and <see cref="ISupportInitialize.EndInit"/>).
+    ///     Get or sets if  the <see cref="View"/> has been initialized (via <see cref="ISupportInitialize.BeginInit"/> and
+    ///     <see cref="ISupportInitialize.EndInit"/>).
     /// </summary>
     /// <para>
     ///     If first-run-only initialization is preferred, overrides to
@@ -350,8 +350,8 @@ public partial class View : Responder, ISupportInitializeNotification {
     ///         when the <see cref="SuperView"/> is initialized.
     ///     </para>
     ///     <para>
-    ///         If first-run-only initialization is preferred, overrides to <see cref="ISupportInitializeNotification"/> can
-    ///         be implemented too, in which case the <see cref="ISupportInitialize"/> methods will only be called if
+    ///         If first-run-only initialization is preferred, overrides to <see cref="ISupportInitializeNotification"/> can be
+    ///         implemented too, in which case the <see cref="ISupportInitialize"/> methods will only be called if
     ///         <see cref="ISupportInitializeNotification.IsInitialized"/> is <see langword="false"/>. This allows proper
     ///         <see cref="View"/> inheritance hierarchies to override base class layout code optimally by doing so only on
     ///         first run, instead of on every run.

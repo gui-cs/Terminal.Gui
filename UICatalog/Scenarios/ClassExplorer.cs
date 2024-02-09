@@ -80,7 +80,7 @@ public class ClassExplorer : Scenario {
         Win.Add (_textView);
     }
 
-    private bool CanExpand (object arg) { return arg is Assembly || arg is Type || arg is ShowForType; }
+    private bool CanExpand (object arg) => arg is Assembly || arg is Type || arg is ShowForType;
 
     private IEnumerable<object> ChildGetter (object arg) {
         try {
@@ -171,7 +171,7 @@ public class ClassExplorer : Scenario {
         object val = e.NewValue;
         object[] all = _treeView.GetAllSelectedObjects ().ToArray ();
 
-        if ((val == null) || val is ShowForType) {
+        if (val == null || val is ShowForType) {
             return;
         }
 
@@ -253,17 +253,14 @@ public class ClassExplorer : Scenario {
         }
 
         public Showable ToShow { get; }
-
         public Type Type { get; }
 
         // Make sure to implement Equals methods on your objects if you intend to return new instances every time in ChildGetter
-        public override bool Equals (object obj) {
-            return obj is ShowForType type &&
-                   EqualityComparer<Type>.Default.Equals (Type, type.Type) &&
-                   ToShow == type.ToShow;
-        }
+        public override bool Equals (object obj) => obj is ShowForType type &&
+                                                    EqualityComparer<Type>.Default.Equals (Type, type.Type) &&
+                                                    ToShow == type.ToShow;
 
-        public override int GetHashCode () { return HashCode.Combine (Type, ToShow); }
-        public override string ToString () { return ToShow.ToString (); }
+        public override int GetHashCode () => HashCode.Combine (Type, ToShow);
+        public override string ToString () => ToShow.ToString ();
     }
 }

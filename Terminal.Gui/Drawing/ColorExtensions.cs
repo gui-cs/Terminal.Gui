@@ -2,7 +2,7 @@ using System.Collections.Frozen;
 
 namespace Terminal.Gui;
 
-static class ColorExtensions {
+internal static class ColorExtensions {
     static ColorExtensions () {
         Dictionary<ColorName, AnsiColorCode> nameToCodeMap = new () {
             { ColorName.Black, AnsiColorCode.BLACK },
@@ -49,12 +49,12 @@ static class ColorExtensions {
     private static FrozenDictionary<Color, ColorName> colorToNameMap;
 
     /// <summary>
-    ///     Gets or sets a <see cref="FrozenDictionary{TKey,TValue}"/> that maps legacy 16-color values to the
-    ///     corresponding <see cref="ColorName"/>.
+    ///     Gets or sets a <see cref="FrozenDictionary{TKey,TValue}"/> that maps legacy 16-color values to the corresponding
+    ///     <see cref="ColorName"/>.
     /// </summary>
     /// <remarks>
-    ///     Setter should be called as infrequently as possible, as <see cref="FrozenDictionary{TKey,TValue}"/> is
-    ///     expensive to create.
+    ///     Setter should be called as infrequently as possible, as <see cref="FrozenDictionary{TKey,TValue}"/> is expensive to
+    ///     create.
     /// </remarks>
     internal static FrozenDictionary<Color, ColorName> ColorToNameMap {
         get => colorToNameMap;

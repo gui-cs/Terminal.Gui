@@ -390,8 +390,8 @@ public class TableEditor : Scenario {
     }
 
     /// <summary>
-    ///     Builds a simple table in which cell values contents are the index of the cell.  This helps testing that
-    ///     scrolling etc is working correctly and not skipping out any rows/columns when paging
+    ///     Builds a simple table in which cell values contents are the index of the cell.  This helps testing that scrolling
+    ///     etc is working correctly and not skipping out any rows/columns when paging
     /// </summary>
     /// <param name="cols"></param>
     /// <param name="rows"></param>
@@ -755,7 +755,7 @@ public class TableEditor : Scenario {
         DataRow dr = null;
 
         for (var i = 0; i < runes.Count; i++) {
-            if ((dr == null) || (i % dt.Columns.Count == 0)) {
+            if (dr == null || i % dt.Columns.Count == 0) {
                 dr = dt.Rows.Add ();
             }
 
@@ -781,7 +781,7 @@ public class TableEditor : Scenario {
     private void CloseExample () { _tableView.Table = null; }
 
     private void EditCurrentCell (object sender, CellActivatedEventArgs e) {
-        if (e.Table is not DataTableSource || (_currentTable == null)) {
+        if (e.Table is not DataTableSource || _currentTable == null) {
             return;
         }
 
@@ -843,7 +843,7 @@ public class TableEditor : Scenario {
             return null;
         }
 
-        if ((_tableView.SelectedColumn < 0) || (_tableView.SelectedColumn > _tableView.Table.Columns)) {
+        if (_tableView.SelectedColumn < 0 || _tableView.SelectedColumn > _tableView.Table.Columns) {
             return null;
         }
 
@@ -899,7 +899,7 @@ public class TableEditor : Scenario {
         return Ranges.FirstOrDefault (r => u >= r.Start && u <= r.End)?.Category ?? "Unknown";
     }
 
-    private bool HasCheckboxes () { return _tableView.Table is CheckBoxTableSourceWrapperBase; }
+    private bool HasCheckboxes () => _tableView.Table is CheckBoxTableSourceWrapperBase;
 
     private void HideColumn (int clickedCol) {
         ColumnStyle style = _tableView.Style.GetOrCreateColumnStyle (clickedCol);
@@ -1192,9 +1192,8 @@ public class TableEditor : Scenario {
         _tableView.Update ();
     }
 
-    private string StripArrows (string columnName) {
-        return columnName.Replace ($"{CM.Glyphs.DownArrow}", "").Replace ($"{CM.Glyphs.UpArrow}", "");
-    }
+    private string StripArrows (string columnName) =>
+        columnName.Replace ($"{CM.Glyphs.DownArrow}", "").Replace ($"{CM.Glyphs.UpArrow}", "");
 
     private void TableViewKeyPress (object sender, Key e) {
         if (_currentTable == null) {
@@ -1394,9 +1393,10 @@ public class TableEditor : Scenario {
         return col;
     }
 
-    private string TrimArrows (string columnName) {
-        return columnName.TrimEnd ((char)CM.Glyphs.UpArrow.Value, (char)CM.Glyphs.DownArrow.Value);
-    }
+    private string TrimArrows (string columnName) => columnName.TrimEnd (
+        (char)CM.Glyphs.UpArrow.Value,
+        (char)CM.Glyphs.DownArrow.Value
+    );
 
     private class UnicodeRange {
         public UnicodeRange (uint start, uint end, string category) {

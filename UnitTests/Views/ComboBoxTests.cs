@@ -91,7 +91,7 @@ public class ComboBoxTests {
     [AutoInitShutdown]
     public void Expanded_Collapsed_Events () {
         var cb = new ComboBox { Height = 4, Width = 5 };
-        List<string> list = new() { "One", "Two", "Three" };
+        List<string> list = new () { "One", "Two", "Three" };
 
         cb.Expanded += (s, e) => cb.SetSource (list);
         cb.Collapsed += (s, e) => cb.Source = null;
@@ -765,7 +765,7 @@ Three ",
     [Fact]
     [AutoInitShutdown]
     public void KeyBindings_Command () {
-        List<string> source = new() { "One", "Two", "Three" };
+        List<string> source = new () { "One", "Two", "Three" };
         var cb = new ComboBox { Width = 10 };
         cb.SetSource (source);
         Application.Top.Add (cb);

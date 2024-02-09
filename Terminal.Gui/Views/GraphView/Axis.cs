@@ -74,14 +74,12 @@ public abstract class Axis {
     /// <param name="y"></param>
     protected abstract void DrawAxisLine (GraphView graph, int x, int y);
 
-    private string DefaultLabelGetter (AxisIncrementToRender toRender) { return toRender.Value.ToString ("N0"); }
+    private string DefaultLabelGetter (AxisIncrementToRender toRender) => toRender.Value.ToString ("N0");
 }
 
 /// <summary>The horizontal (x axis) of a <see cref="GraphView"/></summary>
 public class HorizontalAxis : Axis {
-    /// <summary>
-    ///     Creates a new instance of axis with an <see cref="Orientation"/> of <see cref="Orientation.Horizontal"/>
-    /// </summary>
+    /// <summary>Creates a new instance of axis with an <see cref="Orientation"/> of <see cref="Orientation.Horizontal"/></summary>
     public HorizontalAxis () : base (Orientation.Horizontal) { }
 
     /// <summary>
@@ -126,7 +124,7 @@ public class HorizontalAxis : Axis {
 
     /// <summary>Draws the horizontal x axis labels and <see cref="Axis.Increment"/> ticks</summary>
     public override void DrawAxisLabels (GraphView graph) {
-        if (!Visible || (Increment == 0)) {
+        if (!Visible || Increment == 0) {
             return;
         }
 
@@ -183,8 +181,8 @@ public class HorizontalAxis : Axis {
     }
 
     /// <summary>
-    ///     Returns the Y screen position of the origin (typically 0,0) of graph space. Return value is bounded by the
-    ///     screen i.e. the axis is always rendered even if the origin is offscreen.
+    ///     Returns the Y screen position of the origin (typically 0,0) of graph space. Return value is bounded by the screen
+    ///     i.e. the axis is always rendered even if the origin is offscreen.
     /// </summary>
     /// <param name="graph"></param>
     public int GetAxisYPosition (GraphView graph) {
@@ -283,7 +281,7 @@ public class VerticalAxis : Axis {
     /// <summary>Draws axis <see cref="Axis.Increment"/> markers and labels</summary>
     /// <param name="graph"></param>
     public override void DrawAxisLabels (GraphView graph) {
-        if (!Visible || (Increment == 0)) {
+        if (!Visible || Increment == 0) {
             return;
         }
 
@@ -336,8 +334,8 @@ public class VerticalAxis : Axis {
     }
 
     /// <summary>
-    ///     Returns the X screen position of the origin (typically 0,0) of graph space. Return value is bounded by the
-    ///     screen i.e. the axis is always rendered even if the origin is offscreen.
+    ///     Returns the X screen position of the origin (typically 0,0) of graph space. Return value is bounded by the screen
+    ///     i.e. the axis is always rendered even if the origin is offscreen.
     /// </summary>
     /// <param name="graph"></param>
     public int GetAxisXPosition (GraphView graph) {
@@ -441,7 +439,10 @@ public class AxisIncrementToRender {
 
     /// <summary>The text (if any) that should be displayed at this axis increment</summary>
     /// <value></value>
-    internal string Text { get => _text; set => _text = value ?? ""; }
+    internal string Text {
+        get => _text;
+        set => _text = value ?? "";
+    }
 }
 
 /// <summary>Delegate for custom formatting of axis labels.  Determines what should be displayed at a given label</summary>

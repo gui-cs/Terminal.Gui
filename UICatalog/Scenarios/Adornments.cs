@@ -154,7 +154,6 @@ public class Adornments : Scenario {
         }
 
         public event EventHandler<Attribute> AttributeChanged;
-
         public event EventHandler<ThicknessEventArgs> ThicknessChanged;
 
         private void AdornmentEditor_Initialized (object sender, EventArgs e) {

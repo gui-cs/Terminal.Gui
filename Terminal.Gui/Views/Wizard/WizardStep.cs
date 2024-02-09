@@ -1,16 +1,16 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     Represents a basic step that is displayed in a <see cref="Wizard"/>. The <see cref="WizardStep"/> view is
-///     divided horizontally in two. On the left is the content view where <see cref="View"/>s can be added,  On the right
-///     is the help for the step. Set <see cref="WizardStep.HelpText"/> to set the help text. If the help text is empty the
-///     help pane will not be shown. If there are no Views added to the WizardStep the <see cref="HelpText"/> (if not
-///     empty) will fill the wizard step.
+///     Represents a basic step that is displayed in a <see cref="Wizard"/>. The <see cref="WizardStep"/> view is divided
+///     horizontally in two. On the left is the content view where <see cref="View"/>s can be added,  On the right is the
+///     help for the step. Set <see cref="WizardStep.HelpText"/> to set the help text. If the help text is empty the help
+///     pane will not be shown. If there are no Views added to the WizardStep the <see cref="HelpText"/> (if not empty)
+///     will fill the wizard step.
 /// </summary>
 /// <remarks>
-///     If <see cref="Button"/>s are added, do not set <see cref="Button.IsDefault"/> to true as this will conflict
-///     with the Next button of the Wizard. Subscribe to the <see cref="View.VisibleChanged"/> event to be notified when
-///     the step is active; see also: <see cref="Wizard.StepChanged"/>. To enable or disable a step from being shown to the
+///     If <see cref="Button"/>s are added, do not set <see cref="Button.IsDefault"/> to true as this will conflict with
+///     the Next button of the Wizard. Subscribe to the <see cref="View.VisibleChanged"/> event to be notified when the
+///     step is active; see also: <see cref="Wizard.StepChanged"/>. To enable or disable a step from being shown to the
 ///     user, set <see cref="View.Enabled"/>.
 /// </remarks>
 public class WizardStep : FrameView {
@@ -104,8 +104,8 @@ public class WizardStep : FrameView {
     public string BackButtonText { get; set; } = string.Empty;
 
     /// <summary>
-    ///     Sets or gets help text for the <see cref="WizardStep"/>.If <see cref="WizardStep.HelpText"/> is empty the help
-    ///     pane will not be visible and the content will fill the entire WizardStep.
+    ///     Sets or gets help text for the <see cref="WizardStep"/>.If <see cref="WizardStep.HelpText"/> is empty the help pane
+    ///     will not be visible and the content will fill the entire WizardStep.
     /// </summary>
     /// <remarks>The help text is displayed using a read-only <see cref="TextView"/>.</remarks>
     public string HelpText {

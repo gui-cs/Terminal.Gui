@@ -209,13 +209,9 @@ public class Progress : Scenario {
         }
 
         internal FrameView LeftFrame { get; }
-
         internal ProgressBar ActivityProgressBar { get; }
-
         internal ProgressBar PulseProgressBar { get; }
-
         internal SpinnerView Spinner { get; }
-
         internal TextField Speed { get; }
 
         internal void Pulse () {

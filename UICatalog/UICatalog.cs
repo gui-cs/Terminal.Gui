@@ -21,8 +21,8 @@ using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironm
 namespace UICatalog;
 
 /// <summary>
-///     UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the
-///     catalog of scenarios.
+///     UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of
+///     scenarios.
 /// </summary>
 /// <remarks>
 ///     <para>UI Catalog attempts to satisfy the following goals:</para>
@@ -44,7 +44,7 @@ namespace UICatalog;
 ///         (https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog/README.md).
 ///     </para>
 /// </remarks>
-class UICatalogApp {
+internal class UICatalogApp {
     private static bool _isFirstRunning = true;
     private static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
     private static readonly FileSystemWatcher _currentDirWatcher = new ();
@@ -160,8 +160,8 @@ class UICatalogApp {
     }
 
     /// <summary>
-    ///     Shows the UI Catalog selection UI. When the user selects a Scenario to run, the UI Catalog main app UI is
-    ///     killed and the Scenario is run as though it were Application.Top. When the Scenario exits, this function exits.
+    ///     Shows the UI Catalog selection UI. When the user selects a Scenario to run, the UI Catalog main app UI is killed
+    ///     and the Scenario is run as though it were Application.Top. When the Scenario exits, this function exits.
     /// </summary>
     /// <returns></returns>
     private static Scenario RunUICatalogTopLevel () {
@@ -333,8 +333,8 @@ class UICatalogApp {
     }
 
     /// <summary>
-    ///     This is the main UI Catalog app view. It is run fresh when the app loads (if a Scenario has not been passed on
-    ///     the command line) and each time a Scenario ends.
+    ///     This is the main UI Catalog app view. It is run fresh when the app loads (if a Scenario has not been passed on the
+    ///     command line) and each time a Scenario ends.
     /// </summary>
     public class UICatalogTopLevel : Toplevel {
         public UICatalogTopLevel () {
@@ -549,7 +549,7 @@ class UICatalogApp {
         public TableView ScenarioList;
 
         public void ConfigChanged () {
-            if ((_topLevelColorScheme == null) || !Colors.ColorSchemes.ContainsKey (_topLevelColorScheme)) {
+            if (_topLevelColorScheme == null || !Colors.ColorSchemes.ContainsKey (_topLevelColorScheme)) {
                 _topLevelColorScheme = "Base";
             }
 

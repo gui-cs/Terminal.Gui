@@ -1,8 +1,8 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     Describes how to render a given column in  a <see cref="TableView"/> including <see cref="Alignment"/> and
-///     textual representation of cells (e.g. date formats)
+///     Describes how to render a given column in  a <see cref="TableView"/> including <see cref="Alignment"/> and textual
+///     representation of cells (e.g. date formats)
 ///     <a href="../docs/tableview.md">See TableView Deep Dive for more information</a>.
 /// </summary>
 public class ColumnStyle {
@@ -22,17 +22,20 @@ public class ColumnStyle {
     public Func<object, string> RepresentationGetter;
 
     /// <summary>
-    ///     Defines a delegate for returning custom alignment per cell based on cell values.  When specified this will
-    ///     override <see cref="Alignment"/>
+    ///     Defines a delegate for returning custom alignment per cell based on cell values.  When specified this will override
+    ///     <see cref="Alignment"/>
     /// </summary>
     public Func<object, TextAlignment> AlignmentGetter;
 
     /// <summary>
-    ///     Gets or Sets a value indicating whether the column should be visible to the user. This affects both whether it
-    ///     is rendered and whether it can be selected. Defaults to true.
+    ///     Gets or Sets a value indicating whether the column should be visible to the user. This affects both whether it is
+    ///     rendered and whether it can be selected. Defaults to true.
     /// </summary>
     /// <remarks>If <see cref="MaxWidth"/> is 0 then <see cref="Visible"/> will always return false.</remarks>
-    public bool Visible { get => MaxWidth >= 0 && visible; set => visible = value; }
+    public bool Visible {
+        get => MaxWidth >= 0 && visible;
+        set => visible = value;
+    }
 
     /// <summary>
     ///     Set the maximum width of the column in characters.  This value will be ignored if more than the tables
@@ -58,8 +61,8 @@ public class ColumnStyle {
     public string Format { get; set; }
 
     /// <summary>
-    ///     Defines the default alignment for all values rendered in this column.  For custom alignment based on cell
-    ///     contents use <see cref="AlignmentGetter"/>.
+    ///     Defines the default alignment for all values rendered in this column.  For custom alignment based on cell contents
+    ///     use <see cref="AlignmentGetter"/>.
     /// </summary>
     public TextAlignment Alignment { get; set; }
 
@@ -78,8 +81,8 @@ public class ColumnStyle {
     }
 
     /// <summary>
-    ///     Returns the full string to render (which may be truncated if too long) that the current style says best
-    ///     represents the given <paramref name="value"/>
+    ///     Returns the full string to render (which may be truncated if too long) that the current style says best represents
+    ///     the given <paramref name="value"/>
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>

@@ -15,7 +15,6 @@ public class Ruler {
     public Orientation Orientation { get; set; }
 
     private string _hTemplate { get; } = "|123456789";
-
     private string _vTemplate { get; } = "-123456789";
 
     /// <summary>Draws the <see cref="Ruler"/>.</summary>

@@ -21,8 +21,8 @@ public class DrawTreeViewLineEventArgs<T> where T : class {
     public int Y { get; init; }
 
     /// <summary>
-    ///     If line contains a branch that can be expanded/collapsed then this is the index in <see cref="RuneCells"/> at
-    ///     which the symbol is (or null for leaf elements).
+    ///     If line contains a branch that can be expanded/collapsed then this is the index in <see cref="RuneCells"/> at which
+    ///     the symbol is (or null for leaf elements).
     /// </summary>
     public int? IndexOfExpandCollapseSymbol { get; init; }
 

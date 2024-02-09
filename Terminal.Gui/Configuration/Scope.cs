@@ -4,8 +4,8 @@ using System.Reflection;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Defines a configuration settings scope. Classes that inherit from this abstract class can be used to define
-///     scopes for configuration settings. Each scope is a JSON object that contains a set of configuration settings.
+///     Defines a configuration settings scope. Classes that inherit from this abstract class can be used to define scopes
+///     for configuration settings. Each scope is a JSON object that contains a set of configuration settings.
 /// </summary>
 public class Scope<T> : Dictionary<string, ConfigProperty> { //, IScope<Scope<T>> {
     /// <summary>Crates a new instance.</summary>

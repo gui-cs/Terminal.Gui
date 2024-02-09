@@ -3,8 +3,8 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     <see cref="ITableSource"/> implementation that wraps a <see cref="System.Data.DataTable"/>.  This class is
-///     mutable: changes are permitted to the wrapped <see cref="System.Data.DataTable"/>.
+///     <see cref="ITableSource"/> implementation that wraps a <see cref="System.Data.DataTable"/>.  This class is mutable:
+///     changes are permitted to the wrapped <see cref="System.Data.DataTable"/>.
 /// </summary>
 public class DataTableSource : ITableSource {
     /// <summary>Creates a new instance based on the data in <paramref name="table"/>.</summary>

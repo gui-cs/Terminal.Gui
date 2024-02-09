@@ -46,7 +46,7 @@ public class FileSystemIconProviderTests {
         );
     }
 
-    private string GetFileSystemRoot () { return IsWindows () ? @"c:\" : "/"; }
+    private string GetFileSystemRoot () => IsWindows () ? @"c:\" : "/";
 
     private IFileSystem GetMockFileSystem () {
         string root = GetFileSystemRoot ();
@@ -64,5 +64,5 @@ public class FileSystemIconProviderTests {
         return fileSystem;
     }
 
-    private bool IsWindows () { return RuntimeInformation.IsOSPlatform (OSPlatform.Windows); }
+    private bool IsWindows () => RuntimeInformation.IsOSPlatform (OSPlatform.Windows);
 }

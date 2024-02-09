@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-partial class HistoryText {
+internal partial class HistoryText {
     public class HistoryTextItem : EventArgs {
         public HistoryTextItem (List<List<RuneCell>> lines, Point curPos, LineStatus linesStatus) {
             Lines = lines;
@@ -22,9 +22,6 @@ partial class HistoryText {
         public List<List<RuneCell>> Lines;
         public Point CursorPosition;
         public Point FinalCursorPosition;
-
-        public override string ToString () {
-            return $"(Count: {Lines.Count}, Cursor: {CursorPosition}, Status: {LineStatus})";
-        }
+        public override string ToString () => $"(Count: {Lines.Count}, Cursor: {CursorPosition}, Status: {LineStatus})";
     }
 }

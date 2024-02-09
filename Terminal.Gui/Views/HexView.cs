@@ -28,8 +28,8 @@ namespace Terminal.Gui;
 public class HexView : View {
     /// <summary>Initializes a <see cref="HexView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
     /// <param name="source">
-    ///     The <see cref="Stream"/> to view and edit as hex, this <see cref="Stream"/> must support seeking,
-    ///     or an exception will be thrown.
+    ///     The <see cref="Stream"/> to view and edit as hex, this <see cref="Stream"/> must support seeking, or an exception
+    ///     will be thrown.
     /// </param>
     public HexView (Stream source) {
         Source = source;
@@ -113,8 +113,8 @@ public class HexView : View {
     public int BytesPerLine => bytesPerLine;
 
     /// <summary>
-    ///     Gets a <see cref="SortedDictionary{TKey, TValue}"/> describing the edits done to the <see cref="HexView"/>.
-    ///     Each Key indicates an offset where an edit was made and the Value is the changed byte.
+    ///     Gets a <see cref="SortedDictionary{TKey, TValue}"/> describing the edits done to the <see cref="HexView"/>. Each
+    ///     Key indicates an offset where an edit was made and the Value is the changed byte.
     /// </summary>
     /// <value>The edits.</value>
     public IReadOnlyDictionary<long, byte> Edits => edits;
@@ -152,8 +152,8 @@ public class HexView : View {
     }
 
     /// <summary>
-    ///     Sets or gets the <see cref="Stream"/> the <see cref="HexView"/> is operating on; the stream must support
-    ///     seeking (<see cref="Stream.CanSeek"/> == true).
+    ///     Sets or gets the <see cref="Stream"/> the <see cref="HexView"/> is operating on; the stream must support seeking (
+    ///     <see cref="Stream.CanSeek"/> == true).
     /// </summary>
     /// <value>The source.</value>
     public Stream Source {
@@ -198,8 +198,8 @@ public class HexView : View {
     }
 
     /// <summary>
-    ///     This method applies and edits made to the <see cref="Stream"/> and resets the contents of the
-    ///     <see cref="Edits"/> property.
+    ///     This method applies and edits made to the <see cref="Stream"/> and resets the contents of the <see cref="Edits"/>
+    ///     property.
     /// </summary>
     /// <param name="stream">If provided also applies the changes to the passed <see cref="Stream"/></param>
     /// .
@@ -272,7 +272,7 @@ public class HexView : View {
         x -= block * 2;
         int empty = x % 3;
         int item = x / 3;
-        if (!leftSide && item > 0 && ((empty == 0) || (x == block * 14 + 14 - 1 - block * 2))) {
+        if (!leftSide && item > 0 && (empty == 0 || x == block * 14 + 14 - 1 - block * 2)) {
             return true;
         }
 
@@ -332,7 +332,7 @@ public class HexView : View {
                 for (var b = 0; b < bsize; b++) {
                     int offset = line * nblocks * bsize + block * bsize + b;
                     byte value = GetData (data, offset, out bool edited);
-                    if ((offset + displayStart == position) || edited) {
+                    if (offset + displayStart == position || edited) {
                         SetAttribute (leftSide ? activeColor : trackingColor);
                     } else {
                         SetAttribute (GetNormalColor ());
@@ -362,7 +362,7 @@ public class HexView : View {
                     }
                 }
 
-                if ((offset + displayStart == position) || edited) {
+                if (offset + displayStart == position || edited) {
                     SetAttribute (leftSide ? trackingColor : activeColor);
                 } else {
                     SetAttribute (GetNormalColor ());
@@ -406,7 +406,7 @@ public class HexView : View {
         }
 
         // Ignore control characters and other special keys
-        if ((keyEvent.KeyCode < KeyCode.Space) || (keyEvent.KeyCode > KeyCode.CharMask)) {
+        if (keyEvent.KeyCode < KeyCode.Space || keyEvent.KeyCode > KeyCode.CharMask) {
             return false;
         }
 

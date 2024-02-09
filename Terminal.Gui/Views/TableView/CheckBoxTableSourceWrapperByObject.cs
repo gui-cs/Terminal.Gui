@@ -33,7 +33,7 @@ public class CheckBoxTableSourceWrapperByObject<T> : CheckBoxTableSourceWrapperB
     }
 
     /// <inheritdoc/>
-    protected override bool IsChecked (int row) { return _getter (_toWrap.GetObjectOnRow (row)); }
+    protected override bool IsChecked (int row) => _getter (_toWrap.GetObjectOnRow (row));
 
     /// <inheritdoc/>
     protected override void ToggleAllRows () { ToggleRows (Enumerable.Range (0, _toWrap.Rows).ToArray ()); }

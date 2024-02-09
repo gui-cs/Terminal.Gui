@@ -293,7 +293,7 @@ public class Editor : Scenario {
         };
 
         Win.KeyDown += (s, e) => {
-            if (_winDialog != null && ((e.KeyCode == KeyCode.Esc) || (e == Application.QuitKey))) {
+            if (_winDialog != null && (e.KeyCode == KeyCode.Esc || e == Application.QuitKey)) {
                 DisposeWinDialog ();
             } else if (e == Application.QuitKey) {
                 Quit ();
@@ -867,7 +867,7 @@ public class Editor : Scenario {
             return;
         }
 
-        List<IAllowedType> aTypes = new() {
+        List<IAllowedType> aTypes = new () {
             new AllowedType (
                 "Text",
                 ".txt;.bin;.xml;.json",
@@ -1050,7 +1050,7 @@ public class Editor : Scenario {
     }
 
     private bool SaveAs () {
-        List<IAllowedType> aTypes = new() {
+        List<IAllowedType> aTypes = new () {
             new AllowedType ("Text Files", ".txt", ".bin", ".xml"), new AllowedTypeAny ()
         };
         var sd = new SaveDialog { Title = "Save file", AllowedTypes = aTypes };

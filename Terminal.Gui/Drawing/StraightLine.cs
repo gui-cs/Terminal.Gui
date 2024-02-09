@@ -60,7 +60,7 @@ public class StraightLine {
     }
 
     /// <summary>Formats the Line as a string in (Start.X,Start.Y,Length,Orientation) notation.</summary>
-    public override string ToString () { return $"({Start.X},{Start.Y},{Length},{Orientation})"; }
+    public override string ToString () => $"({Start.X},{Start.Y},{Length},{Orientation})";
 
     internal IntersectionDefinition? Intersects (int x, int y) {
         switch (Orientation) {
@@ -170,5 +170,5 @@ public class StraightLine {
         return null;
     }
 
-    private bool StartsAt (int x, int y) { return Start.X == x && Start.Y == y; }
+    private bool StartsAt (int x, int y) => Start.X == x && Start.Y == y;
 }

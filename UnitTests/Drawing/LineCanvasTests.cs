@@ -1129,8 +1129,8 @@ public class LineCanvasTests {
     }
 
     /// <summary>
-    ///     Demonstrates when <see cref="LineStyle.Rounded"/> corners are used. Notice how not all lines declare rounded.
-    ///     If there are 1+ lines intersecting and a corner is to be used then if any of them are rounded a rounded corner is
+    ///     Demonstrates when <see cref="LineStyle.Rounded"/> corners are used. Notice how not all lines declare rounded. If
+    ///     there are 1+ lines intersecting and a corner is to be used then if any of them are rounded a rounded corner is
     ///     used.
     /// </summary>
     [Fact]

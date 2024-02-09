@@ -132,13 +132,13 @@ public partial class View {
     }
 
     /// <summary>
-    ///     Gets the width or height of the <see cref="TextFormatter.HotKeySpecifier"/> characters in the
-    ///     <see cref="Text"/> property.
+    ///     Gets the width or height of the <see cref="TextFormatter.HotKeySpecifier"/> characters in the <see cref="Text"/>
+    ///     property.
     /// </summary>
     /// <remarks>Only the first HotKey specifier found in <see cref="Text"/> is supported.</remarks>
     /// <param name="isWidth">
-    ///     If <see langword="true"/> (the default) the width required for the HotKey specifier is returned.
-    ///     Otherwise the height is returned.
+    ///     If <see langword="true"/> (the default) the width required for the HotKey specifier is returned. Otherwise the
+    ///     height is returned.
     /// </param>
     /// <returns>
     ///     The number of characters required for the <see cref="TextFormatter.HotKeySpecifier"/>. If the text direction
@@ -168,20 +168,18 @@ public partial class View {
 
     /// <summary>Gets the dimensions required for <see cref="Text"/> ignoring a <see cref="TextFormatter.HotKeySpecifier"/>.</summary>
     /// <returns></returns>
-    internal Size GetSizeNeededForTextWithoutHotKey () {
-        return new Size (
-            TextFormatter.Size.Width - GetHotKeySpecifierLength (),
-            TextFormatter.Size.Height - GetHotKeySpecifierLength (false)
-        );
-    }
+    internal Size GetSizeNeededForTextWithoutHotKey () => new (
+        TextFormatter.Size.Width - GetHotKeySpecifierLength (),
+        TextFormatter.Size.Height - GetHotKeySpecifierLength (false)
+    );
 
     /// <summary>
     ///     Internal API. Sets <see cref="TextFormatter"/>.Size to the current <see cref="Bounds"/> size, adjusted for
     ///     <see cref="TextFormatter.HotKeySpecifier"/>.
     /// </summary>
     /// <remarks>
-    ///     Use this API to set <see cref="TextFormatter.Size"/> when the view has changed such that the size required to
-    ///     fit the text has changed. changes.
+    ///     Use this API to set <see cref="TextFormatter.Size"/> when the view has changed such that the size required to fit
+    ///     the text has changed. changes.
     /// </remarks>
     /// <returns></returns>
     internal void SetTextFormatterSize () {
@@ -211,8 +209,8 @@ public partial class View {
         );
 
         return !((ValidatePosDim && (!(Width is Dim.DimAbsolute) || !(Height is Dim.DimAbsolute))) ||
-                 (_frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength ()) ||
-                 (_frame.Size.Height != rect.Size.Height - GetHotKeySpecifierLength (false)));
+                 _frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength () ||
+                 _frame.Size.Height != rect.Size.Height - GetHotKeySpecifierLength (false));
     }
 
     private bool IsValidAutoSizeHeight (Dim height) {
@@ -220,7 +218,7 @@ public partial class View {
         int dimValue = height.Anchor (0);
 
         return !((ValidatePosDim && !(height is Dim.DimAbsolute))
-                 || (dimValue != rect.Size.Height - GetHotKeySpecifierLength (false)));
+                 || dimValue != rect.Size.Height - GetHotKeySpecifierLength (false));
     }
 
     private bool IsValidAutoSizeWidth (Dim width) {
@@ -228,7 +226,7 @@ public partial class View {
         int dimValue = width.Anchor (0);
 
         return !((ValidatePosDim && !(width is Dim.DimAbsolute))
-                 || (dimValue != rect.Size.Width - GetHotKeySpecifierLength ()));
+                 || dimValue != rect.Size.Width - GetHotKeySpecifierLength ());
     }
 
     /// <summary>Sets the size of the View to the minimum width or height required to fit <see cref="Text"/>.</summary>
@@ -276,7 +274,7 @@ public partial class View {
 
                     // TODO: v2 - This uses frame.Width; it should only use Bounds
                     if (_frame.Width < colWidth &&
-                        ((Width == null) ||
+                        (Width == null ||
                          (Bounds.Width >= 0 &&
                           Width is Dim.DimAbsolute &&
                           Width.Anchor (0) >= 0 &&
@@ -289,7 +287,7 @@ public partial class View {
                     break;
                 default:
                     if (_frame.Height < 1 &&
-                        ((Height == null) ||
+                        (Height == null ||
                          (Height is Dim.DimAbsolute &&
                           Height.Anchor (0) == 0))) {
                         sizeRequired = new Size (Bounds.Width, 1);

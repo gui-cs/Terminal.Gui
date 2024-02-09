@@ -95,8 +95,8 @@ public class ConfigurationManagerTests {
         Assert.Equal (colorschemeSrc, colorschemeCopy);
 
         // Dictionaries
-        Dictionary<string, Attribute> dictDest = new() { { "Disabled", new Attribute (Color.Black) } };
-        Dictionary<string, Attribute> dictSrc = new() { { "Disabled", new Attribute (Color.White) } };
+        Dictionary<string, Attribute> dictDest = new () { { "Disabled", new Attribute (Color.Black) } };
+        Dictionary<string, Attribute> dictSrc = new () { { "Disabled", new Attribute (Color.White) } };
         Dictionary<string, Attribute> dictCopy = (Dictionary<string, Attribute>)DeepMemberwiseCopy (dictSrc, dictDest);
         Assert.Equal (dictSrc, dictCopy);
 
@@ -332,8 +332,8 @@ public class ConfigurationManagerTests {
 
     /// <summary>Save the `config.json` file; this can be used to update the file in `Terminal.Gui.Resources.config.json'.</summary>
     /// <remarks>
-    ///     IMPORTANT: For the file generated to be valid, this must be the ONLY test run. Config Properties are all
-    ///     static and thus can be overwritten by other tests.
+    ///     IMPORTANT: For the file generated to be valid, this must be the ONLY test run. Config Properties are all static and
+    ///     thus can be overwritten by other tests.
     /// </remarks>
     [Fact]
     public void SaveDefaults () {

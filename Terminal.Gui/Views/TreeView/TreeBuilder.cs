@@ -10,12 +10,12 @@ public abstract class TreeBuilder<T> : ITreeBuilder<T> {
     public bool SupportsCanExpand { get; protected set; }
 
     /// <summary>
-    ///     Override this method to return a rapid answer as to whether <see cref="GetChildren(T)"/> returns results.  If
-    ///     you are implementing this method ensure you passed true in base constructor or set <see cref="SupportsCanExpand"/>
+    ///     Override this method to return a rapid answer as to whether <see cref="GetChildren(T)"/> returns results.  If you
+    ///     are implementing this method ensure you passed true in base constructor or set <see cref="SupportsCanExpand"/>
     /// </summary>
     /// <param name="toExpand"></param>
     /// <returns></returns>
-    public virtual bool CanExpand (T toExpand) { return GetChildren (toExpand).Any (); }
+    public virtual bool CanExpand (T toExpand) => GetChildren (toExpand).Any ();
 
     /// <inheritdoc/>
     public abstract IEnumerable<T> GetChildren (T forObject);

@@ -1,8 +1,8 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     <see cref="ITreeViewFilter{T}"/> implementation which searches the <see cref="TreeView{T}.AspectGetter"/> of
-///     the model for the given <see cref="Text"/>.
+///     <see cref="ITreeViewFilter{T}"/> implementation which searches the <see cref="TreeView{T}.AspectGetter"/> of the
+///     model for the given <see cref="Text"/>.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public class TreeViewTextFilter<T> : ITreeViewFilter<T> where T : class {

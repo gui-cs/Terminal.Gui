@@ -56,7 +56,7 @@ public class Responder : IDisposable {
     /// <summary>Method invoked when a mouse event is generated</summary>
     /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
     /// <param name="mouseEvent">Contains the details about the mouse event.</param>
-    public virtual bool MouseEvent (MouseEvent mouseEvent) { return false; }
+    public virtual bool MouseEvent (MouseEvent mouseEvent) => false;
 
     /// <summary>Method invoked when the <see cref="CanFocus"/> property from a view is changed.</summary>
     public virtual void OnCanFocusChanged () { }
@@ -67,37 +67,37 @@ public class Responder : IDisposable {
     /// <summary>Method invoked when a view gets focus.</summary>
     /// <param name="view">The view that is losing focus.</param>
     /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
-    public virtual bool OnEnter (View view) { return false; }
+    public virtual bool OnEnter (View view) => false;
 
     /// <summary>Method invoked when a view loses focus.</summary>
     /// <param name="view">The view that is getting focus.</param>
     /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
-    public virtual bool OnLeave (View view) { return false; }
+    public virtual bool OnLeave (View view) => false;
 
     /// <summary>
-    ///     Called when the mouse first enters the view; the view will now receives mouse events until the mouse leaves
-    ///     the view. At which time, <see cref="OnMouseLeave(Gui.MouseEvent)"/> will be called.
+    ///     Called when the mouse first enters the view; the view will now receives mouse events until the mouse leaves the
+    ///     view. At which time, <see cref="OnMouseLeave(Gui.MouseEvent)"/> will be called.
     /// </summary>
     /// <param name="mouseEvent"></param>
     /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
-    public virtual bool OnMouseEnter (MouseEvent mouseEvent) { return false; }
+    public virtual bool OnMouseEnter (MouseEvent mouseEvent) => false;
 
     /// <summary>
-    ///     Called when the mouse has moved outside of the view; the view will no longer receive mouse events (until the
-    ///     mouse moves within the view again and <see cref="OnMouseEnter(Gui.MouseEvent)"/> is called).
+    ///     Called when the mouse has moved outside of the view; the view will no longer receive mouse events (until the mouse
+    ///     moves within the view again and <see cref="OnMouseEnter(Gui.MouseEvent)"/> is called).
     /// </summary>
     /// <param name="mouseEvent"></param>
     /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
-    public virtual bool OnMouseLeave (MouseEvent mouseEvent) { return false; }
+    public virtual bool OnMouseLeave (MouseEvent mouseEvent) => false;
 
     /// <summary>Method invoked when the <see cref="Visible"/> property from a view is changed.</summary>
     public virtual void OnVisibleChanged () { }
 
     /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
     /// <remarks>
-    ///     If disposing equals true, the method has been called directly or indirectly by a user's code. Managed and
-    ///     unmanaged resources can be disposed. If disposing equals false, the method has been called by the runtime from
-    ///     inside the finalizer and you should not reference other objects. Only unmanaged resources can be disposed.
+    ///     If disposing equals true, the method has been called directly or indirectly by a user's code. Managed and unmanaged
+    ///     resources can be disposed. If disposing equals false, the method has been called by the runtime from inside the
+    ///     finalizer and you should not reference other objects. Only unmanaged resources can be disposed.
     /// </remarks>
     /// <param name="disposing"></param>
     protected virtual void Dispose (bool disposing) {

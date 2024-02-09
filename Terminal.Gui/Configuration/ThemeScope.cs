@@ -4,8 +4,8 @@ using System.Text.Json.Serialization;
 namespace Terminal.Gui;
 
 /// <summary>
-///     The root object for a Theme. A Theme is a set of settings that are applied to the running
-///     <see cref="Application"/> as a group.
+///     The root object for a Theme. A Theme is a set of settings that are applied to the running <see cref="Application"/>
+///     as a group.
 /// </summary>
 /// <remarks>
 ///     <para></para>

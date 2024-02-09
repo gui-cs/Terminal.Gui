@@ -14,8 +14,8 @@ public enum MenuItemCheckStyle {
 }
 
 /// <summary>
-///     A <see cref="MenuItem"/> has title, an associated help text, and an action to execute on activation. MenuItems
-///     can also have a checked indicator (see <see cref="Checked"/>).
+///     A <see cref="MenuItem"/> has title, an associated help text, and an action to execute on activation. MenuItems can
+///     also have a checked indicator (see <see cref="Checked"/>).
 /// </summary>
 public class MenuItem {
     // TODO: Update to use Key instead of KeyCode
@@ -59,9 +59,9 @@ public class MenuItem {
     public Action Action { get; set; }
 
     /// <summary>
-    ///     Used only if <see cref="CheckType"/> is of <see cref="MenuItemCheckStyle.Checked"/> type. If
-    ///     <see langword="true"/> allows <see cref="Checked"/> to be null, true or false. If <see langword="false"/> only
-    ///     allows <see cref="Checked"/> to be true or false.
+    ///     Used only if <see cref="CheckType"/> is of <see cref="MenuItemCheckStyle.Checked"/> type. If <see langword="true"/>
+    ///     allows <see cref="Checked"/> to be null, true or false. If <see langword="false"/> only allows
+    ///     <see cref="Checked"/> to be true or false.
     /// </summary>
     public bool AllowNullChecked {
         get => _allowNullChecked;
@@ -140,7 +140,7 @@ public class MenuItem {
     internal int Width => 1 + // space before Title
                           TitleLength +
                           2 + // space after Title - BUGBUG: This should be 1 
-                          ((Checked == true) || CheckType.HasFlag (MenuItemCheckStyle.Checked) ||
+                          (Checked == true || CheckType.HasFlag (MenuItemCheckStyle.Checked) ||
                            CheckType.HasFlag (MenuItemCheckStyle.Radio)
                                ? 2
                                : 0) + // check glyph + space 
@@ -150,20 +150,20 @@ public class MenuItem {
                                : 0); // Pad two spaces before shortcut tag (which are also aligned right)
 
     /// <summary>Merely a debugging aid to see the interaction with main.</summary>
-    public bool GetMenuBarItem () { return IsFromSubMenu; }
+    public bool GetMenuBarItem () => IsFromSubMenu;
 
     /// <summary>Merely a debugging aid to see the interaction with main.</summary>
-    public MenuItem GetMenuItem () { return this; }
+    public MenuItem GetMenuItem () => this;
 
     /// <summary>
     ///     Returns <see langword="true"/> if the menu item is enabled. This method is a wrapper around
     ///     <see cref="CanExecute"/>.
     /// </summary>
-    public bool IsEnabled () { return CanExecute?.Invoke () ?? true; }
+    public bool IsEnabled () => CanExecute?.Invoke () ?? true;
 
     /// <summary>
-    ///     Toggle the <see cref="Checked"/> between three states if <see cref="AllowNullChecked"/> is
-    ///     <see langword="true"/> or between two states if <see cref="AllowNullChecked"/> is <see langword="false"/>.
+    ///     Toggle the <see cref="Checked"/> between three states if <see cref="AllowNullChecked"/> is <see langword="true"/>
+    ///     or between two states if <see cref="AllowNullChecked"/> is <see langword="false"/>.
     /// </summary>
     public void ToggleChecked () {
         if (_checkType != MenuItemCheckStyle.Checked) {
@@ -195,12 +195,12 @@ public class MenuItem {
     ///     The HotKey is used to activate a <see cref="MenuItem"/> with the keyboard. HotKeys are defined by prefixing the
     ///     <see cref="Title"/> of a MenuItem with an underscore ('_').
     ///     <para>
-    ///         Pressing Alt-Hotkey for a <see cref="MenuBarItem"/> (menu items on the menu bar) works even if the menu is
-    ///         not active). Once a menu has focus and is active, pressing just the HotKey will activate the MenuItem.
+    ///         Pressing Alt-Hotkey for a <see cref="MenuBarItem"/> (menu items on the menu bar) works even if the menu is not
+    ///         active). Once a menu has focus and is active, pressing just the HotKey will activate the MenuItem.
     ///     </para>
     ///     <para>
-    ///         For example for a MenuBar with a "_File" MenuBarItem that contains a "_New" MenuItem, Alt-F will open the
-    ///         File menu. Pressing the N key will then activate the New MenuItem.
+    ///         For example for a MenuBar with a "_File" MenuBarItem that contains a "_New" MenuItem, Alt-F will open the File
+    ///         menu. Pressing the N key will then activate the New MenuItem.
     ///     </para>
     ///     <para>See also <see cref="Shortcut"/> which enable global key-bindings to menu items.</para>
     /// </summary>
@@ -238,7 +238,7 @@ public class MenuItem {
         get => _shortcutHelper.Shortcut;
         set {
             if (_shortcutHelper.Shortcut != value &&
-                (ShortcutHelper.PostShortcutValidation (value) || (value == KeyCode.Null))) {
+                (ShortcutHelper.PostShortcutValidation (value) || value == KeyCode.Null)) {
                 _shortcutHelper.Shortcut = value;
             }
         }
@@ -256,14 +256,14 @@ public class MenuItem {
 ///     An internal class used to represent a menu pop-up menu. Created and managed by <see cref="MenuBar"/> and
 ///     <see cref="ContextMenu"/>.
 /// </summary>
-sealed class Menu : View {
+internal sealed class Menu : View {
     private readonly MenuBarItem _barItems;
     private readonly MenuBar _host;
     internal int _currentChild;
     internal View _previousSubFocused;
 
     internal static Rect MakeFrame (int x, int y, MenuItem[] items, Menu parent = null) {
-        if ((items == null) || (items.Length == 0)) {
+        if (items == null || items.Length == 0) {
             return new Rect ();
         }
 
@@ -283,7 +283,7 @@ sealed class Menu : View {
         return new Rect (minX, minY, maxW, maxH);
     }
 
-    required internal MenuBar Host {
+    internal required MenuBar Host {
         get => _host;
         init {
             ArgumentNullException.ThrowIfNull (value);
@@ -291,7 +291,7 @@ sealed class Menu : View {
         }
     }
 
-    required internal MenuBarItem BarItems {
+    internal required MenuBarItem BarItems {
         get => _barItems;
         init {
             ArgumentNullException.ThrowIfNull (value);
@@ -426,7 +426,7 @@ sealed class Menu : View {
 #endif
 
     private void AddKeyBindings (MenuBarItem menuBarItem) {
-        if ((menuBarItem == null) || (menuBarItem.Children == null)) {
+        if (menuBarItem == null || menuBarItem.Children == null) {
             return;
         }
 
@@ -465,7 +465,7 @@ sealed class Menu : View {
                     return true;
                 }
 
-                bool disabled = (item == null) || !item.IsEnabled ();
+                bool disabled = item == null || !item.IsEnabled ();
                 if (!disabled && (_host.UseSubMenusSingleFrame || !CheckSubMenu ())) {
                     SetNeedsDisplay ();
                     SetParentSetNeedsDisplay ();
@@ -532,7 +532,7 @@ sealed class Menu : View {
                     continue;
                 }
 
-                bool matches = (key == hotKey) || (key == (hotKey | KeyCode.AltMask));
+                bool matches = key == hotKey || key == (hotKey | KeyCode.AltMask);
                 if (!_host.IsMenuOpen) {
                     // If the menu is open, only match if Alt is not pressed.
                     matches = key == hotKey;
@@ -616,8 +616,8 @@ sealed class Menu : View {
             }
 
             var nme = new MouseEvent { X = rx, Y = ry, Flags = a.MouseEvent.Flags, View = view };
-            if (MouseEvent (nme) || (a.MouseEvent.Flags == MouseFlags.Button1Pressed) ||
-                (a.MouseEvent.Flags == MouseFlags.Button1Released)) {
+            if (MouseEvent (nme) || a.MouseEvent.Flags == MouseFlags.Button1Pressed ||
+                a.MouseEvent.Flags == MouseFlags.Button1Released) {
                 a.MouseEvent.Handled = true;
             }
         }
@@ -793,7 +793,7 @@ sealed class Menu : View {
     }
 
     public void Run (Action action) {
-        if ((action == null) || (_host == null)) {
+        if (action == null || _host == null) {
             return;
         }
 
@@ -804,7 +804,7 @@ sealed class Menu : View {
         _host.Run (action);
     }
 
-    public override bool OnLeave (View view) { return _host.OnLeave (view); }
+    public override bool OnLeave (View view) => _host.OnLeave (view);
 
     private void RunSelected () {
         if (_barItems.IsTopLevel) {
@@ -873,7 +873,7 @@ sealed class Menu : View {
                 _host.OpenMenu (_host._selected);
             }
         }
-        while ((_barItems.Children[_currentChild] == null) || disabled);
+        while (_barItems.Children[_currentChild] == null || disabled);
 
         SetNeedsDisplay ();
         SetParentSetNeedsDisplay ();
@@ -885,7 +885,7 @@ sealed class Menu : View {
     }
 
     private bool MoveUp () {
-        if (_barItems.IsTopLevel || (_currentChild == -1)) {
+        if (_barItems.IsTopLevel || _currentChild == -1) {
             return true;
         }
 
@@ -893,7 +893,7 @@ sealed class Menu : View {
         do {
             _currentChild--;
             if (_host.UseKeysUpDownAsKeysLeftRight && !_host.UseSubMenusSingleFrame) {
-                if (((_currentChild == -1) || (this != _host.openCurrentMenu)) &&
+                if ((_currentChild == -1 || this != _host.openCurrentMenu) &&
                     _barItems.Children[_currentChild + 1].IsFromSubMenu && _host._selectedSub > -1) {
                     _currentChild++;
                     _host.PreviousMenu (true);
@@ -923,7 +923,7 @@ sealed class Menu : View {
             MenuItem item = _barItems.Children[_currentChild];
             disabled = item?.IsEnabled () != true;
             if (_host.UseSubMenusSingleFrame || !_host.UseKeysUpDownAsKeysLeftRight ||
-                (_barItems.SubMenu (_barItems.Children[_currentChild]) == null) ||
+                _barItems.SubMenu (_barItems.Children[_currentChild]) == null ||
                 disabled || !_host.IsMenuOpen) {
                 continue;
             }
@@ -934,7 +934,7 @@ sealed class Menu : View {
 
             break;
         }
-        while ((_barItems.Children[_currentChild] == null) || disabled);
+        while (_barItems.Children[_currentChild] == null || disabled);
 
         SetNeedsDisplay ();
         SetParentSetNeedsDisplay ();
@@ -975,7 +975,7 @@ sealed class Menu : View {
             }
 
             MenuItem item = _barItems.Children[meY];
-            if ((item == null) || !item.IsEnabled ()) {
+            if (item == null || !item.IsEnabled ()) {
                 disabled = true;
             }
 
@@ -997,7 +997,7 @@ sealed class Menu : View {
 
         {
             disabled = false;
-            if ((meY < 0) || (meY >= _barItems.Children.Length)) {
+            if (meY < 0 || meY >= _barItems.Children.Length) {
                 return true;
             }
 
@@ -1028,7 +1028,7 @@ sealed class Menu : View {
     }
 
     internal bool CheckSubMenu () {
-        if ((_currentChild == -1) || (_barItems.Children[_currentChild] == null)) {
+        if (_currentChild == -1 || _barItems.Children[_currentChild] == null) {
             return true;
         }
 
@@ -1046,9 +1046,9 @@ sealed class Menu : View {
             }
 
             _host.Activate (_host._selected, pos, subMenu);
-        } else if ((_host._openSubMenu?.Count == 0) ||
-                   (_host._openSubMenu?.Last ()._barItems.IsSubMenuOf (_barItems.Children[_currentChild]) ==
-                    false)) {
+        } else if (_host._openSubMenu?.Count == 0 ||
+                   _host._openSubMenu?.Last ()._barItems.IsSubMenuOf (_barItems.Children[_currentChild]) ==
+                   false) {
             return _host.CloseMenu (false, true);
         } else {
             SetNeedsDisplay ();

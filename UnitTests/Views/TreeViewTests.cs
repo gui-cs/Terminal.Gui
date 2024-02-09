@@ -135,8 +135,8 @@ public class TreeViewTests {
     }
 
     /// <summary>
-    ///     Tests that <see cref="TreeView.GetChildren(object)"/> returns the child objects for the factory.  Note that
-    ///     the method only works once the parent branch (Factory) is expanded to expose the child (Car)
+    ///     Tests that <see cref="TreeView.GetChildren(object)"/> returns the child objects for the factory.  Note that the
+    ///     method only works once the parent branch (Factory) is expanded to expose the child (Car)
     /// </summary>
     [Fact]
     public void GetChildren_ReturnsChildrenOnlyWhenExpanded () {
@@ -162,8 +162,8 @@ public class TreeViewTests {
     }
 
     /// <summary>
-    ///     Tests that <see cref="TreeView.GetParent(object)"/> returns the parent object for Cars (Factories).  Note that
-    ///     the method only works once the parent branch (Factory) is expanded to expose the child (Car)
+    ///     Tests that <see cref="TreeView.GetParent(object)"/> returns the parent object for Cars (Factories).  Note that the
+    ///     method only works once the parent branch (Factory) is expanded to expose the child (Car)
     /// </summary>
     [Fact]
     public void GetParent_ReturnsParentOnlyWhenExpanded () {
@@ -251,8 +251,8 @@ public class TreeViewTests {
     }
 
     /// <summary>
-    ///     Tests that <see cref="TreeView.IsExpanded(object)"/> and <see cref="TreeView.Expand(object)"/> behaves
-    ///     correctly when an object cannot be expanded (because it has no children)
+    ///     Tests that <see cref="TreeView.IsExpanded(object)"/> and <see cref="TreeView.Expand(object)"/> behaves correctly
+    ///     when an object cannot be expanded (because it has no children)
     /// </summary>
     [Fact]
     public void IsExpanded_FalseIfCannotExpand () {
@@ -551,8 +551,8 @@ public class TreeViewTests {
     }
 
     /// <summary>
-    ///     Tests how the tree adapts to changes in the ChildrenGetter delegate during runtime when some branches are
-    ///     expanded and the new delegate returns children for a node that previously didn't have any children
+    ///     Tests how the tree adapts to changes in the ChildrenGetter delegate during runtime when some branches are expanded
+    ///     and the new delegate returns children for a node that previously didn't have any children
     /// </summary>
     [Fact]
     public void RefreshObject_AfterChangingChildrenGetterDuringRuntime () {
@@ -593,8 +593,8 @@ public class TreeViewTests {
     }
 
     /// <summary>
-    ///     Simulates behind the scenes changes to an object (which children it has) and how to sync that into the tree
-    ///     using <see cref="TreeView.RefreshObject(object, bool)"/>
+    ///     Simulates behind the scenes changes to an object (which children it has) and how to sync that into the tree using
+    ///     <see cref="TreeView.RefreshObject(object, bool)"/>
     /// </summary>
     [Fact]
     public void RefreshObject_ChildRemoved () {
@@ -631,8 +631,8 @@ public class TreeViewTests {
     }
 
     /// <summary>
-    ///     Simulates behind the scenes changes to an object (which children it has) and how to sync that into the tree
-    ///     using <see cref="TreeView.RefreshObject(object, bool)"/>
+    ///     Simulates behind the scenes changes to an object (which children it has) and how to sync that into the tree using
+    ///     <see cref="TreeView.RefreshObject(object, bool)"/>
     /// </summary>
     [Fact]
     public void RefreshObject_EqualityTest () {
@@ -1262,28 +1262,24 @@ oot two
     /// <summary>Test object which considers for equality only <see cref="Name"/></summary>
     private class EqualityTestObject {
         public int Age { get; set; }
-
         public string Name { get; set; }
-
-        public override bool Equals (object obj) { return obj is EqualityTestObject eto && Equals (Name, eto.Name); }
-        public override int GetHashCode () { return Name?.GetHashCode () ?? base.GetHashCode (); }
+        public override bool Equals (object obj) => obj is EqualityTestObject eto && Equals (Name, eto.Name);
+        public override int GetHashCode () => Name?.GetHashCode () ?? base.GetHashCode ();
     }
 
     #region Test Setup Methods
 
     private class Factory {
         public Car[] Cars { get; set; }
-
-        public override string ToString () { return "Factory"; }
+        public override string ToString () => "Factory";
     }
 
     private class Car {
         public string Name { get; set; }
-
-        public override string ToString () { return Name; }
+        public override string ToString () => Name;
     }
 
-    private TreeView<object> CreateTree () { return CreateTree (out _, out _, out _); }
+    private TreeView<object> CreateTree () => CreateTree (out _, out _, out _);
 
     private TreeView<object> CreateTree (out Factory factory1, out Car car1, out Car car2) {
         car1 = new Car ();

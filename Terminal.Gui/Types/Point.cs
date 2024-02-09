@@ -28,41 +28,35 @@ public struct Point {
     // -----------------------
 
     /// <summary>Empty Shared Field</summary>
-    /// 
     /// <remarks>An uninitialized Point Structure.</remarks>
     public static readonly Point Empty;
 
     /// <summary>Addition Operator</summary>
-    /// 
     /// <remarks>Translates a Point using the Width and Height properties of the given <typeref>Size</typeref>.</remarks>
-    public static Point operator + (Point pt, Size sz) { return new Point (pt.X + sz.Width, pt.Y + sz.Height); }
+    public static Point operator + (Point pt, Size sz) => new (pt.X + sz.Width, pt.Y + sz.Height);
 
     /// <summary>Equality Operator</summary>
-    /// 
     /// <remarks>
     ///     Compares two Point objects. The return value is based on the equivalence of the X and Y properties of the two
     ///     points.
     /// </remarks>
-    public static bool operator == (Point left, Point right) { return left.X == right.X && left.Y == right.Y; }
+    public static bool operator == (Point left, Point right) => left.X == right.X && left.Y == right.Y;
 
     /// <summary>Inequality Operator</summary>
-    /// 
     /// <remarks>
     ///     Compares two Point objects. The return value is based on the equivalence of the X and Y properties of the two
     ///     points.
     /// </remarks>
-    public static bool operator != (Point left, Point right) { return (left.X != right.X) || (left.Y != right.Y); }
+    public static bool operator != (Point left, Point right) => left.X != right.X || left.Y != right.Y;
 
     /// <summary>Subtraction Operator</summary>
-    /// 
     /// <remarks>Translates a Point using the negation of the Width and Height properties of the given Size.</remarks>
-    public static Point operator - (Point pt, Size sz) { return new Point (pt.X - sz.Width, pt.Y - sz.Height); }
+    public static Point operator - (Point pt, Size sz) => new (pt.X - sz.Width, pt.Y - sz.Height);
 
     /// <summary>Point to Size Conversion</summary>
-    /// 
     /// <remarks>Returns a Size based on the Coordinates of a given Point. Requires explicit cast.</remarks>
     public static explicit operator Size (Point p) {
-        if ((p.X < 0) || (p.Y < 0)) {
+        if (p.X < 0 || p.Y < 0) {
             throw new ArgumentException ("Either Width and Height must be greater or equal to 0.");
         }
 
@@ -73,7 +67,6 @@ public struct Point {
     // Public Constructors
     // -----------------------
     /// <summary>Point Constructor</summary>
-    /// 
     /// <remarks>Creates a Point from a Size value.</remarks>
     public Point (Size sz) {
         X = sz.Width;
@@ -81,7 +74,6 @@ public struct Point {
     }
 
     /// <summary>Point Constructor</summary>
-    /// 
     /// <remarks>Creates a Point from a specified x,y coordinate pair.</remarks>
     public Point (int x, int y) {
         X = x;
@@ -93,13 +85,11 @@ public struct Point {
     // -----------------------
 
     /// <summary>IsEmpty Property</summary>
-    /// 
     /// <remarks>Indicates if both X and Y are zero.</remarks>
     [JsonIgnore]
     public bool IsEmpty => X == 0 && Y == 0;
 
     /// <summary>Equals Method</summary>
-    /// 
     /// <remarks>Checks equivalence of this Point and another object.</remarks>
     public override bool Equals (object obj) {
         if (!(obj is Point)) {
@@ -110,12 +100,10 @@ public struct Point {
     }
 
     /// <summary>GetHashCode Method</summary>
-    /// 
     /// <remarks>Calculates a hashing value.</remarks>
-    public override int GetHashCode () { return X ^ Y; }
+    public override int GetHashCode () => X ^ Y;
 
     /// <summary>Offset Method</summary>
-    /// 
     /// <remarks>Moves the Point a specified distance.</remarks>
     public void Offset (int dx, int dy) {
         X += dx;
@@ -123,21 +111,18 @@ public struct Point {
     }
 
     /// <summary>ToString Method</summary>
-    /// 
     /// <remarks>Formats the Point as a string in coordinate notation.</remarks>
-    public override string ToString () {
-        return string.Format (
-            "{{X={0},Y={1}}}",
-            X.ToString (CultureInfo.InvariantCulture),
-            Y.ToString (CultureInfo.InvariantCulture)
-        );
-    }
+    public override string ToString () => string.Format (
+        "{{X={0},Y={1}}}",
+        X.ToString (CultureInfo.InvariantCulture),
+        Y.ToString (CultureInfo.InvariantCulture)
+    );
 
     /// <summary>Adds the specified Size to the specified Point.</summary>
     /// <returns>The Point that is the result of the addition operation.</returns>
     /// <param name="pt">The Point to add.</param>
     /// <param name="sz">The Size to add.</param>
-    public static Point Add (Point pt, Size sz) { return new Point (pt.X + sz.Width, pt.Y + sz.Height); }
+    public static Point Add (Point pt, Size sz) => new (pt.X + sz.Width, pt.Y + sz.Height);
 
     /// <summary>Translates this Point by the specified Point.</summary>
     /// <returns>The offset.</returns>
@@ -148,5 +133,5 @@ public struct Point {
     /// <returns>The Point that is the result of the subtraction operation.</returns>
     /// <param name="pt">The Point to be subtracted from.</param>
     /// <param name="sz">The Size to subtract from the Point.</param>
-    public static Point Subtract (Point pt, Size sz) { return new Point (pt.X - sz.Width, pt.Y - sz.Height); }
+    public static Point Subtract (Point pt, Size sz) => new (pt.X - sz.Width, pt.Y - sz.Height);
 }

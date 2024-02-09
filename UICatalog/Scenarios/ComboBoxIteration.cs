@@ -8,7 +8,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("ComboBox")]
 public class ComboBoxIteration : Scenario {
     public override void Setup () {
-        List<string> items = new() { "one", "two", "three" };
+        List<string> items = new () { "one", "two", "three" };
 
         var lbListView = new Label { AutoSize = false, Width = 10, Height = 1 };
         Win.Add (lbListView);

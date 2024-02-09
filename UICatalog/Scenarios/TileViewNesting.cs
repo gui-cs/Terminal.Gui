@@ -82,27 +82,22 @@ public class TileViewNesting : Scenario {
         }
     }
 
-    private View CreateContentControl (int number) {
-        return (bool)_cbUseLabels.Checked ? CreateLabelView (number) : CreateTextView (number);
-    }
+    private View CreateContentControl (int number) =>
+        (bool)_cbUseLabels.Checked ? CreateLabelView (number) : CreateTextView (number);
 
-    private View CreateLabelView (int number) {
-        return new Label {
-            Width = Dim.Fill (),
-            Height = 1,
-            AutoSize = false,
-            Text = number.ToString ().Repeat (1000),
-            CanFocus = true
-        };
-    }
+    private View CreateLabelView (int number) => new Label {
+        Width = Dim.Fill (),
+        Height = 1,
+        AutoSize = false,
+        Text = number.ToString ().Repeat (1000),
+        CanFocus = true
+    };
 
-    private View CreateTextView (int number) {
-        return new TextView {
-            Width = Dim.Fill (), Height = Dim.Fill (), Text = number.ToString ().Repeat (1000), AllowsTab = false
+    private View CreateTextView (int number) => new TextView {
+        Width = Dim.Fill (), Height = Dim.Fill (), Text = number.ToString ().Repeat (1000), AllowsTab = false
 
-            //WordWrap = true,  // TODO: This is very slow (like 10s to render with 45 views)
-        };
-    }
+        //WordWrap = true,  // TODO: This is very slow (like 10s to render with 45 views)
+    };
 
     private TileView CreateTileView (int titleNumber, Orientation orientation) {
         var toReturn = new TileView {

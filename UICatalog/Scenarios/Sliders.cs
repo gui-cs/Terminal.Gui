@@ -26,7 +26,7 @@ public class Sliders : Scenario {
             prev = view;
         }
 
-        List<object> singleOptions = new() {
+        List<object> singleOptions = new () {
             1,
             2,
             3,
@@ -92,7 +92,7 @@ public class Sliders : Scenario {
 
         single.OptionsChanged += (s, e) => { single.Title = $"Continuous {e.Options.FirstOrDefault ().Key}"; };
 
-        List<object> oneOption = new() { "The Only Option" };
+        List<object> oneOption = new () { "The Only Option" };
         var one = new Slider (oneOption) {
             Title = "One Option",
             X = 0,
@@ -133,7 +133,7 @@ public class Sliders : Scenario {
 
         #region Config Slider
 
-        Slider<string> slider = new() {
+        Slider<string> slider = new () {
             Title = "Options",
             X = 0,
             Y = 0,
@@ -300,7 +300,7 @@ public class Sliders : Scenario {
             s.Style.RangeChar.Attribute = Win.GetNormalColor ();
         }
 
-        Slider<(Color, Color)> sliderFGColor = new() {
+        Slider<(Color, Color)> sliderFGColor = new () {
             Title = "FG Color",
             X = 0,
             Y = Pos.Bottom (
@@ -362,7 +362,7 @@ public class Sliders : Scenario {
             }
         };
 
-        Slider<(Color, Color)> sliderBGColor = new() {
+        Slider<(Color, Color)> sliderBGColor = new () {
             Title = "BG Color",
             X = Pos.Right (sliderFGColor),
             Y = Pos.Top (sliderFGColor),

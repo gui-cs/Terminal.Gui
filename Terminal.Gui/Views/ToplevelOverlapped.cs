@@ -70,7 +70,7 @@ public static partial class Application {
                 return top;
             }
 
-            if ((type != null && top.GetType () != type) || (exclude?.Contains (top.Data.ToString ()) == true)) {
+            if ((type != null && top.GetType () != type) || exclude?.Contains (top.Data.ToString ()) == true) {
                 continue;
             }
 
@@ -81,8 +81,8 @@ public static partial class Application {
     }
 
     /// <summary>
-    ///     Move to the next Overlapped child from the <see cref="OverlappedTop"/> and set it as the <see cref="Top"/> if
-    ///     it is not already.
+    ///     Move to the next Overlapped child from the <see cref="OverlappedTop"/> and set it as the <see cref="Top"/> if it is
+    ///     not already.
     /// </summary>
     /// <param name="top"></param>
     /// <returns></returns>
@@ -105,7 +105,7 @@ public static partial class Application {
             lock (_topLevels) {
                 _topLevels.MoveNext ();
                 var isOverlapped = false;
-                while ((_topLevels.Peek () == OverlappedTop) || !_topLevels.Peek ().Visible) {
+                while (_topLevels.Peek () == OverlappedTop || !_topLevels.Peek ().Visible) {
                     if (!isOverlapped && _topLevels.Peek () == OverlappedTop) {
                         isOverlapped = true;
                     } else if (isOverlapped && _topLevels.Peek () == OverlappedTop) {
@@ -128,7 +128,7 @@ public static partial class Application {
             lock (_topLevels) {
                 _topLevels.MovePrevious ();
                 var isOverlapped = false;
-                while ((_topLevels.Peek () == OverlappedTop) || !_topLevels.Peek ().Visible) {
+                while (_topLevels.Peek () == OverlappedTop || !_topLevels.Peek ().Visible) {
                     if (!isOverlapped && _topLevels.Peek () == OverlappedTop) {
                         isOverlapped = true;
                     } else if (isOverlapped && _topLevels.Peek () == OverlappedTop) {

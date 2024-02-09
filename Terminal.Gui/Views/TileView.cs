@@ -46,13 +46,13 @@ public class TileView : View {
     }
 
     /// <summary>
-    ///     Returns the immediate parent <see cref="TileView"/> of this. Note that in case of deep nesting this might not
-    ///     be the root <see cref="TileView"/>. Returns null if this instance is not a nested child (created with
+    ///     Returns the immediate parent <see cref="TileView"/> of this. Note that in case of deep nesting this might not be
+    ///     the root <see cref="TileView"/>. Returns null if this instance is not a nested child (created with
     ///     <see cref="TrySplitTile(int, int, out TileView)"/>)
     /// </summary>
     /// <remarks>Use <see cref="IsRootTileView"/> to determine if the returned value is the root.</remarks>
     /// <returns></returns>
-    public TileView GetParentTileView () { return parentTileView; }
+    public TileView GetParentTileView () => parentTileView;
 
     /// <summary>
     ///     Returns the index of the first <see cref="Tile"/> in <see cref="Tiles"/> which contains
@@ -118,17 +118,17 @@ public class TileView : View {
 
     /// <summary>
     ///     <para>
-    ///         <see langword="true"/> if <see cref="TileView"/> is nested within a parent <see cref="TileView"/> e.g. via
-    ///         the <see cref="TrySplitTile"/>. <see langword="false"/> if it is a root level <see cref="TileView"/>.
+    ///         <see langword="true"/> if <see cref="TileView"/> is nested within a parent <see cref="TileView"/> e.g. via the
+    ///         <see cref="TrySplitTile"/>. <see langword="false"/> if it is a root level <see cref="TileView"/>.
     ///     </para>
     /// </summary>
     /// <remarks>
-    ///     Note that manually adding one <see cref="TileView"/> to another will not result in a parent/child relationship
-    ///     and both will still be considered 'root' containers. Always use <see cref="TrySplitTile(int, int, out TileView)"/>
-    ///     if you want to subdivide a <see cref="TileView"/>.
+    ///     Note that manually adding one <see cref="TileView"/> to another will not result in a parent/child relationship and
+    ///     both will still be considered 'root' containers. Always use <see cref="TrySplitTile(int, int, out TileView)"/> if
+    ///     you want to subdivide a <see cref="TileView"/>.
     /// </remarks>
     /// <returns></returns>
-    public bool IsRootTileView () { return parentTileView == null; }
+    public bool IsRootTileView () => parentTileView == null;
 
     /// <inheritdoc/>
     public override void LayoutSubviews () {
@@ -153,7 +153,7 @@ public class TileView : View {
 
     /// <summary>Overridden so no Frames get drawn (BUGBUG: v2 fix this hack)</summary>
     /// <returns></returns>
-    public override bool OnDrawAdornments () { return false; }
+    public override bool OnDrawAdornments () => false;
 
     /// <inheritdoc/>
     public override void OnDrawContent (Rect contentArea) {
@@ -312,15 +312,15 @@ public class TileView : View {
     }
 
     /// <summary>
-    ///     Removes a <see cref="Tiles"/> at the provided <paramref name="idx"/> from the view. Returns the removed tile
-    ///     or null if already empty.
+    ///     Removes a <see cref="Tiles"/> at the provided <paramref name="idx"/> from the view. Returns the removed tile or
+    ///     null if already empty.
     /// </summary>
     /// <param name="idx"></param>
     /// <returns></returns>
     public Tile RemoveTile (int idx) {
         Tile[] oldTiles = Tiles.ToArray ();
 
-        if ((idx < 0) || (idx >= oldTiles.Length)) {
+        if (idx < 0 || idx >= oldTiles.Length) {
             return null;
         }
 
@@ -383,13 +383,13 @@ public class TileView : View {
     public event SplitterEventHandler SplitterMoved;
 
     /// <summary>
-    ///     Converts of <see cref="Tiles"/> element <paramref name="idx"/> from a regular <see cref="View"/> to a new
-    ///     nested <see cref="TileView"/> the specified <paramref name="numberOfPanels"/>. Returns false if the element already
+    ///     Converts of <see cref="Tiles"/> element <paramref name="idx"/> from a regular <see cref="View"/> to a new nested
+    ///     <see cref="TileView"/> the specified <paramref name="numberOfPanels"/>. Returns false if the element already
     ///     contains a nested view.
     /// </summary>
     /// <remarks>
-    ///     After successful splitting, the old contents will be moved to the <paramref name="result"/>
-    ///     <see cref="TileView"/>'s first tile.
+    ///     After successful splitting, the old contents will be moved to the <paramref name="result"/> <see cref="TileView"/>
+    ///     's first tile.
     /// </remarks>
     /// <param name="idx">The element of <see cref="Tiles"/> that is to be subdivided.</param>
     /// <param name="numberOfPanels">The number of panels that the <see cref="Tile"/> should be split into</param>
@@ -535,7 +535,7 @@ public class TileView : View {
         return distance - (HasBorder () ? 1 : 0);
     }
 
-    private bool HasBorder () { return LineStyle != LineStyle.None; }
+    private bool HasBorder () => LineStyle != LineStyle.None;
 
     private void HideSplittersBasedOnTileVisibility () {
         if (_splitterLines.Count == 0) {
@@ -650,7 +650,7 @@ public class TileView : View {
     }
 
     private void Setup (Rect contentArea) {
-        if (contentArea.IsEmpty || (contentArea.Height <= 0) || (contentArea.Width <= 0)) {
+        if (contentArea.IsEmpty || contentArea.Height <= 0 || contentArea.Width <= 0) {
             return;
         }
 
@@ -705,9 +705,7 @@ public class TileView : View {
         }
 
         public int Depth { get; }
-
         public Tile Tile { get; }
-
         public TileView Parent { get; }
 
         /// <summary>
@@ -760,13 +758,11 @@ public class TileView : View {
         private Point? dragPosition;
         public Point? moveRuneRenderLocation;
         private Pos dragOrignalPos;
-
         public int Idx { get; }
-
         public TileView Parent { get; }
 
         public void DrawSplitterSymbol () {
-            if ((dragPosition != null) || CanFocus) {
+            if (dragPosition != null || CanFocus) {
                 Point location = moveRuneRenderLocation ??
                                  new Point (Bounds.Width / 2, Bounds.Height / 2);
 
@@ -881,8 +877,8 @@ public class TileView : View {
         ///         <paramref name="oldValue"/> had.
         ///     </para>
         ///     <remarks>
-        ///         This ensures that if splitter location was e.g. 50% before and you move it to absolute 5 then you end up
-        ///         with 10% (assuming a parent had 50 width).
+        ///         This ensures that if splitter location was e.g. 50% before and you move it to absolute 5 then you end up with
+        ///         10% (assuming a parent had 50 width).
         ///     </remarks>
         /// </summary>
         /// <param name="oldValue"></param>

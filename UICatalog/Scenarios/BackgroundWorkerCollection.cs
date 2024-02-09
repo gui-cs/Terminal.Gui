@@ -111,7 +111,7 @@ public class BackgroundWorkerCollection : Scenario {
 
         private MenuBarItem OpenedWindows () {
             var index = 1;
-            List<MenuItem> menuItems = new List<MenuItem> ();
+            List<MenuItem> menuItems = new ();
             List<Toplevel> sortedChildren = Application.OverlappedChildren;
             sortedChildren.Sort (new ToplevelComparer ());
             foreach (Toplevel top in sortedChildren) {
@@ -158,7 +158,7 @@ public class BackgroundWorkerCollection : Scenario {
         private void Quit () { RequestStop (); }
 
         private MenuBarItem View () {
-            List<MenuItem> menuItems = new List<MenuItem> ();
+            List<MenuItem> menuItems = new ();
             var item = new MenuItem { Title = "WorkerApp", CheckType = MenuItemCheckStyle.Checked };
             Toplevel top = Application.OverlappedChildren?.Find (x => x.Data.ToString () == "WorkerApp");
             if (top != null) {
@@ -190,7 +190,6 @@ public class BackgroundWorkerCollection : Scenario {
         }
 
         public bool Completed { get; }
-
         public DateTime? StartStaging { get; }
     }
 
@@ -259,11 +258,8 @@ public class BackgroundWorkerCollection : Scenario {
         private readonly Button _start;
         private readonly Label _label;
         private readonly ListView _listView;
-
         public Staging Staging { get; private set; }
-
         public event Action<StagingUIController> ReportClosed;
-
         public void Run () { Application.Run (this); }
 
         private void OnReportClosed (object sender, EventArgs e) {
@@ -303,7 +299,7 @@ public class BackgroundWorkerCollection : Scenario {
         private List<StagingUIController> _stagingsUi;
 
         public void CancelWorker () {
-            if ((_stagingWorkers == null) || (_stagingWorkers.Count == 0)) {
+            if (_stagingWorkers == null || _stagingWorkers.Count == 0) {
                 WriteLog ($"Worker is not running at {DateTime.Now}!");
 
                 return;
@@ -331,7 +327,7 @@ public class BackgroundWorkerCollection : Scenario {
             var worker = new BackgroundWorker { WorkerSupportsCancellation = true };
 
             worker.DoWork += (s, e) => {
-                List<string> stageResult = new List<string> ();
+                List<string> stageResult = new ();
                 for (var i = 0; i < 500; i++) {
                     stageResult.Add (
                         $"Worker {i} started at {DateTime.Now}"

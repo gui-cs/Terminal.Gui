@@ -15,8 +15,8 @@ public abstract class CollectionNavigatorBase {
     private string _searchString = "";
 
     /// <summary>
-    ///     Gets or sets the number of milliseconds to delay before clearing the search string. The delay is reset on each
-    ///     call to <see cref="GetNextMatchingItem(int, char)"/>. The default is 500ms.
+    ///     Gets or sets the number of milliseconds to delay before clearing the search string. The delay is reset on each call
+    ///     to <see cref="GetNextMatchingItem(int, char)"/>. The default is 500ms.
     /// </summary>
     public int TypingDelay { get; set; } = 500;
 
@@ -93,7 +93,7 @@ public abstract class CollectionNavigatorBase {
             }
 
             // if no changes to current state manifested
-            if ((idxCandidate == currentIndex) || (idxCandidate == -1)) {
+            if (idxCandidate == currentIndex || idxCandidate == -1) {
                 // clear history and treat as a fresh letter
                 ClearSearchString ();
 
@@ -116,8 +116,8 @@ public abstract class CollectionNavigatorBase {
     }
 
     /// <summary>
-    ///     Returns true if <paramref name="a"/> is a searchable key (e.g. letters, numbers, etc) that are valid to pass
-    ///     to this class for search filtering.
+    ///     Returns true if <paramref name="a"/> is a searchable key (e.g. letters, numbers, etc) that are valid to pass to
+    ///     this class for search filtering.
     /// </summary>
     /// <param name="a"></param>
     /// <returns></returns>
@@ -148,10 +148,9 @@ public abstract class CollectionNavigatorBase {
     /// <param name="currentIndex">The index in the collection to start the search from.</param>
     /// <param name="search">The search string to use.</param>
     /// <param name="minimizeMovement">
-    ///     Set to <see langword="true"/> to stop the search on the first match if there are
-    ///     multiple matches for <paramref name="search"/>. e.g. "ca" + 'r' should stay on "car" and not jump to "cart". If
-    ///     <see langword="false"/> (the default), the next matching item will be returned, even if it is above in the
-    ///     collection.
+    ///     Set to <see langword="true"/> to stop the search on the first match if there are multiple matches for
+    ///     <paramref name="search"/>. e.g. "ca" + 'r' should stay on "car" and not jump to "cart". If <see langword="false"/>
+    ///     (the default), the next matching item will be returned, even if it is above in the collection.
     /// </param>
     /// <returns>The index of the next matching item or <see langword="-1"/> if no match was found.</returns>
     internal int GetNextMatchingItem (int currentIndex, string search, bool minimizeMovement = false) {
@@ -196,7 +195,6 @@ public abstract class CollectionNavigatorBase {
         _lastKeystroke = DateTime.Now;
     }
 
-    private bool IsMatch (string search, object value) {
-        return value?.ToString ().StartsWith (search, StringComparison.InvariantCultureIgnoreCase) ?? false;
-    }
+    private bool IsMatch (string search, object value) =>
+        value?.ToString ().StartsWith (search, StringComparison.InvariantCultureIgnoreCase) ?? false;
 }

@@ -40,9 +40,9 @@ public sealed class ContextMenu : IDisposable {
     private Toplevel _container;
 
     /// <summary>
-    ///     Sets or gets whether the context menu be forced to the right, ensuring it is not clipped, if the x position is
-    ///     less than zero. The default is <see langword="true"/> which means the context menu will be forced to the right. If
-    ///     set to <see langword="false"/>, the context menu will be clipped on the left if x is less than zero.
+    ///     Sets or gets whether the context menu be forced to the right, ensuring it is not clipped, if the x position is less
+    ///     than zero. The default is <see langword="true"/> which means the context menu will be forced to the right. If set
+    ///     to <see langword="false"/>, the context menu will be clipped on the left if x is less than zero.
     /// </summary>
     public bool ForceMinimumPosToZero { get; set; } = true;
 
@@ -140,7 +140,7 @@ public sealed class ContextMenu : IDisposable {
 
         Rect rect = Menu.MakeFrame (position.X, position.Y, MenuItems.Children);
         if (rect.Right >= frame.Right) {
-            if ((frame.Right - rect.Width >= 0) || !ForceMinimumPosToZero) {
+            if (frame.Right - rect.Width >= 0 || !ForceMinimumPosToZero) {
                 position.X = frame.Right - rect.Width;
             } else if (ForceMinimumPosToZero) {
                 position.X = 0;
@@ -150,7 +150,7 @@ public sealed class ContextMenu : IDisposable {
         }
 
         if (rect.Bottom >= frame.Bottom) {
-            if ((frame.Bottom - rect.Height - 1 >= 0) || !ForceMinimumPosToZero) {
+            if (frame.Bottom - rect.Height - 1 >= 0 || !ForceMinimumPosToZero) {
                 if (Host == null) {
                     position.Y = frame.Bottom - rect.Height - 1;
                 } else {

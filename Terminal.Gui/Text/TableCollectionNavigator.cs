@@ -18,5 +18,5 @@ public class TableCollectionNavigator : CollectionNavigatorBase {
     }
 
     /// <inheritdoc/>
-    protected override int GetCollectionLength () { return tableView.Table.Rows; }
+    protected override int GetCollectionLength () => tableView.Table.Rows;
 }

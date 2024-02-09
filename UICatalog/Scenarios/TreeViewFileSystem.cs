@@ -186,9 +186,7 @@ public class TreeViewFileSystem : Scenario {
         UpdateIconCheckedness ();
     }
 
-    private string AspectGetter (IFileSystemInfo f) {
-        return (_iconProvider.GetIconWithOptionalSpace (f) + f.Name).Trim ();
-    }
+    private string AspectGetter (IFileSystemInfo f) => (_iconProvider.GetIconWithOptionalSpace (f) + f.Name).Trim ();
 
     private void InvertExpandableSymbols () {
         _miInvertSymbols.Checked = !_miInvertSymbols.Checked;
@@ -406,7 +404,7 @@ public class TreeViewFileSystem : Scenario {
             int? location = _treeViewFiles.GetObjectRow (selected);
 
             //selected object is offscreen or somehow not found
-            if ((location == null) || (location < 0) || (location > _treeViewFiles.Frame.Height)) {
+            if (location == null || location < 0 || location > _treeViewFiles.Frame.Height) {
                 return;
             }
 

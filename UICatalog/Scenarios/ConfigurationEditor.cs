@@ -124,7 +124,7 @@ public class ConfigurationEditor : Scenario {
                     "No",
                     "Cancel"
                 );
-                if ((result == -1) || (result == 2)) {
+                if (result == -1 || result == 2) {
                     // user cancelled
                 }
 
@@ -157,7 +157,6 @@ public class ConfigurationEditor : Scenario {
         }
 
         internal FileInfo FileInfo { get; set; }
-
         internal Tile Tile { get; set; }
 
         internal void Read () {

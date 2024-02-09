@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-class FileDialogState {
+internal class FileDialogState {
     public FileDialogState (IDirectoryInfo dir, FileDialog parent) {
         Directory = dir;
         Parent = parent;
@@ -12,11 +12,8 @@ class FileDialogState {
     }
 
     protected readonly FileDialog Parent;
-
     public FileSystemInfoStats Selected { get; set; }
-
     public FileSystemInfoStats[] Children { get; internal set; }
-
     public IDirectoryInfo Directory { get; }
 
     /// <summary>Gets what was entered in the path text box of the dialog when the state was active.</summary>
@@ -65,10 +62,9 @@ class FileDialogState {
         }
     }
 
-    protected bool MatchesApiFilter (FileSystemInfoStats arg) {
-        return arg.IsDir ||
-               (arg.FileSystemInfo is IFileInfo f && Parent.CurrentFilter.IsAllowed (f.FullName));
-    }
+    protected bool MatchesApiFilter (FileSystemInfoStats arg) => arg.IsDir ||
+                                                                 (arg.FileSystemInfo is IFileInfo f
+                                                                  && Parent.CurrentFilter.IsAllowed (f.FullName));
 
     internal virtual void RefreshChildren () {
         IDirectoryInfo dir = Directory;

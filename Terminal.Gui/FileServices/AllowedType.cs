@@ -5,8 +5,8 @@ namespace Terminal.Gui;
 /// <summary>Interface for <see cref="FileDialog"/> restrictions on which file type(s) the user is allowed to select/enter.</summary>
 public interface IAllowedType {
     /// <summary>
-    ///     Returns true if the file at <paramref name="path"/> is compatible with this allow option.  Note that the file
-    ///     may not exist (e.g. in the case of saving).
+    ///     Returns true if the file at <paramref name="path"/> is compatible with this allow option.  Note that the file may
+    ///     not exist (e.g. in the case of saving).
     /// </summary>
     /// <param name="path"></param>
     /// <returns></returns>
@@ -16,11 +16,11 @@ public interface IAllowedType {
 /// <summary><see cref="IAllowedType"/> that allows selection of any types (*.*).</summary>
 public class AllowedTypeAny : IAllowedType {
     /// <inheritdoc/>
-    public bool IsAllowed (string path) { return true; }
+    public bool IsAllowed (string path) => true;
 
     /// <summary>Returns a string representation of this <see cref="AllowedTypeAny"/>.</summary>
     /// <returns></returns>
-    public override string ToString () { return Strings.fdAnyFiles + "(*.*)"; }
+    public override string ToString () => Strings.fdAnyFiles + "(*.*)";
 }
 
 /// <summary>

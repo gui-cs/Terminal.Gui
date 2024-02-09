@@ -1,9 +1,9 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     Specifies the event arguments for <see cref="Terminal.Gui.MouseEvent"/>. This is a higher-level construct than
-///     the wrapped <see cref="MouseEvent"/> class and is used for the events defined on <see cref="View"/> and subclasses
-///     of View (e.g. <see cref="View.MouseEnter"/> and <see cref="View.MouseClick"/>).
+///     Specifies the event arguments for <see cref="Terminal.Gui.MouseEvent"/>. This is a higher-level construct than the
+///     wrapped <see cref="MouseEvent"/> class and is used for the events defined on <see cref="View"/> and subclasses of
+///     View (e.g. <see cref="View.MouseEnter"/> and <see cref="View.MouseClick"/>).
 /// </summary>
 public class MouseEventEventArgs : EventArgs {
     /// <summary>Constructs.</summary>
@@ -16,10 +16,13 @@ public class MouseEventEventArgs : EventArgs {
     ///     subscriber method.
     /// </summary>
     /// <remarks>
-    ///     This property forwards to the <see cref="MouseEvent.Handled"/> property and is provided as a convenience and
-    ///     for backwards compatibility
+    ///     This property forwards to the <see cref="MouseEvent.Handled"/> property and is provided as a convenience and for
+    ///     backwards compatibility
     /// </remarks>
-    public bool Handled { get => MouseEvent.Handled; set => MouseEvent.Handled = value; }
+    public bool Handled {
+        get => MouseEvent.Handled;
+        set => MouseEvent.Handled = value;
+    }
 
     // TODO: Merge MouseEvent and MouseEventEventArgs into a single class.
     /// <summary>The <see cref="Terminal.Gui.MouseEvent"/> for the event.</summary>

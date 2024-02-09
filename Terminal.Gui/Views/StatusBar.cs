@@ -43,9 +43,9 @@ public class StatusItem {
     /// <summary>Gets or sets the title.</summary>
     /// <value>The title.</value>
     /// <remarks>
-    ///     The colour of the <see cref="StatusItem.Title"/> will be changed after each ~. A
-    ///     <see cref="StatusItem.Title"/> set to `~F1~ Help` will render as *F1* using <see cref="ColorScheme.HotNormal"/> and
-    ///     *Help* as <see cref="ColorScheme.HotNormal"/>.
+    ///     The colour of the <see cref="StatusItem.Title"/> will be changed after each ~. A <see cref="StatusItem.Title"/> set
+    ///     to `~F1~ Help` will render as *F1* using <see cref="ColorScheme.HotNormal"/> and *Help* as
+    ///     <see cref="ColorScheme.HotNormal"/>.
     /// </remarks>
     public string Title { get; set; }
 
@@ -53,7 +53,7 @@ public class StatusItem {
     ///     Returns <see langword="true"/> if the status item is enabled. This method is a wrapper around
     ///     <see cref="CanExecute"/>.
     /// </summary>
-    public bool IsEnabled () { return CanExecute?.Invoke () ?? true; }
+    public bool IsEnabled () => CanExecute?.Invoke () ?? true;
 }
 
 /// <summary>
@@ -68,9 +68,9 @@ public class StatusBar : View {
     public StatusBar () : this (new StatusItem[] { }) { }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="StatusBar"/> class with the specified set of
-    ///     <see cref="StatusItem"/>s. The <see cref="StatusBar"/> will be drawn on the lowest line of the terminal or
-    ///     <see cref="View.SuperView"/> (if not null).
+    ///     Initializes a new instance of the <see cref="StatusBar"/> class with the specified set of <see cref="StatusItem"/>
+    ///     s. The <see cref="StatusBar"/> will be drawn on the lowest line of the terminal or <see cref="View.SuperView"/> (if
+    ///     not null).
     /// </summary>
     /// <param name="items">A list of status bar items.</param>
     public StatusBar (StatusItem[] items) {

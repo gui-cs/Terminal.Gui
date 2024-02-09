@@ -6,11 +6,11 @@ using System.Text.RegularExpressions;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Json converter for <see cref="Rune"/>. Supports Json converter for <see cref="Rune"/>. Supports A string as
-///     one of: - unicode char (e.g. "☑") - U+hex format (e.g. "U+2611") - \u format (e.g. "\\u2611") A number - The
-///     unicode code in decimal
+///     Json converter for <see cref="Rune"/>. Supports Json converter for <see cref="Rune"/>. Supports A string as one of:
+///     - unicode char (e.g. "☑") - U+hex format (e.g. "U+2611") - \u format (e.g. "\\u2611") A number - The unicode code
+///     in decimal
 /// </summary>
-class RuneJsonConverter : JsonConverter<Rune> {
+internal class RuneJsonConverter : JsonConverter<Rune> {
     public override Rune Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
         switch (reader.TokenType) {
             case JsonTokenType.String: {
@@ -30,7 +30,7 @@ class RuneJsonConverter : JsonConverter<Rune> {
                         )
                         .ToArray ();
 
-                    if ((codePoints.Length == 0) || (codePoints.Length > 2)) {
+                    if (codePoints.Length == 0 || codePoints.Length > 2) {
                         throw new JsonException ($"Invalid Rune: {value}.");
                     }
 
@@ -43,7 +43,7 @@ class RuneJsonConverter : JsonConverter<Rune> {
                     }
                 } else {
                     // Handle single character, surrogate pair, or combining mark + char
-                    if ((value.Length == 0) || (value.Length > 2)) {
+                    if (value.Length == 0 || value.Length > 2) {
                         throw new JsonException ($"Invalid Rune: {value}.");
                     }
 

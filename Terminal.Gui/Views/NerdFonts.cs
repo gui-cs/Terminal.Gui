@@ -5,14 +5,14 @@ using System.IO.Abstractions;
 
 namespace Terminal.Gui;
 
-class NerdFonts {
+internal class NerdFonts {
     private readonly char _nf_cod_file = '';
     private readonly char _nf_cod_folder = '';
     private readonly char _nf_cod_folder_opened = '';
 
     /// <summary>
-    ///     If <see langword="true"/>, enables the use of Nerd unicode symbols. This requires specific font(s) to be
-    ///     installed on the users machine to work correctly.  Defaults to <see langword="false"/>.
+    ///     If <see langword="true"/>, enables the use of Nerd unicode symbols. This requires specific font(s) to be installed
+    ///     on the users machine to work correctly.  Defaults to <see langword="false"/>.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     public static bool Enable { get; set; } = false;

@@ -38,39 +38,37 @@ public struct SizeF : IEquatable<SizeF> {
     }
 
     /// <summary>Performs vector addition of two <see cref='Terminal.Gui.SizeF'/> objects.</summary>
-    public static SizeF operator + (SizeF sz1, SizeF sz2) { return Add (sz1, sz2); }
+    public static SizeF operator + (SizeF sz1, SizeF sz2) => Add (sz1, sz2);
 
     /// <summary>Contracts a <see cref='Terminal.Gui.SizeF'/> by another <see cref='Terminal.Gui.SizeF'/></summary>
-    public static SizeF operator - (SizeF sz1, SizeF sz2) { return Subtract (sz1, sz2); }
+    public static SizeF operator - (SizeF sz1, SizeF sz2) => Subtract (sz1, sz2);
 
     /// <summary>Multiplies <see cref="SizeF"/> by a <see cref="float"/> producing <see cref="SizeF"/>.</summary>
     /// <param name="left">Multiplier of type <see cref="float"/>.</param>
     /// <param name="right">Multiplicand of type <see cref="SizeF"/>.</param>
     /// <returns>Product of type <see cref="SizeF"/>.</returns>
-    public static SizeF operator * (float left, SizeF right) { return Multiply (right, left); }
+    public static SizeF operator * (float left, SizeF right) => Multiply (right, left);
 
     /// <summary>Multiplies <see cref="SizeF"/> by a <see cref="float"/> producing <see cref="SizeF"/>.</summary>
     /// <param name="left">Multiplicand of type <see cref="SizeF"/>.</param>
     /// <param name="right">Multiplier of type <see cref="float"/>.</param>
     /// <returns>Product of type <see cref="SizeF"/>.</returns>
-    public static SizeF operator * (SizeF left, float right) { return Multiply (left, right); }
+    public static SizeF operator * (SizeF left, float right) => Multiply (left, right);
 
     /// <summary>Divides <see cref="SizeF"/> by a <see cref="float"/> producing <see cref="SizeF"/>.</summary>
     /// <param name="left">Dividend of type <see cref="SizeF"/>.</param>
     /// <param name="right">Divisor of type <see cref="int"/>.</param>
     /// <returns>Result of type <see cref="SizeF"/>.</returns>
-    public static SizeF operator / (SizeF left, float right) {
-        return new SizeF (left.Width / right, left.Height / right);
-    }
+    public static SizeF operator / (SizeF left, float right) => new (left.Width / right, left.Height / right);
 
     /// <summary>Tests whether two <see cref='Terminal.Gui.SizeF'/> objects are identical.</summary>
-    public static bool operator == (SizeF sz1, SizeF sz2) { return sz1.Width == sz2.Width && sz1.Height == sz2.Height; }
+    public static bool operator == (SizeF sz1, SizeF sz2) => sz1.Width == sz2.Width && sz1.Height == sz2.Height;
 
     /// <summary>Tests whether two <see cref='Terminal.Gui.SizeF'/> objects are different.</summary>
-    public static bool operator != (SizeF sz1, SizeF sz2) { return !(sz1 == sz2); }
+    public static bool operator != (SizeF sz1, SizeF sz2) => !(sz1 == sz2);
 
     /// <summary>Converts the specified <see cref='Terminal.Gui.SizeF'/> to a <see cref='Terminal.Gui.PointF'/>.</summary>
-    public static explicit operator PointF (SizeF size) { return new PointF (size.Width, size.Height); }
+    public static explicit operator PointF (SizeF size) => new (size.Width, size.Height);
 
     /// <summary>Tests whether this <see cref='Terminal.Gui.SizeF'/> has zero width and height.</summary>
     [Browsable (false)]
@@ -83,36 +81,31 @@ public struct SizeF : IEquatable<SizeF> {
     public float Height { get; set; }
 
     /// <summary>Performs vector addition of two <see cref='Terminal.Gui.SizeF'/> objects.</summary>
-    public static SizeF Add (SizeF sz1, SizeF sz2) {
-        return new SizeF (sz1.Width + sz2.Width, sz1.Height + sz2.Height);
-    }
+    public static SizeF Add (SizeF sz1, SizeF sz2) => new (sz1.Width + sz2.Width, sz1.Height + sz2.Height);
 
     /// <summary>Contracts a <see cref='Terminal.Gui.SizeF'/> by another <see cref='Terminal.Gui.SizeF'/>.</summary>
-    public static SizeF Subtract (SizeF sz1, SizeF sz2) {
-        return new SizeF (sz1.Width - sz2.Width, sz1.Height - sz2.Height);
-    }
+    public static SizeF Subtract (SizeF sz1, SizeF sz2) => new (sz1.Width - sz2.Width, sz1.Height - sz2.Height);
 
     /// <summary>
-    ///     Tests to see whether the specified object is a <see cref='Terminal.Gui.SizeF'/>  with the same dimensions as
-    ///     this <see cref='Terminal.Gui.SizeF'/>.
+    ///     Tests to see whether the specified object is a <see cref='Terminal.Gui.SizeF'/>  with the same dimensions as this
+    ///     <see cref='Terminal.Gui.SizeF'/>.
     /// </summary>
-    public override bool Equals (object obj) { return obj is SizeF && Equals ((SizeF)obj); }
+    public override bool Equals (object obj) => obj is SizeF && Equals ((SizeF)obj);
 
     /// <summary>Tests whether two <see cref='Terminal.Gui.SizeF'/> objects are identical.</summary>
-    public bool Equals (SizeF other) { return this == other; }
+    public bool Equals (SizeF other) => this == other;
 
     /// <summary>Generates a hashcode from the width and height</summary>
     /// <returns></returns>
-    public override int GetHashCode () { return Width.GetHashCode () ^ Height.GetHashCode (); }
+    public override int GetHashCode () => Width.GetHashCode () ^ Height.GetHashCode ();
 
     /// <summary>Creates a human-readable string that represents this <see cref='Terminal.Gui.SizeF'/>.</summary>
-    public override string ToString () { return "{Width=" + Width + ", Height=" + Height + "}"; }
+    public override string ToString () => "{Width=" + Width + ", Height=" + Height + "}";
 
     /// <summary>Multiplies <see cref="SizeF"/> by a <see cref="float"/> producing <see cref="SizeF"/>.</summary>
     /// <param name="size">Multiplicand of type <see cref="SizeF"/>.</param>
     /// <param name="multiplier">Multiplier of type <see cref="float"/>.</param>
     /// <returns>Product of type SizeF.</returns>
-    private static SizeF Multiply (SizeF size, float multiplier) {
-        return new SizeF (size.Width * multiplier, size.Height * multiplier);
-    }
+    private static SizeF Multiply (SizeF size, float multiplier) =>
+        new (size.Width * multiplier, size.Height * multiplier);
 }

@@ -2153,7 +2153,7 @@ public class TileViewTests {
         return split;
     }
 
-    private TileView Get11By3TileView (bool withBorder = false) { return GetTileView (11, 3, withBorder); }
+    private TileView Get11By3TileView (bool withBorder = false) => GetTileView (11, 3, withBorder);
 
     private TileView Get5x1TilesView (bool border = true) {
         var tv = new TileView (5) {
@@ -2193,7 +2193,7 @@ public class TileViewTests {
         return tv;
     }
 
-    private LineView GetLine (TileView tileView) { return tileView.Subviews.OfType<LineView> ().Single (); }
+    private LineView GetLine (TileView tileView) => tileView.Subviews.OfType<LineView> ().Single ();
 
     /// <summary>Creates a vertical orientation root container with left pane split into two (with horizontal splitter line).</summary>
     /// <param name="withBorder"></param>

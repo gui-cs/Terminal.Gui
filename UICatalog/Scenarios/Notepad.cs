@@ -151,7 +151,7 @@ public class Notepad : Scenario {
                 "Cancel"
             );
 
-            if ((result == -1) || (result == 2)) {
+            if (result == -1 || result == 2) {
                 // user cancelled
                 return;
             }
@@ -315,7 +315,6 @@ public class Notepad : Scenario {
 
     private class OpenedFile : Tab {
         public bool UnsavedChanges => !string.Equals (SavedText, View.Text);
-
         public FileInfo File { get; set; }
 
         /// <summary>The text of the tab the last time it was saved</summary>

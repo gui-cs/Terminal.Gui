@@ -11,8 +11,8 @@ public class TabMouseEventArgs : EventArgs {
     }
 
     /// <summary>
-    ///     Gets the actual mouse event.  Use <see cref="MouseEvent.Handled"/> to cancel this event and perform custom
-    ///     behavior (e.g. show a context menu).
+    ///     Gets the actual mouse event.  Use <see cref="MouseEvent.Handled"/> to cancel this event and perform custom behavior
+    ///     (e.g. show a context menu).
     /// </summary>
     public MouseEvent MouseEvent { get; }
 

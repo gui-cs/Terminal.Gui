@@ -30,7 +30,7 @@ public class FileSystemTreeBuilder : ITreeBuilder<IFileSystemInfo>, IComparer<IF
     public bool SupportsCanExpand => true;
 
     /// <inheritdoc/>
-    public bool CanExpand (IFileSystemInfo toExpand) { return TryGetChildren (toExpand).Any (); }
+    public bool CanExpand (IFileSystemInfo toExpand) => TryGetChildren (toExpand).Any ();
 
     /// <inheritdoc/>
     public IEnumerable<IFileSystemInfo> GetChildren (IFileSystemInfo forObject) {

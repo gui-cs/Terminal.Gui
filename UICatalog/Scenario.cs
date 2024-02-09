@@ -18,15 +18,15 @@ namespace UICatalog;
 ///             </item>
 ///             <item>
 ///                 <description>
-///                     Annotate the <see cref="Scenario"/> derived class with a
-///                     <see cref="Scenario.ScenarioMetadata"/> attribute specifying the scenario's name and description.
+///                     Annotate the <see cref="Scenario"/> derived class with a <see cref="Scenario.ScenarioMetadata"/>
+///                     attribute specifying the scenario's name and description.
 ///                 </description>
 ///             </item>
 ///             <item>
 ///                 <description>
-///                     Add one or more <see cref="Scenario.ScenarioCategory"/> attributes to the class specifying
-///                     which categories the scenario belongs to. If you don't specify a category the scenario will show up
-///                     in "_All".
+///                     Add one or more <see cref="Scenario.ScenarioCategory"/> attributes to the class specifying which
+///                     categories the scenario belongs to. If you don't specify a category the scenario will show up in
+///                     "_All".
 ///                 </description>
 ///             </item>
 ///             <item>
@@ -44,8 +44,8 @@ namespace UICatalog;
 ///         </list>
 ///     </para>
 ///     <para>
-///         The UI Catalog program uses reflection to find all scenarios and adds them to the ListViews. Press ENTER to
-///         run the selected scenario. Press the default quit key to quit.	/
+///         The UI Catalog program uses reflection to find all scenarios and adds them to the ListViews. Press ENTER to run
+///         the selected scenario. Press the default quit key to quit.	/
 ///     </para>
 /// </summary>
 /// <example>
@@ -77,8 +77,8 @@ public class Scenario : IDisposable {
     public string TopLevelColorScheme = "Base";
 
     /// <summary>
-    ///     The Window for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/> in
-    ///     most cases.
+    ///     The Window for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/> in most
+    ///     cases.
     /// </summary>
     public Window Win { get; set; }
 
@@ -93,15 +93,15 @@ public class Scenario : IDisposable {
     ///     <see cref="ScenarioCategory"/>)
     /// </summary>
     /// <returns>list of category names</returns>
-    public List<string> GetCategories () { return ScenarioCategory.GetCategories (GetType ()); }
+    public List<string> GetCategories () => ScenarioCategory.GetCategories (GetType ());
 
     /// <summary>Helper to get the <see cref="Scenario"/> Description (defined in <see cref="ScenarioMetadata"/>)</summary>
     /// <returns></returns>
-    public string GetDescription () { return ScenarioMetadata.GetDescription (GetType ()); }
+    public string GetDescription () => ScenarioMetadata.GetDescription (GetType ());
 
     /// <summary>Helper to get the <see cref="Scenario"/> Name (defined in <see cref="ScenarioMetadata"/>)</summary>
     /// <returns></returns>
-    public string GetName () { return ScenarioMetadata.GetName (GetType ()); }
+    public string GetName () => ScenarioMetadata.GetName (GetType ());
 
     /// <summary>
     ///     Returns a list of all <see cref="Scenario"/> instanaces defined in the project, sorted by
@@ -124,8 +124,8 @@ public class Scenario : IDisposable {
     }
 
     /// <summary>
-    ///     Helper that provides the default <see cref="Terminal.Gui.Window"/> implementation with a frame and label
-    ///     showing the name of the <see cref="Scenario"/> and logic to exit back to the Scenario picker UI. Override
+    ///     Helper that provides the default <see cref="Terminal.Gui.Window"/> implementation with a frame and label showing
+    ///     the name of the <see cref="Scenario"/> and logic to exit back to the Scenario picker UI. Override
     ///     <see cref="Init"/> to provide any <see cref="Terminal.Gui.Toplevel"/> behavior needed.
     /// </summary>
     /// <remarks>
@@ -134,8 +134,8 @@ public class Scenario : IDisposable {
     ///         <see cref="Win"/> and adds it to <see cref="Application.Top"/>.
     ///     </para>
     ///     <para>
-    ///         Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Init"/> before
-    ///         creating any views or calling other Terminal.Gui APIs.
+    ///         Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Init"/> before creating
+    ///         any views or calling other Terminal.Gui APIs.
     ///     </para>
     /// </remarks>
     public virtual void Init () {
@@ -177,7 +177,7 @@ public class Scenario : IDisposable {
 
     /// <summary>Gets the Scenario Name + Description with the Description padded based on the longest known Scenario name.</summary>
     /// <returns></returns>
-    public override string ToString () { return $"{GetName ().PadRight (_maxScenarioNameLen)}{GetDescription ()}"; }
+    public override string ToString () => $"{GetName ().PadRight (_maxScenarioNameLen)}{GetDescription ()}";
 
     protected virtual void Dispose (bool disposing) {
         if (!_disposedValue) {
@@ -236,7 +236,7 @@ public class Scenario : IDisposable {
         /// <summary>Static helper function to get the <see cref="Scenario"/> Name given a Type</summary>
         /// <param name="t"></param>
         /// <returns>Name of the category</returns>
-        public static string GetName (Type t) { return ((ScenarioCategory)GetCustomAttributes (t)[0]).Name; }
+        public static string GetName (Type t) => ((ScenarioCategory)GetCustomAttributes (t)[0]).Name;
     }
 
     /// <summary>Defines the metadata (Name and Description) for a <see cref="Scenario"/></summary>
@@ -256,13 +256,11 @@ public class Scenario : IDisposable {
         /// <summary>Static helper function to get the <see cref="Scenario"/> Description given a Type</summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static string GetDescription (Type t) {
-            return ((ScenarioMetadata)GetCustomAttributes (t)[0]).Description;
-        }
+        public static string GetDescription (Type t) => ((ScenarioMetadata)GetCustomAttributes (t)[0]).Description;
 
         /// <summary>Static helper function to get the <see cref="Scenario"/> Name given a Type</summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static string GetName (Type t) { return ((ScenarioMetadata)GetCustomAttributes (t)[0]).Name; }
+        public static string GetName (Type t) => ((ScenarioMetadata)GetCustomAttributes (t)[0]).Name;
     }
 }

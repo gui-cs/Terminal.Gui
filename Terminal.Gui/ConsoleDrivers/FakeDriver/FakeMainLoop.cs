@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui;
 
-class FakeMainLoop : IMainLoopDriver {
+internal class FakeMainLoop : IMainLoopDriver {
     public FakeMainLoop (ConsoleDriver consoleDriver = null) {
         // No implementation needed for FakeMainLoop
     }
@@ -15,10 +15,10 @@ class FakeMainLoop : IMainLoopDriver {
         // No implementation needed for FakeMainLoop
     }
 
-    public bool EventsPending () {
+    public bool EventsPending () =>
+
         // Always return true for FakeMainLoop
-        return true;
-    }
+        true;
 
     public void Iteration () {
         if (FakeConsole.MockKeyPresses.Count > 0) {

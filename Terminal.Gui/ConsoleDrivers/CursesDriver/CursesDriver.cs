@@ -9,14 +9,13 @@ using Unix.Terminal;
 namespace Terminal.Gui;
 
 /// <summary>This is the Curses driver for the gui.cs/Terminal framework.</summary>
-class CursesDriver : ConsoleDriver {
+internal class CursesDriver : ConsoleDriver {
     private CursorVisibility? _currentCursorVisibility;
     private CursorVisibility? _initialCursorVisibility;
     private MouseFlags _lastMouseFlags;
     private object _processInputToken;
     private UnixMainLoop _mainLoopDriver;
     public Curses.Window _window;
-
     public override bool SupportsTrueColor => false;
 
     public override int Cols {
@@ -36,7 +35,7 @@ class CursesDriver : ConsoleDriver {
     }
 
     /// <inheritdoc/>
-    public override bool EnsureCursorVisibility () { return false; }
+    public override bool EnsureCursorVisibility () => false;
 
     /// <inheritdoc/>
     public override bool GetCursorVisibility (out CursorVisibility visibility) {
@@ -51,7 +50,7 @@ class CursesDriver : ConsoleDriver {
         return true;
     }
 
-    public override string GetVersionInfo () { return $"{Curses.curses_version ()}"; }
+    public override string GetVersionInfo () => $"{Curses.curses_version ()}";
 
     public static bool Is_WSL_Platform () {
         // xclip does not work on WSL, so we need to use the Windows clipboard vis Powershell
@@ -67,10 +66,10 @@ class CursesDriver : ConsoleDriver {
         return false;
     }
 
-    public override bool IsRuneSupported (Rune rune) {
+    public override bool IsRuneSupported (Rune rune) =>
+
         // See Issue #2615 - CursesDriver is broken with non-BMP characters
-        return base.IsRuneSupported (rune) && rune.IsBmp;
-    }
+        base.IsRuneSupported (rune) && rune.IsBmp;
 
     public override void Move (int col, int row) {
         base.Move (col, row);
@@ -470,7 +469,7 @@ class CursesDriver : ConsoleDriver {
                 k = (KeyCode)wch | KeyCode.ShiftMask;
             }
 
-            if ((wch == '\n') || (wch == '\r')) {
+            if (wch == '\n' || wch == '\r') {
                 k = KeyCode.Enter;
             }
 
@@ -498,7 +497,7 @@ class CursesDriver : ConsoleDriver {
         while (code == 0) {
             code = Curses.get_wch (out wch2);
             var consoleKeyInfo = new ConsoleKeyInfo ((char)wch2, 0, false, false, false);
-            if ((wch2 == 0) || (wch2 == 27) || (wch2 == Curses.KeyMouse)) {
+            if (wch2 == 0 || wch2 == 27 || wch2 == Curses.KeyMouse) {
                 EscSeqUtils.DecodeEscSeq (
                     null,
                     ref consoleKeyInfo,
@@ -620,30 +619,24 @@ class CursesDriver : ConsoleDriver {
     }
 
     private void ProcessMouseEvent (MouseFlags mouseFlag, Point pos) {
-        bool WasButtonReleased (MouseFlags flag) {
-            return flag.HasFlag (MouseFlags.Button1Released) ||
-                   flag.HasFlag (MouseFlags.Button2Released) ||
-                   flag.HasFlag (MouseFlags.Button3Released) ||
-                   flag.HasFlag (MouseFlags.Button4Released);
-        }
+        bool WasButtonReleased (MouseFlags flag) => flag.HasFlag (MouseFlags.Button1Released) ||
+                                                    flag.HasFlag (MouseFlags.Button2Released) ||
+                                                    flag.HasFlag (MouseFlags.Button3Released) ||
+                                                    flag.HasFlag (MouseFlags.Button4Released);
 
-        bool IsButtonNotPressed (MouseFlags flag) {
-            return !flag.HasFlag (MouseFlags.Button1Pressed) &&
-                   !flag.HasFlag (MouseFlags.Button2Pressed) &&
-                   !flag.HasFlag (MouseFlags.Button3Pressed) &&
-                   !flag.HasFlag (MouseFlags.Button4Pressed);
-        }
+        bool IsButtonNotPressed (MouseFlags flag) => !flag.HasFlag (MouseFlags.Button1Pressed) &&
+                                                     !flag.HasFlag (MouseFlags.Button2Pressed) &&
+                                                     !flag.HasFlag (MouseFlags.Button3Pressed) &&
+                                                     !flag.HasFlag (MouseFlags.Button4Pressed);
 
-        bool IsButtonClickedOrDoubleClicked (MouseFlags flag) {
-            return flag.HasFlag (MouseFlags.Button1Clicked) ||
-                   flag.HasFlag (MouseFlags.Button2Clicked) ||
-                   flag.HasFlag (MouseFlags.Button3Clicked) ||
-                   flag.HasFlag (MouseFlags.Button4Clicked) ||
-                   flag.HasFlag (MouseFlags.Button1DoubleClicked) ||
-                   flag.HasFlag (MouseFlags.Button2DoubleClicked) ||
-                   flag.HasFlag (MouseFlags.Button3DoubleClicked) ||
-                   flag.HasFlag (MouseFlags.Button4DoubleClicked);
-        }
+        bool IsButtonClickedOrDoubleClicked (MouseFlags flag) => flag.HasFlag (MouseFlags.Button1Clicked) ||
+                                                                 flag.HasFlag (MouseFlags.Button2Clicked) ||
+                                                                 flag.HasFlag (MouseFlags.Button3Clicked) ||
+                                                                 flag.HasFlag (MouseFlags.Button4Clicked) ||
+                                                                 flag.HasFlag (MouseFlags.Button1DoubleClicked) ||
+                                                                 flag.HasFlag (MouseFlags.Button2DoubleClicked) ||
+                                                                 flag.HasFlag (MouseFlags.Button3DoubleClicked) ||
+                                                                 flag.HasFlag (MouseFlags.Button4DoubleClicked);
 
         if ((WasButtonReleased (mouseFlag) && IsButtonNotPressed (_lastMouseFlags)) ||
             (IsButtonClickedOrDoubleClicked (mouseFlag) && _lastMouseFlags == 0)) {
@@ -677,9 +670,9 @@ class CursesDriver : ConsoleDriver {
 
     /// <inheritdoc/>
     /// <remarks>
-    ///     In the CursesDriver, colors are encoded as an int. The foreground color is stored in the most significant 4
-    ///     bits, and the background color is stored in the least significant 4 bits. The Terminal.GUi Color values are
-    ///     converted to curses color encoding before being encoded.
+    ///     In the CursesDriver, colors are encoded as an int. The foreground color is stored in the most significant 4 bits,
+    ///     and the background color is stored in the least significant 4 bits. The Terminal.GUi Color values are converted to
+    ///     curses color encoding before being encoded.
     /// </remarks>
     public override Attribute MakeColor (Color foreground, Color background) {
         if (!RunningUnitTests) {
@@ -777,7 +770,7 @@ class CursesDriver : ConsoleDriver {
     #endregion
 }
 
-static class Platform {
+internal static class Platform {
     private static int _suspendSignal;
 
     /// <summary>Suspends the process by sending SIGTSTP to itself</summary>
@@ -839,6 +832,6 @@ static class Platform {
         }
     }
 
-    [DllImport ("libc")] private extern static int killpg (int pgrp, int pid);
-    [DllImport ("libc")] private extern static int uname (nint buf);
+    [DllImport ("libc")] private static extern int killpg (int pgrp, int pid);
+    [DllImport ("libc")] private static extern int uname (nint buf);
 }

@@ -69,7 +69,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     public string[] ColumnNames { get; }
 
     /// <inheritdoc/>
-    public T GetObjectOnRow (int row) { return RowToObject (row); }
+    public T GetObjectOnRow (int row) => RowToObject (row);
 
     /// <inheritdoc/>
     public IEnumerable<T> GetAllObjects () { return _tree.BuildLineMap ().Select (b => b.Model); }
@@ -77,7 +77,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     /// <summary>Returns the tree model object rendering on the given <paramref name="row"/> of the table.</summary>
     /// <param name="row">Row in table.</param>
     /// <returns></returns>
-    public T RowToObject (int row) { return _tree.BuildLineMap ().ElementAt (row).Model; }
+    public T RowToObject (int row) => _tree.BuildLineMap ().ElementAt (row).Model;
 
     private string GetColumnZeroRepresentationFromTree (int row) {
         Branch<T> branch = RowToBranch (row);
@@ -102,7 +102,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     private bool IsInTreeColumn (int column, bool isKeyboard) {
         string[] colNames = _tableView.Table.ColumnNames;
 
-        if ((column < 0) || (column >= colNames.Length)) {
+        if (column < 0 || column >= colNames.Length) {
             return false;
         }
 
@@ -117,7 +117,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
         return colNames[column] == ColumnNames[0];
     }
 
-    private Branch<T> RowToBranch (int row) { return _tree.BuildLineMap ().ElementAt (row); }
+    private Branch<T> RowToBranch (int row) => _tree.BuildLineMap ().ElementAt (row);
 
     private void Table_KeyPress (object sender, Key e) {
         if (!IsInTreeColumn (_tableView.SelectedColumn, true)) {
@@ -153,7 +153,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     private void Table_MouseClick (object sender, MouseEventEventArgs e) {
         Point? hit = _tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? headerIfAny, out int? offsetX);
 
-        if ((hit == null) || (headerIfAny != null) || !IsInTreeColumn (hit.Value.X, false) || (offsetX == null)) {
+        if (hit == null || headerIfAny != null || !IsInTreeColumn (hit.Value.X, false) || offsetX == null) {
             return;
         }
 

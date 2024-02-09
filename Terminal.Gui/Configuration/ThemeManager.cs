@@ -75,7 +75,10 @@ public class ThemeManager : IDictionary<string, ThemeScope> {
 
     /// <summary>Gets or sets the currently selected theme. The value is persisted to the "Theme" property.</summary>
     [JsonIgnore]
-    public string Theme { get => SelectedTheme; set => SelectedTheme = value; }
+    public string Theme {
+        get => SelectedTheme;
+        set => SelectedTheme = value;
+    }
 
     /// <summary>Class is a singleton...</summary>
     public static ThemeManager Instance { get; } = new ();
@@ -128,13 +131,9 @@ public class ThemeManager : IDictionary<string, ThemeScope> {
     #region IDictionary
 
 #pragma warning disable 1591
-
     public ICollection<string> Keys => ((IDictionary<string, ThemeScope>)Themes!).Keys;
-
     public ICollection<ThemeScope> Values => ((IDictionary<string, ThemeScope>)Themes!).Values;
-
     public int Count => ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Count;
-
     public bool IsReadOnly => ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).IsReadOnly;
 
     public ThemeScope this [string key] {
@@ -143,12 +142,11 @@ public class ThemeManager : IDictionary<string, ThemeScope> {
     }
 
     public void Add (string key, ThemeScope value) { ((IDictionary<string, ThemeScope>)Themes!).Add (key, value); }
-    public bool ContainsKey (string key) { return ((IDictionary<string, ThemeScope>)Themes!).ContainsKey (key); }
-    public bool Remove (string key) { return ((IDictionary<string, ThemeScope>)Themes!).Remove (key); }
+    public bool ContainsKey (string key) => ((IDictionary<string, ThemeScope>)Themes!).ContainsKey (key);
+    public bool Remove (string key) => ((IDictionary<string, ThemeScope>)Themes!).Remove (key);
 
-    public bool TryGetValue (string key, out ThemeScope value) {
-        return ((IDictionary<string, ThemeScope>)Themes!).TryGetValue (key, out value!);
-    }
+    public bool TryGetValue (string key, out ThemeScope value) =>
+        ((IDictionary<string, ThemeScope>)Themes!).TryGetValue (key, out value!);
 
     public void Add (KeyValuePair<string, ThemeScope> item) {
         ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Add (item);
@@ -156,23 +154,20 @@ public class ThemeManager : IDictionary<string, ThemeScope> {
 
     public void Clear () { ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Clear (); }
 
-    public bool Contains (KeyValuePair<string, ThemeScope> item) {
-        return ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Contains (item);
-    }
+    public bool Contains (KeyValuePair<string, ThemeScope> item) =>
+        ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Contains (item);
 
     public void CopyTo (KeyValuePair<string, ThemeScope>[] array, int arrayIndex) {
         ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).CopyTo (array, arrayIndex);
     }
 
-    public bool Remove (KeyValuePair<string, ThemeScope> item) {
-        return ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Remove (item);
-    }
+    public bool Remove (KeyValuePair<string, ThemeScope> item) =>
+        ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Remove (item);
 
-    public IEnumerator<KeyValuePair<string, ThemeScope>> GetEnumerator () {
-        return ((IEnumerable<KeyValuePair<string, ThemeScope>>)Themes!).GetEnumerator ();
-    }
+    public IEnumerator<KeyValuePair<string, ThemeScope>> GetEnumerator () =>
+        ((IEnumerable<KeyValuePair<string, ThemeScope>>)Themes!).GetEnumerator ();
 
-    IEnumerator IEnumerable.GetEnumerator () { return ((IEnumerable)Themes!).GetEnumerator (); }
+    IEnumerator IEnumerable.GetEnumerator () => ((IEnumerable)Themes!).GetEnumerator ();
 #pragma warning restore 1591
 
     #endregion

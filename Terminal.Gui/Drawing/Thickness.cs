@@ -23,8 +23,8 @@ public class Thickness : IEquatable<Thickness> {
     public Thickness (int width) : this (width, width, width, width) { }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Thickness"/> class that has specific widths applied to each side
-    ///     of the rectangle.
+    ///     Initializes a new instance of the <see cref="Thickness"/> class that has specific widths applied to each side of
+    ///     the rectangle.
     /// </summary>
     /// <param name="left"></param>
     /// <param name="top"></param>
@@ -54,16 +54,22 @@ public class Thickness : IEquatable<Thickness> {
     public int Top;
 
     /// <summary>
-    ///     Gets the total width of the left and right sides of the rectangle. Sets the width of the left and rigth sides
-    ///     of the rectangle to half the specified value.
+    ///     Gets the total width of the left and right sides of the rectangle. Sets the width of the left and rigth sides of
+    ///     the rectangle to half the specified value.
     /// </summary>
-    public int Horizontal { get => Left + Right; set => Left = Right = value / 2; }
+    public int Horizontal {
+        get => Left + Right;
+        set => Left = Right = value / 2;
+    }
 
     /// <summary>
-    ///     Gets the total height of the top and bottom sides of the rectangle. Sets the height of the top and bottom
-    ///     sides of the rectangle to half the specified value.
+    ///     Gets the total height of the top and bottom sides of the rectangle. Sets the height of the top and bottom sides of
+    ///     the rectangle to half the specified value.
     /// </summary>
-    public int Vertical { get => Top + Bottom; set => Top = Bottom = value / 2; }
+    public int Vertical {
+        get => Top + Bottom;
+        set => Top = Bottom = value / 2;
+    }
 
     // TODO: add operator overloads
     /// <summary>Gets an empty thickness.</summary>
@@ -73,17 +79,15 @@ public class Thickness : IEquatable<Thickness> {
     /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
     /// <param name="other"></param>
     /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
-    public bool Equals (Thickness other) {
-        return other is { } &&
-               Left == other.Left &&
-               Right == other.Right &&
-               Top == other.Top &&
-               Bottom == other.Bottom;
-    }
+    public bool Equals (Thickness other) => other is { } &&
+                                            Left == other.Left &&
+                                            Right == other.Right &&
+                                            Top == other.Top &&
+                                            Bottom == other.Bottom;
 
     /// <summary>
-    ///     Gets whether the specified coordinates lie within the thickness (inside the bounding rectangle but outside of
-    ///     the rectangle described by <see cref="GetInside(Rect)"/>.
+    ///     Gets whether the specified coordinates lie within the thickness (inside the bounding rectangle but outside of the
+    ///     rectangle described by <see cref="GetInside(Rect)"/>.
     /// </summary>
     /// <param name="outside">Describes the location and size of the rectangle that contains the thickness.</param>
     /// <param name="x">The x coord to check.</param>
@@ -97,17 +101,16 @@ public class Thickness : IEquatable<Thickness> {
 
     /// <summary>Draws the <see cref="Thickness"/> rectangle with an optional diagnostics label.</summary>
     /// <remarks>
-    ///     If <see cref="ConsoleDriver.DiagnosticFlags"/> is set to
-    ///     <see cref="ConsoleDriver.DiagnosticFlags.FramePadding"/> then 'T', 'L', 'R', and 'B' glyphs will be used instead of
-    ///     space. If <see cref="ConsoleDriver.DiagnosticFlags"/> is set to
-    ///     <see cref="ConsoleDriver.DiagnosticFlags.FrameRuler"/> then a ruler will be drawn on the outer edge of the
+    ///     If <see cref="ConsoleDriver.DiagnosticFlags"/> is set to <see cref="ConsoleDriver.DiagnosticFlags.FramePadding"/>
+    ///     then 'T', 'L', 'R', and 'B' glyphs will be used instead of space. If <see cref="ConsoleDriver.DiagnosticFlags"/> is
+    ///     set to <see cref="ConsoleDriver.DiagnosticFlags.FrameRuler"/> then a ruler will be drawn on the outer edge of the
     ///     Thickness.
     /// </remarks>
     /// <param name="rect">The location and size of the rectangle that bounds the thickness rectangle, in screen coordinates.</param>
     /// <param name="label">The diagnostics label to draw on the bottom of the <see cref="Bottom"/>.</param>
     /// <returns>The inner rectangle remaining to be drawn.</returns>
     public Rect Draw (Rect rect, string label = null) {
-        if ((rect.Size.Width < 1) || (rect.Size.Height < 1)) {
+        if (rect.Size.Width < 1 || rect.Size.Height < 1) {
             return Rect.Empty;
         }
 
@@ -209,7 +212,7 @@ public class Thickness : IEquatable<Thickness> {
     /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
     public override bool Equals (object obj) {
         //Check for null and compare run-time types.
-        if ((obj == null) || !GetType ().Equals (obj.GetType ())) {
+        if (obj == null || !GetType ().Equals (obj.GetType ())) {
             return false;
         }
 
@@ -250,16 +253,15 @@ public class Thickness : IEquatable<Thickness> {
     }
 
     /// <inheritdoc/>
-    public static bool operator == (Thickness left, Thickness right) {
-        return EqualityComparer<Thickness>.Default.Equals (left, right);
-    }
+    public static bool operator == (Thickness left, Thickness right) =>
+        EqualityComparer<Thickness>.Default.Equals (left, right);
 
     /// <inheritdoc/>
-    public static bool operator != (Thickness left, Thickness right) { return !(left == right); }
+    public static bool operator != (Thickness left, Thickness right) => !(left == right);
 
     /// <summary>Returns the thickness widths of the Thickness formatted as a string.</summary>
     /// <returns>The thickness widths as a string.</returns>
-    public override string ToString () { return $"(Left={Left},Top={Top},Right={Right},Bottom={Bottom})"; }
+    public override string ToString () => $"(Left={Left},Top={Top},Right={Right},Bottom={Bottom})";
 
     private int validate (int width) {
         if (width < 0) {

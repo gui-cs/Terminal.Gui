@@ -5,7 +5,7 @@ namespace Terminal.Gui.ViewsTests;
 
 #region Helper Classes
 
-class FakeHAxis : HorizontalAxis {
+internal class FakeHAxis : HorizontalAxis {
     public List<int> LabelPoints = new ();
     public List<Point> DrawAxisLinePoints = new ();
 
@@ -20,7 +20,7 @@ class FakeHAxis : HorizontalAxis {
     }
 }
 
-class FakeVAxis : VerticalAxis {
+internal class FakeVAxis : VerticalAxis {
     public List<int> LabelPoints = new ();
     public List<Point> DrawAxisLinePoints = new ();
 
@@ -107,8 +107,8 @@ public class GraphViewTests {
     }
 
     /// <summary>
-    ///     Tests that each point in the screen space maps to a rectangle of (float) graph space and that each corner of
-    ///     that rectangle of graph space maps back to the same row/col of the graph that was fed in
+    ///     Tests that each point in the screen space maps to a rectangle of (float) graph space and that each corner of that
+    ///     rectangle of graph space maps back to the same row/col of the graph that was fed in
     /// </summary>
     [Fact]
     public void TestReversing_ScreenToGraphSpace () {
@@ -845,9 +845,7 @@ public class BarSeriesTests {
 
     private class FakeBarSeries : BarSeries {
         public GraphCellToRender FinalColor { get; private set; }
-
         public List<Point> BarScreenEnds { get; } = new ();
-
         public List<Point> BarScreenStarts { get; } = new ();
 
         protected override GraphCellToRender AdjustColor (GraphCellToRender graphCellToRender) {
@@ -864,8 +862,8 @@ public class BarSeriesTests {
 }
 
 public class AxisTests {
-    private GraphView GetGraph (out FakeHAxis axis) { return GetGraph (out axis, out _); }
-    private GraphView GetGraph (out FakeVAxis axis) { return GetGraph (out _, out axis); }
+    private GraphView GetGraph (out FakeHAxis axis) => GetGraph (out axis, out _);
+    private GraphView GetGraph (out FakeVAxis axis) => GetGraph (out _, out axis);
 
     private GraphView GetGraph (out FakeHAxis axisX, out FakeVAxis axisY) {
         GraphViewTests.InitFakeDriver ();

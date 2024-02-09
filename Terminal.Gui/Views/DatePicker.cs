@@ -136,8 +136,8 @@ public class DatePicker : View {
         _calendar.Width = CalculateCalendarWidth ();
     }
 
-    private string GetBackButtonText () { return Glyphs.LeftArrow + Glyphs.LeftArrow.ToString (); }
-    private string GetForwardButtonText () { return Glyphs.RightArrow + Glyphs.RightArrow.ToString (); }
+    private string GetBackButtonText () => Glyphs.LeftArrow + Glyphs.LeftArrow.ToString ();
+    private string GetForwardButtonText () => Glyphs.RightArrow + Glyphs.RightArrow.ToString ();
 
     private void SelectDayOnCalendar (int day) {
         for (var i = 0; i < _table.Rows.Count; i++) {

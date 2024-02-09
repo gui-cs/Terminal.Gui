@@ -11,8 +11,8 @@ public class Cell {
     public Attribute? Attribute { get; set; }
 
     /// <summary>
-    ///     Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.Cell"/> has been modified since the
-    ///     last time it was drawn.
+    ///     Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.Cell"/> has been modified since the last
+    ///     time it was drawn.
     /// </summary>
     public bool IsDirty { get; set; }
 
@@ -36,5 +36,5 @@ public class Cell {
     internal List<Rune> CombiningMarks { get; } = new ();
 
     /// <inheritdoc/>
-    public override string ToString () { return $"[{Rune}, {Attribute}]"; }
+    public override string ToString () => $"[{Rune}, {Attribute}]";
 }

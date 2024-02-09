@@ -9,8 +9,8 @@ public class TableStyle {
     public bool AlwaysShowHeaders { get; set; } = false;
 
     /// <summary>
-    ///     Gets or sets a flag indicating whether to force <see cref="ColorScheme.Normal"/> use when rendering vertical
-    ///     cell lines (even when <see cref="TableView.FullRowSelect"/> is on).
+    ///     Gets or sets a flag indicating whether to force <see cref="ColorScheme.Normal"/> use when rendering vertical cell
+    ///     lines (even when <see cref="TableView.FullRowSelect"/> is on).
     /// </summary>
     public bool AlwaysUseNormalColorForVerticalCellLines { get; set; } = false;
 
@@ -24,8 +24,8 @@ public class TableStyle {
     public bool ExpandLastColumn { get; set; } = true;
 
     /// <summary>
-    ///     True to invert the colors of the first symbol of the selected cell in the <see cref="TableView"/>. This gives
-    ///     the appearance of a cursor for when the <see cref="ConsoleDriver"/> doesn't otherwise show this
+    ///     True to invert the colors of the first symbol of the selected cell in the <see cref="TableView"/>. This gives the
+    ///     appearance of a cursor for when the <see cref="ConsoleDriver"/> doesn't otherwise show this
     /// </summary>
     public bool InvertSelectedCellFirstCharacter { get; set; } = false;
 
@@ -34,14 +34,14 @@ public class TableStyle {
     ///     <see langword="true"/>.
     /// </summary>
     /// <remarks>
-    ///     <see cref="ShowHorizontalHeaderOverline"/>, <see cref="ShowHorizontalHeaderUnderline"/> etc may still be used
-    ///     even if <see cref="ShowHeaders"/> is <see langword="false"/>.
+    ///     <see cref="ShowHorizontalHeaderOverline"/>, <see cref="ShowHorizontalHeaderUnderline"/> etc may still be used even
+    ///     if <see cref="ShowHeaders"/> is <see langword="false"/>.
     /// </remarks>
     public bool ShowHeaders { get; set; } = true;
 
     /// <summary>
-    ///     Gets or sets a flag indicating whether there should be a horizontal line after all the data in the table.
-    ///     Defaults to <see langword="false"/>.
+    ///     Gets or sets a flag indicating whether there should be a horizontal line after all the data in the table. Defaults
+    ///     to <see langword="false"/>.
     /// </summary>
     public bool ShowHorizontalBottomline { get; set; } = false;
 
@@ -88,14 +88,13 @@ public class TableStyle {
     public RowColorGetterDelegate RowColorGetter { get; set; }
 
     /// <summary>
-    ///     Returns the entry from <see cref="ColumnStyles"/> for the given <paramref name="col"/> or null if no custom
-    ///     styling is defined for it
+    ///     Returns the entry from <see cref="ColumnStyles"/> for the given <paramref name="col"/> or null if no custom styling
+    ///     is defined for it
     /// </summary>
     /// <param name="col"></param>
     /// <returns></returns>
-    public ColumnStyle GetColumnStyleIfAny (int col) {
-        return ColumnStyles.TryGetValue (col, out ColumnStyle result) ? result : null;
-    }
+    public ColumnStyle GetColumnStyleIfAny (int col) =>
+        ColumnStyles.TryGetValue (col, out ColumnStyle result) ? result : null;
 
     /// <summary>
     ///     Returns an existing <see cref="ColumnStyle"/> for the given <paramref name="col"/> or creates a new one with

@@ -309,7 +309,7 @@ Item 6",
     [Fact]
     [AutoInitShutdown]
     public void EnsureSelectedItemVisible_Top () {
-        List<string> source = new() { "First", "Second" };
+        List<string> source = new () { "First", "Second" };
         var lv = new ListView { Width = Dim.Fill (), Height = 1, Source = new ListWrapper (source) };
         lv.SelectedItem = 1;
         Application.Top.Add (lv);
@@ -336,7 +336,7 @@ Item 6",
 
     [Fact]
     public void KeyBindings_Command () {
-        List<string> source = new() { "One", "Two", "Three" };
+        List<string> source = new () { "One", "Two", "Three" };
         var lv = new ListView { Height = 2, AllowsMarking = true, Source = new ListWrapper (source) };
         lv.BeginInit ();
         lv.EndInit ();
@@ -365,8 +365,8 @@ Item 6",
     }
 
     /// <summary>
-    ///     Tests that when none of the Commands in a chained keybinding are possible the
-    ///     <see cref="View.NewKeyDownEvent"/> returns the appropriate result
+    ///     Tests that when none of the Commands in a chained keybinding are possible the <see cref="View.NewKeyDownEvent"/>
+    ///     returns the appropriate result
     /// </summary>
     [Fact]
     public void ListViewProcessKeyReturnValue_WithMultipleCommands () {
@@ -491,7 +491,7 @@ Item 6",
     [AutoInitShutdown]
     public void RowRender_Event () {
         var rendered = false;
-        List<string> source = new() { "one", "two", "three" };
+        List<string> source = new () { "one", "two", "three" };
         var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill () };
         lv.RowRender += (s, _) => rendered = true;
         Application.Top.Add (lv);
@@ -539,10 +539,8 @@ Item 6",
 
     private class NewListDataSource : IListDataSource {
         public int Count => throw new NotImplementedException ();
-
         public int Length => throw new NotImplementedException ();
-
-        public bool IsMarked (int item) { throw new NotImplementedException (); }
+        public bool IsMarked (int item) => throw new NotImplementedException ();
 
         public void Render (
             ListView container,
@@ -558,7 +556,7 @@ Item 6",
         }
 
         public void SetMark (int item, bool value) { throw new NotImplementedException (); }
-        public IList ToList () { return new List<string> { "One", "Two", "Three" }; }
+        public IList ToList () => new List<string> { "One", "Two", "Three" };
     }
 
     // No longer needed given PR #2920

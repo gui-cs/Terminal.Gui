@@ -1243,7 +1243,7 @@ public class TabViewTests {
         Application.Shutdown ();
     }
 
-    private TabView GetTabView () { return GetTabView (out _, out _); }
+    private TabView GetTabView () => GetTabView (out _, out _);
 
     private TabView GetTabView (out Tab tab1, out Tab tab2, bool initFakeDriver = true) {
         if (initFakeDriver) {

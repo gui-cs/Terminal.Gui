@@ -8,5 +8,5 @@ public class TreeNodeBuilder : TreeBuilder<ITreeNode> {
     /// <summary>Returns <see cref="ITreeNode.Children"/> from <paramref name="model"/></summary>
     /// <param name="model"></param>
     /// <returns></returns>
-    public override IEnumerable<ITreeNode> GetChildren (ITreeNode model) { return model.Children; }
+    public override IEnumerable<ITreeNode> GetChildren (ITreeNode model) => model.Children;
 }

@@ -126,7 +126,7 @@ public class ShortcutHelper {
         knm &= ~mK;
         uint.TryParse (knm.ToString (), out uint c);
         string s = mK == KeyCode.Null ? "" : mK.ToString ();
-        if (s != "" && ((knm != KeyCode.Null) || (c > 0))) {
+        if (s != "" && (knm != KeyCode.Null || c > 0)) {
             s += ",";
         }
 

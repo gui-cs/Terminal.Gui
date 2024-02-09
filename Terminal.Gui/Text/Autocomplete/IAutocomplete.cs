@@ -17,8 +17,8 @@ public interface IAutocomplete {
     bool Visible { get; set; }
 
     /// <summary>
-    ///     The colors to use to render the overlay. Accessing this property before the Application has been initialized
-    ///     will cause an error
+    ///     The colors to use to render the overlay. Accessing this property before the Application has been initialized will
+    ///     cause an error
     /// </summary>
     ColorScheme ColorScheme { get; set; }
 
@@ -59,8 +59,8 @@ public interface IAutocomplete {
     void ClearSuggestions ();
 
     /// <summary>
-    ///     Populates <see cref="Suggestions"/> with all <see cref="Suggestion"/> proposed by
-    ///     <see cref="SuggestionGenerator"/> at the given <paramref name="context"/> (cursor position)
+    ///     Populates <see cref="Suggestions"/> with all <see cref="Suggestion"/> proposed by <see cref="SuggestionGenerator"/>
+    ///     at the given <paramref name="context"/> (cursor position)
     /// </summary>
     void GenerateSuggestions (AutocompleteContext context);
 
@@ -74,8 +74,8 @@ public interface IAutocomplete {
     bool MouseEvent (MouseEvent me, bool fromHost = false);
 
     /// <summary>
-    ///     Handle key events before <see cref="HostControl"/> e.g. to make key events like up/down apply to the
-    ///     autocomplete control instead of changing the cursor position in the underlying text view.
+    ///     Handle key events before <see cref="HostControl"/> e.g. to make key events like up/down apply to the autocomplete
+    ///     control instead of changing the cursor position in the underlying text view.
     /// </summary>
     /// <param name="a">The key event.</param>
     /// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>

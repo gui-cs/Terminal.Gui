@@ -35,8 +35,8 @@ public enum Command {
     ScrollUp,
 
     /// <summary>
-    ///     Moves the selection left one by the minimum increment supported by the <see cref="View"/> e.g. single
-    ///     character, cell, item etc.
+    ///     Moves the selection left one by the minimum increment supported by the <see cref="View"/> e.g. single character,
+    ///     cell, item etc.
     /// </summary>
     Left,
 
@@ -89,14 +89,14 @@ public enum Command {
     KillWordBackwards,
 
     /// <summary>
-    ///     Toggles overwrite mode such that newly typed text overwrites the text that is already there (typically
-    ///     associated with the Insert key).
+    ///     Toggles overwrite mode such that newly typed text overwrites the text that is already there (typically associated
+    ///     with the Insert key).
     /// </summary>
     ToggleOverwrite,
 
     /// <summary>
-    ///     Enables overwrite mode such that newly typed text overwrites the text that is already there (typically
-    ///     associated with the Insert key).
+    ///     Enables overwrite mode such that newly typed text overwrites the text that is already there (typically associated
+    ///     with the Insert key).
     /// </summary>
     EnableOverwrite,
 

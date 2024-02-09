@@ -49,13 +49,9 @@ public class DynamicStatusBar : Scenario {
         private readonly IValueConverter _valueConverter;
         private readonly object _sourceDataContext;
         private readonly PropertyInfo _sourceBindingProperty;
-
         public string SourcePropertyName { get; }
-
         public string TargetPropertyName { get; }
-
         public View Source { get; }
-
         public View Target { get; }
 
         private void UpdateTarget () {
@@ -175,11 +171,8 @@ public class DynamicStatusBar : Scenario {
         }
 
         private StatusItem _statusItem;
-
         public TextField TextShortcut { get; }
-
         public TextField TextTitle { get; }
-
         public TextView TextAction { get; }
 
         public Action CreateAction (DynamicStatusItem item) {
@@ -276,7 +269,7 @@ public class DynamicStatusBar : Scenario {
                 }
             }
 
-            return (v == null) || !(v is DynamicStatusItem item) ? string.Empty : item.Action;
+            return v == null || !(v is DynamicStatusItem item) ? string.Empty : item.Action;
         }
     }
 
@@ -565,7 +558,6 @@ public class DynamicStatusBar : Scenario {
         private StatusBar _statusBar;
         private StatusItem _currentEditStatusItem;
         private StatusItem _currentStatusItem;
-
         public DynamicStatusItemModel DataContext { get; set; }
 
         public static string SetTitleText (string title, string shortcut) {
@@ -586,9 +578,7 @@ public class DynamicStatusBar : Scenario {
 
     public class DynamicStatusItem {
         public string Action { get; set; } = "";
-
         public string Shortcut { get; set; }
-
         public string Title { get; set; } = "New";
     }
 
@@ -601,10 +591,8 @@ public class DynamicStatusBar : Scenario {
         }
 
         public StatusItem StatusItem { get; set; }
-
         public string Title { get; set; }
-
-        public override string ToString () { return $"{Title}, {StatusItem}"; }
+        public override string ToString () => $"{Title}, {StatusItem}";
     }
 
     public class DynamicStatusItemModel : INotifyPropertyChanged {
@@ -643,8 +631,7 @@ public class DynamicStatusBar : Scenario {
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        public string GetPropertyName ([CallerMemberName] string propertyName = null) { return propertyName; }
+        public string GetPropertyName ([CallerMemberName] string propertyName = null) => propertyName;
     }
 
     public interface IValueConverter {
@@ -652,7 +639,7 @@ public class DynamicStatusBar : Scenario {
     }
 
     public class ListWrapperConverter : IValueConverter {
-        public object Convert (object value, object parameter = null) { return new ListWrapper ((IList)value); }
+        public object Convert (object value, object parameter = null) => new ListWrapper ((IList)value);
     }
 
     public class UStringValueConverter : IValueConverter {
