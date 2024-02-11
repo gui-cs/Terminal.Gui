@@ -532,7 +532,7 @@ public static partial class Application
     ///     <see langword="null"/> if <see cref="Init"/> has already been called.
     /// </param>
     public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
-        where T : Toplevel, new ()
+        where T : Toplevel, new()
     {
         if (_initialized)
         {

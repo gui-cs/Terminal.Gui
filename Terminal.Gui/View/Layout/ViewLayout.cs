@@ -177,7 +177,7 @@ public partial class View
 #endif // DEBUG
 
             // BUGBUG: I think there's a bug here. This should be && not ||
-            if ((Margin == null) || (Border == null) || (Padding == null))
+            if (Margin == null || Border == null || Padding == null)
             {
                 return new Rect (default (Point), Frame.Size);
             }
@@ -556,7 +556,7 @@ public partial class View
     {
         resy = resx = 0;
 
-        if ((start == null) || !start.Frame.Contains (x, y))
+        if (start == null || !start.Frame.Contains (x, y))
         {
             return null;
         }
@@ -1171,7 +1171,7 @@ public partial class View
 
         if (AutoSize)
         {
-            if ((autosize.Width == 0) || (autosize.Height == 0))
+            if (autosize.Width == 0 || autosize.Height == 0)
             {
                 // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height, making
                 // the view LayoutStyle.Absolute.

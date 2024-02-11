@@ -714,9 +714,7 @@ public class Dim
         }
 
         private readonly int _side;
-
         public View Target { get; init; }
-
         public override bool Equals (object other) { return other is DimView abs && abs.Target == Target; }
         public override int GetHashCode () { return Target.GetHashCode (); }
 

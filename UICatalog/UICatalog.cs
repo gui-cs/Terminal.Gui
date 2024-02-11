@@ -822,22 +822,22 @@ internal class UICatalogApp
             string GetDiagnosticsTitle (Enum diag)
             {
                 return Enum.GetName (_diagnosticFlags.GetType (), diag) switch
-                {
-                    "Off" => OFF,
-                    "FrameRuler" => FRAME_RULER,
-                    "FramePadding" => FRAME_PADDING,
-                    _ => ""
-                };
+                       {
+                           "Off" => OFF,
+                           "FrameRuler" => FRAME_RULER,
+                           "FramePadding" => FRAME_PADDING,
+                           _ => ""
+                       };
             }
 
             Enum GetDiagnosticsEnumValue (string title)
             {
                 return title switch
-                {
-                    FRAME_RULER => ConsoleDriver.DiagnosticFlags.FrameRuler,
-                    FRAME_PADDING => ConsoleDriver.DiagnosticFlags.FramePadding,
-                    _ => null!
-                };
+                       {
+                           FRAME_RULER => ConsoleDriver.DiagnosticFlags.FrameRuler,
+                           FRAME_PADDING => ConsoleDriver.DiagnosticFlags.FramePadding,
+                           _ => null!
+                       };
             }
 
             void SetDiagnosticsFlag (Enum diag, bool add)
