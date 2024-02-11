@@ -4,12 +4,14 @@ using System.Globalization;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Provides an abstraction for common keyboard operations and state. Used for processing keyboard input and raising keyboard events.
+///     Provides an abstraction for common keyboard operations and state. Used for processing keyboard input and
+///     raising keyboard events.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         This class provides a high-level abstraction with helper methods and properties for common keyboard operations. Use this class instead of the
-///         <see cref="Terminal.Gui.KeyCode"/> enumeration for keyboard input whenever possible.
+///         This class provides a high-level abstraction with helper methods and properties for common keyboard
+///         operations. Use this class instead of the <see cref="Terminal.Gui.KeyCode"/> enumeration for keyboard input
+///         whenever possible.
 ///     </para>
 ///     <para></para>
 ///     <para>
@@ -24,28 +26,35 @@ namespace Terminal.Gui;
 ///             <item>
 ///                 <term>Testing Shift State</term>
 ///                 <description>
-///                     The <c>Is</c> properties (<see cref="IsShift"/>,<see cref="IsCtrl"/>, <see cref="IsAlt"/>) test for shift state; whether the key press was modified by a shift key.
+///                     The <c>Is</c> properties (<see cref="IsShift"/>,<see cref="IsCtrl"/>, <see cref="IsAlt"/>)
+///                     test for shift state; whether the key press was modified by a shift key.
 ///                 </description>
 ///             </item>
 ///             <item>
 ///                 <term>Adding Shift State</term>
 ///                 <description>
-///                     The <c>With</c> properties (<see cref="WithShift"/>,<see cref="WithCtrl"/>, <see cref="WithAlt"/>) return a copy of the Key with the shift modifier applied. This is useful for specifying a key that requires a shift modifier (e.g.
+///                     The <c>With</c> properties (<see cref="WithShift"/>,<see cref="WithCtrl"/>,
+///                     <see cref="WithAlt"/>) return a copy of the Key with the shift modifier applied. This is useful for
+///                     specifying a key that requires a shift modifier (e.g.
 ///                     <c>var ControlAltDelete = new Key(Key.Delete).WithAlt.WithDel;</c>.
 ///                 </description>
 ///             </item>
 ///             <item>
 ///                 <term>Removing Shift State</term>
 ///                 <description>
-///                     The <c>No</c> properties (<see cref="NoShift"/>,<see cref="NoCtrl"/>, <see cref="NoAlt"/>) return a copy of the Key with the shift modifier removed. This is useful for specifying a key that does not require a shift modifier (e.g.
-///                     <c>var ControlDelete = ControlAltDelete.NoCtrl;</c>.
+///                     The <c>No</c> properties (<see cref="NoShift"/>,<see cref="NoCtrl"/>, <see cref="NoAlt"/>)
+///                     return a copy of the Key with the shift modifier removed. This is useful for specifying a key that
+///                     does not require a shift modifier (e.g. <c>var ControlDelete = ControlAltDelete.NoCtrl;</c>.
 ///                 </description>
 ///             </item>
 ///             <item>
 ///                 <term>Encoding of A..Z</term>
 ///                 <description>
-///                     Lowercase alpha keys are encoded (in <see cref="Key.KeyCode"/>) as values between 65 and 90 corresponding to the un-shifted A to Z keys on a keyboard. Properties are provided for these (e.g.
-///                     <see cref="Key.A"/>, <see cref="Key.B"/>, etc.). Even though the encoded values are the same as the ASCII values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
+///                     Lowercase alpha keys are encoded (in <see cref="Key.KeyCode"/>) as values between 65 and
+///                     90 corresponding to the un-shifted A to Z keys on a keyboard. Properties are provided for these
+///                     (e.g. <see cref="Key.A"/>, <see cref="Key.B"/>, etc.). Even though the encoded values are the same
+///                     as the ASCII values for uppercase characters, these enum values represent *lowercase*, un-shifted
+///                     characters.
 ///                 </description>
 ///             </item>
 ///             <item>
@@ -53,7 +62,8 @@ namespace Terminal.Gui;
 ///                 <description>
 ///                     Keys are persisted as <c>"[Modifiers]+[Key]</c>. For example
 ///                     <c>new Key(Key.Delete).WithAlt.WithDel</c> is persisted as <c>"Ctrl+Alt+Delete"</c>. See
-///                     <see cref="ToString()"/> and <see cref="TryParse(string, out Terminal.Gui.Key)"/> for more information.
+///                     <see cref="ToString()"/> and <see cref="TryParse(string, out Terminal.Gui.Key)"/> for more
+///                     information.
 ///                 </description>
 ///             </item>
 ///         </list>
@@ -72,8 +82,9 @@ public class Key : EventArgs, IEquatable<Key>
     /// <remarks>
     ///     <para>
     ///         The key codes for the A..Z keys are encoded as values between 65 and 90 (<see cref="KeyCode.A"/> through
-    ///         <see cref="KeyCode.Z"/>). While these are the same as the ASCII values for uppercase characters, they represent *keys*, not characters. Therefore, this constructor will store 'A'..'Z' as
-    ///         <see cref="KeyCode.A"/>.. <see cref="KeyCode.Z"/> with the <see cref="KeyCode.ShiftMask"/> set and will store `a`..`z` as
+    ///         <see cref="KeyCode.Z"/>). While these are the same as the ASCII values for uppercase characters, they represent
+    ///         *keys*, not characters. Therefore, this constructor will store 'A'..'Z' as <see cref="KeyCode.A"/>..
+    ///         <see cref="KeyCode.Z"/> with the <see cref="KeyCode.ShiftMask"/> set and will store `a`..`z` as
     ///         <see cref="KeyCode.A"/>..<see cref="KeyCode.Z"/>.
     ///     </para>
     /// </remarks>
@@ -100,7 +111,8 @@ public class Key : EventArgs, IEquatable<Key>
     }
 
     /// <summary>
-    ///     Constructs a new Key from a string describing the key. See <see cref="TryParse(string, out Terminal.Gui.Key)"/> for information on the format of the string.
+    ///     Constructs a new Key from a string describing the key. See
+    ///     <see cref="TryParse(string, out Terminal.Gui.Key)"/> for information on the format of the string.
     /// </summary>
     /// <param name="str">The string describing the key.</param>
     public Key (string str)
@@ -116,7 +128,8 @@ public class Key : EventArgs, IEquatable<Key>
     }
 
     /// <summary>
-    ///     The key value as a Rune. This is the actual value of the key pressed, and is independent of the modifiers. Useful for determining if a key represents is a printable character.
+    ///     The key value as a Rune. This is the actual value of the key pressed, and is independent of the modifiers.
+    ///     Useful for determining if a key represents is a printable character.
     /// </summary>
     /// <remarks>
     ///     <para>Keys with Ctrl or Alt modifiers will return <see langword="default"/>.</para>
@@ -132,7 +145,9 @@ public class Key : EventArgs, IEquatable<Key>
     public Rune AsRune => ToRune (KeyCode);
 
     /// <summary>
-    ///     Indicates if the current Key event has already been processed and the driver should stop notifying any other event subscriber. Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
+    ///     Indicates if the current Key event has already been processed and the driver should stop notifying any other
+    ///     event subscriber. Its important to set this value to true specially when updating any View's layout from inside the
+    ///     subscriber method.
     /// </summary>
     public bool Handled { get; set; } = false;
 
@@ -146,11 +161,14 @@ public class Key : EventArgs, IEquatable<Key>
 
     /// <summary>
     ///     Gets a value indicating whether the key represents a key in the range of <see cref="KeyCode.A"/> to
-    ///     <see cref="KeyCode.Z"/>, regardless of the <see cref="KeyCode.ShiftMask"/>. This is useful for testing if a key is based on these keys which are special cased.
+    ///     <see cref="KeyCode.Z"/>, regardless of the <see cref="KeyCode.ShiftMask"/>. This is useful for testing if a key is
+    ///     based on these keys which are special cased.
     /// </summary>
     /// <remarks>
-    ///     IMPORTANT: Lowercase alpha keys are encoded in <see cref="Key.KeyCode"/> as values between 65 and 90 corresponding to the un-shifted A to Z keys on a keyboard. Helper properties are provided these (e.g.
-    ///     <see cref="Key.A"/>, <see cref="Key.B"/>, etc.). Even though the values are the same as the ASCII values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
+    ///     IMPORTANT: Lowercase alpha keys are encoded in <see cref="Key.KeyCode"/> as values between 65 and 90
+    ///     corresponding to the un-shifted A to Z keys on a keyboard. Helper properties are provided these (e.g.
+    ///     <see cref="Key.A"/>, <see cref="Key.B"/>, etc.). Even though the values are the same as the ASCII values for
+    ///     uppercase characters, these enum values represent *lowercase*, un-shifted characters.
     /// </remarks>
     public bool IsKeyCodeAtoZ => GetIsKeyCodeAtoZ (KeyCode);
 
@@ -159,14 +177,17 @@ public class Key : EventArgs, IEquatable<Key>
     public bool IsShift => (KeyCode & KeyCode.ShiftMask) != 0;
 
     /// <summary>
-    ///     Indicates whether the <see cref="Key"/> is valid or not. Invalid keys are <see cref="Key.Empty"/>, and keys with only shift modifiers.
+    ///     Indicates whether the <see cref="Key"/> is valid or not. Invalid keys are <see cref="Key.Empty"/>, and keys
+    ///     with only shift modifiers.
     /// </summary>
     public bool IsValid => this != Empty && NoAlt.NoShift.NoCtrl != Empty;
 
     /// <summary>The encoded key value.</summary>
     /// <para>
-    ///     IMPORTANT: Lowercase alpha keys are encoded (in <see cref="Gui.KeyCode"/>) as values between 65 and 90 corresponding to the un-shifted A to Z keys on a keyboard. Enum values are provided for these (e.g.
-    ///     <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.). Even though the values are the same as the ASCII values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
+    ///     IMPORTANT: Lowercase alpha keys are encoded (in <see cref="Gui.KeyCode"/>) as values between 65 and 90
+    ///     corresponding to the un-shifted A to Z keys on a keyboard. Enum values are provided for these (e.g.
+    ///     <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.). Even though the values are the same as the ASCII values
+    ///     for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
     /// </para>
     /// <remarks>This property is the backing data for the <see cref="Key"/>. It is a <see cref="KeyCode"/> enum value.</remarks>
     public KeyCode KeyCode { get; init; }
@@ -226,16 +247,19 @@ public class Key : EventArgs, IEquatable<Key>
     public Key WithShift => new (KeyCode | KeyCode.ShiftMask);
 
     /// <summary>
-    ///     Tests if a KeyCode represents a key in the range of <see cref="KeyCode.A"/> to <see cref="KeyCode.Z"/>, regardless of the
-    ///     <see cref="KeyCode.ShiftMask"/>. This is useful for testing if a key is based on these keys which are special cased.
+    ///     Tests if a KeyCode represents a key in the range of <see cref="KeyCode.A"/> to <see cref="KeyCode.Z"/>,
+    ///     regardless of the <see cref="KeyCode.ShiftMask"/>. This is useful for testing if a key is based on these keys which
+    ///     are special cased.
     /// </summary>
     /// <remarks>
-    ///     IMPORTANT: Lowercase alpha keys are encoded in <see cref="Key.KeyCode"/> as values between 65 and 90 corresponding to the un-shifted A to Z keys on a keyboard. Helper properties are provided these (e.g.
-    ///     <see cref="Key.A"/>, <see cref="Key.B"/>, etc.). Even though the values are the same as the ASCII values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
+    ///     IMPORTANT: Lowercase alpha keys are encoded in <see cref="Key.KeyCode"/> as values between 65 and 90
+    ///     corresponding to the un-shifted A to Z keys on a keyboard. Helper properties are provided these (e.g.
+    ///     <see cref="Key.A"/>, <see cref="Key.B"/>, etc.). Even though the values are the same as the ASCII values for
+    ///     uppercase characters, these enum values represent *lowercase*, un-shifted characters.
     /// </remarks>
     public static bool GetIsKeyCodeAtoZ (KeyCode keyCode)
     {
-        if ((keyCode & KeyCode.AltMask) != 0 || (keyCode & KeyCode.CtrlMask) != 0)
+        if (((keyCode & KeyCode.AltMask) != 0) || ((keyCode & KeyCode.CtrlMask) != 0))
         {
             return false;
         }
@@ -249,7 +273,8 @@ public class Key : EventArgs, IEquatable<Key>
     }
 
     /// <summary>
-    ///     Converts a <see cref="KeyCode"/> to a <see cref="Rune"/>. Useful for determining if a key represents is a printable character.
+    ///     Converts a <see cref="KeyCode"/> to a <see cref="Rune"/>. Useful for determining if a key represents is a
+    ///     printable character.
     /// </summary>
     /// <remarks>
     ///     <para>Keys with Ctrl or Alt modifiers will return <see langword="default"/>.</para>
@@ -302,8 +327,8 @@ public class Key : EventArgs, IEquatable<Key>
     #region Operators
 
     /// <summary>
-    ///     Explicitly cast a <see cref="Key"/> to a <see cref="Rune"/>. The conversion is lossy because properties such as
-    ///     <see cref="Handled"/> are not encoded in <see cref="KeyCode"/>.
+    ///     Explicitly cast a <see cref="Key"/> to a <see cref="Rune"/>. The conversion is lossy because properties such
+    ///     as <see cref="Handled"/> are not encoded in <see cref="KeyCode"/>.
     /// </summary>
     /// <remarks>Uses <see cref="AsRune"/>.</remarks>
     /// <param name="kea"></param>
@@ -311,15 +336,15 @@ public class Key : EventArgs, IEquatable<Key>
 
     // BUGBUG: (Tig) I do not think this cast operator is really needed. 
     /// <summary>
-    ///     Explicitly cast <see cref="Key"/> to a <see langword="uint"/>. The conversion is lossy because properties such as
-    ///     <see cref="Handled"/> are not encoded in <see cref="KeyCode"/>.
+    ///     Explicitly cast <see cref="Key"/> to a <see langword="uint"/>. The conversion is lossy because properties such
+    ///     as <see cref="Handled"/> are not encoded in <see cref="KeyCode"/>.
     /// </summary>
     /// <param name="kea"></param>
     public static explicit operator uint (Key kea) { return (uint)kea.KeyCode; }
 
     /// <summary>
-    ///     Explicitly cast <see cref="Key"/> to a <see cref="KeyCode"/>. The conversion is lossy because properties such as
-    ///     <see cref="Handled"/> are not encoded in <see cref="KeyCode"/>.
+    ///     Explicitly cast <see cref="Key"/> to a <see cref="KeyCode"/>. The conversion is lossy because properties such
+    ///     as <see cref="Handled"/> are not encoded in <see cref="KeyCode"/>.
     /// </summary>
     /// <param name="key"></param>
     public static explicit operator KeyCode (Key key) { return key.KeyCode; }
@@ -423,7 +448,8 @@ public class Key : EventArgs, IEquatable<Key>
     /// <summary>Formats a <see cref="KeyCode"/> as a string using the default separator of '+'</summary>
     /// <param name="key">The key to format.</param>
     /// <returns>
-    ///     The formatted string. If the key is a printable character, it will be returned as a string. Otherwise, the key name will be returned.
+    ///     The formatted string. If the key is a printable character, it will be returned as a string. Otherwise, the key
+    ///     name will be returned.
     /// </returns>
     public static string ToString (KeyCode key) { return ToString (key, (Rune)'+'); }
 
@@ -431,7 +457,8 @@ public class Key : EventArgs, IEquatable<Key>
     /// <param name="key">The key to format.</param>
     /// <param name="separator">The character to use as a separator between modifier keys and and the key itself.</param>
     /// <returns>
-    ///     The formatted string. If the key is a printable character, it will be returned as a string. Otherwise, the key name will be returned.
+    ///     The formatted string. If the key is a printable character, it will be returned as a string. Otherwise, the key
+    ///     name will be returned.
     /// </returns>
     public static string ToString (KeyCode key, Rune separator)
     {
@@ -468,13 +495,12 @@ public class Key : EventArgs, IEquatable<Key>
         }
 
         // Handle special cases and modifiers on their own
-        if (key != KeyCode.SpecialMask && (baseKey != KeyCode.Null || hasModifiers))
+        if (key != KeyCode.SpecialMask && ((baseKey != KeyCode.Null) || hasModifiers))
         {
             if ((key & KeyCode.SpecialMask) != 0 && (baseKey & ~KeyCode.Space) is >= KeyCode.A and <= KeyCode.Z)
             {
                 sb.Append (baseKey & ~KeyCode.Space);
-            }
-            else
+            } else
             {
                 // Append the actual key name
                 sb.Append (GetKeyString (baseKey));
@@ -507,7 +533,8 @@ public class Key : EventArgs, IEquatable<Key>
 
     /// <summary>Converts the provided string to a new <see cref="Key"/> instance.</summary>
     /// <param name="text">
-    ///     The text to analyze. Formats supported are "Ctrl+X", "Alt+X", "Shift+X", "Ctrl+Alt+X", "Ctrl+Shift+X", "Alt+Shift+X", "Ctrl+Alt+Shift+X", and "X".
+    ///     The text to analyze. Formats supported are "Ctrl+X", "Alt+X", "Shift+X", "Ctrl+Alt+X",
+    ///     "Ctrl+Shift+X", "Alt+Shift+X", "Ctrl+Alt+Shift+X", and "X".
     /// </param>
     /// <param name="key">The parsed value.</param>
     /// <returns>A boolean value indicating whether parsing was successful.</returns>
@@ -581,8 +608,7 @@ public class Key : EventArgs, IEquatable<Key>
                              ))
             {
                 keyCode = (KeyCode)((int)KeyCode.D0 + parsedInt);
-            }
-            else if (Enum.TryParse (partNotFound, false, out parsedKeyCode))
+            } else if (Enum.TryParse (partNotFound, false, out parsedKeyCode))
             {
                 if (parsedKeyCode != KeyCode.Null)
                 {

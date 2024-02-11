@@ -21,7 +21,8 @@ using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironm
 namespace UICatalog;
 
 /// <summary>
-///     UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of scenarios.
+///     UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the
+///     catalog of scenarios.
 /// </summary>
 /// <remarks>
 ///     <para>UI Catalog attempts to satisfy the following goals:</para>
@@ -38,9 +39,12 @@ namespace UICatalog;
 ///             </item>
 ///         </list>
 ///     </para>
-///     <para>See the project README for more details (https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog/README.md).</para>
+///     <para>
+///         See the project README for more details
+///         (https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog/README.md).
+///     </para>
 /// </remarks>
-internal class UICatalogApp
+class UICatalogApp
 {
     private static StringBuilder? _aboutMessage;
     private static int _cachedCategoryIndex;
@@ -171,7 +175,8 @@ internal class UICatalogApp
     }
 
     /// <summary>
-    ///     Shows the UI Catalog selection UI. When the user selects a Scenario to run, the UI Catalog main app UI is killed and the Scenario is run as though it were Application.Top. When the Scenario exits, this function exits.
+    ///     Shows the UI Catalog selection UI. When the user selects a Scenario to run, the UI Catalog main app UI is
+    ///     killed and the Scenario is run as though it were Application.Top. When the Scenario exits, this function exits.
     /// </summary>
     /// <returns></returns>
     private static Scenario RunUICatalogTopLevel ()
@@ -360,24 +365,11 @@ internal class UICatalogApp
     }
 
     /// <summary>
-    ///     This is the main UI Catalog app view. It is run fresh when the app loads (if a Scenario has not been passed on the command line) and each time a Scenario ends.
+    ///     This is the main UI Catalog app view. It is run fresh when the app loads (if a Scenario has not been passed on
+    ///     the command line) and each time a Scenario ends.
     /// </summary>
     public class UICatalogTopLevel : Toplevel
     {
-        private readonly CollectionNavigator _scenarioCollectionNav = new ();
-        public ListView CategoryList;
-        public StatusItem DriverName;
-        public MenuItem? miForce16Colors;
-        public MenuItem? miIsMenuBorderDisabled;
-        public MenuItem? miIsMouseDisabled;
-        public MenuItem? miUseSubMenusSingleFrame;
-        public StatusItem OS;
-
-        // UI Catalog uses TableView for the scenario list instead of a ListView to demonstate how
-        // TableView works. There's no real reason not to use ListView. Because we use TableView, and TableView
-        // doesn't (currently) have CollectionNavigator support built in, we implement it here, within the app.
-        public TableView ScenarioList;
-
         public UICatalogTopLevel ()
         {
             _themeMenuItems = CreateThemeMenuItems ();
@@ -594,9 +586,23 @@ internal class UICatalogApp
             Applied += ConfigAppliedHandler;
         }
 
+        private readonly CollectionNavigator _scenarioCollectionNav = new ();
+        public ListView CategoryList;
+        public StatusItem DriverName;
+        public MenuItem? miForce16Colors;
+        public MenuItem? miIsMenuBorderDisabled;
+        public MenuItem? miIsMouseDisabled;
+        public MenuItem? miUseSubMenusSingleFrame;
+        public StatusItem OS;
+
+        // UI Catalog uses TableView for the scenario list instead of a ListView to demonstate how
+        // TableView works. There's no real reason not to use ListView. Because we use TableView, and TableView
+        // doesn't (currently) have CollectionNavigator support built in, we implement it here, within the app.
+        public TableView ScenarioList;
+
         public void ConfigChanged ()
         {
-            if (_topLevelColorScheme == null || !Colors.ColorSchemes.ContainsKey (_topLevelColorScheme))
+            if ((_topLevelColorScheme == null) || !Colors.ColorSchemes.ContainsKey (_topLevelColorScheme))
             {
                 _topLevelColorScheme = "Base";
             }
