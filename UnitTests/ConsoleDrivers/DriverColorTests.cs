@@ -12,8 +12,8 @@ public class DriverColorTests {
 	[Theory]
 	[InlineData (typeof (FakeDriver))]
 	[InlineData (typeof (NetDriver))]
-	//[InlineData (typeof (ANSIDriver))]
 	[InlineData (typeof (WindowsDriver))]
+	[InlineData (typeof (ANSIDriver))]
 	[InlineData (typeof (CursesDriver))]
 	public void SetColors_Changes_Colors (Type driverType)
 	{
@@ -37,32 +37,32 @@ public class DriverColorTests {
 	}
 
 
-	[Theory]
-	[InlineData (typeof (FakeDriver), false)]
-	[InlineData (typeof (NetDriver), true)]
-	//[InlineData (typeof (ANSIDriver), true)]
-	[InlineData (typeof (WindowsDriver), true)]
-	[InlineData (typeof (CursesDriver), false)]
-	public void SupportsTrueColor_Defaults (Type driverType, bool expectedSetting)
-	{
-		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-		driver.Init ();
+		[Theory]
+		[InlineData (typeof (FakeDriver), false)]
+		[InlineData (typeof (NetDriver), true)]
+		[InlineData (typeof (ANSIDriver), true)]
+		[InlineData (typeof (WindowsDriver), true)]
+		[InlineData (typeof (CursesDriver), false)]
+		public void SupportsTrueColor_Defaults (Type driverType, bool expectedSetting)
+		{
+			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+			driver.Init ();
 
 		Assert.Equal (expectedSetting, driver.SupportsTrueColor);
 
 		driver.End ();
 	}
 
-	[Theory]
-	[InlineData (typeof (FakeDriver))]
-	[InlineData (typeof (NetDriver))]
-	//[InlineData (typeof (ANSIDriver))]
-	[InlineData (typeof (WindowsDriver))]
-	[InlineData (typeof (CursesDriver))]
-	public void Force16Colors_Sets (Type driverType)
-	{
-		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-		driver.Init ();
+		[Theory]
+		[InlineData (typeof (FakeDriver))]
+		[InlineData (typeof (NetDriver))]
+		[InlineData (typeof (ANSIDriver))]
+		[InlineData (typeof (WindowsDriver))]
+		[InlineData (typeof (CursesDriver))]
+		public void Force16Colors_Sets (Type driverType)
+		{
+			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+			driver.Init ();
 
 		driver.Force16Colors = true;
 		Assert.True (driver.Force16Colors);

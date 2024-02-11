@@ -19,38 +19,38 @@ public class ConsoleDriverTests {
 		this.output = output;
 	}
 
-	[Theory]
-	[InlineData (typeof (FakeDriver))]
-	[InlineData (typeof (NetDriver))]
-	//[InlineData (typeof (ANSIDriver))]
-	[InlineData (typeof (WindowsDriver))]
-	[InlineData (typeof (CursesDriver))]
-	public void Init_Inits (Type driverType)
-	{
-		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-		var ml = driver.Init ();
-		Assert.NotNull (ml);
-		Assert.NotNull (driver.Clipboard);
-		Console.ForegroundColor = ConsoleColor.Red;
-		Assert.Equal (ConsoleColor.Red, Console.ForegroundColor);
-		Console.BackgroundColor = ConsoleColor.Green;
-		Assert.Equal (ConsoleColor.Green, Console.BackgroundColor);
+		[Theory]
+		[InlineData (typeof (FakeDriver))]
+		[InlineData (typeof (NetDriver))]
+		[InlineData (typeof (ANSIDriver))]
+		[InlineData (typeof (WindowsDriver))]
+		[InlineData (typeof (CursesDriver))]
+		public void Init_Inits (Type driverType)
+		{
+			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+			var ml = driver.Init ();
+			Assert.NotNull (ml);
+			Assert.NotNull (driver.Clipboard);
+			Console.ForegroundColor = ConsoleColor.Red;
+			Assert.Equal (ConsoleColor.Red, Console.ForegroundColor);
+			Console.BackgroundColor = ConsoleColor.Green;
+			Assert.Equal (ConsoleColor.Green, Console.BackgroundColor);
 
 		driver.End ();
 	}
 
-	[Theory]
-	[InlineData (typeof (FakeDriver))]
-	[InlineData (typeof (NetDriver))]
-	//[InlineData (typeof (ANSIDriver))]
-	[InlineData (typeof (WindowsDriver))]
-	[InlineData (typeof (CursesDriver))]
-	public void End_Cleans_Up (Type driverType)
-	{
-		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-		driver.Init ();
-		driver.End ();
-	}
+		[Theory]
+		[InlineData (typeof (FakeDriver))]
+		[InlineData (typeof (NetDriver))]
+		[InlineData (typeof (ANSIDriver))]
+		[InlineData (typeof (WindowsDriver))]
+		[InlineData (typeof (CursesDriver))]
+		public void End_Cleans_Up (Type driverType)
+		{
+			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+			driver.Init ();
+			driver.End ();
+		}
 
 	[Theory]
 	[InlineData (typeof (FakeDriver))]
@@ -184,29 +184,29 @@ public class ConsoleDriverTests {
 
 	//	Application.Run ();
 
-	//	// Shutdown must be called to safely clean up Application if Init has been called
-	//	Application.Shutdown ();
-	//}
-
-	[Theory]
-	[InlineData (typeof (FakeDriver))]
-	[InlineData (typeof (NetDriver))]
-	//[InlineData (typeof (ANSIDriver))]
-	[InlineData (typeof (WindowsDriver))]
-	[InlineData (typeof (CursesDriver))]
-	public void TerminalResized_Simulation (Type driverType)
-	{
-		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-		driver?.Init ();
-		driver.Cols = 80;
-		driver.Rows = 25;
-
-		bool wasTerminalResized = false;
-		driver.SizeChanged += (s, e) => {
-			wasTerminalResized = true;
-			Assert.Equal (120, e.Size.Width);
-			Assert.Equal (40, e.Size.Height);
-		};
+		//	// Shutdown must be called to safely clean up Application if Init has been called
+		//	Application.Shutdown ();
+		//}
+		
+		[Theory]
+		[InlineData (typeof (FakeDriver))]
+		[InlineData (typeof (NetDriver))]
+		[InlineData (typeof (ANSIDriver))]
+		[InlineData (typeof (WindowsDriver))]
+		[InlineData (typeof (CursesDriver))]
+		public void TerminalResized_Simulation (Type driverType)
+		{
+			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+			driver?.Init ();
+			driver.Cols = 80;
+			driver.Rows = 25;
+			
+			var wasTerminalResized = false;
+			driver.SizeChanged += (s, e) => {
+				wasTerminalResized = true;
+				Assert.Equal (120, e.Size.Width);
+				Assert.Equal (40, e.Size.Height);
+			};
 
 		Assert.Equal (80, driver.Cols);
 		Assert.Equal (25, driver.Rows);
