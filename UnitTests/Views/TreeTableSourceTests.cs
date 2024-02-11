@@ -28,6 +28,7 @@ public class TreeTableSourceTests: IDisposable {
 	{
 		var tv = GetTreeTable (out _);
 
+		tv.Style.ShowHorizontalHeaderThroughline = false;
 		tv.Style.GetOrCreateColumnStyle (1).MinAcceptableWidth = 1;
 
 		tv.Draw ();
@@ -85,6 +86,7 @@ public class TreeTableSourceTests: IDisposable {
 	{
 		var tv = GetTreeTable (out _);
 
+		tv.Style.ShowHorizontalHeaderThroughline = false;
 		tv.Style.GetOrCreateColumnStyle (1).MinAcceptableWidth = 1;
 
 		tv.Draw ();
@@ -150,6 +152,7 @@ public class TreeTableSourceTests: IDisposable {
 
 		CheckBoxTableSourceWrapperByIndex checkSource;
 		tv.Table = checkSource = new CheckBoxTableSourceWrapperByIndex (tv, tv.Table);
+		tv.Style.ShowHorizontalHeaderThroughline = false;
 		tv.Style.GetOrCreateColumnStyle (2).MinAcceptableWidth = 1;
 
 		tv.Draw ();

@@ -73,12 +73,14 @@ public class ListColumns : Scenario {
 					Checked = _listColView.Style.ExpandLastColumn,
 					CheckType = MenuItemCheckStyle.Checked
 				},
+				/*
 				_miAlwaysUseNormalColorForVerticalCellLines =
 					new MenuItem ("_AlwaysUseNormalColorForVerticalCellLines", "",
 						() => ToggleAlwaysUseNormalColorForVerticalCellLines ()) {
 						Checked = _listColView.Style.AlwaysUseNormalColorForVerticalCellLines,
 						CheckType = MenuItemCheckStyle.Checked
 					},
+				*/
 				_miSmoothScrolling = new MenuItem ("_SmoothHorizontalScrolling", "", () => ToggleSmoothScrolling ()) {
 					Checked = _listColView.Style.SmoothHorizontalScrolling,
 					CheckType = MenuItemCheckStyle.Checked
@@ -218,6 +220,7 @@ public class ListColumns : Scenario {
 
 	}
 
+	/*
 	void ToggleAlwaysUseNormalColorForVerticalCellLines ()
 	{
 		_miAlwaysUseNormalColorForVerticalCellLines.Checked = !_miAlwaysUseNormalColorForVerticalCellLines.Checked;
@@ -225,6 +228,7 @@ public class ListColumns : Scenario {
 
 		_listColView.Update ();
 	}
+	*/
 
 	void ToggleSmoothScrolling ()
 	{
