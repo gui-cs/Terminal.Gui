@@ -14,6 +14,7 @@
 // still incorrect so we still need this hack.
 
 #define HACK_CHECK_WINCHANGED
+
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -25,6 +26,7 @@ internal class WindowsConsole
 {
     public const int STD_OUTPUT_HANDLE = -11;
     public const int STD_INPUT_HANDLE = -10;
+
     private readonly nint _inputHandle;
     private readonly nint _outputHandle;
     private nint _screenBuffer;
@@ -48,13 +50,7 @@ internal class WindowsConsole
 
     private CharInfo [] _originalStdOutChars;
 
-    public bool WriteToConsole (
-        Size size,
-        ExtendedCharInfo [] charInfoBuffer,
-        Coord bufferSize,
-        SmallRect window,
-        bool force16Colors
-    )
+    public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord bufferSize, SmallRect window, bool force16Colors)
     {
         if (_screenBuffer == nint.Zero)
         {
@@ -73,18 +69,12 @@ internal class WindowsConsole
                 ci [i++] = new CharInfo
                 {
                     Char = new CharUnion { UnicodeChar = info.Char },
-                    Attributes = (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor ()
-                                          | ((int)info.Attribute.Background.GetClosestNamedColor () << 4))
+                    Attributes =
+                        (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor () | ((int)info.Attribute.Background.GetClosestNamedColor () << 4))
                 };
             }
 
-            result = WriteConsoleOutput (
-                                         _screenBuffer,
-                                         ci,
-                                         bufferSize,
-                                         new Coord { X = window.Left, Y = window.Top },
-                                         ref window
-                                        );
+            result = WriteConsoleOutput (_screenBuffer, ci, bufferSize, new Coord { X = window.Left, Y = window.Top }, ref window);
         }
         else
         {
@@ -102,22 +92,8 @@ internal class WindowsConsole
                 if (attr != prev)
                 {
                     prev = attr;
-
-                    _stringBuilder.Append (
-                                           EscSeqUtils.CSI_SetForegroundColorRGB (
-                                                                                  attr.Foreground.R,
-                                                                                  attr.Foreground.G,
-                                                                                  attr.Foreground.B
-                                                                                 )
-                                          );
-
-                    _stringBuilder.Append (
-                                           EscSeqUtils.CSI_SetBackgroundColorRGB (
-                                                                                  attr.Background.R,
-                                                                                  attr.Background.G,
-                                                                                  attr.Background.B
-                                                                                 )
-                                          );
+                    _stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.Foreground.R, attr.Foreground.G, attr.Foreground.B));
+                    _stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.Background.R, attr.Background.G, attr.Background.B));
                 }
 
                 if (info.Char != '\x1b')
@@ -242,9 +218,7 @@ internal class WindowsConsole
 
     public bool EnsureCursorVisibility ()
     {
-        if (_initialCursorVisibility.HasValue
-            && _pendingCursorVisibility.HasValue
-            && SetCursorVisibility (_pendingCursorVisibility.Value))
+        if (_initialCursorVisibility.HasValue && _pendingCursorVisibility.HasValue && SetCursorVisibility (_pendingCursorVisibility.Value))
         {
             _pendingCursorVisibility = null;
 
@@ -276,7 +250,8 @@ internal class WindowsConsole
         {
             var info = new ConsoleCursorInfo
             {
-                dwSize = (uint)visibility & 0x00FF, bVisible = ((uint)visibility & 0xFF00) != 0
+                dwSize = (uint)visibility & 0x00FF,
+                bVisible = ((uint)visibility & 0xFF00) != 0
             };
 
             if (!SetConsoleCursorInfo (_screenBuffer, ref info))
@@ -337,8 +312,7 @@ internal class WindowsConsole
 
         var sz = new Size (
                            csbi.srWindow.Right - csbi.srWindow.Left + 1,
-                           csbi.srWindow.Bottom - csbi.srWindow.Top + 1
-                          );
+                           csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
         position = new Point (csbi.srWindow.Left, csbi.srWindow.Top);
 
         return sz;
@@ -356,8 +330,7 @@ internal class WindowsConsole
 
         var sz = new Size (
                            csbi.srWindow.Right - csbi.srWindow.Left + 1,
-                           csbi.srWindow.Bottom - csbi.srWindow.Top + 1
-                          );
+                           csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
         position = new Point (csbi.srWindow.Left, csbi.srWindow.Top);
 
         return sz;
@@ -425,8 +398,7 @@ internal class WindowsConsole
 
         var sz = new Size (
                            csbi.srWindow.Right - csbi.srWindow.Left + 1,
-                           Math.Max (csbi.srWindow.Bottom - csbi.srWindow.Top + 1, 0)
-                          );
+                           Math.Max (csbi.srWindow.Bottom - csbi.srWindow.Top + 1, 0));
         position = new Point (csbi.srWindow.Left, csbi.srWindow.Top);
         SetConsoleOutputWindow (csbi);
         var winRect = new SmallRect (0, 0, (short)(sz.Width - 1), (short)Math.Max (sz.Height - 1, 0));
@@ -551,7 +523,9 @@ internal class WindowsConsole
     public struct WindowBufferSizeRecord
     {
         public Coord _size;
+
         public WindowBufferSizeRecord (short x, short y) { _size = new Coord (x, y); }
+
         public readonly override string ToString () { return $"[WindowBufferSize{_size}"; }
     }
 
@@ -757,7 +731,9 @@ internal class WindowsConsole
             ScrollLock = scrolllock;
         }
 
-        /// <summary>Prints a ConsoleKeyInfoEx structure</summary>
+        /// <summary>
+        ///     Prints a ConsoleKeyInfoEx structure
+        /// </summary>
         /// <param name="ex"></param>
         /// <returns></returns>
         public readonly string ToString (ConsoleKeyInfoEx ex)
@@ -778,8 +754,11 @@ internal class WindowsConsole
         }
     }
 
-    [DllImport ("kernel32.dll", SetLastError = true)] private static extern nint GetStdHandle (int nStdHandle);
-    [DllImport ("kernel32.dll", SetLastError = true)] private static extern bool CloseHandle (nint handle);
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern nint GetStdHandle (int nStdHandle);
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool CloseHandle (nint handle);
 
     [DllImport ("kernel32.dll", EntryPoint = "ReadConsoleInputW", CharSet = CharSet.Unicode)]
     public static extern bool ReadConsoleInput (
@@ -817,7 +796,8 @@ internal class WindowsConsole
         object lpReserved
     );
 
-    [DllImport ("kernel32.dll")] private static extern bool SetConsoleCursorPosition (nint hConsoleOutput, Coord dwCursorPosition);
+    [DllImport ("kernel32.dll")]
+    private static extern bool SetConsoleCursorPosition (nint hConsoleOutput, Coord dwCursorPosition);
 
     [StructLayout (LayoutKind.Sequential)]
     public struct ConsoleCursorInfo
@@ -827,16 +807,16 @@ internal class WindowsConsole
     }
 
     [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool SetConsoleCursorInfo (
-        nint hConsoleOutput,
-        [In] ref ConsoleCursorInfo lpConsoleCursorInfo
-    );
+    private static extern bool SetConsoleCursorInfo (nint hConsoleOutput, [In] ref ConsoleCursorInfo lpConsoleCursorInfo);
 
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool GetConsoleCursorInfo (nint hConsoleOutput, out ConsoleCursorInfo lpConsoleCursorInfo);
 
-    [DllImport ("kernel32.dll")] private static extern bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
-    [DllImport ("kernel32.dll")] private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
+    [DllImport ("kernel32.dll")]
+    private static extern bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
+
+    [DllImport ("kernel32.dll")]
+    private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
 
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern nint CreateConsoleScreenBuffer (
@@ -848,8 +828,12 @@ internal class WindowsConsole
     );
 
     internal static nint INVALID_HANDLE_VALUE = new (-1);
-    [DllImport ("kernel32.dll", SetLastError = true)] private static extern bool SetConsoleActiveScreenBuffer (nint Handle);
-    [DllImport ("kernel32.dll", SetLastError = true)] private static extern bool GetNumberOfConsoleInputEvents (nint handle, out uint lpcNumberOfEvents);
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool SetConsoleActiveScreenBuffer (nint Handle);
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool GetNumberOfConsoleInputEvents (nint handle, out uint lpcNumberOfEvents);
 
     public InputRecord [] ReadConsoleInput ()
     {
@@ -862,8 +846,7 @@ internal class WindowsConsole
                               _inputHandle,
                               pRecord,
                               bufferSize,
-                              out uint numberEventsRead
-                             );
+                              out uint numberEventsRead);
 
             return numberEventsRead == 0
                        ? null
@@ -949,16 +932,10 @@ internal class WindowsConsole
     }
 
     [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool GetConsoleScreenBufferInfoEx (
-        nint hConsoleOutput,
-        ref CONSOLE_SCREEN_BUFFER_INFOEX csbi
-    );
+    private static extern bool GetConsoleScreenBufferInfoEx (nint hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFOEX csbi);
 
     [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool SetConsoleScreenBufferInfoEx (
-        nint hConsoleOutput,
-        ref CONSOLE_SCREEN_BUFFER_INFOEX ConsoleScreenBufferInfo
-    );
+    private static extern bool SetConsoleScreenBufferInfoEx (nint hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFOEX ConsoleScreenBufferInfo);
 
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool SetConsoleWindowInfo (
@@ -975,6 +952,22 @@ internal class WindowsConsole
 
 internal class WindowsDriver : ConsoleDriver
 {
+    private readonly bool _isWindowsTerminal;
+
+    private CursorVisibility _cachedCursorVisibility;
+    private WindowsConsole.SmallRect _damageRegion;
+    private bool _isButtonDoubleClicked;
+    private bool _isButtonPressed;
+    private bool _isButtonReleased;
+    private bool _isOneFingerDoubleClicked;
+
+    private WindowsConsole.ButtonState? _lastMouseButtonPressed;
+    private WindowsMainLoop _mainLoopDriver;
+    private WindowsConsole.ExtendedCharInfo [] _outputBuffer;
+    private Point? _point;
+    private Point _pointMove;
+    private bool _processButtonClick;
+
     public WindowsDriver ()
     {
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
@@ -1000,22 +993,7 @@ internal class WindowsDriver : ConsoleDriver
         }
     }
 
-    private readonly bool _isWindowsTerminal;
-    private CursorVisibility _cachedCursorVisibility;
-    private WindowsConsole.SmallRect _damageRegion;
-    private bool _isButtonDoubleClicked;
-    private bool _isButtonPressed;
-    private bool _isButtonReleased;
-    private bool _isOneFingerDoubleClicked;
-    private WindowsConsole.ButtonState? _lastMouseButtonPressed;
-    private WindowsMainLoop _mainLoopDriver;
-    private WindowsConsole.ExtendedCharInfo [] _outputBuffer;
-    private Point? _point;
-    private Point _pointMove;
-    private bool _processButtonClick;
-
-    public override bool SupportsTrueColor =>
-        RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931 && _isWindowsTerminal);
+    public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931 && _isWindowsTerminal);
 
     public WindowsConsole WinConsole { get; private set; }
 
@@ -1053,8 +1031,7 @@ internal class WindowsDriver : ConsoleDriver
                                            (ConsoleKey)keyEvent.wVirtualKeyCode,
                                            mod.HasFlag (ConsoleModifiers.Shift),
                                            mod.HasFlag (ConsoleModifiers.Alt),
-                                           mod.HasFlag (ConsoleModifiers.Control)
-                                          );
+                                           mod.HasFlag (ConsoleModifiers.Control));
         cKeyInfo = DecodeVKPacketToKConsoleKeyInfo (cKeyInfo);
         uint scanCode = GetScanCodeFromConsoleKeyInfo (cKeyInfo);
 
@@ -1093,9 +1070,15 @@ internal class WindowsDriver : ConsoleDriver
 
     public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
     {
-        var input = new WindowsConsole.InputRecord { EventType = WindowsConsole.EventType.Key };
+        var input = new WindowsConsole.InputRecord
+        {
+            EventType = WindowsConsole.EventType.Key
+        };
 
-        var keyEvent = new WindowsConsole.KeyEventRecord { bKeyDown = true };
+        var keyEvent = new WindowsConsole.KeyEventRecord
+        {
+            bKeyDown = true
+        };
         var controlKey = new WindowsConsole.ControlKeyState ();
 
         if (shift)
@@ -1174,16 +1157,8 @@ internal class WindowsDriver : ConsoleDriver
         WindowsConsole.ControlKeyState state = keyEvent.dwControlKeyState;
 
         bool shift = (state & WindowsConsole.ControlKeyState.ShiftPressed) != 0;
-
-        bool alt = (state
-                    & (WindowsConsole.ControlKeyState.LeftAltPressed
-                       | WindowsConsole.ControlKeyState.RightAltPressed))
-                   != 0;
-
-        bool control = (state
-                        & (WindowsConsole.ControlKeyState.LeftControlPressed
-                           | WindowsConsole.ControlKeyState.RightControlPressed))
-                       != 0;
+        bool alt = (state & (WindowsConsole.ControlKeyState.LeftAltPressed | WindowsConsole.ControlKeyState.RightAltPressed)) != 0;
+        bool control = (state & (WindowsConsole.ControlKeyState.LeftControlPressed | WindowsConsole.ControlKeyState.RightControlPressed)) != 0;
         bool capslock = (state & WindowsConsole.ControlKeyState.CapslockOn) != 0;
         bool numlock = (state & WindowsConsole.ControlKeyState.NumlockOn) != 0;
         bool scrolllock = (state & WindowsConsole.ControlKeyState.ScrolllockOn) != 0;
@@ -1205,7 +1180,12 @@ internal class WindowsDriver : ConsoleDriver
         }
 
         SetCursorVisibility (_cachedCursorVisibility);
-        var position = new WindowsConsole.Coord { X = (short)Col, Y = (short)Row };
+
+        var position = new WindowsConsole.Coord
+        {
+            X = (short)Col,
+            Y = (short)Row
+        };
         WinConsole?.SetCursorPosition (position);
     }
 
@@ -1218,7 +1198,11 @@ internal class WindowsDriver : ConsoleDriver
             return;
         }
 
-        var bufferCoords = new WindowsConsole.Coord { X = (short)Clip.Width, Y = (short)Clip.Height };
+        var bufferCoords = new WindowsConsole.Coord
+        {
+            X = (short)Clip.Width,
+            Y = (short)Clip.Height
+        };
 
         for (var row = 0; row < Rows; row++)
         {
@@ -1265,17 +1249,17 @@ internal class WindowsDriver : ConsoleDriver
             }
         }
 
-        _damageRegion = new WindowsConsole.SmallRect { Top = 0, Left = 0, Bottom = (short)Rows, Right = (short)Cols };
+        _damageRegion = new WindowsConsole.SmallRect
+        {
+            Top = 0,
+            Left = 0,
+            Bottom = (short)Rows,
+            Right = (short)Cols
+        };
 
         if (!RunningUnitTests
             && WinConsole != null
-            && !WinConsole.WriteToConsole (
-                                           new Size (Cols, Rows),
-                                           _outputBuffer,
-                                           bufferCoords,
-                                           _damageRegion,
-                                           Force16Colors
-                                          ))
+            && !WinConsole.WriteToConsole (new Size (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion, Force16Colors))
         {
             int err = Marshal.GetLastWin32Error ();
 
@@ -1338,9 +1322,7 @@ internal class WindowsDriver : ConsoleDriver
             {
                 // We are being run in an environment that does not support a console
                 // such as a unit test, or a pipe.
-                Debug.WriteLine (
-                                 $"Likely running unit tests. Setting WinConsole to null so we can test it elsewhere. Exception: {e}"
-                                );
+                Debug.WriteLine ($"Likely running unit tests. Setting WinConsole to null so we can test it elsewhere. Exception: {e}");
                 WinConsole = null;
             }
         }
@@ -1349,7 +1331,14 @@ internal class WindowsDriver : ConsoleDriver
 
         _outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
         Clip = new Rect (0, 0, Cols, Rows);
-        _damageRegion = new WindowsConsole.SmallRect { Top = 0, Left = 0, Bottom = (short)Rows, Right = (short)Cols };
+
+        _damageRegion = new WindowsConsole.SmallRect
+        {
+            Top = 0,
+            Left = 0,
+            Bottom = (short)Rows,
+            Right = (short)Cols
+        };
 
         ClearContents ();
 
@@ -1407,12 +1396,8 @@ internal class WindowsDriver : ConsoleDriver
                                                            {
                                                                X = me.X,
                                                                Y = me.Y,
-                                                               Flags = ProcessButtonClick (
-                                                                                           inputEvent.MouseEvent
-                                                                                          )
-                                                           }
-                                                          )
-                                 );
+                                                               Flags = ProcessButtonClick (inputEvent.MouseEvent)
+                                                           }));
                 }
 
                 break;
@@ -1453,8 +1438,7 @@ internal class WindowsDriver : ConsoleDriver
         {
             Size newSize = WinConsole.SetConsoleWindow (
                                                         (short)Math.Max (w, 16),
-                                                        (short)Math.Max (e.Size.Height, 0)
-                                                       );
+                                                        (short)Math.Max (e.Size.Height, 0));
 
             Cols = newSize.Width;
             Rows = newSize.Height;
@@ -1574,8 +1558,7 @@ internal class WindowsDriver : ConsoleDriver
                 }
 
                 // KeyChar is printable
-                if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)
-                    && keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
+                if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt) && keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
                 {
                     // AltGr support - AltGr is equivalent to Ctrl+Alt - the correct char is in KeyChar
                     return (KeyCode)keyInfo.KeyChar;
@@ -1603,15 +1586,13 @@ internal class WindowsDriver : ConsoleDriver
             {
                 // KeyChar is not printable - possibly an AltGr key?
                 // AltGr support - AltGr is equivalent to Ctrl+Alt
-                if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)
-                    && keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
+                if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt) && keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
                 {
                     return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
                 }
             }
 
-            if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)
-                || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
+            if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt) || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
             {
                 return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
             }
@@ -1691,7 +1672,11 @@ internal class WindowsDriver : ConsoleDriver
                 break;
         }
 
-        _point = new Point { X = mouseEvent.MousePosition.X, Y = mouseEvent.MousePosition.Y };
+        _point = new Point
+        {
+            X = mouseEvent.MousePosition.X,
+            Y = mouseEvent.MousePosition.Y
+        };
         _lastMouseButtonPressed = null;
         _isButtonReleased = false;
         _processButtonClick = false;
@@ -1714,7 +1699,13 @@ internal class WindowsDriver : ConsoleDriver
         while (_isButtonPressed)
         {
             await Task.Delay (100);
-            var me = new MouseEvent { X = _pointMove.X, Y = _pointMove.Y, Flags = mouseFlag };
+
+            var me = new MouseEvent
+            {
+                X = _pointMove.X,
+                Y = _pointMove.Y,
+                Flags = mouseFlag
+            };
 
             View view = Application.WantContinuousButtonPressedView;
 
@@ -1734,7 +1725,14 @@ internal class WindowsDriver : ConsoleDriver
     {
         _outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
         Clip = new Rect (0, 0, Cols, Rows);
-        _damageRegion = new WindowsConsole.SmallRect { Top = 0, Left = 0, Bottom = (short)Rows, Right = (short)Cols };
+
+        _damageRegion = new WindowsConsole.SmallRect
+        {
+            Top = 0,
+            Left = 0,
+            Bottom = (short)Rows,
+            Right = (short)Cols
+        };
         _dirtyLines = new bool [Rows];
 
         WinConsole?.ForceRefreshCursorVisibility ();
@@ -1777,8 +1775,7 @@ internal class WindowsDriver : ConsoleDriver
                                               Task.Run (async () => await ProcessButtonDoubleClickedAsync ());
 
                                               return false;
-                                          }
-                                         );
+                                          });
         }
 
         // The ButtonState member of the MouseEvent structure has bit corresponding to each mouse button.
@@ -1794,12 +1791,13 @@ internal class WindowsDriver : ConsoleDriver
             _isButtonReleased = false;
         }
 
-        var p = new Point { X = mouseEvent.MousePosition.X, Y = mouseEvent.MousePosition.Y };
+        var p = new Point
+        {
+            X = mouseEvent.MousePosition.X,
+            Y = mouseEvent.MousePosition.Y
+        };
 
-        if ((mouseEvent.ButtonState != 0
-             && mouseEvent.EventFlags == 0
-             && _lastMouseButtonPressed == null
-             && !_isButtonDoubleClicked)
+        if ((mouseEvent.ButtonState != 0 && mouseEvent.EventFlags == 0 && _lastMouseButtonPressed == null && !_isButtonDoubleClicked)
             || (_lastMouseButtonPressed == null
                 && mouseEvent.EventFlags.HasFlag (WindowsConsole.EventFlags.MouseMoved)
                 && mouseEvent.ButtonState != 0
@@ -1824,13 +1822,14 @@ internal class WindowsDriver : ConsoleDriver
                     break;
             }
 
-            if (_point == null)
+            if (_point is null)
             {
                 _point = p;
             }
 
-            if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved)
+            if (mouseEvent.EventFlags.HasFlag (WindowsConsole.EventFlags.MouseMoved))
             {
+                _pointMove = p;
                 mouseFlag |= MouseFlags.ReportMousePosition;
                 _isButtonReleased = false;
                 _processButtonClick = false;
@@ -1844,14 +1843,10 @@ internal class WindowsDriver : ConsoleDriver
                 Application.MainLoop.AddIdle (
                                               () =>
                                               {
-                                                  Task.Run (
-                                                            async () =>
-                                                                await ProcessContinuousButtonPressedAsync (mouseFlag)
-                                                           );
+                                                  Task.Run (async () => await ProcessContinuousButtonPressedAsync (mouseFlag));
 
                                                   return false;
-                                              }
-                                             );
+                                              });
             }
         }
         else if (_lastMouseButtonPressed != null
@@ -1881,9 +1876,7 @@ internal class WindowsDriver : ConsoleDriver
             _isButtonPressed = false;
             _isButtonReleased = true;
 
-            if (_point != null
-                && ((Point)_point).X == mouseEvent.MousePosition.X
-                && ((Point)_point).Y == mouseEvent.MousePosition.Y)
+            if (_point != null && ((Point)_point).X == mouseEvent.MousePosition.X && ((Point)_point).Y == mouseEvent.MousePosition.Y)
             {
                 _processButtonClick = true;
             }
@@ -2007,33 +2000,45 @@ internal class WindowsDriver : ConsoleDriver
         //System.Diagnostics.Debug.WriteLine (
         //	$"point.X:{(point != null ? ((Point)point).X : -1)};point.Y:{(point != null ? ((Point)point).Y : -1)}");
 
-        return new MouseEvent { X = mouseEvent.MousePosition.X, Y = mouseEvent.MousePosition.Y, Flags = mouseFlag };
+        return new MouseEvent
+        {
+            X = mouseEvent.MousePosition.X,
+            Y = mouseEvent.MousePosition.Y,
+            Flags = mouseFlag
+        };
     }
 }
 
-/// <summary>Mainloop intended to be used with the <see cref="WindowsDriver"/>, and can only be used on Windows.</summary>
-/// <remarks>This implementation is used for WindowsDriver.</remarks>
+/// <summary>
+///     Mainloop intended to be used with the <see cref="WindowsDriver"/>, and can
+///     only be used on Windows.
+/// </summary>
+/// <remarks>
+///     This implementation is used for WindowsDriver.
+/// </remarks>
 internal class WindowsMainLoop : IMainLoopDriver
 {
-    public WindowsMainLoop (ConsoleDriver consoleDriver = null)
-    {
-        _consoleDriver = consoleDriver ?? throw new ArgumentNullException (nameof (consoleDriver));
-        _winConsole = ((WindowsDriver)consoleDriver).WinConsole;
-    }
+    /// <summary>
+    ///     Invoked when the window is changed.
+    /// </summary>
+    public EventHandler<SizeChangedEventArgs> WinChanged;
 
     private readonly ConsoleDriver _consoleDriver;
     private readonly ManualResetEventSlim _eventReady = new (false);
-    private readonly CancellationTokenSource _inputHandlerTokenSource = new ();
 
     // The records that we keep fetching
     private readonly Queue<WindowsConsole.InputRecord []> _resultQueue = new ();
     private readonly ManualResetEventSlim _waitForProbe = new (false);
     private readonly WindowsConsole _winConsole;
     private CancellationTokenSource _eventReadyTokenSource = new ();
+    private readonly CancellationTokenSource _inputHandlerTokenSource = new ();
     private MainLoop _mainLoop;
 
-    /// <summary>Invoked when the window is changed.</summary>
-    public EventHandler<SizeChangedEventArgs> WinChanged;
+    public WindowsMainLoop (ConsoleDriver consoleDriver = null)
+    {
+        _consoleDriver = consoleDriver ?? throw new ArgumentNullException (nameof (consoleDriver));
+        _winConsole = ((WindowsDriver)consoleDriver).WinConsole;
+    }
 
     void IMainLoopDriver.Setup (MainLoop mainLoop)
     {
@@ -2195,7 +2200,9 @@ internal class WindowsMainLoop : IMainLoopDriver
 internal class WindowsClipboard : ClipboardBase
 {
     private const uint _cfUnicodeText = 13;
+
     public WindowsClipboard () { IsSupported = IsClipboardFormatAvailable (_cfUnicodeText); }
+
     public override bool IsSupported { get; }
 
     protected override string GetClipboardDataImpl ()
@@ -2301,10 +2308,17 @@ internal class WindowsClipboard : ClipboardBase
     [return: MarshalAs (UnmanagedType.Bool)]
     private static extern bool CloseClipboard ();
 
-    [DllImport ("user32.dll")] private static extern bool EmptyClipboard ();
-    [DllImport ("user32.dll", SetLastError = true)] private static extern nint GetClipboardData (uint uFormat);
-    [DllImport ("kernel32.dll", SetLastError = true)] private static extern nint GlobalLock (nint hMem);
-    [DllImport ("kernel32.dll", SetLastError = true)] private static extern int GlobalSize (nint handle);
+    [DllImport ("user32.dll")]
+    private static extern bool EmptyClipboard ();
+
+    [DllImport ("user32.dll", SetLastError = true)]
+    private static extern nint GetClipboardData (uint uFormat);
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern nint GlobalLock (nint hMem);
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern int GlobalSize (nint handle);
 
     [DllImport ("kernel32.dll", SetLastError = true)]
     [return: MarshalAs (UnmanagedType.Bool)]
@@ -2313,10 +2327,6 @@ internal class WindowsClipboard : ClipboardBase
     [DllImport ("User32.dll", SetLastError = true)]
     [return: MarshalAs (UnmanagedType.Bool)]
     private static extern bool IsClipboardFormatAvailable (uint format);
-
-    [DllImport ("user32.dll", SetLastError = true)]
-    [return: MarshalAs (UnmanagedType.Bool)]
-    private static extern bool OpenClipboard (nint hWndNewOwner);
 
     private void OpenClipboard ()
     {
@@ -2338,6 +2348,12 @@ internal class WindowsClipboard : ClipboardBase
         }
     }
 
-    [DllImport ("user32.dll", SetLastError = true)] private static extern nint SetClipboardData (uint uFormat, nint data);
+    [DllImport ("user32.dll", SetLastError = true)]
+    [return: MarshalAs (UnmanagedType.Bool)]
+    private static extern bool OpenClipboard (nint hWndNewOwner);
+
+    [DllImport ("user32.dll", SetLastError = true)]
+    private static extern nint SetClipboardData (uint uFormat, nint data);
+
     private void ThrowWin32 () { throw new Win32Exception (Marshal.GetLastWin32Error ()); }
 }
