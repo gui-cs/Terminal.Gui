@@ -5,7 +5,8 @@
 ///     <see cref="SearchString"/> is used to find the next item in the collection that matches the search string when
 ///     <see cref="GetNextMatchingItem(int, char)"/> is called.
 ///     <para>
-///         If the user types keystrokes that can't be found in the collection, the search string is cleared and the next item is found that starts with the last keystroke.
+///         If the user types keystrokes that can't be found in the collection, the search string is cleared and the next
+///         item is found that starts with the last keystroke.
 ///     </para>
 ///     <para>If the user pauses keystrokes for a short time (see <see cref="TypingDelay"/>), the search string is cleared.</para>
 /// </summary>
@@ -18,8 +19,8 @@ public abstract class CollectionNavigatorBase
     public StringComparer Comparer { get; set; } = StringComparer.InvariantCultureIgnoreCase;
 
     /// <summary>
-    ///     Gets the current search string. This includes the set of keystrokes that have been pressed since the last unsuccessful match or after
-    ///     <see cref="TypingDelay"/>) milliseconds. Useful for debugging.
+    ///     Gets the current search string. This includes the set of keystrokes that have been pressed since the last
+    ///     unsuccessful match or after <see cref="TypingDelay"/>) milliseconds. Useful for debugging.
     /// </summary>
     public string SearchString
     {
@@ -32,18 +33,20 @@ public abstract class CollectionNavigatorBase
     }
 
     /// <summary>
-    ///     Gets or sets the number of milliseconds to delay before clearing the search string. The delay is reset on each call to
-    ///     <see cref="GetNextMatchingItem(int, char)"/>. The default is 500ms.
+    ///     Gets or sets the number of milliseconds to delay before clearing the search string. The delay is reset on each
+    ///     call to <see cref="GetNextMatchingItem(int, char)"/>. The default is 500ms.
     /// </summary>
     public int TypingDelay { get; set; } = 500;
 
     /// <summary>
-    ///     Gets the index of the next item in the collection that matches the current <see cref="SearchString"/> plus the provided character (typically from a key press).
+    ///     Gets the index of the next item in the collection that matches the current <see cref="SearchString"/> plus the
+    ///     provided character (typically from a key press).
     /// </summary>
     /// <param name="currentIndex">The index in the collection to start the search from.</param>
     /// <param name="keyStruck">The character of the key the user pressed.</param>
     /// <returns>
-    ///     The index of the item that matches what the user has typed. Returns <see langword="-1"/> if no item in the collection matched.
+    ///     The index of the item that matches what the user has typed. Returns <see langword="-1"/> if no item in the
+    ///     collection matched.
     /// </returns>
     public int GetNextMatchingItem (int currentIndex, char keyStruck)
     {
@@ -100,7 +103,7 @@ public abstract class CollectionNavigatorBase
             }
 
             // if no changes to current state manifested
-            if (idxCandidate == currentIndex || idxCandidate == -1)
+            if ((idxCandidate == currentIndex) || (idxCandidate == -1))
             {
                 // clear history and treat as a fresh letter
                 ClearSearchString ();
@@ -124,7 +127,8 @@ public abstract class CollectionNavigatorBase
     }
 
     /// <summary>
-    ///     Returns true if <paramref name="a"/> is a searchable key (e.g. letters, numbers, etc) that are valid to pass to this class for search filtering.
+    ///     Returns true if <paramref name="a"/> is a searchable key (e.g. letters, numbers, etc) that are valid to pass
+    ///     to this class for search filtering.
     /// </summary>
     /// <param name="a"></param>
     /// <returns></returns>
@@ -156,9 +160,10 @@ public abstract class CollectionNavigatorBase
     /// <param name="currentIndex">The index in the collection to start the search from.</param>
     /// <param name="search">The search string to use.</param>
     /// <param name="minimizeMovement">
-    ///     Set to <see langword="true"/> to stop the search on the first match if there are multiple matches for
-    ///     <paramref name="search"/>. e.g. "ca" + 'r' should stay on "car" and not jump to "cart". If <see langword="false"/>
-    ///     (the default), the next matching item will be returned, even if it is above in the collection.
+    ///     Set to <see langword="true"/> to stop the search on the first match if there are
+    ///     multiple matches for <paramref name="search"/>. e.g. "ca" + 'r' should stay on "car" and not jump to "cart". If
+    ///     <see langword="false"/> (the default), the next matching item will be returned, even if it is above in the
+    ///     collection.
     /// </param>
     /// <returns>The index of the next matching item or <see langword="-1"/> if no match was found.</returns>
     internal int GetNextMatchingItem (int currentIndex, string search, bool minimizeMovement = false)

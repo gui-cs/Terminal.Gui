@@ -95,7 +95,8 @@ public static class RuneExtensions
     /// <remarks>This is a Terminal.Gui extension method to <see cref="System.Text.Rune"/> to support TUI text manipulation.</remarks>
     /// <param name="rune">The rune to measure.</param>
     /// <returns>
-    ///     The number of columns required to fit the rune, 0 if the argument is the null character, or -1 if the value is not printable, otherwise the number of columns that the rune occupies.
+    ///     The number of columns required to fit the rune, 0 if the argument is the null character, or -1 if the value is
+    ///     not printable, otherwise the number of columns that the rune occupies.
     /// </returns>
     public static int GetColumns (this Rune rune) { return UnicodeCalculator.GetWidth (rune); }
 
@@ -126,9 +127,9 @@ public static class RuneExtensions
     {
         UnicodeCategory category = Rune.GetUnicodeCategory (rune);
 
-        return Rune.GetUnicodeCategory (rune) == UnicodeCategory.NonSpacingMark
-               || category == UnicodeCategory.SpacingCombiningMark
-               || category == UnicodeCategory.EnclosingMark;
+        return (Rune.GetUnicodeCategory (rune) == UnicodeCategory.NonSpacingMark)
+               || (category == UnicodeCategory.SpacingCombiningMark)
+               || (category == UnicodeCategory.EnclosingMark);
     }
 
     /// <summary>Reports whether a rune is a surrogate code point.</summary>
@@ -138,7 +139,8 @@ public static class RuneExtensions
     public static bool IsSurrogatePair (this Rune rune) { return char.IsSurrogatePair (rune.ToString (), 0); }
 
     /// <summary>
-    ///     Ensures the rune is not a control character and can be displayed by translating characters below 0x20 to equivalent, printable, Unicode chars.
+    ///     Ensures the rune is not a control character and can be displayed by translating characters below 0x20 to
+    ///     equivalent, printable, Unicode chars.
     /// </summary>
     /// <remarks>This is a Terminal.Gui extension method to <see cref="System.Text.Rune"/> to support TUI text manipulation.</remarks>
     /// <param name="rune"></param>

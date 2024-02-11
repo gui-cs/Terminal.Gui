@@ -19,11 +19,7 @@ public partial class View
 
     /// <summary>Returns the container for this view, or null if this view has not been added to a container.</summary>
     /// <value>The super view.</value>
-    public virtual View SuperView
-    {
-        get => _superView;
-        set => throw new NotImplementedException ();
-    }
+    public virtual View SuperView { get => _superView; set => throw new NotImplementedException (); }
 
     // Internally, we use InternalSubviews rather than subviews, as we do not expect us
     // to make the same mistakes our users make when they poke at the Subviews.
@@ -188,7 +184,7 @@ public partial class View
     /// <remarks></remarks>
     public virtual void Remove (View view)
     {
-        if (view == null || _subviews == null)
+        if ((view == null) || (_subviews == null))
         {
             return;
         }
@@ -324,7 +320,7 @@ public partial class View
 
     private void SetHasFocus (bool value, View view, bool force = false)
     {
-        if (_hasFocus != value || force)
+        if ((_hasFocus != value) || force)
         {
             _hasFocus = value;
 
@@ -535,7 +531,7 @@ public partial class View
             return;
         }
 
-        if ((Focused?._hasFocus == true && Focused?.SuperView == view) || view == this)
+        if ((Focused?._hasFocus == true && Focused?.SuperView == view) || (view == this))
         {
             if (!view._hasFocus)
             {
@@ -606,7 +602,8 @@ public partial class View
     }
 
     /// <summary>
-    ///     Finds the first view in the hierarchy that wants to get the focus if nothing is currently focused, otherwise, does nothing.
+    ///     Finds the first view in the hierarchy that wants to get the focus if nothing is currently focused, otherwise,
+    ///     does nothing.
     /// </summary>
     public void EnsureFocus ()
     {
@@ -690,7 +687,7 @@ public partial class View
 
         FocusDirection = NavigationDirection.Backward;
 
-        if (_tabIndexes == null || _tabIndexes.Count == 0)
+        if ((_tabIndexes == null) || (_tabIndexes.Count == 0))
         {
             return false;
         }
@@ -756,7 +753,7 @@ public partial class View
 
         FocusDirection = NavigationDirection.Forward;
 
-        if (_tabIndexes == null || _tabIndexes.Count == 0)
+        if ((_tabIndexes == null) || (_tabIndexes.Count == 0))
         {
             return false;
         }

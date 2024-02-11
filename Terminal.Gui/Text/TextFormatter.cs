@@ -13,7 +13,8 @@ public enum TextAlignment
     Centered,
 
     /// <summary>
-    ///     The text will be justified (spaces will be added to existing spaces such that the text fills the container horizontally).
+    ///     The text will be justified (spaces will be added to existing spaces such that the text fills the container
+    ///     horizontally).
     /// </summary>
     Justified
 }
@@ -31,7 +32,8 @@ public enum VerticalTextAlignment
     Middle,
 
     /// <summary>
-    ///     The text will be justified (spaces will be added to existing spaces such that the text fills the container vertically).
+    ///     The text will be justified (spaces will be added to existing spaces such that the text fills the container
+    ///     vertically).
     /// </summary>
     Justified
 }
@@ -97,7 +99,8 @@ public enum TextDirection
 }
 
 /// <summary>
-///     Provides text formatting. Supports <see cref="View.HotKey"/>s, horizontal alignment, vertical alignment, multiple lines, and word-based line wrap.
+///     Provides text formatting. Supports <see cref="View.HotKey"/>s, horizontal alignment, vertical alignment,
+///     multiple lines, and word-based line wrap.
 /// </summary>
 public class TextFormatter
 {
@@ -117,18 +120,14 @@ public class TextFormatter
 
     /// <summary>Controls the horizontal text-alignment property.</summary>
     /// <value>The text alignment.</value>
-    public TextAlignment Alignment
-    {
-        get => _textAlignment;
-        set => _textAlignment = EnableNeedsFormat (value);
-    }
+    public TextAlignment Alignment { get => _textAlignment; set => _textAlignment = EnableNeedsFormat (value); }
 
     /// <summary>Gets or sets whether the <see cref="Size"/> should be automatically changed to fit the <see cref="Text"/>.</summary>
     /// <remarks>
     ///     <para>Used by <see cref="View.AutoSize"/> to resize the view's <see cref="View.Bounds"/> to fit <see cref="Size"/>.</para>
     ///     <para>
-    ///         AutoSize is ignored if <see cref="TextAlignment.Justified"/> and <see cref="VerticalTextAlignment.Justified"/>
-    ///         are used.
+    ///         AutoSize is ignored if <see cref="TextAlignment.Justified"/> and
+    ///         <see cref="VerticalTextAlignment.Justified"/> are used.
     ///     </para>
     /// </remarks>
     public bool AutoSize
@@ -146,7 +145,8 @@ public class TextFormatter
     }
 
     /// <summary>
-    ///     Gets the cursor position of the <see cref="HotKey"/>. If the <see cref="HotKey"/> is defined, the cursor will be positioned over it.
+    ///     Gets the cursor position of the <see cref="HotKey"/>. If the <see cref="HotKey"/> is defined, the cursor will
+    ///     be positioned over it.
     /// </summary>
     public int CursorPosition { get; internal set; }
 
@@ -182,24 +182,17 @@ public class TextFormatter
     }
 
     /// <summary>The position in the text of the hot key. The hot key will be rendered using the hot color.</summary>
-    public int HotKeyPos
-    {
-        get => _hotKeyPos;
-        internal set => _hotKeyPos = value;
-    }
+    public int HotKeyPos { get => _hotKeyPos; internal set => _hotKeyPos = value; }
 
     /// <summary>
-    ///     The specifier character for the hot key (e.g. '_'). Set to '\xffff' to disable hot key support for this View instance. The default is '\xffff'.
+    ///     The specifier character for the hot key (e.g. '_'). Set to '\xffff' to disable hot key support for this View
+    ///     instance. The default is '\xffff'.
     /// </summary>
     public Rune HotKeySpecifier { get; set; } = (Rune)0xFFFF;
 
     /// <summary>Gets or sets a value indicating whether multi line is allowed.</summary>
     /// <remarks>Multi line is ignored if <see cref="WordWrap"/> is <see langword="true"/>.</remarks>
-    public bool MultiLine
-    {
-        get => _multiLine;
-        set => _multiLine = EnableNeedsFormat (value);
-    }
+    public bool MultiLine { get => _multiLine; set => _multiLine = EnableNeedsFormat (value); }
 
     /// <summary>Gets or sets whether the <see cref="TextFormatter"/> needs to format the text.</summary>
     /// <remarks>
@@ -212,18 +205,17 @@ public class TextFormatter
 
     /// <summary>
     ///     Gets or sets whether trailing spaces at the end of word-wrapped lines are preserved or not when
-    ///     <see cref="TextFormatter.WordWrap"/> is enabled. If <see langword="true"/> trailing spaces at the end of wrapped lines will be removed when
-    ///     <see cref="Text"/> is formatted for display. The default is <see langword="false"/>.
+    ///     <see cref="TextFormatter.WordWrap"/> is enabled. If <see langword="true"/> trailing spaces at the end of wrapped
+    ///     lines will be removed when <see cref="Text"/> is formatted for display. The default is <see langword="false"/>.
     /// </summary>
-    public bool PreserveTrailingSpaces
-    {
-        get => _preserveTrailingSpaces;
-        set => _preserveTrailingSpaces = EnableNeedsFormat (value);
-    }
+    public bool PreserveTrailingSpaces { get => _preserveTrailingSpaces; set => _preserveTrailingSpaces = EnableNeedsFormat (value); }
 
     /// <summary>Gets or sets the size <see cref="Text"/> will be constrained to when formatted.</summary>
     /// <remarks>
-    ///     <para>Does not return the size of the formatted text but the size that will be used to constrain the text when formatted.</para>
+    ///     <para>
+    ///         Does not return the size of the formatted text but the size that will be used to constrain the text when
+    ///         formatted.
+    ///     </para>
     ///     <para>When set, <see cref="NeedsFormat"/> is set to <see langword="true"/>.</para>
     /// </remarks>
     public Size Size
@@ -243,11 +235,7 @@ public class TextFormatter
     }
 
     /// <summary>Gets or sets the number of columns used for a tab.</summary>
-    public int TabWidth
-    {
-        get => _tabWidth;
-        set => _tabWidth = EnableNeedsFormat (value);
-    }
+    public int TabWidth { get => _tabWidth; set => _tabWidth = EnableNeedsFormat (value); }
 
     /// <summary>The text to be formatted. This string is never modified.</summary>
     public virtual string Text
@@ -267,18 +255,10 @@ public class TextFormatter
 
     /// <summary>Controls the vertical text-alignment property.</summary>
     /// <value>The text vertical alignment.</value>
-    public VerticalTextAlignment VerticalAlignment
-    {
-        get => _textVerticalAlignment;
-        set => _textVerticalAlignment = EnableNeedsFormat (value);
-    }
+    public VerticalTextAlignment VerticalAlignment { get => _textVerticalAlignment; set => _textVerticalAlignment = EnableNeedsFormat (value); }
 
     /// <summary>Gets or sets whether word wrap will be used to fit <see cref="Text"/> to <see cref="Size"/>.</summary>
-    public bool WordWrap
-    {
-        get => _wordWrap;
-        set => _wordWrap = EnableNeedsFormat (value);
-    }
+    public bool WordWrap { get => _wordWrap; set => _wordWrap = EnableNeedsFormat (value); }
 
     /// <summary>Draws the text held by <see cref="TextFormatter"/> to <see cref="ConsoleDriver"/> using the colors specified.</summary>
     /// <remarks>
@@ -348,7 +328,7 @@ public class TextFormatter
                                        );
         }
 
-        if (maxBounds.Width == 0 || maxBounds.Height == 0)
+        if ((maxBounds.Width == 0) || (maxBounds.Height == 0))
         {
             return;
         }
@@ -384,7 +364,7 @@ public class TextFormatter
             int x, y;
 
             // Horizontal Alignment
-            if (Alignment == TextAlignment.Right || (Alignment == TextAlignment.Justified && !IsLeftToRight (Direction)))
+            if ((Alignment == TextAlignment.Right) || (Alignment == TextAlignment.Justified && !IsLeftToRight (Direction)))
             {
                 if (isVertical)
                 {
@@ -438,7 +418,7 @@ public class TextFormatter
             }
 
             // Vertical Alignment
-            if (VerticalAlignment == VerticalTextAlignment.Bottom || (VerticalAlignment == VerticalTextAlignment.Justified && !IsTopToBottom (Direction)))
+            if ((VerticalAlignment == VerticalTextAlignment.Bottom) || (VerticalAlignment == VerticalTextAlignment.Justified && !IsTopToBottom (Direction)))
             {
                 if (isVertical)
                 {
@@ -494,7 +474,7 @@ public class TextFormatter
 
                 if (lastZeroWidthPos == null)
                 {
-                    if (idx < 0 || x + current + colOffset < 0)
+                    if ((idx < 0) || (x + current + colOffset < 0))
                     {
                         current++;
 
@@ -647,8 +627,8 @@ public class TextFormatter
 
     /// <summary>Returns the formatted text, constrained to <see cref="Size"/>.</summary>
     /// <remarks>
-    ///     If <see cref="NeedsFormat"/> is <see langword="true"/>, causes a format, resetting <see cref="NeedsFormat"/> to
-    ///     <see langword="false"/>.
+    ///     If <see cref="NeedsFormat"/> is <see langword="true"/>, causes a format, resetting <see cref="NeedsFormat"/>
+    ///     to <see langword="false"/>.
     /// </remarks>
     /// <returns>The formatted text.</returns>
     public string Format ()
@@ -669,7 +649,7 @@ public class TextFormatter
     /// <returns>The size required to hold the formatted text.</returns>
     public Size FormatAndGetSize ()
     {
-        if (string.IsNullOrEmpty (Text) || Size.Height == 0 || Size.Width == 0)
+        if (string.IsNullOrEmpty (Text) || (Size.Height == 0) || (Size.Width == 0))
         {
             return Size.Empty;
         }
@@ -689,13 +669,14 @@ public class TextFormatter
     ///         <see cref="NeedsFormat"/> will be <see langword="false"/>.
     ///     </para>
     ///     <para>
-    ///         If either of the dimensions of <see cref="Size"/> are zero, the text will not be formatted and no lines will be returned.
+    ///         If either of the dimensions of <see cref="Size"/> are zero, the text will not be formatted and no lines will
+    ///         be returned.
     ///     </para>
     /// </remarks>
     public List<string> GetLines ()
     {
         // With this check, we protect against subclasses with overrides of Text
-        if (string.IsNullOrEmpty (Text) || Size.Height == 0 || Size.Width == 0)
+        if (string.IsNullOrEmpty (Text) || (Size.Height == 0) || (Size.Width == 0))
         {
             _lines = new List<string> { string.Empty };
             NeedsFormat = false;
@@ -918,7 +899,8 @@ public class TextFormatter
 
     // TODO: Move to StringExtensions?
     /// <summary>
-    ///     Splits all newlines in the <paramref name="text"/> into a list and supports both CRLF and LF, preserving the ending newline.
+    ///     Splits all newlines in the <paramref name="text"/> into a list and supports both CRLF and LF, preserving the
+    ///     ending newline.
     /// </summary>
     /// <param name="text">The text.</param>
     /// <returns>A list of text without the newline characters.</returns>
@@ -1010,8 +992,8 @@ public class TextFormatter
     /// <param name="text">The text to word wrap</param>
     /// <param name="width">The number of columns to constrain the text to</param>
     /// <param name="preserveTrailingSpaces">
-    ///     If <see langword="true"/> trailing spaces at the end of wrapped lines will be preserved. If <see langword="false"/>
-    ///     , trailing spaces at the end of wrapped lines will be trimmed.
+    ///     If <see langword="true"/> trailing spaces at the end of wrapped lines will be
+    ///     preserved. If <see langword="false"/> , trailing spaces at the end of wrapped lines will be trimmed.
     /// </param>
     /// <param name="tabWidth">The number of columns used for a tab.</param>
     /// <param name="textDirection">The text direction.</param>
@@ -1020,7 +1002,8 @@ public class TextFormatter
     ///     <para>This method does not do any justification.</para>
     ///     <para>This method strips Newline ('\n' and '\r\n') sequences before processing.</para>
     ///     <para>
-    ///         If <paramref name="preserveTrailingSpaces"/> is <see langword="false"/> at most one space will be preserved at the end of the last line.
+    ///         If <paramref name="preserveTrailingSpaces"/> is <see langword="false"/> at most one space will be preserved
+    ///         at the end of the last line.
     ///     </para>
     /// </remarks>
     /// <returns>A list of lines.</returns>
@@ -1187,7 +1170,7 @@ public class TextFormatter
 
                 if (length > cWidth)
                 {
-                    if (to >= runes.Count || (length > 1 && cWidth <= 1))
+                    if ((to >= runes.Count) || (length > 1 && cWidth <= 1))
                     {
                         incomplete = true;
                     }
@@ -1229,7 +1212,7 @@ public class TextFormatter
             return cLength switch
                    {
                        > 0 when to < runes.Count && runes [to].Value != ' ' && runes [to].Value != '\t' => from,
-                       > 0 when to < runes.Count && (runes [to].Value == ' ' || runes [to].Value == '\t') => from,
+                       > 0 when to < runes.Count && ((runes [to].Value == ' ') || (runes [to].Value == '\t')) => from,
                        _ => to
                    };
         }
@@ -1241,7 +1224,7 @@ public class TextFormatter
                                                tabWidth
                                               );
 
-            if (IsVerticalDirection (textDirection) || preserveTrailingSpaces || str.GetColumns () <= width)
+            if (IsVerticalDirection (textDirection) || preserveTrailingSpaces || (str.GetColumns () <= width))
             {
                 lines.Add (str);
             }
@@ -1252,7 +1235,10 @@ public class TextFormatter
 
     /// <summary>Justifies text within a specified width.</summary>
     /// <param name="text">The text to justify.</param>
-    /// <param name="width">The number of columns to clip the text to. Text longer than <paramref name="width"/> will be clipped.</param>
+    /// <param name="width">
+    ///     The number of columns to clip the text to. Text longer than <paramref name="width"/> will be
+    ///     clipped.
+    /// </param>
     /// <param name="talign">Alignment.</param>
     /// <param name="textDirection">The text direction.</param>
     /// <param name="tabWidth">The number of columns used for a tab.</param>
@@ -1270,7 +1256,10 @@ public class TextFormatter
 
     /// <summary>Justifies text within a specified width.</summary>
     /// <param name="text">The text to justify.</param>
-    /// <param name="width">The number of columns to clip the text to. Text longer than <paramref name="width"/> will be clipped.</param>
+    /// <param name="width">
+    ///     The number of columns to clip the text to. Text longer than <paramref name="width"/> will be
+    ///     clipped.
+    /// </param>
     /// <param name="justify">Justify.</param>
     /// <param name="textDirection">The text direction.</param>
     /// <param name="tabWidth">The number of columns used for a tab.</param>
@@ -1417,13 +1406,13 @@ public class TextFormatter
     /// <param name="width">The number of columns to constrain the text to for word wrapping and clipping.</param>
     /// <param name="talign">Specifies how the text will be aligned horizontally.</param>
     /// <param name="wordWrap">
-    ///     If <see langword="true"/>, the text will be wrapped to new lines no longer than <paramref name="width"/>. If
-    ///     <see langword="false"/>, forces text to fit a single line. Line breaks are converted to spaces. The text will be clipped to
-    ///     <paramref name="width"/>.
+    ///     If <see langword="true"/>, the text will be wrapped to new lines no longer than
+    ///     <paramref name="width"/>. If <see langword="false"/>, forces text to fit a single line. Line breaks are converted
+    ///     to spaces. The text will be clipped to <paramref name="width"/>.
     /// </param>
     /// <param name="preserveTrailingSpaces">
-    ///     If <see langword="true"/> trailing spaces at the end of wrapped lines will be preserved. If <see langword="false"/>
-    ///     , trailing spaces at the end of wrapped lines will be trimmed.
+    ///     If <see langword="true"/> trailing spaces at the end of wrapped lines will be
+    ///     preserved. If <see langword="false"/> , trailing spaces at the end of wrapped lines will be trimmed.
     /// </param>
     /// <param name="tabWidth">The number of columns used for a tab.</param>
     /// <param name="textDirection">The text direction.</param>
@@ -1462,13 +1451,13 @@ public class TextFormatter
     /// <param name="width">The number of columns to constrain the text to for word wrapping and clipping.</param>
     /// <param name="justify">Specifies whether the text should be justified.</param>
     /// <param name="wordWrap">
-    ///     If <see langword="true"/>, the text will be wrapped to new lines no longer than <paramref name="width"/>. If
-    ///     <see langword="false"/>, forces text to fit a single line. Line breaks are converted to spaces. The text will be clipped to
-    ///     <paramref name="width"/>.
+    ///     If <see langword="true"/>, the text will be wrapped to new lines no longer than
+    ///     <paramref name="width"/>. If <see langword="false"/>, forces text to fit a single line. Line breaks are converted
+    ///     to spaces. The text will be clipped to <paramref name="width"/>.
     /// </param>
     /// <param name="preserveTrailingSpaces">
-    ///     If <see langword="true"/> trailing spaces at the end of wrapped lines will be preserved. If <see langword="false"/>
-    ///     , trailing spaces at the end of wrapped lines will be trimmed.
+    ///     If <see langword="true"/> trailing spaces at the end of wrapped lines will be
+    ///     preserved. If <see langword="false"/> , trailing spaces at the end of wrapped lines will be trimmed.
     /// </param>
     /// <param name="tabWidth">The number of columns used for a tab.</param>
     /// <param name="textDirection">The text direction.</param>
@@ -1497,7 +1486,7 @@ public class TextFormatter
 
         List<string> lineResult = new ();
 
-        if (string.IsNullOrEmpty (text) || width == 0)
+        if (string.IsNullOrEmpty (text) || (width == 0))
         {
             lineResult.Add (string.Empty);
 
@@ -1605,10 +1594,12 @@ public class TextFormatter
     }
 
     /// <summary>
-    ///     Returns the maximum number of columns needed to render the text (single line or multiple lines, word wrapped) given a number of columns to constrain the text to.
+    ///     Returns the maximum number of columns needed to render the text (single line or multiple lines, word wrapped)
+    ///     given a number of columns to constrain the text to.
     /// </summary>
     /// <remarks>
-    ///     Calls <see cref="Format()"/>. This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding glyphs (e.g. Arabic).
+    ///     Calls <see cref="Format()"/>. This API will return incorrect results if the text includes glyphs who's width
+    ///     is dependent on surrounding glyphs (e.g. Arabic).
     /// </remarks>
     /// <returns>Width of the longest line after formatting the text constrained by <paramref name="maxColumns"/>.</returns>
     /// <param name="text">Text, may contain newlines.</param>
@@ -1636,11 +1627,12 @@ public class TextFormatter
     }
 
     /// <summary>
-    ///     Returns the number of columns in the widest line in the text, without word wrap, accounting for wide-glyphs (uses
-    ///     <see cref="StringExtensions.GetColumns"/>). <paramref name="text"/> if it contains newlines.
+    ///     Returns the number of columns in the widest line in the text, without word wrap, accounting for wide-glyphs
+    ///     (uses <see cref="StringExtensions.GetColumns"/>). <paramref name="text"/> if it contains newlines.
     /// </summary>
     /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding glyphs (e.g. Arabic).
+    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
+    ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="text">Text, may contain newlines.</param>
     /// <param name="tabWidth">The number of columns used for a tab.</param>
@@ -1653,11 +1645,12 @@ public class TextFormatter
     }
 
     /// <summary>
-    ///     Returns the number of columns in the widest line in the list based on the <paramref name="startIndex"/> and the
-    ///     <paramref name="length"/>.
+    ///     Returns the number of columns in the widest line in the list based on the <paramref name="startIndex"/> and
+    ///     the <paramref name="length"/>.
     /// </summary>
     /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding glyphs (e.g. Arabic).
+    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
+    ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="lines">The lines.</param>
     /// <param name="startIndex">The start index.</param>
@@ -1693,7 +1686,8 @@ public class TextFormatter
     ///     <paramref name="length"/>.
     /// </summary>
     /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding glyphs (e.g. Arabic).
+    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
+    ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="text">The text.</param>
     /// <param name="startIndex">The start index.</param>
@@ -1717,7 +1711,8 @@ public class TextFormatter
 
     /// <summary>Gets the number of the Runes in the text that will fit in <paramref name="columns"/>.</summary>
     /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding glyphs (e.g. Arabic).
+    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
+    ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="text">The text.</param>
     /// <param name="columns">The width.</param>
@@ -1727,7 +1722,8 @@ public class TextFormatter
 
     /// <summary>Gets the number of the Runes in a list of Runes that will fit in <paramref name="columns"/>.</summary>
     /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding glyphs (e.g. Arabic).
+    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
+    ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="runes">The list of runes.</param>
     /// <param name="columns">The width.</param>
@@ -1735,7 +1731,7 @@ public class TextFormatter
     /// <returns>The index of the last Rune in <paramref name="runes"/> that fit in <paramref name="columns"/>.</returns>
     public static int GetLengthThatFits (List<Rune> runes, int columns, int tabWidth = 0)
     {
-        if (runes == null || runes.Count == 0)
+        if ((runes == null) || (runes.Count == 0))
         {
             return 0;
         }
@@ -1770,7 +1766,7 @@ public class TextFormatter
             return tabWidth;
         }
 
-        if (runeWidth < 0 || runeWidth > 0)
+        if ((runeWidth < 0) || (runeWidth > 0))
         {
             return Math.Max (runeWidth, 1);
         }
@@ -1780,7 +1776,8 @@ public class TextFormatter
 
     /// <summary>Gets the index position from the list based on the <paramref name="width"/>.</summary>
     /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding glyphs (e.g. Arabic).
+    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
+    ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="lines">The lines.</param>
     /// <param name="width">The width.</param>
@@ -1812,7 +1809,8 @@ public class TextFormatter
 
     /// <summary>Calculates the rectangle required to hold text, assuming no word wrapping or justification.</summary>
     /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding glyphs (e.g. Arabic).
+    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
+    ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="x">The x location of the rectangle</param>
     /// <param name="y">The y location of the rectangle</param>
@@ -1956,8 +1954,9 @@ public class TextFormatter
     /// <param name="hotPos">Outputs the Rune index into <c>text</c>.</param>
     /// <param name="hotKey">Outputs the hotKey. <see cref="Key.Empty"/> if not found.</param>
     /// <param name="firstUpperCase">
-    ///     If <c>true</c> the legacy behavior of identifying the first upper case character as the HotKey will be enabled. Regardless of the value of this parameter,
-    ///     <c>hotKeySpecifier</c> takes precedence. Defaults to <see langword="false"/>.
+    ///     If <c>true</c> the legacy behavior of identifying the first upper case character as the
+    ///     HotKey will be enabled. Regardless of the value of this parameter, <c>hotKeySpecifier</c> takes precedence.
+    ///     Defaults to <see langword="false"/>.
     /// </param>
     /// <returns><c>true</c> if a HotKey was found; <c>false</c> otherwise.</returns>
     public static bool FindHotKey (
@@ -1968,7 +1967,7 @@ public class TextFormatter
         bool firstUpperCase = false
     )
     {
-        if (string.IsNullOrEmpty (text) || hotKeySpecifier == (Rune)0xFFFF)
+        if (string.IsNullOrEmpty (text) || (hotKeySpecifier == (Rune)0xFFFF))
         {
             hotPos = -1;
             hotKey = KeyCode.Null;
@@ -2031,7 +2030,7 @@ public class TextFormatter
 
             var newHotKey = (KeyCode)curHotKey.Value;
 
-            if (newHotKey != KeyCode.Null && !(newHotKey == KeyCode.Space || Rune.IsControl (curHotKey)))
+            if (newHotKey != KeyCode.Null && !((newHotKey == KeyCode.Space) || Rune.IsControl (curHotKey)))
             {
                 if ((newHotKey & ~KeyCode.Space) is >= KeyCode.A and <= KeyCode.Z)
                 {
@@ -2050,7 +2049,10 @@ public class TextFormatter
         return false;
     }
 
-    /// <summary>Replaces the Rune at the index specified by the <c>hotPos</c> parameter with a tag identifying it as the hotkey.</summary>
+    /// <summary>
+    ///     Replaces the Rune at the index specified by the <c>hotPos</c> parameter with a tag identifying it as the
+    ///     hotkey.
+    /// </summary>
     /// <param name="text">The text to tag the hotkey in.</param>
     /// <param name="hotPos">The Rune index of the hotkey in <c>text</c>.</param>
     /// <returns>The text with the hotkey tagged.</returns>
