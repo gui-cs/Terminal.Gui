@@ -33,7 +33,7 @@ You now have your own fork and a local repo that references it as `origin`. Your
 
 ### Starting to Make a Change
 
-Ensure your local `develop` branch is up-to-date with `upstream` (`github.com/gui-cs/Terminal.Gui`):
+Ensure your local `develop` (for v1) or `v2_develop` (for v2) branch is up-to-date with `upstream` (`github.com/gui-cs/Terminal.Gui`):
 ```powershell
 cd ./Terminal.Gui
 git checkout develop
@@ -45,12 +45,12 @@ Create a new local branch:
 git checkout -b my_new_branch
 ```
 
-#### Making Changes
+### Making Changes
 Follow all the guidelines below.
 
-* Coding Style
-* Unit Tests
-* Sample Code
+* [Coding Style](#Terminal.Gui-Coding-Style)
+* [Unit Tests](#Unit-Tests)
+* [Sample Code](#Sample-Code)
 * API Documentation
 * etc...
 
@@ -92,7 +92,13 @@ Follow the template instructions found on Github.
 
 ## Terminal.Gui Coding Style
 
-**Terminal.Gui** follows the [Mono Coding Guidelines](https://www.mono-project.com/community/contributing/coding-guidelines/). [`/.editorconfig`](https://github.com/gui-cs/Terminal.Gui/blob/b0a43ba338adf5ec069066e5a7dff8fea39b41db/.editorconfig) enforces this style in Visual Studio. Use `Ctrl-K-D` in Visual Studio to have it reformat code.
+**Terminal.Gui** uses a derivative of the [Microsoft C# Coding Conventions](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions), with any deviations from those (somewhat older) conventions codified in the .editorconfig for the solution, as well as even more specific definitions in team-shared dotsettings files, used by ReSharper and Rider.\
+Before you commit code, please run the formatting rules on **only the code file(s) you have modified**, in one of the following ways, in order of most preferred to least preferred:
+
+ 1. `Ctrl-E-C` if using ReSharper or Rider
+ 2. Running the free [CleanupCode](https://www.jetbrains.com/help/resharper/CleanupCode.html) tool from JetBrains (this applies the same formatting rules as if you had used ReSharper or Rider, but is free for all users, if you don't have a license for those products)
+   - Run at the command line, from the solution root directory, as: `cleanupcode.exe relative/path/to/your/file.cs`
+ 3. If you are unable to use either of those options, the last resort is to use `Ctrl-K-D` in Visual Studio (with default C# developer key bindings), to apply the subset of the formatting rules that Visual Studio can apply.
 
 ## User Experience Tenets
 
