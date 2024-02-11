@@ -1520,7 +1520,7 @@ internal class WindowsDriver : ConsoleDriver
                         // Dead key (e.g. Oem2 '~'/'^' on POR keyboard)
                         // Option 1: Throw it out. 
                         //    - Apps will never see the dead keys
-                        //    - If user presses a key that can be combined with the dead key ('a'), the right thing happens (app will see 'ã').
+                        //    - If user presses a key that can be combined with the dead key ('a'), the right thing happens (app will see 'ï¿½').
                         //      - NOTE: With Dead Keys, KeyDown != KeyUp. The KeyUp event will have just the base char ('a').
                         //    - If user presses dead key again, the right thing happens (app will see `~~`)
                         //    - This is what Notepad etc... appear to do
@@ -1570,7 +1570,7 @@ internal class WindowsDriver : ConsoleDriver
                     return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)mappedChar);
                 }
 
-                // Strip off Shift - We got here because they KeyChar from Windows is the shifted char (e.g. "Ç")
+                // Strip off Shift - We got here because they KeyChar from Windows is the shifted char (e.g. "ï¿½")
                 // and passing on Shift would be redundant.
                 return MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.KeyChar);
         }
