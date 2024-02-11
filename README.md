@@ -33,10 +33,10 @@ dotnet run
 ## Documentation 
 
 * [Documentation Home](https://gui-cs.github.io/Terminal.Gui/index.html)
-* [Terminal.Gui Overview](https://gui-cs.github.io/Terminal.Gui/articles/overview.html)
-* [List of Views/Controls](https://gui-cs.github.io/Terminal.Gui/articles/views.html)
-* [Conceptual Documentation](https://gui-cs.github.io/Terminal.Gui/articles/index.html)
-* [API Documentation](https://gui-cs.github.io/Terminal.Gui)
+* [Terminal.Gui Overview](https://gui-cs.github.io/Terminal.Gui/docs/overview.html)
+* [List of Views/Controls](https://gui-cs.github.io/Terminal.Gui/docs/views.html)
+* [Conceptual Documentation](https://gui-cs.github.io/Terminal.Gui/docs/index.html)
+* [API Documentation](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui)
 
 _The Documentation matches the most recent Nuget release from the `main` branch ([![Version](https://img.shields.io/nuget/v/Terminal.Gui.svg)](https://www.nuget.org/packages/Terminal.Gui))_
 
