@@ -44,7 +44,7 @@ namespace UICatalog;
 ///         (https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog/README.md).
 ///     </para>
 /// </remarks>
-class UICatalogApp
+internal class UICatalogApp
 {
     private static StringBuilder? _aboutMessage;
     private static int _cachedCategoryIndex;
@@ -602,7 +602,7 @@ class UICatalogApp
 
         public void ConfigChanged ()
         {
-            if ((_topLevelColorScheme == null) || !Colors.ColorSchemes.ContainsKey (_topLevelColorScheme))
+            if (_topLevelColorScheme == null || !Colors.ColorSchemes.ContainsKey (_topLevelColorScheme))
             {
                 _topLevelColorScheme = "Base";
             }
