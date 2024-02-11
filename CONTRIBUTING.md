@@ -48,7 +48,7 @@ git checkout -b my_new_branch
 ### Making Changes
 Follow all the guidelines below.
 
-* [Coding Style](#Terminal.Gui-Coding-Style)
+* [Coding Style](#TerminalGui-Coding-Style)
 * [Unit Tests](#Unit-Tests)
 * [Sample Code](#Sample-Code)
 * API Documentation
