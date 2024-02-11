@@ -22,6 +22,8 @@ public partial class Toplevel : View
 {
     internal static Point? _dragPosition;
 
+    private Point _startGrabPoint;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="Toplevel"/> class with <see cref="LayoutStyle.Computed"/> layout,
     ///     defaulting to full screen. The <see cref="View.Width"/> and <see cref="View.Height"/> properties will be set to the
@@ -138,8 +140,6 @@ public partial class Toplevel : View
         KeyBindings.Add (Key.B.WithCtrl, Command.PreviousView); // Unix
 #endif
     }
-
-    private Point _startGrabPoint;
 
     /// <summary>Gets or sets a value indicating whether this <see cref="Toplevel"/> can focus.</summary>
     /// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>

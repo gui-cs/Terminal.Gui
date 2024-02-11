@@ -39,12 +39,6 @@ internal class UnixMainLoop : IMainLoopDriver
     public const int KEY_RESIZE = unchecked ((int)0xffffffffffffffff);
     private static readonly nint _ignore = Marshal.AllocHGlobal (1);
 
-    public UnixMainLoop (ConsoleDriver consoleDriver = null)
-    {
-        // UnixDriver doesn't use the consoleDriver parameter, but the WindowsDriver does.
-        _cursesDriver = (CursesDriver)Application.Driver;
-    }
-
     private readonly CursesDriver _cursesDriver;
     private readonly Dictionary<int, Watch> _descriptorWatchers = new ();
     private readonly int [] _wakeUpPipes = new int [2];
@@ -52,6 +46,12 @@ internal class UnixMainLoop : IMainLoopDriver
     private bool _pollDirty = true;
     private Pollfd [] _pollMap;
     private bool _winChanged;
+
+    public UnixMainLoop (ConsoleDriver consoleDriver = null)
+    {
+        // UnixDriver doesn't use the consoleDriver parameter, but the WindowsDriver does.
+        _cursesDriver = (CursesDriver)Application.Driver;
+    }
 
     void IMainLoopDriver.Wakeup ()
     {
@@ -186,9 +186,14 @@ internal class UnixMainLoop : IMainLoopDriver
         }
     }
 
-    [DllImport ("libc")] private static extern int pipe ([In] [Out] int [] pipes);
-    [DllImport ("libc")] private static extern int poll ([In] [Out] Pollfd [] ufds, uint nfds, int timeout);
-    [DllImport ("libc")] private static extern int read (int fd, nint buf, nint n);
+    [DllImport ("libc")]
+    private static extern int pipe ([In] [Out] int [] pipes);
+
+    [DllImport ("libc")]
+    private static extern int poll ([In] [Out] Pollfd [] ufds, uint nfds, int timeout);
+
+    [DllImport ("libc")]
+    private static extern int read (int fd, nint buf, nint n);
 
     private void UpdatePollMap ()
     {
@@ -210,7 +215,8 @@ internal class UnixMainLoop : IMainLoopDriver
         }
     }
 
-    [DllImport ("libc")] private static extern int write (int fd, nint buf, nint n);
+    [DllImport ("libc")]
+    private static extern int write (int fd, nint buf, nint n);
 
     [StructLayout (LayoutKind.Sequential)]
     private struct Pollfd

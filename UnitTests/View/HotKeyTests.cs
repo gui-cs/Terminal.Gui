@@ -5,8 +5,8 @@ namespace Terminal.Gui.ViewTests;
 
 public class HotKeyTests
 {
-    public HotKeyTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public HotKeyTests (ITestOutputHelper output) { _output = output; }
 
     [Theory]
     [InlineData (KeyCode.A)]

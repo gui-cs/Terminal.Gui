@@ -4,6 +4,8 @@ namespace Terminal.Gui.ApplicationTests;
 
 public class KeyboardTests
 {
+    private readonly ITestOutputHelper _output;
+
     public KeyboardTests (ITestOutputHelper output)
     {
         _output = output;
@@ -12,8 +14,6 @@ public class KeyboardTests
         RunState.Instances.Clear ();
 #endif
     }
-
-    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void AlternateForwardKey_AlternateBackwardKey_Tests ()

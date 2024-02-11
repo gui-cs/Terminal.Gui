@@ -7,8 +7,8 @@ namespace Terminal.Gui;
 /// <remarks>If xclip is not installed, this implementation will not work.</remarks>
 internal class CursesClipboard : ClipboardBase
 {
-    public CursesClipboard () { IsSupported = CheckSupport (); }
     private string _xclipPath = string.Empty;
+    public CursesClipboard () { IsSupported = CheckSupport (); }
     public override bool IsSupported { get; }
 
     protected override string GetClipboardDataImpl ()
@@ -93,6 +93,19 @@ internal class CursesClipboard : ClipboardBase
 /// </summary>
 internal class MacOSXClipboard : ClipboardBase
 {
+    private readonly nint _allocRegister = sel_registerName ("alloc");
+    private readonly nint _clearContentsRegister = sel_registerName ("clearContents");
+    private readonly nint _generalPasteboard;
+    private readonly nint _generalPasteboardRegister = sel_registerName ("generalPasteboard");
+    private readonly nint _initWithUtf8Register = sel_registerName ("initWithUTF8String:");
+    private readonly nint _nsPasteboard = objc_getClass ("NSPasteboard");
+    private readonly nint _nsString = objc_getClass ("NSString");
+    private readonly nint _nsStringPboardType;
+    private readonly nint _setStringRegister = sel_registerName ("setString:forType:");
+    private readonly nint _stringForTypeRegister = sel_registerName ("stringForType:");
+    private readonly nint _utf8Register = sel_registerName ("UTF8String");
+    private readonly nint _utfTextType;
+
     public MacOSXClipboard ()
     {
         _utfTextType = objc_msgSend (
@@ -110,18 +123,6 @@ internal class MacOSXClipboard : ClipboardBase
         IsSupported = CheckSupport ();
     }
 
-    private readonly nint _allocRegister = sel_registerName ("alloc");
-    private readonly nint _clearContentsRegister = sel_registerName ("clearContents");
-    private readonly nint _generalPasteboard;
-    private readonly nint _generalPasteboardRegister = sel_registerName ("generalPasteboard");
-    private readonly nint _initWithUtf8Register = sel_registerName ("initWithUTF8String:");
-    private readonly nint _nsPasteboard = objc_getClass ("NSPasteboard");
-    private readonly nint _nsString = objc_getClass ("NSString");
-    private readonly nint _nsStringPboardType;
-    private readonly nint _setStringRegister = sel_registerName ("setString:forType:");
-    private readonly nint _stringForTypeRegister = sel_registerName ("stringForType:");
-    private readonly nint _utf8Register = sel_registerName ("UTF8String");
-    private readonly nint _utfTextType;
     public override bool IsSupported { get; }
 
     protected override string GetClipboardDataImpl ()

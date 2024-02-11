@@ -31,6 +31,20 @@ public class Dialog : Window
         Right
     }
 
+    // TODO: Reenable once border/borderframe design is settled
+    /// <summary>
+    ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via
+    ///     <see cref="ConfigurationManager"/>.
+    /// </summary>
+
+    //[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    //public static Border DefaultBorder { get; set; } = new Border () {
+    //	LineStyle = LineStyle.Single,
+    //};
+    private readonly List<Button> _buttons = new ();
+
+    private bool _inLayout;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/>
     ///     positioning with no <see cref="Button"/>s.
@@ -56,20 +70,6 @@ public class Dialog : Window
 
         KeyBindings.Add (Key.Esc, Command.QuitToplevel);
     }
-
-    // TODO: Reenable once border/borderframe design is settled
-    /// <summary>
-    ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via
-    ///     <see cref="ConfigurationManager"/>.
-    /// </summary>
-
-    //[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    //public static Border DefaultBorder { get; set; } = new Border () {
-    //	LineStyle = LineStyle.Single,
-    //};
-    private readonly List<Button> _buttons = new ();
-
-    private bool _inLayout;
 
     /// <summary>Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the bottom of the dialog.</summary>
     public ButtonAlignments ButtonAlignment { get; set; }

@@ -4,8 +4,8 @@ namespace Terminal.Gui.ViewTests;
 
 public class MarginTests
 {
-    public MarginTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public MarginTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [SetupFakeDriver]

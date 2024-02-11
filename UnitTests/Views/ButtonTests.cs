@@ -4,8 +4,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class ButtonTests
 {
-    public ButtonTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public ButtonTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [AutoInitShutdown]

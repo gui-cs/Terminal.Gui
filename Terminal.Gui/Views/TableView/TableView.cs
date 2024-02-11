@@ -26,6 +26,17 @@ public class TableView : View
     /// <summary>The default minimum cell width for <see cref="ColumnStyle.MinAcceptableWidth"/></summary>
     public const int DefaultMinAcceptableWidth = 100;
 
+    // TODO: Update to use Key instead of KeyCode
+    private KeyCode cellActivationKey = KeyCode.Enter;
+    private int columnOffset;
+    private int rowOffset;
+    private Point? scrollLeftPoint;
+    private Point? scrollRightPoint;
+    private int selectedColumn;
+    private int selectedRow;
+    private TableStyle style = new ();
+    private ITableSource table;
+
     /// <summary>Initializes a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
     /// <param name="table">The table to display in the control</param>
     public TableView (ITableSource table) : this () { Table = table; }
@@ -297,17 +308,6 @@ public class TableView : View
         KeyBindings.Add (KeyCode.A | KeyCode.CtrlMask, Command.SelectAll);
         KeyBindings.Add (CellActivationKey, Command.Accept);
     }
-
-    // TODO: Update to use Key instead of KeyCode
-    private KeyCode cellActivationKey = KeyCode.Enter;
-    private int columnOffset;
-    private int rowOffset;
-    private Point? scrollLeftPoint;
-    private Point? scrollRightPoint;
-    private int selectedColumn;
-    private int selectedRow;
-    private TableStyle style = new ();
-    private ITableSource table;
 
     // TODO: Update to use Key instead of KeyCode
     /// <summary>The key which when pressed should trigger <see cref="CellActivated"/> event.  Defaults to Enter.</summary>

@@ -30,6 +30,13 @@ public class HexView : View
     private const int bsize = 4;
     private const int displayWidth = 9;
 
+    private int bpl;
+    private CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
+    private long displayStart, pos;
+    private SortedDictionary<long, byte> edits = new ();
+    private bool firstNibble, leftSide;
+    private Stream source;
+
     /// <summary>Initializes a <see cref="HexView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
     /// <param name="source">
     ///     The <see cref="Stream"/> to view and edit as hex, this <see cref="Stream"/> must support seeking,
@@ -86,13 +93,6 @@ public class HexView : View
 
     /// <summary>Initializes a <see cref="HexView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
     public HexView () : this (new MemoryStream ()) { }
-
-    private int bpl;
-    private CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
-    private long displayStart, pos;
-    private SortedDictionary<long, byte> edits = new ();
-    private bool firstNibble, leftSide;
-    private Stream source;
 
     /// <summary>
     ///     Gets or sets whether this <see cref="HexView"/> allow editing of the <see cref="Stream"/> of the underlying

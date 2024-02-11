@@ -418,8 +418,8 @@ public class HexViewTests
 
     private class NonSeekableStream : Stream
     {
-        public NonSeekableStream (Stream baseStream) { m_stream = baseStream; }
         private readonly Stream m_stream;
+        public NonSeekableStream (Stream baseStream) { m_stream = baseStream; }
         public override bool CanRead => m_stream.CanRead;
         public override bool CanSeek => false;
         public override bool CanWrite => m_stream.CanWrite;

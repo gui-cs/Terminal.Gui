@@ -8,8 +8,8 @@ namespace Terminal.Gui.ViewsTests;
 public class TextViewTests
 {
     private static TextView _textView;
-    public TextViewTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public TextViewTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [TextViewTestsAutoInitShutdown]

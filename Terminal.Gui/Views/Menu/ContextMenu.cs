@@ -24,6 +24,10 @@ public sealed class ContextMenu : IDisposable
 {
     private static MenuBar _menuBar;
 
+    private Toplevel _container;
+    private Key _key = DefaultKey;
+    private MouseFlags _mouseFlags = MouseFlags.Button3Clicked;
+
     /// <summary>Initializes a context menu with no menu items.</summary>
     public ContextMenu ()
     {
@@ -39,10 +43,6 @@ public sealed class ContextMenu : IDisposable
 
         MenuItems = new MenuBarItem ();
     }
-
-    private Toplevel _container;
-    private Key _key = DefaultKey;
-    private MouseFlags _mouseFlags = MouseFlags.Button3Clicked;
 
     /// <summary>The default shortcut key for activating the context menu.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]

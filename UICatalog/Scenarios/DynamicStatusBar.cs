@@ -24,6 +24,10 @@ public class DynamicStatusBar : Scenario
 
     public class Binding
     {
+        private readonly PropertyInfo _sourceBindingProperty;
+        private readonly object _sourceDataContext;
+        private readonly IValueConverter _valueConverter;
+
         public Binding (
             View source,
             string sourcePropertyName,
@@ -55,9 +59,6 @@ public class DynamicStatusBar : Scenario
             }
         }
 
-        private readonly PropertyInfo _sourceBindingProperty;
-        private readonly object _sourceDataContext;
-        private readonly IValueConverter _valueConverter;
         public View Source { get; }
         public string SourcePropertyName { get; }
         public View Target { get; }
@@ -88,6 +89,8 @@ public class DynamicStatusBar : Scenario
 
     public class DynamicStatusBarDetails : FrameView
     {
+        private StatusItem _statusItem;
+
         public DynamicStatusBarDetails (StatusItem statusItem = null) : this ()
         {
             _statusItem = statusItem;
@@ -204,7 +207,6 @@ public class DynamicStatusBar : Scenario
             Add (_btnShortcut);
         }
 
-        private StatusItem _statusItem;
         public TextView TextAction { get; }
         public TextField TextShortcut { get; }
         public TextField TextTitle { get; }
@@ -329,6 +331,12 @@ public class DynamicStatusBar : Scenario
 
     public class DynamicStatusBarSample : Window
     {
+        private readonly ListView _lstItems;
+        private StatusItem _currentEditStatusItem;
+        private int _currentSelectedStatusBar = -1;
+        private StatusItem _currentStatusItem;
+        private StatusBar _statusBar;
+
         public DynamicStatusBarSample ()
         {
             DataContext = new DynamicStatusItemModel ();
@@ -660,11 +668,6 @@ public class DynamicStatusBar : Scenario
             //_frmStatusBarDetails.Initialized += (s, e) => _frmStatusBarDetails.Enabled = false;
         }
 
-        private readonly ListView _lstItems;
-        private StatusItem _currentEditStatusItem;
-        private int _currentSelectedStatusBar = -1;
-        private StatusItem _currentStatusItem;
-        private StatusBar _statusBar;
         public DynamicStatusItemModel DataContext { get; set; }
 
         public static string SetTitleText (string title, string shortcut)
@@ -711,9 +714,9 @@ public class DynamicStatusBar : Scenario
 
     public class DynamicStatusItemModel : INotifyPropertyChanged
     {
-        public DynamicStatusItemModel () { Items = []; }
         private List<DynamicStatusItemList> _items;
         private string _statusBar;
+        public DynamicStatusItemModel () { Items = []; }
 
         public List<DynamicStatusItemList> Items
         {

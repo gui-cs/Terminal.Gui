@@ -233,6 +233,22 @@ public class MenuBar : View
 
     // The column where the MenuBar starts
     private static readonly int _xOrigin = 0;
+    internal bool _isMenuClosing;
+    internal bool _isMenuOpening;
+
+    // BUGBUG: Hack
+    internal Menu _openMenu;
+    internal List<Menu> _openSubMenu;
+    internal int _selected;
+    internal int _selectedSub;
+
+    private bool _initialCanFocus;
+    private bool _isCleaning;
+    private View _lastFocused;
+    private Menu _ocm;
+    private View _previousFocused;
+    private bool _reopen;
+    private bool _useSubMenusSingleFrame;
 
     /// <summary>Initializes a new instance of the <see cref="MenuBar"/>.</summary>
     public MenuBar ()
@@ -310,22 +326,6 @@ public class MenuBar : View
                          Command.ToggleExpandCollapse
                         );
     }
-
-    private bool _initialCanFocus;
-    private bool _isCleaning;
-    internal bool _isMenuClosing;
-    internal bool _isMenuOpening;
-    private View _lastFocused;
-    private Menu _ocm;
-
-    // BUGBUG: Hack
-    internal Menu _openMenu;
-    internal List<Menu> _openSubMenu;
-    private View _previousFocused;
-    private bool _reopen;
-    internal int _selected;
-    internal int _selectedSub;
-    private bool _useSubMenusSingleFrame;
 
     /// <summary><see langword="true"/> if the menu is open; otherwise <see langword="true"/>.</summary>
     public bool IsMenuOpen { get; protected set; }

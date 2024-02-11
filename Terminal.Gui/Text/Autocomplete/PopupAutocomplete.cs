@@ -6,14 +6,14 @@
 /// </summary>
 public abstract class PopupAutocomplete : AutocompleteBase
 {
-    /// <summary>Creates a new instance of the <see cref="PopupAutocomplete"/> class.</summary>
-    public PopupAutocomplete () { PopupInsideContainer = true; }
-
     private bool closed;
     private ColorScheme colorScheme;
     private View hostControl;
     private View top, popup;
     private int toRenderLength;
+
+    /// <summary>Creates a new instance of the <see cref="PopupAutocomplete"/> class.</summary>
+    public PopupAutocomplete () { PopupInsideContainer = true; }
 
     /// <summary>
     ///     The colors to use to render the overlay. Accessing this property before the Application has been initialized
@@ -555,6 +555,8 @@ public abstract class PopupAutocomplete : AutocompleteBase
 
     private class Popup : View
     {
+        private readonly PopupAutocomplete autocomplete;
+
         public Popup (PopupAutocomplete autocomplete)
         {
             this.autocomplete = autocomplete;
@@ -562,7 +564,6 @@ public abstract class PopupAutocomplete : AutocompleteBase
             WantMousePositionReports = true;
         }
 
-        private readonly PopupAutocomplete autocomplete;
         public override bool MouseEvent (MouseEvent mouseEvent) { return autocomplete.MouseEvent (mouseEvent); }
 
         public override void OnDrawContent (Rect contentArea)

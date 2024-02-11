@@ -101,10 +101,10 @@ namespace Terminal.Gui
         /// </summary>
         public class NetMaskedTextProvider : ITextValidateProvider
         {
+            private MaskedTextProvider _provider;
+
             /// <summary>Empty Constructor</summary>
             public NetMaskedTextProvider (string mask) { Mask = mask; }
-
-            private MaskedTextProvider _provider;
 
             /// <summary>Mask property</summary>
             public string Mask
@@ -237,12 +237,12 @@ namespace Terminal.Gui
         /// <summary>Regex Provider for TextValidateField.</summary>
         public class TextRegexProvider : ITextValidateProvider
         {
-            /// <summary>Empty Constructor.</summary>
-            public TextRegexProvider (string pattern) { Pattern = pattern; }
-
             private List<Rune> _pattern;
             private Regex _regex;
             private List<Rune> _text;
+
+            /// <summary>Empty Constructor.</summary>
+            public TextRegexProvider (string pattern) { Pattern = pattern; }
 
             /// <summary>Regex pattern property.</summary>
             public string Pattern
@@ -387,6 +387,10 @@ namespace Terminal.Gui
     /// <summary>Text field that validates input through a  <see cref="ITextValidateProvider"/></summary>
     public class TextValidateField : View
     {
+        private readonly int _defaultLength = 10;
+        private int _cursorPosition;
+        private ITextValidateProvider _provider;
+
         /// <summary>
         ///     Initializes a new instance of the <see cref="TextValidateField"/> class using
         ///     <see cref="LayoutStyle.Computed"/> positioning.
@@ -468,10 +472,6 @@ namespace Terminal.Gui
             KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
             KeyBindings.Add (KeyCode.CursorRight, Command.Right);
         }
-
-        private readonly int _defaultLength = 10;
-        private int _cursorPosition;
-        private ITextValidateProvider _provider;
 
         /// <summary>This property returns true if the input is valid.</summary>
         public virtual bool IsValid

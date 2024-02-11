@@ -20,6 +20,12 @@ public enum MenuItemCheckStyle
 /// </summary>
 public class MenuItem
 {
+    private readonly ShortcutHelper _shortcutHelper;
+    private bool _allowNullChecked;
+    private MenuItemCheckStyle _checkType;
+
+    private string _title;
+
     // TODO: Update to use Key instead of KeyCode
     /// <summary>Initializes a new instance of <see cref="MenuItem"/></summary>
     public MenuItem (KeyCode shortcut = KeyCode.Null) : this ("", "", null, null, null, shortcut) { }
@@ -53,11 +59,6 @@ public class MenuItem
             Shortcut = shortcut;
         }
     }
-
-    private readonly ShortcutHelper _shortcutHelper;
-    private bool _allowNullChecked;
-    private MenuItemCheckStyle _checkType;
-    private string _title;
 
     /// <summary>Gets or sets the action to be invoked when the menu item is triggered.</summary>
     /// <value>Method to invoke.</value>

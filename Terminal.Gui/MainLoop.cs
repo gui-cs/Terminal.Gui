@@ -38,6 +38,14 @@ internal interface IMainLoopDriver
 /// </remarks>
 internal class MainLoop : IDisposable
 {
+    internal List<Func<bool>> _idleHandlers = new ();
+    internal SortedList<long, Timeout> _timeouts = new ();
+
+    /// <summary>The idle handlers and lock that must be held while manipulating them</summary>
+    private readonly object _idleHandlersLock = new ();
+
+    private readonly object _timeoutsLockToken = new ();
+
     /// <summary>Creates a new MainLoop.</summary>
     /// <remarks>Use <see cref="Dispose"/> to release resources.</remarks>
     /// <param name="driver">
@@ -49,13 +57,6 @@ internal class MainLoop : IDisposable
         MainLoopDriver = driver;
         driver.Setup (this);
     }
-
-    /// <summary>The idle handlers and lock that must be held while manipulating them</summary>
-    private readonly object _idleHandlersLock = new ();
-
-    private readonly object _timeoutsLockToken = new ();
-    internal List<Func<bool>> _idleHandlers = new ();
-    internal SortedList<long, Timeout> _timeouts = new ();
 
     /// <summary>Gets a copy of the list of all idle handlers.</summary>
     internal ReadOnlyCollection<Func<bool>> IdleHandlers

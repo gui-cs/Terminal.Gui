@@ -281,6 +281,10 @@ public class Snake : Scenario
 
     private class SnakeView : View
     {
+        private readonly Rune _appleRune;
+        private readonly Attribute red = new (Color.Red, Color.Black);
+        private readonly Attribute white = new (Color.White, Color.Black);
+
         public SnakeView (SnakeState state)
         {
             _appleRune = CM.Glyphs.Apple;
@@ -303,9 +307,6 @@ public class Snake : Scenario
             };
         }
 
-        private readonly Rune _appleRune;
-        private readonly Attribute red = new (Color.Red, Color.Black);
-        private readonly Attribute white = new (Color.White, Color.Black);
         public SnakeState State { get; }
 
         public override void OnDrawContent (Rect contentArea)

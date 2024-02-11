@@ -13,6 +13,14 @@ namespace Terminal.Gui;
 /// <remarks>The <see cref="TimeField"/> <see cref="View"/> provides time editing functionality with mouse support.</remarks>
 public class TimeField : TextField
 {
+    private readonly int _longFieldLen = 8;
+    private readonly string _longFormat;
+    private readonly string _sepChar;
+    private readonly int _shortFieldLen = 5;
+    private readonly string _shortFormat;
+    private bool _isShort;
+    private TimeSpan _time;
+
     /// <summary>Initializes a new instance of <see cref="TimeField"/> using <see cref="LayoutStyle.Computed"/> positioning.</summary>
     public TimeField ()
     {
@@ -69,14 +77,6 @@ public class TimeField : TextField
         KeyBindings.Add (Key.CursorRight, Command.Right);
         KeyBindings.Add (Key.F.WithCtrl, Command.Right);
     }
-
-    private readonly int _longFieldLen = 8;
-    private readonly string _longFormat;
-    private readonly string _sepChar;
-    private readonly int _shortFieldLen = 5;
-    private readonly string _shortFormat;
-    private bool _isShort;
-    private TimeSpan _time;
 
     /// <inheritdoc/>
     public override int CursorPosition

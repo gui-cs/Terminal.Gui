@@ -47,6 +47,8 @@ public class ScatterSeries : ISeries
 /// <summary>Collection of <see cref="BarSeries"/> in which bars are clustered by category</summary>
 public class MultiBarSeries : ISeries
 {
+    private readonly BarSeries [] subSeries;
+
     /// <summary>Creates a new series of clustered bars.</summary>
     /// <param name="numberOfBarsPerCategory">Each category has this many bars</param>
     /// <param name="barsEvery">How far appart to put each category (in graph space)</param>
@@ -87,8 +89,6 @@ public class MultiBarSeries : ISeries
 
         Spacing = spacing;
     }
-
-    private readonly BarSeries [] subSeries;
 
     /// <summary>
     ///     The number of units of graph space between bars.  Should be less than <see cref="BarSeries.BarEvery"/>

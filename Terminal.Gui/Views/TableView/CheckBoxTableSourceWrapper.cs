@@ -10,6 +10,8 @@
 /// </remarks>
 public abstract class CheckBoxTableSourceWrapperBase : ITableSource
 {
+    private readonly TableView tableView;
+
     /// <summary>
     ///     Creates a new instance of the class presenting the data in <paramref name="toWrap"/> plus an additional
     ///     checkbox column.
@@ -29,8 +31,6 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
         tableView.MouseClick += TableView_MouseClick;
         tableView.CellToggled += TableView_CellToggled;
     }
-
-    private readonly TableView tableView;
 
     /// <summary>
     ///     Gets or sets the character to use for checked entries. Defaults to <see cref="GlyphDefinitions.Checked"/>

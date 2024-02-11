@@ -4,8 +4,8 @@ namespace Terminal.Gui.DrawingTests;
 
 public class StraightLineExtensionsTests
 {
-    public StraightLineExtensionsTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public StraightLineExtensionsTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [AutoInitShutdown]

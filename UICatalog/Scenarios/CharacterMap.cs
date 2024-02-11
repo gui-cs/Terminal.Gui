@@ -27,9 +27,9 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("ScrollView")]
 public class CharacterMap : Scenario
 {
+    public Label _errorLabel;
     private TableView _categoryList;
     private CharMap _charMap;
-    public Label _errorLabel;
 
     // Don't create a Window, just return the top-level view
     public override void Init ()
@@ -291,6 +291,11 @@ internal class CharMap : ScrollView
     private const CursorVisibility _cursor = CursorVisibility.Default;
     private const int COLUMN_WIDTH = 3;
 
+    private ContextMenu _contextMenu = new ();
+    private int _rowHeight = 1;
+    private int _selected;
+    private int _start;
+
     public CharMap ()
     {
         ColorScheme = Colors.ColorSchemes ["Dialog"];
@@ -408,11 +413,6 @@ internal class CharMap : ScrollView
 
         MouseClick += Handle_MouseClick;
     }
-
-    private ContextMenu _contextMenu = new ();
-    private int _rowHeight = 1;
-    private int _selected;
-    private int _start;
 
     /// <summary>Gets the coordinates of the Cursor based on the SelectedCodePoint in screen coordinates</summary>
     public Point Cursor
@@ -1084,16 +1084,16 @@ internal class UnicodeRange
 {
     public static List<UnicodeRange> Ranges = GetRanges ();
 
+    public string Category;
+    public int End;
+    public int Start;
+
     public UnicodeRange (int start, int end, string category)
     {
         Start = start;
         End = end;
         Category = category;
     }
-
-    public string Category;
-    public int End;
-    public int Start;
 
     public static List<UnicodeRange> GetRanges ()
     {

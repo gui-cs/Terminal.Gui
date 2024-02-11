@@ -2,6 +2,8 @@
 
 internal class Branch<T> where T : class
 {
+    private readonly TreeView<T> tree;
+
     /// <summary>
     ///     Declares a new branch of <paramref name="tree"/> in which the users object <paramref name="model"/> is
     ///     presented.
@@ -20,8 +22,6 @@ internal class Branch<T> where T : class
             Parent = parentBranchIfAny;
         }
     }
-
-    private readonly TreeView<T> tree;
 
     /// <summary>
     ///     The children of the current branch.  This is null until the first call to <see cref="FetchChildren"/> to avoid

@@ -4,8 +4,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class SpinnerViewTests
 {
-    public SpinnerViewTests (ITestOutputHelper output) { this.output = output; }
     private readonly ITestOutputHelper output;
+    public SpinnerViewTests (ITestOutputHelper output) { this.output = output; }
 
     [Theory]
     [AutoInitShutdown]

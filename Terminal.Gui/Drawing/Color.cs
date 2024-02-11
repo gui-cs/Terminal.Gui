@@ -21,6 +21,44 @@ namespace Terminal.Gui;
 public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Color>, ISpanFormattable,
                                               IUtf8SpanFormattable, IMinMaxValue<Color>
 {
+    /// <summary>The value of the alpha channel component</summary>
+    /// <remarks>
+    ///     The alpha channel is not currently supported, so the value of the alpha channel bits will not affect
+    ///     rendering.
+    /// </remarks>
+    [JsonIgnore]
+    [field: FieldOffset (3)]
+    public readonly byte A;
+
+    /// <summary>The value of this <see cref="Color"/> as a <see langword="uint"/> in ARGB32 format.</summary>
+    /// <remarks>
+    ///     The alpha channel is not currently supported, so the value of the alpha channel bits will not affect
+    ///     rendering.
+    /// </remarks>
+    [JsonIgnore]
+    [field: FieldOffset (0)]
+    public readonly uint Argb;
+
+    /// <summary>The value of the blue color component.</summary>
+    [JsonIgnore]
+    [field: FieldOffset (0)]
+    public readonly byte B;
+
+    /// <summary>The value of the green color component.</summary>
+    [JsonIgnore]
+    [field: FieldOffset (1)]
+    public readonly byte G;
+
+    /// <summary>The value of the red color component.</summary>
+    [JsonIgnore]
+    [field: FieldOffset (2)]
+    public readonly byte R;
+
+    /// <summary>The value of this <see cref="Color"/> encoded as a signed 32-bit integer in ARGB32 format.</summary>
+    [JsonIgnore]
+    [field: FieldOffset (0)]
+    public readonly int Rgba;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="Color"/> <see langword="struct"/> using the supplied component
     ///     values.
@@ -90,44 +128,6 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
 
     /// <summary>Initializes a new instance of the <see cref="Color"/> with all channels set to 0.</summary>
     public Color () { Argb = 0u; }
-
-    /// <summary>The value of the alpha channel component</summary>
-    /// <remarks>
-    ///     The alpha channel is not currently supported, so the value of the alpha channel bits will not affect
-    ///     rendering.
-    /// </remarks>
-    [JsonIgnore]
-    [field: FieldOffset (3)]
-    public readonly byte A;
-
-    /// <summary>The value of this <see cref="Color"/> as a <see langword="uint"/> in ARGB32 format.</summary>
-    /// <remarks>
-    ///     The alpha channel is not currently supported, so the value of the alpha channel bits will not affect
-    ///     rendering.
-    /// </remarks>
-    [JsonIgnore]
-    [field: FieldOffset (0)]
-    public readonly uint Argb;
-
-    /// <summary>The value of the blue color component.</summary>
-    [JsonIgnore]
-    [field: FieldOffset (0)]
-    public readonly byte B;
-
-    /// <summary>The value of the green color component.</summary>
-    [JsonIgnore]
-    [field: FieldOffset (1)]
-    public readonly byte G;
-
-    /// <summary>The value of the red color component.</summary>
-    [JsonIgnore]
-    [field: FieldOffset (2)]
-    public readonly byte R;
-
-    /// <summary>The value of this <see cref="Color"/> encoded as a signed 32-bit integer in ARGB32 format.</summary>
-    [JsonIgnore]
-    [field: FieldOffset (0)]
-    public readonly int Rgba;
 
     /// <summary>Gets or sets the 3-byte/6-character hexadecimal value for each of the legacy 16-color values.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
@@ -234,7 +234,8 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
         return ColorExtensions.ColorToNameMap.MinBy (pair => CalculateColorDistance (inputColor, pair.Key)).Value;
     }
 
-    [SkipLocalsInit] private static float CalculateColorDistance (in Vector4 color1, in Vector4 color2) { return Vector4.Distance (color1, color2); }
+    [SkipLocalsInit]
+    private static float CalculateColorDistance (in Vector4 color1, in Vector4 color2) { return Vector4.Distance (color1, color2); }
 
     #region Legacy Color Names
 

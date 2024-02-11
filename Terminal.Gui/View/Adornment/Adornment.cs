@@ -18,6 +18,8 @@
 /// </remarsk>
 public class Adornment : View
 {
+    private Thickness _thickness = Thickness.Empty;
+
     /// <inheritdoc/>
     public Adornment ()
     {
@@ -27,8 +29,6 @@ public class Adornment : View
     /// <summary>Constructs a new adornment for the view specified by <paramref name="parent"/>.</summary>
     /// <param name="parent"></param>
     public Adornment (View parent) { Parent = parent; }
-
-    private Thickness _thickness = Thickness.Empty;
 
     /// <summary>Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).</summary>
     public override Rect Bounds

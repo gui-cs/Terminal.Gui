@@ -11,12 +11,12 @@ namespace Terminal.Gui;
 /// <summary>This is the Curses driver for the gui.cs/Terminal framework.</summary>
 internal class CursesDriver : ConsoleDriver
 {
+    public Curses.Window _window;
     private CursorVisibility? _currentCursorVisibility;
     private CursorVisibility? _initialCursorVisibility;
     private MouseFlags _lastMouseFlags;
     private UnixMainLoop _mainLoopDriver;
     private object _processInputToken;
-    public Curses.Window _window;
 
     public override int Cols
     {
@@ -1010,6 +1010,9 @@ internal static class Platform
         }
     }
 
-    [DllImport ("libc")] private static extern int killpg (int pgrp, int pid);
-    [DllImport ("libc")] private static extern int uname (nint buf);
+    [DllImport ("libc")]
+    private static extern int killpg (int pgrp, int pid);
+
+    [DllImport ("libc")]
+    private static extern int uname (nint buf);
 }

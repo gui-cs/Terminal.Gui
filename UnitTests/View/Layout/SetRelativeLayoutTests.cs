@@ -4,8 +4,8 @@ namespace Terminal.Gui.ViewTests;
 
 public class SetRelativeLayoutTests
 {
-    public SetRelativeLayoutTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public SetRelativeLayoutTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     public void AbsolutePosDim_DontChange ()

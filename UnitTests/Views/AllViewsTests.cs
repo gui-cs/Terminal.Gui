@@ -5,8 +5,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class AllViewsTests
 {
-    public AllViewsTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public AllViewsTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     public void AllViews_Center_Properly ()

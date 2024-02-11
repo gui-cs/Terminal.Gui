@@ -89,6 +89,13 @@ public interface IListDataSource
 /// </remarks>
 public class ListView : View
 {
+    private bool _allowsMarking;
+    private bool _allowsMultipleSelection = true;
+    private int _lastSelectedItem = -1;
+    private int _selected = -1;
+    private IListDataSource _source;
+    private int _top, _left;
+
     /// <summary>
     ///     Initializes a new instance of <see cref="ListView"/>. Set the <see cref="Source"/> property to display
     ///     something.
@@ -127,13 +134,6 @@ public class ListView : View
 
         KeyBindings.Add (KeyCode.Enter, Command.OpenSelectedItem);
     }
-
-    private bool _allowsMarking;
-    private bool _allowsMultipleSelection = true;
-    private int _lastSelectedItem = -1;
-    private int _selected = -1;
-    private IListDataSource _source;
-    private int _top, _left;
 
     /// <summary>Gets or sets whether this <see cref="ListView"/> allows items to be marked.</summary>
     /// <value>Set to <see langword="true"/> to allow marking elements of the list.</value>
@@ -866,6 +866,10 @@ public class ListView : View
 /// </summary>
 public class ListWrapper : IListDataSource
 {
+    private readonly int _count;
+    private readonly BitArray _marks;
+    private readonly IList _source;
+
     /// <inheritdoc/>
     public ListWrapper (IList source)
     {
@@ -877,10 +881,6 @@ public class ListWrapper : IListDataSource
             Length = GetMaxLengthItem ();
         }
     }
-
-    private readonly int _count;
-    private readonly BitArray _marks;
-    private readonly IList _source;
 
     /// <inheritdoc/>
     public int Count => _source != null ? _source.Count : 0;

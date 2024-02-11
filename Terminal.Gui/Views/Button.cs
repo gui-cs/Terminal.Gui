@@ -23,6 +23,12 @@ namespace Terminal.Gui;
 /// </remarks>
 public class Button : View
 {
+    private readonly Rune _leftBracket;
+    private readonly Rune _leftDefault;
+    private readonly Rune _rightBracket;
+    private readonly Rune _rightDefault;
+    private bool _isDefault;
+
     /// <summary>Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.</summary>
     /// <remarks>The width of the <see cref="Button"/> is computed based on the text length. The height will always be 1.</remarks>
     public Button ()
@@ -57,12 +63,6 @@ public class Button : View
         KeyBindings.Add (Key.Space, Command.Default, Command.Accept);
         KeyBindings.Add (Key.Enter, Command.Default, Command.Accept);
     }
-
-    private readonly Rune _leftBracket;
-    private readonly Rune _leftDefault;
-    private readonly Rune _rightBracket;
-    private readonly Rune _rightDefault;
-    private bool _isDefault;
 
     /// <summary>Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.</summary>
     /// <value><c>true</c> if is default; otherwise, <c>false</c>.</value>

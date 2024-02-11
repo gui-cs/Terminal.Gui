@@ -50,19 +50,6 @@ public enum LineStyle
 /// <summary>Facilitates box drawing and line intersection detection and rendering.  Does not support diagonal lines.</summary>
 public class LineCanvas : IDisposable
 {
-    /// <summary>Creates a new instance.</summary>
-    public LineCanvas ()
-    {
-        // TODO: Refactor ConfigurationManager to not use an event handler for this.
-        // Instead, have it call a method on any class appropriately attributed
-        // to update the cached values. See Issue #2871
-        Applied += ConfigurationManager_Applied;
-    }
-
-    /// <summary>Creates a new instance with the given <paramref name="lines"/>.</summary>
-    /// <param name="lines">Initial lines for the canvas.</param>
-    public LineCanvas (IEnumerable<StraightLine> lines) : this () { _lines = lines.ToList (); }
-
     private readonly List<StraightLine> _lines = new ();
 
     private readonly Dictionary<IntersectionRuneType, IntersectionRuneResolver> runeResolvers = new ()
@@ -108,6 +95,19 @@ public class LineCanvas : IDisposable
     };
 
     private Rect _cachedBounds;
+
+    /// <summary>Creates a new instance.</summary>
+    public LineCanvas ()
+    {
+        // TODO: Refactor ConfigurationManager to not use an event handler for this.
+        // Instead, have it call a method on any class appropriately attributed
+        // to update the cached values. See Issue #2871
+        Applied += ConfigurationManager_Applied;
+    }
+
+    /// <summary>Creates a new instance with the given <paramref name="lines"/>.</summary>
+    /// <param name="lines">Initial lines for the canvas.</param>
+    public LineCanvas (IEnumerable<StraightLine> lines) : this () { _lines = lines.ToList (); }
 
     /// <summary>
     ///     Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the line that is
@@ -708,7 +708,6 @@ public class LineCanvas : IDisposable
 
     private abstract class IntersectionRuneResolver
     {
-        public IntersectionRuneResolver () { SetGlyphs (); }
         internal Rune _doubleBoth;
         internal Rune _doubleH;
         internal Rune _doubleV;
@@ -717,6 +716,7 @@ public class LineCanvas : IDisposable
         internal Rune _thickBoth;
         internal Rune _thickH;
         internal Rune _thickV;
+        public IntersectionRuneResolver () { SetGlyphs (); }
 
         public Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition? [] intersects)
         {

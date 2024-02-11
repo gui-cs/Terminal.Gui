@@ -7,8 +7,8 @@ namespace Terminal.Gui.TextTests;
 
 public class TextFormatterTests
 {
-    public TextFormatterTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public TextFormatterTests (ITestOutputHelper output) { _output = output; }
 
     public static IEnumerable<object []> CMGlyphs =>
         new List<object []> { new object [] { $"{CM.Glyphs.LeftBracket} Say Hello 你 {CM.Glyphs.RightBracket}", 16, 15 } };

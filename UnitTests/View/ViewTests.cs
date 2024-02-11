@@ -7,8 +7,8 @@ namespace Terminal.Gui.ViewTests;
 
 public class ViewTests
 {
-    public ViewTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public ViewTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [TestRespondersDisposed]

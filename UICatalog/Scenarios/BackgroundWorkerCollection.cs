@@ -17,6 +17,10 @@ public class BackgroundWorkerCollection : Scenario
 
     private class OverlappedMain : Toplevel
     {
+        private readonly MenuBar _menu;
+        private readonly WorkerApp _workerApp;
+        private bool _canOpenWorkerApp;
+
         public OverlappedMain ()
         {
             Data = "OverlappedMain";
@@ -99,10 +103,6 @@ public class BackgroundWorkerCollection : Scenario
                                          }
                                      };
         }
-
-        private readonly MenuBar _menu;
-        private readonly WorkerApp _workerApp;
-        private bool _canOpenWorkerApp;
 
         private void Menu_MenuOpening (object sender, MenuOpeningEventArgs menu)
         {
@@ -224,6 +224,11 @@ public class BackgroundWorkerCollection : Scenario
 
     private class StagingUIController : Window
     {
+        private readonly Button _close;
+        private readonly Label _label;
+        private readonly ListView _listView;
+        private readonly Button _start;
+
         public StagingUIController (Staging staging, List<string> list) : this ()
         {
             Staging = staging;
@@ -292,10 +297,6 @@ public class BackgroundWorkerCollection : Scenario
                              };
         }
 
-        private readonly Button _close;
-        private readonly Label _label;
-        private readonly ListView _listView;
-        private readonly Button _start;
         public Staging Staging { get; private set; }
         public event Action<StagingUIController> ReportClosed;
         public void Run () { Application.Run (this); }
@@ -313,6 +314,11 @@ public class BackgroundWorkerCollection : Scenario
 
     private class WorkerApp : Toplevel
     {
+        private readonly ListView _listLog;
+        private readonly List<string> _log = [];
+        private List<StagingUIController> _stagingsUi;
+        private Dictionary<Staging, BackgroundWorker> _stagingWorkers;
+
         public WorkerApp ()
         {
             Data = "WorkerApp";
@@ -335,11 +341,6 @@ public class BackgroundWorkerCollection : Scenario
             };
             Add (_listLog);
         }
-
-        private readonly ListView _listLog;
-        private readonly List<string> _log = [];
-        private List<StagingUIController> _stagingsUi;
-        private Dictionary<Staging, BackgroundWorker> _stagingWorkers;
 
         public void CancelWorker ()
         {

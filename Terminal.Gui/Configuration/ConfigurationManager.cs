@@ -84,8 +84,6 @@ public static class ConfigurationManager
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
     internal static Dictionary<string, ConfigProperty>? _allConfigProperties;
 
-    private static readonly string _configFilename = "config.json";
-
     internal static readonly JsonSerializerOptions _serializerOptions = new ()
     {
         ReadCommentHandling = JsonCommentHandling.Skip,
@@ -106,14 +104,16 @@ public static class ConfigurationManager
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
 
+    internal static StringBuilder jsonErrors = new ();
+
+    private static readonly string _configFilename = "config.json";
+
     /// <summary>The backing property for <see cref="Settings"/>.</summary>
     /// <remarks>
     ///     Is <see langword="null"/> until <see cref="Reset"/> is called. Gets set to a new instance by deserialization
     ///     (see <see cref="Load"/>).
     /// </remarks>
     private static SettingsScope? _settings;
-
-    internal static StringBuilder jsonErrors = new ();
 
     /// <summary>Name of the running application. By default this property is set to the application's assembly name.</summary>
     public static string AppName { get; set; } = Assembly.GetEntryAssembly ()?.FullName?.Split (',') [0]?.Trim ()!;

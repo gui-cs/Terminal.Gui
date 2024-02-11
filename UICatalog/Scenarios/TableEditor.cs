@@ -1572,15 +1572,15 @@ public class TableEditor : Scenario
 
     private class UnicodeRange
     {
+        public readonly string Category;
+        public readonly uint End;
+        public readonly uint Start;
+
         public UnicodeRange (uint start, uint end, string category)
         {
             Start = start;
             End = end;
             Category = category;
         }
-
-        public readonly string Category;
-        public readonly uint End;
-        public readonly uint Start;
     }
 }

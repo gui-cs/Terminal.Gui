@@ -16,6 +16,22 @@ namespace Terminal.Gui;
 /// </remarks>
 public class Thickness : IEquatable<Thickness>
 {
+    /// <summary>Gets or sets the width of the lower side of the rectangle.</summary>
+    [JsonInclude]
+    public int Bottom;
+
+    /// <summary>Gets or sets the width of the left side of the rectangle.</summary>
+    [JsonInclude]
+    public int Left;
+
+    /// <summary>Gets or sets the width of the right side of the rectangle.</summary>
+    [JsonInclude]
+    public int Right;
+
+    /// <summary>Gets or sets the width of the upper side of the rectangle.</summary>
+    [JsonInclude]
+    public int Top;
+
     /// <summary>Initializes a new instance of the <see cref="Thickness"/> class with all widths set to 0.</summary>
     public Thickness () { }
 
@@ -38,22 +54,6 @@ public class Thickness : IEquatable<Thickness>
         Right = right;
         Bottom = bottom;
     }
-
-    /// <summary>Gets or sets the width of the lower side of the rectangle.</summary>
-    [JsonInclude]
-    public int Bottom;
-
-    /// <summary>Gets or sets the width of the left side of the rectangle.</summary>
-    [JsonInclude]
-    public int Left;
-
-    /// <summary>Gets or sets the width of the right side of the rectangle.</summary>
-    [JsonInclude]
-    public int Right;
-
-    /// <summary>Gets or sets the width of the upper side of the rectangle.</summary>
-    [JsonInclude]
-    public int Top;
 
     // TODO: add operator overloads
     /// <summary>Gets an empty thickness.</summary>

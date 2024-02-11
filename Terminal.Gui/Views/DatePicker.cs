@@ -12,12 +12,6 @@ namespace Terminal.Gui;
 /// <summary>The <see cref="DatePicker"/> <see cref="View"/> Date Picker.</summary>
 public class DatePicker : View
 {
-    /// <summary>Initializes a new instance of <see cref="DatePicker"/>.</summary>
-    public DatePicker () { SetInitialProperties (_date); }
-
-    /// <summary>Initializes a new instance of <see cref="DatePicker"/> with the specified date.</summary>
-    public DatePicker (DateTime date) { SetInitialProperties (date); }
-
     private TableView _calendar;
     private DateTime _date = DateTime.Now;
     private DateField _dateField;
@@ -25,6 +19,12 @@ public class DatePicker : View
     private Button _nextMonthButton;
     private Button _previousMonthButton;
     private DataTable _table;
+
+    /// <summary>Initializes a new instance of <see cref="DatePicker"/>.</summary>
+    public DatePicker () { SetInitialProperties (_date); }
+
+    /// <summary>Initializes a new instance of <see cref="DatePicker"/> with the specified date.</summary>
+    public DatePicker (DateTime date) { SetInitialProperties (date); }
 
     /// <summary>CultureInfo for date. The default is CultureInfo.CurrentCulture.</summary>
     public CultureInfo Culture

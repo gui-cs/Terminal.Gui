@@ -4,8 +4,8 @@ namespace Terminal.Gui.InputTests;
 
 public class KeyBindingTests
 {
-    public KeyBindingTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public KeyBindingTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     public void Add_Empty_Throws ()

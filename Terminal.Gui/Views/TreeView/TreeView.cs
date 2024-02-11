@@ -53,6 +53,27 @@ public class TreeView<T> : View, ITreeView where T : class
     public static string NoBuilderError = "ERROR: TreeBuilder Not Set";
 
     /// <summary>
+    ///     Interface for filtering which lines of the tree are displayed e.g. to provide text searching.  Defaults to
+    ///     <see langword="null"/> (no filtering).
+    /// </summary>
+    public ITreeViewFilter<T> Filter = null;
+
+    /// <summary>Secondary selected regions of tree when <see cref="MultiSelect"/> is true.</summary>
+    private readonly Stack<TreeSelection<T>> multiSelectedRegions = new ();
+
+    /// <summary>Cached result of <see cref="BuildLineMap"/></summary>
+    private IReadOnlyCollection<Branch<T>> cachedLineMap;
+
+    private CursorVisibility desiredCursorVisibility = CursorVisibility.Invisible;
+
+    private KeyCode objectActivationKey = KeyCode.Enter;
+    private int scrollOffsetHorizontal;
+    private int scrollOffsetVertical;
+
+    /// <summary>private variable for <see cref="SelectedObject"/></summary>
+    private T selectedObject;
+
+    /// <summary>
     ///     Creates a new tree view with absolute positioning. Use <see cref="AddObjects(IEnumerable{T})"/> to set set
     ///     root objects for the tree. Children will not be rendered until you set <see cref="TreeBuilder"/>.
     /// </summary>
@@ -290,27 +311,6 @@ public class TreeView<T> : View, ITreeView where T : class
     ///     <see cref="AddObjects(IEnumerable{T})"/> to set set root objects for the tree.
     /// </summary>
     public TreeView (ITreeBuilder<T> builder) : this () { TreeBuilder = builder; }
-
-    /// <summary>Secondary selected regions of tree when <see cref="MultiSelect"/> is true.</summary>
-    private readonly Stack<TreeSelection<T>> multiSelectedRegions = new ();
-
-    /// <summary>Cached result of <see cref="BuildLineMap"/></summary>
-    private IReadOnlyCollection<Branch<T>> cachedLineMap;
-
-    private CursorVisibility desiredCursorVisibility = CursorVisibility.Invisible;
-
-    /// <summary>
-    ///     Interface for filtering which lines of the tree are displayed e.g. to provide text searching.  Defaults to
-    ///     <see langword="null"/> (no filtering).
-    /// </summary>
-    public ITreeViewFilter<T> Filter = null;
-
-    private KeyCode objectActivationKey = KeyCode.Enter;
-    private int scrollOffsetHorizontal;
-    private int scrollOffsetVertical;
-
-    /// <summary>private variable for <see cref="SelectedObject"/></summary>
-    private T selectedObject;
 
     /// <summary>True makes a letter key press navigate to the next visible branch that begins with that letter/digit.</summary>
     /// <value></value>
@@ -1598,6 +1598,8 @@ public class TreeView<T> : View, ITreeView where T : class
 
 internal class TreeSelection<T> where T : class
 {
+    private readonly HashSet<T> included = new ();
+
     /// <summary>Creates a new selection between two branches in the tree</summary>
     /// <param name="from"></param>
     /// <param name="toIndex"></param>
@@ -1619,7 +1621,6 @@ internal class TreeSelection<T> where T : class
         }
     }
 
-    private readonly HashSet<T> included = new ();
     public Branch<T> Origin { get; }
     public bool Contains (T model) { return included.Contains (model); }
 }

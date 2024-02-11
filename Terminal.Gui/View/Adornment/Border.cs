@@ -42,6 +42,8 @@
 /// </remarks>
 public class Border : Adornment
 {
+    private LineStyle? _lineStyle;
+
     /// <inheritdoc/>
     public Border ()
     { /* Do nothing; A parameter-less constructor is required to support all views unit tests. */
@@ -52,8 +54,6 @@ public class Border : Adornment
     {
         /* Do nothing; View.CreateAdornment requires a constructor that takes a parent */
     }
-
-    private LineStyle? _lineStyle;
 
     /// <summary>
     ///     The color scheme for the Border. If set to <see langword="null"/>, gets the <see cref="Adornment.Parent"/>

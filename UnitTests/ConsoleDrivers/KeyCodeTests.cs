@@ -4,8 +4,8 @@ namespace Terminal.Gui.DriverTests;
 
 public class KeyCodeTests
 {
-    public KeyCodeTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public KeyCodeTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     public void Key_Enum_Ambiguity_Check ()

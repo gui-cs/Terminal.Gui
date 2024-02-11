@@ -5,8 +5,8 @@ namespace Terminal.Gui.InputTests;
 
 public class KeyTests
 {
-    public KeyTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public KeyTests (ITestOutputHelper output) { _output = output; }
 
     // Via https://andrewlock.net/creating-parameterised-tests-in-xunit-with-inlinedata-classdata-and-memberdata/
     public static TheoryData<string, Key> ValidStrings =>

@@ -2,6 +2,12 @@
 
 internal class FileDialogTableSource : ITableSource
 {
+    private readonly int currentSortColumn;
+    private readonly bool currentSortIsAsc;
+    private readonly FileDialog dlg;
+    private readonly FileDialogState state;
+    private readonly FileDialogStyle style;
+
     public FileDialogTableSource (
         FileDialog dlg,
         FileDialogState state,
@@ -17,11 +23,6 @@ internal class FileDialogTableSource : ITableSource
         this.state = state;
     }
 
-    private readonly int currentSortColumn;
-    private readonly bool currentSortIsAsc;
-    private readonly FileDialog dlg;
-    private readonly FileDialogState state;
-    private readonly FileDialogStyle style;
     public object this [int row, int col] => GetColumnValue (col, state.Children [row]);
     public int Rows => state.Children.Count ();
     public int Columns => 4;

@@ -25,6 +25,10 @@ public class DynamicMenuBar : Scenario
 
     public class Binding
     {
+        private readonly PropertyInfo _sourceBindingProperty;
+        private readonly object _sourceDataContext;
+        private readonly IValueConverter _valueConverter;
+
         public Binding (
             View source,
             string sourcePropertyName,
@@ -56,9 +60,6 @@ public class DynamicMenuBar : Scenario
             }
         }
 
-        private readonly PropertyInfo _sourceBindingProperty;
-        private readonly object _sourceDataContext;
-        private readonly IValueConverter _valueConverter;
         public View Source { get; }
         public string SourcePropertyName { get; }
         public View Target { get; }
@@ -89,6 +90,9 @@ public class DynamicMenuBar : Scenario
 
     public class DynamicMenuBarDetails : FrameView
     {
+        private bool _hasParent;
+        private MenuItem _menuItem;
+
         public DynamicMenuBarDetails (MenuItem menuItem = null, bool hasParent = false) : this ()
         {
             _menuItem = menuItem;
@@ -318,8 +322,6 @@ public class DynamicMenuBar : Scenario
             //Add (_frmMenuDetails);
         }
 
-        private bool _hasParent;
-        private MenuItem _menuItem;
         public CheckBox CkbIsTopLevel { get; }
         public CheckBox CkbNullCheck { get; }
         public CheckBox CkbSubMenu { get; }
@@ -556,6 +558,12 @@ public class DynamicMenuBar : Scenario
 
     public class DynamicMenuBarSample : Window
     {
+        private readonly ListView _lstMenus;
+        private MenuItem _currentEditMenuBarItem;
+        private MenuItem _currentMenuBarItem;
+        private int _currentSelectedMenuBar;
+        private MenuBar _menuBar;
+
         public DynamicMenuBarSample ()
         {
             DataContext = new DynamicMenuItemModel ();
@@ -1308,11 +1316,6 @@ public class DynamicMenuBar : Scenario
             //_frmMenuDetails.Initialized += (s, e) => _frmMenuDetails.Enabled = false;
         }
 
-        private readonly ListView _lstMenus;
-        private MenuItem _currentEditMenuBarItem;
-        private MenuItem _currentMenuBarItem;
-        private int _currentSelectedMenuBar;
-        private MenuBar _menuBar;
         public DynamicMenuItemModel DataContext { get; set; }
     }
 
@@ -1337,10 +1340,10 @@ public class DynamicMenuBar : Scenario
 
     public class DynamicMenuItemModel : INotifyPropertyChanged
     {
-        public DynamicMenuItemModel () { Menus = []; }
         private string _menuBar;
         private List<DynamicMenuItemList> _menus;
         private string _parent;
+        public DynamicMenuItemModel () { Menus = []; }
 
         public string MenuBar
         {

@@ -1469,10 +1469,10 @@ internal partial class HistoryText
 
 internal class WordWrapManager
 {
-    public WordWrapManager (TextModel model) { Model = model; }
     private int _frameWidth;
     private bool _isWrapModelRefreshing;
     private List<WrappedLine> _wrappedModelLines = new ();
+    public WordWrapManager (TextModel model) { Model = model; }
     public TextModel Model { get; private set; }
 
     public void AddLine (int row, int col)
@@ -1950,6 +1950,36 @@ internal class WordWrapManager
 /// </remarks>
 public class TextView : View
 {
+    private readonly HistoryText _historyText = new ();
+    private bool _allowsReturn = true;
+    private bool _allowsTab = true;
+    private int _bottomOffset, _rightOffset;
+    private bool _clickWithSelecting;
+
+    // The column we are tracking, or -1 if we are not tracking any column
+    private int _columnTrack = -1;
+    private bool _continuousFind;
+    private bool _copyWithoutSelection;
+    private string? _currentCaller;
+    private CultureInfo? _currentCulture;
+    private CursorVisibility _desiredCursorVisibility = CursorVisibility.Default;
+    private bool _isButtonShift;
+    private bool _isDrawing;
+    private bool _isReadOnly;
+    private bool _lastWasKill;
+    private int _leftColumn;
+    private TextModel _model = new ();
+    private bool _multiline = true;
+    private CursorVisibility _savedCursorVisibility;
+    private Dim? _savedHeight;
+    private int _selectionStartColumn, _selectionStartRow;
+    private bool _shiftSelecting;
+    private int _tabWidth = 4;
+    private int _topRow;
+    private bool _wordWrap;
+    private WordWrapManager? _wrapManager;
+    private bool _wrapNeeded;
+
     /// <summary>
     ///     Initializes a <see cref="TextView"/> on the specified area, with dimensions controlled with the X, Y, Width
     ///     and Height properties.
@@ -2494,36 +2524,6 @@ public class TextView : View
 
         KeyBindings.Add ((KeyCode)ContextMenu.Key, KeyBindingScope.HotKey, Command.ShowContextMenu);
     }
-
-    private readonly HistoryText _historyText = new ();
-    private bool _allowsReturn = true;
-    private bool _allowsTab = true;
-    private int _bottomOffset, _rightOffset;
-    private bool _clickWithSelecting;
-
-    // The column we are tracking, or -1 if we are not tracking any column
-    private int _columnTrack = -1;
-    private bool _continuousFind;
-    private bool _copyWithoutSelection;
-    private string? _currentCaller;
-    private CultureInfo? _currentCulture;
-    private CursorVisibility _desiredCursorVisibility = CursorVisibility.Default;
-    private bool _isButtonShift;
-    private bool _isDrawing;
-    private bool _isReadOnly;
-    private bool _lastWasKill;
-    private int _leftColumn;
-    private TextModel _model = new ();
-    private bool _multiline = true;
-    private CursorVisibility _savedCursorVisibility;
-    private Dim? _savedHeight;
-    private int _selectionStartColumn, _selectionStartRow;
-    private bool _shiftSelecting;
-    private int _tabWidth = 4;
-    private int _topRow;
-    private bool _wordWrap;
-    private WordWrapManager? _wrapManager;
-    private bool _wrapNeeded;
 
     /// <summary>
     ///     Gets or sets a value indicating whether pressing ENTER in a <see cref="TextView"/> creates a new line of text

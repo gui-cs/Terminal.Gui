@@ -5,8 +5,8 @@ namespace Terminal.Gui.DrawingTests;
 
 public class LineCanvasTests
 {
-    public LineCanvasTests (ITestOutputHelper output) { this.output = output; }
     private readonly ITestOutputHelper output;
+    public LineCanvasTests (ITestOutputHelper output) { this.output = output; }
 
     [Theory]
     [AutoInitShutdown]

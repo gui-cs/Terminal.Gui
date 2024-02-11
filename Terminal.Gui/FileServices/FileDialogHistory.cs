@@ -4,10 +4,10 @@ namespace Terminal.Gui;
 
 internal class FileDialogHistory
 {
-    public FileDialogHistory (FileDialog dlg) { this.dlg = dlg; }
     private readonly Stack<FileDialogState> back = new ();
     private readonly FileDialog dlg;
     private readonly Stack<FileDialogState> forward = new ();
+    public FileDialogHistory (FileDialog dlg) { this.dlg = dlg; }
 
     public bool Back ()
     {

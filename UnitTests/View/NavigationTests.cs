@@ -7,8 +7,8 @@ namespace Terminal.Gui.ViewTests;
 
 public class NavigationTests
 {
-    public NavigationTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public NavigationTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     public void BringSubviewForward_Subviews_vs_TabIndexes ()

@@ -5,8 +5,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class TreeViewTests
 {
-    public TreeViewTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public TreeViewTests (ITestOutputHelper output) { _output = output; }
 
     /// <summary>Tests that <see cref="TreeView.Expand(object)"/> results in a correct content height</summary>
     [Fact]

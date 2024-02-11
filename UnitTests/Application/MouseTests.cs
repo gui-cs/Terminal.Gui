@@ -6,6 +6,8 @@ namespace Terminal.Gui.ApplicationTests;
 
 public class MouseTests
 {
+    private readonly ITestOutputHelper _output;
+
     public MouseTests (ITestOutputHelper output)
     {
         _output = output;
@@ -14,8 +16,6 @@ public class MouseTests
         RunState.Instances.Clear ();
 #endif
     }
-
-    private readonly ITestOutputHelper _output;
 
     #region mouse coordinate tests
 

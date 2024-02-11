@@ -5,8 +5,8 @@ namespace Terminal.Gui.TextTests;
 
 public class AutocompleteTests
 {
-    public AutocompleteTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public AutocompleteTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [AutoInitShutdown]

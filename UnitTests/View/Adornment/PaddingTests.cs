@@ -4,8 +4,8 @@ namespace Terminal.Gui.ViewTests;
 
 public class PaddingTests
 {
-    public PaddingTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public PaddingTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [SetupFakeDriver]

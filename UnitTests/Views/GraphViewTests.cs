@@ -548,6 +548,8 @@ public class SeriesTests
 
     private class FakeSeries : ISeries
     {
+        private readonly Action<GraphView, Rect, RectangleF> _drawSeries;
+
         public FakeSeries (
             Action<GraphView, Rect, RectangleF> drawSeries
         )
@@ -555,15 +557,14 @@ public class SeriesTests
             _drawSeries = drawSeries;
         }
 
-        private readonly Action<GraphView, Rect, RectangleF> _drawSeries;
         public void DrawSeries (GraphView graph, Rect bounds, RectangleF graphBounds) { _drawSeries (graph, bounds, graphBounds); }
     }
 }
 
 public class MultiBarSeriesTests
 {
-    public MultiBarSeriesTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public MultiBarSeriesTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     public void MultiBarSeries_BarSpacing ()
@@ -1082,8 +1083,8 @@ public class AxisTests
 
 public class TextAnnotationTests
 {
-    public TextAnnotationTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public TextAnnotationTests (ITestOutputHelper output) { _output = output; }
 
     [Theory]
     [InlineData (null)]
@@ -1290,8 +1291,8 @@ public class TextAnnotationTests
 
 public class LegendTests
 {
-    public LegendTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public LegendTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     public void Constructors_Defaults ()
@@ -1369,8 +1370,8 @@ public class LegendTests
 
 public class PathAnnotationTests
 {
-    public PathAnnotationTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public PathAnnotationTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     public void MarginBottom_BiggerThanHeight_ExpectBlankGraph ()

@@ -78,8 +78,8 @@ public partial class Curses
     // Currently unused, to do later
     internal class Screen
     {
-        internal Screen (nint handle) { Handle = handle; }
         public readonly nint Handle;
+        internal Screen (nint handle) { Handle = handle; }
     }
 
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

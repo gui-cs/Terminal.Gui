@@ -28,12 +28,12 @@ public class LineDrawing : Scenario
 
     private class DrawingArea : View
     {
-        public DrawingArea () { AddLayer (); }
         private readonly List<LineCanvas> _layers = new ();
         private readonly Stack<StraightLine> _undoHistory = new ();
         private Color _currentColor = new (Color.White);
         private LineCanvas _currentLayer;
         private StraightLine _currentLine;
+        public DrawingArea () { AddLayer (); }
         public LineStyle LineStyle { get; set; }
 
         public override void OnDrawContentComplete (Rect contentArea)
@@ -178,6 +178,10 @@ public class LineDrawing : Scenario
 
     private class ToolsView : Window
     {
+        private Button _addLayerBtn;
+        private ColorPicker _colorPicker;
+        private RadioGroup _stylePicker;
+
         public ToolsView ()
         {
             BorderStyle = LineStyle.Dotted;
@@ -185,9 +189,6 @@ public class LineDrawing : Scenario
             Initialized += ToolsView_Initialized;
         }
 
-        private Button _addLayerBtn;
-        private ColorPicker _colorPicker;
-        private RadioGroup _stylePicker;
         public event Action AddLayer;
 
         public override void BeginInit ()

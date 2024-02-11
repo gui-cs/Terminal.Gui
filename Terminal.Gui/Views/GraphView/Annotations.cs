@@ -104,6 +104,9 @@ public class TextAnnotation : IAnnotation
 /// <summary>A box containing symbol definitions e.g. meanings for colors in a graph. The 'Key' to the graph</summary>
 public class LegendAnnotation : View, IAnnotation
 {
+    /// <summary>Ordered collection of entries that are rendered in the legend.</summary>
+    private readonly List<Tuple<GraphCellToRender, string>> _entries = new ();
+
     /// <summary>Creates a new empty legend at the empty screen coordinates.</summary>
     public LegendAnnotation () : this (Rect.Empty) { }
 
@@ -120,9 +123,6 @@ public class LegendAnnotation : View, IAnnotation
         Height = legendBounds.Height;
         BorderStyle = LineStyle.Single;
     }
-
-    /// <summary>Ordered collection of entries that are rendered in the legend.</summary>
-    private readonly List<Tuple<GraphCellToRender, string>> _entries = new ();
 
     /// <summary>Returns false i.e. Legends render after series</summary>
     public bool BeforeSeries => false;

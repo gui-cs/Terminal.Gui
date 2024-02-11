@@ -161,6 +161,10 @@ public class ASCIICustomButtonTest : Scenario
         private const int BUTTON_WIDTH = 25;
         private const int BUTTONS_ON_PAGE = 7;
 
+        private readonly List<Button> _buttons;
+        private readonly ScrollView _scrollView;
+        private ASCIICustomButton _selected;
+
         public ScrollViewTestWindow ()
         {
             Title = "ScrollViewTestWindow";
@@ -264,10 +268,6 @@ public class ASCIICustomButtonTest : Scenario
                 Add (titleLabel, _scrollView);
             }
         }
-
-        private readonly List<Button> _buttons;
-        private readonly ScrollView _scrollView;
-        private ASCIICustomButton _selected;
 
         private void Button_Clicked (object sender, EventArgs e)
         {

@@ -51,6 +51,28 @@ namespace Terminal.Gui;
 /// </example>
 public class Wizard : Dialog
 {
+    private readonly LinkedList<WizardStep> _steps = new ();
+    private WizardStep _currentStep;
+    private bool _finishedPressed;
+
+    ///// <summary>
+    ///// The title of the Wizard, shown at the top of the Wizard with " - currentStep.Title" appended.
+    ///// </summary>
+    ///// <remarks>
+    ///// The Title is only displayed when the <see cref="Wizard"/> <see cref="Wizard.Modal"/> is set to <c>false</c>.
+    ///// </remarks>
+    //public new string Title {
+    //	get {
+    //		// The base (Dialog) Title holds the full title ("Wizard Title - Step Title")
+    //		return base.Title;
+    //	}
+    //	set {
+    //		wizardTitle = value;
+    //		base.Title = $"{wizardTitle}{(steps.Count > 0 && currentStep != null ? " - " + currentStep.Title : string.Empty)}";
+    //	}
+    //}
+    private string _wizardTitle = string.Empty;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="Wizard"/> class using <see cref="LayoutStyle.Computed"/>
     ///     positioning.
@@ -93,28 +115,6 @@ public class Wizard : Dialog
 
         SetNeedsLayout ();
     }
-
-    private readonly LinkedList<WizardStep> _steps = new ();
-    private WizardStep _currentStep;
-    private bool _finishedPressed;
-
-    ///// <summary>
-    ///// The title of the Wizard, shown at the top of the Wizard with " - currentStep.Title" appended.
-    ///// </summary>
-    ///// <remarks>
-    ///// The Title is only displayed when the <see cref="Wizard"/> <see cref="Wizard.Modal"/> is set to <c>false</c>.
-    ///// </remarks>
-    //public new string Title {
-    //	get {
-    //		// The base (Dialog) Title holds the full title ("Wizard Title - Step Title")
-    //		return base.Title;
-    //	}
-    //	set {
-    //		wizardTitle = value;
-    //		base.Title = $"{wizardTitle}{(steps.Count > 0 && currentStep != null ? " - " + currentStep.Title : string.Empty)}";
-    //	}
-    //}
-    private string _wizardTitle = string.Empty;
 
     /// <summary>
     ///     If the <see cref="CurrentStep"/> is not the first step in the wizard, this button causes the

@@ -370,6 +370,21 @@ internal class UICatalogApp
     /// </summary>
     public class UICatalogTopLevel : Toplevel
     {
+        public ListView CategoryList;
+        public StatusItem DriverName;
+        public MenuItem? miForce16Colors;
+        public MenuItem? miIsMenuBorderDisabled;
+        public MenuItem? miIsMouseDisabled;
+        public MenuItem? miUseSubMenusSingleFrame;
+        public StatusItem OS;
+
+        // UI Catalog uses TableView for the scenario list instead of a ListView to demonstate how
+        // TableView works. There's no real reason not to use ListView. Because we use TableView, and TableView
+        // doesn't (currently) have CollectionNavigator support built in, we implement it here, within the app.
+        public TableView ScenarioList;
+
+        private readonly CollectionNavigator _scenarioCollectionNav = new ();
+
         public UICatalogTopLevel ()
         {
             _themeMenuItems = CreateThemeMenuItems ();
@@ -585,20 +600,6 @@ internal class UICatalogApp
 
             Applied += ConfigAppliedHandler;
         }
-
-        private readonly CollectionNavigator _scenarioCollectionNav = new ();
-        public ListView CategoryList;
-        public StatusItem DriverName;
-        public MenuItem? miForce16Colors;
-        public MenuItem? miIsMenuBorderDisabled;
-        public MenuItem? miIsMouseDisabled;
-        public MenuItem? miUseSubMenusSingleFrame;
-        public StatusItem OS;
-
-        // UI Catalog uses TableView for the scenario list instead of a ListView to demonstate how
-        // TableView works. There's no real reason not to use ListView. Because we use TableView, and TableView
-        // doesn't (currently) have CollectionNavigator support built in, we implement it here, within the app.
-        public TableView ScenarioList;
 
         public void ConfigChanged ()
         {

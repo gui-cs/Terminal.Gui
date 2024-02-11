@@ -885,8 +885,8 @@ public static class EscSeqUtils
                                               {
                                                   Task.Run (
                                                             async () => await ProcessContinuousButtonPressedAsync (
-                                                                         buttonState,
-                                                                         continuousButtonPressedHandler));
+                                                                             buttonState,
+                                                                             continuousButtonPressedHandler));
 
                                                   return false;
                                               });

@@ -512,6 +512,9 @@ public class TreeViewFileSystem : Scenario
 
     private class DetailsFrame : FrameView
     {
+        private readonly FileSystemIconProvider _iconProvider;
+        private IFileSystemInfo _fileInfo;
+
         public DetailsFrame (FileSystemIconProvider iconProvider)
         {
             Title = "Details";
@@ -519,9 +522,6 @@ public class TreeViewFileSystem : Scenario
             CanFocus = true;
             _iconProvider = iconProvider;
         }
-
-        private readonly FileSystemIconProvider _iconProvider;
-        private IFileSystemInfo _fileInfo;
 
         public IFileSystemInfo FileInfo
         {

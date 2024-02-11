@@ -6,6 +6,13 @@ internal partial class HistoryText
 {
     public class HistoryTextItem : EventArgs
     {
+        public Point CursorPosition;
+        public Point FinalCursorPosition;
+        public bool IsUndoing;
+        public List<List<RuneCell>> Lines;
+        public LineStatus LineStatus;
+        public HistoryTextItem RemovedOnAdded;
+
         public HistoryTextItem (List<List<RuneCell>> lines, Point curPos, LineStatus linesStatus)
         {
             Lines = lines;
@@ -20,12 +27,6 @@ internal partial class HistoryText
             LineStatus = historyTextItem.LineStatus;
         }
 
-        public Point CursorPosition;
-        public Point FinalCursorPosition;
-        public bool IsUndoing;
-        public List<List<RuneCell>> Lines;
-        public LineStatus LineStatus;
-        public HistoryTextItem RemovedOnAdded;
         public override string ToString () { return $"(Count: {Lines.Count}, Cursor: {CursorPosition}, Status: {LineStatus})"; }
     }
 }

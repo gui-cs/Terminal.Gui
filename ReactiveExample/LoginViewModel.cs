@@ -22,6 +22,10 @@ namespace ReactiveExample;
 [DataContract]
 public class LoginViewModel : ReactiveObject
 {
+    private readonly ObservableAsPropertyHelper<bool> _isValid;
+    private readonly ObservableAsPropertyHelper<int> _passwordLength;
+    private readonly ObservableAsPropertyHelper<int> _usernameLength;
+
     public LoginViewModel ()
     {
         IObservable<bool> canLogin = this.WhenAnyValue (
@@ -58,10 +62,6 @@ public class LoginViewModel : ReactiveObject
                          }
                         );
     }
-
-    private readonly ObservableAsPropertyHelper<bool> _isValid;
-    private readonly ObservableAsPropertyHelper<int> _passwordLength;
-    private readonly ObservableAsPropertyHelper<int> _usernameLength;
 
     [IgnoreDataMember]
     public ReactiveCommand<EventArgs, Unit> Clear { get; }

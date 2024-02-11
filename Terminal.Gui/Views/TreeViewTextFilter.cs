@@ -7,6 +7,9 @@ namespace Terminal.Gui;
 /// <typeparam name="T"></typeparam>
 public class TreeViewTextFilter<T> : ITreeViewFilter<T> where T : class
 {
+    private readonly TreeView<T> _forTree;
+    private string text;
+
     /// <summary>
     ///     Creates a new instance of the filter for use with <paramref name="forTree"/>. Set <see cref="Text"/> to begin
     ///     filtering.
@@ -14,9 +17,6 @@ public class TreeViewTextFilter<T> : ITreeViewFilter<T> where T : class
     /// <param name="forTree"></param>
     /// <exception cref="ArgumentNullException"></exception>
     public TreeViewTextFilter (TreeView<T> forTree) { _forTree = forTree ?? throw new ArgumentNullException (nameof (forTree)); }
-
-    private readonly TreeView<T> _forTree;
-    private string text;
 
     /// <summary>The case sensitivity of the search match. Defaults to <see cref="StringComparison.OrdinalIgnoreCase"/>.</summary>
     public StringComparison Comparer { get; set; } = StringComparison.OrdinalIgnoreCase;

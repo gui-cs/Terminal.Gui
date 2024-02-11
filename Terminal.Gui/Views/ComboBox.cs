@@ -12,6 +12,17 @@ namespace Terminal.Gui;
 /// <summary>Provides a drop-down list of items the user can select from.</summary>
 public class ComboBox : View
 {
+    private readonly ComboListView _listview;
+    private readonly int _minimumHeight = 2;
+    private readonly TextField _search;
+    private readonly IList _searchset = new List<object> ();
+    private bool _autoHide = true;
+    private bool _hideDropdownListOnClick;
+    private int _lastSelectedItem = -1;
+    private int _selectedItem = -1;
+    private IListDataSource _source;
+    private string _text = "";
+
     /// <summary>Public constructor</summary>
     public ComboBox ()
     {
@@ -84,17 +95,6 @@ public class ComboBox : View
         KeyBindings.Add (KeyCode.Esc, Command.Cancel);
         KeyBindings.Add (KeyCode.U | KeyCode.CtrlMask, Command.UnixEmulation);
     }
-
-    private readonly ComboListView _listview;
-    private readonly int _minimumHeight = 2;
-    private readonly TextField _search;
-    private readonly IList _searchset = new List<object> ();
-    private bool _autoHide = true;
-    private bool _hideDropdownListOnClick;
-    private int _lastSelectedItem = -1;
-    private int _selectedItem = -1;
-    private IListDataSource _source;
-    private string _text = "";
 
     /// <inheritdoc/>
     public new ColorScheme ColorScheme
@@ -771,6 +771,10 @@ public class ComboBox : View
 
     private class ComboListView : ListView
     {
+        private ComboBox _container;
+        private bool _hideDropdownListOnClick;
+        private int _highlighted = -1;
+        private bool _isFocusing;
         public ComboListView (ComboBox container, bool hideDropdownListOnClick) { SetInitialProperties (container, hideDropdownListOnClick); }
 
         public ComboListView (ComboBox container, IList source, bool hideDropdownListOnClick)
@@ -778,11 +782,6 @@ public class ComboBox : View
             Source = new ListWrapper (source);
             SetInitialProperties (container, hideDropdownListOnClick);
         }
-
-        private ComboBox _container;
-        private bool _hideDropdownListOnClick;
-        private int _highlighted = -1;
-        private bool _isFocusing;
 
         public bool HideDropdownListOnClick
         {

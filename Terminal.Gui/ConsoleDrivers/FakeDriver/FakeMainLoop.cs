@@ -2,12 +2,12 @@
 
 internal class FakeMainLoop : IMainLoopDriver
 {
+    public Action<ConsoleKeyInfo> MockKeyPressed;
+
     public FakeMainLoop (ConsoleDriver consoleDriver = null)
     {
         // No implementation needed for FakeMainLoop
     }
-
-    public Action<ConsoleKeyInfo> MockKeyPressed;
 
     public void Setup (MainLoop mainLoop)
     {

@@ -6,6 +6,9 @@
 /// </summary>
 public class AppendAutocomplete : AutocompleteBase
 {
+    private bool _suspendSuggestions;
+    private TextField textField;
+
     /// <summary>Creates a new instance of the <see cref="AppendAutocomplete"/> class.</summary>
     public AppendAutocomplete (TextField textField)
     {
@@ -21,9 +24,6 @@ public class AppendAutocomplete : AutocompleteBase
             Disabled = new Attribute (Color.DarkGray, Color.Black)
         };
     }
-
-    private bool _suspendSuggestions;
-    private TextField textField;
 
     /// <summary>
     ///     The color used for rendering the appended text. Note that only <see cref="ColorScheme.Normal"/> is used and

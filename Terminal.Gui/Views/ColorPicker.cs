@@ -16,9 +16,6 @@ public class ColorEventArgs : EventArgs
 /// <summary>The <see cref="ColorPicker"/> <see cref="View"/> Color picker.</summary>
 public class ColorPicker : View
 {
-    /// <summary>Initializes a new instance of <see cref="ColorPicker"/>.</summary>
-    public ColorPicker () { SetInitialProperties (); }
-
     /// <summary>Columns of color boxes</summary>
     private readonly int _cols = 8;
 
@@ -28,6 +25,9 @@ public class ColorPicker : View
     private int _boxHeight = 2;
     private int _boxWidth = 4;
     private int _selectColorIndex = (int)Color.Black;
+
+    /// <summary>Initializes a new instance of <see cref="ColorPicker"/>.</summary>
+    public ColorPicker () { SetInitialProperties (); }
 
     /// <summary>Height of a color box</summary>
     public int BoxHeight

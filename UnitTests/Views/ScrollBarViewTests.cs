@@ -6,10 +6,10 @@ namespace Terminal.Gui.ViewsTests;
 public class ScrollBarViewTests
 {
     private static HostView _hostView;
-    public ScrollBarViewTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
     private bool _added;
     private ScrollBarView _scrollBar;
+    public ScrollBarViewTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [ScrollBarAutoInitShutdown]

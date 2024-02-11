@@ -167,7 +167,8 @@ public partial class ColorTests
         Assert.Throws<ArgumentException> (() => Color.Parse (badString));
     }
 
-    [Fact] public void Constructor_WithString_Null_ThrowsArgumentNullException () { Assert.Throws<ArgumentNullException> (static () => Color.Parse (null)); }
+    [Fact]
+    public void Constructor_WithString_Null_ThrowsArgumentNullException () { Assert.Throws<ArgumentNullException> (static () => Color.Parse (null)); }
 
     [Theory]
     [CombinatorialData]

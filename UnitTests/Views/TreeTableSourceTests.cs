@@ -5,6 +5,10 @@ namespace Terminal.Gui.ViewsTests;
 
 public class TreeTableSourceTests : IDisposable
 {
+    private readonly Rune _origChecked;
+    private readonly Rune _origUnchecked;
+    private readonly ITestOutputHelper _output;
+
     public TreeTableSourceTests (ITestOutputHelper output)
     {
         _output = output;
@@ -14,10 +18,6 @@ public class TreeTableSourceTests : IDisposable
         ConfigurationManager.Glyphs.Checked = new Rune ('☑');
         ConfigurationManager.Glyphs.UnChecked = new Rune ('☐');
     }
-
-    private readonly Rune _origChecked;
-    private readonly Rune _origUnchecked;
-    private readonly ITestOutputHelper _output;
 
     public void Dispose ()
     {

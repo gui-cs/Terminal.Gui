@@ -9,6 +9,19 @@ namespace Terminal.Gui;
 /// </summary>
 public class ListTableSource : ITableSource
 {
+    /// <summary>The list this source wraps.</summary>
+    public IList List;
+
+    /// <summary>The style this source uses.</summary>
+    public ListColumnStyle Style;
+
+    private readonly TableView _tableView;
+    private Rect _lastBounds;
+    private IList _lastList;
+    private int _lastMaxCellWidth;
+    private int _lastMinCellWidth;
+    private ListColumnStyle _lastStyle;
+
     /// <summary>
     ///     Creates a new columned list table instance based on the data in <paramref name="list"/> and dimensions from
     ///     <paramref name="tableView"/>.
@@ -30,19 +43,6 @@ public class ListTableSource : ITableSource
 
     /// <inheritdoc/>
     public ListTableSource (IList list, TableView tableView) : this (list, tableView, new ListColumnStyle ()) { }
-
-    private readonly TableView _tableView;
-    private Rect _lastBounds;
-    private IList _lastList;
-    private int _lastMaxCellWidth;
-    private int _lastMinCellWidth;
-    private ListColumnStyle _lastStyle;
-
-    /// <summary>The list this source wraps.</summary>
-    public IList List;
-
-    /// <summary>The style this source uses.</summary>
-    public ListColumnStyle Style;
 
     /// <summary>The number of items in the IList source</summary>
     public int Count => List.Count;

@@ -160,6 +160,11 @@ public class Progress : Scenario
     private class ProgressDemo : FrameView
     {
         private const int VerticalSpace = 1;
+        internal readonly Action PulseBtnClick = null;
+        internal Action StartBtnClick;
+        internal Action StopBtnClick;
+
+        private readonly Label _startedLabel;
 
         internal ProgressDemo ()
         {
@@ -246,10 +251,6 @@ public class Progress : Scenario
                            };
         }
 
-        private readonly Label _startedLabel;
-        internal readonly Action PulseBtnClick = null;
-        internal Action StartBtnClick;
-        internal Action StopBtnClick;
         internal ProgressBar ActivityProgressBar { get; }
         internal FrameView LeftFrame { get; }
         internal ProgressBar PulseProgressBar { get; }

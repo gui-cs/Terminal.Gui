@@ -6,6 +6,21 @@ public class TabView : View
     /// <summary>The default <see cref="MaxTabTextWidth"/> to set on new <see cref="TabView"/> controls.</summary>
     public const uint DefaultMaxTabTextWidth = 30;
 
+    /// <summary>
+    ///     This sub view is the main client area of the current tab.  It hosts the <see cref="Tab.View"/> of the tab, the
+    ///     <see cref="SelectedTab"/>.
+    /// </summary>
+    private readonly View _contentView;
+
+    private readonly List<Tab> _tabs = new ();
+
+    /// <summary>This sub view is the 2 or 3 line control that represents the actual tabs themselves.</summary>
+    private readonly TabRowView _tabsBar;
+
+    private Tab _selectedTab;
+    private TabToRender [] _tabLocations;
+    private int _tabScrollOffset;
+
     /// <summary>Initializes a <see cref="TabView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
     public TabView ()
     {
@@ -118,21 +133,6 @@ public class TabView : View
         KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
         KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
     }
-
-    /// <summary>
-    ///     This sub view is the main client area of the current tab.  It hosts the <see cref="Tab.View"/> of the tab, the
-    ///     <see cref="SelectedTab"/>.
-    /// </summary>
-    private readonly View _contentView;
-
-    private readonly List<Tab> _tabs = new ();
-
-    /// <summary>This sub view is the 2 or 3 line control that represents the actual tabs themselves.</summary>
-    private readonly TabRowView _tabsBar;
-
-    private Tab _selectedTab;
-    private TabToRender [] _tabLocations;
-    private int _tabScrollOffset;
 
     /// <summary>
     ///     The maximum number of characters to render in a Tab header.  This prevents one long tab from pushing out all
@@ -555,6 +555,10 @@ public class TabView : View
 
     private class TabRowView : View
     {
+        private readonly TabView _host;
+        private readonly View _leftScrollIndicator;
+        private readonly View _rightScrollIndicator;
+
         public TabRowView (TabView host)
         {
             _host = host;
@@ -585,10 +589,6 @@ public class TabView : View
 
             Add (_rightScrollIndicator, _leftScrollIndicator);
         }
-
-        private readonly TabView _host;
-        private readonly View _leftScrollIndicator;
-        private readonly View _rightScrollIndicator;
 
         public override bool MouseEvent (MouseEvent me)
         {

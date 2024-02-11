@@ -10,8 +10,8 @@ namespace Terminal.Gui.ViewTests;
 /// </summary>
 public class TextTests
 {
-    public TextTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public TextTests (ITestOutputHelper output) { _output = output; }
 
     // Test that View.PreserveTrailingSpaces removes trailing spaces
     [Fact]

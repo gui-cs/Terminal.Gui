@@ -2,10 +2,9 @@
 
 public partial class View
 {
-    private ColorScheme _colorScheme;
-
     // The view-relative region that needs to be redrawn. Marked internal for unit tests.
     internal Rect _needsDisplayRect = Rect.Empty;
+    private ColorScheme _colorScheme;
 
     /// <summary>The color scheme for this view, if it is not defined, it returns the <see cref="SuperView"/>'s color scheme.</summary>
     public virtual ColorScheme ColorScheme

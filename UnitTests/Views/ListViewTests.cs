@@ -5,8 +5,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class ListViewTests
 {
-    public ListViewTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public ListViewTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     public void Constructors_Defaults ()

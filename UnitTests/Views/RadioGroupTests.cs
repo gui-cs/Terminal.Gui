@@ -4,8 +4,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class RadioGroupTests
 {
-    public RadioGroupTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public RadioGroupTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     public void Constructors_Defaults ()

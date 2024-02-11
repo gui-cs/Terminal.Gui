@@ -5,8 +5,8 @@ namespace Terminal.Gui.DialogTests;
 
 public class MessageBoxTests
 {
-    public MessageBoxTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public MessageBoxTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [AutoInitShutdown]

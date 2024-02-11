@@ -7,8 +7,8 @@ namespace Terminal.Gui.FileServicesTests;
 
 public class FileDialogTests
 {
-    public FileDialogTests (ITestOutputHelper output) { this.output = output; }
     private readonly ITestOutputHelper output;
+    public FileDialogTests (ITestOutputHelper output) { this.output = output; }
 
     [Theory]
     [AutoInitShutdown]

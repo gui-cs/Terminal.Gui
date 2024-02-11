@@ -6,6 +6,8 @@
 /// </summary>
 public class Tile
 {
+    private string _title = string.Empty;
+
     /// <summary>Creates a new instance of the <see cref="Tile"/> class.</summary>
     public Tile ()
     {
@@ -16,8 +18,6 @@ public class Tile
         Title = string.Empty;
         MinSize = 0;
     }
-
-    private string _title = string.Empty;
 
     /// <summary>
     ///     The <see cref="ContentView"/> that is contained in this <see cref="TileView"/>. Add new child views to this

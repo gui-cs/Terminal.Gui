@@ -10,6 +10,13 @@ namespace Terminal.Gui;
 /// </summary>
 public class FileDialog : Dialog
 {
+    /// <summary>Gets the Path separators for the operating system</summary>
+    internal static char [] Separators =
+    [
+        System.IO.Path.AltDirectorySeparatorChar,
+        System.IO.Path.DirectorySeparatorChar
+    ];
+
     /// <summary>
     ///     Characters to prevent entry into <see cref="_tbPath"/>. Note that this is not using
     ///     <see cref="System.IO.Path.GetInvalidFileNameChars"/> because we do want to allow directory separators, arrow keys
@@ -17,12 +24,34 @@ public class FileDialog : Dialog
     /// </summary>
     private static readonly char [] _badChars = ['"', '<', '>', '|', '*', '?'];
 
-    /// <summary>Gets the Path separators for the operating system</summary>
-    internal static char [] Separators =
-    [
-        System.IO.Path.AltDirectorySeparatorChar,
-        System.IO.Path.DirectorySeparatorChar
-    ];
+    /// <summary>Locking object for ensuring only a single <see cref="SearchState"/> executes at once.</summary>
+    internal object _onlyOneSearchLock = new ();
+
+    private readonly Button _btnBack;
+    private readonly Button _btnCancel;
+    private readonly Button _btnForward;
+    private readonly Button _btnOk;
+    private readonly Button _btnToggleSplitterCollapse;
+    private readonly Button _btnUp;
+    private readonly IFileSystem _fileSystem;
+    private readonly FileDialogHistory _history;
+    private readonly SpinnerView _spinnerView;
+    private readonly TileView _splitContainer;
+    private readonly TableView _tableView;
+    private readonly TextField _tbFind;
+    private readonly TextField _tbPath;
+    private readonly TreeView<IFileSystemInfo> _treeView;
+    private MenuBarItem _allowedTypeMenu;
+    private MenuBar _allowedTypeMenuBar;
+    private MenuItem [] _allowedTypeMenuItems;
+    private int _currentSortColumn;
+    private bool _currentSortIsAsc = true;
+    private bool _disposed;
+    private string _feedback;
+    private bool _loaded;
+
+    private bool _pushingState;
+    private Dictionary<IDirectoryInfo, string> _treeRoots = new ();
 
     /// <summary>Initializes a new instance of the <see cref="FileDialog"/> class.</summary>
     public FileDialog () : this (new FileSystem ()) { }
@@ -264,35 +293,6 @@ public class FileDialog : Dialog
         Add (_tbPath);
         Add (_splitContainer);
     }
-
-    private readonly Button _btnBack;
-    private readonly Button _btnCancel;
-    private readonly Button _btnForward;
-    private readonly Button _btnOk;
-    private readonly Button _btnToggleSplitterCollapse;
-    private readonly Button _btnUp;
-    private readonly IFileSystem _fileSystem;
-    private readonly FileDialogHistory _history;
-    private readonly SpinnerView _spinnerView;
-    private readonly TileView _splitContainer;
-    private readonly TableView _tableView;
-    private readonly TextField _tbFind;
-    private readonly TextField _tbPath;
-    private readonly TreeView<IFileSystemInfo> _treeView;
-    private MenuBarItem _allowedTypeMenu;
-    private MenuBar _allowedTypeMenuBar;
-    private MenuItem [] _allowedTypeMenuItems;
-    private int _currentSortColumn;
-    private bool _currentSortIsAsc = true;
-    private bool _disposed;
-    private string _feedback;
-    private bool _loaded;
-
-    /// <summary>Locking object for ensuring only a single <see cref="SearchState"/> executes at once.</summary>
-    internal object _onlyOneSearchLock = new ();
-
-    private bool _pushingState;
-    private Dictionary<IDirectoryInfo, string> _treeRoots = new ();
 
     /// <summary>
     ///     Gets or Sets a collection of file types that the user can/must select. Only applies when
@@ -1501,8 +1501,8 @@ public class FileDialog : Dialog
 
     internal class FileDialogCollectionNavigator : CollectionNavigatorBase
     {
-        public FileDialogCollectionNavigator (FileDialog fileDialog) { _fileDialog = fileDialog; }
         private readonly FileDialog _fileDialog;
+        public FileDialogCollectionNavigator (FileDialog fileDialog) { _fileDialog = fileDialog; }
 
         protected override object ElementAt (int idx)
         {
@@ -1525,19 +1525,19 @@ public class FileDialog : Dialog
     /// <summary>State representing a recursive search from <see cref="FileDialogState.Directory"/> downwards.</summary>
     internal class SearchState : FileDialogState
     {
-        public SearchState (IDirectoryInfo dir, FileDialog parent, string searchTerms) : base (dir, parent)
-        {
-            parent.SearchMatcher.Initialize (searchTerms);
-            Children = new FileSystemInfoStats[0];
-            BeginSearch ();
-        }
-
         // TODO: Add thread safe child adding
         private readonly List<FileSystemInfoStats> _found = [];
         private readonly object _oLockFound = new ();
         private readonly CancellationTokenSource _token = new ();
         private bool _cancel;
         private bool _finished;
+
+        public SearchState (IDirectoryInfo dir, FileDialog parent, string searchTerms) : base (dir, parent)
+        {
+            parent.SearchMatcher.Initialize (searchTerms);
+            Children = new FileSystemInfoStats[0];
+            BeginSearch ();
+        }
 
         /// <summary>
         ///     Cancels the current search (if any).  Returns true if a search was running and cancellation was successfully

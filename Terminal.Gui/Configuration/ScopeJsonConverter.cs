@@ -220,8 +220,8 @@ internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT :
 
     internal class ReadHelper<converterT> : ReadHelper
     {
-        public ReadHelper (object converter) { _readDelegate = (ReadDelegate)Delegate.CreateDelegate (typeof (ReadDelegate), converter, "Read"); }
         private readonly ReadDelegate _readDelegate;
+        public ReadHelper (object converter) { _readDelegate = (ReadDelegate)Delegate.CreateDelegate (typeof (ReadDelegate), converter, "Read"); }
 
         public override object? Read (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
         {

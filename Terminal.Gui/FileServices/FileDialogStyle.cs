@@ -8,6 +8,8 @@ namespace Terminal.Gui;
 /// <summary>Stores style settings for <see cref="FileDialog"/>.</summary>
 public class FileDialogStyle
 {
+    private readonly IFileSystem _fileSystem;
+
     /// <summary>Creates a new instance of the <see cref="FileDialogStyle"/> class.</summary>
     public FileDialogStyle (IFileSystem fileSystem)
     {
@@ -16,8 +18,6 @@ public class FileDialogStyle
 
         DateFormat = CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern;
     }
-
-    private readonly IFileSystem _fileSystem;
 
     /// <summary>Gets or sets the text on the 'Cancel' button.</summary>
     public string CancelButtonText { get; set; } = Strings.btnCancel;

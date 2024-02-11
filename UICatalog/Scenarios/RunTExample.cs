@@ -15,6 +15,8 @@ public class RunTExample : Scenario
 
     public class ExampleWindow : Window
     {
+        private readonly TextField _usernameText;
+
         public ExampleWindow ()
         {
             Title = $"Example App ({Application.QuitKey} to quit)";
@@ -78,7 +80,5 @@ public class RunTExample : Scenario
             // Add the views to the Window
             Add (usernameLabel, _usernameText, passwordLabel, passwordText, btnLogin);
         }
-
-        private readonly TextField _usernameText;
     }
 }

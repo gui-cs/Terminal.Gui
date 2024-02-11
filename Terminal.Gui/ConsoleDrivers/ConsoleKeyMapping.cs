@@ -35,8 +35,12 @@ public static class ConsoleKeyMapping
 
     //[DllImport ("user32.dll", EntryPoint = "GetKeyboardLayoutNameW", CharSet = CharSet.Unicode)]
     //extern static uint GetKeyboardLayoutName (uint idThread);
-    [DllImport ("user32.dll")] private static extern nint GetForegroundWindow ();
-    [DllImport ("user32.dll")] private static extern nint GetWindowThreadProcessId (nint hWnd, nint ProcessId);
+    [DllImport ("user32.dll")]
+    private static extern nint GetForegroundWindow ();
+
+    [DllImport ("user32.dll")]
+    private static extern nint GetWindowThreadProcessId (nint hWnd, nint ProcessId);
+
     /// <summary>
     ///     Translates the specified virtual-key code and keyboard state to the corresponding Unicode character or
     ///     characters using the Win32 API MapVirtualKey.
@@ -104,6 +108,11 @@ public static class ConsoleKeyMapping
 
     private class ScanCodeMapping : IEquatable<ScanCodeMapping>
     {
+        public readonly ConsoleModifiers Modifiers;
+        public readonly uint ScanCode;
+        public readonly uint UnicodeChar;
+        public readonly VK VirtualKey;
+
         public ScanCodeMapping (uint scanCode, VK virtualKey, ConsoleModifiers modifiers, uint unicodeChar)
         {
             ScanCode = scanCode;
@@ -111,11 +120,6 @@ public static class ConsoleKeyMapping
             Modifiers = modifiers;
             UnicodeChar = unicodeChar;
         }
-
-        public readonly ConsoleModifiers Modifiers;
-        public readonly uint ScanCode;
-        public readonly uint UnicodeChar;
-        public readonly VK VirtualKey;
 
         public bool Equals (ScanCodeMapping other)
         {

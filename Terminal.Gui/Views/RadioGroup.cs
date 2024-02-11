@@ -3,6 +3,13 @@
 /// <summary>Displays a group of labels each with a selected indicator. Only one of those can be selected at a given time.</summary>
 public class RadioGroup : View
 {
+    private int _cursor;
+    private List<(int pos, int length)> _horizontal;
+    private int _horizontalSpace = 2;
+    private Orientation _orientation = Orientation.Vertical;
+    private List<string> _radioLabels = [];
+    private int _selected;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="RadioGroup"/> class using <see cref="LayoutStyle.Computed"/>
     ///     layout.
@@ -72,13 +79,6 @@ public class RadioGroup : View
 
         LayoutStarted += RadioGroup_LayoutStarted;
     }
-
-    private int _cursor;
-    private List<(int pos, int length)> _horizontal;
-    private int _horizontalSpace = 2;
-    private Orientation _orientation = Orientation.Vertical;
-    private List<string> _radioLabels = [];
-    private int _selected;
 
     /// <summary>
     ///     Gets or sets the horizontal space for this <see cref="RadioGroup"/> if the <see cref="Orientation"/> is

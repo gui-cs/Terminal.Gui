@@ -921,8 +921,8 @@ public class MainLoopTests
 
     private class MillisecondTolerance : IEqualityComparer<TimeSpan>
     {
-        public MillisecondTolerance (int tolerance) { _tolerance = tolerance; }
         private readonly int _tolerance;
+        public MillisecondTolerance (int tolerance) { _tolerance = tolerance; }
         public bool Equals (TimeSpan x, TimeSpan y) { return Math.Abs (x.Milliseconds - y.Milliseconds) <= _tolerance; }
         public int GetHashCode (TimeSpan obj) { return obj.GetHashCode (); }
     }

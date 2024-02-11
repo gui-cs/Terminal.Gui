@@ -32,6 +32,13 @@ internal class NetWinVTConsole
     private const int STD_INPUT_HANDLE = -10;
     private const int STD_OUTPUT_HANDLE = -11;
 
+    private readonly nint _errorHandle;
+    private readonly nint _inputHandle;
+    private readonly uint _originalErrorConsoleMode;
+    private readonly uint _originalInputConsoleMode;
+    private readonly uint _originalOutputConsoleMode;
+    private readonly nint _outputHandle;
+
     public NetWinVTConsole ()
     {
         _inputHandle = GetStdHandle (STD_INPUT_HANDLE);
@@ -92,13 +99,6 @@ internal class NetWinVTConsole
         }
     }
 
-    private readonly nint _errorHandle;
-    private readonly nint _inputHandle;
-    private readonly uint _originalErrorConsoleMode;
-    private readonly uint _originalInputConsoleMode;
-    private readonly uint _originalOutputConsoleMode;
-    private readonly nint _outputHandle;
-
     public void Cleanup ()
     {
         if (!SetConsoleMode (_inputHandle, _originalInputConsoleMode))
@@ -117,10 +117,17 @@ internal class NetWinVTConsole
         }
     }
 
-    [DllImport ("kernel32.dll")] private static extern bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
-    [DllImport ("kernel32.dll")] private static extern uint GetLastError ();
-    [DllImport ("kernel32.dll", SetLastError = true)] private static extern nint GetStdHandle (int nStdHandle);
-    [DllImport ("kernel32.dll")] private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
+    [DllImport ("kernel32.dll")]
+    private static extern bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
+
+    [DllImport ("kernel32.dll")]
+    private static extern uint GetLastError ();
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern nint GetStdHandle (int nStdHandle);
+
+    [DllImport ("kernel32.dll")]
+    private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
 }
 
 internal class NetEvents : IDisposable
@@ -1621,6 +1628,18 @@ internal class NetDriver : ConsoleDriver
 /// <remarks>This implementation is used for NetDriver.</remarks>
 internal class NetMainLoop : IMainLoopDriver
 {
+    internal NetEvents _netEvents;
+
+    /// <summary>Invoked when a Key is pressed.</summary>
+    internal Action<InputResult> ProcessInput;
+
+    private readonly ManualResetEventSlim _eventReady = new (false);
+    private readonly CancellationTokenSource _inputHandlerTokenSource = new ();
+    private readonly Queue<InputResult?> _resultQueue = new ();
+    private readonly ManualResetEventSlim _waitForProbe = new (false);
+    private CancellationTokenSource _eventReadyTokenSource = new ();
+    private MainLoop _mainLoop;
+
     /// <summary>Initializes the class with the console driver.</summary>
     /// <remarks>Passing a consoleDriver is provided to capture windows resizing.</remarks>
     /// <param name="consoleDriver">The console driver used by this Net main loop.</param>
@@ -1634,17 +1653,6 @@ internal class NetMainLoop : IMainLoopDriver
 
         _netEvents = new NetEvents (consoleDriver);
     }
-
-    private readonly ManualResetEventSlim _eventReady = new (false);
-    private readonly CancellationTokenSource _inputHandlerTokenSource = new ();
-    private readonly Queue<InputResult?> _resultQueue = new ();
-    private readonly ManualResetEventSlim _waitForProbe = new (false);
-    private CancellationTokenSource _eventReadyTokenSource = new ();
-    private MainLoop _mainLoop;
-    internal NetEvents _netEvents;
-
-    /// <summary>Invoked when a Key is pressed.</summary>
-    internal Action<InputResult> ProcessInput;
 
     void IMainLoopDriver.Setup (MainLoop mainLoop)
     {

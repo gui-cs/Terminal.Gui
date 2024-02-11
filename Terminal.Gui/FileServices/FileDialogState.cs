@@ -4,6 +4,8 @@ namespace Terminal.Gui;
 
 internal class FileDialogState
 {
+    protected readonly FileDialog Parent;
+
     public FileDialogState (IDirectoryInfo dir, FileDialog parent)
     {
         Directory = dir;
@@ -13,7 +15,6 @@ internal class FileDialogState
         RefreshChildren ();
     }
 
-    protected readonly FileDialog Parent;
     public FileSystemInfoStats [] Children { get; internal set; }
     public IDirectoryInfo Directory { get; }
 

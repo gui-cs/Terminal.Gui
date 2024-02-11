@@ -13,8 +13,9 @@ public class CollectionNavigatorTests
         "candle" // 4
     };
 
-    public CollectionNavigatorTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+
+    public CollectionNavigatorTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     public void AtSymbol ()

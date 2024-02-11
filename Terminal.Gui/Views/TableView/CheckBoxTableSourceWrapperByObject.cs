@@ -6,6 +6,10 @@
 /// </summary>
 public class CheckBoxTableSourceWrapperByObject<T> : CheckBoxTableSourceWrapperBase
 {
+    private readonly Func<T, bool> _getter;
+    private readonly Action<T, bool> _setter;
+    private readonly IEnumerableTableSource<T> _toWrap;
+
     /// <summary>Creates a new instance of the class wrapping the collection <paramref name="toWrap"/>.</summary>
     /// <param name="tableView">The table you will use the source with.</param>
     /// <param name="toWrap">The collection of objects you will record checked state for</param>
@@ -22,10 +26,6 @@ public class CheckBoxTableSourceWrapperByObject<T> : CheckBoxTableSourceWrapperB
         _getter = getter;
         _setter = setter;
     }
-
-    private readonly Func<T, bool> _getter;
-    private readonly Action<T, bool> _setter;
-    private readonly IEnumerableTableSource<T> _toWrap;
 
     /// <inheritdoc/>
     protected override void ClearAllToggles ()

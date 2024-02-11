@@ -7,6 +7,21 @@ namespace Terminal.Gui;
 /// <remarks>The <see cref="TextField"/> <see cref="View"/> provides editing functionality and mouse support.</remarks>
 public class TextField : View
 {
+    private readonly HistoryText _historyText;
+    private readonly CursorVisibility _savedCursorVisibility;
+    private CultureInfo _currentCulture;
+    private int _cursorPosition;
+    private CursorVisibility _desiredCursorVisibility;
+    private bool _isButtonPressed;
+    private bool _isButtonReleased;
+    private bool _isDrawing;
+    private int _preTextChangedCursorPos;
+    private int _selectedStart; // -1 represents there is no text selection.
+    private string _selectedText;
+    private int _start;
+    private List<Rune> _text;
+    private CursorVisibility _visibility;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/>
     ///     positioning.
@@ -402,21 +417,6 @@ public class TextField : View
 
         KeyBindings.Add (ContextMenu.Key.KeyCode, KeyBindingScope.HotKey, Command.ShowContextMenu);
     }
-
-    private readonly HistoryText _historyText;
-    private readonly CursorVisibility _savedCursorVisibility;
-    private CultureInfo _currentCulture;
-    private int _cursorPosition;
-    private CursorVisibility _desiredCursorVisibility;
-    private bool _isButtonPressed;
-    private bool _isButtonReleased;
-    private bool _isDrawing;
-    private int _preTextChangedCursorPos;
-    private int _selectedStart; // -1 represents there is no text selection.
-    private string _selectedText;
-    private int _start;
-    private List<Rune> _text;
-    private CursorVisibility _visibility;
 
     /// <summary>
     ///     Provides autocomplete context menu based on suggestions at the current cursor position. Configure

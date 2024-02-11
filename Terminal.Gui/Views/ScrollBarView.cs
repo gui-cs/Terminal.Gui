@@ -17,6 +17,21 @@ namespace Terminal.Gui;
 /// </remarks>
 public class ScrollBarView : View
 {
+    private bool _autoHideScrollBars = true;
+    private View _contentBottomRightCorner;
+    private bool _hosted;
+    private bool _keepContentAlwaysInViewport = true;
+    private int _lastLocation = -1;
+    private ScrollBarView _otherScrollBarView;
+    private int _posBarOffset;
+    private int _posBottomTee;
+    private int _posLeftTee;
+    private int _posRightTee;
+    private int _posTopTee;
+    private bool _showScrollIndicator;
+    private int _size, _position;
+    private bool _vertical;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using
     ///     <see cref="LayoutStyle.Computed"/> layout.
@@ -92,21 +107,6 @@ public class ScrollBarView : View
         CreateBottomRightCorner (Host);
         ClearOnVisibleFalse = false;
     }
-
-    private bool _autoHideScrollBars = true;
-    private View _contentBottomRightCorner;
-    private bool _hosted;
-    private bool _keepContentAlwaysInViewport = true;
-    private int _lastLocation = -1;
-    private ScrollBarView _otherScrollBarView;
-    private int _posBarOffset;
-    private int _posBottomTee;
-    private int _posLeftTee;
-    private int _posRightTee;
-    private int _posTopTee;
-    private bool _showScrollIndicator;
-    private int _size, _position;
-    private bool _vertical;
 
     /// <summary>If true the vertical/horizontal scroll bars won't be showed if it's not needed.</summary>
     public bool AutoHideScrollBars

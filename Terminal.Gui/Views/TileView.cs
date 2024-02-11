@@ -6,18 +6,18 @@
 /// </summary>
 public class TileView : View
 {
+    private Orientation _orientation = Orientation.Vertical;
+    private List<Pos> _splitterDistances;
+    private List<TileViewLineView> _splitterLines;
+    private List<Tile> _tiles;
+    private TileView parentTileView;
+
     /// <summary>Creates a new instance of the <see cref="TileView"/> class with 2 tiles (i.e. left and right).</summary>
     public TileView () : this (2) { }
 
     /// <summary>Creates a new instance of the <see cref="TileView"/> class with <paramref name="tiles"/> number of tiles.</summary>
     /// <param name="tiles"></param>
     public TileView (int tiles) { RebuildForTileCount (tiles); }
-
-    private Orientation _orientation = Orientation.Vertical;
-    private List<Pos> _splitterDistances;
-    private List<TileViewLineView> _splitterLines;
-    private List<Tile> _tiles;
-    private TileView parentTileView;
 
     /// <summary>The line style to use when drawing the splitter lines.</summary>
     public LineStyle LineStyle { get; set; } = LineStyle.None;
@@ -860,6 +860,11 @@ public class TileView : View
 
     private class TileViewLineView : LineView
     {
+        public Point? moveRuneRenderLocation;
+
+        private Pos dragOrignalPos;
+        private Point? dragPosition;
+
         public TileViewLineView (TileView parent, int idx)
         {
             CanFocus = false;
@@ -881,9 +886,6 @@ public class TileView : View
             KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
         }
 
-        private Pos dragOrignalPos;
-        private Point? dragPosition;
-        public Point? moveRuneRenderLocation;
         public int Idx { get; }
         public TileView Parent { get; }
 

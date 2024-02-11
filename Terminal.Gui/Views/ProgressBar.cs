@@ -37,12 +37,6 @@ public enum ProgressBarFormat
 /// </remarks>
 public class ProgressBar : View
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ProgressBar"/> class, starts in percentage mode and uses relative
-    ///     layout.
-    /// </summary>
-    public ProgressBar () { SetInitialProperties (); }
-
     private int [] _activityPos;
     private bool _bidirectionalMarquee = true;
     private int _delta;
@@ -50,6 +44,12 @@ public class ProgressBar : View
     private bool _isActivity;
     private ProgressBarStyle _progressBarStyle;
     private Rune _segmentCharacter = Glyphs.BlocksMeterSegment;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ProgressBar"/> class, starts in percentage mode and uses relative
+    ///     layout.
+    /// </summary>
+    public ProgressBar () { SetInitialProperties (); }
 
     /// <summary>
     ///     Specifies if the <see cref="ProgressBarStyle.MarqueeBlocks"/> or the

@@ -8,8 +8,8 @@ namespace Terminal.Gui.DrawingTests;
 
 public class RulerTests
 {
-    public RulerTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public RulerTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     public void Attribute_set ()

@@ -278,9 +278,9 @@ public class Scrolling : Scenario
 
     private class Box10x : View
     {
-        public Box10x (int x, int y) { Frame = new Rect (x, y, 20, 10); }
         private readonly int _h = 50;
         private readonly int _w = 40;
+        public Box10x (int x, int y) { Frame = new Rect (x, y, 20, 10); }
         public bool WantCursorPosition { get; set; } = false;
         public Size GetContentSize () { return new Size (_w, _h); }
 
@@ -312,6 +312,9 @@ public class Scrolling : Scenario
 
     private class Filler : View
     {
+        private int _h = 50;
+        private int _w = 40;
+
         public Filler (Rect rect)
         {
             _w = rect.Width;
@@ -319,8 +322,6 @@ public class Scrolling : Scenario
             Frame = rect;
         }
 
-        private int _h = 50;
-        private int _w = 40;
         public Size GetContentSize () { return new Size (_w, _h); }
 
         public override void OnDrawContent (Rect contentArea)

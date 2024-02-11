@@ -6,6 +6,12 @@ public abstract class Axis
     /// <summary>Default value for <see cref="ShowLabelsEvery"/></summary>
     private const uint DefaultShowLabelsEvery = 5;
 
+    /// <summary>
+    ///     Allows you to control what label text is rendered for a given <see cref="Increment"/> when
+    ///     <see cref="ShowLabelsEvery"/> is above 0
+    /// </summary>
+    public LabelGetterDelegate LabelGetter;
+
     /// <summary>Populates base properties and sets the read only <see cref="Orientation"/></summary>
     /// <param name="orientation"></param>
     protected Axis (Orientation orientation)
@@ -13,12 +19,6 @@ public abstract class Axis
         Orientation = orientation;
         LabelGetter = DefaultLabelGetter;
     }
-
-    /// <summary>
-    ///     Allows you to control what label text is rendered for a given <see cref="Increment"/> when
-    ///     <see cref="ShowLabelsEvery"/> is above 0
-    /// </summary>
-    public LabelGetterDelegate LabelGetter;
 
     /// <summary>Number of units of graph space between ticks on axis. 0 for no ticks</summary>
     /// <value></value>
@@ -466,6 +466,8 @@ public class VerticalAxis : Axis
 /// <summary>A location on an axis of a <see cref="GraphView"/> that may or may not have a label associated with it</summary>
 public class AxisIncrementToRender
 {
+    private string _text = "";
+
     /// <summary>Describe a new section of an axis that requires an axis increment symbol and/or label</summary>
     /// <param name="orientation"></param>
     /// <param name="screen"></param>
@@ -476,8 +478,6 @@ public class AxisIncrementToRender
         ScreenLocation = screen;
         Value = value;
     }
-
-    private string _text = "";
 
     /// <summary>Direction of the parent axis</summary>
     public Orientation Orientation { get; }

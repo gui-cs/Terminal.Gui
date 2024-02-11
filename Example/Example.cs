@@ -16,6 +16,8 @@ Application.Shutdown ();
 // Defines a top-level window with border and title
 public class ExampleWindow : Window
 {
+    public TextField UserNameText;
+
     public ExampleWindow ()
     {
         Title = $"Example App ({Application.QuitKey} to quit)";
@@ -75,6 +77,4 @@ public class ExampleWindow : Window
         // Add the views to the Window
         Add (usernameLabel, UserNameText, passwordLabel, passwordText, btnLogin);
     }
-
-    public TextField UserNameText;
 }

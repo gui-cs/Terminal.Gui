@@ -491,6 +491,11 @@ public class FakeDriver : ConsoleDriver
 
     public class FakeClipboard : ClipboardBase
     {
+        public Exception FakeException;
+
+        private readonly bool _isSupportedAlwaysFalse;
+        private string _contents = string.Empty;
+
         public FakeClipboard (
             bool fakeClipboardThrowsNotSupportedException = false,
             bool isSupportedAlwaysFalse = false
@@ -504,9 +509,6 @@ public class FakeDriver : ConsoleDriver
             }
         }
 
-        private readonly bool _isSupportedAlwaysFalse;
-        private string _contents = string.Empty;
-        public Exception FakeException;
         public override bool IsSupported => !_isSupportedAlwaysFalse;
 
         protected override string GetClipboardDataImpl ()

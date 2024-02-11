@@ -16,6 +16,15 @@ public class SpinnerView : View
     private const int DEFAULT_DELAY = 130;
     private static readonly SpinnerStyle DEFAULT_STYLE = new SpinnerStyle.Line ();
 
+    private bool _bounce = DEFAULT_STYLE.SpinBounce;
+    private bool _bounceReverse;
+    private int _currentIdx;
+    private int _delay = DEFAULT_STYLE.SpinDelay;
+    private DateTime _lastRender = DateTime.MinValue;
+    private string [] _sequence = DEFAULT_STYLE.Sequence;
+    private SpinnerStyle _style = DEFAULT_STYLE;
+    private object _timeout;
+
     /// <summary>Creates a new instance of the <see cref="SpinnerView"/> class.</summary>
     public SpinnerView ()
     {
@@ -28,15 +37,6 @@ public class SpinnerView : View
 
         AdvanceAnimation ();
     }
-
-    private bool _bounce = DEFAULT_STYLE.SpinBounce;
-    private bool _bounceReverse;
-    private int _currentIdx;
-    private int _delay = DEFAULT_STYLE.SpinDelay;
-    private DateTime _lastRender = DateTime.MinValue;
-    private string [] _sequence = DEFAULT_STYLE.Sequence;
-    private SpinnerStyle _style = DEFAULT_STYLE;
-    private object _timeout;
 
     /// <summary>
     ///     Gets or sets whether spinning should occur automatically or be manually triggered (e.g. from a background

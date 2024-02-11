@@ -69,6 +69,9 @@ public class StatusBar : View
 {
     private static Rune _shortcutDelimiter = (Rune)'=';
 
+    private StatusItem [] _items = { };
+    private StatusItem _itemToInvoke;
+
     /// <summary>Initializes a new instance of the <see cref="StatusBar"/> class.</summary>
     public StatusBar () : this (new StatusItem [] { }) { }
 
@@ -93,9 +96,6 @@ public class StatusBar : View
         Height = 1;
         AddCommand (Command.Accept, InvokeItem);
     }
-
-    private StatusItem [] _items = { };
-    private StatusItem _itemToInvoke;
 
     /// <summary>The items that compose the <see cref="StatusBar"/></summary>
     public StatusItem [] Items

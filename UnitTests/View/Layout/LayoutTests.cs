@@ -6,8 +6,8 @@ namespace Terminal.Gui.ViewTests;
 
 public class LayoutTests
 {
-    public LayoutTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public LayoutTests (ITestOutputHelper output) { _output = output; }
 
     // Tested in AbsoluteLayoutTests.cs
     // public void Pos_Dim_Are_Null_If_Not_Initialized_On_Constructor_IsAdded_False ()

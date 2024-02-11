@@ -73,9 +73,9 @@ namespace UICatalog;
 public class Scenario : IDisposable
 {
     private static int _maxScenarioNameLen = 30;
-    private bool _disposedValue;
     public string Theme = "Default";
     public string TopLevelColorScheme = "Base";
+    private bool _disposedValue;
 
     /// <summary>
     ///     The Window for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/> in

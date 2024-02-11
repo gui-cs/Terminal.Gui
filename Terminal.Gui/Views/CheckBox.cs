@@ -3,6 +3,12 @@
 /// <summary>The <see cref="CheckBox"/> <see cref="View"/> shows an on/off toggle that the user can set</summary>
 public class CheckBox : View
 {
+    private readonly Rune _charChecked;
+    private readonly Rune _charNullChecked;
+    private readonly Rune _charUnChecked;
+    private bool _allowNullChecked;
+    private bool? _checked = false;
+
     /// <summary>
     ///     Initializes a new instance of <see cref="CheckBox"/> based on the given text, using
     ///     <see cref="LayoutStyle.Computed"/> layout.
@@ -41,12 +47,6 @@ public class CheckBox : View
         // Default keybindings for this view
         KeyBindings.Add (Key.Space, Command.ToggleChecked);
     }
-
-    private readonly Rune _charChecked;
-    private readonly Rune _charNullChecked;
-    private readonly Rune _charUnChecked;
-    private bool _allowNullChecked;
-    private bool? _checked = false;
 
     /// <summary>
     ///     If <see langword="true"/> allows <see cref="Checked"/> to be null, true or false. If <see langword="false"/>

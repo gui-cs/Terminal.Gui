@@ -16,6 +16,11 @@ public class DateField : TextField
 {
     private const string RightToLeftMark = "\u200f";
 
+    private readonly int _dateFieldLength = 12;
+    private DateTime _date;
+    private string _format;
+    private string _separator;
+
     /// <summary>Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Computed"/> layout.</summary>
     public DateField () : this (DateTime.MinValue) { }
 
@@ -26,11 +31,6 @@ public class DateField : TextField
         Width = _dateFieldLength;
         SetInitialProperties (date);
     }
-
-    private readonly int _dateFieldLength = 12;
-    private DateTime _date;
-    private string _format;
-    private string _separator;
 
     /// <summary>CultureInfo for date. The default is CultureInfo.CurrentCulture.</summary>
     public CultureInfo Culture

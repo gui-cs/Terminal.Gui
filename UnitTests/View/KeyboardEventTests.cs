@@ -6,8 +6,8 @@ namespace Terminal.Gui.ViewTests;
 
 public class KeyboardEventTests
 {
-    public KeyboardEventTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public KeyboardEventTests (ITestOutputHelper output) { _output = output; }
 
     /// <summary>
     ///     This tests that when a new key down event is sent to the view the view will fire the 3 key-down related

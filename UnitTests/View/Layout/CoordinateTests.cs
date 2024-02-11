@@ -5,8 +5,8 @@ namespace Terminal.Gui.ViewTests;
 /// <summary>Tests for view coordinate mapping (e.g. <see cref="View.ScreenToFrame"/> etc...).</summary>
 public class CoordinateTests
 {
-    public CoordinateTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public CoordinateTests (ITestOutputHelper output) { _output = output; }
 
     /// <summary>
     ///     Tests that screen to bounds mapping works correctly when the view has no superview and there ARE Frames on the

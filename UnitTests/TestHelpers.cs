@@ -17,6 +17,8 @@ namespace Terminal.Gui;
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 {
+    private readonly Type _driverType;
+
     /// <summary>
     ///     Initializes a [AutoInitShutdown] attribute, which determines if/how Application.Init and Application.Shutdown
     ///     are automatically called Before/After a test runs.
@@ -61,7 +63,6 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         ConfigurationManager.Locations = configLocation;
     }
 
-    private readonly Type _driverType;
     private bool AutoInit { get; }
 
     public override void After (MethodInfo methodUnderTest)
@@ -158,8 +159,8 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class TestDateAttribute : BeforeAfterTestAttribute
 {
-    public TestDateAttribute () { CultureInfo.CurrentCulture = CultureInfo.InvariantCulture; }
     private readonly CultureInfo _currentCulture = CultureInfo.CurrentCulture;
+    public TestDateAttribute () { CultureInfo.CurrentCulture = CultureInfo.InvariantCulture; }
 
     public override void After (MethodInfo methodUnderTest)
     {
@@ -699,7 +700,8 @@ internal partial class TestHelpers
         return viewType;
     }
 
-    [GeneratedRegex ("^\\s+", RegexOptions.Multiline)] private static partial Regex LeadingWhitespaceRegEx ();
+    [GeneratedRegex ("^\\s+", RegexOptions.Multiline)]
+    private static partial Regex LeadingWhitespaceRegEx ();
 
     private static string ReplaceNewLinesToPlatformSpecific (string toReplace)
     {
@@ -715,5 +717,6 @@ internal partial class TestHelpers
         return replaced;
     }
 
-    [GeneratedRegex ("\\s+$", RegexOptions.Multiline)] private static partial Regex TrailingWhiteSpaceRegEx ();
+    [GeneratedRegex ("\\s+$", RegexOptions.Multiline)]
+    private static partial Regex TrailingWhiteSpaceRegEx ();
 }

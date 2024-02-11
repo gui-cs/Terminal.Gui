@@ -5,8 +5,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class DrawTests
 {
-    public DrawTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
+    public DrawTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [AutoInitShutdown]
