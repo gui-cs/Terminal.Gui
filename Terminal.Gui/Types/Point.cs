@@ -37,12 +37,18 @@ public struct Point
     public static Point operator + (Point pt, Size sz) { return new Point (pt.X + sz.Width, pt.Y + sz.Height); }
 
     /// <summary>Equality Operator</summary>
-    /// <remarks>Compares two Point objects. The return value is based on the equivalence of the X and Y properties of the two points.</remarks>
+    /// <remarks>
+    ///     Compares two Point objects. The return value is based on the equivalence of the X and Y properties of the two
+    ///     points.
+    /// </remarks>
     public static bool operator == (Point left, Point right) { return left.X == right.X && left.Y == right.Y; }
 
     /// <summary>Inequality Operator</summary>
-    /// <remarks>Compares two Point objects. The return value is based on the equivalence of the X and Y properties of the two points.</remarks>
-    public static bool operator != (Point left, Point right) { return left.X != right.X || left.Y != right.Y; }
+    /// <remarks>
+    ///     Compares two Point objects. The return value is based on the equivalence of the X and Y properties of the two
+    ///     points.
+    /// </remarks>
+    public static bool operator != (Point left, Point right) { return (left.X != right.X) || (left.Y != right.Y); }
 
     /// <summary>Subtraction Operator</summary>
     /// <remarks>Translates a Point using the negation of the Width and Height properties of the given Size.</remarks>
@@ -52,7 +58,7 @@ public struct Point
     /// <remarks>Returns a Size based on the Coordinates of a given Point. Requires explicit cast.</remarks>
     public static explicit operator Size (Point p)
     {
-        if (p.X < 0 || p.Y < 0)
+        if ((p.X < 0) || (p.Y < 0))
         {
             throw new ArgumentException ("Either Width and Height must be greater or equal to 0.");
         }

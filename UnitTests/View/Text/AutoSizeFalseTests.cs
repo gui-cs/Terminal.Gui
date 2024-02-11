@@ -5,8 +5,8 @@ namespace Terminal.Gui.ViewTests;
 /// <summary>Tests of the  <see cref="View.Text"/> property with <see cref="View.AutoSize"/> set to false.</summary>
 public class AutoSizeFalseTests
 {
-    private readonly ITestOutputHelper _output;
     public AutoSizeFalseTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void AutoSize_False_Equal_Before_And_After_IsInitialized_With_Different_Orders ()

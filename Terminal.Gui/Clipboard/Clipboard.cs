@@ -6,13 +6,16 @@ namespace Terminal.Gui;
 /// <remarks>
 ///     <para>On Windows, the <see cref="Clipboard"/> class uses the Windows Clipboard APIs via P/Invoke.</para>
 ///     <para>
-///         On Linux, when not running under Windows Subsystem for Linux (WSL), the <see cref="Clipboard"/> class uses the xclip command line tool. If xclip is not installed, the clipboard will not work.
+///         On Linux, when not running under Windows Subsystem for Linux (WSL), the <see cref="Clipboard"/> class uses
+///         the xclip command line tool. If xclip is not installed, the clipboard will not work.
 ///     </para>
 ///     <para>
-///         On Linux, when running under Windows Subsystem for Linux (WSL), the <see cref="Clipboard"/> class launches Windows' powershell.exe via WSL interop and uses the "Set-Clipboard" and "Get-Clipboard" Powershell CmdLets.
+///         On Linux, when running under Windows Subsystem for Linux (WSL), the <see cref="Clipboard"/> class launches
+///         Windows' powershell.exe via WSL interop and uses the "Set-Clipboard" and "Get-Clipboard" Powershell CmdLets.
 ///     </para>
 ///     <para>
-///         On the Mac, the <see cref="Clipboard"/> class uses the MacO OS X pbcopy and pbpaste command line tools and the Mac clipboard APIs vai P/Invoke.
+///         On the Mac, the <see cref="Clipboard"/> class uses the MacO OS X pbcopy and pbpaste command line tools and
+///         the Mac clipboard APIs vai P/Invoke.
 ///     </para>
 /// </remarks>
 public static class Clipboard
@@ -110,9 +113,10 @@ public static class Clipboard
 }
 
 /// <summary>
-///     Helper class for console drivers to invoke shell commands to interact with the clipboard. Used primarily by CursesDriver, but also used in Unit tests which is why it is in ConsoleDriver.cs.
+///     Helper class for console drivers to invoke shell commands to interact with the clipboard. Used primarily by
+///     CursesDriver, but also used in Unit tests which is why it is in ConsoleDriver.cs.
 /// </summary>
-internal static class ClipboardProcessRunner
+static class ClipboardProcessRunner
 {
     public static (int exitCode, string result) Bash (
         string commandLine,

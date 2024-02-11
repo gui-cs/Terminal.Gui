@@ -7,8 +7,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class ContextMenuTests
 {
-    private readonly ITestOutputHelper _output;
     public ContextMenuTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     [AutoInitShutdown]

@@ -5,8 +5,8 @@ namespace Terminal.Gui.DrawingTests;
 
 public class LineCanvasTests
 {
-    private readonly ITestOutputHelper output;
     public LineCanvasTests (ITestOutputHelper output) { this.output = output; }
+    private readonly ITestOutputHelper output;
 
     [Theory]
     [AutoInitShutdown]
@@ -1018,7 +1018,8 @@ public class LineCanvasTests
     }
 
     /// <summary>
-    ///     This test demonstrates that corners are only drawn when lines overlap. Not when they terminate adjacent to one another.
+    ///     This test demonstrates that corners are only drawn when lines overlap. Not when they terminate adjacent to one
+    ///     another.
     /// </summary>
     [Fact]
     [AutoInitShutdown]
@@ -1162,7 +1163,9 @@ public class LineCanvasTests
     }
 
     /// <summary>
-    ///     Demonstrates when <see cref="LineStyle.Rounded"/> corners are used. Notice how not all lines declare rounded. If there are 1+ lines intersecting and a corner is to be used then if any of them are rounded a rounded corner is used.
+    ///     Demonstrates when <see cref="LineStyle.Rounded"/> corners are used. Notice how not all lines declare rounded.
+    ///     If there are 1+ lines intersecting and a corner is to be used then if any of them are rounded a rounded corner is
+    ///     used.
     /// </summary>
     [Fact]
     [AutoInitShutdown]

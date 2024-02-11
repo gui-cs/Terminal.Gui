@@ -4,8 +4,8 @@ namespace Terminal.Gui.ViewTests;
 
 public class ViewKeyBindingTests
 {
-    private readonly ITestOutputHelper _output;
     public ViewKeyBindingTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     [AutoInitShutdown]
@@ -133,7 +133,9 @@ public class ViewKeyBindingTests
         }
 
         public bool ApplicationCommand { get; set; }
+
         public bool FocusedCommand { get; set; }
+
         public bool HotKeyCommand { get; set; }
     }
 }

@@ -29,13 +29,18 @@ public enum ProgressBarFormat
 /// <summary>A Progress Bar view that can indicate progress of an activity visually.</summary>
 /// <remarks>
 ///     <para>
-///         <see cref="ProgressBar"/> can operate in two modes, percentage mode, or activity mode. The progress bar starts in percentage mode and setting the Fraction property will reflect on the UI the progress made so far. Activity mode is used when the application has no way of knowing how much time is left, and is started when the
+///         <see cref="ProgressBar"/> can operate in two modes, percentage mode, or activity mode. The progress bar
+///         starts in percentage mode and setting the Fraction property will reflect on the UI the progress made so far.
+///         Activity mode is used when the application has no way of knowing how much time is left, and is started when the
 ///         <see cref="Pulse"/> method is called. Call <see cref="Pulse"/> repeatedly as progress is made.
 ///     </para>
 /// </remarks>
 public class ProgressBar : View
 {
-    /// <summary>Initializes a new instance of the <see cref="ProgressBar"/> class, starts in percentage mode and uses relative layout.</summary>
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ProgressBar"/> class, starts in percentage mode and uses relative
+    ///     layout.
+    /// </summary>
     public ProgressBar () { SetInitialProperties (); }
 
     private int [] _activityPos;
@@ -120,17 +125,17 @@ public class ProgressBar : View
     }
 
     /// <summary>
-    ///     Gets or sets the text displayed on the progress bar. If set to an empty string and <see cref="ProgressBarFormat"/>
-    ///     is <see cref="ProgressBarFormat.SimplePlusPercentage"/> the percentage will be displayed. If
-    ///     <see cref="ProgressBarStyle"/> is a marquee style, the text will be displayed.
+    ///     Gets or sets the text displayed on the progress bar. If set to an empty string and
+    ///     <see cref="ProgressBarFormat"/> is <see cref="ProgressBarFormat.SimplePlusPercentage"/> the percentage will be
+    ///     displayed. If <see cref="ProgressBarStyle"/> is a marquee style, the text will be displayed.
     /// </summary>
     public override string Text
     {
         get => string.IsNullOrEmpty (base.Text) ? $"{_fraction * 100:F0}%" : base.Text;
         set
         {
-            if (ProgressBarStyle == ProgressBarStyle.MarqueeBlocks
-                || ProgressBarStyle == ProgressBarStyle.MarqueeContinuous)
+            if ((ProgressBarStyle == ProgressBarStyle.MarqueeBlocks)
+                || (ProgressBarStyle == ProgressBarStyle.MarqueeContinuous))
             {
                 base.Text = value;
             }
@@ -204,11 +209,12 @@ public class ProgressBar : View
 
     /// <summary>Notifies the <see cref="ProgressBar"/> that some progress has taken place.</summary>
     /// <remarks>
-    ///     If the <see cref="ProgressBar"/> is percentage mode, it switches to activity mode. If is in activity mode, the marker is moved.
+    ///     If the <see cref="ProgressBar"/> is percentage mode, it switches to activity mode. If is in activity mode, the
+    ///     marker is moved.
     /// </remarks>
     public void Pulse ()
     {
-        if (_activityPos == null || _activityPos.Length == 0)
+        if ((_activityPos == null) || (_activityPos.Length == 0))
         {
             PopulateActivityPos ();
         }

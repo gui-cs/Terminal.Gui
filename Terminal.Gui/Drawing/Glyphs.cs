@@ -7,10 +7,12 @@
 ///         <see cref="ConfigurationManager.Glyphs"/>).
 ///     </para>
 ///     <para>
-///         The default glyphs can be changed via the <see cref="ConfigurationManager"/>. Within a <c>config.json</c> file The Json property name is the property name prefixed with "Glyphs.".
+///         The default glyphs can be changed via the <see cref="ConfigurationManager"/>. Within a <c>config.json</c>
+///         file The Json property name is the property name prefixed with "Glyphs.".
 ///     </para>
 ///     <para>
-///         The JSon property can be either a decimal number or a string. The string may be one of: - A unicode char (e.g. "☑") - A hex value in U+ format (e.g. "U+2611") - A hex value in UTF-16 format (e.g. "\\u2611")
+///         The JSon property can be either a decimal number or a string. The string may be one of: - A unicode char
+///         (e.g. "☑") - A hex value in U+ format (e.g. "U+2611") - A hex value in UTF-16 format (e.g. "\\u2611")
 ///     </para>
 /// </remarks>
 public class GlyphDefinitions

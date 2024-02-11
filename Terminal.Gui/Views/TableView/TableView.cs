@@ -332,7 +332,8 @@ public class TableView : View
     public CollectionNavigatorBase CollectionNavigator { get; set; }
 
     /// <summary>
-    ///     Horizontal scroll offset.  The index of the first column in <see cref="Table"/> to display when when rendering the view.
+    ///     Horizontal scroll offset.  The index of the first column in <see cref="Table"/> to display when when rendering
+    ///     the view.
     /// </summary>
     /// <remarks>This property allows very wide tables to be rendered with horizontal scrolling</remarks>
     public int ColumnOffset
@@ -347,7 +348,8 @@ public class TableView : View
     public bool FullRowSelect { get; set; }
 
     /// <summary>
-    ///     The maximum number of characters to render in any given column.  This prevents one long column from pushing out all the others
+    ///     The maximum number of characters to render in any given column.  This prevents one long column from pushing
+    ///     out all the others
     /// </summary>
     public int MaxCellWidth { get; set; } = DefaultMaxCellWidth;
 
@@ -359,8 +361,8 @@ public class TableView : View
     public bool MultiSelect { get; set; } = true;
 
     /// <summary>
-    ///     When <see cref="MultiSelect"/> is enabled this property contain all rectangles of selected cells.  Rectangles describe column/rows selected in
-    ///     <see cref="Table"/> (not screen coordinates)
+    ///     When <see cref="MultiSelect"/> is enabled this property contain all rectangles of selected cells.  Rectangles
+    ///     describe column/rows selected in <see cref="Table"/> (not screen coordinates)
     /// </summary>
     /// <returns></returns>
     public Stack<TableSelection> MultiSelectedRegions { get; } = new ();
@@ -369,13 +371,10 @@ public class TableView : View
     public string NullSymbol { get; set; } = "-";
 
     /// <summary>
-    ///     Vertical scroll offset.  The index of the first row in <see cref="Table"/> to display in the first non header line of the control when rendering the view.
+    ///     Vertical scroll offset.  The index of the first row in <see cref="Table"/> to display in the first non header
+    ///     line of the control when rendering the view.
     /// </summary>
-    public int RowOffset
-    {
-        get => rowOffset;
-        set => rowOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Rows - 1, value));
-    }
+    public int RowOffset { get => rowOffset; set => rowOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Rows - 1, value)); }
 
     /// <summary>The index of <see cref="DataTable.Columns"/> in <see cref="Table"/> that the user has currently selected</summary>
     public int SelectedColumn
@@ -428,7 +427,10 @@ public class TableView : View
         }
     }
 
-    /// <summary>The symbol to add after each cell value and header value to visually seperate values (if not using vertical gridlines)</summary>
+    /// <summary>
+    ///     The symbol to add after each cell value and header value to visually seperate values (if not using vertical
+    ///     gridlines)
+    /// </summary>
     public char SeparatorSymbol { get; set; } = ' ';
 
     /// <summary>Contains options for changing how the table is rendered</summary>
@@ -463,7 +465,8 @@ public class TableView : View
     public event EventHandler<CellToggledEventArgs> CellToggled;
 
     /// <summary>
-    ///     Returns the screen position (relative to the control client area) that the given cell is rendered or null if it is outside the current scroll area or no table is loaded
+    ///     Returns the screen position (relative to the control client area) that the given cell is rendered or null if
+    ///     it is outside the current scroll area or no table is loaded
     /// </summary>
     /// <param name="tableColumn">The index of the <see cref="Table"/> column you are looking for</param>
     /// <param name="tableRow">The index of the row in <see cref="Table"/> that you are looking for</param>
@@ -503,8 +506,8 @@ public class TableView : View
     }
 
     /// <summary>
-    ///     Moves the <see cref="SelectedRow"/> and <see cref="SelectedColumn"/> by the provided offsets. Optionally starting a box selection (see
-    ///     <see cref="MultiSelect"/>)
+    ///     Moves the <see cref="SelectedRow"/> and <see cref="SelectedColumn"/> by the provided offsets. Optionally
+    ///     starting a box selection (see <see cref="MultiSelect"/>)
     /// </summary>
     /// <param name="offsetX">Offset in number of columns</param>
     /// <param name="offsetY">Offset in number of rows</param>
@@ -524,8 +527,8 @@ public class TableView : View
     }
 
     /// <summary>
-    ///     Moves or extends the selection to the final cell in the table (nX,nY). If <see cref="FullRowSelect"/> is enabled then selection instead moves to (
-    ///     <see cref="SelectedColumn"/>,nY) i.e. no horizontal scrolling.
+    ///     Moves or extends the selection to the final cell in the table (nX,nY). If <see cref="FullRowSelect"/> is
+    ///     enabled then selection instead moves to ( <see cref="SelectedColumn"/>,nY) i.e. no horizontal scrolling.
     /// </summary>
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
     public void ChangeSelectionToEndOfTable (bool extend)
@@ -545,8 +548,8 @@ public class TableView : View
     }
 
     /// <summary>
-    ///     Moves or extends the selection to the first cell in the table (0,0). If <see cref="FullRowSelect"/> is enabled then selection instead moves to (
-    ///     <see cref="SelectedColumn"/>,0) i.e. no horizontal scrolling.
+    ///     Moves or extends the selection to the first cell in the table (0,0). If <see cref="FullRowSelect"/> is enabled
+    ///     then selection instead moves to ( <see cref="SelectedColumn"/>,0) i.e. no horizontal scrolling.
     /// </summary>
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
     public void ChangeSelectionToStartOfTable (bool extend)
@@ -556,14 +559,15 @@ public class TableView : View
     }
 
     /// <summary>
-    ///     Updates scroll offsets to ensure that the selected cell is visible.  Has no effect if <see cref="Table"/> has not been set.
+    ///     Updates scroll offsets to ensure that the selected cell is visible.  Has no effect if <see cref="Table"/> has
+    ///     not been set.
     /// </summary>
     /// <remarks>
     ///     Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDisplay()"/>
     /// </remarks>
     public void EnsureSelectedCellIsVisible ()
     {
-        if (Table == null || Table.Columns <= 0)
+        if ((Table == null) || (Table.Columns <= 0))
         {
             return;
         }
@@ -616,8 +620,8 @@ public class TableView : View
     }
 
     /// <summary>
-    ///     Updates <see cref="ColumnOffset"/> and <see cref="RowOffset"/> where they are outside the bounds of the table (by adjusting them to the nearest existing cell).  Has no effect if
-    ///     <see cref="Table"/> has not been set.
+    ///     Updates <see cref="ColumnOffset"/> and <see cref="RowOffset"/> where they are outside the bounds of the table
+    ///     (by adjusting them to the nearest existing cell).  Has no effect if <see cref="Table"/> has not been set.
     /// </summary>
     /// <remarks>
     ///     Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDisplay()"/>
@@ -634,7 +638,8 @@ public class TableView : View
     }
 
     /// <summary>
-    ///     Updates <see cref="SelectedColumn"/>, <see cref="SelectedRow"/> and <see cref="MultiSelectedRegions"/> where they are outside the bounds of the table (by adjusting them to the nearest existing cell).  Has no effect if
+    ///     Updates <see cref="SelectedColumn"/>, <see cref="SelectedRow"/> and <see cref="MultiSelectedRegions"/> where
+    ///     they are outside the bounds of the table (by adjusting them to the nearest existing cell).  Has no effect if
     ///     <see cref="Table"/> has not been set.
     /// </summary>
     /// <remarks>
@@ -694,12 +699,13 @@ public class TableView : View
     }
 
     /// <summary>
-    ///     Returns all cells in any <see cref="MultiSelectedRegions"/> (if <see cref="MultiSelect"/> is enabled) and the selected cell
+    ///     Returns all cells in any <see cref="MultiSelectedRegions"/> (if <see cref="MultiSelect"/> is enabled) and the
+    ///     selected cell
     /// </summary>
     /// <returns></returns>
     public IEnumerable<Point> GetAllSelectedCells ()
     {
-        if (TableIsNullOrInvisible () || Table.Rows == 0)
+        if (TableIsNullOrInvisible () || (Table.Rows == 0))
         {
             return Enumerable.Empty<Point> ();
         }
@@ -752,8 +758,8 @@ public class TableView : View
 
     /// <summary>
     ///     <para>
-    ///         Returns true if the given cell is selected either because it is the active cell or part of a multi cell selection (e.g.
-    ///         <see cref="FullRowSelect"/>).
+    ///         Returns true if the given cell is selected either because it is the active cell or part of a multi cell
+    ///         selection (e.g. <see cref="FullRowSelect"/>).
     ///     </para>
     ///     <remarks>Returns <see langword="false"/> if <see cref="ColumnStyle.Visible"/> is <see langword="false"/>.</remarks>
     /// </summary>
@@ -772,7 +778,7 @@ public class TableView : View
             return true;
         }
 
-        return row == SelectedRow && (col == SelectedColumn || FullRowSelect);
+        return row == SelectedRow && ((col == SelectedColumn) || FullRowSelect);
     }
 
     ///<inheritdoc/>
@@ -942,7 +948,7 @@ public class TableView : View
             int rowToRender = RowOffset + (line - headerLinesConsumed);
 
             //if we have run off the end of the table
-            if (TableIsNullOrInvisible () || rowToRender < 0)
+            if (TableIsNullOrInvisible () || (rowToRender < 0))
             {
                 continue;
             }
@@ -1003,7 +1009,8 @@ public class TableView : View
     }
 
     /// <summary>
-    ///     Positions the cursor in the area of the screen in which the start of the active cell is rendered.  Calls base implementation if active cell is not visible due to scrolling or table is loaded etc
+    ///     Positions the cursor in the area of the screen in which the start of the active cell is rendered.  Calls base
+    ///     implementation if active cell is not visible due to scrolling or table is loaded etc
     /// </summary>
     public override void PositionCursor ()
     {
@@ -1023,7 +1030,9 @@ public class TableView : View
     }
 
     /// <summary>
-    ///     . Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control bounds.
+    ///     . Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
+    ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
+    ///     bounds.
     /// </summary>
     /// <param name="clientX">X offset from the top left of the control.</param>
     /// <param name="clientY">Y offset from the top left of the control.</param>
@@ -1031,7 +1040,9 @@ public class TableView : View
     public Point? ScreenToCell (int clientX, int clientY) { return ScreenToCell (clientX, clientY, out _, out _); }
 
     /// <summary>
-    ///     . Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control bounds.
+    ///     . Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
+    ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
+    ///     bounds.
     /// </summary>
     /// <param name="clientX">X offset from the top left of the control.</param>
     /// <param name="clientY">Y offset from the top left of the control.</param>
@@ -1039,7 +1050,9 @@ public class TableView : View
     public Point? ScreenToCell (int clientX, int clientY, out int? headerIfAny) { return ScreenToCell (clientX, clientY, out headerIfAny, out _); }
 
     /// <summary>
-    ///     . Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control bounds.
+    ///     . Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
+    ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
+    ///     bounds.
     /// </summary>
     /// <param name="clientX">X offset from the top left of the control.</param>
     /// <param name="clientY">Y offset from the top left of the control.</param>
@@ -1090,11 +1103,12 @@ public class TableView : View
     }
 
     /// <summary>
-    ///     When <see cref="MultiSelect"/> is on, creates selection over all cells in the table (replacing any old selection regions)
+    ///     When <see cref="MultiSelect"/> is on, creates selection over all cells in the table (replacing any old
+    ///     selection regions)
     /// </summary>
     public void SelectAll ()
     {
-        if (TableIsNullOrInvisible () || !MultiSelect || Table.Rows == 0)
+        if (TableIsNullOrInvisible () || !MultiSelect || (Table.Rows == 0))
         {
             return;
         }
@@ -1115,8 +1129,8 @@ public class TableView : View
     public event EventHandler<SelectedCellChangedEventArgs> SelectedCellChanged;
 
     /// <summary>
-    ///     Moves the <see cref="SelectedRow"/> and <see cref="SelectedColumn"/> to the given col/row in <see cref="Table"/>. Optionally starting a box selection (see
-    ///     <see cref="MultiSelect"/>)
+    ///     Moves the <see cref="SelectedRow"/> and <see cref="SelectedColumn"/> to the given col/row in
+    ///     <see cref="Table"/>. Optionally starting a box selection (see <see cref="MultiSelect"/>)
     /// </summary>
     /// <param name="col"></param>
     /// <param name="row"></param>
@@ -1137,7 +1151,7 @@ public class TableView : View
         if (extendExistingSelection)
         {
             // If we are extending current selection but there isn't one
-            if (MultiSelectedRegions.Count == 0 || MultiSelectedRegions.All (m => m.IsToggled))
+            if ((MultiSelectedRegions.Count == 0) || MultiSelectedRegions.All (m => m.IsToggled))
             {
                 // Create a new region between the old active cell and the new cell
                 TableSelection rect = CreateTableSelection (SelectedColumn, SelectedRow, col, row);
@@ -1191,8 +1205,8 @@ public class TableView : View
 
     /// <summary>
     ///     Override to provide custom multi colouring to cells.  Use <see cref="View.Driver"/> to with
-    ///     <see cref="ConsoleDriver.AddStr(string)"/>.  The driver will already be in the correct place when rendering and you must render the full
-    ///     <paramref name="render"/> or the view will not look right.  For simpler provision of color use
+    ///     <see cref="ConsoleDriver.AddStr(string)"/>.  The driver will already be in the correct place when rendering and you
+    ///     must render the full <paramref name="render"/> or the view will not look right.  For simpler provision of color use
     ///     <see cref="ColumnStyle.ColorGetter"/> For changing the content that is rendered use
     ///     <see cref="ColumnStyle.RepresentationGetter"/>
     /// </summary>
@@ -1256,8 +1270,8 @@ public class TableView : View
     }
 
     /// <summary>
-    ///     Returns the maximum of the <paramref name="col"/> name and the maximum length of data that will be rendered starting at
-    ///     <see cref="RowOffset"/> and rendering <paramref name="rowsToRender"/>
+    ///     Returns the maximum of the <paramref name="col"/> name and the maximum length of data that will be rendered
+    ///     starting at <see cref="RowOffset"/> and rendering <paramref name="rowsToRender"/>
     /// </summary>
     /// <param name="col"></param>
     /// <param name="rowsToRender"></param>
@@ -1462,8 +1476,8 @@ public class TableView : View
     }
 
     /// <summary>
-    ///     Returns a new rectangle between the two points with positive width/height regardless of relative positioning of the points.  pt1 is always considered the
-    ///     <see cref="TableSelection.Origin"/> point
+    ///     Returns a new rectangle between the two points with positive width/height regardless of relative positioning
+    ///     of the points.  pt1 is always considered the <see cref="TableSelection.Origin"/> point
     /// </summary>
     /// <param name="pt1X">Origin point for the selection in X</param>
     /// <param name="pt1Y">Origin point for the selection in Y</param>
@@ -1534,16 +1548,20 @@ public class TableView : View
     }
 
     /// <summary>
-    ///     Returns <paramref name="columnIndex"/> unless the <see cref="ColumnStyle.Visible"/> is false for the indexed column.  If so then the index returned is nudged to the nearest visible column.
+    ///     Returns <paramref name="columnIndex"/> unless the <see cref="ColumnStyle.Visible"/> is false for the indexed
+    ///     column.  If so then the index returned is nudged to the nearest visible column.
     /// </summary>
     /// <remarks>Returns <paramref name="columnIndex"/> unchanged if it is invalid (e.g. out of bounds).</remarks>
     /// <param name="columnIndex">The input column index.</param>
     /// <param name="lookRight">
-    ///     When nudging invisible selections look right first. <see langword="true"/> to look right, <see langword="false"/>
-    ///     to look left.
+    ///     When nudging invisible selections look right first. <see langword="true"/> to look right,
+    ///     <see langword="false"/> to look left.
     /// </param>
     /// <param name="allowBumpingInOppositeDirection">
-    ///     If we cannot find anything visible when looking in direction of <paramref name="lookRight"/> then should we look in the opposite direction instead? Use true if you want to push a selection to a valid index no matter what. Use false if you are primarily interested in learning about directional column visibility.
+    ///     If we cannot find anything visible when looking in direction of
+    ///     <paramref name="lookRight"/> then should we look in the opposite direction instead? Use true if you want to push a
+    ///     selection to a valid index no matter what. Use false if you are primarily interested in learning about directional
+    ///     column visibility.
     /// </param>
     private int GetNearestVisibleColumn (int columnIndex, bool lookRight, bool allowBumpingInOppositeDirection)
     {
@@ -1556,15 +1574,15 @@ public class TableView : View
     }
 
     /// <summary>
-    ///     Returns the value that should be rendered to best represent a strongly typed <paramref name="value"/> read from
-    ///     <see cref="Table"/>
+    ///     Returns the value that should be rendered to best represent a strongly typed <paramref name="value"/> read
+    ///     from <see cref="Table"/>
     /// </summary>
     /// <param name="value"></param>
     /// <param name="colStyle">Optional style defining how to represent cell values</param>
     /// <returns></returns>
     private string GetRepresentation (object value, ColumnStyle colStyle)
     {
-        if (value == null || value == DBNull.Value)
+        if ((value == null) || (value == DBNull.Value))
         {
             return NullSymbol;
         }
@@ -1575,14 +1593,15 @@ public class TableView : View
     private bool HasControlOrAlt (MouseEvent me) { return me.Flags.HasFlag (MouseFlags.ButtonAlt) || me.Flags.HasFlag (MouseFlags.ButtonCtrl); }
 
     /// <summary>
-    ///     Returns true if the given <paramref name="columnIndex"/> indexes a visible column otherwise false.  Returns false for indexes that are out of bounds.
+    ///     Returns true if the given <paramref name="columnIndex"/> indexes a visible column otherwise false.  Returns
+    ///     false for indexes that are out of bounds.
     /// </summary>
     /// <param name="columnIndex"></param>
     /// <returns></returns>
     private bool IsColumnVisible (int columnIndex)
     {
         // if the column index provided is out of bounds
-        if (columnIndex < 0 || columnIndex >= table.Columns)
+        if ((columnIndex < 0) || (columnIndex >= table.Columns))
         {
             return false;
         }
@@ -1955,18 +1974,18 @@ public class TableView : View
             return false;
         }
 
-        return Style.AlwaysShowHeaders || rowOffset == 0;
+        return Style.AlwaysShowHeaders || (rowOffset == 0);
     }
 
     /// <summary>
-    ///     Returns true if the <see cref="Table"/> is not set or all the columns in the <see cref="Table"/> have an explicit
-    ///     <see cref="ColumnStyle"/> that marks them <see cref="ColumnStyle.visible"/> <see langword="false"/>.
+    ///     Returns true if the <see cref="Table"/> is not set or all the columns in the <see cref="Table"/> have an
+    ///     explicit <see cref="ColumnStyle"/> that marks them <see cref="ColumnStyle.visible"/> <see langword="false"/>.
     /// </summary>
     /// <returns></returns>
     private bool TableIsNullOrInvisible ()
     {
-        return Table == null
-               || Table.Columns <= 0
+        return (Table == null)
+               || (Table.Columns <= 0)
                || Enumerable.Range (0, Table.Columns)
                             .All (
                                   c => (Style.GetColumnStyleIfAny (c)?.Visible ?? true) == false
@@ -2034,7 +2053,8 @@ public class TableView : View
 
     /// <summary>
     ///     Truncates or pads <paramref name="representation"/> so that it occupies a exactly
-    ///     <paramref name="availableHorizontalSpace"/> using the alignment specified in <paramref name="colStyle"/> (or left if no style is defined)
+    ///     <paramref name="availableHorizontalSpace"/> using the alignment specified in <paramref name="colStyle"/> (or left
+    ///     if no style is defined)
     /// </summary>
     /// <param name="originalCellValue">The object in this cell of the <see cref="Table"/></param>
     /// <param name="representation">The string representation of <paramref name="originalCellValue"/></param>
@@ -2094,7 +2114,7 @@ public class TableView : View
     )
     {
         // if the column index provided is out of bounds
-        if (columnIndex < 0 || columnIndex >= table.Columns)
+        if ((columnIndex < 0) || (columnIndex >= table.Columns))
         {
             idx = columnIndex;
 
@@ -2211,7 +2231,8 @@ public class TableView : View
         public bool IsVeryLast { get; }
 
         /// <summary>
-        ///     The width that the column should occupy as calculated by <see cref="CalculateViewport(Rect, int)"/>.  Note that this includes space for padding i.e. the separator between columns.
+        ///     The width that the column should occupy as calculated by <see cref="CalculateViewport(Rect, int)"/>.  Note
+        ///     that this includes space for padding i.e. the separator between columns.
         /// </summary>
         public int Width { get; internal set; }
 

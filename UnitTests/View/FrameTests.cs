@@ -4,8 +4,8 @@ namespace Terminal.Gui.ViewTests;
 
 public class FrameTests
 {
-    private readonly ITestOutputHelper _output;
     public FrameTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     // Test FrameToScreen
     [Theory]

@@ -8,37 +8,43 @@ public static class ConsoleKeyMapping
 {
 #if !WT_ISSUE_8871_FIXED // https://github.com/microsoft/terminal/issues/8871
     /// <summary>
-    ///     Translates (maps) a virtual-key code into a scan code or character value, or translates a scan code into a virtual-key code.
+    ///     Translates (maps) a virtual-key code into a scan code or character value, or translates a scan code into a
+    ///     virtual-key code.
     /// </summary>
     /// <param name="vk"></param>
     /// <param name="uMapType">
-    ///     If MAPVK_VK_TO_CHAR (2) - The uCode parameter is a virtual-key code and is translated into an un-shifted character value in the low order word of the return value.
+    ///     If MAPVK_VK_TO_CHAR (2) - The uCode parameter is a virtual-key code and is translated into an
+    ///     un-shifted character value in the low order word of the return value.
     /// </param>
     /// <param name="dwhkl"></param>
     /// <returns>
-    ///     An un-shifted character value in the low order word of the return value. Dead keys (diacritics) are indicated by setting the top bit of the return value. If there is no translation, the function returns 0. See Remarks.
+    ///     An un-shifted character value in the low order word of the return value. Dead keys (diacritics) are indicated
+    ///     by setting the top bit of the return value. If there is no translation, the function returns 0. See Remarks.
     /// </returns>
     [DllImport ("user32.dll", EntryPoint = "MapVirtualKeyExW", CharSet = CharSet.Unicode)]
-    private static extern uint MapVirtualKeyEx (VK vk, uint uMapType, nint dwhkl);
+    private extern static uint MapVirtualKeyEx (VK vk, uint uMapType, nint dwhkl);
 
     /// <summary>Retrieves the active input locale identifier (formerly called the keyboard layout).</summary>
     /// <param name="idThread">0 for current thread</param>
     /// <returns>
-    ///     The return value is the input locale identifier for the thread. The low word contains a Language Identifier for the input language and the high word contains a device handle to the physical layout of the keyboard.
+    ///     The return value is the input locale identifier for the thread. The low word contains a Language Identifier
+    ///     for the input language and the high word contains a device handle to the physical layout of the keyboard.
     /// </returns>
     [DllImport ("user32.dll", EntryPoint = "GetKeyboardLayout", CharSet = CharSet.Unicode)]
-    private static extern nint GetKeyboardLayout (nint idThread);
+    private extern static nint GetKeyboardLayout (nint idThread);
 
     //[DllImport ("user32.dll", EntryPoint = "GetKeyboardLayoutNameW", CharSet = CharSet.Unicode)]
     //extern static uint GetKeyboardLayoutName (uint idThread);
-    [DllImport ("user32.dll")] private static extern nint GetForegroundWindow ();
-    [DllImport ("user32.dll")] private static extern nint GetWindowThreadProcessId (nint hWnd, nint ProcessId);
+    [DllImport ("user32.dll")] private extern static nint GetForegroundWindow ();
+    [DllImport ("user32.dll")] private extern static nint GetWindowThreadProcessId (nint hWnd, nint ProcessId);
     /// <summary>
-    ///     Translates the specified virtual-key code and keyboard state to the corresponding Unicode character or characters using the Win32 API MapVirtualKey.
+    ///     Translates the specified virtual-key code and keyboard state to the corresponding Unicode character or
+    ///     characters using the Win32 API MapVirtualKey.
     /// </summary>
     /// <param name="vk"></param>
     /// <returns>
-    ///     An un-shifted character value in the low order word of the return value. Dead keys (diacritics) are indicated by setting the top bit of the return value. If there is no translation, the function returns 0.
+    ///     An un-shifted character value in the low order word of the return value. Dead keys (diacritics) are indicated
+    ///     by setting the top bit of the return value. If there is no translation, the function returns 0.
     /// </returns>
     public static uint MapVKtoChar (VK vk)
     {
@@ -69,13 +75,19 @@ public static class ConsoleKeyMapping
 
     uint MapVKtoChar (VK vk) => MapVirtualKeyToCharEx (vk);
 #endif
-    /// <summary>Retrieves the name of the active input locale identifier (formerly called the keyboard layout) for the calling thread.</summary>
+    /// <summary>
+    ///     Retrieves the name of the active input locale identifier (formerly called the keyboard layout) for the calling
+    ///     thread.
+    /// </summary>
     /// <param name="pwszKLID"></param>
     /// <returns></returns>
     [DllImport ("user32.dll")]
-    private static extern bool GetKeyboardLayoutName ([Out] StringBuilder pwszKLID);
+    private extern static bool GetKeyboardLayoutName ([Out] StringBuilder pwszKLID);
 
-    /// <summary>Retrieves the name of the active input locale identifier (formerly called the keyboard layout) for the calling thread.</summary>
+    /// <summary>
+    ///     Retrieves the name of the active input locale identifier (formerly called the keyboard layout) for the calling
+    ///     thread.
+    /// </summary>
     /// <returns></returns>
     public static string GetKeyboardLayoutName ()
     {
@@ -278,7 +290,10 @@ public static class ConsoleKeyMapping
         return modifiers;
     }
 
-    /// <summary>Get the <see cref="ConsoleKeyInfo"/> from a unicode character and modifiers (e.g. (Key)'a' and (Key)Key.CtrlMask).</summary>
+    /// <summary>
+    ///     Get the <see cref="ConsoleKeyInfo"/> from a unicode character and modifiers (e.g. (Key)'a' and
+    ///     (Key)Key.CtrlMask).
+    /// </summary>
     /// <param name="keyValue">The key as a unicode codepoint.</param>
     /// <param name="modifiers">The modifier keys.</param>
     /// <param name="scanCode">The resulting scan code.</param>
@@ -600,8 +615,9 @@ public static class ConsoleKeyMapping
     /// <summary>Maps a unicode character (e.g. (Key)'a') to a uint representing a <see cref="ConsoleKey"/>.</summary>
     /// <param name="keyValue">The key value.</param>
     /// <param name="isConsoleKey">
-    ///     Indicates if the <paramref name="keyValue"/> is a <see cref="ConsoleKey"/>. <see langword="true"/> means the return value is in the ConsoleKey enum.
-    ///     <see langword="false"/> means the return value can be mapped to a valid unicode character.
+    ///     Indicates if the <paramref name="keyValue"/> is a <see cref="ConsoleKey"/>.
+    ///     <see langword="true"/> means the return value is in the ConsoleKey enum. <see langword="false"/> means the return
+    ///     value can be mapped to a valid unicode character.
     /// </param>
     /// <returns>The <see cref="ConsoleKey"/> or the <paramref name="keyValue"/>.</returns>
     /// <remarks>This is only used by the <see cref="GetConsoleKeyInfoFromKeyCode"/> and by unit tests.</remarks>
@@ -1269,7 +1285,8 @@ public static class ConsoleKeyMapping
         OEM_6 = 0xDD,
 
         /// <summary>
-        ///     Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the 'single-quote/double-quote' key
+        ///     Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the
+        ///     'single-quote/double-quote' key
         /// </summary>
         OEM_7 = 0xDE,
 
@@ -2483,7 +2500,8 @@ public static class ConsoleKeyMapping
     }
 
     /// <summary>
-    ///     Encode the <see cref="ConsoleKeyInfo.KeyChar"/> with the <see cref="ConsoleKeyInfo.Key"/> if the first a byte length, otherwise only the KeyChar is considered and searched on the database.
+    ///     Encode the <see cref="ConsoleKeyInfo.KeyChar"/> with the <see cref="ConsoleKeyInfo.Key"/> if the first a byte
+    ///     length, otherwise only the KeyChar is considered and searched on the database.
     /// </summary>
     /// <param name="consoleKeyInfo">The console key info.</param>
     /// <returns>The encoded KeyChar with the Key if both can be shifted, otherwise only the KeyChar.</returns>

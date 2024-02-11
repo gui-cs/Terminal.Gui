@@ -1,8 +1,8 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     Toplevel views are used for both an application's main view (filling the entire screen and for modal (pop-up) views such as
-///     <see cref="Dialog"/>, <see cref="MessageBox"/>, and <see cref="Wizard"/>).
+///     Toplevel views are used for both an application's main view (filling the entire screen and for modal (pop-up)
+///     views such as <see cref="Dialog"/>, <see cref="MessageBox"/>, and <see cref="Wizard"/>).
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -12,9 +12,10 @@ namespace Terminal.Gui;
 ///         property to <c>false</c>).
 ///     </para>
 ///     <para>
-///         A Toplevel is created when an application initializes Terminal.Gui by calling <see cref="Application.Init"/>. The application Toplevel can be accessed via
-///         <see cref="Application.Top"/>. Additional Toplevels can be created and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the
-///         <see cref="Toplevel"/> and call <see cref="Application.Run(Toplevel, Func{Exception,bool})"/>.
+///         A Toplevel is created when an application initializes Terminal.Gui by calling <see cref="Application.Init"/>.
+///         The application Toplevel can be accessed via <see cref="Application.Top"/>. Additional Toplevels can be created
+///         and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and call
+///         <see cref="Application.Run(Toplevel, Func{Exception,bool})"/>.
 ///     </para>
 /// </remarks>
 public partial class Toplevel : View
@@ -22,9 +23,9 @@ public partial class Toplevel : View
     internal static Point? _dragPosition;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Toplevel"/> class with <see cref="LayoutStyle.Computed"/> layout, defaulting to full screen. The
-    ///     <see cref="View.Width"/> and <see cref="View.Height"/> properties will be set to the dimensions of the terminal using
-    ///     <see cref="Dim.Fill"/>.
+    ///     Initializes a new instance of the <see cref="Toplevel"/> class with <see cref="LayoutStyle.Computed"/> layout,
+    ///     defaulting to full screen. The <see cref="View.Width"/> and <see cref="View.Height"/> properties will be set to the
+    ///     dimensions of the terminal using <see cref="Dim.Fill"/>.
     /// </summary>
     public Toplevel ()
     {
@@ -230,8 +231,8 @@ public partial class Toplevel : View
     public event EventHandler<ToplevelEventArgs> Deactivate;
 
     /// <summary>
-    ///     Invoked when the <see cref="Toplevel"/> <see cref="RunState"/> has begun to be loaded. A Loaded event handler is a good place to finalize initialization before calling
-    ///     <see cref="Application.RunLoop(RunState)"/>.
+    ///     Invoked when the <see cref="Toplevel"/> <see cref="RunState"/> has begun to be loaded. A Loaded event handler
+    ///     is a good place to finalize initialization before calling <see cref="Application.RunLoop(RunState)"/>.
     /// </summary>
     public event EventHandler Loaded;
 
@@ -248,9 +249,9 @@ public partial class Toplevel : View
         int nx, ny;
 
         if (!_dragPosition.HasValue
-            && (mouseEvent.Flags == MouseFlags.Button1Pressed
-                || mouseEvent.Flags == MouseFlags.Button2Pressed
-                || mouseEvent.Flags == MouseFlags.Button3Pressed))
+            && ((mouseEvent.Flags == MouseFlags.Button1Pressed)
+                || (mouseEvent.Flags == MouseFlags.Button2Pressed)
+                || (mouseEvent.Flags == MouseFlags.Button3Pressed)))
         {
             SetFocus ();
             Application.BringOverlappedTopToFront ();
@@ -271,7 +272,7 @@ public partial class Toplevel : View
             return true;
         }
 
-        if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) || mouseEvent.Flags == MouseFlags.Button3Pressed)
+        if ((mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) || (mouseEvent.Flags == MouseFlags.Button3Pressed))
         {
             if (_dragPosition.HasValue)
             {
@@ -405,7 +406,10 @@ public partial class Toplevel : View
     /// <inheritdoc/>
     public override bool OnLeave (View view) { return MostFocused?.OnLeave (view) ?? base.OnLeave (view); }
 
-    /// <summary>Called from <see cref="Application.Begin(Toplevel)"/> before the <see cref="Toplevel"/> redraws for the first time.</summary>
+    /// <summary>
+    ///     Called from <see cref="Application.Begin(Toplevel)"/> before the <see cref="Toplevel"/> redraws for the first
+    ///     time.
+    /// </summary>
     public virtual void OnLoaded ()
     {
         IsLoaded = true;
@@ -468,8 +472,8 @@ public partial class Toplevel : View
     }
 
     /// <summary>
-    ///     Adjusts the location and size of <paramref name="top"/> within this Toplevel. Virtual method enabling implementation of specific positions for inherited
-    ///     <see cref="Toplevel"/> views.
+    ///     Adjusts the location and size of <paramref name="top"/> within this Toplevel. Virtual method enabling
+    ///     implementation of specific positions for inherited <see cref="Toplevel"/> views.
     /// </summary>
     /// <param name="top">The Toplevel to adjust.</param>
     public virtual void PositionToplevel (Toplevel top)
@@ -491,18 +495,18 @@ public partial class Toplevel : View
             maxWidth -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
         }
 
-        if ((superView != top || top?.SuperView != null || (top != Application.Top && top.Modal) || (top?.SuperView == null && top.IsOverlapped))
+        if (((superView != top) || (top?.SuperView != null) || (top != Application.Top && top.Modal) || (top?.SuperView == null && top.IsOverlapped))
 
             // BUGBUG: Prevously PositionToplevel required LayotuStyle.Computed
-            && (top.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y) /*&& top.LayoutStyle == LayoutStyle.Computed*/)
+            && ((top.Frame.X + top.Frame.Width > maxWidth) || (ny > top.Frame.Y)) /*&& top.LayoutStyle == LayoutStyle.Computed*/)
         {
-            if ((top.X == null || top.X is Pos.PosAbsolute) && top.Frame.X != nx)
+            if (((top.X == null) || top.X is Pos.PosAbsolute) && top.Frame.X != nx)
             {
                 top.X = nx;
                 layoutSubviews = true;
             }
 
-            if ((top.Y == null || top.Y is Pos.PosAbsolute) && top.Frame.Y != ny)
+            if (((top.Y == null) || top.Y is Pos.PosAbsolute) && top.Frame.Y != ny)
             {
                 top.Y = ny;
                 layoutSubviews = true;
@@ -535,8 +539,8 @@ public partial class Toplevel : View
     public event EventHandler<KeyChangedEventArgs> QuitKeyChanged;
 
     /// <summary>
-    ///     Invoked when the <see cref="Toplevel"/> main loop has started it's first iteration. Subscribe to this event to perform tasks when the
-    ///     <see cref="Toplevel"/> has been laid out and focus has been set. changes.
+    ///     Invoked when the <see cref="Toplevel"/> main loop has started it's first iteration. Subscribe to this event to
+    ///     perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set. changes.
     ///     <para>
     ///         A Ready event handler is a good place to finalize initialization after calling
     ///         <see cref="Application.Run(Func{Exception, bool})"/> on this <see cref="Toplevel"/>.
@@ -577,8 +581,8 @@ public partial class Toplevel : View
     {
         if (IsOverlappedContainer
             && Running
-            && (Application.Current == this
-                || Application.Current?.Modal == false
+            && ((Application.Current == this)
+                || (Application.Current?.Modal == false)
                 || (Application.Current?.Modal == true && Application.Current?.Running == false)))
         {
             foreach (Toplevel child in Application.OverlappedChildren)
@@ -627,8 +631,9 @@ public partial class Toplevel : View
     }
 
     /// <summary>
-    ///     Stops and closes the <see cref="Toplevel"/> specified by <paramref name="top"/>. If <paramref name="top"/> is the top-most Toplevel,
-    ///     <see cref="Application.RequestStop(Toplevel)"/> will be called, causing the application to exit.
+    ///     Stops and closes the <see cref="Toplevel"/> specified by <paramref name="top"/>. If <paramref name="top"/> is
+    ///     the top-most Toplevel, <see cref="Application.RequestStop(Toplevel)"/> will be called, causing the application to
+    ///     exit.
     /// </summary>
     /// <param name="top">The Toplevel to request stop.</param>
     public virtual void RequestStop (Toplevel top) { top.RequestStop (); }
@@ -637,8 +642,8 @@ public partial class Toplevel : View
     public event EventHandler<SizeChangedEventArgs> SizeChanging;
 
     /// <summary>
-    ///     Invoked when the Toplevel <see cref="RunState"/> has been unloaded. A Unloaded event handler is a good place to dispose objects after calling
-    ///     <see cref="Application.End(RunState)"/>.
+    ///     Invoked when the Toplevel <see cref="RunState"/> has been unloaded. A Unloaded event handler is a good place
+    ///     to dispose objects after calling <see cref="Application.End(RunState)"/>.
     /// </summary>
     public event EventHandler Unloaded;
 
@@ -698,7 +703,7 @@ public partial class Toplevel : View
         int maxWidth;
         View superView;
 
-        if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)
+        if ((top?.SuperView == null) || (top == Application.Top) || (top?.SuperView == Application.Top))
         {
             maxWidth = Driver.Cols;
             superView = Application.Top;
@@ -733,7 +738,7 @@ public partial class Toplevel : View
         //System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
         bool menuVisible, statusVisible;
 
-        if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)
+        if ((top?.SuperView == null) || (top == Application.Top) || (top?.SuperView == Application.Top))
         {
             menuVisible = Application.Top.MenuBar?.Visible == true;
             menuBar = Application.Top.MenuBar;
@@ -751,7 +756,7 @@ public partial class Toplevel : View
             menuBar = ((Toplevel)t).MenuBar;
         }
 
-        if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)
+        if ((top?.SuperView == null) || (top == Application.Top) || (top?.SuperView == Application.Top))
         {
             maxWidth = menuVisible ? 1 : 0;
         }
@@ -762,7 +767,7 @@ public partial class Toplevel : View
 
         ny = Math.Max (targetY, maxWidth);
 
-        if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)
+        if ((top?.SuperView == null) || (top == Application.Top) || (top?.SuperView == Application.Top))
         {
             statusVisible = Application.Top.StatusBar?.Visible == true;
             statusBar = Application.Top.StatusBar;
@@ -780,7 +785,7 @@ public partial class Toplevel : View
             statusBar = ((Toplevel)t).StatusBar;
         }
 
-        if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)
+        if ((top?.SuperView == null) || (top == Application.Top) || (top?.SuperView == Application.Top))
         {
             maxWidth = statusVisible ? Driver.Rows - 1 : Driver.Rows;
         }
@@ -840,7 +845,8 @@ public partial class Toplevel : View
     internal virtual void OnDeactivate (Toplevel activated) { Deactivate?.Invoke (this, new ToplevelEventArgs (activated)); }
 
     /// <summary>
-    ///     Called from <see cref="Application.RunLoop"/> after the <see cref="Toplevel"/> has entered the first iteration of the loop.
+    ///     Called from <see cref="Application.RunLoop"/> after the <see cref="Toplevel"/> has entered the first iteration
+    ///     of the loop.
     /// </summary>
     internal virtual void OnReady ()
     {
@@ -1058,7 +1064,7 @@ public partial class Toplevel : View
 
     private bool OutsideTopFrame (Toplevel top)
     {
-        if (top.Frame.X > Driver.Cols || top.Frame.Y > Driver.Rows)
+        if ((top.Frame.X > Driver.Cols) || (top.Frame.Y > Driver.Rows))
         {
             return true;
         }
@@ -1096,7 +1102,7 @@ public class ToplevelEqualityComparer : IEqualityComparer<Toplevel>
             return true;
         }
 
-        if (x == null || y == null)
+        if ((x == null) || (y == null))
         {
             return false;
         }
@@ -1140,13 +1146,17 @@ public class ToplevelEqualityComparer : IEqualityComparer<Toplevel>
 /// </summary>
 public sealed class ToplevelComparer : IComparer<Toplevel>
 {
-    /// <summary>Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.</summary>
+    /// <summary>
+    ///     Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the
+    ///     other.
+    /// </summary>
     /// <param name="x">The first object to compare.</param>
     /// <param name="y">The second object to compare.</param>
     /// <returns>
-    ///     A signed integer that indicates the relative values of <paramref name="x"/> and <paramref name="y"/>, as shown in the following table.Value Meaning Less than zero
-    ///     <paramref name="x"/> is less than <paramref name="y"/>.Zero <paramref name="x"/> equals <paramref name="y"/>
-    ///     .Greater than zero <paramref name="x"/> is greater than <paramref name="y"/>.
+    ///     A signed integer that indicates the relative values of <paramref name="x"/> and <paramref name="y"/>, as shown
+    ///     in the following table.Value Meaning Less than zero <paramref name="x"/> is less than <paramref name="y"/>.Zero
+    ///     <paramref name="x"/> equals <paramref name="y"/> .Greater than zero <paramref name="x"/> is greater than
+    ///     <paramref name="y"/>.
     /// </returns>
     public int Compare (Toplevel x, Toplevel y)
     {

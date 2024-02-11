@@ -14,22 +14,27 @@ namespace Terminal.Gui;
 /// <summary>
 ///     Provides settings and configuration management for Terminal.Gui applications.
 ///     <para>
-///         Users can set Terminal.Gui settings on a global or per-application basis by providing JSON formatted configuration files. The configuration files can be placed in at
-///         <c>.tui</c> folder in the user's home directory (e.g. <c>C:/Users/username/.tui</c>, or
-///         <c>/usr/username/.tui</c>), the folder where the Terminal.Gui application was launched from (e.g. <c>./.tui</c>
-///         ), or as a resource within the Terminal.Gui application's main assembly.
+///         Users can set Terminal.Gui settings on a global or per-application basis by providing JSON formatted
+///         configuration files. The configuration files can be placed in at <c>.tui</c> folder in the user's home
+///         directory (e.g. <c>C:/Users/username/.tui</c>, or <c>/usr/username/.tui</c>), the folder where the Terminal.Gui
+///         application was launched from (e.g. <c>./.tui</c> ), or as a resource within the Terminal.Gui application's
+///         main assembly.
 ///     </para>
 ///     <para>
-///         Settings are defined in JSON format, according to this schema: https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json
+///         Settings are defined in JSON format, according to this schema:
+///         https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json
 ///     </para>
 ///     <para>
-///         Settings that will apply to all applications (global settings) reside in files named <c>config.json</c>. Settings that will apply to a specific Terminal.Gui application reside in files named
+///         Settings that will apply to all applications (global settings) reside in files named <c>config.json</c>.
+///         Settings that will apply to a specific Terminal.Gui application reside in files named
 ///         <c>appname.config.json</c>, where <c>appname</c> is the assembly name of the application (e.g.
 ///         <c>UICatalog.config.json</c>).
 ///     </para>
-///     Settings are applied using the following precedence (higher precedence settings overwrite lower precedence settings):
+///     Settings are applied using the following precedence (higher precedence settings overwrite lower precedence
+///     settings):
 ///     <para>
-///         1. Application configuration found in the users's home directory (<c>~/.tui/appname.config.json</c>) -- Highest precedence
+///         1. Application configuration found in the users's home directory (<c>~/.tui/appname.config.json</c>) --
+///         Highest precedence
 ///     </para>
 ///     <para>
 ///         2. Application configuration found in the directory the app was launched from (
@@ -39,26 +44,29 @@ namespace Terminal.Gui;
 ///     <para>4. Global configuration found in the user's home directory (<c>~/.tui/config.json</c>).</para>
 ///     <para>5. Global configuration found in the directory the app was launched from (<c>./.tui/config.json</c>).</para>
 ///     <para>
-///         6. Global configuration in <c>Terminal.Gui.dll</c>'s resources (<c>Terminal.Gui.Resources.config.json</c>) -- Lowest Precidence.
+///         6. Global configuration in <c>Terminal.Gui.dll</c>'s resources (<c>Terminal.Gui.Resources.config.json</c>) --
+///         Lowest Precidence.
 ///     </para>
 /// </summary>
 public static class ConfigurationManager
 {
     /// <summary>
-    ///     Describes the location of the configuration files. The constants can be combined (bitwise) to specify multiple locations.
+    ///     Describes the location of the configuration files. The constants can be combined (bitwise) to specify multiple
+    ///     locations.
     /// </summary>
     [Flags]
     public enum ConfigLocations
     {
         /// <summary>No configuration will be loaded.</summary>
         /// <remarks>
-        ///     Used for development and testing only. For Terminal,Gui to function properly, at least <see cref="DefaultOnly"/>
-        ///     should be set.
+        ///     Used for development and testing only. For Terminal,Gui to function properly, at least
+        ///     <see cref="DefaultOnly"/> should be set.
         /// </remarks>
         None = 0,
 
         /// <summary>
-        ///     Global configuration in <c>Terminal.Gui.dll</c>'s resources (<c>Terminal.Gui.Resources.config.json</c>) -- Lowest Precedence.
+        ///     Global configuration in <c>Terminal.Gui.dll</c>'s resources (<c>Terminal.Gui.Resources.config.json</c>) --
+        ///     Lowest Precedence.
         /// </summary>
         DefaultOnly,
 
@@ -68,9 +76,10 @@ public static class ConfigurationManager
 
     /// <summary>
     ///     A dictionary of all properties in the Terminal.Gui project that are decorated with the
-    ///     <see cref="SerializableConfigurationProperty"/> attribute. The keys are the property names pre-pended with the class that implements the property (e.g.
-    ///     <c>Application.UseSystemConsole</c>). The values are instances of <see cref="ConfigProperty"/> which hold the property's value and the
-    ///     <see cref="PropertyInfo"/> that allows <see cref="ConfigurationManager"/> to get and set the property's value.
+    ///     <see cref="SerializableConfigurationProperty"/> attribute. The keys are the property names pre-pended with the
+    ///     class that implements the property (e.g. <c>Application.UseSystemConsole</c>). The values are instances of
+    ///     <see cref="ConfigProperty"/> which hold the property's value and the <see cref="PropertyInfo"/> that allows
+    ///     <see cref="ConfigurationManager"/> to get and set the property's value.
     /// </summary>
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
     internal static Dictionary<string, ConfigProperty>? _allConfigProperties;
@@ -99,8 +108,8 @@ public static class ConfigurationManager
 
     /// <summary>The backing property for <see cref="Settings"/>.</summary>
     /// <remarks>
-    ///     Is <see langword="null"/> until <see cref="Reset"/> is called. Gets set to a new instance by deserialization (see
-    ///     <see cref="Load"/>).
+    ///     Is <see langword="null"/> until <see cref="Reset"/> is called. Gets set to a new instance by deserialization
+    ///     (see <see cref="Load"/>).
     /// </remarks>
     private static SettingsScope? _settings;
 
@@ -155,9 +164,9 @@ public static class ConfigurationManager
     public static ThemeManager? Themes => ThemeManager.Instance;
 
     /// <summary>
-    ///     Gets or sets whether the <see cref="ConfigurationManager"/> should throw an exception if it encounters an error on deserialization. If
-    ///     <see langword="false"/> (the default), the error is logged and printed to the console when
-    ///     <see cref="Application.Shutdown"/> is called.
+    ///     Gets or sets whether the <see cref="ConfigurationManager"/> should throw an exception if it encounters an
+    ///     error on deserialization. If <see langword="false"/> (the default), the error is logged and printed to the console
+    ///     when <see cref="Application.Shutdown"/> is called.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool? ThrowOnJsonErrors { get; set; } = false;
@@ -211,11 +220,15 @@ public static class ConfigurationManager
     }
 
     /// <summary>
-    ///     Loads all settings found in the various configuration storage locations to the <see cref="ConfigurationManager"/>. Optionally, resets all settings attributed with
+    ///     Loads all settings found in the various configuration storage locations to the
+    ///     <see cref="ConfigurationManager"/>. Optionally, resets all settings attributed with
     ///     <see cref="SerializableConfigurationProperty"/> to the defaults.
     /// </summary>
     /// <remarks>Use <see cref="Apply"/> to cause the loaded settings to be applied to the running application.</remarks>
-    /// <param name="reset">If <see langword="true"/> the state of <see cref="ConfigurationManager"/> will be reset to the defaults.</param>
+    /// <param name="reset">
+    ///     If <see langword="true"/> the state of <see cref="ConfigurationManager"/> will be reset to the
+    ///     defaults.
+    /// </param>
     public static void Load (bool reset = false)
     {
         Debug.WriteLine ("ConfigurationManager.Load()");
@@ -342,7 +355,8 @@ public static class ConfigurationManager
     }
 
     /// <summary>
-    ///     System.Text.Json does not support copying a deserialized object to an existing instance. To work around this, we implement a 'deep, memberwise copy' method.
+    ///     System.Text.Json does not support copying a deserialized object to an existing instance. To work around this,
+    ///     we implement a 'deep, memberwise copy' method.
     /// </summary>
     /// <remarks>TOOD: When System.Text.Json implements `PopulateObject` revisit https://github.com/dotnet/corefx/issues/37627</remarks>
     /// <param name="source"></param>
@@ -376,7 +390,7 @@ public static class ConfigurationManager
         }
 
         // If value type, just use copy constructor.
-        if (source.GetType ().IsValueType || source.GetType () == typeof (string))
+        if (source.GetType ().IsValueType || (source.GetType () == typeof (string)))
         {
             return source;
         }
@@ -443,17 +457,19 @@ public static class ConfigurationManager
     }
 
     /// <summary>
-    ///     Retrieves the hard coded default settings from the Terminal.Gui library implementation. Used in development of the library to generate the default configuration file. Before calling Application.Init, make sure
+    ///     Retrieves the hard coded default settings from the Terminal.Gui library implementation. Used in development of
+    ///     the library to generate the default configuration file. Before calling Application.Init, make sure
     ///     <see cref="Locations"/> is set to <see cref="ConfigLocations.None"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This method is only really useful when using ConfigurationManagerTests to generate the JSON doc that is embedded into Terminal.Gui (during development).
+    ///         This method is only really useful when using ConfigurationManagerTests to generate the JSON doc that is
+    ///         embedded into Terminal.Gui (during development).
     ///     </para>
     ///     <para>
-    ///         WARNING: The <c>Terminal.Gui.Resources.config.json</c> resource has setting definitions (Themes) that are NOT generated by this function. If you use this function to regenerate
-    ///         <c>Terminal.Gui.Resources.config.json</c>, make sure you copy the Theme definitions from the existing
-    ///         <c>Terminal.Gui.Resources.config.json</c> file.
+    ///         WARNING: The <c>Terminal.Gui.Resources.config.json</c> resource has setting definitions (Themes) that are NOT
+    ///         generated by this function. If you use this function to regenerate <c>Terminal.Gui.Resources.config.json</c>,
+    ///         make sure you copy the Theme definitions from the existing <c>Terminal.Gui.Resources.config.json</c> file.
     ///     </para>
     /// </remarks>
     internal static void GetHardCodedDefaults ()
@@ -474,7 +490,8 @@ public static class ConfigurationManager
     }
 
     /// <summary>
-    ///     Initializes the internal state of ConfigurationManager. Nominally called once as part of application startup to initialize global state. Also called from some Unit Tests to ensure correctness (e.g. Reset()).
+    ///     Initializes the internal state of ConfigurationManager. Nominally called once as part of application startup
+    ///     to initialize global state. Also called from some Unit Tests to ensure correctness (e.g. Reset()).
     /// </summary>
     internal static void Initialize ()
     {

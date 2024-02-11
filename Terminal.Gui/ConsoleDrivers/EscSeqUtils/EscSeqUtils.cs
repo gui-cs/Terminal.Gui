@@ -6,7 +6,8 @@ namespace Terminal.Gui;
 
 /// <summary>Provides a platform-independent API for managing ANSI escape sequences.</summary>
 /// <remarks>
-///     Useful resources: * https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences * https://invisible-island.net/xterm/ctlseqs/ctlseqs.html * https://vt100.net/
+///     Useful resources: * https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences *
+///     https://invisible-island.net/xterm/ctlseqs/ctlseqs.html * https://vt100.net/
 /// </remarks>
 public static class EscSeqUtils
 {
@@ -34,7 +35,9 @@ public static class EscSeqUtils
 
     /// <summary>ESC [ ? 1047 h - Activate xterm alternative buffer (no backscroll)</summary>
     /// <remarks>
-    ///     From https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_ Use Alternate Screen Buffer, xterm.
+    ///     From
+    ///     https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
+    ///     Use Alternate Screen Buffer, xterm.
     /// </remarks>
     public static readonly string CSI_ActivateAltBufferNoBackscroll = CSI + "?1047h";
 
@@ -58,19 +61,28 @@ public static class EscSeqUtils
 
     /// <summary>ESC [ ? 1047 l - Restore xterm working buffer (with backscroll)</summary>
     /// <remarks>
-    ///     From https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_ Use Normal Screen Buffer, xterm.  Clear the screen first if in the Alternate Screen Buffer.
+    ///     From
+    ///     https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
+    ///     Use Normal Screen Buffer, xterm.  Clear the screen first if in the Alternate Screen Buffer.
     /// </remarks>
     public static readonly string CSI_RestoreAltBufferWithBackscroll = CSI + "?1047l";
 
     /// <summary>ESC [ ? 1049 l - Restore cursor position and restore xterm working buffer (with backscroll)</summary>
     /// <remarks>
-    ///     From https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_ Use Normal Screen Buffer and restore cursor as in DECRC, xterm. resource.This combines the effects of the 1047 and 1048  modes.
+    ///     From
+    ///     https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
+    ///     Use Normal Screen Buffer and restore cursor as in DECRC, xterm. resource.This combines the effects of the 1047 and
+    ///     1048  modes.
     /// </remarks>
     public static readonly string CSI_RestoreCursorAndRestoreAltBufferWithBackscroll = CSI + "?1049l";
 
     /// <summary>ESC [ ? 1049 h - Save cursor position and activate xterm alternative buffer (no backscroll)</summary>
     /// <remarks>
-    ///     From https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_ Save cursor as in DECSC, xterm. After saving the cursor, switch to the Alternate Screen Buffer, clearing it first. This control combines the effects of the 1047 and 1048 modes. Use this with terminfo-based applications rather than the 47 mode.
+    ///     From
+    ///     https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
+    ///     Save cursor as in DECSC, xterm. After saving the cursor, switch to the Alternate Screen Buffer, clearing it first.
+    ///     This control combines the effects of the 1047 and 1048 modes. Use this with terminfo-based applications rather than
+    ///     the 47 mode.
     /// </remarks>
     public static readonly string CSI_SaveCursorAndActivateAltBufferNoBackscroll = CSI + "?1049h";
 
@@ -449,7 +461,7 @@ public static class EscSeqUtils
     /// <returns>The c1Control returned by <see cref="GetC1ControlChar(char)"/>, code, values and terminating.</returns>
     public static (string c1Control, string code, string [] values, string terminating) GetEscapeResult (char [] kChar)
     {
-        if (kChar == null || kChar.Length == 0)
+        if ((kChar == null) || (kChar.Length == 0))
         {
             return (null, null, null, null);
         }
@@ -488,7 +500,7 @@ public static class EscSeqUtils
             {
                 valueIdx++;
             }
-            else if (valueIdx == nSep - 1 || i == kChar.Length - 1)
+            else if ((valueIdx == nSep - 1) || (i == kChar.Length - 1))
             {
                 terminating += c.ToString ();
             }
@@ -572,7 +584,7 @@ public static class EscSeqUtils
             {
                 value += c.ToString ();
             }
-            else if (c == 'm' || c == 'M')
+            else if ((c == 'm') || (c == 'M'))
             {
                 //pos.Y = int.Parse (value) + Console.WindowTop - 1;
                 pos.Y = int.Parse (value) - 1;
@@ -795,10 +807,10 @@ public static class EscSeqUtils
 
         if ((!isButtonClicked
              && !isButtonDoubleClicked
-             && (buttonState == MouseFlags.Button1Pressed
-                 || buttonState == MouseFlags.Button2Pressed
-                 || buttonState == MouseFlags.Button3Pressed
-                 || buttonState == MouseFlags.Button4Pressed)
+             && ((buttonState == MouseFlags.Button1Pressed)
+                 || (buttonState == MouseFlags.Button2Pressed)
+                 || (buttonState == MouseFlags.Button3Pressed)
+                 || (buttonState == MouseFlags.Button4Pressed))
              && lastMouseButtonPressed == null)
             || (isButtonPressed
                 && lastMouseButtonPressed != null
@@ -832,20 +844,20 @@ public static class EscSeqUtils
             }
         }
         else if (isButtonDoubleClicked
-                 && (buttonState == MouseFlags.Button1Pressed
-                     || buttonState == MouseFlags.Button2Pressed
-                     || buttonState == MouseFlags.Button3Pressed
-                     || buttonState == MouseFlags.Button4Pressed))
+                 && ((buttonState == MouseFlags.Button1Pressed)
+                     || (buttonState == MouseFlags.Button2Pressed)
+                     || (buttonState == MouseFlags.Button3Pressed)
+                     || (buttonState == MouseFlags.Button4Pressed)))
         {
             mouseFlags [0] = GetButtonTripleClicked (buttonState);
             isButtonDoubleClicked = false;
             isButtonTripleClicked = true;
         }
         else if (isButtonClicked
-                 && (buttonState == MouseFlags.Button1Pressed
-                     || buttonState == MouseFlags.Button2Pressed
-                     || buttonState == MouseFlags.Button3Pressed
-                     || buttonState == MouseFlags.Button4Pressed))
+                 && ((buttonState == MouseFlags.Button1Pressed)
+                     || (buttonState == MouseFlags.Button2Pressed)
+                     || (buttonState == MouseFlags.Button3Pressed)
+                     || (buttonState == MouseFlags.Button4Pressed)))
         {
             mouseFlags [0] = GetButtonDoubleClicked (buttonState);
             isButtonClicked = false;
@@ -874,10 +886,10 @@ public static class EscSeqUtils
         //} 
         else if (!isButtonClicked
                  && !isButtonDoubleClicked
-                 && (buttonState == MouseFlags.Button1Released
-                     || buttonState == MouseFlags.Button2Released
-                     || buttonState == MouseFlags.Button3Released
-                     || buttonState == MouseFlags.Button4Released))
+                 && ((buttonState == MouseFlags.Button1Released)
+                     || (buttonState == MouseFlags.Button2Released)
+                     || (buttonState == MouseFlags.Button3Released)
+                     || (buttonState == MouseFlags.Button4Released)))
         {
             mouseFlags [0] = buttonState;
             isButtonPressed = false;
@@ -1142,19 +1154,19 @@ public static class EscSeqUtils
         return mf;
     }
 
-    private static async Task ProcessButtonClickedAsync ()
+    private async static Task ProcessButtonClickedAsync ()
     {
         await Task.Delay (300);
         isButtonClicked = false;
     }
 
-    private static async Task ProcessButtonDoubleClickedAsync ()
+    private async static Task ProcessButtonDoubleClickedAsync ()
     {
         await Task.Delay (300);
         isButtonDoubleClicked = false;
     }
 
-    private static async Task ProcessContinuousButtonPressedAsync (
+    private async static Task ProcessContinuousButtonPressedAsync (
         MouseFlags mouseFlag,
         Action<MouseFlags, Point> continuousButtonPressedHandler
     )
@@ -1228,7 +1240,8 @@ public static class EscSeqUtils
     //ESC [ < n > d - VPA - Vertical Line Position Absolute Cursor moves to the < n > th position vertically in the current column
 
     /// <summary>
-    ///     ESC [ y ; x H - CUP Cursor Position - Cursor moves to x ; y coordinate within the viewport, where x is the column of the y line
+    ///     ESC [ y ; x H - CUP Cursor Position - Cursor moves to x ; y coordinate within the viewport, where x is the
+    ///     column of the y line
     /// </summary>
     /// <param name="row">Origin is (1,1).</param>
     /// <param name="col">Origin is (1,1).</param>
@@ -1286,7 +1299,10 @@ public static class EscSeqUtils
     #region Colors
 
     /// <summary>
-    ///     ESC [ (n) m - SGR - Set Graphics Rendition - Set the format of the screen and text as specified by (n) This command is special in that the (n) position can accept between 0 and 16 parameters separated by semicolons. When no parameters are specified, it is treated the same as a single 0 parameter. https://terminalguide.namepad.de/seq/csi_sm/
+    ///     ESC [ (n) m - SGR - Set Graphics Rendition - Set the format of the screen and text as specified by (n) This
+    ///     command is special in that the (n) position can accept between 0 and 16 parameters separated by semicolons. When no
+    ///     parameters are specified, it is treated the same as a single 0 parameter.
+    ///     https://terminalguide.namepad.de/seq/csi_sm/
     /// </summary>
     public static string CSI_SetGraphicsRendition (params int [] parameters) { return $"{CSI}{string.Join (";", parameters)}m"; }
 
@@ -1323,12 +1339,20 @@ public static class EscSeqUtils
     public const string CSI_RequestCursorPositionReport_Terminator = "R";
 
     /// <summary>
-    ///     ESC [ 0 c - Send Device Attributes (Primary DA) https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Application-Program-Command-functions https://www.xfree86.org/current/ctlseqs.html Windows Terminal v1.17 and below emits “\x1b[?1;0c”, indicating "VT101 with No Options". Windows Terminal v1.18+ emits: \x1b[?61;6;7;22;23;24;28;32;42c" See https://github.com/microsoft/terminal/pull/14906 61 - The device conforms to level 1 of the character cell display architecture (See https://github.com/microsoft/terminal/issues/15693#issuecomment-1633304497) 6 = Selective erase 7 = Soft fonts 22 = Color text 23 = Greek character sets 24 = Turkish character sets 28 = Rectangular area operations 32 = Text macros 42 = ISO Latin-2 character set
+    ///     ESC [ 0 c - Send Device Attributes (Primary DA)
+    ///     https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Application-Program-Command-functions
+    ///     https://www.xfree86.org/current/ctlseqs.html Windows Terminal v1.17 and below emits “\x1b[?1;0c”, indicating "VT101
+    ///     with No Options". Windows Terminal v1.18+ emits: \x1b[?61;6;7;22;23;24;28;32;42c" See
+    ///     https://github.com/microsoft/terminal/pull/14906 61 - The device conforms to level 1 of the character cell display
+    ///     architecture (See https://github.com/microsoft/terminal/issues/15693#issuecomment-1633304497) 6 = Selective erase 7
+    ///     = Soft fonts 22 = Color text 23 = Greek character sets 24 = Turkish character sets 28 = Rectangular area operations
+    ///     32 = Text macros 42 = ISO Latin-2 character set
     /// </summary>
     public static readonly string CSI_SendDeviceAttributes = CSI + "0c";
 
     /// <summary>
-    ///     ESC [ > 0 c - Send Device Attributes (Secondary DA) Windows Terminal v1.18+ emits: "\x1b[>0;10;1c" (vt100, firmware version 1.0, vt220)
+    ///     ESC [ > 0 c - Send Device Attributes (Secondary DA) Windows Terminal v1.18+ emits: "\x1b[>0;10;1c" (vt100,
+    ///     firmware version 1.0, vt220)
     /// </summary>
     public static readonly string CSI_SendDeviceAttributes2 = CSI + ">0c";
 
@@ -1345,7 +1369,8 @@ public static class EscSeqUtils
     public const string CSI_ReportTerminalSizeInChars_Terminator = "t";
 
     /// <summary>
-    ///     The value of the response to <see cref="CSI_ReportTerminalSizeInChars"/> indicating value 1 and 2 are the terminal size in chars.
+    ///     The value of the response to <see cref="CSI_ReportTerminalSizeInChars"/> indicating value 1 and 2 are the
+    ///     terminal size in chars.
     /// </summary>
     public const string CSI_ReportTerminalSizeInChars_ResponseValue = "8";
 

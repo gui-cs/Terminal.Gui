@@ -8,8 +8,8 @@ namespace Terminal.Gui.ViewTests;
 
 public class AbsoluteLayoutTests
 {
-    private readonly ITestOutputHelper _output;
     public AbsoluteLayoutTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     [TestRespondersDisposed]

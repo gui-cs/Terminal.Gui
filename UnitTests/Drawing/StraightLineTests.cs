@@ -4,8 +4,8 @@ namespace Terminal.Gui.DrawingTests;
 
 public class StraightLineTests
 {
-    private readonly ITestOutputHelper output;
     public StraightLineTests (ITestOutputHelper output) { this.output = output; }
+    private readonly ITestOutputHelper output;
 
     [InlineData (
                     Orientation.Horizontal,

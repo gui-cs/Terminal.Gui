@@ -4,11 +4,13 @@ namespace Terminal.Gui;
 
 /// <summary>
 ///     Describes the thickness of a frame around a rectangle. Four <see cref="int"/> values describe the
-///     <see cref="Left"/>, <see cref="Top"/>, <see cref="Right"/>, and <see cref="Bottom"/> sides of the rectangle, respectively.
+///     <see cref="Left"/>, <see cref="Top"/>, <see cref="Right"/>, and <see cref="Bottom"/> sides of the rectangle,
+///     respectively.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Use the helper API (<see cref="GetInside(Rect)"/> to get the rectangle describing the insides of the frame, with the thickness widths subtracted.
+///         Use the helper API (<see cref="GetInside(Rect)"/> to get the rectangle describing the insides of the frame,
+///         with the thickness widths subtracted.
 ///     </para>
 ///     <para>Use the helper API (<see cref="Draw(Rect, string)"/> to draw the frame with the specified thickness.</para>
 /// </remarks>
@@ -22,7 +24,8 @@ public class Thickness : IEquatable<Thickness>
     public Thickness (int width) : this (width, width, width, width) { }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Thickness"/> class that has specific widths applied to each side of the rectangle.
+    ///     Initializes a new instance of the <see cref="Thickness"/> class that has specific widths applied to each side
+    ///     of the rectangle.
     /// </summary>
     /// <param name="left"></param>
     /// <param name="top"></param>
@@ -57,22 +60,16 @@ public class Thickness : IEquatable<Thickness>
     public static Thickness Empty => new (0);
 
     /// <summary>
-    ///     Gets the total width of the left and right sides of the rectangle. Sets the width of the left and rigth sides of the rectangle to half the specified value.
+    ///     Gets the total width of the left and right sides of the rectangle. Sets the width of the left and rigth sides
+    ///     of the rectangle to half the specified value.
     /// </summary>
-    public int Horizontal
-    {
-        get => Left + Right;
-        set => Left = Right = value / 2;
-    }
+    public int Horizontal { get => Left + Right; set => Left = Right = value / 2; }
 
     /// <summary>
-    ///     Gets the total height of the top and bottom sides of the rectangle. Sets the height of the top and bottom sides of the rectangle to half the specified value.
+    ///     Gets the total height of the top and bottom sides of the rectangle. Sets the height of the top and bottom
+    ///     sides of the rectangle to half the specified value.
     /// </summary>
-    public int Vertical
-    {
-        get => Top + Bottom;
-        set => Top = Bottom = value / 2;
-    }
+    public int Vertical { get => Top + Bottom; set => Top = Bottom = value / 2; }
 
     // IEquitable
     /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
@@ -81,8 +78,8 @@ public class Thickness : IEquatable<Thickness>
     public bool Equals (Thickness other) { return other is { } && Left == other.Left && Right == other.Right && Top == other.Top && Bottom == other.Bottom; }
 
     /// <summary>
-    ///     Gets whether the specified coordinates lie within the thickness (inside the bounding rectangle but outside of the rectangle described by
-    ///     <see cref="GetInside(Rect)"/>.
+    ///     Gets whether the specified coordinates lie within the thickness (inside the bounding rectangle but outside of
+    ///     the rectangle described by <see cref="GetInside(Rect)"/>.
     /// </summary>
     /// <param name="outside">Describes the location and size of the rectangle that contains the thickness.</param>
     /// <param name="x">The x coord to check.</param>
@@ -97,16 +94,18 @@ public class Thickness : IEquatable<Thickness>
 
     /// <summary>Draws the <see cref="Thickness"/> rectangle with an optional diagnostics label.</summary>
     /// <remarks>
-    ///     If <see cref="ConsoleDriver.DiagnosticFlags"/> is set to <see cref="ConsoleDriver.DiagnosticFlags.FramePadding"/>
-    ///     then 'T', 'L', 'R', and 'B' glyphs will be used instead of space. If <see cref="ConsoleDriver.DiagnosticFlags"/> is set to
-    ///     <see cref="ConsoleDriver.DiagnosticFlags.FrameRuler"/> then a ruler will be drawn on the outer edge of the Thickness.
+    ///     If <see cref="ConsoleDriver.DiagnosticFlags"/> is set to
+    ///     <see cref="ConsoleDriver.DiagnosticFlags.FramePadding"/> then 'T', 'L', 'R', and 'B' glyphs will be used instead of
+    ///     space. If <see cref="ConsoleDriver.DiagnosticFlags"/> is set to
+    ///     <see cref="ConsoleDriver.DiagnosticFlags.FrameRuler"/> then a ruler will be drawn on the outer edge of the
+    ///     Thickness.
     /// </remarks>
     /// <param name="rect">The location and size of the rectangle that bounds the thickness rectangle, in screen coordinates.</param>
     /// <param name="label">The diagnostics label to draw on the bottom of the <see cref="Bottom"/>.</param>
     /// <returns>The inner rectangle remaining to be drawn.</returns>
     public Rect Draw (Rect rect, string label = null)
     {
-        if (rect.Size.Width < 1 || rect.Size.Height < 1)
+        if ((rect.Size.Width < 1) || (rect.Size.Height < 1))
         {
             return Rect.Empty;
         }
@@ -226,7 +225,7 @@ public class Thickness : IEquatable<Thickness>
     public override bool Equals (object obj)
     {
         //Check for null and compare run-time types.
-        if (obj == null || !GetType ().Equals (obj.GetType ()))
+        if ((obj == null) || !GetType ().Equals (obj.GetType ()))
         {
             return false;
         }
@@ -247,12 +246,14 @@ public class Thickness : IEquatable<Thickness>
     }
 
     /// <summary>
-    ///     Returns a rectangle describing the location and size of the inside area of <paramref name="rect"/> with the thickness widths subtracted. The height and width of the returned rectangle will never be less than 0.
+    ///     Returns a rectangle describing the location and size of the inside area of <paramref name="rect"/> with the
+    ///     thickness widths subtracted. The height and width of the returned rectangle will never be less than 0.
     /// </summary>
     /// <remarks>
     ///     If a thickness width is negative, the inside rectangle will be larger than <paramref name="rect"/>. e.g. a
     ///     <c>
-    ///         Thickness (-1, -1, -1, -1) will result in a rectangle skewed -1 in the X and Y directions and with a Size increased by 1.
+    ///         Thickness (-1, -1, -1, -1) will result in a rectangle skewed -1 in the X and Y directions and with a Size
+    ///         increased by 1.
     ///     </c>
     /// </remarks>
     /// <param name="rect">The source rectangle</param>

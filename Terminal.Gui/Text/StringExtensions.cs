@@ -63,7 +63,10 @@ public static class StringExtensions
     /// <returns></returns>
     public static int GetRuneCount (this string str) { return str.EnumerateRunes ().Count (); }
 
-    /// <summary>Determines if this <see cref="ReadOnlySpan{T}"/> of <see langword="char"/> is composed entirely of ASCII digits.</summary>
+    /// <summary>
+    ///     Determines if this <see cref="ReadOnlySpan{T}"/> of <see langword="char"/> is composed entirely of ASCII
+    ///     digits.
+    /// </summary>
     /// <param name="stringSpan">A <see cref="ReadOnlySpan{T}"/> of <see langword="char"/> to check.</param>
     /// <returns>
     ///     A <see langword="bool"/> indicating if all elements of the <see cref="ReadOnlySpan{T}"/> are ASCII digits (
@@ -71,7 +74,10 @@ public static class StringExtensions
     /// </returns>
     public static bool IsAllAsciiDigits (this ReadOnlySpan<char> stringSpan) { return stringSpan.ToString ().All (char.IsAsciiDigit); }
 
-    /// <summary>Determines if this <see cref="ReadOnlySpan{T}"/> of <see langword="char"/> is composed entirely of ASCII digits.</summary>
+    /// <summary>
+    ///     Determines if this <see cref="ReadOnlySpan{T}"/> of <see langword="char"/> is composed entirely of ASCII
+    ///     digits.
+    /// </summary>
     /// <param name="stringSpan">A <see cref="ReadOnlySpan{T}"/> of <see langword="char"/> to check.</param>
     /// <returns>
     ///     A <see langword="bool"/> indicating if all elements of the <see cref="ReadOnlySpan{T}"/> are ASCII digits (
@@ -91,7 +97,7 @@ public static class StringExtensions
             return null;
         }
 
-        if (string.IsNullOrEmpty (str) || n == 1)
+        if (string.IsNullOrEmpty (str) || (n == 1))
         {
             return str;
         }

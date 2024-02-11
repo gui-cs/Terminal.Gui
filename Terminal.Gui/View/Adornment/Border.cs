@@ -3,8 +3,8 @@
 /// <summary>The Border for a <see cref="View"/>.</summary>
 /// <remarks>
 ///     <para>
-///         Renders a border around the view with the <see cref="View.Title"/>. A border using <see cref="LineStyle"/> will be drawn on the sides of
-///         <see cref="Thickness"/> that are greater than zero.
+///         Renders a border around the view with the <see cref="View.Title"/>. A border using <see cref="LineStyle"/>
+///         will be drawn on the sides of <see cref="Thickness"/> that are greater than zero.
 ///     </para>
 ///     <para>
 ///         The <see cref="View.Title"/> of <see cref="Adornment.Parent"/> will be drawn based on the value of
@@ -56,7 +56,8 @@ public class Border : Adornment
     private LineStyle? _lineStyle;
 
     /// <summary>
-    ///     The color scheme for the Border. If set to <see langword="null"/>, gets the <see cref="Adornment.Parent"/> scheme. color scheme.
+    ///     The color scheme for the Border. If set to <see langword="null"/>, gets the <see cref="Adornment.Parent"/>
+    ///     scheme. color scheme.
     /// </summary>
     public override ColorScheme ColorScheme
     {
@@ -78,8 +79,8 @@ public class Border : Adornment
 
     /// <summary>
     ///     Sets the style of the border by changing the <see cref="Thickness"/>. This is a helper API for setting the
-    ///     <see cref="Thickness"/> to <c>(1,1,1,1)</c> and setting the line style of the views that comprise the border. If set to
-    ///     <see cref="LineStyle.None"/> no border will be drawn.
+    ///     <see cref="Thickness"/> to <c>(1,1,1,1)</c> and setting the line style of the views that comprise the border. If
+    ///     set to <see cref="LineStyle.None"/> no border will be drawn.
     /// </summary>
     public LineStyle LineStyle
     {
@@ -310,9 +311,9 @@ public class Border : Adornment
             LineCanvas lc = Parent?.LineCanvas;
 
             bool drawTop = Thickness.Top > 0 && Frame.Width > 1 && Frame.Height > 1;
-            bool drawLeft = Thickness.Left > 0 && (Frame.Height > 1 || Thickness.Top == 0);
+            bool drawLeft = Thickness.Left > 0 && ((Frame.Height > 1) || (Thickness.Top == 0));
             bool drawBottom = Thickness.Bottom > 0 && Frame.Width > 1;
-            bool drawRight = Thickness.Right > 0 && (Frame.Height > 1 || Thickness.Top == 0);
+            bool drawRight = Thickness.Right > 0 && ((Frame.Height > 1) || (Thickness.Top == 0));
 
             Attribute prevAttr = Driver.GetAttribute ();
 
@@ -329,7 +330,7 @@ public class Border : Adornment
             {
                 // ╔╡Title╞═════╗
                 // ╔╡╞═════╗
-                if (borderBounds.Width < 4 || string.IsNullOrEmpty (Parent?.Title))
+                if ((borderBounds.Width < 4) || string.IsNullOrEmpty (Parent?.Title))
                 {
                     // ╔╡╞╗ should be ╔══╗
                     lc.AddLine (

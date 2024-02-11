@@ -94,7 +94,10 @@ public class GraphView : View
     /// <value></value>
     public VerticalAxis AxisY { get; set; }
 
-    /// <summary>Translates console width/height into graph space. Defaults to 1 row/col of console space being 1 unit of graph space.</summary>
+    /// <summary>
+    ///     Translates console width/height into graph space. Defaults to 1 row/col of console space being 1 unit of graph
+    ///     space.
+    /// </summary>
     /// <returns></returns>
     public PointF CellSize { get; set; } = new (1, 1);
 
@@ -102,18 +105,21 @@ public class GraphView : View
     public Attribute? GraphColor { get; set; }
 
     /// <summary>
-    ///     Amount of space to leave on bottom of the graph. Graph content (<see cref="Series"/>) will not be rendered in margins but axis labels may be. Use
-    ///     <see cref="Padding"/> to add a margin outside of the GraphView.
+    ///     Amount of space to leave on bottom of the graph. Graph content (<see cref="Series"/>) will not be rendered in
+    ///     margins but axis labels may be. Use <see cref="Padding"/> to add a margin outside of the GraphView.
     /// </summary>
     public uint MarginBottom { get; set; }
 
     /// <summary>
-    ///     Amount of space to leave on left of the graph. Graph content (<see cref="Series"/>) will not be rendered in margins but axis labels may be. Use
-    ///     <see cref="Padding"/> to add a margin outside of the GraphView.
+    ///     Amount of space to leave on left of the graph. Graph content (<see cref="Series"/>) will not be rendered in
+    ///     margins but axis labels may be. Use <see cref="Padding"/> to add a margin outside of the GraphView.
     /// </summary>
     public uint MarginLeft { get; set; }
 
-    /// <summary>The graph space position of the bottom left of the graph. Changing this scrolls the viewport around in the graph.</summary>
+    /// <summary>
+    ///     The graph space position of the bottom left of the graph. Changing this scrolls the viewport around in the
+    ///     graph.
+    /// </summary>
     /// <value></value>
     public PointF ScrollOffset { get; set; } = new (0, 0);
 
@@ -173,10 +179,12 @@ public class GraphView : View
 
     /// <summary>Calculates the screen location for a given point in graph space. Bear in mind these may be off screen.</summary>
     /// <param name="location">
-    ///     Point in graph space that may or may not be represented in the visible area of graph currently presented.  E.g. 0,0 for origin.
+    ///     Point in graph space that may or may not be represented in the visible area of graph currently
+    ///     presented.  E.g. 0,0 for origin.
     /// </param>
     /// <returns>
-    ///     Screen position (Column/Row) which would be used to render the graph <paramref name="location"/>. Note that this can be outside the current content area of the view.
+    ///     Screen position (Column/Row) which would be used to render the graph <paramref name="location"/>. Note that
+    ///     this can be outside the current content area of the view.
     /// </returns>
     public Point GraphSpaceToScreen (PointF location)
     {
@@ -191,7 +199,7 @@ public class GraphView : View
     ///<inheritdoc/>
     public override void OnDrawContent (Rect contentArea)
     {
-        if (CellSize.X == 0 || CellSize.Y == 0)
+        if ((CellSize.X == 0) || (CellSize.Y == 0))
         {
             throw new Exception ($"{nameof (CellSize)} cannot be 0");
         }
@@ -218,7 +226,7 @@ public class GraphView : View
         int graphScreenHeight = Bounds.Height - (int)MarginBottom;
 
         // if the margins take up the full draw bounds don't render
-        if (graphScreenWidth < 0 || graphScreenHeight < 0)
+        if ((graphScreenWidth < 0) || (graphScreenHeight < 0))
         {
             return;
         }
@@ -285,8 +293,8 @@ public class GraphView : View
     public void PageUp () { Scroll (0, CellSize.Y * Bounds.Height); }
 
     /// <summary>
-    ///     Clears all settings configured on the graph and resets all properties to default values ( <see cref="CellSize"/>,
-    ///     <see cref="ScrollOffset"/> etc) .
+    ///     Clears all settings configured on the graph and resets all properties to default values (
+    ///     <see cref="CellSize"/>, <see cref="ScrollOffset"/> etc) .
     /// </summary>
     public void Reset ()
     {
@@ -326,7 +334,8 @@ public class GraphView : View
     }
 
     /// <summary>
-    ///     Scrolls the view by a given number of units in graph space. See <see cref="CellSize"/> to translate this into rows/cols.
+    ///     Scrolls the view by a given number of units in graph space. See <see cref="CellSize"/> to translate this into
+    ///     rows/cols.
     /// </summary>
     /// <param name="offsetX"></param>
     /// <param name="offsetY"></param>

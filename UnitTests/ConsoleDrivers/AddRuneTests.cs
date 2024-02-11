@@ -8,13 +8,13 @@ namespace Terminal.Gui.DriverTests;
 
 public class AddRuneTests
 {
-    private readonly ITestOutputHelper _output;
-
     public AddRuneTests (ITestOutputHelper output)
     {
         ConsoleDriver.RunningUnitTests = true;
         _output = output;
     }
+
+    private readonly ITestOutputHelper _output;
 
     [Theory]
     [InlineData (typeof (FakeDriver))]

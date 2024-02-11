@@ -4,8 +4,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class StatusBarTests
 {
-    private readonly ITestOutputHelper output;
     public StatusBarTests (ITestOutputHelper output) { this.output = output; }
+    private readonly ITestOutputHelper output;
 
     [Fact]
     public void AddItemAt_RemoveItem_Replacing ()

@@ -6,8 +6,6 @@ namespace Terminal.Gui.ApplicationTests;
 
 public class ApplicationTests
 {
-    private readonly ITestOutputHelper _output;
-
     public ApplicationTests (ITestOutputHelper output)
     {
         _output = output;
@@ -18,6 +16,8 @@ public class ApplicationTests
         RunState.Instances.Clear ();
 #endif
     }
+
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void Begin_Null_Toplevel_Throws ()

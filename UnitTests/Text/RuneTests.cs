@@ -369,7 +369,8 @@ public class RuneTests
     }
 
     /// <summary>
-    ///     Shows the difference between using Wcwidth.UnicodeCalculator and our own port of wcwidth. Specifically, the UnicodeCalculator is more accurate to spec where null has a width of 0, and our port says it's -1.
+    ///     Shows the difference between using Wcwidth.UnicodeCalculator and our own port of wcwidth. Specifically, the
+    ///     UnicodeCalculator is more accurate to spec where null has a width of 0, and our port says it's -1.
     /// </summary>
     /// <param name="expectedColumns"></param>
     /// <param name="scalar"></param>

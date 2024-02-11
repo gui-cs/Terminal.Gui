@@ -2,9 +2,10 @@ namespace Terminal.Gui;
 
 /// <summary>
 ///     <see cref="StatusItem"/> objects are contained by <see cref="StatusBar"/> <see cref="View"/>s. Each
-///     <see cref="StatusItem"/> has a title, a shortcut (hotkey), and an <see cref="Command"/> that will be invoked when the
-///     <see cref="StatusItem.Shortcut"/> is pressed. The <see cref="StatusItem.Shortcut"/> will be a global hotkey for the application in the current context of the screen. The color of the
-///     <see cref="StatusItem.Title"/> will be changed after each ~. A <see cref="StatusItem.Title"/> set to `~F1~ Help` will render as *F1* using
+///     <see cref="StatusItem"/> has a title, a shortcut (hotkey), and an <see cref="Command"/> that will be invoked when
+///     the <see cref="StatusItem.Shortcut"/> is pressed. The <see cref="StatusItem.Shortcut"/> will be a global hotkey for
+///     the application in the current context of the screen. The color of the <see cref="StatusItem.Title"/> will be
+///     changed after each ~. A <see cref="StatusItem.Title"/> set to `~F1~ Help` will render as *F1* using
 ///     <see cref="ColorScheme.HotNormal"/> and *Help* as <see cref="ColorScheme.HotNormal"/>.
 /// </summary>
 public class StatusItem
@@ -28,7 +29,8 @@ public class StatusItem
 
     /// <summary>
     ///     Gets or sets the action to be invoked to determine if the <see cref="StatusItem"/> can be triggered. If
-    ///     <see cref="CanExecute"/> returns <see langword="true"/> the status item will be enabled. Otherwise, it will be disabled.
+    ///     <see cref="CanExecute"/> returns <see langword="true"/> the status item will be enabled. Otherwise, it will be
+    ///     disabled.
     /// </summary>
     /// <value>Function to determine if the action is can be executed or not.</value>
     public Func<bool> CanExecute { get; set; }
@@ -43,8 +45,9 @@ public class StatusItem
     /// <summary>Gets or sets the title.</summary>
     /// <value>The title.</value>
     /// <remarks>
-    ///     The colour of the <see cref="StatusItem.Title"/> will be changed after each ~. A <see cref="StatusItem.Title"/> set to `~F1~ Help` will render as *F1* using
-    ///     <see cref="ColorScheme.HotNormal"/> and *Help* as <see cref="ColorScheme.HotNormal"/>.
+    ///     The colour of the <see cref="StatusItem.Title"/> will be changed after each ~. A
+    ///     <see cref="StatusItem.Title"/> set to `~F1~ Help` will render as *F1* using <see cref="ColorScheme.HotNormal"/> and
+    ///     *Help* as <see cref="ColorScheme.HotNormal"/>.
     /// </remarks>
     public string Title { get; set; }
 
@@ -57,7 +60,10 @@ public class StatusItem
 
 /// <summary>
 ///     A status bar is a <see cref="View"/> that snaps to the bottom of a <see cref="Toplevel"/> displaying set of
-///     <see cref="StatusItem"/>s. The <see cref="StatusBar"/> should be context sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a new instance of a status bar.
+///     <see cref="StatusItem"/>s. The <see cref="StatusBar"/> should be context sensitive. This means, if the main menu
+///     and an open text editor are visible, the items probably shown will be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog
+///     to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a
+///     new instance of a status bar.
 /// </summary>
 public class StatusBar : View
 {
@@ -67,8 +73,9 @@ public class StatusBar : View
     public StatusBar () : this (new StatusItem [] { }) { }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="StatusBar"/> class with the specified set of <see cref="StatusItem"/>
-    ///     s. The <see cref="StatusBar"/> will be drawn on the lowest line of the terminal or <see cref="View.SuperView"/> (if not null).
+    ///     Initializes a new instance of the <see cref="StatusBar"/> class with the specified set of
+    ///     <see cref="StatusItem"/> s. The <see cref="StatusBar"/> will be drawn on the lowest line of the terminal or
+    ///     <see cref="View.SuperView"/> (if not null).
     /// </summary>
     /// <param name="items">A list of status bar items.</param>
     public StatusBar (StatusItem [] items)

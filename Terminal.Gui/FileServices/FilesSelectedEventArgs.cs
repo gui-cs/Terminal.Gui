@@ -8,7 +8,8 @@ public class FilesSelectedEventArgs : EventArgs
     public FilesSelectedEventArgs (FileDialog dialog) { Dialog = dialog; }
 
     /// <summary>
-    ///     Set to true if you want to prevent the selection going ahead (this will leave the <see cref="FileDialog"/> still showing).
+    ///     Set to true if you want to prevent the selection going ahead (this will leave the <see cref="FileDialog"/>
+    ///     still showing).
     /// </summary>
     public bool Cancel { get; set; }
 

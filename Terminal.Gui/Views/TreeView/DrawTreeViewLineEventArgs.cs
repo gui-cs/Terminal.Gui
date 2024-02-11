@@ -12,7 +12,8 @@ public class DrawTreeViewLineEventArgs<T> where T : class
     public bool Handled { get; set; }
 
     /// <summary>
-    ///     If line contains a branch that can be expanded/collapsed then this is the index in <see cref="RuneCells"/> at which the symbol is (or null for leaf elements).
+    ///     If line contains a branch that can be expanded/collapsed then this is the index in <see cref="RuneCells"/> at
+    ///     which the symbol is (or null for leaf elements).
     /// </summary>
     public int? IndexOfExpandCollapseSymbol { get; init; }
 
@@ -27,7 +28,8 @@ public class DrawTreeViewLineEventArgs<T> where T : class
     public T Model { get; init; }
 
     /// <summary>
-    ///     The rune and color of each symbol that will be rendered.  Note that only <see cref="ColorScheme.Normal"/> is respected.  You can modify these to change what is rendered.
+    ///     The rune and color of each symbol that will be rendered.  Note that only <see cref="ColorScheme.Normal"/> is
+    ///     respected.  You can modify these to change what is rendered.
     /// </summary>
     /// <remarks>Changing the length of this collection may result in corrupt rendering</remarks>
     public List<RuneCell> RuneCells { get; init; }

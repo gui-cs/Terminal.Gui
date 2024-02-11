@@ -14,8 +14,8 @@ public class RunState : IDisposable
     /// <remarks>Call <see cref="Dispose()"/> when you are finished using the <see cref="RunState"/>.</remarks>
     /// <remarks>
     ///     <see cref="Dispose()"/> method leaves the <see cref="RunState"/> in an unusable state. After calling
-    ///     <see cref="Dispose()"/>, you must release all references to the <see cref="RunState"/> so the garbage collector can reclaim the memory that the
-    ///     <see cref="RunState"/> was occupying.
+    ///     <see cref="Dispose()"/>, you must release all references to the <see cref="RunState"/> so the garbage collector can
+    ///     reclaim the memory that the <see cref="RunState"/> was occupying.
     /// </remarks>
     public void Dispose ()
     {

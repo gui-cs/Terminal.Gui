@@ -5,13 +5,10 @@ using Terminal.Gui;
 
 namespace UICatalog;
 
-internal class KeyBindingsDialog : Dialog
+class KeyBindingsDialog : Dialog
 {
     // TODO: Update to use Key instead of KeyCode
     private static readonly Dictionary<Command, KeyCode> CurrentBindings = new ();
-    private readonly Command [] _commands;
-    private readonly ListView _commandsListView;
-    private readonly Label _keyLabel;
 
     public KeyBindingsDialog ()
     {
@@ -65,6 +62,9 @@ internal class KeyBindingsDialog : Dialog
         SetTextBoxToShowBinding (_commands.First ());
     }
 
+    private readonly Command [] _commands;
+    private readonly ListView _commandsListView;
+    private readonly Label _keyLabel;
     private void CommandsListView_SelectedItemChanged (object sender, ListViewItemEventArgs obj) { SetTextBoxToShowBinding ((Command)obj.Value); }
 
     private void RemapKey (object sender, EventArgs e)
@@ -106,12 +106,6 @@ internal class KeyBindingsDialog : Dialog
     /// <summary>Tracks views as they are created in UICatalog so that their keybindings can be managed.</summary>
     private class ViewTracker
     {
-        /// <summary>All views seen so far and a bool to indicate if we have applied keybindings to them</summary>
-        private readonly Dictionary<View, bool> _knownViews = new ();
-
-        private readonly object _lockKnownViews = new ();
-        private Dictionary<Command, KeyCode> _keybindings;
-
         private ViewTracker (View top)
         {
             RecordView (top);
@@ -133,7 +127,14 @@ internal class KeyBindingsDialog : Dialog
                                    );
         }
 
+        /// <summary>All views seen so far and a bool to indicate if we have applied keybindings to them</summary>
+        private readonly Dictionary<View, bool> _knownViews = new ();
+
+        private readonly object _lockKnownViews = new ();
+        private Dictionary<Command, KeyCode> _keybindings;
+
         public static ViewTracker Instance { get; private set; }
+
         internal static void Initialize () { Instance = new ViewTracker (Application.Top); }
 
         internal void StartUsingNewKeyMap (Dictionary<Command, KeyCode> currentBindings)

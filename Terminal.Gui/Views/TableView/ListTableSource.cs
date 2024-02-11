@@ -4,8 +4,8 @@ using System.Data;
 namespace Terminal.Gui;
 
 /// <summary>
-///     <see cref="ITableSource"/> implementation that wraps a <see cref="System.Collections.IList"/>.  This class is mutable: changes are permitted to the wrapped
-///     <see cref="IList"/>.
+///     <see cref="ITableSource"/> implementation that wraps a <see cref="System.Collections.IList"/>.  This class is
+///     mutable: changes are permitted to the wrapped <see cref="IList"/>.
 /// </summary>
 public class ListTableSource : ITableSource
 {
@@ -66,7 +66,7 @@ public class ListTableSource : ITableSource
                 idx = row * Columns + col;
             }
 
-            if (idx < 0 || idx >= Count)
+            if ((idx < 0) || (idx >= Count))
             {
                 return null;
             }
@@ -124,7 +124,7 @@ public class ListTableSource : ITableSource
     /// <returns></returns>
     private int CalculateMaxLength ()
     {
-        if (List == null || Count == 0)
+        if ((List == null) || (Count == 0))
         {
             return 0;
         }
@@ -180,10 +180,10 @@ public class ListTableSource : ITableSource
     private void TableView_DrawContent (object sender, DrawEventArgs e)
     {
         if (!_tableView.Bounds.Equals (_lastBounds)
-            || _tableView.MaxCellWidth != _lastMaxCellWidth
-            || _tableView.MinCellWidth != _lastMinCellWidth
-            || Style != _lastStyle
-            || List != _lastList)
+            || (_tableView.MaxCellWidth != _lastMaxCellWidth)
+            || (_tableView.MinCellWidth != _lastMinCellWidth)
+            || (Style != _lastStyle)
+            || (List != _lastList))
         {
             DataTable = CreateTable (CalculateColumns ());
         }

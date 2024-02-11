@@ -5,8 +5,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class ListViewTests
 {
-    private readonly ITestOutputHelper _output;
     public ListViewTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void Constructors_Defaults ()
@@ -391,8 +391,8 @@ Item 6",
     }
 
     /// <summary>
-    ///     Tests that when none of the Commands in a chained keybinding are possible the <see cref="View.NewKeyDownEvent"/>
-    ///     returns the appropriate result
+    ///     Tests that when none of the Commands in a chained keybinding are possible the
+    ///     <see cref="View.NewKeyDownEvent"/> returns the appropriate result
     /// </summary>
     [Fact]
     public void ListViewProcessKeyReturnValue_WithMultipleCommands ()
@@ -574,7 +574,9 @@ Item 6",
     private class NewListDataSource : IListDataSource
     {
         public int Count => throw new NotImplementedException ();
+
         public int Length => throw new NotImplementedException ();
+
         public bool IsMarked (int item) { throw new NotImplementedException (); }
 
         public void Render (

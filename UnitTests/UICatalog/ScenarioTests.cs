@@ -5,8 +5,6 @@ namespace UICatalog.Tests;
 
 public class ScenarioTests
 {
-    private readonly ITestOutputHelper _output;
-
     public ScenarioTests (ITestOutputHelper output)
     {
 #if DEBUG_IDISPOSABLE
@@ -14,6 +12,8 @@ public class ScenarioTests
 #endif
         _output = output;
     }
+
+    private readonly ITestOutputHelper _output;
 
     /// <summary>
     ///     <para>This runs through all Scenarios defined in UI Catalog, calling Init, Setup, and Run.</para>

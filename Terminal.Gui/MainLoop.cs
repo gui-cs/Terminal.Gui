@@ -10,7 +10,7 @@ using System.Collections.ObjectModel;
 namespace Terminal.Gui;
 
 /// <summary>Interface to create a platform specific <see cref="MainLoop"/> driver.</summary>
-internal interface IMainLoopDriver
+interface IMainLoopDriver
 {
     /// <summary>Must report whether there are any events pending, or even block waiting for events.</summary>
     /// <returns><c>true</c>, if there were pending events, <c>false</c> otherwise.</returns>
@@ -33,14 +33,16 @@ internal interface IMainLoopDriver
 
 /// <summary>The MainLoop monitors timers and idle handlers.</summary>
 /// <remarks>
-///     Monitoring of file descriptors is only available on Unix, there does not seem to be a way of supporting this on Windows.
+///     Monitoring of file descriptors is only available on Unix, there does not seem to be a way of supporting this
+///     on Windows.
 /// </remarks>
-internal class MainLoop : IDisposable
+class MainLoop : IDisposable
 {
     /// <summary>Creates a new MainLoop.</summary>
     /// <remarks>Use <see cref="Dispose"/> to release resources.</remarks>
     /// <param name="driver">
-    ///     The <see cref="ConsoleDriver"/> instance (one of the implementations FakeMainLoop, UnixMainLoop, NetMainLoop or WindowsMainLoop).
+    ///     The <see cref="ConsoleDriver"/> instance (one of the implementations FakeMainLoop, UnixMainLoop,
+    ///     NetMainLoop or WindowsMainLoop).
     /// </param>
     internal MainLoop (IMainLoopDriver driver)
     {
@@ -75,7 +77,8 @@ internal class MainLoop : IDisposable
     internal bool Running { get; set; }
 
     /// <summary>
-    ///     Gets the list of all timeouts sorted by the <see cref="TimeSpan"/> time ticks. A shorter limit time can be added at the end, but it will be called before an earlier addition that has a longer limit time.
+    ///     Gets the list of all timeouts sorted by the <see cref="TimeSpan"/> time ticks. A shorter limit time can be
+    ///     added at the end, but it will be called before an earlier addition that has a longer limit time.
     /// </summary>
     internal SortedList<long, Timeout> Timeouts => _timeouts;
 
@@ -90,11 +93,15 @@ internal class MainLoop : IDisposable
     }
 
     /// <summary>
-    ///     Adds specified idle handler function to <see cref="MainLoop"/> processing. The handler function will be called once per iteration of the main loop after other events have been handled.
+    ///     Adds specified idle handler function to <see cref="MainLoop"/> processing. The handler function will be called
+    ///     once per iteration of the main loop after other events have been handled.
     /// </summary>
     /// <remarks>
     ///     <para>Remove an idle handler by calling <see cref="RemoveIdle(Func{bool})"/> with the token this method returns.</para>
-    ///     <para>If the <paramref name="idleHandler"/> returns  <see langword="false"/> it will be removed and not called subsequently.</para>
+    ///     <para>
+    ///         If the <paramref name="idleHandler"/> returns  <see langword="false"/> it will be removed and not called
+    ///         subsequently.
+    ///     </para>
     /// </remarks>
     /// <param name="idleHandler">Token that can be used to remove the idle handler with <see cref="RemoveIdle(Func{bool})"/> .</param>
     internal Func<bool> AddIdle (Func<bool> idleHandler)
@@ -111,8 +118,9 @@ internal class MainLoop : IDisposable
 
     /// <summary>Adds a timeout to the <see cref="MainLoop"/>.</summary>
     /// <remarks>
-    ///     When time specified passes, the callback will be invoked. If the callback returns true, the timeout will be reset, repeating the invocation. If it returns false, the timeout will stop and be removed. The returned value is a token that can be used to stop the timeout by calling
-    ///     <see cref="RemoveTimeout(object)"/>.
+    ///     When time specified passes, the callback will be invoked. If the callback returns true, the timeout will be
+    ///     reset, repeating the invocation. If it returns false, the timeout will stop and be removed. The returned value is a
+    ///     token that can be used to stop the timeout by calling <see cref="RemoveTimeout(object)"/>.
     /// </remarks>
     internal object AddTimeout (TimeSpan time, Func<bool> callback)
     {
@@ -127,8 +135,14 @@ internal class MainLoop : IDisposable
         return timeout;
     }
 
-    /// <summary>Called from <see cref="IMainLoopDriver.EventsPending"/> to check if there are any outstanding timers or idle handlers.</summary>
-    /// <param name="waitTimeout">Returns the number of milliseconds remaining in the current timer (if any). Will be -1 if there are no active timers.</param>
+    /// <summary>
+    ///     Called from <see cref="IMainLoopDriver.EventsPending"/> to check if there are any outstanding timers or idle
+    ///     handlers.
+    /// </summary>
+    /// <param name="waitTimeout">
+    ///     Returns the number of milliseconds remaining in the current timer (if any). Will be -1 if
+    ///     there are no active timers.
+    /// </param>
     /// <returns><see langword="true"/> if there is a timer or idle handler active.</returns>
     internal bool CheckTimersAndIdleHandlers (out int waitTimeout)
     {
@@ -168,7 +182,8 @@ internal class MainLoop : IDisposable
 
     /// <summary>Determines whether there are pending events to be processed.</summary>
     /// <remarks>
-    ///     You can use this method if you want to probe if events are pending. Typically used if you need to flush the input queue while still running some of your own code in your main thread.
+    ///     You can use this method if you want to probe if events are pending. Typically used if you need to flush the
+    ///     input queue while still running some of your own code in your main thread.
     /// </remarks>
     internal bool EventsPending () { return MainLoopDriver.EventsPending (); }
 
@@ -272,8 +287,8 @@ internal class MainLoop : IDisposable
     }
 
     /// <summary>
-    ///     Invoked when a new timeout is added. To be used in the case when <see cref="Application.EndAfterFirstIteration"/>
-    ///     is <see langword="true"/>.
+    ///     Invoked when a new timeout is added. To be used in the case when
+    ///     <see cref="Application.EndAfterFirstIteration"/> is <see langword="true"/>.
     /// </summary>
     internal event EventHandler<TimeoutEventArgs> TimeoutAdded;
 

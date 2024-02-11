@@ -28,7 +28,8 @@ public class EscSeqReqStatus
 
 // TODO: This class is a singleton. It should use the singleton pattern.
 /// <summary>
-///     Manages ANSI Escape Sequence requests and responses. The list of <see cref="EscSeqReqStatus"/> contains the status of the request. Each request is identified by the terminator (e.g. ESC[8t ... t is the terminator).
+///     Manages ANSI Escape Sequence requests and responses. The list of <see cref="EscSeqReqStatus"/> contains the
+///     status of the request. Each request is identified by the terminator (e.g. ESC[8t ... t is the terminator).
 /// </summary>
 public class EscSeqRequests
 {
@@ -89,8 +90,10 @@ public class EscSeqRequests
     }
 
     /// <summary>
-    ///     Removes a request defined by <paramref name="terminator"/>. If a matching <see cref="EscSeqReqStatus"/> is found and the number of outstanding requests is greater than 0, the number of outstanding requests is decremented. If the number of outstanding requests is 0, the
-    ///     <see cref="EscSeqReqStatus"/> is removed from <see cref="Statuses"/>.
+    ///     Removes a request defined by <paramref name="terminator"/>. If a matching <see cref="EscSeqReqStatus"/> is
+    ///     found and the number of outstanding requests is greater than 0, the number of outstanding requests is decremented.
+    ///     If the number of outstanding requests is 0, the <see cref="EscSeqReqStatus"/> is removed from
+    ///     <see cref="Statuses"/>.
     /// </summary>
     /// <param name="terminator">The terminating string.</param>
     public void Remove (string terminator)

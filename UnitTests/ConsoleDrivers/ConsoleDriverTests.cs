@@ -7,13 +7,13 @@ namespace Terminal.Gui.DriverTests;
 
 public class ConsoleDriverTests
 {
-    private readonly ITestOutputHelper _output;
-
     public ConsoleDriverTests (ITestOutputHelper output)
     {
         ConsoleDriver.RunningUnitTests = true;
         _output = output;
     }
+
+    private readonly ITestOutputHelper _output;
 
     [Theory]
     [InlineData (typeof (FakeDriver))]

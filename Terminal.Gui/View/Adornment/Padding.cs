@@ -18,7 +18,8 @@ public class Padding : Adornment
     }
 
     /// <summary>
-    ///     The color scheme for the Padding. If set to <see langword="null"/>, gets the <see cref="Adornment.Parent"/> scheme. color scheme.
+    ///     The color scheme for the Padding. If set to <see langword="null"/>, gets the <see cref="Adornment.Parent"/>
+    ///     scheme. color scheme.
     /// </summary>
     public override ColorScheme ColorScheme
     {

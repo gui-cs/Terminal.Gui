@@ -17,28 +17,28 @@ namespace Terminal.Gui;
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 {
-    private readonly Type _driverType;
-
     /// <summary>
-    ///     Initializes a [AutoInitShutdown] attribute, which determines if/how Application.Init and Application.Shutdown are automatically called Before/After a test runs.
+    ///     Initializes a [AutoInitShutdown] attribute, which determines if/how Application.Init and Application.Shutdown
+    ///     are automatically called Before/After a test runs.
     /// </summary>
     /// <param name="autoInit">If true, Application.Init will be called Before the test runs.</param>
     /// <param name="autoShutdown">If true, Application.Shutdown will be called After the test runs.</param>
     /// <param name="consoleDriverType">
-    ///     Determines which ConsoleDriver (FakeDriver, WindowsDriver, CursesDriver, NetDriver) will be used when Application.Init is called. If null FakeDriver will be used. Only valid if
+    ///     Determines which ConsoleDriver (FakeDriver, WindowsDriver, CursesDriver, NetDriver)
+    ///     will be used when Application.Init is called. If null FakeDriver will be used. Only valid if
     ///     <paramref name="autoInit"/> is true.
     /// </param>
     /// <param name="useFakeClipboard">
-    ///     If true, will force the use of <see cref="FakeDriver.FakeClipboard"/>. Only valid if <see cref="ConsoleDriver"/> ==
-    ///     <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
+    ///     If true, will force the use of <see cref="FakeDriver.FakeClipboard"/>. Only valid if
+    ///     <see cref="ConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
     /// </param>
     /// <param name="fakeClipboardAlwaysThrowsNotSupportedException">
-    ///     Only valid if <paramref name="autoInit"/> is true. Only valid if <see cref="ConsoleDriver"/> ==
-    ///     <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
+    ///     Only valid if <paramref name="autoInit"/> is true. Only
+    ///     valid if <see cref="ConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
     /// </param>
     /// <param name="fakeClipboardIsSupportedAlwaysTrue">
-    ///     Only valid if <paramref name="autoInit"/> is true. Only valid if <see cref="ConsoleDriver"/> ==
-    ///     <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
+    ///     Only valid if <paramref name="autoInit"/> is true. Only valid if
+    ///     <see cref="ConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
     /// </param>
     /// <param name="configLocation">Determines what config file locations <see cref="ConfigurationManager"/> will load from.</param>
     public AutoInitShutdownAttribute (
@@ -60,6 +60,8 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
         ConfigurationManager.Locations = configLocation;
     }
+
+    private readonly Type _driverType;
 
     private bool AutoInit { get; }
 
@@ -135,7 +137,8 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
 public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
 {
     /// <summary>
-    ///     Enables test functions annotated with the [SetupFakeDriver] attribute to set Application.Driver to new FakeDriver(). The driver is setup with 25 rows and columns.
+    ///     Enables test functions annotated with the [SetupFakeDriver] attribute to set Application.Driver to new
+    ///     FakeDriver(). The driver is setup with 25 rows and columns.
     /// </summary>
     public SetupFakeDriverAttribute () { }
 
@@ -156,8 +159,8 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class TestDateAttribute : BeforeAfterTestAttribute
 {
-    private readonly CultureInfo _currentCulture = CultureInfo.CurrentCulture;
     public TestDateAttribute () { CultureInfo.CurrentCulture = CultureInfo.InvariantCulture; }
+    private readonly CultureInfo _currentCulture = CultureInfo.CurrentCulture;
 
     public override void After (MethodInfo methodUnderTest)
     {
@@ -168,13 +171,14 @@ public class TestDateAttribute : BeforeAfterTestAttribute
     public override void Before (MethodInfo methodUnderTest) { Assert.Equal (CultureInfo.CurrentCulture, CultureInfo.InvariantCulture); }
 }
 
-internal partial class TestHelpers
+partial class TestHelpers
 {
 #pragma warning disable xUnit1013 // Public method should be marked as test
     /// <summary>
     ///     Verifies <paramref name="expectedAttributes"/> are found at the locations specified by
     ///     <paramref name="expectedLook"/>. <paramref name="expectedLook"/> is a bitmap of indexes into
-    ///     <paramref name="expectedAttributes"/> (e.g. "00110" means the attribute at <c>expectedAttributes[1]</c> is expected at the 3rd and 4th columns of the 1st row of driver.Contents).
+    ///     <paramref name="expectedAttributes"/> (e.g. "00110" means the attribute at <c>expectedAttributes[1]</c> is expected
+    ///     at the 3rd and 4th columns of the 1st row of driver.Contents).
     /// </summary>
     /// <param name="expectedLook">
     ///     Numbers between 0 and 9 for each row/col of the console.  Must be valid indexes into
@@ -300,7 +304,10 @@ internal partial class TestHelpers
         Assert.Equal (expectedLook, actualLook);
     }
 
-    /// <summary>Asserts that the driver contents are equal to the expected look, and that the cursor is at the expected position.</summary>
+    /// <summary>
+    ///     Asserts that the driver contents are equal to the expected look, and that the cursor is at the expected
+    ///     position.
+    /// </summary>
     /// <param name="expectedLook"></param>
     /// <param name="output"></param>
     /// <param name="driver">The ConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
@@ -388,7 +395,7 @@ internal partial class TestHelpers
             {
                 Rune rune = row [c];
 
-                if (rune != (Rune)' ' || row.Sum (x => x.GetColumns ()) == w)
+                if ((rune != (Rune)' ') || (row.Sum (x => x.GetColumns ()) == w))
                 {
                     break;
                 }
@@ -444,12 +451,13 @@ internal partial class TestHelpers
 
 #pragma warning disable xUnit1013 // Public method should be marked as test
     /// <summary>
-    ///     Verifies two strings are equivalent. If the assert fails, output will be generated to standard output showing the expected and actual look.
+    ///     Verifies two strings are equivalent. If the assert fails, output will be generated to standard output showing
+    ///     the expected and actual look.
     /// </summary>
     /// <param name="output"></param>
     /// <param name="expectedLook">
-    ///     A string containing the expected look. Newlines should be specified as "\r\n" as they will be converted to
-    ///     <see cref="Environment.NewLine"/> to make tests platform independent.
+    ///     A string containing the expected look. Newlines should be specified as "\r\n" as they will
+    ///     be converted to <see cref="Environment.NewLine"/> to make tests platform independent.
     /// </param>
     /// <param name="actualLook"></param>
     public static void AssertEqual (ITestOutputHelper output, string expectedLook, string actualLook)
@@ -523,7 +531,9 @@ internal partial class TestHelpers
     }
 
     /// <summary>
-    ///     Verifies the console used all the <paramref name="expectedColors"/> when rendering. If one or more of the expected colors are not used then the failure will output both the colors that were found to be used and which of your expectations was not met.
+    ///     Verifies the console used all the <paramref name="expectedColors"/> when rendering. If one or more of the
+    ///     expected colors are not used then the failure will output both the colors that were found to be used and which of
+    ///     your expectations was not met.
     /// </summary>
     /// <param name="driver">if null uses <see cref="Application.Driver"/></param>
     /// <param name="expectedColors"></param>

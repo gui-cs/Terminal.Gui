@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-internal class DefaultSearchMatcher : ISearchMatcher
+class DefaultSearchMatcher : ISearchMatcher
 {
     private string [] terms;
     public void Initialize (string terms) { this.terms = terms.Split (new [] { " " }, StringSplitOptions.RemoveEmptyEntries); }

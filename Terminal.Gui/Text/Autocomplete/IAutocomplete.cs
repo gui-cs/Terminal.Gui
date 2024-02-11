@@ -2,7 +2,10 @@
 
 namespace Terminal.Gui;
 
-/// <summary>Renders an overlay on another view at a given point that allows selecting from a range of 'autocomplete' options.</summary>
+/// <summary>
+///     Renders an overlay on another view at a given point that allows selecting from a range of 'autocomplete'
+///     options.
+/// </summary>
 public interface IAutocomplete
 {
     // TODO: Update to use Key instead of KeyCode
@@ -10,7 +13,8 @@ public interface IAutocomplete
     KeyCode CloseKey { get; set; }
 
     /// <summary>
-    ///     The colors to use to render the overlay. Accessing this property before the Application has been initialized will cause an error
+    ///     The colors to use to render the overlay. Accessing this property before the Application has been initialized
+    ///     will cause an error
     /// </summary>
     ColorScheme ColorScheme { get; set; }
 
@@ -56,13 +60,14 @@ public interface IAutocomplete
     void ClearSuggestions ();
 
     /// <summary>
-    ///     Populates <see cref="Suggestions"/> with all <see cref="Suggestion"/> proposed by <see cref="SuggestionGenerator"/>
-    ///     at the given <paramref name="context"/> (cursor position)
+    ///     Populates <see cref="Suggestions"/> with all <see cref="Suggestion"/> proposed by
+    ///     <see cref="SuggestionGenerator"/> at the given <paramref name="context"/> (cursor position)
     /// </summary>
     void GenerateSuggestions (AutocompleteContext context);
 
     /// <summary>
-    ///     Handle mouse events before <see cref="HostControl"/> e.g. to make mouse events like report/click apply to the autocomplete control instead of changing the cursor position in the underlying text view.
+    ///     Handle mouse events before <see cref="HostControl"/> e.g. to make mouse events like report/click apply to the
+    ///     autocomplete control instead of changing the cursor position in the underlying text view.
     /// </summary>
     /// <param name="me">The mouse event.</param>
     /// <param name="fromHost">If was called from the popup or from the host.</param>
@@ -70,7 +75,8 @@ public interface IAutocomplete
     bool MouseEvent (MouseEvent me, bool fromHost = false);
 
     /// <summary>
-    ///     Handle key events before <see cref="HostControl"/> e.g. to make key events like up/down apply to the autocomplete control instead of changing the cursor position in the underlying text view.
+    ///     Handle key events before <see cref="HostControl"/> e.g. to make key events like up/down apply to the
+    ///     autocomplete control instead of changing the cursor position in the underlying text view.
     /// </summary>
     /// <param name="a">The key event.</param>
     /// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>

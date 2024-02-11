@@ -2,7 +2,10 @@
 
 namespace Terminal.Gui;
 
-/// <summary>The FrameView is a container frame that draws a frame around the contents. It is similar to a GroupBox in Windows.</summary>
+/// <summary>
+///     The FrameView is a container frame that draws a frame around the contents. It is similar to a GroupBox in
+///     Windows.
+/// </summary>
 public class FrameView : View
 {
     /// <summary>
@@ -33,7 +36,7 @@ public class FrameView : View
     /// <inheritdoc/>
     public override bool OnEnter (View view)
     {
-        if (Subviews.Count == 0 || !Subviews.Any (subview => subview.CanFocus))
+        if ((Subviews.Count == 0) || !Subviews.Any (subview => subview.CanFocus))
         {
             Application.Driver?.SetCursorVisibility (CursorVisibility.Invisible);
         }

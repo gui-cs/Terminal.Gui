@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Terminal.Gui;
 
-internal class AutocompleteFilepathContext : AutocompleteContext
+class AutocompleteFilepathContext : AutocompleteContext
 {
     public AutocompleteFilepathContext (string currentLine, int cursorPosition, FileDialogState state)
         : base (TextModel.ToRuneCellList (currentLine), cursorPosition)
@@ -14,7 +14,7 @@ internal class AutocompleteFilepathContext : AutocompleteContext
     public FileDialogState State { get; set; }
 }
 
-internal class FilepathSuggestionGenerator : ISuggestionGenerator
+class FilepathSuggestionGenerator : ISuggestionGenerator
 {
     private FileDialogState state;
 
@@ -75,7 +75,7 @@ internal class FilepathSuggestionGenerator : ISuggestionGenerator
                                      .ToArray ();
 
         // nothing to suggest
-        if (validSuggestions.Length == 0 || validSuggestions [0].Length == term.Length)
+        if ((validSuggestions.Length == 0) || (validSuggestions [0].Length == term.Length))
         {
             return Enumerable.Empty<Suggestion> ();
         }

@@ -26,7 +26,8 @@ public class CellToggledEventArgs : EventArgs
     public int Row { get; }
 
     /// <summary>
-    ///     The current table to which the new indexes refer.  May be null e.g. if selection change is the result of clearing the table from the view
+    ///     The current table to which the new indexes refer.  May be null e.g. if selection change is the result of
+    ///     clearing the table from the view
     /// </summary>
     /// <value></value>
     public ITableSource Table { get; }

@@ -7,7 +7,8 @@ namespace Terminal.Gui;
 /// <remarks></remarks>
 /// <example>
 ///     <para>
-///         Use the <see cref="SerializableConfigurationProperty"/> attribute to mark properties that should be serialized as part of application-defined configuration settings.
+///         Use the <see cref="SerializableConfigurationProperty"/> attribute to mark properties that should be
+///         serialized as part of application-defined configuration settings.
 ///     </para>
 ///     <code>
 ///  public class MyAppSettings {

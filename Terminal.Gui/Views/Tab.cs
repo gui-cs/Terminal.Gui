@@ -14,11 +14,7 @@ public class Tab : View
 
     /// <summary>The text to display in a <see cref="TabView"/>.</summary>
     /// <value></value>
-    public string DisplayText
-    {
-        get => _displayText ?? "Unamed";
-        set => _displayText = value;
-    }
+    public string DisplayText { get => _displayText ?? "Unamed"; set => _displayText = value; }
 
     /// <summary>The control to display when the tab is selected.</summary>
     /// <value></value>

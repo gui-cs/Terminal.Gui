@@ -462,7 +462,7 @@ public class TreeViewFileSystem : Scenario
             int? location = _treeViewFiles.GetObjectRow (selected);
 
             //selected object is offscreen or somehow not found
-            if (location == null || location < 0 || location > _treeViewFiles.Frame.Height)
+            if ((location == null) || (location < 0) || (location > _treeViewFiles.Frame.Height))
             {
                 return;
             }
@@ -512,9 +512,6 @@ public class TreeViewFileSystem : Scenario
 
     private class DetailsFrame : FrameView
     {
-        private readonly FileSystemIconProvider _iconProvider;
-        private IFileSystemInfo _fileInfo;
-
         public DetailsFrame (FileSystemIconProvider iconProvider)
         {
             Title = "Details";
@@ -522,6 +519,9 @@ public class TreeViewFileSystem : Scenario
             CanFocus = true;
             _iconProvider = iconProvider;
         }
+
+        private readonly FileSystemIconProvider _iconProvider;
+        private IFileSystemInfo _fileInfo;
 
         public IFileSystemInfo FileInfo
         {

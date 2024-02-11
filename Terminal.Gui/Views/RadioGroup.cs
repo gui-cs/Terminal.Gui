@@ -103,15 +103,11 @@ public class RadioGroup : View
     ///     Gets or sets the <see cref="Orientation"/> for this <see cref="RadioGroup"/>. The default is
     ///     <see cref="Orientation.Vertical"/>.
     /// </summary>
-    public Orientation Orientation
-    {
-        get => _orientation;
-        set => OnOrientationChanged (value);
-    }
+    public Orientation Orientation { get => _orientation; set => OnOrientationChanged (value); }
 
     /// <summary>
-    ///     The radio labels to display. A key binding will be added for each radio radio enabling the user to select and/or focus the radio label using the keyboard. See
-    ///     <see cref="View.HotKey"/> for details on how HotKeys work.
+    ///     The radio labels to display. A key binding will be added for each radio radio enabling the user to select
+    ///     and/or focus the radio label using the keyboard. See <see cref="View.HotKey"/> for details on how HotKeys work.
     /// </summary>
     /// <value>The radio labels.</value>
     public string [] RadioLabels
@@ -353,8 +349,8 @@ public class RadioGroup : View
     }
 
     /// <summary>
-    ///     Fired when the view orientation has changed. Can be cancelled by setting <see cref="OrientationEventArgs.Cancel"/>
-    ///     to true.
+    ///     Fired when the view orientation has changed. Can be cancelled by setting
+    ///     <see cref="OrientationEventArgs.Cancel"/> to true.
     /// </summary>
     public event EventHandler<OrientationEventArgs> OrientationChanged;
 

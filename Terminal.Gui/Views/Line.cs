@@ -7,7 +7,8 @@ public class Line : View
     public Line () { }
 
     /// <summary>
-    ///     The direction of the line.  If you change this you will need to manually update the Width/Height of the control to cover a relevant area based on the new direction.
+    ///     The direction of the line.  If you change this you will need to manually update the Width/Height of the
+    ///     control to cover a relevant area based on the new direction.
     /// </summary>
     public Orientation Orientation { get; set; }
 

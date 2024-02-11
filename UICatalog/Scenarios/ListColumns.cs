@@ -29,7 +29,8 @@ public class ListColumns : Scenario
     private MenuItem _miTopline;
 
     /// <summary>
-    ///     Builds a simple list in which values are the index.  This helps testing that scrolling etc is working correctly and not skipping out values when paging
+    ///     Builds a simple list in which values are the index.  This helps testing that scrolling etc is working
+    ///     correctly and not skipping out values when paging
     /// </summary>
     /// <param name="items"></param>
     /// <returns></returns>

@@ -128,11 +128,7 @@ namespace Terminal.Gui
             public event EventHandler<TextChangedEventArgs> TextChanged;
 
             /// <inheritdoc/>
-            public string Text
-            {
-                get => _provider.ToString ();
-                set => _provider.Set (value);
-            }
+            public string Text { get => _provider.ToString (); set => _provider.Set (value); }
 
             /// <inheritdoc/>
             public bool IsValid => _provider.MaskCompleted;
@@ -345,7 +341,7 @@ namespace Terminal.Gui
                 List<Rune> aux = _text.ToList ();
                 aux.Insert (pos, (Rune)ch);
 
-                if (Validate (aux) || ValidateOnInput == false)
+                if (Validate (aux) || (ValidateOnInput == false))
                 {
                     string oldValue = Text;
                     _text.Insert (pos, (Rune)ch);
@@ -388,8 +384,8 @@ namespace Terminal.Gui
     public class TextValidateField : View
     {
         /// <summary>
-        ///     Initializes a new instance of the <see cref="TextValidateField"/> class using <see cref="LayoutStyle.Computed"/>
-        ///     positioning.
+        ///     Initializes a new instance of the <see cref="TextValidateField"/> class using
+        ///     <see cref="LayoutStyle.Computed"/> positioning.
         /// </summary>
         public TextValidateField ()
         {
@@ -660,7 +656,7 @@ namespace Terminal.Gui
                 Move (curPos, 0);
             }
 
-            if (curPos < 0 || curPos >= Bounds.Width)
+            if ((curPos < 0) || (curPos >= Bounds.Width))
             {
                 Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
             }

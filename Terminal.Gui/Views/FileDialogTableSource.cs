@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui;
 
-internal class FileDialogTableSource : ITableSource
+class FileDialogTableSource : ITableSource
 {
     public FileDialogTableSource (
         FileDialog dlg,
@@ -23,7 +23,9 @@ internal class FileDialogTableSource : ITableSource
     private readonly FileDialogState state;
     private readonly FileDialogStyle style;
     public object this [int row, int col] => GetColumnValue (col, state.Children [row]);
+
     public int Rows => state.Children.Count ();
+
     public int Columns => 4;
 
     public string [] ColumnNames => new []
@@ -64,7 +66,7 @@ internal class FileDialogTableSource : ITableSource
             case 1:
                 return stats?.HumanReadableLength ?? string.Empty;
             case 2:
-                if (stats == null || stats.IsParent || stats.LastWriteTime == null)
+                if ((stats == null) || stats.IsParent || (stats.LastWriteTime == null))
                 {
                     return string.Empty;
                 }

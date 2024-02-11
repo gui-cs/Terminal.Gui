@@ -4,11 +4,14 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
-/// <summary>Tests of the <see cref="View.Text"/> and <see cref="View.TextFormatter"/> properties (independent of AutoSize).</summary>
+/// <summary>
+///     Tests of the <see cref="View.Text"/> and <see cref="View.TextFormatter"/> properties (independent of
+///     AutoSize).
+/// </summary>
 public class TextTests
 {
-    private readonly ITestOutputHelper _output;
     public TextTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     // Test that View.PreserveTrailingSpaces removes trailing spaces
     [Fact]

@@ -8,8 +8,8 @@ namespace Terminal.Gui.ViewsTests;
 public class TextFieldTests
 {
     private static TextField _textField;
-    private readonly ITestOutputHelper _output;
     public TextFieldTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     [AutoInitShutdown]

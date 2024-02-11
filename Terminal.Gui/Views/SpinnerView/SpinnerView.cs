@@ -38,7 +38,10 @@ public class SpinnerView : View
     private SpinnerStyle _style = DEFAULT_STYLE;
     private object _timeout;
 
-    /// <summary>Gets or sets whether spinning should occur automatically or be manually triggered (e.g. from a background task).</summary>
+    /// <summary>
+    ///     Gets or sets whether spinning should occur automatically or be manually triggered (e.g. from a background
+    ///     task).
+    /// </summary>
     public bool AutoSpin
     {
         get => _timeout != null;
@@ -55,54 +58,43 @@ public class SpinnerView : View
         }
     }
 
-    /// <summary>Gets whether the current spinner style contains emoji or other special characters. Does not check Custom sequences.</summary>
+    /// <summary>
+    ///     Gets whether the current spinner style contains emoji or other special characters. Does not check Custom
+    ///     sequences.
+    /// </summary>
     public bool HasSpecialCharacters => _style.HasSpecialCharacters;
 
     /// <summary>Gets whether the current spinner style contains only ASCII characters.  Also checks Custom sequences.</summary>
     public bool IsAsciiOnly => GetIsAsciiOnly ();
 
     /// <summary>Gets or sets the animation frames used to animate the spinner.</summary>
-    public string [] Sequence
-    {
-        get => _sequence;
-        set => SetSequence (value);
-    }
+    public string [] Sequence { get => _sequence; set => SetSequence (value); }
 
     /// <summary>
-    ///     Gets or sets whether spinner should go back and forth through the frames rather than going to the end and starting again at the beginning.
+    ///     Gets or sets whether spinner should go back and forth through the frames rather than going to the end and
+    ///     starting again at the beginning.
     /// </summary>
-    public bool SpinBounce
-    {
-        get => _bounce;
-        set => SetBounce (value);
-    }
+    public bool SpinBounce { get => _bounce; set => SetBounce (value); }
 
     /// <summary>Gets or sets the number of milliseconds to wait between characters in the animation.</summary>
     /// <remarks>
     ///     This is the maximum speed the spinner will rotate at.  You still need to call
     ///     <see cref="SpinnerView.AdvanceAnimation()"/> or <see cref="SpinnerView.AutoSpin"/> to advance/start animation.
     /// </remarks>
-    public int SpinDelay
-    {
-        get => _delay;
-        set => SetDelay (value);
-    }
+    public int SpinDelay { get => _delay; set => SetDelay (value); }
 
     /// <summary>
-    ///     Gets or sets whether spinner should go through the frames in reverse order. If SpinBounce is true, this sets the starting order.
+    ///     Gets or sets whether spinner should go through the frames in reverse order. If SpinBounce is true, this sets
+    ///     the starting order.
     /// </summary>
     public bool SpinReverse { get; set; }
 
     /// <summary>Gets or sets the Style used to animate the spinner.</summary>
-    public SpinnerStyle Style
-    {
-        get => _style;
-        set => SetStyle (value);
-    }
+    public SpinnerStyle Style { get => _style; set => SetStyle (value); }
 
     /// <summary>
-    ///     Advances the animation frame and notifies main loop that repainting needs to happen. Repeated calls are ignored based on
-    ///     <see cref="SpinDelay"/>.
+    ///     Advances the animation frame and notifies main loop that repainting needs to happen. Repeated calls are
+    ///     ignored based on <see cref="SpinDelay"/>.
     /// </summary>
     /// <remarks>Ensure this method is called on the main UI thread e.g. via <see cref="Application.Invoke"/></remarks>
     public void AdvanceAnimation ()

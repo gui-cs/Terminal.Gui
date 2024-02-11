@@ -6,6 +6,7 @@ namespace Terminal.Gui.ViewTests;
 /// <summary>Tests of the  <see cref="View.AutoSize"/> property which auto sizes Views based on <see cref="Text"/>.</summary>
 public class AutoSizeTrueTests
 {
+    public AutoSizeTrueTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
 
     private readonly string [] expecteds = new string[21]
@@ -326,8 +327,6 @@ public class AutoSizeTrueTests
 │Label 19            │
 └────────────────────┘"
     };
-
-    public AutoSizeTrueTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [AutoInitShutdown]

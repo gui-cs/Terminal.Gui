@@ -5,7 +5,8 @@ namespace Terminal.Gui;
 
 /// <summary>Attributes represent how text is styled when displayed in the terminal.</summary>
 /// <remarks>
-///     <see cref="Attribute"/> provides a platform independent representation of colors (and someday other forms of text styling). They encode both the foreground and the background color and are used in the
+///     <see cref="Attribute"/> provides a platform independent representation of colors (and someday other forms of
+///     text styling). They encode both the foreground and the background color and are used in the
 ///     <see cref="ColorScheme"/> class to define color schemes that can be used in an application.
 /// </remarks>
 [JsonConverter (typeof (AttributeJsonConverter))]
@@ -109,7 +110,8 @@ public readonly struct Attribute : IEquatable<Attribute>
     public Attribute (Color foreground, ColorName backgroundName) : this (foreground, new Color (backgroundName)) { }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Attribute"/> struct with the same colors for the foreground and background.
+    ///     Initializes a new instance of the <see cref="Attribute"/> struct with the same colors for the foreground and
+    ///     background.
     /// </summary>
     /// <param name="color">The color.</param>
     public Attribute (Color color) : this (color, color) { }

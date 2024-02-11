@@ -49,8 +49,8 @@ public class CheckBox : View
     private bool? _checked = false;
 
     /// <summary>
-    ///     If <see langword="true"/> allows <see cref="Checked"/> to be null, true or false. If <see langword="false"/> only allows
-    ///     <see cref="Checked"/> to be true or false.
+    ///     If <see langword="true"/> allows <see cref="Checked"/> to be null, true or false. If <see langword="false"/>
+    ///     only allows <see cref="Checked"/> to be true or false.
     /// </summary>
     public bool AllowNullChecked
     {
@@ -145,8 +145,8 @@ public class CheckBox : View
 
     /// <summary>Toggled event, raised when the <see cref="CheckBox"/>  is toggled.</summary>
     /// <remarks>
-    ///     Client code can hook up to this event, it is raised when the <see cref="CheckBox"/> is activated either with the mouse or the keyboard. The passed
-    ///     <c>bool</c> contains the previous state.
+    ///     Client code can hook up to this event, it is raised when the <see cref="CheckBox"/> is activated either with
+    ///     the mouse or the keyboard. The passed <c>bool</c> contains the previous state.
     /// </remarks>
     public event EventHandler<ToggleEventArgs> Toggled;
 
@@ -180,7 +180,7 @@ public class CheckBox : View
 
     private string GetFormatterText ()
     {
-        if (AutoSize || string.IsNullOrEmpty (Text) || Frame.Width <= 2)
+        if (AutoSize || string.IsNullOrEmpty (Text) || (Frame.Width <= 2))
         {
             return Text;
         }

@@ -135,7 +135,8 @@ public class TabView : View
     private int _tabScrollOffset;
 
     /// <summary>
-    ///     The maximum number of characters to render in a Tab header.  This prevents one long tab from pushing out all the others.
+    ///     The maximum number of characters to render in a Tab header.  This prevents one long tab from pushing out all
+    ///     the others.
     /// </summary>
     public uint MaxTabTextWidth { get; set; } = DefaultMaxTabTextWidth;
 
@@ -194,11 +195,7 @@ public class TabView : View
 
     /// <summary>When there are too many tabs to render, this indicates the first tab to render on the screen.</summary>
     /// <value></value>
-    public int TabScrollOffset
-    {
-        get => _tabScrollOffset;
-        set => _tabScrollOffset = EnsureValidScrollOffsets (value);
-    }
+    public int TabScrollOffset { get => _tabScrollOffset; set => _tabScrollOffset = EnsureValidScrollOffsets (value); }
 
     /// <summary>Adds the given <paramref name="tab"/> to <see cref="Tabs"/>.</summary>
     /// <param name="tab"></param>
@@ -213,7 +210,7 @@ public class TabView : View
         _tabs.Add (tab);
         _tabsBar.Add (tab);
 
-        if (SelectedTab == null || andSelect)
+        if ((SelectedTab == null) || andSelect)
         {
             SelectedTab = tab;
 
@@ -226,7 +223,8 @@ public class TabView : View
     }
 
     /// <summary>
-    ///     Updates the control to use the latest state settings in <see cref="Style"/>. This can change the size of the client area of the tab (for rendering the selected tab's content).  This method includes a call to
+    ///     Updates the control to use the latest state settings in <see cref="Style"/>. This can change the size of the
+    ///     client area of the tab (for rendering the selected tab's content).  This method includes a call to
     ///     <see cref="View.SetNeedsDisplay()"/>.
     /// </summary>
     public void ApplyStyleChanges ()
@@ -289,7 +287,7 @@ public class TabView : View
     /// <summary>Updates <see cref="TabScrollOffset"/> to ensure that <see cref="SelectedTab"/> is visible.</summary>
     public void EnsureSelectedTabIsVisible ()
     {
-        if (!IsInitialized || SelectedTab == null)
+        if (!IsInitialized || (SelectedTab == null))
         {
             return;
         }
@@ -327,13 +325,13 @@ public class TabView : View
     public override void OnDrawContentComplete (Rect contentArea) { _tabsBar.OnDrawContentComplete (contentArea); }
 
     /// <summary>
-    ///     Removes the given <paramref name="tab"/> from <see cref="Tabs"/>. Caller is responsible for disposing the tab's hosted
-    ///     <see cref="Tab.View"/> if appropriate.
+    ///     Removes the given <paramref name="tab"/> from <see cref="Tabs"/>. Caller is responsible for disposing the
+    ///     tab's hosted <see cref="Tab.View"/> if appropriate.
     /// </summary>
     /// <param name="tab"></param>
     public void RemoveTab (Tab tab)
     {
-        if (tab == null || !_tabs.Contains (tab))
+        if ((tab == null) || !_tabs.Contains (tab))
         {
             return;
         }
@@ -344,7 +342,7 @@ public class TabView : View
         _tabs.Remove (tab);
 
         // if the currently selected tab is no longer a member of Tabs
-        if (SelectedTab == null || !Tabs.Contains (SelectedTab))
+        if ((SelectedTab == null) || !Tabs.Contains (SelectedTab))
         {
             // select the tab closest to the one that disappeared
             int toSelect = Math.Max (idx - 1, 0);
@@ -367,7 +365,8 @@ public class TabView : View
     public event EventHandler<TabChangedEventArgs> SelectedTabChanged;
 
     /// <summary>
-    ///     Changes the <see cref="SelectedTab"/> by the given <paramref name="amount"/>. Positive for right, negative for left.  If no tab is currently selected then the first tab will become selected.
+    ///     Changes the <see cref="SelectedTab"/> by the given <paramref name="amount"/>. Positive for right, negative for
+    ///     left.  If no tab is currently selected then the first tab will become selected.
     /// </summary>
     /// <param name="amount"></param>
     public void SwitchTabBy (int amount)
@@ -378,7 +377,7 @@ public class TabView : View
         }
 
         // if there is only one tab anyway or nothing is selected
-        if (Tabs.Count == 1 || SelectedTab == null)
+        if ((Tabs.Count == 1) || (SelectedTab == null))
         {
             SelectedTab = Tabs.ElementAt (0);
             SetNeedsDisplay ();
@@ -406,7 +405,8 @@ public class TabView : View
     }
 
     /// <summary>
-    ///     Event fired when a <see cref="Tab"/> is clicked.  Can be used to cancel navigation, show context menu (e.g. on right click) etc.
+    ///     Event fired when a <see cref="Tab"/> is clicked.  Can be used to cancel navigation, show context menu (e.g. on
+    ///     right click) etc.
     /// </summary>
     public event EventHandler<TabMouseEventArgs> TabClicked;
 
@@ -508,8 +508,8 @@ public class TabView : View
     }
 
     /// <summary>
-    ///     Returns the number of rows occupied by rendering the tabs, this depends on <see cref="TabStyle.ShowTopLine"/> and can be 0 (e.g. if
-    ///     <see cref="TabStyle.TabsOnBottom"/> and you ask for <paramref name="top"/>).
+    ///     Returns the number of rows occupied by rendering the tabs, this depends on <see cref="TabStyle.ShowTopLine"/>
+    ///     and can be 0 (e.g. if <see cref="TabStyle.TabsOnBottom"/> and you ask for <paramref name="top"/>).
     /// </summary>
     /// <param name="top">True to measure the space required at the top of the control, false to measure space at the bottom.</param>
     /// .
@@ -547,7 +547,7 @@ public class TabView : View
 
     /// <summary>Raises the <see cref="TabClicked"/> event.</summary>
     /// <param name="tabMouseEventArgs"></param>
-    private protected virtual void OnTabClicked (TabMouseEventArgs tabMouseEventArgs) { TabClicked?.Invoke (this, tabMouseEventArgs); }
+    protected private virtual void OnTabClicked (TabMouseEventArgs tabMouseEventArgs) { TabClicked?.Invoke (this, tabMouseEventArgs); }
 
     private class TabRowView : View
     {
@@ -1391,8 +1391,11 @@ public class TabView : View
         public bool IsSelected { get; }
 
         public Tab Tab { get; }
+
         public string TextToRender { get; }
+
         public int Width { get; }
+
         public int X { get; set; }
     }
 }

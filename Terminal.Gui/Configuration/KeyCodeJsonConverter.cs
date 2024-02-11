@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
-internal class KeyCodeJsonConverter : JsonConverter<KeyCode>
+class KeyCodeJsonConverter : JsonConverter<KeyCode>
 {
     public override KeyCode Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {

@@ -4,8 +4,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class LabelTests
 {
-    private readonly ITestOutputHelper _output;
     public LabelTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     [AutoInitShutdown]

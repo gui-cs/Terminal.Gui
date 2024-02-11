@@ -112,7 +112,7 @@ public class Wizards : Scenario
                                             var height = 0;
                                             int.TryParse (heightEdit.Text, out height);
 
-                                            if (width < 1 || height < 1)
+                                            if ((width < 1) || (height < 1))
                                             {
                                                 MessageBox.ErrorQuery (
                                                                        "Nope",

@@ -23,8 +23,8 @@ public class FileDialogStyle
     public string CancelButtonText { get; set; } = Strings.btnCancel;
 
     /// <summary>
-    ///     Gets or sets the class thatis responsible for determining which color to use to represent files and directories when
-    ///     <see cref="UseColors"/> is <see langword="true"/>.
+    ///     Gets or sets the class thatis responsible for determining which color to use to represent files and
+    ///     directories when <see cref="UseColors"/> is <see langword="true"/>.
     /// </summary>
     public FileSystemColorProvider ColorProvider { get; set; } = new ();
 
@@ -41,21 +41,22 @@ public class FileDialogStyle
     public string DateFormat { get; set; }
 
     /// <summary>
-    ///     Gets or sets the default value to use for <see cref="UseColors"/>. This can be populated from .tui config files via
-    ///     <see cref="ConfigurationManager"/>
+    ///     Gets or sets the default value to use for <see cref="UseColors"/>. This can be populated from .tui config
+    ///     files via <see cref="ConfigurationManager"/>
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool DefaultUseColors { get; set; }
 
     /// <summary>
-    ///     Gets or sets the default value to use for <see cref="UseUnicodeCharacters"/>. This can be populated from .tui config files via
-    ///     <see cref="ConfigurationManager"/>
+    ///     Gets or sets the default value to use for <see cref="UseUnicodeCharacters"/>. This can be populated from .tui
+    ///     config files via <see cref="ConfigurationManager"/>
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool DefaultUseUnicodeCharacters { get; set; }
 
     /// <summary>
-    ///     Gets or sets error message when user <see cref="OpenMode"/> is <see cref="OpenMode.File"/> and user enters the name of an existing directory (File system cannot have a folder with the same name as a file).
+    ///     Gets or sets error message when user <see cref="OpenMode"/> is <see cref="OpenMode.File"/> and user enters the
+    ///     name of an existing directory (File system cannot have a folder with the same name as a file).
     /// </summary>
     public string DirectoryAlreadyExistsFeedback { get; set; } = Strings.fdDirectoryAlreadyExistsFeedback;
 
@@ -66,7 +67,8 @@ public class FileDialogStyle
     public string DirectoryMustExistFeedback { get; set; } = Strings.fdDirectoryMustExistFeedback;
 
     /// <summary>
-    ///     Gets or sets error message when user <see cref="OpenMode"/> is <see cref="OpenMode.Directory"/> and user enters the name of an existing file (File system cannot have a folder with the same name as a file).
+    ///     Gets or sets error message when user <see cref="OpenMode"/> is <see cref="OpenMode.Directory"/> and user
+    ///     enters the name of an existing file (File system cannot have a folder with the same name as a file).
     /// </summary>
     public string FileAlreadyExistsFeedback { get; set; } = Strings.fdFileAlreadyExistsFeedback;
 
@@ -86,7 +88,8 @@ public class FileDialogStyle
     public string FileOrDirectoryMustExistFeedback { get; set; } = Strings.fdFileOrDirectoryMustExistFeedback;
 
     /// <summary>
-    ///     Gets or sets whether to flip the order of the Ok and Cancel buttons. Defaults to false (Ok button then Cancel button). Set to true to show Cancel button on left then Ok button instead.
+    ///     Gets or sets whether to flip the order of the Ok and Cancel buttons. Defaults to false (Ok button then Cancel
+    ///     button). Set to true to show Cancel button on left then Ok button instead.
     /// </summary>
     public bool FlipOkCancelButtonLayoutOrder { get; set; }
 
@@ -126,7 +129,8 @@ public class FileDialogStyle
     public string TypeColumnName { get; set; } = Strings.fdType;
 
     /// <summary>
-    ///     Gets or Sets a value indicating whether different colors should be used for different file types/directories. Defaults to false.
+    ///     Gets or Sets a value indicating whether different colors should be used for different file types/directories.
+    ///     Defaults to false.
     /// </summary>
     public bool UseColors { get; set; } = DefaultUseColors;
 

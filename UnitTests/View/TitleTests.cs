@@ -8,8 +8,8 @@ namespace Terminal.Gui.ViewTests;
 
 public class TitleTests
 {
-    private readonly ITestOutputHelper output;
     public TitleTests (ITestOutputHelper output) { this.output = output; }
+    private readonly ITestOutputHelper output;
 
     [Fact]
     public void Set_Title_Fires_TitleChanged ()

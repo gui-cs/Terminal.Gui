@@ -5,8 +5,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class RuneCellTests
 {
-    private readonly ITestOutputHelper _output;
     public RuneCellTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void Constructor_Defaults ()

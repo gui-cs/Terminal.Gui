@@ -2,7 +2,7 @@ using System.Collections.Frozen;
 
 namespace Terminal.Gui;
 
-internal static class ColorExtensions
+static class ColorExtensions
 {
     private static FrozenDictionary<Color, ColorName> colorToNameMap;
 
@@ -59,11 +59,12 @@ internal static class ColorExtensions
     internal static FrozenDictionary<ColorName, Color> ColorNameToColorMap { get; private set; }
 
     /// <summary>
-    ///     Gets or sets a <see cref="FrozenDictionary{TKey,TValue}"/> that maps legacy 16-color values to the corresponding
-    ///     <see cref="ColorName"/>.
+    ///     Gets or sets a <see cref="FrozenDictionary{TKey,TValue}"/> that maps legacy 16-color values to the
+    ///     corresponding <see cref="ColorName"/>.
     /// </summary>
     /// <remarks>
-    ///     Setter should be called as infrequently as possible, as <see cref="FrozenDictionary{TKey,TValue}"/> is expensive to create.
+    ///     Setter should be called as infrequently as possible, as <see cref="FrozenDictionary{TKey,TValue}"/> is
+    ///     expensive to create.
     /// </remarks>
     internal static FrozenDictionary<Color, ColorName> ColorToNameMap
     {

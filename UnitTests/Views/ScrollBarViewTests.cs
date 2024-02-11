@@ -6,10 +6,10 @@ namespace Terminal.Gui.ViewsTests;
 public class ScrollBarViewTests
 {
     private static HostView _hostView;
+    public ScrollBarViewTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
     private bool _added;
     private ScrollBarView _scrollBar;
-    public ScrollBarViewTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [ScrollBarAutoInitShutdown]
@@ -1314,8 +1314,11 @@ This is a test             ",
     public class HostView : View
     {
         public int Cols { get; set; }
+
         public int Left { get; set; }
+
         public int Lines { get; set; }
+
         public int Top { get; set; }
     }
 

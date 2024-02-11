@@ -3,7 +3,8 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     Abstract implementation of <see cref="IAutocomplete"/> allows for tailoring how autocomplete is rendered/interacted with.
+///     Abstract implementation of <see cref="IAutocomplete"/> allows for tailoring how autocomplete is
+///     rendered/interacted with.
 /// </summary>
 public abstract class AutocompleteBase : IAutocomplete
 {

@@ -5,11 +5,11 @@ namespace Terminal.Gui.ViewsTests;
 
 public class ViewDisposalTest
 {
+    public ViewDisposalTest (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
 #nullable enable
     private readonly Dictionary<Type, object? []?> _special_params = new ();
 #nullable restore
-    public ViewDisposalTest (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [AutoInitShutdown]

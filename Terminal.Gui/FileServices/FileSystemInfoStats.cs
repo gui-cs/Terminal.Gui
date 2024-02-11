@@ -5,9 +5,10 @@ using Terminal.Gui.Resources;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Wrapper for <see cref="FileSystemInfo"/> that contains additional information (e.g. <see cref="IsParent"/>) and helper methods.
+///     Wrapper for <see cref="FileSystemInfo"/> that contains additional information (e.g. <see cref="IsParent"/>)
+///     and helper methods.
 /// </summary>
-internal class FileSystemInfoStats
+class FileSystemInfoStats
 {
     /* ---- Colors used by the ls command line tool ----
      *
@@ -60,14 +61,18 @@ internal class FileSystemInfoStats
     public IFileSystemInfo FileSystemInfo { get; }
 
     public string HumanReadableLength { get; }
+
     public bool IsDir { get; }
 
     /// <summary>Gets or Sets a value indicating whether this instance represents the parent of the current state (i.e. "..").</summary>
     public bool IsParent { get; internal set; }
 
     public DateTime? LastWriteTime { get; }
+
     public long MachineReadableLength { get; }
+
     public string Name => IsParent ? ".." : FileSystemInfo.Name;
+
     public string Type { get; }
 
     public bool IsExecutable ()

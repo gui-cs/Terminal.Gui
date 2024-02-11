@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui;
 
-internal static class ReadOnlyCollectionExtensions
+static class ReadOnlyCollectionExtensions
 {
     public static int IndexOf<T> (this IReadOnlyCollection<T> self, Func<T, bool> predicate)
     {

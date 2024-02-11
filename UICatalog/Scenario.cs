@@ -18,25 +18,34 @@ namespace UICatalog;
 ///             </item>
 ///             <item>
 ///                 <description>
-///                     Annotate the <see cref="Scenario"/> derived class with a <see cref="Scenario.ScenarioMetadata"/>
-///                     attribute specifying the scenario's name and description.
+///                     Annotate the <see cref="Scenario"/> derived class with a
+///                     <see cref="Scenario.ScenarioMetadata"/> attribute specifying the scenario's name and description.
 ///                 </description>
 ///             </item>
 ///             <item>
 ///                 <description>
-///                     Add one or more <see cref="Scenario.ScenarioCategory"/> attributes to the class specifying which categories the scenario belongs to. If you don't specify a category the scenario will show up in "_All".
+///                     Add one or more <see cref="Scenario.ScenarioCategory"/> attributes to the class specifying
+///                     which categories the scenario belongs to. If you don't specify a category the scenario will show up
+///                     in "_All".
 ///                 </description>
 ///             </item>
 ///             <item>
-///                 <description>Implement the <see cref="Setup"/> override which will be called when a user selects the scenario to run.</description>
+///                 <description>
+///                     Implement the <see cref="Setup"/> override which will be called when a user selects the
+///                     scenario to run.
+///                 </description>
 ///             </item>
 ///             <item>
-///                 <description>Optionally, implement the <see cref="Init()"/> and/or <see cref="Run"/> overrides to provide a custom implementation.</description>
+///                 <description>
+///                     Optionally, implement the <see cref="Init()"/> and/or <see cref="Run"/> overrides to
+///                     provide a custom implementation.
+///                 </description>
 ///             </item>
 ///         </list>
 ///     </para>
 ///     <para>
-///         The UI Catalog program uses reflection to find all scenarios and adds them to the ListViews. Press ENTER to run the selected scenario. Press the default quit key to quit.	/
+///         The UI Catalog program uses reflection to find all scenarios and adds them to the ListViews. Press ENTER to
+///         run the selected scenario. Press the default quit key to quit.	/
 ///     </para>
 /// </summary>
 /// <example>
@@ -69,7 +78,8 @@ public class Scenario : IDisposable
     public string TopLevelColorScheme = "Base";
 
     /// <summary>
-    ///     The Window for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/> in most cases.
+    ///     The Window for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/> in
+    ///     most cases.
     /// </summary>
     public Window Win { get; set; }
 
@@ -97,7 +107,8 @@ public class Scenario : IDisposable
 
     /// <summary>
     ///     Returns a list of all <see cref="Scenario"/> instanaces defined in the project, sorted by
-    ///     <see cref="ScenarioMetadata.Name"/>. https://stackoverflow.com/questions/5411694/get-all-inherited-classes-of-an-abstract-class
+    ///     <see cref="ScenarioMetadata.Name"/>.
+    ///     https://stackoverflow.com/questions/5411694/get-all-inherited-classes-of-an-abstract-class
     /// </summary>
     public static List<Scenario> GetScenarios ()
     {
@@ -119,9 +130,9 @@ public class Scenario : IDisposable
     }
 
     /// <summary>
-    ///     Helper that provides the default <see cref="Terminal.Gui.Window"/> implementation with a frame and label showing the name of the
-    ///     <see cref="Scenario"/> and logic to exit back to the Scenario picker UI. Override <see cref="Init"/> to provide any
-    ///     <see cref="Terminal.Gui.Toplevel"/> behavior needed.
+    ///     Helper that provides the default <see cref="Terminal.Gui.Window"/> implementation with a frame and label
+    ///     showing the name of the <see cref="Scenario"/> and logic to exit back to the Scenario picker UI. Override
+    ///     <see cref="Init"/> to provide any <see cref="Terminal.Gui.Toplevel"/> behavior needed.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -129,7 +140,8 @@ public class Scenario : IDisposable
     ///         <see cref="Win"/> and adds it to <see cref="Application.Top"/>.
     ///     </para>
     ///     <para>
-    ///         Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Init"/> before creating any views or calling other Terminal.Gui APIs.
+    ///         Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Init"/> before
+    ///         creating any views or calling other Terminal.Gui APIs.
     ///     </para>
     /// </remarks>
     public virtual void Init ()
@@ -158,7 +170,10 @@ public class Scenario : IDisposable
     ///     Runs the <see cref="Scenario"/>. Override to start the <see cref="Scenario"/> using a <see cref="Toplevel"/>
     ///     different than `Top`.
     /// </summary>
-    /// <remarks>Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Shutdown"/> before returning.</remarks>
+    /// <remarks>
+    ///     Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Shutdown"/> before
+    ///     returning.
+    /// </remarks>
     public virtual void Run ()
     {
         // Must explicit call Application.Shutdown method to shutdown.

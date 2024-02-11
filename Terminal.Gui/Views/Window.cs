@@ -8,8 +8,8 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         If any subview is a button and the <see cref="Button.IsDefault"/> property is set to true, the Enter key will invoke the
-///         <see cref="Command.Accept"/> command on that subview.
+///         If any subview is a button and the <see cref="Button.IsDefault"/> property is set to true, the Enter key will
+///         invoke the <see cref="Command.Accept"/> command on that subview.
 ///     </para>
 /// </remarks>
 public class Window : Toplevel

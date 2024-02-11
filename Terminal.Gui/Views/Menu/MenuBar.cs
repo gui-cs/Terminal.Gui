@@ -49,7 +49,7 @@ public class MenuBarItem : MenuItem
     /// <value>The children.</value>
     public MenuItem [] Children { get; set; }
 
-    internal bool IsTopLevel => Parent == null && (Children == null || Children.Length == 0) && Action != null;
+    internal bool IsTopLevel => Parent == null && ((Children == null) || (Children.Length == 0)) && Action != null;
 
     /// <summary>Get the index of a child <see cref="MenuItem"/>.</summary>
     /// <param name="children"></param>
@@ -189,22 +189,35 @@ public class MenuBarItem : MenuItem
 /// <summary>
 ///     <para>Provides a menu bar that spans the top of a <see cref="Toplevel"/> View with drop-down and cascading menus.</para>
 ///     <para>
-///         By default, any sub-sub-menus (sub-menus of the <see cref="MenuItem"/>s added to <see cref="MenuBarItem"/>s) are displayed in a cascading manner, where each sub-sub-menu pops out of the sub-menu frame (either to the right or left, depending on where the sub-menu is relative to the edge of the screen). By setting
-///         <see cref="UseSubMenusSingleFrame"/> to <see langword="true"/>, this behavior can be changed such that all sub-sub-menus are drawn within a single frame below the MenuBar.
+///         By default, any sub-sub-menus (sub-menus of the <see cref="MenuItem"/>s added to <see cref="MenuBarItem"/>s)
+///         are displayed in a cascading manner, where each sub-sub-menu pops out of the sub-menu frame (either to the
+///         right or left, depending on where the sub-menu is relative to the edge of the screen). By setting
+///         <see cref="UseSubMenusSingleFrame"/> to <see langword="true"/>, this behavior can be changed such that all
+///         sub-sub-menus are drawn within a single frame below the MenuBar.
 ///     </para>
 /// </summary>
 /// <remarks>
-///     <para>The <see cref="MenuBar"/> appears on the first row of the <see cref="Toplevel"/> SuperView and uses the full width.</para>
+///     <para>
+///         The <see cref="MenuBar"/> appears on the first row of the <see cref="Toplevel"/> SuperView and uses the full
+///         width.
+///     </para>
 ///     <para>See also: <see cref="ContextMenu"/></para>
 ///     <para>The <see cref="MenuBar"/> provides global hot keys for the application. See <see cref="MenuItem.HotKey"/>.</para>
 ///     <para>
-///         When the menu is created key bindings for each menu item and its sub-menu items are added for each menu item's hot key (both alone AND with AltMask) and shortcut, if defined.
+///         When the menu is created key bindings for each menu item and its sub-menu items are added for each menu
+///         item's hot key (both alone AND with AltMask) and shortcut, if defined.
 ///     </para>
 ///     <para>
-///         If a key press matches any of the menu item's hot keys or shortcuts, the menu item's action is invoked or sub-menu opened.
+///         If a key press matches any of the menu item's hot keys or shortcuts, the menu item's action is invoked or
+///         sub-menu opened.
 ///     </para>
 ///     <para>
-///         * If the menu bar is not open * Any shortcut defined within the menu will be invoked * Only hot keys defined for the menu bar items will be invoked, and only if Alt is pressed too. * If the menu bar is open * Un-shifted hot keys defined for the menu bar items will be invoked, only if the menu they belong to is open (the menu bar item's text is visible). * Alt-shifted hot keys defined for the menu bar items will be invoked, only if the menu they belong to is open (the menu bar item's text is visible). * If there is a visible hot key that duplicates a shortcut (e.g. _File and Alt-F), the hot key wins.
+///         * If the menu bar is not open * Any shortcut defined within the menu will be invoked * Only hot keys defined
+///         for the menu bar items will be invoked, and only if Alt is pressed too. * If the menu bar is open * Un-shifted
+///         hot keys defined for the menu bar items will be invoked, only if the menu they belong to is open (the menu bar
+///         item's text is visible). * Alt-shifted hot keys defined for the menu bar items will be invoked, only if the
+///         menu they belong to is open (the menu bar item's text is visible). * If there is a visible hot key that
+///         duplicates a shortcut (e.g. _File and Alt-F), the hot key wins.
 ///     </para>
 /// </remarks>
 public class MenuBar : View
@@ -321,7 +334,8 @@ public class MenuBar : View
     public View LastFocused { get; private set; }
 
     /// <summary>
-    ///     Gets or sets the array of <see cref="MenuBarItem"/>s for the menu. Only set this after the <see cref="MenuBar"/> is visible.
+    ///     Gets or sets the array of <see cref="MenuBarItem"/>s for the menu. Only set this after the
+    ///     <see cref="MenuBar"/> is visible.
     /// </summary>
     /// <value>The menu array.</value>
     public MenuBarItem [] Menus
@@ -386,8 +400,11 @@ public class MenuBar : View
     /// <summary>
     ///     Gets or sets if the sub-menus must be displayed in a single or multiple frames.
     ///     <para>
-    ///         By default any sub-sub-menus (sub-menus of the main <see cref="MenuItem"/>s) are displayed in a cascading manner, where each sub-sub-menu pops out of the sub-menu frame (either to the right or left, depending on where the sub-menu is relative to the edge of the screen). By setting
-    ///         <see cref="UseSubMenusSingleFrame"/> to <see langword="true"/>, this behavior can be changed such that all sub-sub-menus are drawn within a single frame below the MenuBar.
+    ///         By default any sub-sub-menus (sub-menus of the main <see cref="MenuItem"/>s) are displayed in a cascading
+    ///         manner, where each sub-sub-menu pops out of the sub-menu frame (either to the right or left, depending on where
+    ///         the sub-menu is relative to the edge of the screen). By setting <see cref="UseSubMenusSingleFrame"/> to
+    ///         <see langword="true"/>, this behavior can be changed such that all sub-sub-menus are drawn within a single
+    ///         frame below the MenuBar.
     ///     </para>
     /// </summary>
     public bool UseSubMenusSingleFrame
@@ -564,7 +581,7 @@ public class MenuBar : View
             mbar.CleanUp ();
         }
 
-        if (!Enabled || _openMenu != null)
+        if (!Enabled || (_openMenu != null))
         {
             return;
         }
@@ -809,7 +826,7 @@ public class MenuBar : View
 
                     LastFocused.SetFocus ();
                 }
-                else if (_openSubMenu == null || _openSubMenu.Count == 0)
+                else if ((_openSubMenu == null) || (_openSubMenu.Count == 0))
                 {
                     CloseAllMenus ();
                 }
@@ -921,7 +938,7 @@ public class MenuBar : View
                                                                                  )
                                               : null;
 
-                    if ((_selectedSub == -1 || _openSubMenu == null || _openSubMenu?.Count - 1 == _selectedSub) && subMenu == null)
+                    if (((_selectedSub == -1) || (_openSubMenu == null) || (_openSubMenu?.Count - 1 == _selectedSub)) && subMenu == null)
                     {
                         if (_openSubMenu != null && !CloseMenu (false, true))
                         {
@@ -930,7 +947,7 @@ public class MenuBar : View
 
                         NextMenu (false, ignoreUseSubMenusSingleFrame);
                     }
-                    else if (subMenu != null
+                    else if ((subMenu != null)
                              || (openCurrentMenu._currentChild > -1
                                  && !openCurrentMenu.BarItems
                                                     .Children [openCurrentMenu._currentChild]
@@ -1242,7 +1259,7 @@ public class MenuBar : View
                 }
             }
 
-            if (child == null || !child.IsEnabled ())
+            if ((child == null) || !child.IsEnabled ())
             {
                 if (forward)
                 {
@@ -1376,7 +1393,7 @@ public class MenuBar : View
 
     private void RemoveSubMenu (int index, bool ignoreUseSubMenusSingleFrame = false)
     {
-        if (_openSubMenu == null
+        if ((_openSubMenu == null)
             || (UseSubMenusSingleFrame
                 && !ignoreUseSubMenusSingleFrame
                 && _openSubMenu.Count == 0))
@@ -1435,7 +1452,8 @@ public class MenuBar : View
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         If the user presses any <see cref="MenuItem.HotKey"/>s defined in the <see cref="MenuBarItem"/>s, the menu bar will be activated and the sub-menu will be opened.
+    ///         If the user presses any <see cref="MenuItem.HotKey"/>s defined in the <see cref="MenuBarItem"/>s, the menu
+    ///         bar will be activated and the sub-menu will be opened.
     ///     </para>
     ///     <para><see cref="Key.Esc"/> will close the menu bar and any open sub-menus.</para>
     /// </remarks>
@@ -1500,7 +1518,8 @@ public class MenuBar : View
     private bool _openedByHotKey;
 
     /// <summary>
-    ///     Called when a key bound to Command.Select is pressed. Either activates the menu item or runs it, depending on whether it has a sub-menu. If the menu is open, it will close the menu bar.
+    ///     Called when a key bound to Command.Select is pressed. Either activates the menu item or runs it, depending on
+    ///     whether it has a sub-menu. If the menu is open, it will close the menu bar.
     /// </summary>
     /// <returns></returns>
     private bool SelectOrRun ()
@@ -1590,7 +1609,7 @@ public class MenuBar : View
 
                 if (hotKey != KeyCode.Null)
                 {
-                    bool matches = key == hotKey || key == (hotKey | KeyCode.AltMask);
+                    bool matches = (key == hotKey) || (key == (hotKey | KeyCode.AltMask));
 
                     if (IsMenuOpen)
                     {
@@ -1618,7 +1637,7 @@ public class MenuBar : View
     {
         menuItemToSelect = null;
 
-        if (key == KeyCode.Null || menuBarItem?.Children == null)
+        if ((key == KeyCode.Null) || (menuBarItem?.Children == null))
         {
             return false;
         }
@@ -1681,10 +1700,10 @@ public class MenuBar : View
 
         _handled = false;
 
-        if (me.Flags == MouseFlags.Button1Pressed
-            || me.Flags == MouseFlags.Button1DoubleClicked
-            || me.Flags == MouseFlags.Button1TripleClicked
-            || me.Flags == MouseFlags.Button1Clicked
+        if ((me.Flags == MouseFlags.Button1Pressed)
+            || (me.Flags == MouseFlags.Button1DoubleClicked)
+            || (me.Flags == MouseFlags.Button1TripleClicked)
+            || (me.Flags == MouseFlags.Button1Clicked)
             || (me.Flags == MouseFlags.ReportMousePosition && _selected > -1)
             || (me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) && _selected > -1))
         {
@@ -1717,9 +1736,9 @@ public class MenuBar : View
                             Activate (i);
                         }
                     }
-                    else if (me.Flags == MouseFlags.Button1Pressed
-                             || me.Flags == MouseFlags.Button1DoubleClicked
-                             || me.Flags == MouseFlags.Button1TripleClicked)
+                    else if ((me.Flags == MouseFlags.Button1Pressed)
+                             || (me.Flags == MouseFlags.Button1DoubleClicked)
+                             || (me.Flags == MouseFlags.Button1TripleClicked))
                     {
                         if (IsMenuOpen && !Menus [i].IsTopLevel)
                         {
@@ -1732,7 +1751,7 @@ public class MenuBar : View
                     }
                     else if (_selected != i
                              && _selected > -1
-                             && (me.Flags == MouseFlags.ReportMousePosition
+                             && ((me.Flags == MouseFlags.ReportMousePosition)
                                  || (me.Flags == MouseFlags.Button1Pressed && me.Flags == MouseFlags.ReportMousePosition)))
                     {
                         if (IsMenuOpen)
@@ -1860,9 +1879,9 @@ public class MenuBar : View
             }
         }
         else if (!IsMenuOpen
-                 && (me.Flags == MouseFlags.Button1Pressed
-                     || me.Flags == MouseFlags.Button1DoubleClicked
-                     || me.Flags == MouseFlags.Button1TripleClicked
+                 && ((me.Flags == MouseFlags.Button1Pressed)
+                     || (me.Flags == MouseFlags.Button1DoubleClicked)
+                     || (me.Flags == MouseFlags.Button1TripleClicked)
                      || me.Flags.HasFlag (
                                           MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                          )))
@@ -1887,7 +1906,7 @@ public class MenuBar : View
 
     private MenuBar GetMouseGrabViewInstance (View view)
     {
-        if (view == null || Application.MouseGrabView == null)
+        if ((view == null) || (Application.MouseGrabView == null))
         {
             return null;
         }

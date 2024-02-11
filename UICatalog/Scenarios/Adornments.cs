@@ -95,6 +95,13 @@ public class Adornments : Scenario
 
     public class AdornmentEditor : View
     {
+        public AdornmentEditor ()
+        {
+            Margin.Thickness = new Thickness (0);
+            BorderStyle = LineStyle.Double;
+            Initialized += AdornmentEditor_Initialized;
+        }
+
         private readonly ColorPicker _backgroundColorPicker = new ()
         {
             Title = "BG",
@@ -119,13 +126,6 @@ public class Adornments : Scenario
         private TextField _rightEdit;
         private Thickness _thickness;
         private TextField _topEdit;
-
-        public AdornmentEditor ()
-        {
-            Margin.Thickness = new Thickness (0);
-            BorderStyle = LineStyle.Double;
-            Initialized += AdornmentEditor_Initialized;
-        }
 
         public Attribute Color
         {
@@ -180,6 +180,7 @@ public class Adornments : Scenario
         }
 
         public event EventHandler<Attribute> AttributeChanged;
+
         public event EventHandler<ThicknessEventArgs> ThicknessChanged;
 
         private void AdornmentEditor_Initialized (object sender, EventArgs e)

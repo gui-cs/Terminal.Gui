@@ -62,6 +62,7 @@ public partial class Curses
     private static NativeMethods methods;
     private static char [] r = new char [1];
     private static nint stdscr;
+
     public static int ColorPairs => methods.COLOR_PAIRS ();
 
     public static int Cols
@@ -92,7 +93,7 @@ public partial class Curses
     //
     public static int addch (int ch)
     {
-        if (ch < 127 || ch > 0xffff)
+        if ((ch < 127) || (ch > 0xffff))
         {
             return methods.addch (ch);
         }
@@ -132,7 +133,7 @@ public partial class Curses
             l = 1;
         }
 
-        if (l != lines || c != cols)
+        if ((l != lines) || (c != cols))
         {
             lines = l;
             cols = c;
@@ -178,7 +179,15 @@ public partial class Curses
     public static int init_pair (short pair, short f, short b) { return methods.init_pair (pair, f, b); }
 
     /// <summary>
-    ///     The init_pair routine changes the definition of a color-pair.It takes three arguments: the number of the color-pair to be changed, the  fore- ground color number, and the background color number.For portable ap- plications: o The first argument must be a legal color pair  value.If  default colors are used (see use_default_colors(3x)) the upper limit is ad- justed to allow for extra pairs which use a default color in  fore- ground and/or background. o The second and third arguments must be legal color values. If the  color-pair was previously initialized, the screen is refreshed and all occurrences of that color-pair are changed to the new defini- tion. As an  extension,  ncurses allows you to set color pair 0 via the as- sume_default_colors (3x) routine, or to specify the use of default  col- ors (color number  -1) if you first invoke the use_default_colors (3x) routine.
+    ///     The init_pair routine changes the definition of a color-pair.It takes three arguments: the number of the
+    ///     color-pair to be changed, the  fore- ground color number, and the background color number.For portable ap-
+    ///     plications: o The first argument must be a legal color pair  value.If  default colors are used (see
+    ///     use_default_colors(3x)) the upper limit is ad- justed to allow for extra pairs which use a default color in  fore-
+    ///     ground and/or background. o The second and third arguments must be legal color values. If the  color-pair was
+    ///     previously initialized, the screen is refreshed and all occurrences of that color-pair are changed to the new
+    ///     defini- tion. As an  extension,  ncurses allows you to set color pair 0 via the as- sume_default_colors (3x)
+    ///     routine, or to specify the use of default  col- ors (color number  -1) if you first invoke the use_default_colors
+    ///     (3x) routine.
     /// </summary>
     /// <param name="pair"></param>
     /// <param name="foreground"></param>
@@ -250,7 +259,7 @@ public partial class Curses
 
     public static int mvaddch (int y, int x, int ch)
     {
-        if (ch < 127 || ch > 0xffff)
+        if ((ch < 127) || (ch > 0xffff))
         {
             return methods.mvaddch (y, x, ch);
         }
@@ -281,7 +290,7 @@ public partial class Curses
     public static int savetty () { return methods.savetty (); }
     public static int scrollok (nint win, bool bf) { return methods.scrollok (win, bf); }
     public static int set_escdelay (int size) { return methods.set_escdelay (size); }
-    [DllImport ("libc")] public static extern int setlocale (int cate, [MarshalAs (UnmanagedType.LPStr)] string locale);
+    [DllImport ("libc")] public extern static int setlocale (int cate, [MarshalAs (UnmanagedType.LPStr)] string locale);
     public static int setscrreg (int top, int bot) { return methods.setscrreg (top, bot); }
     public static int start_color () { return methods.start_color (); }
     public static int StartColor () { return methods.start_color (); }
@@ -423,7 +432,7 @@ public partial class Curses
 }
 
 #pragma warning disable RCS1102 // Make class static.'
-internal class Delegates
+class Delegates
 {
 #pragma warning restore RCS1102 // Make class static.
 #pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
@@ -573,7 +582,7 @@ internal class Delegates
     public delegate nint curses_version ();
 }
 
-internal class NativeMethods
+class NativeMethods
 {
     public NativeMethods (UnmanagedLibrary lib)
     {

@@ -4,8 +4,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class ButtonTests
 {
-    private readonly ITestOutputHelper _output;
     public ButtonTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     [AutoInitShutdown]
@@ -522,7 +522,8 @@ public class ButtonTests
     }
 
     /// <summary>
-    ///     This test demonstrates how to change the activation key for Button as described in the README.md keyboard handling section
+    ///     This test demonstrates how to change the activation key for Button as described in the README.md keyboard
+    ///     handling section
     /// </summary>
     [Fact]
     [AutoInitShutdown]

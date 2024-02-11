@@ -33,8 +33,8 @@ public class LineView : View
     }
 
     /// <summary>
-    ///     The rune to display at the end of the line (right end of horizontal line or bottom end of vertical). If not specified then
-    ///     <see cref="LineRune"/> is used
+    ///     The rune to display at the end of the line (right end of horizontal line or bottom end of vertical). If not
+    ///     specified then <see cref="LineRune"/> is used
     /// </summary>
     public Rune? EndingAnchor { get; set; }
 
@@ -42,13 +42,14 @@ public class LineView : View
     public Rune LineRune { get; set; }
 
     /// <summary>
-    ///     The direction of the line.  If you change this you will need to manually update the Width/Height of the control to cover a relevant area based on the new direction.
+    ///     The direction of the line.  If you change this you will need to manually update the Width/Height of the
+    ///     control to cover a relevant area based on the new direction.
     /// </summary>
     public Orientation Orientation { get; set; }
 
     /// <summary>
-    ///     The rune to display at the start of the line (left end of horizontal line or top end of vertical) If not specified then
-    ///     <see cref="LineRune"/> is used
+    ///     The rune to display at the start of the line (left end of horizontal line or top end of vertical) If not
+    ///     specified then <see cref="LineRune"/> is used
     /// </summary>
     public Rune? StartingAnchor { get; set; }
 

@@ -4,8 +4,8 @@ namespace Terminal.Gui.ViewTests;
 
 public class AdornmentTests
 {
-    private readonly ITestOutputHelper _output;
     public AdornmentTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void BoundsToScreen_Uses_Parent_Not_SuperView ()

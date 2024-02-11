@@ -36,23 +36,33 @@ public enum Command
     ScrollUp,
 
     /// <summary>
-    ///     Moves the selection left one by the minimum increment supported by the <see cref="View"/> e.g. single character, cell, item etc.
+    ///     Moves the selection left one by the minimum increment supported by the <see cref="View"/> e.g. single
+    ///     character, cell, item etc.
     /// </summary>
     Left,
 
     /// <summary>Scrolls one item (cell, character, etc...) to the left</summary>
     ScrollLeft,
 
-    /// <summary>Extends the selection left one by the minimum increment supported by the view e.g. single character, cell, item etc.</summary>
+    /// <summary>
+    ///     Extends the selection left one by the minimum increment supported by the view e.g. single character, cell,
+    ///     item etc.
+    /// </summary>
     LeftExtend,
 
-    /// <summary>Moves the selection right one by the minimum increment supported by the view e.g. single character, cell, item etc.</summary>
+    /// <summary>
+    ///     Moves the selection right one by the minimum increment supported by the view e.g. single character, cell, item
+    ///     etc.
+    /// </summary>
     Right,
 
     /// <summary>Scrolls one item (cell, character, etc...) to the right.</summary>
     ScrollRight,
 
-    /// <summary>Extends the selection right one by the minimum increment supported by the view e.g. single character, cell, item etc.</summary>
+    /// <summary>
+    ///     Extends the selection right one by the minimum increment supported by the view e.g. single character, cell,
+    ///     item etc.
+    /// </summary>
     RightExtend,
 
     /// <summary>Moves the caret to the start of the previous word.</summary>
@@ -80,12 +90,14 @@ public enum Command
     KillWordBackwards,
 
     /// <summary>
-    ///     Toggles overwrite mode such that newly typed text overwrites the text that is already there (typically associated with the Insert key).
+    ///     Toggles overwrite mode such that newly typed text overwrites the text that is already there (typically
+    ///     associated with the Insert key).
     /// </summary>
     ToggleOverwrite,
 
     /// <summary>
-    ///     Enables overwrite mode such that newly typed text overwrites the text that is already there (typically associated with the Insert key).
+    ///     Enables overwrite mode such that newly typed text overwrites the text that is already there (typically
+    ///     associated with the Insert key).
     /// </summary>
     EnableOverwrite,
 

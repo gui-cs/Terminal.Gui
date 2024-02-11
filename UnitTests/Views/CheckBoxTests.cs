@@ -4,8 +4,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class CheckBoxTests
 {
-    private readonly ITestOutputHelper _output;
     public CheckBoxTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     [AutoInitShutdown]

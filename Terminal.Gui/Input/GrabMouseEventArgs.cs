@@ -8,7 +8,8 @@ public class GrabMouseEventArgs : EventArgs
     public GrabMouseEventArgs (View view) { View = view; }
 
     /// <summary>
-    ///     Flag that allows the cancellation of the event. If set to <see langword="true"/> in the event handler, the event will be canceled.
+    ///     Flag that allows the cancellation of the event. If set to <see langword="true"/> in the event handler, the
+    ///     event will be canceled.
     /// </summary>
     public bool Cancel { get; set; }
 

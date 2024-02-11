@@ -11,7 +11,8 @@ public class MenuOpeningEventArgs : EventArgs
     public MenuOpeningEventArgs (MenuBarItem currentMenu) { CurrentMenu = currentMenu; }
 
     /// <summary>
-    ///     Flag that allows the cancellation of the event. If set to <see langword="true"/> in the event handler, the event will be canceled.
+    ///     Flag that allows the cancellation of the event. If set to <see langword="true"/> in the event handler, the
+    ///     event will be canceled.
     /// </summary>
     public bool Cancel { get; set; }
 
@@ -56,7 +57,8 @@ public class MenuClosingEventArgs : EventArgs
     }
 
     /// <summary>
-    ///     Flag that allows the cancellation of the event. If set to <see langword="true"/> in the event handler, the event will be canceled.
+    ///     Flag that allows the cancellation of the event. If set to <see langword="true"/> in the event handler, the
+    ///     event will be canceled.
     /// </summary>
     public bool Cancel { get; set; }
 

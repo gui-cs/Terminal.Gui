@@ -91,8 +91,8 @@ public struct SizeF : IEquatable<SizeF>
     public static SizeF Subtract (SizeF sz1, SizeF sz2) { return new SizeF (sz1.Width - sz2.Width, sz1.Height - sz2.Height); }
 
     /// <summary>
-    ///     Tests to see whether the specified object is a <see cref='Terminal.Gui.SizeF'/>  with the same dimensions as this
-    ///     <see cref='Terminal.Gui.SizeF'/>.
+    ///     Tests to see whether the specified object is a <see cref='Terminal.Gui.SizeF'/>  with the same dimensions as
+    ///     this <see cref='Terminal.Gui.SizeF'/>.
     /// </summary>
     public override bool Equals (object obj) { return obj is SizeF && Equals ((SizeF)obj); }
 

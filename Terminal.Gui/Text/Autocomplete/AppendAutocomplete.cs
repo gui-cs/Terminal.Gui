@@ -1,7 +1,8 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     Autocomplete for a <see cref="TextField"/> which shows suggestions within the box. Displayed suggestions can be completed using the tab key.
+///     Autocomplete for a <see cref="TextField"/> which shows suggestions within the box. Displayed suggestions can
+///     be completed using the tab key.
 /// </summary>
 public class AppendAutocomplete : AutocompleteBase
 {
@@ -25,17 +26,13 @@ public class AppendAutocomplete : AutocompleteBase
     private TextField textField;
 
     /// <summary>
-    ///     The color used for rendering the appended text. Note that only <see cref="ColorScheme.Normal"/> is used and then only
-    ///     <see cref="Attribute.Foreground"/> (Background comes from <see cref="HostControl"/>).
+    ///     The color used for rendering the appended text. Note that only <see cref="ColorScheme.Normal"/> is used and
+    ///     then only <see cref="Attribute.Foreground"/> (Background comes from <see cref="HostControl"/>).
     /// </summary>
     public override ColorScheme ColorScheme { get; set; }
 
     /// <inheritdoc/>
-    public override View HostControl
-    {
-        get => textField;
-        set => textField = (TextField)value;
-    }
+    public override View HostControl { get => textField; set => textField = (TextField)value; }
 
     /// <inheritdoc/>
     public override void ClearSuggestions ()
@@ -131,7 +128,8 @@ public class AppendAutocomplete : AutocompleteBase
     }
 
     /// <summary>
-    ///     Accepts the current autocomplete suggestion displaying in the text box. Returns true if a valid suggestion was being rendered and acceptable or false if no suggestion was showing.
+    ///     Accepts the current autocomplete suggestion displaying in the text box. Returns true if a valid suggestion was
+    ///     being rendered and acceptable or false if no suggestion was showing.
     /// </summary>
     /// <returns></returns>
     internal bool AcceptSelectionIfAny ()
@@ -187,7 +185,8 @@ public class AppendAutocomplete : AutocompleteBase
     }
 
     /// <summary>
-    ///     Returns true if there is a suggestion that can be made and the control is in a state where user would expect to see auto-complete (i.e. focused and cursor in right place).
+    ///     Returns true if there is a suggestion that can be made and the control is in a state where user would expect
+    ///     to see auto-complete (i.e. focused and cursor in right place).
     /// </summary>
     /// <returns></returns>
     private bool MakingSuggestion () { return Suggestions.Any () && SelectedIdx != -1 && textField.HasFocus && textField.CursorIsAtEnd (); }

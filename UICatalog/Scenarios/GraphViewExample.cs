@@ -959,12 +959,6 @@ public class GraphViewExample : Scenario
 
     private class DiscoBarSeries : BarSeries
     {
-        private readonly Attribute _brightgreen;
-        private readonly Attribute _brightred;
-        private readonly Attribute _brightyellow;
-        private readonly Attribute _green;
-        private readonly Attribute _red;
-
         public DiscoBarSeries ()
         {
             _green = new Attribute (Color.BrightGreen, Color.Black);
@@ -973,6 +967,12 @@ public class GraphViewExample : Scenario
             _red = new Attribute (Color.Red, Color.Black);
             _brightred = new Attribute (Color.BrightRed, Color.Black);
         }
+
+        private readonly Attribute _brightgreen;
+        private readonly Attribute _brightred;
+        private readonly Attribute _brightyellow;
+        private readonly Attribute _green;
+        private readonly Attribute _red;
 
         protected override void DrawBarLine (GraphView graph, Point start, Point end, BarSeriesBar beingDrawn)
         {

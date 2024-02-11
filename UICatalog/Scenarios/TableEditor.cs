@@ -397,7 +397,8 @@ public class TableEditor : Scenario
     }
 
     /// <summary>
-    ///     Builds a simple table in which cell values contents are the index of the cell.  This helps testing that scrolling etc is working correctly and not skipping out any rows/columns when paging
+    ///     Builds a simple table in which cell values contents are the index of the cell.  This helps testing that
+    ///     scrolling etc is working correctly and not skipping out any rows/columns when paging
     /// </summary>
     /// <param name="cols"></param>
     /// <param name="rows"></param>
@@ -814,7 +815,7 @@ public class TableEditor : Scenario
 
         for (var i = 0; i < runes.Count; i++)
         {
-            if (dr == null || i % dt.Columns.Count == 0)
+            if ((dr == null) || (i % dt.Columns.Count == 0))
             {
                 dr = dt.Rows.Add ();
             }
@@ -847,7 +848,7 @@ public class TableEditor : Scenario
 
     private void EditCurrentCell (object sender, CellActivatedEventArgs e)
     {
-        if (e.Table is not DataTableSource || _currentTable == null)
+        if (e.Table is not DataTableSource || (_currentTable == null))
         {
             return;
         }
@@ -922,7 +923,7 @@ public class TableEditor : Scenario
             return null;
         }
 
-        if (_tableView.SelectedColumn < 0 || _tableView.SelectedColumn > _tableView.Table.Columns)
+        if ((_tableView.SelectedColumn < 0) || (_tableView.SelectedColumn > _tableView.Table.Columns))
         {
             return null;
         }
@@ -1571,15 +1572,15 @@ public class TableEditor : Scenario
 
     private class UnicodeRange
     {
-        public readonly string Category;
-        public readonly uint End;
-        public readonly uint Start;
-
         public UnicodeRange (uint start, uint end, string category)
         {
             Start = start;
             End = end;
             Category = category;
         }
+
+        public readonly string Category;
+        public readonly uint End;
+        public readonly uint Start;
     }
 }

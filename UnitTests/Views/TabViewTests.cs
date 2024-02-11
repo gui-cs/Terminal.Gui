@@ -5,8 +5,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class TabViewTests
 {
-    private readonly ITestOutputHelper _output;
     public TabViewTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void AddTab_SameTabMoreThanOnce ()

@@ -15,7 +15,8 @@ public class MenuBarScenario : Scenario
     private Label _lastKey;
 
     /// <summary>
-    ///     This method creates at test menu bar. It is called by the MenuBar unit tests so it's possible to do both unit testing and user-experience testing with the same setup.
+    ///     This method creates at test menu bar. It is called by the MenuBar unit tests so it's possible to do both unit
+    ///     testing and user-experience testing with the same setup.
     /// </summary>
     /// <param name="actionFn"></param>
     /// <returns></returns>

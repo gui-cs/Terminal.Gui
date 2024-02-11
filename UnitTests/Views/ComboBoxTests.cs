@@ -4,8 +4,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class ComboBoxTests
 {
-    private readonly ITestOutputHelper _output;
     public ComboBoxTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     [AutoInitShutdown]

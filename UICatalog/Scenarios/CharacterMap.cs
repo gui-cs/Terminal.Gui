@@ -17,7 +17,9 @@ using static Terminal.Gui.SpinnerStyle;
 namespace UICatalog.Scenarios;
 
 /// <summary>
-///     This Scenario demonstrates building a custom control (a class deriving from View) that: - Provides a "Character Map" application (like Windows' charmap.exe). - Helps test unicode character rendering in Terminal.Gui - Illustrates how to use ScrollView to do infinite scrolling
+///     This Scenario demonstrates building a custom control (a class deriving from View) that: - Provides a
+///     "Character Map" application (like Windows' charmap.exe). - Helps test unicode character rendering in Terminal.Gui -
+///     Illustrates how to use ScrollView to do infinite scrolling
 /// </summary>
 [ScenarioMetadata ("Character Map", "Unicode viewer demonstrating the ScrollView control.")]
 [ScenarioCategory ("Text and Formatting")]
@@ -284,14 +286,10 @@ public class CharacterMap : Scenario
     }
 }
 
-internal class CharMap : ScrollView
+class CharMap : ScrollView
 {
     private const CursorVisibility _cursor = CursorVisibility.Default;
     private const int COLUMN_WIDTH = 3;
-    private ContextMenu _contextMenu = new ();
-    private int _rowHeight = 1;
-    private int _selected;
-    private int _start;
 
     public CharMap ()
     {
@@ -411,6 +409,11 @@ internal class CharMap : ScrollView
         MouseClick += Handle_MouseClick;
     }
 
+    private ContextMenu _contextMenu = new ();
+    private int _rowHeight = 1;
+    private int _selected;
+    private int _start;
+
     /// <summary>Gets the coordinates of the Cursor based on the SelectedCodePoint in screen coordinates</summary>
     public Point Cursor
     {
@@ -427,7 +430,10 @@ internal class CharMap : ScrollView
 
     public static int MaxCodePoint => 0x10FFFF;
 
-    /// <summary>Specifies the starting offset for the character map. The default is 0x2500 which is the Box Drawing characters.</summary>
+    /// <summary>
+    ///     Specifies the starting offset for the character map. The default is 0x2500 which is the Box Drawing
+    ///     characters.
+    /// </summary>
     public int SelectedCodePoint
     {
         get => _selected;
@@ -488,7 +494,10 @@ internal class CharMap : ScrollView
         }
     }
 
-    /// <summary>Specifies the starting offset for the character map. The default is 0x2500 which is the Box Drawing characters.</summary>
+    /// <summary>
+    ///     Specifies the starting offset for the character map. The default is 0x2500 which is the Box Drawing
+    ///     characters.
+    /// </summary>
     public int StartCodePoint
     {
         get => _start;
@@ -501,7 +510,9 @@ internal class CharMap : ScrollView
     }
 
     private static int RowLabelWidth => $"U+{MaxCodePoint:x5}".Length + 1;
+
     private static int RowWidth => RowLabelWidth + COLUMN_WIDTH * 16;
+
     public event EventHandler<ListViewItemEventArgs> Hover;
 
     public override void OnDrawContent (Rect contentArea)
@@ -531,7 +542,7 @@ internal class CharMap : ScrollView
     //public void CharMap_DrawContent (object s, DrawEventArgs a)
     public override void OnDrawContentComplete (Rect contentArea)
     {
-        if (contentArea.Height == 0 || contentArea.Width == 0)
+        if ((contentArea.Height == 0) || (contentArea.Width == 0))
         {
             return;
         }
@@ -631,7 +642,7 @@ internal class CharMap : ScrollView
                 int width = rune.GetColumns ();
 
                 // are we at first row of the row?
-                if (!ShowGlyphWidths || (y - ContentOffset.Y) % _rowHeight > 0)
+                if (!ShowGlyphWidths || ((y - ContentOffset.Y) % _rowHeight > 0))
                 {
                     if (width > 0)
                     {
@@ -685,7 +696,7 @@ internal class CharMap : ScrollView
                                      : ColorScheme.HotNormal
                                 );
 
-            if (!ShowGlyphWidths || (y - ContentOffset.Y) % _rowHeight > 0)
+            if (!ShowGlyphWidths || ((y - ContentOffset.Y) % _rowHeight > 0))
             {
                 Driver.AddStr ($"U+{val / 16:x5}_ ");
             }
@@ -769,7 +780,7 @@ internal class CharMap : ScrollView
         if (me.Y > 0)
         { }
 
-        if (me.X < RowLabelWidth || me.X > RowLabelWidth + 16 * COLUMN_WIDTH - 1)
+        if ((me.X < RowLabelWidth) || (me.X > RowLabelWidth + 16 * COLUMN_WIDTH - 1))
         {
             me.X = Cursor.X;
         }
@@ -1071,12 +1082,9 @@ public class UcdApiClient
     }
 }
 
-internal class UnicodeRange
+class UnicodeRange
 {
     public static List<UnicodeRange> Ranges = GetRanges ();
-    public string Category;
-    public int End;
-    public int Start;
 
     public UnicodeRange (int start, int end, string category)
     {
@@ -1084,6 +1092,10 @@ internal class UnicodeRange
         End = end;
         Category = category;
     }
+
+    public string Category;
+    public int End;
+    public int Start;
 
     public static List<UnicodeRange> GetRanges ()
     {

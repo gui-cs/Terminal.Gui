@@ -5,11 +5,14 @@ namespace Terminal.Gui;
 public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T : class
 {
     /// <summary>
-    ///     Creates a new instance of <see cref="TreeTableSource{T}"/> presenting the given <paramref name="tree"/>. This source should only be used with
-    ///     <paramref name="table"/>.
+    ///     Creates a new instance of <see cref="TreeTableSource{T}"/> presenting the given <paramref name="tree"/>. This
+    ///     source should only be used with <paramref name="table"/>.
     /// </summary>
     /// <param name="table">The table this source will provide data for.</param>
-    /// <param name="firstColumnName">Column name to use for the first column of the table (where the tree branches/leaves will be rendered.</param>
+    /// <param name="firstColumnName">
+    ///     Column name to use for the first column of the table (where the tree branches/leaves will
+    ///     be rendered.
+    /// </param>
     /// <param name="tree">
     ///     The tree data to render. This should be a new view and not used elsewhere (e.g. via
     ///     <see cref="View.Add(View)"/>).
@@ -105,7 +108,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     {
         string [] colNames = _tableView.Table.ColumnNames;
 
-        if (column < 0 || column >= colNames.Length)
+        if ((column < 0) || (column >= colNames.Length))
         {
             return false;
         }
@@ -167,7 +170,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     {
         Point? hit = _tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? headerIfAny, out int? offsetX);
 
-        if (hit == null || headerIfAny != null || !IsInTreeColumn (hit.Value.X, false) || offsetX == null)
+        if ((hit == null) || (headerIfAny != null) || !IsInTreeColumn (hit.Value.X, false) || (offsetX == null))
         {
             return;
         }

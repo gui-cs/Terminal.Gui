@@ -21,7 +21,7 @@ public class MainLoopTests
     // - wait = false
 
     // TODO: Add IMainLoop tests
-    private static volatile int tbCounter;
+    volatile private static int tbCounter;
     private static int three;
     private static int total;
     private static int two;
@@ -787,7 +787,7 @@ public class MainLoopTests
                  );
     }
 
-    private static async void RunAsyncTest (object sender, EventArgs e)
+    private async static void RunAsyncTest (object sender, EventArgs e)
     {
         Assert.Equal (clickMe, btn.Text);
         Assert.Equal (zero, total);
@@ -921,8 +921,8 @@ public class MainLoopTests
 
     private class MillisecondTolerance : IEqualityComparer<TimeSpan>
     {
-        private readonly int _tolerance;
         public MillisecondTolerance (int tolerance) { _tolerance = tolerance; }
+        private readonly int _tolerance;
         public bool Equals (TimeSpan x, TimeSpan y) { return Math.Abs (x.Milliseconds - y.Milliseconds) <= _tolerance; }
         public int GetHashCode (TimeSpan obj) { return obj.GetHashCode (); }
     }

@@ -44,8 +44,8 @@ public abstract class Axis
     public bool Visible { get; set; } = true;
 
     /// <summary>
-    ///     Draws a custom label <paramref name="text"/> at <paramref name="screenPosition"/> units along the axis (X or Y depending on
-    ///     <see cref="Orientation"/>)
+    ///     Draws a custom label <paramref name="text"/> at <paramref name="screenPosition"/> units along the axis (X or Y
+    ///     depending on <see cref="Orientation"/>)
     /// </summary>
     /// <param name="graph"></param>
     /// <param name="screenPosition"></param>
@@ -89,8 +89,8 @@ public class HorizontalAxis : Axis
     public HorizontalAxis () : base (Orientation.Horizontal) { }
 
     /// <summary>
-    ///     Draws the given <paramref name="text"/> on the axis at x <paramref name="screenPosition"/>. For the screen y position use
-    ///     <see cref="GetAxisYPosition(GraphView)"/>
+    ///     Draws the given <paramref name="text"/> on the axis at x <paramref name="screenPosition"/>. For the screen y
+    ///     position use <see cref="GetAxisYPosition(GraphView)"/>
     /// </summary>
     /// <param name="graph">Graph being drawn onto</param>
     /// <param name="screenPosition">Number of screen columns along the axis to take before rendering</param>
@@ -135,7 +135,7 @@ public class HorizontalAxis : Axis
     /// <summary>Draws the horizontal x axis labels and <see cref="Axis.Increment"/> ticks</summary>
     public override void DrawAxisLabels (GraphView graph)
     {
-        if (!Visible || Increment == 0)
+        if (!Visible || (Increment == 0))
         {
             return;
         }
@@ -200,7 +200,8 @@ public class HorizontalAxis : Axis
     }
 
     /// <summary>
-    ///     Returns the Y screen position of the origin (typically 0,0) of graph space. Return value is bounded by the screen i.e. the axis is always rendered even if the origin is offscreen.
+    ///     Returns the Y screen position of the origin (typically 0,0) of graph space. Return value is bounded by the
+    ///     screen i.e. the axis is always rendered even if the origin is offscreen.
     /// </summary>
     /// <param name="graph"></param>
     public int GetAxisYPosition (GraphView graph)
@@ -280,8 +281,8 @@ public class VerticalAxis : Axis
     public VerticalAxis () : base (Orientation.Vertical) { }
 
     /// <summary>
-    ///     Draws the given <paramref name="text"/> on the axis at y <paramref name="screenPosition"/>. For the screen x position use
-    ///     <see cref="GetAxisXPosition(GraphView)"/>
+    ///     Draws the given <paramref name="text"/> on the axis at y <paramref name="screenPosition"/>. For the screen x
+    ///     position use <see cref="GetAxisXPosition(GraphView)"/>
     /// </summary>
     /// <param name="graph">Graph being drawn onto</param>
     /// <param name="screenPosition">Number of rows from the top of the screen (i.e. down the axis) before rendering</param>
@@ -311,7 +312,7 @@ public class VerticalAxis : Axis
     /// <param name="graph"></param>
     public override void DrawAxisLabels (GraphView graph)
     {
-        if (!Visible || Increment == 0)
+        if (!Visible || (Increment == 0))
         {
             return;
         }
@@ -372,7 +373,8 @@ public class VerticalAxis : Axis
     }
 
     /// <summary>
-    ///     Returns the X screen position of the origin (typically 0,0) of graph space. Return value is bounded by the screen i.e. the axis is always rendered even if the origin is offscreen.
+    ///     Returns the X screen position of the origin (typically 0,0) of graph space. Return value is bounded by the
+    ///     screen i.e. the axis is always rendered even if the origin is offscreen.
     /// </summary>
     /// <param name="graph"></param>
     public int GetAxisXPosition (GraphView graph)
@@ -488,11 +490,7 @@ public class AxisIncrementToRender
 
     /// <summary>The text (if any) that should be displayed at this axis increment</summary>
     /// <value></value>
-    internal string Text
-    {
-        get => _text;
-        set => _text = value ?? "";
-    }
+    internal string Text { get => _text; set => _text = value ?? ""; }
 }
 
 /// <summary>Delegate for custom formatting of axis labels.  Determines what should be displayed at a given label</summary>

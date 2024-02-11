@@ -5,10 +5,13 @@ namespace Terminal.Gui.ViewTests;
 /// <summary>Tests for view coordinate mapping (e.g. <see cref="View.ScreenToFrame"/> etc...).</summary>
 public class CoordinateTests
 {
-    private readonly ITestOutputHelper _output;
     public CoordinateTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
-    /// <summary>Tests that screen to bounds mapping works correctly when the view has no superview and there ARE Frames on the view.</summary>
+    /// <summary>
+    ///     Tests that screen to bounds mapping works correctly when the view has no superview and there ARE Frames on the
+    ///     view.
+    /// </summary>
     [Theory]
     [InlineData (0, 0, 0, 0, -1, -1)]
     [InlineData (0, 0, 1, 1, 0, 0)]
@@ -35,7 +38,8 @@ public class CoordinateTests
     }
 
     /// <summary>
-    ///     Tests that screen to bounds mapping works correctly when the view has no superview and there are no Frames on the view.
+    ///     Tests that screen to bounds mapping works correctly when the view has no superview and there are no Frames on
+    ///     the view.
     /// </summary>
     [Theory]
     [InlineData (0, 0, 0, 0, 0, 0)]
@@ -104,7 +108,10 @@ public class CoordinateTests
         Assert.Equal (expectedY, actual.Y);
     }
 
-    /// <summary>Tests that screen to view mapping works correctly when the view has no superview and there ARE Frames on the view.</summary>
+    /// <summary>
+    ///     Tests that screen to view mapping works correctly when the view has no superview and there ARE Frames on the
+    ///     view.
+    /// </summary>
     [Theory]
     [InlineData (0, 0, 0, 0, 0, 0)]
     [InlineData (0, 0, 1, 1, 1, 1)]
@@ -130,7 +137,10 @@ public class CoordinateTests
         Assert.Equal (expectedY, actual.Y);
     }
 
-    /// <summary>Tests that screen to view mapping works correctly when the view has no superview and there are no Frames on the view.</summary>
+    /// <summary>
+    ///     Tests that screen to view mapping works correctly when the view has no superview and there are no Frames on
+    ///     the view.
+    /// </summary>
     [Theory]
     [InlineData (0, 0, 0, 0, 0, 0)]
     [InlineData (0, 0, 1, 1, 1, 1)]

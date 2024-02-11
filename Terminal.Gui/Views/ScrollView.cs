@@ -14,12 +14,14 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     Scrollviews are views that present a window into a virtual space where subviews are added.  Similar to the iOS UIScrollView.
+///     Scrollviews are views that present a window into a virtual space where subviews are added.  Similar to the iOS
+///     UIScrollView.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         The subviews that are added to this <see cref="Gui.ScrollView"/> are offset by the <see cref="ContentOffset"/>
-///         property.  The view itself is a window into the space represented by the <see cref="ContentSize"/>.
+///         The subviews that are added to this <see cref="Gui.ScrollView"/> are offset by the
+///         <see cref="ContentOffset"/> property.  The view itself is a window into the space represented by the
+///         <see cref="ContentSize"/>.
 ///     </para>
 ///     <para>Use the</para>
 /// </remarks>
@@ -387,7 +389,7 @@ public class ScrollView : View
         // TODO: It's bad practice for views to always clear a view. It negates clipping.
         Clear ();
 
-        if (!string.IsNullOrEmpty (_contentView.Text) || _contentView.Subviews.Count > 0)
+        if (!string.IsNullOrEmpty (_contentView.Text) || (_contentView.Subviews.Count > 0))
         {
             _contentView.Draw ();
         }
@@ -400,7 +402,7 @@ public class ScrollView : View
     /// <inheritdoc/>
     public override bool OnEnter (View view)
     {
-        if (Subviews.Count == 0 || !Subviews.Any (subview => subview.CanFocus))
+        if ((Subviews.Count == 0) || !Subviews.Any (subview => subview.CanFocus))
         {
             Application.Driver?.SetCursorVisibility (CursorVisibility.Invisible);
         }
@@ -619,7 +621,7 @@ public class ScrollView : View
         bool v = false, h = false;
         var p = false;
 
-        if (Bounds.Height == 0 || Bounds.Height > _contentSize.Height)
+        if ((Bounds.Height == 0) || (Bounds.Height > _contentSize.Height))
         {
             if (ShowVerticalScrollIndicator)
             {
@@ -642,7 +644,7 @@ public class ScrollView : View
             v = true;
         }
 
-        if (Bounds.Width == 0 || Bounds.Width > _contentSize.Width)
+        if ((Bounds.Width == 0) || (Bounds.Width > _contentSize.Width))
         {
             if (ShowHorizontalScrollIndicator)
             {

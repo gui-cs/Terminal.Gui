@@ -4,8 +4,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class TileViewTests
 {
-    private readonly ITestOutputHelper _output;
     public TileViewTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     [AutoInitShutdown]

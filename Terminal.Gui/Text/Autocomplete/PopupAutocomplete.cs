@@ -1,6 +1,9 @@
 ﻿namespace Terminal.Gui;
 
-/// <summary>Renders an overlay on another view at a given point that allows selecting from a range of 'autocomplete' options.</summary>
+/// <summary>
+///     Renders an overlay on another view at a given point that allows selecting from a range of 'autocomplete'
+///     options.
+/// </summary>
 public abstract class PopupAutocomplete : AutocompleteBase
 {
     /// <summary>Creates a new instance of the <see cref="PopupAutocomplete"/> class.</summary>
@@ -13,7 +16,8 @@ public abstract class PopupAutocomplete : AutocompleteBase
     private int toRenderLength;
 
     /// <summary>
-    ///     The colors to use to render the overlay. Accessing this property before the Application has been initialized will cause an error
+    ///     The colors to use to render the overlay. Accessing this property before the Application has been initialized
+    ///     will cause an error
     /// </summary>
     public override ColorScheme ColorScheme
     {
@@ -48,7 +52,8 @@ public abstract class PopupAutocomplete : AutocompleteBase
     }
 
     /// <summary>
-    ///     When more suggestions are available than can be rendered the user can scroll down the dropdown list. This indicates how far down they have gone
+    ///     When more suggestions are available than can be rendered the user can scroll down the dropdown list. This
+    ///     indicates how far down they have gone
     /// </summary>
     public virtual int ScrollOffset { get; set; }
 
@@ -73,7 +78,8 @@ public abstract class PopupAutocomplete : AutocompleteBase
     }
 
     /// <summary>
-    ///     Handle mouse events before <see cref="HostControl"/> e.g. to make mouse events like report/click apply to the autocomplete control instead of changing the cursor position in the underlying text view.
+    ///     Handle mouse events before <see cref="HostControl"/> e.g. to make mouse events like report/click apply to the
+    ///     autocomplete control instead of changing the cursor position in the underlying text view.
     /// </summary>
     /// <param name="me">The mouse event.</param>
     /// <param name="fromHost">If was called from the popup or from the host.</param>
@@ -119,7 +125,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
             return false;
         }
 
-        if (popup == null || Suggestions.Count == 0)
+        if ((popup == null) || (Suggestions.Count == 0))
         {
             ManipulatePopup ();
 
@@ -158,7 +164,8 @@ public abstract class PopupAutocomplete : AutocompleteBase
     }
 
     /// <summary>
-    ///     Handle key events before <see cref="HostControl"/> e.g. to make key events like up/down apply to the autocomplete control instead of changing the cursor position in the underlying text view.
+    ///     Handle key events before <see cref="HostControl"/> e.g. to make key events like up/down apply to the
+    ///     autocomplete control instead of changing the cursor position in the underlying text view.
     /// </summary>
     /// <param name="a">The key event.</param>
     /// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
@@ -180,7 +187,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
             return ReopenSuggestions ();
         }
 
-        if (closed || Suggestions.Count == 0)
+        if (closed || (Suggestions.Count == 0))
         {
             Visible = false;
 
@@ -242,7 +249,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
         {
             ProcessKey (new Key ((KeyCode)Suggestions [0].Title [0]));
         }
-        else if (!Visible || HostControl?.HasFocus == false || Suggestions.Count == 0)
+        else if (!Visible || (HostControl?.HasFocus == false) || (Suggestions.Count == 0))
         {
             LastPopupPos = null;
             Visible = false;
@@ -399,8 +406,9 @@ public abstract class PopupAutocomplete : AutocompleteBase
 
     /// <summary>
     ///     Called when the user confirms a selection at the current cursor location in the <see cref="HostControl"/>. The
-    ///     <paramref name="accepted"/> string is the full autocomplete word to be inserted. Typically a host will have to remove some characters such that the
-    ///     <paramref name="accepted"/> string completes the word instead of simply being appended.
+    ///     <paramref name="accepted"/> string is the full autocomplete word to be inserted. Typically a host will have to
+    ///     remove some characters such that the <paramref name="accepted"/> string completes the word instead of simply being
+    ///     appended.
     /// </summary>
     /// <param name="accepted"></param>
     /// <returns>True if the insertion was possible otherwise false</returns>

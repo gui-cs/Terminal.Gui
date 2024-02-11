@@ -33,11 +33,14 @@ public class FakeDriver : ConsoleDriver
         }
 
         public bool FakeClipboardAlwaysThrowsNotSupportedException { get; internal set; }
+
         public bool FakeClipboardIsSupportedAlwaysFalse { get; internal set; }
+
         public bool UseFakeClipboard { get; internal set; }
     }
 
     public static Behaviors FakeBehaviors = new ();
+
     public override bool SupportsTrueColor => false;
 
     public FakeDriver ()
@@ -405,7 +408,7 @@ public class FakeDriver : ConsoleDriver
     {
         FakeConsole.SetWindowSize (width, height);
 
-        if (width != Cols || height != Rows)
+        if ((width != Cols) || (height != Rows))
         {
             SetBufferSize (width, height);
             Cols = width;
@@ -417,7 +420,7 @@ public class FakeDriver : ConsoleDriver
 
     public void SetWindowPosition (int left, int top)
     {
-        if (Left > 0 || Top > 0)
+        if ((Left > 0) || (Top > 0))
         {
             Left = 0;
             Top = 0;
@@ -507,6 +510,7 @@ public class FakeDriver : ConsoleDriver
         private readonly bool _isSupportedAlwaysFalse;
         private string _contents = string.Empty;
         public Exception FakeException;
+
         public override bool IsSupported => !_isSupportedAlwaysFalse;
 
         protected override string GetClipboardDataImpl ()

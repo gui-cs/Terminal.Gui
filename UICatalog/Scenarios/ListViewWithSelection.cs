@@ -156,11 +156,11 @@ public class ListViewWithSelection : Scenario
     // This is basically the same implementation used by the UICatalog main window
     internal class ScenarioListDataSource : IListDataSource
     {
+        public ScenarioListDataSource (List<Scenario> itemList) { Scenarios = itemList; }
         private readonly int _nameColumnWidth = 30;
         private int count;
         private BitArray marks;
         private List<Scenario> scenarios;
-        public ScenarioListDataSource (List<Scenario> itemList) { Scenarios = itemList; }
 
         public List<Scenario> Scenarios
         {
@@ -188,6 +188,7 @@ public class ListViewWithSelection : Scenario
         }
 
         public int Count => Scenarios != null ? Scenarios.Count : 0;
+
         public int Length { get; private set; }
 
         public void Render (

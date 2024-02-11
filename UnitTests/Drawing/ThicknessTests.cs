@@ -9,8 +9,8 @@ namespace Terminal.Gui.DrawingTests;
 
 public class ThicknessTests
 {
-    private readonly ITestOutputHelper _output;
     public ThicknessTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void Constructor_Defaults ()

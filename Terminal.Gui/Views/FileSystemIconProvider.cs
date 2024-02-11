@@ -17,8 +17,9 @@ public class FileSystemIconProvider
 
     /// <summary>
     ///     <para>
-    ///         Gets or sets a flag indicating whether to use Nerd Font icons. Defaults to <see cref="NerdFonts.Enable"/> which can be configured by end users from their
-    ///         <c>./.tui/config.json</c> via <see cref="ConfigurationManager"/>.
+    ///         Gets or sets a flag indicating whether to use Nerd Font icons. Defaults to <see cref="NerdFonts.Enable"/>
+    ///         which can be configured by end users from their <c>./.tui/config.json</c> via
+    ///         <see cref="ConfigurationManager"/>.
     ///     </para>
     ///     <remarks>Enabling <see cref="UseNerdIcons"/> implicitly disables <see cref="UseUnicodeCharacters"/>.</remarks>
     /// </summary>
@@ -52,7 +53,8 @@ public class FileSystemIconProvider
     }
 
     /// <summary>
-    ///     Returns the character to use to represent <paramref name="fileSystemInfo"/> or an empty space if no icon should be used.
+    ///     Returns the character to use to represent <paramref name="fileSystemInfo"/> or an empty space if no icon
+    ///     should be used.
     /// </summary>
     /// <param name="fileSystemInfo">The file or directory requiring an icon.</param>
     /// <returns></returns>
@@ -77,7 +79,8 @@ public class FileSystemIconProvider
     }
 
     /// <summary>
-    ///     Returns <see cref="GetIcon(IFileSystemInfo)"/> with an extra space on the end if icon is likely to overlap adjacent cells.
+    ///     Returns <see cref="GetIcon(IFileSystemInfo)"/> with an extra space on the end if icon is likely to overlap
+    ///     adjacent cells.
     /// </summary>
     public string GetIconWithOptionalSpace (IFileSystemInfo fileSystemInfo)
     {

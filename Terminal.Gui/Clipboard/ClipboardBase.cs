@@ -102,7 +102,10 @@ public abstract class ClipboardBase : IClipboard
         }
     }
 
-    /// <summary>Returns the contents of the OS clipboard if possible. Implemented by <see cref="ConsoleDriver"/>-specific subclasses.</summary>
+    /// <summary>
+    ///     Returns the contents of the OS clipboard if possible. Implemented by <see cref="ConsoleDriver"/>-specific
+    ///     subclasses.
+    /// </summary>
     /// <returns>The contents of the OS clipboard if successful.</returns>
     /// <exception cref="NotSupportedException">Thrown if it was not possible to copy from the OS clipboard.</exception>
     protected abstract string GetClipboardDataImpl ();

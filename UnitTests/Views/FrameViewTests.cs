@@ -4,8 +4,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class FrameViewTests
 {
-    private readonly ITestOutputHelper _output;
     public FrameViewTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void Constructors_Defaults ()

@@ -7,8 +7,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class MenuBarTests
 {
-    private readonly ITestOutputHelper _output;
     public MenuBarTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     [AutoInitShutdown]

@@ -4,8 +4,8 @@ namespace Terminal.Gui.DialogTests;
 
 public class WizardTests
 {
-    private readonly ITestOutputHelper _output;
     public WizardTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     // =========== Wizard Tests
     [Fact]

@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace Terminal.Gui;
 
 /// <summary>Json converter for the <see cref="Color"/> class.</summary>
-internal class ColorJsonConverter : JsonConverter<Color>
+class ColorJsonConverter : JsonConverter<Color>
 {
     private static ColorJsonConverter _instance;
 

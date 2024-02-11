@@ -11,8 +11,9 @@ namespace Terminal.Gui;
 ///     <para>The <see cref="ThemeManager.Theme"/> property is used to detemrine the currently active theme.</para>
 /// </remarks>
 /// <para>
-///     <see cref="ThemeManager"/> is a singleton class. It is created when the first <see cref="ThemeManager"/> property is accessed. Accessing
-///     <see cref="ThemeManager.Instance"/> is the same as accessing <see cref="ConfigurationManager.Themes"/>.
+///     <see cref="ThemeManager"/> is a singleton class. It is created when the first <see cref="ThemeManager"/> property
+///     is accessed. Accessing <see cref="ThemeManager.Instance"/> is the same as accessing
+///     <see cref="ConfigurationManager.Themes"/>.
 /// </para>
 /// <example>
 ///     <code>
@@ -60,11 +61,7 @@ public class ThemeManager : IDictionary<string, ThemeScope>
 
     /// <summary>Gets or sets the currently selected theme. The value is persisted to the "Theme" property.</summary>
     [JsonIgnore]
-    public string Theme
-    {
-        get => SelectedTheme;
-        set => SelectedTheme = value;
-    }
+    public string Theme { get => SelectedTheme; set => SelectedTheme = value; }
 
     /// <summary>Holds the <see cref="ThemeScope"/> definitions.</summary>
     [JsonInclude]
@@ -140,8 +137,11 @@ public class ThemeManager : IDictionary<string, ThemeScope>
 
 #pragma warning disable 1591
     public ICollection<string> Keys => ((IDictionary<string, ThemeScope>)Themes!).Keys;
+
     public ICollection<ThemeScope> Values => ((IDictionary<string, ThemeScope>)Themes!).Values;
+
     public int Count => ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Count;
+
     public bool IsReadOnly => ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).IsReadOnly;
 
     public ThemeScope this [string key]

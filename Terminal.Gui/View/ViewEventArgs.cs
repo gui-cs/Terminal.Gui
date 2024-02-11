@@ -9,8 +9,8 @@ public class ViewEventArgs : EventArgs
 
     /// <summary>The view that the event is about.</summary>
     /// <remarks>
-    ///     Can be different from the sender of the <see cref="EventHandler"/> for example if event describes the adding a child then sender may be the parent while
-    ///     <see cref="View"/> is the child being added.
+    ///     Can be different from the sender of the <see cref="EventHandler"/> for example if event describes the adding a
+    ///     child then sender may be the parent while <see cref="View"/> is the child being added.
     /// </remarks>
     public View View { get; }
 }
@@ -47,7 +47,9 @@ public class FocusEventArgs : EventArgs
     public FocusEventArgs (View view) { View = view; }
 
     /// <summary>
-    ///     Indicates if the current focus event has already been processed and the driver should stop notifying any other event subscriber. Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
+    ///     Indicates if the current focus event has already been processed and the driver should stop notifying any other
+    ///     event subscriber. Its important to set this value to true specially when updating any View's layout from inside the
+    ///     subscriber method.
     /// </summary>
     public bool Handled { get; set; }
 

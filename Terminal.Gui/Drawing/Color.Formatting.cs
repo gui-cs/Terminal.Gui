@@ -10,18 +10,20 @@ public readonly partial record struct Color
 {
     /// <inheritdoc cref="object.ToString"/>
     /// <summary>
-    ///     Returns a <see langword="string"/> representation of the current <see cref="Color"/> value, according to the provided
-    ///     <paramref name="formatString"/> and optional <paramref name="formatProvider"/>.
+    ///     Returns a <see langword="string"/> representation of the current <see cref="Color"/> value, according to the
+    ///     provided <paramref name="formatString"/> and optional <paramref name="formatProvider"/>.
     /// </summary>
     /// <param name="formatString">
-    ///     A format string that will be passed to <see cref="string.Format(System.IFormatProvider?,string,object?[])"/>.
+    ///     A format string that will be passed to
+    ///     <see cref="string.Format(System.IFormatProvider?,string,object?[])"/>.
     ///     <para/>
     ///     See remarks for parameters passed to that method.
     /// </param>
     /// <param name="formatProvider">
-    ///     An optional <see cref="IFormatProvider"/> to use when formatting the <see cref="Color"/> using custom format strings not specified for this method. Provides this instance as
-    ///     <see cref="Argb"/>. <br/> If this parameter is not null, the specified <see cref="IFormatProvider"/> will be used instead of the custom formatting provided by the
-    ///     <see cref="Color"/> type.
+    ///     An optional <see cref="IFormatProvider"/> to use when formatting the <see cref="Color"/>
+    ///     using custom format strings not specified for this method. Provides this instance as <see cref="Argb"/>. <br/> If
+    ///     this parameter is not null, the specified <see cref="IFormatProvider"/> will be used instead of the custom
+    ///     formatting provided by the <see cref="Color"/> type.
     ///     <para/>
     ///     See remarks for defined format strings.
     /// </param>
@@ -34,29 +36,35 @@ public readonly partial record struct Color
     ///         <item>
     ///             <term>g or null or empty string</term>
     ///             <description>
-    ///                 General/default format - Returns a named <see cref="Color"/> if there is a match, or a 24-bit/3-byte/6-hex digit string in "#RRGGBB" format.
+    ///                 General/default format - Returns a named <see cref="Color"/> if there is a match, or a
+    ///                 24-bit/3-byte/6-hex digit string in "#RRGGBB" format.
     ///             </description>
     ///         </item>
     ///         <item>
     ///             <term>G</term>
     ///             <description>
-    ///                 Extended general format - Returns a named <see cref="Color"/> if there is a match, or a 32-bit/4-byte/8-hex digit string in "#AARRGGBB" format.
+    ///                 Extended general format - Returns a named <see cref="Color"/> if there is a match, or a
+    ///                 32-bit/4-byte/8-hex digit string in "#AARRGGBB" format.
     ///             </description>
     ///         </item>
     ///         <item>
     ///             <term>d</term>
-    ///             <description>Decimal format - Returns a 3-component decimal representation of the <see cref="Color"/> in "rgb(R,G,B)" format.</description>
+    ///             <description>
+    ///                 Decimal format - Returns a 3-component decimal representation of the <see cref="Color"/> in
+    ///                 "rgb(R,G,B)" format.
+    ///             </description>
     ///         </item>
     ///         <item>
     ///             <term>D</term>
     ///             <description>
-    ///                 Extended decimal format - Returns a 4-component decimal representation of the <see cref="Color"/> in "rgba(R,G,B,A)" format.
+    ///                 Extended decimal format - Returns a 4-component decimal representation of the
+    ///                 <see cref="Color"/> in "rgba(R,G,B,A)" format.
     ///             </description>
     ///         </item>
     ///     </list>
     ///     <para>
-    ///         If <paramref name="formatProvider"/> is provided and is a non-null <see cref="ICustomColorFormatter"/>, the following behaviors are available, for the specified values of
-    ///         <paramref name="formatString"/>:
+    ///         If <paramref name="formatProvider"/> is provided and is a non-null <see cref="ICustomColorFormatter"/>, the
+    ///         following behaviors are available, for the specified values of <paramref name="formatString"/>:
     ///         <list type="bullet">
     ///             <listheader>
     ///                 <term>Value</term> <description>Result</description>
@@ -64,17 +72,19 @@ public readonly partial record struct Color
     ///             <item>
     ///                 <term>null or empty string</term>
     ///                 <description>
-    ///                     Calls <see cref="ICustomColorFormatter.Format(string?,byte,byte,byte,byte)"/> on the provided
-    ///                     <paramref name="formatProvider"/> with the null string, and <see cref="R"/>, <see cref="G"/>,
-    ///                     <see cref="B"/>, and <see cref="A"/> as typed arguments of type <see cref="Byte"/> .
+    ///                     Calls <see cref="ICustomColorFormatter.Format(string?,byte,byte,byte,byte)"/> on the
+    ///                     provided <paramref name="formatProvider"/> with the null string, and <see cref="R"/>,
+    ///                     <see cref="G"/>, <see cref="B"/>, and <see cref="A"/> as typed arguments of type <see cref="Byte"/>
+    ///                     .
     ///                 </description>
     ///             </item>
     ///             <item>
     ///                 <term>All other values</term>
     ///                 <description>
-    ///                     Calls <see cref="string.Format{TArg0}"/> with the provided <paramref name="formatProvider"/> and
-    ///                     <paramref name="formatString"/> (parsed as a <see cref="CompositeFormat"/>), with the value of
-    ///                     <see cref="Argb"/> as the sole <see langword="uint"/>-typed argument.
+    ///                     Calls <see cref="string.Format{TArg0}"/> with the provided
+    ///                     <paramref name="formatProvider"/> and <paramref name="formatString"/> (parsed as a
+    ///                     <see cref="CompositeFormat"/>), with the value of <see cref="Argb"/> as the sole
+    ///                     <see langword="uint"/>-typed argument.
     ///                 </description>
     ///             </item>
     ///         </list>
@@ -139,18 +149,20 @@ public readonly partial record struct Color
     /// <remarks>
     ///     <para>
     ///         This method should be used only when absolutely necessary, because it <b>always</b> has more overhead than
-    ///         <see cref="ToString(string?,System.IFormatProvider?)"/>, as this method results in an intermediate allocation of one or more instances of
-    ///         <see langword="string"/> and a copy of that string to <paramref name="destination"/> if formatting was successful.
-    ///         <br/> When possible, use <see cref="ToString(string?,System.IFormatProvider?)"/>, which attempts to avoid intermediate allocations.
+    ///         <see cref="ToString(string?,System.IFormatProvider?)"/>, as this method results in an intermediate allocation
+    ///         of one or more instances of <see langword="string"/> and a copy of that string to
+    ///         <paramref name="destination"/> if formatting was successful. <br/> When possible, use
+    ///         <see cref="ToString(string?,System.IFormatProvider?)"/>, which attempts to avoid intermediate allocations.
     ///     </para>
     ///     <para>
     ///         This method only returns <see langword="true"/> and with its output written to <paramref name="destination"/>
-    ///         if the formatted string, <i>in its entirety</i>, will fit in <paramref name="destination"/>. If the resulting formatted string is too large to fit in
-    ///         <paramref name="destination"/>, the result will be false and <paramref name="destination"/> will be unaltered.
+    ///         if the formatted string, <i>in its entirety</i>, will fit in <paramref name="destination"/>. If the resulting
+    ///         formatted string is too large to fit in <paramref name="destination"/>, the result will be false and
+    ///         <paramref name="destination"/> will be unaltered.
     ///     </para>
     ///     <para>
-    ///         The resulting formatted string may be <b>shorter</b> than <paramref name="destination"/>. When this method returns
-    ///         <see langword="true"/>, use <paramref name="charsWritten"/> when handling the value of
+    ///         The resulting formatted string may be <b>shorter</b> than <paramref name="destination"/>. When this method
+    ///         returns <see langword="true"/>, use <paramref name="charsWritten"/> when handling the value of
     ///         <paramref name="destination"/>.
     ///     </para>
     /// </remarks>
@@ -192,8 +204,8 @@ public readonly partial record struct Color
 
     /// <summary>Converts the provided <see langword="string"/> to a new <see cref="Color"/> value.</summary>
     /// <param name="text">
-    ///     The text to analyze. Formats supported are "#RGB", "#RRGGBB", "#ARGB", "#AARRGGBB", "rgb(r,g,b)", "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the
-    ///     <see cref="Gui.ColorName"/> string values.
+    ///     The text to analyze. Formats supported are "#RGB", "#RRGGBB", "#ARGB", "#AARRGGBB", "rgb(r,g,b)",
+    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="Gui.ColorName"/> string values.
     /// </param>
     /// <param name="formatProvider">
     ///     If specified and not <see langword="null"/>, will be passed to
@@ -202,7 +214,10 @@ public readonly partial record struct Color
     /// <returns>A <see cref="Color"/> value equivalent to <paramref name="text"/>, if parsing was successful.</returns>
     /// <remarks>While <see cref="Color"/> supports the alpha channel <see cref="A"/>, Terminal.Gui does not.</remarks>
     /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <see langword="null"/>.</exception>
-    /// <exception cref="ArgumentException">If <paramref name="text"/> is an empty string or consists of only whitespace characters.</exception>
+    /// <exception cref="ArgumentException">
+    ///     If <paramref name="text"/> is an empty string or consists of only whitespace
+    ///     characters.
+    /// </exception>
     /// <exception cref="ColorParseException">
     ///     If thrown by
     ///     <see cref="Parse(System.ReadOnlySpan{char},System.IFormatProvider?)"/>.
@@ -230,19 +245,20 @@ public readonly partial record struct Color
     ///     value.
     /// </summary>
     /// <param name="text">
-    ///     The text to analyze. Formats supported are "#RGB", "#RRGGBB", "#RGBA", "#AARRGGBB", "rgb(r,g,b)", "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the
-    ///     <see cref="Gui.ColorName"/> string values.
+    ///     The text to analyze. Formats supported are "#RGB", "#RRGGBB", "#RGBA", "#AARRGGBB", "rgb(r,g,b)",
+    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="Gui.ColorName"/> string values.
     /// </param>
     /// <param name="formatProvider">
-    ///     Optional <see cref="IFormatProvider"/> to provide parsing services for the input text. <br/> Defaults to
-    ///     <see cref="CultureInfo.InvariantCulture"/> if <see langword="null"/>. <br/> If not null, must implement
-    ///     <see cref="ICustomColorFormatter"/> or will be ignored and <see cref="CultureInfo.InvariantCulture"/> will be used.
+    ///     Optional <see cref="IFormatProvider"/> to provide parsing services for the input text.
+    ///     <br/> Defaults to <see cref="CultureInfo.InvariantCulture"/> if <see langword="null"/>. <br/> If not null, must
+    ///     implement <see cref="ICustomColorFormatter"/> or will be ignored and <see cref="CultureInfo.InvariantCulture"/>
+    ///     will be used.
     /// </param>
     /// <returns>A <see cref="Color"/> value equivalent to <paramref name="text"/>, if parsing was successful.</returns>
     /// <remarks>While <see cref="Color"/> supports the alpha channel <see cref="A"/>, Terminal.Gui does not.</remarks>
     /// <exception cref="ArgumentException">
-    ///     with an inner <see cref="FormatException"/> if <paramref name="text"/> was unable to be successfully parsed as a
-    ///     <see cref="Color"/>, for any reason.
+    ///     with an inner <see cref="FormatException"/> if <paramref name="text"/> was unable
+    ///     to be successfully parsed as a <see cref="Color"/>, for any reason.
     /// </exception>
     [Pure]
     [SkipLocalsInit]
@@ -454,14 +470,18 @@ public readonly partial record struct Color
 
     /// <summary>Converts the provided <see langword="string"/> to a new <see cref="Color"/> value.</summary>
     /// <param name="text">
-    ///     The text to analyze. Formats supported are "#RGB", "#RRGGBB", "#ARGB", "#AARRGGBB", "rgb(r,g,b)", "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the
-    ///     <see cref="GetClosestNamedColor (Color)"/> string values.
+    ///     The text to analyze. Formats supported are "#RGB", "#RRGGBB", "#ARGB", "#AARRGGBB", "rgb(r,g,b)",
+    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="GetClosestNamedColor (Color)"/> string
+    ///     values.
     /// </param>
     /// <param name="formatProvider">
-    ///     Optional <see cref="IFormatProvider"/> to provide formatting services for the input text. <br/> Defaults to
-    ///     <see cref="CultureInfo.InvariantCulture"/> if <see langword="null"/>.
+    ///     Optional <see cref="IFormatProvider"/> to provide formatting services for the input text.
+    ///     <br/> Defaults to <see cref="CultureInfo.InvariantCulture"/> if <see langword="null"/>.
     /// </param>
-    /// <param name="result">The parsed value, if successful, or <see langword="default"/>(<see cref="Color"/>), if unsuccessful.</param>
+    /// <param name="result">
+    ///     The parsed value, if successful, or <see langword="default"/>(<see cref="Color"/>), if
+    ///     unsuccessful.
+    /// </param>
     /// <returns>A <see langword="bool"/> value indicating whether parsing was successful.</returns>
     /// <remarks>While <see cref="Color"/> supports the alpha channel <see cref="A"/>, Terminal.Gui does not.</remarks>
     [Pure]
@@ -480,14 +500,18 @@ public readonly partial record struct Color
     ///     value.
     /// </summary>
     /// <param name="text">
-    ///     The text to analyze. Formats supported are "#RGB", "#RRGGBB", "#ARGB", "#AARRGGBB", "rgb(r,g,b)", "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the
-    ///     <see cref="GetClosestNamedColor (Color)"/> string values.
+    ///     The text to analyze. Formats supported are "#RGB", "#RRGGBB", "#ARGB", "#AARRGGBB", "rgb(r,g,b)",
+    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="GetClosestNamedColor (Color)"/> string
+    ///     values.
     /// </param>
     /// <param name="formatProvider">
     ///     If specified and not <see langword="null"/>, will be passed to
     ///     <see cref="Parse(System.ReadOnlySpan{char},System.IFormatProvider?)"/>.
     /// </param>
-    /// <param name="color">The parsed value, if successful, or <see langword="default"/>(<see cref="Color"/>), if unsuccessful.</param>
+    /// <param name="color">
+    ///     The parsed value, if successful, or <see langword="default"/>(<see cref="Color"/>), if
+    ///     unsuccessful.
+    /// </param>
     /// <returns>A <see langword="bool"/> value indicating whether parsing was successful.</returns>
     /// <remarks>While <see cref="Color"/> supports the alpha channel <see cref="A"/>, Terminal.Gui does not.</remarks>
     [Pure]
@@ -511,7 +535,8 @@ public readonly partial record struct Color
 
     /// <inheritdoc/>
     /// <remarks>
-    ///     Use of this method involves a stack allocation of <paramref name="utf8Destination"/>.Length * 2 bytes. Use of the overload taking a char span is recommended.
+    ///     Use of this method involves a stack allocation of <paramref name="utf8Destination"/>.Length * 2 bytes. Use of
+    ///     the overload taking a char span is recommended.
     /// </remarks>
     [SkipLocalsInit]
     public bool TryFormat (
@@ -569,8 +594,8 @@ public readonly partial record struct Color
 
     /// <summary>Converts the provided string to a new <see cref="Color"/> instance.</summary>
     /// <param name="text">
-    ///     The text to analyze. Formats supported are "#RGB", "#RRGGBB", "#ARGB", "#AARRGGBB", "rgb(r,g,b)", "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the
-    ///     <see cref="Gui.ColorName"/> string values.
+    ///     The text to analyze. Formats supported are "#RGB", "#RRGGBB", "#ARGB", "#AARRGGBB", "rgb(r,g,b)",
+    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="Gui.ColorName"/> string values.
     /// </param>
     /// <param name="color">The parsed value.</param>
     /// <returns>A boolean value indicating whether parsing was successful.</returns>

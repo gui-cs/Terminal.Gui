@@ -7,8 +7,9 @@ namespace Terminal.Gui;
 /// <summary>Defines a standard set of <see cref="Attribute"/>s for common visible elements in a <see cref="View"/>.</summary>
 /// <remarks>
 ///     <para>
-///         ColorScheme objects are immutable. Once constructed, the properties cannot be changed. To change a ColorScheme, create a new one with the desired values, using the
-///         <see cref="ColorScheme(ColorScheme)"/> constructor.
+///         ColorScheme objects are immutable. Once constructed, the properties cannot be changed. To change a
+///         ColorScheme, create a new one with the desired values, using the <see cref="ColorScheme(ColorScheme)"/>
+///         constructor.
 ///     </para>
 /// </remarks>
 [JsonConverter (typeof (ColorSchemeJsonConverter))]
@@ -51,39 +52,19 @@ public class ColorScheme : IEquatable<ColorScheme>
     private readonly Attribute _normal;
 
     /// <summary>The default foreground and background color for text when the view is disabled.</summary>
-    public Attribute Disabled
-    {
-        get => _disabled;
-        init => _disabled = value;
-    }
+    public Attribute Disabled { get => _disabled; init => _disabled = value; }
 
     /// <summary>The foreground and background color for text when the view has the focus.</summary>
-    public Attribute Focus
-    {
-        get => _focus;
-        init => _focus = value;
-    }
+    public Attribute Focus { get => _focus; init => _focus = value; }
 
     /// <summary>The foreground and background color for for text in a focused view that indicates a <see cref="View.HotKey"/>.</summary>
-    public Attribute HotFocus
-    {
-        get => _hotFocus;
-        init => _hotFocus = value;
-    }
+    public Attribute HotFocus { get => _hotFocus; init => _hotFocus = value; }
 
     /// <summary>The foreground and background color for text in a non-focused view that indicates a <see cref="View.HotKey"/>.</summary>
-    public Attribute HotNormal
-    {
-        get => _hotNormal;
-        init => _hotNormal = value;
-    }
+    public Attribute HotNormal { get => _hotNormal; init => _hotNormal = value; }
 
     /// <summary>The foreground and background color for text when the view is not focused, hot, or disabled.</summary>
-    public Attribute Normal
-    {
-        get => _normal;
-        init => _normal = value;
-    }
+    public Attribute Normal { get => _normal; init => _normal = value; }
 
     /// <summary>Compares two <see cref="ColorScheme"/> objects for equality.</summary>
     /// <param name="other"></param>
@@ -134,7 +115,8 @@ public class ColorScheme : IEquatable<ColorScheme>
 }
 
 /// <summary>
-///     Holds the <see cref="ColorScheme"/>s that define the <see cref="Attribute"/>s that are used by views to render themselves.
+///     Holds the <see cref="ColorScheme"/>s that define the <see cref="Attribute"/>s that are used by views to render
+///     themselves.
 /// </summary>
 public static class Colors
 {
@@ -157,7 +139,10 @@ public static class Colors
     ///             </item>
     ///             <item>
     ///                 <term>Dialog</term>
-    ///                 <description>The dialog color scheme; used for <see cref="Dialog"/>, <see cref="MessageBox"/>, and other views dialog-like views.</description>
+    ///                 <description>
+    ///                     The dialog color scheme; used for <see cref="Dialog"/>, <see cref="MessageBox"/>, and
+    ///                     other views dialog-like views.
+    ///                 </description>
     ///             </item>
     ///             <item>
     ///                 <term>Menu</term>
@@ -177,8 +162,8 @@ public static class Colors
     ///     </para>
     ///     <para>Changing the values of an entry in this dictionary will affect all views that use the scheme.</para>
     ///     <para>
-    ///         <see cref="ConfigurationManager"/> can be used to override the default values for these schemes and add additional schemes. See
-    ///         <see cref="ConfigurationManager.Themes"/>.
+    ///         <see cref="ConfigurationManager"/> can be used to override the default values for these schemes and add
+    ///         additional schemes. See <see cref="ConfigurationManager.Themes"/>.
     ///     </para>
     /// </remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]

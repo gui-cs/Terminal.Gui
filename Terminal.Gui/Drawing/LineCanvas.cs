@@ -35,7 +35,8 @@ public enum LineStyle
     RoundedDashed,
 
     /// <summary>
-    ///     The border is drawn using thin line glyphs with rounded corners and short dashed (triple and quadruple) straight lines.
+    ///     The border is drawn using thin line glyphs with rounded corners and short dashed (triple and quadruple)
+    ///     straight lines.
     /// </summary>
     RoundedDotted
 
@@ -109,7 +110,8 @@ public class LineCanvas : IDisposable
     private Rect _cachedBounds;
 
     /// <summary>
-    ///     Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the line that is furthest left/top and Size is defined by the line that extends the furthest right/bottom.
+    ///     Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the line that is
+    ///     furthest left/top and Size is defined by the line that extends the furthest right/bottom.
     /// </summary>
     public Rect Bounds
     {
@@ -166,7 +168,10 @@ public class LineCanvas : IDisposable
     ///     </para>
     /// </summary>
     /// <param name="start">Starting point.</param>
-    /// <param name="length">The length of line. 0 for an intersection (cross or T). Positive for Down/Right. Negative for Up/Left.</param>
+    /// <param name="length">
+    ///     The length of line. 0 for an intersection (cross or T). Positive for Down/Right. Negative for
+    ///     Up/Left.
+    /// </param>
     /// <param name="orientation">The direction of the line.</param>
     /// <param name="style">The style of line to use</param>
     /// <param name="attribute"></param>
@@ -197,11 +202,16 @@ public class LineCanvas : IDisposable
         _lines.Clear ();
     }
 
-    /// <summary>Clears any cached states from the canvas Call this method if you make changes to lines that have already been added.</summary>
+    /// <summary>
+    ///     Clears any cached states from the canvas Call this method if you make changes to lines that have already been
+    ///     added.
+    /// </summary>
     public void ClearCache () { _cachedBounds = Rect.Empty; }
 
     /// <summary>
-    ///     Evaluates the lines that have been added to the canvas and returns a map containing the glyphs and their locations. The glyphs are the characters that should be rendered so that all lines connect up with the appropriate intersection symbols.
+    ///     Evaluates the lines that have been added to the canvas and returns a map containing the glyphs and their
+    ///     locations. The glyphs are the characters that should be rendered so that all lines connect up with the appropriate
+    ///     intersection symbols.
     /// </summary>
     /// <returns>A map of all the points within the canvas.</returns>
     public Dictionary<Point, Cell> GetCellMap ()
@@ -233,7 +243,9 @@ public class LineCanvas : IDisposable
     // TODO: Unless there's an obvious use case for this API we should delete it in favor of the
     // simpler version that doensn't take an area.
     /// <summary>
-    ///     Evaluates the lines that have been added to the canvas and returns a map containing the glyphs and their locations. The glyphs are the characters that should be rendered so that all lines connect up with the appropriate intersection symbols.
+    ///     Evaluates the lines that have been added to the canvas and returns a map containing the glyphs and their
+    ///     locations. The glyphs are the characters that should be rendered so that all lines connect up with the appropriate
+    ///     intersection symbols.
     /// </summary>
     /// <param name="inArea">A rectangle to constrain the search by.</param>
     /// <returns>A map of the points within the canvas that intersect with <paramref name="inArea"/>.</returns>
@@ -264,7 +276,9 @@ public class LineCanvas : IDisposable
     }
 
     /// <summary>
-    ///     Evaluates the lines that have been added to the canvas and returns a map containing the glyphs and their locations. The glyphs are the characters that should be rendered so that all lines connect up with the appropriate intersection symbols.
+    ///     Evaluates the lines that have been added to the canvas and returns a map containing the glyphs and their
+    ///     locations. The glyphs are the characters that should be rendered so that all lines connect up with the appropriate
+    ///     intersection symbols.
     /// </summary>
     /// <returns>A map of all the points within the canvas.</returns>
     public Dictionary<Point, Rune> GetMap () { return GetMap (Bounds); }
@@ -294,8 +308,9 @@ public class LineCanvas : IDisposable
     }
 
     /// <summary>
-    ///     Returns the contents of the line canvas rendered to a string. The string will include all columns and rows, even if
-    ///     <see cref="Bounds"/> has negative coordinates. For example, if the canvas contains a single line that starts at (-1,-1) with a length of 2, the rendered string will have a length of 2.
+    ///     Returns the contents of the line canvas rendered to a string. The string will include all columns and rows,
+    ///     even if <see cref="Bounds"/> has negative coordinates. For example, if the canvas contains a single line that
+    ///     starts at (-1,-1) with a length of 2, the rendered string will have a length of 2.
     /// </summary>
     /// <returns>The canvas rendered to a string.</returns>
     public override string ToString ()
@@ -350,8 +365,8 @@ public class LineCanvas : IDisposable
     }
 
     /// <summary>
-    ///     Returns true if all requested <paramref name="types"/> appear in <paramref name="intersects"/> and there are no additional
-    ///     <see cref="IntersectionRuneType"/>
+    ///     Returns true if all requested <paramref name="types"/> appear in <paramref name="intersects"/> and there are
+    ///     no additional <see cref="IntersectionRuneType"/>
     /// </summary>
     /// <param name="intersects"></param>
     /// <param name="types"></param>
@@ -398,13 +413,13 @@ public class LineCanvas : IDisposable
         bool useDouble = intersects.Any (i => i?.Line.Style == LineStyle.Double);
 
         bool useDashed = intersects.Any (
-                                         i => i?.Line.Style == LineStyle.Dashed
-                                              || i?.Line.Style == LineStyle.RoundedDashed
+                                         i => (i?.Line.Style == LineStyle.Dashed)
+                                              || (i?.Line.Style == LineStyle.RoundedDashed)
                                         );
 
         bool useDotted = intersects.Any (
-                                         i => i?.Line.Style == LineStyle.Dotted
-                                              || i?.Line.Style == LineStyle.RoundedDotted
+                                         i => (i?.Line.Style == LineStyle.Dotted)
+                                              || (i?.Line.Style == LineStyle.RoundedDotted)
                                         );
 
         // horiz and vert lines same as Single for Rounded
@@ -653,7 +668,8 @@ public class LineCanvas : IDisposable
     }
 
     /// <summary>
-    ///     Returns true if the <paramref name="intersects"/> collection has all the <paramref name="types"/> specified (i.e. AND).
+    ///     Returns true if the <paramref name="intersects"/> collection has all the <paramref name="types"/> specified
+    ///     (i.e. AND).
     /// </summary>
     /// <param name="intersects"></param>
     /// <param name="types"></param>
@@ -707,11 +723,11 @@ public class LineCanvas : IDisposable
             bool useRounded = intersects.Any (
                                               i => i?.Line.Length != 0
                                                    && (
-                                                          i?.Line.Style == LineStyle.Rounded
-                                                          || i?.Line.Style
-                                                          == LineStyle.RoundedDashed
-                                                          || i?.Line.Style
-                                                          == LineStyle.RoundedDotted)
+                                                          (i?.Line.Style == LineStyle.Rounded)
+                                                          || (i?.Line.Style
+                                                              == LineStyle.RoundedDashed)
+                                                          || (i?.Line.Style
+                                                              == LineStyle.RoundedDotted))
                                              );
 
             // Note that there aren't any glyphs for intersections of double lines with heavy lines
@@ -729,17 +745,17 @@ public class LineCanvas : IDisposable
             bool thickHorizontal = intersects.Any (
                                                    l => l?.Line.Orientation == Orientation.Horizontal
                                                         && (
-                                                               l.Line.Style == LineStyle.Heavy
-                                                               || l.Line.Style == LineStyle.HeavyDashed
-                                                               || l.Line.Style == LineStyle.HeavyDotted)
+                                                               (l.Line.Style == LineStyle.Heavy)
+                                                               || (l.Line.Style == LineStyle.HeavyDashed)
+                                                               || (l.Line.Style == LineStyle.HeavyDotted))
                                                   );
 
             bool thickVertical = intersects.Any (
                                                  l => l?.Line.Orientation == Orientation.Vertical
                                                       && (
-                                                             l.Line.Style == LineStyle.Heavy
-                                                             || l.Line.Style == LineStyle.HeavyDashed
-                                                             || l.Line.Style == LineStyle.HeavyDotted)
+                                                             (l.Line.Style == LineStyle.Heavy)
+                                                             || (l.Line.Style == LineStyle.HeavyDashed)
+                                                             || (l.Line.Style == LineStyle.HeavyDotted))
                                                 );
 
             if (doubleHorizontal)
@@ -765,7 +781,10 @@ public class LineCanvas : IDisposable
             return useRounded ? _round : _normal;
         }
 
-        /// <summary>Sets the glyphs used. Call this method after construction and any time ConfigurationManager has updated the settings.</summary>
+        /// <summary>
+        ///     Sets the glyphs used. Call this method after construction and any time ConfigurationManager has updated the
+        ///     settings.
+        /// </summary>
         public abstract void SetGlyphs ();
     }
 
@@ -875,7 +894,7 @@ public class LineCanvas : IDisposable
     }
 }
 
-internal class IntersectionDefinition
+class IntersectionDefinition
 {
     internal IntersectionDefinition (Point point, IntersectionType type, StraightLine line)
     {
@@ -895,7 +914,7 @@ internal class IntersectionDefinition
 }
 
 /// <summary>The type of Rune that we will use before considering double width, curved borders etc</summary>
-internal enum IntersectionRuneType
+enum IntersectionRuneType
 {
     None,
     Dot,
@@ -912,7 +931,7 @@ internal enum IntersectionRuneType
     VLine
 }
 
-internal enum IntersectionType
+enum IntersectionType
 {
     /// <summary>There is no intersection</summary>
     None,

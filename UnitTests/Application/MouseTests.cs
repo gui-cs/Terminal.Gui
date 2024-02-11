@@ -6,8 +6,6 @@ namespace Terminal.Gui.ApplicationTests;
 
 public class MouseTests
 {
-    private readonly ITestOutputHelper _output;
-
     public MouseTests (ITestOutputHelper output)
     {
         _output = output;
@@ -16,6 +14,8 @@ public class MouseTests
         RunState.Instances.Clear ();
 #endif
     }
+
+    private readonly ITestOutputHelper _output;
 
     #region mouse coordinate tests
 
@@ -60,7 +60,8 @@ public class MouseTests
     }
 
     /// <summary>
-    ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. No frames; Frame == Bounds
+    ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. No frames;
+    ///     Frame == Bounds
     /// </summary>
     [AutoInitShutdown]
     [Theory]
@@ -128,7 +129,8 @@ public class MouseTests
     }
 
     /// <summary>
-    ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. With Frames; Frame != Bounds
+    ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. With
+    ///     Frames; Frame != Bounds
     /// </summary>
     [AutoInitShutdown]
     [Theory]

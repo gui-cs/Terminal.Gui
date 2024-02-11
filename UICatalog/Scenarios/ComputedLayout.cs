@@ -6,7 +6,8 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios;
 
 /// <summary>
-///     This Scenario demonstrates how to use Termina.gui's Dim and Pos Layout System. [x] - Using Dim.Fill to fill a window [x] - Using Dim.Fill and Dim.Pos to automatically align controls based on an initial control [ ] - ...
+///     This Scenario demonstrates how to use Termina.gui's Dim and Pos Layout System. [x] - Using Dim.Fill to fill a
+///     window [x] - Using Dim.Fill and Dim.Pos to automatically align controls based on an initial control [ ] - ...
 /// </summary>
 [ScenarioMetadata ("Computed Layout", "Demonstrates the Computed (Dim and Pos) Layout System.")]
 [ScenarioCategory ("Layout")]

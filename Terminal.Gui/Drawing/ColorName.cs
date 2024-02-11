@@ -1,14 +1,14 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     Defines the 16 legacy color names and values that can be used to set the foreground and background colors in Terminal.Gui apps. Used with
-///     <see cref="Color"/>.
+///     Defines the 16 legacy color names and values that can be used to set the foreground and background colors in
+///     Terminal.Gui apps. Used with <see cref="Color"/>.
 /// </summary>
 /// <remarks>
 ///     <para>These colors match the 16 colors defined for ANSI escape sequences for 4-bit (16) colors.</para>
 ///     <para>
-///         For terminals that support 24-bit color (TrueColor), the RGB values for each of these colors can be configured using the
-///         <see cref="Color.Colors"/> property.
+///         For terminals that support 24-bit color (TrueColor), the RGB values for each of these colors can be
+///         configured using the <see cref="Color.Colors"/> property.
 ///     </para>
 /// </remarks>
 public enum ColorName

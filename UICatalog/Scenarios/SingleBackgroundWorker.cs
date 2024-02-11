@@ -22,11 +22,6 @@ public class SingleBackgroundWorker : Scenario
 
     public class MainApp : Toplevel
     {
-        private readonly ListView _listLog;
-        private readonly List<string> _log = new ();
-        private DateTime? _startStaging;
-        private BackgroundWorker _worker;
-
         public MainApp ()
         {
             var menu = new MenuBar
@@ -94,6 +89,11 @@ public class SingleBackgroundWorker : Scenario
             top.Add (_listLog);
             Add (top);
         }
+
+        private readonly ListView _listLog;
+        private readonly List<string> _log = new ();
+        private DateTime? _startStaging;
+        private BackgroundWorker _worker;
 
         private void RunWorker ()
         {
@@ -205,8 +205,6 @@ public class SingleBackgroundWorker : Scenario
 
     public class StagingUIController : Window
     {
-        private readonly Toplevel _top;
-
         public StagingUIController (DateTime? start, List<string> list)
         {
             Rect frame = Application.Top.Frame;
@@ -299,6 +297,7 @@ public class SingleBackgroundWorker : Scenario
             _top.Add (this);
         }
 
+        private readonly Toplevel _top;
         public void Load () { Application.Run (_top); }
     }
 }

@@ -26,7 +26,10 @@ public interface IListDataSource
     /// <param name="line">The line where the rendering will be done.</param>
     /// <param name="width">The width that must be filled out.</param>
     /// <param name="start">The index of the string to be displayed.</param>
-    /// <remarks>The default color will be set before this method is invoked, and will be based on whether the item is selected or not.</remarks>
+    /// <remarks>
+    ///     The default color will be set before this method is invoked, and will be based on whether the item is selected
+    ///     or not.
+    /// </remarks>
     void Render (
         ListView container,
         ConsoleDriver driver,
@@ -48,37 +51,48 @@ public interface IListDataSource
     IList ToList ();
 }
 
-/// <summary>ListView <see cref="View"/> renders a scrollable list of data where each item can be activated to perform an action.</summary>
+/// <summary>
+///     ListView <see cref="View"/> renders a scrollable list of data where each item can be activated to perform an
+///     action.
+/// </summary>
 /// <remarks>
 ///     <para>
-///         The <see cref="ListView"/> displays lists of data and allows the user to scroll through the data. Items in the can be activated firing an event (with the ENTER key or a mouse double-click). If the
+///         The <see cref="ListView"/> displays lists of data and allows the user to scroll through the data. Items in
+///         the can be activated firing an event (with the ENTER key or a mouse double-click). If the
 ///         <see cref="AllowsMarking"/> property is true, elements of the list can be marked by the user.
 ///     </para>
 ///     <para>
 ///         By default <see cref="ListView"/> uses <see cref="object.ToString"/> to render the items of any
-///         <see cref="IList"/> object (e.g. arrays, <see cref="List{T}"/>, and other collections). Alternatively, an object that implements
-///         <see cref="IListDataSource"/> can be provided giving full control of what is rendered.
+///         <see cref="IList"/> object (e.g. arrays, <see cref="List{T}"/>, and other collections). Alternatively, an
+///         object that implements <see cref="IListDataSource"/> can be provided giving full control of what is rendered.
 ///     </para>
 ///     <para>
 ///         <see cref="ListView"/> can display any object that implements the <see cref="IList"/> interface.
-///         <see cref="string"/> values are converted into <see cref="string"/> values before rendering, and other values are converted into
-///         <see cref="string"/> by calling <see cref="object.ToString"/> and then converting to <see cref="string"/> .
+///         <see cref="string"/> values are converted into <see cref="string"/> values before rendering, and other values
+///         are converted into <see cref="string"/> by calling <see cref="object.ToString"/> and then converting to
+///         <see cref="string"/> .
 ///     </para>
 ///     <para>
-///         To change the contents of the ListView, set the <see cref="Source"/> property (when providing custom rendering via
-///         <see cref="IListDataSource"/>) or call <see cref="SetSource"/> an <see cref="IList"/> is being used.
+///         To change the contents of the ListView, set the <see cref="Source"/> property (when providing custom
+///         rendering via <see cref="IListDataSource"/>) or call <see cref="SetSource"/> an <see cref="IList"/> is being
+///         used.
 ///     </para>
 ///     <para>
-///         When <see cref="AllowsMarking"/> is set to true the rendering will prefix the rendered items with [x] or [ ] and bind the SPACE key to toggle the selection. To implement a different marking style set
+///         When <see cref="AllowsMarking"/> is set to true the rendering will prefix the rendered items with [x] or [ ]
+///         and bind the SPACE key to toggle the selection. To implement a different marking style set
 ///         <see cref="AllowsMarking"/> to false and implement custom rendering.
 ///     </para>
 ///     <para>
-///         Searching the ListView with the keyboard is supported. Users type the first characters of an item, and the first item that starts with what the user types will be selected.
+///         Searching the ListView with the keyboard is supported. Users type the first characters of an item, and the
+///         first item that starts with what the user types will be selected.
 ///     </para>
 /// </remarks>
 public class ListView : View
 {
-    /// <summary>Initializes a new instance of <see cref="ListView"/>. Set the <see cref="Source"/> property to display something.</summary>
+    /// <summary>
+    ///     Initializes a new instance of <see cref="ListView"/>. Set the <see cref="Source"/> property to display
+    ///     something.
+    /// </summary>
     public ListView ()
     {
         CanFocus = true;
@@ -124,8 +138,8 @@ public class ListView : View
     /// <summary>Gets or sets whether this <see cref="ListView"/> allows items to be marked.</summary>
     /// <value>Set to <see langword="true"/> to allow marking elements of the list.</value>
     /// <remarks>
-    ///     If set to <see langword="true"/>, <see cref="ListView"/> will render items marked items with "[x]", and unmarked items with "[ ]" spaces. SPACE key will toggle marking. The default is
-    ///     <see langword="false"/>.
+    ///     If set to <see langword="true"/>, <see cref="ListView"/> will render items marked items with "[x]", and
+    ///     unmarked items with "[ ]" spaces. SPACE key will toggle marking. The default is <see langword="false"/>.
     /// </remarks>
     public bool AllowsMarking
     {
@@ -148,8 +162,8 @@ public class ListView : View
     }
 
     /// <summary>
-    ///     If set to <see langword="true"/> more than one item can be selected. If <see langword="false"/> selecting an item will cause all others to be un-selected. The default is
-    ///     <see langword="false"/>.
+    ///     If set to <see langword="true"/> more than one item can be selected. If <see langword="false"/> selecting an
+    ///     item will cause all others to be un-selected. The default is <see langword="false"/>.
     /// </summary>
     public bool AllowsMultipleSelection
     {
@@ -175,7 +189,8 @@ public class ListView : View
     }
 
     /// <summary>
-    ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="ListView.Source"/> collection as the user types.
+    ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="ListView.Source"/> collection as the
+    ///     user types.
     /// </summary>
     public CollectionNavigator KeystrokeNavigator { get; } = new ();
 
@@ -191,7 +206,7 @@ public class ListView : View
                 return;
             }
 
-            if (value < 0 || (MaxLength > 0 && value >= MaxLength))
+            if ((value < 0) || (MaxLength > 0 && value >= MaxLength))
             {
                 throw new ArgumentException ("value");
             }
@@ -211,12 +226,12 @@ public class ListView : View
         get => _selected;
         set
         {
-            if (_source == null || _source.Count == 0)
+            if ((_source == null) || (_source.Count == 0))
             {
                 return;
             }
 
-            if (value < -1 || value >= _source.Count)
+            if ((value < -1) || (value >= _source.Count))
             {
                 throw new ArgumentException ("value");
             }
@@ -255,7 +270,7 @@ public class ListView : View
                 return;
             }
 
-            if (value < 0 || (_source.Count > 0 && value >= _source.Count))
+            if ((value < 0) || (_source.Count > 0 && value >= _source.Count))
             {
                 throw new ArgumentException ("value");
             }
@@ -266,7 +281,8 @@ public class ListView : View
     }
 
     /// <summary>
-    ///     If <see cref="AllowsMarking"/> and <see cref="AllowsMultipleSelection"/> are both <see langword="true"/>, unmarks all marked items other than the currently selected.
+    ///     If <see cref="AllowsMarking"/> and <see cref="AllowsMultipleSelection"/> are both <see langword="true"/>,
+    ///     unmarks all marked items other than the currently selected.
     /// </summary>
     /// <returns><see langword="true"/> if unmarking was successful.</returns>
     public virtual bool AllowsAll ()
@@ -380,9 +396,9 @@ public class ListView : View
             return true;
         }
 
-        if (me.Y + _top >= _source.Count
-            || me.Y + _top < 0
-            || me.Y + _top > _top + Bounds.Height)
+        if ((me.Y + _top >= _source.Count)
+            || (me.Y + _top < 0)
+            || (me.Y + _top > _top + Bounds.Height))
         {
             return true;
         }
@@ -493,7 +509,10 @@ public class ListView : View
         return true;
     }
 
-    /// <summary>Changes the <see cref="SelectedItem"/> to the item just below the bottom of the visible list, scrolling if needed.</summary>
+    /// <summary>
+    ///     Changes the <see cref="SelectedItem"/> to the item just below the bottom of the visible list, scrolling if
+    ///     needed.
+    /// </summary>
     /// <returns></returns>
     public virtual bool MovePageDown ()
     {
@@ -624,7 +643,7 @@ public class ListView : View
 
             Move (0, row);
 
-            if (_source == null || item >= _source.Count)
+            if ((_source == null) || (item >= _source.Count))
             {
                 for (var c = 0; c < f.Width; c++)
                 {
@@ -676,7 +695,7 @@ public class ListView : View
     /// <returns></returns>
     public virtual bool OnOpenSelectedItem ()
     {
-        if (_source.Count <= _selected || _selected < 0 || OpenSelectedItem == null)
+        if ((_source.Count <= _selected) || (_selected < 0) || (OpenSelectedItem == null))
         {
             return false;
         }
@@ -794,10 +813,13 @@ public class ListView : View
 
     /// <summary>Sets the source of the <see cref="ListView"/> to an <see cref="IList"/>.</summary>
     /// <value>An object implementing the IList interface.</value>
-    /// <remarks>Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custome rendering.</remarks>
+    /// <remarks>
+    ///     Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custome
+    ///     rendering.
+    /// </remarks>
     public void SetSource (IList source)
     {
-        if (source == null && (Source == null || !(Source is ListWrapper)))
+        if (source == null && ((Source == null) || !(Source is ListWrapper)))
         {
             Source = null;
         }
@@ -809,13 +831,16 @@ public class ListView : View
 
     /// <summary>Sets the source to an <see cref="IList"/> value asynchronously.</summary>
     /// <value>An item implementing the IList interface.</value>
-    /// <remarks>Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custom rendering.</remarks>
+    /// <remarks>
+    ///     Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custom
+    ///     rendering.
+    /// </remarks>
     public Task SetSourceAsync (IList source)
     {
         return Task.Factory.StartNew (
                                       () =>
                                       {
-                                          if (source == null && (Source == null || !(Source is ListWrapper)))
+                                          if (source == null && ((Source == null) || !(Source is ListWrapper)))
                                           {
                                               Source = null;
                                           }
@@ -836,8 +861,8 @@ public class ListView : View
 }
 
 /// <summary>
-///     Provides a default implementation of <see cref="IListDataSource"/> that renders <see cref="ListView"/> items using
-///     <see cref="object.ToString()"/>.
+///     Provides a default implementation of <see cref="IListDataSource"/> that renders <see cref="ListView"/> items
+///     using <see cref="object.ToString()"/>.
 /// </summary>
 public class ListWrapper : IListDataSource
 {
@@ -925,7 +950,7 @@ public class ListWrapper : IListDataSource
     /// <inheritdoc/>
     public int StartsWith (string search)
     {
-        if (_source == null || _source?.Count == 0)
+        if ((_source == null) || (_source?.Count == 0))
         {
             return -1;
         }
@@ -955,7 +980,7 @@ public class ListWrapper : IListDataSource
 
     private int GetMaxLengthItem ()
     {
-        if (_source == null || _source?.Count == 0)
+        if ((_source == null) || (_source?.Count == 0))
         {
             return 0;
         }

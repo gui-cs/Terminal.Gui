@@ -29,8 +29,8 @@ public interface ITreeView
 public class TreeView : TreeView<ITreeNode>
 {
     /// <summary>
-    ///     Creates a new instance of the tree control with absolute positioning and initialises <see cref="TreeBuilder{T}"/>
-    ///     with default <see cref="ITreeNode"/> based builder.
+    ///     Creates a new instance of the tree control with absolute positioning and initialises
+    ///     <see cref="TreeBuilder{T}"/> with default <see cref="ITreeNode"/> based builder.
     /// </summary>
     public TreeView ()
     {
@@ -40,19 +40,21 @@ public class TreeView : TreeView<ITreeNode>
 }
 
 /// <summary>
-///     Hierarchical tree view with expandable branches. Branch objects are dynamically determined when expanded using a user defined
-///     <see cref="ITreeBuilder{T}"/>. <a href="../docs/treeview.md">See TreeView Deep Dive for more information</a>.
+///     Hierarchical tree view with expandable branches. Branch objects are dynamically determined when expanded using
+///     a user defined <see cref="ITreeBuilder{T}"/>.
+///     <a href="../docs/treeview.md">See TreeView Deep Dive for more information</a>.
 /// </summary>
 public class TreeView<T> : View, ITreeView where T : class
 {
     /// <summary>
-    ///     Error message to display when the control is not properly initialized at draw time (nodes added but no tree builder set).
+    ///     Error message to display when the control is not properly initialized at draw time (nodes added but no tree
+    ///     builder set).
     /// </summary>
     public static string NoBuilderError = "ERROR: TreeBuilder Not Set";
 
     /// <summary>
-    ///     Creates a new tree view with absolute positioning. Use <see cref="AddObjects(IEnumerable{T})"/> to set set root objects for the tree. Children will not be rendered until you set
-    ///     <see cref="TreeBuilder"/>.
+    ///     Creates a new tree view with absolute positioning. Use <see cref="AddObjects(IEnumerable{T})"/> to set set
+    ///     root objects for the tree. Children will not be rendered until you set <see cref="TreeBuilder"/>.
     /// </summary>
     public TreeView ()
     {
@@ -322,7 +324,8 @@ public class TreeView<T> : View, ITreeView where T : class
     public AspectGetterDelegate<T> AspectGetter { get; set; } = o => o.ToString () ?? "";
 
     /// <summary>
-    ///     Delegate for multi colored tree views. Return the <see cref="ColorScheme"/> to use for each passed object or null to use the default.
+    ///     Delegate for multi colored tree views. Return the <see cref="ColorScheme"/> to use for each passed object or
+    ///     null to use the default.
     /// </summary>
     public Func<T, ColorScheme> ColorGetter { get; set; }
 
@@ -330,8 +333,8 @@ public class TreeView<T> : View, ITreeView where T : class
     public int ContentHeight => BuildLineMap ().Count ();
 
     /// <summary>
-    ///     Get / Set the wished cursor when the tree is focused. Only applies when <see cref="MultiSelect"/> is true. Defaults to
-    ///     <see cref="CursorVisibility.Invisible"/>.
+    ///     Get / Set the wished cursor when the tree is focused. Only applies when <see cref="MultiSelect"/> is true.
+    ///     Defaults to <see cref="CursorVisibility.Invisible"/>.
     /// </summary>
     public CursorVisibility DesiredCursorVisibility
     {
@@ -350,7 +353,10 @@ public class TreeView<T> : View, ITreeView where T : class
         }
     }
 
-    /// <summary>Gets the <see cref="CollectionNavigator"/> that searches the <see cref="Objects"/> collection as the user types.</summary>
+    /// <summary>
+    ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="Objects"/> collection as the user
+    ///     types.
+    /// </summary>
     public CollectionNavigator KeystrokeNavigator { get; } = new ();
 
     /// <summary>Maximum number of nodes that can be expanded in any given branch.</summary>
@@ -390,25 +396,18 @@ public class TreeView<T> : View, ITreeView where T : class
     ///     Setting a value of less than 0 will result in a offset of 0. To see changes in the UI call
     ///     <see cref="View.SetNeedsDisplay()"/>.
     /// </remarks>
-    public int ScrollOffsetHorizontal
-    {
-        get => scrollOffsetHorizontal;
-        set => scrollOffsetHorizontal = Math.Max (0, value);
-    }
+    public int ScrollOffsetHorizontal { get => scrollOffsetHorizontal; set => scrollOffsetHorizontal = Math.Max (0, value); }
 
     /// <summary>The amount of tree view that has been scrolled off the top of the screen (by the user scrolling down).</summary>
     /// <remarks>
     ///     Setting a value of less than 0 will result in a offset of 0. To see changes in the UI call
     ///     <see cref="View.SetNeedsDisplay()"/>.
     /// </remarks>
-    public int ScrollOffsetVertical
-    {
-        get => scrollOffsetVertical;
-        set => scrollOffsetVertical = Math.Max (0, value);
-    }
+    public int ScrollOffsetVertical { get => scrollOffsetVertical; set => scrollOffsetVertical = Math.Max (0, value); }
 
     /// <summary>
-    ///     The currently selected object in the tree. When <see cref="MultiSelect"/> is true this is the object at which the cursor is at.
+    ///     The currently selected object in the tree. When <see cref="MultiSelect"/> is true this is the object at which
+    ///     the cursor is at.
     /// </summary>
     public T SelectedObject
     {
@@ -430,7 +429,8 @@ public class TreeView<T> : View, ITreeView where T : class
     public ITreeBuilder<T> TreeBuilder { get; set; }
 
     /// <summary>
-    ///     Map of root objects to the branches under them. All objects have a <see cref="Branch{T}"/> even if that branch has no children.
+    ///     Map of root objects to the branches under them. All objects have a <see cref="Branch{T}"/> even if that branch
+    ///     has no children.
     /// </summary>
     internal Dictionary<T, Branch<T>> roots { get; set; } = new ();
 
@@ -502,10 +502,14 @@ public class TreeView<T> : View, ITreeView where T : class
     ///     <paramref name="offset"/>. Each branch occupies 1 line on screen.
     /// </summary>
     /// <remarks>
-    ///     If nothing is currently selected or the selected object is no longer in the tree then the first object in the tree is selected instead.
+    ///     If nothing is currently selected or the selected object is no longer in the tree then the first object in the
+    ///     tree is selected instead.
     /// </remarks>
     /// <param name="offset">Positive to move the selection down the screen, negative to move it up</param>
-    /// <param name="expandSelection">True to expand the selection (assuming <see cref="MultiSelect"/> is enabled). False to replace.</param>
+    /// <param name="expandSelection">
+    ///     True to expand the selection (assuming <see cref="MultiSelect"/> is enabled). False to
+    ///     replace.
+    /// </param>
     public void AdjustSelection (int offset, bool expandSelection = false)
     {
         // if it is not a shift click or we don't allow multi select
@@ -663,7 +667,10 @@ public class TreeView<T> : View, ITreeView where T : class
         PositionCursor ();
     }
 
-    /// <summary>Returns true if the given object <paramref name="o"/> is exposed in the tree and can be expanded otherwise false.</summary>
+    /// <summary>
+    ///     Returns true if the given object <paramref name="o"/> is exposed in the tree and can be expanded otherwise
+    ///     false.
+    /// </summary>
     /// <param name="o"></param>
     /// <returns></returns>
     public bool CanExpand (T o) { return ObjectToBranch (o)?.CanExpand () ?? false; }
@@ -676,7 +683,8 @@ public class TreeView<T> : View, ITreeView where T : class
     public void Collapse (T toCollapse) { CollapseImpl (toCollapse, false); }
 
     /// <summary>
-    ///     Collapses the supplied object if it is currently expanded. Also collapses all children branches (this will only become apparent when/if the user expands it again).
+    ///     Collapses the supplied object if it is currently expanded. Also collapses all children branches (this will
+    ///     only become apparent when/if the user expands it again).
     /// </summary>
     /// <param name="toCollapse">The object to collapse.</param>
     public void CollapseAll (T toCollapse) { CollapseImpl (toCollapse, true); }
@@ -693,11 +701,15 @@ public class TreeView<T> : View, ITreeView where T : class
         SetNeedsDisplay ();
     }
 
-    /// <summary>Called once for each visible row during rendering.  Can be used to make last minute changes to color or text rendered</summary>
+    /// <summary>
+    ///     Called once for each visible row during rendering.  Can be used to make last minute changes to color or text
+    ///     rendered
+    /// </summary>
     public event EventHandler<DrawTreeViewLineEventArgs<T>> DrawLine;
 
     /// <summary>
-    ///     Adjusts the <see cref="ScrollOffsetVertical"/> to ensure the given <paramref name="model"/> is visible. Has no effect if already visible.
+    ///     Adjusts the <see cref="ScrollOffsetVertical"/> to ensure the given <paramref name="model"/> is visible. Has no
+    ///     effect if already visible.
     /// </summary>
     public void EnsureVisible (T model)
     {
@@ -728,7 +740,10 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <summary>Expands the currently <see cref="SelectedObject"/>.</summary>
     public void Expand () { Expand (SelectedObject); }
 
-    /// <summary>Expands the supplied object if it is contained in the tree (either as a root object or as an exposed branch object).</summary>
+    /// <summary>
+    ///     Expands the supplied object if it is contained in the tree (either as a root object or as an exposed branch
+    ///     object).
+    /// </summary>
     /// <param name="toExpand">The object to expand.</param>
     public void Expand (T toExpand)
     {
@@ -757,7 +772,8 @@ public class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <summary>
-    ///     Fully expands all nodes in the tree, if the tree is very big and built dynamically this may take a while (e.g. for file system).
+    ///     Fully expands all nodes in the tree, if the tree is very big and built dynamically this may take a while (e.g.
+    ///     for file system).
     /// </summary>
     public void ExpandAll ()
     {
@@ -799,7 +815,8 @@ public class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <summary>
-    ///     Returns the currently expanded children of the passed object. Returns an empty collection if the branch is not exposed or not expanded.
+    ///     Returns the currently expanded children of the passed object. Returns an empty collection if the branch is not
+    ///     exposed or not expanded.
     /// </summary>
     /// <param name="o">An object in the tree.</param>
     /// <returns></returns>
@@ -807,7 +824,7 @@ public class TreeView<T> : View, ITreeView where T : class
     {
         Branch<T> branch = ObjectToBranch (o);
 
-        if (branch == null || !branch.IsExpanded)
+        if ((branch == null) || !branch.IsExpanded)
         {
             return new T [0];
         }
@@ -817,7 +834,8 @@ public class TreeView<T> : View, ITreeView where T : class
 
     /// <summary>Returns the maximum width line in the tree including prefix and expansion symbols.</summary>
     /// <param name="visible">
-    ///     True to consider only rows currently visible (based on window bounds and <see cref="ScrollOffsetVertical"/>. False to calculate the width of every exposed branch in the tree.
+    ///     True to consider only rows currently visible (based on window bounds and
+    ///     <see cref="ScrollOffsetVertical"/>. False to calculate the width of every exposed branch in the tree.
     /// </param>
     /// <returns></returns>
     public int GetContentWidth (bool visible)
@@ -850,10 +868,11 @@ public class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <summary>
-    ///     Returns the object in the tree list that is currently visible. at the provided row. Returns null if no object is at that location.
+    ///     Returns the object in the tree list that is currently visible. at the provided row. Returns null if no object
+    ///     is at that location.
     ///     <remarks></remarks>
-    ///     If you have screen coordinates then use <see cref="View.ScreenToFrame"/> to translate these into the client area of the
-    ///     <see cref="TreeView{T}"/>.
+    ///     If you have screen coordinates then use <see cref="View.ScreenToFrame"/> to translate these into the client area of
+    ///     the <see cref="TreeView{T}"/>.
     /// </summary>
     /// <param name="row">The row of the <see cref="View.Bounds"/> of the <see cref="TreeView{T}"/>.</param>
     /// <returns>The object currently displayed on this row or null.</returns>
@@ -865,8 +884,8 @@ public class TreeView<T> : View, ITreeView where T : class
     ///         would be displayed or null if it is not currently exposed (e.g. its parent is collapsed).
     ///     </para>
     ///     <para>
-    ///         Note that the returned value can be negative if the TreeView is scrolled down and the <paramref name="toFind"/>
-    ///         object is off the top of the view.
+    ///         Note that the returned value can be negative if the TreeView is scrolled down and the
+    ///         <paramref name="toFind"/> object is off the top of the view.
     ///     </para>
     /// </summary>
     /// <param name="toFind"></param>
@@ -883,14 +902,18 @@ public class TreeView<T> : View, ITreeView where T : class
         return idx - ScrollOffsetVertical;
     }
 
-    /// <summary>Returns the parent object of <paramref name="o"/> in the tree. Returns null if the object is not exposed in the tree.</summary>
+    /// <summary>
+    ///     Returns the parent object of <paramref name="o"/> in the tree. Returns null if the object is not exposed in
+    ///     the tree.
+    /// </summary>
     /// <param name="o">An object in the tree.</param>
     /// <returns></returns>
     public T GetParent (T o) { return ObjectToBranch (o)?.Parent?.Model; }
 
     /// <summary>
-    ///     Returns the index of the object <paramref name="o"/> if it is currently exposed (it's parent(s) have been expanded). This can be used with
-    ///     <see cref="ScrollOffsetVertical"/> and <see cref="View.SetNeedsDisplay()"/> to scroll to a specific object.
+    ///     Returns the index of the object <paramref name="o"/> if it is currently exposed (it's parent(s) have been
+    ///     expanded). This can be used with <see cref="ScrollOffsetVertical"/> and <see cref="View.SetNeedsDisplay()"/> to
+    ///     scroll to a specific object.
     /// </summary>
     /// <remarks>Uses the Equals method and returns the first index at which the object is found or -1 if it is not found.</remarks>
     /// <param name="o">An object that appears in your tree and is currently exposed.</param>
@@ -912,8 +935,8 @@ public class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <summary>
-    ///     Changes the <see cref="SelectedObject"/> to <paramref name="toSelect"/> and scrolls to ensure it is visible. Has no effect if
-    ///     <paramref name="toSelect"/> is not exposed in the tree (e.g. its parents are collapsed).
+    ///     Changes the <see cref="SelectedObject"/> to <paramref name="toSelect"/> and scrolls to ensure it is visible.
+    ///     Has no effect if <paramref name="toSelect"/> is not exposed in the tree (e.g. its parents are collapsed).
     /// </summary>
     /// <param name="toSelect"></param>
     public void GoTo (T toSelect)
@@ -939,8 +962,8 @@ public class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <summary>
-    ///     Changes the <see cref="SelectedObject"/> to the first root object and resets the <see cref="ScrollOffsetVertical"/>
-    ///     to 0.
+    ///     Changes the <see cref="SelectedObject"/> to the first root object and resets the
+    ///     <see cref="ScrollOffsetVertical"/> to 0.
     /// </summary>
     public void GoToFirst ()
     {
@@ -1228,7 +1251,8 @@ public class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <summary>
-    ///     Rebuilds the tree structure for all exposed objects starting with the root objects. Call this method when you know there are changes to the tree but don't know which objects have changed (otherwise use
+    ///     Rebuilds the tree structure for all exposed objects starting with the root objects. Call this method when you
+    ///     know there are changes to the tree but don't know which objects have changed (otherwise use
     ///     <see cref="RefreshObject(T, bool)"/>).
     /// </summary>
     public void RebuildTree ()
@@ -1243,12 +1267,14 @@ public class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <summary>
-    ///     Refreshes the state of the object <paramref name="o"/> in the tree. This will recompute children, string representation etc.
+    ///     Refreshes the state of the object <paramref name="o"/> in the tree. This will recompute children, string
+    ///     representation etc.
     /// </summary>
     /// <remarks>This has no effect if the object is not exposed in the tree.</remarks>
     /// <param name="o"></param>
     /// <param name="startAtTop">
-    ///     True to also refresh all ancestors of the objects branch (starting with the root). False to refresh only the passed node.
+    ///     True to also refresh all ancestors of the objects branch (starting with the root). False to
+    ///     refresh only the passed node.
     /// </param>
     public void RefreshObject (T o, bool startAtTop = false)
     {
@@ -1328,7 +1354,8 @@ public class TreeView<T> : View, ITreeView where T : class
     public event EventHandler<SelectionChangedEventArgs<T>> SelectionChanged;
 
     /// <summary>
-    ///     Implementation of <see cref="Collapse(T)"/> and <see cref="CollapseAll(T)"/>. Performs operation and updates selection if disapeared.
+    ///     Implementation of <see cref="Collapse(T)"/> and <see cref="CollapseAll(T)"/>. Performs operation and updates
+    ///     selection if disapeared.
     /// </summary>
     /// <param name="toCollapse"></param>
     /// <param name="all"></param>
@@ -1367,7 +1394,8 @@ public class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <summary>
-    ///     Determines systems behaviour when the left arrow key is pressed. Default behaviour is to collapse the current tree node if possible otherwise changes selection to current branches parent.
+    ///     Determines systems behaviour when the left arrow key is pressed. Default behaviour is to collapse the current
+    ///     tree node if possible otherwise changes selection to current branches parent.
     /// </summary>
     protected virtual void CursorLeft (bool ctrl)
     {
@@ -1412,10 +1440,12 @@ public class TreeView<T> : View, ITreeView where T : class
     protected virtual void OnSelectionChanged (SelectionChangedEventArgs<T> e) { SelectionChanged?.Invoke (this, e); }
 
     /// <summary>
-    ///     Calculates all currently visible/expanded branches (including leafs) and outputs them by index from the top of the screen.
+    ///     Calculates all currently visible/expanded branches (including leafs) and outputs them by index from the top of
+    ///     the screen.
     /// </summary>
     /// <remarks>
-    ///     Index 0 of the returned array is the first item that should be visible in the top of the control, index 1 is the next etc.
+    ///     Index 0 of the returned array is the first item that should be visible in the top of the control, index 1 is
+    ///     the next etc.
     /// </remarks>
     /// <returns></returns>
     internal IReadOnlyCollection<Branch<T>> BuildLineMap ()
@@ -1538,7 +1568,7 @@ public class TreeView<T> : View, ITreeView where T : class
         int idx = y + ScrollOffsetVertical;
 
         // click is outside any visible nodes
-        if (idx < 0 || idx >= map.Count)
+        if ((idx < 0) || (idx >= map.Count))
         {
             return null;
         }
@@ -1550,14 +1580,15 @@ public class TreeView<T> : View, ITreeView where T : class
     private bool IsFilterMatch (Branch<T> branch) { return Filter?.IsMatch (branch.Model) ?? true; }
 
     /// <summary>
-    ///     Returns the corresponding <see cref="Branch{T}"/> in the tree for <paramref name="toFind"/>. This will not work for objects hidden by their parent being collapsed.
+    ///     Returns the corresponding <see cref="Branch{T}"/> in the tree for <paramref name="toFind"/>. This will not
+    ///     work for objects hidden by their parent being collapsed.
     /// </summary>
     /// <param name="toFind"></param>
     /// <returns>The branch for <paramref name="toFind"/> or null if it is not currently exposed in the tree.</returns>
     private Branch<T> ObjectToBranch (T toFind) { return BuildLineMap ().FirstOrDefault (o => o.Model.Equals (toFind)); }
 }
 
-internal class TreeSelection<T> where T : class
+class TreeSelection<T> where T : class
 {
     /// <summary>Creates a new selection between two branches in the tree</summary>
     /// <param name="from"></param>
@@ -1581,6 +1612,8 @@ internal class TreeSelection<T> where T : class
     }
 
     private readonly HashSet<T> included = new ();
+
     public Branch<T> Origin { get; }
+
     public bool Contains (T model) { return included.Contains (model); }
 }

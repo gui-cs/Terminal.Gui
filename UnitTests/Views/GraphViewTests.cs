@@ -5,7 +5,7 @@ namespace Terminal.Gui.ViewsTests;
 
 #region Helper Classes
 
-internal class FakeHAxis : HorizontalAxis
+class FakeHAxis : HorizontalAxis
 {
     public List<Point> DrawAxisLinePoints = new ();
     public List<int> LabelPoints = new ();
@@ -23,7 +23,7 @@ internal class FakeHAxis : HorizontalAxis
     }
 }
 
-internal class FakeVAxis : VerticalAxis
+class FakeVAxis : VerticalAxis
 {
     public List<Point> DrawAxisLinePoints = new ();
     public List<int> LabelPoints = new ();
@@ -119,7 +119,8 @@ public class GraphViewTests
     }
 
     /// <summary>
-    ///     Tests that each point in the screen space maps to a rectangle of (float) graph space and that each corner of that rectangle of graph space maps back to the same row/col of the graph that was fed in
+    ///     Tests that each point in the screen space maps to a rectangle of (float) graph space and that each corner of
+    ///     that rectangle of graph space maps back to the same row/col of the graph that was fed in
     /// </summary>
     [Fact]
     public void TestReversing_ScreenToGraphSpace ()
@@ -547,8 +548,6 @@ public class SeriesTests
 
     private class FakeSeries : ISeries
     {
-        private readonly Action<GraphView, Rect, RectangleF> _drawSeries;
-
         public FakeSeries (
             Action<GraphView, Rect, RectangleF> drawSeries
         )
@@ -556,14 +555,15 @@ public class SeriesTests
             _drawSeries = drawSeries;
         }
 
+        private readonly Action<GraphView, Rect, RectangleF> _drawSeries;
         public void DrawSeries (GraphView graph, Rect bounds, RectangleF graphBounds) { _drawSeries (graph, bounds, graphBounds); }
     }
 }
 
 public class MultiBarSeriesTests
 {
-    private readonly ITestOutputHelper _output;
     public MultiBarSeriesTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void MultiBarSeries_BarSpacing ()
@@ -888,8 +888,11 @@ public class BarSeriesTests
     private class FakeBarSeries : BarSeries
     {
         public List<Point> BarScreenEnds { get; } = new ();
+
         public List<Point> BarScreenStarts { get; } = new ();
+
         public GraphCellToRender FinalColor { get; private set; }
+
         protected override GraphCellToRender AdjustColor (GraphCellToRender graphCellToRender) { return FinalColor = base.AdjustColor (graphCellToRender); }
 
         protected override void DrawBarLine (GraphView graph, Point start, Point end, BarSeriesBar beingDrawn)
@@ -1082,8 +1085,8 @@ public class AxisTests
 
 public class TextAnnotationTests
 {
-    private readonly ITestOutputHelper _output;
     public TextAnnotationTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Theory]
     [InlineData (null)]
@@ -1290,8 +1293,8 @@ public class TextAnnotationTests
 
 public class LegendTests
 {
-    private readonly ITestOutputHelper _output;
     public LegendTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void Constructors_Defaults ()
@@ -1369,8 +1372,8 @@ public class LegendTests
 
 public class PathAnnotationTests
 {
-    private readonly ITestOutputHelper _output;
     public PathAnnotationTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void MarginBottom_BiggerThanHeight_ExpectBlankGraph ()

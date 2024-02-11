@@ -3,7 +3,10 @@
 /// <summary>Extension methods for <see cref="StraightLine"/> (including collections).</summary>
 public static class StraightLineExtensions
 {
-    /// <summary>Splits or removes all lines in the <paramref name="collection"/> such that none cover the given exclusion area.</summary>
+    /// <summary>
+    ///     Splits or removes all lines in the <paramref name="collection"/> such that none cover the given exclusion
+    ///     area.
+    /// </summary>
     /// <param name="collection">Lines to adjust</param>
     /// <param name="start">First point to remove from collection</param>
     /// <param name="length">The number of sequential points to exclude</param>
@@ -147,8 +150,9 @@ public static class StraightLineExtensions
     }
 
     /// <summary>
-    ///     Creates a new line which is part of <paramref name="l"/> from the point on the varying axis <paramref name="from"/>
-    ///     to <paramref name="length"/>.  Horizontal lines have points that vary by x while vertical lines have points that vary by y
+    ///     Creates a new line which is part of <paramref name="l"/> from the point on the varying axis
+    ///     <paramref name="from"/> to <paramref name="length"/>.  Horizontal lines have points that vary by x while vertical
+    ///     lines have points that vary by y
     /// </summary>
     /// <param name="l">Line to create sub part from</param>
     /// <param name="from">Point on varying axis to start at</param>
@@ -166,7 +170,8 @@ public static class StraightLineExtensions
 
     /// <summary>
     ///     <para>
-    ///         Calculates the single digit point where a line ends on the differing axis i.e. the maximum (controlling for negative lengths).
+    ///         Calculates the single digit point where a line ends on the differing axis i.e. the maximum (controlling for
+    ///         negative lengths).
     ///     </para>
     ///     <para>
     ///         For lines with <see cref="Orientation.Horizontal"/> this is an x coordinate. For lines that are
@@ -198,7 +203,8 @@ public static class StraightLineExtensions
 
     /// <summary>
     ///     <para>
-    ///         Calculates the single digit point where a line starts on the differing axis i.e. the minimum (controlling for negative lengths).
+    ///         Calculates the single digit point where a line starts on the differing axis i.e. the minimum (controlling for
+    ///         negative lengths).
     ///     </para>
     ///     <para>
     ///         For lines with <see cref="Orientation.Horizontal"/> this is an x coordinate. For lines that are

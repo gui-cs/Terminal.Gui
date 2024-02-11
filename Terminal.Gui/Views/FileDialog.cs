@@ -5,13 +5,15 @@ using Terminal.Gui.Resources;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Modal dialog for selecting files/directories. Has auto-complete and expandable navigation pane (Recent, Root drives etc).
+///     Modal dialog for selecting files/directories. Has auto-complete and expandable navigation pane (Recent, Root
+///     drives etc).
 /// </summary>
 public class FileDialog : Dialog
 {
     /// <summary>
     ///     Characters to prevent entry into <see cref="_tbPath"/>. Note that this is not using
-    ///     <see cref="System.IO.Path.GetInvalidFileNameChars"/> because we do want to allow directory separators, arrow keys etc.
+    ///     <see cref="System.IO.Path.GetInvalidFileNameChars"/> because we do want to allow directory separators, arrow keys
+    ///     etc.
     /// </summary>
     private static readonly char [] _badChars = ['"', '<', '>', '|', '*', '?'];
 
@@ -293,20 +295,20 @@ public class FileDialog : Dialog
     private Dictionary<IDirectoryInfo, string> _treeRoots = new ();
 
     /// <summary>
-    ///     Gets or Sets a collection of file types that the user can/must select. Only applies when <see cref="OpenMode"/> is
-    ///     <see cref="OpenMode.File"/> or <see cref="OpenMode.Mixed"/>.
+    ///     Gets or Sets a collection of file types that the user can/must select. Only applies when
+    ///     <see cref="OpenMode"/> is <see cref="OpenMode.File"/> or <see cref="OpenMode.Mixed"/>.
     /// </summary>
     /// <remarks>
-    ///     <see cref="AllowedTypeAny"/> adds the option to select any type (*.*). If this collection is empty then any type is supported and no Types drop-down is shown.
+    ///     <see cref="AllowedTypeAny"/> adds the option to select any type (*.*). If this collection is empty then any
+    ///     type is supported and no Types drop-down is shown.
     /// </remarks>
     public List<IAllowedType> AllowedTypes { get; set; } = [];
 
-    /// <summary>Gets or Sets a value indicating whether to allow selecting multiple existing files/directories. Defaults to false.</summary>
-    public bool AllowsMultipleSelection
-    {
-        get => _tableView.MultiSelect;
-        set => _tableView.MultiSelect = value;
-    }
+    /// <summary>
+    ///     Gets or Sets a value indicating whether to allow selecting multiple existing files/directories. Defaults to
+    ///     false.
+    /// </summary>
+    public bool AllowsMultipleSelection { get => _tableView.MultiSelect; set => _tableView.MultiSelect = value; }
 
     /// <summary>Gets a value indicating whether the <see cref="FileDialog"/> was closed without confirming a selection.</summary>
     public bool Canceled { get; private set; } = true;
@@ -315,7 +317,8 @@ public class FileDialog : Dialog
     public IAllowedType CurrentFilter { get; private set; }
 
     /// <summary>
-    ///     Gets or sets behavior of the <see cref="FileDialog"/> when the user attempts to delete a selected file(s). Set to null to prevent deleting.
+    ///     Gets or sets behavior of the <see cref="FileDialog"/> when the user attempts to delete a selected file(s). Set
+    ///     to null to prevent deleting.
     /// </summary>
     /// <remarks>
     ///     Ensure you use a try/catch block with appropriate error handling (e.g. showing a <see cref="MessageBox"/>
@@ -336,7 +339,8 @@ public class FileDialog : Dialog
         = Enumerable.Empty<string> ().ToList ().AsReadOnly ();
 
     /// <summary>
-    ///     True if the file/folder must exist already to be selected. This prevents user from entering the name of something that doesn't exist. Defaults to false.
+    ///     True if the file/folder must exist already to be selected. This prevents user from entering the name of
+    ///     something that doesn't exist. Defaults to false.
     /// </summary>
     public bool MustExist { get; set; }
 
@@ -361,7 +365,8 @@ public class FileDialog : Dialog
     }
 
     /// <summary>
-    ///     Defines how the dialog matches files/folders when using the search box. Provide a custom implementation if you want to tailor how matching is performed.
+    ///     Defines how the dialog matches files/folders when using the search box. Provide a custom implementation if you
+    ///     want to tailor how matching is performed.
     /// </summary>
     public ISearchMatcher SearchMatcher { get; set; } = new DefaultSearchMatcher ();
 
@@ -375,7 +380,8 @@ public class FileDialog : Dialog
     internal FileDialogState State { get; private set; }
 
     /// <summary>
-    ///     Event fired when user attempts to confirm a selection (or multi selection). Allows you to cancel the selection or undertake alternative behavior e.g. open a dialog "File already exists, Overwrite? yes/no".
+    ///     Event fired when user attempts to confirm a selection (or multi selection). Allows you to cancel the selection
+    ///     or undertake alternative behavior e.g. open a dialog "File already exists, Overwrite? yes/no".
     /// </summary>
     public event EventHandler<FilesSelectedEventArgs> FilesSelected;
 
@@ -542,7 +548,10 @@ public class FileDialog : Dialog
         CancelSearch ();
     }
 
-    /// <summary>Gets a default dialog title, when <see cref="View.Title"/> is not set or empty, result of the function will be shown.</summary>
+    /// <summary>
+    ///     Gets a default dialog title, when <see cref="View.Title"/> is not set or empty, result of the function will be
+    ///     shown.
+    /// </summary>
     protected virtual string GetDefaultTitle ()
     {
         List<string> titleParts = [Strings.fdOpen];
@@ -863,7 +872,7 @@ public class FileDialog : Dialog
 
     private IFileSystemInfo [] GetFocusedFiles ()
     {
-        if (!_tableView.HasFocus || !_tableView.CanFocus || FileOperationsHandler == null)
+        if (!_tableView.HasFocus || !_tableView.CanFocus || (FileOperationsHandler == null))
         {
             return null;
         }
@@ -998,7 +1007,8 @@ public class FileDialog : Dialog
     private bool MatchesAllowedTypes (IFileInfo file) { return AllowedTypes.Any (t => t.IsAllowed (file.FullName)); }
 
     /// <summary>
-    ///     If <see cref="TableView.MultiSelect"/> is this returns a union of all <see cref="FileSystemInfoStats"/> in the selection.
+    ///     If <see cref="TableView.MultiSelect"/> is this returns a union of all <see cref="FileSystemInfoStats"/> in the
+    ///     selection.
     /// </summary>
     /// <returns></returns>
     private IEnumerable<FileSystemInfoStats> MultiRowToStats ()
@@ -1215,7 +1225,7 @@ public class FileDialog : Dialog
     //		}
     private void RestartSearch ()
     {
-        if (_disposed || State?.Directory == null)
+        if (_disposed || (State?.Directory == null))
         {
             return;
         }
@@ -1226,7 +1236,7 @@ public class FileDialog : Dialog
         }
 
         // user is clearing search terms
-        if (_tbFind.Text == null || _tbFind.Text.Length == 0)
+        if ((_tbFind.Text == null) || (_tbFind.Text.Length == 0))
         {
             // Wait for search cancellation (if any) to finish
             // then push the current dir state
@@ -1368,7 +1378,7 @@ public class FileDialog : Dialog
 
     private void TableView_SelectedCellChanged (object sender, SelectedCellChangedEventArgs obj)
     {
-        if (!_tableView.HasFocus || obj.NewRow == -1 || obj.Table.Rows == 0)
+        if (!_tableView.HasFocus || (obj.NewRow == -1) || (obj.Table.Rows == 0))
         {
             return;
         }
@@ -1525,7 +1535,10 @@ public class FileDialog : Dialog
         private bool _cancel;
         private bool _finished;
 
-        /// <summary>Cancels the current search (if any).  Returns true if a search was running and cancellation was successfully set.</summary>
+        /// <summary>
+        ///     Cancels the current search (if any).  Returns true if a search was running and cancellation was successfully
+        ///     set.
+        /// </summary>
         /// <returns></returns>
         internal bool Cancel ()
         {

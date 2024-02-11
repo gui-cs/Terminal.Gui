@@ -29,19 +29,22 @@ public class SelectedCellChangedEventArgs : EventArgs
     public int NewRow { get; }
 
     /// <summary>
-    ///     The previous selected column index.  May be invalid e.g. when the selection has been changed as a result of replacing the existing Table with a smaller one
+    ///     The previous selected column index.  May be invalid e.g. when the selection has been changed as a result of
+    ///     replacing the existing Table with a smaller one
     /// </summary>
     /// <value></value>
     public int OldCol { get; }
 
     /// <summary>
-    ///     The previous selected row index.  May be invalid e.g. when the selection has been changed as a result of deleting rows from the table
+    ///     The previous selected row index.  May be invalid e.g. when the selection has been changed as a result of
+    ///     deleting rows from the table
     /// </summary>
     /// <value></value>
     public int OldRow { get; }
 
     /// <summary>
-    ///     The current table to which the new indexes refer.  May be null e.g. if selection change is the result of clearing the table from the view
+    ///     The current table to which the new indexes refer.  May be null e.g. if selection change is the result of
+    ///     clearing the table from the view
     /// </summary>
     /// <value></value>
     public ITableSource Table { get; }

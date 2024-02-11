@@ -6,7 +6,8 @@ namespace Terminal.Gui;
 public interface IAllowedType
 {
     /// <summary>
-    ///     Returns true if the file at <paramref name="path"/> is compatible with this allow option.  Note that the file may not exist (e.g. in the case of saving).
+    ///     Returns true if the file at <paramref name="path"/> is compatible with this allow option.  Note that the file
+    ///     may not exist (e.g. in the case of saving).
     /// </summary>
     /// <param name="path"></param>
     /// <returns></returns>
@@ -26,7 +27,8 @@ public class AllowedTypeAny : IAllowedType
 
 /// <summary>
 ///     Describes a requirement on what <see cref="FileInfo"/> can be selected. This can be combined with other
-///     <see cref="IAllowedType"/> in a <see cref="FileDialog"/> to for example show only .csv files but let user change to open any if they want.
+///     <see cref="IAllowedType"/> in a <see cref="FileDialog"/> to for example show only .csv files but let user change to
+///     open any if they want.
 /// </summary>
 public class AllowedType : IAllowedType
 {

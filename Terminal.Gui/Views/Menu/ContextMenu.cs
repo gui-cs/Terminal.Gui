@@ -1,14 +1,18 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     ContextMenu provides a pop-up menu that can be positioned anywhere within a <see cref="View"/>. ContextMenu is analogous to
-///     <see cref="MenuBar"/> and, once activated, works like a sub-menu of a <see cref="MenuBarItem"/> (but can be positioned anywhere).
+///     ContextMenu provides a pop-up menu that can be positioned anywhere within a <see cref="View"/>. ContextMenu is
+///     analogous to <see cref="MenuBar"/> and, once activated, works like a sub-menu of a <see cref="MenuBarItem"/> (but
+///     can be positioned anywhere).
 ///     <para>
-///         By default, a ContextMenu with sub-menus is displayed in a cascading manner, where each sub-menu pops out of the ContextMenu frame (either to the right or left, depending on where the ContextMenu is relative to the edge of the screen). By setting
-///         <see cref="UseSubMenusSingleFrame"/> to <see langword="true"/>, this behavior can be changed such that all sub-menus are drawn within the ContextMenu frame.
+///         By default, a ContextMenu with sub-menus is displayed in a cascading manner, where each sub-menu pops out of
+///         the ContextMenu frame (either to the right or left, depending on where the ContextMenu is relative to the edge
+///         of the screen). By setting <see cref="UseSubMenusSingleFrame"/> to <see langword="true"/>, this behavior can be
+///         changed such that all sub-menus are drawn within the ContextMenu frame.
 ///     </para>
 ///     <para>
-///         ContextMenus can be activated using the Shift-F10 key (by default; use the <see cref="Key"/> to change to another key).
+///         ContextMenus can be activated using the Shift-F10 key (by default; use the <see cref="Key"/> to change to
+///         another key).
 ///     </para>
 ///     <para>
 ///         Callers can cause the ContextMenu to be activated on a right-mouse click (or other interaction) by calling
@@ -45,8 +49,9 @@ public sealed class ContextMenu : IDisposable
     public static Key DefaultKey { get; set; } = Key.F10.WithShift;
 
     /// <summary>
-    ///     Sets or gets whether the context menu be forced to the right, ensuring it is not clipped, if the x position is less than zero. The default is
-    ///     <see langword="true"/> which means the context menu will be forced to the right. If set to <see langword="false"/>, the context menu will be clipped on the left if x is less than zero.
+    ///     Sets or gets whether the context menu be forced to the right, ensuring it is not clipped, if the x position is
+    ///     less than zero. The default is <see langword="true"/> which means the context menu will be forced to the right. If
+    ///     set to <see langword="false"/>, the context menu will be clipped on the left if x is less than zero.
     /// </summary>
     public bool ForceMinimumPosToZero { get; set; } = true;
 
@@ -90,8 +95,10 @@ public sealed class ContextMenu : IDisposable
     public Point Position { get; set; }
 
     /// <summary>
-    ///     Gets or sets if sub-menus will be displayed using a "single frame" menu style. If <see langword="true"/>, the ContextMenu and any sub-menus that would normally cascade will be displayed within a single frame. If
-    ///     <see langword="false"/> (the default), sub-menus will cascade using separate frames for each level of the menu hierarchy.
+    ///     Gets or sets if sub-menus will be displayed using a "single frame" menu style. If <see langword="true"/>, the
+    ///     ContextMenu and any sub-menus that would normally cascade will be displayed within a single frame. If
+    ///     <see langword="false"/> (the default), sub-menus will cascade using separate frames for each level of the menu
+    ///     hierarchy.
     /// </summary>
     public bool UseSubMenusSingleFrame { get; set; }
 
@@ -154,7 +161,7 @@ public sealed class ContextMenu : IDisposable
 
         if (rect.Right >= frame.Right)
         {
-            if (frame.Right - rect.Width >= 0 || !ForceMinimumPosToZero)
+            if ((frame.Right - rect.Width >= 0) || !ForceMinimumPosToZero)
             {
                 position.X = frame.Right - rect.Width;
             }
@@ -170,7 +177,7 @@ public sealed class ContextMenu : IDisposable
 
         if (rect.Bottom >= frame.Bottom)
         {
-            if (frame.Bottom - rect.Height - 1 >= 0 || !ForceMinimumPosToZero)
+            if ((frame.Bottom - rect.Height - 1 >= 0) || !ForceMinimumPosToZero)
             {
                 if (Host == null)
                 {

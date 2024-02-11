@@ -7,11 +7,11 @@ using System.Text.Json.Serialization;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Converts <see cref="Scope{T}"/> instances to/from JSON. Does all the heavy lifting of reading/writing config data to/from
-///     <see cref="ConfigurationManager"/> JSON documents.
+///     Converts <see cref="Scope{T}"/> instances to/from JSON. Does all the heavy lifting of reading/writing config
+///     data to/from <see cref="ConfigurationManager"/> JSON documents.
 /// </summary>
 /// <typeparam name="scopeT"></typeparam>
-internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT : Scope<scopeT>
+class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT : Scope<scopeT>
 {
     public override scopeT Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {

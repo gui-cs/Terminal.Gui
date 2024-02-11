@@ -4,8 +4,6 @@ namespace Terminal.Gui.ViewsTests;
 
 public class OverlappedTests
 {
-    private readonly ITestOutputHelper _output;
-
     public OverlappedTests (ITestOutputHelper output)
     {
         _output = output;
@@ -14,6 +12,8 @@ public class OverlappedTests
         RunState.Instances.Clear ();
 #endif
     }
+
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     [AutoInitShutdown]

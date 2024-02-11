@@ -96,11 +96,12 @@ public enum MouseFlags
 // TODO: Merge MouseEvent and MouseEventEventArgs into a single class.
 
 /// <summary>
-///     Low-level construct that conveys the details of mouse events, such as coordinates and button state, from ConsoleDrivers up to
-///     <see cref="Application"/> and Views.
+///     Low-level construct that conveys the details of mouse events, such as coordinates and button state, from
+///     ConsoleDrivers up to <see cref="Application"/> and Views.
 /// </summary>
 /// <remarks>
-///     The <see cref="Application"/> class includes the <see cref="Application.MouseEvent"/> Action which takes a MouseEvent argument.
+///     The <see cref="Application"/> class includes the <see cref="Application.MouseEvent"/> Action which takes a
+///     MouseEvent argument.
 /// </remarks>
 public class MouseEvent
 {
@@ -108,7 +109,9 @@ public class MouseEvent
     public MouseFlags Flags { get; set; }
 
     /// <summary>
-    ///     Indicates if the current mouse event has already been processed and the driver should stop notifying any other event subscriber. Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
+    ///     Indicates if the current mouse event has already been processed and the driver should stop notifying any other
+    ///     event subscriber. Its important to set this value to true specially when updating any View's layout from inside the
+    ///     subscriber method.
     /// </summary>
     public bool Handled { get; set; }
 

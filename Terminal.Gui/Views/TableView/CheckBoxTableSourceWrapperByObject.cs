@@ -1,7 +1,8 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     Implementation of <see cref="CheckBoxTableSourceWrapperBase"/> which records toggled rows by a property on row objects.
+///     Implementation of <see cref="CheckBoxTableSourceWrapperBase"/> which records toggled rows by a property on row
+///     objects.
 /// </summary>
 public class CheckBoxTableSourceWrapperByObject<T> : CheckBoxTableSourceWrapperBase
 {

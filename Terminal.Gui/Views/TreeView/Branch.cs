@@ -1,8 +1,11 @@
 ﻿namespace Terminal.Gui;
 
-internal class Branch<T> where T : class
+class Branch<T> where T : class
 {
-    /// <summary>Declares a new branch of <paramref name="tree"/> in which the users object <paramref name="model"/> is presented.</summary>
+    /// <summary>
+    ///     Declares a new branch of <paramref name="tree"/> in which the users object <paramref name="model"/> is
+    ///     presented.
+    /// </summary>
     /// <param name="tree">The UI control in which the branch resides.</param>
     /// <param name="parentBranchIfAny">Pass null for root level branches, otherwise pass the parent.</param>
     /// <param name="model">The user's object that should be displayed.</param>
@@ -21,7 +24,8 @@ internal class Branch<T> where T : class
     private readonly TreeView<T> tree;
 
     /// <summary>
-    ///     The children of the current branch.  This is null until the first call to <see cref="FetchChildren"/> to avoid enumerating the entire underlying hierarchy.
+    ///     The children of the current branch.  This is null until the first call to <see cref="FetchChildren"/> to avoid
+    ///     enumerating the entire underlying hierarchy.
     /// </summary>
     public Dictionary<T, Branch<T>> ChildBranches { get; set; }
 
@@ -38,7 +42,8 @@ internal class Branch<T> where T : class
     public Branch<T> Parent { get; }
 
     /// <summary>
-    ///     Returns true if the current branch can be expanded according to the <see cref="TreeBuilder{T}"/> or cached children already fetched.
+    ///     Returns true if the current branch can be expanded according to the <see cref="TreeBuilder{T}"/> or cached
+    ///     children already fetched.
     /// </summary>
     /// <returns></returns>
     public bool CanExpand ()
@@ -281,8 +286,8 @@ internal class Branch<T> where T : class
     }
 
     /// <summary>
-    ///     Returns an appropriate symbol for displaying next to the string representation of the <see cref="Model"/> object to indicate whether it
-    ///     <see cref="IsExpanded"/> or not (or it is a leaf).
+    ///     Returns an appropriate symbol for displaying next to the string representation of the <see cref="Model"/>
+    ///     object to indicate whether it <see cref="IsExpanded"/> or not (or it is a leaf).
     /// </summary>
     /// <param name="driver"></param>
     /// <returns></returns>
@@ -304,7 +309,8 @@ internal class Branch<T> where T : class
     }
 
     /// <summary>
-    ///     Returns the width of the line including prefix and the results of <see cref="TreeView{T}.AspectGetter"/> (the line body).
+    ///     Returns the width of the line including prefix and the results of <see cref="TreeView{T}.AspectGetter"/> (the
+    ///     line body).
     /// </summary>
     /// <returns></returns>
     public virtual int GetWidth (ConsoleDriver driver)
@@ -366,7 +372,8 @@ internal class Branch<T> where T : class
     }
 
     /// <summary>
-    ///     Collapses the current branch and all children branches (even though those branches are no longer visible they retain collapse/expansion state).
+    ///     Collapses the current branch and all children branches (even though those branches are no longer visible they
+    ///     retain collapse/expansion state).
     /// </summary>
     internal void CollapseAll ()
     {
@@ -396,7 +403,8 @@ internal class Branch<T> where T : class
     }
 
     /// <summary>
-    ///     Gets all characters to render prior to the current branches line.  This includes indentation whitespace and any tree branches (if enabled).
+    ///     Gets all characters to render prior to the current branches line.  This includes indentation whitespace and
+    ///     any tree branches (if enabled).
     /// </summary>
     /// <param name="driver"></param>
     /// <returns></returns>
@@ -439,7 +447,8 @@ internal class Branch<T> where T : class
     }
 
     /// <summary>
-    ///     Returns true if the given x offset on the branch line is the +/- symbol.  Returns false if not showing expansion symbols or leaf node etc.
+    ///     Returns true if the given x offset on the branch line is the +/- symbol.  Returns false if not showing
+    ///     expansion symbols or leaf node etc.
     /// </summary>
     /// <param name="driver"></param>
     /// <param name="x"></param>
@@ -505,7 +514,10 @@ internal class Branch<T> where T : class
         }
     }
 
-    /// <summary>Returns true if this branch has parents and it is the last node of it's parents branches (or last root of the tree).</summary>
+    /// <summary>
+    ///     Returns true if this branch has parents and it is the last node of it's parents branches (or last root of the
+    ///     tree).
+    /// </summary>
     /// <returns></returns>
     private bool IsLast ()
     {

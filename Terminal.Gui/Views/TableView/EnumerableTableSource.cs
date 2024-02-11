@@ -6,9 +6,13 @@ public class EnumerableTableSource<T> : IEnumerableTableSource<T>
 {
     /// <summary>Creates a new instance of the class that presents <paramref name="data"/> collection as a table.</summary>
     /// <remarks>
-    ///     The elements of the <paramref name="data"/> collection are recorded during construction (immutable) but the properties of those objects are permitted to change.
+    ///     The elements of the <paramref name="data"/> collection are recorded during construction (immutable) but the
+    ///     properties of those objects are permitted to change.
     /// </remarks>
-    /// <param name="data">The data that you want to present.  The members of this collection will be frozen after construction.</param>
+    /// <param name="data">
+    ///     The data that you want to present.  The members of this collection will be frozen after
+    ///     construction.
+    /// </param>
     /// <param name="columnDefinitions">
     ///     Getter methods for each property you want to present in the table. For example:
     ///     <code>

@@ -14,7 +14,10 @@ public struct RectangleF : IEquatable<RectangleF>
     /// <summary>Initializes a new instance of the <see cref='Terminal.Gui.RectangleF'/> class.</summary>
     public static readonly RectangleF Empty;
 
-    /// <summary>Initializes a new instance of the <see cref='Terminal.Gui.RectangleF'/> class with the specified location and size.</summary>
+    /// <summary>
+    ///     Initializes a new instance of the <see cref='Terminal.Gui.RectangleF'/> class with the specified location and
+    ///     size.
+    /// </summary>
     public RectangleF (float x, float y, float width, float height)
     {
         X = x;
@@ -23,7 +26,10 @@ public struct RectangleF : IEquatable<RectangleF>
         Height = height;
     }
 
-    /// <summary>Initializes a new instance of the <see cref='Terminal.Gui.RectangleF'/> class with the specified location and size.</summary>
+    /// <summary>
+    ///     Initializes a new instance of the <see cref='Terminal.Gui.RectangleF'/> class with the specified location and
+    ///     size.
+    /// </summary>
     public RectangleF (PointF location, SizeF size)
     {
         X = location.X;
@@ -109,15 +115,15 @@ public struct RectangleF : IEquatable<RectangleF>
     public float Bottom => Y + Height;
 
     /// <summary>
-    ///     Tests whether this <see cref='Terminal.Gui.RectangleF'/> has a <see cref='Terminal.Gui.RectangleF.Width'/> or a
-    ///     <see cref='Terminal.Gui.RectangleF.Height'/> of 0.
+    ///     Tests whether this <see cref='Terminal.Gui.RectangleF'/> has a <see cref='Terminal.Gui.RectangleF.Width'/> or
+    ///     a <see cref='Terminal.Gui.RectangleF.Height'/> of 0.
     /// </summary>
     [Browsable (false)]
-    public bool IsEmpty => Width <= 0 || Height <= 0;
+    public bool IsEmpty => (Width <= 0) || (Height <= 0);
 
     /// <summary>
-    ///     Tests whether <paramref name="obj"/> is a <see cref='Terminal.Gui.RectangleF'/> with the same location and size of this
-    ///     <see cref='Terminal.Gui.RectangleF'/>.
+    ///     Tests whether <paramref name="obj"/> is a <see cref='Terminal.Gui.RectangleF'/> with the same location and
+    ///     size of this <see cref='Terminal.Gui.RectangleF'/>.
     /// </summary>
     public override bool Equals (object obj) { return obj is RectangleF && Equals ((RectangleF)obj); }
 
@@ -148,8 +154,8 @@ public struct RectangleF : IEquatable<RectangleF>
     public bool Contains (PointF pt) { return Contains (pt.X, pt.Y); }
 
     /// <summary>
-    ///     Determines if the rectangular region represented by <paramref name="rect"/> is entirely contained within the rectangular region represented by this
-    ///     <see cref='Terminal.Gui.Rect'/> .
+    ///     Determines if the rectangular region represented by <paramref name="rect"/> is entirely contained within the
+    ///     rectangular region represented by this <see cref='Terminal.Gui.Rect'/> .
     /// </summary>
     public bool Contains (RectangleF rect)
     {
@@ -195,7 +201,8 @@ public struct RectangleF : IEquatable<RectangleF>
     }
 
     /// <summary>
-    ///     Creates a rectangle that represents the intersection between a and b. If there is no intersection, an empty rectangle is returned.
+    ///     Creates a rectangle that represents the intersection between a and b. If there is no intersection, an empty
+    ///     rectangle is returned.
     /// </summary>
     public static RectangleF Intersect (RectangleF a, RectangleF b)
     {
@@ -246,8 +253,8 @@ public struct RectangleF : IEquatable<RectangleF>
     public static implicit operator RectangleF (Rect r) { return new RectangleF (r.X, r.Y, r.Width, r.Height); }
 
     /// <summary>
-    ///     Converts the <see cref='Terminal.Gui.RectangleF.Location'/> and <see cref='Terminal.Gui.RectangleF.Size'/> of this
-    ///     <see cref='Terminal.Gui.RectangleF'/> to a human-readable string.
+    ///     Converts the <see cref='Terminal.Gui.RectangleF.Location'/> and <see cref='Terminal.Gui.RectangleF.Size'/> of
+    ///     this <see cref='Terminal.Gui.RectangleF'/> to a human-readable string.
     /// </summary>
     public override string ToString () { return "{X=" + X + ",Y=" + Y + ",Width=" + Width + ",Height=" + Height + "}"; }
 }

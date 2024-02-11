@@ -425,14 +425,11 @@ public class TextField : View
     public IAutocomplete Autocomplete { get; set; }
 
     /// <inheritdoc/>
-    public sealed override bool CanFocus
-    {
-        get => base.CanFocus;
-        set => base.CanFocus = value;
-    }
+    public override sealed bool CanFocus { get => base.CanFocus; set => base.CanFocus = value; }
 
     /// <summary>
-    ///     Gets or sets the text to render in control when no value has been entered yet and the <see cref="View"/> does not yet have input focus.
+    ///     Gets or sets the text to render in control when no value has been entered yet and the <see cref="View"/> does
+    ///     not yet have input focus.
     /// </summary>
     public string Caption { get; set; }
 
@@ -471,7 +468,7 @@ public class TextField : View
         get => _desiredCursorVisibility;
         set
         {
-            if ((_desiredCursorVisibility != value || _visibility != value) && HasFocus)
+            if (((_desiredCursorVisibility != value) || (_visibility != value)) && HasFocus)
             {
                 Application.Driver.SetCursorVisibility (value);
             }
@@ -530,11 +527,7 @@ public class TextField : View
     }
 
     /// <summary>The selected text.</summary>
-    public string SelectedText
-    {
-        get => Secret ? null : _selectedText;
-        private set => _selectedText = value;
-    }
+    public string SelectedText { get => Secret ? null : _selectedText; private set => _selectedText = value; }
 
     /// <summary>Sets or gets the text held by the view.</summary>
     public new string Text
@@ -593,7 +586,8 @@ public class TextField : View
     }
 
     /// <summary>
-    ///     Tracks whether the text field should be considered "used", that is, that the user has moved in the entry, so new input should be appended at the cursor position, rather than clearing the entry
+    ///     Tracks whether the text field should be considered "used", that is, that the user has moved in the entry, so
+    ///     new input should be appended at the cursor position, rather than clearing the entry
     /// </summary>
     public bool Used { get; set; }
 
@@ -619,7 +613,7 @@ public class TextField : View
     /// <summary>Copy the selected text to the clipboard.</summary>
     public virtual void Copy ()
     {
-        if (Secret || SelectedLength == 0)
+        if (Secret || (SelectedLength == 0))
         {
             return;
         }
@@ -630,7 +624,7 @@ public class TextField : View
     /// <summary>Cut the selected text to the clipboard.</summary>
     public virtual void Cut ()
     {
-        if (ReadOnly || Secret || SelectedLength == 0)
+        if (ReadOnly || Secret || (SelectedLength == 0))
         {
             return;
         }
@@ -657,8 +651,8 @@ public class TextField : View
 
     /// <summary>Deletes the character to the left.</summary>
     /// <param name="usePreTextChangedCursorPos">
-    ///     If set to <see langword="true">true</see> use the cursor position cached ; otherwise use
-    ///     <see cref="CursorPosition"/>. use .
+    ///     If set to <see langword="true">true</see> use the cursor position cached ;
+    ///     otherwise use <see cref="CursorPosition"/>. use .
     /// </param>
     public virtual void DeleteCharLeft (bool usePreTextChangedCursorPos)
     {
@@ -728,7 +722,7 @@ public class TextField : View
 
         if (SelectedLength == 0)
         {
-            if (_text.Count == 0 || _text.Count == _cursorPosition)
+            if ((_text.Count == 0) || (_text.Count == _cursorPosition))
             {
                 return;
             }
@@ -761,7 +755,8 @@ public class TextField : View
     }
 
     /// <summary>
-    ///     Inserts the given <paramref name="toAdd"/> text at the current cursor position exactly as if the user had just typed it
+    ///     Inserts the given <paramref name="toAdd"/> text at the current cursor position exactly as if the user had just
+    ///     typed it
     /// </summary>
     /// <param name="toAdd">Text to add</param>
     /// <param name="useOldCursorPos">Use the previous cursor position.</param>
@@ -896,7 +891,7 @@ public class TextField : View
             int x = PositionCursor (ev);
             int sbw = x;
 
-            if (x == _text.Count
+            if ((x == _text.Count)
                 || (x > 0 && (char)_text [x - 1].Value != ' ')
                 || (x > 0 && (char)_text [x].Value == ' '))
             {
@@ -1111,7 +1106,7 @@ public class TextField : View
         _preTextChangedCursorPos = _cursorPosition;
 
         // Ignore other control characters.
-        if (!a.IsKeyCodeAtoZ && (a.KeyCode < KeyCode.Space || a.KeyCode > KeyCode.CharMask))
+        if (!a.IsKeyCodeAtoZ && ((a.KeyCode < KeyCode.Space) || (a.KeyCode > KeyCode.CharMask)))
         {
             return false;
         }
@@ -1278,7 +1273,8 @@ public class TextField : View
     }
 
     /// <summary>
-    ///     Returns <see langword="true"/> if the current cursor position is at the end of the <see cref="Text"/>. This includes when it is empty.
+    ///     Returns <see langword="true"/> if the current cursor position is at the end of the <see cref="Text"/>. This
+    ///     includes when it is empty.
     /// </summary>
     /// <returns></returns>
     internal bool CursorIsAtEnd () { return CursorPosition == Text.Length; }
@@ -1303,8 +1299,8 @@ public class TextField : View
             need = true;
         }
         else if (Frame.Width > 0
-                 && (ScrollOffset + _cursorPosition - (Frame.Width + offB) == 0
-                     || TextModel.DisplaySize (_text, ScrollOffset, _cursorPosition).size >= Frame.Width + offB))
+                 && ((ScrollOffset + _cursorPosition - (Frame.Width + offB) == 0)
+                     || (TextModel.DisplaySize (_text, ScrollOffset, _cursorPosition).size >= Frame.Width + offB)))
         {
             ScrollOffset = Math.Max (
                                      TextModel.CalculateLeftColumn (
@@ -1835,7 +1831,7 @@ public class TextField : View
 
             SetNeedsDisplay ();
         }
-        else if (SelectedLength > 0 || _selectedText != null)
+        else if ((SelectedLength > 0) || (_selectedText != null))
         {
             ClearAllSelection ();
         }
@@ -1869,9 +1865,9 @@ public class TextField : View
     private void RenderCaption ()
     {
         if (HasFocus
-            || Caption == null
-            || Caption.Length == 0
-            || Text?.Length > 0)
+            || (Caption == null)
+            || (Caption.Length == 0)
+            || (Text?.Length > 0))
         {
             return;
         }
@@ -1894,7 +1890,7 @@ public class TextField : View
     {
         Application.Driver.GetCursorVisibility (out _visibility);
 
-        if (_desiredCursorVisibility != _savedCursorVisibility || _visibility != _savedCursorVisibility)
+        if ((_desiredCursorVisibility != _savedCursorVisibility) || (_visibility != _savedCursorVisibility))
         {
             DesiredCursorVisibility = _savedCursorVisibility;
         }
@@ -1965,7 +1961,8 @@ public class TextField : View
 }
 
 /// <summary>
-///     Renders an overlay on another view at a given point that allows selecting from a range of 'autocomplete' options. An implementation on a TextField.
+///     Renders an overlay on another view at a given point that allows selecting from a range of 'autocomplete'
+///     options. An implementation on a TextField.
 /// </summary>
 public class TextFieldAutocomplete : PopupAutocomplete
 {

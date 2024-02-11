@@ -106,7 +106,7 @@ public class VkeyPacketSimulator : Scenario
                                     // If the key wasn't handled by the TextView will popup a Dialog with the keys pressed.
                                     bool? handled = tvOutput.OnInvokingKeyBindings (e);
 
-                                    if (handled == null || handled == false)
+                                    if ((handled == null) || (handled == false))
                                     {
                                         if (!tvOutput.OnProcessKeyDown (e))
                                         {

@@ -9,8 +9,6 @@ namespace Terminal.Gui.ViewTests;
 
 public class DimTests
 {
-    private readonly ITestOutputHelper _output;
-
     public DimTests (ITestOutputHelper output)
     {
         _output = output;
@@ -21,6 +19,8 @@ public class DimTests
         Thread.CurrentThread.CurrentCulture = culture;
         Thread.CurrentThread.CurrentUICulture = culture;
     }
+
+    private readonly ITestOutputHelper _output;
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // A new test that does not depend on Application is needed.

@@ -105,7 +105,9 @@ public class Animation : Scenario
         }
 
         public int HeightPixels { get; }
+
         public Func<int, int, bool> PixelIsLit { get; }
+
         public int WidthPixels { get; }
 
         public string GenerateImage ()

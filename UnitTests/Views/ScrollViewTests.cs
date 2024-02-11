@@ -5,8 +5,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class ScrollViewTests
 {
-    private readonly ITestOutputHelper _output;
     public ScrollViewTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output;
 
     [Fact]
     public void Adding_Views ()
@@ -1062,9 +1062,6 @@ public class ScrollViewTests
 
     private class CustomButton : FrameView
     {
-        private readonly Label labelFill;
-        private readonly Label labelText;
-
         public CustomButton (string fill, string text, int width, int height)
         {
             Width = width;
@@ -1097,6 +1094,9 @@ public class ScrollViewTests
             Add (labelFill, labelText);
             CanFocus = true;
         }
+
+        private readonly Label labelFill;
+        private readonly Label labelText;
 
         public override bool OnEnter (View view)
         {

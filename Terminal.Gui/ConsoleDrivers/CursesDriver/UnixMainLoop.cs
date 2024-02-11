@@ -8,9 +8,10 @@ namespace Terminal.Gui;
 
 /// <summary>Unix main loop, suitable for using on Posix systems</summary>
 /// <remarks>
-///     In addition to the general functions of the MainLoop, the Unix version can watch file descriptors using the AddWatch methods.
+///     In addition to the general functions of the MainLoop, the Unix version can watch file descriptors using the
+///     AddWatch methods.
 /// </remarks>
-internal class UnixMainLoop : IMainLoopDriver
+class UnixMainLoop : IMainLoopDriver
 {
     /// <summary>Condition on which to wake up from file descriptor activity.  These match the Linux/BSD poll definitions.</summary>
     [Flags]
@@ -103,7 +104,7 @@ internal class UnixMainLoop : IMainLoopDriver
             _winChanged = true;
         }
 
-        return checkTimersResult || n >= KEY_RESIZE;
+        return checkTimersResult || (n >= KEY_RESIZE);
     }
 
     void IMainLoopDriver.Iteration ()
@@ -152,7 +153,9 @@ internal class UnixMainLoop : IMainLoopDriver
 
     /// <summary>Watches a file descriptor for activity.</summary>
     /// <remarks>
-    ///     When the condition is met, the provided callback is invoked.  If the callback returns false, the watch is automatically removed. The return value is a token that represents this watch, you can use this token to remove the watch by calling RemoveWatch.
+    ///     When the condition is met, the provided callback is invoked.  If the callback returns false, the watch is
+    ///     automatically removed. The return value is a token that represents this watch, you can use this token to remove the
+    ///     watch by calling RemoveWatch.
     /// </remarks>
     internal object AddWatch (int fileDescriptor, Condition condition, Func<MainLoop, bool> callback)
     {
@@ -183,9 +186,9 @@ internal class UnixMainLoop : IMainLoopDriver
         }
     }
 
-    [DllImport ("libc")] private static extern int pipe ([In] [Out] int [] pipes);
-    [DllImport ("libc")] private static extern int poll ([In] [Out] Pollfd [] ufds, uint nfds, int timeout);
-    [DllImport ("libc")] private static extern int read (int fd, nint buf, nint n);
+    [DllImport ("libc")] private extern static int pipe ([In] [Out] int [] pipes);
+    [DllImport ("libc")] private extern static int poll ([In] [Out] Pollfd [] ufds, uint nfds, int timeout);
+    [DllImport ("libc")] private extern static int read (int fd, nint buf, nint n);
 
     private void UpdatePollMap ()
     {
@@ -207,7 +210,7 @@ internal class UnixMainLoop : IMainLoopDriver
         }
     }
 
-    [DllImport ("libc")] private static extern int write (int fd, nint buf, nint n);
+    [DllImport ("libc")] private extern static int write (int fd, nint buf, nint n);
 
     [StructLayout (LayoutKind.Sequential)]
     private struct Pollfd

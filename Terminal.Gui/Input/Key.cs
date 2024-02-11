@@ -500,7 +500,8 @@ public class Key : EventArgs, IEquatable<Key>
             if ((key & KeyCode.SpecialMask) != 0 && (baseKey & ~KeyCode.Space) is >= KeyCode.A and <= KeyCode.Z)
             {
                 sb.Append (baseKey & ~KeyCode.Space);
-            } else
+            }
+            else
             {
                 // Append the actual key name
                 sb.Append (GetKeyString (baseKey));
@@ -608,7 +609,8 @@ public class Key : EventArgs, IEquatable<Key>
                              ))
             {
                 keyCode = (KeyCode)((int)KeyCode.D0 + parsedInt);
-            } else if (Enum.TryParse (partNotFound, false, out parsedKeyCode))
+            }
+            else if (Enum.TryParse (partNotFound, false, out parsedKeyCode))
             {
                 if (parsedKeyCode != KeyCode.Null)
                 {

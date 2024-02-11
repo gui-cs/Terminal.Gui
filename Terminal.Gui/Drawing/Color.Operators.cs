@@ -7,7 +7,10 @@ namespace Terminal.Gui;
 public readonly partial record struct Color
 {
     /// <inheritdoc/>
-    /// <returns>A <see cref="Color"/> <see langword="struct"/> with all values set to <see cref="byte.MaxValue"/>, meaning white.</returns>
+    /// <returns>
+    ///     A <see cref="Color"/> <see langword="struct"/> with all values set to <see cref="byte.MaxValue"/>, meaning
+    ///     white.
+    /// </returns>
     public static Color MaxValue => new (uint.MaxValue);
 
     /// <inheritdoc/>
@@ -23,8 +26,9 @@ public readonly partial record struct Color
     public override int GetHashCode () { return Rgba.GetHashCode (); }
 
     /// <summary>
-    ///     Implicit conversion from <see cref="Color"/> to <see cref="Vector3"/> via <see cref="Vector3(float,float,float)"/>
-    ///     where ( <see cref="Vector3.X"/>, <see cref="Vector3.Y"/>, <see cref="Vector3.Z"/>) is (R,G,B).
+    ///     Implicit conversion from <see cref="Color"/> to <see cref="Vector3"/> via
+    ///     <see cref="Vector3(float,float,float)"/> where ( <see cref="Vector3.X"/>, <see cref="Vector3.Y"/>,
+    ///     <see cref="Vector3.Z"/>) is (R,G,B).
     /// </summary>
     /// <remarks>
     ///     This cast is narrowing and drops the alpha channel.

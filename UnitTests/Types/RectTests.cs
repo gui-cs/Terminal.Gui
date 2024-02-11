@@ -180,7 +180,7 @@ public class RectTests
     {
         var rect = new Rect (x, y, width, height);
 
-        if (rect.Width + inflateWidth < 0 || rect.Height + inflateHeight < 0)
+        if ((rect.Width + inflateWidth < 0) || (rect.Height + inflateHeight < 0))
         {
             Assert.Throws<ArgumentException> (() => rect.Inflate (inflateWidth, inflateHeight));
         }
@@ -197,7 +197,7 @@ public class RectTests
         // Use the other overload (Size)
         rect = new Rect (x, y, width, height);
 
-        if (rect.Width + inflateWidth < 0 || rect.Height + inflateHeight < 0)
+        if ((rect.Width + inflateWidth < 0) || (rect.Height + inflateHeight < 0))
         {
             Assert.Throws<ArgumentException> (() => rect.Inflate (new Size (inflateWidth, inflateHeight)));
         }

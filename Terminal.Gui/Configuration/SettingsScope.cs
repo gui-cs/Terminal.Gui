@@ -102,7 +102,7 @@ public class SettingsScope : Scope<SettingsScope>
     /// <param name="resourceName"></param>
     public SettingsScope? UpdateFromResource (Assembly assembly, string resourceName)
     {
-        if (resourceName == null || string.IsNullOrEmpty (resourceName))
+        if ((resourceName == null) || string.IsNullOrEmpty (resourceName))
         {
             Debug.WriteLine (
                              $"ConfigurationManager: Resource \"{resourceName}\" does not exist in \"{assembly.GetName ().Name}\"."

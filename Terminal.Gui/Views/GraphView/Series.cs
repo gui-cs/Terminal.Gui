@@ -19,7 +19,8 @@ public interface ISeries
 public class ScatterSeries : ISeries
 {
     /// <summary>
-    ///     The color and character that will be rendered in the console when there are point(s) in the corresponding graph space. Defaults to uncolored 'dot'
+    ///     The color and character that will be rendered in the console when there are point(s) in the corresponding
+    ///     graph space. Defaults to uncolored 'dot'
     /// </summary>
     public GraphCellToRender Fill { get; set; } = new (Glyphs.Dot);
 
@@ -95,7 +96,8 @@ public class MultiBarSeries : ISeries
     public float Spacing { get; }
 
     /// <summary>
-    ///     Sub collections.  Each series contains the bars for a different category.  Thus SubSeries[0].Bars[0] is the first bar on the axis and SubSeries[1].Bars[0] is the second etc
+    ///     Sub collections.  Each series contains the bars for a different category.  Thus SubSeries[0].Bars[0] is the
+    ///     first bar on the axis and SubSeries[1].Bars[0] is the second etc
     /// </summary>
     public IReadOnlyCollection<BarSeries> SubSeries => new ReadOnlyCollection<BarSeries> (subSeries);
 
@@ -143,8 +145,8 @@ public class MultiBarSeries : ISeries
 public class BarSeries : ISeries
 {
     /// <summary>
-    ///     Determines the spacing of bars along the axis. Defaults to 1 i.e. every 1 unit of graph space a bar is rendered. Note that you should also consider
-    ///     <see cref="GraphView.CellSize"/> when changing this.
+    ///     Determines the spacing of bars along the axis. Defaults to 1 i.e. every 1 unit of graph space a bar is
+    ///     rendered. Note that you should also consider <see cref="GraphView.CellSize"/> when changing this.
     /// </summary>
     public float BarEvery { get; set; } = 1;
 
@@ -193,7 +195,7 @@ public class BarSeries : ISeries
                 screenEnd.X = Math.Min (graph.Bounds.Width - 1, screenEnd.X);
 
                 // if bar is off the screen
-                if (screenStart.Y < 0 || screenStart.Y > drawBounds.Height - graph.MarginBottom)
+                if ((screenStart.Y < 0) || (screenStart.Y > drawBounds.Height - graph.MarginBottom))
                 {
                     continue;
                 }
@@ -207,7 +209,7 @@ public class BarSeries : ISeries
                 screenEnd.Y = Math.Max (0, screenEnd.Y);
 
                 // if bar is off the screen
-                if (screenStart.X < graph.MarginLeft || screenStart.X > graph.MarginLeft + drawBounds.Width - 1)
+                if ((screenStart.X < graph.MarginLeft) || (screenStart.X > graph.MarginLeft + drawBounds.Width - 1))
                 {
                     continue;
                 }

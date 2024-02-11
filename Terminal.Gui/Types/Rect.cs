@@ -75,7 +75,8 @@ public struct Rect
 
     /// <summary>Produces a new Rect by inflating an existing Rect by the specified coordinate values.</summary>
     /// <remarks>
-    ///     Produces a new Rect by inflating an existing Rect by the specified coordinate values. The rectangle is enlarged in both directions along an axis.
+    ///     Produces a new Rect by inflating an existing Rect by the specified coordinate values. The rectangle is
+    ///     enlarged in both directions along an axis.
     /// </remarks>
     public static Rect Inflate (Rect rect, int x, int y)
     {
@@ -86,7 +87,10 @@ public struct Rect
     }
 
     /// <summary>Inflates an existing Rect by the specified coordinate values.</summary>
-    /// <remarks>This method enlarges this rectangle, not a copy of it. The rectangle is enlarged in both directions along an axis.</remarks>
+    /// <remarks>
+    ///     This method enlarges this rectangle, not a copy of it. The rectangle is enlarged in both directions along an
+    ///     axis.
+    /// </remarks>
     public void Inflate (int width, int height)
     {
         // Set dims first so we don't lose the original values on exception
@@ -98,7 +102,10 @@ public struct Rect
     }
 
     /// <summary>Inflates an existing Rect by the specified Sizwe.</summary>
-    /// <remarks>This method enlarges this rectangle, not a copy of it. The rectangle is enlarged in both directions along an axis.</remarks>
+    /// <remarks>
+    ///     This method enlarges this rectangle, not a copy of it. The rectangle is enlarged in both directions along an
+    ///     axis.
+    /// </remarks>
     public void Inflate (Size size) { Inflate (size.Width, size.Height); }
 
     /// <summary>Intersect Shared Method</summary>
@@ -144,15 +151,17 @@ public struct Rect
 
     /// <summary>Equality Operator</summary>
     /// <remarks>
-    ///     Compares two Rectangle objects. The return value is based on the equivalence of the Location and Size properties of the two Rectangles.
+    ///     Compares two Rectangle objects. The return value is based on the equivalence of the Location and Size
+    ///     properties of the two Rectangles.
     /// </remarks>
     public static bool operator == (Rect left, Rect right) { return left.Location == right.Location && left.Size == right.Size; }
 
     /// <summary>Inequality Operator</summary>
     /// <remarks>
-    ///     Compares two Rectangle objects. The return value is based on the equivalence of the Location and Size properties of the two Rectangles.
+    ///     Compares two Rectangle objects. The return value is based on the equivalence of the Location and Size
+    ///     properties of the two Rectangles.
     /// </remarks>
-    public static bool operator != (Rect left, Rect right) { return left.Location != right.Location || left.Size != right.Size; }
+    public static bool operator != (Rect left, Rect right) { return (left.Location != right.Location) || (left.Size != right.Size); }
 
     // -----------------------
     // Public Constructors
@@ -256,9 +265,9 @@ public struct Rect
 
     /// <summary>IntersectsWith Method</summary>
     /// <remarks>Checks if a Rectangle intersects with this one.</remarks>
-    public bool IntersectsWith (Rect rect) { return !(Left >= rect.Right || Right <= rect.Left || Top >= rect.Bottom || Bottom <= rect.Top); }
+    public bool IntersectsWith (Rect rect) { return !((Left >= rect.Right) || (Right <= rect.Left) || (Top >= rect.Bottom) || (Bottom <= rect.Top)); }
 
-    private bool IntersectsWithInclusive (Rect r) { return !(Left > r.Right || Right < r.Left || Top > r.Bottom || Bottom < r.Top); }
+    private bool IntersectsWithInclusive (Rect r) { return !((Left > r.Right) || (Right < r.Left) || (Top > r.Bottom) || (Bottom < r.Top)); }
 
     /// <summary>Offset Method</summary>
     /// <remarks>Moves the Rectangle a specified distance.</remarks>

@@ -5,10 +5,6 @@ namespace Terminal.Gui.ViewsTests;
 
 public class TreeTableSourceTests : IDisposable
 {
-    private readonly Rune _origChecked;
-    private readonly Rune _origUnchecked;
-    private readonly ITestOutputHelper _output;
-
     public TreeTableSourceTests (ITestOutputHelper output)
     {
         _output = output;
@@ -18,6 +14,10 @@ public class TreeTableSourceTests : IDisposable
         ConfigurationManager.Glyphs.Checked = new Rune ('☑');
         ConfigurationManager.Glyphs.UnChecked = new Rune ('☐');
     }
+
+    private readonly Rune _origChecked;
+    private readonly Rune _origUnchecked;
+    private readonly ITestOutputHelper _output;
 
     public void Dispose ()
     {
@@ -290,19 +290,23 @@ public class TreeTableSourceTests : IDisposable
     private class Car : IDescribedThing
     {
         public string Name { get; set; }
+
         public string Description { get; set; }
     }
 
     private interface IDescribedThing
     {
         string Description { get; }
+
         string Name { get; }
     }
 
     private class Road : IDescribedThing
     {
         public List<Car> Traffic { get; set; }
+
         public string Name { get; set; }
+
         public string Description { get; set; }
     }
 }

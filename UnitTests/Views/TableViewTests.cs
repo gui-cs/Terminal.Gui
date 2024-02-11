@@ -8,8 +8,8 @@ namespace Terminal.Gui.ViewsTests;
 
 public class TableViewTests
 {
-    private readonly ITestOutputHelper output;
     public TableViewTests (ITestOutputHelper output) { this.output = output; }
+    private readonly ITestOutputHelper output;
 
     /// <summary>Builds a simple list with the requested number of string items</summary>
     /// <param name="items"></param>
@@ -3307,7 +3307,9 @@ A B C
         }
 
         public bool IsPicked { get; set; }
+
         public string Kind { get; }
+
         public string Name { get; }
     }
 }

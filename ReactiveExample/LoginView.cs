@@ -8,8 +8,6 @@ namespace ReactiveExample;
 
 public class LoginView : Window, IViewFor<LoginViewModel>
 {
-    private readonly CompositeDisposable _disposable = new ();
-
     public LoginView (LoginViewModel viewModel)
     {
         Title = "Reactive Extensions Example";
@@ -24,13 +22,11 @@ public class LoginView : Window, IViewFor<LoginViewModel>
         LoginProgressLabel (clearButton);
     }
 
+    private readonly CompositeDisposable _disposable = new ();
+
     public LoginViewModel ViewModel { get; set; }
 
-    object IViewFor.ViewModel
-    {
-        get => ViewModel;
-        set => ViewModel = (LoginViewModel)value;
-    }
+    object IViewFor.ViewModel { get => ViewModel; set => ViewModel = (LoginViewModel)value; }
 
     protected override void Dispose (bool disposing)
     {

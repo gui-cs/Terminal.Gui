@@ -9,7 +9,7 @@ using Unix.Terminal;
 namespace Terminal.Gui;
 
 /// <summary>This is the Curses driver for the gui.cs/Terminal framework.</summary>
-internal class CursesDriver : ConsoleDriver
+class CursesDriver : ConsoleDriver
 {
     private CursorVisibility? _currentCursorVisibility;
     private CursorVisibility? _initialCursorVisibility;
@@ -600,7 +600,7 @@ internal class CursesDriver : ConsoleDriver
                 k = (KeyCode)wch | KeyCode.ShiftMask;
             }
 
-            if (wch == '\n' || wch == '\r')
+            if ((wch == '\n') || (wch == '\r'))
             {
                 k = KeyCode.Enter;
             }
@@ -635,7 +635,7 @@ internal class CursesDriver : ConsoleDriver
             code = Curses.get_wch (out wch2);
             var consoleKeyInfo = new ConsoleKeyInfo ((char)wch2, 0, false, false, false);
 
-            if (wch2 == 0 || wch2 == 27 || wch2 == Curses.KeyMouse)
+            if ((wch2 == 0) || (wch2 == 27) || (wch2 == Curses.KeyMouse))
             {
                 EscSeqUtils.DecodeEscSeq (
                                           null,
@@ -831,7 +831,9 @@ internal class CursesDriver : ConsoleDriver
 
     /// <inheritdoc/>
     /// <remarks>
-    ///     In the CursesDriver, colors are encoded as an int. The foreground color is stored in the most significant 4 bits, and the background color is stored in the least significant 4 bits. The Terminal.GUi Color values are converted to curses color encoding before being encoded.
+    ///     In the CursesDriver, colors are encoded as an int. The foreground color is stored in the most significant 4
+    ///     bits, and the background color is stored in the least significant 4 bits. The Terminal.GUi Color values are
+    ///     converted to curses color encoding before being encoded.
     /// </remarks>
     public override Attribute MakeColor (Color foreground, Color background)
     {
@@ -935,7 +937,7 @@ internal class CursesDriver : ConsoleDriver
     #endregion
 }
 
-internal static class Platform
+static class Platform
 {
     private static int _suspendSignal;
 
@@ -1008,6 +1010,6 @@ internal static class Platform
         }
     }
 
-    [DllImport ("libc")] private static extern int killpg (int pgrp, int pid);
-    [DllImport ("libc")] private static extern int uname (nint buf);
+    [DllImport ("libc")] private extern static int killpg (int pgrp, int pid);
+    [DllImport ("libc")] private extern static int uname (nint buf);
 }

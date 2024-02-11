@@ -20,19 +20,20 @@ public class Tile
     private string _title = string.Empty;
 
     /// <summary>
-    ///     The <see cref="ContentView"/> that is contained in this <see cref="TileView"/>. Add new child views to this member for multiple
-    ///     <see cref="ContentView"/>s within the <see cref="Tile"/>.
+    ///     The <see cref="ContentView"/> that is contained in this <see cref="TileView"/>. Add new child views to this
+    ///     member for multiple <see cref="ContentView"/>s within the <see cref="Tile"/>.
     /// </summary>
     public View ContentView { get; internal set; }
 
     /// <summary>
-    ///     Gets or Sets the minimum size you to allow when splitter resizing along parent <see cref="TileView.Orientation"/>
-    ///     direction.
+    ///     Gets or Sets the minimum size you to allow when splitter resizing along parent
+    ///     <see cref="TileView.Orientation"/> direction.
     /// </summary>
     public int MinSize { get; set; }
 
     /// <summary>
-    ///     The text that should be displayed above the <see cref="ContentView"/>. This will appear over the splitter line or border (above the view client area).
+    ///     The text that should be displayed above the <see cref="ContentView"/>. This will appear over the splitter line
+    ///     or border (above the view client area).
     /// </summary>
     /// <remarks>Title are not rendered for root level tiles <see cref="Gui.LineStyle"/> is <see cref="LineStyle.None"/>.</remarks>
     public string Title
@@ -62,7 +63,10 @@ public class Tile
         TitleChanged?.Invoke (this, args);
     }
 
-    /// <summary>Called before the <see cref="Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can be cancelled.</summary>
+    /// <summary>
+    ///     Called before the <see cref="Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can be
+    ///     cancelled.
+    /// </summary>
     /// <param name="oldTitle">The <see cref="Title"/> that is/has been replaced.</param>
     /// <param name="newTitle">The new <see cref="Title"/> to be replaced.</param>
     /// <returns><c>true</c> if an event handler cancelled the Title change.</returns>
@@ -78,7 +82,8 @@ public class Tile
     public event EventHandler<TitleEventArgs> TitleChanged;
 
     /// <summary>
-    ///     Event fired when the <see cref="Title"/> is changing. Set <see cref="TitleEventArgs.Cancel"/> to <c>true</c> to cancel the Title change.
+    ///     Event fired when the <see cref="Title"/> is changing. Set <see cref="TitleEventArgs.Cancel"/> to <c>true</c>
+    ///     to cancel the Title change.
     /// </summary>
     public event EventHandler<TitleEventArgs> TitleChanging;
 }
