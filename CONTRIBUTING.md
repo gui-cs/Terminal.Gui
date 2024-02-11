@@ -97,7 +97,7 @@ Before you commit code, please run the formatting rules on **only the code file(
 
  1. `Ctrl-E-C` if using ReSharper or Rider
  2. Running the free [CleanupCode](https://www.jetbrains.com/help/resharper/CleanupCode.html) tool from JetBrains (this applies the same formatting rules as if you had used ReSharper or Rider, but is free for all users, if you don't have a license for those products)
-   - Run at the command line, from the solution root directory, as: `cleanupcode.exe relative/path/to/your/file.cs`
+     - Run at the command line, from the solution root directory, as: `cleanupcode.exe relative/path/to/your/file.cs`
  3. If you are unable to use either of those options, the last resort is to use `Ctrl-K-D` in Visual Studio (with default C# developer key bindings), to apply the subset of the formatting rules that Visual Studio can apply.
 
 ## User Experience Tenets
