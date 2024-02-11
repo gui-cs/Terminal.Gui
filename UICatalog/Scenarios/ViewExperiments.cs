@@ -7,16 +7,20 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Borders")]
 [ScenarioCategory ("Layout")]
 [ScenarioCategory ("Proof of Concept")]
-public class ViewExperiments : Scenario {
-    public override void Init () {
+public class ViewExperiments : Scenario
+{
+    public override void Init ()
+    {
         Application.Init ();
         ConfigurationManager.Themes.Theme = Theme;
         ConfigurationManager.Apply ();
-        Application.Top.ColorScheme = Colors.ColorSchemes[TopLevelColorScheme];
+        Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
     }
 
-    public override void Setup () {
-        var containerLabel = new Label {
+    public override void Setup ()
+    {
+        var containerLabel = new Label
+        {
             X = 0,
             Y = 0,
             AutoSize = false,
@@ -25,30 +29,32 @@ public class ViewExperiments : Scenario {
         };
         Application.Top.Add (containerLabel);
 
-        var view = new View {
+        var view = new View
+        {
             X = 2,
             Y = Pos.Bottom (containerLabel),
             Height = Dim.Fill (2),
             Width = Dim.Fill (2),
             Title = "View with 2xMargin, 2xBorder, & 2xPadding",
-            ColorScheme = Colors.ColorSchemes["Base"],
+            ColorScheme = Colors.ColorSchemes ["Base"],
             Id = "DaView"
         };
 
         //Application.Top.Add (view);
 
         view.Margin.Thickness = new Thickness (2, 2, 2, 2);
-        view.Margin.ColorScheme = Colors.ColorSchemes["Toplevel"];
+        view.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
         view.Margin.Data = "Margin";
         view.Border.Thickness = new Thickness (3);
         view.Border.LineStyle = LineStyle.Single;
         view.Border.ColorScheme = view.ColorScheme;
         view.Border.Data = "Border";
         view.Padding.Thickness = new Thickness (2);
-        view.Padding.ColorScheme = Colors.ColorSchemes["Error"];
+        view.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
         view.Padding.Data = "Padding";
 
-        var window1 = new Window {
+        var window1 = new Window
+        {
             X = 2,
             Y = 3,
             Height = 7,
@@ -59,19 +65,20 @@ public class ViewExperiments : Scenario {
         };
 
         window1.Margin.Thickness = new Thickness (0);
-        window1.Margin.ColorScheme = Colors.ColorSchemes["Toplevel"];
+        window1.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
         window1.Margin.Data = "Margin";
         window1.Border.Thickness = new Thickness (1);
         window1.Border.LineStyle = LineStyle.Single;
         window1.Border.ColorScheme = view.ColorScheme;
         window1.Border.Data = "Border";
         window1.Padding.Thickness = new Thickness (0);
-        window1.Padding.ColorScheme = Colors.ColorSchemes["Error"];
+        window1.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
         window1.Padding.Data = "Padding";
 
         view.Add (window1);
 
-        var window2 = new Window {
+        var window2 = new Window
+        {
             X = Pos.Right (window1) + 1,
             Y = 3,
             Height = 5,
@@ -83,19 +90,20 @@ public class ViewExperiments : Scenario {
 
         //view3.InitializeFrames ();
         window2.Margin.Thickness = new Thickness (1, 1, 0, 0);
-        window2.Margin.ColorScheme = Colors.ColorSchemes["Toplevel"];
+        window2.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
         window2.Margin.Data = "Margin";
         window2.Border.Thickness = new Thickness (1, 1, 1, 1);
         window2.Border.LineStyle = LineStyle.Single;
         window2.Border.ColorScheme = view.ColorScheme;
         window2.Border.Data = "Border";
         window2.Padding.Thickness = new Thickness (1, 1, 0, 0);
-        window2.Padding.ColorScheme = Colors.ColorSchemes["Error"];
+        window2.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
         window2.Padding.Data = "Padding";
 
         view.Add (window2);
 
-        var view4 = new View {
+        var view4 = new View
+        {
             X = Pos.Right (window2) + 1,
             Y = 3,
             Height = 5,
@@ -107,19 +115,20 @@ public class ViewExperiments : Scenario {
 
         //view4.InitializeFrames ();
         view4.Margin.Thickness = new Thickness (0, 0, 1, 1);
-        view4.Margin.ColorScheme = Colors.ColorSchemes["Toplevel"];
+        view4.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
         view4.Margin.Data = "Margin";
         view4.Border.Thickness = new Thickness (1, 1, 1, 1);
         view4.Border.LineStyle = LineStyle.Single;
         view4.Border.ColorScheme = view.ColorScheme;
         view4.Border.Data = "Border";
         view4.Padding.Thickness = new Thickness (0, 0, 1, 1);
-        view4.Padding.ColorScheme = Colors.ColorSchemes["Error"];
+        view4.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
         view4.Padding.Data = "Padding";
 
         view.Add (view4);
 
-        var view5 = new View {
+        var view5 = new View
+        {
             X = Pos.Right (view4) + 1,
             Y = 3,
             Height = Dim.Fill (2),
@@ -131,14 +140,14 @@ public class ViewExperiments : Scenario {
 
         //view5.InitializeFrames ();
         view5.Margin.Thickness = new Thickness (0, 0, 0, 0);
-        view5.Margin.ColorScheme = Colors.ColorSchemes["Toplevel"];
+        view5.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
         view5.Margin.Data = "Margin";
         view5.Border.Thickness = new Thickness (1, 1, 1, 1);
         view5.Border.LineStyle = LineStyle.Single;
         view5.Border.ColorScheme = view.ColorScheme;
         view5.Border.Data = "Border";
         view5.Padding.Thickness = new Thickness (0, 0, 0, 0);
-        view5.Padding.ColorScheme = Colors.ColorSchemes["Error"];
+        view5.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
         view5.Padding.Data = "Padding";
 
         view.Add (view5);
@@ -146,7 +155,8 @@ public class ViewExperiments : Scenario {
         var label = new Label { Text = "AutoSize true; 1;1:", X = 1, Y = 1 };
         view.Add (label);
 
-        var edit = new TextField {
+        var edit = new TextField
+        {
             Text = "Right (label)",
             X = Pos.Right (label),
             Y = 1,
@@ -155,7 +165,8 @@ public class ViewExperiments : Scenario {
         };
         view.Add (edit);
 
-        edit = new TextField {
+        edit = new TextField
+        {
             Text = "Right (edit) + 1",
             X = Pos.Right (edit) + 1,
             Y = 1,
@@ -164,7 +175,8 @@ public class ViewExperiments : Scenario {
         };
         view.Add (edit);
 
-        var label50 = new View {
+        var label50 = new View
+        {
             Title = "Border Inherit Demo",
             Text = "Center();50%",
             X = Pos.Center (),
@@ -176,7 +188,8 @@ public class ViewExperiments : Scenario {
         label50.Height = 5;
         view.Add (label50);
 
-        edit = new TextField {
+        edit = new TextField
+        {
             Text = "0 + Percent(50);70%",
             X = 0 + Pos.Percent (50),
             Y = Pos.Percent (70),
@@ -189,7 +202,8 @@ public class ViewExperiments : Scenario {
         edit.X = Pos.AnchorEnd () - (Pos.Right (edit) - Pos.Left (edit));
         view.Add (edit);
 
-        edit = new TextField {
+        edit = new TextField
+        {
             Text = "Left;AnchorEnd (2)",
             X = 0,
             Y = Pos.AnchorEnd (2),
@@ -198,28 +212,30 @@ public class ViewExperiments : Scenario {
         };
         view.Add (edit);
 
-        view.LayoutComplete += (s, e) => {
-            containerLabel.Text =
-                $"Container.Frame: {
-                    Application.Top.Frame
-                } .Bounds: {
-                    Application.Top.Bounds
-                }\nView.Frame: {
-                    view.Frame
-                } .Bounds: {
-                    view.Bounds
-                } .BoundsOffset: {
-                    view.GetBoundsOffset ()
-                }\n .Padding.Frame: {
-                    view.Padding.Frame
-                } .Padding.Bounds: {
-                    view.Padding.Bounds
-                }";
-        };
+        view.LayoutComplete += (s, e) =>
+                               {
+                                   containerLabel.Text =
+                                       $"Container.Frame: {
+                                           Application.Top.Frame
+                                       } .Bounds: {
+                                           Application.Top.Bounds
+                                       }\nView.Frame: {
+                                           view.Frame
+                                       } .Bounds: {
+                                           view.Bounds
+                                       } .BoundsOffset: {
+                                           view.GetBoundsOffset ()
+                                       }\n .Padding.Frame: {
+                                           view.Padding.Frame
+                                       } .Padding.Bounds: {
+                                           view.Padding.Bounds
+                                       }";
+                               };
 
         view.X = Pos.Center ();
 
-        var editor = new Adornments.AdornmentsEditor {
+        var editor = new Adornments.AdornmentsEditor
+        {
             Title = "Adornments Editor",
             X = 0,
             Y = Pos.Bottom (containerLabel),

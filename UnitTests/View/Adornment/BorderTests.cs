@@ -2,17 +2,21 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class BorderTests {
-    public BorderTests (ITestOutputHelper output) { _output = output; }
+public class BorderTests
+{
     private readonly ITestOutputHelper _output;
+    public BorderTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [SetupFakeDriver]
-    public void Border_Parent_HasFocus_Title_Uses_FocusAttribute () {
+    public void Border_Parent_HasFocus_Title_Uses_FocusAttribute ()
+    {
         var view = new View { Title = "A", Height = 2, Width = 5 };
         view.Border.Thickness = new Thickness (0, 1, 0, 0);
         view.Border.LineStyle = LineStyle.Single;
-        view.ColorScheme = new ColorScheme {
+
+        view.ColorScheme = new ColorScheme
+        {
             Normal = new Attribute (Color.Red, Color.Green), Focus = new Attribute (Color.Green, Color.Red)
         };
         Assert.NotEqual (view.ColorScheme.Normal.Foreground, view.ColorScheme.Focus.Foreground);
@@ -39,11 +43,14 @@ public class BorderTests {
 
     [Fact]
     [SetupFakeDriver]
-    public void Border_Uses_Parent_ColorScheme () {
+    public void Border_Uses_Parent_ColorScheme ()
+    {
         var view = new View { Title = "A", Height = 2, Width = 5 };
         view.Border.Thickness = new Thickness (0, 1, 0, 0);
         view.Border.LineStyle = LineStyle.Single;
-        view.ColorScheme = new ColorScheme {
+
+        view.ColorScheme = new ColorScheme
+        {
             Normal = new Attribute (Color.Red, Color.Green), Focus = new Attribute (Color.Green, Color.Red)
         };
         Assert.Equal (ColorName.Red, view.Border.GetNormalColor ().Foreground.GetClosestNamedColor ());
@@ -73,8 +80,10 @@ public class BorderTests {
     [InlineData (8)]
     [InlineData (9)]
     [InlineData (10)]
-    public void Border_With_Title_Border_Double_Thickness_Top_Four_Size_Width (int width) {
-        var win = new Window {
+    public void Border_With_Title_Border_Double_Thickness_Top_Four_Size_Width (int width)
+    {
+        var win = new Window
+        {
             Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Double
         };
         win.Border.Thickness.Top = 4;
@@ -86,9 +95,11 @@ public class BorderTests {
         Application.RunIteration (ref rs, ref firstIteration);
         var expected = string.Empty;
 
-        switch (width) {
+        switch (width)
+        {
             case 1:
                 Assert.Equal (new Rect (0, 0, 1, 5), win.Frame);
+
                 expected = @"
 ║
 ║
@@ -97,6 +108,7 @@ public class BorderTests {
                 break;
             case 2:
                 Assert.Equal (new Rect (0, 0, 2, 5), win.Frame);
+
                 expected = @"
 ╔╗
 ║║
@@ -105,6 +117,7 @@ public class BorderTests {
                 break;
             case 3:
                 Assert.Equal (new Rect (0, 0, 3, 5), win.Frame);
+
                 expected = @"
 ╔═╗
 ║ ║
@@ -113,6 +126,7 @@ public class BorderTests {
                 break;
             case 4:
                 Assert.Equal (new Rect (0, 0, 4, 5), win.Frame);
+
                 expected = @"
  ╒╕ 
 ╔╡╞╗
@@ -122,6 +136,7 @@ public class BorderTests {
                 break;
             case 5:
                 Assert.Equal (new Rect (0, 0, 5, 5), win.Frame);
+
                 expected = @"
  ╒═╕ 
 ╔╡1╞╗
@@ -131,6 +146,7 @@ public class BorderTests {
                 break;
             case 6:
                 Assert.Equal (new Rect (0, 0, 6, 5), win.Frame);
+
                 expected = @"
  ╒══╕ 
 ╔╡12╞╗
@@ -140,6 +156,7 @@ public class BorderTests {
                 break;
             case 7:
                 Assert.Equal (new Rect (0, 0, 7, 5), win.Frame);
+
                 expected = @"
  ╒═══╕ 
 ╔╡123╞╗
@@ -149,6 +166,7 @@ public class BorderTests {
                 break;
             case 8:
                 Assert.Equal (new Rect (0, 0, 8, 5), win.Frame);
+
                 expected = @"
  ╒════╕ 
 ╔╡1234╞╗
@@ -158,6 +176,7 @@ public class BorderTests {
                 break;
             case 9:
                 Assert.Equal (new Rect (0, 0, 9, 5), win.Frame);
+
                 expected = @"
  ╒════╕  
 ╔╡1234╞═╗
@@ -167,6 +186,7 @@ public class BorderTests {
                 break;
             case 10:
                 Assert.Equal (new Rect (0, 0, 10, 5), win.Frame);
+
                 expected = @"
  ╒════╕   
 ╔╡1234╞══╗
@@ -193,8 +213,10 @@ public class BorderTests {
     [InlineData (8)]
     [InlineData (9)]
     [InlineData (10)]
-    public void Border_With_Title_Border_Double_Thickness_Top_Three_Size_Width (int width) {
-        var win = new Window {
+    public void Border_With_Title_Border_Double_Thickness_Top_Three_Size_Width (int width)
+    {
+        var win = new Window
+        {
             Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Double
         };
         win.Border.Thickness.Top = 3;
@@ -206,9 +228,11 @@ public class BorderTests {
         Application.RunIteration (ref rs, ref firstIteration);
         var expected = string.Empty;
 
-        switch (width) {
+        switch (width)
+        {
             case 1:
                 Assert.Equal (new Rect (0, 0, 1, 4), win.Frame);
+
                 expected = @"
 ║
 ║
@@ -217,6 +241,7 @@ public class BorderTests {
                 break;
             case 2:
                 Assert.Equal (new Rect (0, 0, 2, 4), win.Frame);
+
                 expected = @"
 ╔╗
 ║║
@@ -225,6 +250,7 @@ public class BorderTests {
                 break;
             case 3:
                 Assert.Equal (new Rect (0, 0, 3, 4), win.Frame);
+
                 expected = @"
 ╔═╗
 ║ ║
@@ -233,6 +259,7 @@ public class BorderTests {
                 break;
             case 4:
                 Assert.Equal (new Rect (0, 0, 4, 4), win.Frame);
+
                 expected = @"
  ╒╕ 
 ╔╡╞╗
@@ -242,6 +269,7 @@ public class BorderTests {
                 break;
             case 5:
                 Assert.Equal (new Rect (0, 0, 5, 4), win.Frame);
+
                 expected = @"
  ╒═╕ 
 ╔╡1╞╗
@@ -251,6 +279,7 @@ public class BorderTests {
                 break;
             case 6:
                 Assert.Equal (new Rect (0, 0, 6, 4), win.Frame);
+
                 expected = @"
  ╒══╕ 
 ╔╡12╞╗
@@ -260,6 +289,7 @@ public class BorderTests {
                 break;
             case 7:
                 Assert.Equal (new Rect (0, 0, 7, 4), win.Frame);
+
                 expected = @"
  ╒═══╕ 
 ╔╡123╞╗
@@ -269,6 +299,7 @@ public class BorderTests {
                 break;
             case 8:
                 Assert.Equal (new Rect (0, 0, 8, 4), win.Frame);
+
                 expected = @"
  ╒════╕ 
 ╔╡1234╞╗
@@ -278,6 +309,7 @@ public class BorderTests {
                 break;
             case 9:
                 Assert.Equal (new Rect (0, 0, 9, 4), win.Frame);
+
                 expected = @"
  ╒════╕  
 ╔╡1234╞═╗
@@ -287,6 +319,7 @@ public class BorderTests {
                 break;
             case 10:
                 Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
+
                 expected = @"
  ╒════╕   
 ╔╡1234╞══╗
@@ -313,8 +346,10 @@ public class BorderTests {
     [InlineData (8)]
     [InlineData (9)]
     [InlineData (10)]
-    public void Border_With_Title_Border_Double_Thickness_Top_Two_Size_Width (int width) {
-        var win = new Window {
+    public void Border_With_Title_Border_Double_Thickness_Top_Two_Size_Width (int width)
+    {
+        var win = new Window
+        {
             Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Double
         };
         win.Border.Thickness.Top = 2;
@@ -326,9 +361,11 @@ public class BorderTests {
         Application.RunIteration (ref rs, ref firstIteration);
         var expected = string.Empty;
 
-        switch (width) {
+        switch (width)
+        {
             case 1:
                 Assert.Equal (new Rect (0, 0, 1, 4), win.Frame);
+
                 expected = @"
 ║
 ║
@@ -337,6 +374,7 @@ public class BorderTests {
                 break;
             case 2:
                 Assert.Equal (new Rect (0, 0, 2, 4), win.Frame);
+
                 expected = @"
 ╔╗
 ║║
@@ -345,6 +383,7 @@ public class BorderTests {
                 break;
             case 3:
                 Assert.Equal (new Rect (0, 0, 3, 4), win.Frame);
+
                 expected = @"
 ╔═╗
 ║ ║
@@ -353,6 +392,7 @@ public class BorderTests {
                 break;
             case 4:
                 Assert.Equal (new Rect (0, 0, 4, 4), win.Frame);
+
                 expected = @"
  ╒╕ 
 ╔╛╘╗
@@ -362,6 +402,7 @@ public class BorderTests {
                 break;
             case 5:
                 Assert.Equal (new Rect (0, 0, 5, 4), win.Frame);
+
                 expected = @"
  ╒═╕ 
 ╔╛1╘╗
@@ -371,6 +412,7 @@ public class BorderTests {
                 break;
             case 6:
                 Assert.Equal (new Rect (0, 0, 6, 4), win.Frame);
+
                 expected = @"
  ╒══╕ 
 ╔╛12╘╗
@@ -380,6 +422,7 @@ public class BorderTests {
                 break;
             case 7:
                 Assert.Equal (new Rect (0, 0, 7, 4), win.Frame);
+
                 expected = @"
  ╒═══╕ 
 ╔╛123╘╗
@@ -389,6 +432,7 @@ public class BorderTests {
                 break;
             case 8:
                 Assert.Equal (new Rect (0, 0, 8, 4), win.Frame);
+
                 expected = @"
  ╒════╕ 
 ╔╛1234╘╗
@@ -398,6 +442,7 @@ public class BorderTests {
                 break;
             case 9:
                 Assert.Equal (new Rect (0, 0, 9, 4), win.Frame);
+
                 expected = @"
  ╒════╕  
 ╔╛1234╘═╗
@@ -407,6 +452,7 @@ public class BorderTests {
                 break;
             case 10:
                 Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
+
                 expected = @"
  ╒════╕   
 ╔╛1234╘══╗
@@ -426,7 +472,8 @@ public class BorderTests {
     [InlineData (1)]
     [InlineData (2)]
     [InlineData (3)]
-    public void Border_With_Title_Size_Height (int height) {
+    public void Border_With_Title_Size_Height (int height)
+    {
         var win = new Window { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill () };
 
         RunState rs = Application.Begin (win);
@@ -436,7 +483,8 @@ public class BorderTests {
         Application.RunIteration (ref rs, ref firstIteration);
         var expected = string.Empty;
 
-        switch (height) {
+        switch (height)
+        {
             case 0:
                 //Assert.Equal (new Rect (0, 0, 17, 0), subview.Frame);
                 expected = @"
@@ -485,7 +533,8 @@ public class BorderTests {
     [InlineData (8)]
     [InlineData (9)]
     [InlineData (10)]
-    public void Border_With_Title_Size_Width (int width) {
+    public void Border_With_Title_Size_Width (int width)
+    {
         var win = new Window { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill () };
 
         RunState rs = Application.Begin (win);
@@ -495,7 +544,8 @@ public class BorderTests {
         Application.RunIteration (ref rs, ref firstIteration);
         var expected = string.Empty;
 
-        switch (width) {
+        switch (width)
+        {
             case 1:
                 //Assert.Equal (new Rect (0, 0, 17, 0), subview.Frame);
                 expected = @"
@@ -596,8 +646,10 @@ public class BorderTests {
         int frameY,
         int expectedScreenX,
         int expectedScreenY
-    ) {
-        var superSuper = new View {
+    )
+    {
+        var superSuper = new View
+        {
             X = superOffset,
             Y = superOffset,
             Width = 30,
@@ -605,7 +657,8 @@ public class BorderTests {
             BorderStyle = LineStyle.Single
         };
 
-        var super = new View {
+        var super = new View
+        {
             X = superOffset,
             Y = superOffset,
             Width = 20,
@@ -635,8 +688,10 @@ public class BorderTests {
         int frameY,
         int expectedScreenX,
         int expectedScreenY
-    ) {
-        var super = new View {
+    )
+    {
+        var super = new View
+        {
             X = superOffset,
             Y = superOffset,
             Width = 20,
@@ -653,7 +708,8 @@ public class BorderTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void HasSuperView () {
+    public void HasSuperView ()
+    {
         Application.Top.BorderStyle = LineStyle.Double;
 
         var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
@@ -664,6 +720,7 @@ public class BorderTests {
 
         ((FakeDriver)Application.Driver).SetBufferSize (5, 5);
         Application.RunIteration (ref rs, ref firstIteration);
+
         var expected = @"
 ╔═══╗
 ║┌─┐║
@@ -677,7 +734,8 @@ public class BorderTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void HasSuperView_Title () {
+    public void HasSuperView_Title ()
+    {
         Application.Top.BorderStyle = LineStyle.Double;
 
         var frame = new FrameView { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill () };
@@ -688,6 +746,7 @@ public class BorderTests {
 
         ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
         Application.RunIteration (ref rs, ref firstIteration);
+
         var expected = @"
 ╔════════╗
 ║┌┤1234├┐║
@@ -700,7 +759,8 @@ public class BorderTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void NoSuperView () {
+    public void NoSuperView ()
+    {
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
 
         RunState rs = Application.Begin (win);
@@ -708,6 +768,7 @@ public class BorderTests {
 
         ((FakeDriver)Application.Driver).SetBufferSize (3, 3);
         Application.RunIteration (ref rs, ref firstIteration);
+
         var expected = @"
 ┌─┐
 │ │
@@ -717,7 +778,8 @@ public class BorderTests {
     }
 
     [Fact]
-    public void View_BorderStyle_Defaults () {
+    public void View_BorderStyle_Defaults ()
+    {
         var view = new View ();
         Assert.Equal (LineStyle.None, view.BorderStyle);
         Assert.Equal (Thickness.Empty, view.Border.Thickness);
@@ -725,7 +787,8 @@ public class BorderTests {
     }
 
     [Fact]
-    public void View_SetBorderStyle () {
+    public void View_SetBorderStyle ()
+    {
         var view = new View ();
         view.BorderStyle = LineStyle.Single;
         Assert.Equal (LineStyle.Single, view.BorderStyle);

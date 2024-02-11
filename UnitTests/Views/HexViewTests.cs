@@ -2,9 +2,11 @@
 
 namespace Terminal.Gui.ViewsTests;
 
-public class HexViewTests {
+public class HexViewTests
+{
     [Fact]
-    public void AllowEdits_Edits_ApplyEdits () {
+    public void AllowEdits_Edits_ApplyEdits ()
+    {
         var hv = new HexView (LoadStream (true)) { Width = 20, Height = 20 };
 
         // Needed because HexView relies on LayoutComplete to calc sizes
@@ -21,8 +23,8 @@ public class HexViewTests {
         Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.D4)));
         Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.D1)));
         Assert.Single (hv.Edits);
-        Assert.Equal (65, hv.Edits.ToList ()[0].Value);
-        Assert.Equal ('A', (char)hv.Edits.ToList ()[0].Value);
+        Assert.Equal (65, hv.Edits.ToList () [0].Value);
+        Assert.Equal ('A', (char)hv.Edits.ToList () [0].Value);
         Assert.Equal (126, hv.Source.Length);
 
         // Appends byte
@@ -30,8 +32,8 @@ public class HexViewTests {
         Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.D4)));
         Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.D2)));
         Assert.Equal (2, hv.Edits.Count);
-        Assert.Equal (66, hv.Edits.ToList ()[1].Value);
-        Assert.Equal ('B', (char)hv.Edits.ToList ()[1].Value);
+        Assert.Equal (66, hv.Edits.ToList () [1].Value);
+        Assert.Equal ('B', (char)hv.Edits.ToList () [1].Value);
         Assert.Equal (126, hv.Source.Length);
 
         hv.ApplyEdits ();
@@ -40,8 +42,9 @@ public class HexViewTests {
     }
 
     [Fact]
-    public void ApplyEdits_With_Argument () {
-        byte[] buffer = Encoding.Default.GetBytes ("Fest");
+    public void ApplyEdits_With_Argument ()
+    {
+        byte [] buffer = Encoding.Default.GetBytes ("Fest");
         var original = new MemoryStream ();
         original.Write (buffer, 0, buffer.Length);
         original.Flush ();
@@ -61,7 +64,7 @@ public class HexViewTests {
 
         Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.D5)));
         Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.D4)));
-        readBuffer[hv.Edits.ToList ()[0].Key] = hv.Edits.ToList ()[0].Value;
+        readBuffer [hv.Edits.ToList () [0].Key] = hv.Edits.ToList () [0].Value;
         Assert.Equal ("Test", Encoding.Default.GetString (readBuffer));
 
         hv.ApplyEdits (original);
@@ -75,7 +78,8 @@ public class HexViewTests {
     }
 
     [Fact]
-    public void Constructors_Defaults () {
+    public void Constructors_Defaults ()
+    {
         var hv = new HexView ();
         Assert.NotNull (hv.Source);
         Assert.IsAssignableFrom<MemoryStream> (hv.Source);
@@ -91,7 +95,8 @@ public class HexViewTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void CursorPosition_Encoding_Default () {
+    public void CursorPosition_Encoding_Default ()
+    {
         var hv = new HexView (LoadStream ()) { Width = Dim.Fill (), Height = Dim.Fill () };
         Application.Top.Add (hv);
         Application.Begin (Application.Top);
@@ -118,7 +123,8 @@ public class HexViewTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void CursorPosition_Encoding_Unicode () {
+    public void CursorPosition_Encoding_Unicode ()
+    {
         var hv = new HexView (LoadStream (true)) { Width = Dim.Fill (), Height = Dim.Fill () };
         Application.Top.Add (hv);
         Application.Begin (Application.Top);
@@ -144,7 +150,8 @@ public class HexViewTests {
     }
 
     [Fact]
-    public void DiscardEdits_Method () {
+    public void DiscardEdits_Method ()
+    {
         var hv = new HexView (LoadStream (true)) { Width = 20, Height = 20 };
 
         // Needed because HexView relies on LayoutComplete to calc sizes
@@ -153,8 +160,8 @@ public class HexViewTests {
         Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.D4)));
         Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.D1)));
         Assert.Single (hv.Edits);
-        Assert.Equal (65, hv.Edits.ToList ()[0].Value);
-        Assert.Equal ('A', (char)hv.Edits.ToList ()[0].Value);
+        Assert.Equal (65, hv.Edits.ToList () [0].Value);
+        Assert.Equal ('A', (char)hv.Edits.ToList () [0].Value);
         Assert.Equal (126, hv.Source.Length);
 
         hv.DiscardEdits ();
@@ -162,7 +169,8 @@ public class HexViewTests {
     }
 
     [Fact]
-    public void DisplayStart_Source () {
+    public void DisplayStart_Source ()
+    {
         var hv = new HexView (LoadStream (true)) { Width = 20, Height = 20 };
 
         // Needed because HexView relies on LayoutComplete to calc sizes
@@ -182,7 +190,8 @@ public class HexViewTests {
     }
 
     [Fact]
-    public void Edited_Event () {
+    public void Edited_Event ()
+    {
         var hv = new HexView (LoadStream (true)) { Width = 20, Height = 20 };
 
         // Needed because HexView relies on LayoutComplete to calc sizes
@@ -200,14 +209,16 @@ public class HexViewTests {
     }
 
     [Fact]
-    public void Exceptions_Tests () {
+    public void Exceptions_Tests ()
+    {
         Assert.Throws<ArgumentNullException> (() => new HexView (null));
         Assert.Throws<ArgumentException> (() => new HexView (new NonSeekableStream (new MemoryStream ())));
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void KeyBindings_Command () {
+    public void KeyBindings_Command ()
+    {
         var hv = new HexView (LoadStream ()) { Width = 20, Height = 10 };
         Application.Top.Add (hv);
         Application.Begin (Application.Top);
@@ -263,7 +274,8 @@ public class HexViewTests {
     }
 
     [Fact]
-    public void Position_Using_Encoding_Default () {
+    public void Position_Using_Encoding_Default ()
+    {
         var hv = new HexView (LoadStream ()) { Width = 20, Height = 20 };
 
         // Needed because HexView relies on LayoutComplete to calc sizes
@@ -296,7 +308,8 @@ public class HexViewTests {
     }
 
     [Fact]
-    public void Position_Using_Encoding_Unicode () {
+    public void Position_Using_Encoding_Unicode ()
+    {
         var hv = new HexView (LoadStream (true)) { Width = 20, Height = 20 };
 
         // Needed because HexView relies on LayoutComplete to calc sizes
@@ -330,7 +343,8 @@ public class HexViewTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void PositionChanged_Event () {
+    public void PositionChanged_Event ()
+    {
         var hv = new HexView (LoadStream ()) { Width = Dim.Fill (), Height = Dim.Fill () };
         HexViewEventArgs hexViewEventArgs = null;
         hv.PositionChanged += (s, e) => hexViewEventArgs = e;
@@ -348,7 +362,8 @@ public class HexViewTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void Source_Sets_DisplayStart_And_Position_To_Zero_If_Greater_Than_Source_Length () {
+    public void Source_Sets_DisplayStart_And_Position_To_Zero_If_Greater_Than_Source_Length ()
+    {
         var hv = new HexView (LoadStream ()) { Width = 10, Height = 5 };
         Application.Top.Add (hv);
         Application.Begin (Application.Top);
@@ -377,17 +392,21 @@ public class HexViewTests {
         Assert.Equal (0, hv.Position - 1);
     }
 
-    private Stream LoadStream (bool unicode = false) {
+    private Stream LoadStream (bool unicode = false)
+    {
         var stream = new MemoryStream ();
-        byte[] bArray;
+        byte [] bArray;
         var memString = "Hello world.\nThis is a test of the Emergency Broadcast System.\n";
 
         Assert.Equal (63, memString.Length);
 
-        if (unicode) {
+        if (unicode)
+        {
             bArray = Encoding.Unicode.GetBytes (memString);
             Assert.Equal (126, bArray.Length);
-        } else {
+        }
+        else
+        {
             bArray = Encoding.Default.GetBytes (memString);
             Assert.Equal (63, bArray.Length);
         }
@@ -397,23 +416,25 @@ public class HexViewTests {
         return stream;
     }
 
-    private class NonSeekableStream : Stream {
-        public NonSeekableStream (Stream baseStream) { m_stream = baseStream; }
+    private class NonSeekableStream : Stream
+    {
         private readonly Stream m_stream;
+        public NonSeekableStream (Stream baseStream) { m_stream = baseStream; }
         public override bool CanRead => m_stream.CanRead;
         public override bool CanSeek => false;
         public override bool CanWrite => m_stream.CanWrite;
         public override long Length => throw new NotSupportedException ();
 
-        public override long Position {
+        public override long Position
+        {
             get => m_stream.Position;
             set => throw new NotSupportedException ();
         }
 
         public override void Flush () { m_stream.Flush (); }
-        public override int Read (byte[] buffer, int offset, int count) => m_stream.Read (buffer, offset, count);
-        public override long Seek (long offset, SeekOrigin origin) => throw new NotImplementedException ();
+        public override int Read (byte [] buffer, int offset, int count) { return m_stream.Read (buffer, offset, count); }
+        public override long Seek (long offset, SeekOrigin origin) { throw new NotImplementedException (); }
         public override void SetLength (long value) { throw new NotSupportedException (); }
-        public override void Write (byte[] buffer, int offset, int count) { m_stream.Write (buffer, offset, count); }
+        public override void Write (byte [] buffer, int offset, int count) { m_stream.Write (buffer, offset, count); }
     }
 }

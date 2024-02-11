@@ -1,12 +1,14 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>Provides data for <see cref="TileView"/> events.</summary>
-public class SplitterEventArgs : EventArgs {
+public class SplitterEventArgs : EventArgs
+{
     /// <summary>Creates a new instance of the <see cref="SplitterEventArgs"/> class.</summary>
     /// <param name="tileView"><see cref="TileView"/> in which splitter is being moved.</param>
     /// <param name="idx">Index of the splitter being moved in <see cref="TileView.SplitterDistances"/>.</param>
     /// <param name="splitterDistance">The new <see cref="Pos"/> of the splitter line.</param>
-    public SplitterEventArgs (TileView tileView, int idx, Pos splitterDistance) {
+    public SplitterEventArgs (TileView tileView, int idx, Pos splitterDistance)
+    {
         SplitterDistance = splitterDistance;
         TileView = tileView;
         Idx = idx;

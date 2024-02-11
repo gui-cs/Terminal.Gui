@@ -10,7 +10,8 @@ namespace Terminal.Gui;
 ///     Interface for all non generic members of <see cref="TreeView{T}"/>.
 ///     <a href="../docs/treeview.md">See TreeView Deep Dive for more information</a>.
 /// </summary>
-public interface ITreeView {
+public interface ITreeView
+{
     /// <summary>Contains options for changing how the tree is rendered.</summary>
     TreeStyle Style { get; set; }
 
@@ -25,194 +26,238 @@ public interface ITreeView {
 ///     Convenience implementation of generic <see cref="TreeView{T}"/> for any tree were all nodes implement
 ///     <see cref="ITreeNode"/>. <a href="../docs/treeview.md">See TreeView Deep Dive for more information</a>.
 /// </summary>
-public class TreeView : TreeView<ITreeNode> {
+public class TreeView : TreeView<ITreeNode>
+{
     /// <summary>
     ///     Creates a new instance of the tree control with absolute positioning and initialises <see cref="TreeBuilder{T}"/>
     ///     with default <see cref="ITreeNode"/> based builder.
     /// </summary>
-    public TreeView () {
+    public TreeView ()
+    {
         TreeBuilder = new TreeNodeBuilder ();
         AspectGetter = o => o == null ? "Null" : o.Text ?? o?.ToString () ?? "Unamed Node";
     }
 }
 
 /// <summary>
-///     Hierarchical tree view with expandable branches. Branch objects are dynamically determined when expanded using a
-///     user defined <see cref="ITreeBuilder{T}"/>.
-///     <a href="../docs/treeview.md">See TreeView Deep Dive for more information</a>.
+///     Hierarchical tree view with expandable branches. Branch objects are dynamically determined when expanded using a user defined
+///     <see cref="ITreeBuilder{T}"/>. <a href="../docs/treeview.md">See TreeView Deep Dive for more information</a>.
 /// </summary>
-public class TreeView<T> : View, ITreeView where T : class {
+public class TreeView<T> : View, ITreeView where T : class
+{
     /// <summary>
-    ///     Creates a new tree view with absolute positioning. Use <see cref="AddObjects(IEnumerable{T})"/> to set set root
-    ///     objects for the tree. Children will not be rendered until you set <see cref="TreeBuilder"/>.
+    ///     Error message to display when the control is not properly initialized at draw time (nodes added but no tree builder set).
     /// </summary>
-    public TreeView () {
+    public static string NoBuilderError = "ERROR: TreeBuilder Not Set";
+
+    /// <summary>
+    ///     Creates a new tree view with absolute positioning. Use <see cref="AddObjects(IEnumerable{T})"/> to set set root objects for the tree. Children will not be rendered until you set
+    ///     <see cref="TreeBuilder"/>.
+    /// </summary>
+    public TreeView ()
+    {
         CanFocus = true;
 
         // Things this view knows how to do
         AddCommand (
-            Command.PageUp,
-            () => {
-                MovePageUp ();
+                    Command.PageUp,
+                    () =>
+                    {
+                        MovePageUp ();
 
-                return true;
-            }
-        );
-        AddCommand (
-            Command.PageDown,
-            () => {
-                MovePageDown ();
-
-                return true;
-            }
-        );
-        AddCommand (
-            Command.PageUpExtend,
-            () => {
-                MovePageUp (true);
-
-                return true;
-            }
-        );
-        AddCommand (
-            Command.PageDownExtend,
-            () => {
-                MovePageDown (true);
-
-                return true;
-            }
-        );
-        AddCommand (
-            Command.Expand,
-            () => {
-                Expand ();
-
-                return true;
-            }
-        );
-        AddCommand (
-            Command.ExpandAll,
-            () => {
-                ExpandAll (SelectedObject);
-
-                return true;
-            }
-        );
-        AddCommand (
-            Command.Collapse,
-            () => {
-                CursorLeft (false);
-
-                return true;
-            }
-        );
-        AddCommand (
-            Command.CollapseAll,
-            () => {
-                CursorLeft (true);
-
-                return true;
-            }
-        );
-        AddCommand (
-            Command.LineUp,
-            () => {
-                AdjustSelection (-1);
-
-                return true;
-            }
-        );
-        AddCommand (
-            Command.LineUpExtend,
-            () => {
-                AdjustSelection (-1, true);
-
-                return true;
-            }
-        );
-        AddCommand (
-            Command.LineUpToFirstBranch,
-            () => {
-                AdjustSelectionToBranchStart ();
-
-                return true;
-            }
-        );
+                        return true;
+                    }
+                   );
 
         AddCommand (
-            Command.LineDown,
-            () => {
-                AdjustSelection (1);
+                    Command.PageDown,
+                    () =>
+                    {
+                        MovePageDown ();
 
-                return true;
-            }
-        );
-        AddCommand (
-            Command.LineDownExtend,
-            () => {
-                AdjustSelection (1, true);
-
-                return true;
-            }
-        );
-        AddCommand (
-            Command.LineDownToLastBranch,
-            () => {
-                AdjustSelectionToBranchEnd ();
-
-                return true;
-            }
-        );
+                        return true;
+                    }
+                   );
 
         AddCommand (
-            Command.TopHome,
-            () => {
-                GoToFirst ();
+                    Command.PageUpExtend,
+                    () =>
+                    {
+                        MovePageUp (true);
 
-                return true;
-            }
-        );
-        AddCommand (
-            Command.BottomEnd,
-            () => {
-                GoToEnd ();
-
-                return true;
-            }
-        );
-        AddCommand (
-            Command.SelectAll,
-            () => {
-                SelectAll ();
-
-                return true;
-            }
-        );
+                        return true;
+                    }
+                   );
 
         AddCommand (
-            Command.ScrollUp,
-            () => {
-                ScrollUp ();
+                    Command.PageDownExtend,
+                    () =>
+                    {
+                        MovePageDown (true);
 
-                return true;
-            }
-        );
+                        return true;
+                    }
+                   );
+
         AddCommand (
-            Command.ScrollDown,
-            () => {
-                ScrollDown ();
+                    Command.Expand,
+                    () =>
+                    {
+                        Expand ();
 
-                return true;
-            }
-        );
+                        return true;
+                    }
+                   );
+
         AddCommand (
-            Command.Accept,
-            () => {
-                ActivateSelectedObjectIfAny ();
+                    Command.ExpandAll,
+                    () =>
+                    {
+                        ExpandAll (SelectedObject);
 
-                return true;
-            }
-        );
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.Collapse,
+                    () =>
+                    {
+                        CursorLeft (false);
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.CollapseAll,
+                    () =>
+                    {
+                        CursorLeft (true);
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.LineUp,
+                    () =>
+                    {
+                        AdjustSelection (-1);
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.LineUpExtend,
+                    () =>
+                    {
+                        AdjustSelection (-1, true);
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.LineUpToFirstBranch,
+                    () =>
+                    {
+                        AdjustSelectionToBranchStart ();
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.LineDown,
+                    () =>
+                    {
+                        AdjustSelection (1);
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.LineDownExtend,
+                    () =>
+                    {
+                        AdjustSelection (1, true);
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.LineDownToLastBranch,
+                    () =>
+                    {
+                        AdjustSelectionToBranchEnd ();
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.TopHome,
+                    () =>
+                    {
+                        GoToFirst ();
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.BottomEnd,
+                    () =>
+                    {
+                        GoToEnd ();
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.SelectAll,
+                    () =>
+                    {
+                        SelectAll ();
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.ScrollUp,
+                    () =>
+                    {
+                        ScrollUp ();
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.ScrollDown,
+                    () =>
+                    {
+                        ScrollDown ();
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.Accept,
+                    () =>
+                    {
+                        ActivateSelectedObjectIfAny ();
+
+                        return true;
+                    }
+                   );
 
         // Default keybindings for this view
         KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
@@ -244,21 +289,13 @@ public class TreeView<T> : View, ITreeView where T : class {
     /// </summary>
     public TreeView (ITreeBuilder<T> builder) : this () { TreeBuilder = builder; }
 
-    /// <summary>
-    ///     Error message to display when the control is not properly initialized at draw time (nodes added but no tree builder
-    ///     set).
-    /// </summary>
-    public static string NoBuilderError = "ERROR: TreeBuilder Not Set";
-
     /// <summary>Secondary selected regions of tree when <see cref="MultiSelect"/> is true.</summary>
     private readonly Stack<TreeSelection<T>> multiSelectedRegions = new ();
 
-    private CursorVisibility desiredCursorVisibility = CursorVisibility.Invisible;
-    private int scrollOffsetHorizontal;
-    private int scrollOffsetVertical;
-
     /// <summary>Cached result of <see cref="BuildLineMap"/></summary>
     private IReadOnlyCollection<Branch<T>> cachedLineMap;
+
+    private CursorVisibility desiredCursorVisibility = CursorVisibility.Invisible;
 
     /// <summary>
     ///     Interface for filtering which lines of the tree are displayed e.g. to provide text searching.  Defaults to
@@ -267,9 +304,15 @@ public class TreeView<T> : View, ITreeView where T : class {
     public ITreeViewFilter<T> Filter = null;
 
     private KeyCode objectActivationKey = KeyCode.Enter;
+    private int scrollOffsetHorizontal;
+    private int scrollOffsetVertical;
 
     /// <summary>private variable for <see cref="SelectedObject"/></summary>
     private T selectedObject;
+
+    /// <summary>True makes a letter key press navigate to the next visible branch that begins with that letter/digit.</summary>
+    /// <value></value>
+    public bool AllowLetterBasedNavigation { get; set; } = true;
 
     /// <summary>
     ///     Returns the string representation of model objects hosted in the tree. Default implementation is to call
@@ -278,57 +321,77 @@ public class TreeView<T> : View, ITreeView where T : class {
     /// <value></value>
     public AspectGetterDelegate<T> AspectGetter { get; set; } = o => o.ToString () ?? "";
 
-    /// <summary>True makes a letter key press navigate to the next visible branch that begins with that letter/digit.</summary>
-    /// <value></value>
-    public bool AllowLetterBasedNavigation { get; set; } = true;
+    /// <summary>
+    ///     Delegate for multi colored tree views. Return the <see cref="ColorScheme"/> to use for each passed object or null to use the default.
+    /// </summary>
+    public Func<T, ColorScheme> ColorGetter { get; set; }
 
-    /// <summary>True to allow multiple objects to be selected at once.</summary>
-    /// <value></value>
-    public bool MultiSelect { get; set; } = true;
+    /// <summary>The current number of rows in the tree (ignoring the controls bounds).</summary>
+    public int ContentHeight => BuildLineMap ().Count ();
 
     /// <summary>
-    ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="Objects"/> collection as the user
-    ///     types.
+    ///     Get / Set the wished cursor when the tree is focused. Only applies when <see cref="MultiSelect"/> is true. Defaults to
+    ///     <see cref="CursorVisibility.Invisible"/>.
     /// </summary>
-    public CollectionNavigator KeystrokeNavigator { get; } = new ();
-
-    /// <summary>
-    ///     Get / Set the wished cursor when the tree is focused. Only applies when <see cref="MultiSelect"/> is true. Defaults
-    ///     to <see cref="CursorVisibility.Invisible"/>.
-    /// </summary>
-    public CursorVisibility DesiredCursorVisibility {
+    public CursorVisibility DesiredCursorVisibility
+    {
         get => MultiSelect ? desiredCursorVisibility : CursorVisibility.Invisible;
-        set {
-            if (desiredCursorVisibility != value) {
+        set
+        {
+            if (desiredCursorVisibility != value)
+            {
                 desiredCursorVisibility = value;
-                if (HasFocus) {
+
+                if (HasFocus)
+                {
                     Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
                 }
             }
         }
     }
 
-    /// <summary>
-    ///     Delegate for multi colored tree views. Return the <see cref="ColorScheme"/> to use for each passed object or null
-    ///     to use the default.
-    /// </summary>
-    public Func<T, ColorScheme> ColorGetter { get; set; }
-
-    /// <summary>The root objects in the tree, note that this collection is of root objects only.</summary>
-    public IEnumerable<T> Objects => roots.Keys;
-
-    /// <summary>The current number of rows in the tree (ignoring the controls bounds).</summary>
-    public int ContentHeight => BuildLineMap ().Count ();
+    /// <summary>Gets the <see cref="CollectionNavigator"/> that searches the <see cref="Objects"/> collection as the user types.</summary>
+    public CollectionNavigator KeystrokeNavigator { get; } = new ();
 
     /// <summary>Maximum number of nodes that can be expanded in any given branch.</summary>
     public int MaxDepth { get; set; } = 100;
+
+    /// <summary>True to allow multiple objects to be selected at once.</summary>
+    /// <value></value>
+    public bool MultiSelect { get; set; } = true;
+
+    /// <summary>
+    ///     Mouse event to trigger <see cref="TreeView{T}.ObjectActivated"/>. Defaults to double click (
+    ///     <see cref="MouseFlags.Button1DoubleClicked"/>). Set to null to disable this feature.
+    /// </summary>
+    /// <value></value>
+    public MouseFlags? ObjectActivationButton { get; set; } = MouseFlags.Button1DoubleClicked;
+
+    // TODO: Update to use Key instead of KeyCode
+    /// <summary>Key which when pressed triggers <see cref="TreeView{T}.ObjectActivated"/>. Defaults to Enter.</summary>
+    public KeyCode ObjectActivationKey
+    {
+        get => objectActivationKey;
+        set
+        {
+            if (objectActivationKey != value)
+            {
+                KeyBindings.Replace (ObjectActivationKey, value);
+                objectActivationKey = value;
+            }
+        }
+    }
+
+    /// <summary>The root objects in the tree, note that this collection is of root objects only.</summary>
+    public IEnumerable<T> Objects => roots.Keys;
 
     /// <summary>The amount of tree view that has been scrolled to the right (horizontally).</summary>
     /// <remarks>
     ///     Setting a value of less than 0 will result in a offset of 0. To see changes in the UI call
     ///     <see cref="View.SetNeedsDisplay()"/>.
     /// </remarks>
-    public int ScrollOffsetHorizontal {
+    public int ScrollOffsetHorizontal
+    {
         get => scrollOffsetHorizontal;
         set => scrollOffsetHorizontal = Math.Max (0, value);
     }
@@ -338,53 +401,36 @@ public class TreeView<T> : View, ITreeView where T : class {
     ///     Setting a value of less than 0 will result in a offset of 0. To see changes in the UI call
     ///     <see cref="View.SetNeedsDisplay()"/>.
     /// </remarks>
-    public int ScrollOffsetVertical {
+    public int ScrollOffsetVertical
+    {
         get => scrollOffsetVertical;
         set => scrollOffsetVertical = Math.Max (0, value);
+    }
+
+    /// <summary>
+    ///     The currently selected object in the tree. When <see cref="MultiSelect"/> is true this is the object at which the cursor is at.
+    /// </summary>
+    public T SelectedObject
+    {
+        get => selectedObject;
+        set
+        {
+            T oldValue = selectedObject;
+            selectedObject = value;
+
+            if (!ReferenceEquals (oldValue, value))
+            {
+                OnSelectionChanged (new SelectionChangedEventArgs<T> (this, oldValue, value));
+            }
+        }
     }
 
     /// <summary>Determines how sub branches of the tree are dynamically built at runtime as the user expands root nodes.</summary>
     /// <value></value>
     public ITreeBuilder<T> TreeBuilder { get; set; }
 
-    // TODO: Update to use Key instead of KeyCode
-    /// <summary>Key which when pressed triggers <see cref="TreeView{T}.ObjectActivated"/>. Defaults to Enter.</summary>
-    public KeyCode ObjectActivationKey {
-        get => objectActivationKey;
-        set {
-            if (objectActivationKey != value) {
-                KeyBindings.Replace (ObjectActivationKey, value);
-                objectActivationKey = value;
-            }
-        }
-    }
-
     /// <summary>
-    ///     Mouse event to trigger <see cref="TreeView{T}.ObjectActivated"/>. Defaults to double click (
-    ///     <see cref="MouseFlags.Button1DoubleClicked"/>). Set to null to disable this feature.
-    /// </summary>
-    /// <value></value>
-    public MouseFlags? ObjectActivationButton { get; set; } = MouseFlags.Button1DoubleClicked;
-
-    /// <summary>
-    ///     The currently selected object in the tree. When <see cref="MultiSelect"/> is true this is the object at which the
-    ///     cursor is at.
-    /// </summary>
-    public T SelectedObject {
-        get => selectedObject;
-        set {
-            T oldValue = selectedObject;
-            selectedObject = value;
-
-            if (!ReferenceEquals (oldValue, value)) {
-                OnSelectionChanged (new SelectionChangedEventArgs<T> (this, oldValue, value));
-            }
-        }
-    }
-
-    /// <summary>
-    ///     Map of root objects to the branches under them. All objects have a <see cref="Branch{T}"/> even if that branch has
-    ///     no children.
+    ///     Map of root objects to the branches under them. All objects have a <see cref="Branch{T}"/> even if that branch has no children.
     /// </summary>
     internal Dictionary<T, Branch<T>> roots { get; set; } = new ();
 
@@ -392,7 +438,8 @@ public class TreeView<T> : View, ITreeView where T : class {
     public TreeStyle Style { get; set; } = new ();
 
     /// <summary>Removes all objects from the tree and clears <see cref="SelectedObject"/>.</summary>
-    public void ClearObjects () {
+    public void ClearObjects ()
+    {
         SelectedObject = default (T);
         multiSelectedRegions.Clear ();
         roots = new Dictionary<T, Branch<T>> ();
@@ -404,10 +451,12 @@ public class TreeView<T> : View, ITreeView where T : class {
     ///     <para>Triggers the <see cref="ObjectActivated"/> event with the <see cref="SelectedObject"/>.</para>
     ///     <para>This method also ensures that the selected object is visible.</para>
     /// </summary>
-    public void ActivateSelectedObjectIfAny () {
+    public void ActivateSelectedObjectIfAny ()
+    {
         T o = SelectedObject;
 
-        if (o != null) {
+        if (o != null)
+        {
             OnObjectActivated (new ObjectActivatedEventArgs<T> (this, o));
             PositionCursor ();
         }
@@ -415,8 +464,10 @@ public class TreeView<T> : View, ITreeView where T : class {
 
     /// <summary>Adds a new root level object unless it is already a root of the tree.</summary>
     /// <param name="o"></param>
-    public void AddObject (T o) {
-        if (!roots.ContainsKey (o)) {
+    public void AddObject (T o)
+    {
+        if (!roots.ContainsKey (o))
+        {
             roots.Add (o, new Branch<T> (this, null, o));
             InvalidateLineMap ();
             SetNeedsDisplay ();
@@ -426,17 +477,21 @@ public class TreeView<T> : View, ITreeView where T : class {
     /// <summary>Adds many new root level objects. Objects that are already root objects are ignored.</summary>
     /// <param name="collection">Objects to add as new root level objects.</param>
     /// .\
-    public void AddObjects (IEnumerable<T> collection) {
+    public void AddObjects (IEnumerable<T> collection)
+    {
         var objectsAdded = false;
 
-        foreach (T o in collection) {
-            if (!roots.ContainsKey (o)) {
+        foreach (T o in collection)
+        {
+            if (!roots.ContainsKey (o))
+            {
                 roots.Add (o, new Branch<T> (this, null, o));
                 objectsAdded = true;
             }
         }
 
-        if (objectsAdded) {
+        if (objectsAdded)
+        {
             InvalidateLineMap ();
             SetNeedsDisplay ();
         }
@@ -447,42 +502,50 @@ public class TreeView<T> : View, ITreeView where T : class {
     ///     <paramref name="offset"/>. Each branch occupies 1 line on screen.
     /// </summary>
     /// <remarks>
-    ///     If nothing is currently selected or the selected object is no longer in the tree then the first object in the tree
-    ///     is selected instead.
+    ///     If nothing is currently selected or the selected object is no longer in the tree then the first object in the tree is selected instead.
     /// </remarks>
     /// <param name="offset">Positive to move the selection down the screen, negative to move it up</param>
-    /// <param name="expandSelection">
-    ///     True to expand the selection (assuming <see cref="MultiSelect"/> is enabled). False to
-    ///     replace.
-    /// </param>
-    public void AdjustSelection (int offset, bool expandSelection = false) {
+    /// <param name="expandSelection">True to expand the selection (assuming <see cref="MultiSelect"/> is enabled). False to replace.</param>
+    public void AdjustSelection (int offset, bool expandSelection = false)
+    {
         // if it is not a shift click or we don't allow multi select
-        if (!expandSelection || !MultiSelect) {
+        if (!expandSelection || !MultiSelect)
+        {
             multiSelectedRegions.Clear ();
         }
 
-        if (SelectedObject == null) {
+        if (SelectedObject == null)
+        {
             SelectedObject = roots.Keys.FirstOrDefault ();
-        } else {
+        }
+        else
+        {
             IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
 
             int idx = map.IndexOf (b => b.Model.Equals (SelectedObject));
 
-            if (idx == -1) {
+            if (idx == -1)
+            {
                 // The current selection has disapeared!
                 SelectedObject = roots.Keys.FirstOrDefault ();
-            } else {
+            }
+            else
+            {
                 int newIdx = Math.Min (Math.Max (0, idx + offset), map.Count - 1);
 
                 Branch<T> newBranch = map.ElementAt (newIdx);
 
                 // If it is a multi selection
-                if (expandSelection && MultiSelect) {
-                    if (multiSelectedRegions.Any ()) {
+                if (expandSelection && MultiSelect)
+                {
+                    if (multiSelectedRegions.Any ())
+                    {
                         // expand the existing head selection
                         TreeSelection<T> head = multiSelectedRegions.Pop ();
                         multiSelectedRegions.Push (new TreeSelection<T> (head.Origin, newIdx, map));
-                    } else {
+                    }
+                    else
+                    {
                         // or start a new multi selection region
                         multiSelectedRegions.Push (new TreeSelection<T> (map.ElementAt (idx), newIdx, map));
                     }
@@ -498,9 +561,12 @@ public class TreeView<T> : View, ITreeView where T : class {
     }
 
     /// <summary>Moves the selection to the last child in the currently selected level.</summary>
-    public void AdjustSelectionToBranchEnd () {
+    public void AdjustSelectionToBranchEnd ()
+    {
         T o = SelectedObject;
-        if (o == null) {
+
+        if (o == null)
+        {
             return;
         }
 
@@ -508,16 +574,19 @@ public class TreeView<T> : View, ITreeView where T : class {
 
         int currentIdx = map.IndexOf (b => Equals (b.Model, o));
 
-        if (currentIdx == -1) {
+        if (currentIdx == -1)
+        {
             return;
         }
 
         Branch<T> currentBranch = map.ElementAt (currentIdx);
         Branch<T> next = currentBranch;
 
-        for (; currentIdx < map.Count; currentIdx++) {
+        for (; currentIdx < map.Count; currentIdx++)
+        {
             //if it is the end of the current depth of branch
-            if (currentBranch.Depth != next.Depth) {
+            if (currentBranch.Depth != next.Depth)
+            {
                 SelectedObject = currentBranch.Model;
                 EnsureVisible (currentBranch.Model);
                 SetNeedsDisplay ();
@@ -534,9 +603,12 @@ public class TreeView<T> : View, ITreeView where T : class {
     }
 
     /// <summary>Moves the selection to the first child in the currently selected level.</summary>
-    public void AdjustSelectionToBranchStart () {
+    public void AdjustSelectionToBranchStart ()
+    {
         T o = SelectedObject;
-        if (o == null) {
+
+        if (o == null)
+        {
             return;
         }
 
@@ -544,16 +616,19 @@ public class TreeView<T> : View, ITreeView where T : class {
 
         int currentIdx = map.IndexOf (b => Equals (b.Model, o));
 
-        if (currentIdx == -1) {
+        if (currentIdx == -1)
+        {
             return;
         }
 
         Branch<T> currentBranch = map.ElementAt (currentIdx);
         Branch<T> next = currentBranch;
 
-        for (; currentIdx >= 0; currentIdx--) {
+        for (; currentIdx >= 0; currentIdx--)
+        {
             //if it is the beginning of the current depth of branch
-            if (currentBranch.Depth != next.Depth) {
+            if (currentBranch.Depth != next.Depth)
+            {
                 SelectedObject = currentBranch.Model;
                 EnsureVisible (currentBranch.Model);
                 SetNeedsDisplay ();
@@ -579,7 +654,8 @@ public class TreeView<T> : View, ITreeView where T : class {
     public void AdjustSelectionToNextItemBeginningWith (
         char character,
         StringComparison caseSensitivity = StringComparison.CurrentCultureIgnoreCase
-    ) {
+    )
+    {
         // search for next branch that begins with that letter
         var characterAsStr = character.ToString ();
         AdjustSelectionToNext (b => AspectGetter (b.Model).StartsWith (characterAsStr, caseSensitivity));
@@ -587,13 +663,10 @@ public class TreeView<T> : View, ITreeView where T : class {
         PositionCursor ();
     }
 
-    /// <summary>
-    ///     Returns true if the given object <paramref name="o"/> is exposed in the tree and can be expanded otherwise
-    ///     false.
-    /// </summary>
+    /// <summary>Returns true if the given object <paramref name="o"/> is exposed in the tree and can be expanded otherwise false.</summary>
     /// <param name="o"></param>
     /// <returns></returns>
-    public bool CanExpand (T o) => ObjectToBranch (o)?.CanExpand () ?? false;
+    public bool CanExpand (T o) { return ObjectToBranch (o)?.CanExpand () ?? false; }
 
     /// <summary>Collapses the <see cref="SelectedObject"/></summary>
     public void Collapse () { Collapse (selectedObject); }
@@ -603,15 +676,16 @@ public class TreeView<T> : View, ITreeView where T : class {
     public void Collapse (T toCollapse) { CollapseImpl (toCollapse, false); }
 
     /// <summary>
-    ///     Collapses the supplied object if it is currently expanded. Also collapses all children branches (this will only
-    ///     become apparent when/if the user expands it again).
+    ///     Collapses the supplied object if it is currently expanded. Also collapses all children branches (this will only become apparent when/if the user expands it again).
     /// </summary>
     /// <param name="toCollapse">The object to collapse.</param>
     public void CollapseAll (T toCollapse) { CollapseImpl (toCollapse, true); }
 
     /// <summary>Collapses all root nodes in the tree.</summary>
-    public void CollapseAll () {
-        foreach (KeyValuePair<T, Branch<T>> item in roots) {
+    public void CollapseAll ()
+    {
+        foreach (KeyValuePair<T, Branch<T>> item in roots)
+        {
             item.Value.Collapse ();
         }
 
@@ -619,32 +693,33 @@ public class TreeView<T> : View, ITreeView where T : class {
         SetNeedsDisplay ();
     }
 
-    /// <summary>
-    ///     Called once for each visible row during rendering.  Can be used to make last minute changes to color or text
-    ///     rendered
-    /// </summary>
+    /// <summary>Called once for each visible row during rendering.  Can be used to make last minute changes to color or text rendered</summary>
     public event EventHandler<DrawTreeViewLineEventArgs<T>> DrawLine;
 
     /// <summary>
-    ///     Adjusts the <see cref="ScrollOffsetVertical"/> to ensure the given <paramref name="model"/> is visible. Has no
-    ///     effect if already visible.
+    ///     Adjusts the <see cref="ScrollOffsetVertical"/> to ensure the given <paramref name="model"/> is visible. Has no effect if already visible.
     /// </summary>
-    public void EnsureVisible (T model) {
+    public void EnsureVisible (T model)
+    {
         IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
 
         int idx = map.IndexOf (b => Equals (b.Model, model));
 
-        if (idx == -1) {
+        if (idx == -1)
+        {
             return;
         }
 
         /*this -1 allows for possible horizontal scroll bar in the last row of the control*/
         int leaveSpace = Style.LeaveLastRow ? 1 : 0;
 
-        if (idx < ScrollOffsetVertical) {
+        if (idx < ScrollOffsetVertical)
+        {
             //if user has scrolled up too far to see their selection
             ScrollOffsetVertical = idx;
-        } else if (idx >= ScrollOffsetVertical + Bounds.Height - leaveSpace) {
+        }
+        else if (idx >= ScrollOffsetVertical + Bounds.Height - leaveSpace)
+        {
             //if user has scrolled off bottom of visible tree
             ScrollOffsetVertical = Math.Max (0, idx + 1 - (Bounds.Height - leaveSpace));
         }
@@ -653,13 +728,12 @@ public class TreeView<T> : View, ITreeView where T : class {
     /// <summary>Expands the currently <see cref="SelectedObject"/>.</summary>
     public void Expand () { Expand (SelectedObject); }
 
-    /// <summary>
-    ///     Expands the supplied object if it is contained in the tree (either as a root object or as an exposed branch
-    ///     object).
-    /// </summary>
+    /// <summary>Expands the supplied object if it is contained in the tree (either as a root object or as an exposed branch object).</summary>
     /// <param name="toExpand">The object to expand.</param>
-    public void Expand (T toExpand) {
-        if (toExpand == null) {
+    public void Expand (T toExpand)
+    {
+        if (toExpand == null)
+        {
             return;
         }
 
@@ -670,8 +744,10 @@ public class TreeView<T> : View, ITreeView where T : class {
 
     /// <summary>Expands the supplied object and all child objects.</summary>
     /// <param name="toExpand">The object to expand.</param>
-    public void ExpandAll (T toExpand) {
-        if (toExpand == null) {
+    public void ExpandAll (T toExpand)
+    {
+        if (toExpand == null)
+        {
             return;
         }
 
@@ -681,11 +757,12 @@ public class TreeView<T> : View, ITreeView where T : class {
     }
 
     /// <summary>
-    ///     Fully expands all nodes in the tree, if the tree is very big and built dynamically this may take a while (e.g. for
-    ///     file system).
+    ///     Fully expands all nodes in the tree, if the tree is very big and built dynamically this may take a while (e.g. for file system).
     /// </summary>
-    public void ExpandAll () {
-        foreach (KeyValuePair<T, Branch<T>> item in roots) {
+    public void ExpandAll ()
+    {
+        foreach (KeyValuePair<T, Branch<T>> item in roots)
+        {
             item.Value.ExpandAll ();
         }
 
@@ -698,33 +775,40 @@ public class TreeView<T> : View, ITreeView where T : class {
     ///     is true
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<T> GetAllSelectedObjects () {
+    public IEnumerable<T> GetAllSelectedObjects ()
+    {
         IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
 
         // To determine multi selected objects, start with the line map, that avoids yielding 
         // hidden nodes that were selected then the parent collapsed e.g. programmatically or
         // with mouse click
-        if (MultiSelect) {
-            foreach (T m in map.Select (b => b.Model).Where (IsSelected)) {
+        if (MultiSelect)
+        {
+            foreach (T m in map.Select (b => b.Model).Where (IsSelected))
+            {
                 yield return m;
             }
-        } else {
-            if (SelectedObject != null) {
+        }
+        else
+        {
+            if (SelectedObject != null)
+            {
                 yield return SelectedObject;
             }
         }
     }
 
     /// <summary>
-    ///     Returns the currently expanded children of the passed object. Returns an empty collection if the branch is not
-    ///     exposed or not expanded.
+    ///     Returns the currently expanded children of the passed object. Returns an empty collection if the branch is not exposed or not expanded.
     /// </summary>
     /// <param name="o">An object in the tree.</param>
     /// <returns></returns>
-    public IEnumerable<T> GetChildren (T o) {
+    public IEnumerable<T> GetChildren (T o)
+    {
         Branch<T> branch = ObjectToBranch (o);
 
-        if (branch == null || !branch.IsExpanded) {
+        if (branch == null || !branch.IsExpanded)
+        {
             return new T [0];
         }
 
@@ -733,25 +817,29 @@ public class TreeView<T> : View, ITreeView where T : class {
 
     /// <summary>Returns the maximum width line in the tree including prefix and expansion symbols.</summary>
     /// <param name="visible">
-    ///     True to consider only rows currently visible (based on window bounds and <see cref="ScrollOffsetVertical"/>. False
-    ///     to calculate the width of every exposed branch in the tree.
+    ///     True to consider only rows currently visible (based on window bounds and <see cref="ScrollOffsetVertical"/>. False to calculate the width of every exposed branch in the tree.
     /// </param>
     /// <returns></returns>
-    public int GetContentWidth (bool visible) {
+    public int GetContentWidth (bool visible)
+    {
         IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
 
-        if (map.Count == 0) {
+        if (map.Count == 0)
+        {
             return 0;
         }
 
-        if (visible) {
+        if (visible)
+        {
             //Somehow we managed to scroll off the end of the control
-            if (ScrollOffsetVertical >= map.Count) {
+            if (ScrollOffsetVertical >= map.Count)
+            {
                 return 0;
             }
 
             // If control has no height to it then there is no visible area for content
-            if (Bounds.Height == 0) {
+            if (Bounds.Height == 0)
+            {
                 return 0;
             }
 
@@ -762,15 +850,14 @@ public class TreeView<T> : View, ITreeView where T : class {
     }
 
     /// <summary>
-    ///     Returns the object in the tree list that is currently visible. at the provided row. Returns null if no object is at
-    ///     that location.
+    ///     Returns the object in the tree list that is currently visible. at the provided row. Returns null if no object is at that location.
     ///     <remarks></remarks>
-    ///     If you have screen coordinates then use <see cref="View.ScreenToFrame"/> to translate these into the client area of
-    ///     the <see cref="TreeView{T}"/>.
+    ///     If you have screen coordinates then use <see cref="View.ScreenToFrame"/> to translate these into the client area of the
+    ///     <see cref="TreeView{T}"/>.
     /// </summary>
     /// <param name="row">The row of the <see cref="View.Bounds"/> of the <see cref="TreeView{T}"/>.</param>
     /// <returns>The object currently displayed on this row or null.</returns>
-    public T GetObjectOnRow (int row) => HitTest (row)?.Model;
+    public T GetObjectOnRow (int row) { return HitTest (row)?.Model; }
 
     /// <summary>
     ///     <para>
@@ -784,36 +871,38 @@ public class TreeView<T> : View, ITreeView where T : class {
     /// </summary>
     /// <param name="toFind"></param>
     /// <returns></returns>
-    public int? GetObjectRow (T toFind) {
+    public int? GetObjectRow (T toFind)
+    {
         int idx = BuildLineMap ().IndexOf (o => o.Model.Equals (toFind));
 
-        if (idx == -1) {
+        if (idx == -1)
+        {
             return null;
         }
 
         return idx - ScrollOffsetVertical;
     }
 
-    /// <summary>
-    ///     Returns the parent object of <paramref name="o"/> in the tree. Returns null if the object is not exposed in
-    ///     the tree.
-    /// </summary>
+    /// <summary>Returns the parent object of <paramref name="o"/> in the tree. Returns null if the object is not exposed in the tree.</summary>
     /// <param name="o">An object in the tree.</param>
     /// <returns></returns>
-    public T GetParent (T o) => ObjectToBranch (o)?.Parent?.Model;
+    public T GetParent (T o) { return ObjectToBranch (o)?.Parent?.Model; }
 
     /// <summary>
-    ///     Returns the index of the object <paramref name="o"/> if it is currently exposed (it's parent(s) have been
-    ///     expanded). This can be used with <see cref="ScrollOffsetVertical"/> and <see cref="View.SetNeedsDisplay()"/> to
-    ///     scroll to a specific object.
+    ///     Returns the index of the object <paramref name="o"/> if it is currently exposed (it's parent(s) have been expanded). This can be used with
+    ///     <see cref="ScrollOffsetVertical"/> and <see cref="View.SetNeedsDisplay()"/> to scroll to a specific object.
     /// </summary>
     /// <remarks>Uses the Equals method and returns the first index at which the object is found or -1 if it is not found.</remarks>
     /// <param name="o">An object that appears in your tree and is currently exposed.</param>
     /// <returns>The index the object was found at or -1 if it is not currently revealed or not in the tree at all.</returns>
-    public int GetScrollOffsetOf (T o) {
+    public int GetScrollOffsetOf (T o)
+    {
         IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
-        for (var i = 0; i < map.Count; i++) {
-            if (map.ElementAt (i).Model.Equals (o)) {
+
+        for (var i = 0; i < map.Count; i++)
+        {
+            if (map.ElementAt (i).Model.Equals (o))
+            {
                 return i;
             }
         }
@@ -823,12 +912,14 @@ public class TreeView<T> : View, ITreeView where T : class {
     }
 
     /// <summary>
-    ///     Changes the <see cref="SelectedObject"/> to <paramref name="toSelect"/> and scrolls to ensure it is visible. Has no
-    ///     effect if <paramref name="toSelect"/> is not exposed in the tree (e.g. its parents are collapsed).
+    ///     Changes the <see cref="SelectedObject"/> to <paramref name="toSelect"/> and scrolls to ensure it is visible. Has no effect if
+    ///     <paramref name="toSelect"/> is not exposed in the tree (e.g. its parents are collapsed).
     /// </summary>
     /// <param name="toSelect"></param>
-    public void GoTo (T toSelect) {
-        if (ObjectToBranch (toSelect) == null) {
+    public void GoTo (T toSelect)
+    {
+        if (ObjectToBranch (toSelect) == null)
+        {
             return;
         }
 
@@ -838,7 +929,8 @@ public class TreeView<T> : View, ITreeView where T : class {
     }
 
     /// <summary>Changes the <see cref="SelectedObject"/> to the last object in the tree and scrolls so that it is visible.</summary>
-    public void GoToEnd () {
+    public void GoToEnd ()
+    {
         IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
         ScrollOffsetVertical = Math.Max (0, map.Count - Bounds.Height + 1);
         SelectedObject = map.LastOrDefault ()?.Model;
@@ -850,7 +942,8 @@ public class TreeView<T> : View, ITreeView where T : class {
     ///     Changes the <see cref="SelectedObject"/> to the first root object and resets the <see cref="ScrollOffsetVertical"/>
     ///     to 0.
     /// </summary>
-    public void GoToFirst () {
+    public void GoToFirst ()
+    {
         ScrollOffsetVertical = 0;
         SelectedObject = roots.Keys.FirstOrDefault ();
 
@@ -863,7 +956,7 @@ public class TreeView<T> : View, ITreeView where T : class {
     /// <summary>Returns true if the given object <paramref name="o"/> is exposed in the tree and expanded otherwise false.</summary>
     /// <param name="o"></param>
     /// <returns></returns>
-    public bool IsExpanded (T o) => ObjectToBranch (o)?.IsExpanded ?? false;
+    public bool IsExpanded (T o) { return ObjectToBranch (o)?.IsExpanded ?? false; }
 
     /// <summary>
     ///     Returns true if the <paramref name="model"/> is either the <see cref="SelectedObject"/> or part of a
@@ -871,82 +964,97 @@ public class TreeView<T> : View, ITreeView where T : class {
     /// </summary>
     /// <param name="model"></param>
     /// <returns></returns>
-    public bool IsSelected (T model) {
-        return Equals (SelectedObject, model) ||
-               (MultiSelect && multiSelectedRegions.Any (s => s.Contains (model)));
-    }
+    public bool IsSelected (T model) { return Equals (SelectedObject, model) || (MultiSelect && multiSelectedRegions.Any (s => s.Contains (model))); }
 
     ///<inheritdoc/>
-    public override bool MouseEvent (MouseEvent me) {
+    public override bool MouseEvent (MouseEvent me)
+    {
         // If it is not an event we care about
-        if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) &&
-            !me.Flags.HasFlag (ObjectActivationButton ?? MouseFlags.Button1DoubleClicked) &&
-            !me.Flags.HasFlag (MouseFlags.WheeledDown) &&
-            !me.Flags.HasFlag (MouseFlags.WheeledUp) &&
-            !me.Flags.HasFlag (MouseFlags.WheeledRight) &&
-            !me.Flags.HasFlag (MouseFlags.WheeledLeft)) {
+        if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
+            && !me.Flags.HasFlag (ObjectActivationButton ?? MouseFlags.Button1DoubleClicked)
+            && !me.Flags.HasFlag (MouseFlags.WheeledDown)
+            && !me.Flags.HasFlag (MouseFlags.WheeledUp)
+            && !me.Flags.HasFlag (MouseFlags.WheeledRight)
+            && !me.Flags.HasFlag (MouseFlags.WheeledLeft))
+        {
             // do nothing
             return false;
         }
 
-        if (!HasFocus && CanFocus) {
+        if (!HasFocus && CanFocus)
+        {
             SetFocus ();
         }
 
-        if (me.Flags == MouseFlags.WheeledDown) {
+        if (me.Flags == MouseFlags.WheeledDown)
+        {
             ScrollDown ();
 
             return true;
         }
 
-        if (me.Flags == MouseFlags.WheeledUp) {
+        if (me.Flags == MouseFlags.WheeledUp)
+        {
             ScrollUp ();
 
             return true;
         }
 
-        if (me.Flags == MouseFlags.WheeledRight) {
+        if (me.Flags == MouseFlags.WheeledRight)
+        {
             ScrollOffsetHorizontal++;
             SetNeedsDisplay ();
 
             return true;
         }
 
-        if (me.Flags == MouseFlags.WheeledLeft) {
+        if (me.Flags == MouseFlags.WheeledLeft)
+        {
             ScrollOffsetHorizontal--;
             SetNeedsDisplay ();
 
             return true;
         }
 
-        if (me.Flags.HasFlag (MouseFlags.Button1Clicked)) {
+        if (me.Flags.HasFlag (MouseFlags.Button1Clicked))
+        {
             // The line they clicked on a branch
             Branch<T> clickedBranch = HitTest (me.Y);
 
-            if (clickedBranch == null) {
+            if (clickedBranch == null)
+            {
                 return false;
             }
 
             bool isExpandToggleAttempt = clickedBranch.IsHitOnExpandableSymbol (Driver, me.X);
 
             // If we are already selected (double click)
-            if (Equals (SelectedObject, clickedBranch.Model)) {
+            if (Equals (SelectedObject, clickedBranch.Model))
+            {
                 isExpandToggleAttempt = true;
             }
 
             // if they clicked on the +/- expansion symbol
-            if (isExpandToggleAttempt) {
-                if (clickedBranch.IsExpanded) {
+            if (isExpandToggleAttempt)
+            {
+                if (clickedBranch.IsExpanded)
+                {
                     clickedBranch.Collapse ();
                     InvalidateLineMap ();
-                } else if (clickedBranch.CanExpand ()) {
+                }
+                else if (clickedBranch.CanExpand ())
+                {
                     clickedBranch.Expand ();
                     InvalidateLineMap ();
-                } else {
+                }
+                else
+                {
                     SelectedObject = clickedBranch.Model; // It is a leaf node
                     multiSelectedRegions.Clear ();
                 }
-            } else {
+            }
+            else
+            {
                 // It is a first click somewhere in the current line that doesn't look like an expansion/collapse attempt
                 SelectedObject = clickedBranch.Model;
                 multiSelectedRegions.Clear ();
@@ -958,11 +1066,13 @@ public class TreeView<T> : View, ITreeView where T : class {
         }
 
         // If it is activation via mouse (e.g. double click)
-        if (ObjectActivationButton.HasValue && me.Flags.HasFlag (ObjectActivationButton.Value)) {
+        if (ObjectActivationButton.HasValue && me.Flags.HasFlag (ObjectActivationButton.Value))
+        {
             // The line they clicked on a branch
             Branch<T> clickedBranch = HitTest (me.Y);
 
-            if (clickedBranch == null) {
+            if (clickedBranch == null)
+            {
                 return false;
             }
 
@@ -998,12 +1108,15 @@ public class TreeView<T> : View, ITreeView where T : class {
     public event EventHandler<ObjectActivatedEventArgs<T>> ObjectActivated;
 
     ///<inheritdoc/>
-    public override void OnDrawContent (Rect contentArea) {
-        if (roots == null) {
+    public override void OnDrawContent (Rect contentArea)
+    {
+        if (roots == null)
+        {
             return;
         }
 
-        if (TreeBuilder == null) {
+        if (TreeBuilder == null)
+        {
             Move (0, 0);
             Driver.AddStr (NoBuilderError);
 
@@ -1012,14 +1125,18 @@ public class TreeView<T> : View, ITreeView where T : class {
 
         IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
 
-        for (var line = 0; line < Bounds.Height; line++) {
+        for (var line = 0; line < Bounds.Height; line++)
+        {
             int idxToRender = ScrollOffsetVertical + line;
 
             // Is there part of the tree view to render?
-            if (idxToRender < map.Count) {
+            if (idxToRender < map.Count)
+            {
                 // Render the line
                 map.ElementAt (idxToRender).Draw (Driver, ColorScheme, line, Bounds.Width);
-            } else {
+            }
+            else
+            {
                 // Else clear the line to prevent stale symbols due to scrolling etc
                 Move (0, line);
                 Driver.SetAttribute (GetNormalColor ());
@@ -1029,10 +1146,12 @@ public class TreeView<T> : View, ITreeView where T : class {
     }
 
     ///<inheritdoc/>
-    public override bool OnEnter (View view) {
+    public override bool OnEnter (View view)
+    {
         Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
 
-        if (SelectedObject == null && Objects.Any ()) {
+        if (SelectedObject == null && Objects.Any ())
+        {
             SelectedObject = Objects.First ();
         }
 
@@ -1040,15 +1159,19 @@ public class TreeView<T> : View, ITreeView where T : class {
     }
 
     /// <inheritdoc/>
-    public override bool OnProcessKeyDown (Key keyEvent) {
-        if (!Enabled) {
+    public override bool OnProcessKeyDown (Key keyEvent)
+    {
+        if (!Enabled)
+        {
             return false;
         }
 
-        try {
+        try
+        {
             // BUGBUG: this should move to OnInvokingKeyBindings
             // If not a keybinding, is the key a searchable key press?
-            if (CollectionNavigatorBase.IsCompatibleKey (keyEvent) && AllowLetterBasedNavigation) {
+            if (CollectionNavigatorBase.IsCompatibleKey (keyEvent) && AllowLetterBasedNavigation)
+            {
                 IReadOnlyCollection<Branch<T>> map;
 
                 // If there has been a call to InvalidateMap since the last time
@@ -1059,7 +1182,8 @@ public class TreeView<T> : View, ITreeView where T : class {
                 int current = map.IndexOf (b => b.Model == SelectedObject);
                 int? newIndex = KeystrokeNavigator?.GetNextMatchingItem (current, (char)keyEvent);
 
-                if (newIndex is int && newIndex != -1) {
+                if (newIndex is int && newIndex != -1)
+                {
                     SelectedObject = map.ElementAt ((int)newIndex).Model;
                     EnsureVisible (selectedObject);
                     SetNeedsDisplay ();
@@ -1068,8 +1192,10 @@ public class TreeView<T> : View, ITreeView where T : class {
                 }
             }
         }
-        finally {
-            if (IsInitialized) {
+        finally
+        {
+            if (IsInitialized)
+            {
                 PositionCursor ();
             }
         }
@@ -1078,29 +1204,37 @@ public class TreeView<T> : View, ITreeView where T : class {
     }
 
     /// <summary>Positions the cursor at the start of the selected objects line (if visible).</summary>
-    public override void PositionCursor () {
-        if (CanFocus && HasFocus && Visible && SelectedObject != null) {
+    public override void PositionCursor ()
+    {
+        if (CanFocus && HasFocus && Visible && SelectedObject != null)
+        {
             IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
             int idx = map.IndexOf (b => b.Model.Equals (SelectedObject));
 
             // if currently selected line is visible
-            if (idx - ScrollOffsetVertical >= 0 && idx - ScrollOffsetVertical < Bounds.Height) {
+            if (idx - ScrollOffsetVertical >= 0 && idx - ScrollOffsetVertical < Bounds.Height)
+            {
                 Move (0, idx - ScrollOffsetVertical);
-            } else {
+            }
+            else
+            {
                 base.PositionCursor ();
             }
-        } else {
+        }
+        else
+        {
             base.PositionCursor ();
         }
     }
 
     /// <summary>
-    ///     Rebuilds the tree structure for all exposed objects starting with the root objects. Call this method when you know
-    ///     there are changes to the tree but don't know which objects have changed (otherwise use
+    ///     Rebuilds the tree structure for all exposed objects starting with the root objects. Call this method when you know there are changes to the tree but don't know which objects have changed (otherwise use
     ///     <see cref="RefreshObject(T, bool)"/>).
     /// </summary>
-    public void RebuildTree () {
-        foreach (Branch<T> branch in roots.Values) {
+    public void RebuildTree ()
+    {
+        foreach (Branch<T> branch in roots.Values)
+        {
             branch.Rebuild ();
         }
 
@@ -1109,18 +1243,19 @@ public class TreeView<T> : View, ITreeView where T : class {
     }
 
     /// <summary>
-    ///     Refreshes the state of the object <paramref name="o"/> in the tree. This will recompute children, string
-    ///     representation etc.
+    ///     Refreshes the state of the object <paramref name="o"/> in the tree. This will recompute children, string representation etc.
     /// </summary>
     /// <remarks>This has no effect if the object is not exposed in the tree.</remarks>
     /// <param name="o"></param>
     /// <param name="startAtTop">
-    ///     True to also refresh all ancestors of the objects branch (starting with the root). False to refresh only the passed
-    ///     node.
+    ///     True to also refresh all ancestors of the objects branch (starting with the root). False to refresh only the passed node.
     /// </param>
-    public void RefreshObject (T o, bool startAtTop = false) {
+    public void RefreshObject (T o, bool startAtTop = false)
+    {
         Branch<T> branch = ObjectToBranch (o);
-        if (branch != null) {
+
+        if (branch != null)
+        {
             branch.Refresh (startAtTop);
             InvalidateLineMap ();
             SetNeedsDisplay ();
@@ -1131,37 +1266,46 @@ public class TreeView<T> : View, ITreeView where T : class {
     /// <remarks>If <paramref name="o"/> is the currently <see cref="SelectedObject"/> then the selection is cleared</remarks>
     /// .
     /// <param name="o"></param>
-    public void Remove (T o) {
-        if (roots.ContainsKey (o)) {
+    public void Remove (T o)
+    {
+        if (roots.ContainsKey (o))
+        {
             roots.Remove (o);
             InvalidateLineMap ();
             SetNeedsDisplay ();
 
-            if (Equals (SelectedObject, o)) {
+            if (Equals (SelectedObject, o))
+            {
                 SelectedObject = default (T);
             }
         }
     }
 
     /// <summary>Scrolls the view area down a single line without changing the current selection.</summary>
-    public void ScrollDown () {
-        if (ScrollOffsetVertical <= ContentHeight - 2) {
+    public void ScrollDown ()
+    {
+        if (ScrollOffsetVertical <= ContentHeight - 2)
+        {
             ScrollOffsetVertical++;
             SetNeedsDisplay ();
         }
     }
 
     /// <summary>Scrolls the view area up a single line without changing the current selection.</summary>
-    public void ScrollUp () {
-        if (scrollOffsetVertical > 0) {
+    public void ScrollUp ()
+    {
+        if (scrollOffsetVertical > 0)
+        {
             ScrollOffsetVertical--;
             SetNeedsDisplay ();
         }
     }
 
     /// <summary>Selects all objects in the tree when <see cref="MultiSelect"/> is enabled otherwise does nothing.</summary>
-    public void SelectAll () {
-        if (!MultiSelect) {
+    public void SelectAll ()
+    {
+        if (!MultiSelect)
+        {
             return;
         }
 
@@ -1169,7 +1313,8 @@ public class TreeView<T> : View, ITreeView where T : class {
 
         IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
 
-        if (map.Count == 0) {
+        if (map.Count == 0)
+        {
             return;
         }
 
@@ -1183,30 +1328,36 @@ public class TreeView<T> : View, ITreeView where T : class {
     public event EventHandler<SelectionChangedEventArgs<T>> SelectionChanged;
 
     /// <summary>
-    ///     Implementation of <see cref="Collapse(T)"/> and <see cref="CollapseAll(T)"/>. Performs operation and updates
-    ///     selection if disapeared.
+    ///     Implementation of <see cref="Collapse(T)"/> and <see cref="CollapseAll(T)"/>. Performs operation and updates selection if disapeared.
     /// </summary>
     /// <param name="toCollapse"></param>
     /// <param name="all"></param>
-    protected void CollapseImpl (T toCollapse, bool all) {
-        if (toCollapse == null) {
+    protected void CollapseImpl (T toCollapse, bool all)
+    {
+        if (toCollapse == null)
+        {
             return;
         }
 
         Branch<T> branch = ObjectToBranch (toCollapse);
 
         // Nothing to collapse
-        if (branch == null) {
+        if (branch == null)
+        {
             return;
         }
 
-        if (all) {
+        if (all)
+        {
             branch.CollapseAll ();
-        } else {
+        }
+        else
+        {
             branch.Collapse ();
         }
 
-        if (SelectedObject != null && ObjectToBranch (SelectedObject) == null) {
+        if (SelectedObject != null && ObjectToBranch (SelectedObject) == null)
+        {
             // If the old selection suddenly became invalid then clear it
             SelectedObject = null;
         }
@@ -1216,20 +1367,27 @@ public class TreeView<T> : View, ITreeView where T : class {
     }
 
     /// <summary>
-    ///     Determines systems behaviour when the left arrow key is pressed. Default behaviour is to collapse the current tree
-    ///     node if possible otherwise changes selection to current branches parent.
+    ///     Determines systems behaviour when the left arrow key is pressed. Default behaviour is to collapse the current tree node if possible otherwise changes selection to current branches parent.
     /// </summary>
-    protected virtual void CursorLeft (bool ctrl) {
-        if (IsExpanded (SelectedObject)) {
-            if (ctrl) {
+    protected virtual void CursorLeft (bool ctrl)
+    {
+        if (IsExpanded (SelectedObject))
+        {
+            if (ctrl)
+            {
                 CollapseAll (SelectedObject);
-            } else {
+            }
+            else
+            {
                 Collapse (SelectedObject);
             }
-        } else {
+        }
+        else
+        {
             T parent = GetParent (SelectedObject);
 
-            if (parent != null) {
+            if (parent != null)
+            {
                 SelectedObject = parent;
                 AdjustSelection (0);
                 SetNeedsDisplay ();
@@ -1238,7 +1396,8 @@ public class TreeView<T> : View, ITreeView where T : class {
     }
 
     /// <inheritdoc/>
-    protected override void Dispose (bool disposing) {
+    protected override void Dispose (bool disposing)
+    {
         base.Dispose (disposing);
 
         ColorGetter = null;
@@ -1253,24 +1412,27 @@ public class TreeView<T> : View, ITreeView where T : class {
     protected virtual void OnSelectionChanged (SelectionChangedEventArgs<T> e) { SelectionChanged?.Invoke (this, e); }
 
     /// <summary>
-    ///     Calculates all currently visible/expanded branches (including leafs) and outputs them by index from the top of the
-    ///     screen.
+    ///     Calculates all currently visible/expanded branches (including leafs) and outputs them by index from the top of the screen.
     /// </summary>
     /// <remarks>
-    ///     Index 0 of the returned array is the first item that should be visible in the top of the control, index 1 is the
-    ///     next etc.
+    ///     Index 0 of the returned array is the first item that should be visible in the top of the control, index 1 is the next etc.
     /// </remarks>
     /// <returns></returns>
-    internal IReadOnlyCollection<Branch<T>> BuildLineMap () {
-        if (cachedLineMap != null) {
+    internal IReadOnlyCollection<Branch<T>> BuildLineMap ()
+    {
+        if (cachedLineMap != null)
+        {
             return cachedLineMap;
         }
 
         List<Branch<T>> toReturn = new ();
 
-        foreach (Branch<T> root in roots.Values) {
+        foreach (Branch<T> root in roots.Values)
+        {
             IEnumerable<Branch<T>> toAdd = AddToLineMap (root, false, out bool isMatch);
-            if (isMatch) {
+
+            if (isMatch)
+            {
                 toReturn.AddRange (toAdd);
             }
         }
@@ -1287,17 +1449,22 @@ public class TreeView<T> : View, ITreeView where T : class {
     /// <param name="e"></param>
     internal void OnDrawLine (DrawTreeViewLineEventArgs<T> e) { DrawLine?.Invoke (this, e); }
 
-    private IEnumerable<Branch<T>> AddToLineMap (Branch<T> currentBranch, bool parentMatches, out bool match) {
+    private IEnumerable<Branch<T>> AddToLineMap (Branch<T> currentBranch, bool parentMatches, out bool match)
+    {
         bool weMatch = IsFilterMatch (currentBranch);
         var anyChildMatches = false;
 
         List<Branch<T>> toReturn = new ();
         List<Branch<T>> children = new ();
 
-        if (currentBranch.IsExpanded) {
-            foreach (Branch<T> subBranch in currentBranch.ChildBranches.Values) {
-                foreach (Branch<T> sub in AddToLineMap (subBranch, weMatch, out bool childMatch)) {
-                    if (childMatch) {
+        if (currentBranch.IsExpanded)
+        {
+            foreach (Branch<T> subBranch in currentBranch.ChildBranches.Values)
+            {
+                foreach (Branch<T> sub in AddToLineMap (subBranch, weMatch, out bool childMatch))
+                {
+                    if (childMatch)
+                    {
                         children.Add (sub);
                         anyChildMatches = true;
                     }
@@ -1305,10 +1472,13 @@ public class TreeView<T> : View, ITreeView where T : class {
             }
         }
 
-        if (parentMatches || weMatch || anyChildMatches) {
+        if (parentMatches || weMatch || anyChildMatches)
+        {
             match = true;
             toReturn.Add (currentBranch);
-        } else {
+        }
+        else
+        {
             match = false;
         }
 
@@ -1319,11 +1489,13 @@ public class TreeView<T> : View, ITreeView where T : class {
 
     /// <summary>Sets the selection to the next branch that matches the <paramref name="predicate"/>.</summary>
     /// <param name="predicate"></param>
-    private void AdjustSelectionToNext (Func<Branch<T>, bool> predicate) {
+    private void AdjustSelectionToNext (Func<Branch<T>, bool> predicate)
+    {
         IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
 
         // empty map means we can't select anything anyway
-        if (map.Count == 0) {
+        if (map.Count == 0)
+        {
             return;
         }
 
@@ -1331,18 +1503,22 @@ public class TreeView<T> : View, ITreeView where T : class {
         var idxStart = 0;
 
         // or the current selected branch
-        if (SelectedObject != null) {
+        if (SelectedObject != null)
+        {
             idxStart = map.IndexOf (b => Equals (b.Model, SelectedObject));
         }
 
         // if currently selected object mysteriously vanished, search from beginning
-        if (idxStart == -1) {
+        if (idxStart == -1)
+        {
             idxStart = 0;
         }
 
         // loop around all indexes and back to first index
-        for (int idxCur = (idxStart + 1) % map.Count; idxCur != idxStart; idxCur = (idxCur + 1) % map.Count) {
-            if (predicate (map.ElementAt (idxCur))) {
+        for (int idxCur = (idxStart + 1) % map.Count; idxCur != idxStart; idxCur = (idxCur + 1) % map.Count)
+        {
+            if (predicate (map.ElementAt (idxCur)))
+            {
                 SelectedObject = map.ElementAt (idxCur).Model;
                 EnsureVisible (map.ElementAt (idxCur).Model);
                 SetNeedsDisplay ();
@@ -1355,13 +1531,15 @@ public class TreeView<T> : View, ITreeView where T : class {
     /// <summary>Returns the branch at the given <paramref name="y"/> client coordinate e.g. following a click event.</summary>
     /// <param name="y">Client Y position in the controls bounds.</param>
     /// <returns>The clicked branch or null if outside of tree region.</returns>
-    private Branch<T> HitTest (int y) {
+    private Branch<T> HitTest (int y)
+    {
         IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
 
         int idx = y + ScrollOffsetVertical;
 
         // click is outside any visible nodes
-        if (idx < 0 || idx >= map.Count) {
+        if (idx < 0 || idx >= map.Count)
+        {
             return null;
         }
 
@@ -1369,25 +1547,24 @@ public class TreeView<T> : View, ITreeView where T : class {
         return map.ElementAt (idx);
     }
 
-    private bool IsFilterMatch (Branch<T> branch) => Filter?.IsMatch (branch.Model) ?? true;
+    private bool IsFilterMatch (Branch<T> branch) { return Filter?.IsMatch (branch.Model) ?? true; }
 
     /// <summary>
-    ///     Returns the corresponding <see cref="Branch{T}"/> in the tree for <paramref name="toFind"/>. This will not work for
-    ///     objects hidden by their parent being collapsed.
+    ///     Returns the corresponding <see cref="Branch{T}"/> in the tree for <paramref name="toFind"/>. This will not work for objects hidden by their parent being collapsed.
     /// </summary>
     /// <param name="toFind"></param>
     /// <returns>The branch for <paramref name="toFind"/> or null if it is not currently exposed in the tree.</returns>
-    private Branch<T> ObjectToBranch (T toFind) {
-        return BuildLineMap ().FirstOrDefault (o => o.Model.Equals (toFind));
-    }
+    private Branch<T> ObjectToBranch (T toFind) { return BuildLineMap ().FirstOrDefault (o => o.Model.Equals (toFind)); }
 }
 
-internal class TreeSelection<T> where T : class {
+internal class TreeSelection<T> where T : class
+{
     /// <summary>Creates a new selection between two branches in the tree</summary>
     /// <param name="from"></param>
     /// <param name="toIndex"></param>
     /// <param name="map"></param>
-    public TreeSelection (Branch<T> from, int toIndex, IReadOnlyCollection<Branch<T>> map) {
+    public TreeSelection (Branch<T> from, int toIndex, IReadOnlyCollection<Branch<T>> map)
+    {
         Origin = from;
         included.Add (Origin.Model);
 
@@ -1397,12 +1574,13 @@ internal class TreeSelection<T> where T : class {
         int highIndex = Math.Max (oldIdx, toIndex);
 
         // Select everything between the old and new indexes
-        foreach (Branch<T> alsoInclude in map.Skip (lowIndex).Take (highIndex - lowIndex)) {
+        foreach (Branch<T> alsoInclude in map.Skip (lowIndex).Take (highIndex - lowIndex))
+        {
             included.Add (alsoInclude.Model);
         }
     }
 
     private readonly HashSet<T> included = new ();
     public Branch<T> Origin { get; }
-    public bool Contains (T model) => included.Contains (model);
+    public bool Contains (T model) { return included.Contains (model); }
 }

@@ -5,15 +5,17 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.FileServicesTests;
 
-public class FileDialogTests {
-    public FileDialogTests (ITestOutputHelper output) { this.output = output; }
+public class FileDialogTests
+{
     private readonly ITestOutputHelper output;
+    public FileDialogTests (ITestOutputHelper output) { this.output = output; }
 
     [Theory]
     [AutoInitShutdown]
     [InlineData (true)]
     [InlineData (false)]
-    public void CancelSelection (bool cancel) {
+    public void CancelSelection (bool cancel)
+    {
         FileDialog dlg = GetInitializedFileDialog ();
         string openIn = Path.Combine (Environment.CurrentDirectory, "zz");
         Directory.CreateDirectory (openIn);
@@ -30,7 +32,8 @@ public class FileDialogTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void DirectTyping_Allowed () {
+    public void DirectTyping_Allowed ()
+    {
         FileDialog dlg = GetInitializedFileDialog ();
         TextField tf = dlg.Subviews.OfType<TextField> ().First (t => t.HasFocus);
         tf.ClearAllSelection ();
@@ -40,9 +43,9 @@ public class FileDialogTests {
         SendSlash ();
 
         Assert.Equal (
-            new DirectoryInfo (Environment.CurrentDirectory + Path.DirectorySeparatorChar).FullName,
-            new DirectoryInfo (dlg.Path + Path.DirectorySeparatorChar).FullName
-        );
+                      new DirectoryInfo (Environment.CurrentDirectory + Path.DirectorySeparatorChar).FullName,
+                      new DirectoryInfo (dlg.Path + Path.DirectorySeparatorChar).FullName
+                     );
 
         // continue typing the rest of the path
         Send ("bob");
@@ -58,7 +61,8 @@ public class FileDialogTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void DirectTyping_AutoComplete () {
+    public void DirectTyping_AutoComplete ()
+    {
         FileDialog dlg = GetInitializedFileDialog ();
         string openIn = Path.Combine (Environment.CurrentDirectory, "zz");
 
@@ -90,7 +94,8 @@ public class FileDialogTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void DoNotConfirmSelectionWhenFindFocused () {
+    public void DoNotConfirmSelectionWhenFindFocused ()
+    {
         FileDialog dlg = GetInitializedFileDialog ();
         string openIn = Path.Combine (Environment.CurrentDirectory, "zz");
         Directory.CreateDirectory (openIn);
@@ -127,7 +132,8 @@ public class FileDialogTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void DotDot_MovesToRoot_ThenPressBack () {
+    public void DotDot_MovesToRoot_ThenPressBack ()
+    {
         FileDialog dlg = GetDialog ();
         dlg.OpenMode = OpenMode.Directory;
         dlg.AllowsMultipleSelection = true;
@@ -166,7 +172,8 @@ public class FileDialogTests {
     [AutoInitShutdown]
     [InlineData (true)]
     [InlineData (false)]
-    public void MultiSelectDirectory_CannotToggleDotDot (bool acceptWithEnter) {
+    public void MultiSelectDirectory_CannotToggleDotDot (bool acceptWithEnter)
+    {
         FileDialog dlg = GetDialog ();
         dlg.OpenMode = OpenMode.Directory;
         dlg.AllowsMultipleSelection = true;
@@ -186,35 +193,41 @@ public class FileDialogTests {
 
         Assert.True (dlg.Canceled);
 
-        if (acceptWithEnter) {
+        if (acceptWithEnter)
+        {
             Send ('\n', ConsoleKey.Enter);
-        } else {
+        }
+        else
+        {
             Send ('O', ConsoleKey.O, false, true);
         }
 
         Assert.False (dlg.Canceled);
 
         Assert.Multiple (
-            () => {
-                // Only the subfolder should be selected
-                Assert.Single (dlg.MultiSelected);
-                AssertIsTheSubfolder (dlg.Path);
-                AssertIsTheSubfolder (dlg.MultiSelected.Single ());
-            },
-            () => {
-                // Event should also agree with the final state
-                Assert.NotNull (eventMultiSelected);
-                Assert.Single (eventMultiSelected);
-                AssertIsTheSubfolder (eventMultiSelected.Single ());
-            }
-        );
+                         () =>
+                         {
+                             // Only the subfolder should be selected
+                             Assert.Single (dlg.MultiSelected);
+                             AssertIsTheSubfolder (dlg.Path);
+                             AssertIsTheSubfolder (dlg.MultiSelected.Single ());
+                         },
+                         () =>
+                         {
+                             // Event should also agree with the final state
+                             Assert.NotNull (eventMultiSelected);
+                             Assert.Single (eventMultiSelected);
+                             AssertIsTheSubfolder (eventMultiSelected.Single ());
+                         }
+                        );
     }
 
     [Theory]
     [AutoInitShutdown]
     [InlineData (true)]
     [InlineData (false)]
-    public void MultiSelectDirectory_CanToggleThenAccept (bool acceptWithEnter) {
+    public void MultiSelectDirectory_CanToggleThenAccept (bool acceptWithEnter)
+    {
         FileDialog dlg = GetDialog ();
         dlg.OpenMode = OpenMode.Directory;
         dlg.AllowsMultipleSelection = true;
@@ -233,33 +246,39 @@ public class FileDialogTests {
 
         Assert.True (dlg.Canceled);
 
-        if (acceptWithEnter) {
+        if (acceptWithEnter)
+        {
             Send ('\n', ConsoleKey.Enter);
-        } else {
+        }
+        else
+        {
             Send ('O', ConsoleKey.O, false, true);
         }
 
         Assert.False (dlg.Canceled);
 
         Assert.Multiple (
-            () => {
-                // Only the subfolder should be selected
-                Assert.Single (dlg.MultiSelected);
-                AssertIsTheSubfolder (dlg.Path);
-                AssertIsTheSubfolder (dlg.MultiSelected.Single ());
-            },
-            () => {
-                // Event should also agree with the final state
-                Assert.NotNull (eventMultiSelected);
-                Assert.Single (eventMultiSelected);
-                AssertIsTheSubfolder (eventMultiSelected.Single ());
-            }
-        );
+                         () =>
+                         {
+                             // Only the subfolder should be selected
+                             Assert.Single (dlg.MultiSelected);
+                             AssertIsTheSubfolder (dlg.Path);
+                             AssertIsTheSubfolder (dlg.MultiSelected.Single ());
+                         },
+                         () =>
+                         {
+                             // Event should also agree with the final state
+                             Assert.NotNull (eventMultiSelected);
+                             Assert.Single (eventMultiSelected);
+                             AssertIsTheSubfolder (eventMultiSelected.Single ());
+                         }
+                        );
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void MultiSelectDirectory_EnterOpensFolder () {
+    public void MultiSelectDirectory_EnterOpensFolder ()
+    {
         FileDialog dlg = GetDialog ();
         dlg.OpenMode = OpenMode.Directory;
         dlg.AllowsMultipleSelection = true;
@@ -286,7 +305,8 @@ public class FileDialogTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void OnLoad_TextBoxIsFocused () {
+    public void OnLoad_TextBoxIsFocused ()
+    {
         FileDialog dlg = GetInitializedFileDialog ();
 
         View tf = dlg.Subviews.FirstOrDefault (t => t.HasFocus);
@@ -300,7 +320,8 @@ public class FileDialogTests {
     [InlineData (true, false)]
     [InlineData (false, true)]
     [InlineData (false, false)]
-    public void PickDirectory_ArrowNavigation (bool openModeMixed, bool multiple) {
+    public void PickDirectory_ArrowNavigation (bool openModeMixed, bool multiple)
+    {
         FileDialog dlg = GetDialog ();
         dlg.OpenMode = openModeMixed ? OpenMode.Mixed : OpenMode.Directory;
         dlg.AllowsMultipleSelection = multiple;
@@ -328,7 +349,8 @@ public class FileDialogTests {
     [InlineData (true, false)]
     [InlineData (false, true)]
     [InlineData (false, false)]
-    public void PickDirectory_DirectTyping (bool openModeMixed, bool multiple) {
+    public void PickDirectory_DirectTyping (bool openModeMixed, bool multiple)
+    {
         FileDialog dlg = GetDialog ();
         dlg.OpenMode = openModeMixed ? OpenMode.Mixed : OpenMode.Directory;
         dlg.AllowsMultipleSelection = multiple;
@@ -354,7 +376,8 @@ public class FileDialogTests {
     [InlineData (".csv", "c:\\MyFile.csv", true)]
     [InlineData (".csv", "c:\\MyFile.CSV", true)]
     [InlineData (".csv", "c:\\MyFile.csv.bak", false)]
-    public void TestAllowedType_Basic (string allowed, string candidate, bool expected) {
+    public void TestAllowedType_Basic (string allowed, string candidate, bool expected)
+    {
         Assert.Equal (expected, new AllowedType ("Test", allowed).IsAllowed (candidate));
     }
 
@@ -364,7 +387,8 @@ public class FileDialogTests {
     [InlineData (".Designer.cs", "MyView.Designer.cs", true)]
     [InlineData (".Designer.cs", "c:\\MyView.DESIGNER.CS", true)]
     [InlineData (".Designer.cs", "MyView.cs", false)]
-    public void TestAllowedType_DoubleBarreled (string allowed, string candidate, bool expected) {
+    public void TestAllowedType_DoubleBarreled (string allowed, string candidate, bool expected)
+    {
         Assert.Equal (expected, new AllowedType ("Test", allowed).IsAllowed (candidate));
     }
 
@@ -372,14 +396,17 @@ public class FileDialogTests {
     [InlineData ("Dockerfile", "c:\\temp\\Dockerfile", true)]
     [InlineData ("Dockerfile", "Dockerfile", true)]
     [InlineData ("Dockerfile", "someimg.Dockerfile", true)]
-    public void TestAllowedType_SpecificFile (string allowed, string candidate, bool expected) {
+    public void TestAllowedType_SpecificFile (string allowed, string candidate, bool expected)
+    {
         Assert.Equal (expected, new AllowedType ("Test", allowed).IsAllowed (candidate));
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void TestDirectoryContents_Linux () {
-        if (IsWindows ()) {
+    public void TestDirectoryContents_Linux ()
+    {
+        if (IsWindows ())
+        {
             return;
         }
 
@@ -433,8 +460,10 @@ public class FileDialogTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void TestDirectoryContents_Windows () {
-        if (!IsWindows ()) {
+    public void TestDirectoryContents_Windows ()
+    {
+        if (!IsWindows ())
+        {
             return;
         }
 
@@ -486,75 +515,94 @@ public class FileDialogTests {
         TestHelpers.AssertDriverContentsAre (expected, output, ignoreLeadingWhitespace: true);
     }
 
-    private void AssertIsTheRootDirectory (string path) {
-        if (IsWindows ()) {
+    private void AssertIsTheRootDirectory (string path)
+    {
+        if (IsWindows ())
+        {
             Assert.Equal (@"c:\", path);
-        } else {
+        }
+        else
+        {
             Assert.Equal ("/", path);
         }
     }
 
-    private void AssertIsTheStartingDirectory (string path) {
-        if (IsWindows ()) {
+    private void AssertIsTheStartingDirectory (string path)
+    {
+        if (IsWindows ())
+        {
             Assert.Equal (@"c:\demo\", path);
-        } else {
+        }
+        else
+        {
             Assert.Equal ("/demo/", path);
         }
     }
 
-    private void AssertIsTheSubfolder (string path) {
-        if (IsWindows ()) {
+    private void AssertIsTheSubfolder (string path)
+    {
+        if (IsWindows ())
+        {
             Assert.Equal (@"c:\demo\subfolder", path);
-        } else {
+        }
+        else
+        {
             Assert.Equal ("/demo/subfolder", path);
         }
     }
 
-    private void Begin (FileDialog dlg) {
+    private void Begin (FileDialog dlg)
+    {
         dlg.BeginInit ();
         dlg.EndInit ();
         Application.Begin (dlg);
     }
 
-    private FileDialog GetDialog () => IsWindows () ? GetWindowsDialog () : GetLinuxDialog ();
+    private FileDialog GetDialog () { return IsWindows () ? GetWindowsDialog () : GetLinuxDialog (); }
 
-    private FileDialog GetInitializedFileDialog () {
+    private FileDialog GetInitializedFileDialog ()
+    {
         var dlg = new FileDialog ();
         Begin (dlg);
 
         return dlg;
     }
 
-    private FileDialog GetLinuxDialog () {
+    private FileDialog GetLinuxDialog ()
+    {
         // Arrange
         var fileSystem = new MockFileSystem (new Dictionary<string, MockFileData> (), "/");
         fileSystem.MockTime (() => new DateTime (2010, 01, 01, 11, 12, 43));
 
         fileSystem.AddFile (
-            @"/myfile.txt",
-            new MockFileData ("Testing is meh.") { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) }
-        );
+                            @"/myfile.txt",
+                            new MockFileData ("Testing is meh.") { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) }
+                           );
+
         fileSystem.AddFile (
-            @"/demo/jQuery.js",
-            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
-        );
+                            @"/demo/jQuery.js",
+                            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
+                           );
+
         fileSystem.AddFile (
-            @"/demo/image.gif",
-            new MockFileData (new byte[] { 0x12, 0x34, 0x56, 0xd2 }) {
-                LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10)
-            }
-        );
+                            @"/demo/image.gif",
+                            new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 })
+                            {
+                                LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10)
+                            }
+                           );
 
         var m = (MockDirectoryInfo)fileSystem.DirectoryInfo.New (@"/demo/subfolder");
         m.Create ();
         m.LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10);
 
         fileSystem.AddFile (
-            @"/demo/subfolder/image2.gif",
-            new MockFileData (new byte[] { 0x12, 0x34, 0x56, 0xd2 }) {
-                LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10)
-            }
-        );
+                            @"/demo/subfolder/image2.gif",
+                            new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 })
+                            {
+                                LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10)
+                            }
+                           );
 
         var fd = new FileDialog (fileSystem) { Height = 15, Width = 75 };
         fd.Path = @"/demo/";
@@ -563,40 +611,46 @@ public class FileDialogTests {
         return fd;
     }
 
-    private FileDialog GetWindowsDialog () {
+    private FileDialog GetWindowsDialog ()
+    {
         // Arrange
         var fileSystem = new MockFileSystem (new Dictionary<string, MockFileData> (), @"c:\");
         fileSystem.MockTime (() => new DateTime (2010, 01, 01, 11, 12, 43));
 
         fileSystem.AddFile (
-            @"c:\myfile.txt",
-            new MockFileData ("Testing is meh.") { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) }
-        );
+                            @"c:\myfile.txt",
+                            new MockFileData ("Testing is meh.") { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) }
+                           );
+
         fileSystem.AddFile (
-            @"c:\demo\jQuery.js",
-            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
-        );
+                            @"c:\demo\jQuery.js",
+                            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
+                           );
+
         fileSystem.AddFile (
-            @"c:\demo\mybinary.exe",
-            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
-        );
+                            @"c:\demo\mybinary.exe",
+                            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
+                           );
+
         fileSystem.AddFile (
-            @"c:\demo\image.gif",
-            new MockFileData (new byte[] { 0x12, 0x34, 0x56, 0xd2 }) {
-                LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10)
-            }
-        );
+                            @"c:\demo\image.gif",
+                            new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 })
+                            {
+                                LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10)
+                            }
+                           );
 
         var m = (MockDirectoryInfo)fileSystem.DirectoryInfo.New (@"c:\demo\subfolder");
         m.Create ();
         m.LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10);
 
         fileSystem.AddFile (
-            @"c:\demo\subfolder\image2.gif",
-            new MockFileData (new byte[] { 0x12, 0x34, 0x56, 0xd2 }) {
-                LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10)
-            }
-        );
+                            @"c:\demo\subfolder\image2.gif",
+                            new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 })
+                            {
+                                LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10)
+                            }
+                           );
 
         var fd = new FileDialog (fileSystem) { Height = 15, Width = 75 };
         fd.Path = @"c:\demo\";
@@ -634,22 +688,29 @@ public class FileDialogTests {
                 Assert.Equal (@"/bob/fish", tb.Text);
             }*/
 
-    private bool IsWindows () => RuntimeInformation.IsOSPlatform (OSPlatform.Windows);
+    private bool IsWindows () { return RuntimeInformation.IsOSPlatform (OSPlatform.Windows); }
 
-    private void Send (char ch, ConsoleKey ck, bool shift = false, bool alt = false, bool control = false) {
+    private void Send (char ch, ConsoleKey ck, bool shift = false, bool alt = false, bool control = false)
+    {
         Application.Driver.SendKeys (ch, ck, shift, alt, control);
     }
 
-    private void Send (string chars) {
-        foreach (char ch in chars) {
+    private void Send (string chars)
+    {
+        foreach (char ch in chars)
+        {
             Application.Driver.SendKeys (ch, ConsoleKey.NoName, false, false, false);
         }
     }
 
-    private void SendSlash () {
-        if (Path.DirectorySeparatorChar == '/') {
+    private void SendSlash ()
+    {
+        if (Path.DirectorySeparatorChar == '/')
+        {
             Send ('/', ConsoleKey.Separator);
-        } else {
+        }
+        else
+        {
             Send ('\\', ConsoleKey.Separator);
         }
     }

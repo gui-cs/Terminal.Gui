@@ -2,12 +2,14 @@
 
 namespace Terminal.Gui.DriverTests;
 
-public class KeyCodeTests {
-    public KeyCodeTests (ITestOutputHelper output) { _output = output; }
+public class KeyCodeTests
+{
     private readonly ITestOutputHelper _output;
+    public KeyCodeTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
-    public void Key_Enum_Ambiguity_Check () {
+    public void Key_Enum_Ambiguity_Check ()
+    {
         KeyCode key = KeyCode.Y | KeyCode.CtrlMask;
 
         // This will not be well compared.
@@ -18,7 +20,9 @@ public class KeyCodeTests {
 
         // This will be well compared, because the Key.CtrlMask have a high value.
         Assert.False (key == Application.QuitKey);
-        switch (key) {
+
+        switch (key)
+        {
             case KeyCode.Q | KeyCode.CtrlMask:
                 // Never goes here.
                 break;
@@ -30,7 +34,8 @@ public class KeyCodeTests {
     }
 
     [Fact]
-    public void Key_ToString () {
+    public void Key_ToString ()
+    {
         KeyCode k = KeyCode.Y | KeyCode.CtrlMask;
         Assert.Equal ("Y, CtrlMask", k.ToString ());
 
@@ -55,7 +60,8 @@ public class KeyCodeTests {
     }
 
     [Fact]
-    public void KeyEnum_ShouldHaveCorrectValues () {
+    public void KeyEnum_ShouldHaveCorrectValues ()
+    {
         Assert.Equal (0, (int)KeyCode.Null);
         Assert.Equal (8, (int)KeyCode.Backspace);
         Assert.Equal (9, (int)KeyCode.Tab);
@@ -64,7 +70,8 @@ public class KeyCodeTests {
     }
 
     [Fact]
-    public void SimpleEnum_And_FlagedEnum () {
+    public void SimpleEnum_And_FlagedEnum ()
+    {
         SimpleEnum simple = SimpleEnum.Three | SimpleEnum.Five;
 
         // Nothing will not be well compared here.
@@ -109,7 +116,8 @@ public class KeyCodeTests {
     }
 
     [Fact]
-    public void SimpleHighValueEnum_And_FlaggedHighValueEnum () {
+    public void SimpleHighValueEnum_And_FlaggedHighValueEnum ()
+    {
         SimpleHighValueEnum simple = SimpleHighValueEnum.Three | SimpleHighValueEnum.Last;
 
         // This will not be well compared.
@@ -149,9 +157,9 @@ public class KeyCodeTests {
 
         // This will be well compared, because the SimpleHighValueEnum.Last have a high value.
         Assert.Equal (
-            FlaggedHighValueEnum.Three | FlaggedHighValueEnum.Last,
-            flagged
-        ); // As it is flagged shows as bitwise.
+                      FlaggedHighValueEnum.Three | FlaggedHighValueEnum.Last,
+                      flagged
+                     ); // As it is flagged shows as bitwise.
         Assert.Equal ("Three, Last", flagged.ToString ()); // As it is flagged shows as bitwise.
         Assert.False (flagged == (FlaggedHighValueEnum.Zero | FlaggedHighValueEnum.Last));
         Assert.False (flagged == (FlaggedHighValueEnum.One | FlaggedHighValueEnum.Last));
@@ -161,7 +169,8 @@ public class KeyCodeTests {
     }
 
     [Flags]
-    private enum FlaggedEnum {
+    private enum FlaggedEnum
+    {
         Zero,
         One,
         Two,
@@ -171,7 +180,8 @@ public class KeyCodeTests {
     }
 
     [Flags]
-    private enum FlaggedHighValueEnum {
+    private enum FlaggedHighValueEnum
+    {
         Zero,
         One,
         Two,
@@ -180,7 +190,8 @@ public class KeyCodeTests {
         Last = 0x40000000
     }
 
-    private enum SimpleEnum {
+    private enum SimpleEnum
+    {
         Zero,
         One,
         Two,
@@ -189,7 +200,8 @@ public class KeyCodeTests {
         Five
     }
 
-    private enum SimpleHighValueEnum {
+    private enum SimpleHighValueEnum
+    {
         Zero,
         One,
         Two,

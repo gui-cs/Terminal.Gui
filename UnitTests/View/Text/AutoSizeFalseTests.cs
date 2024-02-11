@@ -3,31 +3,39 @@
 namespace Terminal.Gui.ViewTests;
 
 /// <summary>Tests of the  <see cref="View.Text"/> property with <see cref="View.AutoSize"/> set to false.</summary>
-public class AutoSizeFalseTests {
-    public AutoSizeFalseTests (ITestOutputHelper output) { _output = output; }
+public class AutoSizeFalseTests
+{
     private readonly ITestOutputHelper _output;
+    public AutoSizeFalseTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
-    public void AutoSize_False_Equal_Before_And_After_IsInitialized_With_Different_Orders () {
+    public void AutoSize_False_Equal_Before_And_After_IsInitialized_With_Different_Orders ()
+    {
         var top = new View { Height = 25, Width = 80 };
         var view1 = new View { Text = "Say Hello view1 你", AutoSize = false, Width = 10, Height = 5 };
         var view2 = new View { Text = "Say Hello view2 你", AutoSize = false, Width = 10, Height = 5 };
         var view3 = new View { AutoSize = false, Width = 10, Height = 5, Text = "Say Hello view3 你" };
-        var view4 = new View {
+
+        var view4 = new View
+        {
             Text = "Say Hello view4 你",
             AutoSize = false,
             Width = 10,
             Height = 5,
             TextDirection = TextDirection.TopBottom_LeftRight
         };
-        var view5 = new View {
+
+        var view5 = new View
+        {
             Text = "Say Hello view5 你",
             AutoSize = false,
             Width = 10,
             Height = 5,
             TextDirection = TextDirection.TopBottom_LeftRight
         };
-        var view6 = new View {
+
+        var view6 = new View
+        {
             AutoSize = false,
             Width = 10,
             Height = 5,
@@ -101,7 +109,8 @@ public class AutoSizeFalseTests {
     }
 
     [Fact]
-    public void AutoSize_False_If_Text_Empty () {
+    public void AutoSize_False_If_Text_Empty ()
+    {
         var view1 = new View ();
         var view3 = new View { Text = "" };
 
@@ -112,7 +121,8 @@ public class AutoSizeFalseTests {
     }
 
     [Fact]
-    public void AutoSize_False_If_Text_Is_Not_Empty () {
+    public void AutoSize_False_If_Text_Is_Not_Empty ()
+    {
         var view1 = new View ();
         view1.Text = "Hello World";
         var view3 = new View { Text = "Hello World" };
@@ -124,7 +134,8 @@ public class AutoSizeFalseTests {
     }
 
     [Fact]
-    public void AutoSize_False_ResizeView_Is_Always_False () {
+    public void AutoSize_False_ResizeView_Is_Always_False ()
+    {
         var super = new View ();
         var view = new View ();
         super.Add (view);
@@ -138,7 +149,8 @@ public class AutoSizeFalseTests {
     }
 
     [Fact]
-    public void AutoSize_False_ResizeView_With_Dim_Fill_After_IsInitialized () {
+    public void AutoSize_False_ResizeView_With_Dim_Fill_After_IsInitialized ()
+    {
         var super = new View { Frame = new Rect (0, 0, 30, 80) };
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
         super.Add (view);
@@ -161,7 +173,8 @@ public class AutoSizeFalseTests {
 
     [Fact]
     [SetupFakeDriver]
-    public void AutoSize_False_Setting_AutoSize_False_Keeps_Dims () {
+    public void AutoSize_False_Setting_AutoSize_False_Keeps_Dims ()
+    {
         var super = new View { Width = 10, Height = 10 };
         var view = new View ();
         view.Width = 2;
@@ -197,7 +210,8 @@ public class AutoSizeFalseTests {
     }
 
     [Fact]
-    public void AutoSize_False_Text_Does_Not_Change_Size () {
+    public void AutoSize_False_Text_Does_Not_Change_Size ()
+    {
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
 
         view.SetRelativeLayout (new Rect (0, 0, 10, 4));
@@ -208,7 +222,7 @@ public class AutoSizeFalseTests {
         Assert.Equal (string.Empty, view.TextFormatter.Format ()); // There's no size, so it returns an empty string
         Assert.False (view.TextFormatter.NeedsFormat);
         Assert.Single (view.TextFormatter.GetLines ());
-        Assert.True (string.IsNullOrEmpty (view.TextFormatter.GetLines ()[0]));
+        Assert.True (string.IsNullOrEmpty (view.TextFormatter.GetLines () [0]));
 
         view.Text = "Views";
         Assert.True (view.TextFormatter.NeedsFormat);
@@ -216,12 +230,13 @@ public class AutoSizeFalseTests {
         Assert.Equal (string.Empty, view.TextFormatter.Format ()); // There's no size, so it returns an empty string
         Assert.False (view.TextFormatter.NeedsFormat);
         Assert.Single (view.TextFormatter.GetLines ());
-        Assert.True (string.IsNullOrEmpty (view.TextFormatter.GetLines ()[0]));
+        Assert.True (string.IsNullOrEmpty (view.TextFormatter.GetLines () [0]));
     }
 
     [Fact]
     [SetupFakeDriver]
-    public void AutoSize_False_View_IsEmpty_False_Return_Null_Lines () {
+    public void AutoSize_False_View_IsEmpty_False_Return_Null_Lines ()
+    {
         var text = "Views";
         var view = new View { Width = Dim.Fill () - text.Length, Height = 1, Text = text };
         var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
@@ -242,6 +257,7 @@ public class AutoSizeFalseTests {
         frame.LayoutSubviews ();
         frame.Clear ();
         frame.Draw ();
+
         var expected = @"
 ┌────────┐
 │Vie     │
@@ -263,6 +279,7 @@ public class AutoSizeFalseTests {
         Assert.Equal (new Rect (0, 0, 0, 1), view.Frame);
         Assert.Equal (new Size (0, 1), view.TextFormatter.Size);
         Assert.Equal (new List<string> { string.Empty }, view.TextFormatter.GetLines ());
+
         expected = @"
 ┌────────┐
 │        │
@@ -276,7 +293,8 @@ public class AutoSizeFalseTests {
 
     [Fact]
     [SetupFakeDriver]
-    public void AutoSize_False_Width_Height_SetMinWidthHeight_Narrow_Wide_Runes () {
+    public void AutoSize_False_Width_Height_SetMinWidthHeight_Narrow_Wide_Runes ()
+    {
         ((FakeDriver)Application.Driver).SetBufferSize (32, 32);
         var top = new View { Width = 32, Height = 32 };
 
@@ -286,7 +304,8 @@ public class AutoSizeFalseTests {
         // Autosize is off, so we have to explicitly set TextFormatter.Size
         horizontalView.TextFormatter.Size = new Size (20, 1);
 
-        var verticalView = new View {
+        var verticalView = new View
+        {
             Y = 3,
             Height = 20,
             Width = 1,
@@ -358,6 +377,7 @@ public class AutoSizeFalseTests {
 
         top.Draw ();
         Assert.Equal (new Rect (0, 3, 2, 20), verticalView.Frame);
+
         expected = @"
 ┌──────────────────────────────┐
 │First line Second li          │

@@ -4,13 +4,17 @@ using System.Text.Json.Serialization;
 namespace Terminal.Gui;
 
 /// <summary>Implements a JSON converter for <see cref="ColorScheme"/>.</summary>
-internal class ColorSchemeJsonConverter : JsonConverter<ColorScheme> {
+internal class ColorSchemeJsonConverter : JsonConverter<ColorScheme>
+{
     private static ColorSchemeJsonConverter instance;
 
     /// <summary>Singleton</summary>
-    public static ColorSchemeJsonConverter Instance {
-        get {
-            if (instance == null) {
+    public static ColorSchemeJsonConverter Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
                 instance = new ColorSchemeJsonConverter ();
             }
 
@@ -19,8 +23,10 @@ internal class ColorSchemeJsonConverter : JsonConverter<ColorScheme> {
     }
 
     /// <inheritdoc/>
-    public override ColorScheme Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
-        if (reader.TokenType != JsonTokenType.StartObject) {
+    public override ColorScheme Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType != JsonTokenType.StartObject)
+        {
             throw new JsonException ($"Unexpected StartObject token when parsing ColorScheme: {reader.TokenType}.");
         }
 
@@ -30,9 +36,12 @@ internal class ColorSchemeJsonConverter : JsonConverter<ColorScheme> {
         var hotFocus = Attribute.Default;
         var disabled = Attribute.Default;
 
-        while (reader.Read ()) {
-            if (reader.TokenType == JsonTokenType.EndObject) {
-                var colorScheme = new ColorScheme {
+        while (reader.Read ())
+        {
+            if (reader.TokenType == JsonTokenType.EndObject)
+            {
+                var colorScheme = new ColorScheme
+                {
                     Normal = normal,
                     Focus = focus,
                     HotNormal = hotNormal,
@@ -43,7 +52,8 @@ internal class ColorSchemeJsonConverter : JsonConverter<ColorScheme> {
                 return colorScheme;
             }
 
-            if (reader.TokenType != JsonTokenType.PropertyName) {
+            if (reader.TokenType != JsonTokenType.PropertyName)
+            {
                 throw new JsonException ($"Unexpected token when parsing Attribute: {reader.TokenType}.");
             }
 
@@ -51,7 +61,8 @@ internal class ColorSchemeJsonConverter : JsonConverter<ColorScheme> {
             reader.Read ();
             var attribute = JsonSerializer.Deserialize<Attribute> (ref reader, options);
 
-            switch (propertyName.ToLower ()) {
+            switch (propertyName.ToLower ())
+            {
                 case "normal":
                     normal = attribute;
 
@@ -81,7 +92,8 @@ internal class ColorSchemeJsonConverter : JsonConverter<ColorScheme> {
     }
 
     /// <inheritdoc/>
-    public override void Write (Utf8JsonWriter writer, ColorScheme value, JsonSerializerOptions options) {
+    public override void Write (Utf8JsonWriter writer, ColorScheme value, JsonSerializerOptions options)
+    {
         writer.WriteStartObject ();
 
         writer.WritePropertyName ("Normal");

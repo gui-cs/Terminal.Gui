@@ -4,13 +4,17 @@ using System.Text.Json.Serialization;
 namespace Terminal.Gui;
 
 /// <summary>Json converter fro the <see cref="Attribute"/> class.</summary>
-internal class AttributeJsonConverter : JsonConverter<Attribute> {
+internal class AttributeJsonConverter : JsonConverter<Attribute>
+{
     private static AttributeJsonConverter _instance;
 
     /// <summary></summary>
-    public static AttributeJsonConverter Instance {
-        get {
-            if (_instance == null) {
+    public static AttributeJsonConverter Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
                 _instance = new AttributeJsonConverter ();
             }
 
@@ -18,24 +22,31 @@ internal class AttributeJsonConverter : JsonConverter<Attribute> {
         }
     }
 
-    public override Attribute Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
-        if (reader.TokenType != JsonTokenType.StartObject) {
+    public override Attribute Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType != JsonTokenType.StartObject)
+        {
             throw new JsonException ($"Unexpected StartObject token when parsing Attribute: {reader.TokenType}.");
         }
 
         var attribute = new Attribute ();
         Color? foreground = null;
         Color? background = null;
-        while (reader.Read ()) {
-            if (reader.TokenType == JsonTokenType.EndObject) {
-                if (foreground == null || background == null) {
+
+        while (reader.Read ())
+        {
+            if (reader.TokenType == JsonTokenType.EndObject)
+            {
+                if (foreground == null || background == null)
+                {
                     throw new JsonException ("Both Foreground and Background colors must be provided.");
                 }
 
                 return new Attribute (foreground.Value, background.Value);
             }
 
-            if (reader.TokenType != JsonTokenType.PropertyName) {
+            if (reader.TokenType != JsonTokenType.PropertyName)
+            {
                 throw new JsonException ($"Unexpected token when parsing Attribute: {reader.TokenType}.");
             }
 
@@ -43,7 +54,8 @@ internal class AttributeJsonConverter : JsonConverter<Attribute> {
             reader.Read ();
             var color = $"\"{reader.GetString ()}\"";
 
-            switch (propertyName?.ToLower ()) {
+            switch (propertyName?.ToLower ())
+            {
                 case "foreground":
                     foreground = JsonSerializer.Deserialize<Color> (color, options);
 
@@ -83,7 +95,8 @@ internal class AttributeJsonConverter : JsonConverter<Attribute> {
         throw new JsonException ();
     }
 
-    public override void Write (Utf8JsonWriter writer, Attribute value, JsonSerializerOptions options) {
+    public override void Write (Utf8JsonWriter writer, Attribute value, JsonSerializerOptions options)
+    {
         writer.WriteStartObject ();
         writer.WritePropertyName (nameof (Attribute.Foreground));
         ColorJsonConverter.Instance.Write (writer, value.Foreground, options);

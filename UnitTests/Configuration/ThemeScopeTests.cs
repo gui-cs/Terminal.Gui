@@ -3,16 +3,20 @@ using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests;
 
-public class ThemeScopeTests {
-    public static readonly JsonSerializerOptions _jsonOptions = new () {
-        Converters = {
+public class ThemeScopeTests
+{
+    public static readonly JsonSerializerOptions _jsonOptions = new ()
+    {
+        Converters =
+        {
             //new AttributeJsonConverter (),
             //new ColorJsonConverter ()
         }
     };
 
     [Fact]
-    public void AllThemesPresent () {
+    public void AllThemesPresent ()
+    {
         Reset ();
         Assert.True (Themes.ContainsKey ("Default"));
         Assert.True (Themes.ContainsKey ("Dark"));
@@ -21,19 +25,21 @@ public class ThemeScopeTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void Apply_ShouldApplyUpdatedProperties () {
+    public void Apply_ShouldApplyUpdatedProperties ()
+    {
         Reset ();
         Assert.NotEmpty (Themes);
         Assert.Equal (Dialog.ButtonAlignments.Center, Dialog.DefaultButtonAlignment);
 
-        Themes["Default"]["Dialog.DefaultButtonAlignment"].PropertyValue = Dialog.ButtonAlignments.Right;
+        Themes ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue = Dialog.ButtonAlignments.Right;
 
-        ThemeManager.Themes![ThemeManager.SelectedTheme]!.Apply ();
+        ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
         Assert.Equal (Dialog.ButtonAlignments.Right, Dialog.DefaultButtonAlignment);
     }
 
     [Fact]
-    public void GetHardCodedDefaults_ShouldSetProperties () {
+    public void GetHardCodedDefaults_ShouldSetProperties ()
+    {
         Reset ();
         GetHardCodedDefaults ();
         Assert.NotEmpty (Themes);
@@ -41,12 +47,14 @@ public class ThemeScopeTests {
     }
 
     [Fact]
-    public void TestSerialize_RoundTrip () {
+    public void TestSerialize_RoundTrip ()
+    {
         Reset ();
 
         Dictionary<string, ThemeScope> initial = ThemeManager.Themes;
 
         string serialized = JsonSerializer.Serialize<IDictionary<string, ThemeScope>> (Themes, _jsonOptions);
+
         IDictionary<string, ThemeScope> deserialized =
             JsonSerializer.Deserialize<IDictionary<string, ThemeScope>> (serialized, _jsonOptions);
 
@@ -55,7 +63,8 @@ public class ThemeScopeTests {
     }
 
     [Fact]
-    public void ThemeManager_ClassMethodsWork () {
+    public void ThemeManager_ClassMethodsWork ()
+    {
         Reset ();
         Assert.Equal (ThemeManager.Instance, Themes);
         Assert.NotEmpty (ThemeManager.Themes);

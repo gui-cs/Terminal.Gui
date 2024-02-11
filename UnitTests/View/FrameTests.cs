@@ -2,9 +2,10 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class FrameTests {
-    public FrameTests (ITestOutputHelper output) { _output = output; }
+public class FrameTests
+{
     private readonly ITestOutputHelper _output;
+    public FrameTests (ITestOutputHelper output) { _output = output; }
 
     // Test FrameToScreen
     [Theory]
@@ -13,7 +14,8 @@ public class FrameTests {
     [InlineData (0, 1, 0, 1)]
     [InlineData (1, 1, 1, 1)]
     [InlineData (10, 10, 10, 10)]
-    public void FrameToScreen_NoSuperView (int frameX, int frameY, int expectedScreenX, int expectedScreenY) {
+    public void FrameToScreen_NoSuperView (int frameX, int frameY, int expectedScreenX, int expectedScreenY)
+    {
         var view = new View { X = frameX, Y = frameY, Width = 10, Height = 10 };
         var expected = new Rect (expectedScreenX, expectedScreenY, 10, 10);
         Rect actual = view.FrameToScreen ();
@@ -34,7 +36,8 @@ public class FrameTests {
         int frameY,
         int expectedScreenX,
         int expectedScreenY
-    ) {
+    )
+    {
         var super = new View { X = superOffset, Y = superOffset, Width = 20, Height = 20 };
 
         var view = new View { X = frameX, Y = frameY, Width = 10, Height = 10 };

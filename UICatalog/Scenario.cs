@@ -24,28 +24,19 @@ namespace UICatalog;
 ///             </item>
 ///             <item>
 ///                 <description>
-///                     Add one or more <see cref="Scenario.ScenarioCategory"/> attributes to the class specifying which
-///                     categories the scenario belongs to. If you don't specify a category the scenario will show up in
-///                     "_All".
+///                     Add one or more <see cref="Scenario.ScenarioCategory"/> attributes to the class specifying which categories the scenario belongs to. If you don't specify a category the scenario will show up in "_All".
 ///                 </description>
 ///             </item>
 ///             <item>
-///                 <description>
-///                     Implement the <see cref="Setup"/> override which will be called when a user selects the
-///                     scenario to run.
-///                 </description>
+///                 <description>Implement the <see cref="Setup"/> override which will be called when a user selects the scenario to run.</description>
 ///             </item>
 ///             <item>
-///                 <description>
-///                     Optionally, implement the <see cref="Init()"/> and/or <see cref="Run"/> overrides to
-///                     provide a custom implementation.
-///                 </description>
+///                 <description>Optionally, implement the <see cref="Init()"/> and/or <see cref="Run"/> overrides to provide a custom implementation.</description>
 ///             </item>
 ///         </list>
 ///     </para>
 ///     <para>
-///         The UI Catalog program uses reflection to find all scenarios and adds them to the ListViews. Press ENTER to run
-///         the selected scenario. Press the default quit key to quit.	/
+///         The UI Catalog program uses reflection to find all scenarios and adds them to the ListViews. Press ENTER to run the selected scenario. Press the default quit key to quit.	/
 ///     </para>
 /// </summary>
 /// <example>
@@ -70,19 +61,20 @@ namespace UICatalog;
 /// }
 /// </code>
 /// </example>
-public class Scenario : IDisposable {
+public class Scenario : IDisposable
+{
     private static int _maxScenarioNameLen = 30;
     private bool _disposedValue;
     public string Theme = "Default";
     public string TopLevelColorScheme = "Base";
 
     /// <summary>
-    ///     The Window for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/> in most
-    ///     cases.
+    ///     The Window for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/> in most cases.
     /// </summary>
     public Window Win { get; set; }
 
-    public void Dispose () {
+    public void Dispose ()
+    {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose (true);
         GC.SuppressFinalize (this);
@@ -93,28 +85,31 @@ public class Scenario : IDisposable {
     ///     <see cref="ScenarioCategory"/>)
     /// </summary>
     /// <returns>list of category names</returns>
-    public List<string> GetCategories () => ScenarioCategory.GetCategories (GetType ());
+    public List<string> GetCategories () { return ScenarioCategory.GetCategories (GetType ()); }
 
     /// <summary>Helper to get the <see cref="Scenario"/> Description (defined in <see cref="ScenarioMetadata"/>)</summary>
     /// <returns></returns>
-    public string GetDescription () => ScenarioMetadata.GetDescription (GetType ());
+    public string GetDescription () { return ScenarioMetadata.GetDescription (GetType ()); }
 
     /// <summary>Helper to get the <see cref="Scenario"/> Name (defined in <see cref="ScenarioMetadata"/>)</summary>
     /// <returns></returns>
-    public string GetName () => ScenarioMetadata.GetName (GetType ());
+    public string GetName () { return ScenarioMetadata.GetName (GetType ()); }
 
     /// <summary>
     ///     Returns a list of all <see cref="Scenario"/> instanaces defined in the project, sorted by
-    ///     <see cref="ScenarioMetadata.Name"/>.
-    ///     https://stackoverflow.com/questions/5411694/get-all-inherited-classes-of-an-abstract-class
+    ///     <see cref="ScenarioMetadata.Name"/>. https://stackoverflow.com/questions/5411694/get-all-inherited-classes-of-an-abstract-class
     /// </summary>
-    public static List<Scenario> GetScenarios () {
+    public static List<Scenario> GetScenarios ()
+    {
         List<Scenario> objects = new ();
+
         foreach (Type type in typeof (Scenario).Assembly.ExportedTypes
-                     .Where (
-                         myType => myType.IsClass && !myType.IsAbstract
-                                                  && myType.IsSubclassOf (typeof (Scenario))
-                     )) {
+                                               .Where (
+                                                       myType => myType.IsClass
+                                                                 && !myType.IsAbstract
+                                                                 && myType.IsSubclassOf (typeof (Scenario))
+                                                      ))
+        {
             var scenario = (Scenario)Activator.CreateInstance (type);
             objects.Add (scenario);
             _maxScenarioNameLen = Math.Max (_maxScenarioNameLen, scenario.GetName ().Length + 1);
@@ -124,9 +119,9 @@ public class Scenario : IDisposable {
     }
 
     /// <summary>
-    ///     Helper that provides the default <see cref="Terminal.Gui.Window"/> implementation with a frame and label showing
-    ///     the name of the <see cref="Scenario"/> and logic to exit back to the Scenario picker UI. Override
-    ///     <see cref="Init"/> to provide any <see cref="Terminal.Gui.Toplevel"/> behavior needed.
+    ///     Helper that provides the default <see cref="Terminal.Gui.Window"/> implementation with a frame and label showing the name of the
+    ///     <see cref="Scenario"/> and logic to exit back to the Scenario picker UI. Override <see cref="Init"/> to provide any
+    ///     <see cref="Terminal.Gui.Toplevel"/> behavior needed.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -134,23 +129,24 @@ public class Scenario : IDisposable {
     ///         <see cref="Win"/> and adds it to <see cref="Application.Top"/>.
     ///     </para>
     ///     <para>
-    ///         Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Init"/> before creating
-    ///         any views or calling other Terminal.Gui APIs.
+    ///         Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Init"/> before creating any views or calling other Terminal.Gui APIs.
     ///     </para>
     /// </remarks>
-    public virtual void Init () {
+    public virtual void Init ()
+    {
         Application.Init ();
 
         ConfigurationManager.Themes.Theme = Theme;
         ConfigurationManager.Apply ();
 
-        Win = new Window {
+        Win = new Window
+        {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
             X = 0,
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            ColorScheme = Colors.ColorSchemes[TopLevelColorScheme]
+            ColorScheme = Colors.ColorSchemes [TopLevelColorScheme]
         };
         Application.Top.Add (Win);
     }
@@ -162,11 +158,9 @@ public class Scenario : IDisposable {
     ///     Runs the <see cref="Scenario"/>. Override to start the <see cref="Scenario"/> using a <see cref="Toplevel"/>
     ///     different than `Top`.
     /// </summary>
-    /// <remarks>
-    ///     Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Shutdown"/> before
-    ///     returning.
-    /// </remarks>
-    public virtual void Run () {
+    /// <remarks>Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Shutdown"/> before returning.</remarks>
+    public virtual void Run ()
+    {
         // Must explicit call Application.Shutdown method to shutdown.
         Application.Run (Application.Top);
     }
@@ -177,11 +171,14 @@ public class Scenario : IDisposable {
 
     /// <summary>Gets the Scenario Name + Description with the Description padded based on the longest known Scenario name.</summary>
     /// <returns></returns>
-    public override string ToString () => $"{GetName ().PadRight (_maxScenarioNameLen)}{GetDescription ()}";
+    public override string ToString () { return $"{GetName ().PadRight (_maxScenarioNameLen)}{GetDescription ()}"; }
 
-    protected virtual void Dispose (bool disposing) {
-        if (!_disposedValue) {
-            if (disposing) {
+    protected virtual void Dispose (bool disposing)
+    {
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
                 // TODO: dispose managed state (managed objects)
             }
 
@@ -192,17 +189,22 @@ public class Scenario : IDisposable {
     }
 
     /// <summary>Returns a list of all Categories set by all of the <see cref="Scenario"/>s defined in the project.</summary>
-    internal static List<string> GetAllCategories () {
+    internal static List<string> GetAllCategories ()
+    {
         List<string> categories = new ();
+
         foreach (Type type in typeof (Scenario).Assembly.GetTypes ()
-                     .Where (
-                         myType => myType.IsClass && !myType.IsAbstract
-                                                  && myType.IsSubclassOf (typeof (Scenario))
-                     )) {
+                                               .Where (
+                                                       myType => myType.IsClass
+                                                                 && !myType.IsAbstract
+                                                                 && myType.IsSubclassOf (typeof (Scenario))
+                                                      ))
+        {
             List<System.Attribute> attrs = System.Attribute.GetCustomAttributes (type).ToList ();
+
             categories = categories
-                .Union (attrs.Where (a => a is ScenarioCategory).Select (a => ((ScenarioCategory)a).Name))
-                .ToList ();
+                         .Union (attrs.Where (a => a is ScenarioCategory).Select (a => ((ScenarioCategory)a).Name))
+                         .ToList ();
         }
 
         // Sort
@@ -216,7 +218,8 @@ public class Scenario : IDisposable {
 
     /// <summary>Defines the category names used to catagorize a <see cref="Scenario"/></summary>
     [AttributeUsage (AttributeTargets.Class, AllowMultiple = true)]
-    public class ScenarioCategory : System.Attribute {
+    public class ScenarioCategory : System.Attribute
+    {
         public ScenarioCategory (string Name) { this.Name = Name; }
 
         /// <summary>Category Name</summary>
@@ -225,24 +228,27 @@ public class Scenario : IDisposable {
         /// <summary>Static helper function to get the <see cref="Scenario"/> Categories given a Type</summary>
         /// <param name="t"></param>
         /// <returns>list of category names</returns>
-        public static List<string> GetCategories (Type t) {
+        public static List<string> GetCategories (Type t)
+        {
             return GetCustomAttributes (t)
-                .ToList ()
-                .Where (a => a is ScenarioCategory)
-                .Select (a => ((ScenarioCategory)a).Name)
-                .ToList ();
+                   .ToList ()
+                   .Where (a => a is ScenarioCategory)
+                   .Select (a => ((ScenarioCategory)a).Name)
+                   .ToList ();
         }
 
         /// <summary>Static helper function to get the <see cref="Scenario"/> Name given a Type</summary>
         /// <param name="t"></param>
         /// <returns>Name of the category</returns>
-        public static string GetName (Type t) => ((ScenarioCategory)GetCustomAttributes (t)[0]).Name;
+        public static string GetName (Type t) { return ((ScenarioCategory)GetCustomAttributes (t) [0]).Name; }
     }
 
     /// <summary>Defines the metadata (Name and Description) for a <see cref="Scenario"/></summary>
     [AttributeUsage (AttributeTargets.Class)]
-    public class ScenarioMetadata : System.Attribute {
-        public ScenarioMetadata (string Name, string Description) {
+    public class ScenarioMetadata : System.Attribute
+    {
+        public ScenarioMetadata (string Name, string Description)
+        {
             this.Name = Name;
             this.Description = Description;
         }
@@ -256,11 +262,11 @@ public class Scenario : IDisposable {
         /// <summary>Static helper function to get the <see cref="Scenario"/> Description given a Type</summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static string GetDescription (Type t) => ((ScenarioMetadata)GetCustomAttributes (t)[0]).Description;
+        public static string GetDescription (Type t) { return ((ScenarioMetadata)GetCustomAttributes (t) [0]).Description; }
 
         /// <summary>Static helper function to get the <see cref="Scenario"/> Name given a Type</summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static string GetName (Type t) => ((ScenarioMetadata)GetCustomAttributes (t)[0]).Name;
+        public static string GetName (Type t) { return ((ScenarioMetadata)GetCustomAttributes (t) [0]).Name; }
     }
 }

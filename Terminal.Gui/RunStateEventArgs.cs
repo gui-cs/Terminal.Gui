@@ -1,7 +1,8 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>Event arguments for events about <see cref="RunState"/></summary>
-public class RunStateEventArgs : EventArgs {
+public class RunStateEventArgs : EventArgs
+{
     /// <summary>Creates a new instance of the <see cref="RunStateEventArgs"/> class</summary>
     /// <param name="state"></param>
     public RunStateEventArgs (RunState state) { State = state; }

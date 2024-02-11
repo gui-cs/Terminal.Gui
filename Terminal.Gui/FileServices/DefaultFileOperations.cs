@@ -4,11 +4,14 @@ using Terminal.Gui.Resources;
 namespace Terminal.Gui;
 
 /// <summary>Default file operation handlers using modal dialogs.</summary>
-public class DefaultFileOperations : IFileOperations {
+public class DefaultFileOperations : IFileOperations
+{
     /// <inheritdoc/>
-    public bool Delete (IEnumerable<IFileSystemInfo> toDelete) {
+    public bool Delete (IEnumerable<IFileSystemInfo> toDelete)
+    {
         // Default implementation does not allow deleting multiple files
-        if (toDelete.Count () != 1) {
+        if (toDelete.Count () != 1)
+        {
             return false;
         }
 
@@ -16,24 +19,30 @@ public class DefaultFileOperations : IFileOperations {
         string adjective = d.Name;
 
         int result = MessageBox.Query (
-            string.Format (Strings.fdDeleteTitle, adjective),
-            string.Format (Strings.fdDeleteBody, adjective),
-            Strings.btnYes,
-            Strings.btnNo
-        );
+                                       string.Format (Strings.fdDeleteTitle, adjective),
+                                       string.Format (Strings.fdDeleteBody, adjective),
+                                       Strings.btnYes,
+                                       Strings.btnNo
+                                      );
 
-        try {
-            if (result == 0) {
-                if (d is IFileInfo) {
+        try
+        {
+            if (result == 0)
+            {
+                if (d is IFileInfo)
+                {
                     d.Delete ();
-                } else {
+                }
+                else
+                {
                     ((IDirectoryInfo)d).Delete (true);
                 }
 
                 return true;
             }
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             MessageBox.ErrorQuery (Strings.fdDeleteFailedTitle, ex.Message, Strings.btnOk);
         }
 
@@ -41,42 +50,51 @@ public class DefaultFileOperations : IFileOperations {
     }
 
     /// <inheritdoc/>
-    public IFileSystemInfo Rename (IFileSystem fileSystem, IFileSystemInfo toRename) {
+    public IFileSystemInfo Rename (IFileSystem fileSystem, IFileSystemInfo toRename)
+    {
         // Don't allow renaming C: or D: or / (on linux) etc
-        if (toRename is IDirectoryInfo dir && dir.Parent == null) {
+        if (toRename is IDirectoryInfo dir && dir.Parent == null)
+        {
             return null;
         }
 
-        if (Prompt (Strings.fdRenameTitle, toRename.Name, out string newName)) {
-            if (!string.IsNullOrWhiteSpace (newName)) {
-                try {
-                    if (toRename is IFileInfo f) {
+        if (Prompt (Strings.fdRenameTitle, toRename.Name, out string newName))
+        {
+            if (!string.IsNullOrWhiteSpace (newName))
+            {
+                try
+                {
+                    if (toRename is IFileInfo f)
+                    {
                         IFileInfo newLocation =
                             fileSystem.FileInfo.New (
-                                Path.Combine (
-                                    f.Directory.FullName,
-                                    newName
-                                )
-                            );
+                                                     Path.Combine (
+                                                                   f.Directory.FullName,
+                                                                   newName
+                                                                  )
+                                                    );
                         f.MoveTo (newLocation.FullName);
 
                         return newLocation;
-                    } else {
+                    }
+                    else
+                    {
                         var d = (IDirectoryInfo)toRename;
 
                         IDirectoryInfo newLocation =
                             fileSystem.DirectoryInfo.New (
-                                Path.Combine (
-                                    d.Parent.FullName,
-                                    newName
-                                )
-                            );
+                                                          Path.Combine (
+                                                                        d.Parent.FullName,
+                                                                        newName
+                                                                       )
+                                                         );
                         d.MoveTo (newLocation.FullName);
 
                         return newLocation;
                     }
                 }
-                catch (Exception ex) {
+                catch (Exception ex)
+                {
                     MessageBox.ErrorQuery (Strings.fdRenameFailedTitle, ex.Message, "Ok");
                 }
             }
@@ -86,19 +104,24 @@ public class DefaultFileOperations : IFileOperations {
     }
 
     /// <inheritdoc/>
-    public IFileSystemInfo New (IFileSystem fileSystem, IDirectoryInfo inDirectory) {
-        if (Prompt (Strings.fdNewTitle, "", out string named)) {
-            if (!string.IsNullOrWhiteSpace (named)) {
-                try {
+    public IFileSystemInfo New (IFileSystem fileSystem, IDirectoryInfo inDirectory)
+    {
+        if (Prompt (Strings.fdNewTitle, "", out string named))
+        {
+            if (!string.IsNullOrWhiteSpace (named))
+            {
+                try
+                {
                     IDirectoryInfo newDir =
                         fileSystem.DirectoryInfo.New (
-                            Path.Combine (inDirectory.FullName, named)
-                        );
+                                                      Path.Combine (inDirectory.FullName, named)
+                                                     );
                     newDir.Create ();
 
                     return newDir;
                 }
-                catch (Exception ex) {
+                catch (Exception ex)
+                {
                     MessageBox.ErrorQuery (Strings.fdNewFailed, ex.Message, "Ok");
                 }
             }
@@ -107,18 +130,23 @@ public class DefaultFileOperations : IFileOperations {
         return null;
     }
 
-    private bool Prompt (string title, string defaultText, out string result) {
+    private bool Prompt (string title, string defaultText, out string result)
+    {
         var confirm = false;
         var btnOk = new Button { IsDefault = true, Text = Strings.btnOk };
-        btnOk.Clicked += (s, e) => {
-            confirm = true;
-            Application.RequestStop ();
-        };
+
+        btnOk.Clicked += (s, e) =>
+                         {
+                             confirm = true;
+                             Application.RequestStop ();
+                         };
         var btnCancel = new Button { Text = Strings.btnCancel };
-        btnCancel.Clicked += (s, e) => {
-            confirm = false;
-            Application.RequestStop ();
-        };
+
+        btnCancel.Clicked += (s, e) =>
+                             {
+                                 confirm = false;
+                                 Application.RequestStop ();
+                             };
 
         var lbl = new Label { Text = Strings.fdRenamePrompt };
         var tf = new TextField { X = Pos.Right (lbl), Width = Dim.Fill (), Text = defaultText };

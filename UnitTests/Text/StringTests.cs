@@ -2,9 +2,11 @@
 
 #nullable enable
 
-public class StringTests {
+public class StringTests
+{
     [Fact]
-    public void TestGetColumns_Empty () {
+    public void TestGetColumns_Empty ()
+    {
         var str = string.Empty;
         Assert.Equal (0, str.GetColumns ());
     }
@@ -24,9 +26,7 @@ public class StringTests {
     [Theory]
     [InlineData ("😂", 2)]
     [InlineData ("😂😂", 4)]
-    public void TestGetColumns_MultiRune_NonBMP (string str, int expected) {
-        Assert.Equal (expected, str.GetColumns ());
-    }
+    public void TestGetColumns_MultiRune_NonBMP (string str, int expected) { Assert.Equal (expected, str.GetColumns ()); }
 
     // Test known wide codepoints
     [Theory]
@@ -42,18 +42,18 @@ public class StringTests {
     [InlineData ("山🙂", 4)] // The character for "mountain" in Chinese/Japanese/Korean (山), Unicode U+5C71
     //[InlineData ("\ufe20\ufe21", 2)] // Combining Ligature Left Half ︠ - U+fe20 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
     //				 // Combining Ligature Right Half - U+fe21 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
-    public void TestGetColumns_MultiRune_WideBMP (string str, int expected) {
-        Assert.Equal (expected, str.GetColumns ());
-    }
+    public void TestGetColumns_MultiRune_WideBMP (string str, int expected) { Assert.Equal (expected, str.GetColumns ()); }
 
     [Fact]
-    public void TestGetColumns_Null () {
+    public void TestGetColumns_Null ()
+    {
         string? str = null;
         Assert.Equal (0, str!.GetColumns ());
     }
 
     [Fact]
-    public void TestGetColumns_SingleRune () {
+    public void TestGetColumns_SingleRune ()
+    {
         var str = "a";
         Assert.Equal (1, str.GetColumns ());
     }

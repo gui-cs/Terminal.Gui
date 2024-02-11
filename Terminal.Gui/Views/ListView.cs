@@ -3,7 +3,8 @@ using System.Collections;
 namespace Terminal.Gui;
 
 /// <summary>Implement <see cref="IListDataSource"/> to provide custom rendering for a <see cref="ListView"/>.</summary>
-public interface IListDataSource {
+public interface IListDataSource
+{
     /// <summary>Returns the number of elements to display</summary>
     int Count { get; }
 
@@ -25,10 +26,7 @@ public interface IListDataSource {
     /// <param name="line">The line where the rendering will be done.</param>
     /// <param name="width">The width that must be filled out.</param>
     /// <param name="start">The index of the string to be displayed.</param>
-    /// <remarks>
-    ///     The default color will be set before this method is invoked, and will be based on whether the item is selected
-    ///     or not.
-    /// </remarks>
+    /// <remarks>The default color will be set before this method is invoked, and will be based on whether the item is selected or not.</remarks>
     void Render (
         ListView container,
         ConsoleDriver driver,
@@ -50,47 +48,39 @@ public interface IListDataSource {
     IList ToList ();
 }
 
-/// <summary>
-///     ListView <see cref="View"/> renders a scrollable list of data where each item can be activated to perform an
-///     action.
-/// </summary>
+/// <summary>ListView <see cref="View"/> renders a scrollable list of data where each item can be activated to perform an action.</summary>
 /// <remarks>
 ///     <para>
-///         The <see cref="ListView"/> displays lists of data and allows the user to scroll through the data. Items in the
-///         can be activated firing an event (with the ENTER key or a mouse double-click). If the
+///         The <see cref="ListView"/> displays lists of data and allows the user to scroll through the data. Items in the can be activated firing an event (with the ENTER key or a mouse double-click). If the
 ///         <see cref="AllowsMarking"/> property is true, elements of the list can be marked by the user.
 ///     </para>
 ///     <para>
 ///         By default <see cref="ListView"/> uses <see cref="object.ToString"/> to render the items of any
-///         <see cref="IList"/> object (e.g. arrays, <see cref="List{T}"/>, and other collections). Alternatively, an
-///         object that implements <see cref="IListDataSource"/> can be provided giving full control of what is rendered.
+///         <see cref="IList"/> object (e.g. arrays, <see cref="List{T}"/>, and other collections). Alternatively, an object that implements
+///         <see cref="IListDataSource"/> can be provided giving full control of what is rendered.
 ///     </para>
 ///     <para>
 ///         <see cref="ListView"/> can display any object that implements the <see cref="IList"/> interface.
-///         <see cref="string"/> values are converted into <see cref="string"/> values before rendering, and other values
-///         are converted into <see cref="string"/> by calling <see cref="object.ToString"/> and then converting to
-///         <see cref="string"/> .
+///         <see cref="string"/> values are converted into <see cref="string"/> values before rendering, and other values are converted into
+///         <see cref="string"/> by calling <see cref="object.ToString"/> and then converting to <see cref="string"/> .
 ///     </para>
 ///     <para>
-///         To change the contents of the ListView, set the <see cref="Source"/> property (when providing custom rendering
-///         via <see cref="IListDataSource"/>) or call <see cref="SetSource"/> an <see cref="IList"/> is being used.
+///         To change the contents of the ListView, set the <see cref="Source"/> property (when providing custom rendering via
+///         <see cref="IListDataSource"/>) or call <see cref="SetSource"/> an <see cref="IList"/> is being used.
 ///     </para>
 ///     <para>
-///         When <see cref="AllowsMarking"/> is set to true the rendering will prefix the rendered items with [x] or [ ]
-///         and bind the SPACE key to toggle the selection. To implement a different marking style set
+///         When <see cref="AllowsMarking"/> is set to true the rendering will prefix the rendered items with [x] or [ ] and bind the SPACE key to toggle the selection. To implement a different marking style set
 ///         <see cref="AllowsMarking"/> to false and implement custom rendering.
 ///     </para>
 ///     <para>
-///         Searching the ListView with the keyboard is supported. Users type the first characters of an item, and the
-///         first item that starts with what the user types will be selected.
+///         Searching the ListView with the keyboard is supported. Users type the first characters of an item, and the first item that starts with what the user types will be selected.
 ///     </para>
 /// </remarks>
-public class ListView : View {
-    /// <summary>
-    ///     Initializes a new instance of <see cref="ListView"/>. Set the <see cref="Source"/> property to display
-    ///     something.
-    /// </summary>
-    public ListView () {
+public class ListView : View
+{
+    /// <summary>Initializes a new instance of <see cref="ListView"/>. Set the <see cref="Source"/> property to display something.</summary>
+    public ListView ()
+    {
         CanFocus = true;
 
         // Things this view knows how to do
@@ -126,24 +116,30 @@ public class ListView : View {
 
     private bool _allowsMarking;
     private bool _allowsMultipleSelection = true;
-    private IListDataSource _source;
     private int _lastSelectedItem = -1;
     private int _selected = -1;
+    private IListDataSource _source;
     private int _top, _left;
 
     /// <summary>Gets or sets whether this <see cref="ListView"/> allows items to be marked.</summary>
     /// <value>Set to <see langword="true"/> to allow marking elements of the list.</value>
     /// <remarks>
-    ///     If set to <see langword="true"/>, <see cref="ListView"/> will render items marked items with "[x]", and unmarked
-    ///     items with "[ ]" spaces. SPACE key will toggle marking. The default is <see langword="false"/>.
+    ///     If set to <see langword="true"/>, <see cref="ListView"/> will render items marked items with "[x]", and unmarked items with "[ ]" spaces. SPACE key will toggle marking. The default is
+    ///     <see langword="false"/>.
     /// </remarks>
-    public bool AllowsMarking {
+    public bool AllowsMarking
+    {
         get => _allowsMarking;
-        set {
+        set
+        {
             _allowsMarking = value;
-            if (_allowsMarking) {
+
+            if (_allowsMarking)
+            {
                 KeyBindings.Add (KeyCode.Space, Command.ToggleChecked);
-            } else {
+            }
+            else
+            {
                 KeyBindings.Remove (KeyCode.Space);
             }
 
@@ -152,17 +148,23 @@ public class ListView : View {
     }
 
     /// <summary>
-    ///     If set to <see langword="true"/> more than one item can be selected. If <see langword="false"/> selecting an item
-    ///     will cause all others to be un-selected. The default is <see langword="false"/>.
+    ///     If set to <see langword="true"/> more than one item can be selected. If <see langword="false"/> selecting an item will cause all others to be un-selected. The default is
+    ///     <see langword="false"/>.
     /// </summary>
-    public bool AllowsMultipleSelection {
+    public bool AllowsMultipleSelection
+    {
         get => _allowsMultipleSelection;
-        set {
+        set
+        {
             _allowsMultipleSelection = value;
-            if (Source != null && !_allowsMultipleSelection) {
+
+            if (Source != null && !_allowsMultipleSelection)
+            {
                 // Clear all selections except selected 
-                for (var i = 0; i < Source.Count; i++) {
-                    if (Source.IsMarked (i) && i != _selected) {
+                for (var i = 0; i < Source.Count; i++)
+                {
+                    if (Source.IsMarked (i) && i != _selected)
+                    {
                         Source.SetMark (i, false);
                     }
                 }
@@ -173,36 +175,24 @@ public class ListView : View {
     }
 
     /// <summary>
-    ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="ListView.Source"/> collection as the user
-    ///     types.
+    ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="ListView.Source"/> collection as the user types.
     /// </summary>
     public CollectionNavigator KeystrokeNavigator { get; } = new ();
 
-    /// <summary>Gets or sets the <see cref="IListDataSource"/> backing this <see cref="ListView"/>, enabling custom rendering.</summary>
-    /// <value>The source.</value>
-    /// <remarks>Use <see cref="SetSource"/> to set a new <see cref="IList"/> source.</remarks>
-    public IListDataSource Source {
-        get => _source;
-        set {
-            _source = value;
-            KeystrokeNavigator.Collection = _source?.ToList ();
-            _top = 0;
-            _selected = -1;
-            _lastSelectedItem = -1;
-            SetNeedsDisplay ();
-        }
-    }
-
     /// <summary>Gets or sets the leftmost column that is currently visible (when scrolling horizontally).</summary>
     /// <value>The left position.</value>
-    public int LeftItem {
+    public int LeftItem
+    {
         get => _left;
-        set {
-            if (_source == null) {
+        set
+        {
+            if (_source == null)
+            {
                 return;
             }
 
-            if (value < 0 || (MaxLength > 0 && value >= MaxLength)) {
+            if (value < 0 || (MaxLength > 0 && value >= MaxLength))
+            {
                 throw new ArgumentException ("value");
             }
 
@@ -216,14 +206,18 @@ public class ListView : View {
 
     /// <summary>Gets or sets the index of the currently selected item.</summary>
     /// <value>The selected item.</value>
-    public int SelectedItem {
+    public int SelectedItem
+    {
         get => _selected;
-        set {
-            if (_source == null || _source.Count == 0) {
+        set
+        {
+            if (_source == null || _source.Count == 0)
+            {
                 return;
             }
 
-            if (value < -1 || value >= _source.Count) {
+            if (value < -1 || value >= _source.Count)
+            {
                 throw new ArgumentException ("value");
             }
 
@@ -232,16 +226,37 @@ public class ListView : View {
         }
     }
 
+    /// <summary>Gets or sets the <see cref="IListDataSource"/> backing this <see cref="ListView"/>, enabling custom rendering.</summary>
+    /// <value>The source.</value>
+    /// <remarks>Use <see cref="SetSource"/> to set a new <see cref="IList"/> source.</remarks>
+    public IListDataSource Source
+    {
+        get => _source;
+        set
+        {
+            _source = value;
+            KeystrokeNavigator.Collection = _source?.ToList ();
+            _top = 0;
+            _selected = -1;
+            _lastSelectedItem = -1;
+            SetNeedsDisplay ();
+        }
+    }
+
     /// <summary>Gets or sets the item that is displayed at the top of the <see cref="ListView"/>.</summary>
     /// <value>The top item.</value>
-    public int TopItem {
+    public int TopItem
+    {
         get => _top;
-        set {
-            if (_source == null) {
+        set
+        {
+            if (_source == null)
+            {
                 return;
             }
 
-            if (value < 0 || (_source.Count > 0 && value >= _source.Count)) {
+            if (value < 0 || (_source.Count > 0 && value >= _source.Count))
+            {
                 throw new ArgumentException ("value");
             }
 
@@ -251,18 +266,22 @@ public class ListView : View {
     }
 
     /// <summary>
-    ///     If <see cref="AllowsMarking"/> and <see cref="AllowsMultipleSelection"/> are both <see langword="true"/>, unmarks
-    ///     all marked items other than the currently selected.
+    ///     If <see cref="AllowsMarking"/> and <see cref="AllowsMultipleSelection"/> are both <see langword="true"/>, unmarks all marked items other than the currently selected.
     /// </summary>
     /// <returns><see langword="true"/> if unmarking was successful.</returns>
-    public virtual bool AllowsAll () {
-        if (!_allowsMarking) {
+    public virtual bool AllowsAll ()
+    {
+        if (!_allowsMarking)
+        {
             return false;
         }
 
-        if (!AllowsMultipleSelection) {
-            for (var i = 0; i < Source.Count; i++) {
-                if (Source.IsMarked (i) && i != _selected) {
+        if (!AllowsMultipleSelection)
+        {
+            for (var i = 0; i < Source.Count; i++)
+            {
+                if (Source.IsMarked (i) && i != _selected)
+                {
                     Source.SetMark (i, false);
 
                     return true;
@@ -274,24 +293,33 @@ public class ListView : View {
     }
 
     /// <summary>Ensures the selected item is always visible on the screen.</summary>
-    public void EnsureSelectedItemVisible () {
-        if (SuperView?.IsInitialized == true) {
-            if (_selected < _top) {
+    public void EnsureSelectedItemVisible ()
+    {
+        if (SuperView?.IsInitialized == true)
+        {
+            if (_selected < _top)
+            {
                 _top = Math.Max (_selected, 0);
-            } else if (Bounds.Height > 0 && _selected >= _top + Bounds.Height) {
+            }
+            else if (Bounds.Height > 0 && _selected >= _top + Bounds.Height)
+            {
                 _top = Math.Max (_selected - Bounds.Height + 1, 0);
             }
 
             LayoutStarted -= ListView_LayoutStarted;
-        } else {
+        }
+        else
+        {
             LayoutStarted += ListView_LayoutStarted;
         }
     }
 
     /// <summary>Marks the <see cref="SelectedItem"/> if it is not already marked.</summary>
     /// <returns><see langword="true"/> if the <see cref="SelectedItem"/> was marked.</returns>
-    public virtual bool MarkUnmarkRow () {
-        if (AllowsAll ()) {
+    public virtual bool MarkUnmarkRow ()
+    {
+        if (AllowsAll ())
+        {
             Source.SetMark (SelectedItem, !Source.IsMarked (SelectedItem));
             SetNeedsDisplay ();
 
@@ -302,41 +330,51 @@ public class ListView : View {
     }
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent me) {
-        if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) &&
-            !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
-            me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp &&
-            me.Flags != MouseFlags.WheeledRight && me.Flags != MouseFlags.WheeledLeft) {
+    public override bool MouseEvent (MouseEvent me)
+    {
+        if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
+            && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
+            && me.Flags != MouseFlags.WheeledDown
+            && me.Flags != MouseFlags.WheeledUp
+            && me.Flags != MouseFlags.WheeledRight
+            && me.Flags != MouseFlags.WheeledLeft)
+        {
             return false;
         }
 
-        if (!HasFocus && CanFocus) {
+        if (!HasFocus && CanFocus)
+        {
             SetFocus ();
         }
 
-        if (_source == null) {
+        if (_source == null)
+        {
             return false;
         }
 
-        if (me.Flags == MouseFlags.WheeledDown) {
+        if (me.Flags == MouseFlags.WheeledDown)
+        {
             ScrollDown (1);
 
             return true;
         }
 
-        if (me.Flags == MouseFlags.WheeledUp) {
+        if (me.Flags == MouseFlags.WheeledUp)
+        {
             ScrollUp (1);
 
             return true;
         }
 
-        if (me.Flags == MouseFlags.WheeledRight) {
+        if (me.Flags == MouseFlags.WheeledRight)
+        {
             ScrollRight (1);
 
             return true;
         }
 
-        if (me.Flags == MouseFlags.WheeledLeft) {
+        if (me.Flags == MouseFlags.WheeledLeft)
+        {
             ScrollLeft (1);
 
             return true;
@@ -344,12 +382,15 @@ public class ListView : View {
 
         if (me.Y + _top >= _source.Count
             || me.Y + _top < 0
-            || me.Y + _top > _top + Bounds.Height) {
+            || me.Y + _top > _top + Bounds.Height)
+        {
             return true;
         }
 
         _selected = _top + me.Y;
-        if (AllowsAll ()) {
+
+        if (AllowsAll ())
+        {
             Source.SetMark (SelectedItem, !Source.IsMarked (SelectedItem));
             SetNeedsDisplay ();
 
@@ -358,7 +399,9 @@ public class ListView : View {
 
         OnSelectedChanged ();
         SetNeedsDisplay ();
-        if (me.Flags == MouseFlags.Button1DoubleClicked) {
+
+        if (me.Flags == MouseFlags.Button1DoubleClicked)
+        {
             OnOpenSelectedItem ();
         }
 
@@ -367,35 +410,47 @@ public class ListView : View {
 
     /// <summary>Changes the <see cref="SelectedItem"/> to the next item in the list, scrolling the list if needed.</summary>
     /// <returns></returns>
-    public virtual bool MoveDown () {
-        if (_source.Count == 0) {
+    public virtual bool MoveDown ()
+    {
+        if (_source.Count == 0)
+        {
             // Do we set lastSelectedItem to -1 here?
             return false; //Nothing for us to move to
         }
 
-        if (_selected >= _source.Count) {
+        if (_selected >= _source.Count)
+        {
             // If for some reason we are currently outside of the
             // valid values range, we should select the bottommost valid value.
             // This can occur if the backing data source changes.
             _selected = _source.Count - 1;
             OnSelectedChanged ();
             SetNeedsDisplay ();
-        } else if (_selected + 1 < _source.Count) {
+        }
+        else if (_selected + 1 < _source.Count)
+        {
             //can move by down by one.
             _selected++;
 
-            if (_selected >= _top + Bounds.Height) {
+            if (_selected >= _top + Bounds.Height)
+            {
                 _top++;
-            } else if (_selected < _top) {
+            }
+            else if (_selected < _top)
+            {
                 _top = Math.Max (_selected, 0);
             }
 
             OnSelectedChanged ();
             SetNeedsDisplay ();
-        } else if (_selected == 0) {
+        }
+        else if (_selected == 0)
+        {
             OnSelectedChanged ();
             SetNeedsDisplay ();
-        } else if (_selected >= _top + Bounds.Height) {
+        }
+        else if (_selected >= _top + Bounds.Height)
+        {
             _top = Math.Max (_source.Count - Bounds.Height, 0);
             SetNeedsDisplay ();
         }
@@ -405,10 +460,14 @@ public class ListView : View {
 
     /// <summary>Changes the <see cref="SelectedItem"/> to last item in the list, scrolling the list if needed.</summary>
     /// <returns></returns>
-    public virtual bool MoveEnd () {
-        if (_source.Count > 0 && _selected != _source.Count - 1) {
+    public virtual bool MoveEnd ()
+    {
+        if (_source.Count > 0 && _selected != _source.Count - 1)
+        {
             _selected = _source.Count - 1;
-            if (_top + _selected > Bounds.Height - 1) {
+
+            if (_top + _selected > Bounds.Height - 1)
+            {
                 _top = Math.Max (_selected, 0);
             }
 
@@ -421,8 +480,10 @@ public class ListView : View {
 
     /// <summary>Changes the <see cref="SelectedItem"/> to the first item in the list, scrolling the list if needed.</summary>
     /// <returns></returns>
-    public virtual bool MoveHome () {
-        if (_selected != 0) {
+    public virtual bool MoveHome ()
+    {
+        if (_selected != 0)
+        {
             _selected = 0;
             _top = Math.Max (_selected, 0);
             OnSelectedChanged ();
@@ -432,22 +493,27 @@ public class ListView : View {
         return true;
     }
 
-    /// <summary>
-    ///     Changes the <see cref="SelectedItem"/> to the item just below the bottom of the visible list, scrolling if
-    ///     needed.
-    /// </summary>
+    /// <summary>Changes the <see cref="SelectedItem"/> to the item just below the bottom of the visible list, scrolling if needed.</summary>
     /// <returns></returns>
-    public virtual bool MovePageDown () {
+    public virtual bool MovePageDown ()
+    {
         int n = _selected + Bounds.Height;
-        if (n >= _source.Count) {
+
+        if (n >= _source.Count)
+        {
             n = _source.Count - 1;
         }
 
-        if (n != _selected) {
+        if (n != _selected)
+        {
             _selected = n;
-            if (_source.Count >= Bounds.Height) {
+
+            if (_source.Count >= Bounds.Height)
+            {
                 _top = Math.Max (_selected, 0);
-            } else {
+            }
+            else
+            {
                 _top = 0;
             }
 
@@ -460,13 +526,17 @@ public class ListView : View {
 
     /// <summary>Changes the <see cref="SelectedItem"/> to the item at the top of the visible list.</summary>
     /// <returns></returns>
-    public virtual bool MovePageUp () {
+    public virtual bool MovePageUp ()
+    {
         int n = _selected - Bounds.Height;
-        if (n < 0) {
+
+        if (n < 0)
+        {
             n = 0;
         }
 
-        if (n != _selected) {
+        if (n != _selected)
+        {
             _selected = n;
             _top = Math.Max (_selected, 0);
             OnSelectedChanged ();
@@ -478,34 +548,46 @@ public class ListView : View {
 
     /// <summary>Changes the <see cref="SelectedItem"/> to the previous item in the list, scrolling the list if needed.</summary>
     /// <returns></returns>
-    public virtual bool MoveUp () {
-        if (_source.Count == 0) {
+    public virtual bool MoveUp ()
+    {
+        if (_source.Count == 0)
+        {
             // Do we set lastSelectedItem to -1 here?
             return false; //Nothing for us to move to
         }
 
-        if (_selected >= _source.Count) {
+        if (_selected >= _source.Count)
+        {
             // If for some reason we are currently outside of the
             // valid values range, we should select the bottommost valid value.
             // This can occur if the backing data source changes.
             _selected = _source.Count - 1;
             OnSelectedChanged ();
             SetNeedsDisplay ();
-        } else if (_selected > 0) {
+        }
+        else if (_selected > 0)
+        {
             _selected--;
-            if (_selected > Source.Count) {
+
+            if (_selected > Source.Count)
+            {
                 _selected = Source.Count - 1;
             }
 
-            if (_selected < _top) {
+            if (_selected < _top)
+            {
                 _top = Math.Max (_selected, 0);
-            } else if (_selected > _top + Bounds.Height) {
+            }
+            else if (_selected > _top + Bounds.Height)
+            {
                 _top = Math.Max (_selected - Bounds.Height + 1, 0);
             }
 
             OnSelectedChanged ();
             SetNeedsDisplay ();
-        } else if (_selected < _top) {
+        }
+        else if (_selected < _top)
+        {
             _top = Math.Max (_selected, 0);
             SetNeedsDisplay ();
         }
@@ -514,7 +596,8 @@ public class ListView : View {
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea) {
+    public override void OnDrawContent (Rect contentArea)
+    {
         base.OnDrawContent (contentArea);
 
         Attribute current = ColorScheme.Focus;
@@ -526,35 +609,45 @@ public class ListView : View {
         int col = _allowsMarking ? 2 : 0;
         int start = _left;
 
-        for (var row = 0; row < f.Height; row++, item++) {
+        for (var row = 0; row < f.Height; row++, item++)
+        {
             bool isSelected = item == _selected;
 
             Attribute newcolor = focused ? isSelected ? ColorScheme.Focus : GetNormalColor () :
                                  isSelected ? ColorScheme.HotNormal : GetNormalColor ();
 
-            if (newcolor != current) {
+            if (newcolor != current)
+            {
                 Driver.SetAttribute (newcolor);
                 current = newcolor;
             }
 
             Move (0, row);
-            if (_source == null || item >= _source.Count) {
-                for (var c = 0; c < f.Width; c++) {
+
+            if (_source == null || item >= _source.Count)
+            {
+                for (var c = 0; c < f.Width; c++)
+                {
                     Driver.AddRune ((Rune)' ');
                 }
-            } else {
+            }
+            else
+            {
                 var rowEventArgs = new ListViewRowEventArgs (item);
                 OnRowRender (rowEventArgs);
-                if (rowEventArgs.RowAttribute != null && current != rowEventArgs.RowAttribute) {
+
+                if (rowEventArgs.RowAttribute != null && current != rowEventArgs.RowAttribute)
+                {
                     current = (Attribute)rowEventArgs.RowAttribute;
                     Driver.SetAttribute (current);
                 }
 
-                if (_allowsMarking) {
+                if (_allowsMarking)
+                {
                     Driver.AddRune (
-                        _source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.Checked : Glyphs.Selected :
-                        AllowsMultipleSelection ? Glyphs.UnChecked : Glyphs.UnSelected
-                    );
+                                    _source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.Checked : Glyphs.Selected :
+                                    AllowsMultipleSelection ? Glyphs.UnChecked : Glyphs.UnSelected
+                                   );
                     Driver.AddRune ((Rune)' ');
                 }
 
@@ -564,12 +657,15 @@ public class ListView : View {
     }
 
     /// <inheritdoc/>
-    public override bool OnEnter (View view) {
-        if (IsInitialized) {
+    public override bool OnEnter (View view)
+    {
+        if (IsInitialized)
+        {
             Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
         }
 
-        if (_lastSelectedItem != _selected) {
+        if (_lastSelectedItem != _selected)
+        {
             EnsureSelectedItemVisible ();
         }
 
@@ -578,12 +674,14 @@ public class ListView : View {
 
     /// <summary>Invokes the <see cref="OpenSelectedItem"/> event if it is defined.</summary>
     /// <returns></returns>
-    public virtual bool OnOpenSelectedItem () {
-        if (_source.Count <= _selected || _selected < 0 || OpenSelectedItem == null) {
+    public virtual bool OnOpenSelectedItem ()
+    {
+        if (_source.Count <= _selected || _selected < 0 || OpenSelectedItem == null)
+        {
             return false;
         }
 
-        object value = _source.ToList ()[_selected];
+        object value = _source.ToList () [_selected];
 
         OpenSelectedItem?.Invoke (this, new ListViewItemEventArgs (_selected, value));
 
@@ -591,11 +689,15 @@ public class ListView : View {
     }
 
     /// <inheritdoc/>
-    public override bool OnProcessKeyDown (Key a) {
+    public override bool OnProcessKeyDown (Key a)
+    {
         // Enable user to find & select an item by typing text
-        if (CollectionNavigatorBase.IsCompatibleKey (a)) {
+        if (CollectionNavigatorBase.IsCompatibleKey (a))
+        {
             int? newItem = KeystrokeNavigator?.GetNextMatchingItem (SelectedItem, (char)a);
-            if (newItem is int && newItem != -1) {
+
+            if (newItem is int && newItem != -1)
+            {
                 SelectedItem = (int)newItem;
                 EnsureSelectedItemVisible ();
                 SetNeedsDisplay ();
@@ -613,9 +715,11 @@ public class ListView : View {
 
     /// <summary>Invokes the <see cref="SelectedItemChanged"/> event if it is defined.</summary>
     /// <returns></returns>
-    public virtual bool OnSelectedChanged () {
-        if (_selected != _lastSelectedItem) {
-            object value = _source?.Count > 0 ? _source.ToList ()[_selected] : null;
+    public virtual bool OnSelectedChanged ()
+    {
+        if (_selected != _lastSelectedItem)
+        {
+            object value = _source?.Count > 0 ? _source.ToList () [_selected] : null;
             SelectedItemChanged?.Invoke (this, new ListViewItemEventArgs (_selected, value));
             _lastSelectedItem = _selected;
             EnsureSelectedItemVisible ();
@@ -630,10 +734,14 @@ public class ListView : View {
     public event EventHandler<ListViewItemEventArgs> OpenSelectedItem;
 
     /// <inheritdoc/>
-    public override void PositionCursor () {
-        if (_allowsMarking) {
+    public override void PositionCursor ()
+    {
+        if (_allowsMarking)
+        {
             Move (0, _selected - _top);
-        } else {
+        }
+        else
+        {
             Move (Bounds.Width - 1, _selected - _top);
         }
     }
@@ -643,7 +751,8 @@ public class ListView : View {
 
     /// <summary>Scrolls the view down by <paramref name="items"/> items.</summary>
     /// <param name="items">Number of items to scroll down.</param>
-    public virtual bool ScrollDown (int items) {
+    public virtual bool ScrollDown (int items)
+    {
         _top = Math.Max (Math.Min (_top + items, _source.Count - 1), 0);
         SetNeedsDisplay ();
 
@@ -652,7 +761,8 @@ public class ListView : View {
 
     /// <summary>Scrolls the view left.</summary>
     /// <param name="cols">Number of columns to scroll left.</param>
-    public virtual bool ScrollLeft (int cols) {
+    public virtual bool ScrollLeft (int cols)
+    {
         _left = Math.Max (_left - cols, 0);
         SetNeedsDisplay ();
 
@@ -661,7 +771,8 @@ public class ListView : View {
 
     /// <summary>Scrolls the view right.</summary>
     /// <param name="cols">Number of columns to scroll right.</param>
-    public virtual bool ScrollRight (int cols) {
+    public virtual bool ScrollRight (int cols)
+    {
         _left = Math.Max (Math.Min (_left + cols, MaxLength - 1), 0);
         SetNeedsDisplay ();
 
@@ -670,7 +781,8 @@ public class ListView : View {
 
     /// <summary>Scrolls the view up by <paramref name="items"/> items.</summary>
     /// <param name="items">Number of items to scroll up.</param>
-    public virtual bool ScrollUp (int items) {
+    public virtual bool ScrollUp (int items)
+    {
         _top = Math.Max (_top - items, 0);
         SetNeedsDisplay ();
 
@@ -682,39 +794,42 @@ public class ListView : View {
 
     /// <summary>Sets the source of the <see cref="ListView"/> to an <see cref="IList"/>.</summary>
     /// <value>An object implementing the IList interface.</value>
-    /// <remarks>
-    ///     Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custome
-    ///     rendering.
-    /// </remarks>
-    public void SetSource (IList source) {
-        if (source == null && (Source == null || !(Source is ListWrapper))) {
+    /// <remarks>Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custome rendering.</remarks>
+    public void SetSource (IList source)
+    {
+        if (source == null && (Source == null || !(Source is ListWrapper)))
+        {
             Source = null;
-        } else {
+        }
+        else
+        {
             Source = new ListWrapper (source);
         }
     }
 
     /// <summary>Sets the source to an <see cref="IList"/> value asynchronously.</summary>
     /// <value>An item implementing the IList interface.</value>
-    /// <remarks>
-    ///     Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custom
-    ///     rendering.
-    /// </remarks>
-    public Task SetSourceAsync (IList source) {
+    /// <remarks>Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custom rendering.</remarks>
+    public Task SetSourceAsync (IList source)
+    {
         return Task.Factory.StartNew (
-            () => {
-                if (source == null && (Source == null || !(Source is ListWrapper))) {
-                    Source = null;
-                } else {
-                    Source = new ListWrapper (source);
-                }
+                                      () =>
+                                      {
+                                          if (source == null && (Source == null || !(Source is ListWrapper)))
+                                          {
+                                              Source = null;
+                                          }
+                                          else
+                                          {
+                                              Source = new ListWrapper (source);
+                                          }
 
-                return source;
-            },
-            CancellationToken.None,
-            TaskCreationOptions.DenyChildAttach,
-            TaskScheduler.Default
-        );
+                                          return source;
+                                      },
+                                      CancellationToken.None,
+                                      TaskCreationOptions.DenyChildAttach,
+                                      TaskScheduler.Default
+                                     );
     }
 
     private void ListView_LayoutStarted (object sender, LayoutEventArgs e) { EnsureSelectedItemVisible (); }
@@ -724,10 +839,13 @@ public class ListView : View {
 ///     Provides a default implementation of <see cref="IListDataSource"/> that renders <see cref="ListView"/> items using
 ///     <see cref="object.ToString()"/>.
 /// </summary>
-public class ListWrapper : IListDataSource {
+public class ListWrapper : IListDataSource
+{
     /// <inheritdoc/>
-    public ListWrapper (IList source) {
-        if (source != null) {
+    public ListWrapper (IList source)
+    {
+        if (source != null)
+        {
             _count = source.Count;
             _marks = new BitArray (_count);
             _source = source;
@@ -735,9 +853,9 @@ public class ListWrapper : IListDataSource {
         }
     }
 
+    private readonly int _count;
     private readonly BitArray _marks;
     private readonly IList _source;
-    private readonly int _count;
 
     /// <inheritdoc/>
     public int Count => _source != null ? _source.Count : 0;
@@ -755,55 +873,78 @@ public class ListWrapper : IListDataSource {
         int line,
         int width,
         int start = 0
-    ) {
+    )
+    {
         container.Move (col, line);
-        object t = _source?[item];
-        if (t == null) {
+        object t = _source? [item];
+
+        if (t == null)
+        {
             RenderUstr (driver, "", col, line, width);
-        } else {
-            if (t is string u) {
+        }
+        else
+        {
+            if (t is string u)
+            {
                 RenderUstr (driver, u, col, line, width, start);
-            } else if (t is string s) {
+            }
+            else if (t is string s)
+            {
                 RenderUstr (driver, s, col, line, width, start);
-            } else {
+            }
+            else
+            {
                 RenderUstr (driver, t.ToString (), col, line, width, start);
             }
         }
     }
 
     /// <inheritdoc/>
-    public bool IsMarked (int item) {
-        if (item >= 0 && item < _count) {
-            return _marks[item];
+    public bool IsMarked (int item)
+    {
+        if (item >= 0 && item < _count)
+        {
+            return _marks [item];
         }
 
         return false;
     }
 
     /// <inheritdoc/>
-    public void SetMark (int item, bool value) {
-        if (item >= 0 && item < _count) {
-            _marks[item] = value;
+    public void SetMark (int item, bool value)
+    {
+        if (item >= 0 && item < _count)
+        {
+            _marks [item] = value;
         }
     }
 
     /// <inheritdoc/>
-    public IList ToList () => _source;
+    public IList ToList () { return _source; }
 
     /// <inheritdoc/>
-    public int StartsWith (string search) {
-        if (_source == null || _source?.Count == 0) {
+    public int StartsWith (string search)
+    {
+        if (_source == null || _source?.Count == 0)
+        {
             return -1;
         }
 
-        for (var i = 0; i < _source.Count; i++) {
-            object t = _source[i];
-            if (t is string u) {
-                if (u.ToUpper ().StartsWith (search.ToUpperInvariant ())) {
+        for (var i = 0; i < _source.Count; i++)
+        {
+            object t = _source [i];
+
+            if (t is string u)
+            {
+                if (u.ToUpper ().StartsWith (search.ToUpperInvariant ()))
+                {
                     return i;
                 }
-            } else if (t is string s) {
-                if (s.StartsWith (search, StringComparison.InvariantCultureIgnoreCase)) {
+            }
+            else if (t is string s)
+            {
+                if (s.StartsWith (search, StringComparison.InvariantCultureIgnoreCase))
+                {
                     return i;
                 }
             }
@@ -812,24 +953,35 @@ public class ListWrapper : IListDataSource {
         return -1;
     }
 
-    private int GetMaxLengthItem () {
-        if (_source == null || _source?.Count == 0) {
+    private int GetMaxLengthItem ()
+    {
+        if (_source == null || _source?.Count == 0)
+        {
             return 0;
         }
 
         var maxLength = 0;
-        for (var i = 0; i < _source.Count; i++) {
-            object t = _source[i];
+
+        for (var i = 0; i < _source.Count; i++)
+        {
+            object t = _source [i];
             int l;
-            if (t is string u) {
+
+            if (t is string u)
+            {
                 l = u.GetColumns ();
-            } else if (t is string s) {
+            }
+            else if (t is string s)
+            {
                 l = s.Length;
-            } else {
+            }
+            else
+            {
                 l = t.ToString ().Length;
             }
 
-            if (l > maxLength) {
+            if (l > maxLength)
+            {
                 maxLength = l;
             }
         }
@@ -837,11 +989,14 @@ public class ListWrapper : IListDataSource {
         return maxLength;
     }
 
-    private void RenderUstr (ConsoleDriver driver, string ustr, int col, int line, int width, int start = 0) {
+    private void RenderUstr (ConsoleDriver driver, string ustr, int col, int line, int width, int start = 0)
+    {
         string u = TextFormatter.ClipAndJustify (ustr, width, TextAlignment.Left);
         driver.AddStr (u);
         width -= u.GetColumns ();
-        while (width-- > 0) {
+
+        while (width-- > 0)
+        {
             driver.AddRune ((Rune)' ');
         }
     }

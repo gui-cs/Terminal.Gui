@@ -4,16 +4,18 @@
 
 namespace Terminal.Gui.ApplicationTests;
 
-public class MouseTests {
-    public MouseTests (ITestOutputHelper output) {
+public class MouseTests
+{
+    private readonly ITestOutputHelper _output;
+
+    public MouseTests (ITestOutputHelper output)
+    {
         _output = output;
 #if DEBUG_IDISPOSABLE
         Responder.Instances.Clear ();
         RunState.Instances.Clear ();
 #endif
     }
-
-    private readonly ITestOutputHelper _output;
 
     #region mouse coordinate tests
 
@@ -37,12 +39,14 @@ public class MouseTests {
         int expectedX,
         int expectedY,
         bool expectedClicked
-    ) {
+    )
+    {
         var mouseEvent = new MouseEvent { X = clickX, Y = clickY, Flags = MouseFlags.Button1Pressed };
         var mouseEventArgs = new MouseEventEventArgs (mouseEvent);
         var clicked = false;
 
-        void OnApplicationOnMouseEvent (object s, MouseEventEventArgs e) {
+        void OnApplicationOnMouseEvent (object s, MouseEventEventArgs e)
+        {
             Assert.Equal (expectedX, e.MouseEvent.X);
             Assert.Equal (expectedY, e.MouseEvent.Y);
             clicked = true;
@@ -56,8 +60,7 @@ public class MouseTests {
     }
 
     /// <summary>
-    ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. No frames; Frame
-    ///     == Bounds
+    ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. No frames; Frame == Bounds
     /// </summary>
     [AutoInitShutdown]
     [Theory]
@@ -97,7 +100,8 @@ public class MouseTests {
         int expectedX,
         int expectedY,
         bool expectedClicked
-    ) {
+    )
+    {
         var size = new Size (10, 10);
         var pos = new Point (offset, offset);
 
@@ -112,19 +116,19 @@ public class MouseTests {
         var mouseEvent = new MouseEvent { X = clickX, Y = clickY, Flags = MouseFlags.Button1Clicked };
         var mouseEventArgs = new MouseEventEventArgs (mouseEvent);
 
-        Application.Top.MouseClick += (s, e) => {
-            Assert.Equal (expectedX, e.MouseEvent.X);
-            Assert.Equal (expectedY, e.MouseEvent.Y);
-            clicked = true;
-        };
+        Application.Top.MouseClick += (s, e) =>
+                                      {
+                                          Assert.Equal (expectedX, e.MouseEvent.X);
+                                          Assert.Equal (expectedY, e.MouseEvent.Y);
+                                          clicked = true;
+                                      };
 
         Application.OnMouseEvent (mouseEventArgs);
         Assert.Equal (expectedClicked, clicked);
     }
 
     /// <summary>
-    ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. With Frames;
-    ///     Frame != Bounds
+    ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. With Frames; Frame != Bounds
     /// </summary>
     [AutoInitShutdown]
     [Theory]
@@ -181,7 +185,8 @@ public class MouseTests {
         int expectedX,
         int expectedY,
         bool expectedClicked
-    ) {
+    )
+    {
         var size = new Size (10, 10);
         var pos = new Point (offset, offset);
 
@@ -204,11 +209,12 @@ public class MouseTests {
         var mouseEvent = new MouseEvent { X = clickX, Y = clickY, Flags = MouseFlags.Button1Clicked };
         var mouseEventArgs = new MouseEventEventArgs (mouseEvent);
 
-        view.MouseClick += (s, e) => {
-            Assert.Equal (expectedX, e.MouseEvent.X);
-            Assert.Equal (expectedY, e.MouseEvent.Y);
-            clicked = true;
-        };
+        view.MouseClick += (s, e) =>
+                           {
+                               Assert.Equal (expectedX, e.MouseEvent.X);
+                               Assert.Equal (expectedY, e.MouseEvent.Y);
+                               clicked = true;
+                           };
 
         Application.OnMouseEvent (mouseEventArgs);
         Assert.Equal (expectedClicked, clicked);
@@ -220,7 +226,8 @@ public class MouseTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void MouseGrabView_WithNullMouseEventView () {
+    public void MouseGrabView_WithNullMouseEventView ()
+    {
         var tf = new TextField { Width = 10 };
         var sv = new ScrollView { Width = Dim.Fill (), Height = Dim.Fill (), ContentSize = new Size (100, 100) };
 
@@ -229,66 +236,77 @@ public class MouseTests {
 
         int iterations = -1;
 
-        Application.Iteration += (s, a) => {
-            iterations++;
-            if (iterations == 0) {
-                Assert.True (tf.HasFocus);
-                Assert.Null (Application.MouseGrabView);
+        Application.Iteration += (s, a) =>
+                                 {
+                                     iterations++;
 
-                Application.OnMouseEvent (
-                    new MouseEventEventArgs (
-                        new MouseEvent { X = 5, Y = 5, Flags = MouseFlags.ReportMousePosition }
-                    )
-                );
+                                     if (iterations == 0)
+                                     {
+                                         Assert.True (tf.HasFocus);
+                                         Assert.Null (Application.MouseGrabView);
 
-                Assert.Equal (sv, Application.MouseGrabView);
+                                         Application.OnMouseEvent (
+                                                                   new MouseEventEventArgs (
+                                                                                            new MouseEvent
+                                                                                                { X = 5, Y = 5, Flags = MouseFlags.ReportMousePosition }
+                                                                                           )
+                                                                  );
 
-                MessageBox.Query ("Title", "Test", "Ok");
+                                         Assert.Equal (sv, Application.MouseGrabView);
 
-                Assert.Null (Application.MouseGrabView);
-            } else if (iterations == 1) {
-                // Application.MouseGrabView is null because
-                // another toplevel (Dialog) was opened
-                Assert.Null (Application.MouseGrabView);
+                                         MessageBox.Query ("Title", "Test", "Ok");
 
-                Application.OnMouseEvent (
-                    new MouseEventEventArgs (
-                        new MouseEvent { X = 5, Y = 5, Flags = MouseFlags.ReportMousePosition }
-                    )
-                );
+                                         Assert.Null (Application.MouseGrabView);
+                                     }
+                                     else if (iterations == 1)
+                                     {
+                                         // Application.MouseGrabView is null because
+                                         // another toplevel (Dialog) was opened
+                                         Assert.Null (Application.MouseGrabView);
 
-                Assert.Null (Application.MouseGrabView);
+                                         Application.OnMouseEvent (
+                                                                   new MouseEventEventArgs (
+                                                                                            new MouseEvent
+                                                                                                { X = 5, Y = 5, Flags = MouseFlags.ReportMousePosition }
+                                                                                           )
+                                                                  );
 
-                Application.OnMouseEvent (
-                    new MouseEventEventArgs (
-                        new MouseEvent { X = 40, Y = 12, Flags = MouseFlags.ReportMousePosition }
-                    )
-                );
+                                         Assert.Null (Application.MouseGrabView);
 
-                Assert.Null (Application.MouseGrabView);
+                                         Application.OnMouseEvent (
+                                                                   new MouseEventEventArgs (
+                                                                                            new MouseEvent
+                                                                                                { X = 40, Y = 12, Flags = MouseFlags.ReportMousePosition }
+                                                                                           )
+                                                                  );
 
-                Application.OnMouseEvent (
-                    new MouseEventEventArgs (
-                        new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed }
-                    )
-                );
+                                         Assert.Null (Application.MouseGrabView);
 
-                Assert.Null (Application.MouseGrabView);
+                                         Application.OnMouseEvent (
+                                                                   new MouseEventEventArgs (
+                                                                                            new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed }
+                                                                                           )
+                                                                  );
 
-                Application.RequestStop ();
-            } else if (iterations == 2) {
-                Assert.Null (Application.MouseGrabView);
+                                         Assert.Null (Application.MouseGrabView);
 
-                Application.RequestStop ();
-            }
-        };
+                                         Application.RequestStop ();
+                                     }
+                                     else if (iterations == 2)
+                                     {
+                                         Assert.Null (Application.MouseGrabView);
+
+                                         Application.RequestStop ();
+                                     }
+                                 };
 
         Application.Run ();
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void MouseGrabView_GrabbedMouse_UnGrabbedMouse () {
+    public void MouseGrabView_GrabbedMouse_UnGrabbedMouse ()
+    {
         View grabView = null;
         var count = 0;
 
@@ -321,11 +339,15 @@ public class MouseTests {
         Assert.Equal (grabView, view2);
         Assert.Null (Application.MouseGrabView);
 
-        void Application_GrabbedMouse (object sender, ViewEventArgs e) {
-            if (count == 0) {
+        void Application_GrabbedMouse (object sender, ViewEventArgs e)
+        {
+            if (count == 0)
+            {
                 Assert.Equal (view1, e.View);
                 grabView = view1;
-            } else {
+            }
+            else
+            {
                 Assert.Equal (view2, e.View);
                 grabView = view2;
             }
@@ -333,11 +355,15 @@ public class MouseTests {
             Application.GrabbedMouse -= Application_GrabbedMouse;
         }
 
-        void Application_UnGrabbedMouse (object sender, ViewEventArgs e) {
-            if (count == 0) {
+        void Application_UnGrabbedMouse (object sender, ViewEventArgs e)
+        {
+            if (count == 0)
+            {
                 Assert.Equal (view1, e.View);
                 Assert.Equal (grabView, e.View);
-            } else {
+            }
+            else
+            {
                 Assert.Equal (view2, e.View);
                 Assert.Equal (grabView, e.View);
             }

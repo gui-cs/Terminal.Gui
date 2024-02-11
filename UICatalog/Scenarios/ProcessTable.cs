@@ -7,10 +7,12 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("ProcessTable", "Demonstrates TableView with the currently running processes.")]
 [ScenarioCategory ("TableView")]
-public class ProcessTable : Scenario {
+public class ProcessTable : Scenario
+{
     private TableView tableView;
 
-    public override void Setup () {
+    public override void Setup ()
+    {
         Win.Title = GetName ();
         Win.Y = 1; // menu
         Win.Height = Dim.Fill (1); // status bar
@@ -22,30 +24,34 @@ public class ProcessTable : Scenario {
 
         // Then every second
         Application.AddTimeout (
-            TimeSpan.FromSeconds (1),
-            () => {
-                CreateProcessTable ();
+                                TimeSpan.FromSeconds (1),
+                                () =>
+                                {
+                                    CreateProcessTable ();
 
-                return true;
-            }
-        );
+                                    return true;
+                                }
+                               );
 
         Win.Add (tableView);
     }
 
-    private void CreateProcessTable () {
+    private void CreateProcessTable ()
+    {
         int ro = tableView.RowOffset;
         int co = tableView.ColumnOffset;
+
         tableView.Table = new EnumerableTableSource<Process> (
-            Process.GetProcesses (),
-            new Dictionary<string, Func<Process, object>> {
-                { "ID", p => p.Id },
-                { "Name", p => p.ProcessName },
-                { "Threads", p => p.Threads.Count },
-                { "Virtual Memory", p => p.VirtualMemorySize64 },
-                { "Working Memory", p => p.WorkingSet64 }
-            }
-        );
+                                                              Process.GetProcesses (),
+                                                              new Dictionary<string, Func<Process, object>>
+                                                              {
+                                                                  { "ID", p => p.Id },
+                                                                  { "Name", p => p.ProcessName },
+                                                                  { "Threads", p => p.Threads.Count },
+                                                                  { "Virtual Memory", p => p.VirtualMemorySize64 },
+                                                                  { "Working Memory", p => p.WorkingSet64 }
+                                                              }
+                                                             );
 
         tableView.RowOffset = ro;
         tableView.ColumnOffset = co;

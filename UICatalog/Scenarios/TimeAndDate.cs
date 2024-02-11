@@ -6,7 +6,8 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("Time And Date", "Illustrates TimeField and time & date handling")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("DateTime")]
-public class TimeAndDate : Scenario {
+public class TimeAndDate : Scenario
+{
     private Label _lblDateFmt;
     private Label _lblNewDate;
     private Label _lblNewTime;
@@ -14,8 +15,10 @@ public class TimeAndDate : Scenario {
     private Label _lblOldTime;
     private Label _lblTimeFmt;
 
-    public override void Setup () {
-        var longTime = new TimeField {
+    public override void Setup ()
+    {
+        var longTime = new TimeField
+        {
             X = Pos.Center (),
             Y = 2,
             IsShortFormat = false,
@@ -25,7 +28,8 @@ public class TimeAndDate : Scenario {
         longTime.TimeChanged += TimeChanged;
         Win.Add (longTime);
 
-        var shortTime = new TimeField {
+        var shortTime = new TimeField
+        {
             X = Pos.Center (),
             Y = Pos.Bottom (longTime) + 1,
             IsShortFormat = true,
@@ -35,19 +39,22 @@ public class TimeAndDate : Scenario {
         shortTime.TimeChanged += TimeChanged;
         Win.Add (shortTime);
 
-        var shortDate = new DateField (DateTime.Now) {
+        var shortDate = new DateField (DateTime.Now)
+        {
             X = Pos.Center (), Y = Pos.Bottom (shortTime) + 1, ReadOnly = true
         };
         shortDate.DateChanged += DateChanged;
         Win.Add (shortDate);
 
-        var longDate = new DateField (DateTime.Now) {
+        var longDate = new DateField (DateTime.Now)
+        {
             X = Pos.Center (), Y = Pos.Bottom (shortDate) + 1, ReadOnly = false
         };
         longDate.DateChanged += DateChanged;
         Win.Add (longDate);
 
-        _lblOldTime = new Label {
+        _lblOldTime = new Label
+        {
             X = Pos.Center (),
             Y = Pos.Bottom (longDate) + 1,
             TextAlignment = TextAlignment.Centered,
@@ -57,7 +64,8 @@ public class TimeAndDate : Scenario {
         };
         Win.Add (_lblOldTime);
 
-        _lblNewTime = new Label {
+        _lblNewTime = new Label
+        {
             X = Pos.Center (),
             Y = Pos.Bottom (_lblOldTime) + 1,
             TextAlignment = TextAlignment.Centered,
@@ -67,7 +75,8 @@ public class TimeAndDate : Scenario {
         };
         Win.Add (_lblNewTime);
 
-        _lblTimeFmt = new Label {
+        _lblTimeFmt = new Label
+        {
             X = Pos.Center (),
             Y = Pos.Bottom (_lblNewTime) + 1,
             TextAlignment = TextAlignment.Centered,
@@ -77,7 +86,8 @@ public class TimeAndDate : Scenario {
         };
         Win.Add (_lblTimeFmt);
 
-        _lblOldDate = new Label {
+        _lblOldDate = new Label
+        {
             X = Pos.Center (),
             Y = Pos.Bottom (_lblTimeFmt) + 2,
             TextAlignment = TextAlignment.Centered,
@@ -87,7 +97,8 @@ public class TimeAndDate : Scenario {
         };
         Win.Add (_lblOldDate);
 
-        _lblNewDate = new Label {
+        _lblNewDate = new Label
+        {
             X = Pos.Center (),
             Y = Pos.Bottom (_lblOldDate) + 1,
             TextAlignment = TextAlignment.Centered,
@@ -97,7 +108,8 @@ public class TimeAndDate : Scenario {
         };
         Win.Add (_lblNewDate);
 
-        _lblDateFmt = new Label {
+        _lblDateFmt = new Label
+        {
             X = Pos.Center (),
             Y = Pos.Bottom (_lblNewDate) + 1,
             TextAlignment = TextAlignment.Centered,
@@ -107,29 +119,34 @@ public class TimeAndDate : Scenario {
         };
         Win.Add (_lblDateFmt);
 
-        var swapButton = new Button {
+        var swapButton = new Button
+        {
             X = Pos.Center (), Y = Pos.Bottom (Win) - 5, Text = "Swap Long/Short & Read/Read Only"
         };
-        swapButton.Clicked += (s, e) => {
-            longTime.ReadOnly = !longTime.ReadOnly;
-            shortTime.ReadOnly = !shortTime.ReadOnly;
 
-            longTime.IsShortFormat = !longTime.IsShortFormat;
-            shortTime.IsShortFormat = !shortTime.IsShortFormat;
+        swapButton.Clicked += (s, e) =>
+                              {
+                                  longTime.ReadOnly = !longTime.ReadOnly;
+                                  shortTime.ReadOnly = !shortTime.ReadOnly;
 
-            longDate.ReadOnly = !longDate.ReadOnly;
-            shortDate.ReadOnly = !shortDate.ReadOnly;
-        };
+                                  longTime.IsShortFormat = !longTime.IsShortFormat;
+                                  shortTime.IsShortFormat = !shortTime.IsShortFormat;
+
+                                  longDate.ReadOnly = !longDate.ReadOnly;
+                                  shortDate.ReadOnly = !shortDate.ReadOnly;
+                              };
         Win.Add (swapButton);
     }
 
-    private void DateChanged (object sender, DateTimeEventArgs<DateTime> e) {
+    private void DateChanged (object sender, DateTimeEventArgs<DateTime> e)
+    {
         _lblOldDate.Text = $"Old Date: {e.OldValue}";
         _lblNewDate.Text = $"New Date: {e.NewValue}";
         _lblDateFmt.Text = $"Date Format: {e.Format}";
     }
 
-    private void TimeChanged (object sender, DateTimeEventArgs<TimeSpan> e) {
+    private void TimeChanged (object sender, DateTimeEventArgs<TimeSpan> e)
+    {
         _lblOldTime.Text = $"Old Time: {e.OldValue}";
         _lblNewTime.Text = $"New Time: {e.NewValue}";
         _lblTimeFmt.Text = $"Time Format: {e.Format}";

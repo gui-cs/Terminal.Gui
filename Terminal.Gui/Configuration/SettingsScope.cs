@@ -23,7 +23,8 @@ namespace Terminal.Gui;
 /// </example>
 /// <remarks></remarks>
 [JsonConverter (typeof (ScopeJsonConverter<SettingsScope>))]
-public class SettingsScope : Scope<SettingsScope> {
+public class SettingsScope : Scope<SettingsScope>
+{
     /// <summary>The list of paths to the configuration files.</summary>
     public List<string> Sources = new ();
 
@@ -35,9 +36,11 @@ public class SettingsScope : Scope<SettingsScope> {
     /// <summary>Updates the <see cref="SettingsScope"/> with the settings in a JSON string.</summary>
     /// <param name="stream">Json document to update the settings with.</param>
     /// <param name="source">The source (filename/resource name) the Json document was read from.</param>
-    public SettingsScope? Update (Stream stream, string source) {
+    public SettingsScope? Update (Stream stream, string source)
+    {
         // Update the existing settings with the new settings.
-        try {
+        try
+        {
             Update (JsonSerializer.Deserialize<SettingsScope> (stream, _serializerOptions)!);
             OnUpdated ();
             Debug.WriteLine ($"ConfigurationManager: Read configuration from \"{source}\"");
@@ -45,8 +48,10 @@ public class SettingsScope : Scope<SettingsScope> {
 
             return this;
         }
-        catch (JsonException e) {
-            if (ThrowOnJsonErrors ?? false) {
+        catch (JsonException e)
+        {
+            if (ThrowOnJsonErrors ?? false)
+            {
                 throw;
             }
 
@@ -58,9 +63,12 @@ public class SettingsScope : Scope<SettingsScope> {
 
     /// <summary>Updates the <see cref="SettingsScope"/> with the settings in a JSON file.</summary>
     /// <param name="filePath"></param>
-    public SettingsScope? Update (string filePath) {
+    public SettingsScope? Update (string filePath)
+    {
         string realPath = filePath.Replace ("~", Environment.GetFolderPath (Environment.SpecialFolder.UserProfile));
-        if (!File.Exists (realPath)) {
+
+        if (!File.Exists (realPath))
+        {
             Debug.WriteLine ($"ConfigurationManager: Configuration file \"{realPath}\" does not exist.");
             Sources.Add (filePath);
 
@@ -78,7 +86,8 @@ public class SettingsScope : Scope<SettingsScope> {
     /// <summary>Updates the <see cref="SettingsScope"/> with the settings in a JSON string.</summary>
     /// <param name="json">Json document to update the settings with.</param>
     /// <param name="source">The source (filename/resource name) the Json document was read from.</param>
-    public SettingsScope? Update (string json, string source) {
+    public SettingsScope? Update (string json, string source)
+    {
         var stream = new MemoryStream ();
         var writer = new StreamWriter (stream);
         writer.Write (json);
@@ -91,20 +100,24 @@ public class SettingsScope : Scope<SettingsScope> {
     /// <summary>Updates the <see cref="SettingsScope"/> with the settings from a Json resource.</summary>
     /// <param name="assembly"></param>
     /// <param name="resourceName"></param>
-    public SettingsScope? UpdateFromResource (Assembly assembly, string resourceName) {
-        if (resourceName == null || string.IsNullOrEmpty (resourceName)) {
+    public SettingsScope? UpdateFromResource (Assembly assembly, string resourceName)
+    {
+        if (resourceName == null || string.IsNullOrEmpty (resourceName))
+        {
             Debug.WriteLine (
-                $"ConfigurationManager: Resource \"{resourceName}\" does not exist in \"{assembly.GetName ().Name}\"."
-            );
+                             $"ConfigurationManager: Resource \"{resourceName}\" does not exist in \"{assembly.GetName ().Name}\"."
+                            );
 
             return this;
         }
 
         using Stream? stream = assembly.GetManifestResourceStream (resourceName)!;
-        if (stream == null) {
+
+        if (stream == null)
+        {
             Debug.WriteLine (
-                $"ConfigurationManager: Failed to read resource \"{resourceName}\" from \"{assembly.GetName ().Name}\"."
-            );
+                             $"ConfigurationManager: Failed to read resource \"{resourceName}\" from \"{assembly.GetName ().Name}\"."
+                            );
 
             return this;
         }

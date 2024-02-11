@@ -4,12 +4,10 @@ using System.Numerics;
 
 namespace Terminal.Gui;
 
-public readonly partial record struct Color {
+public readonly partial record struct Color
+{
     /// <inheritdoc/>
-    /// <returns>
-    ///     A <see cref="Color"/> <see langword="struct"/> with all values set to <see cref="byte.MaxValue"/>, meaning
-    ///     white.
-    /// </returns>
+    /// <returns>A <see cref="Color"/> <see langword="struct"/> with all values set to <see cref="byte.MaxValue"/>, meaning white.</returns>
     public static Color MaxValue => new (uint.MaxValue);
 
     /// <inheritdoc/>
@@ -22,7 +20,7 @@ public readonly partial record struct Color {
 
     /// <inheritdoc/>
     [Pure]
-    public override int GetHashCode () => Rgba.GetHashCode ();
+    public override int GetHashCode () { return Rgba.GetHashCode (); }
 
     /// <summary>
     ///     Implicit conversion from <see cref="Color"/> to <see cref="Vector3"/> via <see cref="Vector3(float,float,float)"/>
@@ -34,28 +32,28 @@ public readonly partial record struct Color {
     ///     Use <see cref="implicit operator Vector4(Color)"/> to maintain full value.
     /// </remarks>
     [Pure]
-    public static explicit operator Vector3 (Color color) => new (color.R, color.G, color.B);
+    public static explicit operator Vector3 (Color color) { return new Vector3 (color.R, color.G, color.B); }
 
     /// <summary>
     ///     Implicit conversion from <see langword="int"/> to <see cref="Color"/>, via the <see cref="Color(int)"/>
     ///     costructor.
     /// </summary>
     [Pure]
-    public static implicit operator Color (int rgba) => new (rgba);
+    public static implicit operator Color (int rgba) { return new Color (rgba); }
 
     /// <summary>
     ///     Implicit conversion from <see langword="uint"/> to <see cref="Color"/>, via the <see cref="Color(uint)"/>
     ///     costructor.
     /// </summary>
     [Pure]
-    public static implicit operator Color (uint u) => new (u);
+    public static implicit operator Color (uint u) { return new Color (u); }
 
     /// <summary>
     ///     Implicit conversion from <see cref="GetClosestNamedColor (Color)"/> to <see cref="Color"/> via lookup from
     ///     <see cref="ColorExtensions.ColorNameToColorMap"/>.
     /// </summary>
     [Pure]
-    public static implicit operator Color (ColorName colorName) => ColorExtensions.ColorNameToColorMap[colorName];
+    public static implicit operator Color (ColorName colorName) { return ColorExtensions.ColorNameToColorMap [colorName]; }
 
     /// <summary>
     ///     Implicit conversion from <see cref="Vector4"/> to <see cref="Color"/>, where (<see cref="Vector4.X"/>,
@@ -63,33 +61,33 @@ public readonly partial record struct Color {
     ///     <see cref="G"/>,<see cref="B"/>), via <see cref="Color(int,int,int,int)"/>.
     /// </summary>
     [Pure]
-    public static implicit operator Color (Vector4 v) => new ((byte)v.X, (byte)v.Y, (byte)v.Z, (byte)v.W);
+    public static implicit operator Color (Vector4 v) { return new Color ((byte)v.X, (byte)v.Y, (byte)v.Z, (byte)v.W); }
 
     /// <summary>
     ///     Implicit conversion from <see cref="Vector3"/>, where <see cref="Vector3.X"/> = <see cref="R"/>,
     ///     <see cref="Vector3.Y"/> = <see cref="G"/>, and <see cref="Vector3.Z"/> = <see cref="B"/>.
     /// </summary>
     [Pure]
-    public static implicit operator Color (Vector3 v) => new ((byte)v.X, (byte)v.Y, (byte)v.Z);
+    public static implicit operator Color (Vector3 v) { return new Color ((byte)v.X, (byte)v.Y, (byte)v.Z); }
 
     /// <summary>
     ///     Implicit conversion from <see cref="Color"/> to <see langword="int"/> by returning the value of the
     ///     <see cref="Rgba"/> field.
     /// </summary>
     [Pure]
-    public static implicit operator int (Color color) => color.Rgba;
+    public static implicit operator int (Color color) { return color.Rgba; }
 
     /// <summary>
     ///     Implicit conversion from <see cref="Color"/> to <see langword="uint"/> by returning the value of the
     ///     <see cref="Argb"/> field.
     /// </summary>
     [Pure]
-    public static implicit operator uint (Color color) => color.Argb;
+    public static implicit operator uint (Color color) { return color.Argb; }
 
     /// <summary>
     ///     Implicit conversion to <see cref="Vector3"/>, where <see cref="Vector3.X"/> = <see cref="R"/>,
     ///     <see cref="Vector3.Y"/> = <see cref="G"/>, and <see cref="Vector3.Z"/> = <see cref="B"/>.
     /// </summary>
     [Pure]
-    public static implicit operator Vector4 (Color color) => new (color.R, color.G, color.B, color.A);
+    public static implicit operator Vector4 (Color color) { return new Vector4 (color.R, color.G, color.B, color.A); }
 }

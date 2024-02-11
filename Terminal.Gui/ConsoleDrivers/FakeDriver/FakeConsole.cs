@@ -8,7 +8,8 @@ namespace Terminal.Gui;
 
 #pragma warning disable RCS1138 // Add summary to documentation comment.
 /// <summary></summary>
-public static class FakeConsole {
+public static class FakeConsole
+{
 #pragma warning restore RCS1138 // Add summary to documentation comment.
 
     //
@@ -473,10 +474,11 @@ public static class FakeConsole {
     // Exceptions:
     //	T:System.IO.IOException:
     //	An I/O error occurred.
-    private static char[,] _buffer = new char [WindowWidth, WindowHeight];
+    private static char [,] _buffer = new char [WindowWidth, WindowHeight];
 
     /// <summary></summary>
-    public static void Clear () {
+    public static void Clear ()
+    {
         _buffer = new char [BufferWidth, BufferHeight];
         SetCursorPosition (0, 0);
     }
@@ -526,7 +528,8 @@ public static class FakeConsole {
         int sourceHeight,
         int targetLeft,
         int targetTop
-    ) {
+    )
+    {
         throw new NotImplementedException ();
     }
 
@@ -592,7 +595,8 @@ public static class FakeConsole {
         char sourceChar,
         ConsoleColor sourceForeColor,
         ConsoleColor sourceBackColor
-    ) {
+    )
+    {
         throw new NotImplementedException ();
     }
 
@@ -603,7 +607,7 @@ public static class FakeConsole {
     // Returns:
     //	The standard error stream.
     /// <summary></summary>
-    public static Stream OpenStandardError () => throw new NotImplementedException ();
+    public static Stream OpenStandardError () { throw new NotImplementedException (); }
 
     //
     // Summary:
@@ -620,7 +624,7 @@ public static class FakeConsole {
     //	T:System.ArgumentOutOfRangeException:
     //	bufferSize is less than or equal to zero.
     /// <summary></summary>
-    public static Stream OpenStandardError (int bufferSize) => throw new NotImplementedException ();
+    public static Stream OpenStandardError (int bufferSize) { throw new NotImplementedException (); }
 
     //
     // Summary:
@@ -637,7 +641,7 @@ public static class FakeConsole {
     //	T:System.ArgumentOutOfRangeException:
     //	bufferSize is less than or equal to zero.
     /// <summary></summary>
-    public static Stream OpenStandardInput (int bufferSize) => throw new NotImplementedException ();
+    public static Stream OpenStandardInput (int bufferSize) { throw new NotImplementedException (); }
 
     //
     // Summary:
@@ -646,7 +650,7 @@ public static class FakeConsole {
     // Returns:
     //	The standard input stream.
     /// <summary></summary>
-    public static Stream OpenStandardInput () => throw new NotImplementedException ();
+    public static Stream OpenStandardInput () { throw new NotImplementedException (); }
 
     //
     // Summary:
@@ -663,7 +667,7 @@ public static class FakeConsole {
     //	T:System.ArgumentOutOfRangeException:
     //	bufferSize is less than or equal to zero.
     /// <summary></summary>
-    public static Stream OpenStandardOutput (int bufferSize) => throw new NotImplementedException ();
+    public static Stream OpenStandardOutput (int bufferSize) { throw new NotImplementedException (); }
 
     //
     // Summary:
@@ -672,7 +676,7 @@ public static class FakeConsole {
     // Returns:
     //	The standard output stream.
     /// <summary></summary>
-    public static Stream OpenStandardOutput () => throw new NotImplementedException ();
+    public static Stream OpenStandardOutput () { throw new NotImplementedException (); }
 
     //
     // Summary:
@@ -686,7 +690,7 @@ public static class FakeConsole {
     //	T:System.IO.IOException:
     //	An I/O error occurred.
     /// <summary></summary>
-    public static int Read () => throw new NotImplementedException ();
+    public static int Read () { throw new NotImplementedException (); }
 
     //
     // Summary:
@@ -716,17 +720,20 @@ public static class FakeConsole {
 
     /// <summary>Helper to push a <see cref="KeyCode"/> onto <see cref="MockKeyPresses"/>.</summary>
     /// <param name="key"></param>
-    public static void PushMockKeyPress (KeyCode key) {
+    public static void PushMockKeyPress (KeyCode key)
+    {
         MockKeyPresses.Push (
-            new ConsoleKeyInfo (
-                (char)(key & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask
-                       & ~KeyCode.AltMask),
-                ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (key).Key,
-                key.HasFlag (KeyCode.ShiftMask),
-                key.HasFlag (KeyCode.AltMask),
-                key.HasFlag (KeyCode.CtrlMask)
-            )
-        );
+                             new ConsoleKeyInfo (
+                                                 (char)(key
+                                                        & ~KeyCode.CtrlMask
+                                                        & ~KeyCode.ShiftMask
+                                                        & ~KeyCode.AltMask),
+                                                 ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (key).Key,
+                                                 key.HasFlag (KeyCode.ShiftMask),
+                                                 key.HasFlag (KeyCode.AltMask),
+                                                 key.HasFlag (KeyCode.CtrlMask)
+                                                )
+                            );
     }
 
     //
@@ -746,7 +753,7 @@ public static class FakeConsole {
     //	The System.Console.In property is redirected from some stream other than the
     //	console.
     /// <summary></summary>
-    public static ConsoleKeyInfo ReadKey () => throw new NotImplementedException ();
+    public static ConsoleKeyInfo ReadKey () { throw new NotImplementedException (); }
 
     //
     // Summary:
@@ -766,7 +773,7 @@ public static class FakeConsole {
     //	T:System.ArgumentOutOfRangeException:
     //	The number of characters in the next line of characters is greater than System.Int32.MaxValue.
     /// <summary></summary>
-    public static string ReadLine () => throw new NotImplementedException ();
+    public static string ReadLine () { throw new NotImplementedException (); }
 
     //
     // Summary:
@@ -780,7 +787,8 @@ public static class FakeConsole {
     //	An I/O error occurred.
     //[SecuritySafeCritical]
     /// <summary></summary>
-    public static void ResetColor () {
+    public static void ResetColor ()
+    {
         BackgroundColor = _defaultBackgroundColor;
         ForegroundColor = _defaultForegroundColor;
     }
@@ -810,7 +818,8 @@ public static class FakeConsole {
     //	An I/O error occurred.
     //[SecuritySafeCritical]
     /// <summary></summary>
-    public static void SetBufferSize (int width, int height) {
+    public static void SetBufferSize (int width, int height)
+    {
         BufferWidth = width;
         BufferHeight = height;
         _buffer = new char [BufferWidth, BufferHeight];
@@ -841,7 +850,8 @@ public static class FakeConsole {
     //	An I/O error occurred.
     //[SecuritySafeCritical]
     /// <summary></summary>
-    public static void SetCursorPosition (int left, int top) {
+    public static void SetCursorPosition (int left, int top)
+    {
         CursorLeft = left;
         CursorTop = top;
         WindowLeft = Math.Max (Math.Min (left, BufferWidth - WindowWidth), 0);
@@ -930,7 +940,8 @@ public static class FakeConsole {
     /// <summary></summary>
     /// <param name="left"></param>
     /// <param name="top"></param>
-    public static void SetWindowPosition (int left, int top) {
+    public static void SetWindowPosition (int left, int top)
+    {
         WindowLeft = left;
         WindowTop = top;
     }
@@ -962,7 +973,8 @@ public static class FakeConsole {
     /// <summary></summary>
     /// <param name="width"></param>
     /// <param name="height"></param>
-    public static void SetWindowSize (int width, int height) {
+    public static void SetWindowSize (int width, int height)
+    {
         WindowWidth = width;
         WindowHeight = height;
     }
@@ -996,10 +1008,14 @@ public static class FakeConsole {
     //	An I/O error occurred.
     /// <summary></summary>
     /// <param name="value"></param>
-    public static void Write (object value) {
-        if (value is Rune rune) {
+    public static void Write (object value)
+    {
+        if (value is Rune rune)
+        {
             Write ((char)rune.Value);
-        } else {
+        }
+        else
+        {
             throw new NotImplementedException ();
         }
     }
@@ -1133,9 +1149,7 @@ public static class FakeConsole {
     /// <param name="arg1"></param>
     /// <param name="arg2"></param>
     /// <param name="arg3"></param>
-    public static void Write (string format, object arg0, object arg1, object arg2, object arg3) {
-        throw new NotImplementedException ();
-    }
+    public static void Write (string format, object arg0, object arg1, object arg2, object arg3) { throw new NotImplementedException (); }
 
     //
     // Summary:
@@ -1161,7 +1175,7 @@ public static class FakeConsole {
     /// <summary></summary>
     /// <param name="format"></param>
     /// <param name="arg"></param>
-    public static void Write (string format, params object[] arg) { throw new NotImplementedException (); }
+    public static void Write (string format, params object [] arg) { throw new NotImplementedException (); }
 
     //
     // Summary:
@@ -1192,7 +1206,7 @@ public static class FakeConsole {
     //	An I/O error occurred.
     /// <summary></summary>
     /// <param name="value"></param>
-    public static void Write (char value) { _buffer[CursorLeft, CursorTop] = value; }
+    public static void Write (char value) { _buffer [CursorLeft, CursorTop] = value; }
 
     //
     // Summary:
@@ -1207,10 +1221,13 @@ public static class FakeConsole {
     //	An I/O error occurred.
     /// <summary></summary>
     /// <param name="buffer"></param>
-    public static void Write (char[] buffer) {
-        _buffer[CursorLeft, CursorTop] = (char)0;
-        foreach (char ch in buffer) {
-            _buffer[CursorLeft, CursorTop] += ch;
+    public static void Write (char [] buffer)
+    {
+        _buffer [CursorLeft, CursorTop] = (char)0;
+
+        foreach (char ch in buffer)
+        {
+            _buffer [CursorLeft, CursorTop] += ch;
         }
     }
 
@@ -1244,7 +1261,7 @@ public static class FakeConsole {
     /// <param name="buffer"></param>
     /// <param name="index"></param>
     /// <param name="count"></param>
-    public static void Write (char[] buffer, int index, int count) { throw new NotImplementedException (); }
+    public static void Write (char [] buffer, int index, int count) { throw new NotImplementedException (); }
 
     //
     // Summary:
@@ -1278,9 +1295,7 @@ public static class FakeConsole {
     /// <param name="arg0"></param>
     /// <param name="arg1"></param>
     /// <param name="arg2"></param>
-    public static void Write (string format, object arg0, object arg1, object arg2) {
-        throw new NotImplementedException ();
-    }
+    public static void Write (string format, object arg0, object arg1, object arg2) { throw new NotImplementedException (); }
 
     //
     // Summary:
@@ -1512,9 +1527,7 @@ public static class FakeConsole {
     /// <param name="arg0"></param>
     /// <param name="arg1"></param>
     /// <param name="arg2"></param>
-    public static void WriteLine (string format, object arg0, object arg1, object arg2) {
-        throw new NotImplementedException ();
-    }
+    public static void WriteLine (string format, object arg0, object arg1, object arg2) { throw new NotImplementedException (); }
 
     //[CLSCompliant (false)]
     /// <summary></summary>
@@ -1523,9 +1536,7 @@ public static class FakeConsole {
     /// <param name="arg1"></param>
     /// <param name="arg2"></param>
     /// <param name="arg3"></param>
-    public static void WriteLine (string format, object arg0, object arg1, object arg2, object arg3) {
-        throw new NotImplementedException ();
-    }
+    public static void WriteLine (string format, object arg0, object arg1, object arg2, object arg3) { throw new NotImplementedException (); }
 
     //
     // Summary:
@@ -1552,7 +1563,7 @@ public static class FakeConsole {
     /// <summary></summary>
     /// <param name="format"></param>
     /// <param name="arg"></param>
-    public static void WriteLine (string format, params object[] arg) { throw new NotImplementedException (); }
+    public static void WriteLine (string format, params object [] arg) { throw new NotImplementedException (); }
 
     //
     // Summary:
@@ -1585,7 +1596,7 @@ public static class FakeConsole {
     /// <param name="buffer"></param>
     /// <param name="index"></param>
     /// <param name="count"></param>
-    public static void WriteLine (char[] buffer, int index, int count) { throw new NotImplementedException (); }
+    public static void WriteLine (char [] buffer, int index, int count) { throw new NotImplementedException (); }
 
     //
     // Summary:
@@ -1617,7 +1628,7 @@ public static class FakeConsole {
     //	An I/O error occurred.
     /// <summary></summary>
     /// <param name="buffer"></param>
-    public static void WriteLine (char[] buffer) { throw new NotImplementedException (); }
+    public static void WriteLine (char [] buffer) { throw new NotImplementedException (); }
 
     //
     // Summary:

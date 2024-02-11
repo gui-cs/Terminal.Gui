@@ -15,7 +15,8 @@ using Terminal.Gui.Resources;
 namespace Terminal.Gui;
 
 /// <summary>Determine which <see cref="System.IO"/> type to open.</summary>
-public enum OpenMode {
+public enum OpenMode
+{
     /// <summary>Opens only file or files.</summary>
     File,
 
@@ -29,18 +30,17 @@ public enum OpenMode {
 /// <summary>The <see cref="OpenDialog"/>provides an interactive dialog box for users to select files or directories.</summary>
 /// <remarks>
 ///     <para>
-///         The open dialog can be used to select files for opening, it can be configured to allow multiple items to be
-///         selected (based on the AllowsMultipleSelection) variable and you can control whether this should allow files or
-///         directories to be selected.
+///         The open dialog can be used to select files for opening, it can be configured to allow multiple items to be selected (based on the AllowsMultipleSelection) variable and you can control whether this should allow files or directories to be selected.
 ///     </para>
 ///     <para>
 ///         To use, create an instance of <see cref="OpenDialog"/>, and pass it to
-///         <see cref="Application.Run(Func{Exception, bool})"/>. This will run the dialog modally, and when this returns,
-///         the list of files will be available on the <see cref="FilePaths"/> property.
+///         <see cref="Application.Run(Func{Exception, bool})"/>. This will run the dialog modally, and when this returns, the list of files will be available on the
+///         <see cref="FilePaths"/> property.
 ///     </para>
 ///     <para>To select more than one file, users can use the spacebar, or control-t.</para>
 /// </remarks>
-public class OpenDialog : FileDialog {
+public class OpenDialog : FileDialog
+{
     /// <summary>Initializes a new <see cref="OpenDialog"/>.</summary>
     public OpenDialog () { }
 
@@ -48,13 +48,16 @@ public class OpenDialog : FileDialog {
     /// <value>The file paths.</value>
     public IReadOnlyList<string> FilePaths =>
         Canceled ? Enumerable.Empty<string> ().ToList ().AsReadOnly () :
-        AllowsMultipleSelection ? MultiSelected : new ReadOnlyCollection<string> (new[] { Path });
+        AllowsMultipleSelection ? MultiSelected : new ReadOnlyCollection<string> (new [] { Path });
 
     /// <inheritdoc/>
-    public override OpenMode OpenMode {
+    public override OpenMode OpenMode
+    {
         get => base.OpenMode;
-        set {
+        set
+        {
             base.OpenMode = value;
+
             Style.OkButtonText = value == OpenMode.File ? Strings.btnOpen :
                                  value == OpenMode.Directory ? Strings.fdSelectFolder : Strings.fdSelectMixed;
         }

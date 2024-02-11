@@ -6,9 +6,11 @@ using System.IO.Abstractions;
 namespace Terminal.Gui;
 
 /// <summary>Provides a way to get the color of a file or directory.</summary>
-public class FileSystemColorProvider {
+public class FileSystemColorProvider
+{
     /// <summary>Mapping of file extension to color.</summary>
-    public Dictionary<string, Color> ExtensionToColor = new () {
+    public Dictionary<string, Color> ExtensionToColor = new ()
+    {
         { ".7z", StringToColor ("#DAA520") },
         { ".bz", StringToColor ("#DAA520") },
         { ".tar", StringToColor ("#DAA520") },
@@ -291,7 +293,8 @@ public class FileSystemColorProvider {
     };
 
     /// <summary>Mapping of file/dir name to color.</summary>
-    public Dictionary<string, Color> FilenameToColor { get; set; } = new () {
+    public Dictionary<string, Color> FilenameToColor { get; set; } = new ()
+    {
         { "docs", StringToColor ("#00BFFF") },
         { "documents", StringToColor ("#00BFFF") },
         { "desktop", StringToColor ("#00FBFF") },
@@ -416,27 +419,33 @@ public class FileSystemColorProvider {
     /// <summary>Gets the color to use.</summary>
     /// <param name="file"></param>
     /// <returns></returns>
-    public Color? GetColor (IFileSystemInfo file) {
-        if (FilenameToColor.TryGetValue (file.Name, out Color nameColor)) {
+    public Color? GetColor (IFileSystemInfo file)
+    {
+        if (FilenameToColor.TryGetValue (file.Name, out Color nameColor))
+        {
             return nameColor;
         }
 
-        if (ExtensionToColor.TryGetValue (file.Extension, out Color extColor)) {
+        if (ExtensionToColor.TryGetValue (file.Extension, out Color extColor))
+        {
             return extColor;
         }
 
         return null;
     }
 
-    private static Color StringToColor (string str) {
-        if (!Color.TryParse (str, out Color? c)) {
+    private static Color StringToColor (string str)
+    {
+        if (!Color.TryParse (str, out Color? c))
+        {
             ThrowFormatException (str);
         }
 
         return c.Value;
 
         [DoesNotReturn]
-        static void ThrowFormatException (string s) {
+        static void ThrowFormatException (string s)
+        {
             throw new FormatException ($"Failed to parse Color from {s}");
         }
     }

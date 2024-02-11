@@ -8,13 +8,17 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Sliders", "Demonstrates the Slider view.")]
 [ScenarioCategory ("Controls")]
-public class Sliders : Scenario {
-    public void MakeSliders (View v, List<object> options) {
+public class Sliders : Scenario
+{
+    public void MakeSliders (View v, List<object> options)
+    {
         List<SliderType> types = Enum.GetValues (typeof (SliderType)).Cast<SliderType> ().ToList ();
         Slider prev = null;
 
-        foreach (SliderType type in types) {
-            var view = new Slider (options) {
+        foreach (SliderType type in types)
+        {
+            var view = new Slider (options)
+            {
                 Title = type.ToString (),
                 X = 0,
                 Y = prev == null ? 0 : Pos.Bottom (prev),
@@ -26,7 +30,8 @@ public class Sliders : Scenario {
             prev = view;
         }
 
-        List<object> singleOptions = new () {
+        List<object> singleOptions = new ()
+        {
             1,
             2,
             3,
@@ -67,7 +72,9 @@ public class Sliders : Scenario {
             38,
             39
         };
-        var single = new Slider (singleOptions) {
+
+        var single = new Slider (singleOptions)
+        {
             Title = "Continuous",
             X = 0,
             Y = prev == null ? 0 : Pos.Bottom (prev),
@@ -76,15 +83,19 @@ public class Sliders : Scenario {
             AllowEmpty = false
         };
 
-        single.LayoutStarted += (s, e) => {
-            if (single.Orientation == Orientation.Horizontal) {
-                single.Style.SpaceChar = new Cell { Rune = CM.Glyphs.HLine };
-                single.Style.OptionChar = new Cell { Rune = CM.Glyphs.HLine };
-            } else {
-                single.Style.SpaceChar = new Cell { Rune = CM.Glyphs.VLine };
-                single.Style.OptionChar = new Cell { Rune = CM.Glyphs.VLine };
-            }
-        };
+        single.LayoutStarted += (s, e) =>
+                                {
+                                    if (single.Orientation == Orientation.Horizontal)
+                                    {
+                                        single.Style.SpaceChar = new Cell { Rune = CM.Glyphs.HLine };
+                                        single.Style.OptionChar = new Cell { Rune = CM.Glyphs.HLine };
+                                    }
+                                    else
+                                    {
+                                        single.Style.SpaceChar = new Cell { Rune = CM.Glyphs.VLine };
+                                        single.Style.OptionChar = new Cell { Rune = CM.Glyphs.VLine };
+                                    }
+                                };
         single.Style.SetChar = new Cell { Rune = CM.Glyphs.ContinuousMeterSegment };
         single.Style.DragChar = new Cell { Rune = CM.Glyphs.ContinuousMeterSegment };
 
@@ -93,7 +104,9 @@ public class Sliders : Scenario {
         single.OptionsChanged += (s, e) => { single.Title = $"Continuous {e.Options.FirstOrDefault ().Key}"; };
 
         List<object> oneOption = new () { "The Only Option" };
-        var one = new Slider (oneOption) {
+
+        var one = new Slider (oneOption)
+        {
             Title = "One Option",
             X = 0,
             Y = prev == null ? 0 : Pos.Bottom (single),
@@ -104,36 +117,41 @@ public class Sliders : Scenario {
         v.Add (one);
     }
 
-    public override void Setup () {
+    public override void Setup ()
+    {
         MakeSliders (
-            Win,
-            new List<object> {
-                500,
-                1000,
-                1500,
-                2000,
-                2500,
-                3000,
-                3500,
-                4000,
-                4500,
-                5000
-            }
-        );
-        var configView = new FrameView {
+                     Win,
+                     new List<object>
+                     {
+                         500,
+                         1000,
+                         1500,
+                         2000,
+                         2500,
+                         3000,
+                         3500,
+                         4000,
+                         4500,
+                         5000
+                     }
+                    );
+
+        var configView = new FrameView
+        {
             Title = "Configuration",
             X = Pos.Percent (50),
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            ColorScheme = Colors.ColorSchemes["Dialog"]
+            ColorScheme = Colors.ColorSchemes ["Dialog"]
         };
 
         Win.Add (configView);
 
         #region Config Slider
 
-        Slider<string> slider = new () {
+        Slider<string> slider = new ()
+        {
             Title = "Options",
             X = 0,
             Y = 0,
@@ -147,7 +165,8 @@ public class Sliders : Scenario {
         slider.Style.SetChar.Attribute = new Attribute (Color.BrightGreen, Color.Black);
         slider.Style.LegendAttributes.SetAttribute = new Attribute (Color.Green, Color.Black);
 
-        slider.Options = new List<SliderOption<string>> {
+        slider.Options = new List<SliderOption<string>>
+        {
             new () { Legend = "Legends" },
             new () { Legend = "RangeAllowSingle" },
             new () { Legend = "EndSpacing" },
@@ -156,31 +175,40 @@ public class Sliders : Scenario {
 
         configView.Add (slider);
 
-        slider.OptionsChanged += (sender, e) => {
-            foreach (Slider s in Win.Subviews.OfType<Slider> ()) {
-                s.ShowLegends = e.Options.ContainsKey (0);
-                s.RangeAllowSingle = e.Options.ContainsKey (1);
-                s.ShowEndSpacing = e.Options.ContainsKey (2);
-                s.AutoSize = e.Options.ContainsKey (3);
-                if (!s.AutoSize) {
-                    if (s.Orientation == Orientation.Horizontal) {
-                        s.Width = Dim.Percent (50);
-                        int h = s.ShowLegends && s.LegendsOrientation == Orientation.Vertical
-                                    ? s.Options.Max (o => o.Legend.Length) + 3
-                                    : 4;
-                        s.Height = h;
-                    } else {
-                        int w = s.ShowLegends ? s.Options.Max (o => o.Legend.Length) + 3 : 3;
-                        s.Width = w;
-                        s.Height = Dim.Fill ();
-                    }
-                }
-            }
+        slider.OptionsChanged += (sender, e) =>
+                                 {
+                                     foreach (Slider s in Win.Subviews.OfType<Slider> ())
+                                     {
+                                         s.ShowLegends = e.Options.ContainsKey (0);
+                                         s.RangeAllowSingle = e.Options.ContainsKey (1);
+                                         s.ShowEndSpacing = e.Options.ContainsKey (2);
+                                         s.AutoSize = e.Options.ContainsKey (3);
 
-            if (Win.IsInitialized) {
-                Win.LayoutSubviews ();
-            }
-        };
+                                         if (!s.AutoSize)
+                                         {
+                                             if (s.Orientation == Orientation.Horizontal)
+                                             {
+                                                 s.Width = Dim.Percent (50);
+
+                                                 int h = s.ShowLegends && s.LegendsOrientation == Orientation.Vertical
+                                                             ? s.Options.Max (o => o.Legend.Length) + 3
+                                                             : 4;
+                                                 s.Height = h;
+                                             }
+                                             else
+                                             {
+                                                 int w = s.ShowLegends ? s.Options.Max (o => o.Legend.Length) + 3 : 3;
+                                                 s.Width = w;
+                                                 s.Height = Dim.Fill ();
+                                             }
+                                         }
+                                     }
+
+                                     if (Win.IsInitialized)
+                                     {
+                                         Win.LayoutSubviews ();
+                                     }
+                                 };
         slider.SetOption (0); // Legends
         slider.SetOption (1); // RangeAllowSingle
 
@@ -188,7 +216,8 @@ public class Sliders : Scenario {
 
         #region Slider Orientation Slider
 
-        Slider<string> slider_orientation_slider = new (new List<string> { "Horizontal", "Vertical" }) {
+        Slider<string> slider_orientation_slider = new (new List<string> { "Horizontal", "Vertical" })
+        {
             Title = "Slider Orientation",
             X = 0,
             Y = Pos.Bottom (slider) + 1,
@@ -201,58 +230,75 @@ public class Sliders : Scenario {
 
         configView.Add (slider_orientation_slider);
 
-        slider_orientation_slider.OptionsChanged += (sender, e) => {
-            View prev = null;
-            foreach (Slider s in Win.Subviews.OfType<Slider> ()) {
-                if (e.Options.ContainsKey (0)) {
-                    s.Orientation = Orientation.Horizontal;
+        slider_orientation_slider.OptionsChanged += (sender, e) =>
+                                                    {
+                                                        View prev = null;
 
-                    s.Style.SpaceChar = new Cell { Rune = CM.Glyphs.HLine };
+                                                        foreach (Slider s in Win.Subviews.OfType<Slider> ())
+                                                        {
+                                                            if (e.Options.ContainsKey (0))
+                                                            {
+                                                                s.Orientation = Orientation.Horizontal;
 
-                    if (prev == null) {
-                        s.Y = 0;
-                    } else {
-                        s.Y = Pos.Bottom (prev) + 1;
-                    }
+                                                                s.Style.SpaceChar = new Cell { Rune = CM.Glyphs.HLine };
 
-                    s.X = 0;
-                    prev = s;
-                } else if (e.Options.ContainsKey (1)) {
-                    s.Orientation = Orientation.Vertical;
+                                                                if (prev == null)
+                                                                {
+                                                                    s.Y = 0;
+                                                                }
+                                                                else
+                                                                {
+                                                                    s.Y = Pos.Bottom (prev) + 1;
+                                                                }
 
-                    s.Style.SpaceChar = new Cell { Rune = CM.Glyphs.VLine };
+                                                                s.X = 0;
+                                                                prev = s;
+                                                            }
+                                                            else if (e.Options.ContainsKey (1))
+                                                            {
+                                                                s.Orientation = Orientation.Vertical;
 
-                    if (prev == null) {
-                        s.X = 0;
-                    } else {
-                        s.X = Pos.Right (prev) + 2;
-                    }
+                                                                s.Style.SpaceChar = new Cell { Rune = CM.Glyphs.VLine };
 
-                    s.Y = 0;
-                    prev = s;
-                }
+                                                                if (prev == null)
+                                                                {
+                                                                    s.X = 0;
+                                                                }
+                                                                else
+                                                                {
+                                                                    s.X = Pos.Right (prev) + 2;
+                                                                }
 
-                if (s.Orientation == Orientation.Horizontal) {
-                    s.Width = Dim.Percent (50);
-                    int h = s.ShowLegends && s.LegendsOrientation == Orientation.Vertical
-                                ? s.Options.Max (o => o.Legend.Length) + 3
-                                : 4;
-                    s.Height = h;
-                } else {
-                    int w = s.ShowLegends ? s.Options.Max (o => o.Legend.Length) + 3 : 3;
-                    s.Width = w;
-                    s.Height = Dim.Fill ();
-                }
-            }
+                                                                s.Y = 0;
+                                                                prev = s;
+                                                            }
 
-            Win.LayoutSubviews ();
-        };
+                                                            if (s.Orientation == Orientation.Horizontal)
+                                                            {
+                                                                s.Width = Dim.Percent (50);
+
+                                                                int h = s.ShowLegends && s.LegendsOrientation == Orientation.Vertical
+                                                                            ? s.Options.Max (o => o.Legend.Length) + 3
+                                                                            : 4;
+                                                                s.Height = h;
+                                                            }
+                                                            else
+                                                            {
+                                                                int w = s.ShowLegends ? s.Options.Max (o => o.Legend.Length) + 3 : 3;
+                                                                s.Width = w;
+                                                                s.Height = Dim.Fill ();
+                                                            }
+                                                        }
+
+                                                        Win.LayoutSubviews ();
+                                                    };
 
         #endregion Slider Orientation Slider
 
         #region Legends Orientation Slider
 
-        Slider<string> legends_orientation_slider = new (new List<string> { "Horizontal", "Vertical" }) {
+        Slider<string> legends_orientation_slider = new (new List<string> { "Horizontal", "Vertical" })
+        {
             Title = "Legends Orientation",
             X = Pos.Center (),
             Y = Pos.Bottom (slider_orientation_slider) + 1,
@@ -265,47 +311,59 @@ public class Sliders : Scenario {
 
         configView.Add (legends_orientation_slider);
 
-        legends_orientation_slider.OptionsChanged += (sender, e) => {
-            foreach (Slider s in Win.Subviews.OfType<Slider> ()) {
-                if (e.Options.ContainsKey (0)) {
-                    s.LegendsOrientation = Orientation.Horizontal;
-                } else if (e.Options.ContainsKey (1)) {
-                    s.LegendsOrientation = Orientation.Vertical;
-                }
+        legends_orientation_slider.OptionsChanged += (sender, e) =>
+                                                     {
+                                                         foreach (Slider s in Win.Subviews.OfType<Slider> ())
+                                                         {
+                                                             if (e.Options.ContainsKey (0))
+                                                             {
+                                                                 s.LegendsOrientation = Orientation.Horizontal;
+                                                             }
+                                                             else if (e.Options.ContainsKey (1))
+                                                             {
+                                                                 s.LegendsOrientation = Orientation.Vertical;
+                                                             }
 
-                if (s.Orientation == Orientation.Horizontal) {
-                    s.Width = Dim.Percent (50);
-                    int h = s.ShowLegends && s.LegendsOrientation == Orientation.Vertical
-                                ? s.Options.Max (o => o.Legend.Length) + 3
-                                : 4;
-                    s.Height = h;
-                } else {
-                    int w = s.ShowLegends ? s.Options.Max (o => o.Legend.Length) + 3 : 3;
-                    s.Width = w;
-                    s.Height = Dim.Fill ();
-                }
-            }
+                                                             if (s.Orientation == Orientation.Horizontal)
+                                                             {
+                                                                 s.Width = Dim.Percent (50);
 
-            Win.LayoutSubviews ();
-        };
+                                                                 int h = s.ShowLegends && s.LegendsOrientation == Orientation.Vertical
+                                                                             ? s.Options.Max (o => o.Legend.Length) + 3
+                                                                             : 4;
+                                                                 s.Height = h;
+                                                             }
+                                                             else
+                                                             {
+                                                                 int w = s.ShowLegends ? s.Options.Max (o => o.Legend.Length) + 3 : 3;
+                                                                 s.Width = w;
+                                                                 s.Height = Dim.Fill ();
+                                                             }
+                                                         }
+
+                                                         Win.LayoutSubviews ();
+                                                     };
 
         #endregion Legends Orientation Slider
 
         #region Color Slider
 
-        foreach (Slider s in Win.Subviews.OfType<Slider> ()) {
+        foreach (Slider s in Win.Subviews.OfType<Slider> ())
+        {
             s.Style.OptionChar.Attribute = Win.GetNormalColor ();
             s.Style.SetChar.Attribute = Win.GetNormalColor ();
             s.Style.LegendAttributes.SetAttribute = Win.GetNormalColor ();
             s.Style.RangeChar.Attribute = Win.GetNormalColor ();
         }
 
-        Slider<(Color, Color)> sliderFGColor = new () {
+        Slider<(Color, Color)> sliderFGColor = new ()
+        {
             Title = "FG Color",
             X = 0,
             Y = Pos.Bottom (
-                    legends_orientation_slider
-                ) + 1,
+                            legends_orientation_slider
+                           )
+                + 1,
             Type = SliderType.Single,
             BorderStyle = LineStyle.Single,
             AllowEmpty = false,
@@ -319,50 +377,63 @@ public class Sliders : Scenario {
         sliderFGColor.Style.LegendAttributes.SetAttribute = new Attribute (Color.Green, Color.Blue);
 
         List<SliderOption<(Color, Color)>> colorOptions = new ();
-        foreach (ColorName colorIndex in Enum.GetValues<ColorName> ()) {
+
+        foreach (ColorName colorIndex in Enum.GetValues<ColorName> ())
+        {
             var colorName = colorIndex.ToString ();
+
             colorOptions.Add (
-                new SliderOption<(Color, Color)> {
-                    Data = (new Color (colorIndex),
-                            new Color (colorIndex)),
-                    Legend = colorName,
-                    LegendAbbr = (Rune)colorName[0]
-                }
-            );
+                              new SliderOption<(Color, Color)>
+                              {
+                                  Data = (new Color (colorIndex),
+                                          new Color (colorIndex)),
+                                  Legend = colorName,
+                                  LegendAbbr = (Rune)colorName [0]
+                              }
+                             );
         }
 
         sliderFGColor.Options = colorOptions;
 
         configView.Add (sliderFGColor);
 
-        sliderFGColor.OptionsChanged += (sender, e) => {
-            if (e.Options.Count != 0) {
-                (Color, Color) data = e.Options.First ().Value.Data;
-                foreach (Slider s in Win.Subviews.OfType<Slider> ()) {
-                    s.ColorScheme = new ColorScheme (s.ColorScheme);
-                    s.ColorScheme = new ColorScheme (s.ColorScheme) {
-                        Normal = new Attribute (
-                            data.Item2,
-                            s.ColorScheme.Normal.Background
-                        )
-                    };
+        sliderFGColor.OptionsChanged += (sender, e) =>
+                                        {
+                                            if (e.Options.Count != 0)
+                                            {
+                                                (Color, Color) data = e.Options.First ().Value.Data;
 
-                    s.Style.OptionChar.Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
-                    s.Style.SetChar.Attribute = new Attribute (
-                        data.Item1,
-                        s.Style.SetChar.Attribute?.Background
-                        ?? s.ColorScheme.Normal.Background
-                    );
-                    s.Style.LegendAttributes.SetAttribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
-                    s.Style.RangeChar.Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
-                    s.Style.SpaceChar.Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
-                    s.Style.LegendAttributes.NormalAttribute =
-                        new Attribute (data.Item1, s.ColorScheme.Normal.Background);
-                }
-            }
-        };
+                                                foreach (Slider s in Win.Subviews.OfType<Slider> ())
+                                                {
+                                                    s.ColorScheme = new ColorScheme (s.ColorScheme);
 
-        Slider<(Color, Color)> sliderBGColor = new () {
+                                                    s.ColorScheme = new ColorScheme (s.ColorScheme)
+                                                    {
+                                                        Normal = new Attribute (
+                                                                                data.Item2,
+                                                                                s.ColorScheme.Normal.Background
+                                                                               )
+                                                    };
+
+                                                    s.Style.OptionChar.Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
+
+                                                    s.Style.SetChar.Attribute = new Attribute (
+                                                                                               data.Item1,
+                                                                                               s.Style.SetChar.Attribute?.Background
+                                                                                               ?? s.ColorScheme.Normal.Background
+                                                                                              );
+                                                    s.Style.LegendAttributes.SetAttribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
+                                                    s.Style.RangeChar.Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
+                                                    s.Style.SpaceChar.Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
+
+                                                    s.Style.LegendAttributes.NormalAttribute =
+                                                        new Attribute (data.Item1, s.ColorScheme.Normal.Background);
+                                                }
+                                            }
+                                        };
+
+        Slider<(Color, Color)> sliderBGColor = new ()
+        {
             Title = "BG Color",
             X = Pos.Right (sliderFGColor),
             Y = Pos.Top (sliderFGColor),
@@ -382,20 +453,24 @@ public class Sliders : Scenario {
 
         configView.Add (sliderBGColor);
 
-        sliderBGColor.OptionsChanged += (sender, e) => {
-            if (e.Options.Count != 0) {
-                (Color, Color) data = e.Options.First ().Value.Data;
+        sliderBGColor.OptionsChanged += (sender, e) =>
+                                        {
+                                            if (e.Options.Count != 0)
+                                            {
+                                                (Color, Color) data = e.Options.First ().Value.Data;
 
-                foreach (Slider s in Win.Subviews.OfType<Slider> ()) {
-                    s.ColorScheme = new ColorScheme (s.ColorScheme) {
-                        Normal = new Attribute (
-                            s.ColorScheme.Normal.Foreground,
-                            data.Item2
-                        )
-                    };
-                }
-            }
-        };
+                                                foreach (Slider s in Win.Subviews.OfType<Slider> ())
+                                                {
+                                                    s.ColorScheme = new ColorScheme (s.ColorScheme)
+                                                    {
+                                                        Normal = new Attribute (
+                                                                                s.ColorScheme.Normal.Foreground,
+                                                                                data.Item2
+                                                                               )
+                                                    };
+                                                }
+                                            }
+                                        };
 
         #endregion Color Slider
 

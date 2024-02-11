@@ -2,13 +2,15 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class ViewKeyBindingTests {
-    public ViewKeyBindingTests (ITestOutputHelper output) { _output = output; }
+public class ViewKeyBindingTests
+{
     private readonly ITestOutputHelper _output;
+    public ViewKeyBindingTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [AutoInitShutdown]
-    public void Focus_KeyBinding () {
+    public void Focus_KeyBinding ()
+    {
         var view = new ScopedKeyBindingView ();
         var invoked = false;
         view.InvokingKeyBindings += (s, e) => invoked = true;
@@ -43,7 +45,8 @@ public class ViewKeyBindingTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void Focus_KeyBinding_Negative () {
+    public void Focus_KeyBinding_Negative ()
+    {
         var view = new ScopedKeyBindingView ();
         var invoked = false;
         view.InvokingKeyBindings += (s, e) => invoked = true;
@@ -68,7 +71,8 @@ public class ViewKeyBindingTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void HotKey_KeyBinding () {
+    public void HotKey_KeyBinding ()
+    {
         var view = new ScopedKeyBindingView ();
         var invoked = false;
         view.InvokingKeyBindings += (s, e) => invoked = true;
@@ -95,7 +99,8 @@ public class ViewKeyBindingTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void HotKey_KeyBinding_Negative () {
+    public void HotKey_KeyBinding_Negative ()
+    {
         var view = new ScopedKeyBindingView ();
         var invoked = false;
         view.InvokingKeyBindings += (s, e) => invoked = true;
@@ -114,8 +119,10 @@ public class ViewKeyBindingTests {
 
     // tests that test KeyBindingScope.Focus and KeyBindingScope.HotKey (tests for KeyBindingScope.Application are in Application/KeyboardTests.cs)
 
-    public class ScopedKeyBindingView : View {
-        public ScopedKeyBindingView () {
+    public class ScopedKeyBindingView : View
+    {
+        public ScopedKeyBindingView ()
+        {
             AddCommand (Command.Save, () => ApplicationCommand = true);
             AddCommand (Command.Default, () => HotKeyCommand = true);
             AddCommand (Command.Left, () => FocusedCommand = true);

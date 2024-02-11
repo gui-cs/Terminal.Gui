@@ -2,9 +2,14 @@ using System.Collections.Frozen;
 
 namespace Terminal.Gui;
 
-internal static class ColorExtensions {
-    static ColorExtensions () {
-        Dictionary<ColorName, AnsiColorCode> nameToCodeMap = new () {
+internal static class ColorExtensions
+{
+    private static FrozenDictionary<Color, ColorName> colorToNameMap;
+
+    static ColorExtensions ()
+    {
+        Dictionary<ColorName, AnsiColorCode> nameToCodeMap = new ()
+        {
             { ColorName.Black, AnsiColorCode.BLACK },
             { ColorName.Blue, AnsiColorCode.BLUE },
             { ColorName.Green, AnsiColorCode.GREEN },
@@ -24,7 +29,8 @@ internal static class ColorExtensions {
         };
         ColorNameToAnsiColorMap = nameToCodeMap.ToFrozenDictionary ();
 
-        ColorToNameMap = new Dictionary<Color, ColorName> {
+        ColorToNameMap = new Dictionary<Color, ColorName>
+        {
             // using "Windows 10 Console/PowerShell 6" here: https://i.stack.imgur.com/9UVnC.png
             // See also: https://en.wikipedia.org/wiki/ANSI_escape_code
             { new Color (12, 12, 12), ColorName.Black },
@@ -46,29 +52,28 @@ internal static class ColorExtensions {
         }.ToFrozenDictionary ();
     }
 
-    private static FrozenDictionary<Color, ColorName> colorToNameMap;
+    /// <summary>Defines the 16 legacy color names and their corresponding ANSI color codes.</summary>
+    internal static FrozenDictionary<ColorName, AnsiColorCode> ColorNameToAnsiColorMap { get; }
+
+    /// <summary>Reverse mapping for <see cref="ColorToNameMap"/>.</summary>
+    internal static FrozenDictionary<ColorName, Color> ColorNameToColorMap { get; private set; }
 
     /// <summary>
     ///     Gets or sets a <see cref="FrozenDictionary{TKey,TValue}"/> that maps legacy 16-color values to the corresponding
     ///     <see cref="ColorName"/>.
     /// </summary>
     /// <remarks>
-    ///     Setter should be called as infrequently as possible, as <see cref="FrozenDictionary{TKey,TValue}"/> is expensive to
-    ///     create.
+    ///     Setter should be called as infrequently as possible, as <see cref="FrozenDictionary{TKey,TValue}"/> is expensive to create.
     /// </remarks>
-    internal static FrozenDictionary<Color, ColorName> ColorToNameMap {
+    internal static FrozenDictionary<Color, ColorName> ColorToNameMap
+    {
         get => colorToNameMap;
-        set {
+        set
+        {
             colorToNameMap = value;
 
             //Also be sure to set the reverse mapping
             ColorNameToColorMap = value.ToFrozenDictionary (static kvp => kvp.Value, static kvp => kvp.Key);
         }
     }
-
-    /// <summary>Defines the 16 legacy color names and their corresponding ANSI color codes.</summary>
-    internal static FrozenDictionary<ColorName, AnsiColorCode> ColorNameToAnsiColorMap { get; }
-
-    /// <summary>Reverse mapping for <see cref="ColorToNameMap"/>.</summary>
-    internal static FrozenDictionary<ColorName, Color> ColorNameToColorMap { get; private set; }
 }

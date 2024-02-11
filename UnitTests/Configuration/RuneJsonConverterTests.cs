@@ -3,7 +3,8 @@ using System.Text.Json;
 
 namespace Terminal.Gui.ConfigurationTests;
 
-public class RunJsonConverterTests {
+public class RunJsonConverterTests
+{
     [Theory]
     [InlineData ("aa")]
     [InlineData ("☑☑")]
@@ -27,17 +28,18 @@ public class RunJsonConverterTests {
     // Girl (U+1F467, 👧)
     [InlineData ("U+1F469 U+200D U+1F469 U+200D U+1F467 U+200D U+1F467")]
     [InlineData ("\\U0001F469\\u200D\\U0001F469\\u200D\\U0001F467\\u200D\\U0001F467")]
-    public void RoundTripConversion_Negative (string rune) {
+    public void RoundTripConversion_Negative (string rune)
+    {
         // Act
         string json = JsonSerializer.Serialize (rune, ConfigurationManager._serializerOptions);
 
         // Assert
         Assert.Throws<JsonException> (
-            () => JsonSerializer.Deserialize<Rune> (
-                json,
-                ConfigurationManager._serializerOptions
-            )
-        );
+                                      () => JsonSerializer.Deserialize<Rune> (
+                                                                              json,
+                                                                              ConfigurationManager._serializerOptions
+                                                                             )
+                                     );
     }
 
     [Theory]
@@ -54,7 +56,8 @@ public class RunJsonConverterTests {
     [InlineData ("U+1F469", "👩")]
     [InlineData ("\\U0001F469", "👩")]
     [InlineData ("\\u0065\\u0301", "é")]
-    public void RoundTripConversion_Positive (string rune, string expected) {
+    public void RoundTripConversion_Positive (string rune, string expected)
+    {
         // Arrange
 
         // Act

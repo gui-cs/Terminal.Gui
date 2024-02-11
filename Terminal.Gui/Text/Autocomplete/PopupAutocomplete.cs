@@ -1,27 +1,27 @@
 ﻿namespace Terminal.Gui;
 
-/// <summary>
-///     Renders an overlay on another view at a given point that allows selecting from a range of 'autocomplete'
-///     options.
-/// </summary>
-public abstract class PopupAutocomplete : AutocompleteBase {
+/// <summary>Renders an overlay on another view at a given point that allows selecting from a range of 'autocomplete' options.</summary>
+public abstract class PopupAutocomplete : AutocompleteBase
+{
     /// <summary>Creates a new instance of the <see cref="PopupAutocomplete"/> class.</summary>
     public PopupAutocomplete () { PopupInsideContainer = true; }
 
     private bool closed;
     private ColorScheme colorScheme;
-    private int toRenderLength;
     private View hostControl;
     private View top, popup;
+    private int toRenderLength;
 
     /// <summary>
-    ///     The colors to use to render the overlay. Accessing this property before the Application has been initialized will
-    ///     cause an error
+    ///     The colors to use to render the overlay. Accessing this property before the Application has been initialized will cause an error
     /// </summary>
-    public override ColorScheme ColorScheme {
-        get {
-            if (colorScheme == null) {
-                colorScheme = Colors.ColorSchemes["Menu"];
+    public override ColorScheme ColorScheme
+    {
+        get
+        {
+            if (colorScheme == null)
+            {
+                colorScheme = Colors.ColorSchemes ["Menu"];
             }
 
             return colorScheme;
@@ -29,19 +29,17 @@ public abstract class PopupAutocomplete : AutocompleteBase {
         set => colorScheme = value;
     }
 
-    /// <summary>
-    ///     When more suggestions are available than can be rendered the user can scroll down the dropdown list. This indicates
-    ///     how far down they have gone
-    /// </summary>
-    public virtual int ScrollOffset { get; set; }
-
     /// <summary>The host control to handle.</summary>
-    public override View HostControl {
+    public override View HostControl
+    {
         get => hostControl;
-        set {
+        set
+        {
             hostControl = value;
             top = hostControl.SuperView;
-            if (top != null) {
+
+            if (top != null)
+            {
                 top.DrawContent += Top_DrawContent;
                 top.DrawContentComplete += Top_DrawContentComplete;
                 top.Removed += Top_Removed;
@@ -49,47 +47,59 @@ public abstract class PopupAutocomplete : AutocompleteBase {
         }
     }
 
+    /// <summary>
+    ///     When more suggestions are available than can be rendered the user can scroll down the dropdown list. This indicates how far down they have gone
+    /// </summary>
+    public virtual int ScrollOffset { get; set; }
+
     private Point? LastPopupPos { get; set; }
 
     /// <inheritdoc/>
-    public override void EnsureSelectedIdxIsValid () {
+    public override void EnsureSelectedIdxIsValid ()
+    {
         base.EnsureSelectedIdxIsValid ();
 
         // if user moved selection up off top of current scroll window
-        if (SelectedIdx < ScrollOffset) {
+        if (SelectedIdx < ScrollOffset)
+        {
             ScrollOffset = SelectedIdx;
         }
 
         // if user moved selection down past bottom of current scroll window
-        while (toRenderLength > 0 && SelectedIdx >= ScrollOffset + toRenderLength) {
+        while (toRenderLength > 0 && SelectedIdx >= ScrollOffset + toRenderLength)
+        {
             ScrollOffset++;
         }
     }
 
     /// <summary>
-    ///     Handle mouse events before <see cref="HostControl"/> e.g. to make mouse events like report/click apply to the
-    ///     autocomplete control instead of changing the cursor position in the underlying text view.
+    ///     Handle mouse events before <see cref="HostControl"/> e.g. to make mouse events like report/click apply to the autocomplete control instead of changing the cursor position in the underlying text view.
     /// </summary>
     /// <param name="me">The mouse event.</param>
     /// <param name="fromHost">If was called from the popup or from the host.</param>
     /// <returns><c>true</c>if the mouse can be handled <c>false</c>otherwise.</returns>
-    public override bool MouseEvent (MouseEvent me, bool fromHost = false) {
-        if (fromHost) {
-            if (!Visible) {
+    public override bool MouseEvent (MouseEvent me, bool fromHost = false)
+    {
+        if (fromHost)
+        {
+            if (!Visible)
+            {
                 return false;
             }
 
             // TODO: Revisit this
             //GenerateSuggestions ();
 
-            if (Visible && Suggestions.Count == 0) {
+            if (Visible && Suggestions.Count == 0)
+            {
                 Visible = false;
                 HostControl?.SetNeedsDisplay ();
 
                 return true;
             }
 
-            if (!Visible && Suggestions.Count > 0) {
+            if (!Visible && Suggestions.Count > 0)
+            {
                 Visible = true;
                 HostControl?.SetNeedsDisplay ();
                 Application.UngrabMouse ();
@@ -98,7 +108,8 @@ public abstract class PopupAutocomplete : AutocompleteBase {
             }
 
             // not in the popup
-            if (Visible && HostControl != null) {
+            if (Visible && HostControl != null)
+            {
                 Visible = false;
                 closed = false;
             }
@@ -108,31 +119,36 @@ public abstract class PopupAutocomplete : AutocompleteBase {
             return false;
         }
 
-        if (popup == null || Suggestions.Count == 0) {
+        if (popup == null || Suggestions.Count == 0)
+        {
             ManipulatePopup ();
 
             return false;
         }
 
-        if (me.Flags == MouseFlags.ReportMousePosition) {
+        if (me.Flags == MouseFlags.ReportMousePosition)
+        {
             RenderSelectedIdxByMouse (me);
 
             return true;
         }
 
-        if (me.Flags == MouseFlags.Button1Clicked) {
+        if (me.Flags == MouseFlags.Button1Clicked)
+        {
             SelectedIdx = me.Y - ScrollOffset;
 
             return Select ();
         }
 
-        if (me.Flags == MouseFlags.WheeledDown) {
+        if (me.Flags == MouseFlags.WheeledDown)
+        {
             MoveDown ();
 
             return true;
         }
 
-        if (me.Flags == MouseFlags.WheeledUp) {
+        if (me.Flags == MouseFlags.WheeledUp)
+        {
             MoveUp ();
 
             return true;
@@ -142,13 +158,14 @@ public abstract class PopupAutocomplete : AutocompleteBase {
     }
 
     /// <summary>
-    ///     Handle key events before <see cref="HostControl"/> e.g. to make key events like up/down apply to the autocomplete
-    ///     control instead of changing the cursor position in the underlying text view.
+    ///     Handle key events before <see cref="HostControl"/> e.g. to make key events like up/down apply to the autocomplete control instead of changing the cursor position in the underlying text view.
     /// </summary>
     /// <param name="a">The key event.</param>
     /// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
-    public override bool ProcessKey (Key a) {
-        if (SuggestionGenerator.IsWordChar ((Rune)a)) {
+    public override bool ProcessKey (Key a)
+    {
+        if (SuggestionGenerator.IsWordChar ((Rune)a))
+        {
             Visible = true;
             ManipulatePopup ();
             closed = false;
@@ -156,28 +173,34 @@ public abstract class PopupAutocomplete : AutocompleteBase {
             return false;
         }
 
-        if (a.KeyCode == Reopen) {
+        if (a.KeyCode == Reopen)
+        {
             Context.Canceled = false;
 
             return ReopenSuggestions ();
         }
 
-        if (closed || Suggestions.Count == 0) {
+        if (closed || Suggestions.Count == 0)
+        {
             Visible = false;
-            if (!closed) {
+
+            if (!closed)
+            {
                 Close ();
             }
 
             return false;
         }
 
-        if (a.KeyCode == KeyCode.CursorDown) {
+        if (a.KeyCode == KeyCode.CursorDown)
+        {
             MoveDown ();
 
             return true;
         }
 
-        if (a.KeyCode == KeyCode.CursorUp) {
+        if (a.KeyCode == KeyCode.CursorUp)
+        {
             MoveUp ();
 
             return true;
@@ -195,11 +218,13 @@ public abstract class PopupAutocomplete : AutocompleteBase {
             return false;
         }*/
 
-        if (a.KeyCode == SelectionKey) {
+        if (a.KeyCode == SelectionKey)
+        {
             return Select ();
         }
 
-        if (a.KeyCode == CloseKey) {
+        if (a.KeyCode == CloseKey)
+        {
             Close ();
             Context.Canceled = true;
 
@@ -211,13 +236,19 @@ public abstract class PopupAutocomplete : AutocompleteBase {
 
     /// <summary>Renders the autocomplete dialog inside or outside the given <see cref="HostControl"/> at the given point.</summary>
     /// <param name="renderAt"></param>
-    public override void RenderOverlay (Point renderAt) {
-        if (!Context.Canceled && Suggestions.Count > 0 && !Visible && HostControl?.HasFocus == true) {
-            ProcessKey (new Key ((KeyCode)Suggestions[0].Title[0]));
-        } else if (!Visible || HostControl?.HasFocus == false || Suggestions.Count == 0) {
+    public override void RenderOverlay (Point renderAt)
+    {
+        if (!Context.Canceled && Suggestions.Count > 0 && !Visible && HostControl?.HasFocus == true)
+        {
+            ProcessKey (new Key ((KeyCode)Suggestions [0].Title [0]));
+        }
+        else if (!Visible || HostControl?.HasFocus == false || Suggestions.Count == 0)
+        {
             LastPopupPos = null;
             Visible = false;
-            if (Suggestions.Count == 0) {
+
+            if (Suggestions.Count == 0)
+            {
                 Context.Canceled = false;
             }
 
@@ -228,102 +259,134 @@ public abstract class PopupAutocomplete : AutocompleteBase {
 
         int height, width;
 
-        if (PopupInsideContainer) {
+        if (PopupInsideContainer)
+        {
             // don't overspill vertically
             height = Math.Min (HostControl.Bounds.Height - renderAt.Y, MaxHeight);
 
             // There is no space below, lets see if can popup on top
-            if (height < Suggestions.Count && HostControl.Bounds.Height - renderAt.Y >= height) {
+            if (height < Suggestions.Count && HostControl.Bounds.Height - renderAt.Y >= height)
+            {
                 // Verifies that the upper limit available is greater than the lower limit
-                if (renderAt.Y > HostControl.Bounds.Height - renderAt.Y) {
+                if (renderAt.Y > HostControl.Bounds.Height - renderAt.Y)
+                {
                     renderAt.Y = Math.Max (renderAt.Y - Math.Min (Suggestions.Count + 1, MaxHeight + 1), 0);
                     height = Math.Min (Math.Min (Suggestions.Count, MaxHeight), LastPopupPos.Value.Y - 1);
                 }
             }
-        } else {
+        }
+        else
+        {
             // don't overspill vertically
             height = Math.Min (Math.Min (top.Bounds.Height - HostControl.Frame.Bottom, MaxHeight), Suggestions.Count);
 
             // There is no space below, lets see if can popup on top
-            if (height < Suggestions.Count && HostControl.Frame.Y - top.Frame.Y >= height) {
+            if (height < Suggestions.Count && HostControl.Frame.Y - top.Frame.Y >= height)
+            {
                 // Verifies that the upper limit available is greater than the lower limit
-                if (HostControl.Frame.Y > top.Bounds.Height - HostControl.Frame.Y) {
+                if (HostControl.Frame.Y > top.Bounds.Height - HostControl.Frame.Y)
+                {
                     renderAt.Y = Math.Max (HostControl.Frame.Y - Math.Min (Suggestions.Count, MaxHeight), 0);
                     height = Math.Min (Math.Min (Suggestions.Count, MaxHeight), HostControl.Frame.Y);
                 }
-            } else {
+            }
+            else
+            {
                 renderAt.Y = HostControl.Frame.Bottom;
             }
         }
 
-        if (ScrollOffset > Suggestions.Count - height) {
+        if (ScrollOffset > Suggestions.Count - height)
+        {
             ScrollOffset = 0;
         }
 
-        Suggestion[] toRender = Suggestions.Skip (ScrollOffset).Take (height).ToArray ();
+        Suggestion [] toRender = Suggestions.Skip (ScrollOffset).Take (height).ToArray ();
         toRenderLength = toRender.Length;
 
-        if (toRender.Length == 0) {
+        if (toRender.Length == 0)
+        {
             return;
         }
 
         width = Math.Min (MaxWidth, toRender.Max (s => s.Title.Length));
 
-        if (PopupInsideContainer) {
+        if (PopupInsideContainer)
+        {
             // don't overspill horizontally, let's see if can be displayed on the left
-            if (width > HostControl.Bounds.Width - renderAt.X) {
+            if (width > HostControl.Bounds.Width - renderAt.X)
+            {
                 // Verifies that the left limit available is greater than the right limit
-                if (renderAt.X > HostControl.Bounds.Width - renderAt.X) {
+                if (renderAt.X > HostControl.Bounds.Width - renderAt.X)
+                {
                     renderAt.X -= Math.Min (width, LastPopupPos.Value.X);
                     width = Math.Min (width, LastPopupPos.Value.X);
-                } else {
+                }
+                else
+                {
                     width = Math.Min (width, HostControl.Bounds.Width - renderAt.X);
                 }
             }
-        } else {
+        }
+        else
+        {
             // don't overspill horizontally, let's see if can be displayed on the left
-            if (width > top.Bounds.Width - (renderAt.X + HostControl.Frame.X)) {
+            if (width > top.Bounds.Width - (renderAt.X + HostControl.Frame.X))
+            {
                 // Verifies that the left limit available is greater than the right limit
-                if (renderAt.X + HostControl.Frame.X > top.Bounds.Width - (renderAt.X + HostControl.Frame.X)) {
+                if (renderAt.X + HostControl.Frame.X > top.Bounds.Width - (renderAt.X + HostControl.Frame.X))
+                {
                     renderAt.X -= Math.Min (width, LastPopupPos.Value.X);
                     width = Math.Min (width, LastPopupPos.Value.X);
-                } else {
+                }
+                else
+                {
                     width = Math.Min (width, top.Bounds.Width - renderAt.X);
                 }
             }
         }
 
-        if (PopupInsideContainer) {
+        if (PopupInsideContainer)
+        {
             popup.Frame = new Rect (
-                new Point (HostControl.Frame.X + renderAt.X, HostControl.Frame.Y + renderAt.Y),
-                new Size (width, height)
-            );
-        } else {
+                                    new Point (HostControl.Frame.X + renderAt.X, HostControl.Frame.Y + renderAt.Y),
+                                    new Size (width, height)
+                                   );
+        }
+        else
+        {
             popup.Frame = new Rect (
-                new Point (HostControl.Frame.X + renderAt.X, renderAt.Y),
-                new Size (width, height)
-            );
+                                    new Point (HostControl.Frame.X + renderAt.X, renderAt.Y),
+                                    new Size (width, height)
+                                   );
         }
 
         popup.Move (0, 0);
 
-        for (var i = 0; i < toRender.Length; i++) {
-            if (i == SelectedIdx - ScrollOffset) {
+        for (var i = 0; i < toRender.Length; i++)
+        {
+            if (i == SelectedIdx - ScrollOffset)
+            {
                 Application.Driver.SetAttribute (ColorScheme.Focus);
-            } else {
+            }
+            else
+            {
                 Application.Driver.SetAttribute (ColorScheme.Normal);
             }
 
             popup.Move (0, i);
 
-            string text = TextFormatter.ClipOrPad (toRender[i].Title, width);
+            string text = TextFormatter.ClipOrPad (toRender [i].Title, width);
 
             Application.Driver.AddStr (text);
         }
     }
 
-    /// <summary>Closes the Autocomplete context menu if it is showing and <see cref="IAutocomplete.ClearSuggestions"/></summary>
-    protected void Close () {
+    /// <summary>
+    ///     Closes the Autocomplete context menu if it is showing and <see cref="IAutocomplete.ClearSuggestions"/>
+    /// </summary>
+    protected void Close ()
+    {
         ClearSuggestions ();
         Visible = false;
         closed = true;
@@ -336,17 +399,18 @@ public abstract class PopupAutocomplete : AutocompleteBase {
 
     /// <summary>
     ///     Called when the user confirms a selection at the current cursor location in the <see cref="HostControl"/>. The
-    ///     <paramref name="accepted"/> string is the full autocomplete word to be inserted. Typically a host will have to
-    ///     remove some characters such that the <paramref name="accepted"/> string completes the word instead of simply being
-    ///     appended.
+    ///     <paramref name="accepted"/> string is the full autocomplete word to be inserted. Typically a host will have to remove some characters such that the
+    ///     <paramref name="accepted"/> string completes the word instead of simply being appended.
     /// </summary>
     /// <param name="accepted"></param>
     /// <returns>True if the insertion was possible otherwise false</returns>
-    protected virtual bool InsertSelection (Suggestion accepted) {
+    protected virtual bool InsertSelection (Suggestion accepted)
+    {
         SetCursorPosition (Context.CursorPosition + accepted.Remove);
 
         // delete the text
-        for (var i = 0; i < accepted.Remove; i++) {
+        for (var i = 0; i < accepted.Remove; i++)
+        {
             DeleteTextBackwards ();
         }
 
@@ -360,9 +424,12 @@ public abstract class PopupAutocomplete : AutocompleteBase {
     protected abstract void InsertText (string accepted);
 
     /// <summary>Moves the selection in the Autocomplete context menu down one</summary>
-    protected void MoveDown () {
+    protected void MoveDown ()
+    {
         SelectedIdx++;
-        if (SelectedIdx > Suggestions.Count - 1) {
+
+        if (SelectedIdx > Suggestions.Count - 1)
+        {
             SelectedIdx = 0;
         }
 
@@ -371,9 +438,12 @@ public abstract class PopupAutocomplete : AutocompleteBase {
     }
 
     /// <summary>Moves the selection in the Autocomplete context menu up one</summary>
-    protected void MoveUp () {
+    protected void MoveUp ()
+    {
         SelectedIdx--;
-        if (SelectedIdx < 0) {
+
+        if (SelectedIdx < 0)
+        {
             SelectedIdx = Suggestions.Count - 1;
         }
 
@@ -383,10 +453,14 @@ public abstract class PopupAutocomplete : AutocompleteBase {
 
     /// <summary>Render the current selection in the Autocomplete context menu by the mouse reporting.</summary>
     /// <param name="me"></param>
-    protected void RenderSelectedIdxByMouse (MouseEvent me) {
-        if (SelectedIdx != me.Y - ScrollOffset) {
+    protected void RenderSelectedIdxByMouse (MouseEvent me)
+    {
+        if (SelectedIdx != me.Y - ScrollOffset)
+        {
             SelectedIdx = me.Y - ScrollOffset;
-            if (LastPopupPos != null) {
+
+            if (LastPopupPos != null)
+            {
                 RenderOverlay ((Point)LastPopupPos);
             }
         }
@@ -394,11 +468,13 @@ public abstract class PopupAutocomplete : AutocompleteBase {
 
     /// <summary>Reopen the popup after it has been closed.</summary>
     /// <returns></returns>
-    protected bool ReopenSuggestions () {
+    protected bool ReopenSuggestions ()
+    {
         // TODO: Revisit
         //GenerateSuggestions ();
 
-        if (Suggestions.Count > 0) {
+        if (Suggestions.Count > 0)
+        {
             Visible = true;
             closed = false;
             HostControl?.SetNeedsDisplay ();
@@ -414,9 +490,11 @@ public abstract class PopupAutocomplete : AutocompleteBase {
     ///     <see cref="IAutocomplete.SelectionKey"/>.
     /// </summary>
     /// <returns></returns>
-    protected bool Select () {
-        if (SelectedIdx >= 0 && SelectedIdx < Suggestions.Count) {
-            Suggestion accepted = Suggestions[SelectedIdx];
+    protected bool Select ()
+    {
+        if (SelectedIdx >= 0 && SelectedIdx < Suggestions.Count)
+        {
+            Suggestion accepted = Suggestions [SelectedIdx];
 
             return InsertSelection (accepted);
         }
@@ -428,49 +506,61 @@ public abstract class PopupAutocomplete : AutocompleteBase {
     /// <param name="column"></param>
     protected abstract void SetCursorPosition (int column);
 
-    private void ManipulatePopup () {
-        if (Visible && popup == null) {
+    private void ManipulatePopup ()
+    {
+        if (Visible && popup == null)
+        {
             popup = new Popup (this) { Frame = Rect.Empty };
             top?.Add (popup);
         }
 
-        if (!Visible && popup != null) {
+        if (!Visible && popup != null)
+        {
             top?.Remove (popup);
             popup.Dispose ();
             popup = null;
         }
     }
 
-    private void Top_DrawContent (object sender, DrawEventArgs e) {
-        if (!closed) {
+    private void Top_DrawContent (object sender, DrawEventArgs e)
+    {
+        if (!closed)
+        {
             ReopenSuggestions ();
         }
 
         ManipulatePopup ();
-        if (Visible) {
+
+        if (Visible)
+        {
             top.BringSubviewToFront (popup);
         }
     }
 
     private void Top_DrawContentComplete (object sender, DrawEventArgs e) { ManipulatePopup (); }
 
-    private void Top_Removed (object sender, SuperViewChangedEventArgs e) {
+    private void Top_Removed (object sender, SuperViewChangedEventArgs e)
+    {
         Visible = false;
         ManipulatePopup ();
     }
 
-    private class Popup : View {
-        public Popup (PopupAutocomplete autocomplete) {
+    private class Popup : View
+    {
+        public Popup (PopupAutocomplete autocomplete)
+        {
             this.autocomplete = autocomplete;
             CanFocus = true;
             WantMousePositionReports = true;
         }
 
         private readonly PopupAutocomplete autocomplete;
-        public override bool MouseEvent (MouseEvent mouseEvent) => autocomplete.MouseEvent (mouseEvent);
+        public override bool MouseEvent (MouseEvent mouseEvent) { return autocomplete.MouseEvent (mouseEvent); }
 
-        public override void OnDrawContent (Rect contentArea) {
-            if (autocomplete.LastPopupPos == null) {
+        public override void OnDrawContent (Rect contentArea)
+        {
+            if (autocomplete.LastPopupPos == null)
+            {
                 return;
             }
 

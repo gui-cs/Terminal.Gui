@@ -2,15 +2,17 @@
 
 namespace Terminal.Gui.ViewsTests;
 
-public class SpinnerViewTests {
-    public SpinnerViewTests (ITestOutputHelper output) { this.output = output; }
+public class SpinnerViewTests
+{
     private readonly ITestOutputHelper output;
+    public SpinnerViewTests (ITestOutputHelper output) { this.output = output; }
 
     [Theory]
     [AutoInitShutdown]
     [InlineData (true)]
     [InlineData (false)]
-    public void TestSpinnerView_AutoSpin (bool callStop) {
+    public void TestSpinnerView_AutoSpin (bool callStop)
+    {
         SpinnerView view = GetSpinnerView ();
 
         Assert.Empty (Application.MainLoop._timeouts);
@@ -26,11 +28,14 @@ public class SpinnerViewTests {
         Assert.True (view.AutoSpin);
         Assert.Single (Application.MainLoop._timeouts);
 
-        if (callStop) {
+        if (callStop)
+        {
             view.AutoSpin = false;
             Assert.Empty (Application.MainLoop._timeouts);
             Assert.False (view.AutoSpin);
-        } else {
+        }
+        else
+        {
             Assert.NotEmpty (Application.MainLoop._timeouts);
         }
 
@@ -41,7 +46,8 @@ public class SpinnerViewTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void TestSpinnerView_NoThrottle () {
+    public void TestSpinnerView_NoThrottle ()
+    {
         SpinnerView view = GetSpinnerView ();
         view.SpinDelay = 0;
 
@@ -60,7 +66,8 @@ public class SpinnerViewTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void TestSpinnerView_ThrottlesAnimation () {
+    public void TestSpinnerView_ThrottlesAnimation ()
+    {
         SpinnerView view = GetSpinnerView ();
         view.Draw ();
 
@@ -89,7 +96,8 @@ public class SpinnerViewTests {
         //TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
     }
 
-    private SpinnerView GetSpinnerView () {
+    private SpinnerView GetSpinnerView ()
+    {
         var view = new SpinnerView ();
 
         Application.Top.Add (view);

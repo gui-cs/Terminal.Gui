@@ -2,12 +2,15 @@
 
 namespace UICatalog;
 
-public static class NumberToWords {
-    private static readonly string[] tens = {
+public static class NumberToWords
+{
+    private static readonly string [] tens =
+    {
         "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"
     };
 
-    private static readonly string[] units = {
+    private static readonly string [] units =
+    {
         "Zero",
         "One",
         "Two",
@@ -30,50 +33,67 @@ public static class NumberToWords {
         "Nineteen"
     };
 
-    public static string Convert (long i) {
-        if (i < 20) {
-            return units[i];
+    public static string Convert (long i)
+    {
+        if (i < 20)
+        {
+            return units [i];
         }
 
-        if (i < 100) {
-            return tens[i / 10] + (i % 10 > 0 ? " " + Convert (i % 10) : "");
+        if (i < 100)
+        {
+            return tens [i / 10] + (i % 10 > 0 ? " " + Convert (i % 10) : "");
         }
 
-        if (i < 1000) {
-            return units[i / 100] + " Hundred"
-                                  + (i % 100 > 0 ? " And " + Convert (i % 100) : "");
+        if (i < 1000)
+        {
+            return units [i / 100]
+                   + " Hundred"
+                   + (i % 100 > 0 ? " And " + Convert (i % 100) : "");
         }
 
-        if (i < 100000) {
-            return Convert (i / 1000) + " Thousand "
-                                      + (i % 1000 > 0 ? " " + Convert (i % 1000) : "");
+        if (i < 100000)
+        {
+            return Convert (i / 1000)
+                   + " Thousand "
+                   + (i % 1000 > 0 ? " " + Convert (i % 1000) : "");
         }
 
-        if (i < 10000000) {
-            return Convert (i / 100000) + " Lakh "
-                                        + (i % 100000 > 0 ? " " + Convert (i % 100000) : "");
+        if (i < 10000000)
+        {
+            return Convert (i / 100000)
+                   + " Lakh "
+                   + (i % 100000 > 0 ? " " + Convert (i % 100000) : "");
         }
 
-        if (i < 1000000000) {
-            return Convert (i / 10000000) + " Crore "
-                                          + (i % 10000000 > 0 ? " " + Convert (i % 10000000) : "");
+        if (i < 1000000000)
+        {
+            return Convert (i / 10000000)
+                   + " Crore "
+                   + (i % 10000000 > 0 ? " " + Convert (i % 10000000) : "");
         }
 
-        return Convert (i / 1000000000) + " Arab "
-                                        + (i % 1000000000 > 0 ? " " + Convert (i % 1000000000) : "");
+        return Convert (i / 1000000000)
+               + " Arab "
+               + (i % 1000000000 > 0 ? " " + Convert (i % 1000000000) : "");
     }
 
-    public static string ConvertAmount (double amount) {
-        try {
+    public static string ConvertAmount (double amount)
+    {
+        try
+        {
             var amount_int = (long)amount;
             var amount_dec = (long)Math.Round ((amount - amount_int) * 100);
-            if (amount_dec == 0) {
+
+            if (amount_dec == 0)
+            {
                 return Convert (amount_int) + " Only.";
             }
 
             return Convert (amount_int) + " Point " + Convert (amount_dec) + " Only.";
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             throw new ArgumentOutOfRangeException (e.Message);
         }
     }

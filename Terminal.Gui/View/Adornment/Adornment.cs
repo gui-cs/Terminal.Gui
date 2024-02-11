@@ -10,15 +10,14 @@
 ///     <see cref="Thickness"/> class, which specifies the thickness of the sides of a rectangle.
 /// </summary>
 /// <remarsk>
-///     <para>
-///         There is no prevision for creating additional subclasses of Adornment. It is not abstract to enable unit
-///         testing.
-///     </para>
+///     <para>There is no prevision for creating additional subclasses of Adornment. It is not abstract to enable unit testing.</para>
 ///     <para>Each of <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/> can be customized.</para>
 /// </remarsk>
-public class Adornment : View {
+public class Adornment : View
+{
     /// <inheritdoc/>
-    public Adornment () {
+    public Adornment ()
+    {
         /* Do nothing; A parameter-less constructor is required to support all views unit tests. */
     }
 
@@ -28,38 +27,16 @@ public class Adornment : View {
 
     private Thickness _thickness = Thickness.Empty;
 
-    /// <summary>
-    ///     Adornments only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas, so setting this property
-    ///     throws an <see cref="InvalidOperationException"/>.
-    /// </summary>
-    public override bool SuperViewRendersLineCanvas {
-        get => false; // throw new NotImplementedException ();
-        set => throw new NotImplementedException ();
-    }
-
     /// <summary>Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).</summary>
-    public override Rect Bounds {
+    public override Rect Bounds
+    {
         get => Thickness?.GetInside (new Rect (Point.Empty, Frame.Size)) ?? new Rect (Point.Empty, Frame.Size);
         set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
     }
 
-    /// <summary>Defines the rectangle that the <see cref="Adornment"/> will use to draw its content.</summary>
-    public Thickness Thickness {
-        get => _thickness;
-        set {
-            Thickness prev = _thickness;
-            _thickness = value;
-            if (prev != _thickness) {
-                Parent?.LayoutAdornments ();
-                OnThicknessChanged (prev);
-            }
-        }
-    }
-
     /// <summary>The Parent of this Adornment (the View this Adornment surrounds).</summary>
     /// <remarks>
-    ///     Adornments are distinguished from typical View classes in that they are not sub-views, but have a parent/child
-    ///     relationship with their containing View.
+    ///     Adornments are distinguished from typical View classes in that they are not sub-views, but have a parent/child relationship with their containing View.
     /// </remarks>
     public View Parent { get; set; }
 
@@ -67,13 +44,42 @@ public class Adornment : View {
     ///     Adornments cannot be used as sub-views (see <see cref="Parent"/>); this method always throws an
     ///     <see cref="InvalidOperationException"/>. TODO: Are we sure?
     /// </summary>
-    public override View SuperView {
+    public override View SuperView
+    {
         get => null;
         set => throw new NotImplementedException ();
     }
 
+    /// <summary>
+    ///     Adornments only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas, so setting this property throws an
+    ///     <see cref="InvalidOperationException"/>.
+    /// </summary>
+    public override bool SuperViewRendersLineCanvas
+    {
+        get => false; // throw new NotImplementedException ();
+        set => throw new NotImplementedException ();
+    }
+
+    /// <summary>Defines the rectangle that the <see cref="Adornment"/> will use to draw its content.</summary>
+    public Thickness Thickness
+    {
+        get => _thickness;
+        set
+        {
+            Thickness prev = _thickness;
+            _thickness = value;
+
+            if (prev != _thickness)
+            {
+                Parent?.LayoutAdornments ();
+                OnThicknessChanged (prev);
+            }
+        }
+    }
+
     /// <inheritdoc/>
-    public override void BoundsToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true) {
+    public override void BoundsToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
+    {
         // Adornments are *Children* of a View, not SubViews. Thus View.BoundsToScreen will not work.
         // To get the screen-relative coordinates of a Adornment, we need to know who
         // the Parent is
@@ -87,7 +93,8 @@ public class Adornment : View {
     }
 
     /// <inheritdoc/>
-    public override Rect FrameToScreen () {
+    public override Rect FrameToScreen ()
+    {
         // Adornments are *Children* of a View, not SubViews. Thus View.FrameToScreen will not work.
         // To get the screen-relative coordinates of a Adornment, we need to know who
         // the Parent is
@@ -103,11 +110,13 @@ public class Adornment : View {
 
     /// <summary>Does nothing for Adornment</summary>
     /// <returns></returns>
-    public override bool OnDrawAdornments () => false;
+    public override bool OnDrawAdornments () { return false; }
 
     /// <summary>Redraws the Adornments that comprise the <see cref="Adornment"/>.</summary>
-    public override void OnDrawContent (Rect contentArea) {
-        if (Thickness == Thickness.Empty) {
+    public override void OnDrawContent (Rect contentArea)
+    {
+        if (Thickness == Thickness.Empty)
+        {
             return;
         }
 
@@ -119,8 +128,10 @@ public class Adornment : View {
         Driver.SetAttribute (normalAttr);
         Thickness.Draw (screenBounds, (string)(Data ?? string.Empty));
 
-        if (!string.IsNullOrEmpty (TextFormatter.Text)) {
-            if (TextFormatter != null) {
+        if (!string.IsNullOrEmpty (TextFormatter.Text))
+        {
+            if (TextFormatter != null)
+            {
                 TextFormatter.Size = Frame.Size;
                 TextFormatter.NeedsFormat = true;
             }
@@ -133,24 +144,28 @@ public class Adornment : View {
 
     /// <summary>Does nothing for Adornment</summary>
     /// <returns></returns>
-    public override bool OnRenderLineCanvas () => false;
+    public override bool OnRenderLineCanvas () { return false; }
 
     /// <summary>Called whenever the <see cref="Thickness"/> property changes.</summary>
-    public virtual void OnThicknessChanged (Thickness previousThickness) {
+    public virtual void OnThicknessChanged (Thickness previousThickness)
+    {
         ThicknessChanged?.Invoke (
-            this,
-            new ThicknessEventArgs { Thickness = Thickness, PreviousThickness = previousThickness }
-        );
+                                  this,
+                                  new ThicknessEventArgs { Thickness = Thickness, PreviousThickness = previousThickness }
+                                 );
     }
 
     /// <summary>Fired whenever the <see cref="Thickness"/> property changes.</summary>
     public event EventHandler<ThicknessEventArgs> ThicknessChanged;
 
-    internal override Adornment CreateAdornment (Type adornmentType) =>
+    internal override Adornment CreateAdornment (Type adornmentType)
+    {
         /* Do nothing - Adornments do not have Adornments */
-        null;
+        return null;
+    }
 
-    internal override void LayoutAdornments () {
+    internal override void LayoutAdornments ()
+    {
         /* Do nothing - Adornments do not have Adornments */
     }
 }

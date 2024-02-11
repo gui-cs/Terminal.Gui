@@ -3,13 +3,15 @@
 namespace Terminal.Gui.ViewTests;
 
 /// <summary>Tests View BeginInit/EndInit/Initialized functionality.</summary>
-public class InitTests {
-    public InitTests (ITestOutputHelper output) { _output = output; }
+public class InitTests
+{
     private readonly ITestOutputHelper _output;
+    public InitTests (ITestOutputHelper output) { _output = output; }
 
     // Test behavior of calling BeginInit multiple times
     [Fact]
-    public void BeginInit_Called_Multiple_Times_Throws () {
+    public void BeginInit_Called_Multiple_Times_Throws ()
+    {
         var view = new View ();
         var superView = new View ();
         superView.Add (view);
@@ -26,7 +28,8 @@ public class InitTests {
     }
 
     [Fact]
-    public void BeginInit_EndInit_Initialized () {
+    public void BeginInit_EndInit_Initialized ()
+    {
         var view = new View ();
         Assert.False (view.IsInitialized, "View should not be initialized");
         view.BeginInit ();
@@ -36,7 +39,8 @@ public class InitTests {
     }
 
     [Fact]
-    public void BeginInit_EndInit_Initialized_WithSuperView () {
+    public void BeginInit_EndInit_Initialized_WithSuperView ()
+    {
         var view = new View ();
         var superView = new View ();
         superView.Add (view);
@@ -50,7 +54,8 @@ public class InitTests {
     }
 
     [Fact]
-    public void BeginInit_EndInit_SuperView_Initialized () {
+    public void BeginInit_EndInit_SuperView_Initialized ()
+    {
         var view = new View ();
         var superView = new View ();
         superView.Add (view);
@@ -65,7 +70,8 @@ public class InitTests {
     }
 
     [Fact]
-    public void BeginInit_EndInit_SuperView_Initialized_WithSuperSuperView () {
+    public void BeginInit_EndInit_SuperView_Initialized_WithSuperSuperView ()
+    {
         var view = new View ();
         var superView = new View ();
         var superSuperView = new View ();
@@ -86,7 +92,8 @@ public class InitTests {
 
     // Test behavior of calling EndInit multiple times
     [Fact]
-    public void EndInit_Called_Multiple_Times_Throws () {
+    public void EndInit_Called_Multiple_Times_Throws ()
+    {
         var view = new View ();
         var superView = new View ();
         superView.Add (view);
@@ -112,7 +119,8 @@ public class InitTests {
 
     // Test calling EndInit without first calling BeginInit
     [Fact]
-    public void EndInit_Called_Without_BeginInit_Throws () {
+    public void EndInit_Called_Without_BeginInit_Throws ()
+    {
         var view = new View ();
         var superView = new View ();
         superView.Add (view);
@@ -132,7 +140,8 @@ public class InitTests {
 
     // Initialized event
     [Fact]
-    public void InitializedEvent_Fires_On_EndInit () {
+    public void InitializedEvent_Fires_On_EndInit ()
+    {
         var view = new View ();
         var superView = new View ();
         superView.Add (view);

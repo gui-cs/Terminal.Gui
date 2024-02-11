@@ -4,11 +4,13 @@
 ///     Event args for when a <see cref="Key"/> is changed from one value to a new value (e.g. in
 ///     <see cref="View.HotKeyChanged"/>)
 /// </summary>
-public class KeyChangedEventArgs : EventArgs {
+public class KeyChangedEventArgs : EventArgs
+{
     /// <summary>Creates a new instance of the <see cref="KeyChangedEventArgs"/> class</summary>
     /// <param name="oldKey"></param>
     /// <param name="newKey"></param>
-    public KeyChangedEventArgs (Key oldKey, Key newKey) {
+    public KeyChangedEventArgs (Key oldKey, Key newKey)
+    {
         OldKey = oldKey;
         NewKey = newKey;
     }

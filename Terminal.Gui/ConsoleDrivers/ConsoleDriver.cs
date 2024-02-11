@@ -12,16 +12,17 @@ namespace Terminal.Gui;
 ///     <see cref="WindowsDriver"/> - <see cref="NetDriver"/> that uses the .NET Console API - <see cref="FakeConsole"/>
 ///     for unit testing.
 /// </remarks>
-public abstract class ConsoleDriver {
+public abstract class ConsoleDriver
+{
     /// <summary>Enables diagnostic functions</summary>
     [Flags]
-    public enum DiagnosticFlags : uint {
+    public enum DiagnosticFlags : uint
+    {
         /// <summary>All diagnostics off</summary>
         Off = 0b_0000_0000,
 
         /// <summary>
-        ///     When enabled, <see cref="View.OnDrawAdornments"/> will draw a ruler in the frame for any side with a padding value
-        ///     greater than 0.
+        ///     When enabled, <see cref="View.OnDrawAdornments"/> will draw a ruler in the frame for any side with a padding value greater than 0.
         /// </summary>
         FrameRuler = 0b_0000_0001,
 
@@ -34,17 +35,14 @@ public abstract class ConsoleDriver {
 
     // As performance is a concern, we keep track of the dirty lines and only refresh those.
     // This is in addition to the dirty flag on each cell.
-    internal bool[] _dirtyLines;
+    internal bool [] _dirtyLines;
 
-    /// <summary>
-    ///     The contents of the application output. The driver outputs this buffer to the terminal when
-    ///     <see cref="UpdateScreen"/> is called.
-    ///     <remarks>The format of the array is rows, columns. The first index is the row, the second index is the column.</remarks>
-    /// </summary>
-    public Cell[,] Contents { get; internal set; }
+    /// <summary>Gets the dimensions of the terminal.</summary>
+    public Rect Bounds => new (0, 0, Cols, Rows);
 
-    /// <summary>Set flags to enable/disable <see cref="ConsoleDriver"/> diagnostics.</summary>
-    public static DiagnosticFlags Diagnostics { get; set; }
+    /// <summary>Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject to.</summary>
+    /// <value>The rectangle describing the bounds of <see cref="Clip"/>.</value>
+    public Rect Clip { get; set; }
 
     /// <summary>Get the operating system clipboard.</summary>
     public IClipboard Clipboard { get; internal set; }
@@ -56,13 +54,25 @@ public abstract class ConsoleDriver {
     public int Col { get; internal set; }
 
     /// <summary>The number of columns visible in the terminal.</summary>
-    public virtual int Cols {
+    public virtual int Cols
+    {
         get => _cols;
-        internal set {
+        internal set
+        {
             _cols = value;
             ClearContents ();
         }
     }
+
+    /// <summary>
+    ///     The contents of the application output. The driver outputs this buffer to the terminal when
+    ///     <see cref="UpdateScreen"/> is called.
+    ///     <remarks>The format of the array is rows, columns. The first index is the row, the second index is the column.</remarks>
+    /// </summary>
+    public Cell [,] Contents { get; internal set; }
+
+    /// <summary>Set flags to enable/disable <see cref="ConsoleDriver"/> diagnostics.</summary>
+    public static DiagnosticFlags Diagnostics { get; set; }
 
     /// <summary>The leftmost column in the terminal.</summary>
     public virtual int Left { get; internal set; } = 0;
@@ -74,9 +84,11 @@ public abstract class ConsoleDriver {
     public int Row { get; internal set; }
 
     /// <summary>The number of rows visible in the terminal.</summary>
-    public virtual int Rows {
+    public virtual int Rows
+    {
         get => _rows;
-        internal set {
+        internal set
+        {
             _rows = value;
             ClearContents ();
         }
@@ -84,16 +96,6 @@ public abstract class ConsoleDriver {
 
     /// <summary>The topmost row in the terminal.</summary>
     public virtual int Top { get; internal set; } = 0;
-
-    /// <summary>Gets the dimensions of the terminal.</summary>
-    public Rect Bounds => new (0, 0, Cols, Rows);
-
-    /// <summary>
-    ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
-    ///     to.
-    /// </summary>
-    /// <value>The rectangle describing the bounds of <see cref="Clip"/>.</value>
-    public Rect Clip { get; set; }
 
     /// <summary>
     ///     Set this to true in any unit tests that attempt to test drivers other than FakeDriver.
@@ -114,19 +116,23 @@ public abstract class ConsoleDriver {
     ///         <see cref="Cols"/>.
     ///     </para>
     ///     <para>
-    ///         If <paramref name="rune"/> requires more than one column, and <see cref="Col"/> plus the number of columns
-    ///         needed exceeds the <see cref="Clip"/> or screen dimensions, the default Unicode replacement character (U+FFFD)
-    ///         will be added instead.
+    ///         If <paramref name="rune"/> requires more than one column, and <see cref="Col"/> plus the number of columns needed exceeds the
+    ///         <see cref="Clip"/> or screen dimensions, the default Unicode replacement character (U+FFFD) will be added instead.
     ///     </para>
     /// </remarks>
     /// <param name="rune">Rune to add.</param>
-    public void AddRune (Rune rune) {
+    public void AddRune (Rune rune)
+    {
         int runeWidth = -1;
         bool validLocation = IsValidLocation (Col, Row);
-        if (validLocation) {
+
+        if (validLocation)
+        {
             rune = rune.MakePrintable ();
             runeWidth = rune.GetColumns ();
-            if (runeWidth == 0 && rune.IsCombiningMark ()) {
+
+            if (runeWidth == 0 && rune.IsCombiningMark ())
+            {
                 // AtlasEngine does not support NON-NORMALIZED combining marks in a way
                 // compatible with the driver architecture. Any CMs (except in the first col)
                 // are correctly combined with the base char, but are ALSO treated as 1 column
@@ -135,97 +141,129 @@ public abstract class ConsoleDriver {
                 // Until this is addressed (see Issue #), we do our best by 
                 // a) Attempting to normalize any CM with the base char to it's left
                 // b) Ignoring any CMs that don't normalize
-                if (Col > 0) {
-                    if (Contents[Row, Col - 1].CombiningMarks.Count > 0) {
+                if (Col > 0)
+                {
+                    if (Contents [Row, Col - 1].CombiningMarks.Count > 0)
+                    {
                         // Just add this mark to the list
-                        Contents[Row, Col - 1].CombiningMarks.Add (rune);
+                        Contents [Row, Col - 1].CombiningMarks.Add (rune);
 
                         // Ignore. Don't move to next column (let the driver figure out what to do).
-                    } else {
+                    }
+                    else
+                    {
                         // Attempt to normalize the cell to our left combined with this mark
-                        string combined = Contents[Row, Col - 1].Rune + rune.ToString ();
+                        string combined = Contents [Row, Col - 1].Rune + rune.ToString ();
 
                         // Normalize to Form C (Canonical Composition)
                         string normalized = combined.Normalize (NormalizationForm.FormC);
-                        if (normalized.Length == 1) {
+
+                        if (normalized.Length == 1)
+                        {
                             // It normalized! We can just set the Cell to the left with the
                             // normalized codepoint 
-                            Contents[Row, Col - 1].Rune = (Rune)normalized[0];
+                            Contents [Row, Col - 1].Rune = (Rune)normalized [0];
 
                             // Ignore. Don't move to next column because we're already there
-                        } else {
+                        }
+                        else
+                        {
                             // It didn't normalize. Add it to the Cell to left's CM list
-                            Contents[Row, Col - 1].CombiningMarks.Add (rune);
+                            Contents [Row, Col - 1].CombiningMarks.Add (rune);
 
                             // Ignore. Don't move to next column (let the driver figure out what to do).
                         }
                     }
 
-                    Contents[Row, Col - 1].Attribute = CurrentAttribute;
-                    Contents[Row, Col - 1].IsDirty = true;
-                } else {
+                    Contents [Row, Col - 1].Attribute = CurrentAttribute;
+                    Contents [Row, Col - 1].IsDirty = true;
+                }
+                else
+                {
                     // Most drivers will render a combining mark at col 0 as the mark
-                    Contents[Row, Col].Rune = rune;
-                    Contents[Row, Col].Attribute = CurrentAttribute;
-                    Contents[Row, Col].IsDirty = true;
+                    Contents [Row, Col].Rune = rune;
+                    Contents [Row, Col].Attribute = CurrentAttribute;
+                    Contents [Row, Col].IsDirty = true;
                     Col++;
                 }
-            } else {
-                Contents[Row, Col].Attribute = CurrentAttribute;
-                Contents[Row, Col].IsDirty = true;
+            }
+            else
+            {
+                Contents [Row, Col].Attribute = CurrentAttribute;
+                Contents [Row, Col].IsDirty = true;
 
-                if (Col > 0) {
+                if (Col > 0)
+                {
                     // Check if cell to left has a wide glyph
-                    if (Contents[Row, Col - 1].Rune.GetColumns () > 1) {
+                    if (Contents [Row, Col - 1].Rune.GetColumns () > 1)
+                    {
                         // Invalidate cell to left
-                        Contents[Row, Col - 1].Rune = Rune.ReplacementChar;
-                        Contents[Row, Col - 1].IsDirty = true;
+                        Contents [Row, Col - 1].Rune = Rune.ReplacementChar;
+                        Contents [Row, Col - 1].IsDirty = true;
                     }
                 }
 
-                if (runeWidth < 1) {
-                    Contents[Row, Col].Rune = Rune.ReplacementChar;
-                } else if (runeWidth == 1) {
-                    Contents[Row, Col].Rune = rune;
-                    if (Col < Clip.Right - 1) {
-                        Contents[Row, Col + 1].IsDirty = true;
+                if (runeWidth < 1)
+                {
+                    Contents [Row, Col].Rune = Rune.ReplacementChar;
+                }
+                else if (runeWidth == 1)
+                {
+                    Contents [Row, Col].Rune = rune;
+
+                    if (Col < Clip.Right - 1)
+                    {
+                        Contents [Row, Col + 1].IsDirty = true;
                     }
-                } else if (runeWidth == 2) {
-                    if (Col == Clip.Right - 1) {
+                }
+                else if (runeWidth == 2)
+                {
+                    if (Col == Clip.Right - 1)
+                    {
                         // We're at the right edge of the clip, so we can't display a wide character.
                         // TODO: Figure out if it is better to show a replacement character or ' '
-                        Contents[Row, Col].Rune = Rune.ReplacementChar;
-                    } else {
-                        Contents[Row, Col].Rune = rune;
-                        if (Col < Clip.Right - 1) {
+                        Contents [Row, Col].Rune = Rune.ReplacementChar;
+                    }
+                    else
+                    {
+                        Contents [Row, Col].Rune = rune;
+
+                        if (Col < Clip.Right - 1)
+                        {
                             // Invalidate cell to right so that it doesn't get drawn
                             // TODO: Figure out if it is better to show a replacement character or ' '
-                            Contents[Row, Col + 1].Rune = Rune.ReplacementChar;
-                            Contents[Row, Col + 1].IsDirty = true;
+                            Contents [Row, Col + 1].Rune = Rune.ReplacementChar;
+                            Contents [Row, Col + 1].IsDirty = true;
                         }
                     }
-                } else {
+                }
+                else
+                {
                     // This is a non-spacing character, so we don't need to do anything
-                    Contents[Row, Col].Rune = (Rune)' ';
-                    Contents[Row, Col].IsDirty = false;
+                    Contents [Row, Col].Rune = (Rune)' ';
+                    Contents [Row, Col].IsDirty = false;
                 }
 
-                _dirtyLines[Row] = true;
+                _dirtyLines [Row] = true;
             }
         }
 
-        if (runeWidth is < 0 or > 0) {
+        if (runeWidth is < 0 or > 0)
+        {
             Col++;
         }
 
-        if (runeWidth > 1) {
+        if (runeWidth > 1)
+        {
             Debug.Assert (runeWidth <= 2);
-            if (validLocation && Col < Clip.Right) {
+
+            if (validLocation && Col < Clip.Right)
+            {
                 // This is a double-width character, and we are not at the end of the line.
                 // Col now points to the second column of the character. Ensure it doesn't
                 // Get rendered.
-                Contents[Row, Col].IsDirty = false;
-                Contents[Row, Col].Attribute = CurrentAttribute;
+                Contents [Row, Col].IsDirty = false;
+                Contents [Row, Col].Attribute = CurrentAttribute;
 
                 // TODO: Determine if we should wipe this out (for now now)
                 //Contents [Row, Col].Rune = (Rune)' ';
@@ -236,8 +274,8 @@ public abstract class ConsoleDriver {
     }
 
     /// <summary>
-    ///     Adds the specified <see langword="char"/> to the display at the current cursor position. This method is a
-    ///     convenience method that calls <see cref="AddRune(Rune)"/> with the <see cref="Rune"/> constructor.
+    ///     Adds the specified <see langword="char"/> to the display at the current cursor position. This method is a convenience method that calls
+    ///     <see cref="AddRune(Rune)"/> with the <see cref="Rune"/> constructor.
     /// </summary>
     /// <param name="c">Character to add.</param>
     public void AddRune (char c) { AddRune (new Rune (c)); }
@@ -252,9 +290,12 @@ public abstract class ConsoleDriver {
     ///     <para>If <paramref name="str"/> requires more columns than are available, the output will be clipped.</para>
     /// </remarks>
     /// <param name="str">String.</param>
-    public void AddStr (string str) {
+    public void AddStr (string str)
+    {
         List<Rune> runes = str.EnumerateRunes ().ToList ();
-        for (var i = 0; i < runes.Count; i++) {
+
+        for (var i = 0; i < runes.Count; i++)
+        {
             //if (runes [i].IsCombiningMark()) {
 
             //	// Attempt to normalize
@@ -265,30 +306,37 @@ public abstract class ConsoleDriver {
 
             //	runes [i-]
             //}
-            AddRune (runes[i]);
+            AddRune (runes [i]);
         }
     }
 
     /// <summary>Clears the <see cref="Contents"/> of the driver.</summary>
-    public void ClearContents () {
+    public void ClearContents ()
+    {
         // TODO: This method is really "Clear Contents" now and should not be abstract (or virtual)
         Contents = new Cell [Rows, Cols];
         Clip = new Rect (0, 0, Cols, Rows);
         _dirtyLines = new bool [Rows];
 
-        lock (Contents) {
+        lock (Contents)
+        {
             // Can raise an exception while is still resizing.
-            try {
-                for (var row = 0; row < Rows; row++) {
-                    for (var c = 0; c < Cols; c++) {
-                        Contents[row, c] = new Cell {
+            try
+            {
+                for (var row = 0; row < Rows; row++)
+                {
+                    for (var c = 0; c < Cols; c++)
+                    {
+                        Contents [row, c] = new Cell
+                        {
                             Rune = (Rune)' ', Attribute = new Attribute (Color.White, Color.Black), IsDirty = true
                         };
-                        _dirtyLines[row] = true;
+                        _dirtyLines [row] = true;
                     }
                 }
             }
-            catch (IndexOutOfRangeException) { }
+            catch (IndexOutOfRangeException)
+            { }
         }
     }
 
@@ -300,9 +348,12 @@ public abstract class ConsoleDriver {
     /// <summary>Fills the specified rectangle with the specified rune.</summary>
     /// <param name="rect"></param>
     /// <param name="rune"></param>
-    public void FillRect (Rect rect, Rune rune = default) {
-        for (int r = rect.Y; r < rect.Y + rect.Height; r++) {
-            for (int c = rect.X; c < rect.X + rect.Width; c++) {
+    public void FillRect (Rect rect, Rune rune = default)
+    {
+        for (int r = rect.Y; r < rect.Y + rect.Height; r++)
+        {
+            for (int c = rect.X; c < rect.X + rect.Width; c++)
+            {
                 Application.Driver.Move (c, r);
                 Application.Driver.AddRune (rune == default (Rune) ? new Rune (' ') : rune);
             }
@@ -310,8 +361,8 @@ public abstract class ConsoleDriver {
     }
 
     /// <summary>
-    ///     Fills the specified rectangle with the specified <see langword="char"/>. This method is a convenience method that
-    ///     calls <see cref="FillRect(Rect, Rune)"/>.
+    ///     Fills the specified rectangle with the specified <see langword="char"/>. This method is a convenience method that calls
+    ///     <see cref="FillRect(Rect, Rune)"/>.
     /// </summary>
     /// <param name="rect"></param>
     /// <param name="c"></param>
@@ -324,15 +375,14 @@ public abstract class ConsoleDriver {
 
     /// <summary>Returns the name of the driver and relevant library version information.</summary>
     /// <returns></returns>
-    public virtual string GetVersionInfo () => GetType ().Name;
+    public virtual string GetVersionInfo () { return GetType ().Name; }
 
     /// <summary>Tests if the specified rune is supported by the driver.</summary>
     /// <param name="rune"></param>
     /// <returns>
-    ///     <see langword="true"/> if the rune can be properly presented; <see langword="false"/> if the driver does not
-    ///     support displaying this rune.
+    ///     <see langword="true"/> if the rune can be properly presented; <see langword="false"/> if the driver does not support displaying this rune.
     /// </returns>
-    public virtual bool IsRuneSupported (Rune rune) => Rune.IsValid (rune.Value);
+    public virtual bool IsRuneSupported (Rune rune) { return Rune.IsValid (rune.Value); }
 
     /// <summary>Tests whether the specified coordinate are valid for drawing.</summary>
     /// <param name="col">The column.</param>
@@ -341,9 +391,7 @@ public abstract class ConsoleDriver {
     ///     <see langword="false"/> if the coordinate is outside of the screen bounds or outside of <see cref="Clip"/>.
     ///     <see langword="true"/> otherwise.
     /// </returns>
-    public bool IsValidLocation (int col, int row) => col >= 0 && row >= 0 &&
-                                                      col < Cols && row < Rows &&
-                                                      Clip.Contains (col, row);
+    public bool IsValidLocation (int col, int row) { return col >= 0 && row >= 0 && col < Cols && row < Rows && Clip.Contains (col, row); }
 
     /// <summary>
     ///     Updates <see cref="Col"/> and <see cref="Row"/> to the specified column and row in <see cref="Contents"/>. Used by
@@ -358,7 +406,8 @@ public abstract class ConsoleDriver {
     /// </remarks>
     /// <param name="col">Column to move to.</param>
     /// <param name="row">Row to move to.</param>
-    public virtual void Move (int col, int row) {
+    public virtual void Move (int col, int row)
+    {
         Col = col;
         Row = row;
     }
@@ -414,7 +463,8 @@ public abstract class ConsoleDriver {
     ///         <see langword="false"/>, indicating that the <see cref="ConsoleDriver"/> cannot support TrueColor.
     ///     </para>
     /// </remarks>
-    internal virtual bool Force16Colors {
+    internal virtual bool Force16Colors
+    {
         get => Application.Force16Colors || !SupportsTrueColor;
         set => Application.Force16Colors = value || !SupportsTrueColor;
     }
@@ -427,10 +477,13 @@ public abstract class ConsoleDriver {
     ///     The <see cref="Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or <see cref="AddStr"/>
     ///     call.
     /// </summary>
-    public Attribute CurrentAttribute {
+    public Attribute CurrentAttribute
+    {
         get => _currentAttribute;
-        set {
-            if (Application.Driver != null) {
+        set
+        {
+            if (Application.Driver != null)
+            {
                 _currentAttribute = new Attribute (value.Foreground, value.Background);
 
                 return;
@@ -443,7 +496,8 @@ public abstract class ConsoleDriver {
     /// <summary>Selects the specified attribute as the attribute to use for future calls to AddRune and AddString.</summary>
     /// <remarks>Implementations should call <c>base.SetAttribute(c)</c>.</remarks>
     /// <param name="c">C.</param>
-    public Attribute SetAttribute (Attribute c) {
+    public Attribute SetAttribute (Attribute c)
+    {
         Attribute prevAttribute = CurrentAttribute;
         CurrentAttribute = c;
 
@@ -452,7 +506,7 @@ public abstract class ConsoleDriver {
 
     /// <summary>Gets the current <see cref="Attribute"/>.</summary>
     /// <returns>The current attribute.</returns>
-    public Attribute GetAttribute () => CurrentAttribute;
+    public Attribute GetAttribute () { return CurrentAttribute; }
 
     // TODO: This is only overridden by CursesDriver. Once CursesDriver supports 24-bit color, this virtual method can be
     // removed (and Attribute can lose the platformColor property).
@@ -460,14 +514,15 @@ public abstract class ConsoleDriver {
     /// <param name="foreground">The foreground color.</param>
     /// <param name="background">The background color.</param>
     /// <returns>The attribute for the foreground and background colors.</returns>
-    public virtual Attribute MakeColor (Color foreground, Color background) =>
-
+    public virtual Attribute MakeColor (Color foreground, Color background)
+    {
         // Encode the colors into the int value.
-        new (
-            -1, // only used by cursesdriver!
-            foreground,
-            background
-        );
+        return new Attribute (
+                              -1, // only used by cursesdriver!
+                              foreground,
+                              background
+                             );
+    }
 
     #endregion
 
@@ -485,15 +540,13 @@ public abstract class ConsoleDriver {
 
     /// <summary>Event fired when a key is released.</summary>
     /// <remarks>
-    ///     Drivers that do not support key release events will fire this event after <see cref="KeyDown"/> processing is
-    ///     complete.
+    ///     Drivers that do not support key release events will fire this event after <see cref="KeyDown"/> processing is complete.
     /// </remarks>
     public event EventHandler<Key> KeyUp;
 
     /// <summary>Called when a key is released. Fires the <see cref="KeyUp"/> event.</summary>
     /// <remarks>
-    ///     Drivers that do not support key release events will calls this method after <see cref="OnKeyDown"/> processing is
-    ///     complete.
+    ///     Drivers that do not support key release events will calls this method after <see cref="OnKeyDown"/> processing is complete.
     /// </remarks>
     /// <param name="a"></param>
     public void OnKeyUp (Key a) { KeyUp?.Invoke (this, a); }
@@ -518,16 +571,13 @@ public abstract class ConsoleDriver {
 
 /// <summary>Terminal Cursor Visibility settings.</summary>
 /// <remarks>
-///     Hex value are set as 0xAABBCCDD where : AA stand for the TERMINFO DECSUSR parameter value to be used under Linux
-///     and MacOS BB stand for the NCurses curs_set parameter value to be used under Linux and MacOS CC stand for the
-///     CONSOLE_CURSOR_INFO.bVisible parameter value to be used under Windows DD stand for the CONSOLE_CURSOR_INFO.dwSize
-///     parameter value to be used under Windows
+///     Hex value are set as 0xAABBCCDD where : AA stand for the TERMINFO DECSUSR parameter value to be used under Linux and MacOS BB stand for the NCurses curs_set parameter value to be used under Linux and MacOS CC stand for the CONSOLE_CURSOR_INFO.bVisible parameter value to be used under Windows DD stand for the CONSOLE_CURSOR_INFO.dwSize parameter value to be used under Windows
 /// </remarks>
-public enum CursorVisibility {
+public enum CursorVisibility
+{
     /// <summary>Cursor caret has default</summary>
     /// <remarks>
-    ///     Works under Xterm-like terminal otherwise this is equivalent to <see ref="Underscore"/>. This default directly
-    ///     depends of the XTerm user configuration settings so it could be Block, I-Beam, Underline with possible blinking.
+    ///     Works under Xterm-like terminal otherwise this is equivalent to <see ref="Underscore"/>. This default directly depends of the XTerm user configuration settings so it could be Block, I-Beam, Underline with possible blinking.
     /// </remarks>
     Default = 0x00010119,
 
@@ -558,20 +608,16 @@ public enum CursorVisibility {
 }
 
 /// <summary>
-///     The <see cref="KeyCode"/> enumeration encodes key information from <see cref="ConsoleDriver"/>s and provides a
-///     consistent way for application code to specify keys and receive key events.
+///     The <see cref="KeyCode"/> enumeration encodes key information from <see cref="ConsoleDriver"/>s and provides a consistent way for application code to specify keys and receive key events.
 ///     <para>
-///         The <see cref="Key"/> class provides a higher-level abstraction, with helper methods and properties for common
-///         operations. For example, <see cref="Key.IsAlt"/> and <see cref="Key.IsCtrl"/> provide a convenient way to check
-///         whether the Alt or Ctrl modifier keys were pressed when a key was pressed.
+///         The <see cref="Key"/> class provides a higher-level abstraction, with helper methods and properties for common operations. For example,
+///         <see cref="Key.IsAlt"/> and <see cref="Key.IsCtrl"/> provide a convenient way to check whether the Alt or Ctrl modifier keys were pressed when a key was pressed.
 ///     </para>
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Lowercase alpha keys are encoded as values between 65 and 90 corresponding to the un-shifted A to Z keys on a
-///         keyboard. Enum values are provided for these (e.g. <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.).
-///         Even though the values are the same as the ASCII values for uppercase characters, these enum values represent
-///         *lowercase*, un-shifted characters.
+///         Lowercase alpha keys are encoded as values between 65 and 90 corresponding to the un-shifted A to Z keys on a keyboard. Enum values are provided for these (e.g.
+///         <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.). Even though the values are the same as the ASCII values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
 ///     </para>
 ///     <para>
 ///         Numeric keys are the values between 48 and 57 corresponding to 0 to 9 (e.g. <see cref="KeyCode.D0"/>,
@@ -579,50 +625,46 @@ public enum CursorVisibility {
 ///     </para>
 ///     <para>
 ///         The shift modifiers (<see cref="KeyCode.ShiftMask"/>, <see cref="KeyCode.CtrlMask"/>, and
-///         <see cref="KeyCode.AltMask"/>) can be combined (with logical or) with the other key codes to represent shifted
-///         keys. For example, the <see cref="KeyCode.A"/> enum value represents the un-shifted 'a' key, while
-///         <see cref="KeyCode.ShiftMask"/> | <see cref="KeyCode.A"/> represents the 'A' key (shifted 'a' key). Likewise,
-///         <see cref="KeyCode.AltMask"/> | <see cref="KeyCode.A"/> represents the 'Alt+A' key combination.
+///         <see cref="KeyCode.AltMask"/>) can be combined (with logical or) with the other key codes to represent shifted keys. For example, the
+///         <see cref="KeyCode.A"/> enum value represents the un-shifted 'a' key, while <see cref="KeyCode.ShiftMask"/> |
+///         <see cref="KeyCode.A"/> represents the 'A' key (shifted 'a' key). Likewise, <see cref="KeyCode.AltMask"/> |
+///         <see cref="KeyCode.A"/> represents the 'Alt+A' key combination.
 ///     </para>
 ///     <para>
-///         All other keys that produce a printable character are encoded as the Unicode value of the character. For
-///         example, the <see cref="KeyCode"/> for the '!' character is 33, which is the Unicode value for '!'. Likewise,
-///         `â` is 226, `Â` is 194, etc.
+///         All other keys that produce a printable character are encoded as the Unicode value of the character. For example, the
+///         <see cref="KeyCode"/> for the '!' character is 33, which is the Unicode value for '!'. Likewise, `â` is 226, `Â` is 194, etc.
 ///     </para>
 ///     <para>
-///         If the <see cref="SpecialMask"/> is set, then the value is that of the special mask, otherwise, the value is
-///         the one of the lower bits (as extracted by <see cref="CharMask"/>).
+///         If the <see cref="SpecialMask"/> is set, then the value is that of the special mask, otherwise, the value is the one of the lower bits (as extracted by
+///         <see cref="CharMask"/>).
 ///     </para>
 /// </remarks>
 [Flags]
-public enum KeyCode : uint {
+public enum KeyCode : uint
+{
     /// <summary>
-    ///     Mask that indicates that the key is a unicode codepoint. Values outside this range indicate the key has shift
-    ///     modifiers or is a special key like function keys, arrows keys and so on.
+    ///     Mask that indicates that the key is a unicode codepoint. Values outside this range indicate the key has shift modifiers or is a special key like function keys, arrows keys and so on.
     /// </summary>
     CharMask = 0x_f_ffff,
 
     /// <summary>
-    ///     If the <see cref="SpecialMask"/> is set, then the value is that of the special mask, otherwise, the value is in the
-    ///     the lower bits (as extracted by <see cref="CharMask"/>).
+    ///     If the <see cref="SpecialMask"/> is set, then the value is that of the special mask, otherwise, the value is in the the lower bits (as extracted by
+    ///     <see cref="CharMask"/>).
     /// </summary>
     SpecialMask = 0x_fff0_0000,
 
     /// <summary>
-    ///     When this value is set, the Key encodes the sequence Shift-KeyValue. The actual value must be extracted by removing
-    ///     the ShiftMask.
+    ///     When this value is set, the Key encodes the sequence Shift-KeyValue. The actual value must be extracted by removing the ShiftMask.
     /// </summary>
     ShiftMask = 0x_1000_0000,
 
     /// <summary>
-    ///     When this value is set, the Key encodes the sequence Alt-KeyValue. The actual value must be extracted by removing
-    ///     the AltMask.
+    ///     When this value is set, the Key encodes the sequence Alt-KeyValue. The actual value must be extracted by removing the AltMask.
     /// </summary>
     AltMask = 0x_8000_0000,
 
     /// <summary>
-    ///     When this value is set, the Key encodes the sequence Ctrl-KeyValue. The actual value must be extracted by removing
-    ///     the CtrlMask.
+    ///     When this value is set, the Key encodes the sequence Ctrl-KeyValue. The actual value must be extracted by removing the CtrlMask.
     /// </summary>
     CtrlMask = 0x_4000_0000,
 

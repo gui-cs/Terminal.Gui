@@ -6,13 +6,18 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Windows & FrameViews", "Stress Tests Windows, sub-Windows, and FrameViews.")]
 [ScenarioCategory ("Layout")]
-public class WindowsAndFrameViews : Scenario {
-    public override void Setup () {
-        static int About () => MessageBox.Query (
-            "About UI Catalog",
-            "UI Catalog is a comprehensive sample library for Terminal.Gui",
-            "Ok"
-        );
+public class WindowsAndFrameViews : Scenario
+{
+    public override void Setup ()
+    {
+        static int About ()
+        {
+            return MessageBox.Query (
+                                     "About UI Catalog",
+                                     "UI Catalog is a comprehensive sample library for Terminal.Gui",
+                                     "Ok"
+                                    );
+        }
 
         var margin = 2;
         var padding = 1;
@@ -25,33 +30,37 @@ public class WindowsAndFrameViews : Scenario {
         Application.Top.Remove (Win);
         Win?.Dispose ();
 
-        Win = new Window {
+        Win = new Window
+        {
             Title = $"{listWin.Count} - Scenario: {GetName ()}",
             X = Pos.Center (),
             Y = 1,
             Width = Dim.Fill (15),
             Height = 10,
-            ColorScheme = Colors.ColorSchemes["Dialog"]
+            ColorScheme = Colors.ColorSchemes ["Dialog"]
         };
         Win.Padding.Thickness = new Thickness (padding);
         Win.Margin.Thickness = new Thickness (margin);
 
-        var paddingButton = new Button {
+        var paddingButton = new Button
+        {
             X = Pos.Center (),
             Y = 0,
-            ColorScheme = Colors.ColorSchemes["Error"],
+            ColorScheme = Colors.ColorSchemes ["Error"],
             Text = $"Padding of container is {padding}"
         };
         paddingButton.Clicked += (s, e) => About ();
         Win.Add (paddingButton);
+
         Win.Add (
-            new Button {
-                X = Pos.Center (),
-                Y = Pos.AnchorEnd (1),
-                ColorScheme = Colors.ColorSchemes["Error"],
-                Text = "Press ME! (Y = Pos.AnchorEnd(1))"
-            }
-        );
+                 new Button
+                 {
+                     X = Pos.Center (),
+                     Y = Pos.AnchorEnd (1),
+                     ColorScheme = Colors.ColorSchemes ["Error"],
+                     Text = "Press ME! (Y = Pos.AnchorEnd(1))"
+                 }
+                );
         Application.Top.Add (Win);
 
         // add it to our list
@@ -64,9 +73,12 @@ public class WindowsAndFrameViews : Scenario {
         //		TextField
         //	sub FrameView with
         // 
-        for (var pad = 0; pad < 3; pad++) {
+        for (var pad = 0; pad < 3; pad++)
+        {
             Window win = null;
-            win = new Window {
+
+            win = new Window
+            {
                 Title = $"{listWin.Count} - Window Loop - padding = {pad}",
                 X = margin,
                 Y = Pos.Bottom (listWin.Last ()) + margin,
@@ -75,38 +87,47 @@ public class WindowsAndFrameViews : Scenario {
             };
             win.Padding.Thickness = new Thickness (pad);
 
-            win.ColorScheme = Colors.ColorSchemes["Dialog"];
-            var pressMeButton = new Button {
-                X = Pos.Center (), Y = 0, ColorScheme = Colors.ColorSchemes["Error"], Text = "Press me! (Y = 0)"
+            win.ColorScheme = Colors.ColorSchemes ["Dialog"];
+
+            var pressMeButton = new Button
+            {
+                X = Pos.Center (), Y = 0, ColorScheme = Colors.ColorSchemes ["Error"], Text = "Press me! (Y = 0)"
             };
+
             pressMeButton.Clicked += (s, e) =>
-                MessageBox.ErrorQuery (win.Title, "Neat?", "Yes", "No");
+                                         MessageBox.ErrorQuery (win.Title, "Neat?", "Yes", "No");
             win.Add (pressMeButton);
-            var subWin = new Window {
+
+            var subWin = new Window
+            {
                 Title = "Sub Window",
                 X = Pos.Percent (0),
                 Y = 1,
                 Width = Dim.Percent (50),
                 Height = 5,
-                ColorScheme = Colors.ColorSchemes["Base"],
+                ColorScheme = Colors.ColorSchemes ["Base"],
                 Text = "The Text in the Window"
             };
+
             subWin.Add (
-                new TextField { Y = 1, ColorScheme = Colors.ColorSchemes["Error"], Text = "Edit me! " + win.Title }
-            );
+                        new TextField { Y = 1, ColorScheme = Colors.ColorSchemes ["Error"], Text = "Edit me! " + win.Title }
+                       );
             win.Add (subWin);
-            var frameView = new FrameView {
+
+            var frameView = new FrameView
+            {
                 X = Pos.Percent (50),
                 Y = 1,
                 Width = Dim.Percent (100, true), // Or Dim.Percent (50)
                 Height = 5,
-                ColorScheme = Colors.ColorSchemes["Base"],
+                ColorScheme = Colors.ColorSchemes ["Base"],
                 Text = "The Text in the FrameView",
                 Title = "This is a Sub-FrameView"
             };
+
             frameView.Add (
-                new TextField { Y = 1, Text = "Edit Me!" }
-            );
+                           new TextField { Y = 1, Text = "Edit Me!" }
+                          );
             win.Add (frameView);
 
             Application.Top.Add (win);
@@ -126,42 +147,51 @@ public class WindowsAndFrameViews : Scenario {
         //   a checkbox
         //   a checkbox
         FrameView frame = null;
-        frame = new FrameView {
+
+        frame = new FrameView
+        {
             X = margin,
             Y = Pos.Bottom (listWin.Last ()) + margin / 2,
             Width = Dim.Fill (margin),
             Height = contentHeight + 2, // 2 for default padding
             Title = "This is a FrameView"
         };
-        frame.ColorScheme = Colors.ColorSchemes["Dialog"];
+        frame.ColorScheme = Colors.ColorSchemes ["Dialog"];
+
         frame.Add (
-            new Label {
-                X = Pos.Center (), Y = 0, ColorScheme = Colors.ColorSchemes["Error"], Text = "This is a Label! (Y = 0)"
-            }
-        );
-        var subWinofFV = new Window {
+                   new Label
+                   {
+                       X = Pos.Center (), Y = 0, ColorScheme = Colors.ColorSchemes ["Error"], Text = "This is a Label! (Y = 0)"
+                   }
+                  );
+
+        var subWinofFV = new Window
+        {
             Title = "This is a Sub-Window",
             X = Pos.Percent (0),
             Y = 1,
             Width = Dim.Percent (50),
             Height = Dim.Fill () - 1,
-            ColorScheme = Colors.ColorSchemes["Base"],
+            ColorScheme = Colors.ColorSchemes ["Base"],
             Text = "The Text in the Window"
         };
+
         subWinofFV.Add (
-            new TextField { ColorScheme = Colors.ColorSchemes["Error"], Text = "Edit Me" }
-        );
+                        new TextField { ColorScheme = Colors.ColorSchemes ["Error"], Text = "Edit Me" }
+                       );
 
         subWinofFV.Add (new CheckBox { Y = 1, Text = "Check me" });
         subWinofFV.Add (new CheckBox { Y = 2, Text = "Or, Check me" });
 
         frame.Add (subWinofFV);
-        var subFrameViewofFV = new FrameView {
+
+        var subFrameViewofFV = new FrameView
+        {
             X = Pos.Percent (50),
             Y = 1,
             Width = Dim.Percent (100),
             Height = Dim.Fill () - 1,
-            ColorScheme = Colors.ColorSchemes["Base"],
+            ColorScheme = Colors.ColorSchemes ["Base"],
             Text = "The Text in the FrameView",
             Title = "this is a Sub-FrameView"
         };
@@ -174,8 +204,8 @@ public class WindowsAndFrameViews : Scenario {
         subFrameViewofFV.Add (new CheckBox { Y = 2, Text = "Or, Check me" });
 
         frame.Add (
-            new CheckBox { X = 0, Y = Pos.AnchorEnd (1), Text = "Btn1 (Y = Pos.AnchorEnd (1))" }
-        );
+                   new CheckBox { X = 0, Y = Pos.AnchorEnd (1), Text = "Btn1 (Y = Pos.AnchorEnd (1))" }
+                  );
         var c = new CheckBox { Y = Pos.AnchorEnd (1), Text = "Btn2 (Y = Pos.AnchorEnd (1))" };
         c.X = Pos.AnchorEnd () - (Pos.Right (c) - Pos.Left (c));
         frame.Add (c);
@@ -185,6 +215,6 @@ public class WindowsAndFrameViews : Scenario {
         Application.Top.Add (frame);
         listWin.Add (frame);
 
-        Application.Top.ColorScheme = Colors.ColorSchemes["Base"];
+        Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
     }
 }

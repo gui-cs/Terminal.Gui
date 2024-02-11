@@ -4,8 +4,10 @@ using Terminal.Gui;
 
 namespace ReactiveExample;
 
-public static class Program {
-    private static void Main (string[] args) {
+public static class Program
+{
+    private static void Main (string [] args)
+    {
         Application.Init ();
         RxApp.MainThreadScheduler = TerminalScheduler.Default;
         RxApp.TaskpoolScheduler = TaskPoolScheduler.Default;

@@ -7,19 +7,22 @@ namespace Terminal.Gui;
 /// <summary>Defines a standard set of <see cref="Attribute"/>s for common visible elements in a <see cref="View"/>.</summary>
 /// <remarks>
 ///     <para>
-///         ColorScheme objects are immutable. Once constructed, the properties cannot be changed. To change a ColorScheme,
-///         create a new one with the desired values, using the <see cref="ColorScheme(ColorScheme)"/> constructor.
+///         ColorScheme objects are immutable. Once constructed, the properties cannot be changed. To change a ColorScheme, create a new one with the desired values, using the
+///         <see cref="ColorScheme(ColorScheme)"/> constructor.
 ///     </para>
 /// </remarks>
 [JsonConverter (typeof (ColorSchemeJsonConverter))]
-public class ColorScheme : IEquatable<ColorScheme> {
+public class ColorScheme : IEquatable<ColorScheme>
+{
     /// <summary>Creates a new instance set to the default colors (see <see cref="Attribute.Default"/>).</summary>
     public ColorScheme () : this (Attribute.Default) { }
 
     /// <summary>Creates a new instance, initialized with the values from <paramref name="scheme"/>.</summary>
     /// <param name="scheme">The scheme to initialize the new instance with.</param>
-    public ColorScheme (ColorScheme scheme) {
-        if (scheme is null) {
+    public ColorScheme (ColorScheme scheme)
+    {
+        if (scheme is null)
+        {
             throw new ArgumentNullException (nameof (scheme));
         }
 
@@ -32,7 +35,8 @@ public class ColorScheme : IEquatable<ColorScheme> {
 
     /// <summary>Creates a new instance, initialized with the values from <paramref name="attribute"/>.</summary>
     /// <param name="attribute">The attribute to initialize the new instance with.</param>
-    public ColorScheme (Attribute attribute) {
+    public ColorScheme (Attribute attribute)
+    {
         _normal = attribute;
         _focus = attribute;
         _hotNormal = attribute;
@@ -47,31 +51,36 @@ public class ColorScheme : IEquatable<ColorScheme> {
     private readonly Attribute _normal;
 
     /// <summary>The default foreground and background color for text when the view is disabled.</summary>
-    public Attribute Disabled {
+    public Attribute Disabled
+    {
         get => _disabled;
         init => _disabled = value;
     }
 
     /// <summary>The foreground and background color for text when the view has the focus.</summary>
-    public Attribute Focus {
+    public Attribute Focus
+    {
         get => _focus;
         init => _focus = value;
     }
 
     /// <summary>The foreground and background color for for text in a focused view that indicates a <see cref="View.HotKey"/>.</summary>
-    public Attribute HotFocus {
+    public Attribute HotFocus
+    {
         get => _hotFocus;
         init => _hotFocus = value;
     }
 
     /// <summary>The foreground and background color for text in a non-focused view that indicates a <see cref="View.HotKey"/>.</summary>
-    public Attribute HotNormal {
+    public Attribute HotNormal
+    {
         get => _hotNormal;
         init => _hotNormal = value;
     }
 
     /// <summary>The foreground and background color for text when the view is not focused, hot, or disabled.</summary>
-    public Attribute Normal {
+    public Attribute Normal
+    {
         get => _normal;
         init => _normal = value;
     }
@@ -79,23 +88,25 @@ public class ColorScheme : IEquatable<ColorScheme> {
     /// <summary>Compares two <see cref="ColorScheme"/> objects for equality.</summary>
     /// <param name="other"></param>
     /// <returns>true if the two objects are equal</returns>
-    public bool Equals (ColorScheme? other) => other is { } &&
-                                               EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
-                                               EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
-                                               EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal)
-                                               &&
-                                               EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus)
-                                               &&
-                                               EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
+    public bool Equals (ColorScheme? other)
+    {
+        return other is { }
+               && EqualityComparer<Attribute>.Default.Equals (_normal, other._normal)
+               && EqualityComparer<Attribute>.Default.Equals (_focus, other._focus)
+               && EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal)
+               && EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus)
+               && EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
+    }
 
     /// <summary>Compares two <see cref="ColorScheme"/> objects for equality.</summary>
     /// <param name="obj"></param>
     /// <returns>true if the two objects are equal</returns>
-    public override bool Equals (object? obj) => Equals (obj as ColorScheme);
+    public override bool Equals (object? obj) { return Equals (obj as ColorScheme); }
 
     /// <summary>Returns a hashcode for this instance.</summary>
     /// <returns>hashcode for this instance</returns>
-    public override int GetHashCode () {
+    public override int GetHashCode ()
+    {
         int hashCode = -1242460230;
         hashCode = hashCode * -1521134295 + _normal.GetHashCode ();
         hashCode = hashCode * -1521134295 + _focus.GetHashCode ();
@@ -110,25 +121,23 @@ public class ColorScheme : IEquatable<ColorScheme> {
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns><c>true</c> if the two objects are equivalent</returns>
-    public static bool operator == (ColorScheme left, ColorScheme right) =>
-        EqualityComparer<ColorScheme>.Default.Equals (left, right);
+    public static bool operator == (ColorScheme left, ColorScheme right) { return EqualityComparer<ColorScheme>.Default.Equals (left, right); }
 
     /// <summary>Compares two <see cref="ColorScheme"/> objects for inequality.</summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns><c>true</c> if the two objects are not equivalent</returns>
-    public static bool operator != (ColorScheme left, ColorScheme right) => !(left == right);
+    public static bool operator != (ColorScheme left, ColorScheme right) { return !(left == right); }
 
     /// <inheritdoc/>
-    public override string ToString () =>
-        $"Normal: {Normal}; Focus: {Focus}; HotNormal: {HotNormal}; HotFocus: {HotFocus}; Disabled: {Disabled}";
+    public override string ToString () { return $"Normal: {Normal}; Focus: {Focus}; HotNormal: {HotNormal}; HotFocus: {HotFocus}; Disabled: {Disabled}"; }
 }
 
 /// <summary>
-///     Holds the <see cref="ColorScheme"/>s that define the <see cref="Attribute"/>s that are used by views to render
-///     themselves.
+///     Holds the <see cref="ColorScheme"/>s that define the <see cref="Attribute"/>s that are used by views to render themselves.
 /// </summary>
-public static class Colors {
+public static class Colors
+{
     static Colors () { Reset (); }
 
     /// <summary>Gets a dictionary of defined <see cref="ColorScheme"/> objects.</summary>
@@ -148,10 +157,7 @@ public static class Colors {
     ///             </item>
     ///             <item>
     ///                 <term>Dialog</term>
-    ///                 <description>
-    ///                     The dialog color scheme; used for <see cref="Dialog"/>, <see cref="MessageBox"/>, and
-    ///                     other views dialog-like views.
-    ///                 </description>
+    ///                 <description>The dialog color scheme; used for <see cref="Dialog"/>, <see cref="MessageBox"/>, and other views dialog-like views.</description>
     ///             </item>
     ///             <item>
     ///                 <term>Menu</term>
@@ -171,8 +177,8 @@ public static class Colors {
     ///     </para>
     ///     <para>Changing the values of an entry in this dictionary will affect all views that use the scheme.</para>
     ///     <para>
-    ///         <see cref="ConfigurationManager"/> can be used to override the default values for these schemes and add
-    ///         additional schemes. See <see cref="ConfigurationManager.Themes"/>.
+    ///         <see cref="ConfigurationManager"/> can be used to override the default values for these schemes and add additional schemes. See
+    ///         <see cref="ConfigurationManager.Themes"/>.
     ///     </para>
     /// </remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]
@@ -181,14 +187,15 @@ public static class Colors {
         ColorSchemes { get; private set; } // Serialization requires this to have a setter (private set;)
 
     /// <summary>Resets the <see cref="ColorSchemes"/> dictionary to the default values.</summary>
-    public static Dictionary<string, ColorScheme> Reset () {
+    public static Dictionary<string, ColorScheme> Reset ()
+    {
         ColorSchemes ??= new Dictionary<string, ColorScheme> (
-            5,
-            CultureInfo.InvariantCulture.CompareInfo
-                .GetStringComparer (
-                    CompareOptions.IgnoreCase
-                )
-        );
+                                                              5,
+                                                              CultureInfo.InvariantCulture.CompareInfo
+                                                                         .GetStringComparer (
+                                                                                             CompareOptions.IgnoreCase
+                                                                                            )
+                                                             );
         ColorSchemes.Clear ();
         ColorSchemes.Add ("TopLevel", new ColorScheme ());
         ColorSchemes.Add ("Base", new ColorScheme ());
@@ -199,15 +206,18 @@ public static class Colors {
         return ColorSchemes;
     }
 
-    private class SchemeNameComparerIgnoreCase : IEqualityComparer<string> {
-        public bool Equals (string x, string y) {
-            if (x != null && y != null) {
+    private class SchemeNameComparerIgnoreCase : IEqualityComparer<string>
+    {
+        public bool Equals (string x, string y)
+        {
+            if (x != null && y != null)
+            {
                 return string.Equals (x, y, StringComparison.InvariantCultureIgnoreCase);
             }
 
             return false;
         }
 
-        public int GetHashCode (string obj) => obj.ToLowerInvariant ().GetHashCode ();
+        public int GetHashCode (string obj) { return obj.ToLowerInvariant ().GetHashCode (); }
     }
 }

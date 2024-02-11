@@ -5,11 +5,13 @@
 ///     <see cref="EscSeqRequests"/>.
 /// </summary>
 /// <remarks></remarks>
-public class EscSeqReqStatus {
+public class EscSeqReqStatus
+{
     /// <summary>Creates a new state of escape sequence request.</summary>
     /// <param name="terminator">The terminator.</param>
     /// <param name="numReq">The number of requests.</param>
-    public EscSeqReqStatus (string terminator, int numReq) {
+    public EscSeqReqStatus (string terminator, int numReq)
+    {
         Terminator = terminator;
         NumRequests = NumOutstanding = numReq;
     }
@@ -26,10 +28,10 @@ public class EscSeqReqStatus {
 
 // TODO: This class is a singleton. It should use the singleton pattern.
 /// <summary>
-///     Manages ANSI Escape Sequence requests and responses. The list of <see cref="EscSeqReqStatus"/> contains the status
-///     of the request. Each request is identified by the terminator (e.g. ESC[8t ... t is the terminator).
+///     Manages ANSI Escape Sequence requests and responses. The list of <see cref="EscSeqReqStatus"/> contains the status of the request. Each request is identified by the terminator (e.g. ESC[8t ... t is the terminator).
 /// </summary>
-public class EscSeqRequests {
+public class EscSeqRequests
+{
     /// <summary>Gets the <see cref="EscSeqReqStatus"/> list.</summary>
     public List<EscSeqReqStatus> Statuses { get; } = new ();
 
@@ -39,12 +41,18 @@ public class EscSeqRequests {
     /// </summary>
     /// <param name="terminator">The terminator.</param>
     /// <param name="numReq">The number of requests.</param>
-    public void Add (string terminator, int numReq = 1) {
-        lock (Statuses) {
+    public void Add (string terminator, int numReq = 1)
+    {
+        lock (Statuses)
+        {
             EscSeqReqStatus found = Statuses.Find (x => x.Terminator == terminator);
-            if (found == null) {
+
+            if (found == null)
+            {
                 Statuses.Add (new EscSeqReqStatus (terminator, numReq));
-            } else if (found != null && found.NumOutstanding < found.NumRequests) {
+            }
+            else if (found != null && found.NumOutstanding < found.NumRequests)
+            {
                 found.NumOutstanding = Math.Min (found.NumOutstanding + numReq, found.NumRequests);
             }
         }
@@ -56,14 +64,19 @@ public class EscSeqRequests {
     /// </summary>
     /// <param name="terminator"></param>
     /// <returns><see langword="true"/> if exist, <see langword="false"/> otherwise.</returns>
-    public bool HasResponse (string terminator) {
-        lock (Statuses) {
+    public bool HasResponse (string terminator)
+    {
+        lock (Statuses)
+        {
             EscSeqReqStatus found = Statuses.Find (x => x.Terminator == terminator);
-            if (found == null) {
+
+            if (found == null)
+            {
                 return false;
             }
 
-            if (found != null && found.NumOutstanding > 0) {
+            if (found != null && found.NumOutstanding > 0)
+            {
                 return true;
             }
 
@@ -76,23 +89,31 @@ public class EscSeqRequests {
     }
 
     /// <summary>
-    ///     Removes a request defined by <paramref name="terminator"/>. If a matching <see cref="EscSeqReqStatus"/> is found
-    ///     and the number of outstanding requests is greater than 0, the number of outstanding requests is decremented. If the
-    ///     number of outstanding requests is 0, the <see cref="EscSeqReqStatus"/> is removed from <see cref="Statuses"/>.
+    ///     Removes a request defined by <paramref name="terminator"/>. If a matching <see cref="EscSeqReqStatus"/> is found and the number of outstanding requests is greater than 0, the number of outstanding requests is decremented. If the number of outstanding requests is 0, the
+    ///     <see cref="EscSeqReqStatus"/> is removed from <see cref="Statuses"/>.
     /// </summary>
     /// <param name="terminator">The terminating string.</param>
-    public void Remove (string terminator) {
-        lock (Statuses) {
+    public void Remove (string terminator)
+    {
+        lock (Statuses)
+        {
             EscSeqReqStatus found = Statuses.Find (x => x.Terminator == terminator);
-            if (found == null) {
+
+            if (found == null)
+            {
                 return;
             }
 
-            if (found != null && found.NumOutstanding == 0) {
+            if (found != null && found.NumOutstanding == 0)
+            {
                 Statuses.Remove (found);
-            } else if (found != null && found.NumOutstanding > 0) {
+            }
+            else if (found != null && found.NumOutstanding > 0)
+            {
                 found.NumOutstanding--;
-                if (found.NumOutstanding == 0) {
+
+                if (found.NumOutstanding == 0)
+                {
                     Statuses.Remove (found);
                 }
             }

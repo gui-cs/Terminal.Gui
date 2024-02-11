@@ -2,37 +2,40 @@
 
 namespace Terminal.Gui.ViewsTests;
 
-public class RadioGroupTests {
-    public RadioGroupTests (ITestOutputHelper output) { _output = output; }
+public class RadioGroupTests
+{
     private readonly ITestOutputHelper _output;
+    public RadioGroupTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
-    public void Constructors_Defaults () {
+    public void Constructors_Defaults ()
+    {
         var rg = new RadioGroup ();
         Assert.True (rg.CanFocus);
         Assert.Empty (rg.RadioLabels);
         Assert.Equal (Rect.Empty, rg.Frame);
         Assert.Equal (0, rg.SelectedItem);
 
-        rg = new RadioGroup { RadioLabels = new[] { "Test" } };
+        rg = new RadioGroup { RadioLabels = new [] { "Test" } };
         Assert.True (rg.CanFocus);
         Assert.Single (rg.RadioLabels);
         Assert.Equal (new Rect (0, 0, 0, 0), rg.Frame);
         Assert.Equal (0, rg.SelectedItem);
 
-        rg = new RadioGroup {
+        rg = new RadioGroup
+        {
             X = 1,
             Y = 2,
             Width = 20,
             Height = 5,
-            RadioLabels = new[] { "Test" }
+            RadioLabels = new [] { "Test" }
         };
         Assert.True (rg.CanFocus);
         Assert.Single (rg.RadioLabels);
         Assert.Equal (new Rect (1, 2, 20, 5), rg.Frame);
         Assert.Equal (0, rg.SelectedItem);
 
-        rg = new RadioGroup { X = 1, Y = 2, RadioLabels = new[] { "Test" } };
+        rg = new RadioGroup { X = 1, Y = 2, RadioLabels = new [] { "Test" } };
 
         var view = new View { Width = 30, Height = 40 };
         view.Add (rg);
@@ -47,16 +50,18 @@ public class RadioGroupTests {
     }
 
     [Fact]
-    public void Initialize_SelectedItem_With_Minus_One () {
-        var rg = new RadioGroup { RadioLabels = new[] { "Test" }, SelectedItem = -1 };
+    public void Initialize_SelectedItem_With_Minus_One ()
+    {
+        var rg = new RadioGroup { RadioLabels = new [] { "Test" }, SelectedItem = -1 };
         Assert.Equal (-1, rg.SelectedItem);
         Assert.True (rg.NewKeyDownEvent (new Key (KeyCode.Space)));
         Assert.Equal (0, rg.SelectedItem);
     }
 
     [Fact]
-    public void KeyBindings_Are_Added_Correctly () {
-        var rg = new RadioGroup { RadioLabels = new[] { "_Left", "_Right" } };
+    public void KeyBindings_Are_Added_Correctly ()
+    {
+        var rg = new RadioGroup { RadioLabels = new [] { "_Left", "_Right" } };
         Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L));
         Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.R));
 
@@ -68,8 +73,9 @@ public class RadioGroupTests {
     }
 
     [Fact]
-    public void KeyBindings_Command () {
-        var rg = new RadioGroup { RadioLabels = new[] { "Test", "New Test" } };
+    public void KeyBindings_Command ()
+    {
+        var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test" } };
 
         Assert.True (rg.NewKeyDownEvent (new Key (KeyCode.CursorUp)));
         Assert.True (rg.NewKeyDownEvent (new Key (KeyCode.CursorDown)));
@@ -80,8 +86,9 @@ public class RadioGroupTests {
     }
 
     [Fact]
-    public void KeyBindings_HotKeys () {
-        var rg = new RadioGroup { RadioLabels = new[] { "_Left", "_Right", "Cen_tered", "_Justified" } };
+    public void KeyBindings_HotKeys ()
+    {
+        var rg = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
         Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L));
         Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.ShiftMask));
         Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.AltMask));
@@ -128,8 +135,9 @@ public class RadioGroupTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void Orientation_Width_Height_Vertical_Horizontal_Space () {
-        var rg = new RadioGroup { RadioLabels = new[] { "Test", "New Test 你" } };
+    public void Orientation_Width_Height_Vertical_Horizontal_Space ()
+    {
+        var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test 你" } };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (rg);
         Application.Top.Add (win);
@@ -143,6 +151,7 @@ public class RadioGroupTests {
         Assert.Equal (0, rg.Y);
         Assert.Equal (13, rg.Frame.Width);
         Assert.Equal (2, rg.Frame.Height);
+
         var expected = @$"
 ┌────────────────────────────┐
 │{
@@ -192,6 +201,7 @@ public class RadioGroupTests {
         Assert.Equal (0, rg.Y);
         Assert.Equal (23, rg.Width);
         Assert.Equal (1, rg.Height);
+
         expected = @$"
 ┌────────────────────────────┐
 │{
@@ -209,14 +219,17 @@ public class RadioGroupTests {
     }
 
     [Fact]
-    public void SelectedItemChanged_Event () {
+    public void SelectedItemChanged_Event ()
+    {
         int previousSelectedItem = -1;
         int selectedItem = -1;
-        var rg = new RadioGroup { RadioLabels = new[] { "Test", "New Test" } };
-        rg.SelectedItemChanged += (s, e) => {
-            previousSelectedItem = e.PreviousSelectedItem;
-            selectedItem = e.SelectedItem;
-        };
+        var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test" } };
+
+        rg.SelectedItemChanged += (s, e) =>
+                                  {
+                                      previousSelectedItem = e.PreviousSelectedItem;
+                                      selectedItem = e.SelectedItem;
+                                  };
 
         rg.SelectedItem = 1;
         Assert.Equal (0, previousSelectedItem);

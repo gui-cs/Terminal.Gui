@@ -1,16 +1,18 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     Autocomplete for a <see cref="TextField"/> which shows suggestions within the box. Displayed suggestions can be
-///     completed using the tab key.
+///     Autocomplete for a <see cref="TextField"/> which shows suggestions within the box. Displayed suggestions can be completed using the tab key.
 /// </summary>
-public class AppendAutocomplete : AutocompleteBase {
+public class AppendAutocomplete : AutocompleteBase
+{
     /// <summary>Creates a new instance of the <see cref="AppendAutocomplete"/> class.</summary>
-    public AppendAutocomplete (TextField textField) {
+    public AppendAutocomplete (TextField textField)
+    {
         this.textField = textField;
         SelectionKey = KeyCode.Tab;
 
-        ColorScheme = new ColorScheme {
+        ColorScheme = new ColorScheme
+        {
             Normal = new Attribute (Color.DarkGray, Color.Black),
             Focus = new Attribute (Color.DarkGray, Color.Black),
             HotNormal = new Attribute (Color.DarkGray, Color.Black),
@@ -23,26 +25,30 @@ public class AppendAutocomplete : AutocompleteBase {
     private TextField textField;
 
     /// <summary>
-    ///     The color used for rendering the appended text. Note that only <see cref="ColorScheme.Normal"/> is used and then
-    ///     only <see cref="Attribute.Foreground"/> (Background comes from <see cref="HostControl"/>).
+    ///     The color used for rendering the appended text. Note that only <see cref="ColorScheme.Normal"/> is used and then only
+    ///     <see cref="Attribute.Foreground"/> (Background comes from <see cref="HostControl"/>).
     /// </summary>
     public override ColorScheme ColorScheme { get; set; }
 
     /// <inheritdoc/>
-    public override View HostControl {
+    public override View HostControl
+    {
         get => textField;
         set => textField = (TextField)value;
     }
 
     /// <inheritdoc/>
-    public override void ClearSuggestions () {
+    public override void ClearSuggestions ()
+    {
         base.ClearSuggestions ();
         textField.SetNeedsDisplay ();
     }
 
     /// <inheritdoc/>
-    public override void GenerateSuggestions (AutocompleteContext context) {
-        if (_suspendSuggestions) {
+    public override void GenerateSuggestions (AutocompleteContext context)
+    {
+        if (_suspendSuggestions)
+        {
             _suspendSuggestions = false;
 
             return;
@@ -52,31 +58,38 @@ public class AppendAutocomplete : AutocompleteBase {
     }
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent me, bool fromHost = false) => false;
+    public override bool MouseEvent (MouseEvent me, bool fromHost = false) { return false; }
 
     /// <inheritdoc/>
-    public override bool ProcessKey (Key a) {
+    public override bool ProcessKey (Key a)
+    {
         KeyCode key = a.KeyCode;
-        if (key == SelectionKey) {
+
+        if (key == SelectionKey)
+        {
             return AcceptSelectionIfAny ();
         }
 
-        if (key == KeyCode.CursorUp) {
+        if (key == KeyCode.CursorUp)
+        {
             return CycleSuggestion (1);
         }
 
-        if (key == KeyCode.CursorDown) {
+        if (key == KeyCode.CursorDown)
+        {
             return CycleSuggestion (-1);
         }
 
-        if (key == CloseKey && Suggestions.Any ()) {
+        if (key == CloseKey && Suggestions.Any ())
+        {
             ClearSuggestions ();
             _suspendSuggestions = true;
 
             return true;
         }
 
-        if (char.IsLetterOrDigit ((char)a)) {
+        if (char.IsLetterOrDigit ((char)a))
+        {
             _suspendSuggestions = false;
         }
 
@@ -84,18 +97,20 @@ public class AppendAutocomplete : AutocompleteBase {
     }
 
     /// <summary>Renders the current suggestion into the <see cref="TextField"/></summary>
-    public override void RenderOverlay (Point renderAt) {
-        if (!MakingSuggestion ()) {
+    public override void RenderOverlay (Point renderAt)
+    {
+        if (!MakingSuggestion ())
+        {
             return;
         }
 
         // draw it like its selected even though its not
         Application.Driver.SetAttribute (
-            new Attribute (
-                ColorScheme.Normal.Foreground,
-                textField.ColorScheme.Focus.Background
-            )
-        );
+                                         new Attribute (
+                                                        ColorScheme.Normal.Foreground,
+                                                        textField.ColorScheme.Focus.Background
+                                                       )
+                                        );
         textField.Move (textField.Text.Length, 0);
 
         Suggestion suggestion = Suggestions.ElementAt (SelectedIdx);
@@ -104,23 +119,25 @@ public class AppendAutocomplete : AutocompleteBase {
         int spaceAvailable = textField.Bounds.Width - textField.Text.GetColumns ();
         int spaceRequired = fragment.EnumerateRunes ().Sum (c => c.GetColumns ());
 
-        if (spaceAvailable < spaceRequired) {
+        if (spaceAvailable < spaceRequired)
+        {
             fragment = new string (
-                fragment.TakeWhile (c => (spaceAvailable -= ((Rune)c).GetColumns ()) >= 0)
-                    .ToArray ()
-            );
+                                   fragment.TakeWhile (c => (spaceAvailable -= ((Rune)c).GetColumns ()) >= 0)
+                                           .ToArray ()
+                                  );
         }
 
         Application.Driver.AddStr (fragment);
     }
 
     /// <summary>
-    ///     Accepts the current autocomplete suggestion displaying in the text box. Returns true if a valid suggestion was
-    ///     being rendered and acceptable or false if no suggestion was showing.
+    ///     Accepts the current autocomplete suggestion displaying in the text box. Returns true if a valid suggestion was being rendered and acceptable or false if no suggestion was showing.
     /// </summary>
     /// <returns></returns>
-    internal bool AcceptSelectionIfAny () {
-        if (MakingSuggestion ()) {
+    internal bool AcceptSelectionIfAny ()
+    {
+        if (MakingSuggestion ())
+        {
             Suggestion insert = Suggestions.ElementAt (SelectedIdx);
             string newText = textField.Text;
             newText = newText.Substring (0, newText.Length - insert.Remove);
@@ -137,9 +154,12 @@ public class AppendAutocomplete : AutocompleteBase {
         return false;
     }
 
-    internal void SetTextTo (FileSystemInfo fileSystemInfo) {
+    internal void SetTextTo (FileSystemInfo fileSystemInfo)
+    {
         string newText = fileSystemInfo.FullName;
-        if (fileSystemInfo is DirectoryInfo) {
+
+        if (fileSystemInfo is DirectoryInfo)
+        {
             newText += Path.DirectorySeparatorChar;
         }
 
@@ -147,14 +167,17 @@ public class AppendAutocomplete : AutocompleteBase {
         textField.MoveEnd ();
     }
 
-    private bool CycleSuggestion (int direction) {
-        if (Suggestions.Count <= 1) {
+    private bool CycleSuggestion (int direction)
+    {
+        if (Suggestions.Count <= 1)
+        {
             return false;
         }
 
         SelectedIdx = (SelectedIdx + direction) % Suggestions.Count;
 
-        if (SelectedIdx < 0) {
+        if (SelectedIdx < 0)
+        {
             SelectedIdx = Suggestions.Count () - 1;
         }
 
@@ -164,10 +187,8 @@ public class AppendAutocomplete : AutocompleteBase {
     }
 
     /// <summary>
-    ///     Returns true if there is a suggestion that can be made and the control is in a state where user would expect to see
-    ///     auto-complete (i.e. focused and cursor in right place).
+    ///     Returns true if there is a suggestion that can be made and the control is in a state where user would expect to see auto-complete (i.e. focused and cursor in right place).
     /// </summary>
     /// <returns></returns>
-    private bool MakingSuggestion () =>
-        Suggestions.Any () && SelectedIdx != -1 && textField.HasFocus && textField.CursorIsAtEnd ();
+    private bool MakingSuggestion () { return Suggestions.Any () && SelectedIdx != -1 && textField.HasFocus && textField.CursorIsAtEnd (); }
 }

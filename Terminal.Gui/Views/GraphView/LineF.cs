@@ -1,9 +1,11 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>Describes two points in graph space and a line between them</summary>
-public class LineF {
+public class LineF
+{
     /// <summary>Creates a new line between the points</summary>
-    public LineF (PointF start, PointF end) {
+    public LineF (PointF start, PointF end)
+    {
         Start = start;
         End = end;
     }

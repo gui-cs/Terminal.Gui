@@ -1,8 +1,10 @@
 ﻿namespace Terminal.Gui.ViewsTests;
 
-public class ColorPickerTests {
+public class ColorPickerTests
+{
     [Fact]
-    public void Constructors () {
+    public void Constructors ()
+    {
         var colorPicker = new ColorPicker ();
         Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
         Assert.Equal (new Point (0, 0), colorPicker.Cursor);
@@ -16,7 +18,8 @@ public class ColorPickerTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void KeyBindings_Command () {
+    public void KeyBindings_Command ()
+    {
         var colorPicker = new ColorPicker ();
         Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
 
@@ -41,7 +44,8 @@ public class ColorPickerTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void MouseEvents () {
+    public void MouseEvents ()
+    {
         var colorPicker = new ColorPicker { X = 0, Y = 0, Height = 4, Width = 32 };
         Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
         Application.Top.Add (colorPicker);
@@ -55,7 +59,8 @@ public class ColorPickerTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void SelectedColorAndCursor () {
+    public void SelectedColorAndCursor ()
+    {
         var colorPicker = new ColorPicker ();
         colorPicker.SelectedColor = ColorName.White;
         Assert.Equal (7, colorPicker.Cursor.X);

@@ -3,19 +3,19 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     The <see cref="Dialog"/> <see cref="View"/> is a <see cref="Window"/> that by default is centered and contains one
-///     or more <see cref="Button"/>s. It defaults to the <c>Colors.ColorSchemes ["Dialog"]</c> color scheme and has a 1
-///     cell padding around the edges.
+///     The <see cref="Dialog"/> <see cref="View"/> is a <see cref="Window"/> that by default is centered and contains one or more
+///     <see cref="Button"/>s. It defaults to the <c>Colors.ColorSchemes ["Dialog"]</c> color scheme and has a 1 cell padding around the edges.
 /// </summary>
 /// <remarks>
 ///     To run the <see cref="Dialog"/> modally, create the <see cref="Dialog"/>, and pass it to
-///     <see cref="Application.Run(Func{Exception, bool})"/>. This will execute the dialog until it terminates via the
-///     [ESC] or [CTRL-Q] key, or when one of the views or buttons added to the dialog calls
+///     <see cref="Application.Run(Func{Exception, bool})"/>. This will execute the dialog until it terminates via the [ESC] or [CTRL-Q] key, or when one of the views or buttons added to the dialog calls
 ///     <see cref="Application.RequestStop"/>.
 /// </remarks>
-public class Dialog : Window {
+public class Dialog : Window
+{
     /// <summary>Determines the horizontal alignment of the Dialog buttons.</summary>
-    public enum ButtonAlignments {
+    public enum ButtonAlignments
+    {
         /// <summary>Center-aligns the buttons (the default).</summary>
         Center = 0,
 
@@ -30,15 +30,15 @@ public class Dialog : Window {
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/> positioning
-    ///     with no <see cref="Button"/>s.
+    ///     Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/> positioning with no
+    ///     <see cref="Button"/>s.
     /// </summary>
     /// <remarks>
     ///     By default, <see cref="View.X"/> and <see cref="View.Y"/> are set to <c>Pos.Center ()</c> and
-    ///     <see cref="View.Width"/> and <see cref="View.Height"/> are set to <c>Width = Dim.Percent (85)</c>, centering the
-    ///     Dialog vertically and horizontally.
+    ///     <see cref="View.Width"/> and <see cref="View.Height"/> are set to <c>Width = Dim.Percent (85)</c>, centering the Dialog vertically and horizontally.
     /// </remarks>
-    public Dialog () {
+    public Dialog ()
+    {
         X = Pos.Center ();
         Y = Pos.Center ();
         ValidatePosDim = true;
@@ -46,7 +46,7 @@ public class Dialog : Window {
         Width = Dim.Percent (85); // Dim.Auto (min: Dim.Percent (10));
         Height = Dim.Percent (85); //Dim.Auto (min: Dim.Percent (50));
 
-        ColorScheme = Colors.ColorSchemes["Dialog"];
+        ColorScheme = Colors.ColorSchemes ["Dialog"];
 
         Modal = true;
         ButtonAlignment = DefaultButtonAlignment;
@@ -68,22 +68,26 @@ public class Dialog : Window {
 
     private bool _inLayout;
 
+    /// <summary>Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the bottom of the dialog.</summary>
+    public ButtonAlignments ButtonAlignment { get; set; }
+
     /// <summary>Optional buttons to lay out at the bottom of the dialog.</summary>
-    public Button[] Buttons {
+    public Button [] Buttons
+    {
         get => _buttons.ToArray ();
-        init {
-            if (value == null) {
+        init
+        {
+            if (value == null)
+            {
                 return;
             }
 
-            foreach (Button b in value) {
+            foreach (Button b in value)
+            {
                 AddButton (b);
             }
         }
     }
-
-    /// <summary>Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the bottom of the dialog.</summary>
-    public ButtonAlignments ButtonAlignment { get; set; }
 
     /// <summary>The default <see cref="ButtonAlignments"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
@@ -96,8 +100,10 @@ public class Dialog : Window {
     ///     <see cref="Dialog"/>
     /// </summary>
     /// <param name="button">Button to add.</param>
-    public void AddButton (Button button) {
-        if (button == null) {
+    public void AddButton (Button button)
+    {
+        if (button == null)
+        {
             return;
         }
 
@@ -106,14 +112,18 @@ public class Dialog : Window {
         Add (button);
 
         SetNeedsDisplay ();
-        if (IsInitialized) {
+
+        if (IsInitialized)
+        {
             LayoutSubviews ();
         }
     }
 
     /// <inheritdoc/>
-    public override void LayoutSubviews () {
-        if (_inLayout) {
+    public override void LayoutSubviews ()
+    {
+        if (_inLayout)
+        {
             return;
         }
 
@@ -124,8 +134,10 @@ public class Dialog : Window {
     }
 
     // Get the width of all buttons, not including any Margin.
-    internal int GetButtonsWidth () {
-        if (_buttons.Count == 0) {
+    internal int GetButtonsWidth ()
+    {
+        if (_buttons.Count == 0)
+        {
             return 0;
         }
 
@@ -135,24 +147,34 @@ public class Dialog : Window {
         return widths.Sum ();
     }
 
-    private void LayoutButtons () {
-        if (_buttons.Count == 0 || !IsInitialized) {
+    private void LayoutButtons ()
+    {
+        if (_buttons.Count == 0 || !IsInitialized)
+        {
             return;
         }
 
         var shiftLeft = 0;
 
         int buttonsWidth = GetButtonsWidth ();
-        switch (ButtonAlignment) {
+
+        switch (ButtonAlignment)
+        {
             case ButtonAlignments.Center:
                 // Center Buttons
                 shiftLeft = (Bounds.Width - buttonsWidth - _buttons.Count - 1) / 2 + 1;
-                for (int i = _buttons.Count - 1; i >= 0; i--) {
-                    Button button = _buttons[i];
+
+                for (int i = _buttons.Count - 1; i >= 0; i--)
+                {
+                    Button button = _buttons [i];
                     shiftLeft += button.Frame.Width + (i == _buttons.Count - 1 ? 0 : 1);
-                    if (shiftLeft > -1) {
+
+                    if (shiftLeft > -1)
+                    {
                         button.X = Pos.AnchorEnd (shiftLeft);
-                    } else {
+                    }
+                    else
+                    {
                         button.X = Bounds.Width - shiftLeft;
                     }
 
@@ -166,17 +188,26 @@ public class Dialog : Window {
                 // leftmost and rightmost buttons are hard against edges. The rest are evenly spaced.
 
                 var spacing = (int)Math.Ceiling ((double)(Bounds.Width - buttonsWidth) / (_buttons.Count - 1));
-                for (int i = _buttons.Count - 1; i >= 0; i--) {
-                    Button button = _buttons[i];
-                    if (i == _buttons.Count - 1) {
+
+                for (int i = _buttons.Count - 1; i >= 0; i--)
+                {
+                    Button button = _buttons [i];
+
+                    if (i == _buttons.Count - 1)
+                    {
                         shiftLeft += button.Frame.Width;
                         button.X = Pos.AnchorEnd (shiftLeft);
-                    } else {
-                        if (i == 0) {
+                    }
+                    else
+                    {
+                        if (i == 0)
+                        {
                             // first (leftmost) button 
                             int left = Bounds.Width;
                             button.X = Pos.AnchorEnd (left);
-                        } else {
+                        }
+                        else
+                        {
                             shiftLeft += button.Frame.Width + spacing;
                             button.X = Pos.AnchorEnd (shiftLeft);
                         }
@@ -189,11 +220,13 @@ public class Dialog : Window {
 
             case ButtonAlignments.Left:
                 // Left Align Buttons
-                Button prevButton = _buttons[0];
+                Button prevButton = _buttons [0];
                 prevButton.X = 0;
                 prevButton.Y = Pos.AnchorEnd (1);
-                for (var i = 1; i < _buttons.Count; i++) {
-                    Button button = _buttons[i];
+
+                for (var i = 1; i < _buttons.Count; i++)
+                {
+                    Button button = _buttons [i];
                     button.X = Pos.Right (prevButton) + 1;
                     button.Y = Pos.AnchorEnd (1);
                     prevButton = button;
@@ -203,11 +236,13 @@ public class Dialog : Window {
 
             case ButtonAlignments.Right:
                 // Right align buttons
-                shiftLeft = _buttons[_buttons.Count - 1].Frame.Width;
-                _buttons[_buttons.Count - 1].X = Pos.AnchorEnd (shiftLeft);
-                _buttons[_buttons.Count - 1].Y = Pos.AnchorEnd (1);
-                for (int i = _buttons.Count - 2; i >= 0; i--) {
-                    Button button = _buttons[i];
+                shiftLeft = _buttons [_buttons.Count - 1].Frame.Width;
+                _buttons [_buttons.Count - 1].X = Pos.AnchorEnd (shiftLeft);
+                _buttons [_buttons.Count - 1].Y = Pos.AnchorEnd (1);
+
+                for (int i = _buttons.Count - 2; i >= 0; i--)
+                {
+                    Button button = _buttons [i];
                     shiftLeft += button.Frame.Width + 1;
                     button.X = Pos.AnchorEnd (shiftLeft);
                     button.Y = Pos.AnchorEnd (1);

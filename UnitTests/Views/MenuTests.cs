@@ -4,14 +4,16 @@
 
 namespace Terminal.Gui.ViewsTests;
 
-public class MenuTests {
-    public MenuTests (ITestOutputHelper output) { _output = output; }
+public class MenuTests
+{
     private readonly ITestOutputHelper _output;
+    public MenuTests (ITestOutputHelper output) { _output = output; }
 
     // TODO: Create more low-level unit tests for Menu and MenuItem
 
     [Fact]
-    public void Menu_Constructors_Defaults () {
+    public void Menu_Constructors_Defaults ()
+    {
         Assert.Throws<ArgumentNullException> (() => new Menu { Host = null, BarItems = new MenuBarItem () });
         Assert.Throws<ArgumentNullException> (() => new Menu { Host = new MenuBar (), BarItems = null });
 
@@ -21,7 +23,8 @@ public class MenuTests {
     }
 
     [Fact]
-    public void MenuItem_Constructors_Defaults () {
+    public void MenuItem_Constructors_Defaults ()
+    {
         var menuItem = new MenuItem ();
         Assert.Equal ("", menuItem.Title);
         Assert.Equal ("", menuItem.Help);

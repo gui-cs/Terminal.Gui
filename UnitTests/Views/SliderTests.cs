@@ -2,9 +2,11 @@
 
 namespace Terminal.Gui.ViewsTests;
 
-public class SliderOptionTests {
+public class SliderOptionTests
+{
     [Fact]
-    public void OnChanged_Should_Raise_ChangedEvent () {
+    public void OnChanged_Should_Raise_ChangedEvent ()
+    {
         // Arrange
         SliderOption<int> sliderOption = new ();
         var eventRaised = false;
@@ -18,7 +20,8 @@ public class SliderOptionTests {
     }
 
     [Fact]
-    public void OnSet_Should_Raise_SetEvent () {
+    public void OnSet_Should_Raise_SetEvent ()
+    {
         // Arrange
         SliderOption<int> sliderOption = new ();
         var eventRaised = false;
@@ -32,7 +35,8 @@ public class SliderOptionTests {
     }
 
     [Fact]
-    public void OnUnSet_Should_Raise_UnSetEvent () {
+    public void OnUnSet_Should_Raise_UnSetEvent ()
+    {
         // Arrange
         SliderOption<int> sliderOption = new ();
         var eventRaised = false;
@@ -46,7 +50,8 @@ public class SliderOptionTests {
     }
 
     [Fact]
-    public void Slider_Option_Default_Constructor () {
+    public void Slider_Option_Default_Constructor ()
+    {
         SliderOption<int> o = new ();
         Assert.Null (o.Legend);
         Assert.Equal (default (Rune), o.LegendAbbr);
@@ -54,7 +59,8 @@ public class SliderOptionTests {
     }
 
     [Fact]
-    public void Slider_Option_Values_Constructor () {
+    public void Slider_Option_Values_Constructor ()
+    {
         SliderOption<int> o = new ("1 thousand", new Rune ('y'), 1000);
         Assert.Equal ("1 thousand", o.Legend);
         Assert.Equal (new Rune ('y'), o.LegendAbbr);
@@ -62,21 +68,25 @@ public class SliderOptionTests {
     }
 
     [Fact]
-    public void SliderOption_ToString_WhenEmpty () {
+    public void SliderOption_ToString_WhenEmpty ()
+    {
         SliderOption<object> sliderOption = new ();
         Assert.Equal ("{Legend=, LegendAbbr=\0, Data=}", sliderOption.ToString ());
     }
 
     [Fact]
-    public void SliderOption_ToString_WhenPopulated_WithInt () {
+    public void SliderOption_ToString_WhenPopulated_WithInt ()
+    {
         SliderOption<int> sliderOption = new () { Legend = "Lord flibble", LegendAbbr = new Rune ('l'), Data = 1 };
 
         Assert.Equal ("{Legend=Lord flibble, LegendAbbr=l, Data=1}", sliderOption.ToString ());
     }
 
     [Fact]
-    public void SliderOption_ToString_WhenPopulated_WithSizeF () {
-        SliderOption<SizeF> sliderOption = new () {
+    public void SliderOption_ToString_WhenPopulated_WithSizeF ()
+    {
+        SliderOption<SizeF> sliderOption = new ()
+        {
             Legend = "Lord flibble", LegendAbbr = new Rune ('l'), Data = new SizeF (32, 11)
         };
 
@@ -84,9 +94,11 @@ public class SliderOptionTests {
     }
 }
 
-public class SliderEventArgsTests {
+public class SliderEventArgsTests
+{
     [Fact]
-    public void Constructor_Sets_Cancel_Default_To_False () {
+    public void Constructor_Sets_Cancel_Default_To_False ()
+    {
         // Arrange
         Dictionary<int, SliderOption<int>> options = new ();
         var focused = 42;
@@ -99,7 +111,8 @@ public class SliderEventArgsTests {
     }
 
     [Fact]
-    public void Constructor_Sets_Focused () {
+    public void Constructor_Sets_Focused ()
+    {
         // Arrange
         Dictionary<int, SliderOption<int>> options = new ();
         var focused = 42;
@@ -112,7 +125,8 @@ public class SliderEventArgsTests {
     }
 
     [Fact]
-    public void Constructor_Sets_Options () {
+    public void Constructor_Sets_Options ()
+    {
         // Arrange
         Dictionary<int, SliderOption<int>> options = new ();
 
@@ -124,9 +138,11 @@ public class SliderEventArgsTests {
     }
 }
 
-public class SliderTests {
+public class SliderTests
+{
     [Fact]
-    public void Constructor_Default () {
+    public void Constructor_Default ()
+    {
         // Arrange & Act
         Slider<int> slider = new ();
 
@@ -145,7 +161,8 @@ public class SliderTests {
     }
 
     [Fact]
-    public void Constructor_With_Options () {
+    public void Constructor_With_Options ()
+    {
         // Arrange
         List<int> options = new () { 1, 2, 3 };
 
@@ -159,7 +176,8 @@ public class SliderTests {
     }
 
     [Fact]
-    public void MovePlus_Should_MoveFocusRight_When_OptionIsAvailable () {
+    public void MovePlus_Should_MoveFocusRight_When_OptionIsAvailable ()
+    {
         // Arrange
         Slider<int> slider = new (new List<int> { 1, 2, 3, 4 });
         slider.AutoSize = true;
@@ -173,7 +191,8 @@ public class SliderTests {
     }
 
     [Fact]
-    public void MovePlus_Should_NotMoveFocusRight_When_AtEnd () {
+    public void MovePlus_Should_NotMoveFocusRight_When_AtEnd ()
+    {
         // Arrange
         Slider<int> slider = new (new List<int> { 1, 2, 3, 4 });
         slider.AutoSize = true;
@@ -188,7 +207,8 @@ public class SliderTests {
     }
 
     [Fact]
-    public void OnOptionFocused_Event_Cancelled () {
+    public void OnOptionFocused_Event_Cancelled ()
+    {
         // Arrange
         Slider<int> slider = new (new List<int> { 1, 2, 3 });
         var eventRaised = false;
@@ -198,6 +218,7 @@ public class SliderTests {
 
         // Create args with cancel set to false
         cancel = false;
+
         SliderEventArgs<int> args =
             new (new Dictionary<int, SliderOption<int>> (), newFocusedOption) { Cancel = cancel };
         Assert.Equal (0, slider.FocusedOption);
@@ -211,7 +232,9 @@ public class SliderTests {
 
         // Create args with cancel set to true
         cancel = true;
-        args = new SliderEventArgs<int> (new Dictionary<int, SliderOption<int>> (), newFocusedOption) {
+
+        args = new SliderEventArgs<int> (new Dictionary<int, SliderOption<int>> (), newFocusedOption)
+        {
             Cancel = cancel
         };
 
@@ -224,7 +247,8 @@ public class SliderTests {
     }
 
     [Fact]
-    public void OnOptionFocused_Event_Raised () {
+    public void OnOptionFocused_Event_Raised ()
+    {
         // Arrange
         Slider<int> slider = new (new List<int> { 1, 2, 3 });
         var eventRaised = false;
@@ -240,7 +264,8 @@ public class SliderTests {
     }
 
     [Fact]
-    public void OnOptionsChanged_Event_Raised () {
+    public void OnOptionsChanged_Event_Raised ()
+    {
         // Arrange
         Slider<int> slider = new ();
         var eventRaised = false;
@@ -254,7 +279,8 @@ public class SliderTests {
     }
 
     [Fact]
-    public void Set_Should_Not_UnSetFocusedOption_When_EmptyNotAllowed () {
+    public void Set_Should_Not_UnSetFocusedOption_When_EmptyNotAllowed ()
+    {
         // Arrange
         Slider<int> slider = new (new List<int> { 1, 2, 3, 4 }) { AllowEmpty = false };
         slider.AutoSize = true;
@@ -272,7 +298,8 @@ public class SliderTests {
     // Add similar tests for other methods like MoveMinus, MoveStart, MoveEnd, Set, etc.
 
     [Fact]
-    public void Set_Should_SetFocusedOption () {
+    public void Set_Should_SetFocusedOption ()
+    {
         // Arrange
         Slider<int> slider = new (new List<int> { 1, 2, 3, 4 });
         slider.AutoSize = true;
@@ -288,7 +315,8 @@ public class SliderTests {
     }
 
     [Fact]
-    public void TryGetOptionByPosition_InvalidPosition_Failure () {
+    public void TryGetOptionByPosition_InvalidPosition_Failure ()
+    {
         // Arrange
         Slider<int> slider = new (new List<int> { 1, 2, 3 });
         var x = 10;
@@ -311,7 +339,8 @@ public class SliderTests {
     [InlineData (0, 0, 1, 1)]
     [InlineData (3, 0, 1, 2)]
     [InlineData (9, 0, 1, 4)]
-    public void TryGetOptionByPosition_ValidPositionHorizontal_Success (int x, int y, int threshold, int expectedData) {
+    public void TryGetOptionByPosition_ValidPositionHorizontal_Success (int x, int y, int threshold, int expectedData)
+    {
         // Arrange
         Slider<int> slider = new (new List<int> { 1, 2, 3, 4 });
         slider.AutoSize = true; // Set auto size to true to enable testing
@@ -327,7 +356,7 @@ public class SliderTests {
 
         // Assert
         Assert.True (result);
-        Assert.Equal (expectedData, slider.Options[option].Data);
+        Assert.Equal (expectedData, slider.Options [option].Data);
     }
 
     [Theory]
@@ -337,7 +366,8 @@ public class SliderTests {
     [InlineData (0, 0, 1, 1)]
     [InlineData (0, 3, 1, 2)]
     [InlineData (0, 9, 1, 4)]
-    public void TryGetOptionByPosition_ValidPositionVertical_Success (int x, int y, int threshold, int expectedData) {
+    public void TryGetOptionByPosition_ValidPositionVertical_Success (int x, int y, int threshold, int expectedData)
+    {
         // Arrange
         Slider<int> slider = new (new List<int> { 1, 2, 3, 4 });
         slider.Orientation = Orientation.Vertical;
@@ -360,11 +390,12 @@ public class SliderTests {
 
         // Assert
         Assert.True (result);
-        Assert.Equal (expectedData, slider.Options[option].Data);
+        Assert.Equal (expectedData, slider.Options [option].Data);
     }
 
     [Fact]
-    public void TryGetPositionByOption_InvalidOption_Failure () {
+    public void TryGetPositionByOption_InvalidOption_Failure ()
+    {
         // Arrange
         Slider<int> slider = new (new List<int> { 1, 2, 3 });
         int option = -1;
@@ -382,7 +413,8 @@ public class SliderTests {
     [InlineData (0, 0, 0)]
     [InlineData (1, 3, 0)]
     [InlineData (3, 9, 0)]
-    public void TryGetPositionByOption_ValidOptionHorizontal_Success (int option, int expectedX, int expectedY) {
+    public void TryGetPositionByOption_ValidOptionHorizontal_Success (int option, int expectedX, int expectedY)
+    {
         // Arrange
         Slider<int> slider = new (new List<int> { 1, 2, 3, 4 });
         slider.AutoSize = true; // Set auto size to true to enable testing
@@ -404,7 +436,8 @@ public class SliderTests {
     [InlineData (0, 0, 0)]
     [InlineData (1, 0, 3)]
     [InlineData (3, 0, 9)]
-    public void TryGetPositionByOption_ValidOptionVertical_Success (int option, int expectedX, int expectedY) {
+    public void TryGetPositionByOption_ValidOptionVertical_Success (int option, int expectedX, int expectedY)
+    {
         // Arrange
         Slider<int> slider = new (new List<int> { 1, 2, 3, 4 });
         slider.Orientation = Orientation.Vertical;
@@ -422,7 +455,8 @@ public class SliderTests {
 
     // https://github.com/gui-cs/Terminal.Gui/issues/3099
     [Fact]
-    private void One_Option_Does_Not_Throw () {
+    private void One_Option_Does_Not_Throw ()
+    {
         // Arrange
         Slider<int> slider = new ();
         slider.BeginInit ();
@@ -433,7 +467,8 @@ public class SliderTests {
     }
 
     [Fact]
-    private void Set_Options_No_Legend_Throws () {
+    private void Set_Options_No_Legend_Throws ()
+    {
         // Arrange
         Slider<int> slider = new ();
 
@@ -442,7 +477,8 @@ public class SliderTests {
     }
 
     [Fact]
-    private void Set_Options_Throws_If_Null () {
+    private void Set_Options_Throws_If_Null ()
+    {
         // Arrange
         Slider<int> slider = new ();
 

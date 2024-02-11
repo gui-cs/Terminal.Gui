@@ -2,7 +2,8 @@
 
 namespace Terminal.Gui.DrawingTests;
 
-public partial class ColorTests {
+public partial class ColorTests
+{
     [Theory]
     [CombinatorialData]
     public void Argb_Returns_Expected_Value (
@@ -10,7 +11,8 @@ public partial class ColorTests {
         [CombinatorialRange (0, 255, 51)] byte r,
         [CombinatorialRange (0, 153, 51)] byte g,
         [CombinatorialRange (0, 128, 32)] byte b
-    ) {
+    )
+    {
         Color color = new (r, g, b, a);
 
         // Color.Rgba is expected to be a signed int32 in little endian order (a,b,g,r)
@@ -20,7 +22,8 @@ public partial class ColorTests {
     }
 
     [Fact]
-    public void Color_ColorName_Get_ReturnsClosestColorName () {
+    public void Color_ColorName_Get_ReturnsClosestColorName ()
+    {
         // Arrange
         var color = new Color (128, 64, 40); // Custom RGB color, closest to Yellow
         var expectedColorName = ColorName.Yellow;
@@ -33,7 +36,8 @@ public partial class ColorTests {
     }
 
     [Fact]
-    public void Color_IsClosestToNamedColor_ReturnsExpectedValue () {
+    public void Color_IsClosestToNamedColor_ReturnsExpectedValue ()
+    {
         // Arrange
         var color1 = new Color (ColorName.Red);
         var color2 = new Color (197, 15, 31); // Red in RGB
@@ -45,10 +49,11 @@ public partial class ColorTests {
 
     [Theory]
     [MemberData (
-        nameof (ColorTestsTheoryDataGenerators.FindClosestColor_ReturnsClosestColor),
-        MemberType = typeof (ColorTestsTheoryDataGenerators)
-    )]
-    public void FindClosestColor_ReturnsClosestColor (Color inputColor, ColorName expectedColorName) {
+                    nameof (ColorTestsTheoryDataGenerators.FindClosestColor_ReturnsClosestColor),
+                    MemberType = typeof (ColorTestsTheoryDataGenerators)
+                )]
+    public void FindClosestColor_ReturnsClosestColor (Color inputColor, ColorName expectedColorName)
+    {
         ColorName actualColorName = Color.GetClosestNamedColor (inputColor);
 
         Assert.Equal (expectedColorName, actualColorName);
@@ -61,7 +66,8 @@ public partial class ColorTests {
         [CombinatorialRange (0, 255, 51)] byte r,
         [CombinatorialRange (0, 153, 51)] byte g,
         [CombinatorialRange (0, 128, 32)] byte b
-    ) {
+    )
+    {
         Color color = new (r, g, b, a);
 
         // Color.Rgba is expected to be a signed int32 in little endian order (a,b,g,r)
@@ -71,8 +77,10 @@ public partial class ColorTests {
     }
 }
 
-public static partial class ColorTestsTheoryDataGenerators {
-    public static TheoryData<Color, ColorName> FindClosestColor_ReturnsClosestColor () {
+public static partial class ColorTestsTheoryDataGenerators
+{
+    public static TheoryData<Color, ColorName> FindClosestColor_ReturnsClosestColor ()
+    {
         TheoryData<Color, ColorName> data = [];
         data.Add (new Color (0, 0), ColorName.Black);
         data.Add (new Color (255, 255, 255), ColorName.White);

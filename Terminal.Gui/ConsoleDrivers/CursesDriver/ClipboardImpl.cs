@@ -5,20 +5,26 @@ namespace Terminal.Gui;
 
 /// <summary>A clipboard implementation for Linux. This implementation uses the xclip command to access the clipboard.</summary>
 /// <remarks>If xclip is not installed, this implementation will not work.</remarks>
-internal class CursesClipboard : ClipboardBase {
+internal class CursesClipboard : ClipboardBase
+{
     public CursesClipboard () { IsSupported = CheckSupport (); }
     private string _xclipPath = string.Empty;
     public override bool IsSupported { get; }
 
-    protected override string GetClipboardDataImpl () {
+    protected override string GetClipboardDataImpl ()
+    {
         string tempFileName = Path.GetTempFileName ();
         var xclipargs = "-selection clipboard -o";
 
-        try {
+        try
+        {
             (int exitCode, string result) =
                 ClipboardProcessRunner.Bash ($"{_xclipPath} {xclipargs} > {tempFileName}", waitForOutput: false);
-            if (exitCode == 0) {
-                if (Application.Driver is CursesDriver) {
+
+            if (exitCode == 0)
+            {
+                if (Application.Driver is CursesDriver)
+                {
                     Curses.raw ();
                     Curses.noecho ();
                 }
@@ -26,41 +32,54 @@ internal class CursesClipboard : ClipboardBase {
                 return File.ReadAllText (tempFileName);
             }
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             throw new NotSupportedException ($"\"{_xclipPath} {xclipargs}\" failed.", e);
         }
-        finally {
+        finally
+        {
             File.Delete (tempFileName);
         }
 
         return string.Empty;
     }
 
-    protected override void SetClipboardDataImpl (string text) {
+    protected override void SetClipboardDataImpl (string text)
+    {
         var xclipargs = "-selection clipboard -i";
-        try {
+
+        try
+        {
             (int exitCode, _) = ClipboardProcessRunner.Bash ($"{_xclipPath} {xclipargs}", text);
-            if (exitCode == 0 && Application.Driver is CursesDriver) {
+
+            if (exitCode == 0 && Application.Driver is CursesDriver)
+            {
                 Curses.raw ();
                 Curses.noecho ();
             }
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             throw new NotSupportedException ($"\"{_xclipPath} {xclipargs} < {text}\" failed", e);
         }
     }
 
-    private bool CheckSupport () {
+    private bool CheckSupport ()
+    {
 #pragma warning disable RCS1075 // Avoid empty catch clause that catches System.Exception.
-        try {
+        try
+        {
             (int exitCode, string result) = ClipboardProcessRunner.Bash ("which xclip", waitForOutput: true);
-            if (exitCode == 0 && result.FileExists ()) {
+
+            if (exitCode == 0 && result.FileExists ())
+            {
                 _xclipPath = result;
 
                 return true;
             }
         }
-        catch (Exception) {
+        catch (Exception)
+        {
             // Permissions issue.
         }
 #pragma warning restore RCS1075 // Avoid empty catch clause that catches System.Exception.
@@ -69,21 +88,23 @@ internal class CursesClipboard : ClipboardBase {
 }
 
 /// <summary>
-///     A clipboard implementation for MacOSX. This implementation uses the Mac clipboard API (via P/Invoke) to copy/paste.
-///     The existance of the Mac pbcopy and pbpaste commands is used to determine if copy/paste is supported.
+///     A clipboard implementation for MacOSX. This implementation uses the Mac clipboard API (via P/Invoke) to copy/paste. The existance of the Mac pbcopy and pbpaste commands is used to determine if copy/paste is supported.
 /// </summary>
-internal class MacOSXClipboard : ClipboardBase {
-    public MacOSXClipboard () {
+internal class MacOSXClipboard : ClipboardBase
+{
+    public MacOSXClipboard ()
+    {
         _utfTextType = objc_msgSend (
-            objc_msgSend (_nsString, _allocRegister),
-            _initWithUtf8Register,
-            "public.utf8-plain-text"
-        );
+                                     objc_msgSend (_nsString, _allocRegister),
+                                     _initWithUtf8Register,
+                                     "public.utf8-plain-text"
+                                    );
+
         _nsStringPboardType = objc_msgSend (
-            objc_msgSend (_nsString, _allocRegister),
-            _initWithUtf8Register,
-            "NSStringPboardType"
-        );
+                                            objc_msgSend (_nsString, _allocRegister),
+                                            _initWithUtf8Register,
+                                            "NSStringPboardType"
+                                           );
         _generalPasteboard = objc_msgSend (_nsPasteboard, _generalPasteboardRegister);
         IsSupported = CheckSupport ();
     }
@@ -102,30 +123,39 @@ internal class MacOSXClipboard : ClipboardBase {
     private readonly nint _utfTextType;
     public override bool IsSupported { get; }
 
-    protected override string GetClipboardDataImpl () {
+    protected override string GetClipboardDataImpl ()
+    {
         nint ptr = objc_msgSend (_generalPasteboard, _stringForTypeRegister, _nsStringPboardType);
         nint charArray = objc_msgSend (ptr, _utf8Register);
 
         return Marshal.PtrToStringAnsi (charArray);
     }
 
-    protected override void SetClipboardDataImpl (string text) {
+    protected override void SetClipboardDataImpl (string text)
+    {
         nint str = default;
-        try {
+
+        try
+        {
             str = objc_msgSend (objc_msgSend (_nsString, _allocRegister), _initWithUtf8Register, text);
             objc_msgSend (_generalPasteboard, _clearContentsRegister);
             objc_msgSend (_generalPasteboard, _setStringRegister, str, _utfTextType);
         }
-        finally {
-            if (str != default (nint)) {
+        finally
+        {
+            if (str != default (nint))
+            {
                 objc_msgSend (str, sel_registerName ("release"));
             }
         }
     }
 
-    private bool CheckSupport () {
+    private bool CheckSupport ()
+    {
         (int exitCode, string result) = ClipboardProcessRunner.Bash ("which pbcopy", waitForOutput: true);
-        if (exitCode != 0 || !result.FileExists ()) {
+
+        if (exitCode != 0 || !result.FileExists ())
+        {
             return false;
         }
 
@@ -154,28 +184,33 @@ internal class MacOSXClipboard : ClipboardBase {
 }
 
 /// <summary>
-///     A clipboard implementation for Linux, when running under WSL. This implementation uses the Windows clipboard to
-///     store the data, and uses Windows' powershell.exe (launched via WSL interop services) to set/get the Windows
-///     clipboard.
+///     A clipboard implementation for Linux, when running under WSL. This implementation uses the Windows clipboard to store the data, and uses Windows' powershell.exe (launched via WSL interop services) to set/get the Windows clipboard.
 /// </summary>
-internal class WSLClipboard : ClipboardBase {
+internal class WSLClipboard : ClipboardBase
+{
     private static string _powershellPath = string.Empty;
     public override bool IsSupported => CheckSupport ();
 
-    protected override string GetClipboardDataImpl () {
-        if (!IsSupported) {
+    protected override string GetClipboardDataImpl ()
+    {
+        if (!IsSupported)
+        {
             return string.Empty;
         }
 
         (int exitCode, string output) =
             ClipboardProcessRunner.Process (_powershellPath, "-noprofile -command \"Get-Clipboard\"");
-        if (exitCode == 0) {
-            if (Application.Driver is CursesDriver) {
+
+        if (exitCode == 0)
+        {
+            if (Application.Driver is CursesDriver)
+            {
                 Curses.raw ();
                 Curses.noecho ();
             }
 
-            if (output.EndsWith ("\r\n")) {
+            if (output.EndsWith ("\r\n"))
+            {
                 output = output.Substring (0, output.Length - 2);
             }
 
@@ -185,32 +220,42 @@ internal class WSLClipboard : ClipboardBase {
         return string.Empty;
     }
 
-    protected override void SetClipboardDataImpl (string text) {
-        if (!IsSupported) {
+    protected override void SetClipboardDataImpl (string text)
+    {
+        if (!IsSupported)
+        {
             return;
         }
 
         (int exitCode, string output) = ClipboardProcessRunner.Process (
-            _powershellPath,
-            $"-noprofile -command \"Set-Clipboard -Value \\\"{text}\\\"\""
-        );
-        if (exitCode == 0) {
-            if (Application.Driver is CursesDriver) {
+                                                                        _powershellPath,
+                                                                        $"-noprofile -command \"Set-Clipboard -Value \\\"{text}\\\"\""
+                                                                       );
+
+        if (exitCode == 0)
+        {
+            if (Application.Driver is CursesDriver)
+            {
                 Curses.raw ();
                 Curses.noecho ();
             }
         }
     }
 
-    private bool CheckSupport () {
-        if (string.IsNullOrEmpty (_powershellPath)) {
+    private bool CheckSupport ()
+    {
+        if (string.IsNullOrEmpty (_powershellPath))
+        {
             // Specify pwsh.exe (not pwsh) to ensure we get the Windows version (invoked via WSL)
             (int exitCode, string result) = ClipboardProcessRunner.Bash ("which pwsh.exe", waitForOutput: true);
-            if (exitCode > 0) {
+
+            if (exitCode > 0)
+            {
                 (exitCode, result) = ClipboardProcessRunner.Bash ("which powershell.exe", waitForOutput: true);
             }
 
-            if (exitCode == 0) {
+            if (exitCode == 0)
+            {
                 _powershellPath = result;
             }
         }

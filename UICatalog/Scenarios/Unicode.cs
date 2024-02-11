@@ -8,8 +8,10 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("Unicode", "Tries to test Unicode in all controls (#204)")]
 [ScenarioCategory ("Text and Formatting")]
 [ScenarioCategory ("Controls")]
-public class UnicodeInMenu : Scenario {
-    public override void Setup () {
+public class UnicodeInMenu : Scenario
+{
+    public override void Setup ()
+    {
         var unicode =
             "Τὴ γλῶσσα μοῦ ἔδωσαν ἑλληνικὴ\nτὸ σπίτι φτωχικὸ στὶς ἀμμουδιὲς τοῦ Ὁμήρου.\nΜονάχη ἔγνοια ἡ γλῶσσα μου στὶς ἀμμουδιὲς τοῦ Ὁμήρου.";
 
@@ -26,51 +28,59 @@ public class UnicodeInMenu : Scenario {
                 CM.Glyphs.HorizontalEllipsis
             }";
 
-        var menu = new MenuBar {
-            Menus = [
-                        new MenuBarItem (
-                            "_Файл",
-                            new MenuItem[] {
-                                new (
-                                    "_Создать",
-                                    "Creates new file",
-                                    null
+        var menu = new MenuBar
+        {
+            Menus =
+            [
+                new MenuBarItem (
+                                 "_Файл",
+                                 new MenuItem []
+                                 {
+                                     new (
+                                          "_Создать",
+                                          "Creates new file",
+                                          null
+                                         ),
+                                     new ("_Открыть", "", null),
+                                     new ("Со_хранить", "", null),
+                                     new (
+                                          "_Выход",
+                                          "",
+                                          () => Application.RequestStop ()
+                                         )
+                                 }
                                 ),
-                                new ("_Открыть", "", null),
-                                new ("Со_хранить", "", null),
-                                new (
-                                    "_Выход",
-                                    "",
-                                    () => Application.RequestStop ()
+                new MenuBarItem (
+                                 "_Edit",
+                                 new MenuItem []
+                                 {
+                                     new ("_Copy", "", null), new ("C_ut", "", null),
+                                     new ("_糊", "hú (Paste)", null)
+                                 }
                                 )
-                            }
-                        ),
-                        new MenuBarItem (
-                            "_Edit",
-                            new MenuItem[] {
-                                new ("_Copy", "", null), new ("C_ut", "", null), new ("_糊", "hú (Paste)", null)
-                            }
-                        )
-                    ]
+            ]
         };
         Application.Top.Add (menu);
 
         var statusBar = new StatusBar (
-            new StatusItem[] {
-                new (
-                    Application.QuitKey,
-                    $"{Application.QuitKey} Выход",
-                    () => Application.RequestStop ()
-                ),
-                new (KeyCode.Null, "~F2~ Создать", null),
-                new (KeyCode.Null, "~F3~ Со_хранить", null)
-            }
-        );
+                                       new StatusItem []
+                                       {
+                                           new (
+                                                Application.QuitKey,
+                                                $"{Application.QuitKey} Выход",
+                                                () => Application.RequestStop ()
+                                               ),
+                                           new (KeyCode.Null, "~F2~ Создать", null),
+                                           new (KeyCode.Null, "~F3~ Со_хранить", null)
+                                       }
+                                      );
         Application.Top.Add (statusBar);
 
         var label = new Label { X = 0, Y = 1, Text = "Label:" };
         Win.Add (label);
-        var testlabel = new Label {
+
+        var testlabel = new Label
+        {
             X = 20,
             Y = Pos.Y (label),
             AutoSize = false,
@@ -85,7 +95,9 @@ public class UnicodeInMenu : Scenario {
         sb.Append ('e');
         sb.Append ('\u0301');
         sb.Append ('\u0301');
-        testlabel = new Label {
+
+        testlabel = new Label
+        {
             X = 20,
             Y = Pos.Y (label),
             AutoSize = false,
@@ -102,7 +114,9 @@ public class UnicodeInMenu : Scenario {
 
         label = new Label { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "CheckBox:" };
         Win.Add (label);
-        var checkBox = new CheckBox {
+
+        var checkBox = new CheckBox
+        {
             X = 20,
             Y = Pos.Y (label),
             AutoSize = false,
@@ -110,7 +124,9 @@ public class UnicodeInMenu : Scenario {
             Height = 1,
             Text = gitString
         };
-        var checkBoxRight = new CheckBox {
+
+        var checkBoxRight = new CheckBox
+        {
             X = 20,
             Y = Pos.Bottom (checkBox),
             AutoSize = false,
@@ -131,44 +147,54 @@ public class UnicodeInMenu : Scenario {
 
         label = new Label { X = Pos.X (label), Y = Pos.Bottom (label) + 2, Text = "HexView:" };
         Win.Add (label);
-        var hexView = new HexView (new MemoryStream (Encoding.ASCII.GetBytes (gitString + " Со_хранить"))) {
+
+        var hexView = new HexView (new MemoryStream (Encoding.ASCII.GetBytes (gitString + " Со_хранить")))
+        {
             X = 20, Y = Pos.Y (label), Width = Dim.Percent (60), Height = 5
         };
         Win.Add (hexView);
 
         label = new Label { X = Pos.X (label), Y = Pos.Bottom (hexView) + 1, Text = "ListView:" };
         Win.Add (label);
-        var listView = new ListView {
+
+        var listView = new ListView
+        {
             X = 20,
             Y = Pos.Y (label),
             Width = Dim.Percent (60),
             Height = 3,
             Source = new ListWrapper (
-                new List<string> { "item #1", gitString, "Со_хранить", unicode }
-            )
+                                      new List<string> { "item #1", gitString, "Со_хранить", unicode }
+                                     )
         };
         Win.Add (listView);
 
         label = new Label { X = Pos.X (label), Y = Pos.Bottom (listView) + 1, Text = "RadioGroup:" };
         Win.Add (label);
-        var radioGroup = new RadioGroup {
+
+        var radioGroup = new RadioGroup
+        {
             X = 20,
             Y = Pos.Y (label),
             Width = Dim.Percent (60),
-            RadioLabels = new[] { "item #1", gitString, "Со_хранить", "𝔽𝕆𝕆𝔹𝔸ℝ" }
+            RadioLabels = new [] { "item #1", gitString, "Со_хранить", "𝔽𝕆𝕆𝔹𝔸ℝ" }
         };
         Win.Add (radioGroup);
 
         label = new Label { X = Pos.X (label), Y = Pos.Bottom (radioGroup) + 1, Text = "TextField:" };
         Win.Add (label);
-        var textField = new TextField {
+
+        var textField = new TextField
+        {
             X = 20, Y = Pos.Y (label), Width = Dim.Percent (60), Text = gitString + " = Со_хранить"
         };
         Win.Add (textField);
 
         label = new Label { X = Pos.X (label), Y = Pos.Bottom (textField) + 1, Text = "TextView:" };
         Win.Add (label);
-        var textView = new TextView {
+
+        var textView = new TextView
+        {
             X = 20,
             Y = Pos.Y (label),
             Width = Dim.Percent (60),

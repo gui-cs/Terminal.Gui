@@ -1,169 +1,170 @@
 ﻿namespace Terminal.Gui.TypeTests;
 
-public class RectTests {
+public class RectTests
+{
     [Theory]
 
     // Empty
     [InlineData (
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-    )]
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                )]
     [InlineData (
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        -1,
-        0,
-        2,
-        0
-    )]
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    -1,
+                    0,
+                    2,
+                    0
+                )]
     [InlineData (
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        -1,
-        0,
-        2
-    )]
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    -1,
+                    0,
+                    2
+                )]
     [InlineData (
-        0,
-        0,
-        0,
-        0,
-        1,
-        1,
-        -1,
-        -1,
-        2,
-        2
-    )]
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    1,
+                    -1,
+                    -1,
+                    2,
+                    2
+                )]
     [InlineData (
-        0,
-        0,
-        0,
-        0,
-        -1,
-        -1, // Throws
-        0,
-        0,
-        0,
-        0
-    )]
+                    0,
+                    0,
+                    0,
+                    0,
+                    -1,
+                    -1, // Throws
+                    0,
+                    0,
+                    0,
+                    0
+                )]
 
     // Zero location, Size of 1
     [InlineData (
-        0,
-        0,
-        1,
-        1,
-        0,
-        0,
-        0,
-        0,
-        1,
-        1
-    )]
+                    0,
+                    0,
+                    1,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    1
+                )]
     [InlineData (
-        0,
-        0,
-        1,
-        1,
-        1,
-        0,
-        -1,
-        0,
-        3,
-        1
-    )]
+                    0,
+                    0,
+                    1,
+                    1,
+                    1,
+                    0,
+                    -1,
+                    0,
+                    3,
+                    1
+                )]
     [InlineData (
-        0,
-        0,
-        1,
-        1,
-        0,
-        1,
-        0,
-        -1,
-        1,
-        3
-    )]
+                    0,
+                    0,
+                    1,
+                    1,
+                    0,
+                    1,
+                    0,
+                    -1,
+                    1,
+                    3
+                )]
     [InlineData (
-        0,
-        0,
-        1,
-        1,
-        1,
-        1,
-        -1,
-        -1,
-        3,
-        3
-    )]
+                    0,
+                    0,
+                    1,
+                    1,
+                    1,
+                    1,
+                    -1,
+                    -1,
+                    3,
+                    3
+                )]
 
     // Positive location, Size of 1
     [InlineData (
-        1,
-        1,
-        1,
-        1,
-        0,
-        0,
-        1,
-        1,
-        1,
-        1
-    )]
+                    1,
+                    1,
+                    1,
+                    1,
+                    0,
+                    0,
+                    1,
+                    1,
+                    1,
+                    1
+                )]
     [InlineData (
-        1,
-        1,
-        1,
-        1,
-        1,
-        0,
-        0,
-        1,
-        3,
-        1
-    )]
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    0,
+                    0,
+                    1,
+                    3,
+                    1
+                )]
     [InlineData (
-        1,
-        1,
-        1,
-        1,
-        0,
-        1,
-        1,
-        0,
-        1,
-        3
-    )]
+                    1,
+                    1,
+                    1,
+                    1,
+                    0,
+                    1,
+                    1,
+                    0,
+                    1,
+                    3
+                )]
     [InlineData (
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        0,
-        0,
-        3,
-        3
-    )]
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    0,
+                    0,
+                    3,
+                    3
+                )]
     public void Inflate (
         int x,
         int y,
@@ -175,12 +176,16 @@ public class RectTests {
         int exptectedY,
         int expectedWidth,
         int expectedHeight
-    ) {
+    )
+    {
         var rect = new Rect (x, y, width, height);
 
-        if (rect.Width + inflateWidth < 0 || rect.Height + inflateHeight < 0) {
+        if (rect.Width + inflateWidth < 0 || rect.Height + inflateHeight < 0)
+        {
             Assert.Throws<ArgumentException> (() => rect.Inflate (inflateWidth, inflateHeight));
-        } else {
+        }
+        else
+        {
             rect.Inflate (inflateWidth, inflateHeight);
         }
 
@@ -191,9 +196,13 @@ public class RectTests {
 
         // Use the other overload (Size)
         rect = new Rect (x, y, width, height);
-        if (rect.Width + inflateWidth < 0 || rect.Height + inflateHeight < 0) {
+
+        if (rect.Width + inflateWidth < 0 || rect.Height + inflateHeight < 0)
+        {
             Assert.Throws<ArgumentException> (() => rect.Inflate (new Size (inflateWidth, inflateHeight)));
-        } else {
+        }
+        else
+        {
             rect.Inflate (new Size (inflateWidth, inflateHeight));
         }
 
@@ -204,14 +213,18 @@ public class RectTests {
     }
 
     [Fact]
-    public void Negative_X_Y_Positions () {
+    public void Negative_X_Y_Positions ()
+    {
         var rect = new Rect (-10, -5, 100, 50);
         int yCount = 0, xCount = 0, yxCount = 0;
 
-        for (int line = rect.Y; line < rect.Y + rect.Height; line++) {
+        for (int line = rect.Y; line < rect.Y + rect.Height; line++)
+        {
             yCount++;
             xCount = 0;
-            for (int col = rect.X; col < rect.X + rect.Width; col++) {
+
+            for (int col = rect.X; col < rect.X + rect.Width; col++)
+            {
                 xCount++;
                 yxCount++;
             }
@@ -223,14 +236,18 @@ public class RectTests {
     }
 
     [Fact]
-    public void Positive_X_Y_Positions () {
+    public void Positive_X_Y_Positions ()
+    {
         var rect = new Rect (10, 5, 100, 50);
         int yCount = 0, xCount = 0, yxCount = 0;
 
-        for (int line = rect.Y; line < rect.Y + rect.Height; line++) {
+        for (int line = rect.Y; line < rect.Y + rect.Height; line++)
+        {
             yCount++;
             xCount = 0;
-            for (int col = rect.X; col < rect.X + rect.Width; col++) {
+
+            for (int col = rect.X; col < rect.X + rect.Width; col++)
+            {
                 xCount++;
                 yxCount++;
             }
@@ -242,7 +259,8 @@ public class RectTests {
     }
 
     [Fact]
-    public void Rect_Contains () {
+    public void Rect_Contains ()
+    {
         var rect = new Rect (0, 0, 3, 3);
         Assert.True (rect.Contains (new Point (1, 1)));
         Assert.True (rect.Contains (new Point (1, 2)));
@@ -280,7 +298,8 @@ public class RectTests {
     }
 
     [Fact]
-    public void Rect_Equals () {
+    public void Rect_Equals ()
+    {
         var rect1 = new Rect ();
         var rect2 = new Rect ();
         Assert.Equal (rect1, rect2);
@@ -295,7 +314,8 @@ public class RectTests {
     }
 
     [Fact]
-    public void Rect_New () {
+    public void Rect_New ()
+    {
         var rect = new Rect ();
         Assert.True (rect.IsEmpty);
 
@@ -322,7 +342,8 @@ public class RectTests {
     }
 
     [Fact]
-    public void Rect_SetsValue () {
+    public void Rect_SetsValue ()
+    {
         var rect = new Rect { X = 0, Y = 0 };
         Assert.True (rect.IsEmpty);
 
@@ -349,7 +370,8 @@ public class RectTests {
     }
 
     [Fact]
-    public void Union_EmptyRectangles () {
+    public void Union_EmptyRectangles ()
+    {
         var r1 = new Rect (0, 0, 0, 0);
         var r2 = new Rect (1, 1, 0, 0);
         Rect result = Rect.Union (r1, r2);
@@ -357,7 +379,8 @@ public class RectTests {
     }
 
     [Fact]
-    public void Union_NegativeCoords () {
+    public void Union_NegativeCoords ()
+    {
         // arrange
         var rect1 = new Rect (-2, -2, 4, 4);
         var rect2 = new Rect (-1, -1, 5, 5);
@@ -370,7 +393,8 @@ public class RectTests {
     }
 
     [Fact]
-    public void Union_PositiveCoords () {
+    public void Union_PositiveCoords ()
+    {
         var r1 = new Rect (0, 0, 2, 2);
         var r2 = new Rect (1, 1, 2, 2);
         Rect result = Rect.Union (r1, r2);
@@ -378,7 +402,8 @@ public class RectTests {
     }
 
     [Fact]
-    public void Union_RectangleAHasNegativeCoordinates_ReturnsCombinedRectangle () {
+    public void Union_RectangleAHasNegativeCoordinates_ReturnsCombinedRectangle ()
+    {
         // arrange
         var rect1 = new Rect (-2, -2, 5, 5);
         var rect2 = new Rect (3, 3, 4, 4);
@@ -391,7 +416,8 @@ public class RectTests {
     }
 
     [Fact]
-    public void Union_RectangleAIsLarger_ReturnsA () {
+    public void Union_RectangleAIsLarger_ReturnsA ()
+    {
         // arrange
         var rect1 = new Rect (1, 1, 6, 6);
         var rect2 = new Rect (2, 2, 3, 3);
@@ -404,7 +430,8 @@ public class RectTests {
     }
 
     [Fact]
-    public void Union_RectangleBIsLarger_ReturnsB () {
+    public void Union_RectangleBIsLarger_ReturnsB ()
+    {
         // arrange
         var rect1 = new Rect (1, 1, 3, 3);
         var rect2 = new Rect (2, 2, 6, 6);
@@ -417,7 +444,8 @@ public class RectTests {
     }
 
     [Fact]
-    public void Union_RectanglesDoNotOverlap_ReturnsCombinedRectangle () {
+    public void Union_RectanglesDoNotOverlap_ReturnsCombinedRectangle ()
+    {
         // arrange
         var rect1 = new Rect (1, 1, 3, 3);
         var rect2 = new Rect (5, 5, 3, 3);
@@ -430,7 +458,8 @@ public class RectTests {
     }
 
     [Fact]
-    public void Union_RectanglesOverlap_ReturnsCombinedRectangle () {
+    public void Union_RectanglesOverlap_ReturnsCombinedRectangle ()
+    {
         // arrange
         var rect1 = new Rect (1, 1, 3, 3);
         var rect2 = new Rect (2, 2, 3, 3);
@@ -443,7 +472,8 @@ public class RectTests {
     }
 
     [Fact]
-    public void Union_RectanglesTouchHorizontally_ReturnsCombinedRectangle () {
+    public void Union_RectanglesTouchHorizontally_ReturnsCombinedRectangle ()
+    {
         // arrange
         var rect1 = new Rect (1, 1, 3, 3);
         var rect2 = new Rect (4, 2, 3, 3);
@@ -456,7 +486,8 @@ public class RectTests {
     }
 
     [Fact]
-    public void Union_RectanglesTouchVertically_ReturnsCombinedRectangle () {
+    public void Union_RectanglesTouchVertically_ReturnsCombinedRectangle ()
+    {
         // arrange
         var rect1 = new Rect (1, 1, 3, 3);
         var rect2 = new Rect (2, 4, 3, 3);
@@ -469,7 +500,8 @@ public class RectTests {
     }
 
     [Fact]
-    public void Union_SameRectangle () {
+    public void Union_SameRectangle ()
+    {
         var r1 = new Rect (0, 0, 2, 2);
         var r2 = new Rect (0, 0, 2, 2);
         Rect result = Rect.Union (r1, r2);

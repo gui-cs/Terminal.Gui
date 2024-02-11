@@ -1,12 +1,14 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>Event arguments describing a change in selected object in a tree view</summary>
-public class SelectionChangedEventArgs<T> : EventArgs where T : class {
+public class SelectionChangedEventArgs<T> : EventArgs where T : class
+{
     /// <summary>Creates a new instance of event args describing a change of selection in <paramref name="tree"/></summary>
     /// <param name="tree"></param>
     /// <param name="oldValue"></param>
     /// <param name="newValue"></param>
-    public SelectionChangedEventArgs (TreeView<T> tree, T oldValue, T newValue) {
+    public SelectionChangedEventArgs (TreeView<T> tree, T oldValue, T newValue)
+    {
         Tree = tree;
         OldValue = oldValue;
         NewValue = newValue;

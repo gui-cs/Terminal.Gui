@@ -5,13 +5,15 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.DriverTests;
 
-public class ClipRegionTests {
-    public ClipRegionTests (ITestOutputHelper output) {
+public class ClipRegionTests
+{
+    private readonly ITestOutputHelper output;
+
+    public ClipRegionTests (ITestOutputHelper output)
+    {
         ConsoleDriver.RunningUnitTests = true;
         this.output = output;
     }
-
-    private readonly ITestOutputHelper output;
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
@@ -20,7 +22,8 @@ public class ClipRegionTests {
     //[InlineData (typeof (ANSIDriver))]
     [InlineData (typeof (WindowsDriver))]
     [InlineData (typeof (CursesDriver))]
-    public void AddRune_Is_Clipped (Type driverType) {
+    public void AddRune_Is_Clipped (Type driverType)
+    {
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driver);
         Application.Driver.Rows = 25;
@@ -28,24 +31,24 @@ public class ClipRegionTests {
 
         driver.Move (0, 0);
         driver.AddRune ('x');
-        Assert.Equal ((Rune)'x', driver.Contents[0, 0].Rune);
+        Assert.Equal ((Rune)'x', driver.Contents [0, 0].Rune);
 
         driver.Move (5, 5);
         driver.AddRune ('x');
-        Assert.Equal ((Rune)'x', driver.Contents[5, 5].Rune);
+        Assert.Equal ((Rune)'x', driver.Contents [5, 5].Rune);
 
         // Clear the contents
         driver.FillRect (new Rect (0, 0, driver.Rows, driver.Cols), ' ');
-        Assert.Equal ((Rune)' ', driver.Contents[0, 0].Rune);
+        Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
 
         // Setup the region with a single rectangle, fill screen with 'x'
         driver.Clip = new Rect (5, 5, 5, 5);
         driver.FillRect (new Rect (0, 0, driver.Rows, driver.Cols), 'x');
-        Assert.Equal ((Rune)' ', driver.Contents[0, 0].Rune);
-        Assert.Equal ((Rune)' ', driver.Contents[4, 9].Rune);
-        Assert.Equal ((Rune)'x', driver.Contents[5, 5].Rune);
-        Assert.Equal ((Rune)'x', driver.Contents[9, 9].Rune);
-        Assert.Equal ((Rune)' ', driver.Contents[10, 10].Rune);
+        Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+        Assert.Equal ((Rune)' ', driver.Contents [4, 9].Rune);
+        Assert.Equal ((Rune)'x', driver.Contents [5, 5].Rune);
+        Assert.Equal ((Rune)'x', driver.Contents [9, 9].Rune);
+        Assert.Equal ((Rune)' ', driver.Contents [10, 10].Rune);
 
         Application.Shutdown ();
     }
@@ -57,7 +60,8 @@ public class ClipRegionTests {
     //[InlineData (typeof (ANSIDriver))]
     [InlineData (typeof (WindowsDriver))]
     [InlineData (typeof (CursesDriver))]
-    public void Clip_Set_To_Empty_AllInvalid (Type driverType) {
+    public void Clip_Set_To_Empty_AllInvalid (Type driverType)
+    {
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driver);
 
@@ -86,7 +90,8 @@ public class ClipRegionTests {
     //[InlineData (typeof (ANSIDriver))]
     [InlineData (typeof (WindowsDriver))]
     [InlineData (typeof (CursesDriver))]
-    public void IsValidLocation (Type driverType) {
+    public void IsValidLocation (Type driverType)
+    {
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driver);
         Application.Driver.Rows = 10;

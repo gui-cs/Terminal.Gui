@@ -4,7 +4,8 @@ namespace Terminal.Gui;
 
 /// <inheritdoc/>
 /// <remarks>This implementation is based on a static <see cref="Collection"/> of objects.</remarks>
-public class CollectionNavigator : CollectionNavigatorBase {
+public class CollectionNavigator : CollectionNavigatorBase
+{
     /// <summary>Constructs a new CollectionNavigator.</summary>
     public CollectionNavigator () { }
 
@@ -16,8 +17,8 @@ public class CollectionNavigator : CollectionNavigatorBase {
     public IList Collection { get; set; }
 
     /// <inheritdoc/>
-    protected override object ElementAt (int idx) => Collection[idx];
+    protected override object ElementAt (int idx) { return Collection [idx]; }
 
     /// <inheritdoc/>
-    protected override int GetCollectionLength () => Collection.Count;
+    protected override int GetCollectionLength () { return Collection.Count; }
 }

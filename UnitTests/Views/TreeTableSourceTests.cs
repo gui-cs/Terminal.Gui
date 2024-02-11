@@ -3,8 +3,14 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class TreeTableSourceTests : IDisposable {
-    public TreeTableSourceTests (ITestOutputHelper output) {
+public class TreeTableSourceTests : IDisposable
+{
+    private readonly Rune _origChecked;
+    private readonly Rune _origUnchecked;
+    private readonly ITestOutputHelper _output;
+
+    public TreeTableSourceTests (ITestOutputHelper output)
+    {
         _output = output;
 
         _origChecked = ConfigurationManager.Glyphs.Checked;
@@ -13,18 +19,16 @@ public class TreeTableSourceTests : IDisposable {
         ConfigurationManager.Glyphs.UnChecked = new Rune ('☐');
     }
 
-    private readonly ITestOutputHelper _output;
-    private readonly Rune _origChecked;
-    private readonly Rune _origUnchecked;
-
-    public void Dispose () {
+    public void Dispose ()
+    {
         ConfigurationManager.Glyphs.Checked = _origChecked;
         ConfigurationManager.Glyphs.UnChecked = _origUnchecked;
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void TestTreeTableSource_BasicExpanding_WithKeyboard () {
+    public void TestTreeTableSource_BasicExpanding_WithKeyboard ()
+    {
         TableView tv = GetTreeTable (out _);
 
         tv.Style.GetOrCreateColumnStyle (1).MinAcceptableWidth = 1;
@@ -81,7 +85,8 @@ public class TreeTableSourceTests : IDisposable {
 
     [Fact]
     [AutoInitShutdown]
-    public void TestTreeTableSource_BasicExpanding_WithMouse () {
+    public void TestTreeTableSource_BasicExpanding_WithMouse ()
+    {
         TableView tv = GetTreeTable (out _);
 
         tv.Style.GetOrCreateColumnStyle (1).MinAcceptableWidth = 1;
@@ -143,7 +148,8 @@ public class TreeTableSourceTests : IDisposable {
 
     [Fact]
     [AutoInitShutdown]
-    public void TestTreeTableSource_CombinedWithCheckboxes () {
+    public void TestTreeTableSource_CombinedWithCheckboxes ()
+    {
         TableView tv = GetTreeTable (out TreeView<IDescribedThing> treeSource);
 
         CheckBoxTableSourceWrapperByIndex checkSource;
@@ -209,17 +215,18 @@ public class TreeTableSourceTests : IDisposable {
 
         TestHelpers.AssertDriverContentsAre (expected, _output);
 
-        IDescribedThing[] selectedObjects = checkSource.CheckedRows.Select (treeSource.GetObjectOnRow).ToArray ();
+        IDescribedThing [] selectedObjects = checkSource.CheckedRows.Select (treeSource.GetObjectOnRow).ToArray ();
         IDescribedThing selected = Assert.Single (selectedObjects);
 
         Assert.Equal ("Ford Trans-Am", selected.Name);
         Assert.Equal ("Talking thunderbird car", selected.Description);
     }
 
-    private TableView GetTreeTable (out TreeView<IDescribedThing> tree) {
+    private TableView GetTreeTable (out TreeView<IDescribedThing> tree)
+    {
         var tableView = new TableView ();
-        tableView.ColorScheme = Colors.ColorSchemes["TopLevel"];
-        tableView.ColorScheme = Colors.ColorSchemes["TopLevel"];
+        tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
         tableView.Bounds = new Rect (0, 0, 40, 6);
 
         tableView.Style.ShowHorizontalHeaderUnderline = true;
@@ -231,39 +238,43 @@ public class TreeTableSourceTests : IDisposable {
         tree.AspectGetter = d => d.Name;
 
         tree.TreeBuilder = new DelegateTreeBuilder<IDescribedThing> (
-            d => d is Road r
-                     ? r.Traffic
-                     : Enumerable.Empty<IDescribedThing> ()
-        );
+                                                                     d => d is Road r
+                                                                              ? r.Traffic
+                                                                              : Enumerable.Empty<IDescribedThing> ()
+                                                                    );
 
         tree.AddObject (
-            new Road {
-                Name = "Lost Highway",
-                Description = "Exciting night road",
-                Traffic = new List<Car> {
-                    new () { Name = "Ford Trans-Am", Description = "Talking thunderbird car" },
-                    new () { Name = "DeLorean", Description = "Time travelling car" }
-                }
-            }
-        );
+                        new Road
+                        {
+                            Name = "Lost Highway",
+                            Description = "Exciting night road",
+                            Traffic = new List<Car>
+                            {
+                                new () { Name = "Ford Trans-Am", Description = "Talking thunderbird car" },
+                                new () { Name = "DeLorean", Description = "Time travelling car" }
+                            }
+                        }
+                       );
 
         tree.AddObject (
-            new Road {
-                Name = "Route 66",
-                Description = "Great race course",
-                Traffic = new List<Car> {
-                    new () { Name = "Pink Compact", Description = "Penelope Pitstop's car" },
-                    new () { Name = "Mean Machine", Description = "Dick Dastardly's car" }
-                }
-            }
-        );
+                        new Road
+                        {
+                            Name = "Route 66",
+                            Description = "Great race course",
+                            Traffic = new List<Car>
+                            {
+                                new () { Name = "Pink Compact", Description = "Penelope Pitstop's car" },
+                                new () { Name = "Mean Machine", Description = "Dick Dastardly's car" }
+                            }
+                        }
+                       );
 
         tableView.Table = new TreeTableSource<IDescribedThing> (
-            tableView,
-            "Name",
-            tree,
-            new Dictionary<string, Func<IDescribedThing, object>> { { "Description", d => d.Description } }
-        );
+                                                                tableView,
+                                                                "Name",
+                                                                tree,
+                                                                new Dictionary<string, Func<IDescribedThing, object>> { { "Description", d => d.Description } }
+                                                               );
 
         tableView.BeginInit ();
         tableView.EndInit ();
@@ -276,17 +287,20 @@ public class TreeTableSourceTests : IDisposable {
         return tableView;
     }
 
-    private class Car : IDescribedThing {
+    private class Car : IDescribedThing
+    {
         public string Name { get; set; }
         public string Description { get; set; }
     }
 
-    private interface IDescribedThing {
+    private interface IDescribedThing
+    {
         string Description { get; }
         string Name { get; }
     }
 
-    private class Road : IDescribedThing {
+    private class Road : IDescribedThing
+    {
         public List<Car> Traffic { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }

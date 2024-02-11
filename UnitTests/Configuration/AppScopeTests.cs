@@ -3,9 +3,12 @@ using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests;
 
-public class AppScopeTests {
-    public static readonly JsonSerializerOptions _jsonOptions = new () {
-        Converters = {
+public class AppScopeTests
+{
+    public static readonly JsonSerializerOptions _jsonOptions = new ()
+    {
+        Converters =
+        {
             //new AttributeJsonConverter (),
             //new ColorJsonConverter ()
         }
@@ -13,27 +16,28 @@ public class AppScopeTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void Apply_ShouldApplyUpdatedProperties () {
+    public void Apply_ShouldApplyUpdatedProperties ()
+    {
         Reset ();
         Assert.Null (AppSettingsTestClass.TestProperty);
         Assert.NotEmpty (AppSettings);
-        Assert.Null (AppSettings["AppSettingsTestClass.TestProperty"].PropertyValue);
+        Assert.Null (AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue);
 
         AppSettingsTestClass.TestProperty = true;
         Reset ();
         Assert.True (AppSettingsTestClass.TestProperty);
         Assert.NotEmpty (AppSettings);
-        Assert.Null (AppSettings["AppSettingsTestClass.TestProperty"].PropertyValue as bool?);
+        Assert.Null (AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue as bool?);
 
-        AppSettings["AppSettingsTestClass.TestProperty"].PropertyValue = false;
-        Assert.False (AppSettings["AppSettingsTestClass.TestProperty"].PropertyValue as bool?);
+        AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue = false;
+        Assert.False (AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue as bool?);
 
         // ConfigurationManager.Settings should NOT apply theme settings
         Settings.Apply ();
         Assert.True (AppSettingsTestClass.TestProperty);
 
         // ConfigurationManager.Themes should NOT apply theme settings
-        ThemeManager.Themes![ThemeManager.SelectedTheme]!.Apply ();
+        ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
         Assert.True (AppSettingsTestClass.TestProperty);
 
         // ConfigurationManager.AppSettings should NOT apply theme settings
@@ -42,7 +46,8 @@ public class AppScopeTests {
     }
 
     [Fact]
-    public void TestNullable () {
+    public void TestNullable ()
+    {
         AppSettingsTestClass.TestProperty = null;
         Assert.Null (AppSettingsTestClass.TestProperty);
 
@@ -60,7 +65,8 @@ public class AppScopeTests {
     }
 
     [Fact]
-    public void TestSerialize_RoundTrip () {
+    public void TestSerialize_RoundTrip ()
+    {
         Reset ();
 
         AppScope initial = AppSettings;
@@ -72,7 +78,8 @@ public class AppScopeTests {
         Assert.Equal (deserialized.Count, initial.Count);
     }
 
-    public class AppSettingsTestClass {
+    public class AppSettingsTestClass
+    {
         [SerializableConfigurationProperty (Scope = typeof (AppScope))]
         public static bool? TestProperty { get; set; }
     }

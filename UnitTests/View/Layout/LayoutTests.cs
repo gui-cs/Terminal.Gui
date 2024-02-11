@@ -4,9 +4,10 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class LayoutTests {
-    public LayoutTests (ITestOutputHelper output) { _output = output; }
+public class LayoutTests
+{
     private readonly ITestOutputHelper _output;
+    public LayoutTests (ITestOutputHelper output) { _output = output; }
 
     // Tested in AbsoluteLayoutTests.cs
     // public void Pos_Dim_Are_Null_If_Not_Initialized_On_Constructor_IsAdded_False ()
@@ -23,10 +24,12 @@ public class LayoutTests {
     [InlineData (8)]
     [InlineData (9)]
     [InlineData (10)]
-    public void Dim_CenteredSubView_85_Percent_Height (int height) {
+    public void Dim_CenteredSubView_85_Percent_Height (int height)
+    {
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
 
-        var subview = new Window {
+        var subview = new Window
+        {
             X = Pos.Center (), Y = Pos.Center (), Width = Dim.Percent (85), Height = Dim.Percent (85)
         };
 
@@ -39,7 +42,8 @@ public class LayoutTests {
         Application.RunIteration (ref rs, ref firstIteration);
         var expected = string.Empty;
 
-        switch (height) {
+        switch (height)
+        {
             case 1:
                 //Assert.Equal (new Rect (0, 0, 17, 0), subview.Frame);
                 expected = @"
@@ -165,10 +169,12 @@ public class LayoutTests {
     [InlineData (8)]
     [InlineData (9)]
     [InlineData (10)]
-    public void Dim_CenteredSubView_85_Percent_Width (int width) {
+    public void Dim_CenteredSubView_85_Percent_Width (int width)
+    {
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
 
-        var subview = new Window {
+        var subview = new Window
+        {
             X = Pos.Center (), Y = Pos.Center (), Width = Dim.Percent (85), Height = Dim.Percent (85)
         };
 
@@ -181,9 +187,11 @@ public class LayoutTests {
         Application.RunIteration (ref rs, ref firstIteration);
         var expected = string.Empty;
 
-        switch (width) {
+        switch (width)
+        {
             case 1:
                 Assert.Equal (new Rect (0, 0, 0, 4), subview.Frame);
+
                 expected = @"
 │
 │
@@ -196,6 +204,7 @@ public class LayoutTests {
                 break;
             case 2:
                 Assert.Equal (new Rect (0, 0, 0, 4), subview.Frame);
+
                 expected = @"
 ┌┐
 ││
@@ -208,6 +217,7 @@ public class LayoutTests {
                 break;
             case 3:
                 Assert.Equal (new Rect (0, 0, 0, 4), subview.Frame);
+
                 expected = @"
 ┌─┐
 │ │
@@ -220,6 +230,7 @@ public class LayoutTests {
                 break;
             case 4:
                 Assert.Equal (new Rect (0, 0, 1, 4), subview.Frame);
+
                 expected = @"
 ┌──┐
 ││ │
@@ -232,6 +243,7 @@ public class LayoutTests {
                 break;
             case 5:
                 Assert.Equal (new Rect (0, 0, 2, 4), subview.Frame);
+
                 expected = @"
 ┌───┐
 │┌┐ │
@@ -244,6 +256,7 @@ public class LayoutTests {
                 break;
             case 6:
                 Assert.Equal (new Rect (0, 0, 3, 4), subview.Frame);
+
                 expected = @"
 ┌────┐
 │┌─┐ │
@@ -256,6 +269,7 @@ public class LayoutTests {
                 break;
             case 7:
                 Assert.Equal (new Rect (0, 0, 4, 4), subview.Frame);
+
                 expected = @"
 ┌─────┐
 │┌──┐ │
@@ -268,6 +282,7 @@ public class LayoutTests {
                 break;
             case 8:
                 Assert.Equal (new Rect (0, 0, 5, 4), subview.Frame);
+
                 expected = @"
 ┌──────┐
 │┌───┐ │
@@ -280,6 +295,7 @@ public class LayoutTests {
                 break;
             case 9:
                 Assert.Equal (new Rect (1, 0, 5, 4), subview.Frame);
+
                 expected = @"
 ┌───────┐
 │ ┌───┐ │
@@ -292,6 +308,7 @@ public class LayoutTests {
                 break;
             case 10:
                 Assert.Equal (new Rect (1, 0, 6, 4), subview.Frame);
+
                 expected = @"
 ┌────────┐
 │ ┌────┐ │
@@ -310,7 +327,8 @@ public class LayoutTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void DimFill_SizedCorrectly () {
+    public void DimFill_SizedCorrectly ()
+    {
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
         Application.Top.Add (view);
         RunState rs = Application.Begin (Application.Top);
@@ -326,7 +344,8 @@ public class LayoutTests {
 
     [Fact]
     [TestRespondersDisposed]
-    public void Draw_Throws_IndexOutOfRangeException_With_Negative_Bounds () {
+    public void Draw_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
+    {
         Application.Init (new FakeDriver ());
 
         Toplevel top = Application.Top;
@@ -334,16 +353,19 @@ public class LayoutTests {
         var view = new View { X = -2, Text = "view" };
         top.Add (view);
 
-        Application.Iteration += (s, a) => {
-            Assert.Equal (-2, view.X);
+        Application.Iteration += (s, a) =>
+                                 {
+                                     Assert.Equal (-2, view.X);
 
-            Application.RequestStop ();
-        };
+                                     Application.RequestStop ();
+                                 };
 
-        try {
+        try
+        {
             Application.Run ();
         }
-        catch (IndexOutOfRangeException ex) {
+        catch (IndexOutOfRangeException ex)
+        {
             // After the fix this exception will not be caught.
             Assert.IsType<IndexOutOfRangeException> (ex);
         }
@@ -354,7 +376,8 @@ public class LayoutTests {
 
     [Fact]
     [TestRespondersDisposed]
-    public void Draw_Vertical_Throws_IndexOutOfRangeException_With_Negative_Bounds () {
+    public void Draw_Vertical_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
+    {
         Application.Init (new FakeDriver ());
 
         Toplevel top = Application.Top;
@@ -362,16 +385,19 @@ public class LayoutTests {
         var view = new View { Y = -2, Height = 10, TextDirection = TextDirection.TopBottom_LeftRight, Text = "view" };
         top.Add (view);
 
-        Application.Iteration += (s, a) => {
-            Assert.Equal (-2, view.Y);
+        Application.Iteration += (s, a) =>
+                                 {
+                                     Assert.Equal (-2, view.Y);
 
-            Application.RequestStop ();
-        };
+                                     Application.RequestStop ();
+                                 };
 
-        try {
+        try
+        {
             Application.Run ();
         }
-        catch (IndexOutOfRangeException ex) {
+        catch (IndexOutOfRangeException ex)
+        {
             // After the fix this exception will not be caught.
             Assert.IsType<IndexOutOfRangeException> (ex);
         }
@@ -381,9 +407,12 @@ public class LayoutTests {
     }
 
     [Fact]
-    public void LayoutSubviews_No_SuperView () {
+    public void LayoutSubviews_No_SuperView ()
+    {
         var root = new View ();
-        var first = new View {
+
+        var first = new View
+        {
             Id = "first",
             X = 1,
             Y = 2,
@@ -406,12 +435,14 @@ public class LayoutTests {
     }
 
     [Fact]
-    public void LayoutSubviews_RootHas_SuperView () {
+    public void LayoutSubviews_RootHas_SuperView ()
+    {
         var top = new View ();
         var root = new View ();
         top.Add (root);
 
-        var first = new View {
+        var first = new View
+        {
             Id = "first",
             X = 1,
             Y = 2,
@@ -435,7 +466,8 @@ public class LayoutTests {
     }
 
     [Fact]
-    public void LayoutSubviews_ViewThatRefsSubView_Throws () {
+    public void LayoutSubviews_ViewThatRefsSubView_Throws ()
+    {
         var root = new View ();
         var super = new View ();
         root.Add (super);
@@ -451,7 +483,8 @@ public class LayoutTests {
     // but doesn't actually have anything to do with AutoSize.
     [Fact]
     public void
-        Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute () {
+        Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
+    {
         Application.Init (new FakeDriver ());
 
         Toplevel t = Application.Top;
@@ -463,11 +496,12 @@ public class LayoutTests {
         w.Add (v);
         t.Add (w);
 
-        t.Ready += (s, e) => {
-            v.Frame = new Rect (2, 2, 10, 10);
-            Assert.Equal (2, v.X = 2);
-            Assert.Equal (2, v.Y = 2);
-        };
+        t.Ready += (s, e) =>
+                   {
+                       v.Frame = new Rect (2, 2, 10, 10);
+                       Assert.Equal (2, v.X = 2);
+                       Assert.Equal (2, v.Y = 2);
+                   };
 
         Application.Iteration += (s, a) => Application.RequestStop ();
 
@@ -477,7 +511,8 @@ public class LayoutTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void PosCombine_DimCombine_View_With_SubViews () {
+    public void PosCombine_DimCombine_View_With_SubViews ()
+    {
         var clicked = false;
         Toplevel top = Application.Top;
         var win1 = new Window { Id = "win1", Width = 20, Height = 10 };
@@ -495,7 +530,7 @@ public class LayoutTests {
         RunState rs = Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌──────────────────┐
 │view1             │
 │                  │
@@ -506,8 +541,8 @@ public class LayoutTests {
 │                  │
 │                  │
 └──────────────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
         Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
         Assert.Equal (new Rect (0, 0, 5, 1), view1.Frame);
         Assert.Equal (new Rect (0, 0, 20, 10), win1.Frame);
@@ -516,18 +551,20 @@ public class LayoutTests {
         Assert.Equal (new Rect (0, 0, 7, 1), view3.Frame);
         var foundView = View.FindDeepestView (top, 9, 4, out int rx, out int ry);
         Assert.Equal (foundView, view2);
+
         Application.OnMouseEvent (
-            new MouseEventEventArgs (
-                new MouseEvent { X = 9, Y = 4, Flags = MouseFlags.Button1Clicked }
-            )
-        );
+                                  new MouseEventEventArgs (
+                                                           new MouseEvent { X = 9, Y = 4, Flags = MouseFlags.Button1Clicked }
+                                                          )
+                                 );
         Assert.True (clicked);
 
         Application.End (rs);
     }
 
     [Fact]
-    public void PosCombine_Refs_SuperView_Throws () {
+    public void PosCombine_Refs_SuperView_Throws ()
+    {
         Application.Init (new FakeDriver ());
 
         var w = new Window { X = Pos.Left (Application.Top) + 2, Y = Pos.Top (Application.Top) + 2 };
@@ -542,18 +579,19 @@ public class LayoutTests {
         f.X = Pos.X (Application.Top) + Pos.X (v2) - Pos.X (v1);
         f.Y = Pos.Y (Application.Top) + Pos.Y (v2) - Pos.Y (v1);
 
-        Application.Top.LayoutComplete += (s, e) => {
-            Assert.Equal (0, Application.Top.Frame.X);
-            Assert.Equal (0, Application.Top.Frame.Y);
-            Assert.Equal (2, w.Frame.X);
-            Assert.Equal (2, w.Frame.Y);
-            Assert.Equal (2, f.Frame.X);
-            Assert.Equal (2, f.Frame.Y);
-            Assert.Equal (4, v1.Frame.X);
-            Assert.Equal (4, v1.Frame.Y);
-            Assert.Equal (6, v2.Frame.X);
-            Assert.Equal (6, v2.Frame.Y);
-        };
+        Application.Top.LayoutComplete += (s, e) =>
+                                          {
+                                              Assert.Equal (0, Application.Top.Frame.X);
+                                              Assert.Equal (0, Application.Top.Frame.Y);
+                                              Assert.Equal (2, w.Frame.X);
+                                              Assert.Equal (2, w.Frame.Y);
+                                              Assert.Equal (2, f.Frame.X);
+                                              Assert.Equal (2, f.Frame.Y);
+                                              Assert.Equal (4, v1.Frame.X);
+                                              Assert.Equal (4, v1.Frame.Y);
+                                              Assert.Equal (6, v2.Frame.X);
+                                              Assert.Equal (6, v2.Frame.Y);
+                                          };
 
         Application.Iteration += (s, a) => Application.RequestStop ();
 
@@ -562,7 +600,8 @@ public class LayoutTests {
     }
 
     [Fact]
-    public void TopologicalSort_Missing_Add () {
+    public void TopologicalSort_Missing_Add ()
+    {
         var root = new View ();
         var sub1 = new View ();
         root.Add (sub1);
@@ -580,7 +619,8 @@ public class LayoutTests {
     }
 
     [Fact]
-    public void TopologicalSort_Recursive_Ref () {
+    public void TopologicalSort_Recursive_Ref ()
+    {
         var root = new View ();
         var sub1 = new View ();
         root.Add (sub1);
@@ -597,7 +637,8 @@ public class LayoutTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void TrySetHeight_ForceValidatePosDim () {
+    public void TrySetHeight_ForceValidatePosDim ()
+    {
         var top = new View { X = 0, Y = 0, Height = 20 };
 
         var v = new View { Height = Dim.Fill (), ValidatePosDim = true };
@@ -627,7 +668,8 @@ public class LayoutTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void TrySetWidth_ForceValidatePosDim () {
+    public void TrySetWidth_ForceValidatePosDim ()
+    {
         var top = new View { X = 0, Y = 0, Width = 80 };
 
         var v = new View { Width = Dim.Fill (), ValidatePosDim = true };

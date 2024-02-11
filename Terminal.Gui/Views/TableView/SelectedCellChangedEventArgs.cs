@@ -1,14 +1,18 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>Defines the event arguments for <see cref="TableView.SelectedCellChanged"/></summary>
-public class SelectedCellChangedEventArgs : EventArgs {
-    /// <summary>Creates a new instance of arguments describing a change in selected cell in a <see cref="TableView"/></summary>
+public class SelectedCellChangedEventArgs : EventArgs
+{
+    /// <summary>
+    ///     Creates a new instance of arguments describing a change in selected cell in a <see cref="TableView"/>
+    /// </summary>
     /// <param name="t"></param>
     /// <param name="oldCol"></param>
     /// <param name="newCol"></param>
     /// <param name="oldRow"></param>
     /// <param name="newRow"></param>
-    public SelectedCellChangedEventArgs (ITableSource t, int oldCol, int newCol, int oldRow, int newRow) {
+    public SelectedCellChangedEventArgs (ITableSource t, int oldCol, int newCol, int oldRow, int newRow)
+    {
         Table = t;
         OldCol = oldCol;
         NewCol = newCol;
@@ -25,22 +29,19 @@ public class SelectedCellChangedEventArgs : EventArgs {
     public int NewRow { get; }
 
     /// <summary>
-    ///     The previous selected column index.  May be invalid e.g. when the selection has been changed as a result of
-    ///     replacing the existing Table with a smaller one
+    ///     The previous selected column index.  May be invalid e.g. when the selection has been changed as a result of replacing the existing Table with a smaller one
     /// </summary>
     /// <value></value>
     public int OldCol { get; }
 
     /// <summary>
-    ///     The previous selected row index.  May be invalid e.g. when the selection has been changed as a result of deleting
-    ///     rows from the table
+    ///     The previous selected row index.  May be invalid e.g. when the selection has been changed as a result of deleting rows from the table
     /// </summary>
     /// <value></value>
     public int OldRow { get; }
 
     /// <summary>
-    ///     The current table to which the new indexes refer.  May be null e.g. if selection change is the result of clearing
-    ///     the table from the view
+    ///     The current table to which the new indexes refer.  May be null e.g. if selection change is the result of clearing the table from the view
     /// </summary>
     /// <value></value>
     public ITableSource Table { get; }

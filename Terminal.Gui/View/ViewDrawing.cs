@@ -1,45 +1,28 @@
 ﻿namespace Terminal.Gui;
 
-public partial class View {
+public partial class View
+{
     private ColorScheme _colorScheme;
 
     // The view-relative region that needs to be redrawn. Marked internal for unit tests.
     internal Rect _needsDisplayRect = Rect.Empty;
 
-    /// <summary>Gets or sets whether the view needs to be redrawn.</summary>
-    public bool NeedsDisplay {
-        get => _needsDisplayRect != Rect.Empty;
-        set {
-            if (value) {
-                SetNeedsDisplay ();
-            } else {
-                ClearNeedsDisplay ();
-            }
-        }
-    }
-
-    /// <summary>Gets whether any Subviews need to be redrawn.</summary>
-    public bool SubViewNeedsDisplay { get; private set; }
-
-    /// <summary>
-    ///     Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for rendering any border lines.
-    ///     If <see langword="true"/> the rendering of any borders drawn by this Frame will be done by it's parent's SuperView.
-    ///     If <see langword="false"/> (the default) this View's <see cref="OnDrawAdornments"/> method will be called to render
-    ///     the borders.
-    /// </summary>
-    public virtual bool SuperViewRendersLineCanvas { get; set; } = false;
-
     /// <summary>The color scheme for this view, if it is not defined, it returns the <see cref="SuperView"/>'s color scheme.</summary>
-    public virtual ColorScheme ColorScheme {
-        get {
-            if (_colorScheme == null) {
+    public virtual ColorScheme ColorScheme
+    {
+        get
+        {
+            if (_colorScheme == null)
+            {
                 return SuperView?.ColorScheme;
             }
 
             return _colorScheme;
         }
-        set {
-            if (_colorScheme != value) {
+        set
+        {
+            if (_colorScheme != value)
+            {
                 _colorScheme = value;
                 SetNeedsDisplay ();
             }
@@ -50,16 +33,46 @@ public partial class View {
     /// <remarks><see cref="Border"/> adds border lines to this LineCanvas.</remarks>
     public LineCanvas LineCanvas { get; } = new ();
 
+    /// <summary>Gets or sets whether the view needs to be redrawn.</summary>
+    public bool NeedsDisplay
+    {
+        get => _needsDisplayRect != Rect.Empty;
+        set
+        {
+            if (value)
+            {
+                SetNeedsDisplay ();
+            }
+            else
+            {
+                ClearNeedsDisplay ();
+            }
+        }
+    }
+
+    /// <summary>Gets whether any Subviews need to be redrawn.</summary>
+    public bool SubViewNeedsDisplay { get; private set; }
+
+    /// <summary>
+    ///     Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for rendering any border lines. If
+    ///     <see langword="true"/> the rendering of any borders drawn by this Frame will be done by it's parent's SuperView. If
+    ///     <see langword="false"/> (the default) this View's <see cref="OnDrawAdornments"/> method will be called to render the borders.
+    /// </summary>
+    public virtual bool SuperViewRendersLineCanvas { get; set; } = false;
+
     /// <summary>Displays the specified character in the specified column and row of the View.</summary>
     /// <param name="col">Column (view-relative).</param>
     /// <param name="row">Row (view-relative).</param>
     /// <param name="ch">Ch.</param>
-    public void AddRune (int col, int row, Rune ch) {
-        if (row < 0 || col < 0) {
+    public void AddRune (int col, int row, Rune ch)
+    {
+        if (row < 0 || col < 0)
+        {
             return;
         }
 
-        if (row > _frame.Height - 1 || col > _frame.Width - 1) {
+        if (row > _frame.Height - 1 || col > _frame.Width - 1)
+        {
             return;
         }
 
@@ -71,8 +84,10 @@ public partial class View {
     /// <remarks>
     ///     <para>This clears the Bounds used by this view.</para>
     /// </remarks>
-    public void Clear () {
-        if (IsInitialized) {
+    public void Clear ()
+    {
+        if (IsInitialized)
+        {
             Clear (BoundsToScreen (Bounds));
         }
     }
@@ -83,8 +98,10 @@ public partial class View {
     /// <summary>Clears the specified screen-relative rectangle with the normal background.</summary>
     /// <remarks></remarks>
     /// <param name="regionScreen">The screen-relative rectangle to clear.</param>
-    public void Clear (Rect regionScreen) {
-        if (Driver == null) {
+    public void Clear (Rect regionScreen)
+    {
+        if (Driver == null)
+        {
             return;
         }
 
@@ -104,8 +121,10 @@ public partial class View {
     ///         <see cref="Rect.Empty"/>.
     ///     </para>
     /// </remarks>
-    public Rect ClipToBounds () {
-        if (Driver == null) {
+    public Rect ClipToBounds ()
+    {
+        if (Driver == null)
+        {
             return Rect.Empty;
         }
 
@@ -125,16 +144,17 @@ public partial class View {
     ///         <see cref="Frame"/> (superview-relative).
     ///     </para>
     ///     <para>
-    ///         Views should set the color that they want to use on entry, as otherwise this will inherit the last color that
-    ///         was set globally on the driver.
+    ///         Views should set the color that they want to use on entry, as otherwise this will inherit the last color that was set globally on the driver.
     ///     </para>
     ///     <para>
-    ///         Overrides of <see cref="OnDrawContent(Rect)"/> must ensure they do not set <c>Driver.Clip</c> to a clip region
-    ///         larger than the <ref name="Bounds"/> property, as this will cause the driver to clip the entire region.
+    ///         Overrides of <see cref="OnDrawContent(Rect)"/> must ensure they do not set <c>Driver.Clip</c> to a clip region larger than the
+    ///         <ref name="Bounds"/> property, as this will cause the driver to clip the entire region.
     ///     </para>
     /// </remarks>
-    public void Draw () {
-        if (!CanBeVisible (this)) {
+    public void Draw ()
+    {
+        if (!CanBeVisible (this))
+        {
             return;
         }
 
@@ -142,7 +162,8 @@ public partial class View {
 
         Rect prevClip = ClipToBounds ();
 
-        if (ColorScheme != null) {
+        if (ColorScheme != null)
+        {
             //Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
             Driver?.SetAttribute (GetNormalColor ());
         }
@@ -151,11 +172,13 @@ public partial class View {
         var dev = new DrawEventArgs (Bounds);
         DrawContent?.Invoke (this, dev);
 
-        if (!dev.Cancel) {
+        if (!dev.Cancel)
+        {
             OnDrawContent (Bounds);
         }
 
-        if (Driver != null) {
+        if (Driver != null)
+        {
             Driver.Clip = prevClip;
         }
 
@@ -194,17 +217,18 @@ public partial class View {
     /// <param name="hotColor">Hot color.</param>
     /// <param name="normalColor">Normal color.</param>
     /// <remarks>
-    ///     <para>
-    ///         The hotkey is any character following the hotkey specifier, which is the underscore ('_') character by
-    ///         default.
-    ///     </para>
+    ///     <para>The hotkey is any character following the hotkey specifier, which is the underscore ('_') character by default.</para>
     ///     <para>The hotkey specifier can be changed via <see cref="HotKeySpecifier"/></para>
     /// </remarks>
-    public void DrawHotString (string text, Attribute hotColor, Attribute normalColor) {
+    public void DrawHotString (string text, Attribute hotColor, Attribute normalColor)
+    {
         Rune hotkeySpec = HotKeySpecifier == (Rune)0xffff ? (Rune)'_' : HotKeySpecifier;
         Application.Driver.SetAttribute (normalColor);
-        foreach (Rune rune in text.EnumerateRunes ()) {
-            if (rune == new Rune (hotkeySpec.Value)) {
+
+        foreach (Rune rune in text.EnumerateRunes ())
+        {
+            if (rune == new Rune (hotkeySpec.Value))
+            {
                 Application.Driver.SetAttribute (hotColor);
 
                 continue;
@@ -215,37 +239,37 @@ public partial class View {
         }
     }
 
-    /// <summary>
-    ///     Utility function to draw strings that contains a hotkey using a <see cref="ColorScheme"/> and the "focused"
-    ///     state.
-    /// </summary>
+    /// <summary>Utility function to draw strings that contains a hotkey using a <see cref="ColorScheme"/> and the "focused" state.</summary>
     /// <param name="text">String to display, the underscore before a letter flags the next letter as the hotkey.</param>
-    /// <param name="focused">
-    ///     If set to <see langword="true"/> this uses the focused colors from the color scheme, otherwise
-    ///     the regular ones.
-    /// </param>
+    /// <param name="focused">If set to <see langword="true"/> this uses the focused colors from the color scheme, otherwise the regular ones.</param>
     /// <param name="scheme">The color scheme to use.</param>
-    public void DrawHotString (string text, bool focused, ColorScheme scheme) {
-        if (focused) {
+    public void DrawHotString (string text, bool focused, ColorScheme scheme)
+    {
+        if (focused)
+        {
             DrawHotString (text, scheme.HotFocus, scheme.Focus);
-        } else {
+        }
+        else
+        {
             DrawHotString (
-                text,
-                Enabled ? scheme.HotNormal : scheme.Disabled,
-                Enabled ? scheme.Normal : scheme.Disabled
-            );
+                           text,
+                           Enabled ? scheme.HotNormal : scheme.Disabled,
+                           Enabled ? scheme.Normal : scheme.Disabled
+                          );
         }
     }
 
     /// <summary>Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.</summary>
     /// <returns>
     ///     <see cref="Terminal.Gui.ColorScheme.Focus"/> if <see cref="Enabled"/> is <see langword="true"/> or
-    ///     <see cref="Terminal.Gui.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
-    ///     overridden can return other values.
+    ///     <see cref="Terminal.Gui.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's overridden can return other values.
     /// </returns>
-    public virtual Attribute GetFocusColor () {
+    public virtual Attribute GetFocusColor ()
+    {
         ColorScheme cs = ColorScheme;
-        if (ColorScheme == null) {
+
+        if (ColorScheme == null)
+        {
             cs = new ColorScheme ();
         }
 
@@ -255,12 +279,14 @@ public partial class View {
     /// <summary>Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.</summary>
     /// <returns>
     ///     <see cref="Terminal.Gui.ColorScheme.HotNormal"/> if <see cref="Enabled"/> is <see langword="true"/> or
-    ///     <see cref="Terminal.Gui.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
-    ///     overridden can return other values.
+    ///     <see cref="Terminal.Gui.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's overridden can return other values.
     /// </returns>
-    public virtual Attribute GetHotNormalColor () {
+    public virtual Attribute GetHotNormalColor ()
+    {
         ColorScheme cs = ColorScheme;
-        if (ColorScheme == null) {
+
+        if (ColorScheme == null)
+        {
             cs = new ColorScheme ();
         }
 
@@ -270,12 +296,14 @@ public partial class View {
     /// <summary>Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.</summary>
     /// <returns>
     ///     <see cref="Terminal.Gui.ColorScheme.Normal"/> if <see cref="Enabled"/> is <see langword="true"/> or
-    ///     <see cref="Terminal.Gui.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
-    ///     overridden can return other values.
+    ///     <see cref="Terminal.Gui.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's overridden can return other values.
     /// </returns>
-    public virtual Attribute GetNormalColor () {
+    public virtual Attribute GetNormalColor ()
+    {
         ColorScheme cs = ColorScheme;
-        if (ColorScheme == null) {
+
+        if (ColorScheme == null)
+        {
             cs = new ColorScheme ();
         }
 
@@ -286,8 +314,10 @@ public partial class View {
     /// <returns>The move.</returns>
     /// <param name="col">The column to move to, in view-relative coordinates.</param>
     /// <param name="row">the row to move to, in view-relative coordinates.</param>
-    public void Move (int col, int row) {
-        if (Driver == null || Driver?.Rows == 0) {
+    public void Move (int col, int row)
+    {
+        if (Driver == null || Driver?.Rows == 0)
+        {
             return;
         }
 
@@ -298,12 +328,14 @@ public partial class View {
     // TODO: Make this cancelable
     /// <summary>
     ///     Prepares <see cref="View.LineCanvas"/>. If <see cref="SuperViewRendersLineCanvas"/> is true, only the
-    ///     <see cref="LineCanvas"/> of this view's subviews will be rendered. If <see cref="SuperViewRendersLineCanvas"/> is
-    ///     false (the default), this method will cause the <see cref="LineCanvas"/> be prepared to be rendered.
+    ///     <see cref="LineCanvas"/> of this view's subviews will be rendered. If <see cref="SuperViewRendersLineCanvas"/> is false (the default), this method will cause the
+    ///     <see cref="LineCanvas"/> be prepared to be rendered.
     /// </summary>
     /// <returns></returns>
-    public virtual bool OnDrawAdornments () {
-        if (!IsInitialized) {
+    public virtual bool OnDrawAdornments ()
+    {
+        if (!IsInitialized)
+        {
             return false;
         }
 
@@ -322,43 +354,49 @@ public partial class View {
     ///     <see cref="View"/>
     /// </param>
     /// <remarks>This method will be called before any subviews added with <see cref="Add(View)"/> have been drawn.</remarks>
-    public virtual void OnDrawContent (Rect contentArea) {
-        if (NeedsDisplay) {
-            if (SuperView != null) {
+    public virtual void OnDrawContent (Rect contentArea)
+    {
+        if (NeedsDisplay)
+        {
+            if (SuperView != null)
+            {
                 Clear (BoundsToScreen (contentArea));
             }
 
-            if (!string.IsNullOrEmpty (TextFormatter.Text)) {
-                if (TextFormatter != null) {
+            if (!string.IsNullOrEmpty (TextFormatter.Text))
+            {
+                if (TextFormatter != null)
+                {
                     TextFormatter.NeedsFormat = true;
                 }
             }
 
             // This should NOT clear 
             TextFormatter?.Draw (
-                BoundsToScreen (contentArea),
-                HasFocus ? GetFocusColor () : GetNormalColor (),
-                HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
-                Rect.Empty,
-                false
-            );
+                                 BoundsToScreen (contentArea),
+                                 HasFocus ? GetFocusColor () : GetNormalColor (),
+                                 HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
+                                 Rect.Empty,
+                                 false
+                                );
             SetSubViewNeedsDisplay ();
         }
 
         // Draw subviews
         // TODO: Implement OnDrawSubviews (cancelable);
-        if (_subviews != null && SubViewNeedsDisplay) {
+        if (_subviews != null && SubViewNeedsDisplay)
+        {
             IEnumerable<View> subviewsNeedingDraw = _subviews.Where (
-                view => view.Visible &&
-                        (view.NeedsDisplay ||
-                         view.SubViewNeedsDisplay ||
-                         view.LayoutNeeded)
-            );
+                                                                     view => view.Visible
+                                                                             && (view.NeedsDisplay || view.SubViewNeedsDisplay || view.LayoutNeeded)
+                                                                    );
 
-            foreach (View view in subviewsNeedingDraw) {
+            foreach (View view in subviewsNeedingDraw)
+            {
                 //view.Frame.IntersectsWith (bounds)) {
                 // && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
-                if (view.LayoutNeeded) {
+                if (view.LayoutNeeded)
+                {
                     view.LayoutSubviews ();
                 }
 
@@ -372,37 +410,33 @@ public partial class View {
         }
     }
 
-    /// <summary>
-    ///     Enables overrides after completed drawing infinitely scrolled content and/or a background behind removed
-    ///     controls.
-    /// </summary>
+    /// <summary>Enables overrides after completed drawing infinitely scrolled content and/or a background behind removed controls.</summary>
     /// <param name="contentArea">
     ///     The view-relative rectangle describing the currently visible viewport into the
     ///     <see cref="View"/>
     /// </param>
-    /// <remarks>
-    ///     This method will be called after any subviews removed with <see cref="Remove(View)"/> have been completed
-    ///     drawing.
-    /// </remarks>
-    public virtual void OnDrawContentComplete (Rect contentArea) {
-        DrawContentComplete?.Invoke (this, new DrawEventArgs (contentArea));
-    }
+    /// <remarks>This method will be called after any subviews removed with <see cref="Remove(View)"/> have been completed drawing.</remarks>
+    public virtual void OnDrawContentComplete (Rect contentArea) { DrawContentComplete?.Invoke (this, new DrawEventArgs (contentArea)); }
 
     // TODO: Make this cancelable
     /// <summary>
     ///     Renders <see cref="View.LineCanvas"/>. If <see cref="SuperViewRendersLineCanvas"/> is true, only the
-    ///     <see cref="LineCanvas"/> of this view's subviews will be rendered. If <see cref="SuperViewRendersLineCanvas"/> is
-    ///     false (the default), this method will cause the <see cref="LineCanvas"/> to be rendered.
+    ///     <see cref="LineCanvas"/> of this view's subviews will be rendered. If <see cref="SuperViewRendersLineCanvas"/> is false (the default), this method will cause the
+    ///     <see cref="LineCanvas"/> to be rendered.
     /// </summary>
     /// <returns></returns>
-    public virtual bool OnRenderLineCanvas () {
-        if (!IsInitialized) {
+    public virtual bool OnRenderLineCanvas ()
+    {
+        if (!IsInitialized)
+        {
             return false;
         }
 
         // If we have a SuperView, it'll render our frames.
-        if (!SuperViewRendersLineCanvas && LineCanvas.Bounds != Rect.Empty) {
-            foreach (KeyValuePair<Point, Cell> p in LineCanvas.GetCellMap ()) {
+        if (!SuperViewRendersLineCanvas && LineCanvas.Bounds != Rect.Empty)
+        {
+            foreach (KeyValuePair<Point, Cell> p in LineCanvas.GetCellMap ())
+            {
                 // Get the entire map
                 Driver.SetAttribute (p.Value.Attribute ?? ColorScheme.Normal);
                 Driver.Move (p.Key.X, p.Key.Y);
@@ -414,14 +448,17 @@ public partial class View {
             LineCanvas.Clear ();
         }
 
-        if (Subviews.Any (s => s.SuperViewRendersLineCanvas)) {
-            foreach (View subview in Subviews.Where (s => s.SuperViewRendersLineCanvas)) {
+        if (Subviews.Any (s => s.SuperViewRendersLineCanvas))
+        {
+            foreach (View subview in Subviews.Where (s => s.SuperViewRendersLineCanvas))
+            {
                 // Combine the LineCanvas'
                 LineCanvas.Merge (subview.LineCanvas);
                 subview.LineCanvas.Clear ();
             }
 
-            foreach (KeyValuePair<Point, Cell> p in LineCanvas.GetCellMap ()) {
+            foreach (KeyValuePair<Point, Cell> p in LineCanvas.GetCellMap ())
+            {
                 // Get the entire map
                 Driver.SetAttribute (p.Value.Attribute ?? ColorScheme.Normal);
                 Driver.Move (p.Key.X, p.Key.Y);
@@ -438,31 +475,37 @@ public partial class View {
 
     /// <summary>Sets the area of this view needing to be redrawn to <see cref="Bounds"/>.</summary>
     /// <remarks>
-    ///     If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), this method does
-    ///     nothing.
+    ///     If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), this method does nothing.
     /// </remarks>
-    public void SetNeedsDisplay () {
-        if (IsInitialized) {
+    public void SetNeedsDisplay ()
+    {
+        if (IsInitialized)
+        {
             SetNeedsDisplay (Bounds);
         }
     }
 
     /// <summary>Expands the area of this view needing to be redrawn to include <paramref name="region"/>.</summary>
     /// <remarks>
-    ///     If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), the area to be
-    ///     redrawn will be the <paramref name="region"/>.
+    ///     If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), the area to be redrawn will be the
+    ///     <paramref name="region"/>.
     /// </remarks>
     /// <param name="region">The Bounds-relative region that needs to be redrawn.</param>
-    public void SetNeedsDisplay (Rect region) {
-        if (!IsInitialized) {
+    public void SetNeedsDisplay (Rect region)
+    {
+        if (!IsInitialized)
+        {
             _needsDisplayRect = region;
 
             return;
         }
 
-        if (_needsDisplayRect.IsEmpty) {
+        if (_needsDisplayRect.IsEmpty)
+        {
             _needsDisplayRect = region;
-        } else {
+        }
+        else
+        {
             int x = Math.Min (_needsDisplayRect.X, region.X);
             int y = Math.Min (_needsDisplayRect.Y, region.Y);
             int w = Math.Max (_needsDisplayRect.Width, region.Width);
@@ -472,21 +515,25 @@ public partial class View {
 
         _superView?.SetSubViewNeedsDisplay ();
 
-        if (_needsDisplayRect.X < Bounds.X ||
-            _needsDisplayRect.Y < Bounds.Y ||
-            _needsDisplayRect.Width > Bounds.Width ||
-            _needsDisplayRect.Height > Bounds.Height) {
+        if (_needsDisplayRect.X < Bounds.X
+            || _needsDisplayRect.Y < Bounds.Y
+            || _needsDisplayRect.Width > Bounds.Width
+            || _needsDisplayRect.Height > Bounds.Height)
+        {
             Margin?.SetNeedsDisplay (Margin.Bounds);
             Border?.SetNeedsDisplay (Border.Bounds);
             Padding?.SetNeedsDisplay (Padding.Bounds);
         }
 
-        if (_subviews == null) {
+        if (_subviews == null)
+        {
             return;
         }
 
-        foreach (View subview in _subviews) {
-            if (subview.Frame.IntersectsWith (region)) {
+        foreach (View subview in _subviews)
+        {
+            if (subview.Frame.IntersectsWith (region))
+            {
                 Rect subviewRegion = Rect.Intersect (subview.Frame, region);
                 subviewRegion.X -= subview.Frame.X;
                 subviewRegion.Y -= subview.Frame.Y;
@@ -496,26 +543,33 @@ public partial class View {
     }
 
     /// <summary>Indicates that any Subviews (in the <see cref="Subviews"/> list) need to be repainted.</summary>
-    public void SetSubViewNeedsDisplay () {
+    public void SetSubViewNeedsDisplay ()
+    {
         SubViewNeedsDisplay = true;
-        if (_superView != null && !_superView.SubViewNeedsDisplay) {
+
+        if (_superView != null && !_superView.SubViewNeedsDisplay)
+        {
             _superView.SetSubViewNeedsDisplay ();
         }
     }
 
     /// <summary>Clears <see cref="NeedsDisplay"/> and <see cref="SubViewNeedsDisplay"/>.</summary>
-    protected void ClearNeedsDisplay () {
+    protected void ClearNeedsDisplay ()
+    {
         _needsDisplayRect = Rect.Empty;
         SubViewNeedsDisplay = false;
     }
 
     // Clips a rectangle in screen coordinates to the dimensions currently available on the screen
-    internal Rect ScreenClip (Rect regionScreen) {
+    internal Rect ScreenClip (Rect regionScreen)
+    {
         int x = regionScreen.X < 0 ? 0 : regionScreen.X;
         int y = regionScreen.Y < 0 ? 0 : regionScreen.Y;
+
         int w = regionScreen.X + regionScreen.Width >= Driver.Cols
                     ? Driver.Cols - regionScreen.X
                     : regionScreen.Width;
+
         int h = regionScreen.Y + regionScreen.Height >= Driver.Rows
                     ? Driver.Rows - regionScreen.Y
                     : regionScreen.Height;

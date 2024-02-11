@@ -20,55 +20,54 @@ namespace ReactiveExample;
 // See also: https://www.reactiveui.net../docs/handbook/data-persistence/
 //
 [DataContract]
-public class LoginViewModel : ReactiveObject {
-    public LoginViewModel () {
-        IObservable<bool> canLogin = this.WhenAnyValue (
-            x => x.Username,
-            x => x.Password,
-            (username, password) =>
-                !string.IsNullOrEmpty (username) &&
-                !string.IsNullOrEmpty (password)
-        );
-
-        _isValid = canLogin.ToProperty (this, x => x.IsValid);
-        Login = ReactiveCommand.CreateFromTask<EventArgs> (
-            e => Task.Delay (TimeSpan.FromSeconds (1)),
-            canLogin
-        );
-
-        _usernameLength = this
-            .WhenAnyValue (x => x.Username)
-            .Select (name => name.Length)
-            .ToProperty (this, x => x.UsernameLength);
-        _passwordLength = this
-            .WhenAnyValue (x => x.Password)
-            .Select (password => password.Length)
-            .ToProperty (this, x => x.PasswordLength);
-
-        Clear = ReactiveCommand.Create<EventArgs> (e => { });
-        Clear.Subscribe (
-            unit => {
-                Username = string.Empty;
-                Password = string.Empty;
-            }
-        );
-    }
-
+public class LoginViewModel : ReactiveObject
+{
     private readonly ObservableAsPropertyHelper<bool> _isValid;
     private readonly ObservableAsPropertyHelper<int> _passwordLength;
     private readonly ObservableAsPropertyHelper<int> _usernameLength;
 
-    [IgnoreDataMember]
-    public bool IsValid => _isValid.Value;
+    public LoginViewModel ()
+    {
+        IObservable<bool> canLogin = this.WhenAnyValue (
+                                                        x => x.Username,
+                                                        x => x.Password,
+                                                        (username, password) =>
+                                                            !string.IsNullOrEmpty (username) && !string.IsNullOrEmpty (password)
+                                                       );
 
-    [IgnoreDataMember]
-    public int PasswordLength => _passwordLength.Value;
+        _isValid = canLogin.ToProperty (this, x => x.IsValid);
 
-    [IgnoreDataMember]
-    public int UsernameLength => _usernameLength.Value;
+        Login = ReactiveCommand.CreateFromTask<EventArgs> (
+                                                           e => Task.Delay (TimeSpan.FromSeconds (1)),
+                                                           canLogin
+                                                          );
+
+        _usernameLength = this
+                          .WhenAnyValue (x => x.Username)
+                          .Select (name => name.Length)
+                          .ToProperty (this, x => x.UsernameLength);
+
+        _passwordLength = this
+                          .WhenAnyValue (x => x.Password)
+                          .Select (password => password.Length)
+                          .ToProperty (this, x => x.PasswordLength);
+
+        Clear = ReactiveCommand.Create<EventArgs> (e => { });
+
+        Clear.Subscribe (
+                         unit =>
+                         {
+                             Username = string.Empty;
+                             Password = string.Empty;
+                         }
+                        );
+    }
 
     [IgnoreDataMember]
     public ReactiveCommand<EventArgs, Unit> Clear { get; }
+
+    [IgnoreDataMember]
+    public bool IsValid => _isValid.Value;
 
     [IgnoreDataMember]
     public ReactiveCommand<EventArgs, Unit> Login { get; }
@@ -77,7 +76,13 @@ public class LoginViewModel : ReactiveObject {
     [DataMember]
     public string Password { get; set; } = string.Empty;
 
+    [IgnoreDataMember]
+    public int PasswordLength => _passwordLength.Value;
+
     [Reactive]
     [DataMember]
     public string Username { get; set; } = string.Empty;
+
+    [IgnoreDataMember]
+    public int UsernameLength => _usernameLength.Value;
 }

@@ -9,21 +9,24 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("Graph View", "Demos the GraphView control.")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Drawing")]
-public class GraphViewExample : Scenario {
+public class GraphViewExample : Scenario
+{
     private readonly Thickness _thickness = new (1, 1, 1, 1);
-    private Action[] _graphs;
-    private GraphView _graphView;
+    private TextView _about;
     private int _currentGraph;
+    private Action [] _graphs;
+    private GraphView _graphView;
     private MenuItem _miDiags;
     private MenuItem _miShowBorder;
-    private TextView _about;
 
-    public override void Setup () {
+    public override void Setup ()
+    {
         Win.Title = GetName ();
         Win.Y = 1; // menu
         Win.Height = Dim.Fill (1); // status bar
 
-        _graphs = new[] {
+        _graphs = new []
+        {
             () => SetupPeriodicTableScatterPlot (), //0
             () => SetupLifeExpectancyBarGraph (true), //1
             () => SetupLifeExpectancyBarGraph (false), //2
@@ -34,99 +37,106 @@ public class GraphViewExample : Scenario {
             () => MultiBarGraph () //7
         };
 
-        var menu = new MenuBar {
-            Menus = [
-                        new MenuBarItem (
-                            "_File",
-                            new MenuItem[] {
-                                new (
-                                    "Scatter _Plot",
-                                    "",
-                                    () => _graphs[_currentGraph =
-                                                      0] ()
+        var menu = new MenuBar
+        {
+            Menus =
+            [
+                new MenuBarItem (
+                                 "_File",
+                                 new MenuItem []
+                                 {
+                                     new (
+                                          "Scatter _Plot",
+                                          "",
+                                          () => _graphs [_currentGraph =
+                                                             0] ()
+                                         ),
+                                     new (
+                                          "_V Bar Graph",
+                                          "",
+                                          () => _graphs [_currentGraph =
+                                                             1] ()
+                                         ),
+                                     new (
+                                          "_H Bar Graph",
+                                          "",
+                                          () => _graphs [_currentGraph =
+                                                             2] ()
+                                         ),
+                                     new (
+                                          "P_opulation Pyramid",
+                                          "",
+                                          () => _graphs [_currentGraph =
+                                                             3] ()
+                                         ),
+                                     new (
+                                          "_Line Graph",
+                                          "",
+                                          () => _graphs [_currentGraph =
+                                                             4] ()
+                                         ),
+                                     new (
+                                          "Sine _Wave",
+                                          "",
+                                          () => _graphs [_currentGraph =
+                                                             5] ()
+                                         ),
+                                     new (
+                                          "Silent _Disco",
+                                          "",
+                                          () => _graphs [_currentGraph =
+                                                             6] ()
+                                         ),
+                                     new (
+                                          "_Multi Bar Graph",
+                                          "",
+                                          () => _graphs [_currentGraph =
+                                                             7] ()
+                                         ),
+                                     new ("_Quit", "", () => Quit ())
+                                 }
                                 ),
-                                new (
-                                    "_V Bar Graph",
-                                    "",
-                                    () => _graphs[_currentGraph =
-                                                      1] ()
-                                ),
-                                new (
-                                    "_H Bar Graph",
-                                    "",
-                                    () => _graphs[_currentGraph =
-                                                      2] ()
-                                ),
-                                new (
-                                    "P_opulation Pyramid",
-                                    "",
-                                    () => _graphs[_currentGraph =
-                                                      3] ()
-                                ),
-                                new (
-                                    "_Line Graph",
-                                    "",
-                                    () => _graphs[_currentGraph =
-                                                      4] ()
-                                ),
-                                new (
-                                    "Sine _Wave",
-                                    "",
-                                    () => _graphs[_currentGraph =
-                                                      5] ()
-                                ),
-                                new (
-                                    "Silent _Disco",
-                                    "",
-                                    () => _graphs[_currentGraph =
-                                                      6] ()
-                                ),
-                                new (
-                                    "_Multi Bar Graph",
-                                    "",
-                                    () => _graphs[_currentGraph =
-                                                      7] ()
-                                ),
-                                new ("_Quit", "", () => Quit ())
-                            }
-                        ),
-                        new MenuBarItem (
-                            "_View",
-                            new[] {
-                                new ("Zoom _In", "", () => Zoom (0.5f)),
-                                new ("Zoom _Out", "", () => Zoom (2f)),
-                                new ("MarginLeft++", "", () => Margin (true, true)),
-                                new ("MarginLeft--", "", () => Margin (true, false)),
-                                new ("MarginBottom++", "", () => Margin (false, true)),
-                                new ("MarginBottom--", "", () => Margin (false, false)),
-                                _miShowBorder = new MenuItem (
-                                    "_Enable Margin, Border, and Padding",
-                                    "",
-                                    () => ShowBorder ()
-                                ) {
-                                    Checked = true,
-                                    CheckType = MenuItemCheckStyle
-                                        .Checked
-                                },
-                                _miDiags = new MenuItem (
-                                    "Dri_ver Diagnostics",
-                                    "",
-                                    () => EnableDiagnostics ()
-                                ) {
-                                    Checked = ConsoleDriver.Diagnostics ==
-                                              (ConsoleDriver.DiagnosticFlags
-                                                   .FramePadding |
-                                               ConsoleDriver.DiagnosticFlags
-                                                   .FrameRuler),
-                                    CheckType = MenuItemCheckStyle.Checked
-                                }
-                            }
-                        )
-                    ]
+                new MenuBarItem (
+                                 "_View",
+                                 new []
+                                 {
+                                     new ("Zoom _In", "", () => Zoom (0.5f)),
+                                     new ("Zoom _Out", "", () => Zoom (2f)),
+                                     new ("MarginLeft++", "", () => Margin (true, true)),
+                                     new ("MarginLeft--", "", () => Margin (true, false)),
+                                     new ("MarginBottom++", "", () => Margin (false, true)),
+                                     new ("MarginBottom--", "", () => Margin (false, false)),
+                                     _miShowBorder = new MenuItem (
+                                                                   "_Enable Margin, Border, and Padding",
+                                                                   "",
+                                                                   () => ShowBorder ()
+                                                                  )
+                                     {
+                                         Checked = true,
+                                         CheckType = MenuItemCheckStyle
+                                             .Checked
+                                     },
+                                     _miDiags = new MenuItem (
+                                                              "Dri_ver Diagnostics",
+                                                              "",
+                                                              () => EnableDiagnostics ()
+                                                             )
+                                     {
+                                         Checked = ConsoleDriver.Diagnostics
+                                                   == (ConsoleDriver.DiagnosticFlags
+                                                                    .FramePadding
+                                                       | ConsoleDriver.DiagnosticFlags
+                                                                      .FrameRuler),
+                                         CheckType = MenuItemCheckStyle.Checked
+                                     }
+                                 }
+                                )
+            ]
         };
         Application.Top.Add (menu);
 
-        _graphView = new GraphView {
+        _graphView = new GraphView
+        {
             X = 0,
             Y = 0,
             Width = Dim.Percent (70),
@@ -139,7 +149,8 @@ public class GraphViewExample : Scenario {
 
         Win.Add (_graphView);
 
-        var frameRight = new FrameView {
+        var frameRight = new FrameView
+        {
             X = Pos.Right (_graphView) + 1,
             Y = 0,
             Width = Dim.Fill (),
@@ -148,29 +159,31 @@ public class GraphViewExample : Scenario {
         };
 
         frameRight.Add (
-            _about = new TextView { Width = Dim.Fill (), Height = Dim.Fill () }
-        );
+                        _about = new TextView { Width = Dim.Fill (), Height = Dim.Fill () }
+                       );
 
         Win.Add (frameRight);
 
         var statusBar = new StatusBar (
-            new StatusItem[] {
-                new (
-                    Application.QuitKey,
-                    $"{Application.QuitKey} to Quit",
-                    () => Quit ()
-                ),
-                new (
-                    KeyCode.CtrlMask | KeyCode.G,
-                    "~^G~ Next",
-                    () => _graphs[_currentGraph++ % _graphs.Length] ()
-                )
-            }
-        );
+                                       new StatusItem []
+                                       {
+                                           new (
+                                                Application.QuitKey,
+                                                $"{Application.QuitKey} to Quit",
+                                                () => Quit ()
+                                               ),
+                                           new (
+                                                KeyCode.CtrlMask | KeyCode.G,
+                                                "~^G~ Next",
+                                                () => _graphs [_currentGraph++ % _graphs.Length] ()
+                                               )
+                                       }
+                                      );
         Application.Top.Add (statusBar);
     }
 
-    private void EnableDiagnostics () {
+    private void EnableDiagnostics ()
+    {
         _miDiags.Checked = !_miDiags.Checked;
 
         ConsoleDriver.Diagnostics = _miDiags.Checked == true
@@ -180,17 +193,22 @@ public class GraphViewExample : Scenario {
         Application.Refresh ();
     }
 
-    private void Margin (bool left, bool increase) {
-        if (left) {
+    private void Margin (bool left, bool increase)
+    {
+        if (left)
+        {
             _graphView.MarginLeft = (uint)Math.Max (0, _graphView.MarginLeft + (increase ? 1 : -1));
-        } else {
+        }
+        else
+        {
             _graphView.MarginBottom = (uint)Math.Max (0, _graphView.MarginBottom + (increase ? 1 : -1));
         }
 
         _graphView.SetNeedsDisplay ();
     }
 
-    private void MultiBarGraph () {
+    private void MultiBarGraph ()
+    {
         _graphView.Reset ();
 
         _graphView.Title = "Multi Bar";
@@ -207,7 +225,7 @@ public class GraphViewExample : Scenario {
 
         _graphView.GraphColor = black;
 
-        var series = new MultiBarSeries (3, 1, 0.25f, new[] { magenta, cyan, red });
+        var series = new MultiBarSeries (3, 1, 0.25f, new [] { magenta, cyan, red });
 
         Rune stiple = CM.Glyphs.Stipple;
 
@@ -237,24 +255,28 @@ public class GraphViewExample : Scenario {
         _graphView.AxisY.Minimum = 0;
 
         var legend = new LegendAnnotation (new Rect (_graphView.Bounds.Width - 20, 0, 20, 5));
+
         legend.AddEntry (
-            new GraphCellToRender (stiple, series.SubSeries.ElementAt (0).OverrideBarColor),
-            "Lower Third"
-        );
+                         new GraphCellToRender (stiple, series.SubSeries.ElementAt (0).OverrideBarColor),
+                         "Lower Third"
+                        );
+
         legend.AddEntry (
-            new GraphCellToRender (stiple, series.SubSeries.ElementAt (1).OverrideBarColor),
-            "Middle Third"
-        );
+                         new GraphCellToRender (stiple, series.SubSeries.ElementAt (1).OverrideBarColor),
+                         "Middle Third"
+                        );
+
         legend.AddEntry (
-            new GraphCellToRender (stiple, series.SubSeries.ElementAt (2).OverrideBarColor),
-            "Upper Third"
-        );
+                         new GraphCellToRender (stiple, series.SubSeries.ElementAt (2).OverrideBarColor),
+                         "Upper Third"
+                        );
         _graphView.Annotations.Add (legend);
     }
 
     private void Quit () { Application.RequestStop (); }
 
-    private void SetupDisco () {
+    private void SetupDisco ()
+    {
         _graphView.Reset ();
 
         _graphView.Title = "Graphic Equalizer";
@@ -269,23 +291,26 @@ public class GraphViewExample : Scenario {
         var series = new DiscoBarSeries ();
         List<BarSeriesBar> bars = new ();
 
-        Func<bool> genSample = () => {
-            bars.Clear ();
+        Func<bool> genSample = () =>
+                               {
+                                   bars.Clear ();
 
-            // generate an imaginary sample
-            for (var i = 0; i < 31; i++) {
-                bars.Add (
-                    new BarSeriesBar (null, stiple, r.Next (0, 100)) {
-                        //ColorGetter = colorDelegate
-                    }
-                );
-            }
+                                   // generate an imaginary sample
+                                   for (var i = 0; i < 31; i++)
+                                   {
+                                       bars.Add (
+                                                 new BarSeriesBar (null, stiple, r.Next (0, 100))
+                                                 {
+                                                     //ColorGetter = colorDelegate
+                                                 }
+                                                );
+                                   }
 
-            _graphView.SetNeedsDisplay ();
+                                   _graphView.SetNeedsDisplay ();
 
-            // while the equaliser is showing
-            return _graphView.Series.Contains (series);
-        };
+                                   // while the equaliser is showing
+                                   return _graphView.Series.Contains (series);
+                               };
 
         Application.AddTimeout (TimeSpan.FromMilliseconds (250), genSample);
 
@@ -336,7 +361,8 @@ public class GraphViewExample : Scenario {
 "Kuwait",81,79.3,83.9
 "Costa Rica",80.8,78.3,83.4*/
 
-    private void SetupLifeExpectancyBarGraph (bool verticalBars) {
+    private void SetupLifeExpectancyBarGraph (bool verticalBars)
+    {
         _graphView.Reset ();
 
         _graphView.Title = $"Life Expectancy - {(verticalBars ? "Vertical" : "Horizontal")}";
@@ -346,79 +372,82 @@ public class GraphViewExample : Scenario {
         var softStiple = new GraphCellToRender ((Rune)'\u2591');
         var mediumStiple = new GraphCellToRender ((Rune)'\u2592');
 
-        var barSeries = new BarSeries {
-            Bars = new List<BarSeriesBar> {
+        var barSeries = new BarSeries
+        {
+            Bars = new List<BarSeriesBar>
+            {
                 new ("Switzerland", softStiple, 83.4f),
                 new (
-                    "South Korea",
-                    !verticalBars
-                        ? mediumStiple
-                        : softStiple,
-                    83.3f
-                ),
+                     "South Korea",
+                     !verticalBars
+                         ? mediumStiple
+                         : softStiple,
+                     83.3f
+                    ),
                 new ("Singapore", softStiple, 83.2f),
                 new (
-                    "Spain",
-                    !verticalBars
-                        ? mediumStiple
-                        : softStiple,
-                    83.2f
-                ),
+                     "Spain",
+                     !verticalBars
+                         ? mediumStiple
+                         : softStiple,
+                     83.2f
+                    ),
                 new ("Cyprus", softStiple, 83.1f),
                 new (
-                    "Australia",
-                    !verticalBars
-                        ? mediumStiple
-                        : softStiple,
-                    83
-                ),
+                     "Australia",
+                     !verticalBars
+                         ? mediumStiple
+                         : softStiple,
+                     83
+                    ),
                 new ("Italy", softStiple, 83),
                 new (
-                    "Norway",
-                    !verticalBars
-                        ? mediumStiple
-                        : softStiple,
-                    83
-                ),
+                     "Norway",
+                     !verticalBars
+                         ? mediumStiple
+                         : softStiple,
+                     83
+                    ),
                 new ("Israel", softStiple, 82.6f),
                 new (
-                    "France",
-                    !verticalBars
-                        ? mediumStiple
-                        : softStiple,
-                    82.5f
-                ),
+                     "France",
+                     !verticalBars
+                         ? mediumStiple
+                         : softStiple,
+                     82.5f
+                    ),
                 new ("Luxembourg", softStiple, 82.4f),
                 new (
-                    "Sweden",
-                    !verticalBars
-                        ? mediumStiple
-                        : softStiple,
-                    82.4f
-                ),
+                     "Sweden",
+                     !verticalBars
+                         ? mediumStiple
+                         : softStiple,
+                     82.4f
+                    ),
                 new ("Iceland", softStiple, 82.3f),
                 new (
-                    "Canada",
-                    !verticalBars
-                        ? mediumStiple
-                        : softStiple,
-                    82.2f
-                ),
+                     "Canada",
+                     !verticalBars
+                         ? mediumStiple
+                         : softStiple,
+                     82.2f
+                    ),
                 new ("New Zealand", softStiple, 82),
                 new (
-                    "Malta",
-                    !verticalBars
-                        ? mediumStiple
-                        : softStiple,
-                    81.9f
-                ),
+                     "Malta",
+                     !verticalBars
+                         ? mediumStiple
+                         : softStiple,
+                     81.9f
+                    ),
                 new ("Ireland", softStiple, 81.8f)
             }
         };
 
         _graphView.Series.Add (barSeries);
 
-        if (verticalBars) {
+        if (verticalBars)
+        {
             barSeries.Orientation = Orientation.Vertical;
 
             // How much graph space each cell of the console depicts
@@ -441,7 +470,9 @@ public class GraphViewExample : Scenario {
 
             // Start the graph at 80 years because that is where most of our data is
             _graphView.ScrollOffset = new PointF (0, 80);
-        } else {
+        }
+        else
+        {
             barSeries.Orientation = Orientation.Horizontal;
 
             // How much graph space each cell of the console depicts
@@ -470,7 +501,8 @@ public class GraphViewExample : Scenario {
         _graphView.SetNeedsDisplay ();
     }
 
-    private void SetupLineGraph () {
+    private void SetupLineGraph ()
+    {
         _graphView.Reset ();
 
         _graphView.Title = "Line";
@@ -488,13 +520,15 @@ public class GraphViewExample : Scenario {
 
         var r = new Random ();
 
-        for (var i = 0; i < 10; i++) {
+        for (var i = 0; i < 10; i++)
+        {
             randomPoints.Add (new PointF (r.Next (100), r.Next (100)));
         }
 
         var points = new ScatterSeries { Points = randomPoints };
 
-        var line = new PathAnnotation {
+        var line = new PathAnnotation
+        {
             LineColor = cyan, Points = randomPoints.OrderBy (p => p.X).ToList (), BeforeSeries = true
         };
 
@@ -503,13 +537,15 @@ public class GraphViewExample : Scenario {
 
         randomPoints = new List<PointF> ();
 
-        for (var i = 0; i < 10; i++) {
+        for (var i = 0; i < 10; i++)
+        {
             randomPoints.Add (new PointF (r.Next (100), r.Next (100)));
         }
 
         var points2 = new ScatterSeries { Points = randomPoints, Fill = new GraphCellToRender ((Rune)'x', red) };
 
-        var line2 = new PathAnnotation {
+        var line2 = new PathAnnotation
+        {
             LineColor = magenta, Points = randomPoints.OrderBy (p => p.X).ToList (), BeforeSeries = true
         };
 
@@ -533,20 +569,23 @@ public class GraphViewExample : Scenario {
         _graphView.AxisY.Text = "↑Y";
 
         PointF max = line.Points.Union (line2.Points).OrderByDescending (p => p.Y).First ();
+
         _graphView.Annotations.Add (
-            new TextAnnotation {
-                Text = "(Max)",
-                GraphPosition = new PointF (
-                    max.X + 2 * _graphView.CellSize.X,
-                    max.Y
-                )
-            }
-        );
+                                    new TextAnnotation
+                                    {
+                                        Text = "(Max)",
+                                        GraphPosition = new PointF (
+                                                                    max.X + 2 * _graphView.CellSize.X,
+                                                                    max.Y
+                                                                   )
+                                    }
+                                   );
 
         _graphView.SetNeedsDisplay ();
     }
 
-    private void SetupPeriodicTableScatterPlot () {
+    private void SetupPeriodicTableScatterPlot ()
+    {
         _graphView.Reset ();
 
         _graphView.Title = "Scatter Plot";
@@ -556,126 +595,128 @@ public class GraphViewExample : Scenario {
 
         //AtomicNumber and AtomicMass of all elements in the periodic table
         _graphView.Series.Add (
-            new ScatterSeries {
-                Points = new List<PointF> {
-                    new (1, 1.007f),
-                    new (2, 4.002f),
-                    new (3, 6.941f),
-                    new (4, 9.012f),
-                    new (5, 10.811f),
-                    new (6, 12.011f),
-                    new (7, 14.007f),
-                    new (8, 15.999f),
-                    new (9, 18.998f),
-                    new (10, 20.18f),
-                    new (11, 22.99f),
-                    new (12, 24.305f),
-                    new (13, 26.982f),
-                    new (14, 28.086f),
-                    new (15, 30.974f),
-                    new (16, 32.065f),
-                    new (17, 35.453f),
-                    new (18, 39.948f),
-                    new (19, 39.098f),
-                    new (20, 40.078f),
-                    new (21, 44.956f),
-                    new (22, 47.867f),
-                    new (23, 50.942f),
-                    new (24, 51.996f),
-                    new (25, 54.938f),
-                    new (26, 55.845f),
-                    new (27, 58.933f),
-                    new (28, 58.693f),
-                    new (29, 63.546f),
-                    new (30, 65.38f),
-                    new (31, 69.723f),
-                    new (32, 72.64f),
-                    new (33, 74.922f),
-                    new (34, 78.96f),
-                    new (35, 79.904f),
-                    new (36, 83.798f),
-                    new (37, 85.468f),
-                    new (38, 87.62f),
-                    new (39, 88.906f),
-                    new (40, 91.224f),
-                    new (41, 92.906f),
-                    new (42, 95.96f),
-                    new (43, 98f),
-                    new (44, 101.07f),
-                    new (45, 102.906f),
-                    new (46, 106.42f),
-                    new (47, 107.868f),
-                    new (48, 112.411f),
-                    new (49, 114.818f),
-                    new (50, 118.71f),
-                    new (51, 121.76f),
-                    new (52, 127.6f),
-                    new (53, 126.904f),
-                    new (54, 131.293f),
-                    new (55, 132.905f),
-                    new (56, 137.327f),
-                    new (57, 138.905f),
-                    new (58, 140.116f),
-                    new (59, 140.908f),
-                    new (60, 144.242f),
-                    new (61, 145),
-                    new (62, 150.36f),
-                    new (63, 151.964f),
-                    new (64, 157.25f),
-                    new (65, 158.925f),
-                    new (66, 162.5f),
-                    new (67, 164.93f),
-                    new (68, 167.259f),
-                    new (69, 168.934f),
-                    new (70, 173.054f),
-                    new (71, 174.967f),
-                    new (72, 178.49f),
-                    new (73, 180.948f),
-                    new (74, 183.84f),
-                    new (75, 186.207f),
-                    new (76, 190.23f),
-                    new (77, 192.217f),
-                    new (78, 195.084f),
-                    new (79, 196.967f),
-                    new (80, 200.59f),
-                    new (81, 204.383f),
-                    new (82, 207.2f),
-                    new (83, 208.98f),
-                    new (84, 210),
-                    new (85, 210),
-                    new (86, 222),
-                    new (87, 223),
-                    new (88, 226),
-                    new (89, 227),
-                    new (90, 232.038f),
-                    new (91, 231.036f),
-                    new (92, 238.029f),
-                    new (93, 237),
-                    new (94, 244),
-                    new (95, 243),
-                    new (96, 247),
-                    new (97, 247),
-                    new (98, 251),
-                    new (99, 252),
-                    new (100, 257),
-                    new (101, 258),
-                    new (102, 259),
-                    new (103, 262),
-                    new (104, 261),
-                    new (105, 262),
-                    new (106, 266),
-                    new (107, 264),
-                    new (108, 267),
-                    new (109, 268),
-                    new (113, 284),
-                    new (114, 289),
-                    new (115, 288),
-                    new (116, 292),
-                    new (117, 295),
-                    new (118, 294)
-                }
-            }
-        );
+                               new ScatterSeries
+                               {
+                                   Points = new List<PointF>
+                                   {
+                                       new (1, 1.007f),
+                                       new (2, 4.002f),
+                                       new (3, 6.941f),
+                                       new (4, 9.012f),
+                                       new (5, 10.811f),
+                                       new (6, 12.011f),
+                                       new (7, 14.007f),
+                                       new (8, 15.999f),
+                                       new (9, 18.998f),
+                                       new (10, 20.18f),
+                                       new (11, 22.99f),
+                                       new (12, 24.305f),
+                                       new (13, 26.982f),
+                                       new (14, 28.086f),
+                                       new (15, 30.974f),
+                                       new (16, 32.065f),
+                                       new (17, 35.453f),
+                                       new (18, 39.948f),
+                                       new (19, 39.098f),
+                                       new (20, 40.078f),
+                                       new (21, 44.956f),
+                                       new (22, 47.867f),
+                                       new (23, 50.942f),
+                                       new (24, 51.996f),
+                                       new (25, 54.938f),
+                                       new (26, 55.845f),
+                                       new (27, 58.933f),
+                                       new (28, 58.693f),
+                                       new (29, 63.546f),
+                                       new (30, 65.38f),
+                                       new (31, 69.723f),
+                                       new (32, 72.64f),
+                                       new (33, 74.922f),
+                                       new (34, 78.96f),
+                                       new (35, 79.904f),
+                                       new (36, 83.798f),
+                                       new (37, 85.468f),
+                                       new (38, 87.62f),
+                                       new (39, 88.906f),
+                                       new (40, 91.224f),
+                                       new (41, 92.906f),
+                                       new (42, 95.96f),
+                                       new (43, 98f),
+                                       new (44, 101.07f),
+                                       new (45, 102.906f),
+                                       new (46, 106.42f),
+                                       new (47, 107.868f),
+                                       new (48, 112.411f),
+                                       new (49, 114.818f),
+                                       new (50, 118.71f),
+                                       new (51, 121.76f),
+                                       new (52, 127.6f),
+                                       new (53, 126.904f),
+                                       new (54, 131.293f),
+                                       new (55, 132.905f),
+                                       new (56, 137.327f),
+                                       new (57, 138.905f),
+                                       new (58, 140.116f),
+                                       new (59, 140.908f),
+                                       new (60, 144.242f),
+                                       new (61, 145),
+                                       new (62, 150.36f),
+                                       new (63, 151.964f),
+                                       new (64, 157.25f),
+                                       new (65, 158.925f),
+                                       new (66, 162.5f),
+                                       new (67, 164.93f),
+                                       new (68, 167.259f),
+                                       new (69, 168.934f),
+                                       new (70, 173.054f),
+                                       new (71, 174.967f),
+                                       new (72, 178.49f),
+                                       new (73, 180.948f),
+                                       new (74, 183.84f),
+                                       new (75, 186.207f),
+                                       new (76, 190.23f),
+                                       new (77, 192.217f),
+                                       new (78, 195.084f),
+                                       new (79, 196.967f),
+                                       new (80, 200.59f),
+                                       new (81, 204.383f),
+                                       new (82, 207.2f),
+                                       new (83, 208.98f),
+                                       new (84, 210),
+                                       new (85, 210),
+                                       new (86, 222),
+                                       new (87, 223),
+                                       new (88, 226),
+                                       new (89, 227),
+                                       new (90, 232.038f),
+                                       new (91, 231.036f),
+                                       new (92, 238.029f),
+                                       new (93, 237),
+                                       new (94, 244),
+                                       new (95, 243),
+                                       new (96, 247),
+                                       new (97, 247),
+                                       new (98, 251),
+                                       new (99, 252),
+                                       new (100, 257),
+                                       new (101, 258),
+                                       new (102, 259),
+                                       new (103, 262),
+                                       new (104, 261),
+                                       new (105, 262),
+                                       new (106, 266),
+                                       new (107, 264),
+                                       new (108, 267),
+                                       new (109, 268),
+                                       new (113, 284),
+                                       new (114, 289),
+                                       new (115, 288),
+                                       new (116, 292),
+                                       new (117, 295),
+                                       new (118, 294)
+                                   }
+                               }
+                              );
 
         // How much graph space each cell of the console depicts
         _graphView.CellSize = new PointF (1, 5);
@@ -698,7 +739,8 @@ public class GraphViewExample : Scenario {
         _graphView.SetNeedsDisplay ();
     }
 
-    private void SetupPopulationPyramid () {
+    private void SetupPopulationPyramid ()
+    {
         /*
         Age,M,F
 0-4,2009363,1915127
@@ -756,9 +798,11 @@ public class GraphViewExample : Scenario {
         // Bars in 2 directions
 
         // Males (negative to make the bars go left)
-        var malesSeries = new BarSeries {
+        var malesSeries = new BarSeries
+        {
             Orientation = Orientation.Horizontal,
-            Bars = new List<BarSeriesBar> {
+            Bars = new List<BarSeriesBar>
+            {
                 new ("0-4", stiple, -2009363),
                 new ("5-9", stiple, -2108550),
                 new ("10-14", stiple, -2022370),
@@ -785,9 +829,11 @@ public class GraphViewExample : Scenario {
         _graphView.Series.Add (malesSeries);
 
         // Females
-        var femalesSeries = new BarSeries {
+        var femalesSeries = new BarSeries
+        {
             Orientation = Orientation.Horizontal,
-            Bars = new List<BarSeriesBar> {
+            Bars = new List<BarSeriesBar>
+            {
                 new ("0-4", stiple, 1915127),
                 new ("5-9", stiple, 2011016),
                 new ("10-14", stiple, 1933970),
@@ -815,22 +861,25 @@ public class GraphViewExample : Scenario {
         var softStiple = new GraphCellToRender ((Rune)'\u2591');
         var mediumStiple = new GraphCellToRender ((Rune)'\u2592');
 
-        for (var i = 0; i < malesSeries.Bars.Count; i++) {
-            malesSeries.Bars[i].Fill = i % 2 == 0 ? softStiple : mediumStiple;
-            femalesSeries.Bars[i].Fill = i % 2 == 0 ? softStiple : mediumStiple;
+        for (var i = 0; i < malesSeries.Bars.Count; i++)
+        {
+            malesSeries.Bars [i].Fill = i % 2 == 0 ? softStiple : mediumStiple;
+            femalesSeries.Bars [i].Fill = i % 2 == 0 ? softStiple : mediumStiple;
         }
 
         _graphView.Series.Add (femalesSeries);
 
         _graphView.Annotations.Add (new TextAnnotation { Text = "M", ScreenPosition = new Point (0, 10) });
+
         _graphView.Annotations.Add (
-            new TextAnnotation { Text = "F", ScreenPosition = new Point (_graphView.Bounds.Width - 1, 10) }
-        );
+                                    new TextAnnotation { Text = "F", ScreenPosition = new Point (_graphView.Bounds.Width - 1, 10) }
+                                   );
 
         _graphView.SetNeedsDisplay ();
     }
 
-    private void SetupSineWave () {
+    private void SetupSineWave ()
+    {
         _graphView.Reset ();
 
         _graphView.Title = "Sine Wave";
@@ -844,7 +893,8 @@ public class GraphViewExample : Scenario {
         line.BeforeSeries = true;
 
         // Generate line graph with 2,000 points
-        for (float x = -500; x < 500; x += 0.5f) {
+        for (float x = -500; x < 500; x += 0.5f)
+        {
             points.Points.Add (new PointF (x, (float)Math.Sin (x)));
             line.Points.Add (new PointF (x, (float)Math.Sin (x)));
         }
@@ -875,26 +925,31 @@ public class GraphViewExample : Scenario {
         _graphView.SetNeedsDisplay ();
     }
 
-    private void ShowBorder () {
+    private void ShowBorder ()
+    {
         _miShowBorder.Checked = !_miShowBorder.Checked;
 
-        if (_miShowBorder.Checked == true) {
+        if (_miShowBorder.Checked == true)
+        {
             _graphView.BorderStyle = LineStyle.Single;
             _graphView.Border.Thickness = _thickness;
             _graphView.Margin.Thickness = _thickness;
             _graphView.Padding.Thickness = _thickness;
-        } else {
+        }
+        else
+        {
             _graphView.BorderStyle = LineStyle.None;
             _graphView.Margin.Thickness = Thickness.Empty;
             _graphView.Padding.Thickness = Thickness.Empty;
         }
     }
 
-    private void Zoom (float factor) {
+    private void Zoom (float factor)
+    {
         _graphView.CellSize = new PointF (
-            _graphView.CellSize.X * factor,
-            _graphView.CellSize.Y * factor
-        );
+                                          _graphView.CellSize.X * factor,
+                                          _graphView.CellSize.Y * factor
+                                         );
 
         _graphView.AxisX.Increment *= factor;
         _graphView.AxisY.Increment *= factor;
@@ -902,8 +957,16 @@ public class GraphViewExample : Scenario {
         _graphView.SetNeedsDisplay ();
     }
 
-    private class DiscoBarSeries : BarSeries {
-        public DiscoBarSeries () {
+    private class DiscoBarSeries : BarSeries
+    {
+        private readonly Attribute _brightgreen;
+        private readonly Attribute _brightred;
+        private readonly Attribute _brightyellow;
+        private readonly Attribute _green;
+        private readonly Attribute _red;
+
+        public DiscoBarSeries ()
+        {
             _green = new Attribute (Color.BrightGreen, Color.Black);
             _brightgreen = new Attribute (Color.Green, Color.Black);
             _brightyellow = new Attribute (Color.BrightYellow, Color.Black);
@@ -911,28 +974,34 @@ public class GraphViewExample : Scenario {
             _brightred = new Attribute (Color.BrightRed, Color.Black);
         }
 
-        private readonly Attribute _brightgreen;
-        private readonly Attribute _brightred;
-        private readonly Attribute _brightyellow;
-        private readonly Attribute _green;
-        private readonly Attribute _red;
-
-        protected override void DrawBarLine (GraphView graph, Point start, Point end, BarSeriesBar beingDrawn) {
+        protected override void DrawBarLine (GraphView graph, Point start, Point end, BarSeriesBar beingDrawn)
+        {
             ConsoleDriver driver = Application.Driver;
 
             int x = start.X;
-            for (int y = end.Y; y <= start.Y; y++) {
+
+            for (int y = end.Y; y <= start.Y; y++)
+            {
                 float height = graph.ScreenToGraphSpace (x, y).Y;
 
-                if (height >= 85) {
+                if (height >= 85)
+                {
                     driver.SetAttribute (_red);
-                } else if (height >= 66) {
+                }
+                else if (height >= 66)
+                {
                     driver.SetAttribute (_brightred);
-                } else if (height >= 45) {
+                }
+                else if (height >= 45)
+                {
                     driver.SetAttribute (_brightyellow);
-                } else if (height >= 25) {
+                }
+                else if (height >= 25)
+                {
                     driver.SetAttribute (_brightgreen);
-                } else {
+                }
+                else
+                {
                     driver.SetAttribute (_green);
                 }
 

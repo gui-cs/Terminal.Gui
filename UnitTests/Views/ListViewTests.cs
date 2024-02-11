@@ -3,12 +3,14 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class ListViewTests {
-    public ListViewTests (ITestOutputHelper output) { _output = output; }
+public class ListViewTests
+{
     private readonly ITestOutputHelper _output;
+    public ListViewTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
-    public void Constructors_Defaults () {
+    public void Constructors_Defaults ()
+    {
         var lv = new ListView ();
         Assert.Null (lv.Source);
         Assert.True (lv.CanFocus);
@@ -22,7 +24,8 @@ public class ListViewTests {
         Assert.NotNull (lv.Source);
         Assert.Equal (-1, lv.SelectedItem);
 
-        lv = new ListView {
+        lv = new ListView
+        {
             Y = 1, Width = 10, Height = 20, Source = new ListWrapper (new List<string> { "One", "Two", "Three" })
         };
         Assert.NotNull (lv.Source);
@@ -37,9 +40,12 @@ public class ListViewTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void Ensures_Visibility_SelectedItem_On_MoveDown_And_MoveUp () {
+    public void Ensures_Visibility_SelectedItem_On_MoveDown_And_MoveUp ()
+    {
         List<string> source = new ();
-        for (var i = 0; i < 20; i++) {
+
+        for (var i = 0; i < 20; i++)
+        {
             source.Add ($"Line{i}");
         }
 
@@ -52,8 +58,9 @@ public class ListViewTests {
         Application.Refresh ();
 
         Assert.Equal (-1, lv.SelectedItem);
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌──────────┐
 │Line0     │
 │Line1     │
@@ -66,14 +73,15 @@ public class ListViewTests {
 │Line8     │
 │Line9     │
 └──────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
 
         Assert.True (lv.ScrollDown (10));
         lv.Draw ();
         Assert.Equal (-1, lv.SelectedItem);
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌──────────┐
 │Line10    │
 │Line11    │
@@ -86,14 +94,15 @@ public class ListViewTests {
 │Line18    │
 │Line19    │
 └──────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
 
         Assert.True (lv.MoveDown ());
         lv.Draw ();
         Assert.Equal (0, lv.SelectedItem);
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌──────────┐
 │Line0     │
 │Line1     │
@@ -106,14 +115,15 @@ public class ListViewTests {
 │Line8     │
 │Line9     │
 └──────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
 
         Assert.True (lv.MoveEnd ());
         lv.Draw ();
         Assert.Equal (19, lv.SelectedItem);
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌──────────┐
 │Line19    │
 │          │
@@ -126,14 +136,15 @@ public class ListViewTests {
 │          │
 │          │
 └──────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
 
         Assert.True (lv.ScrollUp (20));
         lv.Draw ();
         Assert.Equal (19, lv.SelectedItem);
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌──────────┐
 │Line0     │
 │Line1     │
@@ -146,14 +157,15 @@ public class ListViewTests {
 │Line8     │
 │Line9     │
 └──────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
 
         Assert.True (lv.MoveDown ());
         lv.Draw ();
         Assert.Equal (19, lv.SelectedItem);
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌──────────┐
 │Line10    │
 │Line11    │
@@ -166,14 +178,15 @@ public class ListViewTests {
 │Line18    │
 │Line19    │
 └──────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
 
         Assert.True (lv.ScrollUp (20));
         lv.Draw ();
         Assert.Equal (19, lv.SelectedItem);
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌──────────┐
 │Line0     │
 │Line1     │
@@ -186,14 +199,15 @@ public class ListViewTests {
 │Line8     │
 │Line9     │
 └──────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
 
         Assert.True (lv.MoveDown ());
         lv.Draw ();
         Assert.Equal (19, lv.SelectedItem);
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌──────────┐
 │Line10    │
 │Line11    │
@@ -206,14 +220,15 @@ public class ListViewTests {
 │Line18    │
 │Line19    │
 └──────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
 
         Assert.True (lv.MoveHome ());
         lv.Draw ();
         Assert.Equal (0, lv.SelectedItem);
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌──────────┐
 │Line0     │
 │Line1     │
@@ -226,14 +241,15 @@ public class ListViewTests {
 │Line8     │
 │Line9     │
 └──────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
 
         Assert.True (lv.ScrollDown (20));
         lv.Draw ();
         Assert.Equal (0, lv.SelectedItem);
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌──────────┐
 │Line19    │
 │          │
@@ -246,14 +262,15 @@ public class ListViewTests {
 │          │
 │          │
 └──────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
 
         Assert.True (lv.MoveUp ());
         lv.Draw ();
         Assert.Equal (0, lv.SelectedItem);
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌──────────┐
 │Line0     │
 │Line1     │
@@ -266,15 +283,18 @@ public class ListViewTests {
 │Line8     │
 │Line9     │
 └──────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void EnsureSelectedItemVisible_SelectedItem () {
+    public void EnsureSelectedItemVisible_SelectedItem ()
+    {
         List<string> source = new ();
-        for (var i = 0; i < 10; i++) {
+
+        for (var i = 0; i < 10; i++)
+        {
             source.Add ($"Item {i}");
         }
 
@@ -283,32 +303,34 @@ public class ListViewTests {
         Application.Begin (Application.Top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 Item 0
 Item 1
 Item 2
 Item 3
 Item 4",
-            _output
-        );
+                                                      _output
+                                                     );
 
         // EnsureSelectedItemVisible is auto enabled on the OnSelectedChanged
         lv.SelectedItem = 6;
         Application.Refresh ();
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 Item 2
 Item 3
 Item 4
 Item 5
 Item 6",
-            _output
-        );
+                                                      _output
+                                                     );
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void EnsureSelectedItemVisible_Top () {
+    public void EnsureSelectedItemVisible_Top ()
+    {
         List<string> source = new () { "First", "Second" };
         var lv = new ListView { Width = Dim.Fill (), Height = 1, Source = new ListWrapper (source) };
         lv.SelectedItem = 1;
@@ -324,10 +346,13 @@ Item 6",
         Assert.Equal ("First  ", GetContents (0));
         Assert.Equal (new string (' ', 7), GetContents (1));
 
-        string GetContents (int line) {
+        string GetContents (int line)
+        {
             var item = "";
-            for (var i = 0; i < 7; i++) {
-                item += Application.Driver.Contents[line, i].Rune;
+
+            for (var i = 0; i < 7; i++)
+            {
+                item += Application.Driver.Contents [line, i].Rune;
             }
 
             return item;
@@ -335,7 +360,8 @@ Item 6",
     }
 
     [Fact]
-    public void KeyBindings_Command () {
+    public void KeyBindings_Command ()
+    {
         List<string> source = new () { "One", "Two", "Three" };
         var lv = new ListView { Height = 2, AllowsMarking = true, Source = new ListWrapper (source) };
         lv.BeginInit ();
@@ -369,7 +395,8 @@ Item 6",
     ///     returns the appropriate result
     /// </summary>
     [Fact]
-    public void ListViewProcessKeyReturnValue_WithMultipleCommands () {
+    public void ListViewProcessKeyReturnValue_WithMultipleCommands ()
+    {
         var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three", "Four" }) };
 
         Assert.NotNull (lv.Source);
@@ -395,7 +422,8 @@ Item 6",
     }
 
     [Fact]
-    public void ListViewSelectThenDown () {
+    public void ListViewSelectThenDown ()
+    {
         var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
         lv.AllowsMarking = true;
 
@@ -458,7 +486,8 @@ Item 6",
     }
 
     [Fact]
-    public void ListWrapper_StartsWith () {
+    public void ListWrapper_StartsWith ()
+    {
         var lw = new ListWrapper (new List<string> { "One", "Two", "Three" });
 
         Assert.Equal (1, lw.StartsWith ("t"));
@@ -479,7 +508,8 @@ Item 6",
     }
 
     [Fact]
-    public void OnEnter_Does_Not_Throw_Exception () {
+    public void OnEnter_Does_Not_Throw_Exception ()
+    {
         var lv = new ListView ();
         var top = new View ();
         top.Add (lv);
@@ -489,7 +519,8 @@ Item 6",
 
     [Fact]
     [AutoInitShutdown]
-    public void RowRender_Event () {
+    public void RowRender_Event ()
+    {
         var rendered = false;
         List<string> source = new () { "one", "two", "three" };
         var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill () };
@@ -504,7 +535,8 @@ Item 6",
     }
 
     [Fact]
-    public void SelectedItem_Get_Set () {
+    public void SelectedItem_Get_Set ()
+    {
         var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
         Assert.Equal (-1, lv.SelectedItem);
         Assert.Throws<ArgumentException> (() => lv.SelectedItem = 3);
@@ -513,7 +545,8 @@ Item 6",
     }
 
     [Fact]
-    public void SetSource_Preserves_ListWrapper_Instance_If_Not_Null () {
+    public void SetSource_Preserves_ListWrapper_Instance_If_Not_Null ()
+    {
         var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two" }) };
 
         Assert.NotNull (lv.Source);
@@ -532,15 +565,17 @@ Item 6",
     }
 
     [Fact]
-    public void SettingEmptyKeybindingThrows () {
+    public void SettingEmptyKeybindingThrows ()
+    {
         var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
         Assert.Throws<ArgumentException> (() => lv.KeyBindings.Add (KeyCode.Space));
     }
 
-    private class NewListDataSource : IListDataSource {
+    private class NewListDataSource : IListDataSource
+    {
         public int Count => throw new NotImplementedException ();
         public int Length => throw new NotImplementedException ();
-        public bool IsMarked (int item) => throw new NotImplementedException ();
+        public bool IsMarked (int item) { throw new NotImplementedException (); }
 
         public void Render (
             ListView container,
@@ -551,12 +586,13 @@ Item 6",
             int line,
             int width,
             int start = 0
-        ) {
+        )
+        {
             throw new NotImplementedException ();
         }
 
         public void SetMark (int item, bool value) { throw new NotImplementedException (); }
-        public IList ToList () => new List<string> { "One", "Two", "Three" };
+        public IList ToList () { return new List<string> { "One", "Two", "Three" }; }
     }
 
     // No longer needed given PR #2920

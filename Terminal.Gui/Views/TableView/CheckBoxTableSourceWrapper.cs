@@ -1,24 +1,20 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     <see cref="ITableSource"/> for a <see cref="TableView"/> which adds a checkbox column as an additional column in
-///     the table.
+///     <see cref="ITableSource"/> for a <see cref="TableView"/> which adds a checkbox column as an additional column in the table.
 /// </summary>
 /// <remarks>
-///     This class wraps another <see cref="ITableSource"/> and dynamically serves its rows/cols plus an extra column. Data
-///     in the wrapped source can be dynamic (change over time).
+///     This class wraps another <see cref="ITableSource"/> and dynamically serves its rows/cols plus an extra column. Data in the wrapped source can be dynamic (change over time).
 /// </remarks>
-public abstract class CheckBoxTableSourceWrapperBase : ITableSource {
+public abstract class CheckBoxTableSourceWrapperBase : ITableSource
+{
     /// <summary>
-    ///     Creates a new instance of the class presenting the data in <paramref name="toWrap"/> plus an additional checkbox
-    ///     column.
+    ///     Creates a new instance of the class presenting the data in <paramref name="toWrap"/> plus an additional checkbox column.
     /// </summary>
-    /// <param name="tableView">
-    ///     The <see cref="TableView"/> this source will be used with. This is required for event
-    ///     registration.
-    /// </param>
+    /// <param name="tableView">The <see cref="TableView"/> this source will be used with. This is required for event registration.</param>
     /// <param name="toWrap">The original data source of the <see cref="TableView"/> that you want to add checkboxes to.</param>
-    public CheckBoxTableSourceWrapperBase (TableView tableView, ITableSource toWrap) {
+    public CheckBoxTableSourceWrapperBase (TableView tableView, ITableSource toWrap)
+    {
         Wrapping = toWrap;
         this.tableView = tableView;
 
@@ -30,13 +26,9 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource {
 
     private readonly TableView tableView;
 
-    /// <summary>Gets or sets whether to only allow a single row to be toggled at once (Radio button).</summary>
-    public bool UseRadioButtons { get; set; }
-
-    /// <summary>Gets the <see cref="ITableSource"/> that this instance is wrapping.</summary>
-    public ITableSource Wrapping { get; }
-
-    /// <summary>Gets or sets the character to use for checked entries. Defaults to <see cref="GlyphDefinitions.Checked"/></summary>
+    /// <summary>
+    ///     Gets or sets the character to use for checked entries. Defaults to <see cref="GlyphDefinitions.Checked"/>
+    /// </summary>
     public Rune CheckedRune { get; set; } = Glyphs.Checked;
 
     /// <summary>
@@ -51,21 +43,33 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource {
     /// </summary>
     public Rune RadioUnCheckedRune { get; set; } = Glyphs.UnSelected;
 
-    /// <summary>Gets or sets the character to use for UnChecked entries. Defaults to <see cref="GlyphDefinitions.UnChecked"/></summary>
+    /// <summary>
+    ///     Gets or sets the character to use for UnChecked entries. Defaults to <see cref="GlyphDefinitions.UnChecked"/>
+    /// </summary>
     public Rune UnCheckedRune { get; set; } = Glyphs.UnChecked;
 
+    /// <summary>Gets or sets whether to only allow a single row to be toggled at once (Radio button).</summary>
+    public bool UseRadioButtons { get; set; }
+
+    /// <summary>Gets the <see cref="ITableSource"/> that this instance is wrapping.</summary>
+    public ITableSource Wrapping { get; }
+
     /// <inheritdoc/>
-    public object this [int row, int col] {
-        get {
-            if (col == 0) {
-                if (UseRadioButtons) {
+    public object this [int row, int col]
+    {
+        get
+        {
+            if (col == 0)
+            {
+                if (UseRadioButtons)
+                {
                     return IsChecked (row) ? RadioCheckedRune : RadioUnCheckedRune;
                 }
 
                 return IsChecked (row) ? CheckedRune : UnCheckedRune;
             }
 
-            return Wrapping[row, col - 1];
+            return Wrapping [row, col - 1];
         }
     }
 
@@ -76,8 +80,10 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource {
     public int Columns => Wrapping.Columns + 1;
 
     /// <inheritdoc/>
-    public string[] ColumnNames {
-        get {
+    public string [] ColumnNames
+    {
+        get
+        {
             List<string> toReturn = Wrapping.ColumnNames.ToList ();
             toReturn.Insert (0, " ");
 
@@ -94,8 +100,7 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource {
     protected abstract bool IsChecked (int row);
 
     /// <summary>
-    ///     Called when the 'toggled all' action is performed. This should change state from 'some selected' to 'all selected'
-    ///     or clear selection if all area already selected.
+    ///     Called when the 'toggled all' action is performed. This should change state from 'some selected' to 'all selected' or clear selection if all area already selected.
     /// </summary>
     protected abstract void ToggleAllRows ();
 
@@ -103,21 +108,21 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource {
     /// <param name="row"></param>
     protected abstract void ToggleRow (int row);
 
-    /// <summary>
-    ///     Flips the checked state for a collection of rows. If some (but not all) are selected they should flip to all
-    ///     selected.
-    /// </summary>
+    /// <summary>Flips the checked state for a collection of rows. If some (but not all) are selected they should flip to all selected.</summary>
     /// <param name="range"></param>
-    protected abstract void ToggleRows (int[] range);
+    protected abstract void ToggleRows (int [] range);
 
-    private void TableView_CellToggled (object sender, CellToggledEventArgs e) {
+    private void TableView_CellToggled (object sender, CellToggledEventArgs e)
+    {
         // Suppress default toggle behavior when using checkboxes
         // and instead handle ourselves
-        int[] range = tableView.GetAllSelectedCells ().Select (c => c.Y).Distinct ().ToArray ();
+        int [] range = tableView.GetAllSelectedCells ().Select (c => c.Y).Distinct ().ToArray ();
 
-        if (UseRadioButtons) {
+        if (UseRadioButtons)
+        {
             // multi selection makes it unclear what to toggle in this situation
-            if (range.Length != 1) {
+            if (range.Length != 1)
+            {
                 e.Cancel = true;
 
                 return;
@@ -125,7 +130,9 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource {
 
             ClearAllToggles ();
             ToggleRow (range.Single ());
-        } else {
+        }
+        else
+        {
             ToggleRows (range);
         }
 
@@ -133,17 +140,21 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource {
         tableView.SetNeedsDisplay ();
     }
 
-    private void TableView_MouseClick (object sender, MouseEventEventArgs e) {
+    private void TableView_MouseClick (object sender, MouseEventEventArgs e)
+    {
         // we only care about clicks (not movements)
-        if (!e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
+        if (!e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+        {
             return;
         }
 
         Point? hit = tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? headerIfAny);
 
-        if (headerIfAny.HasValue && headerIfAny.Value == 0) {
+        if (headerIfAny.HasValue && headerIfAny.Value == 0)
+        {
             // clicking in header with radio buttons does nothing
-            if (UseRadioButtons) {
+            if (UseRadioButtons)
+            {
                 return;
             }
 
@@ -151,11 +162,16 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource {
             ToggleAllRows ();
             e.Handled = true;
             tableView.SetNeedsDisplay ();
-        } else if (hit.HasValue && hit.Value.X == 0) {
-            if (UseRadioButtons) {
+        }
+        else if (hit.HasValue && hit.Value.X == 0)
+        {
+            if (UseRadioButtons)
+            {
                 ClearAllToggles ();
                 ToggleRow (hit.Value.Y);
-            } else {
+            }
+            else
+            {
                 ToggleRow (hit.Value.Y);
             }
 

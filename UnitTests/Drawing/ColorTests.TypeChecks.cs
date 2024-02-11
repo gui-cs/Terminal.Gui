@@ -3,31 +3,31 @@ using System.Runtime.CompilerServices;
 
 namespace Terminal.Gui.DrawingTests;
 
-public partial class ColorTests {
+public partial class ColorTests
+{
     [Fact]
     [Trait ("Category", "Type Checks")]
     [Trait ("Category", "Change Control")]
-    public void ColorName_Has_Exactly_16_Defined_Values () {
-        Assert.Equal (16, Enum.GetValues<ColorName> ().DistinctBy (static cname => (int)cname).Count ());
-    }
+    public void ColorName_Has_Exactly_16_Defined_Values () { Assert.Equal (16, Enum.GetValues<ColorName> ().DistinctBy (static cname => (int)cname).Count ()); }
 
     [Theory]
     [Trait ("Category", "Type Checks")]
     [Trait ("Category", "Change Control")]
     [MemberData (
-        nameof (ColorTestsTheoryDataGenerators.ColorName_HasCorrectOrdinals),
-        MemberType = typeof (ColorTestsTheoryDataGenerators)
-    )]
+                    nameof (ColorTestsTheoryDataGenerators.ColorName_HasCorrectOrdinals),
+                    MemberType = typeof (ColorTestsTheoryDataGenerators)
+                )]
     public void ColorName_HasCorrectOrdinals (ColorName cname, int ordinal) { Assert.Equal ((int)cname, ordinal); }
 
     [Fact]
     [Trait ("Category", "Type Checks")]
     [Trait ("Category", "Change Control")]
     [SkipLocalsInit]
-    public unsafe void Fields_At_Expected_Offsets () {
+    public unsafe void Fields_At_Expected_Offsets ()
+    {
         // Raw write to the stack and read-back as a Color
         // Byte order is little endian
-        Color* c = stackalloc Color[1];
+        Color* c = stackalloc Color [1];
         var rgba = (int*)c;
         *rgba = 0;
 
@@ -87,15 +87,16 @@ public partial class ColorTests {
     [CombinatorialData]
     public void Implements_Expected_Interfaces (
         [CombinatorialValues (
-            typeof (IEquatable<Color>),
-            typeof (ISpanParsable<Color>),
-            typeof (IUtf8SpanParsable<Color>),
-            typeof (ISpanFormattable),
-            typeof (IUtf8SpanFormattable),
-            typeof (IMinMaxValue<Color>)
-        )]
+                                 typeof (IEquatable<Color>),
+                                 typeof (ISpanParsable<Color>),
+                                 typeof (IUtf8SpanParsable<Color>),
+                                 typeof (ISpanFormattable),
+                                 typeof (IUtf8SpanFormattable),
+                                 typeof (IMinMaxValue<Color>)
+                             )]
         Type expectedInterface
-    ) {
+    )
+    {
         Assert.Contains (expectedInterface, typeof (Color).GetInterfaces ());
     }
 
@@ -107,14 +108,17 @@ public partial class ColorTests {
     [Fact]
     [Trait ("Category", "Type Checks")]
     [Trait ("Category", "Change Control")]
-    public void Is_Value_Type () {
+    public void Is_Value_Type ()
+    {
         // prove that Color is a value type
         Assert.True (typeof (Color).IsValueType);
     }
 }
 
-public static partial class ColorTestsTheoryDataGenerators {
-    public static TheoryData<ColorName, int> ColorName_HasCorrectOrdinals () {
+public static partial class ColorTestsTheoryDataGenerators
+{
+    public static TheoryData<ColorName, int> ColorName_HasCorrectOrdinals ()
+    {
         TheoryData<ColorName, int> data = []
             ;
         data.Add (ColorName.Black, 0);

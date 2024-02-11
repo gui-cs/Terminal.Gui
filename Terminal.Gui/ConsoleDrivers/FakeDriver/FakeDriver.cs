@@ -11,15 +11,18 @@ using Terminal.Gui.ConsoleDrivers;
 namespace Terminal.Gui;
 
 /// <summary>Implements a mock ConsoleDriver for unit testing</summary>
-public class FakeDriver : ConsoleDriver {
+public class FakeDriver : ConsoleDriver
+{
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
-    public class Behaviors {
+    public class Behaviors
+    {
         public Behaviors (
             bool useFakeClipboard = false,
             bool fakeClipboardAlwaysThrowsNotSupportedException = false,
             bool fakeClipboardIsSupportedAlwaysTrue = false
-        ) {
+        )
+        {
             UseFakeClipboard = useFakeClipboard;
             FakeClipboardAlwaysThrowsNotSupportedException = fakeClipboardAlwaysThrowsNotSupportedException;
             FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
@@ -37,37 +40,52 @@ public class FakeDriver : ConsoleDriver {
     public static Behaviors FakeBehaviors = new ();
     public override bool SupportsTrueColor => false;
 
-    public FakeDriver () {
+    public FakeDriver ()
+    {
         Cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
         Rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
-        if (FakeBehaviors.UseFakeClipboard) {
+
+        if (FakeBehaviors.UseFakeClipboard)
+        {
             Clipboard = new FakeClipboard (
-                FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException,
-                FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse
-            );
-        } else {
-            if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
+                                           FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException,
+                                           FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse
+                                          );
+        }
+        else
+        {
+            if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
+            {
                 Clipboard = new WindowsClipboard ();
-            } else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+            }
+            else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX))
+            {
                 Clipboard = new MacOSXClipboard ();
-            } else {
-                if (CursesDriver.Is_WSL_Platform ()) {
+            }
+            else
+            {
+                if (CursesDriver.Is_WSL_Platform ())
+                {
                     Clipboard = new WSLClipboard ();
-                } else {
+                }
+                else
+                {
                     Clipboard = new CursesClipboard ();
                 }
             }
         }
     }
 
-    internal override void End () {
+    internal override void End ()
+    {
         FakeConsole.ResetColor ();
         FakeConsole.Clear ();
     }
 
     private FakeMainLoop _mainLoopDriver;
 
-    internal override MainLoop Init () {
+    internal override MainLoop Init ()
+    {
         FakeConsole.MockKeyPresses.Clear ();
 
         Cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
@@ -83,7 +101,8 @@ public class FakeDriver : ConsoleDriver {
         return new MainLoop (_mainLoopDriver);
     }
 
-    public override void UpdateScreen () {
+    public override void UpdateScreen ()
+    {
         int savedRow = FakeConsole.CursorTop;
         int savedCol = FakeConsole.CursorLeft;
         bool savedCursorVisible = FakeConsole.CursorVisible;
@@ -96,64 +115,81 @@ public class FakeDriver : ConsoleDriver {
         var redrawAttr = new Attribute ();
         int lastCol = -1;
 
-        for (int row = top; row < rows; row++) {
-            if (!_dirtyLines[row]) {
+        for (int row = top; row < rows; row++)
+        {
+            if (!_dirtyLines [row])
+            {
                 continue;
             }
 
             FakeConsole.CursorTop = row;
             FakeConsole.CursorLeft = 0;
 
-            _dirtyLines[row] = false;
+            _dirtyLines [row] = false;
             output.Clear ();
-            for (int col = left; col < cols; col++) {
+
+            for (int col = left; col < cols; col++)
+            {
                 lastCol = -1;
                 var outputWidth = 0;
-                for (; col < cols; col++) {
-                    if (!Contents[row, col].IsDirty) {
-                        if (output.Length > 0) {
+
+                for (; col < cols; col++)
+                {
+                    if (!Contents [row, col].IsDirty)
+                    {
+                        if (output.Length > 0)
+                        {
                             WriteToConsole (output, ref lastCol, row, ref outputWidth);
-                        } else if (lastCol == -1) {
+                        }
+                        else if (lastCol == -1)
+                        {
                             lastCol = col;
                         }
 
-                        if (lastCol + 1 < cols) {
+                        if (lastCol + 1 < cols)
+                        {
                             lastCol++;
                         }
 
                         continue;
                     }
 
-                    if (lastCol == -1) {
+                    if (lastCol == -1)
+                    {
                         lastCol = col;
                     }
 
-                    Attribute attr = Contents[row, col].Attribute.Value;
+                    Attribute attr = Contents [row, col].Attribute.Value;
 
                     // Performance: Only send the escape sequence if the attribute has changed.
-                    if (attr != redrawAttr) {
+                    if (attr != redrawAttr)
+                    {
                         redrawAttr = attr;
                         FakeConsole.ForegroundColor = (ConsoleColor)attr.Foreground.GetClosestNamedColor ();
                         FakeConsole.BackgroundColor = (ConsoleColor)attr.Background.GetClosestNamedColor ();
                     }
 
                     outputWidth++;
-                    Rune rune = Contents[row, col].Rune;
+                    Rune rune = Contents [row, col].Rune;
                     output.Append (rune.ToString ());
-                    if (rune.IsSurrogatePair () && rune.GetColumns () < 2) {
+
+                    if (rune.IsSurrogatePair () && rune.GetColumns () < 2)
+                    {
                         WriteToConsole (output, ref lastCol, row, ref outputWidth);
                         FakeConsole.CursorLeft--;
                     }
 
-                    Contents[row, col].IsDirty = false;
+                    Contents [row, col].IsDirty = false;
                 }
             }
 
-            if (output.Length > 0) {
+            if (output.Length > 0)
+            {
                 FakeConsole.CursorTop = row;
                 FakeConsole.CursorLeft = lastCol;
 
-                foreach (char c in output.ToString ()) {
+                foreach (char c in output.ToString ())
+                {
                     FakeConsole.Write (c);
                 }
             }
@@ -164,10 +200,13 @@ public class FakeDriver : ConsoleDriver {
 
         //SetCursorVisibility (savedVisibitity);
 
-        void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth) {
+        void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
+        {
             FakeConsole.CursorTop = row;
             FakeConsole.CursorLeft = lastCol;
-            foreach (char c in output.ToString ()) {
+
+            foreach (char c in output.ToString ())
+            {
                 FakeConsole.Write (c);
             }
 
@@ -181,7 +220,8 @@ public class FakeDriver : ConsoleDriver {
         FakeConsole.CursorVisible = savedCursorVisible;
     }
 
-    public override void Refresh () {
+    public override void Refresh ()
+    {
         UpdateScreen ();
         UpdateCursor ();
     }
@@ -205,8 +245,10 @@ public class FakeDriver : ConsoleDriver {
 
     #endregion
 
-    private KeyCode MapKey (ConsoleKeyInfo keyInfo) {
-        switch (keyInfo.Key) {
+    private KeyCode MapKey (ConsoleKeyInfo keyInfo)
+    {
+        switch (keyInfo.Key)
+        {
             case ConsoleKey.Escape:
                 return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Esc);
             case ConsoleKey.Tab:
@@ -233,11 +275,11 @@ public class FakeDriver : ConsoleDriver {
                 return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Enter);
             case ConsoleKey.Spacebar:
                 return ConsoleKeyMapping.MapToKeyCodeModifiers (
-                    keyInfo.Modifiers,
-                    keyInfo.KeyChar == 0
-                        ? KeyCode.Space
-                        : (KeyCode)keyInfo.KeyChar
-                );
+                                                                keyInfo.Modifiers,
+                                                                keyInfo.KeyChar == 0
+                                                                    ? KeyCode.Space
+                                                                    : (KeyCode)keyInfo.KeyChar
+                                                               );
             case ConsoleKey.Backspace:
                 return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Backspace);
             case ConsoleKey.Delete:
@@ -260,7 +302,8 @@ public class FakeDriver : ConsoleDriver {
             case ConsoleKey.OemComma:
             case ConsoleKey.OemPlus:
             case ConsoleKey.OemMinus:
-                if (keyInfo.KeyChar == 0) {
+                if (keyInfo.KeyChar == 0)
+                {
                     return KeyCode.Null;
                 }
 
@@ -268,15 +311,20 @@ public class FakeDriver : ConsoleDriver {
         }
 
         ConsoleKey key = keyInfo.Key;
-        if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
+
+        if (key >= ConsoleKey.A && key <= ConsoleKey.Z)
+        {
             int delta = key - ConsoleKey.A;
-            if (keyInfo.KeyChar != (uint)key) {
+
+            if (keyInfo.KeyChar != (uint)key)
+            {
                 return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
             }
 
             if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control)
                 || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)
-                || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Shift)) {
+                || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Shift))
+            {
                 return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.A + delta));
             }
 
@@ -290,8 +338,10 @@ public class FakeDriver : ConsoleDriver {
 
     private CursorVisibility _savedCursorVisibility;
 
-    private void MockKeyPressedHandler (ConsoleKeyInfo consoleKeyInfo) {
-        if (consoleKeyInfo.Key == ConsoleKey.Packet) {
+    private void MockKeyPressedHandler (ConsoleKeyInfo consoleKeyInfo)
+    {
+        if (consoleKeyInfo.Key == ConsoleKey.Packet)
+        {
             consoleKeyInfo = ConsoleKeyMapping.DecodeVKPacketToKConsoleKeyInfo (consoleKeyInfo);
         }
 
@@ -303,7 +353,8 @@ public class FakeDriver : ConsoleDriver {
     }
 
     /// <inheritdoc/>
-    public override bool GetCursorVisibility (out CursorVisibility visibility) {
+    public override bool GetCursorVisibility (out CursorVisibility visibility)
+    {
         visibility = FakeConsole.CursorVisible
                          ? CursorVisibility.Default
                          : CursorVisibility.Invisible;
@@ -312,15 +363,18 @@ public class FakeDriver : ConsoleDriver {
     }
 
     /// <inheritdoc/>
-    public override bool SetCursorVisibility (CursorVisibility visibility) {
+    public override bool SetCursorVisibility (CursorVisibility visibility)
+    {
         _savedCursorVisibility = visibility;
 
         return FakeConsole.CursorVisible = visibility == CursorVisibility.Default;
     }
 
     /// <inheritdoc/>
-    public override bool EnsureCursorVisibility () {
-        if (!(Col >= 0 && Row >= 0 && Col < Cols && Row < Rows)) {
+    public override bool EnsureCursorVisibility ()
+    {
+        if (!(Col >= 0 && Row >= 0 && Col < Cols && Row < Rows))
+        {
             GetCursorVisibility (out CursorVisibility cursorVisibility);
             _savedCursorVisibility = cursorVisibility;
             SetCursorVisibility (CursorVisibility.Invisible);
@@ -333,11 +387,13 @@ public class FakeDriver : ConsoleDriver {
         return FakeConsole.CursorVisible;
     }
 
-    public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control) {
+    public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
+    {
         MockKeyPressedHandler (new ConsoleKeyInfo (keyChar, key, shift, alt, control));
     }
 
-    public void SetBufferSize (int width, int height) {
+    public void SetBufferSize (int width, int height)
+    {
         FakeConsole.SetBufferSize (width, height);
         Cols = width;
         Rows = height;
@@ -345,9 +401,12 @@ public class FakeDriver : ConsoleDriver {
         ProcessResize ();
     }
 
-    public void SetWindowSize (int width, int height) {
+    public void SetWindowSize (int width, int height)
+    {
         FakeConsole.SetWindowSize (width, height);
-        if (width != Cols || height != Rows) {
+
+        if (width != Cols || height != Rows)
+        {
             SetBufferSize (width, height);
             Cols = width;
             Rows = height;
@@ -356,8 +415,10 @@ public class FakeDriver : ConsoleDriver {
         ProcessResize ();
     }
 
-    public void SetWindowPosition (int left, int top) {
-        if (Left > 0 || Top > 0) {
+    public void SetWindowPosition (int left, int top)
+    {
+        if (Left > 0 || Top > 0)
+        {
             Left = 0;
             Top = 0;
         }
@@ -365,25 +426,31 @@ public class FakeDriver : ConsoleDriver {
         FakeConsole.SetWindowPosition (Left, Top);
     }
 
-    private void ProcessResize () {
+    private void ProcessResize ()
+    {
         ResizeScreen ();
         ClearContents ();
         OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
     }
 
-    public virtual void ResizeScreen () {
-        if (FakeConsole.WindowHeight > 0) {
+    public virtual void ResizeScreen ()
+    {
+        if (FakeConsole.WindowHeight > 0)
+        {
             // Can raise an exception while is still resizing.
-            try {
+            try
+            {
                 FakeConsole.CursorTop = 0;
                 FakeConsole.CursorLeft = 0;
                 FakeConsole.WindowTop = 0;
                 FakeConsole.WindowLeft = 0;
             }
-            catch (IOException) {
+            catch (IOException)
+            {
                 return;
             }
-            catch (ArgumentOutOfRangeException) {
+            catch (ArgumentOutOfRangeException)
+            {
                 return;
             }
         }
@@ -391,60 +458,76 @@ public class FakeDriver : ConsoleDriver {
         Clip = new Rect (0, 0, Cols, Rows);
     }
 
-    public override void UpdateCursor () {
-        if (!EnsureCursorVisibility ()) {
+    public override void UpdateCursor ()
+    {
+        if (!EnsureCursorVisibility ())
+        {
             return;
         }
 
         // Prevents the exception of size changing during resizing.
-        try {
+        try
+        {
             // BUGBUG: Why is this using BufferWidth/Height and now Cols/Rows?
-            if (Col >= 0 && Col < FakeConsole.BufferWidth && Row >= 0 && Row < FakeConsole.BufferHeight) {
+            if (Col >= 0 && Col < FakeConsole.BufferWidth && Row >= 0 && Row < FakeConsole.BufferHeight)
+            {
                 FakeConsole.SetCursorPosition (Col, Row);
             }
         }
-        catch (IOException) { }
-        catch (ArgumentOutOfRangeException) { }
+        catch (IOException)
+        { }
+        catch (ArgumentOutOfRangeException)
+        { }
     }
 
     #region Not Implemented
 
-    public override void Suspend () {
+    public override void Suspend ()
+    {
         //throw new NotImplementedException ();
     }
 
     #endregion
 
-    public class FakeClipboard : ClipboardBase {
+    public class FakeClipboard : ClipboardBase
+    {
         public FakeClipboard (
             bool fakeClipboardThrowsNotSupportedException = false,
             bool isSupportedAlwaysFalse = false
-        ) {
+        )
+        {
             _isSupportedAlwaysFalse = isSupportedAlwaysFalse;
-            if (fakeClipboardThrowsNotSupportedException) {
+
+            if (fakeClipboardThrowsNotSupportedException)
+            {
                 FakeException = new NotSupportedException ("Fake clipboard exception");
             }
         }
 
         private readonly bool _isSupportedAlwaysFalse;
-        public Exception FakeException;
         private string _contents = string.Empty;
+        public Exception FakeException;
         public override bool IsSupported => !_isSupportedAlwaysFalse;
 
-        protected override string GetClipboardDataImpl () {
-            if (FakeException != null) {
+        protected override string GetClipboardDataImpl ()
+        {
+            if (FakeException != null)
+            {
                 throw FakeException;
             }
 
             return _contents;
         }
 
-        protected override void SetClipboardDataImpl (string text) {
-            if (text == null) {
+        protected override void SetClipboardDataImpl (string text)
+        {
+            if (text == null)
+            {
                 throw new ArgumentNullException (nameof (text));
             }
 
-            if (FakeException != null) {
+            if (FakeException != null)
+            {
                 throw FakeException;
             }
 

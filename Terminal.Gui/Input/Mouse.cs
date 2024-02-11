@@ -3,7 +3,8 @@ namespace Terminal.Gui;
 /// <summary>Mouse flags reported in <see cref="MouseEvent"/>.</summary>
 /// <remarks>They just happen to map to the ncurses ones.</remarks>
 [Flags]
-public enum MouseFlags {
+public enum MouseFlags
+{
     /// <summary>The first mouse button was pressed.</summary>
     Button1Pressed = 0x2,
 
@@ -95,18 +96,19 @@ public enum MouseFlags {
 // TODO: Merge MouseEvent and MouseEventEventArgs into a single class.
 
 /// <summary>
-///     Low-level construct that conveys the details of mouse events, such as coordinates and button state, from
-///     ConsoleDrivers up to <see cref="Application"/> and Views.
+///     Low-level construct that conveys the details of mouse events, such as coordinates and button state, from ConsoleDrivers up to
+///     <see cref="Application"/> and Views.
 /// </summary>
 /// <remarks>
-///     The <see cref="Application"/> class includes the <see cref="Application.MouseEvent"/> Action which takes a
-///     MouseEvent argument.
+///     The <see cref="Application"/> class includes the <see cref="Application.MouseEvent"/> Action which takes a MouseEvent argument.
 /// </remarks>
-public class MouseEvent {
+public class MouseEvent
+{
+    /// <summary>Flags indicating the kind of mouse event that is being posted.</summary>
+    public MouseFlags Flags { get; set; }
+
     /// <summary>
-    ///     Indicates if the current mouse event has already been processed and the driver should stop notifying any other
-    ///     event subscriber. Its important to set this value to true specially when updating any View's layout from inside the
-    ///     subscriber method.
+    ///     Indicates if the current mouse event has already been processed and the driver should stop notifying any other event subscriber. Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
     /// </summary>
     public bool Handled { get; set; }
 
@@ -116,19 +118,16 @@ public class MouseEvent {
     /// <summary>The offset Y (column) location for the mouse event.</summary>
     public int OfY { get; set; }
 
+    /// <summary>The current view at the location for the mouse event.</summary>
+    public View View { get; set; }
+
     /// <summary>The X (column) location for the mouse event.</summary>
     public int X { get; set; }
 
     /// <summary>The Y (column) location for the mouse event.</summary>
     public int Y { get; set; }
 
-    /// <summary>Flags indicating the kind of mouse event that is being posted.</summary>
-    public MouseFlags Flags { get; set; }
-
-    /// <summary>The current view at the location for the mouse event.</summary>
-    public View View { get; set; }
-
     /// <summary>Returns a <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</summary>
     /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</returns>
-    public override string ToString () => $"({X},{Y}):{Flags}";
+    public override string ToString () { return $"({X},{Y}):{Flags}"; }
 }

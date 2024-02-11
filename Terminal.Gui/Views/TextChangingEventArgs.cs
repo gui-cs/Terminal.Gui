@@ -8,7 +8,8 @@
 namespace Terminal.Gui;
 
 /// <summary>An <see cref="EventArgs"/> which allows passing a cancelable new text value event.</summary>
-public class TextChangingEventArgs : EventArgs {
+public class TextChangingEventArgs : EventArgs
+{
     /// <summary>Initializes a new instance of <see cref="TextChangingEventArgs"/></summary>
     /// <param name="newText">The new <see cref="TextField.Text"/> to be replaced.</param>
     public TextChangingEventArgs (string newText) { NewText = newText; }

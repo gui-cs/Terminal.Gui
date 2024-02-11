@@ -1,8 +1,10 @@
 namespace Terminal.Gui.ViewsTests;
 
-public class TimeFieldTests {
+public class TimeFieldTests
+{
     [Fact]
-    public void Constructors_Defaults () {
+    public void Constructors_Defaults ()
+    {
         var tf = new TimeField ();
         Assert.False (tf.IsShortFormat);
         Assert.Equal (TimeSpan.MinValue, tf.Time);
@@ -35,7 +37,8 @@ public class TimeFieldTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void Copy_Paste () {
+    public void Copy_Paste ()
+    {
         var tf1 = new TimeField { Time = TimeSpan.Parse ("12:12:19") };
         var tf2 = new TimeField { Time = TimeSpan.Parse ("12:59:01") };
 
@@ -55,7 +58,8 @@ public class TimeFieldTests {
     }
 
     [Fact]
-    public void CursorPosition_Min_Is_Always_One_Max_Is_Always_Max_Format () {
+    public void CursorPosition_Min_Is_Always_One_Max_Is_Always_Max_Format ()
+    {
         var tf = new TimeField ();
         Assert.Equal (1, tf.CursorPosition);
         tf.CursorPosition = 0;
@@ -70,7 +74,8 @@ public class TimeFieldTests {
     }
 
     [Fact]
-    public void CursorPosition_Min_Is_Always_One_Max_Is_Always_Max_Format_After_Selection () {
+    public void CursorPosition_Min_Is_Always_One_Max_Is_Always_Max_Format_After_Selection ()
+    {
         var tf = new TimeField ();
 
         // Start selection
@@ -112,7 +117,8 @@ public class TimeFieldTests {
     }
 
     [Fact]
-    public void KeyBindings_Command () {
+    public void KeyBindings_Command ()
+    {
         var tf = new TimeField { Time = TimeSpan.Parse ("12:12:19") };
         tf.BeginInit ();
         tf.EndInit ();
@@ -159,7 +165,8 @@ public class TimeFieldTests {
     }
 
     [Fact]
-    public void Typing_With_Selection_Normalize_Format () {
+    public void Typing_With_Selection_Normalize_Format ()
+    {
         var tf = new TimeField { Time = TimeSpan.Parse ("12:12:19") };
 
         // Start selection at before the first separator :

@@ -8,63 +8,74 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Threading", "Demonstration of how to use threading in different ways")]
 [ScenarioCategory ("Threading")]
-public class Threading : Scenario {
+public class Threading : Scenario
+{
     private readonly List<string> _log = [];
     private Action _action;
-    private Action _lambda;
-    private Action _sync;
     private Button _btnActionCancel;
     private CancellationTokenSource _cancellationTokenSource;
     private EventHandler _handler;
     private ListView _itemsList;
+    private Action _lambda;
     private ListView _logJob;
+    private Action _sync;
 
-    public override void Setup () {
+    public override void Setup ()
+    {
         _action = LoadData;
-        _lambda = async () => {
-            _itemsList.Source = null;
-            LogJob ("Loading task lambda");
-            List<string> items = await LoadDataAsync ();
-            LogJob ("Returning from task lambda");
-            await _itemsList.SetSourceAsync (items);
-        };
-        _handler = async (s, e) => {
-            _itemsList.Source = null;
-            LogJob ("Loading task handler");
-            List<string> items = await LoadDataAsync ();
-            LogJob ("Returning from task handler");
-            await _itemsList.SetSourceAsync (items);
-        };
-        _sync = () => {
-            _itemsList.Source = null;
-            LogJob ("Loading task synchronous");
-            List<string> items =
-                ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
-            LogJob ("Returning from task synchronous");
-            _itemsList.SetSource (items);
-        };
+
+        _lambda = async () =>
+                  {
+                      _itemsList.Source = null;
+                      LogJob ("Loading task lambda");
+                      List<string> items = await LoadDataAsync ();
+                      LogJob ("Returning from task lambda");
+                      await _itemsList.SetSourceAsync (items);
+                  };
+
+        _handler = async (s, e) =>
+                   {
+                       _itemsList.Source = null;
+                       LogJob ("Loading task handler");
+                       List<string> items = await LoadDataAsync ();
+                       LogJob ("Returning from task handler");
+                       await _itemsList.SetSourceAsync (items);
+                   };
+
+        _sync = () =>
+                {
+                    _itemsList.Source = null;
+                    LogJob ("Loading task synchronous");
+
+                    List<string> items =
+                        ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+                    LogJob ("Returning from task synchronous");
+                    _itemsList.SetSource (items);
+                };
 
         _btnActionCancel = new Button { X = 1, Y = 1, Text = "Cancelable Load Items" };
         _btnActionCancel.Clicked += (s, e) => Application.Invoke (CallLoadItemsAsync);
 
         Win.Add (new Label { X = Pos.X (_btnActionCancel), Y = Pos.Y (_btnActionCancel) + 4, Text = "Data Items:" });
 
-        _itemsList = new ListView {
+        _itemsList = new ListView
+        {
             X = Pos.X (_btnActionCancel),
             Y = Pos.Y (_btnActionCancel) + 6,
             Width = 10,
             Height = 10,
-            ColorScheme = Colors.ColorSchemes["TopLevel"]
+            ColorScheme = Colors.ColorSchemes ["TopLevel"]
         };
 
         Win.Add (new Label { X = Pos.Right (_itemsList) + 10, Y = Pos.Y (_btnActionCancel) + 4, Text = "Task Logs:" });
 
-        _logJob = new ListView {
+        _logJob = new ListView
+        {
             X = Pos.Right (_itemsList) + 10,
             Y = Pos.Y (_itemsList),
             Width = 50,
             Height = Dim.Fill (),
-            ColorScheme = Colors.ColorSchemes["TopLevel"],
+            ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Source = new ListWrapper (_log)
         };
 
@@ -81,28 +92,31 @@ public class Threading : Scenario {
         var btnMethod = new Button { X = 80, Y = 18, Text = "Load Data Method" };
         btnMethod.Clicked += async (s, e) => await MethodAsync ();
         var btnClearData = new Button { X = 80, Y = 20, Text = "Clear Data" };
-        btnClearData.Clicked += (s, e) => {
-            _itemsList.Source = null;
-            LogJob ("Cleaning Data");
-        };
+
+        btnClearData.Clicked += (s, e) =>
+                                {
+                                    _itemsList.Source = null;
+                                    LogJob ("Cleaning Data");
+                                };
         var btnQuit = new Button { X = 80, Y = 22, Text = "Quit" };
         btnQuit.Clicked += (s, e) => Application.RequestStop ();
 
         Win.Add (
-            _itemsList,
-            _btnActionCancel,
-            _logJob,
-            text,
-            btnAction,
-            btnLambda,
-            btnHandler,
-            btnSync,
-            btnMethod,
-            btnClearData,
-            btnQuit
-        );
+                 _itemsList,
+                 _btnActionCancel,
+                 _logJob,
+                 text,
+                 btnAction,
+                 btnLambda,
+                 btnHandler,
+                 btnSync,
+                 btnMethod,
+                 btnClearData,
+                 btnQuit
+                );
 
-        void Top_Loaded (object sender, EventArgs args) {
+        void Top_Loaded (object sender, EventArgs args)
+        {
             _btnActionCancel.SetFocus ();
             Application.Top.Loaded -= Top_Loaded;
         }
@@ -110,43 +124,57 @@ public class Threading : Scenario {
         Application.Top.Loaded += Top_Loaded;
     }
 
-    private async void CallLoadItemsAsync () {
+    private async void CallLoadItemsAsync ()
+    {
         _cancellationTokenSource = new CancellationTokenSource ();
         _itemsList.Source = null;
         LogJob ("Clicked the button");
-        if (_btnActionCancel.Text != "Cancel") {
+
+        if (_btnActionCancel.Text != "Cancel")
+        {
             _btnActionCancel.Text = "Cancel";
-        } else {
+        }
+        else
+        {
             _btnActionCancel.Text = "Cancelable Load Items";
             await _cancellationTokenSource.CancelAsync ();
         }
 
-        try {
-            if (_cancellationTokenSource.Token.IsCancellationRequested) {
+        try
+        {
+            if (_cancellationTokenSource.Token.IsCancellationRequested)
+            {
                 _cancellationTokenSource.Token.ThrowIfCancellationRequested ();
             }
 
             LogJob ($"Calling task Thread:{Thread.CurrentThread.ManagedThreadId} {DateTime.Now}");
             List<string> items = await Task.Run (LoadItemsAsync, _cancellationTokenSource.Token);
-            if (!_cancellationTokenSource.IsCancellationRequested) {
+
+            if (!_cancellationTokenSource.IsCancellationRequested)
+            {
                 LogJob (
-                    $"Returned from task Thread:{Thread.CurrentThread.ManagedThreadId} {DateTime.Now}"
-                );
+                        $"Returned from task Thread:{Thread.CurrentThread.ManagedThreadId} {DateTime.Now}"
+                       );
                 await _itemsList.SetSourceAsync (items);
+
                 LogJob (
-                    $"Finished populate list view Thread:{Thread.CurrentThread.ManagedThreadId} {DateTime.Now}"
-                );
+                        $"Finished populate list view Thread:{Thread.CurrentThread.ManagedThreadId} {DateTime.Now}"
+                       );
                 _btnActionCancel.Text = "Cancelable Load Items";
-            } else {
+            }
+            else
+            {
                 LogJob ("Task was canceled!");
             }
         }
-        catch (OperationCanceledException ex) {
+        catch (OperationCanceledException ex)
+        {
             LogJob (ex.Message);
         }
     }
 
-    private async void LoadData () {
+    private async void LoadData ()
+    {
         _itemsList.Source = null;
         LogJob ("Loading task");
         List<string> items = await LoadDataAsync ();
@@ -154,34 +182,37 @@ public class Threading : Scenario {
         await _itemsList.SetSourceAsync (items);
     }
 
-    private async Task<List<string>> LoadDataAsync () {
+    private async Task<List<string>> LoadDataAsync ()
+    {
         _itemsList.Source = null;
         LogJob ("Starting delay");
         await Task.Delay (3000);
         LogJob ("Finished delay");
 
-        return [
-                   "One",
-                   "Two",
-                   "Three",
-                   "Four",
-                   "Five",
-                   "Six",
-                   "Seven",
-                   "Eight",
-                   "Nine",
-                   "Ten",
-                   "Four",
-                   "Five",
-                   "Six",
-                   "Seven",
-                   "Eight",
-                   "Nine",
-                   "Ten"
-               ];
+        return
+        [
+            "One",
+            "Two",
+            "Three",
+            "Four",
+            "Five",
+            "Six",
+            "Seven",
+            "Eight",
+            "Nine",
+            "Ten",
+            "Four",
+            "Five",
+            "Six",
+            "Seven",
+            "Eight",
+            "Nine",
+            "Ten"
+        ];
     }
 
-    private async Task<List<string>> LoadItemsAsync () {
+    private async Task<List<string>> LoadItemsAsync ()
+    {
         // Do something that takes lot of times.
         LogJob ($"Starting delay Thread:{Thread.CurrentThread.ManagedThreadId} {DateTime.Now}");
         await Task.Delay (5000);
@@ -190,12 +221,14 @@ public class Threading : Scenario {
         return ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
     }
 
-    private void LogJob (string job) {
+    private void LogJob (string job)
+    {
         _log.Add (job);
         _logJob.MoveDown ();
     }
 
-    private async Task MethodAsync () {
+    private async Task MethodAsync ()
+    {
         _itemsList.Source = null;
         LogJob ("Loading task method");
         List<string> items = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];

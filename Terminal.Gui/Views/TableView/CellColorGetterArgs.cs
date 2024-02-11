@@ -4,7 +4,8 @@
 ///     Arguments for a <see cref="CellColorGetterDelegate"/>.  Describes a cell for which a rendering
 ///     <see cref="ColorScheme"/> is being sought
 /// </summary>
-public class CellColorGetterArgs {
+public class CellColorGetterArgs
+{
     internal CellColorGetterArgs (
         ITableSource table,
         int rowIdx,
@@ -12,7 +13,8 @@ public class CellColorGetterArgs {
         object cellValue,
         string representation,
         ColorScheme rowScheme
-    ) {
+    )
+    {
         Table = table;
         RowIndex = rowIdx;
         ColIdex = colIdx;
@@ -21,21 +23,21 @@ public class CellColorGetterArgs {
         RowScheme = rowScheme;
     }
 
-    /// <summary>the color scheme that is going to be used to render the cell if no cell specific color scheme is returned</summary>
-    public ColorScheme RowScheme { get; }
+    /// <summary>The hard typed value being rendered in the cell for which color is needed</summary>
+    public object CellValue { get; }
 
     /// <summary>The index of column in <see cref="Table"/> for which color is needed</summary>
     public int ColIdex { get; }
 
+    /// <summary>The textual representation of <see cref="CellValue"/> (what will actually be drawn to the screen)</summary>
+    public string Representation { get; }
+
     /// <summary>The index of the row in <see cref="Table"/> for which color is needed</summary>
     public int RowIndex { get; }
 
+    /// <summary>the color scheme that is going to be used to render the cell if no cell specific color scheme is returned</summary>
+    public ColorScheme RowScheme { get; }
+
     /// <summary>The data table hosted by the <see cref="TableView"/> control.</summary>
     public ITableSource Table { get; }
-
-    /// <summary>The hard typed value being rendered in the cell for which color is needed</summary>
-    public object CellValue { get; }
-
-    /// <summary>The textual representation of <see cref="CellValue"/> (what will actually be drawn to the screen)</summary>
-    public string Representation { get; }
 }

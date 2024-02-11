@@ -1,11 +1,13 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     Arguments for <see cref="RowColorGetterDelegate"/>. Describes a row of data in a <see cref="ITableSource"/> for
-///     which <see cref="ColorScheme"/> is sought.
+///     Arguments for <see cref="RowColorGetterDelegate"/>. Describes a row of data in a <see cref="ITableSource"/> for which
+///     <see cref="ColorScheme"/> is sought.
 /// </summary>
-public class RowColorGetterArgs {
-    internal RowColorGetterArgs (ITableSource table, int rowIdx) {
+public class RowColorGetterArgs
+{
+    internal RowColorGetterArgs (ITableSource table, int rowIdx)
+    {
         Table = table;
         RowIndex = rowIdx;
     }

@@ -9,7 +9,8 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("FileDialog", "Demonstrates how to the FileDialog class")]
 [ScenarioCategory ("Dialogs")]
 [ScenarioCategory ("Files and IO")]
-public class FileDialogExamples : Scenario {
+public class FileDialogExamples : Scenario
+{
     private CheckBox _cbAllowMultipleSelection;
     private CheckBox _cbAlwaysTableShowHeaders;
     private CheckBox _cbCaseSensitive;
@@ -25,7 +26,8 @@ public class FileDialogExamples : Scenario {
     private TextField _tbCancelButton;
     private TextField _tbOkButton;
 
-    public override void Setup () {
+    public override void Setup ()
+    {
         var y = 0;
         var x = 1;
 
@@ -54,36 +56,36 @@ public class FileDialogExamples : Scenario {
         x = 24;
 
         Win.Add (
-            new LineView (Orientation.Vertical) { X = x++, Y = 1, Height = 4 }
-        );
+                 new LineView (Orientation.Vertical) { X = x++, Y = 1, Height = 4 }
+                );
         Win.Add (new Label { X = x++, Y = y++, Text = "Caption" });
 
         _rgCaption = new RadioGroup { X = x, Y = y };
-        _rgCaption.RadioLabels = new[] { "Ok", "Open", "Save" };
+        _rgCaption.RadioLabels = new [] { "Ok", "Open", "Save" };
         Win.Add (_rgCaption);
 
         y = 0;
         x = 34;
 
         Win.Add (
-            new LineView (Orientation.Vertical) { X = x++, Y = 1, Height = 4 }
-        );
+                 new LineView (Orientation.Vertical) { X = x++, Y = 1, Height = 4 }
+                );
         Win.Add (new Label { X = x++, Y = y++, Text = "OpenMode" });
 
         _rgOpenMode = new RadioGroup { X = x, Y = y };
-        _rgOpenMode.RadioLabels = new[] { "File", "Directory", "Mixed" };
+        _rgOpenMode.RadioLabels = new [] { "File", "Directory", "Mixed" };
         Win.Add (_rgOpenMode);
 
         y = 0;
         x = 48;
 
         Win.Add (
-            new LineView (Orientation.Vertical) { X = x++, Y = 1, Height = 4 }
-        );
+                 new LineView (Orientation.Vertical) { X = x++, Y = 1, Height = 4 }
+                );
         Win.Add (new Label { X = x++, Y = y++, Text = "Icons" });
 
         _rgIcons = new RadioGroup { X = x, Y = y };
-        _rgIcons.RadioLabels = new[] { "None", "Unicode", "Nerd*" };
+        _rgIcons.RadioLabels = new [] { "None", "Unicode", "Nerd*" };
         Win.Add (_rgIcons);
 
         Win.Add (new Label { Y = Pos.AnchorEnd (2), Text = "* Requires installing Nerd fonts" });
@@ -93,20 +95,20 @@ public class FileDialogExamples : Scenario {
         x = 24;
 
         Win.Add (
-            new LineView (Orientation.Vertical) { X = x++, Y = y + 1, Height = 4 }
-        );
+                 new LineView (Orientation.Vertical) { X = x++, Y = y + 1, Height = 4 }
+                );
         Win.Add (new Label { X = x++, Y = y++, Text = "Allowed" });
 
         _rgAllowedTypes = new RadioGroup { X = x, Y = y };
-        _rgAllowedTypes.RadioLabels = new[] { "Any", "Csv (Recommended)", "Csv (Strict)" };
+        _rgAllowedTypes.RadioLabels = new [] { "Any", "Csv (Recommended)", "Csv (Strict)" };
         Win.Add (_rgAllowedTypes);
 
         y = 5;
         x = 45;
 
         Win.Add (
-            new LineView (Orientation.Vertical) { X = x++, Y = y + 1, Height = 4 }
-        );
+                 new LineView (Orientation.Vertical) { X = x++, Y = y + 1, Height = 4 }
+                );
         Win.Add (new Label { X = x++, Y = y++, Text = "Buttons" });
 
         Win.Add (new Label { X = x, Y = y++, Text = "Ok Text:" });
@@ -124,35 +126,42 @@ public class FileDialogExamples : Scenario {
         Win.Add (btn);
     }
 
-    private void ConfirmOverwrite (object sender, FilesSelectedEventArgs e) {
-        if (!string.IsNullOrWhiteSpace (e.Dialog.Path)) {
-            if (File.Exists (e.Dialog.Path)) {
+    private void ConfirmOverwrite (object sender, FilesSelectedEventArgs e)
+    {
+        if (!string.IsNullOrWhiteSpace (e.Dialog.Path))
+        {
+            if (File.Exists (e.Dialog.Path))
+            {
                 int result = MessageBox.Query ("Overwrite?", "File already exists", "Yes", "No");
                 e.Cancel = result == 1;
             }
         }
     }
 
-    private void CreateDialog () {
-        var fd = new FileDialog {
+    private void CreateDialog ()
+    {
+        var fd = new FileDialog
+        {
             OpenMode = Enum.Parse<OpenMode> (
-                _rgOpenMode.RadioLabels[_rgOpenMode.SelectedItem]
-            ),
+                                             _rgOpenMode.RadioLabels [_rgOpenMode.SelectedItem]
+                                            ),
             MustExist = _cbMustExist.Checked ?? false,
             AllowsMultipleSelection = _cbAllowMultipleSelection.Checked ?? false
         };
 
-        fd.Style.OkButtonText = _rgCaption.RadioLabels[_rgCaption.SelectedItem];
+        fd.Style.OkButtonText = _rgCaption.RadioLabels [_rgCaption.SelectedItem];
 
         // If Save style dialog then give them an overwrite prompt
-        if (_rgCaption.SelectedItem == 2) {
+        if (_rgCaption.SelectedItem == 2)
+        {
             fd.FilesSelected += ConfirmOverwrite;
         }
 
         fd.Style.IconProvider.UseUnicodeCharacters = _rgIcons.SelectedItem == 1;
         fd.Style.IconProvider.UseNerdIcons = _rgIcons.SelectedItem == 2;
 
-        if (_cbCaseSensitive.Checked ?? false) {
+        if (_cbCaseSensitive.Checked ?? false)
+        {
             fd.SearchMatcher = new CaseSensitiveSearchMatcher ();
         }
 
@@ -163,70 +172,83 @@ public class FileDialogExamples : Scenario {
 
         IDirectoryInfoFactory dirInfoFactory = new FileSystem ().DirectoryInfo;
 
-        if (_cbDrivesOnlyInTree.Checked ?? false) {
-            fd.Style.TreeRootGetter = () => {
-                return Environment.GetLogicalDrives ().ToDictionary (dirInfoFactory.New, k => k);
-            };
+        if (_cbDrivesOnlyInTree.Checked ?? false)
+        {
+            fd.Style.TreeRootGetter = () => { return Environment.GetLogicalDrives ().ToDictionary (dirInfoFactory.New, k => k); };
         }
 
-        if (_rgAllowedTypes.SelectedItem > 0) {
+        if (_rgAllowedTypes.SelectedItem > 0)
+        {
             fd.AllowedTypes.Add (new AllowedType ("Data File", ".csv", ".tsv"));
 
-            if (_rgAllowedTypes.SelectedItem == 1) {
+            if (_rgAllowedTypes.SelectedItem == 1)
+            {
                 fd.AllowedTypes.Insert (1, new AllowedTypeAny ());
             }
         }
 
-        if (!string.IsNullOrWhiteSpace (_tbOkButton.Text)) {
+        if (!string.IsNullOrWhiteSpace (_tbOkButton.Text))
+        {
             fd.Style.OkButtonText = _tbOkButton.Text;
         }
 
-        if (!string.IsNullOrWhiteSpace (_tbCancelButton.Text)) {
+        if (!string.IsNullOrWhiteSpace (_tbCancelButton.Text))
+        {
             fd.Style.CancelButtonText = _tbCancelButton.Text;
         }
 
-        if (_cbFlipButtonOrder.Checked ?? false) {
+        if (_cbFlipButtonOrder.Checked ?? false)
+        {
             fd.Style.FlipOkCancelButtonLayoutOrder = true;
         }
 
         Application.Run (fd);
 
-        if (fd.Canceled) {
+        if (fd.Canceled)
+        {
             MessageBox.Query (
-                "Canceled",
-                "You canceled navigation and did not pick anything",
-                "Ok"
-            );
-        } else if (_cbAllowMultipleSelection.Checked ?? false) {
+                              "Canceled",
+                              "You canceled navigation and did not pick anything",
+                              "Ok"
+                             );
+        }
+        else if (_cbAllowMultipleSelection.Checked ?? false)
+        {
             MessageBox.Query (
-                "Chosen!",
-                "You chose:" + Environment.NewLine +
-                string.Join (Environment.NewLine, fd.MultiSelected.Select (m => m)),
-                "Ok"
-            );
-        } else {
+                              "Chosen!",
+                              "You chose:" + Environment.NewLine + string.Join (Environment.NewLine, fd.MultiSelected.Select (m => m)),
+                              "Ok"
+                             );
+        }
+        else
+        {
             MessageBox.Query (
-                "Chosen!",
-                "You chose:" + Environment.NewLine + fd.Path,
-                "Ok"
-            );
+                              "Chosen!",
+                              "You chose:" + Environment.NewLine + fd.Path,
+                              "Ok"
+                             );
         }
     }
 
-    private void SetupHandler (Button btn) {
-        btn.Clicked += (s, e) => {
-            try {
-                CreateDialog ();
-            }
-            catch (Exception ex) {
-                MessageBox.ErrorQuery ("Error", ex.ToString (), "Ok");
-            }
-        };
+    private void SetupHandler (Button btn)
+    {
+        btn.Clicked += (s, e) =>
+                       {
+                           try
+                           {
+                               CreateDialog ();
+                           }
+                           catch (Exception ex)
+                           {
+                               MessageBox.ErrorQuery ("Error", ex.ToString (), "Ok");
+                           }
+                       };
     }
 
-    private class CaseSensitiveSearchMatcher : ISearchMatcher {
+    private class CaseSensitiveSearchMatcher : ISearchMatcher
+    {
         private string _terms;
         public void Initialize (string terms) { _terms = terms; }
-        public bool IsMatch (IFileSystemInfo f) => f.Name.Contains (_terms, StringComparison.CurrentCulture);
+        public bool IsMatch (IFileSystemInfo f) { return f.Name.Contains (_terms, StringComparison.CurrentCulture); }
     }
 }

@@ -3,278 +3,279 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.DrawingTests;
 
-public class LineCanvasTests {
-    public LineCanvasTests (ITestOutputHelper output) { this.output = output; }
+public class LineCanvasTests
+{
     private readonly ITestOutputHelper output;
+    public LineCanvasTests (ITestOutputHelper output) { this.output = output; }
 
     [Theory]
     [AutoInitShutdown]
 
     // Horizontal lines with a vertical zero-length
     [InlineData (
-        0,
-        0,
-        1,
-        Orientation.Horizontal,
-        LineStyle.Double,
-        0,
-        0,
-        0,
-        Orientation.Vertical,
-        LineStyle.Single,
-        "╞"
-    )]
+                    0,
+                    0,
+                    1,
+                    Orientation.Horizontal,
+                    LineStyle.Double,
+                    0,
+                    0,
+                    0,
+                    Orientation.Vertical,
+                    LineStyle.Single,
+                    "╞"
+                )]
     [InlineData (
-        0,
-        0,
-        -1,
-        Orientation.Horizontal,
-        LineStyle.Double,
-        0,
-        0,
-        0,
-        Orientation.Vertical,
-        LineStyle.Single,
-        "╡"
-    )]
+                    0,
+                    0,
+                    -1,
+                    Orientation.Horizontal,
+                    LineStyle.Double,
+                    0,
+                    0,
+                    0,
+                    Orientation.Vertical,
+                    LineStyle.Single,
+                    "╡"
+                )]
     [InlineData (
-        0,
-        0,
-        1,
-        Orientation.Horizontal,
-        LineStyle.Single,
-        0,
-        0,
-        0,
-        Orientation.Vertical,
-        LineStyle.Double,
-        "╟"
-    )]
+                    0,
+                    0,
+                    1,
+                    Orientation.Horizontal,
+                    LineStyle.Single,
+                    0,
+                    0,
+                    0,
+                    Orientation.Vertical,
+                    LineStyle.Double,
+                    "╟"
+                )]
     [InlineData (
-        0,
-        0,
-        -1,
-        Orientation.Horizontal,
-        LineStyle.Single,
-        0,
-        0,
-        0,
-        Orientation.Vertical,
-        LineStyle.Double,
-        "╢"
-    )]
+                    0,
+                    0,
+                    -1,
+                    Orientation.Horizontal,
+                    LineStyle.Single,
+                    0,
+                    0,
+                    0,
+                    Orientation.Vertical,
+                    LineStyle.Double,
+                    "╢"
+                )]
     [InlineData (
-        0,
-        0,
-        1,
-        Orientation.Horizontal,
-        LineStyle.Single,
-        0,
-        0,
-        0,
-        Orientation.Vertical,
-        LineStyle.Single,
-        "├"
-    )]
+                    0,
+                    0,
+                    1,
+                    Orientation.Horizontal,
+                    LineStyle.Single,
+                    0,
+                    0,
+                    0,
+                    Orientation.Vertical,
+                    LineStyle.Single,
+                    "├"
+                )]
     [InlineData (
-        0,
-        0,
-        -1,
-        Orientation.Horizontal,
-        LineStyle.Single,
-        0,
-        0,
-        0,
-        Orientation.Vertical,
-        LineStyle.Single,
-        "┤"
-    )]
+                    0,
+                    0,
+                    -1,
+                    Orientation.Horizontal,
+                    LineStyle.Single,
+                    0,
+                    0,
+                    0,
+                    Orientation.Vertical,
+                    LineStyle.Single,
+                    "┤"
+                )]
     [InlineData (
-        0,
-        0,
-        1,
-        Orientation.Horizontal,
-        LineStyle.Double,
-        0,
-        0,
-        0,
-        Orientation.Vertical,
-        LineStyle.Double,
-        "╠"
-    )]
+                    0,
+                    0,
+                    1,
+                    Orientation.Horizontal,
+                    LineStyle.Double,
+                    0,
+                    0,
+                    0,
+                    Orientation.Vertical,
+                    LineStyle.Double,
+                    "╠"
+                )]
     [InlineData (
-        0,
-        0,
-        -1,
-        Orientation.Horizontal,
-        LineStyle.Double,
-        0,
-        0,
-        0,
-        Orientation.Vertical,
-        LineStyle.Double,
-        "╣"
-    )]
+                    0,
+                    0,
+                    -1,
+                    Orientation.Horizontal,
+                    LineStyle.Double,
+                    0,
+                    0,
+                    0,
+                    Orientation.Vertical,
+                    LineStyle.Double,
+                    "╣"
+                )]
 
     // Vertical lines with a horizontal zero-length
     [InlineData (
-        0,
-        0,
-        1,
-        Orientation.Vertical,
-        LineStyle.Double,
-        0,
-        0,
-        0,
-        Orientation.Horizontal,
-        LineStyle.Single,
-        "╥"
-    )]
+                    0,
+                    0,
+                    1,
+                    Orientation.Vertical,
+                    LineStyle.Double,
+                    0,
+                    0,
+                    0,
+                    Orientation.Horizontal,
+                    LineStyle.Single,
+                    "╥"
+                )]
     [InlineData (
-        0,
-        0,
-        -1,
-        Orientation.Vertical,
-        LineStyle.Double,
-        0,
-        0,
-        0,
-        Orientation.Horizontal,
-        LineStyle.Single,
-        "╨"
-    )]
+                    0,
+                    0,
+                    -1,
+                    Orientation.Vertical,
+                    LineStyle.Double,
+                    0,
+                    0,
+                    0,
+                    Orientation.Horizontal,
+                    LineStyle.Single,
+                    "╨"
+                )]
     [InlineData (
-        0,
-        0,
-        1,
-        Orientation.Vertical,
-        LineStyle.Single,
-        0,
-        0,
-        0,
-        Orientation.Horizontal,
-        LineStyle.Double,
-        "╤"
-    )]
+                    0,
+                    0,
+                    1,
+                    Orientation.Vertical,
+                    LineStyle.Single,
+                    0,
+                    0,
+                    0,
+                    Orientation.Horizontal,
+                    LineStyle.Double,
+                    "╤"
+                )]
     [InlineData (
-        0,
-        0,
-        -1,
-        Orientation.Vertical,
-        LineStyle.Single,
-        0,
-        0,
-        0,
-        Orientation.Horizontal,
-        LineStyle.Double,
-        "╧"
-    )]
+                    0,
+                    0,
+                    -1,
+                    Orientation.Vertical,
+                    LineStyle.Single,
+                    0,
+                    0,
+                    0,
+                    Orientation.Horizontal,
+                    LineStyle.Double,
+                    "╧"
+                )]
     [InlineData (
-        0,
-        0,
-        1,
-        Orientation.Vertical,
-        LineStyle.Single,
-        0,
-        0,
-        0,
-        Orientation.Horizontal,
-        LineStyle.Single,
-        "┬"
-    )]
+                    0,
+                    0,
+                    1,
+                    Orientation.Vertical,
+                    LineStyle.Single,
+                    0,
+                    0,
+                    0,
+                    Orientation.Horizontal,
+                    LineStyle.Single,
+                    "┬"
+                )]
     [InlineData (
-        0,
-        0,
-        -1,
-        Orientation.Vertical,
-        LineStyle.Single,
-        0,
-        0,
-        0,
-        Orientation.Horizontal,
-        LineStyle.Single,
-        "┴"
-    )]
+                    0,
+                    0,
+                    -1,
+                    Orientation.Vertical,
+                    LineStyle.Single,
+                    0,
+                    0,
+                    0,
+                    Orientation.Horizontal,
+                    LineStyle.Single,
+                    "┴"
+                )]
     [InlineData (
-        0,
-        0,
-        1,
-        Orientation.Vertical,
-        LineStyle.Double,
-        0,
-        0,
-        0,
-        Orientation.Horizontal,
-        LineStyle.Double,
-        "╦"
-    )]
+                    0,
+                    0,
+                    1,
+                    Orientation.Vertical,
+                    LineStyle.Double,
+                    0,
+                    0,
+                    0,
+                    Orientation.Horizontal,
+                    LineStyle.Double,
+                    "╦"
+                )]
     [InlineData (
-        0,
-        0,
-        -1,
-        Orientation.Vertical,
-        LineStyle.Double,
-        0,
-        0,
-        0,
-        Orientation.Horizontal,
-        LineStyle.Double,
-        "╩"
-    )]
+                    0,
+                    0,
+                    -1,
+                    Orientation.Vertical,
+                    LineStyle.Double,
+                    0,
+                    0,
+                    0,
+                    Orientation.Horizontal,
+                    LineStyle.Double,
+                    "╩"
+                )]
 
     // Crosses (two zero-length)
     [InlineData (
-        0,
-        0,
-        0,
-        Orientation.Vertical,
-        LineStyle.Double,
-        0,
-        0,
-        0,
-        Orientation.Horizontal,
-        LineStyle.Single,
-        "╫"
-    )]
+                    0,
+                    0,
+                    0,
+                    Orientation.Vertical,
+                    LineStyle.Double,
+                    0,
+                    0,
+                    0,
+                    Orientation.Horizontal,
+                    LineStyle.Single,
+                    "╫"
+                )]
     [InlineData (
-        0,
-        0,
-        0,
-        Orientation.Vertical,
-        LineStyle.Single,
-        0,
-        0,
-        0,
-        Orientation.Horizontal,
-        LineStyle.Double,
-        "╪"
-    )]
+                    0,
+                    0,
+                    0,
+                    Orientation.Vertical,
+                    LineStyle.Single,
+                    0,
+                    0,
+                    0,
+                    Orientation.Horizontal,
+                    LineStyle.Double,
+                    "╪"
+                )]
     [InlineData (
-        0,
-        0,
-        0,
-        Orientation.Vertical,
-        LineStyle.Single,
-        0,
-        0,
-        0,
-        Orientation.Horizontal,
-        LineStyle.Single,
-        "┼"
-    )]
+                    0,
+                    0,
+                    0,
+                    Orientation.Vertical,
+                    LineStyle.Single,
+                    0,
+                    0,
+                    0,
+                    Orientation.Horizontal,
+                    LineStyle.Single,
+                    "┼"
+                )]
     [InlineData (
-        0,
-        0,
-        0,
-        Orientation.Vertical,
-        LineStyle.Double,
-        0,
-        0,
-        0,
-        Orientation.Horizontal,
-        LineStyle.Double,
-        "╬"
-    )]
+                    0,
+                    0,
+                    0,
+                    Orientation.Vertical,
+                    LineStyle.Double,
+                    0,
+                    0,
+                    0,
+                    Orientation.Horizontal,
+                    LineStyle.Double,
+                    "╬"
+                )]
     public void Add_2_Lines (
         int x1,
         int y1,
@@ -287,7 +288,8 @@ public class LineCanvasTests {
         Orientation o2,
         LineStyle s2,
         string expected
-    ) {
+    )
+    {
         View v = GetCanvas (out LineCanvas lc);
         v.Width = 10;
         v.Height = 10;
@@ -300,68 +302,68 @@ public class LineCanvasTests {
     }
 
     [InlineData (
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        1
-    )]
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    1
+                )]
     [InlineData (
-        0,
-        0,
-        1,
-        0,
-        0,
-        1,
-        1
-    )]
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    1,
+                    1
+                )]
     [InlineData (
-        0,
-        0,
-        2,
-        0,
-        0,
-        2,
-        2
-    )]
+                    0,
+                    0,
+                    2,
+                    0,
+                    0,
+                    2,
+                    2
+                )]
     [InlineData (
-        0,
-        0,
-        3,
-        0,
-        0,
-        3,
-        3
-    )]
+                    0,
+                    0,
+                    3,
+                    0,
+                    0,
+                    3,
+                    3
+                )]
     [InlineData (
-        0,
-        0,
-        -1,
-        0,
-        0,
-        1,
-        1
-    )]
+                    0,
+                    0,
+                    -1,
+                    0,
+                    0,
+                    1,
+                    1
+                )]
     [InlineData (
-        0,
-        0,
-        -2,
-        -1,
-        -1,
-        2,
-        2
-    )]
+                    0,
+                    0,
+                    -2,
+                    -1,
+                    -1,
+                    2,
+                    2
+                )]
     [InlineData (
-        0,
-        0,
-        -3,
-        -2,
-        -2,
-        3,
-        3
-    )]
+                    0,
+                    0,
+                    -3,
+                    -2,
+                    -2,
+                    3,
+                    3
+                )]
     [Theory]
     [SetupFakeDriver]
     public void Bounds_H_And_V_Lines_Both_Positive (
@@ -372,7 +374,8 @@ public class LineCanvasTests {
         int expectedY,
         int expectedWidth,
         int expectedHeight
-    ) {
+    )
+    {
         var canvas = new LineCanvas ();
         canvas.AddLine (new Point (x, y), length, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new Point (x, y), length, Orientation.Vertical, LineStyle.Single);
@@ -381,68 +384,68 @@ public class LineCanvasTests {
     }
 
     [InlineData (
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        1
-    )]
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    1
+                )]
     [InlineData (
-        0,
-        0,
-        1,
-        0,
-        0,
-        1,
-        1
-    )]
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    1,
+                    1
+                )]
     [InlineData (
-        0,
-        0,
-        2,
-        0,
-        0,
-        2,
-        1
-    )]
+                    0,
+                    0,
+                    2,
+                    0,
+                    0,
+                    2,
+                    1
+                )]
     [InlineData (
-        0,
-        0,
-        3,
-        0,
-        0,
-        3,
-        1
-    )]
+                    0,
+                    0,
+                    3,
+                    0,
+                    0,
+                    3,
+                    1
+                )]
     [InlineData (
-        0,
-        0,
-        -1,
-        0,
-        0,
-        1,
-        1
-    )]
+                    0,
+                    0,
+                    -1,
+                    0,
+                    0,
+                    1,
+                    1
+                )]
     [InlineData (
-        0,
-        0,
-        -2,
-        -1,
-        0,
-        2,
-        1
-    )]
+                    0,
+                    0,
+                    -2,
+                    -1,
+                    0,
+                    2,
+                    1
+                )]
     [InlineData (
-        0,
-        0,
-        -3,
-        -2,
-        0,
-        3,
-        1
-    )]
+                    0,
+                    0,
+                    -3,
+                    -2,
+                    0,
+                    3,
+                    1
+                )]
     [Theory]
     [SetupFakeDriver]
     public void Bounds_H_Line (
@@ -453,7 +456,8 @@ public class LineCanvasTests {
         int expectedY,
         int expectedWidth,
         int expectedHeight
-    ) {
+    )
+    {
         var canvas = new LineCanvas ();
         canvas.AddLine (new Point (x, y), length, Orientation.Horizontal, LineStyle.Single);
 
@@ -462,7 +466,8 @@ public class LineCanvasTests {
 
     [Fact]
     [SetupFakeDriver]
-    public void Bounds_Specific () {
+    public void Bounds_Specific ()
+    {
         // Draw at 1,1 within client area of View (i.e. leave a top and left margin of 1)
         // This proves we aren't drawing excess above
         var x = 1;
@@ -501,17 +506,18 @@ public class LineCanvasTests {
         Assert.Equal (new Rect (x, y, 4, 2), lc.Bounds);
 
         TestHelpers.AssertEqual (
-            output,
-            @"
+                                 output,
+                                 @"
 ╔╡╞╗
 ║  ║",
-            $"{Environment.NewLine}{lc}"
-        );
+                                 $"{Environment.NewLine}{lc}"
+                                );
     }
 
     [Fact]
     [SetupFakeDriver]
-    public void Bounds_Specific_With_Ustring () {
+    public void Bounds_Specific_With_Ustring ()
+    {
         // Draw at 1,1 within client area of View (i.e. leave a top and left margin of 1)
         // This proves we aren't drawing excess above
         var x = 1;
@@ -550,17 +556,18 @@ public class LineCanvasTests {
         Assert.Equal (new Rect (x, y, 4, 2), lc.Bounds);
 
         TestHelpers.AssertEqual (
-            output,
-            @"
+                                 output,
+                                 @"
 ╔╡╞╗
 ║  ║",
-            $"{Environment.NewLine}{lc}"
-        );
+                                 $"{Environment.NewLine}{lc}"
+                                );
     }
 
     [Fact]
     [SetupFakeDriver]
-    public void Canvas_Updates_On_Changes () {
+    public void Canvas_Updates_On_Changes ()
+    {
         var lc = new LineCanvas ();
 
         Assert.Equal (Rect.Empty, lc.Bounds);
@@ -586,7 +593,8 @@ public class LineCanvasTests {
     [InlineData (-1, -1, Orientation.Vertical, "│")]
     [Theory]
     [SetupFakeDriver]
-    public void Length_0_Is_1_Long (int x, int y, Orientation orientation, string expected) {
+    public void Length_0_Is_1_Long (int x, int y, Orientation orientation, string expected)
+    {
         var canvas = new LineCanvas ();
 
         // Add a line at 5, 5 that's has length of 1
@@ -642,7 +650,8 @@ public class LineCanvasTests {
     [InlineData (-1, -1, -2, Orientation.Vertical, "│\r\n│")]
     [Theory]
     [SetupFakeDriver]
-    public void Length_n_Is_n_Long (int x, int y, int length, Orientation orientation, string expected) {
+    public void Length_n_Is_n_Long (int x, int y, int length, Orientation orientation, string expected)
+    {
         var canvas = new LineCanvas ();
         canvas.AddLine (new Point (x, y), length, orientation, LineStyle.Single);
 
@@ -652,7 +661,8 @@ public class LineCanvasTests {
 
     [Fact]
     [SetupFakeDriver]
-    public void Length_Negative () {
+    public void Length_Negative ()
+    {
         var offset = new Point (5, 5);
 
         var canvas = new LineCanvas ();
@@ -667,7 +677,8 @@ public class LineCanvasTests {
     [InlineData (Orientation.Vertical, "│")]
     [Theory]
     [SetupFakeDriver]
-    public void Length_Zero_Alone_Is_Line (Orientation orientation, string expected) {
+    public void Length_Zero_Alone_Is_Line (Orientation orientation, string expected)
+    {
         var lc = new LineCanvas ();
 
         // Add a line at 0, 0 that's has length of 0
@@ -679,16 +690,17 @@ public class LineCanvasTests {
     [InlineData (Orientation.Vertical, "┼")]
     [Theory]
     [SetupFakeDriver]
-    public void Length_Zero_Cross_Is_Cross (Orientation orientation, string expected) {
+    public void Length_Zero_Cross_Is_Cross (Orientation orientation, string expected)
+    {
         var lc = new LineCanvas ();
 
         // Add point at opposite orientation
         lc.AddLine (
-            new Point (0, 0),
-            0,
-            orientation == Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal,
-            LineStyle.Single
-        );
+                    new Point (0, 0),
+                    0,
+                    orientation == Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal,
+                    LineStyle.Single
+                   );
 
         // Add a line at 0, 0 that's has length of 0
         lc.AddLine (new Point (0, 0), 0, orientation, LineStyle.Single);
@@ -699,13 +711,17 @@ public class LineCanvasTests {
     [InlineData (Orientation.Vertical, "╞")]
     [Theory]
     [SetupFakeDriver]
-    public void Length_Zero_NextTo_Opposite_Is_T (Orientation orientation, string expected) {
+    public void Length_Zero_NextTo_Opposite_Is_T (Orientation orientation, string expected)
+    {
         var lc = new LineCanvas ();
 
         // Add line with length of 1 in opposite orientation starting at same location
-        if (orientation == Orientation.Horizontal) {
+        if (orientation == Orientation.Horizontal)
+        {
             lc.AddLine (new Point (0, 0), 1, Orientation.Vertical, LineStyle.Double);
-        } else {
+        }
+        else
+        {
             lc.AddLine (new Point (0, 0), 1, Orientation.Horizontal, LineStyle.Double);
         }
 
@@ -716,7 +732,8 @@ public class LineCanvasTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void TestLineCanvas_LeaveMargin_Top1_Left1 () {
+    public void TestLineCanvas_LeaveMargin_Top1_Left1 ()
+    {
         var canvas = new LineCanvas ();
 
         // Upper box
@@ -732,7 +749,8 @@ public class LineCanvasTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void TestLineCanvas_Window_Heavy () {
+    public void TestLineCanvas_Window_Heavy ()
+    {
         View v = GetCanvas (out LineCanvas canvas);
 
         // outer box
@@ -760,7 +778,8 @@ public class LineCanvasTests {
     [AutoInitShutdown]
     [InlineData (LineStyle.Single)]
     [InlineData (LineStyle.Rounded)]
-    public void TestLineCanvas_Window_HeavyTop_ThinSides (LineStyle thinStyle) {
+    public void TestLineCanvas_Window_HeavyTop_ThinSides (LineStyle thinStyle)
+    {
         View v = GetCanvas (out LineCanvas canvas);
 
         // outer box
@@ -789,7 +808,8 @@ public class LineCanvasTests {
     [AutoInitShutdown]
     [InlineData (LineStyle.Single)]
     [InlineData (LineStyle.Rounded)]
-    public void TestLineCanvas_Window_ThinTop_HeavySides (LineStyle thinStyle) {
+    public void TestLineCanvas_Window_ThinTop_HeavySides (LineStyle thinStyle)
+    {
         View v = GetCanvas (out LineCanvas canvas);
 
         // outer box
@@ -817,7 +837,8 @@ public class LineCanvasTests {
 
     [Fact]
     [SetupFakeDriver]
-    public void Top_Left_From_TopRight_LeftUp () {
+    public void Top_Left_From_TopRight_LeftUp ()
+    {
         var canvas = new LineCanvas ();
 
         // Upper box
@@ -833,7 +854,8 @@ public class LineCanvasTests {
 
     [Fact]
     [SetupFakeDriver]
-    public void Top_With_1Down () {
+    public void Top_With_1Down ()
+    {
         var canvas = new LineCanvas ();
 
         // Top      ─  
@@ -857,17 +879,18 @@ public class LineCanvasTests {
         Assert.Equal (2, map.Count);
 
         TestHelpers.AssertEqual (
-            output,
-            @"
+                                 output,
+                                 @"
 ─ 
  ─",
-            $"{Environment.NewLine}{canvas}"
-        );
+                                 $"{Environment.NewLine}{canvas}"
+                                );
     }
 
     [Fact]
     [SetupFakeDriver]
-    public void ToString_Empty () {
+    public void ToString_Empty ()
+    {
         var lc = new LineCanvas ();
         TestHelpers.AssertEqual (output, string.Empty, lc.ToString ());
     }
@@ -884,7 +907,8 @@ public class LineCanvasTests {
     [InlineData (-2, -2, "═══")]
     [Theory]
     [SetupFakeDriver]
-    public void ToString_Positive_Horizontal_1Line_Offset (int x, int y, string expected) {
+    public void ToString_Positive_Horizontal_1Line_Offset (int x, int y, string expected)
+    {
         var lc = new LineCanvas ();
         lc.AddLine (new Point (x, y), 3, Orientation.Horizontal, LineStyle.Double);
         TestHelpers.AssertEqual (output, expected, $"{lc}");
@@ -906,7 +930,8 @@ public class LineCanvasTests {
     [InlineData (2, 2, 0, 1, "═══  \r\n  ═══")]
     [Theory]
     [SetupFakeDriver]
-    public void ToString_Positive_Horizontal_2Line_Offset (int x1, int y1, int x2, int y2, string expected) {
+    public void ToString_Positive_Horizontal_2Line_Offset (int x1, int y1, int x2, int y2, string expected)
+    {
         var lc = new LineCanvas ();
         lc.AddLine (new Point (x1, y1), 3, Orientation.Horizontal, LineStyle.Double);
         lc.AddLine (new Point (x2, y2), 3, Orientation.Horizontal, LineStyle.Double);
@@ -960,7 +985,8 @@ public class LineCanvasTests {
         Orientation o1,
         LineStyle s1,
         string expected
-    ) {
+    )
+    {
         View v = GetCanvas (out LineCanvas lc);
         v.Width = 10;
         v.Height = 10;
@@ -976,7 +1002,8 @@ public class LineCanvasTests {
     /// <summary>This test demonstrates how to correctly trigger a corner.  By overlapping the lines in the same cell</summary>
     [Fact]
     [AutoInitShutdown]
-    public void View_Draws_Corner_Correct () {
+    public void View_Draws_Corner_Correct ()
+    {
         View v = GetCanvas (out LineCanvas canvas);
         canvas.AddLine (new Point (0, 0), 2, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new Point (0, 0), 2, Orientation.Vertical, LineStyle.Single);
@@ -991,12 +1018,12 @@ public class LineCanvasTests {
     }
 
     /// <summary>
-    ///     This test demonstrates that corners are only drawn when lines overlap. Not when they terminate adjacent to one
-    ///     another.
+    ///     This test demonstrates that corners are only drawn when lines overlap. Not when they terminate adjacent to one another.
     /// </summary>
     [Fact]
     [AutoInitShutdown]
-    public void View_Draws_Corner_NoOverlap () {
+    public void View_Draws_Corner_NoOverlap ()
+    {
         View v = GetCanvas (out LineCanvas canvas);
         canvas.AddLine (new Point (0, 0), 2, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new Point (0, 1), 2, Orientation.Vertical, LineStyle.Single);
@@ -1015,7 +1042,8 @@ public class LineCanvasTests {
     [InlineData (LineStyle.Rounded)]
     [Theory]
     [AutoInitShutdown]
-    public void View_Draws_Horizontal (LineStyle style) {
+    public void View_Draws_Horizontal (LineStyle style)
+    {
         View v = GetCanvas (out LineCanvas canvas);
         canvas.AddLine (new Point (0, 0), 2, Orientation.Horizontal, style);
 
@@ -1029,7 +1057,8 @@ public class LineCanvasTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void View_Draws_Horizontal_Double () {
+    public void View_Draws_Horizontal_Double ()
+    {
         View v = GetCanvas (out LineCanvas canvas);
         canvas.AddLine (new Point (0, 0), 2, Orientation.Horizontal, LineStyle.Double);
 
@@ -1045,7 +1074,8 @@ public class LineCanvasTests {
     [InlineData (LineStyle.Rounded)]
     [Theory]
     [AutoInitShutdown]
-    public void View_Draws_Vertical (LineStyle style) {
+    public void View_Draws_Vertical (LineStyle style)
+    {
         View v = GetCanvas (out LineCanvas canvas);
         canvas.AddLine (new Point (0, 0), 2, Orientation.Vertical, style);
 
@@ -1060,7 +1090,8 @@ public class LineCanvasTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void View_Draws_Vertical_Double () {
+    public void View_Draws_Vertical_Double ()
+    {
         View v = GetCanvas (out LineCanvas canvas);
         canvas.AddLine (new Point (0, 0), 2, Orientation.Vertical, LineStyle.Double);
 
@@ -1075,7 +1106,8 @@ public class LineCanvasTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void View_Draws_Window_Double () {
+    public void View_Draws_Window_Double ()
+    {
         View v = GetCanvas (out LineCanvas canvas);
 
         // outer box
@@ -1103,7 +1135,8 @@ public class LineCanvasTests {
     [AutoInitShutdown]
     [InlineData (LineStyle.Single)]
     [InlineData (LineStyle.Rounded)]
-    public void View_Draws_Window_DoubleTop_SingleSides (LineStyle thinStyle) {
+    public void View_Draws_Window_DoubleTop_SingleSides (LineStyle thinStyle)
+    {
         View v = GetCanvas (out LineCanvas canvas);
 
         // outer box
@@ -1129,13 +1162,12 @@ public class LineCanvasTests {
     }
 
     /// <summary>
-    ///     Demonstrates when <see cref="LineStyle.Rounded"/> corners are used. Notice how not all lines declare rounded. If
-    ///     there are 1+ lines intersecting and a corner is to be used then if any of them are rounded a rounded corner is
-    ///     used.
+    ///     Demonstrates when <see cref="LineStyle.Rounded"/> corners are used. Notice how not all lines declare rounded. If there are 1+ lines intersecting and a corner is to be used then if any of them are rounded a rounded corner is used.
     /// </summary>
     [Fact]
     [AutoInitShutdown]
-    public void View_Draws_Window_Rounded () {
+    public void View_Draws_Window_Rounded ()
+    {
         View v = GetCanvas (out LineCanvas canvas);
 
         // outer box
@@ -1167,7 +1199,8 @@ public class LineCanvasTests {
     [AutoInitShutdown]
     [InlineData (LineStyle.Single)]
     [InlineData (LineStyle.Rounded)]
-    public void View_Draws_Window_SingleTop_DoubleSides (LineStyle thinStyle) {
+    public void View_Draws_Window_SingleTop_DoubleSides (LineStyle thinStyle)
+    {
         View v = GetCanvas (out LineCanvas canvas);
 
         // outer box
@@ -1195,7 +1228,8 @@ public class LineCanvasTests {
 
     [Fact]
     [SetupFakeDriver]
-    public void Window () {
+    public void Window ()
+    {
         var canvas = new LineCanvas ();
 
         // Frame
@@ -1220,7 +1254,8 @@ public class LineCanvasTests {
 
     [Fact]
     [SetupFakeDriver]
-    public void Zero_Length_Intersections () {
+    public void Zero_Length_Intersections ()
+    {
         // Draw at 1,2 within client area of View (i.e. leave a top and left margin of 1)
         // This proves we aren't drawing excess above
         var x = 1;
@@ -1264,24 +1299,29 @@ public class LineCanvasTests {
     /// <param name="offsetX">How far to offset drawing in X</param>
     /// <param name="offsetY">How far to offset drawing in Y</param>
     /// <returns></returns>
-    private View GetCanvas (out LineCanvas canvas, int offsetX = 0, int offsetY = 0) {
+    private View GetCanvas (out LineCanvas canvas, int offsetX = 0, int offsetY = 0)
+    {
         var v = new View { Width = 10, Height = 5, Bounds = new Rect (0, 0, 10, 5) };
         Application.Top.Add (v);
         Application.Begin (Application.Top);
 
         LineCanvas canvasCopy = canvas = new LineCanvas ();
-        v.DrawContentComplete += (s, e) => {
-            v.Clear ();
-            foreach (KeyValuePair<Point, Rune> p in canvasCopy.GetMap ()) {
-                v.AddRune (
-                    offsetX + p.Key.X,
-                    offsetY + p.Key.Y,
-                    p.Value
-                );
-            }
 
-            canvasCopy.Clear ();
-        };
+        v.DrawContentComplete += (s, e) =>
+                                 {
+                                     v.Clear ();
+
+                                     foreach (KeyValuePair<Point, Rune> p in canvasCopy.GetMap ())
+                                     {
+                                         v.AddRune (
+                                                    offsetX + p.Key.X,
+                                                    offsetY + p.Key.Y,
+                                                    p.Value
+                                                   );
+                                     }
+
+                                     canvasCopy.Clear ();
+                                 };
 
         return v;
     }

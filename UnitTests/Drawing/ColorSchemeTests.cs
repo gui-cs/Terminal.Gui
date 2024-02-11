@@ -2,9 +2,11 @@
 
 namespace Terminal.Gui.DrawingTests;
 
-public class ColorSchemeTests {
+public class ColorSchemeTests
+{
     [Fact]
-    public void Colors_ColorSchemes_Built_Ins () {
+    public void Colors_ColorSchemes_Built_Ins ()
+    {
         Colors.Reset ();
         Dictionary<string, ColorScheme> schemes = Colors.ColorSchemes;
         Assert.NotNull (schemes);
@@ -17,7 +19,8 @@ public class ColorSchemeTests {
     }
 
     [Fact]
-    public void Colors_ColorSchemes_Property_Has_Private_Setter () {
+    public void Colors_ColorSchemes_Property_Has_Private_Setter ()
+    {
         // Resharper Code Cleanup likes to remove the `private set; `
         // from the ColorSchemes property.  This test will fail if
         // that happens.
@@ -28,7 +31,8 @@ public class ColorSchemeTests {
     }
 
     [Fact]
-    public void ColorScheme_New () {
+    public void ColorScheme_New ()
+    {
         var scheme = new ColorScheme ();
         var lbl = new Label ();
         lbl.ColorScheme = scheme;

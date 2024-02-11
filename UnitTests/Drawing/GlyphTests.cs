@@ -4,14 +4,18 @@ using System.Text.Json;
 
 namespace Terminal.Gui.DrawingTests;
 
-public class GlyphTests {
+public class GlyphTests
+{
     [Fact]
-    public void Default_GlyphDefinitions_Deserialize () {
+    public void Default_GlyphDefinitions_Deserialize ()
+    {
         var defs = new GlyphDefinitions ();
 
         // enumerate all properties in GlyphDefinitions
-        foreach (PropertyInfo prop in typeof (GlyphDefinitions).GetProperties ()) {
-            if (prop.PropertyType == typeof (Rune)) {
+        foreach (PropertyInfo prop in typeof (GlyphDefinitions).GetProperties ())
+        {
+            if (prop.PropertyType == typeof (Rune))
+            {
                 // Act
                 var rune = (Rune)prop.GetValue (defs);
                 string json = JsonSerializer.Serialize (rune, ConfigurationManager._serializerOptions);

@@ -5,12 +5,14 @@ using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.ViewTests;
 
-public class NavigationTests {
-    public NavigationTests (ITestOutputHelper output) { _output = output; }
+public class NavigationTests
+{
     private readonly ITestOutputHelper _output;
+    public NavigationTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
-    public void BringSubviewForward_Subviews_vs_TabIndexes () {
+    public void BringSubviewForward_Subviews_vs_TabIndexes ()
+    {
         var r = new View ();
         var v1 = new View { CanFocus = true };
         var v2 = new View { CanFocus = true };
@@ -30,7 +32,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void BringSubviewToFront_Subviews_vs_TabIndexes () {
+    public void BringSubviewToFront_Subviews_vs_TabIndexes ()
+    {
         var r = new View ();
         var v1 = new View { CanFocus = true };
         var v2 = new View { CanFocus = true };
@@ -50,7 +53,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void CanFocus_Container_ToFalse_Turns_All_Subviews_ToFalse_Too () {
+    public void CanFocus_Container_ToFalse_Turns_All_Subviews_ToFalse_Too ()
+    {
         Application.Init (new FakeDriver ());
 
         Toplevel t = Application.Top;
@@ -63,19 +67,20 @@ public class NavigationTests {
         w.Add (f);
         t.Add (w);
 
-        t.Ready += (s, e) => {
-            Assert.True (t.CanFocus);
-            Assert.True (w.CanFocus);
-            Assert.True (f.CanFocus);
-            Assert.True (v1.CanFocus);
-            Assert.True (v2.CanFocus);
+        t.Ready += (s, e) =>
+                   {
+                       Assert.True (t.CanFocus);
+                       Assert.True (w.CanFocus);
+                       Assert.True (f.CanFocus);
+                       Assert.True (v1.CanFocus);
+                       Assert.True (v2.CanFocus);
 
-            w.CanFocus = false;
-            Assert.False (w.CanFocus);
-            Assert.False (f.CanFocus);
-            Assert.False (v1.CanFocus);
-            Assert.False (v2.CanFocus);
-        };
+                       w.CanFocus = false;
+                       Assert.False (w.CanFocus);
+                       Assert.False (f.CanFocus);
+                       Assert.False (v1.CanFocus);
+                       Assert.False (v2.CanFocus);
+                   };
 
         Application.Iteration += (s, a) => Application.RequestStop ();
 
@@ -84,7 +89,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void CanFocus_Container_Toggling_All_Subviews_To_Old_Value_When_Is_True () {
+    public void CanFocus_Container_Toggling_All_Subviews_To_Old_Value_When_Is_True ()
+    {
         Application.Init (new FakeDriver ());
 
         Toplevel t = Application.Top;
@@ -97,25 +103,26 @@ public class NavigationTests {
         w.Add (f);
         t.Add (w);
 
-        t.Ready += (s, e) => {
-            Assert.True (t.CanFocus);
-            Assert.True (w.CanFocus);
-            Assert.True (f.CanFocus);
-            Assert.False (v1.CanFocus);
-            Assert.True (v2.CanFocus);
+        t.Ready += (s, e) =>
+                   {
+                       Assert.True (t.CanFocus);
+                       Assert.True (w.CanFocus);
+                       Assert.True (f.CanFocus);
+                       Assert.False (v1.CanFocus);
+                       Assert.True (v2.CanFocus);
 
-            w.CanFocus = false;
-            Assert.False (w.CanFocus);
-            Assert.False (f.CanFocus);
-            Assert.False (v1.CanFocus);
-            Assert.False (v2.CanFocus);
+                       w.CanFocus = false;
+                       Assert.False (w.CanFocus);
+                       Assert.False (f.CanFocus);
+                       Assert.False (v1.CanFocus);
+                       Assert.False (v2.CanFocus);
 
-            w.CanFocus = true;
-            Assert.True (w.CanFocus);
-            Assert.True (f.CanFocus);
-            Assert.False (v1.CanFocus);
-            Assert.True (v2.CanFocus);
-        };
+                       w.CanFocus = true;
+                       Assert.True (w.CanFocus);
+                       Assert.True (f.CanFocus);
+                       Assert.False (v1.CanFocus);
+                       Assert.True (v2.CanFocus);
+                   };
 
         Application.Iteration += (s, a) => Application.RequestStop ();
 
@@ -125,7 +132,8 @@ public class NavigationTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void CanFocus_Faced_With_Container () {
+    public void CanFocus_Faced_With_Container ()
+    {
         var t = new Toplevel ();
         var w = new Window ();
         var f = new FrameView ();
@@ -154,7 +162,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void CanFocus_Faced_With_Container_After_Run () {
+    public void CanFocus_Faced_With_Container_After_Run ()
+    {
         Application.Init (new FakeDriver ());
 
         Toplevel t = Application.Top;
@@ -166,28 +175,29 @@ public class NavigationTests {
         w.Add (f);
         t.Add (w);
 
-        t.Ready += (s, e) => {
-            Assert.True (t.CanFocus);
-            Assert.True (w.CanFocus);
-            Assert.True (f.CanFocus);
-            Assert.True (v.CanFocus);
+        t.Ready += (s, e) =>
+                   {
+                       Assert.True (t.CanFocus);
+                       Assert.True (w.CanFocus);
+                       Assert.True (f.CanFocus);
+                       Assert.True (v.CanFocus);
 
-            f.CanFocus = false;
-            Assert.False (f.CanFocus);
-            Assert.False (v.CanFocus);
+                       f.CanFocus = false;
+                       Assert.False (f.CanFocus);
+                       Assert.False (v.CanFocus);
 
-            v.CanFocus = false;
-            Assert.False (f.CanFocus);
-            Assert.False (v.CanFocus);
+                       v.CanFocus = false;
+                       Assert.False (f.CanFocus);
+                       Assert.False (v.CanFocus);
 
-            Assert.Throws<InvalidOperationException> (() => v.CanFocus = true);
-            Assert.False (f.CanFocus);
-            Assert.False (v.CanFocus);
+                       Assert.Throws<InvalidOperationException> (() => v.CanFocus = true);
+                       Assert.False (f.CanFocus);
+                       Assert.False (v.CanFocus);
 
-            f.CanFocus = true;
-            Assert.True (f.CanFocus);
-            Assert.True (v.CanFocus);
-        };
+                       f.CanFocus = true;
+                       Assert.True (f.CanFocus);
+                       Assert.True (v.CanFocus);
+                   };
 
         Application.Iteration += (s, a) => Application.RequestStop ();
 
@@ -196,7 +206,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void CanFocus_Faced_With_Container_Before_Run () {
+    public void CanFocus_Faced_With_Container_Before_Run ()
+    {
         Application.Init (new FakeDriver ());
 
         Toplevel t = Application.Top;
@@ -232,7 +243,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void CanFocus_Set_Changes_TabIndex_And_TabStop () {
+    public void CanFocus_Set_Changes_TabIndex_And_TabStop ()
+    {
         var r = new View ();
         var v1 = new View { Text = "1" };
         var v2 = new View { Text = "2" };
@@ -275,7 +287,8 @@ public class NavigationTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void CanFocus_Sets_To_False_Does_Not_Sets_HasFocus_To_True () {
+    public void CanFocus_Sets_To_False_Does_Not_Sets_HasFocus_To_True ()
+    {
         var view = new View { CanFocus = true };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (view);
@@ -294,7 +307,8 @@ public class NavigationTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void CanFocus_Sets_To_False_On_Single_View_Focus_View_On_Another_Toplevel () {
+    public void CanFocus_Sets_To_False_On_Single_View_Focus_View_On_Another_Toplevel ()
+    {
         var view1 = new View { Id = "view1", Width = 10, Height = 1, CanFocus = true };
         var win1 = new Window { Id = "win1", Width = Dim.Percent (50), Height = Dim.Fill () };
         win1.Add (view1);
@@ -332,7 +346,8 @@ public class NavigationTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void CanFocus_Sets_To_False_On_Toplevel_Focus_View_On_Another_Toplevel () {
+    public void CanFocus_Sets_To_False_On_Toplevel_Focus_View_On_Another_Toplevel ()
+    {
         var view1 = new View { Id = "view1", Width = 10, Height = 1, CanFocus = true };
         var win1 = new Window { Id = "win1", Width = Dim.Percent (50), Height = Dim.Fill () };
         win1.Add (view1);
@@ -372,9 +387,12 @@ public class NavigationTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void CanFocus_Sets_To_False_With_Two_Views_Focus_Another_View_On_The_Same_Toplevel () {
+    public void CanFocus_Sets_To_False_With_Two_Views_Focus_Another_View_On_The_Same_Toplevel ()
+    {
         var view1 = new View { Id = "view1", Width = 10, Height = 1, CanFocus = true };
-        var view12 = new View {
+
+        var view12 = new View
+        {
             Id = "view12",
             Y = 5,
             Width = 10,
@@ -418,7 +436,8 @@ public class NavigationTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void Enabled_False_Sets_HasFocus_To_False () {
+    public void Enabled_False_Sets_HasFocus_To_False ()
+    {
         var wasClicked = false;
         var view = new Button { Text = "Click Me" };
         view.Clicked += (s, e) => wasClicked = !wasClicked;
@@ -446,7 +465,8 @@ public class NavigationTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void Enabled_Sets_Also_Sets_Subviews () {
+    public void Enabled_Sets_Also_Sets_Subviews ()
+    {
         var wasClicked = false;
         var button = new Button { Text = "Click Me" };
         button.IsDefault = true;
@@ -457,45 +477,46 @@ public class NavigationTests {
 
         var iterations = 0;
 
-        Application.Iteration += (s, a) => {
-            iterations++;
+        Application.Iteration += (s, a) =>
+                                 {
+                                     iterations++;
 
-            win.NewKeyDownEvent (new Key (KeyCode.Enter));
-            Assert.True (wasClicked);
-            button.MouseEvent (new MouseEvent { Flags = MouseFlags.Button1Clicked });
-            Assert.False (wasClicked);
-            Assert.True (button.Enabled);
-            Assert.True (button.CanFocus);
-            Assert.True (button.HasFocus);
-            Assert.True (win.Enabled);
-            Assert.True (win.CanFocus);
-            Assert.True (win.HasFocus);
+                                     win.NewKeyDownEvent (new Key (KeyCode.Enter));
+                                     Assert.True (wasClicked);
+                                     button.MouseEvent (new MouseEvent { Flags = MouseFlags.Button1Clicked });
+                                     Assert.False (wasClicked);
+                                     Assert.True (button.Enabled);
+                                     Assert.True (button.CanFocus);
+                                     Assert.True (button.HasFocus);
+                                     Assert.True (win.Enabled);
+                                     Assert.True (win.CanFocus);
+                                     Assert.True (win.HasFocus);
 
-            win.Enabled = false;
-            button.NewKeyDownEvent (new Key (KeyCode.Enter));
-            Assert.False (wasClicked);
-            button.MouseEvent (new MouseEvent { Flags = MouseFlags.Button1Clicked });
-            Assert.False (wasClicked);
-            Assert.False (button.Enabled);
-            Assert.True (button.CanFocus);
-            Assert.False (button.HasFocus);
-            Assert.False (win.Enabled);
-            Assert.True (win.CanFocus);
-            Assert.False (win.HasFocus);
-            button.SetFocus ();
-            Assert.False (button.HasFocus);
-            Assert.False (win.HasFocus);
-            win.SetFocus ();
-            Assert.False (button.HasFocus);
-            Assert.False (win.HasFocus);
+                                     win.Enabled = false;
+                                     button.NewKeyDownEvent (new Key (KeyCode.Enter));
+                                     Assert.False (wasClicked);
+                                     button.MouseEvent (new MouseEvent { Flags = MouseFlags.Button1Clicked });
+                                     Assert.False (wasClicked);
+                                     Assert.False (button.Enabled);
+                                     Assert.True (button.CanFocus);
+                                     Assert.False (button.HasFocus);
+                                     Assert.False (win.Enabled);
+                                     Assert.True (win.CanFocus);
+                                     Assert.False (win.HasFocus);
+                                     button.SetFocus ();
+                                     Assert.False (button.HasFocus);
+                                     Assert.False (win.HasFocus);
+                                     win.SetFocus ();
+                                     Assert.False (button.HasFocus);
+                                     Assert.False (win.HasFocus);
 
-            win.Enabled = true;
-            win.FocusFirst ();
-            Assert.True (button.HasFocus);
-            Assert.True (win.HasFocus);
+                                     win.Enabled = true;
+                                     win.FocusFirst ();
+                                     Assert.True (button.HasFocus);
+                                     Assert.True (win.HasFocus);
 
-            Application.RequestStop ();
-        };
+                                     Application.RequestStop ();
+                                 };
 
         Application.Run ();
 
@@ -503,7 +524,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void FocusNearestView_Ensure_Focus_Ordered () {
+    public void FocusNearestView_Ensure_Focus_Ordered ()
+    {
         var top = new Toplevel ();
 
         var win = new Window ();
@@ -532,11 +554,14 @@ public class NavigationTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void FocusNext_Does_Not_Throws_If_A_View_Was_Removed_From_The_Collection () {
+    public void FocusNext_Does_Not_Throws_If_A_View_Was_Removed_From_The_Collection ()
+    {
         Toplevel top1 = Application.Top;
         var view1 = new View { Id = "view1", Width = 10, Height = 5, CanFocus = true };
         var top2 = new Toplevel { Id = "top2", Y = 1, Width = 10, Height = 5 };
-        var view2 = new View {
+
+        var view2 = new View
+        {
             Id = "view2",
             Y = 1,
             Width = 10,
@@ -545,20 +570,25 @@ public class NavigationTests {
         };
         View view3 = null;
         var removed = false;
-        view2.Enter += (s, e) => {
-            if (!removed) {
-                removed = true;
-                view3 = new View { Id = "view3", Y = 1, Width = 10, Height = 5 };
-                Application.Current.Add (view3);
-                Application.Current.BringSubviewToFront (view3);
-                Assert.False (view3.HasFocus);
-            }
-        };
-        view2.Leave += (s, e) => {
-            Application.Current.Remove (view3);
-            view3.Dispose ();
-            view3 = null;
-        };
+
+        view2.Enter += (s, e) =>
+                       {
+                           if (!removed)
+                           {
+                               removed = true;
+                               view3 = new View { Id = "view3", Y = 1, Width = 10, Height = 5 };
+                               Application.Current.Add (view3);
+                               Application.Current.BringSubviewToFront (view3);
+                               Assert.False (view3.HasFocus);
+                           }
+                       };
+
+        view2.Leave += (s, e) =>
+                       {
+                           Application.Current.Remove (view3);
+                           view3.Dispose ();
+                           view3 = null;
+                       };
         top2.Add (view2);
         top1.Add (view1, top2);
         Application.Begin (top1);
@@ -585,24 +615,29 @@ public class NavigationTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void HotKey_Will_Invoke_KeyPressed_Only_For_The_MostFocused_With_Top_KeyPress_Event () {
+    public void HotKey_Will_Invoke_KeyPressed_Only_For_The_MostFocused_With_Top_KeyPress_Event ()
+    {
         var sbQuiting = false;
         var tfQuiting = false;
         var topQuiting = false;
+
         var sb = new StatusBar (
-            new StatusItem[] {
-                new (
-                    KeyCode.CtrlMask | KeyCode.Q,
-                    "~^Q~ Quit",
-                    () => sbQuiting = true
-                )
-            }
-        );
+                                new StatusItem []
+                                {
+                                    new (
+                                         KeyCode.CtrlMask | KeyCode.Q,
+                                         "~^Q~ Quit",
+                                         () => sbQuiting = true
+                                        )
+                                }
+                               );
         var tf = new TextField ();
         tf.KeyDown += Tf_KeyPressed;
 
-        void Tf_KeyPressed (object sender, Key obj) {
-            if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask)) {
+        void Tf_KeyPressed (object sender, Key obj)
+        {
+            if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask))
+            {
                 obj.Handled = tfQuiting = true;
             }
         }
@@ -612,8 +647,10 @@ public class NavigationTests {
         Toplevel top = Application.Top;
         top.KeyDown += Top_KeyPress;
 
-        void Top_KeyPress (object sender, Key obj) {
-            if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask)) {
+        void Top_KeyPress (object sender, Key obj)
+        {
+            if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask))
+            {
                 obj.Handled = topQuiting = true;
             }
         }
@@ -653,23 +690,28 @@ public class NavigationTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void HotKey_Will_Invoke_KeyPressed_Only_For_The_MostFocused_Without_Top_KeyPress_Event () {
+    public void HotKey_Will_Invoke_KeyPressed_Only_For_The_MostFocused_Without_Top_KeyPress_Event ()
+    {
         var sbQuiting = false;
         var tfQuiting = false;
+
         var sb = new StatusBar (
-            new StatusItem[] {
-                new (
-                    KeyCode.CtrlMask | KeyCode.Q,
-                    "~^Q~ Quit",
-                    () => sbQuiting = true
-                )
-            }
-        );
+                                new StatusItem []
+                                {
+                                    new (
+                                         KeyCode.CtrlMask | KeyCode.Q,
+                                         "~^Q~ Quit",
+                                         () => sbQuiting = true
+                                        )
+                                }
+                               );
         var tf = new TextField ();
         tf.KeyDown += Tf_KeyPressed;
 
-        void Tf_KeyPressed (object sender, Key obj) {
-            if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask)) {
+        void Tf_KeyPressed (object sender, Key obj)
+        {
+            if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask))
+            {
                 obj.Handled = tfQuiting = true;
             }
         }
@@ -698,7 +740,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void Navigation_With_Null_Focused_View () {
+    public void Navigation_With_Null_Focused_View ()
+    {
         // Non-regression test for #882 (NullReferenceException during keyboard navigation when Focused is null)
 
         Application.Init (new FakeDriver ());
@@ -716,7 +759,8 @@ public class NavigationTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void Remove_Does_Not_Change_Focus () {
+    public void Remove_Does_Not_Change_Focus ()
+    {
         Assert.True (Application.Top.CanFocus);
         Assert.False (Application.Top.HasFocus);
 
@@ -754,10 +798,13 @@ public class NavigationTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void ScreenToView_ViewToScreen_FindDeepestView_Full_Top () {
+    public void ScreenToView_ViewToScreen_FindDeepestView_Full_Top ()
+    {
         Toplevel top = Application.Current;
         top.BorderStyle = LineStyle.Single;
-        var view = new View {
+
+        var view = new View
+        {
             X = 3,
             Y = 2,
             Width = 10,
@@ -776,8 +823,9 @@ public class NavigationTests {
         ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
         Assert.Equal (new Rect (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
         Assert.Equal (new Rect (0, 0, 20, 10), top.Frame);
+
         _ = TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                          @"
 ┌──────────────────┐
 │                  │
 │                  │
@@ -788,8 +836,8 @@ public class NavigationTests {
 │                  │
 │                  │
 └──────────────────┘",
-            _output
-        );
+                                                          _output
+                                                         );
 
         // top
         Assert.Equal (Point.Empty, top.ScreenToFrame (0, 0));
@@ -887,15 +935,19 @@ public class NavigationTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void ScreenToView_ViewToScreen_FindDeepestView_Smaller_Top () {
-        var top = new Toplevel {
+    public void ScreenToView_ViewToScreen_FindDeepestView_Smaller_Top ()
+    {
+        var top = new Toplevel
+        {
             X = 3,
             Y = 2,
             Width = 20,
             Height = 10,
             BorderStyle = LineStyle.Single
         };
-        var view = new View {
+
+        var view = new View
+        {
             X = 3,
             Y = 2,
             Width = 10,
@@ -915,8 +967,9 @@ public class NavigationTests {
         Assert.Equal (new Rect (0, 0, 30, 20), new Rect (0, 0, View.Driver.Cols, View.Driver.Rows));
         Assert.NotEqual (new Rect (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
         Assert.Equal (new Rect (3, 2, 20, 10), top.Frame);
+
         Rect frame = TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                                   @"
    ┌──────────────────┐
    │                  │
    │                  │
@@ -927,8 +980,8 @@ public class NavigationTests {
    │                  │
    │                  │
    └──────────────────┘",
-            _output
-        );
+                                                                   _output
+                                                                  );
 
         // mean the output started at col 3 and line 2
         // which result with a width of 23 and a height of 10 on the output
@@ -1031,7 +1084,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void SendSubviewBackwards_Subviews_vs_TabIndexes () {
+    public void SendSubviewBackwards_Subviews_vs_TabIndexes ()
+    {
         var r = new View ();
         var v1 = new View { CanFocus = true };
         var v2 = new View { CanFocus = true };
@@ -1051,7 +1105,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void SendSubviewToBack_Subviews_vs_TabIndexes () {
+    public void SendSubviewToBack_Subviews_vs_TabIndexes ()
+    {
         var r = new View ();
         var v1 = new View { CanFocus = true };
         var v2 = new View { CanFocus = true };
@@ -1072,7 +1127,8 @@ public class NavigationTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void SetFocus_View_With_Null_Superview_Does_Not_Throw_Exception () {
+    public void SetFocus_View_With_Null_Superview_Does_Not_Throw_Exception ()
+    {
         Assert.True (Application.Top.CanFocus);
         Assert.False (Application.Top.HasFocus);
 
@@ -1084,7 +1140,8 @@ public class NavigationTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void SetHasFocus_Do_Not_Throws_If_OnLeave_Remove_Focused_Changing_To_Null () {
+    public void SetHasFocus_Do_Not_Throws_If_OnLeave_Remove_Focused_Changing_To_Null ()
+    {
         var view1Leave = false;
         var subView1Leave = false;
         var subView1subView1Leave = false;
@@ -1093,15 +1150,19 @@ public class NavigationTests {
         var subView1 = new View { CanFocus = true };
         var subView1subView1 = new View { CanFocus = true };
         view1.Leave += (s, e) => { view1Leave = true; };
-        subView1.Leave += (s, e) => {
-            subView1.Remove (subView1subView1);
-            subView1Leave = true;
-        };
+
+        subView1.Leave += (s, e) =>
+                          {
+                              subView1.Remove (subView1subView1);
+                              subView1Leave = true;
+                          };
         view1.Add (subView1);
-        subView1subView1.Leave += (s, e) => {
-            // This is never invoked
-            subView1subView1Leave = true;
-        };
+
+        subView1subView1.Leave += (s, e) =>
+                                  {
+                                      // This is never invoked
+                                      subView1subView1Leave = true;
+                                  };
         subView1.Add (subView1subView1);
         var view2 = new View { CanFocus = true };
         top.Add (view1, view2);
@@ -1116,7 +1177,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void Subviews_TabIndexes_AreEqual () {
+    public void Subviews_TabIndexes_AreEqual ()
+    {
         var r = new View ();
         var v1 = new View { CanFocus = true };
         var v2 = new View { CanFocus = true };
@@ -1139,7 +1201,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void TabIndex_Set_CanFocus_False () {
+    public void TabIndex_Set_CanFocus_False ()
+    {
         var r = new View ();
         var v1 = new View { CanFocus = true };
         var v2 = new View { CanFocus = true };
@@ -1156,7 +1219,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void TabIndex_Set_CanFocus_False_To_True () {
+    public void TabIndex_Set_CanFocus_False_To_True ()
+    {
         var r = new View ();
         var v1 = new View ();
         var v2 = new View { CanFocus = true };
@@ -1172,7 +1236,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void TabIndex_Set_CanFocus_HigherValues () {
+    public void TabIndex_Set_CanFocus_HigherValues ()
+    {
         var r = new View ();
         var v1 = new View { CanFocus = true };
         var v2 = new View { CanFocus = true };
@@ -1187,7 +1252,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void TabIndex_Set_CanFocus_LowerValues () {
+    public void TabIndex_Set_CanFocus_LowerValues ()
+    {
         var r = new View ();
         var v1 = new View { CanFocus = true };
         var v2 = new View { CanFocus = true };
@@ -1202,7 +1268,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void TabIndex_Set_CanFocus_ValidValues () {
+    public void TabIndex_Set_CanFocus_ValidValues ()
+    {
         var r = new View ();
         var v1 = new View { CanFocus = true };
         var v2 = new View { CanFocus = true };
@@ -1221,7 +1288,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void TabStop_All_False_And_All_True_And_Changing_TabStop_Later () {
+    public void TabStop_All_False_And_All_True_And_Changing_TabStop_Later ()
+    {
         var r = new View ();
         var v1 = new View { CanFocus = true, TabStop = false };
         var v2 = new View { CanFocus = true, TabStop = false };
@@ -1253,7 +1321,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void TabStop_All_True_And_Changing_CanFocus_Later () {
+    public void TabStop_All_True_And_Changing_CanFocus_Later ()
+    {
         var r = new View ();
         var v1 = new View ();
         var v2 = new View ();
@@ -1285,7 +1354,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void TabStop_And_CanFocus_Are_All_True () {
+    public void TabStop_And_CanFocus_Are_All_True ()
+    {
         var r = new View ();
         var v1 = new View { CanFocus = true };
         var v2 = new View { CanFocus = true };
@@ -1309,7 +1379,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void TabStop_And_CanFocus_Mixed_And_BothFalse () {
+    public void TabStop_And_CanFocus_Mixed_And_BothFalse ()
+    {
         var r = new View ();
         var v1 = new View { CanFocus = true, TabStop = false };
         var v2 = new View { CanFocus = false, TabStop = true };
@@ -1333,7 +1404,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void TabStop_Are_All_False_And_CanFocus_Are_All_True () {
+    public void TabStop_Are_All_False_And_CanFocus_Are_All_True ()
+    {
         var r = new View ();
         var v1 = new View { CanFocus = true, TabStop = false };
         var v2 = new View { CanFocus = true, TabStop = false };
@@ -1357,7 +1429,8 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void TabStop_Are_All_True_And_CanFocus_Are_All_False () {
+    public void TabStop_Are_All_True_And_CanFocus_Are_All_False ()
+    {
         var r = new View ();
         var v1 = new View ();
         var v2 = new View ();
@@ -1382,7 +1455,8 @@ public class NavigationTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void WindowDispose_CanFocusProblem () {
+    public void WindowDispose_CanFocusProblem ()
+    {
         // Arrange
         Application.Init ();
         using var top = new Toplevel ();

@@ -14,14 +14,19 @@ Console.WriteLine ($"Username: {((ExampleWindow)Application.Top).UserNameText.Te
 Application.Shutdown ();
 
 // Defines a top-level window with border and title
-public class ExampleWindow : Window {
-    public ExampleWindow () {
+public class ExampleWindow : Window
+{
+    public TextField UserNameText;
+
+    public ExampleWindow ()
+    {
         Title = $"Example App ({Application.QuitKey} to quit)";
 
         // Create input components and labels
         var usernameLabel = new Label { Text = "Username:" };
 
-        UserNameText = new TextField {
+        UserNameText = new TextField
+        {
             // Position text field adjacent to the label
             X = Pos.Right (usernameLabel) + 1,
 
@@ -29,11 +34,13 @@ public class ExampleWindow : Window {
             Width = Dim.Fill ()
         };
 
-        var passwordLabel = new Label {
+        var passwordLabel = new Label
+        {
             Text = "Password:", X = Pos.Left (usernameLabel), Y = Pos.Bottom (usernameLabel) + 1
         };
 
-        var passwordText = new TextField {
+        var passwordText = new TextField
+        {
             Secret = true,
 
             // align with the text box above
@@ -43,7 +50,8 @@ public class ExampleWindow : Window {
         };
 
         // Create login button
-        var btnLogin = new Button {
+        var btnLogin = new Button
+        {
             Text = "Login",
             Y = Pos.Bottom (passwordLabel) + 1,
 
@@ -53,18 +61,20 @@ public class ExampleWindow : Window {
         };
 
         // When login button is clicked display a message popup
-        btnLogin.Clicked += (s, e) => {
-            if (UserNameText.Text == "admin" && passwordText.Text == "password") {
-                MessageBox.Query ("Logging In", "Login Successful", "Ok");
-                Application.RequestStop ();
-            } else {
-                MessageBox.ErrorQuery ("Logging In", "Incorrect username or password", "Ok");
-            }
-        };
+        btnLogin.Clicked += (s, e) =>
+                            {
+                                if (UserNameText.Text == "admin" && passwordText.Text == "password")
+                                {
+                                    MessageBox.Query ("Logging In", "Login Successful", "Ok");
+                                    Application.RequestStop ();
+                                }
+                                else
+                                {
+                                    MessageBox.ErrorQuery ("Logging In", "Incorrect username or password", "Ok");
+                                }
+                            };
 
         // Add the views to the Window
         Add (usernameLabel, UserNameText, passwordLabel, passwordText, btnLogin);
     }
-
-    public TextField UserNameText;
 }

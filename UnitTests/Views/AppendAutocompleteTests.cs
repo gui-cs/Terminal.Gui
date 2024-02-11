@@ -2,13 +2,15 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.TextTests;
 
-public class AppendAutocompleteTests {
-    public AppendAutocompleteTests (ITestOutputHelper output) { this.output = output; }
+public class AppendAutocompleteTests
+{
     private readonly ITestOutputHelper output;
+    public AppendAutocompleteTests (ITestOutputHelper output) { this.output = output; }
 
     [Fact]
     [AutoInitShutdown]
-    public void TestAutoAppend_AfterCloseKey_NoAutocomplete () {
+    public void TestAutoAppend_AfterCloseKey_NoAutocomplete ()
+    {
         TextField tf = GetTextFieldsInViewSuggesting ("fish");
 
         // f is typed and suggestion is "fish"
@@ -36,7 +38,8 @@ public class AppendAutocompleteTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void TestAutoAppend_AfterCloseKey_ReappearsOnLetter () {
+    public void TestAutoAppend_AfterCloseKey_ReappearsOnLetter ()
+    {
         TextField tf = GetTextFieldsInViewSuggesting ("fish");
 
         // f is typed and suggestion is "fish"
@@ -66,7 +69,8 @@ public class AppendAutocompleteTests {
     [AutoInitShutdown]
     [InlineData (ConsoleKey.UpArrow)]
     [InlineData (ConsoleKey.DownArrow)]
-    public void TestAutoAppend_CycleSelections (ConsoleKey cycleKey) {
+    public void TestAutoAppend_CycleSelections (ConsoleKey cycleKey)
+    {
         TextField tf = GetTextFieldsInViewSuggesting ("fish", "friend");
 
         // f is typed and suggestion is "fish"
@@ -94,7 +98,8 @@ public class AppendAutocompleteTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void TestAutoAppend_NoRender_WhenCursorNotAtEnd () {
+    public void TestAutoAppend_NoRender_WhenCursorNotAtEnd ()
+    {
         TextField tf = GetTextFieldsInViewSuggesting ("fish");
 
         // f is typed and suggestion is "fish"
@@ -115,7 +120,8 @@ public class AppendAutocompleteTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void TestAutoAppend_NoRender_WhenNoMatch () {
+    public void TestAutoAppend_NoRender_WhenNoMatch ()
+    {
         TextField tf = GetTextFieldsInViewSuggesting ("fish");
 
         // f is typed and suggestion is "fish"
@@ -134,7 +140,8 @@ public class AppendAutocompleteTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void TestAutoAppend_ShowThenAccept_CasesDiffer () {
+    public void TestAutoAppend_ShowThenAccept_CasesDiffer ()
+    {
         TextField tf = GetTextFieldsInView ();
 
         tf.Autocomplete = new AppendAutocomplete (tf);
@@ -165,7 +172,8 @@ public class AppendAutocompleteTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void TestAutoAppend_ShowThenAccept_MatchCase () {
+    public void TestAutoAppend_ShowThenAccept_MatchCase ()
+    {
         TextField tf = GetTextFieldsInView ();
 
         tf.Autocomplete = new AppendAutocomplete (tf);
@@ -202,7 +210,8 @@ public class AppendAutocompleteTests {
     [InlineData ("ffffffffffffffffffffffffff", "ffffffffff")]
     [InlineData ("f234567890", "f234567890")]
     [InlineData ("fisérables", "fisérables")]
-    public void TestAutoAppendRendering_ShouldNotOverspill (string overspillUsing, string expectRender) {
+    public void TestAutoAppendRendering_ShouldNotOverspill (string overspillUsing, string expectRender)
+    {
         TextField tf = GetTextFieldsInViewSuggesting (overspillUsing);
 
         // f is typed we should only see 'f' up to size of View (10)
@@ -213,7 +222,8 @@ public class AppendAutocompleteTests {
         Assert.Equal ("f", tf.Text);
     }
 
-    private TextField GetTextFieldsInView () {
+    private TextField GetTextFieldsInView ()
+    {
         var tf = new TextField { Width = 10 };
         var tf2 = new TextField { Y = 1, Width = 10 };
 
@@ -228,7 +238,8 @@ public class AppendAutocompleteTests {
         return tf;
     }
 
-    private TextField GetTextFieldsInViewSuggesting (params string[] suggestions) {
+    private TextField GetTextFieldsInViewSuggesting (params string [] suggestions)
+    {
         TextField tf = GetTextFieldsInView ();
 
         tf.Autocomplete = new AppendAutocomplete (tf);

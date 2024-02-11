@@ -1,11 +1,13 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary><see cref="EventArgs"/> for timeout events (e.g. <see cref="MainLoop.TimeoutAdded"/>)</summary>
-internal class TimeoutEventArgs : EventArgs {
+internal class TimeoutEventArgs : EventArgs
+{
     /// <summary>Creates a new instance of the <see cref="TimeoutEventArgs"/> class.</summary>
     /// <param name="timeout"></param>
     /// <param name="ticks"></param>
-    public TimeoutEventArgs (Timeout timeout, long ticks) {
+    public TimeoutEventArgs (Timeout timeout, long ticks)
+    {
         Timeout = timeout;
         Ticks = ticks;
     }

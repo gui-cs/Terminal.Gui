@@ -1,7 +1,8 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>Definition to interact with the OS clipboard.</summary>
-public interface IClipboard {
+public interface IClipboard
+{
     /// <summary>Returns true if the environmental dependencies are in place to interact with the OS clipboard.</summary>
     bool IsSupported { get; }
 

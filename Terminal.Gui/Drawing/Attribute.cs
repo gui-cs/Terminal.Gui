@@ -5,12 +5,12 @@ namespace Terminal.Gui;
 
 /// <summary>Attributes represent how text is styled when displayed in the terminal.</summary>
 /// <remarks>
-///     <see cref="Attribute"/> provides a platform independent representation of colors (and someday other forms of text
-///     styling). They encode both the foreground and the background color and are used in the <see cref="ColorScheme"/>
-///     class to define color schemes that can be used in an application.
+///     <see cref="Attribute"/> provides a platform independent representation of colors (and someday other forms of text styling). They encode both the foreground and the background color and are used in the
+///     <see cref="ColorScheme"/> class to define color schemes that can be used in an application.
 /// </remarks>
 [JsonConverter (typeof (AttributeJsonConverter))]
-public readonly struct Attribute : IEquatable<Attribute> {
+public readonly struct Attribute : IEquatable<Attribute>
+{
     /// <summary>Default empty attribute.</summary>
     public static readonly Attribute Default = new (Color.White, ColorName.Black);
 
@@ -27,14 +27,16 @@ public readonly struct Attribute : IEquatable<Attribute> {
     public Color Background { get; }
 
     /// <summary>Initializes a new instance with default values.</summary>
-    public Attribute () {
+    public Attribute ()
+    {
         PlatformColor = -1;
         Foreground = Default.Foreground;
         Background = Default.Background;
     }
 
     /// <summary>Initializes a new instance from an existing instance.</summary>
-    public Attribute (in Attribute attr) {
+    public Attribute (in Attribute attr)
+    {
         PlatformColor = -1;
         Foreground = attr.Foreground;
         Background = attr.Background;
@@ -42,7 +44,8 @@ public readonly struct Attribute : IEquatable<Attribute> {
 
     /// <summary>Initializes a new instance with platform specific color value.</summary>
     /// <param name="platformColor">Value.</param>
-    internal Attribute (int platformColor) {
+    internal Attribute (int platformColor)
+    {
         PlatformColor = platformColor;
         Foreground = Default.Foreground;
         Background = Default.Background;
@@ -52,7 +55,8 @@ public readonly struct Attribute : IEquatable<Attribute> {
     /// <param name="platformColor">platform-dependent color value.</param>
     /// <param name="foreground">Foreground</param>
     /// <param name="background">Background</param>
-    internal Attribute (int platformColor, in Color foreground, in Color background) {
+    internal Attribute (int platformColor, in Color foreground, in Color background)
+    {
         Foreground = foreground;
         Background = background;
         PlatformColor = platformColor;
@@ -61,12 +65,14 @@ public readonly struct Attribute : IEquatable<Attribute> {
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="foreground">Foreground</param>
     /// <param name="background">Background</param>
-    public Attribute (Color foreground, Color background) {
+    public Attribute (Color foreground, Color background)
+    {
         Foreground = foreground;
         Background = background;
 
         // TODO: Once CursesDriver supports truecolor all the PlatformColor stuff goes away
-        if (Application.Driver == null) {
+        if (Application.Driver == null)
+        {
             PlatformColor = -1;
 
             return;
@@ -87,9 +93,10 @@ public readonly struct Attribute : IEquatable<Attribute> {
     /// <param name="foregroundName">Foreground</param>
     /// <param name="backgroundName">Background</param>
     public Attribute (in ColorName foregroundName, in ColorName backgroundName) : this (
-        new Color (foregroundName),
-        new Color (backgroundName)
-    ) { }
+                                                                                        new Color (foregroundName),
+                                                                                        new Color (backgroundName)
+                                                                                       )
+    { }
 
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="foregroundName">Foreground</param>
@@ -102,8 +109,7 @@ public readonly struct Attribute : IEquatable<Attribute> {
     public Attribute (Color foreground, ColorName backgroundName) : this (foreground, new Color (backgroundName)) { }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Attribute"/> struct with the same colors for the foreground and
-    ///     background.
+    ///     Initializes a new instance of the <see cref="Attribute"/> struct with the same colors for the foreground and background.
     /// </summary>
     /// <param name="color">The color.</param>
     public Attribute (Color color) : this (color, color) { }
@@ -112,28 +118,27 @@ public readonly struct Attribute : IEquatable<Attribute> {
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns></returns>
-    public static bool operator == (Attribute left, Attribute right) => left.Equals (right);
+    public static bool operator == (Attribute left, Attribute right) { return left.Equals (right); }
 
     /// <summary>Compares two attributes for inequality.</summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns></returns>
-    public static bool operator != (Attribute left, Attribute right) => !(left == right);
+    public static bool operator != (Attribute left, Attribute right) { return !(left == right); }
 
     /// <inheritdoc/>
-    public override bool Equals (object? obj) => obj is Attribute other && Equals (other);
+    public override bool Equals (object? obj) { return obj is Attribute other && Equals (other); }
 
     /// <inheritdoc/>
-    public bool Equals (Attribute other) => PlatformColor == other.PlatformColor &&
-                                            Foreground == other.Foreground &&
-                                            Background == other.Background;
+    public bool Equals (Attribute other) { return PlatformColor == other.PlatformColor && Foreground == other.Foreground && Background == other.Background; }
 
     /// <inheritdoc/>
-    public override int GetHashCode () => HashCode.Combine (PlatformColor, Foreground, Background);
+    public override int GetHashCode () { return HashCode.Combine (PlatformColor, Foreground, Background); }
 
     /// <inheritdoc/>
-    public override string ToString () =>
-
+    public override string ToString ()
+    {
         // Note: Unit tests are dependent on this format
-        $"[{Foreground},{Background}]";
+        return $"[{Foreground},{Background}]";
+    }
 }

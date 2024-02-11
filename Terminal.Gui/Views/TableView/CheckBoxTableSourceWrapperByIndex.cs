@@ -1,7 +1,8 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>Implementation of <see cref="CheckBoxTableSourceWrapperBase"/> which records toggled rows by their row number.</summary>
-public class CheckBoxTableSourceWrapperByIndex : CheckBoxTableSourceWrapperBase {
+public class CheckBoxTableSourceWrapperByIndex : CheckBoxTableSourceWrapperBase
+{
     /// <inheritdoc/>
     public CheckBoxTableSourceWrapperByIndex (TableView tableView, ITableSource toWrap) : base (tableView, toWrap) { }
 
@@ -15,39 +16,53 @@ public class CheckBoxTableSourceWrapperByIndex : CheckBoxTableSourceWrapperBase 
     protected override void ClearAllToggles () { CheckedRows.Clear (); }
 
     /// <inheritdoc/>
-    protected override bool IsChecked (int row) => CheckedRows.Contains (row);
+    protected override bool IsChecked (int row) { return CheckedRows.Contains (row); }
 
     /// <inheritdoc/>
-    protected override void ToggleAllRows () {
-        if (CheckedRows.Count == Rows) {
+    protected override void ToggleAllRows ()
+    {
+        if (CheckedRows.Count == Rows)
+        {
             // select none
             ClearAllToggles ();
-        } else {
+        }
+        else
+        {
             // select all
             CheckedRows = new HashSet<int> (Enumerable.Range (0, Rows));
         }
     }
 
     /// <inheritdoc/>
-    protected override void ToggleRow (int row) {
-        if (CheckedRows.Contains (row)) {
+    protected override void ToggleRow (int row)
+    {
+        if (CheckedRows.Contains (row))
+        {
             CheckedRows.Remove (row);
-        } else {
+        }
+        else
+        {
             CheckedRows.Add (row);
         }
     }
 
     /// <inheritdoc/>
-    protected override void ToggleRows (int[] range) {
+    protected override void ToggleRows (int [] range)
+    {
         // if all are ticked untick them
-        if (range.All (CheckedRows.Contains)) {
+        if (range.All (CheckedRows.Contains))
+        {
             // select none
-            foreach (int r in range) {
+            foreach (int r in range)
+            {
                 CheckedRows.Remove (r);
             }
-        } else {
+        }
+        else
+        {
             // otherwise tick all
-            foreach (int r in range) {
+            foreach (int r in range)
+            {
                 CheckedRows.Add (r);
             }
         }

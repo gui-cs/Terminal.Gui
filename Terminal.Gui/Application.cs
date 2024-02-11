@@ -22,37 +22,37 @@ namespace Terminal.Gui;
 /// </code>
 /// </example>
 /// <remarks>TODO: Flush this out.</remarks>
-public static partial class Application {
+public static partial class Application
+{
     // For Unit testing - ignores UseSystemConsole
     internal static bool _forceFakeConsole;
-
-    /// <summary>
-    ///     Gets or sets whether <see cref="Application.Driver"/> will be forced to output only the 16 colors defined in
-    ///     <see cref="ColorName"/>. The default is <see langword="false"/>, meaning 24-bit (TrueColor) colors will be output
-    ///     as long as the selected <see cref="ConsoleDriver"/> supports TrueColor.
-    /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static bool Force16Colors { get; set; }
 
     /// <summary>Gets the <see cref="ConsoleDriver"/> that has been selected. See also <see cref="ForceDriver"/>.</summary>
     public static ConsoleDriver Driver { get; internal set; }
 
-    /// <summary>Gets all cultures supported by the application without the invariant language.</summary>
-    public static List<CultureInfo> SupportedCultures { get; private set; }
+    /// <summary>
+    ///     Gets or sets whether <see cref="Application.Driver"/> will be forced to output only the 16 colors defined in
+    ///     <see cref="ColorName"/>. The default is <see langword="false"/>, meaning 24-bit (TrueColor) colors will be output as long as the selected
+    ///     <see cref="ConsoleDriver"/> supports TrueColor.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static bool Force16Colors { get; set; }
 
     /// <summary>
-    ///     Forces the use of the specified driver (one of "fake", "ansi", "curses", "net", or "windows"). If not specified,
-    ///     the driver is selected based on the platform.
+    ///     Forces the use of the specified driver (one of "fake", "ansi", "curses", "net", or "windows"). If not specified, the driver is selected based on the platform.
     /// </summary>
     /// <remarks>
-    ///     Note, <see cref="Application.Init(ConsoleDriver, string)"/> will override this configuration setting if called with
-    ///     either `driver` or `driverName` specified.
+    ///     Note, <see cref="Application.Init(ConsoleDriver, string)"/> will override this configuration setting if called with either `driver` or `driverName` specified.
     /// </remarks>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     public static string ForceDriver { get; set; } = string.Empty;
 
-    internal static List<CultureInfo> GetSupportedCultures () {
-        CultureInfo[] culture = CultureInfo.GetCultures (CultureTypes.AllCultures);
+    /// <summary>Gets all cultures supported by the application without the invariant language.</summary>
+    public static List<CultureInfo> SupportedCultures { get; private set; }
+
+    internal static List<CultureInfo> GetSupportedCultures ()
+    {
+        CultureInfo [] culture = CultureInfo.GetCultures (CultureTypes.AllCultures);
 
         // Get the assembly
         var assembly = Assembly.GetExecutingAssembly ();
@@ -65,11 +65,11 @@ public static partial class Application {
 
         // Return all culture for which satellite folder found with culture code.
         return culture.Where (
-                cultureInfo =>
-                    Directory.Exists (Path.Combine (assemblyLocation, cultureInfo.Name)) &&
-                    File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
-            )
-            .ToList ();
+                              cultureInfo =>
+                                  Directory.Exists (Path.Combine (assemblyLocation, cultureInfo.Name))
+                                  && File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
+                             )
+                      .ToList ();
     }
 
     // IMPORTANT: Ensure all property/fields are reset here. See Init_ResetState_Resets_Properties unit test.
@@ -77,11 +77,13 @@ public static partial class Application {
     // this in a function like this ensures we don't make mistakes in
     // guaranteeing that the state of this singleton is deterministic when Init
     // starts running and after Shutdown returns.
-    internal static void ResetState () {
+    internal static void ResetState ()
+    {
         // Shutdown is the bookend for Init. As such it needs to clean up all resources
         // Init created. Apps that do any threading will need to code defensively for this.
         // e.g. see Issue #537
-        foreach (Toplevel t in _topLevels) {
+        foreach (Toplevel t in _topLevels)
+        {
             t.Running = false;
             t.Dispose ();
         }
@@ -99,7 +101,8 @@ public static partial class Application {
         EndAfterFirstIteration = false;
 
         // Driver stuff
-        if (Driver != null) {
+        if (Driver != null)
+        {
             Driver.SizeChanged -= Driver_SizeChanged;
             Driver.KeyDown -= Driver_KeyDown;
             Driver.KeyUp -= Driver_KeyUp;
@@ -150,32 +153,27 @@ public static partial class Application {
     /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
     /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
     /// <para>
-    ///     This function loads the right <see cref="ConsoleDriver"/> for the platform, Creates a <see cref="Toplevel"/>. and
-    ///     assigns it to <see cref="Top"/>
+    ///     This function loads the right <see cref="ConsoleDriver"/> for the platform, Creates a <see cref="Toplevel"/>. and assigns it to
+    ///     <see cref="Top"/>
     /// </para>
     /// <para>
     ///     <see cref="Shutdown"/> must be called when the application is closing (typically after
-    ///     <see cref="Run(Func{Exception, bool})"/> has returned) to ensure resources are cleaned up and terminal settings
-    ///     restored.
+    ///     <see cref="Run(Func{Exception, bool})"/> has returned) to ensure resources are cleaned up and terminal settings restored.
     /// </para>
     /// <para>
     ///     The <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> function combines
-    ///     <see cref="Init(ConsoleDriver, string)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/> into a single
-    ///     call. An application cam use <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> without explicitly calling
+    ///     <see cref="Init(ConsoleDriver, string)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/> into a single call. An application cam use
+    ///     <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> without explicitly calling
     ///     <see cref="Init(ConsoleDriver, string)"/>.
     /// </para>
     /// <param name="driver">
-    ///     The <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are
-    ///     specified the default driver for the platform will be used.
+    ///     The <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are specified the default driver for the platform will be used.
     /// </param>
     /// <param name="driverName">
-    ///     The short name (e.g. "net", "windows", "ansi", "fake", or "curses") of the <see cref="ConsoleDriver"/> to use. If
-    ///     neither <paramref name="driver"/> or <paramref name="driverName"/> are specified the default driver for the
-    ///     platform will be used.
+    ///     The short name (e.g. "net", "windows", "ansi", "fake", or "curses") of the <see cref="ConsoleDriver"/> to use. If neither
+    ///     <paramref name="driver"/> or <paramref name="driverName"/> are specified the default driver for the platform will be used.
     /// </param>
-    public static void Init (ConsoleDriver driver = null, string driverName = null) {
-        InternalInit (() => new Toplevel (), driver, driverName);
-    }
+    public static void Init (ConsoleDriver driver = null, string driverName = null) { InternalInit (() => new Toplevel (), driver, driverName); }
 
     internal static bool _initialized;
     internal static int _mainThreadId = -1;
@@ -194,22 +192,27 @@ public static partial class Application {
         ConsoleDriver driver = null,
         string driverName = null,
         bool calledViaRunT = false
-    ) {
-        if (_initialized && driver == null) {
+    )
+    {
+        if (_initialized && driver == null)
+        {
             return;
         }
 
-        if (_initialized) {
+        if (_initialized)
+        {
             throw new InvalidOperationException ("Init has already been called and must be bracketed by Shutdown.");
         }
 
-        if (!calledViaRunT) {
+        if (!calledViaRunT)
+        {
             // Reset all class variables (Application is a singleton).
             ResetState ();
         }
 
         // For UnitTests
-        if (driver != null) {
+        if (driver != null)
+        {
             Driver = driver;
         }
 
@@ -222,47 +225,62 @@ public static partial class Application {
         Apply ();
 
         // Ignore Configuration for ForceDriver if driverName is specified
-        if (!string.IsNullOrEmpty (driverName)) {
+        if (!string.IsNullOrEmpty (driverName))
+        {
             ForceDriver = driverName;
         }
 
-        if (Driver == null) {
+        if (Driver == null)
+        {
             PlatformID p = Environment.OSVersion.Platform;
-            if (string.IsNullOrEmpty (ForceDriver)) {
-                if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
+
+            if (string.IsNullOrEmpty (ForceDriver))
+            {
+                if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+                {
                     Driver = new WindowsDriver ();
-                } else {
+                }
+                else
+                {
                     Driver = new CursesDriver ();
                 }
-            } else {
+            }
+            else
+            {
                 List<Type> drivers = GetDriverTypes ();
                 Type driverType = drivers.FirstOrDefault (t => t.Name.ToLower () == ForceDriver.ToLower ());
-                if (driverType != null) {
+
+                if (driverType != null)
+                {
                     Driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-                } else {
+                }
+                else
+                {
                     throw new ArgumentException (
-                        $"Invalid driver name: {
-                            ForceDriver
-                        }. Valid names are {
-                            string.Join (", ", drivers.Select (t => t.Name))
-                        }"
-                    );
+                                                 $"Invalid driver name: {
+                                                     ForceDriver
+                                                 }. Valid names are {
+                                                     string.Join (", ", drivers.Select (t => t.Name))
+                                                 }"
+                                                );
                 }
             }
         }
 
-        try {
+        try
+        {
             MainLoop = Driver.Init ();
         }
-        catch (InvalidOperationException ex) {
+        catch (InvalidOperationException ex)
+        {
             // This is a case where the driver is unable to initialize the console.
             // This can happen if the console is already in use by another process or
             // if running in unit tests.
             // In this case, we want to throw a more specific exception.
             throw new InvalidOperationException (
-                "Unable to initialize the console. This can happen if the console is already in use by another process or in unit tests.",
-                ex
-            );
+                                                 "Unable to initialize the console. This can happen if the console is already in use by another process or in unit tests.",
+                                                 ex
+                                                );
         }
 
         Driver.SizeChanged += (s, args) => OnSizeChanging (args);
@@ -290,12 +308,17 @@ public static partial class Application {
 
     /// <summary>Gets of list of <see cref="ConsoleDriver"/> types that are available.</summary>
     /// <returns></returns>
-    public static List<Type> GetDriverTypes () {
+    public static List<Type> GetDriverTypes ()
+    {
         // use reflection to get the list of drivers
         List<Type> driverTypes = new ();
-        foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies ()) {
-            foreach (Type type in asm.GetTypes ()) {
-                if (type.IsSubclassOf (typeof (ConsoleDriver)) && !type.IsAbstract) {
+
+        foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies ())
+        {
+            foreach (Type type in asm.GetTypes ())
+            {
+                if (type.IsSubclassOf (typeof (ConsoleDriver)) && !type.IsAbstract)
+                {
                     driverTypes.Add (type);
                 }
             }
@@ -307,10 +330,10 @@ public static partial class Application {
     /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
     /// <remarks>
     ///     Shutdown must be called for every call to <see cref="Init"/> or
-    ///     <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> to ensure all resources are cleaned up (Disposed)
-    ///     and terminal settings are restored.
+    ///     <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> to ensure all resources are cleaned up (Disposed) and terminal settings are restored.
     /// </remarks>
-    public static void Shutdown () {
+    public static void Shutdown ()
+    {
         ResetState ();
         PrintJsonErrors ();
     }
@@ -320,42 +343,39 @@ public static partial class Application {
     #region Run (Begin, Run, End, Stop)
 
     /// <summary>
-    ///     Notify that a new <see cref="RunState"/> was created (<see cref="Begin(Toplevel)"/> was called). The token is
-    ///     created in <see cref="Begin(Toplevel)"/> and this event will be fired before that function exits.
+    ///     Notify that a new <see cref="RunState"/> was created (<see cref="Begin(Toplevel)"/> was called). The token is created in
+    ///     <see cref="Begin(Toplevel)"/> and this event will be fired before that function exits.
     /// </summary>
     /// <remarks>
-    ///     If <see cref="EndAfterFirstIteration"/> is <see langword="true"/> callers to <see cref="Begin(Toplevel)"/> must
-    ///     also subscribe to <see cref="NotifyStopRunState"/> and manually dispose of the <see cref="RunState"/> token when
-    ///     the application is done.
+    ///     If <see cref="EndAfterFirstIteration"/> is <see langword="true"/> callers to <see cref="Begin(Toplevel)"/> must also subscribe to
+    ///     <see cref="NotifyStopRunState"/> and manually dispose of the <see cref="RunState"/> token when the application is done.
     /// </remarks>
     public static event EventHandler<RunStateEventArgs> NotifyNewRunState;
 
     /// <summary>Notify that a existent <see cref="RunState"/> is stopping (<see cref="End(RunState)"/> was called).</summary>
     /// <remarks>
-    ///     If <see cref="EndAfterFirstIteration"/> is <see langword="true"/> callers to <see cref="Begin(Toplevel)"/> must
-    ///     also subscribe to <see cref="NotifyStopRunState"/> and manually dispose of the <see cref="RunState"/> token when
-    ///     the application is done.
+    ///     If <see cref="EndAfterFirstIteration"/> is <see langword="true"/> callers to <see cref="Begin(Toplevel)"/> must also subscribe to
+    ///     <see cref="NotifyStopRunState"/> and manually dispose of the <see cref="RunState"/> token when the application is done.
     /// </remarks>
     public static event EventHandler<ToplevelEventArgs> NotifyStopRunState;
 
     /// <summary>Building block API: Prepares the provided <see cref="Toplevel"/> for execution.</summary>
-    /// <returns>
-    ///     The <see cref="RunState"/> handle that needs to be passed to the <see cref="End(RunState)"/> method upon
-    ///     completion.
-    /// </returns>
+    /// <returns>The <see cref="RunState"/> handle that needs to be passed to the <see cref="End(RunState)"/> method upon completion.</returns>
     /// <param name="Toplevel">The <see cref="Toplevel"/> to prepare execution for.</param>
     /// <remarks>
     ///     This method prepares the provided <see cref="Toplevel"/> for running with the focus, it adds this to the list of
-    ///     <see cref="Toplevel"/>s, lays out the Subviews, focuses the first element, and draws the <see cref="Toplevel"/> in
-    ///     the screen. This is usually followed by executing the <see cref="RunLoop"/> method, and then the
-    ///     <see cref="End(RunState)"/> method upon termination which will undo these changes.
+    ///     <see cref="Toplevel"/>s, lays out the Subviews, focuses the first element, and draws the <see cref="Toplevel"/> in the screen. This is usually followed by executing the
+    ///     <see cref="RunLoop"/> method, and then the <see cref="End(RunState)"/> method upon termination which will undo these changes.
     /// </remarks>
-    public static RunState Begin (Toplevel Toplevel) {
-        if (Toplevel == null) {
+    public static RunState Begin (Toplevel Toplevel)
+    {
+        if (Toplevel == null)
+        {
             throw new ArgumentNullException (nameof (Toplevel));
         }
 
-        if (Toplevel.IsOverlappedContainer && OverlappedTop != Toplevel && OverlappedTop != null) {
+        if (Toplevel.IsOverlappedContainer && OverlappedTop != Toplevel && OverlappedTop != null)
+        {
             throw new InvalidOperationException ("Only one Overlapped Container is allowed.");
         }
 
@@ -365,28 +385,36 @@ public static partial class Application {
         var rs = new RunState (Toplevel);
 
         // View implements ISupportInitializeNotification which is derived from ISupportInitialize
-        if (!Toplevel.IsInitialized) {
+        if (!Toplevel.IsInitialized)
+        {
             Toplevel.BeginInit ();
             Toplevel.EndInit ();
         }
 
-        lock (_topLevels) {
+        lock (_topLevels)
+        {
             // If Top was already initialized with Init, and Begin has never been called
             // Top was not added to the Toplevels Stack. It will thus never get disposed.
             // Clean it up here:
-            if (Top != null && Toplevel != Top && !_topLevels.Contains (Top)) {
+            if (Top != null && Toplevel != Top && !_topLevels.Contains (Top))
+            {
                 Top.Dispose ();
                 Top = null;
-            } else if (Top != null && Toplevel != Top && _topLevels.Contains (Top)) {
+            }
+            else if (Top != null && Toplevel != Top && _topLevels.Contains (Top))
+            {
                 Top.OnLeave (Toplevel);
             }
 
             // BUGBUG: We should not depend on `Id` internally. 
             // BUGBUG: It is super unclear what this code does anyway.
-            if (string.IsNullOrEmpty (Toplevel.Id)) {
+            if (string.IsNullOrEmpty (Toplevel.Id))
+            {
                 var count = 1;
                 var id = (_topLevels.Count + count).ToString ();
-                while (_topLevels.Count > 0 && _topLevels.FirstOrDefault (x => x.Id == id) != null) {
+
+                while (_topLevels.Count > 0 && _topLevels.FirstOrDefault (x => x.Id == id) != null)
+                {
                     count++;
                     id = (_topLevels.Count + count).ToString ();
                 }
@@ -394,37 +422,57 @@ public static partial class Application {
                 Toplevel.Id = (_topLevels.Count + count).ToString ();
 
                 _topLevels.Push (Toplevel);
-            } else {
+            }
+            else
+            {
                 Toplevel dup = _topLevels.FirstOrDefault (x => x.Id == Toplevel.Id);
-                if (dup == null) {
+
+                if (dup == null)
+                {
                     _topLevels.Push (Toplevel);
                 }
             }
 
-            if (_topLevels.FindDuplicates (new ToplevelEqualityComparer ()).Count > 0) {
+            if (_topLevels.FindDuplicates (new ToplevelEqualityComparer ()).Count > 0)
+            {
                 throw new ArgumentException ("There are duplicates Toplevels Id's");
             }
         }
 
-        if (Top == null || Toplevel.IsOverlappedContainer) {
+        if (Top == null || Toplevel.IsOverlappedContainer)
+        {
             Top = Toplevel;
         }
 
         var refreshDriver = true;
-        if (OverlappedTop == null || Toplevel.IsOverlappedContainer || (Current?.Modal == false && Toplevel.Modal)
-            || (Current?.Modal == false && !Toplevel.Modal) || (Current?.Modal == true && Toplevel.Modal)) {
-            if (Toplevel.Visible) {
+
+        if (OverlappedTop == null
+            || Toplevel.IsOverlappedContainer
+            || (Current?.Modal == false && Toplevel.Modal)
+            || (Current?.Modal == false && !Toplevel.Modal)
+            || (Current?.Modal == true && Toplevel.Modal))
+        {
+            if (Toplevel.Visible)
+            {
                 Current = Toplevel;
                 SetCurrentOverlappedAsTop ();
-            } else {
+            }
+            else
+            {
                 refreshDriver = false;
             }
-        } else if ((OverlappedTop != null && Toplevel != OverlappedTop && Current?.Modal == true
-                    && !_topLevels.Peek ().Modal)
-                   || (OverlappedTop != null && Toplevel != OverlappedTop && Current?.Running == false)) {
+        }
+        else if ((OverlappedTop != null
+                  && Toplevel != OverlappedTop
+                  && Current?.Modal == true
+                  && !_topLevels.Peek ().Modal)
+                 || (OverlappedTop != null && Toplevel != OverlappedTop && Current?.Running == false))
+        {
             refreshDriver = false;
             MoveCurrent (Toplevel);
-        } else {
+        }
+        else
+        {
             refreshDriver = false;
             MoveCurrent (Current);
         }
@@ -436,7 +484,9 @@ public static partial class Application {
         Toplevel.LayoutSubviews ();
         Toplevel.PositionToplevels ();
         Toplevel.FocusFirst ();
-        if (refreshDriver) {
+
+        if (refreshDriver)
+        {
             OverlappedTop?.OnChildLoaded (Toplevel);
             Toplevel.OnLoaded ();
             Toplevel.SetNeedsDisplay ();
@@ -458,12 +508,11 @@ public static partial class Application {
     public static void Run (Func<Exception, bool> errorHandler = null) { Run (Top, errorHandler); }
 
     /// <summary>
-    ///     Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> with a new instance of the
-    ///     specified <see cref="Toplevel"/>-derived class.
+    ///     Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> with a new instance of the specified
+    ///     <see cref="Toplevel"/>-derived class.
     ///     <para>Calling <see cref="Init"/> first is not needed as this function will initialize the application.</para>
     ///     <para>
-    ///         <see cref="Shutdown"/> must be called when the application is closing (typically after Run> has returned) to
-    ///         ensure resources are cleaned up and terminal settings restored.
+    ///         <see cref="Shutdown"/> must be called when the application is closing (typically after Run> has returned) to ensure resources are cleaned up and terminal settings restored.
     ///     </para>
     /// </summary>
     /// <remarks>See <see cref="Run(Toplevel, Func{Exception, bool})"/> for more details.</remarks>
@@ -474,28 +523,38 @@ public static partial class Application {
     ///     <see langword="null"/> if <see cref="Init"/> has already been called.
     /// </param>
     public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
-        where T : Toplevel, new () {
-        if (_initialized) {
-            if (Driver != null) {
+        where T : Toplevel, new ()
+    {
+        if (_initialized)
+        {
+            if (Driver != null)
+            {
                 // Init() has been called and we have a driver, so just run the app.
                 var top = new T ();
                 Type type = top.GetType ().BaseType;
-                while (type != typeof (Toplevel) && type != typeof (object)) {
+
+                while (type != typeof (Toplevel) && type != typeof (object))
+                {
                     type = type.BaseType;
                 }
 
-                if (type != typeof (Toplevel)) {
+                if (type != typeof (Toplevel))
+                {
                     throw new ArgumentException ($"{top.GetType ().Name} must be derived from TopLevel");
                 }
 
                 Run (top, errorHandler);
-            } else {
+            }
+            else
+            {
                 // This code path should be impossible because Init(null, null) will select the platform default driver
                 throw new InvalidOperationException (
-                    "Init() completed without a driver being set (this should be impossible); Run<T>() cannot be called."
-                );
+                                                     "Init() completed without a driver being set (this should be impossible); Run<T>() cannot be called."
+                                                    );
             }
-        } else {
+        }
+        else
+        {
             // Init() has NOT been called.
             InternalInit (() => new T (), driver, null, true);
             Run (Top, errorHandler);
@@ -521,26 +580,25 @@ public static partial class Application {
     ///         Alternatively, to have a program control the main loop and process events manually, call
     ///         <see cref="Begin(Toplevel)"/> to set things up manually and then repeatedly call
     ///         <see cref="RunLoop(RunState)"/> with the wait parameter set to false. By doing this the
-    ///         <see cref="RunLoop(RunState)"/> method will only process any pending events, timers, idle handlers and then
-    ///         return control immediately.
+    ///         <see cref="RunLoop(RunState)"/> method will only process any pending events, timers, idle handlers and then return control immediately.
     ///     </para>
     ///     <para>
-    ///         RELEASE builds only: When <paramref name="errorHandler"/> is <see langword="null"/> any exceptions will be
-    ///         rethrown. Otherwise, if <paramref name="errorHandler"/> will be called. If <paramref name="errorHandler"/>
-    ///         returns <see langword="true"/> the <see cref="RunLoop(RunState)"/> will resume; otherwise this method will
-    ///         exit.
+    ///         RELEASE builds only: When <paramref name="errorHandler"/> is <see langword="null"/> any exceptions will be rethrown. Otherwise, if
+    ///         <paramref name="errorHandler"/> will be called. If <paramref name="errorHandler"/> returns
+    ///         <see langword="true"/> the <see cref="RunLoop(RunState)"/> will resume; otherwise this method will exit.
     ///     </para>
     /// </remarks>
     /// <param name="view">The <see cref="Toplevel"/> to run as a modal.</param>
-    /// <param name="errorHandler">
-    ///     RELEASE builds only: Handler for any unhandled exceptions (resumes when returns true,
-    ///     rethrows when null).
-    /// </param>
-    public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null) {
+    /// <param name="errorHandler">RELEASE builds only: Handler for any unhandled exceptions (resumes when returns true, rethrows when null).</param>
+    public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null)
+    {
         var resume = true;
-        while (resume) {
+
+        while (resume)
+        {
 #if !DEBUG
-            try {
+            try
+            {
 #endif
             resume = false;
             RunState runState = Begin (view);
@@ -548,13 +606,17 @@ public static partial class Application {
             // If EndAfterFirstIteration is true then the user must dispose of the runToken
             // by using NotifyStopRunState event.
             RunLoop (runState);
-            if (!EndAfterFirstIteration) {
+
+            if (!EndAfterFirstIteration)
+            {
                 End (runState);
             }
 #if !DEBUG
             }
-            catch (Exception error) {
-                if (errorHandler == null) {
+            catch (Exception error)
+            {
+                if (errorHandler == null)
+                {
                     throw;
                 }
 
@@ -566,11 +628,10 @@ public static partial class Application {
 
     /// <summary>Adds a timeout to the application.</summary>
     /// <remarks>
-    ///     When time specified passes, the callback will be invoked. If the callback returns true, the timeout will be reset,
-    ///     repeating the invocation. If it returns false, the timeout will stop and be removed. The returned value is a token
-    ///     that can be used to stop the timeout by calling <see cref="RemoveTimeout(object)"/>.
+    ///     When time specified passes, the callback will be invoked. If the callback returns true, the timeout will be reset, repeating the invocation. If it returns false, the timeout will stop and be removed. The returned value is a token that can be used to stop the timeout by calling
+    ///     <see cref="RemoveTimeout(object)"/>.
     /// </remarks>
-    public static object AddTimeout (TimeSpan time, Func<bool> callback) => MainLoop?.AddTimeout (time, callback);
+    public static object AddTimeout (TimeSpan time, Func<bool> callback) { return MainLoop?.AddTimeout (time, callback); }
 
     /// <summary>Removes a previously scheduled timeout</summary>
     /// <remarks>The token parameter is the value returned by <see cref="AddTimeout"/>.</remarks>
@@ -582,18 +643,20 @@ public static partial class Application {
     /// This method also returns
     /// <c>false</c>
     /// if the timeout is not found.
-    public static bool RemoveTimeout (object token) => MainLoop?.RemoveTimeout (token) ?? false;
+    public static bool RemoveTimeout (object token) { return MainLoop?.RemoveTimeout (token) ?? false; }
 
     /// <summary>Runs <paramref name="action"/> on the thread that is processing events</summary>
     /// <param name="action">the action to be invoked on the main processing thread.</param>
-    public static void Invoke (Action action) {
+    public static void Invoke (Action action)
+    {
         MainLoop?.AddIdle (
-            () => {
-                action ();
+                           () =>
+                           {
+                               action ();
 
-                return false;
-            }
-        );
+                               return false;
+                           }
+                          );
     }
 
     // TODO: Determine if this is really needed. The only code that calls WakeUp I can find
@@ -602,12 +665,16 @@ public static partial class Application {
     public static void Wakeup () { MainLoop?.Wakeup (); }
 
     /// <summary>Triggers a refresh of the entire display.</summary>
-    public static void Refresh () {
+    public static void Refresh ()
+    {
         // TODO: Figure out how to remove this call to ClearContents. Refresh should just repaint damaged areas, not clear
         Driver.ClearContents ();
         View last = null;
-        foreach (Toplevel v in _topLevels.Reverse ()) {
-            if (v.Visible) {
+
+        foreach (Toplevel v in _topLevels.Reverse ())
+        {
+            if (v.Visible)
+            {
                 v.SetNeedsDisplay ();
                 v.SetSubViewNeedsDisplay ();
                 v.Draw ();
@@ -629,8 +696,7 @@ public static partial class Application {
     internal static MainLoop MainLoop { get; private set; }
 
     /// <summary>
-    ///     Set to true to cause <see cref="End"/> to be called after the first iteration. Set to false (the default) to cause
-    ///     the application to continue running until Application.RequestStop () is called.
+    ///     Set to true to cause <see cref="End"/> to be called after the first iteration. Set to false (the default) to cause the application to continue running until Application.RequestStop () is called.
     /// </summary>
     public static bool EndAfterFirstIteration { get; set; }
 
@@ -638,32 +704,43 @@ public static partial class Application {
     // provides the sync context set while executing code in Terminal.Gui, to let
     // users use async/await on their code
     //
-    private class MainLoopSyncContext : SynchronizationContext {
-        public override SynchronizationContext CreateCopy () => new MainLoopSyncContext ();
+    private class MainLoopSyncContext : SynchronizationContext
+    {
+        public override SynchronizationContext CreateCopy () { return new MainLoopSyncContext (); }
 
-        public override void Post (SendOrPostCallback d, object state) {
+        public override void Post (SendOrPostCallback d, object state)
+        {
             MainLoop.AddIdle (
-                () => {
-                    d (state);
+                              () =>
+                              {
+                                  d (state);
 
-                    return false;
-                }
-            );
+                                  return false;
+                              }
+                             );
         }
 
         //_mainLoop.Driver.Wakeup ();
-        public override void Send (SendOrPostCallback d, object state) {
-            if (Thread.CurrentThread.ManagedThreadId == _mainThreadId) {
+        public override void Send (SendOrPostCallback d, object state)
+        {
+            if (Thread.CurrentThread.ManagedThreadId == _mainThreadId)
+            {
                 d (state);
-            } else {
+            }
+            else
+            {
                 var wasExecuted = false;
+
                 Invoke (
-                    () => {
-                        d (state);
-                        wasExecuted = true;
-                    }
-                );
-                while (!wasExecuted) {
+                        () =>
+                        {
+                            d (state);
+                            wasExecuted = true;
+                        }
+                       );
+
+                while (!wasExecuted)
+                {
                     Thread.Sleep (15);
                 }
             }
@@ -672,19 +749,26 @@ public static partial class Application {
 
     /// <summary>Building block API: Runs the main loop for the created <see cref="Toplevel"/>.</summary>
     /// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
-    public static void RunLoop (RunState state) {
-        if (state == null) {
+    public static void RunLoop (RunState state)
+    {
+        if (state == null)
+        {
             throw new ArgumentNullException (nameof (state));
         }
 
-        if (state.Toplevel == null) {
+        if (state.Toplevel == null)
+        {
             throw new ObjectDisposedException ("state");
         }
 
         var firstIteration = true;
-        for (state.Toplevel.Running = true; state.Toplevel.Running;) {
+
+        for (state.Toplevel.Running = true; state.Toplevel.Running;)
+        {
             MainLoop.Running = true;
-            if (EndAfterFirstIteration && !firstIteration) {
+
+            if (EndAfterFirstIteration && !firstIteration)
+            {
                 return;
             }
 
@@ -704,17 +788,22 @@ public static partial class Application {
     ///     Set to <see langword="true"/> if this is the first run loop iteration. Upon return, it will be set to
     ///     <see langword="false"/> if at least one iteration happened.
     /// </param>
-    public static void RunIteration (ref RunState state, ref bool firstIteration) {
-        if (MainLoop.Running && MainLoop.EventsPending ()) {
+    public static void RunIteration (ref RunState state, ref bool firstIteration)
+    {
+        if (MainLoop.Running && MainLoop.EventsPending ())
+        {
             // Notify Toplevel it's ready
-            if (firstIteration) {
+            if (firstIteration)
+            {
                 state.Toplevel.OnReady ();
             }
 
             MainLoop.RunIteration ();
             Iteration?.Invoke (null, new IterationEventArgs ());
             EnsureModalOrVisibleAlwaysOnTop (state.Toplevel);
-            if (state.Toplevel != Current) {
+
+            if (state.Toplevel != Current)
+            {
                 OverlappedTop?.OnDeactivate (state.Toplevel);
                 state.Toplevel = Current;
                 OverlappedTop?.OnActivate (state.Toplevel);
@@ -725,12 +814,15 @@ public static partial class Application {
 
         firstIteration = false;
 
-        if (state.Toplevel != Top &&
-            (Top.NeedsDisplay || Top.SubViewNeedsDisplay || Top.LayoutNeeded)) {
+        if (state.Toplevel != Top && (Top.NeedsDisplay || Top.SubViewNeedsDisplay || Top.LayoutNeeded))
+        {
             state.Toplevel.SetNeedsDisplay (state.Toplevel.Frame);
             Top.Draw ();
-            foreach (Toplevel top in _topLevels.Reverse ()) {
-                if (top != Top && top != state.Toplevel) {
+
+            foreach (Toplevel top in _topLevels.Reverse ())
+            {
+                if (top != Top && top != state.Toplevel)
+                {
                     top.SetNeedsDisplay ();
                     top.SetSubViewNeedsDisplay ();
                     top.Draw ();
@@ -738,28 +830,30 @@ public static partial class Application {
             }
         }
 
-        if (_topLevels.Count == 1 && state.Toplevel == Top
-                                  && (Driver.Cols != state.Toplevel.Frame.Width
-                                      || Driver.Rows != state.Toplevel.Frame.Height)
-                                  && (state.Toplevel.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay
-                                                                  || state.Toplevel.LayoutNeeded)) {
+        if (_topLevels.Count == 1
+            && state.Toplevel == Top
+            && (Driver.Cols != state.Toplevel.Frame.Width
+                || Driver.Rows != state.Toplevel.Frame.Height)
+            && (state.Toplevel.NeedsDisplay
+                || state.Toplevel.SubViewNeedsDisplay
+                || state.Toplevel.LayoutNeeded))
+        {
             state.Toplevel.Clear (Driver.Bounds);
         }
 
-        if (state.Toplevel.NeedsDisplay ||
-            state.Toplevel.SubViewNeedsDisplay ||
-            state.Toplevel.LayoutNeeded ||
-            OverlappedChildNeedsDisplay ()) {
+        if (state.Toplevel.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded || OverlappedChildNeedsDisplay ())
+        {
             state.Toplevel.Draw ();
             state.Toplevel.PositionCursor ();
             Driver.Refresh ();
-        } else {
+        }
+        else
+        {
             Driver.UpdateCursor ();
         }
 
-        if (state.Toplevel != Top &&
-            !state.Toplevel.Modal &&
-            (Top.NeedsDisplay || Top.SubViewNeedsDisplay || Top.LayoutNeeded)) {
+        if (state.Toplevel != Top && !state.Toplevel.Modal && (Top.NeedsDisplay || Top.SubViewNeedsDisplay || Top.LayoutNeeded))
+        {
             Top.Draw ();
         }
     }
@@ -773,25 +867,40 @@ public static partial class Application {
     ///         property on the currently running <see cref="Toplevel"/> to false.
     ///     </para>
     /// </remarks>
-    public static void RequestStop (Toplevel top = null) {
-        if (OverlappedTop == null || top == null || (OverlappedTop == null && top != null)) {
+    public static void RequestStop (Toplevel top = null)
+    {
+        if (OverlappedTop == null || top == null || (OverlappedTop == null && top != null))
+        {
             top = Current;
         }
 
-        if (OverlappedTop != null && top.IsOverlappedContainer && top?.Running == true
-            && (Current?.Modal == false || (Current?.Modal == true && Current?.Running == false))) {
+        if (OverlappedTop != null
+            && top.IsOverlappedContainer
+            && top?.Running == true
+            && (Current?.Modal == false || (Current?.Modal == true && Current?.Running == false)))
+        {
             OverlappedTop.RequestStop ();
-        } else if (OverlappedTop != null && top != Current && Current?.Running == true && Current?.Modal == true
-                   && top.Modal && top.Running) {
+        }
+        else if (OverlappedTop != null
+                 && top != Current
+                 && Current?.Running == true
+                 && Current?.Modal == true
+                 && top.Modal
+                 && top.Running)
+        {
             var ev = new ToplevelClosingEventArgs (Current);
             Current.OnClosing (ev);
-            if (ev.Cancel) {
+
+            if (ev.Cancel)
+            {
                 return;
             }
 
             ev = new ToplevelClosingEventArgs (top);
             top.OnClosing (ev);
-            if (ev.Cancel) {
+
+            if (ev.Cancel)
+            {
                 return;
             }
 
@@ -799,38 +908,70 @@ public static partial class Application {
             OnNotifyStopRunState (Current);
             top.Running = false;
             OnNotifyStopRunState (top);
-        } else if ((OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == false
-                    && Current?.Running == true && !top.Running)
-                   || (OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == false
-                       && Current?.Running == false && !top.Running && _topLevels.ToArray ()[1].Running)) {
+        }
+        else if ((OverlappedTop != null
+                  && top != OverlappedTop
+                  && top != Current
+                  && Current?.Modal == false
+                  && Current?.Running == true
+                  && !top.Running)
+                 || (OverlappedTop != null
+                     && top != OverlappedTop
+                     && top != Current
+                     && Current?.Modal == false
+                     && Current?.Running == false
+                     && !top.Running
+                     && _topLevels.ToArray () [1].Running))
+        {
             MoveCurrent (top);
-        } else if (OverlappedTop != null && Current != top && Current?.Running == true && !top.Running
-                   && Current?.Modal == true && top.Modal) {
+        }
+        else if (OverlappedTop != null
+                 && Current != top
+                 && Current?.Running == true
+                 && !top.Running
+                 && Current?.Modal == true
+                 && top.Modal)
+        {
             // The Current and the top are both modal so needed to set the Current.Running to false too.
             Current.Running = false;
             OnNotifyStopRunState (Current);
-        } else if (OverlappedTop != null && Current == top && OverlappedTop?.Running == true && Current?.Running == true
-                   && top.Running
-                   && Current?.Modal == true && top.Modal) {
+        }
+        else if (OverlappedTop != null
+                 && Current == top
+                 && OverlappedTop?.Running == true
+                 && Current?.Running == true
+                 && top.Running
+                 && Current?.Modal == true
+                 && top.Modal)
+        {
             // The OverlappedTop was requested to stop inside a modal Toplevel which is the Current and top,
             // both are the same, so needed to set the Current.Running to false too.
             Current.Running = false;
             OnNotifyStopRunState (Current);
-        } else {
+        }
+        else
+        {
             Toplevel currentTop;
-            if (top == Current || (Current?.Modal == true && !top.Modal)) {
+
+            if (top == Current || (Current?.Modal == true && !top.Modal))
+            {
                 currentTop = Current;
-            } else {
+            }
+            else
+            {
                 currentTop = top;
             }
 
-            if (!currentTop.Running) {
+            if (!currentTop.Running)
+            {
                 return;
             }
 
             var ev = new ToplevelClosingEventArgs (currentTop);
             currentTop.OnClosing (ev);
-            if (ev.Cancel) {
+
+            if (ev.Cancel)
+            {
                 return;
             }
 
@@ -839,8 +980,10 @@ public static partial class Application {
         }
     }
 
-    private static void OnNotifyStopRunState (Toplevel top) {
-        if (EndAfterFirstIteration) {
+    private static void OnNotifyStopRunState (Toplevel top)
+    {
+        if (EndAfterFirstIteration)
+        {
             NotifyStopRunState?.Invoke (top, new ToplevelEventArgs (top));
         }
     }
@@ -850,21 +993,28 @@ public static partial class Application {
     ///     <see cref="Begin(Toplevel)"/> .
     /// </summary>
     /// <param name="runState">The <see cref="RunState"/> returned by the <see cref="Begin(Toplevel)"/> method.</param>
-    public static void End (RunState runState) {
-        if (runState == null) {
+    public static void End (RunState runState)
+    {
+        if (runState == null)
+        {
             throw new ArgumentNullException (nameof (runState));
         }
 
-        if (OverlappedTop != null) {
+        if (OverlappedTop != null)
+        {
             OverlappedTop.OnChildUnloaded (runState.Toplevel);
-        } else {
+        }
+        else
+        {
             runState.Toplevel.OnUnloaded ();
         }
 
         // End the RunState.Toplevel 
         // First, take it off the Toplevel Stack
-        if (_topLevels.Count > 0) {
-            if (_topLevels.Peek () != runState.Toplevel) {
+        if (_topLevels.Count > 0)
+        {
+            if (_topLevels.Peek () != runState.Toplevel)
+            {
                 // If there the top of the stack is not the RunState.Toplevel then
                 // this call to End is not balanced with the call to Begin that started the RunState
                 throw new ArgumentException ("End must be balanced with calls to Begin");
@@ -878,18 +1028,26 @@ public static partial class Application {
 
         // If there is a OverlappedTop that is not the RunState.Toplevel then runstate.TopLevel 
         // is a child of MidTop and we should notify the OverlappedTop that it is closing
-        if (OverlappedTop != null && !runState.Toplevel.Modal && runState.Toplevel != OverlappedTop) {
+        if (OverlappedTop != null && !runState.Toplevel.Modal && runState.Toplevel != OverlappedTop)
+        {
             OverlappedTop.OnChildClosed (runState.Toplevel);
         }
 
         // Set Current and Top to the next TopLevel on the stack
-        if (_topLevels.Count == 0) {
+        if (_topLevels.Count == 0)
+        {
             Current = null;
-        } else {
+        }
+        else
+        {
             Current = _topLevels.Peek ();
-            if (_topLevels.Count == 1 && Current == OverlappedTop) {
+
+            if (_topLevels.Count == 1 && Current == OverlappedTop)
+            {
                 OverlappedTop.OnAllChildClosed ();
-            } else {
+            }
+            else
+            {
                 SetCurrentOverlappedAsTop ();
                 runState.Toplevel.OnLeave (Current);
                 Current.OnEnter (runState.Toplevel);
@@ -925,43 +1083,59 @@ public static partial class Application {
     /// <value>The current.</value>
     public static Toplevel Current { get; private set; }
 
-    private static void EnsureModalOrVisibleAlwaysOnTop (Toplevel Toplevel) {
-        if (!Toplevel.Running || (Toplevel == Current && Toplevel.Visible) || OverlappedTop == null
-            || _topLevels.Peek ().Modal) {
+    private static void EnsureModalOrVisibleAlwaysOnTop (Toplevel Toplevel)
+    {
+        if (!Toplevel.Running
+            || (Toplevel == Current && Toplevel.Visible)
+            || OverlappedTop == null
+            || _topLevels.Peek ().Modal)
+        {
             return;
         }
 
-        foreach (Toplevel top in _topLevels.Reverse ()) {
-            if (top.Modal && top != Current) {
+        foreach (Toplevel top in _topLevels.Reverse ())
+        {
+            if (top.Modal && top != Current)
+            {
                 MoveCurrent (top);
 
                 return;
             }
         }
 
-        if (!Toplevel.Visible && Toplevel == Current) {
+        if (!Toplevel.Visible && Toplevel == Current)
+        {
             OverlappedMoveNext ();
         }
     }
 
-    private static View FindDeepestTop (Toplevel start, int x, int y, out int resx, out int resy) {
+    private static View FindDeepestTop (Toplevel start, int x, int y, out int resx, out int resy)
+    {
         Rect startFrame = start.Frame;
 
-        if (!startFrame.Contains (x, y)) {
+        if (!startFrame.Contains (x, y))
+        {
             resx = 0;
             resy = 0;
 
             return null;
         }
 
-        if (_topLevels != null) {
+        if (_topLevels != null)
+        {
             int count = _topLevels.Count;
-            if (count > 0) {
+
+            if (count > 0)
+            {
                 int rx = x - startFrame.X;
                 int ry = y - startFrame.Y;
-                foreach (Toplevel t in _topLevels) {
-                    if (t != Current) {
-                        if (t != start && t.Visible && t.Frame.Contains (rx, ry)) {
+
+                foreach (Toplevel t in _topLevels)
+                {
+                    if (t != Current)
+                    {
+                        if (t != start && t.Visible && t.Frame.Contains (rx, ry))
+                        {
                             start = t;
 
                             break;
@@ -977,12 +1151,14 @@ public static partial class Application {
         return start;
     }
 
-    private static View FindTopFromView (View view) {
+    private static View FindTopFromView (View view)
+    {
         View top = view?.SuperView != null && view?.SuperView != Top
                        ? view.SuperView
                        : view;
 
-        while (top?.SuperView != null && top?.SuperView != Top) {
+        while (top?.SuperView != null && top?.SuperView != Top)
+        {
             top = top.SuperView;
         }
 
@@ -990,20 +1166,30 @@ public static partial class Application {
     }
 
     // Only return true if the Current has changed.
-    private static bool MoveCurrent (Toplevel top) {
+    private static bool MoveCurrent (Toplevel top)
+    {
         // The Current is modal and the top is not modal Toplevel then
         // the Current must be moved above the first not modal Toplevel.
-        if (OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == true
-            && !_topLevels.Peek ().Modal) {
-            lock (_topLevels) {
+        if (OverlappedTop != null
+            && top != OverlappedTop
+            && top != Current
+            && Current?.Modal == true
+            && !_topLevels.Peek ().Modal)
+        {
+            lock (_topLevels)
+            {
                 _topLevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
             }
 
             var index = 0;
-            Toplevel[] savedToplevels = _topLevels.ToArray ();
-            foreach (Toplevel t in savedToplevels) {
-                if (!t.Modal && t != Current && t != top && t != savedToplevels[index]) {
-                    lock (_topLevels) {
+            Toplevel [] savedToplevels = _topLevels.ToArray ();
+
+            foreach (Toplevel t in savedToplevels)
+            {
+                if (!t.Modal && t != Current && t != top && t != savedToplevels [index])
+                {
+                    lock (_topLevels)
+                    {
                         _topLevels.MoveTo (top, index, new ToplevelEqualityComparer ());
                     }
                 }
@@ -1016,16 +1202,25 @@ public static partial class Application {
 
         // The Current and the top are both not running Toplevel then
         // the top must be moved above the first not running Toplevel.
-        if (OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Running == false
-            && !top.Running) {
-            lock (_topLevels) {
+        if (OverlappedTop != null
+            && top != OverlappedTop
+            && top != Current
+            && Current?.Running == false
+            && !top.Running)
+        {
+            lock (_topLevels)
+            {
                 _topLevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
             }
 
             var index = 0;
-            foreach (Toplevel t in _topLevels.ToArray ()) {
-                if (!t.Running && t != Current && index > 0) {
-                    lock (_topLevels) {
+
+            foreach (Toplevel t in _topLevels.ToArray ())
+            {
+                if (!t.Running && t != Current && index > 0)
+                {
+                    lock (_topLevels)
+                    {
                         _topLevels.MoveTo (top, index - 1, new ToplevelEqualityComparer ());
                     }
                 }
@@ -1039,8 +1234,10 @@ public static partial class Application {
         if ((OverlappedTop != null && top?.Modal == true && _topLevels.Peek () != top)
             || (OverlappedTop != null && Current != OverlappedTop && Current?.Modal == false && top == OverlappedTop)
             || (OverlappedTop != null && Current?.Modal == false && top != Current)
-            || (OverlappedTop != null && Current?.Modal == true && top == OverlappedTop)) {
-            lock (_topLevels) {
+            || (OverlappedTop != null && Current?.Modal == true && top == OverlappedTop))
+        {
+            lock (_topLevels)
+            {
                 _topLevels.MoveTo (top, 0, new ToplevelEqualityComparer ());
                 Current = top;
             }
@@ -1062,13 +1259,17 @@ public static partial class Application {
     /// </summary>
     /// <param name="args">The new size.</param>
     /// <returns><see lanword="true"/>if the size was changed.</returns>
-    public static bool OnSizeChanging (SizeChangedEventArgs args) {
+    public static bool OnSizeChanging (SizeChangedEventArgs args)
+    {
         SizeChanging?.Invoke (null, args);
-        if (args.Cancel) {
+
+        if (args.Cancel)
+        {
             return false;
         }
 
-        foreach (Toplevel t in _topLevels) {
+        foreach (Toplevel t in _topLevels)
+        {
             t.SetRelativeLayout (new Rect (0, 0, args.Size.Width, args.Size.Height));
             t.LayoutSubviews ();
             t.PositionToplevels ();
@@ -1092,8 +1293,8 @@ public static partial class Application {
     public static View WantContinuousButtonPressedView { get; private set; }
 
     /// <summary>
-    ///     Gets the view that grabbed the mouse (e.g. for dragging). When this is set, all mouse events will be routed to this
-    ///     view until the view calls <see cref="UngrabMouse"/> or the mouse is released.
+    ///     Gets the view that grabbed the mouse (e.g. for dragging). When this is set, all mouse events will be routed to this view until the view calls
+    ///     <see cref="UngrabMouse"/> or the mouse is released.
     /// </summary>
     public static View MouseGrabView { get; private set; }
 
@@ -1110,35 +1311,42 @@ public static partial class Application {
     public static event EventHandler<ViewEventArgs> UnGrabbedMouse;
 
     /// <summary>
-    ///     Grabs the mouse, forcing all mouse events to be routed to the specified view until <see cref="UngrabMouse"/> is
-    ///     called.
+    ///     Grabs the mouse, forcing all mouse events to be routed to the specified view until <see cref="UngrabMouse"/> is called.
     /// </summary>
     /// <param name="view">View that will receive all mouse events until <see cref="UngrabMouse"/> is invoked.</param>
-    public static void GrabMouse (View view) {
-        if (view == null) {
+    public static void GrabMouse (View view)
+    {
+        if (view == null)
+        {
             return;
         }
 
-        if (!OnGrabbingMouse (view)) {
+        if (!OnGrabbingMouse (view))
+        {
             OnGrabbedMouse (view);
             MouseGrabView = view;
         }
     }
 
     /// <summary>Releases the mouse grab, so mouse events will be routed to the view on which the mouse is.</summary>
-    public static void UngrabMouse () {
-        if (MouseGrabView == null) {
+    public static void UngrabMouse ()
+    {
+        if (MouseGrabView == null)
+        {
             return;
         }
 
-        if (!OnUnGrabbingMouse (MouseGrabView)) {
+        if (!OnUnGrabbingMouse (MouseGrabView))
+        {
             OnUnGrabbedMouse (MouseGrabView);
             MouseGrabView = null;
         }
     }
 
-    private static bool OnGrabbingMouse (View view) {
-        if (view == null) {
+    private static bool OnGrabbingMouse (View view)
+    {
+        if (view == null)
+        {
             return false;
         }
 
@@ -1148,8 +1356,10 @@ public static partial class Application {
         return evArgs.Cancel;
     }
 
-    private static bool OnUnGrabbingMouse (View view) {
-        if (view == null) {
+    private static bool OnUnGrabbingMouse (View view)
+    {
+        if (view == null)
+        {
             return false;
         }
 
@@ -1159,16 +1369,20 @@ public static partial class Application {
         return evArgs.Cancel;
     }
 
-    private static void OnGrabbedMouse (View view) {
-        if (view == null) {
+    private static void OnGrabbedMouse (View view)
+    {
+        if (view == null)
+        {
             return;
         }
 
         GrabbedMouse?.Invoke (view, new ViewEventArgs (view));
     }
 
-    private static void OnUnGrabbedMouse (View view) {
-        if (view == null) {
+    private static void OnUnGrabbedMouse (View view)
+    {
+        if (view == null)
+        {
             return;
         }
 
@@ -1181,8 +1395,8 @@ public static partial class Application {
     /// <summary>Event fired when a mouse move or click occurs. Coordinates are screen relative.</summary>
     /// <remarks>
     ///     <para>
-    ///         Use this event to receive mouse events in screen coordinates. Use <see cref="Responder.MouseEvent"/> to receive
-    ///         mouse events relative to a <see cref="View"/>'s bounds.
+    ///         Use this event to receive mouse events in screen coordinates. Use <see cref="Responder.MouseEvent"/> to receive mouse events relative to a
+    ///         <see cref="View"/>'s bounds.
     ///     </para>
     ///     <para>The <see cref="MouseEvent.View"/> will contain the <see cref="View"/> that contains the mouse coordinates.</para>
     /// </remarks>
@@ -1191,36 +1405,46 @@ public static partial class Application {
     /// <summary>Called when a mouse event occurs. Fires the <see cref="MouseEvent"/> event.</summary>
     /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
     /// <param name="a">The mouse event with coordinates relative to the screen.</param>
-    public static void OnMouseEvent (MouseEventEventArgs a) {
-        static bool OutsideRect (Point p, Rect r) => p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom;
+    public static void OnMouseEvent (MouseEventEventArgs a)
+    {
+        static bool OutsideRect (Point p, Rect r) { return p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom; }
 
-        if (IsMouseDisabled) {
+        if (IsMouseDisabled)
+        {
             return;
         }
 
         var view = View.FindDeepestView (Current, a.MouseEvent.X, a.MouseEvent.Y, out int screenX, out int screenY);
 
-        if (view != null && view.WantContinuousButtonPressed) {
+        if (view != null && view.WantContinuousButtonPressed)
+        {
             WantContinuousButtonPressedView = view;
-        } else {
+        }
+        else
+        {
             WantContinuousButtonPressedView = null;
         }
 
-        if (view != null) {
+        if (view != null)
+        {
             a.MouseEvent.View = view;
         }
 
         MouseEvent?.Invoke (null, new MouseEventEventArgs (a.MouseEvent));
 
-        if (a.MouseEvent.Handled) {
+        if (a.MouseEvent.Handled)
+        {
             return;
         }
 
-        if (MouseGrabView != null) {
+        if (MouseGrabView != null)
+        {
             // If the mouse is grabbed, send the event to the view that grabbed it.
             // The coordinates are relative to the Bounds of the view that grabbed the mouse.
             Point newxy = MouseGrabView.ScreenToFrame (a.MouseEvent.X, a.MouseEvent.Y);
-            var nme = new MouseEvent {
+
+            var nme = new MouseEvent
+            {
                 X = newxy.X,
                 Y = newxy.Y,
                 Flags = a.MouseEvent.Flags,
@@ -1228,7 +1452,9 @@ public static partial class Application {
                 OfY = a.MouseEvent.Y - newxy.Y,
                 View = view
             };
-            if (OutsideRect (new Point (nme.X, nme.Y), MouseGrabView.Bounds)) {
+
+            if (OutsideRect (new Point (nme.X, nme.Y), MouseGrabView.Bounds))
+            {
                 // The mouse has moved outside the bounds of the the view that
                 // grabbed the mouse, so we tell the view that last got 
                 // OnMouseEnter the mouse is leaving
@@ -1238,27 +1464,35 @@ public static partial class Application {
             }
 
             //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-            if (MouseGrabView?.OnMouseEvent (nme) == true) {
+            if (MouseGrabView?.OnMouseEvent (nme) == true)
+            {
                 return;
             }
         }
 
-        if ((view == null || view == OverlappedTop) &&
-            Current is { Modal: false } && OverlappedTop != null &&
-            a.MouseEvent.Flags != MouseFlags.ReportMousePosition &&
-            a.MouseEvent.Flags != 0) {
+        if ((view == null || view == OverlappedTop)
+            && Current is { Modal: false }
+            && OverlappedTop != null
+            && a.MouseEvent.Flags != MouseFlags.ReportMousePosition
+            && a.MouseEvent.Flags != 0)
+        {
             View top = FindDeepestTop (Top, a.MouseEvent.X, a.MouseEvent.Y, out _, out _);
             view = View.FindDeepestView (top, a.MouseEvent.X, a.MouseEvent.Y, out screenX, out screenY);
 
-            if (view != null && view != OverlappedTop && top != Current) {
+            if (view != null && view != OverlappedTop && top != Current)
+            {
                 MoveCurrent ((Toplevel)top);
             }
         }
 
-        bool AdornmentHandledMouseEvent (Adornment frame) {
-            if (frame?.Thickness.Contains (frame.FrameToScreen (), a.MouseEvent.X, a.MouseEvent.Y) ?? false) {
+        bool AdornmentHandledMouseEvent (Adornment frame)
+        {
+            if (frame?.Thickness.Contains (frame.FrameToScreen (), a.MouseEvent.X, a.MouseEvent.Y) ?? false)
+            {
                 Point boundsPoint = frame.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
-                var me = new MouseEvent {
+
+                var me = new MouseEvent
+                {
                     X = boundsPoint.X,
                     Y = boundsPoint.Y,
                     Flags = a.MouseEvent.Flags,
@@ -1274,19 +1508,24 @@ public static partial class Application {
             return false;
         }
 
-        if (view != null) {
+        if (view != null)
+        {
             // Work inside-out (Padding, Border, Margin)
             // TODO: Debate whether inside-out or outside-in is the right strategy
-            if (AdornmentHandledMouseEvent (view?.Padding)) {
+            if (AdornmentHandledMouseEvent (view?.Padding))
+            {
                 return;
             }
 
-            if (AdornmentHandledMouseEvent (view?.Border)) {
-                if (view is Toplevel) {
+            if (AdornmentHandledMouseEvent (view?.Border))
+            {
+                if (view is Toplevel)
+                {
                     // TODO: This is a temporary hack to work around the fact that 
                     // drag handling is handled in Toplevel (See Issue #2537)
 
-                    var me = new MouseEvent {
+                    var me = new MouseEvent
+                    {
                         X = screenX,
                         Y = screenY,
                         Flags = a.MouseEvent.Flags,
@@ -1295,22 +1534,27 @@ public static partial class Application {
                         View = view
                     };
 
-                    if (_mouseEnteredView == null) {
+                    if (_mouseEnteredView == null)
+                    {
                         _mouseEnteredView = view;
                         view.OnMouseEnter (me);
-                    } else if (_mouseEnteredView != view) {
+                    }
+                    else if (_mouseEnteredView != view)
+                    {
                         _mouseEnteredView.OnMouseLeave (me);
                         view.OnMouseEnter (me);
                         _mouseEnteredView = view;
                     }
 
-                    if (!view.WantMousePositionReports && a.MouseEvent.Flags == MouseFlags.ReportMousePosition) {
+                    if (!view.WantMousePositionReports && a.MouseEvent.Flags == MouseFlags.ReportMousePosition)
+                    {
                         return;
                     }
 
                     WantContinuousButtonPressedView = view.WantContinuousButtonPressed ? view : null;
 
-                    if (view.OnMouseEvent (me)) {
+                    if (view.OnMouseEvent (me))
+                    {
                         // Should we bubble up the event, if it is not handled?
                         //return;
                     }
@@ -1321,14 +1565,19 @@ public static partial class Application {
                 return;
             }
 
-            if (AdornmentHandledMouseEvent (view?.Margin)) {
+            if (AdornmentHandledMouseEvent (view?.Margin))
+            {
                 return;
             }
 
             Rect bounds = view.BoundsToScreen (view.Bounds);
-            if (bounds.Contains (a.MouseEvent.X, a.MouseEvent.Y)) {
+
+            if (bounds.Contains (a.MouseEvent.X, a.MouseEvent.Y))
+            {
                 Point boundsPoint = view.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
-                var me = new MouseEvent {
+
+                var me = new MouseEvent
+                {
                     X = boundsPoint.X,
                     Y = boundsPoint.Y,
                     Flags = a.MouseEvent.Flags,
@@ -1337,22 +1586,27 @@ public static partial class Application {
                     View = view
                 };
 
-                if (_mouseEnteredView == null) {
+                if (_mouseEnteredView == null)
+                {
                     _mouseEnteredView = view;
                     view.OnMouseEnter (me);
-                } else if (_mouseEnteredView != view) {
+                }
+                else if (_mouseEnteredView != view)
+                {
                     _mouseEnteredView.OnMouseLeave (me);
                     view.OnMouseEnter (me);
                     _mouseEnteredView = view;
                 }
 
-                if (!view.WantMousePositionReports && a.MouseEvent.Flags == MouseFlags.ReportMousePosition) {
+                if (!view.WantMousePositionReports && a.MouseEvent.Flags == MouseFlags.ReportMousePosition)
+                {
                     return;
                 }
 
                 WantContinuousButtonPressedView = view.WantContinuousButtonPressed ? view : null;
 
-                if (view.OnMouseEvent (me)) {
+                if (view.OnMouseEvent (me))
+                {
                     // Should we bubble up the event, if it is not handled?
                     //return;
                 }
@@ -1371,10 +1625,13 @@ public static partial class Application {
     /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     [JsonConverter (typeof (KeyJsonConverter))]
-    public static Key AlternateForwardKey {
+    public static Key AlternateForwardKey
+    {
         get => _alternateForwardKey;
-        set {
-            if (_alternateForwardKey != value) {
+        set
+        {
+            if (_alternateForwardKey != value)
+            {
                 Key oldKey = _alternateForwardKey;
                 _alternateForwardKey = value;
                 OnAlternateForwardKeyChanged (new KeyChangedEventArgs (oldKey, value));
@@ -1382,8 +1639,10 @@ public static partial class Application {
         }
     }
 
-    private static void OnAlternateForwardKeyChanged (KeyChangedEventArgs e) {
-        foreach (Toplevel top in _topLevels.ToArray ()) {
+    private static void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
+    {
+        foreach (Toplevel top in _topLevels.ToArray ())
+        {
             top.OnAlternateForwardKeyChanged (e);
         }
     }
@@ -1393,10 +1652,13 @@ public static partial class Application {
     /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     [JsonConverter (typeof (KeyJsonConverter))]
-    public static Key AlternateBackwardKey {
+    public static Key AlternateBackwardKey
+    {
         get => _alternateBackwardKey;
-        set {
-            if (_alternateBackwardKey != value) {
+        set
+        {
+            if (_alternateBackwardKey != value)
+            {
                 Key oldKey = _alternateBackwardKey;
                 _alternateBackwardKey = value;
                 OnAlternateBackwardKeyChanged (new KeyChangedEventArgs (oldKey, value));
@@ -1404,8 +1666,10 @@ public static partial class Application {
         }
     }
 
-    private static void OnAlternateBackwardKeyChanged (KeyChangedEventArgs oldKey) {
-        foreach (Toplevel top in _topLevels.ToArray ()) {
+    private static void OnAlternateBackwardKeyChanged (KeyChangedEventArgs oldKey)
+    {
+        foreach (Toplevel top in _topLevels.ToArray ())
+        {
             top.OnAlternateBackwardKeyChanged (oldKey);
         }
     }
@@ -1415,10 +1679,13 @@ public static partial class Application {
     /// <summary>Gets or sets the key to quit the application.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     [JsonConverter (typeof (KeyJsonConverter))]
-    public static Key QuitKey {
+    public static Key QuitKey
+    {
         get => _quitKey;
-        set {
-            if (_quitKey != value) {
+        set
+        {
+            if (_quitKey != value)
+            {
                 Key oldKey = _quitKey;
                 _quitKey = value;
                 OnQuitKeyChanged (new KeyChangedEventArgs (oldKey, value));
@@ -1426,9 +1693,11 @@ public static partial class Application {
         }
     }
 
-    private static void OnQuitKeyChanged (KeyChangedEventArgs e) {
+    private static void OnQuitKeyChanged (KeyChangedEventArgs e)
+    {
         // Duplicate the list so if it changes during enumeration we're safe
-        foreach (Toplevel top in _topLevels.ToArray ()) {
+        foreach (Toplevel top in _topLevels.ToArray ())
+        {
             top.OnQuitKeyChanged (e);
         }
     }
@@ -1436,8 +1705,7 @@ public static partial class Application {
     /// <summary>
     ///     Event fired when the user presses a key. Fired by <see cref="OnKeyDown"/>.
     ///     <para>
-    ///         Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and to prevent
-    ///         additional processing.
+    ///         Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and to prevent additional processing.
     ///     </para>
     /// </summary>
     /// <remarks>
@@ -1448,46 +1716,58 @@ public static partial class Application {
     public static event EventHandler<Key> KeyDown;
 
     /// <summary>
-    ///     Called by the <see cref="ConsoleDriver"/> when the user presses a key. Fires the <see cref="KeyDown"/> event then
-    ///     calls <see cref="View.NewKeyDownEvent"/> on all top level views. Called after <see cref="OnKeyDown"/> and before
+    ///     Called by the <see cref="ConsoleDriver"/> when the user presses a key. Fires the <see cref="KeyDown"/> event then calls
+    ///     <see cref="View.NewKeyDownEvent"/> on all top level views. Called after <see cref="OnKeyDown"/> and before
     ///     <see cref="OnKeyUp"/>.
     /// </summary>
     /// <remarks>Can be used to simulate key press events.</remarks>
     /// <param name="keyEvent"></param>
     /// <returns><see langword="true"/> if the key was handled.</returns>
-    public static bool OnKeyDown (Key keyEvent) {
-        if (!_initialized) {
+    public static bool OnKeyDown (Key keyEvent)
+    {
+        if (!_initialized)
+        {
             return true;
         }
 
         KeyDown?.Invoke (null, keyEvent);
-        if (keyEvent.Handled) {
+
+        if (keyEvent.Handled)
+        {
             return true;
         }
 
-        foreach (Toplevel topLevel in _topLevels.ToList ()) {
-            if (topLevel.NewKeyDownEvent (keyEvent)) {
+        foreach (Toplevel topLevel in _topLevels.ToList ())
+        {
+            if (topLevel.NewKeyDownEvent (keyEvent))
+            {
                 return true;
             }
 
-            if (topLevel.Modal) {
+            if (topLevel.Modal)
+            {
                 break;
             }
         }
 
         // Invoke any Global KeyBindings
-        foreach (Toplevel topLevel in _topLevels.ToList ()) {
+        foreach (Toplevel topLevel in _topLevels.ToList ())
+        {
             foreach (View view in topLevel.Subviews.Where (
-                         v => v.KeyBindings.TryGet (
-                             keyEvent.KeyCode,
-                             KeyBindingScope.Application,
-                             out KeyBinding _
-                         )
-                     )) {
-                if (view.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.Application, out KeyBinding _)) {
+                                                           v => v.KeyBindings.TryGet (
+                                                                                      keyEvent.KeyCode,
+                                                                                      KeyBindingScope.Application,
+                                                                                      out KeyBinding _
+                                                                                     )
+                                                          ))
+            {
+                if (view.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.Application, out KeyBinding _))
+                {
                     keyEvent.Scope = KeyBindingScope.Application;
                     bool? handled = view.OnInvokingKeyBindings (keyEvent);
-                    if (handled != null && (bool)handled) {
+
+                    if (handled != null && (bool)handled)
+                    {
                         return true;
                     }
                 }
@@ -1500,8 +1780,7 @@ public static partial class Application {
     /// <summary>
     ///     Event fired when the user releases a key. Fired by <see cref="OnKeyUp"/>.
     ///     <para>
-    ///         Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and to prevent
-    ///         additional processing.
+    ///         Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and to prevent additional processing.
     ///     </para>
     /// </summary>
     /// <remarks>
@@ -1512,28 +1791,35 @@ public static partial class Application {
     public static event EventHandler<Key> KeyUp;
 
     /// <summary>
-    ///     Called by the <see cref="ConsoleDriver"/> when the user releases a key. Fires the <see cref="KeyUp"/> event then
-    ///     calls <see cref="View.NewKeyUpEvent"/> on all top level views. Called after <see cref="OnKeyDown"/>.
+    ///     Called by the <see cref="ConsoleDriver"/> when the user releases a key. Fires the <see cref="KeyUp"/> event then calls
+    ///     <see cref="View.NewKeyUpEvent"/> on all top level views. Called after <see cref="OnKeyDown"/>.
     /// </summary>
     /// <remarks>Can be used to simulate key press events.</remarks>
     /// <param name="a"></param>
     /// <returns><see langword="true"/> if the key was handled.</returns>
-    public static bool OnKeyUp (Key a) {
-        if (!_initialized) {
+    public static bool OnKeyUp (Key a)
+    {
+        if (!_initialized)
+        {
             return true;
         }
 
         KeyUp?.Invoke (null, a);
-        if (a.Handled) {
+
+        if (a.Handled)
+        {
             return true;
         }
 
-        foreach (Toplevel topLevel in _topLevels.ToList ()) {
-            if (topLevel.NewKeyUpEvent (a)) {
+        foreach (Toplevel topLevel in _topLevels.ToList ())
+        {
+            if (topLevel.NewKeyUpEvent (a))
+            {
                 return true;
             }
 
-            if (topLevel.Modal) {
+            if (topLevel.Modal)
+            {
                 break;
             }
         }
@@ -1545,4 +1831,5 @@ public static partial class Application {
 }
 
 /// <summary>Event arguments for the <see cref="Application.Iteration"/> event.</summary>
-public class IterationEventArgs { }
+public class IterationEventArgs
+{ }

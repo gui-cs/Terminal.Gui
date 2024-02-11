@@ -3,13 +3,15 @@
 namespace Terminal.Gui;
 
 /// <summary>Event arguments for the <see cref="ConfigurationManager"/> events.</summary>
-public class ConfigurationManagerEventArgs : EventArgs {
+public class ConfigurationManagerEventArgs : EventArgs
+{
     /// <summary>Initializes a new instance of <see cref="ConfigurationManagerEventArgs"/></summary>
     public ConfigurationManagerEventArgs () { }
 }
 
 /// <summary>Event arguments for the <see cref="ThemeManager"/> events.</summary>
-public class ThemeManagerEventArgs : EventArgs {
+public class ThemeManagerEventArgs : EventArgs
+{
     /// <summary>Initializes a new instance of <see cref="ThemeManagerEventArgs"/></summary>
     public ThemeManagerEventArgs (string newTheme) { NewTheme = newTheme; }
 

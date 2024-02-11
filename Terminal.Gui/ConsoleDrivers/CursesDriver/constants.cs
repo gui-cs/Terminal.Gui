@@ -8,7 +8,8 @@ using System.Runtime.InteropServices;
 
 namespace Unix.Terminal;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-public partial class Curses {
+public partial class Curses
+{
     public const int A_NORMAL = 0x0;
     public const int A_STANDOUT = 0x10000;
     public const int A_UNDERLINE = 0x20000;
@@ -57,7 +58,8 @@ public partial class Curses {
     public const int TIOCGWINSZ = 0x5413;
     public const int TIOCGWINSZ_MAC = 0x40087468;
     [Flags]
-    public enum Event : long {
+    public enum Event : long
+    {
         Button1Pressed = 0x2,
         Button1Released = 0x1,
         Button1Clicked = 0x4,
@@ -171,6 +173,6 @@ public partial class Curses {
     // see #949
     public static int LC_ALL { get; }
     static Curses () { LC_ALL = RuntimeInformation.IsOSPlatform (OSPlatform.OSX) ? 0 : 6; }
-    public static int ColorPair (int n) => 0 + n * 256;
+    public static int ColorPair (int n) { return 0 + n * 256; }
 }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

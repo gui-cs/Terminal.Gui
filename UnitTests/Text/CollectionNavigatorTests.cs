@@ -2,10 +2,10 @@
 
 namespace Terminal.Gui.TextTests;
 
-public class CollectionNavigatorTests {
-    public CollectionNavigatorTests (ITestOutputHelper output) { _output = output; }
-
-    private static readonly string[] simpleStrings = {
+public class CollectionNavigatorTests
+{
+    private static readonly string [] simpleStrings =
+    {
         "appricot", // 0
         "arm", // 1
         "bat", // 2
@@ -14,10 +14,12 @@ public class CollectionNavigatorTests {
     };
 
     private readonly ITestOutputHelper _output;
+    public CollectionNavigatorTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
-    public void AtSymbol () {
-        var strings = new[] { "appricot", "arm", "ta", "@bob", "@bb", "text", "egg", "candle" };
+    public void AtSymbol ()
+    {
+        var strings = new [] { "appricot", "arm", "ta", "@bob", "@bb", "text", "egg", "candle" };
 
         var n = new CollectionNavigator (strings);
         Assert.Equal (3, n.GetNextMatchingItem (0, '@'));
@@ -26,7 +28,8 @@ public class CollectionNavigatorTests {
     }
 
     [Fact]
-    public void Cycling () {
+    public void Cycling ()
+    {
         // cycling with 'b'
         var n = new CollectionNavigator (simpleStrings);
         Assert.Equal (2, n.GetNextMatchingItem (0, 'b'));
@@ -45,8 +48,9 @@ public class CollectionNavigatorTests {
     }
 
     [Fact]
-    public void Delay () {
-        var strings = new[] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "appricot" };
+    public void Delay ()
+    {
+        var strings = new [] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "appricot" };
         var current = 0;
         var n = new CollectionNavigator (strings);
 
@@ -85,8 +89,9 @@ public class CollectionNavigatorTests {
     }
 
     [Fact]
-    public void FullText () {
-        var strings = new[] { "appricot", "arm", "ta", "target", "text", "egg", "candle" };
+    public void FullText ()
+    {
+        var strings = new [] { "appricot", "arm", "ta", "target", "text", "egg", "candle" };
 
         var n = new CollectionNavigator (strings);
         var current = 0;
@@ -120,13 +125,15 @@ public class CollectionNavigatorTests {
     [InlineData (KeyCode.Delete, false)]
     [InlineData (KeyCode.Esc, false)]
     [InlineData (KeyCode.ShiftMask, false)]
-    public void IsCompatibleKey_Does_Not_Allow_Alt_And_Ctrl_Keys (KeyCode keyCode, bool compatible) {
+    public void IsCompatibleKey_Does_Not_Allow_Alt_And_Ctrl_Keys (KeyCode keyCode, bool compatible)
+    {
         Assert.Equal (compatible, CollectionNavigatorBase.IsCompatibleKey (keyCode));
     }
 
     [Fact]
-    public void MinimizeMovement_False_ShouldMoveIfMultipleMatches () {
-        var strings = new[] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "appricot", "c", "car", "cart" };
+    public void MinimizeMovement_False_ShouldMoveIfMultipleMatches ()
+    {
+        var strings = new [] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "appricot", "c", "car", "cart" };
         var current = 0;
         var n = new CollectionNavigator (strings);
         Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$$"));
@@ -160,8 +167,9 @@ public class CollectionNavigatorTests {
     }
 
     [Fact]
-    public void MinimizeMovement_True_ShouldStayOnCurrentIfMultipleMatches () {
-        var strings = new[] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "appricot", "c", "car", "cart" };
+    public void MinimizeMovement_True_ShouldStayOnCurrentIfMultipleMatches ()
+    {
+        var strings = new [] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "appricot", "c", "car", "cart" };
         var current = 0;
         var n = new CollectionNavigator (strings);
         Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$$", true));
@@ -178,8 +186,9 @@ public class CollectionNavigatorTests {
     }
 
     [Fact]
-    public void MutliKeySearchPlusWrongKeyStays () {
-        var strings = new[] { "a", "c", "can", "candle", "candy", "yellow", "zebra" };
+    public void MutliKeySearchPlusWrongKeyStays ()
+    {
+        var strings = new [] { "a", "c", "can", "candle", "candy", "yellow", "zebra" };
         var current = 0;
         var n = new CollectionNavigator (strings);
 
@@ -218,7 +227,8 @@ public class CollectionNavigatorTests {
     }
 
     [Fact]
-    public void OutOfBoundsShouldBeIgnored () {
+    public void OutOfBoundsShouldBeIgnored ()
+    {
         var n = new CollectionNavigator (simpleStrings);
 
         // Expect saying that index 500 is the current selection should not cause
@@ -227,7 +237,8 @@ public class CollectionNavigatorTests {
     }
 
     [Fact]
-    public void ShouldAcceptNegativeOne () {
+    public void ShouldAcceptNegativeOne ()
+    {
         var n = new CollectionNavigator (simpleStrings);
 
         // Expect that index of -1 (i.e. no selection) should work correctly
@@ -236,8 +247,9 @@ public class CollectionNavigatorTests {
     }
 
     [Fact]
-    public void Symbols () {
-        var strings = new[] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "appricot" };
+    public void Symbols ()
+    {
+        var strings = new [] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "appricot" };
         var current = 0;
         var n = new CollectionNavigator (strings);
         Assert.Equal (strings.IndexOf ("appricot"), current = n.GetNextMatchingItem (current, 'a'));
@@ -273,8 +285,9 @@ public class CollectionNavigatorTests {
     }
 
     [Fact]
-    public void Unicode () {
-        var strings = new[] { "appricot", "arm", "ta", "丗丙业丞", "丗丙丛", "text", "egg", "candle" };
+    public void Unicode ()
+    {
+        var strings = new [] { "appricot", "arm", "ta", "丗丙业丞", "丗丙丛", "text", "egg", "candle" };
 
         var n = new CollectionNavigator (strings);
         var current = 0;
@@ -300,24 +313,28 @@ public class CollectionNavigatorTests {
     }
 
     [Fact]
-    public void Word () {
-        var strings = new[] { "appricot", "arm", "bat", "batman", "bates hotel", "candle" };
+    public void Word ()
+    {
+        var strings = new [] { "appricot", "arm", "bat", "batman", "bates hotel", "candle" };
         var current = 0;
         var n = new CollectionNavigator (strings);
         Assert.Equal (strings.IndexOf ("bat"), current = n.GetNextMatchingItem (current, 'b')); // match bat
         Assert.Equal (strings.IndexOf ("bat"), current = n.GetNextMatchingItem (current, 'a')); // match bat
         Assert.Equal (strings.IndexOf ("bat"), current = n.GetNextMatchingItem (current, 't')); // match bat
+
         Assert.Equal (
-            strings.IndexOf ("bates hotel"),
-            current = n.GetNextMatchingItem (current, 'e')
-        ); // match bates hotel
+                      strings.IndexOf ("bates hotel"),
+                      current = n.GetNextMatchingItem (current, 'e')
+                     ); // match bates hotel
+
         Assert.Equal (
-            strings.IndexOf ("bates hotel"),
-            current = n.GetNextMatchingItem (current, 's')
-        ); // match bates hotel
+                      strings.IndexOf ("bates hotel"),
+                      current = n.GetNextMatchingItem (current, 's')
+                     ); // match bates hotel
+
         Assert.Equal (
-            strings.IndexOf ("bates hotel"),
-            current = n.GetNextMatchingItem (current, ' ')
-        ); // match bates hotel
+                      strings.IndexOf ("bates hotel"),
+                      current = n.GetNextMatchingItem (current, ' ')
+                     ); // match bates hotel
     }
 }

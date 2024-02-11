@@ -1,10 +1,10 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     The 16 foreground color codes used by ANSI Esc sequences for 256 color terminals. Add 10 to these values for
-///     background color.
+///     The 16 foreground color codes used by ANSI Esc sequences for 256 color terminals. Add 10 to these values for background color.
 /// </summary>
-public enum AnsiColorCode {
+public enum AnsiColorCode
+{
     /// <summary>The ANSI color code for Black.</summary>
     BLACK = 30,
 

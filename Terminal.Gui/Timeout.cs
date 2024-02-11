@@ -8,7 +8,8 @@
 namespace Terminal.Gui;
 
 /// <summary>Provides data for timers running manipulation.</summary>
-public sealed class Timeout {
+public sealed class Timeout
+{
     /// <summary>The function that will be invoked.</summary>
     public Func<bool> Callback;
 

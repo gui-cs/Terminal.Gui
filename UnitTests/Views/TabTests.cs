@@ -1,8 +1,10 @@
 ﻿namespace Terminal.Gui.ViewsTests;
 
-public class TabTests {
+public class TabTests
+{
     [Fact]
-    public void Constructor_Defaults () {
+    public void Constructor_Defaults ()
+    {
         var tab = new Tab ();
         Assert.Equal ("Unamed", tab.DisplayText);
         Assert.Null (tab.View);

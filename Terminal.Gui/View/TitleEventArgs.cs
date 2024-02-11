@@ -1,11 +1,13 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>Event arguments for Title change events.</summary>
-public class TitleEventArgs : EventArgs {
+public class TitleEventArgs : EventArgs
+{
     /// <summary>Initializes a new instance of <see cref="TitleEventArgs"/></summary>
     /// <param name="oldTitle">The <see cref="View.Title"/> that is/has been replaced.</param>
     /// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
-    public TitleEventArgs (string oldTitle, string newTitle) {
+    public TitleEventArgs (string oldTitle, string newTitle)
+    {
         OldTitle = oldTitle;
         NewTitle = newTitle;
     }

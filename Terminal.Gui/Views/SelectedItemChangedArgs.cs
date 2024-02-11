@@ -1,11 +1,13 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>Event arguments for the SelectedItemChagned event.</summary>
-public class SelectedItemChangedArgs : EventArgs {
+public class SelectedItemChangedArgs : EventArgs
+{
     /// <summary>Initializes a new <see cref="SelectedItemChangedArgs"/> class.</summary>
     /// <param name="selectedItem"></param>
     /// <param name="previousSelectedItem"></param>
-    public SelectedItemChangedArgs (int selectedItem, int previousSelectedItem) {
+    public SelectedItemChangedArgs (int selectedItem, int previousSelectedItem)
+    {
         PreviousSelectedItem = previousSelectedItem;
         SelectedItem = selectedItem;
     }

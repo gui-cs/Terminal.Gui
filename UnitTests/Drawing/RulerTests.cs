@@ -6,12 +6,14 @@
 
 namespace Terminal.Gui.DrawingTests;
 
-public class RulerTests {
-    public RulerTests (ITestOutputHelper output) { _output = output; }
+public class RulerTests
+{
     private readonly ITestOutputHelper _output;
+    public RulerTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
-    public void Attribute_set () {
+    public void Attribute_set ()
+    {
         var newAttribute = new Attribute (Color.Red, Color.Green);
 
         var r = new Ruler ();
@@ -20,7 +22,8 @@ public class RulerTests {
     }
 
     [Fact]
-    public void Constructor_Defaults () {
+    public void Constructor_Defaults ()
+    {
         var r = new Ruler ();
         Assert.Equal (0, r.Length);
         Assert.Equal (Orientation.Horizontal, r.Orientation);
@@ -28,7 +31,8 @@ public class RulerTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void Draw_Default () {
+    public void Draw_Default ()
+    {
         ((FakeDriver)Application.Driver).SetBufferSize (25, 25);
 
         var r = new Ruler ();
@@ -38,7 +42,8 @@ public class RulerTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void Draw_Horizontal () {
+    public void Draw_Horizontal ()
+    {
         var len = 15;
 
         // Add a frame so we can see the ruler
@@ -53,59 +58,64 @@ public class RulerTests {
 
         r.Length = len;
         r.Draw (new Point (0, 0));
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 |123456789|1234────┐
 │                  │
 │                  │
 │                  │
 └──────────────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
 
         // Postive offset
         Application.Refresh ();
         r.Draw (new Point (1, 1));
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌──────────────────┐
 │|123456789|1234   │
 │                  │
 │                  │
 └──────────────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
 
         // Negative offset
         Application.Refresh ();
         r.Draw (new Point (-1, 1));
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌──────────────────┐
 123456789|1234     │
 │                  │
 │                  │
 └──────────────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
 
         // Clip
         Application.Refresh ();
         r.Draw (new Point (10, 1));
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌──────────────────┐
 │         |123456789
 │                  │
 │                  │
 └──────────────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void Draw_Horizontal_Start () {
+    public void Draw_Horizontal_Start ()
+    {
         var len = 15;
 
         // Add a frame so we can see the ruler
@@ -120,33 +130,36 @@ public class RulerTests {
 
         r.Length = len;
         r.Draw (new Point (0, 0), 1);
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 123456789|12345────┐
 │                  │
 │                  │
 │                  │
 └──────────────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
 
         Application.Refresh ();
         r.Length = len;
         r.Draw (new Point (1, 0), 1);
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌123456789|12345───┐
 │                  │
 │                  │
 │                  │
 └──────────────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void Draw_Vertical () {
+    public void Draw_Vertical ()
+    {
         var len = 15;
 
         // Add a frame so we can see the ruler
@@ -161,8 +174,9 @@ public class RulerTests {
         r.Orientation = Orientation.Vertical;
         r.Length = len;
         r.Draw (new Point (0, 0));
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 -───┐
 1   │
 2   │
@@ -183,14 +197,15 @@ public class RulerTests {
 │   │
 │   │
 └───┘",
-            _output
-        );
+                                                      _output
+                                                     );
 
         // Postive offset
         Application.Refresh ();
         r.Draw (new Point (1, 1));
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌───┐
 │-  │
 │1  │
@@ -211,14 +226,15 @@ public class RulerTests {
 │   │
 │   │
 └───┘",
-            _output
-        );
+                                                      _output
+                                                     );
 
         // Negative offset
         Application.Refresh ();
         r.Draw (new Point (1, -1));
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌1──┐
 │2  │
 │3  │
@@ -239,14 +255,15 @@ public class RulerTests {
 │   │
 │   │
 └───┘",
-            _output
-        );
+                                                      _output
+                                                     );
 
         // Clip
         Application.Refresh ();
         r.Draw (new Point (1, 10));
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌───┐
 │   │
 │   │
@@ -267,13 +284,14 @@ public class RulerTests {
 │7  │
 │8  │
 └9──┘",
-            _output
-        );
+                                                      _output
+                                                     );
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void Draw_Vertical_Start () {
+    public void Draw_Vertical_Start ()
+    {
         var len = 15;
 
         // Add a frame so we can see the ruler
@@ -288,8 +306,9 @@ public class RulerTests {
         r.Orientation = Orientation.Vertical;
         r.Length = len;
         r.Draw (new Point (0, 0), 1);
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 1───┐
 2   │
 3   │
@@ -310,14 +329,15 @@ public class RulerTests {
 │   │
 │   │
 └───┘",
-            _output
-        );
+                                                      _output
+                                                     );
 
         Application.Refresh ();
         r.Length = len;
         r.Draw (new Point (0, 1), 1);
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌───┐
 1   │
 2   │
@@ -338,12 +358,13 @@ public class RulerTests {
 │   │
 │   │
 └───┘",
-            _output
-        );
+                                                      _output
+                                                     );
     }
 
     [Fact]
-    public void Length_set () {
+    public void Length_set ()
+    {
         var r = new Ruler ();
         Assert.Equal (0, r.Length);
         r.Length = 42;
@@ -351,7 +372,8 @@ public class RulerTests {
     }
 
     [Fact]
-    public void Orientation_set () {
+    public void Orientation_set ()
+    {
         var r = new Ruler ();
         Assert.Equal (Orientation.Horizontal, r.Orientation);
         r.Orientation = Orientation.Vertical;

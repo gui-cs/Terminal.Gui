@@ -2,9 +2,11 @@
 
 namespace Terminal.Gui.ViewsTests;
 
-public class DatePickerTests {
+public class DatePickerTests
+{
     [Fact]
-    public void DatePicker_ChangingCultureChangesFormat () {
+    public void DatePicker_ChangingCultureChangesFormat ()
+    {
         var date = new DateTime (2000, 7, 23);
         var datePicker = new DatePicker (date);
 
@@ -21,7 +23,8 @@ public class DatePickerTests {
     }
 
     [Fact]
-    public void DatePicker_Initialize_ShouldSetCurrentDate () {
+    public void DatePicker_Initialize_ShouldSetCurrentDate ()
+    {
         var datePicker = new DatePicker ();
         Assert.Equal (DateTime.Now.Date.Day, datePicker.Date.Day);
         Assert.Equal (DateTime.Now.Date.Month, datePicker.Date.Month);
@@ -29,7 +32,8 @@ public class DatePickerTests {
     }
 
     [Fact]
-    public void DatePicker_SetDate_ShouldChangeText () {
+    public void DatePicker_SetDate_ShouldChangeText ()
+    {
         var datePicker = new DatePicker { Culture = CultureInfo.GetCultureInfo ("en-GB") };
         var newDate = new DateTime (2024, 1, 15);
         string format = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
@@ -40,7 +44,8 @@ public class DatePickerTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void DatePicker_ShouldNot_SetDateOutOfRange_UsingNextMonthButton () {
+    public void DatePicker_ShouldNot_SetDateOutOfRange_UsingNextMonthButton ()
+    {
         var date = new DateTime (9999, 11, 15);
         var datePicker = new DatePicker (date);
 
@@ -63,7 +68,8 @@ public class DatePickerTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void DatePicker_ShouldNot_SetDateOutOfRange_UsingPreviousMonthButton () {
+    public void DatePicker_ShouldNot_SetDateOutOfRange_UsingPreviousMonthButton ()
+    {
         var date = new DateTime (1, 2, 15);
         var datePicker = new DatePicker (date);
 

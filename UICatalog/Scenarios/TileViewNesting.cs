@@ -6,19 +6,21 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("Tile View Nesting", "Demonstrates recursive nesting of TileViews")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("LineView")]
-public class TileViewNesting : Scenario {
-    private bool _loaded;
+public class TileViewNesting : Scenario
+{
     private CheckBox _cbBorder;
     private CheckBox _cbHorizontal;
     private CheckBox _cbTitles;
     private CheckBox _cbUseLabels;
+    private bool _loaded;
+    private TextField _textField;
     private int _viewsCreated;
     private int _viewsToCreate;
-    private TextField _textField;
     private View _workArea;
 
     /// <summary>Setup the scenario.</summary>
-    public override void Setup () {
+    public override void Setup ()
+    {
         // Scenario Windows.
         Win.Title = GetName ();
         Win.Y = 1;
@@ -42,10 +44,12 @@ public class TileViewNesting : Scenario {
 
         _workArea = new View { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill () };
 
-        var menu = new MenuBar {
-            Menus = [
-                        new MenuBarItem ("_File", new MenuItem[] { new ("_Quit", "", () => Quit ()) })
-                    ]
+        var menu = new MenuBar
+        {
+            Menus =
+            [
+                new MenuBarItem ("_File", new MenuItem [] { new ("_Quit", "", () => Quit ()) })
+            ]
         };
 
         Win.Add (lblViews);
@@ -63,44 +67,58 @@ public class TileViewNesting : Scenario {
         Win.Loaded += (s, e) => _loaded = true;
     }
 
-    private void AddMoreViews (TileView to) {
-        if (_viewsCreated == _viewsToCreate) {
+    private void AddMoreViews (TileView to)
+    {
+        if (_viewsCreated == _viewsToCreate)
+        {
             return;
         }
 
-        if (!(to.Tiles.ElementAt (0).ContentView is TileView)) {
+        if (!(to.Tiles.ElementAt (0).ContentView is TileView))
+        {
             Split (to, true);
         }
 
-        if (!(to.Tiles.ElementAt (1).ContentView is TileView)) {
+        if (!(to.Tiles.ElementAt (1).ContentView is TileView))
+        {
             Split (to, false);
         }
 
-        if (to.Tiles.ElementAt (0).ContentView is TileView && to.Tiles.ElementAt (1).ContentView is TileView) {
+        if (to.Tiles.ElementAt (0).ContentView is TileView && to.Tiles.ElementAt (1).ContentView is TileView)
+        {
             AddMoreViews ((TileView)to.Tiles.ElementAt (0).ContentView);
             AddMoreViews ((TileView)to.Tiles.ElementAt (1).ContentView);
         }
     }
 
-    private View CreateContentControl (int number) =>
-        (bool)_cbUseLabels.Checked ? CreateLabelView (number) : CreateTextView (number);
+    private View CreateContentControl (int number) { return (bool)_cbUseLabels.Checked ? CreateLabelView (number) : CreateTextView (number); }
 
-    private View CreateLabelView (int number) => new Label {
-        Width = Dim.Fill (),
-        Height = 1,
-        AutoSize = false,
-        Text = number.ToString ().Repeat (1000),
-        CanFocus = true
-    };
+    private View CreateLabelView (int number)
+    {
+        return new Label
+        {
+            Width = Dim.Fill (),
+            Height = 1,
+            AutoSize = false,
+            Text = number.ToString ().Repeat (1000),
+            CanFocus = true
+        };
+    }
 
-    private View CreateTextView (int number) => new TextView {
-        Width = Dim.Fill (), Height = Dim.Fill (), Text = number.ToString ().Repeat (1000), AllowsTab = false
+    private View CreateTextView (int number)
+    {
+        return new TextView
+        {
+            Width = Dim.Fill (), Height = Dim.Fill (), Text = number.ToString ().Repeat (1000), AllowsTab = false
 
-        //WordWrap = true,  // TODO: This is very slow (like 10s to render with 45 views)
-    };
+            //WordWrap = true,  // TODO: This is very slow (like 10s to render with 45 views)
+        };
+    }
 
-    private TileView CreateTileView (int titleNumber, Orientation orientation) {
-        var toReturn = new TileView {
+    private TileView CreateTileView (int titleNumber, Orientation orientation)
+    {
+        var toReturn = new TileView
+        {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
 
@@ -114,8 +132,10 @@ public class TileViewNesting : Scenario {
         return toReturn;
     }
 
-    private int GetNumberOfViews () {
-        if (int.TryParse (_textField.Text, out int views) && views >= 0) {
+    private int GetNumberOfViews ()
+    {
+        if (int.TryParse (_textField.Text, out int views) && views >= 0)
+        {
             return views;
         }
 
@@ -124,20 +144,23 @@ public class TileViewNesting : Scenario {
 
     private void Quit () { Application.RequestStop (); }
 
-    private void SetupTileView () {
+    private void SetupTileView ()
+    {
         int numberOfViews = GetNumberOfViews ();
 
         bool? titles = _cbTitles.Checked;
         bool? border = _cbBorder.Checked;
         bool? startHorizontal = _cbHorizontal.Checked;
 
-        foreach (View sub in _workArea.Subviews) {
+        foreach (View sub in _workArea.Subviews)
+        {
             sub.Dispose ();
         }
 
         _workArea.RemoveAll ();
 
-        if (numberOfViews <= 0) {
+        if (numberOfViews <= 0)
+        {
             return;
         }
 
@@ -152,31 +175,39 @@ public class TileViewNesting : Scenario {
 
         _workArea.Add (root);
 
-        if (numberOfViews == 1) {
+        if (numberOfViews == 1)
+        {
             root.Tiles.ElementAt (1).ContentView.Visible = false;
         }
 
-        if (numberOfViews > 2) {
+        if (numberOfViews > 2)
+        {
             _viewsCreated = 2;
             _viewsToCreate = numberOfViews;
             AddMoreViews (root);
         }
 
-        if (_loaded) {
+        if (_loaded)
+        {
             _workArea.LayoutSubviews ();
         }
     }
 
-    private void Split (TileView to, bool left) {
-        if (_viewsCreated == _viewsToCreate) {
+    private void Split (TileView to, bool left)
+    {
+        if (_viewsCreated == _viewsToCreate)
+        {
             return;
         }
 
         TileView newView;
 
-        if (left) {
+        if (left)
+        {
             to.TrySplitTile (0, 2, out newView);
-        } else {
+        }
+        else
+        {
             to.TrySplitTile (1, 2, out newView);
         }
 

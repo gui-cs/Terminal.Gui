@@ -3,10 +3,10 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     Abstract implementation of <see cref="IAutocomplete"/> allows for tailoring how autocomplete is rendered/interacted
-///     with.
+///     Abstract implementation of <see cref="IAutocomplete"/> allows for tailoring how autocomplete is rendered/interacted with.
 /// </summary>
-public abstract class AutocompleteBase : IAutocomplete {
+public abstract class AutocompleteBase : IAutocomplete
+{
     /// <inheritdoc/>
     public abstract View HostControl { get; set; }
 
@@ -64,14 +64,13 @@ public abstract class AutocompleteBase : IAutocomplete {
     public virtual void ClearSuggestions () { Suggestions = Enumerable.Empty<Suggestion> ().ToList ().AsReadOnly (); }
 
     /// <inheritdoc/>
-    public virtual void GenerateSuggestions (AutocompleteContext context) {
+    public virtual void GenerateSuggestions (AutocompleteContext context)
+    {
         Suggestions = SuggestionGenerator.GenerateSuggestions (context).ToList ().AsReadOnly ();
 
         EnsureSelectedIdxIsValid ();
     }
 
     /// <summary>Updates <see cref="SelectedIdx"/> to be a valid index within <see cref="Suggestions"/></summary>
-    public virtual void EnsureSelectedIdxIsValid () {
-        SelectedIdx = Math.Max (0, Math.Min (Suggestions.Count - 1, SelectedIdx));
-    }
+    public virtual void EnsureSelectedIdxIsValid () { SelectedIdx = Math.Max (0, Math.Min (Suggestions.Count - 1, SelectedIdx)); }
 }

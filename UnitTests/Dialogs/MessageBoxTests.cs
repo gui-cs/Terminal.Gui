@@ -3,40 +3,46 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.DialogTests;
 
-public class MessageBoxTests {
-    public MessageBoxTests (ITestOutputHelper output) { _output = output; }
+public class MessageBoxTests
+{
     private readonly ITestOutputHelper _output;
+    public MessageBoxTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [AutoInitShutdown]
-    public void KeyBindings_Enter_Causes_Focused_Button_Click () {
+    public void KeyBindings_Enter_Causes_Focused_Button_Click ()
+    {
         Application.Begin (Application.Top);
 
         int result = -1;
 
         var iteration = 0;
-        Application.Iteration += (s, a) => {
-            iteration++;
-            switch (iteration) {
-                case 1:
-                    result = MessageBox.Query (string.Empty, string.Empty, 0, false, "btn0", "btn1");
-                    Application.RequestStop ();
 
-                    break;
+        Application.Iteration += (s, a) =>
+                                 {
+                                     iteration++;
 
-                case 2:
-                    // Tab to btn2
-                    Application.OnKeyDown (Key.Tab);
-                    Application.OnKeyDown (Key.Enter);
+                                     switch (iteration)
+                                     {
+                                         case 1:
+                                             result = MessageBox.Query (string.Empty, string.Empty, 0, false, "btn0", "btn1");
+                                             Application.RequestStop ();
 
-                    break;
+                                             break;
 
-                default:
-                    Assert.Fail ();
+                                         case 2:
+                                             // Tab to btn2
+                                             Application.OnKeyDown (Key.Tab);
+                                             Application.OnKeyDown (Key.Enter);
 
-                    break;
-            }
-        };
+                                             break;
+
+                                         default:
+                                             Assert.Fail ();
+
+                                             break;
+                                     }
+                                 };
         Application.Run ();
 
         Assert.Equal (1, result);
@@ -44,32 +50,37 @@ public class MessageBoxTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void KeyBindings_Esc_Closes () {
+    public void KeyBindings_Esc_Closes ()
+    {
         Application.Begin (Application.Top);
 
         var result = 999;
 
         var iteration = 0;
-        Application.Iteration += (s, a) => {
-            iteration++;
-            switch (iteration) {
-                case 1:
-                    result = MessageBox.Query (string.Empty, string.Empty, 0, false, "btn0", "btn1");
-                    Application.RequestStop ();
 
-                    break;
+        Application.Iteration += (s, a) =>
+                                 {
+                                     iteration++;
 
-                case 2:
-                    Application.OnKeyDown (Key.Esc);
+                                     switch (iteration)
+                                     {
+                                         case 1:
+                                             result = MessageBox.Query (string.Empty, string.Empty, 0, false, "btn0", "btn1");
+                                             Application.RequestStop ();
 
-                    break;
+                                             break;
 
-                default:
-                    Assert.Fail ();
+                                         case 2:
+                                             Application.OnKeyDown (Key.Esc);
 
-                    break;
-            }
-        };
+                                             break;
+
+                                         default:
+                                             Assert.Fail ();
+
+                                             break;
+                                     }
+                                 };
         Application.Run ();
 
         Assert.Equal (-1, result);
@@ -77,34 +88,39 @@ public class MessageBoxTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void KeyBindings_Space_Causes_Focused_Button_Click () {
+    public void KeyBindings_Space_Causes_Focused_Button_Click ()
+    {
         Application.Begin (Application.Top);
 
         int result = -1;
 
         var iteration = 0;
-        Application.Iteration += (s, a) => {
-            iteration++;
-            switch (iteration) {
-                case 1:
-                    result = MessageBox.Query (string.Empty, string.Empty, 0, false, "btn0", "btn1");
-                    Application.RequestStop ();
 
-                    break;
+        Application.Iteration += (s, a) =>
+                                 {
+                                     iteration++;
 
-                case 2:
-                    // Tab to btn2
-                    Application.OnKeyDown (Key.Tab);
-                    Application.OnKeyDown (Key.Space);
+                                     switch (iteration)
+                                     {
+                                         case 1:
+                                             result = MessageBox.Query (string.Empty, string.Empty, 0, false, "btn0", "btn1");
+                                             Application.RequestStop ();
 
-                    break;
+                                             break;
 
-                default:
-                    Assert.Fail ();
+                                         case 2:
+                                             // Tab to btn2
+                                             Application.OnKeyDown (Key.Tab);
+                                             Application.OnKeyDown (Key.Space);
 
-                    break;
-            }
-        };
+                                             break;
+
+                                         default:
+                                             Assert.Fail ();
+
+                                             break;
+                                     }
+                                 };
         Application.Run ();
 
         Assert.Equal (1, result);
@@ -112,31 +128,36 @@ public class MessageBoxTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void Location_Default () {
+    public void Location_Default ()
+    {
         int iterations = -1;
         Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
 
-        Application.Iteration += (s, a) => {
-            iterations++;
+        Application.Iteration += (s, a) =>
+                                 {
+                                     iterations++;
 
-            if (iterations == 0) {
-                MessageBox.Query (string.Empty, string.Empty, null);
+                                     if (iterations == 0)
+                                     {
+                                         MessageBox.Query (string.Empty, string.Empty, null);
 
-                Application.RequestStop ();
-            } else if (iterations == 1) {
-                Application.Refresh ();
+                                         Application.RequestStop ();
+                                     }
+                                     else if (iterations == 1)
+                                     {
+                                         Application.Refresh ();
 
-                Assert.IsType<Dialog> (Application.Current);
+                                         Assert.IsType<Dialog> (Application.Current);
 
-                // Default location is centered, so
-                // X = (100 / 2) - (60 / 2) = 20
-                // Y = (100 / 2) - (5 / 2) = 47
-                Assert.Equal (new Point (20, 47), Application.Current.Frame.Location);
+                                         // Default location is centered, so
+                                         // X = (100 / 2) - (60 / 2) = 20
+                                         // Y = (100 / 2) - (5 / 2) = 47
+                                         Assert.Equal (new Point (20, 47), Application.Current.Frame.Location);
 
-                Application.RequestStop ();
-            }
-        };
+                                         Application.RequestStop ();
+                                     }
+                                 };
 
         Application.Run ();
     }
@@ -155,22 +176,29 @@ public class MessageBoxTests {
         string message,
         bool wrapMessage,
         int linesLength
-    ) {
+    )
+    {
         int iterations = -1;
         Application.Begin (Application.Top);
 
-        Application.Iteration += (s, a) => {
-            iterations++;
+        Application.Iteration += (s, a) =>
+                                 {
+                                     iterations++;
 
-            if (iterations == 0) {
-                MessageBox.Query (string.Empty, message, 0, wrapMessage, "ok");
+                                     if (iterations == 0)
+                                     {
+                                         MessageBox.Query (string.Empty, message, 0, wrapMessage, "ok");
 
-                Application.RequestStop ();
-            } else if (iterations == 1) {
-                Application.Refresh ();
-                if (linesLength == 1) {
-                    TestHelpers.AssertDriverContentsWithFrameAre (
-                        @$"
+                                         Application.RequestStop ();
+                                     }
+                                     else if (iterations == 1)
+                                     {
+                                         Application.Refresh ();
+
+                                         if (linesLength == 1)
+                                         {
+                                             TestHelpers.AssertDriverContentsWithFrameAre (
+                                                                                           @$"
                 ┌──────────────────────────────────────────────┐
                 │                                              │
                 │                                              │
@@ -184,11 +212,13 @@ public class MessageBoxTests {
                     CM.Glyphs.RightBracket
                 }                   │
                 └──────────────────────────────────────────────┘",
-                        _output
-                    );
-                } else {
-                    TestHelpers.AssertDriverContentsWithFrameAre (
-                        @$"
+                                                                                           _output
+                                                                                          );
+                                         }
+                                         else
+                                         {
+                                             TestHelpers.AssertDriverContentsWithFrameAre (
+                                                                                           @$"
                 ┌──────────────────────────────────────────────┐
                 │                                              │
                 │                                              │
@@ -203,20 +233,21 @@ public class MessageBoxTests {
                     CM.Glyphs.RightBracket
                 }                   │
                 └──────────────────────────────────────────────┘",
-                        _output
-                    );
-                }
+                                                                                           _output
+                                                                                          );
+                                         }
 
-                Application.RequestStop ();
-            }
-        };
+                                         Application.RequestStop ();
+                                     }
+                                 };
 
         Application.Run ();
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void Message_Long_Without_Spaces_WrapMessage_True () {
+    public void Message_Long_Without_Spaces_WrapMessage_True ()
+    {
         int iterations = -1;
         Application.Begin (Application.Top);
         Application.Top.BorderStyle = LineStyle.Double;
@@ -232,19 +263,24 @@ public class MessageBoxTests {
             }{
                 CM.Glyphs.RightBracket
             }";
-        Application.Iteration += (s, a) => {
-            iterations++;
 
-            if (iterations == 0) {
-                // 50 characters should make the height of the wrapped text 7
-                MessageBox.Query (string.Empty, new string ('f', 50), 0, true, "btn");
+        Application.Iteration += (s, a) =>
+                                 {
+                                     iterations++;
 
-                Application.RequestStop ();
-            } else if (iterations == 1) {
-                Application.Refresh ();
+                                     if (iterations == 0)
+                                     {
+                                         // 50 characters should make the height of the wrapped text 7
+                                         MessageBox.Query (string.Empty, new string ('f', 50), 0, true, "btn");
 
-                TestHelpers.AssertDriverContentsWithFrameAre (
-                    @$"
+                                         Application.RequestStop ();
+                                     }
+                                     else if (iterations == 1)
+                                     {
+                                         Application.Refresh ();
+
+                                         TestHelpers.AssertDriverContentsWithFrameAre (
+                                                                                       @$"
 ╔══════════════════╗
 ║┌────────────────┐║
 ║│ffffffffffffffff│║
@@ -257,17 +293,20 @@ public class MessageBoxTests {
 }   │║
 ║└────────────────┘║
 ╚══════════════════╝",
-                    _output
-                );
-                Assert.Equal (new Size (20 - 2, 10 - 2), Application.Current.Frame.Size);
-                Application.RequestStop ();
+                                                                                       _output
+                                                                                      );
+                                         Assert.Equal (new Size (20 - 2, 10 - 2), Application.Current.Frame.Size);
+                                         Application.RequestStop ();
 
-                // Really long text
-                MessageBox.Query (string.Empty, new string ('f', 500), 0, true, "btn");
-            } else if (iterations == 2) {
-                Application.Refresh ();
-                TestHelpers.AssertDriverContentsWithFrameAre (
-                    @$"
+                                         // Really long text
+                                         MessageBox.Query (string.Empty, new string ('f', 500), 0, true, "btn");
+                                     }
+                                     else if (iterations == 2)
+                                     {
+                                         Application.Refresh ();
+
+                                         TestHelpers.AssertDriverContentsWithFrameAre (
+                                                                                       @$"
 ╔┌────────────────┐╗
 ║│ffffffffffffffff│║
 ║│ffffffffffffffff│║
@@ -280,22 +319,24 @@ public class MessageBoxTests {
     btn
 }   │║
 ╚└────────────────┘╝",
-                    _output
-                );
-                Application.RequestStop ();
-            }
-        };
+                                                                                       _output
+                                                                                      );
+                                         Application.RequestStop ();
+                                     }
+                                 };
 
         Application.Run ();
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void Message_With_Spaces_WrapMessage_False () {
+    public void Message_With_Spaces_WrapMessage_False ()
+    {
         int iterations = -1;
         Application.Begin (Application.Top);
         Application.Top.BorderStyle = LineStyle.Double;
         ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+
         var btn =
             $"{
                 CM.Glyphs.LeftBracket
@@ -307,22 +348,29 @@ public class MessageBoxTests {
                 CM.Glyphs.RightBracket
             }";
 
-        Application.Iteration += (s, a) => {
-            iterations++;
+        Application.Iteration += (s, a) =>
+                                 {
+                                     iterations++;
 
-            if (iterations == 0) {
-                var sb = new StringBuilder ();
-                for (var i = 0; i < 17; i++) {
-                    sb.Append ("ff ");
-                }
+                                     if (iterations == 0)
+                                     {
+                                         var sb = new StringBuilder ();
 
-                MessageBox.Query (string.Empty, sb.ToString (), 0, false, "btn");
+                                         for (var i = 0; i < 17; i++)
+                                         {
+                                             sb.Append ("ff ");
+                                         }
 
-                Application.RequestStop ();
-            } else if (iterations == 1) {
-                Application.Refresh ();
-                TestHelpers.AssertDriverContentsWithFrameAre (
-                    @"
+                                         MessageBox.Query (string.Empty, sb.ToString (), 0, false, "btn");
+
+                                         Application.RequestStop ();
+                                     }
+                                     else if (iterations == 1)
+                                     {
+                                         Application.Refresh ();
+
+                                         TestHelpers.AssertDriverContentsWithFrameAre (
+                                                                                       @"
 ╔══════════════════╗
 ║                  ║
 ────────────────────
@@ -333,16 +381,19 @@ ff ff ff ff ff ff ff
 ║                  ║
 ║                  ║
 ╚══════════════════╝",
-                    _output
-                );
-                Application.RequestStop ();
+                                                                                       _output
+                                                                                      );
+                                         Application.RequestStop ();
 
-                // Really long text
-                MessageBox.Query (string.Empty, new string ('f', 500), 0, false, "btn");
-            } else if (iterations == 2) {
-                Application.Refresh ();
-                TestHelpers.AssertDriverContentsWithFrameAre (
-                    @"
+                                         // Really long text
+                                         MessageBox.Query (string.Empty, new string ('f', 500), 0, false, "btn");
+                                     }
+                                     else if (iterations == 2)
+                                     {
+                                         Application.Refresh ();
+
+                                         TestHelpers.AssertDriverContentsWithFrameAre (
+                                                                                       @"
 ╔══════════════════╗
 ║                  ║
 ────────────────────
@@ -353,18 +404,19 @@ ffffffffffffffffffff
 ║                  ║
 ║                  ║
 ╚══════════════════╝",
-                    _output
-                );
-                Application.RequestStop ();
-            }
-        };
+                                                                                       _output
+                                                                                      );
+                                         Application.RequestStop ();
+                                     }
+                                 };
 
         Application.Run ();
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void Message_With_Spaces_WrapMessage_True () {
+    public void Message_With_Spaces_WrapMessage_True ()
+    {
         int iterations = -1;
         Application.Begin (Application.Top);
         Application.Top.BorderStyle = LineStyle.Double;
@@ -381,22 +433,29 @@ ffffffffffffffffffff
                 CM.Glyphs.RightBracket
             }";
 
-        Application.Iteration += (s, a) => {
-            iterations++;
+        Application.Iteration += (s, a) =>
+                                 {
+                                     iterations++;
 
-            if (iterations == 0) {
-                var sb = new StringBuilder ();
-                for (var i = 0; i < 17; i++) {
-                    sb.Append ("ff ");
-                }
+                                     if (iterations == 0)
+                                     {
+                                         var sb = new StringBuilder ();
 
-                MessageBox.Query (string.Empty, sb.ToString (), 0, true, "btn");
+                                         for (var i = 0; i < 17; i++)
+                                         {
+                                             sb.Append ("ff ");
+                                         }
 
-                Application.RequestStop ();
-            } else if (iterations == 1) {
-                Application.Refresh ();
-                TestHelpers.AssertDriverContentsWithFrameAre (
-                    @$"
+                                         MessageBox.Query (string.Empty, sb.ToString (), 0, true, "btn");
+
+                                         Application.RequestStop ();
+                                     }
+                                     else if (iterations == 1)
+                                     {
+                                         Application.Refresh ();
+
+                                         TestHelpers.AssertDriverContentsWithFrameAre (
+                                                                                       @$"
 ╔══════════════════╗
 ║ ┌──────────────┐ ║
 ║ │ff ff ff ff ff│ ║
@@ -409,16 +468,19 @@ ffffffffffffffffffff
 }  │ ║
 ║ └──────────────┘ ║
 ╚══════════════════╝",
-                    _output
-                );
-                Application.RequestStop ();
+                                                                                       _output
+                                                                                      );
+                                         Application.RequestStop ();
 
-                // Really long text
-                MessageBox.Query (string.Empty, new string ('f', 500), 0, true, "btn");
-            } else if (iterations == 2) {
-                Application.Refresh ();
-                TestHelpers.AssertDriverContentsWithFrameAre (
-                    @$"
+                                         // Really long text
+                                         MessageBox.Query (string.Empty, new string ('f', 500), 0, true, "btn");
+                                     }
+                                     else if (iterations == 2)
+                                     {
+                                         Application.Refresh ();
+
+                                         TestHelpers.AssertDriverContentsWithFrameAre (
+                                                                                       @$"
 ╔┌────────────────┐╗
 ║│ffffffffffffffff│║
 ║│ffffffffffffffff│║
@@ -431,18 +493,19 @@ ffffffffffffffffffff
     btn
 }   │║
 ╚└────────────────┘╝",
-                    _output
-                );
-                Application.RequestStop ();
-            }
-        };
+                                                                                       _output
+                                                                                      );
+                                         Application.RequestStop ();
+                                     }
+                                 };
 
         Application.Run ();
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void Message_Without_Spaces_WrapMessage_False () {
+    public void Message_Without_Spaces_WrapMessage_False ()
+    {
         int iterations = -1;
         Application.Begin (Application.Top);
         Application.Top.BorderStyle = LineStyle.Double;
@@ -459,17 +522,22 @@ ffffffffffffffffffff
                 CM.Glyphs.RightBracket
             }";
 
-        Application.Iteration += (s, a) => {
-            iterations++;
+        Application.Iteration += (s, a) =>
+                                 {
+                                     iterations++;
 
-            if (iterations == 0) {
-                MessageBox.Query (string.Empty, new string ('f', 50), 0, false, "btn");
+                                     if (iterations == 0)
+                                     {
+                                         MessageBox.Query (string.Empty, new string ('f', 50), 0, false, "btn");
 
-                Application.RequestStop ();
-            } else if (iterations == 1) {
-                Application.Refresh ();
-                TestHelpers.AssertDriverContentsWithFrameAre (
-                    @"
+                                         Application.RequestStop ();
+                                     }
+                                     else if (iterations == 1)
+                                     {
+                                         Application.Refresh ();
+
+                                         TestHelpers.AssertDriverContentsWithFrameAre (
+                                                                                       @"
 ╔══════════════════╗
 ║                  ║
 ────────────────────
@@ -480,17 +548,20 @@ ffffffffffffffffffff
 ║                  ║
 ║                  ║
 ╚══════════════════╝",
-                    _output
-                );
+                                                                                       _output
+                                                                                      );
 
-                Application.RequestStop ();
+                                         Application.RequestStop ();
 
-                // Really long text
-                MessageBox.Query (string.Empty, new string ('f', 500), 0, false, "btn");
-            } else if (iterations == 2) {
-                Application.Refresh ();
-                TestHelpers.AssertDriverContentsWithFrameAre (
-                    @"
+                                         // Really long text
+                                         MessageBox.Query (string.Empty, new string ('f', 500), 0, false, "btn");
+                                     }
+                                     else if (iterations == 2)
+                                     {
+                                         Application.Refresh ();
+
+                                         TestHelpers.AssertDriverContentsWithFrameAre (
+                                                                                       @"
 ╔══════════════════╗
 ║                  ║
 ────────────────────
@@ -501,50 +572,57 @@ ffffffffffffffffffff
 ║                  ║
 ║                  ║
 ╚══════════════════╝",
-                    _output
-                );
+                                                                                       _output
+                                                                                      );
 
-                Application.RequestStop ();
-            }
-        };
+                                         Application.RequestStop ();
+                                     }
+                                 };
 
         Application.Run ();
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void Size_Default () {
+    public void Size_Default ()
+    {
         int iterations = -1;
         Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
 
-        Application.Iteration += (s, a) => {
-            iterations++;
+        Application.Iteration += (s, a) =>
+                                 {
+                                     iterations++;
 
-            if (iterations == 0) {
-                MessageBox.Query (string.Empty, string.Empty, null);
+                                     if (iterations == 0)
+                                     {
+                                         MessageBox.Query (string.Empty, string.Empty, null);
 
-                Application.RequestStop ();
-            } else if (iterations == 1) {
-                Application.Refresh ();
+                                         Application.RequestStop ();
+                                     }
+                                     else if (iterations == 1)
+                                     {
+                                         Application.Refresh ();
 
-                Assert.IsType<Dialog> (Application.Current);
+                                         Assert.IsType<Dialog> (Application.Current);
 
-                // Default size is Percent(60) 
-                Assert.Equal (new Size ((int)(100 * .60), 5), Application.Current.Frame.Size);
+                                         // Default size is Percent(60) 
+                                         Assert.Equal (new Size ((int)(100 * .60), 5), Application.Current.Frame.Size);
 
-                Application.RequestStop ();
-            }
-        };
+                                         Application.RequestStop ();
+                                     }
+                                 };
 
         Application.Run ();
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void Size_JustBigEnough_Fixed_Size () {
+    public void Size_JustBigEnough_Fixed_Size ()
+    {
         int iterations = -1;
         Application.Begin (Application.Top);
+
         var btn =
             $"{
                 CM.Glyphs.LeftBracket
@@ -556,17 +634,22 @@ ffffffffffffffffffff
                 CM.Glyphs.RightBracket
             }";
 
-        Application.Iteration += (s, a) => {
-            iterations++;
+        Application.Iteration += (s, a) =>
+                                 {
+                                     iterations++;
 
-            if (iterations == 0) {
-                MessageBox.Query (11, 5, string.Empty, "Message", "_Ok");
+                                     if (iterations == 0)
+                                     {
+                                         MessageBox.Query (11, 5, string.Empty, "Message", "_Ok");
 
-                Application.RequestStop ();
-            } else if (iterations == 1) {
-                Application.Refresh ();
-                TestHelpers.AssertDriverContentsWithFrameAre (
-                    @$"
+                                         Application.RequestStop ();
+                                     }
+                                     else if (iterations == 1)
+                                     {
+                                         Application.Refresh ();
+
+                                         TestHelpers.AssertDriverContentsWithFrameAre (
+                                                                                       @$"
                                   ┌─────────┐
                                   │ Message │
                                   │         │
@@ -575,19 +658,20 @@ ffffffffffffffffffff
                                   } │
                                   └─────────┘
 ",
-                    _output
-                );
+                                                                                       _output
+                                                                                      );
 
-                Application.RequestStop ();
-            }
-        };
+                                         Application.RequestStop ();
+                                     }
+                                 };
 
         Application.Run ();
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void Size_No_With_Button () {
+    public void Size_No_With_Button ()
+    {
         Application.Top.BorderStyle = LineStyle.Double;
         int iterations = -1;
         Application.Begin (Application.Top);
@@ -596,6 +680,7 @@ ffffffffffffffffffff
         aboutMessage.AppendLine (@"0123456789012345678901234567890123456789");
         aboutMessage.AppendLine (@"https://github.com/gui-cs/Terminal.Gui");
         var message = aboutMessage.ToString ();
+
         var btn =
             $"{
                 CM.Glyphs.LeftBracket
@@ -609,17 +694,22 @@ ffffffffffffffffffff
 
         ((FakeDriver)Application.Driver).SetBufferSize (40 + 4, 8);
 
-        Application.Iteration += (s, a) => {
-            iterations++;
+        Application.Iteration += (s, a) =>
+                                 {
+                                     iterations++;
 
-            if (iterations == 0) {
-                MessageBox.Query (string.Empty, message, "_Ok");
+                                     if (iterations == 0)
+                                     {
+                                         MessageBox.Query (string.Empty, message, "_Ok");
 
-                Application.RequestStop ();
-            } else if (iterations == 1) {
-                Application.Refresh ();
-                TestHelpers.AssertDriverContentsWithFrameAre (
-                    @$"
+                                         Application.RequestStop ();
+                                     }
+                                     else if (iterations == 1)
+                                     {
+                                         Application.Refresh ();
+
+                                         TestHelpers.AssertDriverContentsWithFrameAre (
+                                                                                       @$"
 ╔══════════════════════════════════════════╗
 ║┌────────────────────────────────────────┐║
 ║│0123456789012345678901234567890123456789│║
@@ -631,45 +721,51 @@ ffffffffffffffffffff
 ║└────────────────────────────────────────┘║
 ╚══════════════════════════════════════════╝
 ",
-                    _output
-                );
+                                                                                       _output
+                                                                                      );
 
-                Application.RequestStop ();
-            }
-        };
+                                         Application.RequestStop ();
+                                     }
+                                 };
 
         Application.Run ();
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void Size_None_No_Buttons () {
+    public void Size_None_No_Buttons ()
+    {
         int iterations = -1;
         Application.Begin (Application.Top);
 
-        Application.Iteration += (s, a) => {
-            iterations++;
+        Application.Iteration += (s, a) =>
+                                 {
+                                     iterations++;
 
-            if (iterations == 0) {
-                MessageBox.Query ("Title", "Message");
+                                     if (iterations == 0)
+                                     {
+                                         MessageBox.Query ("Title", "Message");
 
-                Application.RequestStop ();
-            } else if (iterations == 1) {
-                Application.Refresh ();
-                TestHelpers.AssertDriverContentsWithFrameAre (
-                    @"
+                                         Application.RequestStop ();
+                                     }
+                                     else if (iterations == 1)
+                                     {
+                                         Application.Refresh ();
+
+                                         TestHelpers.AssertDriverContentsWithFrameAre (
+                                                                                       @"
                 ┌┤Title├───────────────────────────────────────┐
                 │                   Message                    │
                 │                                              │
                 │                                              │
                 └──────────────────────────────────────────────┘
 ",
-                    _output
-                );
+                                                                                       _output
+                                                                                      );
 
-                Application.RequestStop ();
-            }
-        };
+                                         Application.RequestStop ();
+                                     }
+                                 };
 
         Application.Run ();
     }
@@ -684,27 +780,32 @@ ffffffffffffffffffff
     [InlineData (7, 5, "message")]
     [InlineData (50, 50, "message")]
     [AutoInitShutdown]
-    public void Size_Not_Default_Message (int height, int width, string message) {
+    public void Size_Not_Default_Message (int height, int width, string message)
+    {
         int iterations = -1;
         Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
 
-        Application.Iteration += (s, a) => {
-            iterations++;
+        Application.Iteration += (s, a) =>
+                                 {
+                                     iterations++;
 
-            if (iterations == 0) {
-                MessageBox.Query (height, width, string.Empty, message, null);
+                                     if (iterations == 0)
+                                     {
+                                         MessageBox.Query (height, width, string.Empty, message, null);
 
-                Application.RequestStop ();
-            } else if (iterations == 1) {
-                Application.Refresh ();
+                                         Application.RequestStop ();
+                                     }
+                                     else if (iterations == 1)
+                                     {
+                                         Application.Refresh ();
 
-                Assert.IsType<Dialog> (Application.Current);
-                Assert.Equal (new Size (height, width), Application.Current.Frame.Size);
+                                         Assert.IsType<Dialog> (Application.Current);
+                                         Assert.Equal (new Size (height, width), Application.Current.Frame.Size);
 
-                Application.RequestStop ();
-            }
-        };
+                                         Application.RequestStop ();
+                                     }
+                                 };
     }
 
     [Theory]
@@ -717,27 +818,32 @@ ffffffffffffffffffff
     [InlineData (7, 5, "message")]
     [InlineData (50, 50, "message")]
     [AutoInitShutdown]
-    public void Size_Not_Default_Message_Button (int height, int width, string message) {
+    public void Size_Not_Default_Message_Button (int height, int width, string message)
+    {
         int iterations = -1;
         Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
 
-        Application.Iteration += (s, a) => {
-            iterations++;
+        Application.Iteration += (s, a) =>
+                                 {
+                                     iterations++;
 
-            if (iterations == 0) {
-                MessageBox.Query (height, width, string.Empty, message, "_Ok");
+                                     if (iterations == 0)
+                                     {
+                                         MessageBox.Query (height, width, string.Empty, message, "_Ok");
 
-                Application.RequestStop ();
-            } else if (iterations == 1) {
-                Application.Refresh ();
+                                         Application.RequestStop ();
+                                     }
+                                     else if (iterations == 1)
+                                     {
+                                         Application.Refresh ();
 
-                Assert.IsType<Dialog> (Application.Current);
-                Assert.Equal (new Size (height, width), Application.Current.Frame.Size);
+                                         Assert.IsType<Dialog> (Application.Current);
+                                         Assert.Equal (new Size (height, width), Application.Current.Frame.Size);
 
-                Application.RequestStop ();
-            }
-        };
+                                         Application.RequestStop ();
+                                     }
+                                 };
     }
 
     [Theory]
@@ -746,49 +852,59 @@ ffffffffffffffffffff
     [InlineData (7, 5)]
     [InlineData (50, 50)]
     [AutoInitShutdown]
-    public void Size_Not_Default_No_Message (int height, int width) {
+    public void Size_Not_Default_No_Message (int height, int width)
+    {
         int iterations = -1;
         Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
 
-        Application.Iteration += (s, a) => {
-            iterations++;
+        Application.Iteration += (s, a) =>
+                                 {
+                                     iterations++;
 
-            if (iterations == 0) {
-                MessageBox.Query (height, width, string.Empty, string.Empty, null);
+                                     if (iterations == 0)
+                                     {
+                                         MessageBox.Query (height, width, string.Empty, string.Empty, null);
 
-                Application.RequestStop ();
-            } else if (iterations == 1) {
-                Application.Refresh ();
+                                         Application.RequestStop ();
+                                     }
+                                     else if (iterations == 1)
+                                     {
+                                         Application.Refresh ();
 
-                Assert.IsType<Dialog> (Application.Current);
-                Assert.Equal (new Size (height, width), Application.Current.Frame.Size);
+                                         Assert.IsType<Dialog> (Application.Current);
+                                         Assert.Equal (new Size (height, width), Application.Current.Frame.Size);
 
-                Application.RequestStop ();
-            }
-        };
+                                         Application.RequestStop ();
+                                     }
+                                 };
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void Size_Tiny_Fixed_Size () {
+    public void Size_Tiny_Fixed_Size ()
+    {
         int iterations = -1;
         Application.Begin (Application.Top);
 
-        Application.Iteration += (s, a) => {
-            iterations++;
+        Application.Iteration += (s, a) =>
+                                 {
+                                     iterations++;
 
-            if (iterations == 0) {
-                MessageBox.Query (7, 5, string.Empty, "Message", "_Ok");
+                                     if (iterations == 0)
+                                     {
+                                         MessageBox.Query (7, 5, string.Empty, "Message", "_Ok");
 
-                Application.RequestStop ();
-            } else if (iterations == 1) {
-                Application.Refresh ();
+                                         Application.RequestStop ();
+                                     }
+                                     else if (iterations == 1)
+                                     {
+                                         Application.Refresh ();
 
-                Assert.Equal (new Size (7, 5), Application.Current.Frame.Size);
+                                         Assert.Equal (new Size (7, 5), Application.Current.Frame.Size);
 
-                TestHelpers.AssertDriverContentsWithFrameAre (
-                    @$"
+                                         TestHelpers.AssertDriverContentsWithFrameAre (
+                                                                                       @$"
                                     ┌─────┐
                                     │Messa│
                                     │ ge  │
@@ -797,12 +913,12 @@ ffffffffffffffffffff
                                     }│
                                     └─────┘
 ",
-                    _output
-                );
+                                                                                       _output
+                                                                                      );
 
-                Application.RequestStop ();
-            }
-        };
+                                         Application.RequestStop ();
+                                     }
+                                 };
 
         Application.Run ();
     }

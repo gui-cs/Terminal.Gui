@@ -1,18 +1,22 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>A replacement suggestion made by <see cref="IAutocomplete"/></summary>
-public class Suggestion {
+public class Suggestion
+{
     /// <summary>Creates a new instance of the <see cref="Suggestion"/> class.</summary>
     /// <param name="remove"></param>
     /// <param name="replacement"></param>
     /// <param name="title">User visible title for the suggestion or null if the same as <paramref name="replacement"/>.</param>
-    public Suggestion (int remove, string replacement, string title = null) {
+    public Suggestion (int remove, string replacement, string title = null)
+    {
         Remove = remove;
         Replacement = replacement;
         Title = title ?? replacement;
     }
 
-    /// <summary>The number of characters to remove at the current cursor position before adding the <see cref="Replacement"/></summary>
+    /// <summary>
+    ///     The number of characters to remove at the current cursor position before adding the <see cref="Replacement"/>
+    /// </summary>
     public int Remove { get; }
 
     /// <summary>The replacement text that will be added</summary>

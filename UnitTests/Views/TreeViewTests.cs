@@ -3,13 +3,15 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class TreeViewTests {
-    public TreeViewTests (ITestOutputHelper output) { _output = output; }
+public class TreeViewTests
+{
     private readonly ITestOutputHelper _output;
+    public TreeViewTests (ITestOutputHelper output) { _output = output; }
 
     /// <summary>Tests that <see cref="TreeView.Expand(object)"/> results in a correct content height</summary>
     [Fact]
-    public void ContentHeight_BiggerAfterExpand () {
+    public void ContentHeight_BiggerAfterExpand ()
+    {
         TreeView<object> tree = CreateTree (out Factory f, out _, out _);
         Assert.Equal (1, tree.ContentHeight);
 
@@ -21,7 +23,8 @@ public class TreeViewTests {
     }
 
     [Fact]
-    public void ContentWidth_BiggerAfterExpand () {
+    public void ContentWidth_BiggerAfterExpand ()
+    {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
         tree.BeginInit ();
         tree.EndInit ();
@@ -49,7 +52,8 @@ public class TreeViewTests {
     }
 
     [Fact]
-    public void ContentWidth_VisibleVsAll () {
+    public void ContentWidth_VisibleVsAll ()
+    {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out Car car2);
         tree.BeginInit ();
         tree.EndInit ();
@@ -70,10 +74,11 @@ public class TreeViewTests {
 
         // Although expanded the bigger (longer) child node is not in the rendered area of the control
         Assert.Equal (9, tree.GetContentWidth (true));
+
         Assert.Equal (
-            13,
-            tree.GetContentWidth (false)
-        ); // If you ask for the global max width it includes the longer child
+                      13,
+                      tree.GetContentWidth (false)
+                     ); // If you ask for the global max width it includes the longer child
 
         // Now that we have scrolled down 1 row we should see the big child
         tree.ScrollOffsetVertical = 1;
@@ -95,7 +100,8 @@ public class TreeViewTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void DesiredCursorVisibility_MultiSelect () {
+    public void DesiredCursorVisibility_MultiSelect ()
+    {
         var tv = new TreeView { Width = 20, Height = 10 };
 
         var n1 = new TreeNode ("normal");
@@ -119,7 +125,8 @@ public class TreeViewTests {
     }
 
     [Fact]
-    public void EmptyTreeView_ContentSizes () {
+    public void EmptyTreeView_ContentSizes ()
+    {
         var emptyTree = new TreeView ();
         Assert.Equal (0, emptyTree.ContentHeight);
         Assert.Equal (0, emptyTree.GetContentWidth (true));
@@ -127,7 +134,8 @@ public class TreeViewTests {
     }
 
     [Fact]
-    public void EmptyTreeViewGeneric_ContentSizes () {
+    public void EmptyTreeViewGeneric_ContentSizes ()
+    {
         TreeView<string> emptyTree = new ();
         Assert.Equal (0, emptyTree.ContentHeight);
         Assert.Equal (0, emptyTree.GetContentWidth (true));
@@ -135,11 +143,11 @@ public class TreeViewTests {
     }
 
     /// <summary>
-    ///     Tests that <see cref="TreeView.GetChildren(object)"/> returns the child objects for the factory.  Note that the
-    ///     method only works once the parent branch (Factory) is expanded to expose the child (Car)
+    ///     Tests that <see cref="TreeView.GetChildren(object)"/> returns the child objects for the factory.  Note that the method only works once the parent branch (Factory) is expanded to expose the child (Car)
     /// </summary>
     [Fact]
-    public void GetChildren_ReturnsChildrenOnlyWhenExpanded () {
+    public void GetChildren_ReturnsChildrenOnlyWhenExpanded ()
+    {
         TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
         Assert.Empty (tree.GetChildren (f));
@@ -162,11 +170,11 @@ public class TreeViewTests {
     }
 
     /// <summary>
-    ///     Tests that <see cref="TreeView.GetParent(object)"/> returns the parent object for Cars (Factories).  Note that the
-    ///     method only works once the parent branch (Factory) is expanded to expose the child (Car)
+    ///     Tests that <see cref="TreeView.GetParent(object)"/> returns the parent object for Cars (Factories).  Note that the method only works once the parent branch (Factory) is expanded to expose the child (Car)
     /// </summary>
     [Fact]
-    public void GetParent_ReturnsParentOnlyWhenExpanded () {
+    public void GetParent_ReturnsParentOnlyWhenExpanded ()
+    {
         TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
         Assert.Null (tree.GetParent (f));
@@ -189,7 +197,8 @@ public class TreeViewTests {
 
     /// <summary>Tests <see cref="TreeView.GetScrollOffsetOf(object)"/> for objects that are as yet undiscovered by the tree</summary>
     [Fact]
-    public void GetScrollOffsetOf_MinusOneForUnRevealed () {
+    public void GetScrollOffsetOf_MinusOneForUnRevealed ()
+    {
         TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
         // to start with the tree is collapsed and only knows about the root object
@@ -215,7 +224,8 @@ public class TreeViewTests {
     }
 
     [Fact]
-    public void GoTo_OnlyAppliesToExposedObjects () {
+    public void GoTo_OnlyAppliesToExposedObjects ()
+    {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
         tree.BeginInit ();
         tree.EndInit ();
@@ -242,7 +252,8 @@ public class TreeViewTests {
     }
 
     [Fact]
-    public void GoToEnd_ShouldNotFailOnEmptyTreeView () {
+    public void GoToEnd_ShouldNotFailOnEmptyTreeView ()
+    {
         var tree = new TreeView ();
 
         Exception exception = Record.Exception (() => tree.GoToEnd ());
@@ -251,11 +262,11 @@ public class TreeViewTests {
     }
 
     /// <summary>
-    ///     Tests that <see cref="TreeView.IsExpanded(object)"/> and <see cref="TreeView.Expand(object)"/> behaves correctly
-    ///     when an object cannot be expanded (because it has no children)
+    ///     Tests that <see cref="TreeView.IsExpanded(object)"/> and <see cref="TreeView.Expand(object)"/> behaves correctly when an object cannot be expanded (because it has no children)
     /// </summary>
     [Fact]
-    public void IsExpanded_FalseIfCannotExpand () {
+    public void IsExpanded_FalseIfCannotExpand ()
+    {
         TreeView<object> tree = CreateTree (out Factory f, out Car c, out _);
 
         // expose the car by expanding the factory
@@ -279,7 +290,8 @@ public class TreeViewTests {
 
     /// <summary>Tests that <see cref="TreeView.Expand(object)"/> and <see cref="TreeView.IsExpanded(object)"/> are consistent</summary>
     [Fact]
-    public void IsExpanded_TrueAfterExpand () {
+    public void IsExpanded_TrueAfterExpand ()
+    {
         TreeView<object> tree = CreateTree (out Factory f, out _, out _);
         Assert.False (tree.IsExpanded (f));
 
@@ -291,7 +303,8 @@ public class TreeViewTests {
     }
 
     [Fact]
-    public void MultiSelect_GetAllSelectedObjects () {
+    public void MultiSelect_GetAllSelectedObjects ()
+    {
         var tree = new TreeView ();
 
         TreeNode l1;
@@ -336,7 +349,8 @@ public class TreeViewTests {
     }
 
     [Fact]
-    public void ObjectActivated_Called () {
+    public void ObjectActivated_Called ()
+    {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
 
         InitFakeDriver ();
@@ -345,10 +359,11 @@ public class TreeViewTests {
         var called = false;
 
         // register for the event
-        tree.ObjectActivated += (s, e) => {
-            activated = e.ActivatedObject;
-            called = true;
-        };
+        tree.ObjectActivated += (s, e) =>
+                                {
+                                    activated = e.ActivatedObject;
+                                    called = true;
+                                };
 
         Assert.False (called);
 
@@ -370,7 +385,8 @@ public class TreeViewTests {
     }
 
     [Fact]
-    public void ObjectActivated_CustomKey () {
+    public void ObjectActivated_CustomKey ()
+    {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
 
         InitFakeDriver ();
@@ -380,10 +396,11 @@ public class TreeViewTests {
         var called = false;
 
         // register for the event
-        tree.ObjectActivated += (s, e) => {
-            activated = e.ActivatedObject;
-            called = true;
-        };
+        tree.ObjectActivated += (s, e) =>
+                                {
+                                    activated = e.ActivatedObject;
+                                    called = true;
+                                };
 
         Assert.False (called);
 
@@ -412,7 +429,8 @@ public class TreeViewTests {
     }
 
     [Fact]
-    public void ObjectActivationButton_DoubleClick () {
+    public void ObjectActivationButton_DoubleClick ()
+    {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
 
         InitFakeDriver ();
@@ -421,10 +439,11 @@ public class TreeViewTests {
         var called = false;
 
         // register for the event
-        tree.ObjectActivated += (s, e) => {
-            activated = e.ActivatedObject;
-            called = true;
-        };
+        tree.ObjectActivated += (s, e) =>
+                                {
+                                    activated = e.ActivatedObject;
+                                    called = true;
+                                };
 
         Assert.False (called);
 
@@ -439,7 +458,8 @@ public class TreeViewTests {
     }
 
     [Fact]
-    public void ObjectActivationButton_RightClick () {
+    public void ObjectActivationButton_RightClick ()
+    {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
 
         InitFakeDriver ();
@@ -451,10 +471,11 @@ public class TreeViewTests {
         var called = false;
 
         // register for the event
-        tree.ObjectActivated += (s, e) => {
-            activated = e.ActivatedObject;
-            called = true;
-        };
+        tree.ObjectActivated += (s, e) =>
+                                {
+                                    activated = e.ActivatedObject;
+                                    called = true;
+                                };
 
         Assert.False (called);
 
@@ -474,7 +495,8 @@ public class TreeViewTests {
     }
 
     [Fact]
-    public void ObjectActivationButton_SetToNull () {
+    public void ObjectActivationButton_SetToNull ()
+    {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
 
         InitFakeDriver ();
@@ -486,10 +508,11 @@ public class TreeViewTests {
         var called = false;
 
         // register for the event
-        tree.ObjectActivated += (s, e) => {
-            activated = e.ActivatedObject;
-            called = true;
-        };
+        tree.ObjectActivated += (s, e) =>
+                                {
+                                    activated = e.ActivatedObject;
+                                    called = true;
+                                };
 
         Assert.False (called);
 
@@ -508,7 +531,8 @@ public class TreeViewTests {
     ///     <see cref="TreeView.RebuildTree()"/> instead of <see cref="TreeView.RefreshObject(object, bool)"/>
     /// </summary>
     [Fact]
-    public void RebuildTree_AfterChangingChildrenGetterDuringRuntime () {
+    public void RebuildTree_AfterChangingChildrenGetterDuringRuntime ()
+    {
         TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
         var wheel = "Shiny Wheel";
@@ -525,15 +549,15 @@ public class TreeViewTests {
 
         // change the children getter so that now cars can have wheels
         tree.TreeBuilder = new DelegateTreeBuilder<object> (
-            o =>
+                                                            o =>
 
-                // factories have cars
-                o is Factory
-                    ? new object[] { c1, c2 }
+                                                                // factories have cars
+                                                                o is Factory
+                                                                    ? new object [] { c1, c2 }
 
-                    // cars have wheels
-                    : new object[] { wheel }
-        );
+                                                                    // cars have wheels
+                                                                    : new object [] { wheel }
+                                                           );
 
         // still cannot expand
         tree.Expand (c1);
@@ -551,11 +575,11 @@ public class TreeViewTests {
     }
 
     /// <summary>
-    ///     Tests how the tree adapts to changes in the ChildrenGetter delegate during runtime when some branches are expanded
-    ///     and the new delegate returns children for a node that previously didn't have any children
+    ///     Tests how the tree adapts to changes in the ChildrenGetter delegate during runtime when some branches are expanded and the new delegate returns children for a node that previously didn't have any children
     /// </summary>
     [Fact]
-    public void RefreshObject_AfterChangingChildrenGetterDuringRuntime () {
+    public void RefreshObject_AfterChangingChildrenGetterDuringRuntime ()
+    {
         TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
         var wheel = "Shiny Wheel";
@@ -572,15 +596,15 @@ public class TreeViewTests {
 
         // change the children getter so that now cars can have wheels
         tree.TreeBuilder = new DelegateTreeBuilder<object> (
-            o =>
+                                                            o =>
 
-                // factories have cars
-                o is Factory
-                    ? new object[] { c1, c2 }
+                                                                // factories have cars
+                                                                o is Factory
+                                                                    ? new object [] { c1, c2 }
 
-                    // cars have wheels
-                    : new object[] { wheel }
-        );
+                                                                    // cars have wheels
+                                                                    : new object [] { wheel }
+                                                           );
 
         // still cannot expand
         tree.Expand (c1);
@@ -597,7 +621,8 @@ public class TreeViewTests {
     ///     <see cref="TreeView.RefreshObject(object, bool)"/>
     /// </summary>
     [Fact]
-    public void RefreshObject_ChildRemoved () {
+    public void RefreshObject_ChildRemoved ()
+    {
         TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
         //reveal it by expanding the root object
@@ -608,7 +633,7 @@ public class TreeViewTests {
         Assert.Equal (2, tree.GetScrollOffsetOf (c2));
 
         // Factory now no longer makes Car c1 (only c2)
-        f.Cars = new[] { c2 };
+        f.Cars = new [] { c2 };
 
         // Tree does not know this yet
         Assert.Equal (0, tree.GetScrollOffsetOf (f));
@@ -635,7 +660,8 @@ public class TreeViewTests {
     ///     <see cref="TreeView.RefreshObject(object, bool)"/>
     /// </summary>
     [Fact]
-    public void RefreshObject_EqualityTest () {
+    public void RefreshObject_EqualityTest ()
+    {
         var obj1 = new EqualityTestObject { Name = "Bob", Age = 1 };
         var obj2 = new EqualityTestObject { Name = "Bob", Age = 2 };
         ;
@@ -643,8 +669,9 @@ public class TreeViewTests {
         var root = "root";
 
         TreeView<object> tree = new ();
+
         tree.TreeBuilder =
-            new DelegateTreeBuilder<object> (s => ReferenceEquals (s, root) ? new object[] { obj1 } : null);
+            new DelegateTreeBuilder<object> (s => ReferenceEquals (s, root) ? new object [] { obj1 } : null);
         tree.AddObject (root);
 
         // Tree is not expanded so the root has no children yet
@@ -657,7 +684,7 @@ public class TreeViewTests {
 
         // change the getter to return an Equal object (but not the same reference - obj2)
         tree.TreeBuilder =
-            new DelegateTreeBuilder<object> (s => ReferenceEquals (s, root) ? new object[] { obj2 } : null);
+            new DelegateTreeBuilder<object> (s => ReferenceEquals (s, root) ? new object [] { obj2 } : null);
 
         // tree has cached the knowledge of what children the root has so won't know about the change (we still get obj1)
         Assert.Equal (1, tree.GetChildren (root).Count (child => ReferenceEquals (obj1, child)));
@@ -669,7 +696,8 @@ public class TreeViewTests {
 
     /// <summary>Tests illegal ranges for <see cref="TreeView.ScrollOffset"/></summary>
     [Fact]
-    public void ScrollOffset_CannotBeNegative () {
+    public void ScrollOffset_CannotBeNegative ()
+    {
         TreeView<object> tree = CreateTree ();
 
         Assert.Equal (0, tree.ScrollOffsetVertical);
@@ -683,12 +711,13 @@ public class TreeViewTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void TestBottomlessTreeView_MaxDepth_3 () {
+    public void TestBottomlessTreeView_MaxDepth_3 ()
+    {
         TreeView<string> tv = new () { Width = 20, Height = 10 };
 
         tv.TreeBuilder = new DelegateTreeBuilder<string> (
-            s => new[] { (int.Parse (s) + 1).ToString () }
-        );
+                                                          s => new [] { (int.Parse (s) + 1).ToString () }
+                                                         );
 
         tv.AddObject ("1");
         tv.ColorScheme = new ColorScheme ();
@@ -698,34 +727,35 @@ public class TreeViewTests {
 
         // Nothing expanded
         TestHelpers.AssertDriverContentsAre (
-            @"└+1
+                                             @"└+1
 ",
-            _output
-        );
+                                             _output
+                                            );
         tv.MaxDepth = 3;
         tv.ExpandAll ();
         tv.Draw ();
 
         // Normal drawing of the tree view
         TestHelpers.AssertDriverContentsAre (
-            @"    
+                                             @"    
 └-1
   └-2
     └-3
       └─4
 ",
-            _output
-        );
+                                             _output
+                                            );
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void TestBottomlessTreeView_MaxDepth_5 () {
+    public void TestBottomlessTreeView_MaxDepth_5 ()
+    {
         TreeView<string> tv = new () { Width = 20, Height = 10 };
 
         tv.TreeBuilder = new DelegateTreeBuilder<string> (
-            s => new[] { (int.Parse (s) + 1).ToString () }
-        );
+                                                          s => new [] { (int.Parse (s) + 1).ToString () }
+                                                         );
 
         tv.AddObject ("1");
         tv.ColorScheme = new ColorScheme ();
@@ -735,10 +765,10 @@ public class TreeViewTests {
 
         // Nothing expanded
         TestHelpers.AssertDriverContentsAre (
-            @"└+1
+                                             @"└+1
 ",
-            _output
-        );
+                                             _output
+                                            );
         tv.MaxDepth = 5;
         tv.ExpandAll ();
 
@@ -746,7 +776,7 @@ public class TreeViewTests {
 
         // Normal drawing of the tree view
         TestHelpers.AssertDriverContentsAre (
-            @"    
+                                             @"    
 └-1
   └-2
     └-3
@@ -754,8 +784,8 @@ public class TreeViewTests {
         └-5
           └─6
 ",
-            _output
-        );
+                                             _output
+                                            );
         Assert.False (tv.CanExpand ("6"));
         Assert.False (tv.IsExpanded ("6"));
 
@@ -773,20 +803,21 @@ public class TreeViewTests {
 
         // Normal drawing of the tree view
         TestHelpers.AssertDriverContentsAre (
-            @"    
+                                             @"    
 └-1
   └-2
     └-3
       └-4
         └+5
 ",
-            _output
-        );
+                                             _output
+                                            );
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void TestGetObjectOnRow () {
+    public void TestGetObjectOnRow ()
+    {
         var tv = new TreeView { Width = 20, Height = 10 };
         tv.BeginInit ();
         tv.EndInit ();
@@ -806,13 +837,13 @@ public class TreeViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsAre (
-            @"├-normal
+                                             @"├-normal
 │ ├─pink
 │ └─normal
 └─pink
 ",
-            _output
-        );
+                                             _output
+                                            );
 
         Assert.Same (n1, tv.GetObjectOnRow (0));
         Assert.Same (n1_1, tv.GetObjectOnRow (1));
@@ -825,11 +856,11 @@ public class TreeViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsAre (
-            @"├+normal
+                                             @"├+normal
 └─pink
 ",
-            _output
-        );
+                                             _output
+                                            );
 
         Assert.Same (n1, tv.GetObjectOnRow (0));
         Assert.Same (n2, tv.GetObjectOnRow (1));
@@ -840,7 +871,8 @@ public class TreeViewTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void TestGetObjectRow () {
+    public void TestGetObjectRow ()
+    {
         var tv = new TreeView { Width = 20, Height = 10 };
 
         var n1 = new TreeNode ("normal");
@@ -859,13 +891,13 @@ public class TreeViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsAre (
-            @"├-normal
+                                             @"├-normal
 │ ├─pink
 │ └─normal
 └─pink
 ",
-            _output
-        );
+                                             _output
+                                            );
 
         Assert.Equal (0, tv.GetObjectRow (n1));
         Assert.Equal (1, tv.GetObjectRow (n1_1));
@@ -878,11 +910,11 @@ public class TreeViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsAre (
-            @"├+normal
+                                             @"├+normal
 └─pink
 ",
-            _output
-        );
+                                             _output
+                                            );
         Assert.Equal (0, tv.GetObjectRow (n1));
         Assert.Null (tv.GetObjectRow (n1_1));
         Assert.Null (tv.GetObjectRow (n1_2));
@@ -895,10 +927,10 @@ public class TreeViewTests {
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsAre (
-            @"└─pink
+                                             @"└─pink
 ",
-            _output
-        );
+                                             _output
+                                            );
         Assert.Equal (-1, tv.GetObjectRow (n1));
         Assert.Null (tv.GetObjectRow (n1_1));
         Assert.Null (tv.GetObjectRow (n1_2));
@@ -907,7 +939,8 @@ public class TreeViewTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void TestTreeView_DrawLineEvent () {
+    public void TestTreeView_DrawLineEvent ()
+    {
         var tv = new TreeView { Width = 20, Height = 10 };
 
         List<DrawTreeViewLineEventArgs<ITreeNode>> eventArgs = new ();
@@ -931,59 +964,63 @@ public class TreeViewTests {
 
         // Normal drawing of the tree view
         TestHelpers.AssertDriverContentsAre (
-            @"
+                                             @"
 ├-root one
 │ ├─leaf 1
 │ └─leaf 2
 └─root two
 ",
-            _output
-        );
+                                             _output
+                                            );
         Assert.Equal (4, eventArgs.Count ());
 
-        Assert.Equal (0, eventArgs[0].Y);
-        Assert.Equal (1, eventArgs[1].Y);
-        Assert.Equal (2, eventArgs[2].Y);
-        Assert.Equal (3, eventArgs[3].Y);
+        Assert.Equal (0, eventArgs [0].Y);
+        Assert.Equal (1, eventArgs [1].Y);
+        Assert.Equal (2, eventArgs [2].Y);
+        Assert.Equal (3, eventArgs [3].Y);
 
         Assert.All (eventArgs, ea => Assert.Equal (ea.Tree, tv));
         Assert.All (eventArgs, ea => Assert.False (ea.Handled));
 
-        Assert.Equal ("├-root one", eventArgs[0].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("│ ├─leaf 1", eventArgs[1].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("│ └─leaf 2", eventArgs[2].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("└─root two", eventArgs[3].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("├-root one", eventArgs [0].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("│ ├─leaf 1", eventArgs [1].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("│ └─leaf 2", eventArgs [2].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("└─root two", eventArgs [3].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
 
-        Assert.Equal (1, eventArgs[0].IndexOfExpandCollapseSymbol);
-        Assert.Equal (3, eventArgs[1].IndexOfExpandCollapseSymbol);
-        Assert.Equal (3, eventArgs[2].IndexOfExpandCollapseSymbol);
-        Assert.Equal (1, eventArgs[3].IndexOfExpandCollapseSymbol);
+        Assert.Equal (1, eventArgs [0].IndexOfExpandCollapseSymbol);
+        Assert.Equal (3, eventArgs [1].IndexOfExpandCollapseSymbol);
+        Assert.Equal (3, eventArgs [2].IndexOfExpandCollapseSymbol);
+        Assert.Equal (1, eventArgs [3].IndexOfExpandCollapseSymbol);
 
-        Assert.Equal (2, eventArgs[0].IndexOfModelText);
-        Assert.Equal (4, eventArgs[1].IndexOfModelText);
-        Assert.Equal (4, eventArgs[2].IndexOfModelText);
-        Assert.Equal (2, eventArgs[3].IndexOfModelText);
+        Assert.Equal (2, eventArgs [0].IndexOfModelText);
+        Assert.Equal (4, eventArgs [1].IndexOfModelText);
+        Assert.Equal (4, eventArgs [2].IndexOfModelText);
+        Assert.Equal (2, eventArgs [3].IndexOfModelText);
 
-        Assert.Equal ("root one", eventArgs[0].Model.Text);
-        Assert.Equal ("leaf 1", eventArgs[1].Model.Text);
-        Assert.Equal ("leaf 2", eventArgs[2].Model.Text);
-        Assert.Equal ("root two", eventArgs[3].Model.Text);
+        Assert.Equal ("root one", eventArgs [0].Model.Text);
+        Assert.Equal ("leaf 1", eventArgs [1].Model.Text);
+        Assert.Equal ("leaf 2", eventArgs [2].Model.Text);
+        Assert.Equal ("root two", eventArgs [3].Model.Text);
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void TestTreeView_DrawLineEvent_Handled () {
+    public void TestTreeView_DrawLineEvent_Handled ()
+    {
         var tv = new TreeView { Width = 20, Height = 10 };
 
-        tv.DrawLine += (s, e) => {
-            if (e.Model.Text.Equals ("leaf 1")) {
-                e.Handled = true;
+        tv.DrawLine += (s, e) =>
+                       {
+                           if (e.Model.Text.Equals ("leaf 1"))
+                           {
+                               e.Handled = true;
 
-                for (var i = 0; i < 10; i++) {
-                    e.Tree.AddRune (i, e.Y, new Rune ('F'));
-                }
-            }
-        };
+                               for (var i = 0; i < 10; i++)
+                               {
+                                   e.Tree.AddRune (i, e.Y, new Rune ('F'));
+                               }
+                           }
+                       };
 
         var n1 = new TreeNode ("root one");
         var n1_1 = new TreeNode ("leaf 1");
@@ -1002,19 +1039,20 @@ public class TreeViewTests {
 
         // Normal drawing of the tree view
         TestHelpers.AssertDriverContentsAre (
-            @"
+                                             @"
 ├-root one
 FFFFFFFFFF
 │ └─leaf 2
 └─root two
 ",
-            _output
-        );
+                                             _output
+                                            );
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void TestTreeView_DrawLineEvent_WithScrolling () {
+    public void TestTreeView_DrawLineEvent_WithScrolling ()
+    {
         var tv = new TreeView { Width = 20, Height = 10 };
 
         List<DrawTreeViewLineEventArgs<ITreeNode>> eventArgs = new ();
@@ -1041,42 +1079,43 @@ FFFFFFFFFF
 
         // Normal drawing of the tree view
         TestHelpers.AssertDriverContentsAre (
-            @"
+                                             @"
 ─leaf 1
 ─leaf 2
 oot two
 ",
-            _output
-        );
+                                             _output
+                                            );
         Assert.Equal (3, eventArgs.Count ());
 
-        Assert.Equal (0, eventArgs[0].Y);
-        Assert.Equal (1, eventArgs[1].Y);
-        Assert.Equal (2, eventArgs[2].Y);
+        Assert.Equal (0, eventArgs [0].Y);
+        Assert.Equal (1, eventArgs [1].Y);
+        Assert.Equal (2, eventArgs [2].Y);
 
         Assert.All (eventArgs, ea => Assert.Equal (ea.Tree, tv));
         Assert.All (eventArgs, ea => Assert.False (ea.Handled));
 
-        Assert.Equal ("─leaf 1", eventArgs[0].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("─leaf 2", eventArgs[1].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("oot two", eventArgs[2].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("─leaf 1", eventArgs [0].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("─leaf 2", eventArgs [1].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("oot two", eventArgs [2].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
 
-        Assert.Equal (0, eventArgs[0].IndexOfExpandCollapseSymbol);
-        Assert.Equal (0, eventArgs[1].IndexOfExpandCollapseSymbol);
-        Assert.Null (eventArgs[2].IndexOfExpandCollapseSymbol);
+        Assert.Equal (0, eventArgs [0].IndexOfExpandCollapseSymbol);
+        Assert.Equal (0, eventArgs [1].IndexOfExpandCollapseSymbol);
+        Assert.Null (eventArgs [2].IndexOfExpandCollapseSymbol);
 
-        Assert.Equal (1, eventArgs[0].IndexOfModelText);
-        Assert.Equal (1, eventArgs[1].IndexOfModelText);
-        Assert.Equal (-1, eventArgs[2].IndexOfModelText);
+        Assert.Equal (1, eventArgs [0].IndexOfModelText);
+        Assert.Equal (1, eventArgs [1].IndexOfModelText);
+        Assert.Equal (-1, eventArgs [2].IndexOfModelText);
 
-        Assert.Equal ("leaf 1", eventArgs[0].Model.Text);
-        Assert.Equal ("leaf 2", eventArgs[1].Model.Text);
-        Assert.Equal ("root two", eventArgs[2].Model.Text);
+        Assert.Equal ("leaf 1", eventArgs [0].Model.Text);
+        Assert.Equal ("leaf 2", eventArgs [1].Model.Text);
+        Assert.Equal ("root two", eventArgs [2].Model.Text);
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void TestTreeView_Filter () {
+    public void TestTreeView_Filter ()
+    {
         var tv = new TreeView { Width = 20, Height = 10 };
 
         var n1 = new TreeNode ("root one");
@@ -1096,14 +1135,14 @@ oot two
 
         // Normal drawing of the tree view
         TestHelpers.AssertDriverContentsAre (
-            @"
+                                             @"
 ├-root one
 │ ├─leaf 1
 │ └─leaf 2
 └─root two
 ",
-            _output
-        );
+                                             _output
+                                            );
         TreeViewTextFilter<ITreeNode> filter = new (tv);
         tv.Filter = filter;
 
@@ -1113,50 +1152,54 @@ oot two
 
         // Normal drawing of the tree view
         TestHelpers.AssertDriverContentsAre (
-            @"",
-            _output
-        );
+                                             @"",
+                                             _output
+                                            );
 
         // Matches everything
         filter.Text = "root";
         tv.Draw ();
+
         TestHelpers.AssertDriverContentsAre (
-            @"
+                                             @"
 ├-root one
 │ ├─leaf 1
 │ └─leaf 2
 └─root two
 ",
-            _output
-        );
+                                             _output
+                                            );
 
         // Matches 2 leaf nodes
         filter.Text = "leaf";
         tv.Draw ();
+
         TestHelpers.AssertDriverContentsAre (
-            @"
+                                             @"
 ├-root one
 │ ├─leaf 1
 │ └─leaf 2
 ",
-            _output
-        );
+                                             _output
+                                            );
 
         // Matches 1 leaf nodes
         filter.Text = "leaf 1";
         tv.Draw ();
+
         TestHelpers.AssertDriverContentsAre (
-            @"
+                                             @"
 ├-root one
 │ ├─leaf 1
 ",
-            _output
-        );
+                                             _output
+                                            );
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void TestTreeViewColor () {
+    public void TestTreeViewColor ()
+    {
         var tv = new TreeView { Width = 20, Height = 10 };
         tv.BeginInit ();
         tv.EndInit ();
@@ -1181,27 +1224,27 @@ oot two
 
         // Normal drawing of the tree view
         TestHelpers.AssertDriverContentsAre (
-            @"
+                                             @"
 ├-normal
 │ ├─pink
 │ └─normal
 └─pink
 ",
-            _output
-        );
+                                             _output
+                                            );
 
         // Should all be the same color
         TestHelpers.AssertDriverAttributesAre (
-            @"
+                                               @"
 0000000000
 0000000000
 0000000000
 0000000000
 ",
-            Application.Driver,
-            tv.ColorScheme.Normal,
-            pink
-        );
+                                               Application.Driver,
+                                               tv.ColorScheme.Normal,
+                                               pink
+                                              );
 
         var pinkScheme = new ColorScheme { Normal = pink, Focus = hotpink };
 
@@ -1215,32 +1258,33 @@ oot two
 
         // Same text
         TestHelpers.AssertDriverContentsAre (
-            @"
+                                             @"
 ├-normal
 │ ├─pink
 │ └─normal
 └─pink
 ",
-            _output
-        );
+                                             _output
+                                            );
 
         // but now the item (only not lines) appear
         // in pink when they are the word "pink"
         TestHelpers.AssertDriverAttributesAre (
-            @"
+                                               @"
 00000000
 00001111
 0000000000
 001111
 ",
-            Application.Driver,
-            tv.ColorScheme.Normal,
-            pink
-        );
+                                               Application.Driver,
+                                               tv.ColorScheme.Normal,
+                                               pink
+                                              );
     }
 
     [Fact]
-    public void TreeNode_WorksWithoutDelegate () {
+    public void TreeNode_WorksWithoutDelegate ()
+    {
         var tree = new TreeView ();
 
         var root = new TreeNode ("Root");
@@ -1253,39 +1297,44 @@ oot two
         Assert.Equal (2, tree.GetChildren (root).Count ());
     }
 
-    private void InitFakeDriver () {
+    private void InitFakeDriver ()
+    {
         var driver = new FakeDriver ();
         Application.Init (driver);
         driver.Init ();
     }
 
     /// <summary>Test object which considers for equality only <see cref="Name"/></summary>
-    private class EqualityTestObject {
+    private class EqualityTestObject
+    {
         public int Age { get; set; }
         public string Name { get; set; }
-        public override bool Equals (object obj) => obj is EqualityTestObject eto && Equals (Name, eto.Name);
-        public override int GetHashCode () => Name?.GetHashCode () ?? base.GetHashCode ();
+        public override bool Equals (object obj) { return obj is EqualityTestObject eto && Equals (Name, eto.Name); }
+        public override int GetHashCode () { return Name?.GetHashCode () ?? base.GetHashCode (); }
     }
 
     #region Test Setup Methods
 
-    private class Factory {
-        public Car[] Cars { get; set; }
-        public override string ToString () => "Factory";
+    private class Factory
+    {
+        public Car [] Cars { get; set; }
+        public override string ToString () { return "Factory"; }
     }
 
-    private class Car {
+    private class Car
+    {
         public string Name { get; set; }
-        public override string ToString () => Name;
+        public override string ToString () { return Name; }
     }
 
-    private TreeView<object> CreateTree () => CreateTree (out _, out _, out _);
+    private TreeView<object> CreateTree () { return CreateTree (out _, out _, out _); }
 
-    private TreeView<object> CreateTree (out Factory factory1, out Car car1, out Car car2) {
+    private TreeView<object> CreateTree (out Factory factory1, out Car car1, out Car car2)
+    {
         car1 = new Car ();
         car2 = new Car ();
 
-        factory1 = new Factory { Cars = new[] { car1, car2 } };
+        factory1 = new Factory { Cars = new [] { car1, car2 } };
 
         TreeView<object> tree = new (new DelegateTreeBuilder<object> (s => s is Factory f ? f.Cars : null));
         tree.AddObject (factory1);

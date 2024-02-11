@@ -6,11 +6,13 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Drawing")]
 [ScenarioCategory ("Borders")]
 [ScenarioCategory ("Proof of Concept")]
-public class LineCanvasExperiment : Scenario {
+public class LineCanvasExperiment : Scenario
+{
     public override void Init () { Application.Init (); }
 
     /// <summary>Setup the scenario.</summary>
-    public override void Setup () {
+    public override void Setup ()
+    {
         //var menu = new MenuBar (new MenuBarItem [] {
         //new MenuBarItem ("_File", new MenuItem [] {
         //	new MenuItem ("_Quit", "", () => Application.RequestStop()),
@@ -18,13 +20,14 @@ public class LineCanvasExperiment : Scenario {
 
         //Application.Top.Add (menu);
 
-        var frame1 = new FrameView {
+        var frame1 = new FrameView
+        {
             Title = "LineCanvas Experiments",
             X = 0,
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            ColorScheme = Colors.ColorSchemes["Base"]
+            ColorScheme = Colors.ColorSchemes ["Base"]
         };
         frame1.BorderStyle = LineStyle.Double;
 
@@ -32,7 +35,8 @@ public class LineCanvasExperiment : Scenario {
 
         Application.Top.Add (frame1);
 
-        var win1 = new Window {
+        var win1 = new Window
+        {
             AutoSize = false,
             Title = "win1",
             Text = "Win1 30%/50% Heavy",
@@ -48,7 +52,8 @@ public class LineCanvasExperiment : Scenario {
 
         frame1.Add (win1);
 
-        var win2 = new Window {
+        var win2 = new Window
+        {
             Title = "win2",
             Text = "Win2 right of win1, 30%/70% Single.",
             X = Pos.Right (win1) - 1,
@@ -62,7 +67,8 @@ public class LineCanvasExperiment : Scenario {
 
         frame1.Add (win2);
 
-        var view3 = new FrameView {
+        var view3 = new FrameView
+        {
             Title = "View 3",
             Text = "View3 right of win2 Fill/Fill Single",
             X = Pos.Right (win2) - 1,
@@ -76,7 +82,8 @@ public class LineCanvasExperiment : Scenario {
 
         frame1.Add (view3);
 
-        var view4 = new FrameView {
+        var view4 = new FrameView
+        {
             Title = "View 4",
             Text = "View4 below win2 win2.Width/5 Single",
             X = Pos.Left (win2),
@@ -90,7 +97,8 @@ public class LineCanvasExperiment : Scenario {
 
         frame1.Add (view4);
 
-        var win5 = new Window {
+        var win5 = new Window
+        {
             Title = "Win 5",
             Text = "win5 below View4 view4.Width/5 Double",
             X = Pos.Left (win2),
@@ -105,7 +113,8 @@ public class LineCanvasExperiment : Scenario {
 
         frame1.Add (win5);
 
-        var line = new Line {
+        var line = new Line
+        {
             X = 1,
             Y = 1,
             Width = 10,
@@ -115,7 +124,8 @@ public class LineCanvasExperiment : Scenario {
         };
         frame1.Add (line);
 
-        var marginWindow = new Window {
+        var marginWindow = new Window
+        {
             Title = "Positive Margin",
             X = 0,
             Y = 8,
@@ -125,7 +135,7 @@ public class LineCanvasExperiment : Scenario {
             //ColorScheme = Colors.ColorSchemes ["Error"],
             SuperViewRendersLineCanvas = true
         };
-        marginWindow.Margin.ColorScheme = Colors.ColorSchemes["Dialog"];
+        marginWindow.Margin.ColorScheme = Colors.ColorSchemes ["Dialog"];
         marginWindow.Margin.Thickness = new Thickness (1);
         marginWindow.Border.Thickness = new Thickness (1, 2, 1, 1);
 

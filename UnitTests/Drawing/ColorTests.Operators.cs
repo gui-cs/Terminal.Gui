@@ -3,7 +3,8 @@ using System.Reflection;
 
 namespace Terminal.Gui.DrawingTests;
 
-public partial class ColorTests {
+public partial class ColorTests
+{
     [Theory]
     [Trait ("Category", "Operators")]
     [CombinatorialData]
@@ -12,7 +13,8 @@ public partial class ColorTests {
         [CombinatorialRange (0, 255, 51)] byte g,
         [CombinatorialRange (0, 255, 51)] byte b,
         [CombinatorialValues (0, 255)] byte a
-    ) {
+    )
+    {
         Color color = new (r, g, b, a);
 
         var vector = (Vector3)color;
@@ -29,14 +31,18 @@ public partial class ColorTests {
         uint u1,
         [CombinatorialValues (0, short.MaxValue, int.MaxValue, uint.MaxValue)]
         uint u2
-    ) {
+    )
+    {
         Color color1 = u1;
         Color color2 = u2;
 
-        if (u1 == u2) {
+        if (u1 == u2)
+        {
             Assert.True (color1 == color2);
             Assert.False (color1 != color2);
-        } else {
+        }
+        else
+        {
             Assert.True (color1 != color2);
             Assert.False (color1 == color2);
         }
@@ -45,7 +51,8 @@ public partial class ColorTests {
     [Theory]
     [CombinatorialData]
     [Trait ("Category", "Operators")]
-    public void GetHashCode_DelegatesTo_Rgba ([CombinatorialRandomData (Count = 16)] int rgba) {
+    public void GetHashCode_DelegatesTo_Rgba ([CombinatorialRandomData (Count = 16)] int rgba)
+    {
         Color color = new (rgba);
 
         Assert.Equal (rgba.GetHashCode (), color.GetHashCode ());
@@ -54,10 +61,11 @@ public partial class ColorTests {
     [Theory]
     [Trait ("Category", "Operators")]
     [MemberData (
-        nameof (ColorTestsTheoryDataGenerators.ExplicitOperator_FromColorName_RoundTripsCorrectly),
-        MemberType = typeof (ColorTestsTheoryDataGenerators)
-    )]
-    public void ImplicitOperator_FromColorName_ReturnsCorrectColorValue (ColorName cname, Color expectedColor) {
+                    nameof (ColorTestsTheoryDataGenerators.ExplicitOperator_FromColorName_RoundTripsCorrectly),
+                    MemberType = typeof (ColorTestsTheoryDataGenerators)
+                )]
+    public void ImplicitOperator_FromColorName_ReturnsCorrectColorValue (ColorName cname, Color expectedColor)
+    {
         Color color = cname;
 
         Assert.Equal (expectedColor, color);
@@ -68,7 +76,8 @@ public partial class ColorTests {
     [Trait ("Category", "Operators")]
     public void ImplicitOperator_FromInt32_ReturnsCorrectColorValue (
         [CombinatorialRandomData (Count = 16)] int expectedValue
-    ) {
+    )
+    {
         Color color = expectedValue;
 
         Assert.Equal (expectedValue, color.Rgba);
@@ -79,7 +88,8 @@ public partial class ColorTests {
     [Trait ("Category", "Operators")]
     public void ImplicitOperator_FromUInt32_ReturnsCorrectColorValue (
         [CombinatorialRandomData (Count = 16)] uint expectedValue
-    ) {
+    )
+    {
         Color color = expectedValue;
 
         Assert.Equal (expectedValue, color.Argb);
@@ -92,7 +102,8 @@ public partial class ColorTests {
         [CombinatorialRange (0, 255, 51)] byte r,
         [CombinatorialRange (0, 255, 51)] byte g,
         [CombinatorialRange (0, 255, 51)] byte b
-    ) {
+    )
+    {
         Vector3 vector = new (r, g, b);
         Color color = vector;
 
@@ -110,7 +121,8 @@ public partial class ColorTests {
         [CombinatorialRange (0, 255, 51)] byte g,
         [CombinatorialRange (0, 255, 51)] byte b,
         [CombinatorialValues (0, 255)] byte a
-    ) {
+    )
+    {
         Vector4 vector = new (r, g, b, a);
         Color color = vector;
 
@@ -125,7 +137,8 @@ public partial class ColorTests {
     [Trait ("Category", "Operators")]
     public void ImplicitOperator_ToInt32_ReturnsCorrectInt32Value (
         [CombinatorialRandomData (Count = 16)] int expectedValue
-    ) {
+    )
+    {
         Color color = new (expectedValue);
 
         int colorAsInt32 = color;
@@ -138,7 +151,8 @@ public partial class ColorTests {
     [Trait ("Category", "Operators")]
     public void ImplicitOperator_ToUInt32_ReturnsCorrectUInt32Value (
         [CombinatorialRandomData (Count = 16)] uint expectedValue
-    ) {
+    )
+    {
         Color color = new (expectedValue);
 
         uint colorAsInt32 = color;
@@ -154,7 +168,8 @@ public partial class ColorTests {
         [CombinatorialRange (0, 255, 51)] byte g,
         [CombinatorialRange (0, 255, 51)] byte b,
         [CombinatorialValues (0, 255)] byte a
-    ) {
+    )
+    {
         Color color = new (r, g, b, a);
         Vector4 vector = color;
 
@@ -165,8 +180,10 @@ public partial class ColorTests {
     }
 }
 
-public static partial class ColorTestsTheoryDataGenerators {
-    public static TheoryData<ColorName, Color> ExplicitOperator_FromColorName_RoundTripsCorrectly () {
+public static partial class ColorTestsTheoryDataGenerators
+{
+    public static TheoryData<ColorName, Color> ExplicitOperator_FromColorName_RoundTripsCorrectly ()
+    {
         TheoryData<ColorName, Color> data = []
             ;
         data.Add (ColorName.Black, new Color (12, 12, 12));
@@ -189,51 +206,58 @@ public static partial class ColorTestsTheoryDataGenerators {
         return data;
     }
 
-    public static TheoryData<FieldInfo, int> Fields_At_Expected_Offsets () {
+    public static TheoryData<FieldInfo, int> Fields_At_Expected_Offsets ()
+    {
         TheoryData<FieldInfo, int> data = []
             ;
+
         data.Add (
-            typeof (Color).GetField (
-                "Argb",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding
-            ),
-            0
-        );
+                  typeof (Color).GetField (
+                                           "Argb",
+                                           BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding
+                                          ),
+                  0
+                 );
+
         data.Add (
-            typeof (Color).GetField (
-                "Rgba",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding
-            ),
-            0
-        );
+                  typeof (Color).GetField (
+                                           "Rgba",
+                                           BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding
+                                          ),
+                  0
+                 );
+
         data.Add (
-            typeof (Color).GetField (
-                "B",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding
-            ),
-            0
-        );
+                  typeof (Color).GetField (
+                                           "B",
+                                           BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding
+                                          ),
+                  0
+                 );
+
         data.Add (
-            typeof (Color).GetField (
-                "G",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding
-            ),
-            1
-        );
+                  typeof (Color).GetField (
+                                           "G",
+                                           BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding
+                                          ),
+                  1
+                 );
+
         data.Add (
-            typeof (Color).GetField (
-                "R",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding
-            ),
-            2
-        );
+                  typeof (Color).GetField (
+                                           "R",
+                                           BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding
+                                          ),
+                  2
+                 );
+
         data.Add (
-            typeof (Color).GetField (
-                "A",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding
-            ),
-            3
-        );
+                  typeof (Color).GetField (
+                                           "A",
+                                           BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding
+                                          ),
+                  3
+                 );
 
         return data;
     }

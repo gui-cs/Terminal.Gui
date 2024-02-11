@@ -1,27 +1,34 @@
 ﻿namespace Terminal.Gui;
 
-internal class FakeMainLoop : IMainLoopDriver {
-    public FakeMainLoop (ConsoleDriver consoleDriver = null) {
+internal class FakeMainLoop : IMainLoopDriver
+{
+    public FakeMainLoop (ConsoleDriver consoleDriver = null)
+    {
         // No implementation needed for FakeMainLoop
     }
 
     public Action<ConsoleKeyInfo> MockKeyPressed;
 
-    public void Setup (MainLoop mainLoop) {
+    public void Setup (MainLoop mainLoop)
+    {
         // No implementation needed for FakeMainLoop
     }
 
-    public void Wakeup () {
+    public void Wakeup ()
+    {
         // No implementation needed for FakeMainLoop
     }
 
-    public bool EventsPending () =>
-
+    public bool EventsPending ()
+    {
         // Always return true for FakeMainLoop
-        true;
+        return true;
+    }
 
-    public void Iteration () {
-        if (FakeConsole.MockKeyPresses.Count > 0) {
+    public void Iteration ()
+    {
+        if (FakeConsole.MockKeyPresses.Count > 0)
+        {
             MockKeyPressed?.Invoke (FakeConsole.MockKeyPresses.Pop ());
         }
     }

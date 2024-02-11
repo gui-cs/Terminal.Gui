@@ -1,18 +1,19 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>Describes a selected region of the table</summary>
-public class TableSelection {
+public class TableSelection
+{
     /// <summary>Creates a new selected area starting at the origin corner and covering the provided rectangular area</summary>
     /// <param name="origin"></param>
     /// <param name="rect"></param>
-    public TableSelection (Point origin, Rect rect) {
+    public TableSelection (Point origin, Rect rect)
+    {
         Origin = origin;
         Rect = rect;
     }
 
     /// <summary>
-    ///     True if the selection was made through <see cref="Command.ToggleChecked"/> and therefore should persist even
-    ///     through keyboard navigation.
+    ///     True if the selection was made through <see cref="Command.ToggleChecked"/> and therefore should persist even through keyboard navigation.
     /// </summary>
     public bool IsToggled { get; set; }
 

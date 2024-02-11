@@ -5,8 +5,10 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("SendKeys", "SendKeys sample - Send key combinations.")]
 [ScenarioCategory ("Mouse and Keyboard")]
-public class SendKeys : Scenario {
-    public override void Setup () {
+public class SendKeys : Scenario
+{
+    public override void Setup ()
+    {
         var label = new Label { X = Pos.Center (), Y = Pos.Center () - 6, Text = "Insert the text to send:" };
         Win.Add (label);
 
@@ -34,23 +36,28 @@ public class SendKeys : Scenario {
         var IsAlt = false;
         var IsCtrl = false;
 
-        txtResult.KeyDown += (s, e) => {
-            rKeys += (char)e.KeyCode;
-            if (!IsShift && e.IsShift) {
-                rControlKeys += " Shift ";
-                IsShift = true;
-            }
+        txtResult.KeyDown += (s, e) =>
+                             {
+                                 rKeys += (char)e.KeyCode;
 
-            if (!IsAlt && e.IsAlt) {
-                rControlKeys += " Alt ";
-                IsAlt = true;
-            }
+                                 if (!IsShift && e.IsShift)
+                                 {
+                                     rControlKeys += " Shift ";
+                                     IsShift = true;
+                                 }
 
-            if (!IsCtrl && e.IsCtrl) {
-                rControlKeys += " Ctrl ";
-                IsCtrl = true;
-            }
-        };
+                                 if (!IsAlt && e.IsAlt)
+                                 {
+                                     rControlKeys += " Alt ";
+                                     IsAlt = true;
+                                 }
+
+                                 if (!IsCtrl && e.IsCtrl)
+                                 {
+                                     rControlKeys += " Ctrl ";
+                                     IsCtrl = true;
+                                 }
+                             };
 
         var lblShippedKeys = new Label { X = Pos.Center (), Y = Pos.Center () + 3, AutoSize = true };
         Win.Add (lblShippedKeys);
@@ -61,7 +68,8 @@ public class SendKeys : Scenario {
         var button = new Button { X = Pos.Center (), Y = Pos.Center () + 7, IsDefault = true, Text = "Process keys" };
         Win.Add (button);
 
-        void ProcessInput () {
+        void ProcessInput ()
+        {
             rKeys = "";
             rControlKeys = "";
             txtResult.Text = "";
@@ -69,17 +77,20 @@ public class SendKeys : Scenario {
             IsAlt = false;
             IsCtrl = false;
             txtResult.SetFocus ();
-            foreach (char r in txtInput.Text) {
+
+            foreach (char r in txtInput.Text)
+            {
                 ConsoleKey ck = char.IsLetter (r)
                                     ? (ConsoleKey)char.ToUpper (r)
                                     : (ConsoleKey)r;
+
                 Application.Driver.SendKeys (
-                    r,
-                    ck,
-                    (bool)ckbShift.Checked,
-                    (bool)ckbAlt.Checked,
-                    (bool)ckbControl.Checked
-                );
+                                             r,
+                                             ck,
+                                             (bool)ckbShift.Checked,
+                                             (bool)ckbAlt.Checked,
+                                             (bool)ckbControl.Checked
+                                            );
             }
 
             lblShippedKeys.Text = rKeys;
@@ -89,11 +100,13 @@ public class SendKeys : Scenario {
 
         button.Clicked += (s, e) => ProcessInput ();
 
-        Win.KeyDown += (s, e) => {
-            if (e.KeyCode == KeyCode.Enter) {
-                ProcessInput ();
-                e.Handled = true;
-            }
-        };
+        Win.KeyDown += (s, e) =>
+                       {
+                           if (e.KeyCode == KeyCode.Enter)
+                           {
+                               ProcessInput ();
+                               e.Handled = true;
+                           }
+                       };
     }
 }

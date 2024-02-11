@@ -1,8 +1,10 @@
 namespace Terminal.Gui.FileServicesTests;
 
-public class FileSystemColorProviderTests {
+public class FileSystemColorProviderTests
+{
     [Fact]
-    public void CanConstruct () {
+    public void CanConstruct ()
+    {
         var prov = new FileSystemColorProvider ();
         Assert.NotNull (prov);
     }

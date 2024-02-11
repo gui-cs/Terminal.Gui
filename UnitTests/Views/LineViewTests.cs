@@ -1,9 +1,11 @@
 ﻿namespace Terminal.Gui.ViewsTests;
 
-public class LineViewTests {
+public class LineViewTests
+{
     [Fact]
     [AutoInitShutdown]
-    public void LineView_DefaultConstructor () {
+    public void LineView_DefaultConstructor ()
+    {
         var horizontal = new LineView ();
 
         Assert.Equal (Orientation.Horizontal, horizontal.Orientation);
@@ -13,7 +15,8 @@ public class LineViewTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void LineView_Horizontal () {
+    public void LineView_Horizontal ()
+    {
         var horizontal = new LineView (Orientation.Horizontal);
 
         Assert.Equal (Orientation.Horizontal, horizontal.Orientation);
@@ -23,7 +26,8 @@ public class LineViewTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void LineView_Vertical () {
+    public void LineView_Vertical ()
+    {
         var vert = new LineView (Orientation.Vertical);
 
         Assert.Equal (Orientation.Vertical, vert.Orientation);

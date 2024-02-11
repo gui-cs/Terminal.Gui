@@ -6,21 +6,25 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class TitleTests {
-    public TitleTests (ITestOutputHelper output) { this.output = output; }
+public class TitleTests
+{
     private readonly ITestOutputHelper output;
+    public TitleTests (ITestOutputHelper output) { this.output = output; }
 
     [Fact]
-    public void Set_Title_Fires_TitleChanged () {
+    public void Set_Title_Fires_TitleChanged ()
+    {
         var r = new View ();
         Assert.Equal (string.Empty, r.Title);
 
         string expectedOld = null;
         string expected = null;
-        r.TitleChanged += (s, args) => {
-            Assert.Equal (expectedOld, args.OldTitle);
-            Assert.Equal (r.Title, args.NewTitle);
-        };
+
+        r.TitleChanged += (s, args) =>
+                          {
+                              Assert.Equal (expectedOld, args.OldTitle);
+                              Assert.Equal (r.Title, args.NewTitle);
+                          };
 
         expected = "title";
         expectedOld = r.Title;
@@ -30,7 +34,8 @@ public class TitleTests {
     }
 
     [Fact]
-    public void Set_Title_Fires_TitleChanging () {
+    public void Set_Title_Fires_TitleChanging ()
+    {
         var r = new View ();
         Assert.Equal (string.Empty, r.Title);
 
@@ -38,11 +43,13 @@ public class TitleTests {
         string expectedDuring = null;
         string expectedAfter = null;
         var cancel = false;
-        r.TitleChanging += (s, args) => {
-            Assert.Equal (expectedOld, args.OldTitle);
-            Assert.Equal (expectedDuring, args.NewTitle);
-            args.Cancel = cancel;
-        };
+
+        r.TitleChanging += (s, args) =>
+                           {
+                               Assert.Equal (expectedOld, args.OldTitle);
+                               Assert.Equal (expectedDuring, args.NewTitle);
+                               args.Cancel = cancel;
+                           };
 
         expectedOld = string.Empty;
         r.Title = expectedDuring = expectedAfter = "title";

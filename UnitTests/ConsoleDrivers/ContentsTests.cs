@@ -5,13 +5,15 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.DriverTests;
 
-public class ContentsTests {
-    public ContentsTests (ITestOutputHelper output) {
+public class ContentsTests
+{
+    private readonly ITestOutputHelper output;
+
+    public ContentsTests (ITestOutputHelper output)
+    {
         ConsoleDriver.RunningUnitTests = true;
         this.output = output;
     }
-
-    private readonly ITestOutputHelper output;
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
@@ -20,7 +22,8 @@ public class ContentsTests {
     //[InlineData (typeof (ANSIDriver))]
     //[InlineData (typeof (CursesDriver))] // TODO: Uncomment when #2796 and #2615 are fixed
     //[InlineData (typeof (WindowsDriver))] // TODO: Uncomment when #2610 is fixed
-    public void AddStr_Combining_Character_1st_Column (Type driverType) {
+    public void AddStr_Combining_Character_1st_Column (Type driverType)
+    {
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         driver.Init ();
         var expected = "\u0301!";
@@ -37,7 +40,8 @@ public class ContentsTests {
     //[InlineData (typeof (ANSIDriver))]
     //[InlineData (typeof (CursesDriver))] // TODO: Uncomment when #2796 and #2615 are fixed
     //[InlineData (typeof (WindowsDriver))] // TODO: Uncomment when #2610 is fixed
-    public void AddStr_With_Combining_Characters (Type driverType) {
+    public void AddStr_With_Combining_Characters (Type driverType)
+    {
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         driver.Init ();
 
@@ -92,7 +96,8 @@ public class ContentsTests {
     //[InlineData (typeof (ANSIDriver))]
     [InlineData (typeof (WindowsDriver))]
     [InlineData (typeof (CursesDriver))]
-    public void Move_Bad_Coordinates (Type driverType) {
+    public void Move_Bad_Coordinates (Type driverType)
+    {
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         driver.Init ();
 

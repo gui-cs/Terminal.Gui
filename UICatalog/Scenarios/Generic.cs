@@ -4,8 +4,10 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Generic", "Generic sample - A template for creating new Scenarios")]
 [ScenarioCategory ("Controls")]
-public class MyScenario : Scenario {
-    public override void Init () {
+public class MyScenario : Scenario
+{
+    public override void Init ()
+    {
         // The base `Scenario.Init` implementation:
         //  - Calls `Application.Init ()`
         //  - Adds a full-screen Window to Application.Top with a title
@@ -21,10 +23,11 @@ public class MyScenario : Scenario {
         Application.Init ();
         ConfigurationManager.Themes.Theme = Theme;
         ConfigurationManager.Apply ();
-        Application.Top.ColorScheme = Colors.ColorSchemes[TopLevelColorScheme];
+        Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
     }
 
-    public override void Setup () {
+    public override void Setup ()
+    {
         // Put scenario code here (in a real app, this would be the code
         // that would setup the app before `Application.Run` is called`).
         // With a Scenario, after UI Catalog calls `Scenario.Setup` it calls

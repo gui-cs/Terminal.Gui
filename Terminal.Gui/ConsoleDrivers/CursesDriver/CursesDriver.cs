@@ -9,39 +9,47 @@ using Unix.Terminal;
 namespace Terminal.Gui;
 
 /// <summary>This is the Curses driver for the gui.cs/Terminal framework.</summary>
-internal class CursesDriver : ConsoleDriver {
+internal class CursesDriver : ConsoleDriver
+{
     private CursorVisibility? _currentCursorVisibility;
     private CursorVisibility? _initialCursorVisibility;
     private MouseFlags _lastMouseFlags;
-    private object _processInputToken;
     private UnixMainLoop _mainLoopDriver;
+    private object _processInputToken;
     public Curses.Window _window;
-    public override bool SupportsTrueColor => false;
 
-    public override int Cols {
+    public override int Cols
+    {
         get => Curses.Cols;
-        internal set {
+        internal set
+        {
             Curses.Cols = value;
             ClearContents ();
         }
     }
 
-    public override int Rows {
+    public override int Rows
+    {
         get => Curses.Lines;
-        internal set {
+        internal set
+        {
             Curses.Lines = value;
             ClearContents ();
         }
     }
 
-    /// <inheritdoc/>
-    public override bool EnsureCursorVisibility () => false;
+    public override bool SupportsTrueColor => false;
 
     /// <inheritdoc/>
-    public override bool GetCursorVisibility (out CursorVisibility visibility) {
+    public override bool EnsureCursorVisibility () { return false; }
+
+    /// <inheritdoc/>
+    public override bool GetCursorVisibility (out CursorVisibility visibility)
+    {
         visibility = CursorVisibility.Invisible;
 
-        if (!_currentCursorVisibility.HasValue) {
+        if (!_currentCursorVisibility.HasValue)
+        {
             return false;
         }
 
@@ -50,69 +58,87 @@ internal class CursesDriver : ConsoleDriver {
         return true;
     }
 
-    public override string GetVersionInfo () => $"{Curses.curses_version ()}";
+    public override string GetVersionInfo () { return $"{Curses.curses_version ()}"; }
 
-    public static bool Is_WSL_Platform () {
+    public static bool Is_WSL_Platform ()
+    {
         // xclip does not work on WSL, so we need to use the Windows clipboard vis Powershell
         //if (new CursesClipboard ().IsSupported) {
         //	// If xclip is installed on Linux under WSL, this will return true.
         //	return false;
         //}
         (int exitCode, string result) = ClipboardProcessRunner.Bash ("uname -a", waitForOutput: true);
-        if (exitCode == 0 && result.Contains ("microsoft") && result.Contains ("WSL")) {
+
+        if (exitCode == 0 && result.Contains ("microsoft") && result.Contains ("WSL"))
+        {
             return true;
         }
 
         return false;
     }
 
-    public override bool IsRuneSupported (Rune rune) =>
-
+    public override bool IsRuneSupported (Rune rune)
+    {
         // See Issue #2615 - CursesDriver is broken with non-BMP characters
-        base.IsRuneSupported (rune) && rune.IsBmp;
+        return base.IsRuneSupported (rune) && rune.IsBmp;
+    }
 
-    public override void Move (int col, int row) {
+    public override void Move (int col, int row)
+    {
         base.Move (col, row);
 
-        if (RunningUnitTests) {
+        if (RunningUnitTests)
+        {
             return;
         }
 
-        if (IsValidLocation (col, row)) {
+        if (IsValidLocation (col, row))
+        {
             Curses.move (row, col);
-        } else {
+        }
+        else
+        {
             // Not a valid location (outside screen or clip region)
             // Move within the clip region, then AddRune will actually move to Col, Row
             Curses.move (Clip.Y, Clip.X);
         }
     }
 
-    public override void Refresh () {
+    public override void Refresh ()
+    {
         UpdateScreen ();
         UpdateCursor ();
     }
 
-    public override void SendKeys (char keyChar, ConsoleKey consoleKey, bool shift, bool alt, bool control) {
+    public override void SendKeys (char keyChar, ConsoleKey consoleKey, bool shift, bool alt, bool control)
+    {
         KeyCode key;
 
-        if (consoleKey == ConsoleKey.Packet) {
+        if (consoleKey == ConsoleKey.Packet)
+        {
             var mod = new ConsoleModifiers ();
-            if (shift) {
+
+            if (shift)
+            {
                 mod |= ConsoleModifiers.Shift;
             }
 
-            if (alt) {
+            if (alt)
+            {
                 mod |= ConsoleModifiers.Alt;
             }
 
-            if (control) {
+            if (control)
+            {
                 mod |= ConsoleModifiers.Control;
             }
 
             var cKeyInfo = new ConsoleKeyInfo (keyChar, consoleKey, shift, alt, control);
             cKeyInfo = ConsoleKeyMapping.DecodeVKPacketToKConsoleKeyInfo (cKeyInfo);
             key = ConsoleKeyMapping.MapConsoleKeyInfoToKeyCode (cKeyInfo);
-        } else {
+        }
+        else
+        {
             key = (KeyCode)keyChar;
         }
 
@@ -123,22 +149,26 @@ internal class CursesDriver : ConsoleDriver {
     }
 
     /// <inheritdoc/>
-    public override bool SetCursorVisibility (CursorVisibility visibility) {
-        if (_initialCursorVisibility.HasValue == false) {
+    public override bool SetCursorVisibility (CursorVisibility visibility)
+    {
+        if (_initialCursorVisibility.HasValue == false)
+        {
             return false;
         }
 
-        if (!RunningUnitTests) {
+        if (!RunningUnitTests)
+        {
             Curses.curs_set (((int)visibility >> 16) & 0x000000FF);
         }
 
-        if (visibility != CursorVisibility.Invisible) {
+        if (visibility != CursorVisibility.Invisible)
+        {
             Console.Out.Write (
-                EscSeqUtils.CSI_SetCursorStyle (
-                    (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24)
-                                                 & 0xFF)
-                )
-            );
+                               EscSeqUtils.CSI_SetCursorStyle (
+                                                               (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24)
+                                                                                            & 0xFF)
+                                                              )
+                              );
         }
 
         _currentCursorVisibility = visibility;
@@ -146,21 +176,28 @@ internal class CursesDriver : ConsoleDriver {
         return true;
     }
 
-    public void StartReportingMouseMoves () {
-        if (!RunningUnitTests) {
+    public void StartReportingMouseMoves ()
+    {
+        if (!RunningUnitTests)
+        {
             Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
         }
     }
 
-    public void StopReportingMouseMoves () {
-        if (!RunningUnitTests) {
+    public void StopReportingMouseMoves ()
+    {
+        if (!RunningUnitTests)
+        {
             Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
         }
     }
 
-    public override void Suspend () {
+    public override void Suspend ()
+    {
         StopReportingMouseMoves ();
-        if (!RunningUnitTests) {
+
+        if (!RunningUnitTests)
+        {
             Platform.Suspend ();
             Curses.Window.Standard.redrawwin ();
             Curses.refresh ();
@@ -169,45 +206,62 @@ internal class CursesDriver : ConsoleDriver {
         StartReportingMouseMoves ();
     }
 
-    public override void UpdateCursor () {
+    public override void UpdateCursor ()
+    {
         EnsureCursorVisibility ();
 
-        if (!RunningUnitTests && Col >= 0 && Col < Cols && Row >= 0 && Row < Rows) {
+        if (!RunningUnitTests && Col >= 0 && Col < Cols && Row >= 0 && Row < Rows)
+        {
             Curses.move (Row, Col);
         }
     }
 
-    public override void UpdateScreen () {
-        for (var row = 0; row < Rows; row++) {
-            if (!_dirtyLines[row]) {
+    public override void UpdateScreen ()
+    {
+        for (var row = 0; row < Rows; row++)
+        {
+            if (!_dirtyLines [row])
+            {
                 continue;
             }
 
-            _dirtyLines[row] = false;
+            _dirtyLines [row] = false;
 
-            for (var col = 0; col < Cols; col++) {
-                if (Contents[row, col].IsDirty == false) {
+            for (var col = 0; col < Cols; col++)
+            {
+                if (Contents [row, col].IsDirty == false)
+                {
                     continue;
                 }
 
-                if (RunningUnitTests) {
+                if (RunningUnitTests)
+                {
                     // In unit tests, we don't want to actually write to the screen.
                     continue;
                 }
 
-                Curses.attrset (Contents[row, col].Attribute.GetValueOrDefault ().PlatformColor);
+                Curses.attrset (Contents [row, col].Attribute.GetValueOrDefault ().PlatformColor);
 
-                Rune rune = Contents[row, col].Rune;
-                if (rune.IsBmp) {
+                Rune rune = Contents [row, col].Rune;
+
+                if (rune.IsBmp)
+                {
                     // BUGBUG: CursesDriver doesn't render CharMap correctly for wide chars (and other Unicode) - Curses is doing something funky with glyphs that report GetColums() of 1 yet are rendered wide. E.g. 0x2064 (invisible times) is reported as 1 column but is rendered as 2. WindowsDriver & NetDriver correctly render this as 1 column, overlapping the next cell.
-                    if (rune.GetColumns () < 2) {
+                    if (rune.GetColumns () < 2)
+                    {
                         Curses.mvaddch (row, col, rune.Value);
-                    } else /*if (col + 1 < Cols)*/ {
+                    }
+                    else /*if (col + 1 < Cols)*/
+                    {
                         Curses.mvaddwstr (row, col, rune.ToString ());
                     }
-                } else {
+                }
+                else
+                {
                     Curses.mvaddwstr (row, col, rune.ToString ());
-                    if (rune.GetColumns () > 1 && col + 1 < Cols) {
+
+                    if (rune.GetColumns () > 1 && col + 1 < Cols)
+                    {
                         // TODO: This is a hack to deal with non-BMP and wide characters.
                         //col++;
                         Curses.mvaddch (row, ++col, '*');
@@ -216,21 +270,25 @@ internal class CursesDriver : ConsoleDriver {
             }
         }
 
-        if (!RunningUnitTests) {
+        if (!RunningUnitTests)
+        {
             Curses.move (Row, Col);
             _window.wrefresh ();
         }
     }
 
-    internal override void End () {
+    internal override void End ()
+    {
         StopReportingMouseMoves ();
         SetCursorVisibility (CursorVisibility.Default);
 
-        if (_mainLoopDriver != null) {
+        if (_mainLoopDriver != null)
+        {
             _mainLoopDriver.RemoveWatch (_processInputToken);
         }
 
-        if (RunningUnitTests) {
+        if (RunningUnitTests)
+        {
             return;
         }
 
@@ -241,9 +299,12 @@ internal class CursesDriver : ConsoleDriver {
         Curses.endwin ();
     }
 
-    internal override MainLoop Init () {
+    internal override MainLoop Init ()
+    {
         _mainLoopDriver = new UnixMainLoop (this);
-        if (!RunningUnitTests) {
+
+        if (!RunningUnitTests)
+        {
             _window = Curses.initscr ();
             Curses.set_escdelay (10);
 
@@ -253,7 +314,8 @@ internal class CursesDriver : ConsoleDriver {
             // 
             // We are setting Invisible as default so we could ignore XTerm DECSUSR setting
             //
-            switch (Curses.curs_set (0)) {
+            switch (Curses.curs_set (0))
+            {
                 case 0:
                     _currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Invisible;
 
@@ -277,7 +339,8 @@ internal class CursesDriver : ConsoleDriver {
                     break;
             }
 
-            if (!Curses.HasColors) {
+            if (!Curses.HasColors)
+            {
                 throw new InvalidOperationException ("V2 - This should never happen. File an Issue if it does.");
             }
 
@@ -289,32 +352,43 @@ internal class CursesDriver : ConsoleDriver {
             Curses.StartColor ();
             Curses.UseDefaultColors ();
 
-            if (!RunningUnitTests) {
+            if (!RunningUnitTests)
+            {
                 Curses.timeout (0);
             }
 
             _processInputToken = _mainLoopDriver?.AddWatch (
-                0,
-                UnixMainLoop.Condition.PollIn,
-                x => {
-                    ProcessInput ();
+                                                            0,
+                                                            UnixMainLoop.Condition.PollIn,
+                                                            x =>
+                                                            {
+                                                                ProcessInput ();
 
-                    return true;
-                }
-            );
+                                                                return true;
+                                                            }
+                                                           );
         }
 
         CurrentAttribute = new Attribute (ColorName.White, ColorName.Black);
 
-        if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
+        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+        {
             Clipboard = new FakeDriver.FakeClipboard ();
-        } else {
-            if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+        }
+        else
+        {
+            if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX))
+            {
                 Clipboard = new MacOSXClipboard ();
-            } else {
-                if (Is_WSL_Platform ()) {
+            }
+            else
+            {
+                if (Is_WSL_Platform ())
+                {
                     Clipboard = new WSLClipboard ();
-                } else {
+                }
+                else
+                {
                     Clipboard = new CursesClipboard ();
                 }
             }
@@ -323,7 +397,8 @@ internal class CursesDriver : ConsoleDriver {
         ClearContents ();
         StartReportingMouseMoves ();
 
-        if (!RunningUnitTests) {
+        if (!RunningUnitTests)
+        {
             Curses.CheckWinChange ();
             Curses.refresh ();
         }
@@ -331,33 +406,42 @@ internal class CursesDriver : ConsoleDriver {
         return new MainLoop (_mainLoopDriver);
     }
 
-    internal void ProcessInput () {
+    internal void ProcessInput ()
+    {
         int wch;
         int code = Curses.get_wch (out wch);
 
         //System.Diagnostics.Debug.WriteLine ($"code: {code}; wch: {wch}");
-        if (code == Curses.ERR) {
+        if (code == Curses.ERR)
+        {
             return;
         }
 
         var k = KeyCode.Null;
 
-        if (code == Curses.KEY_CODE_YES) {
-            while (code == Curses.KEY_CODE_YES && wch == Curses.KeyResize) {
+        if (code == Curses.KEY_CODE_YES)
+        {
+            while (code == Curses.KEY_CODE_YES && wch == Curses.KeyResize)
+            {
                 ProcessWinChange ();
                 code = Curses.get_wch (out wch);
             }
 
-            if (wch == 0) {
+            if (wch == 0)
+            {
                 return;
             }
 
-            if (wch == Curses.KeyMouse) {
+            if (wch == Curses.KeyMouse)
+            {
                 int wch2 = wch;
 
-                while (wch2 == Curses.KeyMouse) {
+                while (wch2 == Curses.KeyMouse)
+                {
                     Key kea = null;
-                    ConsoleKeyInfo[] cki = {
+
+                    ConsoleKeyInfo [] cki =
+                    {
                         new ((char)KeyCode.Esc, 0, false, false, false),
                         new ('[', 0, false, false, false),
                         new ('<', 0, false, false, false)
@@ -370,23 +454,33 @@ internal class CursesDriver : ConsoleDriver {
             }
 
             k = MapCursesKey (wch);
-            if (wch >= 277 && wch <= 288) {
+
+            if (wch >= 277 && wch <= 288)
+            {
                 // Shift+(F1 - F12)
                 wch -= 12;
                 k = KeyCode.ShiftMask | MapCursesKey (wch);
-            } else if (wch >= 289 && wch <= 300) {
+            }
+            else if (wch >= 289 && wch <= 300)
+            {
                 // Ctrl+(F1 - F12)
                 wch -= 24;
                 k = KeyCode.CtrlMask | MapCursesKey (wch);
-            } else if (wch >= 301 && wch <= 312) {
+            }
+            else if (wch >= 301 && wch <= 312)
+            {
                 // Ctrl+Shift+(F1 - F12)
                 wch -= 36;
                 k = KeyCode.CtrlMask | KeyCode.ShiftMask | MapCursesKey (wch);
-            } else if (wch >= 313 && wch <= 324) {
+            }
+            else if (wch >= 313 && wch <= 324)
+            {
                 // Alt+(F1 - F12)
                 wch -= 48;
                 k = KeyCode.AltMask | MapCursesKey (wch);
-            } else if (wch >= 325 && wch <= 327) {
+            }
+            else if (wch >= 325 && wch <= 327)
+            {
                 // Shift+Alt+(F1 - F3)
                 wch -= 60;
                 k = KeyCode.ShiftMask | KeyCode.AltMask | MapCursesKey (wch);
@@ -399,77 +493,115 @@ internal class CursesDriver : ConsoleDriver {
         }
 
         // Special handling for ESC, we want to try to catch ESC+letter to simulate alt-letter as well as Alt-Fkey
-        if (wch == 27) {
+        if (wch == 27)
+        {
             Curses.timeout (10);
 
             code = Curses.get_wch (out int wch2);
 
-            if (code == Curses.KEY_CODE_YES) {
+            if (code == Curses.KEY_CODE_YES)
+            {
                 k = KeyCode.AltMask | MapCursesKey (wch);
             }
 
             Key key = null;
-            if (code == 0) {
+
+            if (code == 0)
+            {
                 // The ESC-number handling, debatable.
                 // Simulates the AltMask itself by pressing Alt + Space.
-                if (wch2 == (int)KeyCode.Space) {
+                if (wch2 == (int)KeyCode.Space)
+                {
                     k = KeyCode.AltMask;
-                } else if (wch2 - (int)KeyCode.Space >= (uint)KeyCode.A
-                           && wch2 - (int)KeyCode.Space <= (uint)KeyCode.Z) {
+                }
+                else if (wch2 - (int)KeyCode.Space >= (uint)KeyCode.A
+                         && wch2 - (int)KeyCode.Space <= (uint)KeyCode.Z)
+                {
                     k = (KeyCode)((uint)KeyCode.AltMask + (wch2 - (int)KeyCode.Space));
-                } else if (wch2 >= (uint)KeyCode.A - 64 && wch2 <= (uint)KeyCode.Z - 64) {
+                }
+                else if (wch2 >= (uint)KeyCode.A - 64 && wch2 <= (uint)KeyCode.Z - 64)
+                {
                     k = (KeyCode)((uint)(KeyCode.AltMask | KeyCode.CtrlMask) + (wch2 + 64));
-                } else if (wch2 >= (uint)KeyCode.D0 && wch2 <= (uint)KeyCode.D9) {
+                }
+                else if (wch2 >= (uint)KeyCode.D0 && wch2 <= (uint)KeyCode.D9)
+                {
                     k = (KeyCode)((uint)KeyCode.AltMask + (uint)KeyCode.D0 + (wch2 - (uint)KeyCode.D0));
-                } else if (wch2 == Curses.KeyCSI) {
-                    ConsoleKeyInfo[] cki = {
+                }
+                else if (wch2 == Curses.KeyCSI)
+                {
+                    ConsoleKeyInfo [] cki =
+                    {
                         new ((char)KeyCode.Esc, 0, false, false, false), new ('[', 0, false, false, false)
                     };
                     HandleEscSeqResponse (ref code, ref k, ref wch2, ref key, ref cki);
 
                     return;
-                } else {
+                }
+                else
+                {
                     // Unfortunately there are no way to differentiate Ctrl+Alt+alfa and Ctrl+Shift+Alt+alfa.
-                    if (((KeyCode)wch2 & KeyCode.CtrlMask) != 0) {
+                    if (((KeyCode)wch2 & KeyCode.CtrlMask) != 0)
+                    {
                         k = (KeyCode)((uint)KeyCode.CtrlMask + (wch2 & ~(int)KeyCode.CtrlMask));
                     }
 
-                    if (wch2 == 0) {
+                    if (wch2 == 0)
+                    {
                         k = KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Space;
-                    } else if (wch >= (uint)KeyCode.A && wch <= (uint)KeyCode.Z) {
+                    }
+                    else if (wch >= (uint)KeyCode.A && wch <= (uint)KeyCode.Z)
+                    {
                         k = KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.Space;
-                    } else if (wch2 < 256) {
+                    }
+                    else if (wch2 < 256)
+                    {
                         k = (KeyCode)wch2; // | KeyCode.AltMask;
-                    } else {
+                    }
+                    else
+                    {
                         k = (KeyCode)((uint)(KeyCode.AltMask | KeyCode.CtrlMask) + wch2);
                     }
                 }
 
                 key = new Key (k);
-            } else {
+            }
+            else
+            {
                 key = new Key (KeyCode.Esc);
             }
 
             OnKeyDown (key);
             OnKeyUp (key);
-        } else if (wch == Curses.KeyTab) {
+        }
+        else if (wch == Curses.KeyTab)
+        {
             k = MapCursesKey (wch);
             OnKeyDown (new Key (k));
             OnKeyUp (new Key (k));
-        } else {
+        }
+        else
+        {
             // Unfortunately there are no way to differentiate Ctrl+alfa and Ctrl+Shift+alfa.
             k = (KeyCode)wch;
-            if (wch == 0) {
+
+            if (wch == 0)
+            {
                 k = KeyCode.CtrlMask | KeyCode.Space;
-            } else if (wch >= (uint)KeyCode.A - 64 && wch <= (uint)KeyCode.Z - 64) {
-                if ((KeyCode)(wch + 64) != KeyCode.J) {
+            }
+            else if (wch >= (uint)KeyCode.A - 64 && wch <= (uint)KeyCode.Z - 64)
+            {
+                if ((KeyCode)(wch + 64) != KeyCode.J)
+                {
                     k = KeyCode.CtrlMask | (KeyCode)(wch + 64);
                 }
-            } else if (wch >= (uint)KeyCode.A && wch <= (uint)KeyCode.Z) {
+            }
+            else if (wch >= (uint)KeyCode.A && wch <= (uint)KeyCode.Z)
+            {
                 k = (KeyCode)wch | KeyCode.ShiftMask;
             }
 
-            if (wch == '\n' || wch == '\r') {
+            if (wch == '\n' || wch == '\r')
+            {
                 k = KeyCode.Enter;
             }
 
@@ -478,8 +610,10 @@ internal class CursesDriver : ConsoleDriver {
         }
     }
 
-    internal void ProcessWinChange () {
-        if (!RunningUnitTests && Curses.CheckWinChange ()) {
+    internal void ProcessWinChange ()
+    {
+        if (!RunningUnitTests && Curses.CheckWinChange ())
+        {
             ClearContents ();
             OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
         }
@@ -490,61 +624,77 @@ internal class CursesDriver : ConsoleDriver {
         ref KeyCode k,
         ref int wch2,
         ref Key keyEventArgs,
-        ref ConsoleKeyInfo[] cki
-    ) {
+        ref ConsoleKeyInfo [] cki
+    )
+    {
         ConsoleKey ck = 0;
         ConsoleModifiers mod = 0;
-        while (code == 0) {
+
+        while (code == 0)
+        {
             code = Curses.get_wch (out wch2);
             var consoleKeyInfo = new ConsoleKeyInfo ((char)wch2, 0, false, false, false);
-            if (wch2 == 0 || wch2 == 27 || wch2 == Curses.KeyMouse) {
+
+            if (wch2 == 0 || wch2 == 27 || wch2 == Curses.KeyMouse)
+            {
                 EscSeqUtils.DecodeEscSeq (
-                    null,
-                    ref consoleKeyInfo,
-                    ref ck,
-                    cki,
-                    ref mod,
-                    out _,
-                    out _,
-                    out _,
-                    out _,
-                    out bool isKeyMouse,
-                    out List<MouseFlags> mouseFlags,
-                    out Point pos,
-                    out _,
-                    ProcessMouseEvent
-                );
-                if (isKeyMouse) {
-                    foreach (MouseFlags mf in mouseFlags) {
+                                          null,
+                                          ref consoleKeyInfo,
+                                          ref ck,
+                                          cki,
+                                          ref mod,
+                                          out _,
+                                          out _,
+                                          out _,
+                                          out _,
+                                          out bool isKeyMouse,
+                                          out List<MouseFlags> mouseFlags,
+                                          out Point pos,
+                                          out _,
+                                          ProcessMouseEvent
+                                         );
+
+                if (isKeyMouse)
+                {
+                    foreach (MouseFlags mf in mouseFlags)
+                    {
                         ProcessMouseEvent (mf, pos);
                     }
 
                     cki = null;
-                    if (wch2 == 27) {
+
+                    if (wch2 == 27)
+                    {
                         cki = EscSeqUtils.ResizeArray (
-                            new ConsoleKeyInfo (
-                                (char)KeyCode.Esc,
-                                0,
-                                false,
-                                false,
-                                false
-                            ),
-                            cki
-                        );
+                                                       new ConsoleKeyInfo (
+                                                                           (char)KeyCode.Esc,
+                                                                           0,
+                                                                           false,
+                                                                           false,
+                                                                           false
+                                                                          ),
+                                                       cki
+                                                      );
                     }
-                } else {
+                }
+                else
+                {
                     k = ConsoleKeyMapping.MapConsoleKeyInfoToKeyCode (consoleKeyInfo);
                     keyEventArgs = new Key (k);
                     OnKeyDown (keyEventArgs);
                 }
-            } else {
+            }
+            else
+            {
                 cki = EscSeqUtils.ResizeArray (consoleKeyInfo, cki);
             }
         }
     }
 
-    private static KeyCode MapCursesKey (int cursesKey) {
-        switch (cursesKey) {
+    private static KeyCode MapCursesKey (int cursesKey)
+    {
+        switch (cursesKey)
+        {
             case Curses.KeyF1: return KeyCode.F1;
             case Curses.KeyF2: return KeyCode.F2;
             case Curses.KeyF3: return KeyCode.F3;
@@ -618,28 +768,38 @@ internal class CursesDriver : ConsoleDriver {
         }
     }
 
-    private void ProcessMouseEvent (MouseFlags mouseFlag, Point pos) {
-        bool WasButtonReleased (MouseFlags flag) => flag.HasFlag (MouseFlags.Button1Released) ||
-                                                    flag.HasFlag (MouseFlags.Button2Released) ||
-                                                    flag.HasFlag (MouseFlags.Button3Released) ||
-                                                    flag.HasFlag (MouseFlags.Button4Released);
+    private void ProcessMouseEvent (MouseFlags mouseFlag, Point pos)
+    {
+        bool WasButtonReleased (MouseFlags flag)
+        {
+            return flag.HasFlag (MouseFlags.Button1Released)
+                   || flag.HasFlag (MouseFlags.Button2Released)
+                   || flag.HasFlag (MouseFlags.Button3Released)
+                   || flag.HasFlag (MouseFlags.Button4Released);
+        }
 
-        bool IsButtonNotPressed (MouseFlags flag) => !flag.HasFlag (MouseFlags.Button1Pressed) &&
-                                                     !flag.HasFlag (MouseFlags.Button2Pressed) &&
-                                                     !flag.HasFlag (MouseFlags.Button3Pressed) &&
-                                                     !flag.HasFlag (MouseFlags.Button4Pressed);
+        bool IsButtonNotPressed (MouseFlags flag)
+        {
+            return !flag.HasFlag (MouseFlags.Button1Pressed)
+                   && !flag.HasFlag (MouseFlags.Button2Pressed)
+                   && !flag.HasFlag (MouseFlags.Button3Pressed)
+                   && !flag.HasFlag (MouseFlags.Button4Pressed);
+        }
 
-        bool IsButtonClickedOrDoubleClicked (MouseFlags flag) => flag.HasFlag (MouseFlags.Button1Clicked) ||
-                                                                 flag.HasFlag (MouseFlags.Button2Clicked) ||
-                                                                 flag.HasFlag (MouseFlags.Button3Clicked) ||
-                                                                 flag.HasFlag (MouseFlags.Button4Clicked) ||
-                                                                 flag.HasFlag (MouseFlags.Button1DoubleClicked) ||
-                                                                 flag.HasFlag (MouseFlags.Button2DoubleClicked) ||
-                                                                 flag.HasFlag (MouseFlags.Button3DoubleClicked) ||
-                                                                 flag.HasFlag (MouseFlags.Button4DoubleClicked);
+        bool IsButtonClickedOrDoubleClicked (MouseFlags flag)
+        {
+            return flag.HasFlag (MouseFlags.Button1Clicked)
+                   || flag.HasFlag (MouseFlags.Button2Clicked)
+                   || flag.HasFlag (MouseFlags.Button3Clicked)
+                   || flag.HasFlag (MouseFlags.Button4Clicked)
+                   || flag.HasFlag (MouseFlags.Button1DoubleClicked)
+                   || flag.HasFlag (MouseFlags.Button2DoubleClicked)
+                   || flag.HasFlag (MouseFlags.Button3DoubleClicked)
+                   || flag.HasFlag (MouseFlags.Button4DoubleClicked);
+        }
 
-        if ((WasButtonReleased (mouseFlag) && IsButtonNotPressed (_lastMouseFlags)) ||
-            (IsButtonClickedOrDoubleClicked (mouseFlag) && _lastMouseFlags == 0)) {
+        if ((WasButtonReleased (mouseFlag) && IsButtonNotPressed (_lastMouseFlags)) || (IsButtonClickedOrDoubleClicked (mouseFlag) && _lastMouseFlags == 0))
+        {
             return;
         }
 
@@ -655,42 +815,45 @@ internal class CursesDriver : ConsoleDriver {
     /// <param name="foreground">Contains the curses color number for the foreground (color, plus any attributes)</param>
     /// <param name="background">Contains the curses color number for the background (color, plus any attributes)</param>
     /// <returns></returns>
-    private static Attribute MakeColor (short foreground, short background) {
+    private static Attribute MakeColor (short foreground, short background)
+    {
         var v = (short)(foreground | (background << 4));
 
         // TODO: for TrueColor - Use InitExtendedPair
         Curses.InitColorPair (v, foreground, background);
 
         return new Attribute (
-            Curses.ColorPair (v),
-            CursesColorNumberToColorName (foreground),
-            CursesColorNumberToColorName (background)
-        );
+                              Curses.ColorPair (v),
+                              CursesColorNumberToColorName (foreground),
+                              CursesColorNumberToColorName (background)
+                             );
     }
 
     /// <inheritdoc/>
     /// <remarks>
-    ///     In the CursesDriver, colors are encoded as an int. The foreground color is stored in the most significant 4 bits,
-    ///     and the background color is stored in the least significant 4 bits. The Terminal.GUi Color values are converted to
-    ///     curses color encoding before being encoded.
+    ///     In the CursesDriver, colors are encoded as an int. The foreground color is stored in the most significant 4 bits, and the background color is stored in the least significant 4 bits. The Terminal.GUi Color values are converted to curses color encoding before being encoded.
     /// </remarks>
-    public override Attribute MakeColor (Color foreground, Color background) {
-        if (!RunningUnitTests) {
+    public override Attribute MakeColor (Color foreground, Color background)
+    {
+        if (!RunningUnitTests)
+        {
             return MakeColor (
-                ColorNameToCursesColorNumber (foreground.GetClosestNamedColor ()),
-                ColorNameToCursesColorNumber (background.GetClosestNamedColor ())
-            );
+                              ColorNameToCursesColorNumber (foreground.GetClosestNamedColor ()),
+                              ColorNameToCursesColorNumber (background.GetClosestNamedColor ())
+                             );
         }
 
         return new Attribute (
-            0,
-            foreground,
-            background
-        );
+                              0,
+                              foreground,
+                              background
+                             );
     }
 
-    private static short ColorNameToCursesColorNumber (ColorName color) {
-        switch (color) {
+    private static short ColorNameToCursesColorNumber (ColorName color)
+    {
+        switch (color)
+        {
             case ColorName.Black:
                 return Curses.COLOR_BLACK;
             case ColorName.Blue:
@@ -728,8 +891,10 @@ internal class CursesDriver : ConsoleDriver {
         throw new ArgumentException ("Invalid color code");
     }
 
-    private static ColorName CursesColorNumberToColorName (short color) {
-        switch (color) {
+    private static ColorName CursesColorNumberToColorName (short color)
+    {
+        switch (color)
+        {
             case Curses.COLOR_BLACK:
                 return ColorName.Black;
             case Curses.COLOR_BLUE:
@@ -770,14 +935,18 @@ internal class CursesDriver : ConsoleDriver {
     #endregion
 }
 
-internal static class Platform {
+internal static class Platform
+{
     private static int _suspendSignal;
 
     /// <summary>Suspends the process by sending SIGTSTP to itself</summary>
     /// <returns>The suspend.</returns>
-    public static bool Suspend () {
+    public static bool Suspend ()
+    {
         int signal = GetSuspendSignal ();
-        if (signal == -1) {
+
+        if (signal == -1)
+        {
             return false;
         }
 
@@ -786,21 +955,27 @@ internal static class Platform {
         return true;
     }
 
-    private static int GetSuspendSignal () {
-        if (_suspendSignal != 0) {
+    private static int GetSuspendSignal ()
+    {
+        if (_suspendSignal != 0)
+        {
             return _suspendSignal;
         }
 
         nint buf = Marshal.AllocHGlobal (8192);
-        if (uname (buf) != 0) {
+
+        if (uname (buf) != 0)
+        {
             Marshal.FreeHGlobal (buf);
             _suspendSignal = -1;
 
             return _suspendSignal;
         }
 
-        try {
-            switch (Marshal.PtrToStringAnsi (buf)) {
+        try
+        {
+            switch (Marshal.PtrToStringAnsi (buf))
+            {
                 case "Darwin":
                 case "DragonFly":
                 case "FreeBSD":
@@ -827,7 +1002,8 @@ internal static class Platform {
 
             return _suspendSignal;
         }
-        finally {
+        finally
+        {
             Marshal.FreeHGlobal (buf);
         }
     }

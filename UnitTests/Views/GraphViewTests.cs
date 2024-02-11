@@ -5,31 +5,37 @@ namespace Terminal.Gui.ViewsTests;
 
 #region Helper Classes
 
-internal class FakeHAxis : HorizontalAxis {
-    public List<int> LabelPoints = new ();
+internal class FakeHAxis : HorizontalAxis
+{
     public List<Point> DrawAxisLinePoints = new ();
+    public List<int> LabelPoints = new ();
 
-    public override void DrawAxisLabel (GraphView graph, int screenPosition, string text) {
+    public override void DrawAxisLabel (GraphView graph, int screenPosition, string text)
+    {
         base.DrawAxisLabel (graph, screenPosition, text);
         LabelPoints.Add (screenPosition);
     }
 
-    protected override void DrawAxisLine (GraphView graph, int x, int y) {
+    protected override void DrawAxisLine (GraphView graph, int x, int y)
+    {
         base.DrawAxisLine (graph, x, y);
         DrawAxisLinePoints.Add (new Point (x, y));
     }
 }
 
-internal class FakeVAxis : VerticalAxis {
-    public List<int> LabelPoints = new ();
+internal class FakeVAxis : VerticalAxis
+{
     public List<Point> DrawAxisLinePoints = new ();
+    public List<int> LabelPoints = new ();
 
-    public override void DrawAxisLabel (GraphView graph, int screenPosition, string text) {
+    public override void DrawAxisLabel (GraphView graph, int screenPosition, string text)
+    {
         base.DrawAxisLabel (graph, screenPosition, text);
         LabelPoints.Add (screenPosition);
     }
 
-    protected override void DrawAxisLine (GraphView graph, int x, int y) {
+    protected override void DrawAxisLine (GraphView graph, int x, int y)
+    {
         base.DrawAxisLine (graph, x, y);
         DrawAxisLinePoints.Add (new Point (x, y));
     }
@@ -37,7 +43,8 @@ internal class FakeVAxis : VerticalAxis {
 
 #endregion
 
-public class GraphViewTests {
+public class GraphViewTests
+{
     private static string LastInitFakeDriver;
 
     /// <summary>
@@ -45,7 +52,8 @@ public class GraphViewTests {
     ///     <see cref="GraphView.CellSize"/> is mutable a sensible place to check this is in redraw.
     /// </summary>
     [Fact]
-    public void CellSizeZero () {
+    public void CellSizeZero ()
+    {
         InitFakeDriver ();
 
         var gv = new GraphView ();
@@ -66,7 +74,8 @@ public class GraphViewTests {
 
     /// <summary>Returns a basic very small graph (10 x 5)</summary>
     /// <returns></returns>
-    public static GraphView GetGraph () {
+    public static GraphView GetGraph ()
+    {
         InitFakeDriver ();
 
         var gv = new GraphView ();
@@ -81,12 +90,16 @@ public class GraphViewTests {
         return gv;
     }
 
-    public static FakeDriver InitFakeDriver () {
+    public static FakeDriver InitFakeDriver ()
+    {
         var driver = new FakeDriver ();
-        try {
+
+        try
+        {
             Application.Init (driver);
         }
-        catch (InvalidOperationException) {
+        catch (InvalidOperationException)
+        {
             // close it so that we don't get a thousand of these errors in a row
             Application.Shutdown ();
 
@@ -94,9 +107,8 @@ public class GraphViewTests {
             // that the test that didn't shutdown won't be the one currently running it will
             // be the last one
             throw new Exception (
-                "A test did not call shutdown correctly.  Test stack trace was:" +
-                LastInitFakeDriver
-            );
+                                 "A test did not call shutdown correctly.  Test stack trace was:" + LastInitFakeDriver
+                                );
         }
 
         driver.Init ();
@@ -107,11 +119,11 @@ public class GraphViewTests {
     }
 
     /// <summary>
-    ///     Tests that each point in the screen space maps to a rectangle of (float) graph space and that each corner of that
-    ///     rectangle of graph space maps back to the same row/col of the graph that was fed in
+    ///     Tests that each point in the screen space maps to a rectangle of (float) graph space and that each corner of that rectangle of graph space maps back to the same row/col of the graph that was fed in
     /// </summary>
     [Fact]
-    public void TestReversing_ScreenToGraphSpace () {
+    public void TestReversing_ScreenToGraphSpace ()
+    {
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
@@ -128,8 +140,10 @@ public class GraphViewTests {
         // Start the graph at 80
         gv.ScrollOffset = new PointF (0, 80);
 
-        for (var x = 0; x < gv.Bounds.Width; x++) {
-            for (var y = 0; y < gv.Bounds.Height; y++) {
+        for (var x = 0; x < gv.Bounds.Width; x++)
+        {
+            for (var y = 0; y < gv.Bounds.Height; y++)
+            {
                 RectangleF graphSpace = gv.ScreenToGraphSpace (x, y);
 
                 // See 
@@ -137,38 +151,38 @@ public class GraphViewTests {
                 var epsilon = 0.0001f;
 
                 Point p = gv.GraphSpaceToScreen (
-                    new PointF (
-                        graphSpace.Left + epsilon,
-                        graphSpace.Top + epsilon
-                    )
-                );
+                                                 new PointF (
+                                                             graphSpace.Left + epsilon,
+                                                             graphSpace.Top + epsilon
+                                                            )
+                                                );
                 Assert.Equal (x, p.X);
                 Assert.Equal (y, p.Y);
 
                 p = gv.GraphSpaceToScreen (
-                    new PointF (
-                        graphSpace.Right - epsilon,
-                        graphSpace.Top + epsilon
-                    )
-                );
+                                           new PointF (
+                                                       graphSpace.Right - epsilon,
+                                                       graphSpace.Top + epsilon
+                                                      )
+                                          );
                 Assert.Equal (x, p.X);
                 Assert.Equal (y, p.Y);
 
                 p = gv.GraphSpaceToScreen (
-                    new PointF (
-                        graphSpace.Left + epsilon,
-                        graphSpace.Bottom - epsilon
-                    )
-                );
+                                           new PointF (
+                                                       graphSpace.Left + epsilon,
+                                                       graphSpace.Bottom - epsilon
+                                                      )
+                                          );
                 Assert.Equal (x, p.X);
                 Assert.Equal (y, p.Y);
 
                 p = gv.GraphSpaceToScreen (
-                    new PointF (
-                        graphSpace.Right - epsilon,
-                        graphSpace.Bottom - epsilon
-                    )
-                );
+                                           new PointF (
+                                                       graphSpace.Right - epsilon,
+                                                       graphSpace.Bottom - epsilon
+                                                      )
+                                          );
                 Assert.Equal (x, p.X);
                 Assert.Equal (y, p.Y);
             }
@@ -178,7 +192,8 @@ public class GraphViewTests {
     #region Screen to Graph Tests
 
     [Fact]
-    public void ScreenToGraphSpace_DefaultCellSize () {
+    public void ScreenToGraphSpace_DefaultCellSize ()
+    {
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
@@ -199,7 +214,8 @@ public class GraphViewTests {
     }
 
     [Fact]
-    public void ScreenToGraphSpace_DefaultCellSize_WithMargin () {
+    public void ScreenToGraphSpace_DefaultCellSize_WithMargin ()
+    {
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
@@ -238,7 +254,8 @@ public class GraphViewTests {
     }
 
     [Fact]
-    public void ScreenToGraphSpace_CustomCellSize () {
+    public void ScreenToGraphSpace_CustomCellSize ()
+    {
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
@@ -269,7 +286,8 @@ public class GraphViewTests {
     #region Graph to Screen Tests
 
     [Fact]
-    public void GraphSpaceToScreen_DefaultCellSize () {
+    public void GraphSpaceToScreen_DefaultCellSize ()
+    {
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
@@ -288,7 +306,8 @@ public class GraphViewTests {
     }
 
     [Fact]
-    public void GraphSpaceToScreen_DefaultCellSize_WithMargin () {
+    public void GraphSpaceToScreen_DefaultCellSize_WithMargin ()
+    {
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
@@ -317,7 +336,8 @@ public class GraphViewTests {
     }
 
     [Fact]
-    public void GraphSpaceToScreen_ScrollOffset () {
+    public void GraphSpaceToScreen_ScrollOffset ()
+    {
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
@@ -339,7 +359,8 @@ public class GraphViewTests {
     }
 
     [Fact]
-    public void GraphSpaceToScreen_CustomCellSize () {
+    public void GraphSpaceToScreen_CustomCellSize ()
+    {
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
@@ -379,7 +400,8 @@ public class GraphViewTests {
     }
 
     [Fact]
-    public void GraphSpaceToScreen_CustomCellSize_WithScrollOffset () {
+    public void GraphSpaceToScreen_CustomCellSize_WithScrollOffset ()
+    {
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
@@ -415,9 +437,11 @@ public class GraphViewTests {
     #endregion
 }
 
-public class SeriesTests {
+public class SeriesTests
+{
     [Fact]
-    public void Series_GetsPassedCorrectBounds_AllAtOnce () {
+    public void Series_GetsPassedCorrectBounds_AllAtOnce ()
+    {
         GraphViewTests.InitFakeDriver ();
 
         var gv = new GraphView ();
@@ -430,11 +454,12 @@ public class SeriesTests {
         var graphScreenBounds = Rect.Empty;
 
         var series = new FakeSeries (
-            (v, s, g) => {
-                graphScreenBounds = s;
-                fullGraphBounds = g;
-            }
-        );
+                                     (v, s, g) =>
+                                     {
+                                         graphScreenBounds = s;
+                                         fullGraphBounds = g;
+                                     }
+                                    );
         gv.Series.Add (series);
 
         gv.LayoutSubviews ();
@@ -467,7 +492,8 @@ public class SeriesTests {
     ///     <see cref="GraphView.CellSize"/> results in multiple units of graph space being condensed into each cell of console
     /// </summary>
     [Fact]
-    public void Series_GetsPassedCorrectBounds_AllAtOnce_LargeCellSize () {
+    public void Series_GetsPassedCorrectBounds_AllAtOnce_LargeCellSize ()
+    {
         GraphViewTests.InitFakeDriver ();
 
         var gv = new GraphView ();
@@ -483,11 +509,12 @@ public class SeriesTests {
         var graphScreenBounds = Rect.Empty;
 
         var series = new FakeSeries (
-            (v, s, g) => {
-                graphScreenBounds = s;
-                fullGraphBounds = g;
-            }
-        );
+                                     (v, s, g) =>
+                                     {
+                                         graphScreenBounds = s;
+                                         fullGraphBounds = g;
+                                     }
+                                    );
 
         gv.Series.Add (series);
 
@@ -518,27 +545,29 @@ public class SeriesTests {
         Application.Shutdown ();
     }
 
-    private class FakeSeries : ISeries {
+    private class FakeSeries : ISeries
+    {
+        private readonly Action<GraphView, Rect, RectangleF> _drawSeries;
+
         public FakeSeries (
             Action<GraphView, Rect, RectangleF> drawSeries
-        ) {
+        )
+        {
             _drawSeries = drawSeries;
         }
 
-        private readonly Action<GraphView, Rect, RectangleF> _drawSeries;
-
-        public void DrawSeries (GraphView graph, Rect bounds, RectangleF graphBounds) {
-            _drawSeries (graph, bounds, graphBounds);
-        }
+        public void DrawSeries (GraphView graph, Rect bounds, RectangleF graphBounds) { _drawSeries (graph, bounds, graphBounds); }
     }
 }
 
-public class MultiBarSeriesTests {
-    public MultiBarSeriesTests (ITestOutputHelper output) { _output = output; }
+public class MultiBarSeriesTests
+{
     private readonly ITestOutputHelper _output;
+    public MultiBarSeriesTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
-    public void MultiBarSeries_BarSpacing () {
+    public void MultiBarSeries_BarSpacing ()
+    {
         // Creates clusters of 5 adjacent bars with 2 spaces between clusters
         var series = new MultiBarSeries (5, 7, 1);
 
@@ -552,52 +581,58 @@ public class MultiBarSeriesTests {
     }
 
     [Fact]
-    public void MultiBarSeriesAddValues_WrongNumber () {
+    public void MultiBarSeriesAddValues_WrongNumber ()
+    {
         // user asks for 3 bars per category
         var series = new MultiBarSeries (3, 7, 1);
 
         var ex = Assert.Throws<ArgumentException> (() => series.AddBars ("Cars", (Rune)'#', 1));
 
         Assert.Equal (
-            "Number of values must match the number of bars per category (Parameter 'values')",
-            ex.Message
-        );
+                      "Number of values must match the number of bars per category (Parameter 'values')",
+                      ex.Message
+                     );
     }
 
     [Fact]
-    public void MultiBarSeriesColors_RightNumber () {
-        Attribute[] colors = {
+    public void MultiBarSeriesColors_RightNumber ()
+    {
+        Attribute [] colors =
+        {
             new (Color.Green, Color.Black), new (Color.Green, Color.White), new (Color.BrightYellow, Color.White)
         };
 
         // user passes 3 colors and asks for 3 bars
         var series = new MultiBarSeries (3, 7, 1, colors);
 
-        Assert.Equal (series.SubSeries.ElementAt (0).OverrideBarColor, colors[0]);
-        Assert.Equal (series.SubSeries.ElementAt (1).OverrideBarColor, colors[1]);
-        Assert.Equal (series.SubSeries.ElementAt (2).OverrideBarColor, colors[2]);
+        Assert.Equal (series.SubSeries.ElementAt (0).OverrideBarColor, colors [0]);
+        Assert.Equal (series.SubSeries.ElementAt (1).OverrideBarColor, colors [1]);
+        Assert.Equal (series.SubSeries.ElementAt (2).OverrideBarColor, colors [2]);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
     }
 
     [Fact]
-    public void MultiBarSeriesColors_WrongNumber () {
-        Attribute[] colors = { new (Color.Green, Color.Black) };
+    public void MultiBarSeriesColors_WrongNumber ()
+    {
+        Attribute [] colors = { new (Color.Green, Color.Black) };
 
         // user passes 1 color only but asks for 5 bars
         var ex = Assert.Throws<ArgumentException> (() => new MultiBarSeries (5, 7, 1, colors));
+
         Assert.Equal (
-            "Number of colors must match the number of bars (Parameter 'numberOfBarsPerCategory')",
-            ex.Message
-        );
+                      "Number of colors must match the number of bars (Parameter 'numberOfBarsPerCategory')",
+                      ex.Message
+                     );
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
     }
 
     [Fact]
-    public void TestRendering_MultibarSeries () {
+    public void TestRendering_MultibarSeries ()
+    {
         GraphViewTests.InitFakeDriver ();
 
         var gv = new GraphView ();
@@ -613,7 +648,8 @@ public class MultiBarSeriesTests {
         var multibarSeries = new MultiBarSeries (2, 4, 1);
 
         //nudge them left to avoid float rounding errors at the boundaries of cells
-        foreach (BarSeries sub in multibarSeries.SubSeries) {
+        foreach (BarSeries sub in multibarSeries.SubSeries)
+        {
             sub.Offset -= 0.001f;
         }
 
@@ -646,9 +682,9 @@ public class MultiBarSeriesTests {
         gv.Draw ();
 
         Assert.Equal (3, fakeXAxis.LabelPoints.Count);
-        Assert.Equal (4, fakeXAxis.LabelPoints[0]);
-        Assert.Equal (8, fakeXAxis.LabelPoints[1]);
-        Assert.Equal (12, fakeXAxis.LabelPoints[2]);
+        Assert.Equal (4, fakeXAxis.LabelPoints [0]);
+        Assert.Equal (8, fakeXAxis.LabelPoints [1]);
+        Assert.Equal (12, fakeXAxis.LabelPoints [2]);
 
         var looksLike =
             @" 
@@ -669,9 +705,11 @@ public class MultiBarSeriesTests {
     }
 }
 
-public class BarSeriesTests {
+public class BarSeriesTests
+{
     [Fact]
-    public void TestOneLongOneShortHorizontalBars_WithOffset () {
+    public void TestOneLongOneShortHorizontalBars_WithOffset ()
+    {
         GraphView graph = GetGraph (out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
         graph.Draw ();
 
@@ -693,35 +731,35 @@ public class BarSeriesTests {
 
         // 1 bar that is very wide (100 graph units horizontally = screen pos 50 but bounded by screen)
         barSeries.Bars.Add (
-            new BarSeriesBar ("hi1", new GraphCellToRender ((Rune)'.'), 100)
-        );
+                            new BarSeriesBar ("hi1", new GraphCellToRender ((Rune)'.'), 100)
+                           );
 
         // 1 bar that is shorter
         barSeries.Bars.Add (
-            new BarSeriesBar ("hi2", new GraphCellToRender ((Rune)'.'), 5)
-        );
+                            new BarSeriesBar ("hi2", new GraphCellToRender ((Rune)'.'), 5)
+                           );
 
         // redraw graph
         graph.Draw ();
 
         // since bars are horizontal all have the same X start cordinates
-        Assert.Equal (0, barSeries.BarScreenStarts[0].X);
-        Assert.Equal (0, barSeries.BarScreenStarts[1].X);
+        Assert.Equal (0, barSeries.BarScreenStarts [0].X);
+        Assert.Equal (0, barSeries.BarScreenStarts [1].X);
 
         // bar goes all the way to the end so bumps up against right screen boundary
         // width of graph is 20
-        Assert.Equal (19, barSeries.BarScreenEnds[0].X);
+        Assert.Equal (19, barSeries.BarScreenEnds [0].X);
 
         // shorter bar is 5 graph units wide which is 10 screen units
-        Assert.Equal (10, barSeries.BarScreenEnds[1].X);
+        Assert.Equal (10, barSeries.BarScreenEnds [1].X);
 
         // first  bar should be offset 6 screen units (0.25f + 0.3f graph units)
         // since height of control is 10 then first bar should be at screen row 4 (10-6)
-        Assert.Equal (4, barSeries.BarScreenStarts[0].Y);
+        Assert.Equal (4, barSeries.BarScreenStarts [0].Y);
 
         // second  bar should be offset 9 screen units (0.25f + 0.6f graph units)
         // since height of control is 10 then second bar should be at screen row 1 (10-9)
-        Assert.Equal (1, barSeries.BarScreenStarts[1].Y);
+        Assert.Equal (1, barSeries.BarScreenStarts [1].Y);
 
         // both bars should have labels but on the y axis
         Assert.Equal (2, axisY.LabelPoints.Count);
@@ -736,7 +774,8 @@ public class BarSeriesTests {
     }
 
     [Fact]
-    public void TestTwoTallBars_WithOffset () {
+    public void TestTwoTallBars_WithOffset ()
+    {
         GraphView graph = GetGraph (out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
         graph.Draw ();
 
@@ -754,11 +793,12 @@ public class BarSeriesTests {
         barSeries.BarEvery = 1f;
 
         barSeries.Bars.Add (
-            new BarSeriesBar ("hi1", new GraphCellToRender ((Rune)'.'), 100)
-        );
+                            new BarSeriesBar ("hi1", new GraphCellToRender ((Rune)'.'), 100)
+                           );
+
         barSeries.Bars.Add (
-            new BarSeriesBar ("hi2", new GraphCellToRender ((Rune)'.'), 100)
-        );
+                            new BarSeriesBar ("hi2", new GraphCellToRender ((Rune)'.'), 100)
+                           );
 
         barSeries.Orientation = Orientation.Vertical;
 
@@ -766,12 +806,12 @@ public class BarSeriesTests {
         graph.Draw ();
 
         // bar should be drawn at BarEvery 1f + offset 0.5f = 3 screen units
-        Assert.Equal (3, barSeries.BarScreenStarts[0].X);
-        Assert.Equal (3, barSeries.BarScreenEnds[0].X);
+        Assert.Equal (3, barSeries.BarScreenStarts [0].X);
+        Assert.Equal (3, barSeries.BarScreenEnds [0].X);
 
         // second bar should be BarEveryx2 = 2f + offset 0.5f = 5 screen units
-        Assert.Equal (5, barSeries.BarScreenStarts[1].X);
-        Assert.Equal (5, barSeries.BarScreenEnds[1].X);
+        Assert.Equal (5, barSeries.BarScreenStarts [1].X);
+        Assert.Equal (5, barSeries.BarScreenEnds [1].X);
 
         // both bars should have labels
         Assert.Equal (2, axisX.LabelPoints.Count);
@@ -779,17 +819,18 @@ public class BarSeriesTests {
         Assert.Contains (5, axisX.LabelPoints);
 
         // bars are very tall but should not draw up off top of screen
-        Assert.Equal (9, barSeries.BarScreenStarts[0].Y);
-        Assert.Equal (0, barSeries.BarScreenEnds[0].Y);
-        Assert.Equal (9, barSeries.BarScreenStarts[1].Y);
-        Assert.Equal (0, barSeries.BarScreenEnds[1].Y);
+        Assert.Equal (9, barSeries.BarScreenStarts [0].Y);
+        Assert.Equal (0, barSeries.BarScreenEnds [0].Y);
+        Assert.Equal (9, barSeries.BarScreenStarts [1].Y);
+        Assert.Equal (0, barSeries.BarScreenEnds [1].Y);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
     }
 
     [Fact]
-    public void TestZeroHeightBar_WithName () {
+    public void TestZeroHeightBar_WithName ()
+    {
         GraphView graph = GetGraph (out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
         graph.Draw ();
 
@@ -820,7 +861,8 @@ public class BarSeriesTests {
         Application.Shutdown ();
     }
 
-    private GraphView GetGraph (out FakeBarSeries series, out FakeHAxis axisX, out FakeVAxis axisY) {
+    private GraphView GetGraph (out FakeBarSeries series, out FakeHAxis axisX, out FakeVAxis axisY)
+    {
         GraphViewTests.InitFakeDriver ();
 
         var gv = new GraphView ();
@@ -843,16 +885,15 @@ public class BarSeriesTests {
         return gv;
     }
 
-    private class FakeBarSeries : BarSeries {
-        public GraphCellToRender FinalColor { get; private set; }
+    private class FakeBarSeries : BarSeries
+    {
         public List<Point> BarScreenEnds { get; } = new ();
         public List<Point> BarScreenStarts { get; } = new ();
+        public GraphCellToRender FinalColor { get; private set; }
+        protected override GraphCellToRender AdjustColor (GraphCellToRender graphCellToRender) { return FinalColor = base.AdjustColor (graphCellToRender); }
 
-        protected override GraphCellToRender AdjustColor (GraphCellToRender graphCellToRender) {
-            return FinalColor = base.AdjustColor (graphCellToRender);
-        }
-
-        protected override void DrawBarLine (GraphView graph, Point start, Point end, BarSeriesBar beingDrawn) {
+        protected override void DrawBarLine (GraphView graph, Point start, Point end, BarSeriesBar beingDrawn)
+        {
             base.DrawBarLine (graph, start, end, beingDrawn);
 
             BarScreenStarts.Add (start);
@@ -861,11 +902,13 @@ public class BarSeriesTests {
     }
 }
 
-public class AxisTests {
-    private GraphView GetGraph (out FakeHAxis axis) => GetGraph (out axis, out _);
-    private GraphView GetGraph (out FakeVAxis axis) => GetGraph (out _, out axis);
+public class AxisTests
+{
+    private GraphView GetGraph (out FakeHAxis axis) { return GetGraph (out axis, out _); }
+    private GraphView GetGraph (out FakeVAxis axis) { return GetGraph (out _, out axis); }
 
-    private GraphView GetGraph (out FakeHAxis axisX, out FakeVAxis axisY) {
+    private GraphView GetGraph (out FakeHAxis axisX, out FakeVAxis axisY)
+    {
         GraphViewTests.InitFakeDriver ();
 
         var gv = new GraphView ();
@@ -887,7 +930,8 @@ public class AxisTests {
 
     /// <summary>Tests that the horizontal axis is computed correctly and does not over spill it's bounds</summary>
     [Fact]
-    public void TestHAxisLocation_NoMargin () {
+    public void TestHAxisLocation_NoMargin ()
+    {
         GraphView gv = GetGraph (out FakeHAxis axis);
         gv.LayoutSubviews ();
         gv.Draw ();
@@ -908,7 +952,8 @@ public class AxisTests {
     }
 
     [Fact]
-    public void TestHAxisLocation_MarginBottom () {
+    public void TestHAxisLocation_MarginBottom ()
+    {
         GraphView gv = GetGraph (out FakeHAxis axis);
 
         gv.MarginBottom = 10;
@@ -931,7 +976,8 @@ public class AxisTests {
     }
 
     [Fact]
-    public void TestHAxisLocation_MarginLeft () {
+    public void TestHAxisLocation_MarginLeft ()
+    {
         GraphView gv = GetGraph (out FakeHAxis axis);
 
         gv.MarginLeft = 5;
@@ -960,7 +1006,8 @@ public class AxisTests {
 
     /// <summary>Tests that the horizontal axis is computed correctly and does not over spill it's bounds</summary>
     [Fact]
-    public void TestVAxisLocation_NoMargin () {
+    public void TestVAxisLocation_NoMargin ()
+    {
         GraphView gv = GetGraph (out FakeVAxis axis);
 
         gv.LayoutSubviews ();
@@ -982,7 +1029,8 @@ public class AxisTests {
     }
 
     [Fact]
-    public void TestVAxisLocation_MarginBottom () {
+    public void TestVAxisLocation_MarginBottom ()
+    {
         GraphView gv = GetGraph (out FakeVAxis axis);
 
         gv.MarginBottom = 10;
@@ -1006,7 +1054,8 @@ public class AxisTests {
     }
 
     [Fact]
-    public void TestVAxisLocation_MarginLeft () {
+    public void TestVAxisLocation_MarginLeft ()
+    {
         GraphView gv = GetGraph (out FakeVAxis axis);
 
         gv.MarginLeft = 5;
@@ -1031,20 +1080,22 @@ public class AxisTests {
     #endregion
 }
 
-public class TextAnnotationTests {
-    public TextAnnotationTests (ITestOutputHelper output) { _output = output; }
+public class TextAnnotationTests
+{
     private readonly ITestOutputHelper _output;
+    public TextAnnotationTests (ITestOutputHelper output) { _output = output; }
 
     [Theory]
     [InlineData (null)]
     [InlineData ("  ")]
     [InlineData ("\t\t")]
-    public void TestTextAnnotation_EmptyText (string whitespace) {
+    public void TestTextAnnotation_EmptyText (string whitespace)
+    {
         GraphView gv = GraphViewTests.GetGraph ();
 
         gv.Annotations.Add (
-            new TextAnnotation { Text = whitespace, GraphPosition = new PointF (4, 2) }
-        );
+                            new TextAnnotation { Text = whitespace, GraphPosition = new PointF (4, 2) }
+                           );
 
         // add a point a bit further along the graph so if the whitespace were rendered
         // the test would pick it up (AssertDriverContentsAre ignores trailing whitespace on lines)
@@ -1071,12 +1122,13 @@ public class TextAnnotationTests {
     }
 
     [Fact]
-    public void TestTextAnnotation_GraphUnits () {
+    public void TestTextAnnotation_GraphUnits ()
+    {
         GraphView gv = GraphViewTests.GetGraph ();
 
         gv.Annotations.Add (
-            new TextAnnotation { Text = "hey!", GraphPosition = new PointF (2, 2) }
-        );
+                            new TextAnnotation { Text = "hey!", GraphPosition = new PointF (2, 2) }
+                           );
 
         gv.LayoutSubviews ();
         gv.Draw ();
@@ -1114,14 +1166,16 @@ public class TextAnnotationTests {
     }
 
     [Fact]
-    public void TestTextAnnotation_LongText () {
+    public void TestTextAnnotation_LongText ()
+    {
         GraphView gv = GraphViewTests.GetGraph ();
 
         gv.Annotations.Add (
-            new TextAnnotation {
-                Text = "hey there partner hows it going boy its great", GraphPosition = new PointF (2, 2)
-            }
-        );
+                            new TextAnnotation
+                            {
+                                Text = "hey there partner hows it going boy its great", GraphPosition = new PointF (2, 2)
+                            }
+                           );
 
         gv.LayoutSubviews ();
         gv.Draw ();
@@ -1145,14 +1199,16 @@ public class TextAnnotationTests {
     }
 
     [Fact]
-    public void TestTextAnnotation_Offscreen () {
+    public void TestTextAnnotation_Offscreen ()
+    {
         GraphView gv = GraphViewTests.GetGraph ();
 
         gv.Annotations.Add (
-            new TextAnnotation {
-                Text = "hey there partner hows it going boy its great", GraphPosition = new PointF (9, 2)
-            }
-        );
+                            new TextAnnotation
+                            {
+                                Text = "hey there partner hows it going boy its great", GraphPosition = new PointF (9, 2)
+                            }
+                           );
 
         gv.LayoutSubviews ();
         gv.Draw ();
@@ -1173,12 +1229,13 @@ public class TextAnnotationTests {
     }
 
     [Fact]
-    public void TestTextAnnotation_ScreenUnits () {
+    public void TestTextAnnotation_ScreenUnits ()
+    {
         GraphView gv = GraphViewTests.GetGraph ();
 
         gv.Annotations.Add (
-            new TextAnnotation { Text = "hey!", ScreenPosition = new Point (3, 1) }
-        );
+                            new TextAnnotation { Text = "hey!", ScreenPosition = new Point (3, 1) }
+                           );
         gv.LayoutSubviews ();
         gv.Draw ();
 
@@ -1231,12 +1288,14 @@ public class TextAnnotationTests {
     }
 }
 
-public class LegendTests {
-    public LegendTests (ITestOutputHelper output) { _output = output; }
+public class LegendTests
+{
     private readonly ITestOutputHelper _output;
+    public LegendTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
-    public void Constructors_Defaults () {
+    public void Constructors_Defaults ()
+    {
         var legend = new LegendAnnotation ();
         Assert.Equal (Rect.Empty, legend.Bounds);
         Assert.Equal (Rect.Empty, legend.Frame);
@@ -1255,7 +1314,8 @@ public class LegendTests {
     }
 
     [Fact]
-    public void LegendNormalUsage_WithBorder () {
+    public void LegendNormalUsage_WithBorder ()
+    {
         GraphView gv = GraphViewTests.GetGraph ();
         var legend = new LegendAnnotation (new Rect (2, 0, 5, 3));
         legend.AddEntry (new GraphCellToRender ((Rune)'A'), "Ant");
@@ -1279,7 +1339,8 @@ public class LegendTests {
     }
 
     [Fact]
-    public void LegendNormalUsage_WithoutBorder () {
+    public void LegendNormalUsage_WithoutBorder ()
+    {
         GraphView gv = GraphViewTests.GetGraph ();
         var legend = new LegendAnnotation (new Rect (2, 0, 5, 3));
         legend.AddEntry (new GraphCellToRender ((Rune)'A'), "Ant");
@@ -1306,19 +1367,21 @@ public class LegendTests {
     }
 }
 
-public class PathAnnotationTests {
-    public PathAnnotationTests (ITestOutputHelper output) { _output = output; }
+public class PathAnnotationTests
+{
     private readonly ITestOutputHelper _output;
+    public PathAnnotationTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
-    public void MarginBottom_BiggerThanHeight_ExpectBlankGraph () {
+    public void MarginBottom_BiggerThanHeight_ExpectBlankGraph ()
+    {
         GraphView gv = GraphViewTests.GetGraph ();
         gv.Height = 10;
         gv.MarginBottom = 20;
 
         gv.Series.Add (
-            new ScatterSeries { Points = { new PointF (1, 1), new PointF (5, 0) } }
-        );
+                       new ScatterSeries { Points = { new PointF (1, 1), new PointF (5, 0) } }
+                      );
 
         gv.LayoutSubviews ();
         gv.Draw ();
@@ -1335,14 +1398,15 @@ public class PathAnnotationTests {
     }
 
     [Fact]
-    public void MarginLeft_BiggerThanWidth_ExpectBlankGraph () {
+    public void MarginLeft_BiggerThanWidth_ExpectBlankGraph ()
+    {
         GraphView gv = GraphViewTests.GetGraph ();
         gv.Width = 10;
         gv.MarginLeft = 20;
 
         gv.Series.Add (
-            new ScatterSeries { Points = { new PointF (1, 1), new PointF (5, 0) } }
-        );
+                       new ScatterSeries { Points = { new PointF (1, 1), new PointF (5, 0) } }
+                      );
 
         gv.LayoutSubviews ();
         gv.Draw ();
@@ -1359,7 +1423,8 @@ public class PathAnnotationTests {
     }
 
     [Fact]
-    public void PathAnnotation_Box () {
+    public void PathAnnotation_Box ()
+    {
         GraphView gv = GraphViewTests.GetGraph ();
 
         var path = new PathAnnotation ();
@@ -1391,7 +1456,8 @@ public class PathAnnotationTests {
     }
 
     [Fact]
-    public void PathAnnotation_Diamond () {
+    public void PathAnnotation_Diamond ()
+    {
         GraphView gv = GraphViewTests.GetGraph ();
 
         var path = new PathAnnotation ();
@@ -1425,7 +1491,8 @@ public class PathAnnotationTests {
     [Theory]
     [InlineData (true)]
     [InlineData (false)]
-    public void ViewChangeText_RendersCorrectly (bool useFill) {
+    public void ViewChangeText_RendersCorrectly (bool useFill)
+    {
         var driver = new FakeDriver ();
         Application.Init (driver);
         driver.Init ();
@@ -1433,14 +1500,18 @@ public class PathAnnotationTests {
         // create a wide window
         var mount = new View { Width = 100, Height = 100 };
 
-        try {
+        try
+        {
             // Create a view with a short text 
             var view = new View { Text = "ff", Width = 2, Height = 1 };
 
             // Specify that the label should be very wide
-            if (useFill) {
+            if (useFill)
+            {
                 view.Width = Dim.Fill ();
-            } else {
+            }
+            else
+            {
                 view.Width = 100;
             }
 
@@ -1467,13 +1538,15 @@ public class PathAnnotationTests {
             // should have the new text rendered
             TestHelpers.AssertDriverContentsAre ("ff1234", null);
         }
-        finally {
+        finally
+        {
             Application.Shutdown ();
         }
     }
 
     [Fact]
-    public void XAxisLabels_With_MarginLeft () {
+    public void XAxisLabels_With_MarginLeft ()
+    {
         GraphViewTests.InitFakeDriver ();
         var gv = new GraphView { ColorScheme = new ColorScheme (), Bounds = new Rect (0, 0, 10, 7) };
 
@@ -1482,8 +1555,8 @@ public class PathAnnotationTests {
         gv.AxisY.ShowLabelsEvery = 1;
 
         gv.Series.Add (
-            new ScatterSeries { Points = { new PointF (1, 1), new PointF (5, 0) } }
-        );
+                       new ScatterSeries { Points = { new PointF (1, 1), new PointF (5, 0) } }
+                      );
 
         // reserve 3 cells of the left for the margin
         gv.MarginLeft = 3;
@@ -1514,7 +1587,8 @@ public class PathAnnotationTests {
     }
 
     [Fact]
-    public void YAxisLabels_With_MarginBottom () {
+    public void YAxisLabels_With_MarginBottom ()
+    {
         GraphViewTests.InitFakeDriver ();
         var gv = new GraphView { ColorScheme = new ColorScheme (), Bounds = new Rect (0, 0, 10, 7) };
 
@@ -1523,8 +1597,8 @@ public class PathAnnotationTests {
         gv.AxisY.ShowLabelsEvery = 1;
 
         gv.Series.Add (
-            new ScatterSeries { Points = { new PointF (1, 1), new PointF (5, 0) } }
-        );
+                       new ScatterSeries { Points = { new PointF (1, 1), new PointF (5, 0) } }
+                      );
 
         // reserve 3 cells of the console for the margin
         gv.MarginBottom = 3;
@@ -1553,9 +1627,11 @@ public class PathAnnotationTests {
     }
 }
 
-public class AxisIncrementToRenderTests {
+public class AxisIncrementToRenderTests
+{
     [Fact]
-    public void AxisIncrementToRenderTests_Constructor () {
+    public void AxisIncrementToRenderTests_Constructor ()
+    {
         var render = new AxisIncrementToRender (Orientation.Horizontal, 1, 6.6f);
 
         Assert.Equal (Orientation.Horizontal, render.Orientation);

@@ -7,16 +7,20 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("LineView")]
 [ScenarioCategory ("Borders")]
-public class LineViewExample : Scenario {
-    public override void Setup () {
+public class LineViewExample : Scenario
+{
+    public override void Setup ()
+    {
         Win.Title = GetName ();
         Win.Y = 1; // menu
         Win.Height = Dim.Fill (1); // status bar
 
-        var menu = new MenuBar {
-            Menus = [
-                        new MenuBarItem ("_File", new MenuItem[] { new ("_Quit", "", () => Quit ()) })
-                    ]
+        var menu = new MenuBar
+        {
+            Menus =
+            [
+                new MenuBarItem ("_File", new MenuItem [] { new ("_Quit", "", () => Quit ()) })
+            ]
         };
         Application.Top.Add (menu);
 
@@ -44,7 +48,8 @@ public class LineViewExample : Scenario {
         Win.Add (new Label { Y = 6, Text = "Arrow Line" });
 
         // creates a horizontal line
-        var arrowLine = new LineView {
+        var arrowLine = new LineView
+        {
             Y = 7, Width = 10, StartingAnchor = CM.Glyphs.LeftTee, EndingAnchor = (Rune)'>'
         };
 
@@ -60,21 +65,23 @@ public class LineViewExample : Scenario {
         Win.Add (new Label { Y = 11, X = 28, Text = "Vertical Arrow" });
 
         // creates a horizontal line
-        var verticalArrow = new LineView (Orientation.Vertical) {
+        var verticalArrow = new LineView (Orientation.Vertical)
+        {
             X = 27, StartingAnchor = CM.Glyphs.TopTee, EndingAnchor = (Rune)'V'
         };
 
         Win.Add (verticalArrow);
 
         var statusBar = new StatusBar (
-            new StatusItem[] {
-                new (
-                    Application.QuitKey,
-                    $"{Application.QuitKey} to Quit",
-                    () => Quit ()
-                )
-            }
-        );
+                                       new StatusItem []
+                                       {
+                                           new (
+                                                Application.QuitKey,
+                                                $"{Application.QuitKey} to Quit",
+                                                () => Quit ()
+                                               )
+                                       }
+                                      );
         Application.Top.Add (statusBar);
     }
 

@@ -6,24 +6,26 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("Color Picker", "Color Picker.")]
 [ScenarioCategory ("Colors")]
 [ScenarioCategory ("Controls")]
-public class ColorPickers : Scenario {
+public class ColorPickers : Scenario
+{
+    /// <summary>Background color Label.</summary>
+    private Label _backgroundColorLabel;
+
+    /// <summary>Demo label.</summary>
+    private View _demoView;
+
+    /// <summary>Foreground color label.</summary>
+    private Label _foregroundColorLabel;
+
     /// <summary>Background ColorPicker.</summary>
     private ColorPicker backgroundColorPicker;
 
     /// <summary>Foreground ColorPicker.</summary>
     private ColorPicker foregroundColorPicker;
 
-    /// <summary>Background color Label.</summary>
-    private Label _backgroundColorLabel;
-
-    /// <summary>Foreground color label.</summary>
-    private Label _foregroundColorLabel;
-
-    /// <summary>Demo label.</summary>
-    private View _demoView;
-
     /// <summary>Setup the scenario.</summary>
-    public override void Setup () {
+    public override void Setup ()
+    {
         // Scenario Window's.
         Win.Title = GetName ();
 
@@ -32,13 +34,15 @@ public class ColorPickers : Scenario {
         foregroundColorPicker.ColorChanged += ForegroundColor_ColorChanged;
         Win.Add (foregroundColorPicker);
 
-        _foregroundColorLabel = new Label {
+        _foregroundColorLabel = new Label
+        {
             X = Pos.Left (foregroundColorPicker), Y = Pos.Bottom (foregroundColorPicker) + 1
         };
         Win.Add (_foregroundColorLabel);
 
         // Background ColorPicker.
-        backgroundColorPicker = new ColorPicker {
+        backgroundColorPicker = new ColorPicker
+        {
             Title = "Background Color",
             Y = Pos.Center (),
             X = Pos.Center (),
@@ -51,13 +55,15 @@ public class ColorPickers : Scenario {
         backgroundColorPicker.ColorChanged += BackgroundColor_ColorChanged;
         Win.Add (backgroundColorPicker);
         _backgroundColorLabel = new Label ();
+
         _backgroundColorLabel.X =
             Pos.AnchorEnd () - (Pos.Right (_backgroundColorLabel) - Pos.Left (_backgroundColorLabel));
         _backgroundColorLabel.Y = Pos.Bottom (backgroundColorPicker) + 1;
         Win.Add (_backgroundColorLabel);
 
         // Demo Label.
-        _demoView = new View {
+        _demoView = new View
+        {
             Title = "Color Sample",
             Text = "Lorem Ipsum",
             TextAlignment = TextAlignment.Centered,
@@ -77,32 +83,38 @@ public class ColorPickers : Scenario {
     }
 
     /// <summary>Fired when background color is changed.</summary>
-    private void BackgroundColor_ColorChanged (object sender, EventArgs e) {
+    private void BackgroundColor_ColorChanged (object sender, EventArgs e)
+    {
         UpdateColorLabel (_backgroundColorLabel, backgroundColorPicker);
         UpdateDemoLabel ();
     }
 
     /// <summary>Fired when foreground color is changed.</summary>
-    private void ForegroundColor_ColorChanged (object sender, EventArgs e) {
+    private void ForegroundColor_ColorChanged (object sender, EventArgs e)
+    {
         UpdateColorLabel (_foregroundColorLabel, foregroundColorPicker);
         UpdateDemoLabel ();
     }
 
     /// <summary>Update a color label from his ColorPicker.</summary>
-    private void UpdateColorLabel (Label label, ColorPicker colorPicker) {
+    private void UpdateColorLabel (Label label, ColorPicker colorPicker)
+    {
         label.Clear ();
         var color = new Color (colorPicker.SelectedColor);
+
         label.Text =
             $"{colorPicker.SelectedColor} ({(int)colorPicker.SelectedColor}) #{color.R:X2}{color.G:X2}{color.B:X2}";
     }
 
     /// <summary>Update Demo Label.</summary>
-    private void UpdateDemoLabel () {
-        _demoView.ColorScheme = new ColorScheme {
+    private void UpdateDemoLabel ()
+    {
+        _demoView.ColorScheme = new ColorScheme
+        {
             Normal = new Attribute (
-                foregroundColorPicker.SelectedColor,
-                backgroundColorPicker.SelectedColor
-            )
+                                    foregroundColorPicker.SelectedColor,
+                                    backgroundColorPicker.SelectedColor
+                                   )
         };
     }
 }

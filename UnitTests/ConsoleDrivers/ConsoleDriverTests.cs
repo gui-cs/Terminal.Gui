@@ -5,13 +5,15 @@ using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.DriverTests;
 
-public class ConsoleDriverTests {
-    public ConsoleDriverTests (ITestOutputHelper output) {
+public class ConsoleDriverTests
+{
+    private readonly ITestOutputHelper _output;
+
+    public ConsoleDriverTests (ITestOutputHelper output)
+    {
         ConsoleDriver.RunningUnitTests = true;
         _output = output;
     }
-
-    private readonly ITestOutputHelper _output;
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
@@ -20,7 +22,8 @@ public class ConsoleDriverTests {
     //[InlineData (typeof (ANSIDriver))]
     [InlineData (typeof (WindowsDriver))]
     [InlineData (typeof (CursesDriver))]
-    public void End_Cleans_Up (Type driverType) {
+    public void End_Cleans_Up (Type driverType)
+    {
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         driver.Init ();
         driver.End ();
@@ -28,13 +31,16 @@ public class ConsoleDriverTests {
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    public void FakeDriver_MockKeyPresses (Type driverType) {
+    public void FakeDriver_MockKeyPresses (Type driverType)
+    {
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driver);
 
         var text = "MockKeyPresses";
         Stack<ConsoleKeyInfo> mKeys = new ();
-        foreach (char r in text.Reverse ()) {
+
+        foreach (char r in text.Reverse ())
+        {
             ConsoleKey ck = char.IsLetter (r) ? (ConsoleKey)char.ToUpper (r) : (ConsoleKey)r;
             var cki = new ConsoleKeyInfo (r, ck, false, false, false);
             mKeys.Push (cki);
@@ -47,20 +53,23 @@ public class ConsoleDriverTests {
         var rText = "";
         var idx = 0;
 
-        view.KeyDown += (s, e) => {
-            Assert.Equal (text[idx], (char)e.KeyCode);
-            rText += (char)e.KeyCode;
-            Assert.Equal (rText, text.Substring (0, idx + 1));
-            e.Handled = true;
-            idx++;
-        };
+        view.KeyDown += (s, e) =>
+                        {
+                            Assert.Equal (text [idx], (char)e.KeyCode);
+                            rText += (char)e.KeyCode;
+                            Assert.Equal (rText, text.Substring (0, idx + 1));
+                            e.Handled = true;
+                            idx++;
+                        };
         top.Add (view);
 
-        Application.Iteration += (s, a) => {
-            if (mKeys.Count == 0) {
-                Application.RequestStop ();
-            }
-        };
+        Application.Iteration += (s, a) =>
+                                 {
+                                     if (mKeys.Count == 0)
+                                     {
+                                         Application.RequestStop ();
+                                     }
+                                 };
 
         Application.Run ();
 
@@ -72,7 +81,8 @@ public class ConsoleDriverTests {
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    public void FakeDriver_Only_Sends_Keystrokes_Through_MockKeyPresses (Type driverType) {
+    public void FakeDriver_Only_Sends_Keystrokes_Through_MockKeyPresses (Type driverType)
+    {
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driver);
 
@@ -84,12 +94,15 @@ public class ConsoleDriverTests {
         view.KeyDown += (s, e) => { wasKeyPressed = true; };
         top.Add (view);
 
-        Application.Iteration += (s, a) => {
-            count++;
-            if (count == 10) {
-                Application.RequestStop ();
-            }
-        };
+        Application.Iteration += (s, a) =>
+                                 {
+                                     count++;
+
+                                     if (count == 10)
+                                     {
+                                         Application.RequestStop ();
+                                     }
+                                 };
 
         Application.Run ();
 
@@ -106,7 +119,8 @@ public class ConsoleDriverTests {
     //[InlineData (typeof (ANSIDriver))]
     [InlineData (typeof (WindowsDriver))]
     [InlineData (typeof (CursesDriver))]
-    public void Init_Inits (Type driverType) {
+    public void Init_Inits (Type driverType)
+    {
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         MainLoop ml = driver.Init ();
         Assert.NotNull (ml);
@@ -182,18 +196,21 @@ public class ConsoleDriverTests {
     //[InlineData (typeof (ANSIDriver))]
     [InlineData (typeof (WindowsDriver))]
     [InlineData (typeof (CursesDriver))]
-    public void TerminalResized_Simulation (Type driverType) {
+    public void TerminalResized_Simulation (Type driverType)
+    {
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         driver?.Init ();
         driver.Cols = 80;
         driver.Rows = 25;
 
         var wasTerminalResized = false;
-        driver.SizeChanged += (s, e) => {
-            wasTerminalResized = true;
-            Assert.Equal (120, e.Size.Width);
-            Assert.Equal (40, e.Size.Height);
-        };
+
+        driver.SizeChanged += (s, e) =>
+                              {
+                                  wasTerminalResized = true;
+                                  Assert.Equal (120, e.Size.Width);
+                                  Assert.Equal (40, e.Size.Height);
+                              };
 
         Assert.Equal (80, driver.Cols);
         Assert.Equal (25, driver.Rows);

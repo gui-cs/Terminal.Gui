@@ -4,17 +4,16 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
-/// <summary>
-///     Tests of the <see cref="View.Text"/> and <see cref="View.TextFormatter"/> properties (independent of
-///     AutoSize).
-/// </summary>
-public class TextTests {
-    public TextTests (ITestOutputHelper output) { _output = output; }
+/// <summary>Tests of the <see cref="View.Text"/> and <see cref="View.TextFormatter"/> properties (independent of AutoSize).</summary>
+public class TextTests
+{
     private readonly ITestOutputHelper _output;
+    public TextTests (ITestOutputHelper output) { _output = output; }
 
     // Test that View.PreserveTrailingSpaces removes trailing spaces
     [Fact]
-    public void PreserveTrailingSpaces_Removes_Trailing_Spaces () {
+    public void PreserveTrailingSpaces_Removes_Trailing_Spaces ()
+    {
         var view = new View { Text = "Hello World " };
         Assert.Equal ("Hello World ", view.TextFormatter.Text);
 
@@ -33,7 +32,8 @@ public class TextTests {
     // If <see langword="true"/> trailing spaces at the end of wrapped lines will be removed when
     // <see cref = "Text" / > is formatted for display.The default is <see langword = "false" / >.
     [Fact]
-    public void PreserveTrailingSpaces_Set_Get () {
+    public void PreserveTrailingSpaces_Set_Get ()
+    {
         var view = new View { Text = "Hello World" };
 
         Assert.False (view.PreserveTrailingSpaces);
@@ -44,7 +44,8 @@ public class TextTests {
 
     // Setting TextFormatter DOES NOT update Text
     [Fact]
-    public void SettingTextFormatterDoesNotUpdateText () {
+    public void SettingTextFormatterDoesNotUpdateText ()
+    {
         var view = new View ();
         view.TextFormatter.Text = "Hello World";
 
@@ -53,7 +54,8 @@ public class TextTests {
 
     // Setting Text updates TextFormatter
     [Fact]
-    public void SettingTextUpdatesTextFormatter () {
+    public void SettingTextUpdatesTextFormatter ()
+    {
         var view = new View { Text = "Hello World" };
 
         Assert.Equal ("Hello World", view.Text);
@@ -62,20 +64,22 @@ public class TextTests {
 
     // Test that TextFormatter is init only
     [Fact]
-    public void TextFormatterIsInitOnly () {
+    public void TextFormatterIsInitOnly ()
+    {
         var view = new View ();
 
         // Use reflection to ensure the TextFormatter property is `init` only
         Assert.True (
-            typeof (View).GetMethod ("set_TextFormatter")
-                .ReturnParameter.GetRequiredCustomModifiers ()
-                .Contains (typeof (IsExternalInit))
-        );
+                     typeof (View).GetMethod ("set_TextFormatter")
+                                  .ReturnParameter.GetRequiredCustomModifiers ()
+                                  .Contains (typeof (IsExternalInit))
+                    );
     }
 
     // Test that the Text property is set correctly.
     [Fact]
-    public void TextProperty () {
+    public void TextProperty ()
+    {
         var view = new View { Text = "Hello World" };
 
         Assert.Equal ("Hello World", view.Text);
@@ -83,7 +87,8 @@ public class TextTests {
 
     // Setting Text sets the HotKey
     [Fact]
-    public void TextSetsHotKey () {
+    public void TextSetsHotKey ()
+    {
         var view = new View { HotKeySpecifier = (Rune)'_', Text = "_Hello World" };
 
         Assert.Equal (Key.H, view.HotKey);
@@ -91,14 +96,16 @@ public class TextTests {
 
     // Test view.UpdateTextFormatterText overridden in a subclass updates TextFormatter.Text
     [Fact]
-    public void UpdateTextFormatterText_Overridden () {
+    public void UpdateTextFormatterText_Overridden ()
+    {
         var view = new TestView { Text = "Hello World" };
 
         Assert.Equal ("Hello World", view.Text);
         Assert.Equal (">Hello World<", view.TextFormatter.Text);
     }
 
-    private class TestView : View {
+    private class TestView : View
+    {
         protected override void UpdateTextFormatterText () { TextFormatter.Text = $">{Text}<"; }
     }
 

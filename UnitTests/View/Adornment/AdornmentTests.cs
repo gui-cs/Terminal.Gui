@@ -2,12 +2,14 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class AdornmentTests {
-    public AdornmentTests (ITestOutputHelper output) { _output = output; }
+public class AdornmentTests
+{
     private readonly ITestOutputHelper _output;
+    public AdornmentTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
-    public void BoundsToScreen_Uses_Parent_Not_SuperView () {
+    public void BoundsToScreen_Uses_Parent_Not_SuperView ()
+    {
         var parent = new View { X = 1, Y = 2, Width = 10, Height = 10 };
 
         parent.BeginInit ();
@@ -24,7 +26,8 @@ public class AdornmentTests {
     }
 
     [Fact]
-    public void FrameToScreen_Uses_Parent_Not_SuperView () {
+    public void FrameToScreen_Uses_Parent_Not_SuperView ()
+    {
         var parent = new View { X = 1, Y = 2, Width = 10, Height = 10 };
 
         parent.BeginInit ();
@@ -40,7 +43,8 @@ public class AdornmentTests {
     }
 
     [Fact]
-    public void GetAdornmentsThickness () {
+    public void GetAdornmentsThickness ()
+    {
         var view = new View ();
         Assert.Equal (Thickness.Empty, view.GetAdornmentsThickness ());
 
@@ -65,25 +69,29 @@ public class AdornmentTests {
     }
 
     [Fact]
-    public void Setting_Bounds_Throws () {
+    public void Setting_Bounds_Throws ()
+    {
         var adornment = new Adornment (null);
         Assert.Throws<InvalidOperationException> (() => adornment.Bounds = new Rect (1, 2, 3, 4));
     }
 
     [Fact]
-    public void Setting_SuperView_Throws () {
+    public void Setting_SuperView_Throws ()
+    {
         var adornment = new Adornment (null);
         Assert.Throws<NotImplementedException> (() => adornment.SuperView = new View ());
     }
 
     [Fact]
-    public void Setting_SuperViewRendersLineCanvas_Throws () {
+    public void Setting_SuperViewRendersLineCanvas_Throws ()
+    {
         var adornment = new Adornment (null);
         Assert.Throws<NotImplementedException> (() => adornment.SuperViewRendersLineCanvas = true);
     }
 
     [Fact]
-    public void Setting_Thickness_Changes_Parent_Bounds () {
+    public void Setting_Thickness_Changes_Parent_Bounds ()
+    {
         var parent = new View { Width = 10, Height = 10 };
         parent.BeginInit ();
         parent.EndInit ();
@@ -97,16 +105,19 @@ public class AdornmentTests {
     }
 
     [Fact]
-    public void Setting_Thickness_Raises_ThicknessChanged () {
+    public void Setting_Thickness_Raises_ThicknessChanged ()
+    {
         var adornment = new Adornment (null);
         var super = new View ();
         var raised = false;
-        adornment.ThicknessChanged += (s, e) => {
-            raised = true;
-            Assert.Equal (Thickness.Empty, e.PreviousThickness);
-            Assert.Equal (new Thickness (1, 2, 3, 4), e.Thickness);
-            Assert.Equal (new Thickness (1, 2, 3, 4), adornment.Thickness);
-        };
+
+        adornment.ThicknessChanged += (s, e) =>
+                                      {
+                                          raised = true;
+                                          Assert.Equal (Thickness.Empty, e.PreviousThickness);
+                                          Assert.Equal (new Thickness (1, 2, 3, 4), e.Thickness);
+                                          Assert.Equal (new Thickness (1, 2, 3, 4), adornment.Thickness);
+                                      };
         adornment.Thickness = new Thickness (1, 2, 3, 4);
         Assert.True (raised);
     }

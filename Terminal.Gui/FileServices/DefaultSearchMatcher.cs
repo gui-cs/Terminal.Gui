@@ -2,14 +2,13 @@
 
 namespace Terminal.Gui;
 
-internal class DefaultSearchMatcher : ISearchMatcher {
-    private string[] terms;
+internal class DefaultSearchMatcher : ISearchMatcher
+{
+    private string [] terms;
+    public void Initialize (string terms) { this.terms = terms.Split (new [] { " " }, StringSplitOptions.RemoveEmptyEntries); }
 
-    public void Initialize (string terms) {
-        this.terms = terms.Split (new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-    }
-
-    public bool IsMatch (IFileSystemInfo f) {
+    public bool IsMatch (IFileSystemInfo f)
+    {
         //Contains overload with StringComparison is not available in (net472) or (netstandard2.0)
         //return f.Name.Contains (terms, StringComparison.OrdinalIgnoreCase);
 

@@ -4,18 +4,20 @@ using System.Text.Unicode;
 
 namespace Terminal.Gui.ConfigurationTests;
 
-public class ColorJsonConverterTests {
+public class ColorJsonConverterTests
+{
     [Theory]
     [InlineData ("\"#000000\"", 0, 0, 0)]
-    public void DeserializesFromHexCode (string hexCode, int r, int g, int b) {
+    public void DeserializesFromHexCode (string hexCode, int r, int g, int b)
+    {
         // Arrange
         var expected = new Color (r, g, b);
 
         // Act
         var actual = JsonSerializer.Deserialize<Color> (
-            hexCode,
-            new JsonSerializerOptions { Converters = { new ColorJsonConverter () } }
-        );
+                                                        hexCode,
+                                                        new JsonSerializerOptions { Converters = { new ColorJsonConverter () } }
+                                                       );
 
         //Assert
         Assert.Equal (expected, actual);
@@ -23,15 +25,16 @@ public class ColorJsonConverterTests {
 
     [Theory]
     [InlineData ("\"rgb(0,0,0)\"", 0, 0, 0)]
-    public void DeserializesFromRgb (string rgb, int r, int g, int b) {
+    public void DeserializesFromRgb (string rgb, int r, int g, int b)
+    {
         // Arrange
         var expected = new Color (r, g, b);
 
         // Act
         var actual = JsonSerializer.Deserialize<Color> (
-            rgb,
-            new JsonSerializerOptions { Converters = { new ColorJsonConverter () } }
-        );
+                                                        rgb,
+                                                        new JsonSerializerOptions { Converters = { new ColorJsonConverter () } }
+                                                       );
 
         //Assert
         Assert.Equal (expected, actual);
@@ -54,7 +57,8 @@ public class ColorJsonConverterTests {
     [InlineData (ColorName.BrightMagenta, "BrightMagenta")]
     [InlineData (ColorName.BrightYellow, "BrightYellow")]
     [InlineData (ColorName.White, "White")]
-    public void SerializesEnumValuesAsStrings (ColorName colorName, string expectedJson) {
+    public void SerializesEnumValuesAsStrings (ColorName colorName, string expectedJson)
+    {
         var converter = new ColorJsonConverter ();
         var options = new JsonSerializerOptions { Converters = { converter } };
 
@@ -66,14 +70,15 @@ public class ColorJsonConverterTests {
     [Theory]
     [InlineData (0, 0, 0, "\"#000000\"")]
     [InlineData (0, 0, 1, "\"#000001\"")]
-    public void SerializesToHexCode (int r, int g, int b, string expected) {
+    public void SerializesToHexCode (int r, int g, int b, string expected)
+    {
         // Arrange
 
         // Act
         string actual = JsonSerializer.Serialize (
-            new Color (r, g, b),
-            new JsonSerializerOptions { Converters = { new ColorJsonConverter () } }
-        );
+                                                  new Color (r, g, b),
+                                                  new JsonSerializerOptions { Converters = { new ColorJsonConverter () } }
+                                                 );
 
         //Assert
         Assert.Equal (expected, actual);
@@ -96,7 +101,8 @@ public class ColorJsonConverterTests {
     [InlineData ("Magenta", Color.Magenta)]
     [InlineData ("Red", Color.Red)]
     [InlineData ("White", Color.White)]
-    public void TestColorDeserializationFromHumanReadableColorNames (string colorName, ColorName expectedColor) {
+    public void TestColorDeserializationFromHumanReadableColorNames (string colorName, ColorName expectedColor)
+    {
         // Arrange
         var json = $"\"{colorName}\"";
 
@@ -108,71 +114,77 @@ public class ColorJsonConverterTests {
     }
 
     [Fact]
-    public void TestDeserializeColor_Black () {
+    public void TestDeserializeColor_Black ()
+    {
         // Arrange
         var json = "\"Black\"";
         var expectedColor = new Color (ColorName.Black);
 
         // Act
         var color = JsonSerializer.Deserialize<Color> (
-            json,
-            new JsonSerializerOptions { Converters = { new ColorJsonConverter () } }
-        );
+                                                       json,
+                                                       new JsonSerializerOptions { Converters = { new ColorJsonConverter () } }
+                                                      );
 
         // Assert
         Assert.Equal (expectedColor, color);
     }
 
     [Fact]
-    public void TestDeserializeColor_BrightRed () {
+    public void TestDeserializeColor_BrightRed ()
+    {
         // Arrange
         var json = "\"BrightRed\"";
         var expectedColor = new Color (ColorName.BrightRed);
 
         // Act
         var color = JsonSerializer.Deserialize<Color> (
-            json,
-            new JsonSerializerOptions { Converters = { new ColorJsonConverter () } }
-        );
+                                                       json,
+                                                       new JsonSerializerOptions { Converters = { new ColorJsonConverter () } }
+                                                      );
 
         // Assert
         Assert.Equal (expectedColor, color);
     }
 
     [Fact]
-    public void TestSerializeColor_Black () {
+    public void TestSerializeColor_Black ()
+    {
         // Arrange
         var expectedJson = "\"Black\"";
 
         // Act
         string json = JsonSerializer.Serialize (
-            new Color (Color.Black),
-            new JsonSerializerOptions { Converters = { new ColorJsonConverter () } }
-        );
+                                                new Color (Color.Black),
+                                                new JsonSerializerOptions { Converters = { new ColorJsonConverter () } }
+                                               );
 
         // Assert
         Assert.Equal (expectedJson, json);
     }
 
     [Fact]
-    public void TestSerializeColor_BrightRed () {
+    public void TestSerializeColor_BrightRed ()
+    {
         // Arrange
         var expectedJson = "\"BrightRed\"";
 
         // Act
         string json = JsonSerializer.Serialize (
-            new Color (Color.BrightRed),
-            new JsonSerializerOptions { Converters = { new ColorJsonConverter () } }
-        );
+                                                new Color (Color.BrightRed),
+                                                new JsonSerializerOptions { Converters = { new ColorJsonConverter () } }
+                                               );
 
         // Assert
         Assert.Equal (expectedJson, json);
     }
 }
 
-public class AttributeJsonConverterTests {
+public class AttributeJsonConverterTests
+{
     [Fact]
-    public void TestDeserialize () {
+    public void TestDeserialize ()
+    {
         // Test deserializing from human-readable color names
         var json = "{\"Foreground\":\"Blue\",\"Background\":\"Green\"}";
         var attribute = JsonSerializer.Deserialize<Attribute> (json, ConfigurationManagerTests._jsonOptions);
@@ -188,7 +200,8 @@ public class AttributeJsonConverterTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void TestSerialize () {
+    public void TestSerialize ()
+    {
         // Test serializing to human-readable color names
         var attribute = new Attribute (Color.Blue, Color.Green);
         string json = JsonSerializer.Serialize (attribute, ConfigurationManagerTests._jsonOptions);
@@ -196,7 +209,8 @@ public class AttributeJsonConverterTests {
     }
 }
 
-public class ColorSchemeJsonConverterTests {
+public class ColorSchemeJsonConverterTests
+{
     //string json = @"
     //	{
     //	""ColorSchemes"": {
@@ -226,15 +240,18 @@ public class ColorSchemeJsonConverterTests {
     //	}";
     [Fact]
     [AutoInitShutdown]
-    public void TestColorSchemesSerialization () {
+    public void TestColorSchemesSerialization ()
+    {
         // Arrange
-        var expectedColorScheme = new ColorScheme {
+        var expectedColorScheme = new ColorScheme
+        {
             Normal = new Attribute (Color.White, Color.Blue),
             Focus = new Attribute (Color.Black, Color.Gray),
             HotNormal = new Attribute (Color.BrightCyan, Color.Blue),
             HotFocus = new Attribute (Color.BrightBlue, Color.Gray),
             Disabled = new Attribute (Color.DarkGray, Color.Blue)
         };
+
         string serializedColorScheme =
             JsonSerializer.Serialize (expectedColorScheme, ConfigurationManagerTests._jsonOptions);
 
@@ -247,7 +264,8 @@ public class ColorSchemeJsonConverterTests {
     }
 }
 
-public class KeyCodeJsonConverterTests {
+public class KeyCodeJsonConverterTests
+{
     [Theory]
     [InlineData (KeyCode.A, "A")]
     [InlineData (KeyCode.A | KeyCode.ShiftMask, "A, ShiftMask")]
@@ -258,7 +276,8 @@ public class KeyCodeJsonConverterTests {
     [InlineData (KeyCode.Delete | KeyCode.AltMask | KeyCode.CtrlMask, "Delete, CtrlMask, AltMask")]
     [InlineData (KeyCode.D4, "D4")]
     [InlineData (KeyCode.Esc, "Esc")]
-    public void TestKeyRoundTripConversion (KeyCode key, string expectedStringTo) {
+    public void TestKeyRoundTripConversion (KeyCode key, string expectedStringTo)
+    {
         // Arrange
         var options = new JsonSerializerOptions ();
         options.Converters.Add (new KeyCodeJsonConverter ());
@@ -272,7 +291,8 @@ public class KeyCodeJsonConverterTests {
     }
 }
 
-public class KeyJsonConverterTests {
+public class KeyJsonConverterTests
+{
     [Theory]
     [InlineData (KeyCode.A, "\"a\"")]
     [InlineData ((KeyCode)'â', "\"â\"")]
@@ -284,7 +304,8 @@ public class KeyJsonConverterTests {
     [InlineData (KeyCode.Delete | KeyCode.AltMask | KeyCode.CtrlMask, "\"Ctrl+Alt+Delete\"")]
     [InlineData (KeyCode.D4, "\"4\"")]
     [InlineData (KeyCode.Esc, "\"Esc\"")]
-    public void TestKey_Serialize (KeyCode key, string expected) {
+    public void TestKey_Serialize (KeyCode key, string expected)
+    {
         // Arrange
         var options = new JsonSerializerOptions ();
         options.Converters.Add (new KeyJsonConverter ());
@@ -307,7 +328,8 @@ public class KeyJsonConverterTests {
     [InlineData (KeyCode.Delete | KeyCode.AltMask | KeyCode.CtrlMask, "Ctrl+Alt+Delete")]
     [InlineData (KeyCode.D4, "4")]
     [InlineData (KeyCode.Esc, "Esc")]
-    public void TestKeyRoundTripConversion (KeyCode key, string expectedStringTo) {
+    public void TestKeyRoundTripConversion (KeyCode key, string expectedStringTo)
+    {
         // Arrange
         var options = new JsonSerializerOptions ();
         options.Converters.Add (new KeyJsonConverter ());

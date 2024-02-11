@@ -1,7 +1,8 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary><see cref="EventArgs"/> for <see cref="WizardStep"/> transition events.</summary>
-public class WizardButtonEventArgs : EventArgs {
+public class WizardButtonEventArgs : EventArgs
+{
     /// <summary>Initializes a new instance of <see cref="WizardButtonEventArgs"/></summary>
     public WizardButtonEventArgs () { Cancel = false; }
 
@@ -10,11 +11,13 @@ public class WizardButtonEventArgs : EventArgs {
 }
 
 /// <summary><see cref="EventArgs"/> for <see cref="WizardStep"/> events.</summary>
-public class StepChangeEventArgs : EventArgs {
+public class StepChangeEventArgs : EventArgs
+{
     /// <summary>Initializes a new instance of <see cref="StepChangeEventArgs"/></summary>
     /// <param name="oldStep">The current <see cref="WizardStep"/>.</param>
     /// <param name="newStep">The new <see cref="WizardStep"/>.</param>
-    public StepChangeEventArgs (WizardStep oldStep, WizardStep newStep) {
+    public StepChangeEventArgs (WizardStep oldStep, WizardStep newStep)
+    {
         OldStep = oldStep;
         NewStep = newStep;
         Cancel = false;

@@ -48,23 +48,24 @@ using Terminal.Gui;
 namespace Unix.Terminal;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
-public partial class Curses {
+public partial class Curses
+{
     // We encode ESC + char (what Alt-char generates) as 0x2000 + char
     public const int KeyAlt = 0x2000;
-    private static char[] r = new char [1];
-    private static int lines, cols;
     private static nint curses_handle, curscr_ptr, lines_ptr, cols_ptr;
-    private static nint stdscr;
-    private static NativeMethods methods;
 
     // If true, uses the DllImport into "ncurses", otherwise "libncursesw.so.5"
     //static bool use_naked_driver;
     private static UnmanagedLibrary curses_library;
+    private static int lines, cols;
     private static Window main_window;
-    public static bool HasColors => methods.has_colors ();
+    private static NativeMethods methods;
+    private static char [] r = new char [1];
+    private static nint stdscr;
     public static int ColorPairs => methods.COLOR_PAIRS ();
 
-    public static int Cols {
+    public static int Cols
+    {
         get => cols;
         internal set =>
 
@@ -72,7 +73,10 @@ public partial class Curses {
             cols = value;
     }
 
-    public static int Lines {
+    public static bool HasColors => methods.has_colors ();
+
+    public static int Lines
+    {
         get => lines;
         internal set =>
 
@@ -86,8 +90,10 @@ public partial class Curses {
     // for that.   but we need addch to render special ACS
     // characters
     //
-    public static int addch (int ch) {
-        if (ch < 127 || ch > 0xffff) {
+    public static int addch (int ch)
+    {
+        if (ch < 127 || ch > 0xffff)
+        {
             return methods.addch (ch);
         }
 
@@ -96,34 +102,38 @@ public partial class Curses {
         return addwstr (new string (c, 1));
     }
 
-    public static int addstr (string format, params object[] args) {
+    public static int addstr (string format, params object [] args)
+    {
         string s = string.Format (format, args);
 
         return addwstr (s);
     }
 
-    public static int addwstr (string s) => methods.addwstr (s);
-    public static int attroff (int attrs) => methods.attroff (attrs);
+    public static int addwstr (string s) { return methods.addwstr (s); }
+    public static int attroff (int attrs) { return methods.attroff (attrs); }
 
     //static public int wechochar (IntPtr win, int ch) => methods.wechochar (win, ch);
-    public static int attron (int attrs) => methods.attron (attrs);
-    public static int attrset (int attrs) => methods.attrset (attrs);
-    public static int cbreak () => methods.cbreak ();
+    public static int attron (int attrs) { return methods.attron (attrs); }
+    public static int attrset (int attrs) { return methods.attrset (attrs); }
+    public static int cbreak () { return methods.cbreak (); }
 
     //
     // Returns true if the window changed since the last invocation, as a
     // side effect, the Lines and Cols properties are updated
     //
-    public static bool CheckWinChange () {
+    public static bool CheckWinChange ()
+    {
         int l, c;
 
         console_sharp_get_dims (out l, out c);
 
-        if (l < 1) {
+        if (l < 1)
+        {
             l = 1;
         }
 
-        if (l != lines || c != cols) {
+        if (l != lines || c != cols)
+        {
             lines = l;
             cols = c;
 
@@ -133,57 +143,51 @@ public partial class Curses {
         return false;
     }
 
-    public static int clearok (nint win, bool bf) => methods.clearok (win, bf);
-    public static int COLOR_PAIRS () => methods.COLOR_PAIRS ();
-    public static int curs_set (int visibility) => methods.curs_set (visibility);
+    public static int clearok (nint win, bool bf) { return methods.clearok (win, bf); }
+    public static int COLOR_PAIRS () { return methods.COLOR_PAIRS (); }
+    public static int curs_set (int visibility) { return methods.curs_set (visibility); }
 
-    public static string curses_version () {
+    public static string curses_version ()
+    {
         nint v = methods.curses_version ();
 
         return $"{Marshal.PtrToStringAnsi (v)}, {curses_library.LibraryPath}";
     }
 
-    public static int def_prog_mode () => methods.def_prog_mode ();
-    public static int def_shell_mode () => methods.def_shell_mode ();
-    public static int doupdate () => methods.doupdate ();
-    public static int echo () => methods.echo ();
+    public static int def_prog_mode () { return methods.def_prog_mode (); }
+    public static int def_shell_mode () { return methods.def_shell_mode (); }
+    public static int doupdate () { return methods.doupdate (); }
+    public static int echo () { return methods.echo (); }
 
     //static public int addch (int ch) => methods.addch (ch);
-    public static int echochar (int ch) => methods.echochar (ch);
+    public static int echochar (int ch) { return methods.echochar (ch); }
 
     //
     // The proxy methods to call into each version
     //
-    public static int endwin () => methods.endwin ();
-    public static int flushinp () => methods.flushinp ();
-    public static int get_wch (out int sequence) => methods.get_wch (out sequence);
-    public static int getch () => methods.getch ();
-    public static uint getmouse (out MouseEvent ev) => methods.getmouse (out ev);
-    public static int halfdelay (int t) => methods.halfdelay (t);
-    public static bool has_colors () => methods.has_colors ();
+    public static int endwin () { return methods.endwin (); }
+    public static int flushinp () { return methods.flushinp (); }
+    public static int get_wch (out int sequence) { return methods.get_wch (out sequence); }
+    public static int getch () { return methods.getch (); }
+    public static uint getmouse (out MouseEvent ev) { return methods.getmouse (out ev); }
+    public static int halfdelay (int t) { return methods.halfdelay (t); }
+    public static bool has_colors () { return methods.has_colors (); }
     public static void idcok (nint win, bool bf) { methods.idcok (win, bf); }
-    public static int idlok (nint win, bool bf) => methods.idlok (win, bf);
+    public static int idlok (nint win, bool bf) { return methods.idlok (win, bf); }
     public static void immedok (nint win, bool bf) { methods.immedok (win, bf); }
-    public static int init_pair (short pair, short f, short b) => methods.init_pair (pair, f, b);
+    public static int init_pair (short pair, short f, short b) { return methods.init_pair (pair, f, b); }
 
     /// <summary>
-    ///     The init_pair routine changes the definition of a color-pair.It takes three arguments: the number of the color-pair
-    ///     to be changed, the  fore- ground color number, and the background color number.For portable ap- plications: o The
-    ///     first argument must be a legal color pair  value.If  default colors are used (see use_default_colors(3x)) the upper
-    ///     limit is ad- justed to allow for extra pairs which use a default color in  fore- ground and/or background. o The
-    ///     second and third arguments must be legal color values. If the  color-pair was previously initialized, the screen is
-    ///     refreshed and all occurrences of that color-pair are changed to the new defini- tion. As an  extension,  ncurses
-    ///     allows you to set color pair 0 via the as- sume_default_colors (3x) routine, or to specify the use of default  col-
-    ///     ors (color number  -1) if you first invoke the use_default_colors (3x) routine.
+    ///     The init_pair routine changes the definition of a color-pair.It takes three arguments: the number of the color-pair to be changed, the  fore- ground color number, and the background color number.For portable ap- plications: o The first argument must be a legal color pair  value.If  default colors are used (see use_default_colors(3x)) the upper limit is ad- justed to allow for extra pairs which use a default color in  fore- ground and/or background. o The second and third arguments must be legal color values. If the  color-pair was previously initialized, the screen is refreshed and all occurrences of that color-pair are changed to the new defini- tion. As an  extension,  ncurses allows you to set color pair 0 via the as- sume_default_colors (3x) routine, or to specify the use of default  col- ors (color number  -1) if you first invoke the use_default_colors (3x) routine.
     /// </summary>
     /// <param name="pair"></param>
     /// <param name="foreground"></param>
     /// <param name="background"></param>
     /// <returns></returns>
-    public static int InitColorPair (short pair, short foreground, short background) =>
-        methods.init_pair (pair, foreground, background);
+    public static int InitColorPair (short pair, short foreground, short background) { return methods.init_pair (pair, foreground, background); }
 
-    public static Window initscr () {
+    public static Window initscr ()
+    {
         setlocale (LC_ALL, "");
         FindNCurses ();
 
@@ -191,17 +195,21 @@ public partial class Curses {
         reset_shell_mode ();
 
         main_window = new Window (methods.initscr ());
-        try {
+
+        try
+        {
             console_sharp_get_dims (out lines, out cols);
         }
-        catch (DllNotFoundException) {
+        catch (DllNotFoundException)
+        {
             endwin ();
+
             Console.Error.WriteLine (
-                "Unable to find the @MONO_CURSES@ native library\n" +
-                "this is different than the managed mono-curses.dll\n\n" +
-                "Typically you need to install to a LD_LIBRARY_PATH directory\n" +
-                "or DYLD_LIBRARY_PATH directory or run /sbin/ldconfig"
-            );
+                                     "Unable to find the @MONO_CURSES@ native library\n"
+                                     + "this is different than the managed mono-curses.dll\n\n"
+                                     + "Typically you need to install to a LD_LIBRARY_PATH directory\n"
+                                     + "or DYLD_LIBRARY_PATH directory or run /sbin/ldconfig"
+                                    );
             Environment.Exit (1);
         }
 
@@ -210,24 +218,27 @@ public partial class Curses {
         return main_window;
     }
 
-    public static int intrflush (nint win, bool bf) => methods.intrflush (win, bf);
-    public static bool is_term_resized (int lines, int columns) => methods.is_term_resized (lines, columns);
+    public static int intrflush (nint win, bool bf) { return methods.intrflush (win, bf); }
+    public static bool is_term_resized (int lines, int columns) { return methods.is_term_resized (lines, columns); }
 
-    public static int IsAlt (int key) {
-        if ((key & KeyAlt) != 0) {
+    public static int IsAlt (int key)
+    {
+        if ((key & KeyAlt) != 0)
+        {
             return key & ~KeyAlt;
         }
 
         return 0;
     }
 
-    public static bool isendwin () => methods.isendwin ();
-    public static int keypad (nint win, bool bf) => methods.keypad (win, bf);
-    public static int leaveok (nint win, bool bf) => methods.leaveok (win, bf);
-    public static int meta (nint win, bool bf) => methods.meta (win, bf);
-    public static int mouseinterval (int interval) => methods.mouseinterval (interval);
+    public static bool isendwin () { return methods.isendwin (); }
+    public static int keypad (nint win, bool bf) { return methods.keypad (win, bf); }
+    public static int leaveok (nint win, bool bf) { return methods.leaveok (win, bf); }
+    public static int meta (nint win, bool bf) { return methods.meta (win, bf); }
+    public static int mouseinterval (int interval) { return methods.mouseinterval (interval); }
 
-    public static Event mousemask (Event newmask, out Event oldmask) {
+    public static Event mousemask (Event newmask, out Event oldmask)
+    {
         nint e;
         var ret = (Event)methods.mousemask ((nint)newmask, out e);
         oldmask = (Event)e;
@@ -235,10 +246,12 @@ public partial class Curses {
         return ret;
     }
 
-    public static int move (int line, int col) => methods.move (line, col);
+    public static int move (int line, int col) { return methods.move (line, col); }
 
-    public static int mvaddch (int y, int x, int ch) {
-        if (ch < 127 || ch > 0xffff) {
+    public static int mvaddch (int y, int x, int ch)
+    {
+        if (ch < 127 || ch > 0xffff)
+        {
             return methods.mvaddch (y, x, ch);
         }
 
@@ -247,52 +260,53 @@ public partial class Curses {
         return mvaddwstr (y, x, new string (c, 1));
     }
 
-    public static int mvaddwstr (int y, int x, string s) => methods.mvaddwstr (y, x, s);
-    public static int mvgetch (int y, int x) => methods.mvgetch (y, x);
-    public static int nl () => methods.nl ();
-    public static int nocbreak () => methods.nocbreak ();
-    public static int noecho () => methods.noecho ();
-    public static int nonl () => methods.nonl ();
+    public static int mvaddwstr (int y, int x, string s) { return methods.mvaddwstr (y, x, s); }
+    public static int mvgetch (int y, int x) { return methods.mvgetch (y, x); }
+    public static int nl () { return methods.nl (); }
+    public static int nocbreak () { return methods.nocbreak (); }
+    public static int noecho () { return methods.noecho (); }
+    public static int nonl () { return methods.nonl (); }
     public static void noqiflush () { methods.noqiflush (); }
-    public static int noraw () => methods.noraw ();
-    public static int notimeout (nint win, bool bf) => methods.notimeout (win, bf);
+    public static int noraw () { return methods.noraw (); }
+    public static int notimeout (nint win, bool bf) { return methods.notimeout (win, bf); }
     public static void qiflush () { methods.qiflush (); }
-    public static int raw () => methods.raw ();
-    public static int redrawwin (nint win) => methods.redrawwin (win);
-    public static int refresh () => methods.refresh ();
-    public static int reset_prog_mode () => methods.reset_prog_mode ();
-    public static int reset_shell_mode () => methods.reset_shell_mode ();
-    public static int resetty () => methods.resetty ();
-    public static int resize_term (int lines, int columns) => methods.resize_term (lines, columns);
-    public static int resizeterm (int lines, int columns) => methods.resizeterm (lines, columns);
-    public static int savetty () => methods.savetty ();
-    public static int scrollok (nint win, bool bf) => methods.scrollok (win, bf);
-    public static int set_escdelay (int size) => methods.set_escdelay (size);
+    public static int raw () { return methods.raw (); }
+    public static int redrawwin (nint win) { return methods.redrawwin (win); }
+    public static int refresh () { return methods.refresh (); }
+    public static int reset_prog_mode () { return methods.reset_prog_mode (); }
+    public static int reset_shell_mode () { return methods.reset_shell_mode (); }
+    public static int resetty () { return methods.resetty (); }
+    public static int resize_term (int lines, int columns) { return methods.resize_term (lines, columns); }
+    public static int resizeterm (int lines, int columns) { return methods.resizeterm (lines, columns); }
+    public static int savetty () { return methods.savetty (); }
+    public static int scrollok (nint win, bool bf) { return methods.scrollok (win, bf); }
+    public static int set_escdelay (int size) { return methods.set_escdelay (size); }
     [DllImport ("libc")] public static extern int setlocale (int cate, [MarshalAs (UnmanagedType.LPStr)] string locale);
-    public static int setscrreg (int top, int bot) => methods.setscrreg (top, bot);
-    public static int start_color () => methods.start_color ();
-    public static int StartColor () => methods.start_color ();
-    public static int timeout (int delay) => methods.timeout (delay);
-    public static int typeahead (nint fd) => methods.typeahead (fd);
-    public static int ungetch (int ch) => methods.ungetch (ch);
-    public static uint ungetmouse (ref MouseEvent ev) => methods.ungetmouse (ref ev);
-    public static int use_default_colors () => methods.use_default_colors ();
+    public static int setscrreg (int top, int bot) { return methods.setscrreg (top, bot); }
+    public static int start_color () { return methods.start_color (); }
+    public static int StartColor () { return methods.start_color (); }
+    public static int timeout (int delay) { return methods.timeout (delay); }
+    public static int typeahead (nint fd) { return methods.typeahead (fd); }
+    public static int ungetch (int ch) { return methods.ungetch (ch); }
+    public static uint ungetmouse (ref MouseEvent ev) { return methods.ungetmouse (ref ev); }
+    public static int use_default_colors () { return methods.use_default_colors (); }
     public static void use_env (bool f) { methods.use_env (f); }
 
     // TODO: Upgrade to ncurses 6.1 and use the extended version
     //public static int InitExtendedPair (int pair, int foreground, int background) => methods.init_extended_pair (pair, foreground, background);
-    public static int UseDefaultColors () => methods.use_default_colors ();
-    public static int waddch (nint win, int ch) => methods.waddch (win, ch);
-    public static int wmove (nint win, int line, int col) => methods.wmove (win, line, col);
+    public static int UseDefaultColors () { return methods.use_default_colors (); }
+    public static int waddch (nint win, int ch) { return methods.waddch (win, ch); }
+    public static int wmove (nint win, int line, int col) { return methods.wmove (win, line, col); }
 
     //static public int wredrawwin (IntPtr win, int beg_line, int num_lines) => methods.wredrawwin (win, beg_line, num_lines);
-    public static int wnoutrefresh (nint win) => methods.wnoutrefresh (win);
-    public static int wrefresh (nint win) => methods.wrefresh (win);
-    public static int wsetscrreg (nint win, int top, int bot) => methods.wsetscrreg (win, top, bot);
-    public static int wtimeout (nint win, int delay) => methods.wtimeout (win, delay);
-    internal static nint console_sharp_get_curscr () => Marshal.ReadIntPtr (curscr_ptr);
+    public static int wnoutrefresh (nint win) { return methods.wnoutrefresh (win); }
+    public static int wrefresh (nint win) { return methods.wrefresh (win); }
+    public static int wsetscrreg (nint win, int top, int bot) { return methods.wsetscrreg (win, top, bot); }
+    public static int wtimeout (nint win, int delay) { return methods.wtimeout (win, delay); }
+    internal static nint console_sharp_get_curscr () { return Marshal.ReadIntPtr (curscr_ptr); }
 
-    internal static void console_sharp_get_dims (out int lines, out int cols) {
+    internal static void console_sharp_get_dims (out int lines, out int cols)
+    {
         lines = Marshal.ReadInt32 (lines_ptr);
         cols = Marshal.ReadInt32 (cols_ptr);
 
@@ -318,15 +332,17 @@ public partial class Curses {
         //}
     }
 
-    internal static nint console_sharp_get_stdscr () => stdscr;
+    internal static nint console_sharp_get_stdscr () { return stdscr; }
 
-    internal static nint read_static_ptr (string key) {
+    internal static nint read_static_ptr (string key)
+    {
         nint ptr = get_ptr (key);
 
         return Marshal.ReadIntPtr (ptr);
     }
 
-    private static void FindNCurses () {
+    private static void FindNCurses ()
+    {
         LoadMethods ();
         curses_handle = methods.UnmanagedLibrary.NativeLibraryHandle;
 
@@ -336,10 +352,12 @@ public partial class Curses {
         cols_ptr = get_ptr ("COLS");
     }
 
-    private static nint get_ptr (string key) {
+    private static nint get_ptr (string key)
+    {
         nint ptr = curses_library.LoadSymbol (key);
 
-        if (ptr == nint.Zero) {
+        if (ptr == nint.Zero)
+        {
             throw new Exception ("Could not load the key " + key);
         }
 
@@ -349,27 +367,38 @@ public partial class Curses {
     //[DllImport ("libc")]
     //public extern static int ioctl (int fd, int cmd, out winsize argp);
 
-    private static void LoadMethods () {
-        string[] libs = UnmanagedLibrary.IsMacOSPlatform
-                            ? new[] { "libncurses.dylib" }
-                            : new[] { "libncursesw.so.6", "libncursesw.so.5" };
+    private static void LoadMethods ()
+    {
+        string [] libs = UnmanagedLibrary.IsMacOSPlatform
+                             ? new [] { "libncurses.dylib" }
+                             : new [] { "libncursesw.so.6", "libncursesw.so.5" };
         var attempts = 1;
-        while (true) {
-            try {
+
+        while (true)
+        {
+            try
+            {
                 curses_library = new UnmanagedLibrary (libs, false);
                 methods = new NativeMethods (curses_library);
 
                 break;
             }
-            catch (Exception ex) {
-                if (attempts == 1) {
+            catch (Exception ex)
+            {
+                if (attempts == 1)
+                {
                     attempts++;
+
                     (int exitCode, string result) =
                         ClipboardProcessRunner.Bash ("cat /etc/os-release", waitForOutput: true);
-                    if (exitCode == 0 && result.Contains ("opensuse")) {
-                        libs[0] = "libncursesw.so.5";
+
+                    if (exitCode == 0 && result.Contains ("opensuse"))
+                    {
+                        libs [0] = "libncursesw.so.5";
                     }
-                } else {
+                }
+                else
+                {
                     throw ex.GetBaseException ();
                 }
             }
@@ -385,7 +414,8 @@ public partial class Curses {
     //};
 
     [StructLayout (LayoutKind.Sequential)]
-    public struct MouseEvent {
+    public struct MouseEvent
+    {
         public short ID;
         public int X, Y, Z;
         public Event ButtonState;
@@ -393,7 +423,8 @@ public partial class Curses {
 }
 
 #pragma warning disable RCS1102 // Make class static.'
-internal class Delegates {
+internal class Delegates
+{
 #pragma warning restore RCS1102 // Make class static.
 #pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
     public delegate nint initscr ();
@@ -542,8 +573,10 @@ internal class Delegates {
     public delegate nint curses_version ();
 }
 
-internal class NativeMethods {
-    public NativeMethods (UnmanagedLibrary lib) {
+internal class NativeMethods
+{
+    public NativeMethods (UnmanagedLibrary lib)
+    {
         UnmanagedLibrary = lib;
         initscr = lib.GetNativeMethodDelegate<Delegates.initscr> ("initscr");
         endwin = lib.GetNativeMethodDelegate<Delegates.endwin> ("endwin");

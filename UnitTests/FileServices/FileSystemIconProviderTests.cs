@@ -5,9 +5,11 @@ using System.Text;
 
 namespace Terminal.Gui.FileServicesTests;
 
-public class FileSystemIconProviderTests {
+public class FileSystemIconProviderTests
+{
     [Fact]
-    public void FlagsShouldBeMutuallyExclusive () {
+    public void FlagsShouldBeMutuallyExclusive ()
+    {
         var p = new FileSystemIconProvider { UseUnicodeCharacters = false, UseNerdIcons = false };
 
         Assert.False (p.UseUnicodeCharacters);
@@ -32,23 +34,25 @@ public class FileSystemIconProviderTests {
     }
 
     [Fact]
-    public void TestBasicIcons () {
+    public void TestBasicIcons ()
+    {
         var p = new FileSystemIconProvider ();
         IFileSystem fs = GetMockFileSystem ();
 
         Assert.Equal (IsWindows () ? new Rune ('\\') : new Rune ('/'), p.GetIcon (fs.DirectoryInfo.New (@"c:\")));
 
         Assert.Equal (
-            new Rune (' '),
-            p.GetIcon (
-                fs.FileInfo.New (GetFileSystemRoot () + @"myfile.txt")
-            )
-        );
+                      new Rune (' '),
+                      p.GetIcon (
+                                 fs.FileInfo.New (GetFileSystemRoot () + @"myfile.txt")
+                                )
+                     );
     }
 
-    private string GetFileSystemRoot () => IsWindows () ? @"c:\" : "/";
+    private string GetFileSystemRoot () { return IsWindows () ? @"c:\" : "/"; }
 
-    private IFileSystem GetMockFileSystem () {
+    private IFileSystem GetMockFileSystem ()
+    {
         string root = GetFileSystemRoot ();
 
         var fileSystem = new MockFileSystem (new Dictionary<string, MockFileData> (), root);
@@ -56,7 +60,7 @@ public class FileSystemIconProviderTests {
         fileSystem.AddFile (root + @"myfile.txt", new MockFileData ("Testing is meh."));
         fileSystem.AddFile (root + @"demo/jQuery.js", new MockFileData ("some js"));
         fileSystem.AddFile (root + @"demo/mybinary.exe", new MockFileData ("some js"));
-        fileSystem.AddFile (root + @"demo/image.gif", new MockFileData (new byte[] { 0x12, 0x34, 0x56, 0xd2 }));
+        fileSystem.AddFile (root + @"demo/image.gif", new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 }));
 
         var m = (MockDirectoryInfo)fileSystem.DirectoryInfo.New (root + @"demo/subfolder");
         m.Create ();
@@ -64,5 +68,5 @@ public class FileSystemIconProviderTests {
         return fileSystem;
     }
 
-    private bool IsWindows () => RuntimeInformation.IsOSPlatform (OSPlatform.Windows);
+    private bool IsWindows () { return RuntimeInformation.IsOSPlatform (OSPlatform.Windows); }
 }

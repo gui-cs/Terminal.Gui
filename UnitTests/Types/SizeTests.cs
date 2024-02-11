@@ -1,8 +1,10 @@
 ﻿namespace Terminal.Gui.TypeTests;
 
-public class SizeTests {
+public class SizeTests
+{
     [Fact]
-    public void Size_Equals () {
+    public void Size_Equals ()
+    {
         var size1 = new Size ();
         var size2 = new Size ();
         Assert.Equal (size1, size2);
@@ -17,7 +19,8 @@ public class SizeTests {
     }
 
     [Fact]
-    public void Size_New () {
+    public void Size_New ()
+    {
         var size = new Size ();
         Assert.True (size.IsEmpty);
 
@@ -41,7 +44,8 @@ public class SizeTests {
     }
 
     [Fact]
-    public void Size_SetsValue () {
+    public void Size_SetsValue ()
+    {
         var size = new Size { Width = 0, Height = 0 };
         Assert.True (size.IsEmpty);
 

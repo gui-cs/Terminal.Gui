@@ -18,13 +18,11 @@ using System.Runtime.InteropServices;
 namespace Unix.Terminal;
 
 /// <summary>
-///     Represents a dynamically loaded unmanaged library in a (partially) platform independent manner. First, the native
-///     library is loaded using dlopen (on Unix systems) or using LoadLibrary (on Windows). dlsym or GetProcAddress are
-///     then used to obtain symbol addresses. <c>Marshal.GetDelegateForFunctionPointer</c> transforms the addresses into
-///     delegates to native methods. See
-///     http://stackoverflow.com/questions/13461989/p-invoke-to-dynamically-loaded-library-on-mono.
+///     Represents a dynamically loaded unmanaged library in a (partially) platform independent manner. First, the native library is loaded using dlopen (on Unix systems) or using LoadLibrary (on Windows). dlsym or GetProcAddress are then used to obtain symbol addresses.
+///     <c>Marshal.GetDelegateForFunctionPointer</c> transforms the addresses into delegates to native methods. See http://stackoverflow.com/questions/13461989/p-invoke-to-dynamically-loaded-library-on-mono.
 /// </summary>
-internal class UnmanagedLibrary {
+internal class UnmanagedLibrary
+{
     private const string UnityEngineApplicationClassName = "UnityEngine.Application, UnityEngine";
     private const string XamarinAndroidObjectClassName = "Java.Lang.Object, Mono.Android";
     private const string XamarinIOSObjectClassName = "Foundation.NSObject, Xamarin.iOS";
@@ -40,35 +38,47 @@ internal class UnmanagedLibrary {
     public static bool IsMacOSPlatform { get; }
     [DllImport ("libc")] private static extern int uname (nint buf);
 
-    private static string GetUname () {
+    private static string GetUname ()
+    {
         nint buffer = Marshal.AllocHGlobal (8192);
-        try {
-            if (uname (buffer) == 0) {
+
+        try
+        {
+            if (uname (buffer) == 0)
+            {
                 return Marshal.PtrToStringAnsi (buffer);
             }
 
             return string.Empty;
         }
-        catch {
+        catch
+        {
             return string.Empty;
         }
-        finally {
-            if (buffer != nint.Zero) {
+        finally
+        {
+            if (buffer != nint.Zero)
+            {
                 Marshal.FreeHGlobal (buffer);
             }
         }
     }
 
-    static UnmanagedLibrary () {
+    static UnmanagedLibrary ()
+    {
         PlatformID platform = Environment.OSVersion.Platform;
 
         IsMacOSPlatform = platform == PlatformID.Unix && GetUname () == "Darwin";
         IsLinux = platform == PlatformID.Unix && !IsMacOSPlatform;
-        IsWindows = platform == PlatformID.Win32NT || platform == PlatformID.Win32S
-                                                   || platform == PlatformID.Win32Windows;
+
+        IsWindows = platform == PlatformID.Win32NT
+                    || platform == PlatformID.Win32S
+                    || platform == PlatformID.Win32Windows;
         Is64Bit = Marshal.SizeOf (typeof (nint)) == 8;
         IsMono = Type.GetType ("Mono.Runtime") != null;
-        if (!IsMono) {
+
+        if (!IsMono)
+        {
             IsNetCore = Type.GetType ("System.MathF") != null;
         }
 #if GUICS
@@ -93,14 +103,21 @@ internal class UnmanagedLibrary {
     // and are tested for the file existing, otherwise the file is merely the name
     // of the shared library that we pass to dlopen
     //
-    public UnmanagedLibrary (string[] libraryPathAlternatives, bool isFullPath) {
-        if (isFullPath) {
+    public UnmanagedLibrary (string [] libraryPathAlternatives, bool isFullPath)
+    {
+        if (isFullPath)
+        {
             LibraryPath = FirstValidLibraryPath (libraryPathAlternatives);
             NativeLibraryHandle = PlatformSpecificLoadLibrary (LibraryPath);
-        } else {
-            foreach (string lib in libraryPathAlternatives) {
+        }
+        else
+        {
+            foreach (string lib in libraryPathAlternatives)
+            {
                 NativeLibraryHandle = PlatformSpecificLoadLibrary (lib);
-                if (NativeLibraryHandle != nint.Zero) {
+
+                if (NativeLibraryHandle != nint.Zero)
+                {
                     LibraryPath = lib;
 
                     break;
@@ -108,7 +125,8 @@ internal class UnmanagedLibrary {
             }
         }
 
-        if (NativeLibraryHandle == nint.Zero) {
+        if (NativeLibraryHandle == nint.Zero)
+        {
             throw new IOException ($"Error loading native library \"{string.Join (", ", libraryPathAlternatives)}\"");
         }
     }
@@ -116,10 +134,13 @@ internal class UnmanagedLibrary {
     /// <summary>Loads symbol in a platform specific way.</summary>
     /// <param name="symbolName"></param>
     /// <returns></returns>
-    public nint LoadSymbol (string symbolName) {
-        if (IsWindows) {
+    public nint LoadSymbol (string symbolName)
+    {
+        if (IsWindows)
+        {
             // See http://stackoverflow.com/questions/10473310 for background on this.
-            if (Is64Bit) {
+            if (Is64Bit)
+            {
                 return Windows.GetProcAddress (NativeLibraryHandle, symbolName);
             }
 
@@ -128,9 +149,13 @@ internal class UnmanagedLibrary {
             // many options - and if it takes a little bit longer to fail if we've really got the wrong
             // library, that's not a big problem. This is only called once per function in the native library.
             symbolName = "_" + symbolName + "@";
-            for (var stackSize = 0; stackSize < 128; stackSize += 4) {
+
+            for (var stackSize = 0; stackSize < 128; stackSize += 4)
+            {
                 nint candidate = Windows.GetProcAddress (NativeLibraryHandle, symbolName + stackSize);
-                if (candidate != nint.Zero) {
+
+                if (candidate != nint.Zero)
+                {
                     return candidate;
                 }
             }
@@ -139,19 +164,23 @@ internal class UnmanagedLibrary {
             return nint.Zero;
         }
 
-        if (IsLinux) {
-            if (IsMono) {
+        if (IsLinux)
+        {
+            if (IsMono)
+            {
                 return Mono.dlsym (NativeLibraryHandle, symbolName);
             }
 
-            if (IsNetCore) {
+            if (IsNetCore)
+            {
                 return CoreCLR.dlsym (NativeLibraryHandle, symbolName);
             }
 
             return Linux.dlsym (NativeLibraryHandle, symbolName);
         }
 
-        if (IsMacOSPlatform) {
+        if (IsMacOSPlatform)
+        {
             return MacOSX.dlsym (NativeLibraryHandle, symbolName);
         }
 
@@ -159,9 +188,12 @@ internal class UnmanagedLibrary {
     }
 
     public T GetNativeMethodDelegate<T> (string methodName)
-        where T : class {
+        where T : class
+    {
         nint ptr = LoadSymbol (methodName);
-        if (ptr == nint.Zero) {
+
+        if (ptr == nint.Zero)
+        {
             throw new MissingMethodException (string.Format ("The native method \"{0}\" does not exist", methodName));
         }
 
@@ -169,21 +201,28 @@ internal class UnmanagedLibrary {
     }
 
     /// <summary>Loads library in a platform specific way.</summary>
-    private static nint PlatformSpecificLoadLibrary (string libraryPath) {
-        if (IsWindows) {
+    private static nint PlatformSpecificLoadLibrary (string libraryPath)
+    {
+        if (IsWindows)
+        {
             return Windows.LoadLibrary (libraryPath);
         }
 
-        if (IsLinux) {
-            if (IsMono) {
+        if (IsLinux)
+        {
+            if (IsMono)
+            {
                 return Mono.dlopen (libraryPath, RTLD_GLOBAL + RTLD_LAZY);
             }
 
-            if (IsNetCore) {
-                try {
+            if (IsNetCore)
+            {
+                try
+                {
                     return CoreCLR.dlopen (libraryPath, RTLD_GLOBAL + RTLD_LAZY);
                 }
-                catch (Exception) {
+                catch (Exception)
+                {
                     IsNetCore = false;
                 }
             }
@@ -191,69 +230,76 @@ internal class UnmanagedLibrary {
             return Linux.dlopen (libraryPath, RTLD_GLOBAL + RTLD_LAZY);
         }
 
-        if (IsMacOSPlatform) {
+        if (IsMacOSPlatform)
+        {
             return MacOSX.dlopen (libraryPath, RTLD_GLOBAL + RTLD_LAZY);
         }
 
         throw new InvalidOperationException ("Unsupported platform.");
     }
 
-    private static string FirstValidLibraryPath (string[] libraryPathAlternatives) {
-        foreach (string path in libraryPathAlternatives) {
-            if (File.Exists (path)) {
+    private static string FirstValidLibraryPath (string [] libraryPathAlternatives)
+    {
+        foreach (string path in libraryPathAlternatives)
+        {
+            if (File.Exists (path))
+            {
                 return path;
             }
         }
 
         throw new FileNotFoundException (
-            string.Format (
-                "Error loading native library. Not found in any of the possible locations: {0}",
-                string.Join (",", libraryPathAlternatives)
-            )
-        );
+                                         string.Format (
+                                                        "Error loading native library. Not found in any of the possible locations: {0}",
+                                                        string.Join (",", libraryPathAlternatives)
+                                                       )
+                                        );
     }
 
-    private static class Windows {
+    private static class Windows
+    {
         [DllImport ("kernel32.dll")] internal static extern nint GetProcAddress (nint hModule, string procName);
         [DllImport ("kernel32.dll")] internal static extern nint LoadLibrary (string filename);
     }
 
-    private static class Linux {
+    private static class Linux
+    {
         [DllImport ("libdl.so")] internal static extern nint dlopen (string filename, int flags);
         [DllImport ("libdl.so")] internal static extern nint dlsym (nint handle, string symbol);
     }
 
-    private static class MacOSX {
+    private static class MacOSX
+    {
         [DllImport ("libSystem.dylib")] internal static extern nint dlopen (string filename, int flags);
         [DllImport ("libSystem.dylib")] internal static extern nint dlsym (nint handle, string symbol);
     }
 
     /// <summary>
-    ///     On Linux systems, using using dlopen and dlsym results in DllNotFoundException("libdl.so not found") if libc6-dev
-    ///     is not installed. As a workaround, we load symbols for dlopen and dlsym from the current process as on Linux Mono
-    ///     sure is linked against these symbols.
+    ///     On Linux systems, using using dlopen and dlsym results in DllNotFoundException("libdl.so not found") if libc6-dev is not installed. As a workaround, we load symbols for dlopen and dlsym from the current process as on Linux Mono sure is linked against these symbols.
     /// </summary>
-    private static class Mono {
+    private static class Mono
+    {
         [DllImport ("__Internal")] internal static extern nint dlopen (string filename, int flags);
         [DllImport ("__Internal")] internal static extern nint dlsym (nint handle, string symbol);
     }
 
     /// <summary>
-    ///     Similarly as for Mono on Linux, we load symbols for dlopen and dlsym from the "libcoreclr.so", to avoid the
-    ///     dependency on libc-dev Linux.
+    ///     Similarly as for Mono on Linux, we load symbols for dlopen and dlsym from the "libcoreclr.so", to avoid the dependency on libc-dev Linux.
     /// </summary>
-    private static class CoreCLR {
+    private static class CoreCLR
+    {
         // Custom resolver to support true single-file apps
         // (those which run directly from bundle; in-memory).
         //	 -1 on Unix means self-referencing binary (libcoreclr.so)
         //	 0 means fallback to CoreCLR's internal resolution
         // Note: meaning of -1 stay the same even for non-single-file form factors.
-        static CoreCLR () {
+        static CoreCLR ()
+        {
             NativeLibrary.SetDllImportResolver (
-                typeof (CoreCLR).Assembly,
-                (libraryName, assembly, searchPath) =>
-                    libraryName == "libcoreclr.so" ? -1 : nint.Zero
-            );
+                                                typeof (CoreCLR).Assembly,
+                                                (libraryName, assembly, searchPath) =>
+                                                    libraryName == "libcoreclr.so" ? -1 : nint.Zero
+                                               );
         }
 
         [DllImport ("libcoreclr.so")] internal static extern nint dlopen (string filename, int flags);

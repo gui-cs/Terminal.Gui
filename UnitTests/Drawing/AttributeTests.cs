@@ -2,16 +2,19 @@
 
 namespace Terminal.Gui.DrawingTests;
 
-public class AttributeTests {
+public class AttributeTests
+{
     [Fact]
-    public void Attribute_Is_Value_Type () {
+    public void Attribute_Is_Value_Type ()
+    {
         // prove that Color is a value type
         Assert.True (typeof (Attribute).IsValueType);
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void ColorAndColorNamesConstructor () {
+    public void ColorAndColorNamesConstructor ()
+    {
         // Arrange & Act
         var foregroundColor = new Color (0, 0, 255);
         var backgroundColorName = ColorName.Black;
@@ -24,7 +27,8 @@ public class AttributeTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void ColorConstructor () {
+    public void ColorConstructor ()
+    {
         // Arrange & Act
         var foregroundColor = new Color (0, 0, 255);
         var backgroundColor = new Color (255, 255, 255);
@@ -36,7 +40,8 @@ public class AttributeTests {
     }
 
     [Fact]
-    public void ColorNamesAndColorConstructor () {
+    public void ColorNamesAndColorConstructor ()
+    {
         // Arrange & Act
         var foregroundColorName = ColorName.BrightYellow;
         var backgroundColor = new Color (128, 128, 128);
@@ -48,7 +53,8 @@ public class AttributeTests {
     }
 
     [Fact]
-    public void ColorNamesConstructor () {
+    public void ColorNamesConstructor ()
+    {
         // Arrange & Act
         var attribute = new Attribute (ColorName.Blue);
 
@@ -58,7 +64,8 @@ public class AttributeTests {
     }
 
     [Fact]
-    public void Constructors_Construct () {
+    public void Constructors_Construct ()
+    {
         var driver = new FakeDriver ();
         driver.Init ();
 
@@ -101,7 +108,8 @@ public class AttributeTests {
     }
 
     [Fact]
-    public void DefaultConstructor () {
+    public void DefaultConstructor ()
+    {
         // Arrange & Act
         var attribute = new Attribute ();
 
@@ -113,7 +121,8 @@ public class AttributeTests {
     }
 
     [Fact]
-    public void EqualityOperator_ShouldReturnFalseForDifferentAttributes () {
+    public void EqualityOperator_ShouldReturnFalseForDifferentAttributes ()
+    {
         // Arrange
         var attribute1 = new Attribute (Color.Red, Color.Black);
         var attribute2 = new Attribute (Color.Blue, Color.Black);
@@ -123,7 +132,8 @@ public class AttributeTests {
     }
 
     [Fact]
-    public void EqualityOperator_ShouldReturnTrueForEqualAttributes () {
+    public void EqualityOperator_ShouldReturnTrueForEqualAttributes ()
+    {
         // Arrange
         var attribute1 = new Attribute (Color.Red, Color.Black);
         var attribute2 = new Attribute (Color.Red, Color.Black);
@@ -134,7 +144,8 @@ public class AttributeTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void Equals_Initialized () {
+    public void Equals_Initialized ()
+    {
         Assert.NotNull (Application.Driver);
 
         var attr1 = new Attribute (Color.Red, Color.Green);
@@ -145,7 +156,8 @@ public class AttributeTests {
     }
 
     [Fact]
-    public void Equals_NotInitialized () {
+    public void Equals_NotInitialized ()
+    {
         var attr1 = new Attribute (Color.Red, Color.Green);
         var attr2 = new Attribute (Color.Red, Color.Green);
 
@@ -154,7 +166,8 @@ public class AttributeTests {
     }
 
     [Fact]
-    public void Implicit_Assign () {
+    public void Implicit_Assign ()
+    {
         var driver = new FakeDriver ();
         driver.Init ();
 
@@ -178,7 +191,8 @@ public class AttributeTests {
     }
 
     [Fact]
-    public void InequalityOperator_ShouldReturnFalseForEqualAttributes () {
+    public void InequalityOperator_ShouldReturnFalseForEqualAttributes ()
+    {
         // Arrange
         var attribute1 = new Attribute (Color.Red, Color.Black);
         var attribute2 = new Attribute (Color.Red, Color.Black);
@@ -188,7 +202,8 @@ public class AttributeTests {
     }
 
     [Fact]
-    public void InequalityOperator_ShouldReturnTrueForDifferentAttributes () {
+    public void InequalityOperator_ShouldReturnTrueForDifferentAttributes ()
+    {
         // Arrange
         var attribute1 = new Attribute (Color.Red, Color.Black);
         var attribute2 = new Attribute (Color.Blue, Color.Black);
@@ -198,7 +213,8 @@ public class AttributeTests {
     }
 
     [Fact]
-    public void Make_Creates () {
+    public void Make_Creates ()
+    {
         var driver = new FakeDriver ();
         driver.Init ();
 
@@ -218,7 +234,8 @@ public class AttributeTests {
     }
 
     [Fact]
-    public void Make_Creates_NoDriver () {
+    public void Make_Creates_NoDriver ()
+    {
         var fg = new Color ();
         fg = new Color (Color.Red);
 
@@ -233,7 +250,8 @@ public class AttributeTests {
     }
 
     [Fact]
-    public void Make_SetsNotInitialized_NoDriver () {
+    public void Make_SetsNotInitialized_NoDriver ()
+    {
         var fg = new Color ();
         fg = new Color (Color.Red);
 
@@ -246,7 +264,8 @@ public class AttributeTests {
     }
 
     [Fact]
-    public void MakeColorAndColor_ForegroundAndBackgroundShouldMatchInput () {
+    public void MakeColorAndColor_ForegroundAndBackgroundShouldMatchInput ()
+    {
         // Arrange
         var foregroundColor = new Color (0, 0, 255);
         var backgroundColor = new Color (255, 255, 255);
@@ -260,7 +279,8 @@ public class AttributeTests {
     }
 
     [Fact]
-    public void MakeColorAndColorNames_ForegroundAndBackgroundShouldMatchInput () {
+    public void MakeColorAndColorNames_ForegroundAndBackgroundShouldMatchInput ()
+    {
         // Arrange
         var foregroundColor = new Color (255, 0);
         var backgroundColorName = ColorName.White;
@@ -274,7 +294,8 @@ public class AttributeTests {
     }
 
     [Fact]
-    public void MakeColorNamesAndColor_ForegroundAndBackgroundShouldMatchInput () {
+    public void MakeColorNamesAndColor_ForegroundAndBackgroundShouldMatchInput ()
+    {
         // Arrange
         var foregroundColorName = ColorName.Green;
         var backgroundColor = new Color (128, 128, 128);
@@ -288,7 +309,8 @@ public class AttributeTests {
     }
 
     [Fact]
-    public void MakeColorNamesAndColorNames_ForegroundAndBackgroundShouldMatchInput () {
+    public void MakeColorNamesAndColorNames_ForegroundAndBackgroundShouldMatchInput ()
+    {
         // Arrange
         var foregroundColorName = ColorName.BrightYellow;
         var backgroundColorName = ColorName.Black;
@@ -303,7 +325,8 @@ public class AttributeTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void NotEquals_Initialized () {
+    public void NotEquals_Initialized ()
+    {
         var attr1 = new Attribute (Color.Red, Color.Green);
         var attr2 = new Attribute (Color.Green, Color.Red);
 
@@ -312,7 +335,8 @@ public class AttributeTests {
     }
 
     [Fact]
-    public void NotEquals_NotInitialized () {
+    public void NotEquals_NotInitialized ()
+    {
         var attr1 = new Attribute (Color.Red, Color.Green);
         var attr2 = new Attribute (Color.Green, Color.Red);
 
@@ -321,7 +345,8 @@ public class AttributeTests {
     }
 
     [Fact]
-    public void PlatformColorConstructor () {
+    public void PlatformColorConstructor ()
+    {
         // Arrange & Act
         var attribute = new Attribute (42);
 
@@ -333,7 +358,8 @@ public class AttributeTests {
     }
 
     [Fact]
-    public void ToString_ShouldReturnFormattedStringWithForegroundAndBackground () {
+    public void ToString_ShouldReturnFormattedStringWithForegroundAndBackground ()
+    {
         // Arrange
         var foregroundColor = new Color (0, 0, 255);
         var backgroundColor = new Color (255, 255, 255);

@@ -3,8 +3,10 @@
 namespace Terminal.Gui.ApplicationTests;
 
 /// <summary>These tests focus on Application.RunState and the various ways it can be changed.</summary>
-public class RunStateTests {
-    public RunStateTests () {
+public class RunStateTests
+{
+    public RunStateTests ()
+    {
 #if DEBUG_IDISPOSABLE
         Responder.Instances.Clear ();
         RunState.Instances.Clear ();
@@ -12,7 +14,8 @@ public class RunStateTests {
     }
 
     [Fact]
-    public void Begin_End_Cleans_Up_RunState () {
+    public void Begin_End_Cleans_Up_RunState ()
+    {
         // Setup Mock driver
         Init ();
 
@@ -42,7 +45,8 @@ public class RunStateTests {
     }
 
     [Fact]
-    public void Dispose_Cleans_Up_RunState () {
+    public void Dispose_Cleans_Up_RunState ()
+    {
         var rs = new RunState (null);
         Assert.NotNull (rs);
 
@@ -68,7 +72,8 @@ public class RunStateTests {
     }
 
     [Fact]
-    public void New_Creates_RunState () {
+    public void New_Creates_RunState ()
+    {
         var rs = new RunState (null);
         Assert.Null (rs.Toplevel);
 
@@ -77,19 +82,22 @@ public class RunStateTests {
         Assert.Equal (top, rs.Toplevel);
     }
 
-    private void Init () {
+    private void Init ()
+    {
         Application.Init (new FakeDriver ());
         Assert.NotNull (Application.Driver);
         Assert.NotNull (Application.MainLoop);
         Assert.NotNull (SynchronizationContext.Current);
     }
 
-    private void Shutdown () {
+    private void Shutdown ()
+    {
         Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
 
         // Validate there are no outstanding RunState-based instances left
-        foreach (RunState inst in RunState.Instances) {
+        foreach (RunState inst in RunState.Instances)
+        {
             Assert.True (inst.WasDisposed);
         }
 #endif

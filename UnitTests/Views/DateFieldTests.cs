@@ -2,10 +2,12 @@
 
 namespace Terminal.Gui.ViewsTests;
 
-public class DateFieldTests {
+public class DateFieldTests
+{
     [Fact]
     [TestDate]
-    public void Constructors_Defaults () {
+    public void Constructors_Defaults ()
+    {
         var df = new DateField ();
         Assert.Equal (DateTime.MinValue, df.Date);
         Assert.Equal (1, df.CursorPosition);
@@ -29,7 +31,8 @@ public class DateFieldTests {
     [Fact]
     [TestDate]
     [AutoInitShutdown]
-    public void Copy_Paste () {
+    public void Copy_Paste ()
+    {
         var df1 = new DateField (DateTime.Parse ("12/12/1971"));
         var df2 = new DateField (DateTime.Parse ("12/31/2023"));
 
@@ -50,7 +53,8 @@ public class DateFieldTests {
 
     [Fact]
     [TestDate]
-    public void CursorPosition_Min_Is_Always_One_Max_Is_Always_Max_Format () {
+    public void CursorPosition_Min_Is_Always_One_Max_Is_Always_Max_Format ()
+    {
         var df = new DateField ();
         Assert.Equal (1, df.CursorPosition);
         df.CursorPosition = 0;
@@ -61,7 +65,8 @@ public class DateFieldTests {
 
     [Fact]
     [TestDate]
-    public void CursorPosition_Min_Is_Always_One_Max_Is_Always_Max_Format_After_Selection () {
+    public void CursorPosition_Min_Is_Always_One_Max_Is_Always_Max_Format_After_Selection ()
+    {
         var df = new DateField ();
 
         // Start selection
@@ -88,7 +93,8 @@ public class DateFieldTests {
 
     [Fact]
     [TestDate]
-    public void Date_Start_From_01_01_0001_And_End_At_12_31_9999 () {
+    public void Date_Start_From_01_01_0001_And_End_At_12_31_9999 ()
+    {
         var df = new DateField (DateTime.Parse ("01/01/0001"));
         Assert.Equal (" 01/01/0001", df.Text);
         df.Date = DateTime.Parse ("12/31/9999");
@@ -97,7 +103,8 @@ public class DateFieldTests {
 
     [Fact]
     [TestDate]
-    public void KeyBindings_Command () {
+    public void KeyBindings_Command ()
+    {
         var df = new DateField (DateTime.Parse ("12/12/1971")) { ReadOnly = true };
         Assert.True (df.NewKeyDownEvent (new Key (KeyCode.Delete)));
         Assert.Equal (" 12/12/1971", df.Text);
@@ -140,8 +147,10 @@ public class DateFieldTests {
 
     [Fact]
     [TestDate]
-    public void Typing_With_Selection_Normalize_Format () {
-        var df = new DateField (DateTime.Parse ("12/12/1971")) {
+    public void Typing_With_Selection_Normalize_Format ()
+    {
+        var df = new DateField (DateTime.Parse ("12/12/1971"))
+        {
             // Start selection at before the first separator /
             CursorPosition = 2
         };
@@ -161,22 +170,30 @@ public class DateFieldTests {
     }
 
     [Fact]
-    public void Using_All_Culture_StandardizeDateFormat () {
+    public void Using_All_Culture_StandardizeDateFormat ()
+    {
         CultureInfo cultureBackup = CultureInfo.CurrentCulture;
 
         DateTime date = DateTime.Parse ("1/1/1971");
-        foreach (CultureInfo culture in CultureInfo.GetCultures (CultureTypes.AllCultures)) {
+
+        foreach (CultureInfo culture in CultureInfo.GetCultures (CultureTypes.AllCultures))
+        {
             CultureInfo.CurrentCulture = culture;
             string separator = culture.DateTimeFormat.DateSeparator.Trim ();
-            if (separator.Length > 1 && separator.Contains ('\u200f')) {
+
+            if (separator.Length > 1 && separator.Contains ('\u200f'))
+            {
                 separator = separator.Replace ("\u200f", "");
             }
 
             string format = culture.DateTimeFormat.ShortDatePattern;
             var df = new DateField (date);
+
             if ((!culture.TextInfo.IsRightToLeft || (culture.TextInfo.IsRightToLeft && !df.Text.Contains ('\u200f')))
-                && (format.StartsWith ('d') || format.StartsWith ('M'))) {
-                switch (culture.Name) {
+                && (format.StartsWith ('d') || format.StartsWith ('M')))
+            {
+                switch (culture.Name)
+                {
                     case "ar-SA":
                         Assert.Equal ($" 04{separator}11{separator}1390", df.Text);
 
@@ -191,11 +208,16 @@ public class DateFieldTests {
 
                         break;
                 }
-            } else if (culture.TextInfo.IsRightToLeft) {
-                if (df.Text.Contains ('\u200f')) {
+            }
+            else if (culture.TextInfo.IsRightToLeft)
+            {
+                if (df.Text.Contains ('\u200f'))
+                {
                     // It's a Unicode Character (U+200F) - Right-to-Left Mark (RLM)
                     Assert.True (df.Text.Contains ('\u200f'));
-                    switch (culture.Name) {
+
+                    switch (culture.Name)
+                    {
                         case "ar-SA":
                             Assert.Equal ($" 04‏{separator}11‏{separator}1390", df.Text);
 
@@ -205,8 +227,11 @@ public class DateFieldTests {
 
                             break;
                     }
-                } else {
-                    switch (culture.Name) {
+                }
+                else
+                {
+                    switch (culture.Name)
+                    {
                         case "ckb-IR":
                         case "fa":
                         case "fa-AF":
@@ -228,8 +253,11 @@ public class DateFieldTests {
                             break;
                     }
                 }
-            } else {
-                switch (culture.Name) {
+            }
+            else
+            {
+                switch (culture.Name)
+                {
                     default:
                         Assert.Equal ($" 1971{separator}01{separator}01", df.Text);
 
@@ -242,10 +270,13 @@ public class DateFieldTests {
     }
 
     [Fact]
-    public void Using_Pt_Culture () {
+    public void Using_Pt_Culture ()
+    {
         CultureInfo cultureBackup = CultureInfo.CurrentCulture;
         CultureInfo.CurrentCulture = new CultureInfo ("pt-PT");
-        var df = new DateField (DateTime.Parse ("12/12/1971")) {
+
+        var df = new DateField (DateTime.Parse ("12/12/1971"))
+        {
             // Move to the first 2
             CursorPosition = 2
         };

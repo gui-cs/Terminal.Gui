@@ -2,9 +2,11 @@
 namespace Terminal.Gui;
 
 /// <summary>View for rendering graphs (bar, scatter, etc...).</summary>
-public class GraphView : View {
+public class GraphView : View
+{
     /// <summary>Creates a new graph with a 1 to 1 graph space with absolute layout.</summary>
-    public GraphView () {
+    public GraphView ()
+    {
         CanFocus = true;
 
         AxisX = new HorizontalAxis ();
@@ -12,53 +14,64 @@ public class GraphView : View {
 
         // Things this view knows how to do
         AddCommand (
-            Command.ScrollUp,
-            () => {
-                Scroll (0, CellSize.Y);
+                    Command.ScrollUp,
+                    () =>
+                    {
+                        Scroll (0, CellSize.Y);
 
-                return true;
-            }
-        );
+                        return true;
+                    }
+                   );
+
         AddCommand (
-            Command.ScrollDown,
-            () => {
-                Scroll (0, -CellSize.Y);
+                    Command.ScrollDown,
+                    () =>
+                    {
+                        Scroll (0, -CellSize.Y);
 
-                return true;
-            }
-        );
+                        return true;
+                    }
+                   );
+
         AddCommand (
-            Command.ScrollRight,
-            () => {
-                Scroll (CellSize.X, 0);
+                    Command.ScrollRight,
+                    () =>
+                    {
+                        Scroll (CellSize.X, 0);
 
-                return true;
-            }
-        );
+                        return true;
+                    }
+                   );
+
         AddCommand (
-            Command.ScrollLeft,
-            () => {
-                Scroll (-CellSize.X, 0);
+                    Command.ScrollLeft,
+                    () =>
+                    {
+                        Scroll (-CellSize.X, 0);
 
-                return true;
-            }
-        );
+                        return true;
+                    }
+                   );
+
         AddCommand (
-            Command.PageUp,
-            () => {
-                PageUp ();
+                    Command.PageUp,
+                    () =>
+                    {
+                        PageUp ();
 
-                return true;
-            }
-        );
+                        return true;
+                    }
+                   );
+
         AddCommand (
-            Command.PageDown,
-            () => {
-                PageDown ();
+                    Command.PageDown,
+                    () =>
+                    {
+                        PageDown ();
 
-                return true;
-            }
-        );
+                        return true;
+                    }
+                   );
 
         KeyBindings.Add (KeyCode.CursorRight, Command.ScrollRight);
         KeyBindings.Add (KeyCode.CursorLeft, Command.ScrollLeft);
@@ -70,48 +83,42 @@ public class GraphView : View {
         //KeyBindings.Add (Key.PageDown, Command.PageDown);
     }
 
-    /// <summary>The color of the background of the graph and axis/labels.</summary>
-    public Attribute? GraphColor { get; set; }
+    /// <summary>Elements drawn into graph after series have been drawn e.g. Legends etc.</summary>
+    public List<IAnnotation> Annotations { get; } = new ();
 
     /// <summary>Horizontal axis.</summary>
     /// <value></value>
     public HorizontalAxis AxisX { get; set; }
 
-    /// <summary>Elements drawn into graph after series have been drawn e.g. Legends etc.</summary>
-    public List<IAnnotation> Annotations { get; } = new ();
+    /// <summary>Vertical axis.</summary>
+    /// <value></value>
+    public VerticalAxis AxisY { get; set; }
 
-    /// <summary>Collection of data series that are rendered in the graph.</summary>
-    public List<ISeries> Series { get; } = new ();
-
-    /// <summary>
-    ///     Translates console width/height into graph space. Defaults to 1 row/col of console space being 1 unit of graph
-    ///     space.
-    /// </summary>
+    /// <summary>Translates console width/height into graph space. Defaults to 1 row/col of console space being 1 unit of graph space.</summary>
     /// <returns></returns>
     public PointF CellSize { get; set; } = new (1, 1);
 
-    /// <summary>
-    ///     The graph space position of the bottom left of the graph. Changing this scrolls the viewport around in the
-    ///     graph.
-    /// </summary>
-    /// <value></value>
-    public PointF ScrollOffset { get; set; } = new (0, 0);
+    /// <summary>The color of the background of the graph and axis/labels.</summary>
+    public Attribute? GraphColor { get; set; }
 
     /// <summary>
-    ///     Amount of space to leave on bottom of the graph. Graph content (<see cref="Series"/>) will not be rendered in
-    ///     margins but axis labels may be. Use <see cref="Padding"/> to add a margin outside of the GraphView.
+    ///     Amount of space to leave on bottom of the graph. Graph content (<see cref="Series"/>) will not be rendered in margins but axis labels may be. Use
+    ///     <see cref="Padding"/> to add a margin outside of the GraphView.
     /// </summary>
     public uint MarginBottom { get; set; }
 
     /// <summary>
-    ///     Amount of space to leave on left of the graph. Graph content (<see cref="Series"/>) will not be rendered in margins
-    ///     but axis labels may be. Use <see cref="Padding"/> to add a margin outside of the GraphView.
+    ///     Amount of space to leave on left of the graph. Graph content (<see cref="Series"/>) will not be rendered in margins but axis labels may be. Use
+    ///     <see cref="Padding"/> to add a margin outside of the GraphView.
     /// </summary>
     public uint MarginLeft { get; set; }
 
-    /// <summary>Vertical axis.</summary>
+    /// <summary>The graph space position of the bottom left of the graph. Changing this scrolls the viewport around in the graph.</summary>
     /// <value></value>
-    public VerticalAxis AxisY { get; set; }
+    public PointF ScrollOffset { get; set; } = new (0, 0);
+
+    /// <summary>Collection of data series that are rendered in the graph.</summary>
+    public List<ISeries> Series { get; } = new ();
 
     #region Bresenham's line algorithm
 
@@ -121,8 +128,10 @@ public class GraphView : View {
     /// <param name="start"></param>
     /// <param name="end"></param>
     /// <param name="symbol">The symbol to use for the line</param>
-    public void DrawLine (Point start, Point end, Rune symbol) {
-        if (Equals (start, end)) {
+    public void DrawLine (Point start, Point end, Rune symbol)
+    {
+        if (Equals (start, end))
+        {
             return;
         }
 
@@ -135,20 +144,25 @@ public class GraphView : View {
         int dy = Math.Abs (y1 - y0), sy = y0 < y1 ? 1 : -1;
         int err = (dx > dy ? dx : -dy) / 2, e2;
 
-        while (true) {
+        while (true)
+        {
             AddRune (x0, y0, symbol);
 
-            if (x0 == x1 && y0 == y1) {
+            if (x0 == x1 && y0 == y1)
+            {
                 break;
             }
 
             e2 = err;
-            if (e2 > -dx) {
+
+            if (e2 > -dx)
+            {
                 err -= dy;
                 x0 += sx;
             }
 
-            if (e2 < dy) {
+            if (e2 < dy)
+            {
                 err += dx;
                 y0 += sy;
             }
@@ -159,23 +173,26 @@ public class GraphView : View {
 
     /// <summary>Calculates the screen location for a given point in graph space. Bear in mind these may be off screen.</summary>
     /// <param name="location">
-    ///     Point in graph space that may or may not be represented in the visible area of graph currently presented.  E.g. 0,0
-    ///     for origin.
+    ///     Point in graph space that may or may not be represented in the visible area of graph currently presented.  E.g. 0,0 for origin.
     /// </param>
     /// <returns>
-    ///     Screen position (Column/Row) which would be used to render the graph <paramref name="location"/>. Note that this
-    ///     can be outside the current content area of the view.
+    ///     Screen position (Column/Row) which would be used to render the graph <paramref name="location"/>. Note that this can be outside the current content area of the view.
     /// </returns>
-    public Point GraphSpaceToScreen (PointF location) => new (
-        (int)((location.X - ScrollOffset.X) / CellSize.X) + (int)MarginLeft,
+    public Point GraphSpaceToScreen (PointF location)
+    {
+        return new Point (
+                          (int)((location.X - ScrollOffset.X) / CellSize.X) + (int)MarginLeft,
 
-        // screen coordinates are top down while graph coordinates are bottom up
-        Bounds.Height - 1 - (int)MarginBottom - (int)((location.Y - ScrollOffset.Y) / CellSize.Y)
-    );
+                          // screen coordinates are top down while graph coordinates are bottom up
+                          Bounds.Height - 1 - (int)MarginBottom - (int)((location.Y - ScrollOffset.Y) / CellSize.Y)
+                         );
+    }
 
     ///<inheritdoc/>
-    public override void OnDrawContent (Rect contentArea) {
-        if (CellSize.X == 0 || CellSize.Y == 0) {
+    public override void OnDrawContent (Rect contentArea)
+    {
+        if (CellSize.X == 0 || CellSize.Y == 0)
+        {
             throw new Exception ($"{nameof (CellSize)} cannot be 0");
         }
 
@@ -184,13 +201,15 @@ public class GraphView : View {
         Move (0, 0);
 
         // clear all old content
-        for (var i = 0; i < Bounds.Height; i++) {
+        for (var i = 0; i < Bounds.Height; i++)
+        {
             Move (0, i);
             Driver.AddStr (new string (' ', Bounds.Width));
         }
 
         // If there is no data do not display a graph
-        if (!Series.Any () && !Annotations.Any ()) {
+        if (!Series.Any () && !Annotations.Any ())
+        {
             return;
         }
 
@@ -199,12 +218,14 @@ public class GraphView : View {
         int graphScreenHeight = Bounds.Height - (int)MarginBottom;
 
         // if the margins take up the full draw bounds don't render
-        if (graphScreenWidth < 0 || graphScreenHeight < 0) {
+        if (graphScreenWidth < 0 || graphScreenHeight < 0)
+        {
             return;
         }
 
         // Draw 'before' annotations
-        foreach (IAnnotation a in Annotations.ToArray ().Where (a => a.BeforeSeries)) {
+        foreach (IAnnotation a in Annotations.ToArray ().Where (a => a.BeforeSeries))
+        {
             a.Render (this);
         }
 
@@ -219,7 +240,8 @@ public class GraphView : View {
         // Draw a cross where the two axis cross
         var axisIntersection = new Point (AxisY.GetAxisXPosition (this), AxisX.GetAxisYPosition (this));
 
-        if (AxisX.Visible && AxisY.Visible) {
+        if (AxisX.Visible && AxisY.Visible)
+        {
             Move (axisIntersection.X, axisIntersection.Y);
             AddRune (axisIntersection.X, axisIntersection.Y, (Rune)'\u253C');
         }
@@ -230,7 +252,8 @@ public class GraphView : View {
 
         RectangleF graphSpace = ScreenToGraphSpace (drawBounds);
 
-        foreach (ISeries s in Series.ToArray ()) {
+        foreach (ISeries s in Series.ToArray ())
+        {
             s.DrawSeries (this, drawBounds, graphSpace);
 
             // If a series changes the graph color reset it
@@ -240,14 +263,16 @@ public class GraphView : View {
         SetDriverColorToGraphColor ();
 
         // Draw 'after' annotations
-        foreach (IAnnotation a in Annotations.ToArray ().Where (a => !a.BeforeSeries)) {
+        foreach (IAnnotation a in Annotations.ToArray ().Where (a => !a.BeforeSeries))
+        {
             a.Render (this);
         }
     }
 
     /// <inheritdoc/>
     /// <remarks>Also ensures that cursor is invisible after entering the <see cref="GraphView"/>.</remarks>
-    public override bool OnEnter (View view) {
+    public override bool OnEnter (View view)
+    {
         Driver.SetCursorVisibility (CursorVisibility.Invisible);
 
         return base.OnEnter (view);
@@ -263,7 +288,8 @@ public class GraphView : View {
     ///     Clears all settings configured on the graph and resets all properties to default values ( <see cref="CellSize"/>,
     ///     <see cref="ScrollOffset"/> etc) .
     /// </summary>
-    public void Reset () {
+    public void Reset ()
+    {
         ScrollOffset = new PointF (0, 0);
         CellSize = new PointF (1, 1);
         AxisX.Reset ();
@@ -278,17 +304,21 @@ public class GraphView : View {
     /// <param name="col"></param>
     /// <param name="row"></param>
     /// <returns></returns>
-    public RectangleF ScreenToGraphSpace (int col, int row) => new (
-        ScrollOffset.X + (col - MarginLeft) * CellSize.X,
-        ScrollOffset.Y + (Bounds.Height - (row + MarginBottom + 1)) * CellSize.Y,
-        CellSize.X,
-        CellSize.Y
-    );
+    public RectangleF ScreenToGraphSpace (int col, int row)
+    {
+        return new RectangleF (
+                               ScrollOffset.X + (col - MarginLeft) * CellSize.X,
+                               ScrollOffset.Y + (Bounds.Height - (row + MarginBottom + 1)) * CellSize.Y,
+                               CellSize.X,
+                               CellSize.Y
+                              );
+    }
 
     /// <summary>Returns the section of the graph that is represented by the screen area.</summary>
     /// <param name="screenArea"></param>
     /// <returns></returns>
-    public RectangleF ScreenToGraphSpace (Rect screenArea) {
+    public RectangleF ScreenToGraphSpace (Rect screenArea)
+    {
         // get position of the bottom left
         RectangleF pos = ScreenToGraphSpace (screenArea.Left, screenArea.Bottom - 1);
 
@@ -296,16 +326,16 @@ public class GraphView : View {
     }
 
     /// <summary>
-    ///     Scrolls the view by a given number of units in graph space. See <see cref="CellSize"/> to translate this into
-    ///     rows/cols.
+    ///     Scrolls the view by a given number of units in graph space. See <see cref="CellSize"/> to translate this into rows/cols.
     /// </summary>
     /// <param name="offsetX"></param>
     /// <param name="offsetY"></param>
-    public void Scroll (float offsetX, float offsetY) {
+    public void Scroll (float offsetX, float offsetY)
+    {
         ScrollOffset = new PointF (
-            ScrollOffset.X + offsetX,
-            ScrollOffset.Y + offsetY
-        );
+                                   ScrollOffset.X + offsetX,
+                                   ScrollOffset.Y + offsetY
+                                  );
 
         SetNeedsDisplay ();
     }

@@ -1,18 +1,19 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>Describes a mouse event over a specific <see cref="Tab"/> in a <see cref="TabView"/>.</summary>
-public class TabMouseEventArgs : EventArgs {
+public class TabMouseEventArgs : EventArgs
+{
     /// <summary>Creates a new instance of the <see cref="TabMouseEventArgs"/> class.</summary>
     /// <param name="tab"><see cref="Tab"/> that the mouse was over when the event occurred.</param>
     /// <param name="mouseEvent">The mouse activity being reported</param>
-    public TabMouseEventArgs (Tab tab, MouseEvent mouseEvent) {
+    public TabMouseEventArgs (Tab tab, MouseEvent mouseEvent)
+    {
         Tab = tab;
         MouseEvent = mouseEvent;
     }
 
     /// <summary>
-    ///     Gets the actual mouse event.  Use <see cref="MouseEvent.Handled"/> to cancel this event and perform custom behavior
-    ///     (e.g. show a context menu).
+    ///     Gets the actual mouse event.  Use <see cref="MouseEvent.Handled"/> to cancel this event and perform custom behavior (e.g. show a context menu).
     /// </summary>
     public MouseEvent MouseEvent { get; }
 

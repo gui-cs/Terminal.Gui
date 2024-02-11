@@ -8,13 +8,14 @@ namespace Terminal.Gui;
 
 /// <summary>Unix main loop, suitable for using on Posix systems</summary>
 /// <remarks>
-///     In addition to the general functions of the MainLoop, the Unix version can watch file descriptors using the
-///     AddWatch methods.
+///     In addition to the general functions of the MainLoop, the Unix version can watch file descriptors using the AddWatch methods.
 /// </remarks>
-internal class UnixMainLoop : IMainLoopDriver {
+internal class UnixMainLoop : IMainLoopDriver
+{
     /// <summary>Condition on which to wake up from file descriptor activity.  These match the Linux/BSD poll definitions.</summary>
     [Flags]
-    public enum Condition : short {
+    public enum Condition : short
+    {
         /// <summary>There is data to read</summary>
         PollIn = 1,
 
@@ -34,66 +35,81 @@ internal class UnixMainLoop : IMainLoopDriver {
         PollNval = 32
     }
 
-    public UnixMainLoop (ConsoleDriver consoleDriver = null) {
+    public const int KEY_RESIZE = unchecked ((int)0xffffffffffffffff);
+    private static readonly nint _ignore = Marshal.AllocHGlobal (1);
+
+    public UnixMainLoop (ConsoleDriver consoleDriver = null)
+    {
         // UnixDriver doesn't use the consoleDriver parameter, but the WindowsDriver does.
         _cursesDriver = (CursesDriver)Application.Driver;
     }
 
-    public const int KEY_RESIZE = unchecked ((int)0xffffffffffffffff);
-    private static readonly nint _ignore = Marshal.AllocHGlobal (1);
     private readonly CursesDriver _cursesDriver;
     private readonly Dictionary<int, Watch> _descriptorWatchers = new ();
-    private readonly int[] _wakeUpPipes = new int [2];
-    private bool _pollDirty = true;
-    private bool _winChanged;
+    private readonly int [] _wakeUpPipes = new int [2];
     private MainLoop _mainLoop;
-    private Pollfd[] _pollMap;
+    private bool _pollDirty = true;
+    private Pollfd [] _pollMap;
+    private bool _winChanged;
 
-    void IMainLoopDriver.Wakeup () {
-        if (!ConsoleDriver.RunningUnitTests) {
-            write (_wakeUpPipes[1], _ignore, 1);
+    void IMainLoopDriver.Wakeup ()
+    {
+        if (!ConsoleDriver.RunningUnitTests)
+        {
+            write (_wakeUpPipes [1], _ignore, 1);
         }
     }
 
-    void IMainLoopDriver.Setup (MainLoop mainLoop) {
+    void IMainLoopDriver.Setup (MainLoop mainLoop)
+    {
         _mainLoop = mainLoop;
-        if (ConsoleDriver.RunningUnitTests) {
+
+        if (ConsoleDriver.RunningUnitTests)
+        {
             return;
         }
 
-        try {
+        try
+        {
             pipe (_wakeUpPipes);
-            AddWatch (
-                _wakeUpPipes[0],
-                Condition.PollIn,
-                ml => {
-                    read (_wakeUpPipes[0], _ignore, 1);
 
-                    return true;
-                }
-            );
+            AddWatch (
+                      _wakeUpPipes [0],
+                      Condition.PollIn,
+                      ml =>
+                      {
+                          read (_wakeUpPipes [0], _ignore, 1);
+
+                          return true;
+                      }
+                     );
         }
-        catch (DllNotFoundException e) {
+        catch (DllNotFoundException e)
+        {
             throw new NotSupportedException ("libc not found", e);
         }
     }
 
-    bool IMainLoopDriver.EventsPending () {
+    bool IMainLoopDriver.EventsPending ()
+    {
         UpdatePollMap ();
 
         bool checkTimersResult = _mainLoop.CheckTimersAndIdleHandlers (out int pollTimeout);
 
         int n = poll (_pollMap, (uint)_pollMap.Length, pollTimeout);
 
-        if (n == KEY_RESIZE) {
+        if (n == KEY_RESIZE)
+        {
             _winChanged = true;
         }
 
         return checkTimersResult || n >= KEY_RESIZE;
     }
 
-    void IMainLoopDriver.Iteration () {
-        if (_winChanged) {
+    void IMainLoopDriver.Iteration ()
+    {
+        if (_winChanged)
+        {
             _winChanged = false;
             _cursesDriver.ProcessInput ();
 
@@ -101,28 +117,34 @@ internal class UnixMainLoop : IMainLoopDriver {
             _cursesDriver.ProcessWinChange ();
         }
 
-        if (_pollMap == null) {
+        if (_pollMap == null)
+        {
             return;
         }
 
-        foreach (Pollfd p in _pollMap) {
+        foreach (Pollfd p in _pollMap)
+        {
             Watch watch;
 
-            if (p.revents == 0) {
+            if (p.revents == 0)
+            {
                 continue;
             }
 
-            if (!_descriptorWatchers.TryGetValue (p.fd, out watch)) {
+            if (!_descriptorWatchers.TryGetValue (p.fd, out watch))
+            {
                 continue;
             }
 
-            if (!watch.Callback (_mainLoop)) {
+            if (!watch.Callback (_mainLoop))
+            {
                 _descriptorWatchers.Remove (p.fd);
             }
         }
     }
 
-    void IMainLoopDriver.TearDown () {
+    void IMainLoopDriver.TearDown ()
+    {
         _descriptorWatchers?.Clear ();
 
         _mainLoop = null;
@@ -130,17 +152,17 @@ internal class UnixMainLoop : IMainLoopDriver {
 
     /// <summary>Watches a file descriptor for activity.</summary>
     /// <remarks>
-    ///     When the condition is met, the provided callback is invoked.  If the callback returns false, the watch is
-    ///     automatically removed. The return value is a token that represents this watch, you can use this token to remove the
-    ///     watch by calling RemoveWatch.
+    ///     When the condition is met, the provided callback is invoked.  If the callback returns false, the watch is automatically removed. The return value is a token that represents this watch, you can use this token to remove the watch by calling RemoveWatch.
     /// </remarks>
-    internal object AddWatch (int fileDescriptor, Condition condition, Func<MainLoop, bool> callback) {
-        if (callback == null) {
+    internal object AddWatch (int fileDescriptor, Condition condition, Func<MainLoop, bool> callback)
+    {
+        if (callback == null)
+        {
             throw new ArgumentNullException (nameof (callback));
         }
 
         var watch = new Watch { Condition = condition, Callback = callback, File = fileDescriptor };
-        _descriptorWatchers[fileDescriptor] = watch;
+        _descriptorWatchers [fileDescriptor] = watch;
         _pollDirty = true;
 
         return watch;
@@ -148,9 +170,12 @@ internal class UnixMainLoop : IMainLoopDriver {
 
     /// <summary>Removes an active watch from the mainloop.</summary>
     /// <remarks>The token parameter is the value returned from AddWatch</remarks>
-    internal void RemoveWatch (object token) {
-        if (!ConsoleDriver.RunningUnitTests) {
-            if (token is not Watch watch) {
+    internal void RemoveWatch (object token)
+    {
+        if (!ConsoleDriver.RunningUnitTests)
+        {
+            if (token is not Watch watch)
+            {
                 return;
             }
 
@@ -158,12 +183,14 @@ internal class UnixMainLoop : IMainLoopDriver {
         }
     }
 
-    [DllImport ("libc")] private static extern int pipe ([In] [Out] int[] pipes);
-    [DllImport ("libc")] private static extern int poll ([In] [Out] Pollfd[] ufds, uint nfds, int timeout);
+    [DllImport ("libc")] private static extern int pipe ([In] [Out] int [] pipes);
+    [DllImport ("libc")] private static extern int poll ([In] [Out] Pollfd [] ufds, uint nfds, int timeout);
     [DllImport ("libc")] private static extern int read (int fd, nint buf, nint n);
 
-    private void UpdatePollMap () {
-        if (!_pollDirty) {
+    private void UpdatePollMap ()
+    {
+        if (!_pollDirty)
+        {
             return;
         }
 
@@ -171,9 +198,11 @@ internal class UnixMainLoop : IMainLoopDriver {
 
         _pollMap = new Pollfd [_descriptorWatchers.Count];
         var i = 0;
-        foreach (int fd in _descriptorWatchers.Keys) {
-            _pollMap[i].fd = fd;
-            _pollMap[i].events = (short)_descriptorWatchers[fd].Condition;
+
+        foreach (int fd in _descriptorWatchers.Keys)
+        {
+            _pollMap [i].fd = fd;
+            _pollMap [i].events = (short)_descriptorWatchers [fd].Condition;
             i++;
         }
     }
@@ -181,15 +210,17 @@ internal class UnixMainLoop : IMainLoopDriver {
     [DllImport ("libc")] private static extern int write (int fd, nint buf, nint n);
 
     [StructLayout (LayoutKind.Sequential)]
-    private struct Pollfd {
+    private struct Pollfd
+    {
         public int fd;
         public short events;
         public readonly short revents;
     }
 
-    private class Watch {
-        public Condition Condition;
+    private class Watch
+    {
         public Func<MainLoop, bool> Callback;
+        public Condition Condition;
         public int File;
     }
 }

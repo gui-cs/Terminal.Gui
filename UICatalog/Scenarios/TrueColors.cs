@@ -5,20 +5,24 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("True Colors", "Demonstration of true color support.")]
 [ScenarioCategory ("Colors")]
-public class TrueColors : Scenario {
-    public override void Setup () {
+public class TrueColors : Scenario
+{
+    public override void Setup ()
+    {
         var x = 2;
         var y = 1;
 
         bool canTrueColor = Application.Driver.SupportsTrueColor;
 
-        var lblDriverName = new Label {
+        var lblDriverName = new Label
+        {
             X = x, Y = y++, Text = $"Current driver is {Application.Driver.GetType ().Name}"
         };
         Win.Add (lblDriverName);
         y++;
 
-        var cbSupportsTrueColor = new CheckBox {
+        var cbSupportsTrueColor = new CheckBox
+        {
             X = x,
             Y = y++,
             Checked = canTrueColor,
@@ -27,7 +31,8 @@ public class TrueColors : Scenario {
         };
         Win.Add (cbSupportsTrueColor);
 
-        var cbUseTrueColor = new CheckBox {
+        var cbUseTrueColor = new CheckBox
+        {
             X = x,
             Y = y++,
             Checked = Application.Force16Colors,
@@ -47,17 +52,20 @@ public class TrueColors : Scenario {
         SetupGradient ("Gray gradient", x, ref y, i => new Color (i, i, i));
 
         Win.Add (
-            new Label { X = Pos.AnchorEnd (44), Y = 2, Text = "Mouse over to get the gradient view color:" }
-        );
+                 new Label { X = Pos.AnchorEnd (44), Y = 2, Text = "Mouse over to get the gradient view color:" }
+                );
+
         Win.Add (
-            new Label { X = Pos.AnchorEnd (44), Y = 4, Text = "Red:" }
-        );
+                 new Label { X = Pos.AnchorEnd (44), Y = 4, Text = "Red:" }
+                );
+
         Win.Add (
-            new Label { X = Pos.AnchorEnd (44), Y = 5, Text = "Green:" }
-        );
+                 new Label { X = Pos.AnchorEnd (44), Y = 5, Text = "Green:" }
+                );
+
         Win.Add (
-            new Label { X = Pos.AnchorEnd (44), Y = 6, Text = "Blue:" }
-        );
+                 new Label { X = Pos.AnchorEnd (44), Y = 6, Text = "Blue:" }
+                );
 
         var lblRed = new Label { X = Pos.AnchorEnd (32), Y = 4, Text = "na" };
         Win.Add (lblRed);
@@ -66,28 +74,35 @@ public class TrueColors : Scenario {
         var lblBlue = new Label { X = Pos.AnchorEnd (32), Y = 6, Text = "na" };
         Win.Add (lblBlue);
 
-        Application.MouseEvent += (s, e) => {
-            if (e.MouseEvent.View != null) {
-                Attribute normal = e.MouseEvent.View.GetNormalColor ();
-                lblRed.Text = normal.Foreground.R.ToString ();
-                lblGreen.Text = normal.Foreground.G.ToString ();
-                lblBlue.Text = normal.Foreground.B.ToString ();
-            }
-        };
+        Application.MouseEvent += (s, e) =>
+                                  {
+                                      if (e.MouseEvent.View != null)
+                                      {
+                                          Attribute normal = e.MouseEvent.View.GetNormalColor ();
+                                          lblRed.Text = normal.Foreground.R.ToString ();
+                                          lblGreen.Text = normal.Foreground.G.ToString ();
+                                          lblBlue.Text = normal.Foreground.B.ToString ();
+                                      }
+                                  };
     }
 
-    private void SetupGradient (string name, int x, ref int y, Func<int, Color> colorFunc) {
+    private void SetupGradient (string name, int x, ref int y, Func<int, Color> colorFunc)
+    {
         var gradient = new Label { X = x, Y = y++, Text = name };
         Win.Add (gradient);
-        for (int dx = x, i = 0; i <= 256; i += 4) {
-            var l = new Label {
+
+        for (int dx = x, i = 0; i <= 256; i += 4)
+        {
+            var l = new Label
+            {
                 X = dx++,
                 Y = y,
-                ColorScheme = new ColorScheme {
+                ColorScheme = new ColorScheme
+                {
                     Normal = new Attribute (
-                        colorFunc (Math.Clamp (i, 0, 255)),
-                        colorFunc (Math.Clamp (i, 0, 255))
-                    )
+                                            colorFunc (Math.Clamp (i, 0, 255)),
+                                            colorFunc (Math.Clamp (i, 0, 255))
+                                           )
                 },
                 Text = " "
             };

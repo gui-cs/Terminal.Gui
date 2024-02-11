@@ -1,9 +1,11 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>A single tab in a <see cref="TabView"/>.</summary>
-public class Tab : View {
+public class Tab : View
+{
     /// <summary>Creates a new unamed tab with no controls inside.</summary>
-    public Tab () {
+    public Tab ()
+    {
         BorderStyle = LineStyle.Rounded;
         CanFocus = true;
     }
@@ -12,7 +14,8 @@ public class Tab : View {
 
     /// <summary>The text to display in a <see cref="TabView"/>.</summary>
     /// <value></value>
-    public string DisplayText {
+    public string DisplayText
+    {
         get => _displayText ?? "Unamed";
         set => _displayText = value;
     }

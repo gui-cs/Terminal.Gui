@@ -8,51 +8,8 @@ using static Terminal.Gui.NetEvents;
 
 namespace Terminal.Gui;
 
-internal class NetWinVTConsole {
-    public NetWinVTConsole () {
-        _inputHandle = GetStdHandle (STD_INPUT_HANDLE);
-        if (!GetConsoleMode (_inputHandle, out uint mode)) {
-            throw new ApplicationException ($"Failed to get input console mode, error code: {GetLastError ()}.");
-        }
-
-        _originalInputConsoleMode = mode;
-        if ((mode & ENABLE_VIRTUAL_TERMINAL_INPUT) < ENABLE_VIRTUAL_TERMINAL_INPUT) {
-            mode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
-            if (!SetConsoleMode (_inputHandle, mode)) {
-                throw new ApplicationException ($"Failed to set input console mode, error code: {GetLastError ()}.");
-            }
-        }
-
-        _outputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
-        if (!GetConsoleMode (_outputHandle, out mode)) {
-            throw new ApplicationException ($"Failed to get output console mode, error code: {GetLastError ()}.");
-        }
-
-        _originalOutputConsoleMode = mode;
-        if ((mode & (ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN)) < DISABLE_NEWLINE_AUTO_RETURN) {
-            mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN;
-            if (!SetConsoleMode (_outputHandle, mode)) {
-                throw new ApplicationException ($"Failed to set output console mode, error code: {GetLastError ()}.");
-            }
-        }
-
-        _errorHandle = GetStdHandle (STD_ERROR_HANDLE);
-        if (!GetConsoleMode (_errorHandle, out mode)) {
-            throw new ApplicationException ($"Failed to get error console mode, error code: {GetLastError ()}.");
-        }
-
-        _originalErrorConsoleMode = mode;
-        if ((mode & DISABLE_NEWLINE_AUTO_RETURN) < DISABLE_NEWLINE_AUTO_RETURN) {
-            mode |= DISABLE_NEWLINE_AUTO_RETURN;
-            if (!SetConsoleMode (_errorHandle, mode)) {
-                throw new ApplicationException ($"Failed to set error console mode, error code: {GetLastError ()}.");
-            }
-        }
-    }
-
-    private const int STD_ERROR_HANDLE = -12;
-    private const int STD_INPUT_HANDLE = -10;
-    private const int STD_OUTPUT_HANDLE = -11;
+internal class NetWinVTConsole
+{
     private const uint DISABLE_NEWLINE_AUTO_RETURN = 8;
     private const uint ENABLE_ECHO_INPUT = 4;
     private const uint ENABLE_EXTENDED_FLAGS = 128;
@@ -71,23 +28,91 @@ internal class NetWinVTConsole {
     private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4;
     private const uint ENABLE_WINDOW_INPUT = 8;
     private const uint ENABLE_WRAP_AT_EOL_OUTPUT = 2;
+    private const int STD_ERROR_HANDLE = -12;
+    private const int STD_INPUT_HANDLE = -10;
+    private const int STD_OUTPUT_HANDLE = -11;
+
+    public NetWinVTConsole ()
+    {
+        _inputHandle = GetStdHandle (STD_INPUT_HANDLE);
+
+        if (!GetConsoleMode (_inputHandle, out uint mode))
+        {
+            throw new ApplicationException ($"Failed to get input console mode, error code: {GetLastError ()}.");
+        }
+
+        _originalInputConsoleMode = mode;
+
+        if ((mode & ENABLE_VIRTUAL_TERMINAL_INPUT) < ENABLE_VIRTUAL_TERMINAL_INPUT)
+        {
+            mode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
+
+            if (!SetConsoleMode (_inputHandle, mode))
+            {
+                throw new ApplicationException ($"Failed to set input console mode, error code: {GetLastError ()}.");
+            }
+        }
+
+        _outputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
+
+        if (!GetConsoleMode (_outputHandle, out mode))
+        {
+            throw new ApplicationException ($"Failed to get output console mode, error code: {GetLastError ()}.");
+        }
+
+        _originalOutputConsoleMode = mode;
+
+        if ((mode & (ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN)) < DISABLE_NEWLINE_AUTO_RETURN)
+        {
+            mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN;
+
+            if (!SetConsoleMode (_outputHandle, mode))
+            {
+                throw new ApplicationException ($"Failed to set output console mode, error code: {GetLastError ()}.");
+            }
+        }
+
+        _errorHandle = GetStdHandle (STD_ERROR_HANDLE);
+
+        if (!GetConsoleMode (_errorHandle, out mode))
+        {
+            throw new ApplicationException ($"Failed to get error console mode, error code: {GetLastError ()}.");
+        }
+
+        _originalErrorConsoleMode = mode;
+
+        if ((mode & DISABLE_NEWLINE_AUTO_RETURN) < DISABLE_NEWLINE_AUTO_RETURN)
+        {
+            mode |= DISABLE_NEWLINE_AUTO_RETURN;
+
+            if (!SetConsoleMode (_errorHandle, mode))
+            {
+                throw new ApplicationException ($"Failed to set error console mode, error code: {GetLastError ()}.");
+            }
+        }
+    }
+
     private readonly nint _errorHandle;
     private readonly nint _inputHandle;
-    private readonly nint _outputHandle;
     private readonly uint _originalErrorConsoleMode;
     private readonly uint _originalInputConsoleMode;
     private readonly uint _originalOutputConsoleMode;
+    private readonly nint _outputHandle;
 
-    public void Cleanup () {
-        if (!SetConsoleMode (_inputHandle, _originalInputConsoleMode)) {
+    public void Cleanup ()
+    {
+        if (!SetConsoleMode (_inputHandle, _originalInputConsoleMode))
+        {
             throw new ApplicationException ($"Failed to restore input console mode, error code: {GetLastError ()}.");
         }
 
-        if (!SetConsoleMode (_outputHandle, _originalOutputConsoleMode)) {
+        if (!SetConsoleMode (_outputHandle, _originalOutputConsoleMode))
+        {
             throw new ApplicationException ($"Failed to restore output console mode, error code: {GetLastError ()}.");
         }
 
-        if (!SetConsoleMode (_errorHandle, _originalErrorConsoleMode)) {
+        if (!SetConsoleMode (_errorHandle, _originalErrorConsoleMode))
+        {
             throw new ApplicationException ($"Failed to restore error console mode, error code: {GetLastError ()}.");
         }
     }
@@ -98,7 +123,8 @@ internal class NetWinVTConsole {
     [DllImport ("kernel32.dll")] private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
 }
 
-internal class NetEvents : IDisposable {
+internal class NetEvents : IDisposable
+{
     private readonly ManualResetEventSlim _inputReady = new (false);
     private CancellationTokenSource _inputReadyCancellationTokenSource;
     private readonly ManualResetEventSlim _waitForStart = new (false);
@@ -107,14 +133,15 @@ internal class NetEvents : IDisposable {
     private readonly ManualResetEventSlim _winChange = new (false);
     private readonly Queue<InputResult?> _inputQueue = new ();
     private readonly ConsoleDriver _consoleDriver;
-    private ConsoleKeyInfo[] _cki;
+    private ConsoleKeyInfo [] _cki;
     private bool _isEscSeq;
 #if PROCESS_REQUEST
     bool _neededProcessRequest;
 #endif
     public EscSeqRequests EscSeqRequests { get; } = new ();
 
-    public NetEvents (ConsoleDriver consoleDriver) {
+    public NetEvents (ConsoleDriver consoleDriver)
+    {
         _consoleDriver = consoleDriver ?? throw new ArgumentNullException (nameof (consoleDriver));
         _inputReadyCancellationTokenSource = new CancellationTokenSource ();
 
@@ -123,30 +150,38 @@ internal class NetEvents : IDisposable {
         Task.Run (CheckWindowSizeChange, _inputReadyCancellationTokenSource.Token);
     }
 
-    public InputResult? DequeueInput () {
+    public InputResult? DequeueInput ()
+    {
         while (_inputReadyCancellationTokenSource != null
-               && !_inputReadyCancellationTokenSource.Token.IsCancellationRequested) {
+               && !_inputReadyCancellationTokenSource.Token.IsCancellationRequested)
+        {
             _waitForStart.Set ();
             _winChange.Set ();
 
-            try {
-                if (!_inputReadyCancellationTokenSource.Token.IsCancellationRequested) {
-                    if (_inputQueue.Count == 0) {
+            try
+            {
+                if (!_inputReadyCancellationTokenSource.Token.IsCancellationRequested)
+                {
+                    if (_inputQueue.Count == 0)
+                    {
                         _inputReady.Wait (_inputReadyCancellationTokenSource.Token);
                     }
                 }
             }
-            catch (OperationCanceledException) {
+            catch (OperationCanceledException)
+            {
                 return null;
             }
-            finally {
+            finally
+            {
                 _inputReady.Reset ();
             }
 
 #if PROCESS_REQUEST
             _neededProcessRequest = false;
 #endif
-            if (_inputQueue.Count > 0) {
+            if (_inputQueue.Count > 0)
+            {
                 return _inputQueue.Dequeue ();
             }
         }
@@ -154,16 +189,21 @@ internal class NetEvents : IDisposable {
         return null;
     }
 
-    private static ConsoleKeyInfo ReadConsoleKeyInfo (CancellationToken cancellationToken, bool intercept = true) {
+    private static ConsoleKeyInfo ReadConsoleKeyInfo (CancellationToken cancellationToken, bool intercept = true)
+    {
         // if there is a key available, return it without waiting
         //  (or dispatching work to the thread queue)
-        if (Console.KeyAvailable) {
+        if (Console.KeyAvailable)
+        {
             return Console.ReadKey (intercept);
         }
 
-        while (!cancellationToken.IsCancellationRequested) {
+        while (!cancellationToken.IsCancellationRequested)
+        {
             Task.Delay (100);
-            if (Console.KeyAvailable) {
+
+            if (Console.KeyAvailable)
+            {
                 return Console.ReadKey (intercept);
             }
         }
@@ -173,54 +213,68 @@ internal class NetEvents : IDisposable {
         return default (ConsoleKeyInfo);
     }
 
-    private void ProcessInputQueue () {
-        while (!_inputReadyCancellationTokenSource.Token.IsCancellationRequested) {
-            try {
+    private void ProcessInputQueue ()
+    {
+        while (!_inputReadyCancellationTokenSource.Token.IsCancellationRequested)
+        {
+            try
+            {
                 _waitForStart.Wait (_inputReadyCancellationTokenSource.Token);
             }
-            catch (OperationCanceledException) {
+            catch (OperationCanceledException)
+            {
                 return;
             }
 
             _waitForStart.Reset ();
 
-            if (_inputQueue.Count == 0) {
+            if (_inputQueue.Count == 0)
+            {
                 ConsoleKey key = 0;
                 ConsoleModifiers mod = 0;
                 ConsoleKeyInfo newConsoleKeyInfo = default;
 
-                while (true) {
-                    if (_inputReadyCancellationTokenSource.Token.IsCancellationRequested) {
+                while (true)
+                {
+                    if (_inputReadyCancellationTokenSource.Token.IsCancellationRequested)
+                    {
                         return;
                     }
 
                     ConsoleKeyInfo consoleKeyInfo;
-                    try {
+
+                    try
+                    {
                         consoleKeyInfo = ReadConsoleKeyInfo (_inputReadyCancellationTokenSource.Token);
                     }
-                    catch (OperationCanceledException) {
+                    catch (OperationCanceledException)
+                    {
                         return;
                     }
 
                     if ((consoleKeyInfo.KeyChar == (char)KeyCode.Esc && !_isEscSeq)
-                        || (consoleKeyInfo.KeyChar != (char)KeyCode.Esc && _isEscSeq)) {
-                        if (_cki == null && consoleKeyInfo.KeyChar != (char)KeyCode.Esc && _isEscSeq) {
+                        || (consoleKeyInfo.KeyChar != (char)KeyCode.Esc && _isEscSeq))
+                    {
+                        if (_cki == null && consoleKeyInfo.KeyChar != (char)KeyCode.Esc && _isEscSeq)
+                        {
                             _cki = EscSeqUtils.ResizeArray (
-                                new ConsoleKeyInfo (
-                                    (char)KeyCode.Esc,
-                                    0,
-                                    false,
-                                    false,
-                                    false
-                                ),
-                                _cki
-                            );
+                                                            new ConsoleKeyInfo (
+                                                                                (char)KeyCode.Esc,
+                                                                                0,
+                                                                                false,
+                                                                                false,
+                                                                                false
+                                                                               ),
+                                                            _cki
+                                                           );
                         }
 
                         _isEscSeq = true;
                         newConsoleKeyInfo = consoleKeyInfo;
                         _cki = EscSeqUtils.ResizeArray (consoleKeyInfo, _cki);
-                        if (Console.KeyAvailable) {
+
+                        if (Console.KeyAvailable)
+                        {
                             continue;
                         }
 
@@ -231,12 +285,17 @@ internal class NetEvents : IDisposable {
                         break;
                     }
 
-                    if (consoleKeyInfo.KeyChar == (char)KeyCode.Esc && _isEscSeq && _cki != null) {
+                    if (consoleKeyInfo.KeyChar == (char)KeyCode.Esc && _isEscSeq && _cki != null)
+                    {
                         ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki, ref mod);
                         _cki = null;
-                        if (Console.KeyAvailable) {
+
+                        if (Console.KeyAvailable)
+                        {
                             _cki = EscSeqUtils.ResizeArray (consoleKeyInfo, _cki);
-                        } else {
+                        }
+                        else
+                        {
                             ProcessMapConsoleKeyInfo (consoleKeyInfo);
                         }
 
@@ -252,37 +311,47 @@ internal class NetEvents : IDisposable {
             _inputReady.Set ();
         }
 
-        void ProcessMapConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo) {
+        void ProcessMapConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
+        {
             _inputQueue.Enqueue (
-                new InputResult {
-                    EventType = EventType.Key, ConsoleKeyInfo = EscSeqUtils.MapConsoleKeyInfo (consoleKeyInfo)
-                }
-            );
+                                 new InputResult
+                                 {
+                                     EventType = EventType.Key, ConsoleKeyInfo = EscSeqUtils.MapConsoleKeyInfo (consoleKeyInfo)
+                                 }
+                                );
             _isEscSeq = false;
         }
     }
 
-    private void CheckWindowSizeChange () {
-        void RequestWindowSize (CancellationToken cancellationToken) {
-            while (!cancellationToken.IsCancellationRequested) {
+    private void CheckWindowSizeChange ()
+    {
+        void RequestWindowSize (CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
                 // Wait for a while then check if screen has changed sizes
                 Task.Delay (500, cancellationToken);
 
                 int buffHeight, buffWidth;
-                if (((NetDriver)_consoleDriver).IsWinPlatform) {
+
+                if (((NetDriver)_consoleDriver).IsWinPlatform)
+                {
                     buffHeight = Math.Max (Console.BufferHeight, 0);
                     buffWidth = Math.Max (Console.BufferWidth, 0);
-                } else {
+                }
+                else
+                {
                     buffHeight = _consoleDriver.Rows;
                     buffWidth = _consoleDriver.Cols;
                 }
 
                 if (EnqueueWindowSizeEvent (
-                        Math.Max (Console.WindowHeight, 0),
-                        Math.Max (Console.WindowWidth, 0),
-                        buffHeight,
-                        buffWidth
-                    )) {
+                                            Math.Max (Console.WindowHeight, 0),
+                                            Math.Max (Console.WindowWidth, 0),
+                                            buffHeight,
+                                            buffWidth
+                                           ))
+                {
                     return;
                 }
             }
@@ -290,17 +359,22 @@ internal class NetEvents : IDisposable {
             cancellationToken.ThrowIfCancellationRequested ();
         }
 
-        while (true) {
-            if (_inputReadyCancellationTokenSource.IsCancellationRequested) {
+        while (true)
+        {
+            if (_inputReadyCancellationTokenSource.IsCancellationRequested)
+            {
                 return;
             }
 
             _winChange.Wait (_inputReadyCancellationTokenSource.Token);
             _winChange.Reset ();
-            try {
+
+            try
+            {
                 RequestWindowSize (_inputReadyCancellationTokenSource.Token);
             }
-            catch (OperationCanceledException) {
+            catch (OperationCanceledException)
+            {
                 return;
             }
 
@@ -314,18 +388,22 @@ internal class NetEvents : IDisposable {
     /// <param name="buffHeight"></param>
     /// <param name="buffWidth"></param>
     /// <returns></returns>
-    private bool EnqueueWindowSizeEvent (int winHeight, int winWidth, int buffHeight, int buffWidth) {
-        if (winWidth == _consoleDriver.Cols && winHeight == _consoleDriver.Rows) {
+    private bool EnqueueWindowSizeEvent (int winHeight, int winWidth, int buffHeight, int buffWidth)
+    {
+        if (winWidth == _consoleDriver.Cols && winHeight == _consoleDriver.Rows)
+        {
             return false;
         }
 
         int w = Math.Max (winWidth, 0);
         int h = Math.Max (winHeight, 0);
+
         _inputQueue.Enqueue (
-            new InputResult {
-                EventType = EventType.WindowSize, WindowSizeEvent = new WindowSizeEvent { Size = new Size (w, h) }
-            }
-        );
+                             new InputResult
+                             {
+                                 EventType = EventType.WindowSize, WindowSizeEvent = new WindowSizeEvent { Size = new Size (w, h) }
+                             }
+                            );
 
         return true;
     }
@@ -334,36 +412,40 @@ internal class NetEvents : IDisposable {
     private void ProcessRequestResponse (
         ref ConsoleKeyInfo newConsoleKeyInfo,
         ref ConsoleKey key,
-        ConsoleKeyInfo[] cki,
+        ConsoleKeyInfo [] cki,
         ref ConsoleModifiers mod
-    ) {
+    )
+    {
         // isMouse is true if it's CSI<, false otherwise
         EscSeqUtils.DecodeEscSeq (
-            EscSeqRequests,
-            ref newConsoleKeyInfo,
-            ref key,
-            cki,
-            ref mod,
-            out string c1Control,
-            out string code,
-            out string[] values,
-            out string terminating,
-            out bool isMouse,
-            out List<MouseFlags> mouseFlags,
-            out Point pos,
-            out bool isReq,
-            (f, p) => HandleMouseEvent (MapMouseFlags (f), p)
-        );
+                                  EscSeqRequests,
+                                  ref newConsoleKeyInfo,
+                                  ref key,
+                                  cki,
+                                  ref mod,
+                                  out string c1Control,
+                                  out string code,
+                                  out string [] values,
+                                  out string terminating,
+                                  out bool isMouse,
+                                  out List<MouseFlags> mouseFlags,
+                                  out Point pos,
+                                  out bool isReq,
+                                  (f, p) => HandleMouseEvent (MapMouseFlags (f), p)
+                                 );
 
-        if (isMouse) {
-            foreach (MouseFlags mf in mouseFlags) {
+        if (isMouse)
+        {
+            foreach (MouseFlags mf in mouseFlags)
+            {
                 HandleMouseEvent (MapMouseFlags (mf), pos);
             }
 
             return;
         }
 
-        if (isReq) {
+        if (isReq)
+        {
             HandleRequestResponseEvent (c1Control, code, values, terminating);
 
             return;
@@ -372,11 +454,16 @@ internal class NetEvents : IDisposable {
         HandleKeyboardEvent (newConsoleKeyInfo);
     }
 
-    private MouseButtonState MapMouseFlags (MouseFlags mouseFlags) {
+    private MouseButtonState MapMouseFlags (MouseFlags mouseFlags)
+    {
         MouseButtonState mbs = default;
-        foreach (object flag in Enum.GetValues (mouseFlags.GetType ())) {
-            if (mouseFlags.HasFlag ((MouseFlags)flag)) {
-                switch (flag) {
+
+        foreach (object flag in Enum.GetValues (mouseFlags.GetType ()))
+        {
+            if (mouseFlags.HasFlag ((MouseFlags)flag))
+            {
+                switch (flag)
+                {
                     case MouseFlags.Button1Pressed:
                         mbs |= MouseButtonState.Button1Pressed;
 
@@ -502,33 +589,41 @@ internal class NetEvents : IDisposable {
 
     private Point _lastCursorPosition;
 
-    private void HandleRequestResponseEvent (string c1Control, string code, string[] values, string terminating) {
-        switch (terminating) {
+    private void HandleRequestResponseEvent (string c1Control, string code, string [] values, string terminating)
+    {
+        switch (terminating)
+        {
             // BUGBUG: I can't find where we send a request for cursor position (ESC[?6n), so I'm not sure if this is needed.
             case EscSeqUtils.CSI_RequestCursorPositionReport_Terminator:
-                var point = new Point { X = int.Parse (values[1]) - 1, Y = int.Parse (values[0]) - 1 };
-                if (_lastCursorPosition.Y != point.Y) {
+                var point = new Point { X = int.Parse (values [1]) - 1, Y = int.Parse (values [0]) - 1 };
+
+                if (_lastCursorPosition.Y != point.Y)
+                {
                     _lastCursorPosition = point;
                     var eventType = EventType.WindowPosition;
                     var winPositionEv = new WindowPositionEvent { CursorPosition = point };
+
                     _inputQueue.Enqueue (
-                        new InputResult { EventType = eventType, WindowPositionEvent = winPositionEv }
-                    );
-                } else {
+                                         new InputResult { EventType = eventType, WindowPositionEvent = winPositionEv }
+                                        );
+                }
+                else
+                {
                     return;
                 }
 
                 break;
 
             case EscSeqUtils.CSI_ReportTerminalSizeInChars_Terminator:
-                switch (values[0]) {
+                switch (values [0])
+                {
                     case EscSeqUtils.CSI_ReportTerminalSizeInChars_ResponseValue:
                         EnqueueWindowSizeEvent (
-                            Math.Max (int.Parse (values[1]), 0),
-                            Math.Max (int.Parse (values[2]), 0),
-                            Math.Max (int.Parse (values[1]), 0),
-                            Math.Max (int.Parse (values[2]), 0)
-                        );
+                                                Math.Max (int.Parse (values [1]), 0),
+                                                Math.Max (int.Parse (values [2]), 0),
+                                                Math.Max (int.Parse (values [1]), 0),
+                                                Math.Max (int.Parse (values [2]), 0)
+                                               );
 
                         break;
                     default:
@@ -547,25 +642,29 @@ internal class NetEvents : IDisposable {
         _inputReady.Set ();
     }
 
-    private void EnqueueRequestResponseEvent (string c1Control, string code, string[] values, string terminating) {
+    private void EnqueueRequestResponseEvent (string c1Control, string code, string [] values, string terminating)
+    {
         var eventType = EventType.RequestResponse;
         var requestRespEv = new RequestResponseEvent { ResultTuple = (c1Control, code, values, terminating) };
+
         _inputQueue.Enqueue (
-            new InputResult { EventType = eventType, RequestResponseEvent = requestRespEv }
-        );
+                             new InputResult { EventType = eventType, RequestResponseEvent = requestRespEv }
+                            );
     }
 
-    private void HandleMouseEvent (MouseButtonState buttonState, Point pos) {
+    private void HandleMouseEvent (MouseButtonState buttonState, Point pos)
+    {
         var mouseEvent = new MouseEvent { Position = pos, ButtonState = buttonState };
 
         _inputQueue.Enqueue (
-            new InputResult { EventType = EventType.Mouse, MouseEvent = mouseEvent }
-        );
+                             new InputResult { EventType = EventType.Mouse, MouseEvent = mouseEvent }
+                            );
 
         _inputReady.Set ();
     }
 
-    public enum EventType {
+    public enum EventType
+    {
         Key = 1,
         Mouse = 2,
         WindowSize = 3,
@@ -574,7 +673,8 @@ internal class NetEvents : IDisposable {
     }
 
     [Flags]
-    public enum MouseButtonState {
+    public enum MouseButtonState
+    {
         Button1Pressed = 0x1,
         Button1Released = 0x2,
         Button1Clicked = 0x4,
@@ -606,26 +706,31 @@ internal class NetEvents : IDisposable {
         AllEvents = -1
     }
 
-    public struct MouseEvent {
+    public struct MouseEvent
+    {
         public Point Position;
         public MouseButtonState ButtonState;
     }
 
-    public struct WindowSizeEvent {
+    public struct WindowSizeEvent
+    {
         public Size Size;
     }
 
-    public struct WindowPositionEvent {
+    public struct WindowPositionEvent
+    {
         public int Top;
         public int Left;
         public Point CursorPosition;
     }
 
-    public struct RequestResponseEvent {
-        public (string c1Control, string code, string[] values, string terminating) ResultTuple;
+    public struct RequestResponseEvent
+    {
+        public (string c1Control, string code, string [] values, string terminating) ResultTuple;
     }
 
-    public struct InputResult {
+    public struct InputResult
+    {
         public EventType EventType;
         public ConsoleKeyInfo ConsoleKeyInfo;
         public MouseEvent MouseEvent;
@@ -633,8 +738,10 @@ internal class NetEvents : IDisposable {
         public WindowPositionEvent WindowPositionEvent;
         public RequestResponseEvent RequestResponseEvent;
 
-        public readonly override string ToString () {
-            return EventType switch {
+        public readonly override string ToString ()
+        {
+            return EventType switch
+                   {
                        EventType.Key => ToString (ConsoleKeyInfo),
                        EventType.Mouse => MouseEvent.ToString (),
 
@@ -647,7 +754,8 @@ internal class NetEvents : IDisposable {
         /// <summary>Prints a ConsoleKeyInfoEx structure</summary>
         /// <param name="cki"></param>
         /// <returns></returns>
-        public readonly string ToString (ConsoleKeyInfo cki) {
+        public readonly string ToString (ConsoleKeyInfo cki)
+        {
             var ke = new Key ((KeyCode)cki.KeyChar);
             var sb = new StringBuilder ();
             sb.Append ($"Key: {(KeyCode)cki.Key} ({cki.Key})");
@@ -661,31 +769,37 @@ internal class NetEvents : IDisposable {
         }
     }
 
-    private void HandleKeyboardEvent (ConsoleKeyInfo cki) {
+    private void HandleKeyboardEvent (ConsoleKeyInfo cki)
+    {
         var inputResult = new InputResult { EventType = EventType.Key, ConsoleKeyInfo = cki };
 
         _inputQueue.Enqueue (inputResult);
     }
 
-    public void Dispose () {
+    public void Dispose ()
+    {
         _inputReadyCancellationTokenSource?.Cancel ();
         _inputReadyCancellationTokenSource?.Dispose ();
         _inputReadyCancellationTokenSource = null;
 
-        try {
+        try
+        {
             // throws away any typeahead that has been typed by
             // the user and has not yet been read by the program.
-            while (Console.KeyAvailable) {
+            while (Console.KeyAvailable)
+            {
                 Console.ReadKey (true);
             }
         }
-        catch (InvalidOperationException) {
+        catch (InvalidOperationException)
+        {
             // Ignore - Console input has already been closed
         }
     }
 }
 
-internal class NetDriver : ConsoleDriver {
+internal class NetDriver : ConsoleDriver
+{
     private const int COLOR_BLACK = 30;
     private const int COLOR_BLUE = 34;
     private const int COLOR_BRIGHT_BLACK = 90;
@@ -704,26 +818,30 @@ internal class NetDriver : ConsoleDriver {
     private const int COLOR_YELLOW = 33;
     private NetMainLoop _mainLoopDriver;
     public bool IsWinPlatform { get; private set; }
+    public NetWinVTConsole NetWinConsole { get; private set; }
 
     public override bool SupportsTrueColor => Environment.OSVersion.Platform == PlatformID.Unix
                                               || (IsWinPlatform && Environment.OSVersion.Version.Build >= 14931);
 
-    public NetWinVTConsole NetWinConsole { get; private set; }
-
-    public override void Refresh () {
+    public override void Refresh ()
+    {
         UpdateScreen ();
         UpdateCursor ();
     }
 
-    public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control) {
-        var input = new InputResult {
+    public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
+    {
+        var input = new InputResult
+        {
             EventType = EventType.Key, ConsoleKeyInfo = new ConsoleKeyInfo (keyChar, key, shift, alt, control)
         };
 
-        try {
+        try
+        {
             ProcessInput (input);
         }
-        catch (OverflowException) { }
+        catch (OverflowException)
+        { }
     }
 
     #region Not Implemented
@@ -732,9 +850,14 @@ internal class NetDriver : ConsoleDriver {
 
     #endregion
 
-    public override void UpdateScreen () {
-        if (RunningUnitTests || _winSizeChanging || Console.WindowHeight < 1 || Contents.Length != Rows * Cols
-            || Rows != Console.WindowHeight) {
+    public override void UpdateScreen ()
+    {
+        if (RunningUnitTests
+            || _winSizeChanging
+            || Console.WindowHeight < 1
+            || Contents.Length != Rows * Cols
+            || Rows != Console.WindowHeight)
+        {
             return;
         }
 
@@ -749,81 +872,102 @@ internal class NetDriver : ConsoleDriver {
         CursorVisibility? savedVisibitity = _cachedCursorVisibility;
         SetCursorVisibility (CursorVisibility.Invisible);
 
-        for (int row = top; row < rows; row++) {
-            if (Console.WindowHeight < 1) {
+        for (int row = top; row < rows; row++)
+        {
+            if (Console.WindowHeight < 1)
+            {
                 return;
             }
 
-            if (!_dirtyLines[row]) {
+            if (!_dirtyLines [row])
+            {
                 continue;
             }
 
-            if (!SetCursorPosition (0, row)) {
+            if (!SetCursorPosition (0, row))
+            {
                 return;
             }
 
-            _dirtyLines[row] = false;
+            _dirtyLines [row] = false;
             output.Clear ();
-            for (int col = left; col < cols; col++) {
+
+            for (int col = left; col < cols; col++)
+            {
                 lastCol = -1;
                 var outputWidth = 0;
-                for (; col < cols; col++) {
-                    if (!Contents[row, col].IsDirty) {
-                        if (output.Length > 0) {
+
+                for (; col < cols; col++)
+                {
+                    if (!Contents [row, col].IsDirty)
+                    {
+                        if (output.Length > 0)
+                        {
                             WriteToConsole (output, ref lastCol, row, ref outputWidth);
-                        } else if (lastCol == -1) {
+                        }
+                        else if (lastCol == -1)
+                        {
                             lastCol = col;
                         }
 
-                        if (lastCol + 1 < cols) {
+                        if (lastCol + 1 < cols)
+                        {
                             lastCol++;
                         }
 
                         continue;
                     }
 
-                    if (lastCol == -1) {
+                    if (lastCol == -1)
+                    {
                         lastCol = col;
                     }
 
-                    Attribute attr = Contents[row, col].Attribute.Value;
+                    Attribute attr = Contents [row, col].Attribute.Value;
 
                     // Performance: Only send the escape sequence if the attribute has changed.
-                    if (attr != redrawAttr) {
+                    if (attr != redrawAttr)
+                    {
                         redrawAttr = attr;
 
-                        if (Force16Colors) {
+                        if (Force16Colors)
+                        {
                             output.Append (
-                                EscSeqUtils.CSI_SetGraphicsRendition (
-                                    MapColors (
-                                        (ConsoleColor)attr.Background.GetClosestNamedColor (),
-                                        false
-                                    ),
-                                    MapColors ((ConsoleColor)attr.Foreground.GetClosestNamedColor ())
-                                )
-                            );
-                        } else {
+                                           EscSeqUtils.CSI_SetGraphicsRendition (
+                                                                                 MapColors (
+                                                                                            (ConsoleColor)attr.Background.GetClosestNamedColor (),
+                                                                                            false
+                                                                                           ),
+                                                                                 MapColors ((ConsoleColor)attr.Foreground.GetClosestNamedColor ())
+                                                                                )
+                                          );
+                        }
+                        else
+                        {
                             output.Append (
-                                EscSeqUtils.CSI_SetForegroundColorRGB (
-                                    attr.Foreground.R,
-                                    attr.Foreground.G,
-                                    attr.Foreground.B
-                                )
-                            );
+                                           EscSeqUtils.CSI_SetForegroundColorRGB (
+                                                                                  attr.Foreground.R,
+                                                                                  attr.Foreground.G,
+                                                                                  attr.Foreground.B
+                                                                                 )
+                                          );
+
                             output.Append (
-                                EscSeqUtils.CSI_SetBackgroundColorRGB (
-                                    attr.Background.R,
-                                    attr.Background.G,
-                                    attr.Background.B
-                                )
-                            );
+                                           EscSeqUtils.CSI_SetBackgroundColorRGB (
+                                                                                  attr.Background.R,
+                                                                                  attr.Background.G,
+                                                                                  attr.Background.B
+                                                                                 )
+                                          );
                         }
                     }
 
                     outputWidth++;
-                    Rune rune = Contents[row, col].Rune;
+                    Rune rune = Contents [row, col].Rune;
                     output.Append (rune);
-                    if (Contents[row, col].CombiningMarks.Count > 0) {
+
+                    if (Contents [row, col].CombiningMarks.Count > 0)
+                    {
                         // AtlasEngine does not support NON-NORMALIZED combining marks in a way
                         // compatible with the driver architecture. Any CMs (except in the first col)
                         // are correctly combined with the base char, but are ALSO treated as 1 column
@@ -834,16 +978,19 @@ internal class NetDriver : ConsoleDriver {
                         //	output.Append (combMark);
                         //}
                         // WriteToConsole (output, ref lastCol, row, ref outputWidth);
-                    } else if (rune.IsSurrogatePair () && rune.GetColumns () < 2) {
+                    }
+                    else if (rune.IsSurrogatePair () && rune.GetColumns () < 2)
+                    {
                         WriteToConsole (output, ref lastCol, row, ref outputWidth);
                         SetCursorPosition (col - 1, row);
                     }
 
-                    Contents[row, col].IsDirty = false;
+                    Contents [row, col].IsDirty = false;
                 }
             }
 
-            if (output.Length > 0) {
+            if (output.Length > 0)
+            {
                 SetCursorPosition (lastCol, row);
                 Console.Write (output);
             }
@@ -853,7 +1000,8 @@ internal class NetDriver : ConsoleDriver {
 
         _cachedCursorVisibility = savedVisibitity;
 
-        void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth) {
+        void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
+        {
             SetCursorPosition (lastCol, row);
             Console.Write (output);
             output.Clear ();
@@ -862,14 +1010,17 @@ internal class NetDriver : ConsoleDriver {
         }
     }
 
-    internal override void End () {
-        if (IsWinPlatform) {
+    internal override void End ()
+    {
+        if (IsWinPlatform)
+        {
             NetWinConsole?.Cleanup ();
         }
 
         StopReportingMouseMoves ();
 
-        if (!RunningUnitTests) {
+        if (!RunningUnitTests)
+        {
             Console.ResetColor ();
 
             //Disable alternative screen buffer.
@@ -881,31 +1032,46 @@ internal class NetDriver : ConsoleDriver {
         }
     }
 
-    internal override MainLoop Init () {
+    internal override MainLoop Init ()
+    {
         PlatformID p = Environment.OSVersion.Platform;
-        if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
+
+        if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+        {
             IsWinPlatform = true;
-            try {
+
+            try
+            {
                 NetWinConsole = new NetWinVTConsole ();
             }
-            catch (ApplicationException) {
+            catch (ApplicationException)
+            {
                 // Likely running as a unit test, or in a non-interactive session.
             }
         }
 
-        if (IsWinPlatform) {
+        if (IsWinPlatform)
+        {
             Clipboard = new WindowsClipboard ();
-        } else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+        }
+        else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX))
+        {
             Clipboard = new MacOSXClipboard ();
-        } else {
-            if (CursesDriver.Is_WSL_Platform ()) {
+        }
+        else
+        {
+            if (CursesDriver.Is_WSL_Platform ())
+            {
                 Clipboard = new WSLClipboard ();
-            } else {
+            }
+            else
+            {
                 Clipboard = new CursesClipboard ();
             }
         }
 
-        if (!RunningUnitTests) {
+        if (!RunningUnitTests)
+        {
             Console.TreatControlCAsInput = true;
 
             Cols = Console.WindowWidth;
@@ -916,7 +1082,9 @@ internal class NetDriver : ConsoleDriver {
 
             //Set cursor key to application.
             Console.Out.Write (EscSeqUtils.CSI_HideCursor);
-        } else {
+        }
+        else
+        {
             // We are being run in an environment that does not support a console
             // such as a unit test, or a pipe.
             Cols = 80;
@@ -935,8 +1103,10 @@ internal class NetDriver : ConsoleDriver {
         return new MainLoop (_mainLoopDriver);
     }
 
-    private void ProcessInput (InputResult inputEvent) {
-        switch (inputEvent.EventType) {
+    private void ProcessInput (InputResult inputEvent)
+    {
+        switch (inputEvent.EventType)
+        {
             case EventType.Key:
                 ConsoleKeyInfo consoleKeyInfo = inputEvent.ConsoleKeyInfo;
 
@@ -948,7 +1118,8 @@ internal class NetDriver : ConsoleDriver {
 
                 KeyCode map = MapKey (consoleKeyInfo);
 
-                if (map == KeyCode.Null) {
+                if (map == KeyCode.Null)
+                {
                     break;
                 }
 
@@ -986,28 +1157,38 @@ internal class NetDriver : ConsoleDriver {
 
     private volatile bool _winSizeChanging;
 
-    private void SetWindowPosition (int col, int row) {
-        if (!RunningUnitTests) {
+    private void SetWindowPosition (int col, int row)
+    {
+        if (!RunningUnitTests)
+        {
             Top = Console.WindowTop;
             Left = Console.WindowLeft;
-        } else {
+        }
+        else
+        {
             Top = row;
             Left = col;
         }
     }
 
-    public virtual void ResizeScreen () {
+    public virtual void ResizeScreen ()
+    {
         // Not supported on Unix.
-        if (IsWinPlatform) {
+        if (IsWinPlatform)
+        {
             // Can raise an exception while is still resizing.
-            try {
+            try
+            {
 #pragma warning disable CA1416
-                if (Console.WindowHeight > 0) {
+                if (Console.WindowHeight > 0)
+                {
                     Console.CursorTop = 0;
                     Console.CursorLeft = 0;
                     Console.WindowTop = 0;
                     Console.WindowLeft = 0;
-                    if (Console.WindowHeight > Rows) {
+
+                    if (Console.WindowHeight > Rows)
+                    {
                         Console.SetWindowSize (Cols, Rows);
                     }
 
@@ -1015,13 +1196,17 @@ internal class NetDriver : ConsoleDriver {
                 }
 #pragma warning restore CA1416
             }
-            catch (IOException) {
+            catch (IOException)
+            {
                 Clip = new Rect (0, 0, Cols, Rows);
             }
-            catch (ArgumentOutOfRangeException) {
+            catch (ArgumentOutOfRangeException)
+            {
                 Clip = new Rect (0, 0, Cols, Rows);
             }
-        } else {
+        }
+        else
+        {
             Console.Out.Write (EscSeqUtils.CSI_SetTerminalWindowSize (Rows, Cols));
         }
 
@@ -1034,13 +1219,14 @@ internal class NetDriver : ConsoleDriver {
 
     // Cache the list of ConsoleColor values.
     private static readonly HashSet<int> ConsoleColorValues = new (
-        Enum.GetValues (typeof (ConsoleColor))
-            .OfType<ConsoleColor> ()
-            .Select (c => (int)c)
-    );
+                                                                   Enum.GetValues (typeof (ConsoleColor))
+                                                                       .OfType<ConsoleColor> ()
+                                                                       .Select (c => (int)c)
+                                                                  );
 
     // Dictionary for mapping ConsoleColor values to the values used by System.Net.Console.
-    private static readonly Dictionary<ConsoleColor, int> colorMap = new () {
+    private static readonly Dictionary<ConsoleColor, int> colorMap = new ()
+    {
         { ConsoleColor.Black, COLOR_BLACK },
         { ConsoleColor.DarkBlue, COLOR_BLUE },
         { ConsoleColor.DarkGreen, COLOR_GREEN },
@@ -1060,8 +1246,10 @@ internal class NetDriver : ConsoleDriver {
     };
 
     // Map a ConsoleColor to a platform dependent value.
-    private int MapColors (ConsoleColor color, bool isForeground = true) =>
-        colorMap.TryGetValue (color, out int colorValue) ? colorValue + (isForeground ? 0 : 10) : 0;
+    private int MapColors (ConsoleColor color, bool isForeground = true)
+    {
+        return colorMap.TryGetValue (color, out int colorValue) ? colorValue + (isForeground ? 0 : 10) : 0;
+    }
 
     ///// <remarks>
     ///// In the NetDriver, colors are encoded as an int. 
@@ -1082,15 +1270,19 @@ internal class NetDriver : ConsoleDriver {
 
     #region Cursor Handling
 
-    private bool SetCursorPosition (int col, int row) {
-        if (IsWinPlatform) {
+    private bool SetCursorPosition (int col, int row)
+    {
+        if (IsWinPlatform)
+        {
             // Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
-            try {
+            try
+            {
                 Console.SetCursorPosition (col, row);
 
                 return true;
             }
-            catch (Exception) {
+            catch (Exception)
+            {
                 return false;
             }
         }
@@ -1104,23 +1296,28 @@ internal class NetDriver : ConsoleDriver {
 
     private CursorVisibility? _cachedCursorVisibility;
 
-    public override void UpdateCursor () {
+    public override void UpdateCursor ()
+    {
         EnsureCursorVisibility ();
 
-        if (Col >= 0 && Col < Cols && Row >= 0 && Row < Rows) {
+        if (Col >= 0 && Col < Cols && Row >= 0 && Row < Rows)
+        {
             SetCursorPosition (Col, Row);
             SetWindowPosition (0, Row);
         }
     }
 
-    public override bool GetCursorVisibility (out CursorVisibility visibility) {
+    public override bool GetCursorVisibility (out CursorVisibility visibility)
+    {
         visibility = _cachedCursorVisibility ?? CursorVisibility.Default;
 
         return visibility == CursorVisibility.Default;
     }
 
-    public override bool SetCursorVisibility (CursorVisibility visibility) {
+    public override bool SetCursorVisibility (CursorVisibility visibility)
+    {
         _cachedCursorVisibility = visibility;
+
         bool isVisible = RunningUnitTests
                              ? visibility == CursorVisibility.Default
                              : Console.CursorVisible = visibility == CursorVisibility.Default;
@@ -1129,8 +1326,10 @@ internal class NetDriver : ConsoleDriver {
         return isVisible;
     }
 
-    public override bool EnsureCursorVisibility () {
-        if (!(Col >= 0 && Row >= 0 && Col < Cols && Row < Rows)) {
+    public override bool EnsureCursorVisibility ()
+    {
+        if (!(Col >= 0 && Row >= 0 && Col < Cols && Row < Rows))
+        {
             GetCursorVisibility (out CursorVisibility cursorVisibility);
             _cachedCursorVisibility = cursorVisibility;
             SetCursorVisibility (CursorVisibility.Invisible);
@@ -1147,132 +1346,165 @@ internal class NetDriver : ConsoleDriver {
 
     #region Mouse Handling
 
-    public void StartReportingMouseMoves () {
-        if (!RunningUnitTests) {
+    public void StartReportingMouseMoves ()
+    {
+        if (!RunningUnitTests)
+        {
             Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
         }
     }
 
-    public void StopReportingMouseMoves () {
-        if (!RunningUnitTests) {
+    public void StopReportingMouseMoves ()
+    {
+        if (!RunningUnitTests)
+        {
             Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
         }
     }
 
-    private MouseEvent ToDriverMouse (NetEvents.MouseEvent me) {
+    private MouseEvent ToDriverMouse (NetEvents.MouseEvent me)
+    {
         //System.Diagnostics.Debug.WriteLine ($"X: {me.Position.X}; Y: {me.Position.Y}; ButtonState: {me.ButtonState}");
 
         MouseFlags mouseFlag = 0;
 
-        if ((me.ButtonState & MouseButtonState.Button1Pressed) != 0) {
+        if ((me.ButtonState & MouseButtonState.Button1Pressed) != 0)
+        {
             mouseFlag |= MouseFlags.Button1Pressed;
         }
 
-        if ((me.ButtonState & MouseButtonState.Button1Released) != 0) {
+        if ((me.ButtonState & MouseButtonState.Button1Released) != 0)
+        {
             mouseFlag |= MouseFlags.Button1Released;
         }
 
-        if ((me.ButtonState & MouseButtonState.Button1Clicked) != 0) {
+        if ((me.ButtonState & MouseButtonState.Button1Clicked) != 0)
+        {
             mouseFlag |= MouseFlags.Button1Clicked;
         }
 
-        if ((me.ButtonState & MouseButtonState.Button1DoubleClicked) != 0) {
+        if ((me.ButtonState & MouseButtonState.Button1DoubleClicked) != 0)
+        {
             mouseFlag |= MouseFlags.Button1DoubleClicked;
         }
 
-        if ((me.ButtonState & MouseButtonState.Button1TripleClicked) != 0) {
+        if ((me.ButtonState & MouseButtonState.Button1TripleClicked) != 0)
+        {
             mouseFlag |= MouseFlags.Button1TripleClicked;
         }
 
-        if ((me.ButtonState & MouseButtonState.Button2Pressed) != 0) {
+        if ((me.ButtonState & MouseButtonState.Button2Pressed) != 0)
+        {
             mouseFlag |= MouseFlags.Button2Pressed;
         }
 
-        if ((me.ButtonState & MouseButtonState.Button2Released) != 0) {
+        if ((me.ButtonState & MouseButtonState.Button2Released) != 0)
+        {
             mouseFlag |= MouseFlags.Button2Released;
         }
 
-        if ((me.ButtonState & MouseButtonState.Button2Clicked) != 0) {
+        if ((me.ButtonState & MouseButtonState.Button2Clicked) != 0)
+        {
             mouseFlag |= MouseFlags.Button2Clicked;
         }
 
-        if ((me.ButtonState & MouseButtonState.Button2DoubleClicked) != 0) {
+        if ((me.ButtonState & MouseButtonState.Button2DoubleClicked) != 0)
+        {
             mouseFlag |= MouseFlags.Button2DoubleClicked;
         }
 
-        if ((me.ButtonState & MouseButtonState.Button2TripleClicked) != 0) {
+        if ((me.ButtonState & MouseButtonState.Button2TripleClicked) != 0)
+        {
             mouseFlag |= MouseFlags.Button2TripleClicked;
         }
 
-        if ((me.ButtonState & MouseButtonState.Button3Pressed) != 0) {
+        if ((me.ButtonState & MouseButtonState.Button3Pressed) != 0)
+        {
             mouseFlag |= MouseFlags.Button3Pressed;
         }
 
-        if ((me.ButtonState & MouseButtonState.Button3Released) != 0) {
+        if ((me.ButtonState & MouseButtonState.Button3Released) != 0)
+        {
             mouseFlag |= MouseFlags.Button3Released;
         }
 
-        if ((me.ButtonState & MouseButtonState.Button3Clicked) != 0) {
+        if ((me.ButtonState & MouseButtonState.Button3Clicked) != 0)
+        {
             mouseFlag |= MouseFlags.Button3Clicked;
         }
 
-        if ((me.ButtonState & MouseButtonState.Button3DoubleClicked) != 0) {
+        if ((me.ButtonState & MouseButtonState.Button3DoubleClicked) != 0)
+        {
             mouseFlag |= MouseFlags.Button3DoubleClicked;
         }
 
-        if ((me.ButtonState & MouseButtonState.Button3TripleClicked) != 0) {
+        if ((me.ButtonState & MouseButtonState.Button3TripleClicked) != 0)
+        {
             mouseFlag |= MouseFlags.Button3TripleClicked;
         }
 
-        if ((me.ButtonState & MouseButtonState.ButtonWheeledUp) != 0) {
+        if ((me.ButtonState & MouseButtonState.ButtonWheeledUp) != 0)
+        {
             mouseFlag |= MouseFlags.WheeledUp;
         }
 
-        if ((me.ButtonState & MouseButtonState.ButtonWheeledDown) != 0) {
+        if ((me.ButtonState & MouseButtonState.ButtonWheeledDown) != 0)
+        {
             mouseFlag |= MouseFlags.WheeledDown;
         }
 
-        if ((me.ButtonState & MouseButtonState.ButtonWheeledLeft) != 0) {
+        if ((me.ButtonState & MouseButtonState.ButtonWheeledLeft) != 0)
+        {
             mouseFlag |= MouseFlags.WheeledLeft;
         }
 
-        if ((me.ButtonState & MouseButtonState.ButtonWheeledRight) != 0) {
+        if ((me.ButtonState & MouseButtonState.ButtonWheeledRight) != 0)
+        {
             mouseFlag |= MouseFlags.WheeledRight;
         }
 
-        if ((me.ButtonState & MouseButtonState.Button4Pressed) != 0) {
+        if ((me.ButtonState & MouseButtonState.Button4Pressed) != 0)
+        {
             mouseFlag |= MouseFlags.Button4Pressed;
         }
 
-        if ((me.ButtonState & MouseButtonState.Button4Released) != 0) {
+        if ((me.ButtonState & MouseButtonState.Button4Released) != 0)
+        {
             mouseFlag |= MouseFlags.Button4Released;
         }
 
-        if ((me.ButtonState & MouseButtonState.Button4Clicked) != 0) {
+        if ((me.ButtonState & MouseButtonState.Button4Clicked) != 0)
+        {
             mouseFlag |= MouseFlags.Button4Clicked;
         }
 
-        if ((me.ButtonState & MouseButtonState.Button4DoubleClicked) != 0) {
+        if ((me.ButtonState & MouseButtonState.Button4DoubleClicked) != 0)
+        {
             mouseFlag |= MouseFlags.Button4DoubleClicked;
         }
 
-        if ((me.ButtonState & MouseButtonState.Button4TripleClicked) != 0) {
+        if ((me.ButtonState & MouseButtonState.Button4TripleClicked) != 0)
+        {
             mouseFlag |= MouseFlags.Button4TripleClicked;
         }
 
-        if ((me.ButtonState & MouseButtonState.ReportMousePosition) != 0) {
+        if ((me.ButtonState & MouseButtonState.ReportMousePosition) != 0)
+        {
             mouseFlag |= MouseFlags.ReportMousePosition;
         }
 
-        if ((me.ButtonState & MouseButtonState.ButtonShift) != 0) {
+        if ((me.ButtonState & MouseButtonState.ButtonShift) != 0)
+        {
             mouseFlag |= MouseFlags.ButtonShift;
         }
 
-        if ((me.ButtonState & MouseButtonState.ButtonCtrl) != 0) {
+        if ((me.ButtonState & MouseButtonState.ButtonCtrl) != 0)
+        {
             mouseFlag |= MouseFlags.ButtonCtrl;
         }
 
-        if ((me.ButtonState & MouseButtonState.ButtonAlt) != 0) {
+        if ((me.ButtonState & MouseButtonState.ButtonAlt) != 0)
+        {
             mouseFlag |= MouseFlags.ButtonAlt;
         }
 
@@ -1283,8 +1515,10 @@ internal class NetDriver : ConsoleDriver {
 
     #region Keyboard Handling
 
-    private ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo) {
-        if (consoleKeyInfo.Key != ConsoleKey.Packet) {
+    private ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
+    {
+        if (consoleKeyInfo.Key != ConsoleKey.Packet)
+        {
             return consoleKeyInfo;
         }
 
@@ -1298,8 +1532,10 @@ internal class NetDriver : ConsoleDriver {
         return new ConsoleKeyInfo (cKeyInfo.KeyChar, cKeyInfo.Key, shift, alt, control);
     }
 
-    private KeyCode MapKey (ConsoleKeyInfo keyInfo) {
-        switch (keyInfo.Key) {
+    private KeyCode MapKey (ConsoleKeyInfo keyInfo)
+    {
+        switch (keyInfo.Key)
+        {
             case ConsoleKey.OemPeriod:
             case ConsoleKey.OemComma:
             case ConsoleKey.OemPlus:
@@ -1314,13 +1550,15 @@ internal class NetDriver : ConsoleDriver {
             case ConsoleKey.Oem7:
             case ConsoleKey.Oem8:
             case ConsoleKey.Oem102:
-                if (keyInfo.KeyChar == 0) {
+                if (keyInfo.KeyChar == 0)
+                {
                     // If the keyChar is 0, keyInfo.Key value is not a printable character. 
 
                     return KeyCode.Null; // MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode)keyInfo.Key);
                 }
 
-                if (keyInfo.Modifiers != ConsoleModifiers.Shift) {
+                if (keyInfo.Modifiers != ConsoleModifiers.Shift)
+                {
                     // If Shift wasn't down we don't need to do anything but return the keyInfo.KeyChar
                     return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
                 }
@@ -1337,15 +1575,19 @@ internal class NetDriver : ConsoleDriver {
         // - With ShiftMask they are A..Z
         // - If CapsLock is on the above is reversed.
         // - If Alt and/or Ctrl are present, treat as upper case
-        if (keyInfo.Key is >= ConsoleKey.A and <= ConsoleKey.Z) {
+        if (keyInfo.Key is >= ConsoleKey.A and <= ConsoleKey.Z)
+        {
             if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)
-                || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control)) {
+                || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
+            {
                 return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
             }
 
-            if (keyInfo.Modifiers == ConsoleModifiers.Shift) {
+            if (keyInfo.Modifiers == ConsoleModifiers.Shift)
+            {
                 // If ShiftMask is on  add the ShiftMask
-                if (char.IsUpper (keyInfo.KeyChar)) {
+                if (char.IsUpper (keyInfo.KeyChar))
+                {
                     return (KeyCode)(uint)keyInfo.Key | KeyCode.ShiftMask;
                 }
             }
@@ -1354,13 +1596,15 @@ internal class NetDriver : ConsoleDriver {
         }
 
         // Handle control keys whose VK codes match the related ASCII value (those below ASCII 33) like ESC
-        if (keyInfo.Key != ConsoleKey.None && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key)) {
+        if (keyInfo.Key != ConsoleKey.None && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key))
+        {
             return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.Key);
         }
 
         // Handle control keys (e.g. CursorUp)
         if (keyInfo.Key != ConsoleKey.None
-            && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint)) {
+            && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint))
+        {
             return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint));
         }
 
@@ -1371,64 +1615,73 @@ internal class NetDriver : ConsoleDriver {
 }
 
 /// <summary>
-///     Mainloop intended to be used with the .NET System.Console API, and can be used on Windows and Unix, it is cross
-///     platform but lacks things like file descriptor monitoring.
+///     Mainloop intended to be used with the .NET System.Console API, and can be used on Windows and Unix, it is cross platform but lacks things like file descriptor monitoring.
 /// </summary>
 /// <remarks>This implementation is used for NetDriver.</remarks>
-internal class NetMainLoop : IMainLoopDriver {
+internal class NetMainLoop : IMainLoopDriver
+{
     /// <summary>Initializes the class with the console driver.</summary>
     /// <remarks>Passing a consoleDriver is provided to capture windows resizing.</remarks>
     /// <param name="consoleDriver">The console driver used by this Net main loop.</param>
     /// <exception cref="ArgumentNullException"></exception>
-    public NetMainLoop (ConsoleDriver consoleDriver = null) {
-        if (consoleDriver == null) {
+    public NetMainLoop (ConsoleDriver consoleDriver = null)
+    {
+        if (consoleDriver == null)
+        {
             throw new ArgumentNullException (nameof (consoleDriver));
         }
 
         _netEvents = new NetEvents (consoleDriver);
     }
 
-    private readonly CancellationTokenSource _inputHandlerTokenSource = new ();
     private readonly ManualResetEventSlim _eventReady = new (false);
-    private readonly ManualResetEventSlim _waitForProbe = new (false);
+    private readonly CancellationTokenSource _inputHandlerTokenSource = new ();
     private readonly Queue<InputResult?> _resultQueue = new ();
-
-    /// <summary>Invoked when a Key is pressed.</summary>
-    internal Action<InputResult> ProcessInput;
-
+    private readonly ManualResetEventSlim _waitForProbe = new (false);
     private CancellationTokenSource _eventReadyTokenSource = new ();
     private MainLoop _mainLoop;
     internal NetEvents _netEvents;
 
-    void IMainLoopDriver.Setup (MainLoop mainLoop) {
+    /// <summary>Invoked when a Key is pressed.</summary>
+    internal Action<InputResult> ProcessInput;
+
+    void IMainLoopDriver.Setup (MainLoop mainLoop)
+    {
         _mainLoop = mainLoop;
         Task.Run (NetInputHandler, _inputHandlerTokenSource.Token);
     }
 
     void IMainLoopDriver.Wakeup () { _eventReady.Set (); }
 
-    bool IMainLoopDriver.EventsPending () {
+    bool IMainLoopDriver.EventsPending ()
+    {
         _waitForProbe.Set ();
 
-        if (_mainLoop.CheckTimersAndIdleHandlers (out int waitTimeout)) {
+        if (_mainLoop.CheckTimersAndIdleHandlers (out int waitTimeout))
+        {
             return true;
         }
 
-        try {
-            if (!_eventReadyTokenSource.IsCancellationRequested) {
+        try
+        {
+            if (!_eventReadyTokenSource.IsCancellationRequested)
+            {
                 // Note: ManualResetEventSlim.Wait will wait indefinitely if the timeout is -1. The timeout is -1 when there
                 // are no timers, but there IS an idle handler waiting.
                 _eventReady.Wait (waitTimeout, _eventReadyTokenSource.Token);
             }
         }
-        catch (OperationCanceledException) {
+        catch (OperationCanceledException)
+        {
             return true;
         }
-        finally {
+        finally
+        {
             _eventReady.Reset ();
         }
 
-        if (!_eventReadyTokenSource.IsCancellationRequested) {
+        if (!_eventReadyTokenSource.IsCancellationRequested)
+        {
             return _resultQueue.Count > 0 || _mainLoop.CheckTimersAndIdleHandlers (out _);
         }
 
@@ -1438,13 +1691,16 @@ internal class NetMainLoop : IMainLoopDriver {
         return true;
     }
 
-    void IMainLoopDriver.Iteration () {
-        while (_resultQueue.Count > 0) {
+    void IMainLoopDriver.Iteration ()
+    {
+        while (_resultQueue.Count > 0)
+        {
             ProcessInput?.Invoke (_resultQueue.Dequeue ().Value);
         }
     }
 
-    void IMainLoopDriver.TearDown () {
+    void IMainLoopDriver.TearDown ()
+    {
         _inputHandlerTokenSource?.Cancel ();
         _inputHandlerTokenSource?.Dispose ();
         _eventReadyTokenSource?.Cancel ();
@@ -1460,40 +1716,53 @@ internal class NetMainLoop : IMainLoopDriver {
         _mainLoop = null;
     }
 
-    private void NetInputHandler () {
-        while (_mainLoop != null) {
-            try {
-                if (!_inputHandlerTokenSource.IsCancellationRequested) {
+    private void NetInputHandler ()
+    {
+        while (_mainLoop != null)
+        {
+            try
+            {
+                if (!_inputHandlerTokenSource.IsCancellationRequested)
+                {
                     _waitForProbe.Wait (_inputHandlerTokenSource.Token);
                 }
             }
-            catch (OperationCanceledException) {
+            catch (OperationCanceledException)
+            {
                 return;
             }
-            finally {
-                if (_waitForProbe.IsSet) {
+            finally
+            {
+                if (_waitForProbe.IsSet)
+                {
                     _waitForProbe.Reset ();
                 }
             }
 
-            if (_inputHandlerTokenSource.IsCancellationRequested) {
+            if (_inputHandlerTokenSource.IsCancellationRequested)
+            {
                 return;
             }
 
-            if (_resultQueue.Count == 0) {
+            if (_resultQueue.Count == 0)
+            {
                 _resultQueue.Enqueue (_netEvents.DequeueInput ());
             }
 
-            try {
-                while (_resultQueue.Peek () == null) {
+            try
+            {
+                while (_resultQueue.Peek () == null)
+                {
                     _resultQueue.Dequeue ();
                 }
 
-                if (_resultQueue.Count > 0) {
+                if (_resultQueue.Count > 0)
+                {
                     _eventReady.Set ();
                 }
             }
-            catch (InvalidOperationException) {
+            catch (InvalidOperationException)
+            {
                 // Ignore
             }
         }

@@ -3,7 +3,8 @@
 namespace Terminal.Gui;
 
 /// <summary>Defines whether a given file/directory matches a set of search terms.</summary>
-public interface ISearchMatcher {
+public interface ISearchMatcher
+{
     /// <summary>Called once for each new search. Defines the string the user has provided as search terms.</summary>
     void Initialize (string terms);
 

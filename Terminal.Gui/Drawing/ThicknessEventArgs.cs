@@ -3,7 +3,8 @@
 namespace Terminal.Gui;
 
 /// <summary>Event arguments for the <see cref="Thickness"/> events.</summary>
-public class ThicknessEventArgs : EventArgs {
+public class ThicknessEventArgs : EventArgs
+{
     /// <summary>Initializes a new instance of <see cref="ThicknessEventArgs"/></summary>
     public ThicknessEventArgs () { }
 

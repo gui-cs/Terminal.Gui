@@ -1,17 +1,18 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     Describes how to render a given column in  a <see cref="TableView"/> including <see cref="Alignment"/> and textual
-///     representation of cells (e.g. date formats)
+///     Describes how to render a given column in  a <see cref="TableView"/> including <see cref="Alignment"/> and textual representation of cells (e.g. date formats)
 ///     <a href="../docs/tableview.md">See TableView Deep Dive for more information</a>.
 /// </summary>
-public class ColumnStyle {
-    private bool visible = true;
-
+public class ColumnStyle
+{
     /// <summary>
-    ///     Defines a delegate for returning a custom color scheme per cell based on cell values. Return null for the
-    ///     default
+    ///     Defines a delegate for returning custom alignment per cell based on cell values.  When specified this will override
+    ///     <see cref="Alignment"/>
     /// </summary>
+    public Func<object, TextAlignment> AlignmentGetter;
+
+    /// <summary>Defines a delegate for returning a custom color scheme per cell based on cell values. Return null for the default</summary>
     public CellColorGetterDelegate ColorGetter;
 
     /// <summary>
@@ -21,21 +22,16 @@ public class ColumnStyle {
     /// </summary>
     public Func<object, string> RepresentationGetter;
 
-    /// <summary>
-    ///     Defines a delegate for returning custom alignment per cell based on cell values.  When specified this will override
-    ///     <see cref="Alignment"/>
-    /// </summary>
-    public Func<object, TextAlignment> AlignmentGetter;
+    private bool visible = true;
 
     /// <summary>
-    ///     Gets or Sets a value indicating whether the column should be visible to the user. This affects both whether it is
-    ///     rendered and whether it can be selected. Defaults to true.
+    ///     Defines the default alignment for all values rendered in this column.  For custom alignment based on cell contents use
+    ///     <see cref="AlignmentGetter"/>.
     /// </summary>
-    /// <remarks>If <see cref="MaxWidth"/> is 0 then <see cref="Visible"/> will always return false.</remarks>
-    public bool Visible {
-        get => MaxWidth >= 0 && visible;
-        set => visible = value;
-    }
+    public TextAlignment Alignment { get; set; }
+
+    /// <summary>Defines the format for values e.g. "yyyy-MM-dd" for dates</summary>
+    public string Format { get; set; }
 
     /// <summary>
     ///     Set the maximum width of the column in characters.  This value will be ignored if more than the tables
@@ -47,8 +43,7 @@ public class ColumnStyle {
     public int MinAcceptableWidth { get; set; } = TableView.DefaultMinAcceptableWidth;
 
     /// <summary>
-    ///     Set the minimum width of the column in characters.  Setting this will ensure that even when a column has short
-    ///     content/header it still fills a given width of the control.
+    ///     Set the minimum width of the column in characters.  Setting this will ensure that even when a column has short content/header it still fills a given width of the control.
     ///     <para>
     ///         This value will be ignored if more than the tables <see cref="TableView.MaxCellWidth"/> or the
     ///         <see cref="MaxWidth"/>
@@ -57,14 +52,15 @@ public class ColumnStyle {
     /// </summary>
     public int MinWidth { get; set; }
 
-    /// <summary>Defines the format for values e.g. "yyyy-MM-dd" for dates</summary>
-    public string Format { get; set; }
-
     /// <summary>
-    ///     Defines the default alignment for all values rendered in this column.  For custom alignment based on cell contents
-    ///     use <see cref="AlignmentGetter"/>.
+    ///     Gets or Sets a value indicating whether the column should be visible to the user. This affects both whether it is rendered and whether it can be selected. Defaults to true.
     /// </summary>
-    public TextAlignment Alignment { get; set; }
+    /// <remarks>If <see cref="MaxWidth"/> is 0 then <see cref="Visible"/> will always return false.</remarks>
+    public bool Visible
+    {
+        get => MaxWidth >= 0 && visible;
+        set => visible = value;
+    }
 
     /// <summary>
     ///     Returns the alignment for the cell based on <paramref name="cellValue"/> and <see cref="AlignmentGetter"/>/
@@ -72,8 +68,10 @@ public class ColumnStyle {
     /// </summary>
     /// <param name="cellValue"></param>
     /// <returns></returns>
-    public TextAlignment GetAlignment (object cellValue) {
-        if (AlignmentGetter != null) {
+    public TextAlignment GetAlignment (object cellValue)
+    {
+        if (AlignmentGetter != null)
+        {
             return AlignmentGetter (cellValue);
         }
 
@@ -81,19 +79,23 @@ public class ColumnStyle {
     }
 
     /// <summary>
-    ///     Returns the full string to render (which may be truncated if too long) that the current style says best represents
-    ///     the given <paramref name="value"/>
+    ///     Returns the full string to render (which may be truncated if too long) that the current style says best represents the given
+    ///     <paramref name="value"/>
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public string GetRepresentation (object value) {
-        if (!string.IsNullOrWhiteSpace (Format)) {
-            if (value is IFormattable f) {
+    public string GetRepresentation (object value)
+    {
+        if (!string.IsNullOrWhiteSpace (Format))
+        {
+            if (value is IFormattable f)
+            {
                 return f.ToString (Format, null);
             }
         }
 
-        if (RepresentationGetter != null) {
+        if (RepresentationGetter != null)
+        {
             return RepresentationGetter (value);
         }
 

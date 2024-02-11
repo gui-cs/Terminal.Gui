@@ -2,16 +2,13 @@
 
 /// <summary><see cref="ITableSource"/> implementation that wraps arbitrary data.</summary>
 /// <typeparam name="T"></typeparam>
-public class EnumerableTableSource<T> : IEnumerableTableSource<T> {
+public class EnumerableTableSource<T> : IEnumerableTableSource<T>
+{
     /// <summary>Creates a new instance of the class that presents <paramref name="data"/> collection as a table.</summary>
     /// <remarks>
-    ///     The elements of the <paramref name="data"/> collection are recorded during construction (immutable) but the
-    ///     properties of those objects are permitted to change.
+    ///     The elements of the <paramref name="data"/> collection are recorded during construction (immutable) but the properties of those objects are permitted to change.
     /// </remarks>
-    /// <param name="data">
-    ///     The data that you want to present.  The members of this collection will be frozen after
-    ///     construction.
-    /// </param>
+    /// <param name="data">The data that you want to present.  The members of this collection will be frozen after construction.</param>
     /// <param name="columnDefinitions">
     ///     Getter methods for each property you want to present in the table. For example:
     ///     <code>
@@ -21,20 +18,21 @@ public class EnumerableTableSource<T> : IEnumerableTableSource<T> {
     /// }
     ///  </code>
     /// </param>
-    public EnumerableTableSource (IEnumerable<T> data, Dictionary<string, Func<T, object>> columnDefinitions) {
+    public EnumerableTableSource (IEnumerable<T> data, Dictionary<string, Func<T, object>> columnDefinitions)
+    {
         this.data = data.ToArray ();
         ColumnNames = columnDefinitions.Keys.ToArray ();
         lamdas = columnDefinitions;
     }
 
+    private readonly T [] data;
     private readonly Dictionary<string, Func<T, object>> lamdas;
-    private readonly T[] data;
 
     /// <summary>Gets the object collection hosted by this wrapper.</summary>
     public IReadOnlyCollection<T> Data => data.AsReadOnly ();
 
     /// <inheritdoc/>
-    public object this [int row, int col] => lamdas[ColumnNames[col]] (data[row]);
+    public object this [int row, int col] => lamdas [ColumnNames [col]] (data [row]);
 
     /// <inheritdoc/>
     public int Rows => data.Length;
@@ -43,11 +41,11 @@ public class EnumerableTableSource<T> : IEnumerableTableSource<T> {
     public int Columns => ColumnNames.Length;
 
     /// <inheritdoc/>
-    public string[] ColumnNames { get; }
+    public string [] ColumnNames { get; }
 
     /// <inheritdoc/>
-    public IEnumerable<T> GetAllObjects () => Data;
+    public IEnumerable<T> GetAllObjects () { return Data; }
 
     /// <inheritdoc/>
-    public T GetObjectOnRow (int row) => Data.ElementAt (row);
+    public T GetObjectOnRow (int row) { return Data.ElementAt (row); }
 }

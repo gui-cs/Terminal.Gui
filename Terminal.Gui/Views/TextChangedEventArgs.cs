@@ -8,7 +8,8 @@
 namespace Terminal.Gui;
 
 /// <summary>Event args for the <see cref="TextField.TextChanged"/> event</summary>
-public class TextChangedEventArgs : EventArgs {
+public class TextChangedEventArgs : EventArgs
+{
     /// <summary>Creates a new instance of the <see cref="TextChangedEventArgs"/> class</summary>
     /// <param name="oldValue"></param>
     public TextChangedEventArgs (string oldValue) { OldValue = oldValue; }

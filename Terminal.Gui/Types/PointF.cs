@@ -9,12 +9,14 @@ using System.ComponentModel;
 namespace Terminal.Gui;
 
 /// <summary>Represents an ordered pair of x and y coordinates that define a point in a two-dimensional plane.</summary>
-public struct PointF : IEquatable<PointF> {
+public struct PointF : IEquatable<PointF>
+{
     /// <summary>Creates a new instance of the <see cref='Terminal.Gui.PointF'/> class with member data left uninitialized.</summary>
     public static readonly PointF Empty;
 
     /// <summary>Initializes a new instance of the <see cref='Terminal.Gui.PointF'/> class with the specified coordinates.</summary>
-    public PointF (float x, float y) {
+    public PointF (float x, float y)
+    {
         X = x;
         Y = y;
     }
@@ -30,62 +32,62 @@ public struct PointF : IEquatable<PointF> {
     public float Y { get; set; }
 
     /// <summary>Translates a <see cref='Terminal.Gui.PointF'/> by a given <see cref='Terminal.Gui.Size'/> .</summary>
-    public static PointF operator + (PointF pt, Size sz) => Add (pt, sz);
+    public static PointF operator + (PointF pt, Size sz) { return Add (pt, sz); }
 
     /// <summary>Translates a <see cref='Terminal.Gui.PointF'/> by the negative of a given <see cref='Terminal.Gui.Size'/> .</summary>
-    public static PointF operator - (PointF pt, Size sz) => Subtract (pt, sz);
+    public static PointF operator - (PointF pt, Size sz) { return Subtract (pt, sz); }
 
     /// <summary>Translates a <see cref='Terminal.Gui.PointF'/> by a given <see cref='Terminal.Gui.SizeF'/> .</summary>
-    public static PointF operator + (PointF pt, SizeF sz) => Add (pt, sz);
+    public static PointF operator + (PointF pt, SizeF sz) { return Add (pt, sz); }
 
     /// <summary>Translates a <see cref='Terminal.Gui.PointF'/> by the negative of a given <see cref='Terminal.Gui.SizeF'/> .</summary>
-    public static PointF operator - (PointF pt, SizeF sz) => Subtract (pt, sz);
+    public static PointF operator - (PointF pt, SizeF sz) { return Subtract (pt, sz); }
 
     /// <summary>
     ///     Compares two <see cref='Terminal.Gui.PointF'/> objects. The result specifies whether the values of the
     ///     <see cref='Terminal.Gui.PointF.X'/> and <see cref='Terminal.Gui.PointF.Y'/> properties of the two
     ///     <see cref='Terminal.Gui.PointF'/> objects are equal.
     /// </summary>
-    public static bool operator == (PointF left, PointF right) => left.X == right.X && left.Y == right.Y;
+    public static bool operator == (PointF left, PointF right) { return left.X == right.X && left.Y == right.Y; }
 
     /// <summary>
     ///     Compares two <see cref='Terminal.Gui.PointF'/> objects. The result specifies whether the values of the
     ///     <see cref='Terminal.Gui.PointF.X'/> or <see cref='Terminal.Gui.PointF.Y'/> properties of the two
     ///     <see cref='Terminal.Gui.PointF'/> objects are unequal.
     /// </summary>
-    public static bool operator != (PointF left, PointF right) => !(left == right);
+    public static bool operator != (PointF left, PointF right) { return !(left == right); }
 
     /// <summary>Translates a <see cref='Terminal.Gui.PointF'/> by a given <see cref='Terminal.Gui.Size'/> .</summary>
-    public static PointF Add (PointF pt, Size sz) => new (pt.X + sz.Width, pt.Y + sz.Height);
+    public static PointF Add (PointF pt, Size sz) { return new PointF (pt.X + sz.Width, pt.Y + sz.Height); }
 
     /// <summary>Translates a <see cref='Terminal.Gui.PointF'/> by the negative of a given <see cref='Terminal.Gui.Size'/> .</summary>
-    public static PointF Subtract (PointF pt, Size sz) => new (pt.X - sz.Width, pt.Y - sz.Height);
+    public static PointF Subtract (PointF pt, Size sz) { return new PointF (pt.X - sz.Width, pt.Y - sz.Height); }
 
     /// <summary>Translates a <see cref='Terminal.Gui.PointF'/> by a given <see cref='Terminal.Gui.SizeF'/> .</summary>
-    public static PointF Add (PointF pt, SizeF sz) => new (pt.X + sz.Width, pt.Y + sz.Height);
+    public static PointF Add (PointF pt, SizeF sz) { return new PointF (pt.X + sz.Width, pt.Y + sz.Height); }
 
     /// <summary>Translates a <see cref='Terminal.Gui.PointF'/> by the negative of a given <see cref='Terminal.Gui.SizeF'/> .</summary>
-    public static PointF Subtract (PointF pt, SizeF sz) => new (pt.X - sz.Width, pt.Y - sz.Height);
+    public static PointF Subtract (PointF pt, SizeF sz) { return new PointF (pt.X - sz.Width, pt.Y - sz.Height); }
 
     /// <summary>
     ///     Compares two <see cref='Terminal.Gui.PointF'/> objects. The result specifies whether the values of the
     ///     <see cref='Terminal.Gui.PointF.X'/> and <see cref='Terminal.Gui.PointF.Y'/> properties of the two
     ///     <see cref='Terminal.Gui.PointF'/> objects are equal.
     /// </summary>
-    public override bool Equals (object obj) => obj is PointF && Equals ((PointF)obj);
+    public override bool Equals (object obj) { return obj is PointF && Equals ((PointF)obj); }
 
     /// <summary>
     ///     Compares two <see cref='Terminal.Gui.PointF'/> objects. The result specifies whether the values of the
     ///     <see cref='Terminal.Gui.PointF.X'/> and <see cref='Terminal.Gui.PointF.Y'/> properties of the two
     ///     <see cref='Terminal.Gui.PointF'/> objects are equal.
     /// </summary>
-    public bool Equals (PointF other) => this == other;
+    public bool Equals (PointF other) { return this == other; }
 
     /// <summary>Generates a hashcode from the X and Y components</summary>
     /// <returns></returns>
-    public override int GetHashCode () => X.GetHashCode () ^ Y.GetHashCode ();
+    public override int GetHashCode () { return X.GetHashCode () ^ Y.GetHashCode (); }
 
     /// <summary>Returns a string including the X and Y values</summary>
     /// <returns></returns>
-    public override string ToString () => "{X=" + X + ", Y=" + Y + "}";
+    public override string ToString () { return "{X=" + X + ", Y=" + Y + "}"; }
 }

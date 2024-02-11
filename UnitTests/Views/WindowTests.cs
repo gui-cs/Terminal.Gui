@@ -2,17 +2,21 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class WindowTests {
-    public WindowTests (ITestOutputHelper output) { _output = output; }
+public class WindowTests
+{
     private readonly ITestOutputHelper _output;
+    public WindowTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [AutoInitShutdown]
-    public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw () {
-        var menu = new MenuBar {
-            Menus = [
-                        new MenuBarItem ("Child", new MenuItem[] { new ("_Create Child", "", null) })
-                    ]
+    public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
+    {
+        var menu = new MenuBar
+        {
+            Menus =
+            [
+                new MenuBarItem ("Child", new MenuItem [] { new ("_Create Child", "", null) })
+            ]
         };
         var win = new Window ();
         win.Add (menu);
@@ -25,24 +29,28 @@ public class WindowTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void MenuBar_And_StatusBar_Inside_Window () {
-        var menu = new MenuBar {
-            Menus = [
-                        new MenuBarItem ("File", new MenuItem[] { new ("Open", "", null), new ("Quit", "", null) }),
-                        new MenuBarItem (
-                            "Edit",
-                            new MenuItem[] { new ("Copy", "", null) }
-                        )
-                    ]
+    public void MenuBar_And_StatusBar_Inside_Window ()
+    {
+        var menu = new MenuBar
+        {
+            Menus =
+            [
+                new MenuBarItem ("File", new MenuItem [] { new ("Open", "", null), new ("Quit", "", null) }),
+                new MenuBarItem (
+                                 "Edit",
+                                 new MenuItem [] { new ("Copy", "", null) }
+                                )
+            ]
         };
 
         var sb = new StatusBar (
-            new StatusItem[] {
-                new (KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null),
-                new (KeyCode.CtrlMask | KeyCode.O, "~^O~ Open", null),
-                new (KeyCode.CtrlMask | KeyCode.C, "~^C~ Copy", null)
-            }
-        );
+                                new StatusItem []
+                                {
+                                    new (KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null),
+                                    new (KeyCode.CtrlMask | KeyCode.O, "~^O~ Open", null),
+                                    new (KeyCode.CtrlMask | KeyCode.C, "~^C~ Copy", null)
+                                }
+                               );
 
         var fv = new FrameView { Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1), Title = "Frame View" };
         var win = new Window ();
@@ -53,7 +61,7 @@ public class WindowTests {
         ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌──────────────────┐
 │ File  Edit       │
 │┌┤Frame View├────┐│
@@ -64,13 +72,13 @@ public class WindowTests {
 │└────────────────┘│
 │ ^Q Quit │ ^O Open│
 └──────────────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
 
         ((FakeDriver)Application.Driver).SetBufferSize (40, 20);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │┌┤Frame View├────────────────────────┐│
@@ -91,13 +99,13 @@ public class WindowTests {
 │└────────────────────────────────────┘│
 │ ^Q Quit │ ^O Open │ ^C Copy          │
 └──────────────────────────────────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
 
         ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ┌──────────────────┐
 │ File  Edit       │
 │┌┤Frame View├────┐│
@@ -108,12 +116,13 @@ public class WindowTests {
 │└────────────────┘│
 │ ^Q Quit │ ^O Open│
 └──────────────────┘",
-            _output
-        );
+                                                      _output
+                                                     );
     }
 
     [Fact]
-    public void New_Initializes () {
+    public void New_Initializes ()
+    {
         // Parameterless
         var r = new Window ();
         Assert.NotNull (r);
@@ -197,7 +206,8 @@ public class WindowTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void OnCanFocusChanged_Only_Must_ContentView_Forces_SetFocus_After_IsInitialized_Is_True () {
+    public void OnCanFocusChanged_Only_Must_ContentView_Forces_SetFocus_After_IsInitialized_Is_True ()
+    {
         var win1 = new Window { Id = "win1", Width = 10, Height = 1 };
         var view1 = new View { Id = "view1", Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = true };
         var win2 = new Window { Id = "win2", Y = 6, Width = 10, Height = 1 };

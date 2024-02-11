@@ -4,7 +4,8 @@ using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.DriverTests;
 
-public class DriverColorTests {
+public class DriverColorTests
+{
     public DriverColorTests () { ConsoleDriver.RunningUnitTests = true; }
 
     [Theory]
@@ -14,7 +15,8 @@ public class DriverColorTests {
     //[InlineData (typeof (ANSIDriver))]
     [InlineData (typeof (WindowsDriver))]
     [InlineData (typeof (CursesDriver))]
-    public void Force16Colors_Sets (Type driverType) {
+    public void Force16Colors_Sets (Type driverType)
+    {
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         driver.Init ();
 
@@ -31,7 +33,8 @@ public class DriverColorTests {
     //[InlineData (typeof (ANSIDriver))]
     [InlineData (typeof (WindowsDriver))]
     [InlineData (typeof (CursesDriver))]
-    public void SetColors_Changes_Colors (Type driverType) {
+    public void SetColors_Changes_Colors (Type driverType)
+    {
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         driver.Init ();
 
@@ -58,7 +61,8 @@ public class DriverColorTests {
     //[InlineData (typeof (ANSIDriver), true)]
     [InlineData (typeof (WindowsDriver), true)]
     [InlineData (typeof (CursesDriver), false)]
-    public void SupportsTrueColor_Defaults (Type driverType, bool expectedSetting) {
+    public void SupportsTrueColor_Defaults (Type driverType, bool expectedSetting)
+    {
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         driver.Init ();
 

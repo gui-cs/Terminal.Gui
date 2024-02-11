@@ -1,12 +1,14 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>The <see cref="CheckBox"/> <see cref="View"/> shows an on/off toggle that the user can set</summary>
-public class CheckBox : View {
+public class CheckBox : View
+{
     /// <summary>
     ///     Initializes a new instance of <see cref="CheckBox"/> based on the given text, using
     ///     <see cref="LayoutStyle.Computed"/> layout.
     /// </summary>
-    public CheckBox () {
+    public CheckBox ()
+    {
         _charNullChecked = Glyphs.NullChecked;
         _charChecked = Glyphs.Checked;
         _charUnChecked = Glyphs.UnChecked;
@@ -20,18 +22,21 @@ public class CheckBox : View {
 
         // Things this view knows how to do
         AddCommand (Command.ToggleChecked, () => ToggleChecked ());
+
         AddCommand (
-            Command.Accept,
-            () => {
-                if (!HasFocus) {
-                    SetFocus ();
-                }
+                    Command.Accept,
+                    () =>
+                    {
+                        if (!HasFocus)
+                        {
+                            SetFocus ();
+                        }
 
-                ToggleChecked ();
+                        ToggleChecked ();
 
-                return true;
-            }
-        );
+                        return true;
+                    }
+                   );
 
         // Default keybindings for this view
         KeyBindings.Add (Key.Space, Command.ToggleChecked);
@@ -44,22 +49,27 @@ public class CheckBox : View {
     private bool? _checked = false;
 
     /// <summary>
-    ///     If <see langword="true"/> allows <see cref="Checked"/> to be null, true or false. If <see langword="false"/> only
-    ///     allows <see cref="Checked"/> to be true or false.
+    ///     If <see langword="true"/> allows <see cref="Checked"/> to be null, true or false. If <see langword="false"/> only allows
+    ///     <see cref="Checked"/> to be true or false.
     /// </summary>
-    public bool AllowNullChecked {
+    public bool AllowNullChecked
+    {
         get => _allowNullChecked;
-        set {
+        set
+        {
             _allowNullChecked = value;
             Checked ??= false;
         }
     }
 
     /// <summary>The state of the <see cref="CheckBox"/></summary>
-    public bool? Checked {
+    public bool? Checked
+    {
         get => _checked;
-        set {
-            if (value == null && !AllowNullChecked) {
+        set
+        {
+            if (value == null && !AllowNullChecked)
+            {
                 return;
             }
 
@@ -70,25 +80,36 @@ public class CheckBox : View {
     }
 
     /// <inheritdoc/>
-    public override Key HotKey {
+    public override Key HotKey
+    {
         get => base.HotKey;
-        set {
-            if (value is null) {
+        set
+        {
+            if (value is null)
+            {
                 throw new ArgumentException (nameof (value));
             }
 
             Key prev = base.HotKey;
-            if (prev != value) {
+
+            if (prev != value)
+            {
                 base.HotKey = TextFormatter.HotKey = value;
 
                 // Also add Alt+HotKey
-                if (prev != Key.Empty && KeyBindings.TryGet (prev.WithAlt, out _)) {
-                    if (value.KeyCode == KeyCode.Null) {
+                if (prev != Key.Empty && KeyBindings.TryGet (prev.WithAlt, out _))
+                {
+                    if (value.KeyCode == KeyCode.Null)
+                    {
                         KeyBindings.Remove (prev.WithAlt);
-                    } else {
+                    }
+                    else
+                    {
                         KeyBindings.Replace (prev.WithAlt, value.WithAlt);
                     }
-                } else if (value != Key.Empty) {
+                }
+                else if (value != Key.Empty)
+                {
                     KeyBindings.Add (value.WithAlt, Command.Accept);
                 }
             }
@@ -96,8 +117,10 @@ public class CheckBox : View {
     }
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent me) {
-        if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) || !CanFocus) {
+    public override bool MouseEvent (MouseEvent me)
+    {
+        if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) || !CanFocus)
+        {
             return false;
         }
 
@@ -107,7 +130,8 @@ public class CheckBox : View {
     }
 
     /// <inheritdoc/>
-    public override bool OnEnter (View view) {
+    public override bool OnEnter (View view)
+    {
         Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
 
         return base.OnEnter (view);
@@ -121,14 +145,16 @@ public class CheckBox : View {
 
     /// <summary>Toggled event, raised when the <see cref="CheckBox"/>  is toggled.</summary>
     /// <remarks>
-    ///     Client code can hook up to this event, it is raised when the <see cref="CheckBox"/> is activated either with the
-    ///     mouse or the keyboard. The passed <c>bool</c> contains the previous state.
+    ///     Client code can hook up to this event, it is raised when the <see cref="CheckBox"/> is activated either with the mouse or the keyboard. The passed
+    ///     <c>bool</c> contains the previous state.
     /// </remarks>
     public event EventHandler<ToggleEventArgs> Toggled;
 
     /// <inheritdoc/>
-    protected override void UpdateTextFormatterText () {
-        switch (TextAlignment) {
+    protected override void UpdateTextFormatterText ()
+    {
+        switch (TextAlignment)
+        {
             case TextAlignment.Left:
             case TextAlignment.Centered:
             case TextAlignment.Justified:
@@ -142,30 +168,39 @@ public class CheckBox : View {
         }
     }
 
-    private Rune GetCheckedState () {
-        return Checked switch {
+    private Rune GetCheckedState ()
+    {
+        return Checked switch
+               {
                    true => _charChecked,
                    false => _charUnChecked,
                    var _ => _charNullChecked
                };
     }
 
-    private string GetFormatterText () {
-        if (AutoSize || string.IsNullOrEmpty (Text) || Frame.Width <= 2) {
+    private string GetFormatterText ()
+    {
+        if (AutoSize || string.IsNullOrEmpty (Text) || Frame.Width <= 2)
+        {
             return Text;
         }
 
-        return Text[..Math.Min (Frame.Width - 2, Text.GetRuneCount ())];
+        return Text [..Math.Min (Frame.Width - 2, Text.GetRuneCount ())];
     }
 
-    private bool ToggleChecked () {
-        if (!HasFocus) {
+    private bool ToggleChecked ()
+    {
+        if (!HasFocus)
+        {
             SetFocus ();
         }
 
         bool? previousChecked = Checked;
-        if (AllowNullChecked) {
-            switch (previousChecked) {
+
+        if (AllowNullChecked)
+        {
+            switch (previousChecked)
+            {
                 case null:
                     Checked = true;
 
@@ -179,7 +214,9 @@ public class CheckBox : View {
 
                     break;
             }
-        } else {
+        }
+        else
+        {
             Checked = !Checked;
         }
 

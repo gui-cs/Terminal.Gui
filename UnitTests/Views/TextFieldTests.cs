@@ -5,63 +5,72 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class TextFieldTests {
-    public TextFieldTests (ITestOutputHelper output) { _output = output; }
+public class TextFieldTests
+{
     private static TextField _textField;
     private readonly ITestOutputHelper _output;
+    public TextFieldTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [AutoInitShutdown]
-    public void Accented_Letter_With_Three_Combining_Unicode_Chars () {
+    public void Accented_Letter_With_Three_Combining_Unicode_Chars ()
+    {
         var tf = new TextField { Width = 3, Text = "ắ" };
         Toplevel top = Application.Top;
         top.Add (tf);
         Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ắ",
-            _output
-        );
+                                                      _output
+                                                     );
 
         tf.Text = "\u1eaf";
         Application.Refresh ();
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ắ",
-            _output
-        );
+                                                      _output
+                                                     );
 
         tf.Text = "\u0103\u0301";
         Application.Refresh ();
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ắ",
-            _output
-        );
+                                                      _output
+                                                     );
 
         tf.Text = "\u0061\u0306\u0301";
         Application.Refresh ();
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 ắ",
-            _output
-        );
+                                                      _output
+                                                     );
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void Adjust_First () {
+    public void Adjust_First ()
+    {
         var tf = new TextField { Width = Dim.Fill (), Text = "This is a test." };
         Application.Top.Add (tf);
         Application.Begin (Application.Top);
 
         Assert.Equal ("This is a test. ", GetContents ());
 
-        string GetContents () {
+        string GetContents ()
+        {
             var item = "";
-            for (var i = 0; i < 16; i++) {
-                item += Application.Driver.Contents[0, i].Rune;
+
+            for (var i = 0; i < 16; i++)
+            {
+                item += Application.Driver.Contents [0, i].Rune;
             }
 
             return item;
@@ -69,7 +78,8 @@ public class TextFieldTests {
     }
 
     [Fact]
-    public void Cancel_TextChanging_ThenBackspace () {
+    public void Cancel_TextChanging_ThenBackspace ()
+    {
         var tf = new TextField ();
         tf.EnsureFocus ();
         tf.NewKeyDownEvent (new Key (KeyCode.A | KeyCode.ShiftMask));
@@ -90,10 +100,13 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void CanFocus_False_Wont_Focus_With_Mouse () {
+    public void CanFocus_False_Wont_Focus_With_Mouse ()
+    {
         Toplevel top = Application.Top;
         var tf = new TextField { Width = Dim.Fill (), CanFocus = false, ReadOnly = true, Text = "some text" };
-        var fv = new FrameView {
+
+        var fv = new FrameView
+        {
             Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = false, Title = "I shouldn't get focus"
         };
         fv.Add (tf);
@@ -107,8 +120,8 @@ public class TextFieldTests {
         Assert.False (fv.HasFocus);
 
         tf.MouseEvent (
-            new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
-        );
+                       new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
+                      );
 
         Assert.Null (tf.SelectedText);
         Assert.False (tf.CanFocus);
@@ -119,9 +132,10 @@ public class TextFieldTests {
         Assert.Throws<InvalidOperationException> (() => tf.CanFocus = true);
         fv.CanFocus = true;
         tf.CanFocus = true;
+
         tf.MouseEvent (
-            new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
-        );
+                       new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
+                      );
 
         Assert.Equal ("some ", tf.SelectedText);
         Assert.True (tf.CanFocus);
@@ -130,9 +144,10 @@ public class TextFieldTests {
         Assert.True (fv.HasFocus);
 
         fv.CanFocus = false;
+
         tf.MouseEvent (
-            new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
-        );
+                       new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
+                      );
 
         Assert.Equal ("some ", tf.SelectedText); // Setting CanFocus to false don't change the SelectedText
         Assert.False (tf.CanFocus);
@@ -145,7 +160,8 @@ public class TextFieldTests {
     [AutoInitShutdown]
     [InlineData ("0123456789", "0123456789")]
     [InlineData ("01234567890", "0123456789")]
-    public void CaptionedTextField_DoesNotOverspillBounds (string caption, string expectedRender) {
+    public void CaptionedTextField_DoesNotOverspillBounds (string caption, string expectedRender)
+    {
         TextField tf = GetTextFieldsInView ();
 
         // Caption has no effect when focused
@@ -159,7 +175,8 @@ public class TextFieldTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void CaptionedTextField_DoesNotOverspillBounds_Unicode () {
+    public void CaptionedTextField_DoesNotOverspillBounds_Unicode ()
+    {
         string caption = "Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables";
 
         Assert.Equal (11, caption.Length);
@@ -179,7 +196,8 @@ public class TextFieldTests {
     [AutoInitShutdown]
     [InlineData ("blah")]
     [InlineData (" ")]
-    public void CaptionedTextField_DoNotRenderCaption_WhenTextPresent (string content) {
+    public void CaptionedTextField_DoNotRenderCaption_WhenTextPresent (string content)
+    {
         TextField tf = GetTextFieldsInView ();
 
         tf.Draw ();
@@ -201,7 +219,8 @@ public class TextFieldTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void CaptionedTextField_RendersCaption_WhenNotFocused () {
+    public void CaptionedTextField_RendersCaption_WhenNotFocused ()
+    {
         TextField tf = GetTextFieldsInView ();
 
         tf.Draw ();
@@ -222,7 +241,8 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void Changing_SelectedStart_Or_CursorPosition_Update_SelectedLength_And_SelectedText () {
+    public void Changing_SelectedStart_Or_CursorPosition_Update_SelectedLength_And_SelectedText ()
+    {
         _textField.BeginInit ();
         _textField.EndInit ();
         _textField.SelectedStart = 2;
@@ -237,7 +257,8 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void Copy_Or_Cut__Not_Allowed_If_Secret_Is_True () {
+    public void Copy_Or_Cut__Not_Allowed_If_Secret_Is_True ()
+    {
         _textField.Secret = true;
         _textField.SelectedStart = 20;
         _textField.CursorPosition = 24;
@@ -254,7 +275,8 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void Copy_Or_Cut_And_Paste_With_No_Selection () {
+    public void Copy_Or_Cut_And_Paste_With_No_Selection ()
+    {
         _textField.SelectedStart = 20;
         _textField.CursorPosition = 24;
         _textField.Copy ();
@@ -274,7 +296,8 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void Copy_Or_Cut_And_Paste_With_Selection () {
+    public void Copy_Or_Cut_And_Paste_With_Selection ()
+    {
         _textField.SelectedStart = 20;
         _textField.CursorPosition = 24;
         _textField.Copy ();
@@ -290,7 +313,8 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void Copy_Or_Cut_Not_Null_If_Has_Selection () {
+    public void Copy_Or_Cut_Not_Null_If_Has_Selection ()
+    {
         _textField.SelectedStart = 20;
         _textField.CursorPosition = 24;
         _textField.Copy ();
@@ -301,7 +325,8 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void Copy_Or_Cut_Null_If_No_Selection () {
+    public void Copy_Or_Cut_Null_If_No_Selection ()
+    {
         _textField.SelectedStart = -1;
         _textField.Copy ();
         Assert.Null (_textField.SelectedText);
@@ -311,14 +336,16 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void Copy_Paste_Surrogate_Pairs () {
+    public void Copy_Paste_Surrogate_Pairs ()
+    {
         _textField.Text = "TextField with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!";
         _textField.SelectAll ();
         _textField.Cut ();
+
         Assert.Equal (
-            "TextField with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!",
-            Application.Driver.Clipboard.GetClipboardData ()
-        );
+                      "TextField with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!",
+                      Application.Driver.Clipboard.GetClipboardData ()
+                     );
         Assert.Equal (string.Empty, _textField.Text);
         _textField.Paste ();
         Assert.Equal ("TextField with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!", _textField.Text);
@@ -326,15 +353,18 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void Copy_Paste_Text_Changing_Updates_Cursor_Position () {
+    public void Copy_Paste_Text_Changing_Updates_Cursor_Position ()
+    {
         _textField.BeginInit ();
         _textField.EndInit ();
 
         _textField.TextChanging += _textField_TextChanging;
 
-        void _textField_TextChanging (object sender, TextChangingEventArgs e) {
-            if (e.NewText.GetRuneCount () > 11) {
-                e.NewText = e.NewText[..11];
+        void _textField_TextChanging (object sender, TextChangingEventArgs e)
+        {
+            if (e.NewText.GetRuneCount () > 11)
+            {
+                e.NewText = e.NewText [..11];
             }
         }
 
@@ -353,7 +383,8 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void Cursor_Position_Initialization () {
+    public void Cursor_Position_Initialization ()
+    {
         Assert.False (_textField.IsInitialized);
 
         // BUGBUG: IsInitialized is false and
@@ -369,7 +400,8 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void CursorPosition_With_Value_Greater_Than_Text_Length_Changes_To_Text_Length () {
+    public void CursorPosition_With_Value_Greater_Than_Text_Length_Changes_To_Text_Length ()
+    {
         _textField.CursorPosition = 33;
         Assert.Equal (32, _textField.CursorPosition);
         Assert.Equal (0, _textField.SelectedLength);
@@ -378,7 +410,8 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void CursorPosition_With_Value_Less_Than_Zero_Changes_To_Zero () {
+    public void CursorPosition_With_Value_Less_Than_Zero_Changes_To_Zero ()
+    {
         _textField.CursorPosition = -1;
         Assert.Equal (0, _textField.CursorPosition);
         Assert.Equal (0, _textField.SelectedLength);
@@ -387,7 +420,8 @@ public class TextFieldTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void DeleteSelectedText_InsertText_DeleteCharLeft_DeleteCharRight_Cut () {
+    public void DeleteSelectedText_InsertText_DeleteCharLeft_DeleteCharRight_Cut ()
+    {
         var newText = "";
         var oldText = "";
         var tf = new TextField { Width = 10, Text = "-1" };
@@ -444,11 +478,12 @@ public class TextFieldTests {
 
         // Delete word with accented char
         tf.Text = "Les Misérables movie.";
+
         Assert.True (
-            tf.MouseEvent (
-                new MouseEvent { X = 7, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
-            )
-        );
+                     tf.MouseEvent (
+                                    new MouseEvent { X = 7, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
+                                   )
+                    );
         Assert.Equal ("Misérables ", tf.SelectedText);
         Assert.Equal (11, tf.SelectedLength);
         Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Delete)));
@@ -458,7 +493,8 @@ public class TextFieldTests {
     }
 
     [Fact]
-    public void HistoryText_IsDirty_ClearHistoryChanges () {
+    public void HistoryText_IsDirty_ClearHistoryChanges ()
+    {
         var text = "Testing";
         var tf = new TextField { Text = text };
         tf.BeginInit ();
@@ -475,7 +511,8 @@ public class TextFieldTests {
 
     [Fact]
     [AutoInitShutdown (useFakeClipboard: true)]
-    public void KeyBindings_Command () {
+    public void KeyBindings_Command ()
+    {
         var tf = new TextField { Width = 20, Text = "This is a test." };
         tf.BeginInit ();
         tf.EndInit ();
@@ -683,7 +720,8 @@ public class TextFieldTests {
     }
 
     [Fact]
-    public void OnEnter_Does_Not_Throw_If_Not_IsInitialized_SetCursorVisibility () {
+    public void OnEnter_Does_Not_Throw_If_Not_IsInitialized_SetCursorVisibility ()
+    {
         var top = new Toplevel ();
         var tf = new TextField { Width = 10 };
         top.Add (tf);
@@ -694,7 +732,8 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void Paste_Always_Clear_The_SelectedText () {
+    public void Paste_Always_Clear_The_SelectedText ()
+    {
         _textField.SelectedStart = 20;
         _textField.CursorPosition = 24;
         _textField.Copy ();
@@ -704,7 +743,8 @@ public class TextFieldTests {
     }
 
     [Fact]
-    public void ProcessKey_Backspace_From_End () {
+    public void ProcessKey_Backspace_From_End ()
+    {
         var tf = new TextField { Text = "ABC" };
         tf.EnsureFocus ();
         Assert.Equal ("ABC", tf.Text);
@@ -730,7 +770,8 @@ public class TextFieldTests {
     }
 
     [Fact]
-    public void ProcessKey_Backspace_From_Middle () {
+    public void ProcessKey_Backspace_From_Middle ()
+    {
         var tf = new TextField { Text = "ABC" };
         tf.EnsureFocus ();
         tf.CursorPosition = 2;
@@ -756,7 +797,8 @@ public class TextFieldTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void ScrollOffset_Initialize () {
+    public void ScrollOffset_Initialize ()
+    {
         var tf = new TextField { X = 1, Y = 1, Width = 20, Text = "Testing Scrolls." };
         tf.BeginInit ();
         tf.EndInit ();
@@ -773,19 +815,21 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void Selected_Text_Shows () {
+    public void Selected_Text_Shows ()
+    {
         // Proves #3022 is fixed (TextField selected text does not show in v2)
 
         _textField.CursorPosition = 0;
         Application.Top.Add (_textField);
         RunState rs = Application.Begin (Application.Top);
 
-        Attribute[] attributes = {
+        Attribute [] attributes =
+        {
             _textField.ColorScheme.Focus,
             new (
-                _textField.ColorScheme.Focus.Background,
-                _textField.ColorScheme.Focus.Foreground
-            )
+                 _textField.ColorScheme.Focus.Background,
+                 _textField.ColorScheme.Focus.Foreground
+                )
         };
 
         //                                             TAB to jump between text fields.
@@ -806,7 +850,8 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void SelectedStart_And_CursorPosition_With_Value_Greater_Than_Text_Length_Changes_Both_To_Text_Length () {
+    public void SelectedStart_And_CursorPosition_With_Value_Greater_Than_Text_Length_Changes_Both_To_Text_Length ()
+    {
         _textField.CursorPosition = 33;
         _textField.SelectedStart = 33;
         Assert.Equal (32, _textField.CursorPosition);
@@ -817,7 +862,8 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void SelectedStart_Greater_Than_CursorPosition_All_Selection_Is_Overwritten_On_Typing () {
+    public void SelectedStart_Greater_Than_CursorPosition_All_Selection_Is_Overwritten_On_Typing ()
+    {
         _textField.SelectedStart = 19;
         _textField.CursorPosition = 12;
         Assert.Equal ("TAB to jump between text fields.", _textField.Text);
@@ -827,7 +873,8 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void SelectedStart_With_Value_Greater_Than_Text_Length_Changes_To_Text_Length () {
+    public void SelectedStart_With_Value_Greater_Than_Text_Length_Changes_To_Text_Length ()
+    {
         _textField.CursorPosition = 2;
         _textField.SelectedStart = 33;
         Assert.Equal (32, _textField.SelectedStart);
@@ -837,7 +884,8 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void SelectedStart_With_Value_Less_Than_Minus_One_Changes_To_Minus_One () {
+    public void SelectedStart_With_Value_Less_Than_Minus_One_Changes_To_Minus_One ()
+    {
         _textField.SelectedStart = -2;
         Assert.Equal (-1, _textField.SelectedStart);
         Assert.Equal (0, _textField.SelectedLength);
@@ -846,7 +894,8 @@ public class TextFieldTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void Test_RootKeyEvent_Cancel () {
+    public void Test_RootKeyEvent_Cancel ()
+    {
         Application.KeyDown += SuppressKey;
 
         var tf = new TextField ();
@@ -870,7 +919,8 @@ public class TextFieldTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void Test_RootMouseKeyEvent_Cancel () {
+    public void Test_RootMouseKeyEvent_Cancel ()
+    {
         Application.MouseEvent += SuppressRightClick;
 
         var tf = new TextField { Width = 10 };
@@ -909,7 +959,8 @@ public class TextFieldTests {
     [InlineData ("aaaaaaaaaaa")] // Greater than selection
     [InlineData ("aaaa")] // Equal than selection
     [Theory]
-    public void TestSetTextAndMoveCursorToEnd_WhenExistingSelection (string newText) {
+    public void TestSetTextAndMoveCursorToEnd_WhenExistingSelection (string newText)
+    {
         var tf = new TextField ();
         tf.Text = "fish";
         tf.CursorPosition = tf.Text.Length;
@@ -933,7 +984,8 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void Text_Replaces_Tabs_With_Empty_String () {
+    public void Text_Replaces_Tabs_With_Empty_String ()
+    {
         _textField.Text = "\t\tTAB to jump between text fields.";
         Assert.Equal ("TAB to jump between text fields.", _textField.Text);
         _textField.Text = "";
@@ -944,7 +996,8 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void TextChanged_Event () {
+    public void TextChanged_Event ()
+    {
         _textField.TextChanged += (s, e) => { Assert.Equal ("TAB to jump between text fields.", e.OldValue); };
 
         _textField.Text = "changed";
@@ -953,15 +1006,19 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void TextChanging_Event () {
+    public void TextChanging_Event ()
+    {
         var cancel = true;
 
-        _textField.TextChanging += (s, e) => {
-            Assert.Equal ("changing", e.NewText);
-            if (cancel) {
-                e.Cancel = true;
-            }
-        };
+        _textField.TextChanging += (s, e) =>
+                                   {
+                                       Assert.Equal ("changing", e.NewText);
+
+                                       if (cancel)
+                                       {
+                                           e.Cancel = true;
+                                       }
+                                   };
 
         _textField.Text = "changing";
         Assert.Equal ("TAB to jump between text fields.", _textField.Text);
@@ -972,7 +1029,8 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void TextField_SpaceHandling () {
+    public void TextField_SpaceHandling ()
+    {
         var tf = new TextField { Width = 10, Text = " " };
 
         var ev = new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1DoubleClicked };
@@ -988,7 +1046,8 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void Used_Is_False () {
+    public void Used_Is_False ()
+    {
         _textField.Used = false;
         _textField.CursorPosition = 10;
         Assert.Equal ("TAB to jump between text fields.", _textField.Text);
@@ -1004,7 +1063,8 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void Used_Is_True_By_Default () {
+    public void Used_Is_True_By_Default ()
+    {
         _textField.CursorPosition = 10;
         Assert.Equal ("TAB to jump between text fields.", _textField.Text);
         _textField.NewKeyDownEvent (new Key ((KeyCode)0x75)); // u
@@ -1019,13 +1079,17 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void WordBackward_With_No_Selection () {
+    public void WordBackward_With_No_Selection ()
+    {
         _textField.CursorPosition = _textField.Text.Length;
         var iteration = 0;
 
-        while (_textField.CursorPosition > 0) {
+        while (_textField.CursorPosition > 0)
+        {
             _textField.NewKeyDownEvent (new Key (KeyCode.CursorLeft | KeyCode.CtrlMask));
-            switch (iteration) {
+
+            switch (iteration)
+            {
                 case 0:
                     Assert.Equal (31, _textField.CursorPosition);
                     Assert.Equal (-1, _textField.SelectedStart);
@@ -1083,16 +1147,20 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void WordBackward_With_No_Selection_And_With_More_Than_Only_One_Whitespace_And_With_Only_One_Letter () {
+    public void WordBackward_With_No_Selection_And_With_More_Than_Only_One_Whitespace_And_With_Only_One_Letter ()
+    {
         //                           1         2         3         4         5    
         //                 0123456789012345678901234567890123456789012345678901234=55 (Length)
         _textField.Text = "TAB   t  o  jump         b  etween    t ext   f ields .";
         _textField.CursorPosition = _textField.Text.Length;
         var iteration = 0;
 
-        while (_textField.CursorPosition > 0) {
+        while (_textField.CursorPosition > 0)
+        {
             _textField.NewKeyDownEvent (new Key (KeyCode.CursorLeft | KeyCode.CtrlMask));
-            switch (iteration) {
+
+            switch (iteration)
+            {
                 case 0:
                     Assert.Equal (54, _textField.CursorPosition);
                     Assert.Equal (-1, _textField.SelectedStart);
@@ -1178,19 +1246,22 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void WordBackward_With_Selection () {
+    public void WordBackward_With_Selection ()
+    {
         _textField.CursorPosition = _textField.Text.Length;
         _textField.SelectedStart = _textField.Text.Length;
         var iteration = 0;
 
-        while (_textField.CursorPosition > 0) {
+        while (_textField.CursorPosition > 0)
+        {
             _textField.NewKeyDownEvent (
-                new Key (
-                    KeyCode.CursorLeft | KeyCode.CtrlMask |
-                    KeyCode.ShiftMask
-                )
-            );
-            switch (iteration) {
+                                        new Key (
+                                                 KeyCode.CursorLeft | KeyCode.CtrlMask | KeyCode.ShiftMask
+                                                )
+                                       );
+
+            switch (iteration)
+            {
                 case 0:
                     Assert.Equal (31, _textField.CursorPosition);
                     Assert.Equal (32, _textField.SelectedStart);
@@ -1249,19 +1320,22 @@ public class TextFieldTests {
     [Fact]
     [TextFieldTestsAutoInitShutdown]
     public void
-        WordBackward_With_The_Same_Values_For_SelectedStart_And_CursorPosition_And_Not_Starting_At_Beginning_Of_The_Text () {
+        WordBackward_With_The_Same_Values_For_SelectedStart_And_CursorPosition_And_Not_Starting_At_Beginning_Of_The_Text ()
+    {
         _textField.CursorPosition = 10;
         _textField.SelectedStart = 10;
         var iteration = 0;
 
-        while (_textField.CursorPosition > 0) {
+        while (_textField.CursorPosition > 0)
+        {
             _textField.NewKeyDownEvent (
-                new Key (
-                    KeyCode.CursorLeft | KeyCode.CtrlMask |
-                    KeyCode.ShiftMask
-                )
-            );
-            switch (iteration) {
+                                        new Key (
+                                                 KeyCode.CursorLeft | KeyCode.CtrlMask | KeyCode.ShiftMask
+                                                )
+                                       );
+
+            switch (iteration)
+            {
                 case 0:
                     Assert.Equal (7, _textField.CursorPosition);
                     Assert.Equal (10, _textField.SelectedStart);
@@ -1290,7 +1364,8 @@ public class TextFieldTests {
     }
 
     [Fact]
-    public void WordBackward_WordForward_Mixed () {
+    public void WordBackward_WordForward_Mixed ()
+    {
         var tf = new TextField { Width = 30, Text = "Test with0. and!.?;-@+" };
         tf.BeginInit ();
         tf.EndInit ();
@@ -1319,7 +1394,8 @@ public class TextFieldTests {
     }
 
     [Fact]
-    public void WordBackward_WordForward_SelectedText_With_Accent () {
+    public void WordBackward_WordForward_SelectedText_With_Accent ()
+    {
         var text = "Les Misérables movie.";
         var tf = new TextField { Width = 30, Text = text };
 
@@ -1331,41 +1407,46 @@ public class TextFieldTests {
         Assert.Equal (21, runes.Count);
         Assert.Equal (21, tf.Text.Length);
 
-        for (var i = 0; i < runes.Count; i++) {
-            char cs = text[i];
-            var cus = (char)runes[i].Value;
+        for (var i = 0; i < runes.Count; i++)
+        {
+            char cs = text [i];
+            var cus = (char)runes [i].Value;
             Assert.Equal (cs, cus);
         }
 
         var idx = 15;
-        Assert.Equal ('m', text[idx]);
-        Assert.Equal ('m', (char)runes[idx].Value);
-        Assert.Equal ("m", runes[idx].ToString ());
+        Assert.Equal ('m', text [idx]);
+        Assert.Equal ('m', (char)runes [idx].Value);
+        Assert.Equal ("m", runes [idx].ToString ());
 
         Assert.True (
-            tf.MouseEvent (
-                new MouseEvent { X = idx, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
-            )
-        );
+                     tf.MouseEvent (
+                                    new MouseEvent { X = idx, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
+                                   )
+                    );
         Assert.Equal ("movie.", tf.SelectedText);
 
         Assert.True (
-            tf.MouseEvent (
-                new MouseEvent { X = idx + 1, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
-            )
-        );
+                     tf.MouseEvent (
+                                    new MouseEvent { X = idx + 1, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
+                                   )
+                    );
         Assert.Equal ("movie.", tf.SelectedText);
     }
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void WordForward_With_No_Selection () {
+    public void WordForward_With_No_Selection ()
+    {
         _textField.CursorPosition = 0;
         var iteration = 0;
 
-        while (_textField.CursorPosition < _textField.Text.Length) {
+        while (_textField.CursorPosition < _textField.Text.Length)
+        {
             _textField.NewKeyDownEvent (new Key (KeyCode.CursorRight | KeyCode.CtrlMask));
-            switch (iteration) {
+
+            switch (iteration)
+            {
                 case 0:
                     Assert.Equal (4, _textField.CursorPosition);
                     Assert.Equal (-1, _textField.SelectedStart);
@@ -1416,16 +1497,20 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void WordForward_With_No_Selection_And_With_More_Than_Only_One_Whitespace_And_With_Only_One_Letter () {
+    public void WordForward_With_No_Selection_And_With_More_Than_Only_One_Whitespace_And_With_Only_One_Letter ()
+    {
         //                           1         2         3         4         5    
         //                 0123456789012345678901234567890123456789012345678901234=55 (Length)
         _textField.Text = "TAB   t  o  jump         b  etween    t ext   f ields .";
         _textField.CursorPosition = 0;
         var iteration = 0;
 
-        while (_textField.CursorPosition < _textField.Text.Length) {
+        while (_textField.CursorPosition < _textField.Text.Length)
+        {
             _textField.NewKeyDownEvent (new Key (KeyCode.CursorRight | KeyCode.CtrlMask));
-            switch (iteration) {
+
+            switch (iteration)
+            {
                 case 0:
                     Assert.Equal (6, _textField.CursorPosition);
                     Assert.Equal (-1, _textField.SelectedStart);
@@ -1511,16 +1596,20 @@ public class TextFieldTests {
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void WordForward_With_Selection () {
+    public void WordForward_With_Selection ()
+    {
         _textField.CursorPosition = 0;
         _textField.SelectedStart = 0;
         var iteration = 0;
 
-        while (_textField.CursorPosition < _textField.Text.Length) {
+        while (_textField.CursorPosition < _textField.Text.Length)
+        {
             _textField.NewKeyDownEvent (
-                new Key (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask)
-            );
-            switch (iteration) {
+                                        new Key (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask)
+                                       );
+
+            switch (iteration)
+            {
                 case 0:
                     Assert.Equal (4, _textField.CursorPosition);
                     Assert.Equal (0, _textField.SelectedStart);
@@ -1572,16 +1661,20 @@ public class TextFieldTests {
     [Fact]
     [TextFieldTestsAutoInitShutdown]
     public void
-        WordForward_With_The_Same_Values_For_SelectedStart_And_CursorPosition_And_Not_Starting_At_Beginning_Of_The_Text () {
+        WordForward_With_The_Same_Values_For_SelectedStart_And_CursorPosition_And_Not_Starting_At_Beginning_Of_The_Text ()
+    {
         _textField.CursorPosition = 10;
         _textField.SelectedStart = 10;
         var iteration = 0;
 
-        while (_textField.CursorPosition < _textField.Text.Length) {
+        while (_textField.CursorPosition < _textField.Text.Length)
+        {
             _textField.NewKeyDownEvent (
-                new Key (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask)
-            );
-            switch (iteration) {
+                                        new Key (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask)
+                                       );
+
+            switch (iteration)
+            {
                 case 0:
                     Assert.Equal (12, _textField.CursorPosition);
                     Assert.Equal (10, _textField.SelectedStart);
@@ -1618,37 +1711,41 @@ public class TextFieldTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void Words_With_Accents_Incorrect_Order_Will_Result_With_Wrong_Accent_Place () {
+    public void Words_With_Accents_Incorrect_Order_Will_Result_With_Wrong_Accent_Place ()
+    {
         var tf = new TextField { Width = 30, Text = "Les Misérables" };
         Toplevel top = Application.Top;
         top.Add (tf);
         Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 Les Misérables",
-            _output
-        );
+                                                      _output
+                                                     );
 
         tf.Text = "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables";
         Application.Refresh ();
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 Les Misérables",
-            _output
-        );
+                                                      _output
+                                                     );
 
         // incorrect order will result with a wrong accent place
         tf.Text = "Les Mis" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "erables";
         Application.Refresh ();
+
         TestHelpers.AssertDriverContentsWithFrameAre (
-            @"
+                                                      @"
 Les Miśerables",
-            _output
-        );
+                                                      _output
+                                                     );
     }
 
-    private TextField GetTextFieldsInView () {
+    private TextField GetTextFieldsInView ()
+    {
         var tf = new TextField { Width = 10 };
         var tf2 = new TextField { Y = 1, Width = 10 };
 
@@ -1663,14 +1760,18 @@ Les Miśerables",
         return tf;
     }
 
-    private void SuppressKey (object s, Key arg) {
-        if (arg.AsRune == new Rune ('j')) {
+    private void SuppressKey (object s, Key arg)
+    {
+        if (arg.AsRune == new Rune ('j'))
+        {
             arg.Handled = true;
         }
     }
 
-    private void SuppressRightClick (object sender, MouseEventEventArgs arg) {
-        if (arg.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
+    private void SuppressRightClick (object sender, MouseEventEventArgs arg)
+    {
+        if (arg.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
+        {
             arg.Handled = true;
         }
     }
@@ -1681,19 +1782,23 @@ Les Miśerables",
     // This is necessary because a) Application is a singleton and Init/Shutdown must be called
     // as a pair, and b) all unit test functions should be atomic.
     [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
-    public class TextFieldTestsAutoInitShutdown : AutoInitShutdownAttribute {
-        public override void After (MethodInfo methodUnderTest) {
+    public class TextFieldTestsAutoInitShutdown : AutoInitShutdownAttribute
+    {
+        public override void After (MethodInfo methodUnderTest)
+        {
             _textField.Dispose ();
             _textField = null;
             base.After (methodUnderTest);
         }
 
-        public override void Before (MethodInfo methodUnderTest) {
+        public override void Before (MethodInfo methodUnderTest)
+        {
             base.Before (methodUnderTest);
 
             //Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
-            _textField = new TextField {
-                ColorScheme = new ColorScheme (Colors.ColorSchemes["Base"]),
+            _textField = new TextField
+            {
+                ColorScheme = new ColorScheme (Colors.ColorSchemes ["Base"]),
 
                 //                1         2         3 
                 //      01234567890123456789012345678901=32 (Length)

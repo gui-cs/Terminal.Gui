@@ -8,36 +8,40 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         If any subview is a button and the <see cref="Button.IsDefault"/> property is set to true, the Enter key will
-///         invoke the <see cref="Command.Accept"/> command on that subview.
+///         If any subview is a button and the <see cref="Button.IsDefault"/> property is set to true, the Enter key will invoke the
+///         <see cref="Command.Accept"/> command on that subview.
 ///     </para>
 /// </remarks>
-public class Window : Toplevel {
+public class Window : Toplevel
+{
     /// <summary>
     ///     Initializes a new instance of the <see cref="Window"/> class using <see cref="LayoutStyle.Computed"/>
     ///     positioning.
     /// </summary>
-    public Window () {
+    public Window ()
+    {
         CanFocus = true;
-        ColorScheme = Colors.ColorSchemes["Base"]; // TODO: make this a theme property
+        ColorScheme = Colors.ColorSchemes ["Base"]; // TODO: make this a theme property
         BorderStyle = DefaultBorderStyle;
 
         // This enables the default button to be activated by the Enter key.
         AddCommand (
-            Command.Accept,
-            () => {
-                // TODO: Perhaps all views should support the concept of being default?
-                // ReSharper disable once InvertIf
-                if (Subviews.FirstOrDefault (v => v is Button { IsDefault: true, Enabled: true }) is Button
-                    defaultBtn) {
-                    defaultBtn.InvokeCommand (Command.Accept);
+                    Command.Accept,
+                    () =>
+                    {
+                        // TODO: Perhaps all views should support the concept of being default?
+                        // ReSharper disable once InvertIf
+                        if (Subviews.FirstOrDefault (v => v is Button { IsDefault: true, Enabled: true }) is Button
+                            defaultBtn)
+                        {
+                            defaultBtn.InvokeCommand (Command.Accept);
 
-                    return true;
-                }
+                            return true;
+                        }
 
-                return false;
-            }
-        );
+                        return false;
+                    }
+                   );
 
         KeyBindings.Add (Key.Enter, Command.Accept);
     }

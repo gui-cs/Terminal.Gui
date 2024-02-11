@@ -1,6 +1,7 @@
 ﻿namespace Terminal.Gui;
 
-public partial class View {
+public partial class View
+{
     /// <summary>Gets or sets a value indicating whether this <see cref="View"/> want continuous button pressed event.</summary>
     public virtual bool WantContinuousButtonPressed { get; set; }
 
@@ -18,12 +19,15 @@ public partial class View {
     public event EventHandler<MouseEventEventArgs> MouseLeave;
 
     /// <inheritdoc/>
-    public override bool OnMouseEnter (MouseEvent mouseEvent) {
-        if (!Enabled) {
+    public override bool OnMouseEnter (MouseEvent mouseEvent)
+    {
+        if (!Enabled)
+        {
             return true;
         }
 
-        if (!CanBeVisible (this)) {
+        if (!CanBeVisible (this))
+        {
             return false;
         }
 
@@ -36,22 +40,29 @@ public partial class View {
     /// <summary>Method invoked when a mouse event is generated</summary>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    public virtual bool OnMouseEvent (MouseEvent mouseEvent) {
-        if (!Enabled) {
+    public virtual bool OnMouseEvent (MouseEvent mouseEvent)
+    {
+        if (!Enabled)
+        {
             return true;
         }
 
-        if (!CanBeVisible (this)) {
+        if (!CanBeVisible (this))
+        {
             return false;
         }
 
         var args = new MouseEventEventArgs (mouseEvent);
-        if (MouseEvent (mouseEvent)) {
+
+        if (MouseEvent (mouseEvent))
+        {
             return true;
         }
 
-        if (mouseEvent.Flags == MouseFlags.Button1Clicked) {
-            if (CanFocus && !HasFocus && SuperView != null) {
+        if (mouseEvent.Flags == MouseFlags.Button1Clicked)
+        {
+            if (CanFocus && !HasFocus && SuperView != null)
+            {
                 SuperView.SetFocus (this);
                 SetNeedsDisplay ();
             }
@@ -59,15 +70,18 @@ public partial class View {
             return OnMouseClick (args);
         }
 
-        if (mouseEvent.Flags == MouseFlags.Button2Clicked) {
+        if (mouseEvent.Flags == MouseFlags.Button2Clicked)
+        {
             return OnMouseClick (args);
         }
 
-        if (mouseEvent.Flags == MouseFlags.Button3Clicked) {
+        if (mouseEvent.Flags == MouseFlags.Button3Clicked)
+        {
             return OnMouseClick (args);
         }
 
-        if (mouseEvent.Flags == MouseFlags.Button4Clicked) {
+        if (mouseEvent.Flags == MouseFlags.Button4Clicked)
+        {
             return OnMouseClick (args);
         }
 
@@ -75,12 +89,15 @@ public partial class View {
     }
 
     /// <inheritdoc/>
-    public override bool OnMouseLeave (MouseEvent mouseEvent) {
-        if (!Enabled) {
+    public override bool OnMouseLeave (MouseEvent mouseEvent)
+    {
+        if (!Enabled)
+        {
             return true;
         }
 
-        if (!CanBeVisible (this)) {
+        if (!CanBeVisible (this))
+        {
             return false;
         }
 
@@ -91,8 +108,10 @@ public partial class View {
     }
 
     /// <summary>Invokes the MouseClick event.</summary>
-    protected bool OnMouseClick (MouseEventEventArgs args) {
-        if (!Enabled) {
+    protected bool OnMouseClick (MouseEventEventArgs args)
+    {
+        if (!Enabled)
+        {
             return true;
         }
 

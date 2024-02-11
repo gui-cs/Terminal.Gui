@@ -11,7 +11,8 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("TreeView")]
 [ScenarioCategory ("Files and IO")]
-public class TreeViewFileSystem : Scenario {
+public class TreeViewFileSystem : Scenario
+{
     private readonly FileSystemIconProvider _iconProvider = new ();
     private DetailsFrame _detailsFrame;
     private MenuItem _miArrowSymbols;
@@ -33,138 +34,151 @@ public class TreeViewFileSystem : Scenario {
     /// <summary>A tree view where nodes are files and folders</summary>
     private TreeView<IFileSystemInfo> _treeViewFiles;
 
-    public override void Setup () {
+    public override void Setup ()
+    {
         Win.Title = GetName ();
         Win.Y = 1; // menu
         Win.Height = Dim.Fill ();
 
-        var menu = new MenuBar {
-            Menus = [
-                        new MenuBarItem (
-                            "_File",
-                            new MenuItem[] {
-                                new (
-                                    "_Quit",
-                                    $"{Application.QuitKey}",
-                                    () => Quit ()
+        var menu = new MenuBar
+        {
+            Menus =
+            [
+                new MenuBarItem (
+                                 "_File",
+                                 new MenuItem []
+                                 {
+                                     new (
+                                          "_Quit",
+                                          $"{Application.QuitKey}",
+                                          () => Quit ()
+                                         )
+                                 }
+                                ),
+                new MenuBarItem (
+                                 "_View",
+                                 new []
+                                 {
+                                     _miFullPaths =
+                                         new MenuItem ("_Full Paths", "", () => SetFullName ())
+                                         {
+                                             Checked = false, CheckType = MenuItemCheckStyle.Checked
+                                         },
+                                     _miMultiSelect = new MenuItem (
+                                                                    "_Multi Select",
+                                                                    "",
+                                                                    () => SetMultiSelect ()
+                                                                   )
+                                     {
+                                         Checked = true,
+                                         CheckType = MenuItemCheckStyle
+                                             .Checked
+                                     }
+                                 }
+                                ),
+                new MenuBarItem (
+                                 "_Style",
+                                 new []
+                                 {
+                                     _miShowLines =
+                                         new MenuItem ("_Show Lines", "", () => ShowLines ())
+                                         {
+                                             Checked = true, CheckType = MenuItemCheckStyle.Checked
+                                         },
+                                     null /*separator*/,
+                                     _miPlusMinus =
+                                         new MenuItem (
+                                                       "_Plus Minus Symbols",
+                                                       "+ -",
+                                                       () => SetExpandableSymbols (
+                                                                                   (Rune)'+',
+                                                                                   (Rune)'-'
+                                                                                  )
+                                                      ) { Checked = true, CheckType = MenuItemCheckStyle.Radio },
+                                     _miArrowSymbols =
+                                         new MenuItem (
+                                                       "_Arrow Symbols",
+                                                       "> v",
+                                                       () => SetExpandableSymbols (
+                                                                                   (Rune)'>',
+                                                                                   (Rune)'v'
+                                                                                  )
+                                                      ) { Checked = false, CheckType = MenuItemCheckStyle.Radio },
+                                     _miNoSymbols =
+                                         new MenuItem (
+                                                       "_No Symbols",
+                                                       "",
+                                                       () => SetExpandableSymbols (
+                                                                                   default (Rune),
+                                                                                   null
+                                                                                  )
+                                                      ) { Checked = false, CheckType = MenuItemCheckStyle.Radio },
+                                     null /*separator*/,
+                                     _miColoredSymbols =
+                                         new MenuItem (
+                                                       "_Colored Symbols",
+                                                       "",
+                                                       () => ShowColoredExpandableSymbols ()
+                                                      ) { Checked = false, CheckType = MenuItemCheckStyle.Checked },
+                                     _miInvertSymbols =
+                                         new MenuItem (
+                                                       "_Invert Symbols",
+                                                       "",
+                                                       () => InvertExpandableSymbols ()
+                                                      ) { Checked = false, CheckType = MenuItemCheckStyle.Checked },
+                                     null /*separator*/,
+                                     _miBasicIcons =
+                                         new MenuItem ("_Basic Icons", null, SetNoIcons)
+                                         {
+                                             Checked = false, CheckType = MenuItemCheckStyle.Radio
+                                         },
+                                     _miUnicodeIcons =
+                                         new MenuItem ("_Unicode Icons", null, SetUnicodeIcons)
+                                         {
+                                             Checked = false, CheckType = MenuItemCheckStyle.Radio
+                                         },
+                                     _miNerdIcons =
+                                         new MenuItem ("_Nerd Icons", null, SetNerdIcons)
+                                         {
+                                             Checked = false, CheckType = MenuItemCheckStyle.Radio
+                                         },
+                                     null /*separator*/,
+                                     _miLeaveLastRow =
+                                         new MenuItem (
+                                                       "_Leave Last Row",
+                                                       "",
+                                                       () => SetLeaveLastRow ()
+                                                      ) { Checked = true, CheckType = MenuItemCheckStyle.Checked },
+                                     _miHighlightModelTextOnly =
+                                         new MenuItem (
+                                                       "_Highlight Model Text Only",
+                                                       "",
+                                                       () => SetCheckHighlightModelTextOnly ()
+                                                      ) { Checked = false, CheckType = MenuItemCheckStyle.Checked },
+                                     null /*separator*/,
+                                     _miCustomColors =
+                                         new MenuItem (
+                                                       "C_ustom Colors Hidden Files",
+                                                       "Yellow/Red",
+                                                       () => SetCustomColors ()
+                                                      ) { Checked = false, CheckType = MenuItemCheckStyle.Checked },
+                                     null /*separator*/,
+                                     _miCursor = new MenuItem (
+                                                               "Curs_or (MultiSelect only)",
+                                                               "",
+                                                               () => SetCursor ()
+                                                              ) { Checked = false, CheckType = MenuItemCheckStyle.Checked }
+                                 }
                                 )
-                            }
-                        ),
-                        new MenuBarItem (
-                            "_View",
-                            new[] {
-                                _miFullPaths =
-                                    new MenuItem ("_Full Paths", "", () => SetFullName ()) {
-                                        Checked = false, CheckType = MenuItemCheckStyle.Checked
-                                    },
-                                _miMultiSelect = new MenuItem (
-                                    "_Multi Select",
-                                    "",
-                                    () => SetMultiSelect ()
-                                ) {
-                                    Checked = true,
-                                    CheckType = MenuItemCheckStyle
-                                        .Checked
-                                }
-                            }
-                        ),
-                        new MenuBarItem (
-                            "_Style",
-                            new[] {
-                                _miShowLines =
-                                    new MenuItem ("_Show Lines", "", () => ShowLines ()) {
-                                        Checked = true, CheckType = MenuItemCheckStyle.Checked
-                                    },
-                                null /*separator*/,
-                                _miPlusMinus =
-                                    new MenuItem (
-                                        "_Plus Minus Symbols",
-                                        "+ -",
-                                        () => SetExpandableSymbols (
-                                            (Rune)'+',
-                                            (Rune)'-'
-                                        )
-                                    ) { Checked = true, CheckType = MenuItemCheckStyle.Radio },
-                                _miArrowSymbols =
-                                    new MenuItem (
-                                        "_Arrow Symbols",
-                                        "> v",
-                                        () => SetExpandableSymbols (
-                                            (Rune)'>',
-                                            (Rune)'v'
-                                        )
-                                    ) { Checked = false, CheckType = MenuItemCheckStyle.Radio },
-                                _miNoSymbols =
-                                    new MenuItem (
-                                        "_No Symbols",
-                                        "",
-                                        () => SetExpandableSymbols (
-                                            default (Rune),
-                                            null
-                                        )
-                                    ) { Checked = false, CheckType = MenuItemCheckStyle.Radio },
-                                null /*separator*/,
-                                _miColoredSymbols =
-                                    new MenuItem (
-                                        "_Colored Symbols",
-                                        "",
-                                        () => ShowColoredExpandableSymbols ()
-                                    ) { Checked = false, CheckType = MenuItemCheckStyle.Checked },
-                                _miInvertSymbols =
-                                    new MenuItem (
-                                        "_Invert Symbols",
-                                        "",
-                                        () => InvertExpandableSymbols ()
-                                    ) { Checked = false, CheckType = MenuItemCheckStyle.Checked },
-                                null /*separator*/,
-                                _miBasicIcons =
-                                    new MenuItem ("_Basic Icons", null, SetNoIcons) {
-                                        Checked = false, CheckType = MenuItemCheckStyle.Radio
-                                    },
-                                _miUnicodeIcons =
-                                    new MenuItem ("_Unicode Icons", null, SetUnicodeIcons) {
-                                        Checked = false, CheckType = MenuItemCheckStyle.Radio
-                                    },
-                                _miNerdIcons =
-                                    new MenuItem ("_Nerd Icons", null, SetNerdIcons) {
-                                        Checked = false, CheckType = MenuItemCheckStyle.Radio
-                                    },
-                                null /*separator*/,
-                                _miLeaveLastRow =
-                                    new MenuItem (
-                                        "_Leave Last Row",
-                                        "",
-                                        () => SetLeaveLastRow ()
-                                    ) { Checked = true, CheckType = MenuItemCheckStyle.Checked },
-                                _miHighlightModelTextOnly =
-                                    new MenuItem (
-                                        "_Highlight Model Text Only",
-                                        "",
-                                        () => SetCheckHighlightModelTextOnly ()
-                                    ) { Checked = false, CheckType = MenuItemCheckStyle.Checked },
-                                null /*separator*/,
-                                _miCustomColors =
-                                    new MenuItem (
-                                        "C_ustom Colors Hidden Files",
-                                        "Yellow/Red",
-                                        () => SetCustomColors ()
-                                    ) { Checked = false, CheckType = MenuItemCheckStyle.Checked },
-                                null /*separator*/,
-                                _miCursor = new MenuItem (
-                                    "Curs_or (MultiSelect only)",
-                                    "",
-                                    () => SetCursor ()
-                                ) { Checked = false, CheckType = MenuItemCheckStyle.Checked }
-                            }
-                        )
-                    ]
+            ]
         };
         Application.Top.Add (menu);
 
         _treeViewFiles = new TreeView<IFileSystemInfo> { X = 0, Y = 0, Width = Dim.Percent (50), Height = Dim.Fill () };
         _treeViewFiles.DrawLine += TreeViewFiles_DrawLine;
 
-        _detailsFrame = new DetailsFrame (_iconProvider) {
+        _detailsFrame = new DetailsFrame (_iconProvider)
+        {
             X = Pos.Right (_treeViewFiles), Y = 0, Width = Dim.Fill (), Height = Dim.Fill ()
         };
 
@@ -186,9 +200,10 @@ public class TreeViewFileSystem : Scenario {
         UpdateIconCheckedness ();
     }
 
-    private string AspectGetter (IFileSystemInfo f) => (_iconProvider.GetIconWithOptionalSpace (f) + f.Name).Trim ();
+    private string AspectGetter (IFileSystemInfo f) { return (_iconProvider.GetIconWithOptionalSpace (f) + f.Name).Trim (); }
 
-    private void InvertExpandableSymbols () {
+    private void InvertExpandableSymbols ()
+    {
         _miInvertSymbols.Checked = !_miInvertSymbols.Checked;
 
         _treeViewFiles.Style.InvertExpandSymbolColors = (bool)_miInvertSymbols.Checked;
@@ -197,63 +212,76 @@ public class TreeViewFileSystem : Scenario {
 
     private void Quit () { Application.RequestStop (); }
 
-    private void SetCheckHighlightModelTextOnly () {
+    private void SetCheckHighlightModelTextOnly ()
+    {
         _treeViewFiles.Style.HighlightModelTextOnly = !_treeViewFiles.Style.HighlightModelTextOnly;
         _miHighlightModelTextOnly.Checked = _treeViewFiles.Style.HighlightModelTextOnly;
         _treeViewFiles.SetNeedsDisplay ();
     }
 
-    private void SetCursor () {
+    private void SetCursor ()
+    {
         _miCursor.Checked = !_miCursor.Checked;
+
         _treeViewFiles.DesiredCursorVisibility =
             _miCursor.Checked == true ? CursorVisibility.Default : CursorVisibility.Invisible;
     }
 
-    private void SetCustomColors () {
+    private void SetCustomColors ()
+    {
         _miCustomColors.Checked = !_miCustomColors.Checked;
 
-        if (_miCustomColors.Checked == true) {
-            _treeViewFiles.ColorGetter = m => {
-                if (m is IDirectoryInfo && m.Attributes.HasFlag (FileAttributes.Hidden)) {
-                    return new ColorScheme {
-                        Focus = new Attribute (
-                            Color.BrightRed,
-                            _treeViewFiles.ColorScheme.Focus.Background
-                        ),
-                        Normal = new Attribute (
-                            Color.BrightYellow,
-                            _treeViewFiles.ColorScheme.Normal.Background
-                        )
-                    };
+        if (_miCustomColors.Checked == true)
+        {
+            _treeViewFiles.ColorGetter = m =>
+                                         {
+                                             if (m is IDirectoryInfo && m.Attributes.HasFlag (FileAttributes.Hidden))
+                                             {
+                                                 return new ColorScheme
+                                                 {
+                                                     Focus = new Attribute (
+                                                                            Color.BrightRed,
+                                                                            _treeViewFiles.ColorScheme.Focus.Background
+                                                                           ),
+                                                     Normal = new Attribute (
+                                                                             Color.BrightYellow,
+                                                                             _treeViewFiles.ColorScheme.Normal.Background
+                                                                            )
+                                                 };
 
-                    ;
-                }
+                                                 ;
+                                             }
 
-                if (m is IFileInfo && m.Attributes.HasFlag (FileAttributes.Hidden)) {
-                    return new ColorScheme {
-                        Focus = new Attribute (
-                            Color.BrightRed,
-                            _treeViewFiles.ColorScheme.Focus.Background
-                        ),
-                        Normal = new Attribute (
-                            Color.BrightYellow,
-                            _treeViewFiles.ColorScheme.Normal.Background
-                        )
-                    };
+                                             if (m is IFileInfo && m.Attributes.HasFlag (FileAttributes.Hidden))
+                                             {
+                                                 return new ColorScheme
+                                                 {
+                                                     Focus = new Attribute (
+                                                                            Color.BrightRed,
+                                                                            _treeViewFiles.ColorScheme.Focus.Background
+                                                                           ),
+                                                     Normal = new Attribute (
+                                                                             Color.BrightYellow,
+                                                                             _treeViewFiles.ColorScheme.Normal.Background
+                                                                            )
+                                                 };
 
-                    ;
-                }
+                                                 ;
+                                             }
 
-                return null;
-            };
-        } else {
+                                             return null;
+                                         };
+        }
+        else
+        {
             _treeViewFiles.ColorGetter = null;
         }
 
         _treeViewFiles.SetNeedsDisplay ();
     }
 
-    private void SetExpandableSymbols (Rune expand, Rune? collapse) {
+    private void SetExpandableSymbols (Rune expand, Rune? collapse)
+    {
         _miPlusMinus.Checked = expand.Value == '+';
         _miArrowSymbols.Checked = expand.Value == '>';
         _miNoSymbols.Checked = expand.Value == default (int);
@@ -263,47 +291,58 @@ public class TreeViewFileSystem : Scenario {
         _treeViewFiles.SetNeedsDisplay ();
     }
 
-    private void SetFullName () {
+    private void SetFullName ()
+    {
         _miFullPaths.Checked = !_miFullPaths.Checked;
 
-        if (_miFullPaths.Checked == true) {
+        if (_miFullPaths.Checked == true)
+        {
             _treeViewFiles.AspectGetter = f => f.FullName;
-        } else {
+        }
+        else
+        {
             _treeViewFiles.AspectGetter = f => f.Name;
         }
 
         _treeViewFiles.SetNeedsDisplay ();
     }
 
-    private void SetLeaveLastRow () {
+    private void SetLeaveLastRow ()
+    {
         _miLeaveLastRow.Checked = !_miLeaveLastRow.Checked;
         _treeViewFiles.Style.LeaveLastRow = (bool)_miLeaveLastRow.Checked;
     }
 
-    private void SetMultiSelect () {
+    private void SetMultiSelect ()
+    {
         _miMultiSelect.Checked = !_miMultiSelect.Checked;
         _treeViewFiles.MultiSelect = (bool)_miMultiSelect.Checked;
     }
 
-    private void SetNerdIcons () {
+    private void SetNerdIcons ()
+    {
         _iconProvider.UseNerdIcons = true;
         UpdateIconCheckedness ();
     }
 
-    private void SetNoIcons () {
+    private void SetNoIcons ()
+    {
         _iconProvider.UseUnicodeCharacters = false;
         _iconProvider.UseNerdIcons = false;
         UpdateIconCheckedness ();
     }
 
-    private void SetUnicodeIcons () {
+    private void SetUnicodeIcons ()
+    {
         _iconProvider.UseUnicodeCharacters = true;
         UpdateIconCheckedness ();
     }
 
-    private void SetupFileTree () {
+    private void SetupFileTree ()
+    {
         // setup how to build tree
         var fs = new FileSystem ();
+
         IEnumerable<IDirectoryInfo> rootDirs =
             DriveInfo.GetDrives ().Select (d => fs.DirectoryInfo.New (d.RootDirectory.FullName));
         _treeViewFiles.TreeBuilder = new FileSystemTreeBuilder ();
@@ -315,58 +354,69 @@ public class TreeViewFileSystem : Scenario {
         _iconProvider.IsOpenGetter = _treeViewFiles.IsExpanded;
     }
 
-    private void SetupScrollBar () {
+    private void SetupScrollBar ()
+    {
         // When using scroll bar leave the last row of the control free (for over-rendering with scroll bar)
         _treeViewFiles.Style.LeaveLastRow = true;
 
         var scrollBar = new ScrollBarView (_treeViewFiles, true);
 
-        scrollBar.ChangedPosition += (s, e) => {
-            _treeViewFiles.ScrollOffsetVertical = scrollBar.Position;
-            if (_treeViewFiles.ScrollOffsetVertical != scrollBar.Position) {
-                scrollBar.Position = _treeViewFiles.ScrollOffsetVertical;
-            }
+        scrollBar.ChangedPosition += (s, e) =>
+                                     {
+                                         _treeViewFiles.ScrollOffsetVertical = scrollBar.Position;
 
-            _treeViewFiles.SetNeedsDisplay ();
-        };
+                                         if (_treeViewFiles.ScrollOffsetVertical != scrollBar.Position)
+                                         {
+                                             scrollBar.Position = _treeViewFiles.ScrollOffsetVertical;
+                                         }
 
-        scrollBar.OtherScrollBarView.ChangedPosition += (s, e) => {
-            _treeViewFiles.ScrollOffsetHorizontal = scrollBar.OtherScrollBarView.Position;
-            if (_treeViewFiles.ScrollOffsetHorizontal != scrollBar.OtherScrollBarView.Position) {
-                scrollBar.OtherScrollBarView.Position = _treeViewFiles.ScrollOffsetHorizontal;
-            }
+                                         _treeViewFiles.SetNeedsDisplay ();
+                                     };
 
-            _treeViewFiles.SetNeedsDisplay ();
-        };
+        scrollBar.OtherScrollBarView.ChangedPosition += (s, e) =>
+                                                        {
+                                                            _treeViewFiles.ScrollOffsetHorizontal = scrollBar.OtherScrollBarView.Position;
 
-        _treeViewFiles.DrawContent += (s, e) => {
-            scrollBar.Size = _treeViewFiles.ContentHeight;
-            scrollBar.Position = _treeViewFiles.ScrollOffsetVertical;
-            scrollBar.OtherScrollBarView.Size = _treeViewFiles.GetContentWidth (true);
-            scrollBar.OtherScrollBarView.Position = _treeViewFiles.ScrollOffsetHorizontal;
-            scrollBar.Refresh ();
-        };
+                                                            if (_treeViewFiles.ScrollOffsetHorizontal != scrollBar.OtherScrollBarView.Position)
+                                                            {
+                                                                scrollBar.OtherScrollBarView.Position = _treeViewFiles.ScrollOffsetHorizontal;
+                                                            }
+
+                                                            _treeViewFiles.SetNeedsDisplay ();
+                                                        };
+
+        _treeViewFiles.DrawContent += (s, e) =>
+                                      {
+                                          scrollBar.Size = _treeViewFiles.ContentHeight;
+                                          scrollBar.Position = _treeViewFiles.ScrollOffsetVertical;
+                                          scrollBar.OtherScrollBarView.Size = _treeViewFiles.GetContentWidth (true);
+                                          scrollBar.OtherScrollBarView.Position = _treeViewFiles.ScrollOffsetHorizontal;
+                                          scrollBar.Refresh ();
+                                      };
     }
 
-    private void ShowColoredExpandableSymbols () {
+    private void ShowColoredExpandableSymbols ()
+    {
         _miColoredSymbols.Checked = !_miColoredSymbols.Checked;
 
         _treeViewFiles.Style.ColorExpandSymbol = (bool)_miColoredSymbols.Checked;
         _treeViewFiles.SetNeedsDisplay ();
     }
 
-    private void ShowContextMenu (Point screenPoint, IFileSystemInfo forObject) {
+    private void ShowContextMenu (Point screenPoint, IFileSystemInfo forObject)
+    {
         var menu = new ContextMenu ();
         menu.Position = screenPoint;
 
         menu.MenuItems = new MenuBarItem (
-            new[] { new MenuItem ("Properties", null, () => ShowPropertiesOf (forObject)) }
-        );
+                                          new [] { new MenuItem ("Properties", null, () => ShowPropertiesOf (forObject)) }
+                                         );
 
         Application.Invoke (menu.Show);
     }
 
-    private void ShowLines () {
+    private void ShowLines ()
+    {
         _miShowLines.Checked = !_miShowLines.Checked;
 
         _treeViewFiles.Style.ShowBranchLines = (bool)_miShowLines.Checked;
@@ -375,98 +425,114 @@ public class TreeViewFileSystem : Scenario {
 
     private void ShowPropertiesOf (IFileSystemInfo fileSystemInfo) { _detailsFrame.FileInfo = fileSystemInfo; }
 
-    private void TreeViewFiles_DrawLine (object sender, DrawTreeViewLineEventArgs<IFileSystemInfo> e) {
+    private void TreeViewFiles_DrawLine (object sender, DrawTreeViewLineEventArgs<IFileSystemInfo> e)
+    {
         // Render directory icons in yellow
-        if (e.Model is IDirectoryInfo d) {
-            if (_iconProvider.UseNerdIcons || _iconProvider.UseUnicodeCharacters) {
-                if (e.IndexOfModelText > 0 && e.IndexOfModelText < e.RuneCells.Count) {
-                    RuneCell cell = e.RuneCells[e.IndexOfModelText];
+        if (e.Model is IDirectoryInfo d)
+        {
+            if (_iconProvider.UseNerdIcons || _iconProvider.UseUnicodeCharacters)
+            {
+                if (e.IndexOfModelText > 0 && e.IndexOfModelText < e.RuneCells.Count)
+                {
+                    RuneCell cell = e.RuneCells [e.IndexOfModelText];
+
                     cell.ColorScheme = new ColorScheme (
-                        new Attribute (
-                            Color.BrightYellow,
-                            cell.ColorScheme.Normal.Background
-                        )
-                    );
+                                                        new Attribute (
+                                                                       Color.BrightYellow,
+                                                                       cell.ColorScheme.Normal.Background
+                                                                      )
+                                                       );
                 }
             }
         }
     }
 
-    private void TreeViewFiles_KeyPress (object sender, Key obj) {
-        if (obj.KeyCode == (KeyCode.R | KeyCode.CtrlMask)) {
+    private void TreeViewFiles_KeyPress (object sender, Key obj)
+    {
+        if (obj.KeyCode == (KeyCode.R | KeyCode.CtrlMask))
+        {
             IFileSystemInfo selected = _treeViewFiles.SelectedObject;
 
             // nothing is selected
-            if (selected == null) {
+            if (selected == null)
+            {
                 return;
             }
 
             int? location = _treeViewFiles.GetObjectRow (selected);
 
             //selected object is offscreen or somehow not found
-            if (location == null || location < 0 || location > _treeViewFiles.Frame.Height) {
+            if (location == null || location < 0 || location > _treeViewFiles.Frame.Height)
+            {
                 return;
             }
 
             ShowContextMenu (
-                new Point (
-                    5 + _treeViewFiles.Frame.X,
-                    location.Value + _treeViewFiles.Frame.Y + 2
-                ),
-                selected
-            );
+                             new Point (
+                                        5 + _treeViewFiles.Frame.X,
+                                        location.Value + _treeViewFiles.Frame.Y + 2
+                                       ),
+                             selected
+                            );
         }
     }
 
-    private void TreeViewFiles_MouseClick (object sender, MouseEventEventArgs obj) {
+    private void TreeViewFiles_MouseClick (object sender, MouseEventEventArgs obj)
+    {
         // if user right clicks
-        if (obj.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
+        if (obj.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
+        {
             IFileSystemInfo rightClicked = _treeViewFiles.GetObjectOnRow (obj.MouseEvent.Y);
 
             // nothing was clicked
-            if (rightClicked == null) {
+            if (rightClicked == null)
+            {
                 return;
             }
 
             ShowContextMenu (
-                new Point (
-                    obj.MouseEvent.X + _treeViewFiles.Frame.X,
-                    obj.MouseEvent.Y + _treeViewFiles.Frame.Y + 2
-                ),
-                rightClicked
-            );
+                             new Point (
+                                        obj.MouseEvent.X + _treeViewFiles.Frame.X,
+                                        obj.MouseEvent.Y + _treeViewFiles.Frame.Y + 2
+                                       ),
+                             rightClicked
+                            );
         }
     }
 
-    private void TreeViewFiles_SelectionChanged (object sender, SelectionChangedEventArgs<IFileSystemInfo> e) {
-        ShowPropertiesOf (e.NewValue);
-    }
+    private void TreeViewFiles_SelectionChanged (object sender, SelectionChangedEventArgs<IFileSystemInfo> e) { ShowPropertiesOf (e.NewValue); }
 
-    private void UpdateIconCheckedness () {
+    private void UpdateIconCheckedness ()
+    {
         _miBasicIcons.Checked = !_iconProvider.UseNerdIcons && !_iconProvider.UseUnicodeCharacters;
         _miUnicodeIcons.Checked = _iconProvider.UseUnicodeCharacters;
         _miNerdIcons.Checked = _iconProvider.UseNerdIcons;
         _treeViewFiles.SetNeedsDisplay ();
     }
 
-    private class DetailsFrame : FrameView {
-        public DetailsFrame (FileSystemIconProvider iconProvider) {
+    private class DetailsFrame : FrameView
+    {
+        private readonly FileSystemIconProvider _iconProvider;
+        private IFileSystemInfo _fileInfo;
+
+        public DetailsFrame (FileSystemIconProvider iconProvider)
+        {
             Title = "Details";
             Visible = true;
             CanFocus = true;
             _iconProvider = iconProvider;
         }
 
-        private readonly FileSystemIconProvider _iconProvider;
-        private IFileSystemInfo _fileInfo;
-
-        public IFileSystemInfo FileInfo {
+        public IFileSystemInfo FileInfo
+        {
             get => _fileInfo;
-            set {
+            set
+            {
                 _fileInfo = value;
                 StringBuilder sb = null;
 
-                if (_fileInfo is IFileInfo f) {
+                if (_fileInfo is IFileInfo f)
+                {
                     Title = $"{_iconProvider.GetIconWithOptionalSpace (f)}{f.Name}".Trim ();
                     sb = new StringBuilder ();
                     sb.AppendLine ($"Path:\n {f.FullName}\n");
@@ -475,7 +541,8 @@ public class TreeViewFileSystem : Scenario {
                     sb.AppendLine ($"Created:\n {f.CreationTime}");
                 }
 
-                if (_fileInfo is IDirectoryInfo dir) {
+                if (_fileInfo is IDirectoryInfo dir)
+                {
                     Title = $"{_iconProvider.GetIconWithOptionalSpace (dir)}{dir.Name}".Trim ();
                     sb = new StringBuilder ();
                     sb.AppendLine ($"Path:\n {dir?.FullName}\n");

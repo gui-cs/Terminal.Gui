@@ -1,8 +1,10 @@
 ﻿namespace Terminal.Gui.TypeTests;
 
-public class PointTests {
+public class PointTests
+{
     [Fact]
-    public void Point_Equals () {
+    public void Point_Equals ()
+    {
         var point1 = new Point ();
         var point2 = new Point ();
         Assert.Equal (point1, point2);
@@ -21,7 +23,8 @@ public class PointTests {
     }
 
     [Fact]
-    public void Point_New () {
+    public void Point_New ()
+    {
         var point = new Point ();
         Assert.True (point.IsEmpty);
 
@@ -36,7 +39,8 @@ public class PointTests {
     }
 
     [Fact]
-    public void Point_SetsValue () {
+    public void Point_SetsValue ()
+    {
         var point = new Point { X = 0, Y = 0 };
         Assert.True (point.IsEmpty);
 
@@ -48,7 +52,8 @@ public class PointTests {
     }
 
     [Fact]
-    public void Point_Size () {
+    public void Point_Size ()
+    {
         var point = new Point (1, 2);
         var size = (Size)point;
         Assert.False (size.IsEmpty);
