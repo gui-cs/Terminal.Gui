@@ -260,7 +260,7 @@ public static class EscSeqUtils {
 	/// </summary>
 	/// <param name="code">One of the 16 color codes.</param>
 	/// <returns></returns>
-	public static string CSI_SetBackgroundColor (AnsiColorCode code) => CSI_SetGraphicsRendition ((int)code+10);
+	public static string CSI_SetBackgroundColor (AnsiColorCode code) => CSI_SetGraphicsRendition ((int)code + 10);
 
 	/// <summary>
 	/// ESC[38;5;{id}m - Set foreground color (256 colors)
@@ -743,7 +743,7 @@ public static class EscSeqUtils {
 	private static bool isButtonClicked;
 	private static bool isButtonDoubleClicked;
 	private static bool isButtonTripleClicked;
-	private static Point point;
+	private static Point? point;
 
 	/// <summary>
 	/// Gets the <see cref="MouseFlags"/> mouse button flags and the position.
@@ -974,18 +974,21 @@ public static class EscSeqUtils {
 			lastMouseButtonPressed = buttonState;
 			isButtonPressed = true;
 
-			if ((mouseFlags [0] & MouseFlags.ReportMousePosition) == 0) {
-				point = new Point () {
-					X = pos.X,
-					Y = pos.Y
-				};
+			if (point is null) {
+				point = pos;
+			}
 
+			if ((mouseFlags [0] & MouseFlags.ReportMousePosition) == 0) {
 				Application.MainLoop.AddIdle (() => {
 					Task.Run (async () => await ProcessContinuousButtonPressedAsync (buttonState, continuousButtonPressedHandler));
 					return false;
 				});
-			} else if (mouseFlags [0] == MouseFlags.ReportMousePosition) {
-				isButtonPressed = false;
+			} else if (mouseFlags [0].HasFlag (MouseFlags.ReportMousePosition)) {
+				point = pos;
+				// The isButtonPressed must always be true, otherwise we can lose the feature
+				// If mouse flags has ReportMousePosition this feature won't run
+				// but is always prepared with the new location
+				//isButtonPressed = false;
 			}
 
 		} else if (isButtonDoubleClicked && (buttonState == MouseFlags.Button1Pressed || buttonState == MouseFlags.Button2Pressed ||
@@ -1026,7 +1029,7 @@ public static class EscSeqUtils {
 
 			if (isButtonTripleClicked) {
 				isButtonTripleClicked = false;
-			} else if (pos.X == point.X && pos.Y == point.Y) {
+			} else if (pos.X == point?.X && pos.Y == point?.Y) {
 				mouseFlags.Add (GetButtonClicked (buttonState));
 				isButtonClicked = true;
 				Application.MainLoop.AddIdle (() => {
@@ -1085,17 +1088,12 @@ public static class EscSeqUtils {
 	{
 		while (isButtonPressed) {
 			await Task.Delay (100);
-			//var me = new MouseEvent () {
-			//	X = point.X,
-			//	Y = point.Y,
-			//	Flags = mouseFlag
-			//};
 
 			var view = Application.WantContinuousButtonPressedView;
 			if (view == null)
 				break;
 			if (isButtonPressed && lastMouseButtonPressed != null && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-				Application.Invoke (() => continuousButtonPressedHandler (mouseFlag, point));
+				Application.Invoke (() => continuousButtonPressedHandler (mouseFlag, point ?? Point.Empty));
 			}
 		}
 	}

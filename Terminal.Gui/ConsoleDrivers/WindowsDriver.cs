@@ -826,7 +826,7 @@ internal class WindowsDriver : ConsoleDriver {
 		// TODO: if some other Windows-based terminal supports true color, update this logic to not
 		// force 16color mode (.e.g ConEmu which really doesn't work well at all).
 		_isWindowsTerminal = _isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null ||
-		                                          Environment.GetEnvironmentVariable ("VSAPPIDNAME") != null;
+							  Environment.GetEnvironmentVariable ("VSAPPIDNAME") != null;
 		if (!_isWindowsTerminal) {
 			Force16Colors = true;
 		}
@@ -1190,11 +1190,12 @@ internal class WindowsDriver : ConsoleDriver {
 				break;
 			}
 
-			if (_point == null) {
+			if (_point is null) {
 				_point = p;
 			}
 
-			if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
+			if (mouseEvent.EventFlags.HasFlag (WindowsConsole.EventFlags.MouseMoved)) {
+				_pointMove = p;
 				mouseFlag |= MouseFlags.ReportMousePosition;
 				_isButtonReleased = false;
 				_processButtonClick = false;
