@@ -1088,11 +1088,6 @@ public static class EscSeqUtils {
 	{
 		while (isButtonPressed) {
 			await Task.Delay (100);
-			var me = new MouseEvent () {
-				X = point?.X ?? 0,
-				Y = point?.Y ?? 0,
-				Flags = mouseFlag
-			};
 
 			var view = Application.WantContinuousButtonPressedView;
 			if (view == null)
