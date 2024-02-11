@@ -241,7 +241,7 @@ public static partial class Application
 
             if (string.IsNullOrEmpty (ForceDriver))
             {
-                if ((p == PlatformID.Win32NT) || (p == PlatformID.Win32S) || (p == PlatformID.Win32Windows))
+                if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
                 {
                     Driver = new WindowsDriver ();
                 }
@@ -262,11 +262,7 @@ public static partial class Application
                 else
                 {
                     throw new ArgumentException (
-                                                 $"Invalid driver name: {
-                                                     ForceDriver
-                                                 }. Valid names are {
-                                                     string.Join (", ", drivers.Select (t => t.Name))
-                                                 }"
+                                                 $"Invalid driver name: {ForceDriver}. Valid names are {string.Join (", ", drivers.Select (t => t.Name))}"
                                                 );
                 }
             }
@@ -451,14 +447,14 @@ public static partial class Application
             }
         }
 
-        if ((Top == null) || Toplevel.IsOverlappedContainer)
+        if (Top == null || Toplevel.IsOverlappedContainer)
         {
             Top = Toplevel;
         }
 
         var refreshDriver = true;
 
-        if ((OverlappedTop == null)
+        if (OverlappedTop == null
             || Toplevel.IsOverlappedContainer
             || (Current?.Modal == false && Toplevel.Modal)
             || (Current?.Modal == false && !Toplevel.Modal)
@@ -852,8 +848,8 @@ public static partial class Application
 
         if (_topLevels.Count == 1
             && state.Toplevel == Top
-            && ((Driver.Cols != state.Toplevel.Frame.Width)
-                || (Driver.Rows != state.Toplevel.Frame.Height))
+            && (Driver.Cols != state.Toplevel.Frame.Width
+                || Driver.Rows != state.Toplevel.Frame.Height)
             && (state.Toplevel.NeedsDisplay
                 || state.Toplevel.SubViewNeedsDisplay
                 || state.Toplevel.LayoutNeeded))
@@ -889,7 +885,7 @@ public static partial class Application
     /// </remarks>
     public static void RequestStop (Toplevel top = null)
     {
-        if ((OverlappedTop == null) || (top == null) || (OverlappedTop == null && top != null))
+        if (OverlappedTop == null || top == null || (OverlappedTop == null && top != null))
         {
             top = Current;
         }
@@ -897,7 +893,7 @@ public static partial class Application
         if (OverlappedTop != null
             && top.IsOverlappedContainer
             && top?.Running == true
-            && ((Current?.Modal == false) || (Current?.Modal == true && Current?.Running == false)))
+            && (Current?.Modal == false || (Current?.Modal == true && Current?.Running == false)))
         {
             OverlappedTop.RequestStop ();
         }
@@ -973,7 +969,7 @@ public static partial class Application
         {
             Toplevel currentTop;
 
-            if ((top == Current) || (Current?.Modal == true && !top.Modal))
+            if (top == Current || (Current?.Modal == true && !top.Modal))
             {
                 currentTop = Current;
             }
@@ -1107,7 +1103,7 @@ public static partial class Application
     {
         if (!Toplevel.Running
             || (Toplevel == Current && Toplevel.Visible)
-            || (OverlappedTop == null)
+            || OverlappedTop == null
             || _topLevels.Peek ().Modal)
         {
             return;
@@ -1428,7 +1424,7 @@ public static partial class Application
     /// <param name="a">The mouse event with coordinates relative to the screen.</param>
     public static void OnMouseEvent (MouseEventEventArgs a)
     {
-        static bool OutsideRect (Point p, Rect r) { return (p.X < 0) || (p.X > r.Right) || (p.Y < 0) || (p.Y > r.Bottom); }
+        static bool OutsideRect (Point p, Rect r) { return p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom; }
 
         if (IsMouseDisabled)
         {
@@ -1491,7 +1487,7 @@ public static partial class Application
             }
         }
 
-        if (((view == null) || (view == OverlappedTop))
+        if ((view == null || view == OverlappedTop)
             && Current is { Modal: false }
             && OverlappedTop != null
             && a.MouseEvent.Flags != MouseFlags.ReportMousePosition
