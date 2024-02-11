@@ -34,7 +34,6 @@ public class LineDrawing : Scenario
         private Color _currentColor = new (Color.White);
         private LineCanvas _currentLayer;
         private StraightLine _currentLine;
-
         public LineStyle LineStyle { get; set; }
 
         public override void OnDrawContentComplete (Rect contentArea)
@@ -189,7 +188,6 @@ public class LineDrawing : Scenario
         private Button _addLayerBtn;
         private ColorPicker _colorPicker;
         private RadioGroup _stylePicker;
-
         public event Action AddLayer;
 
         public override void BeginInit ()
@@ -214,7 +212,6 @@ public class LineDrawing : Scenario
         }
 
         public event Action<Color> ColorChanged;
-
         public event Action<LineStyle> SetStyle;
 
         private void ToolsView_Initialized (object sender, EventArgs e)

@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-class FileDialogState
+internal class FileDialogState
 {
     public FileDialogState (IDirectoryInfo dir, FileDialog parent)
     {
@@ -14,9 +14,7 @@ class FileDialogState
     }
 
     protected readonly FileDialog Parent;
-
     public FileSystemInfoStats [] Children { get; internal set; }
-
     public IDirectoryInfo Directory { get; }
 
     /// <summary>Gets what was entered in the path text box of the dialog when the state was active.</summary>

@@ -84,13 +84,9 @@ public class Snake : Scenario
         public Point Head => Snake.Last ();
 
         public int Height { get; private set; }
-
         public Direction PlannedDirection { get; set; }
-
         public int SleepAfterAdvancingState { get; private set; } = StartingSpeed;
-
         public List<Point> Snake { get; private set; }
-
         public int Width { get; private set; }
 
         public void GrowSnake ()
@@ -158,7 +154,7 @@ public class Snake : Scenario
         /// <param name="height"></param>
         internal void Reset (int width, int height)
         {
-            if ((width < 5) || (height < 5))
+            if (width < 5 || height < 5)
             {
                 return;
             }
@@ -246,7 +242,7 @@ public class Snake : Scenario
 
         private int GetStepVelocity ()
         {
-            if ((CurrentDirection == Direction.Left) || (CurrentDirection == Direction.Right))
+            if (CurrentDirection == Direction.Left || CurrentDirection == Direction.Right)
             {
                 return 1;
             }
@@ -256,12 +252,12 @@ public class Snake : Scenario
 
         private bool IsDeath (Point p)
         {
-            if ((p.X <= 0) || (p.X >= Width - 1))
+            if (p.X <= 0 || p.X >= Width - 1)
             {
                 return true;
             }
 
-            if ((p.Y <= 0) || (p.Y >= Height - 1))
+            if (p.Y <= 0 || p.Y >= Height - 1)
             {
                 return true;
             }
@@ -310,7 +306,6 @@ public class Snake : Scenario
         private readonly Rune _appleRune;
         private readonly Attribute red = new (Color.Red, Color.Black);
         private readonly Attribute white = new (Color.White, Color.Black);
-
         public SnakeState State { get; }
 
         public override void OnDrawContent (Rect contentArea)

@@ -124,7 +124,7 @@ public partial class View
 
         Key baseKey = newKey.NoAlt.NoShift.NoCtrl;
 
-        if (newKey != Key.Empty && ((baseKey == Key.Space) || Rune.IsControl (baseKey.AsRune)))
+        if (newKey != Key.Empty && (baseKey == Key.Space || Rune.IsControl (baseKey.AsRune)))
         {
             throw new ArgumentException (@$"HotKey must be a printable (and non-space) key ({hotKey}).");
         }
@@ -215,7 +215,7 @@ public partial class View
 
     private void SetHotKey ()
     {
-        if ((TextFormatter == null) || (HotKeySpecifier == new Rune ('\xFFFF')))
+        if (TextFormatter == null || HotKeySpecifier == new Rune ('\xFFFF'))
         {
             return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
         }
@@ -263,7 +263,7 @@ public partial class View
                 return;
             }
 
-            if ((SuperView?._tabIndexes == null) || (SuperView?._tabIndexes.Count == 1))
+            if (SuperView?._tabIndexes == null || SuperView?._tabIndexes.Count == 1)
             {
                 _tabIndex = 0;
 
@@ -294,7 +294,7 @@ public partial class View
 
         foreach (View v in SuperView._tabIndexes)
         {
-            if ((v._tabIndex == -1) || (v == this))
+            if (v._tabIndex == -1 || v == this)
             {
                 continue;
             }
@@ -625,7 +625,7 @@ public partial class View
     {
         // fire event
         // BUGBUG: KeyEventArgs doesn't include scope, so the event never sees it.
-        if ((keyEvent.Scope == KeyBindingScope.Application) || (keyEvent.Scope == KeyBindingScope.HotKey))
+        if (keyEvent.Scope == KeyBindingScope.Application || keyEvent.Scope == KeyBindingScope.HotKey)
         {
             InvokingKeyBindings?.Invoke (this, keyEvent);
 

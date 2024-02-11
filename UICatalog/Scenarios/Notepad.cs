@@ -170,7 +170,7 @@ public class Notepad : Scenario
                                            "Cancel"
                                           );
 
-            if ((result == -1) || (result == 2))
+            if (result == -1 || result == 2)
             {
                 // user cancelled
                 return;

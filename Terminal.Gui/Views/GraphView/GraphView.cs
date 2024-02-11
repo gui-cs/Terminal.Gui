@@ -199,7 +199,7 @@ public class GraphView : View
     ///<inheritdoc/>
     public override void OnDrawContent (Rect contentArea)
     {
-        if ((CellSize.X == 0) || (CellSize.Y == 0))
+        if (CellSize.X == 0 || CellSize.Y == 0)
         {
             throw new Exception ($"{nameof (CellSize)} cannot be 0");
         }
@@ -226,7 +226,7 @@ public class GraphView : View
         int graphScreenHeight = Bounds.Height - (int)MarginBottom;
 
         // if the margins take up the full draw bounds don't render
-        if ((graphScreenWidth < 0) || (graphScreenHeight < 0))
+        if (graphScreenWidth < 0 || graphScreenHeight < 0)
         {
             return;
         }

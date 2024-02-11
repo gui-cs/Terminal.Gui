@@ -425,7 +425,11 @@ public class TextField : View
     public IAutocomplete Autocomplete { get; set; }
 
     /// <inheritdoc/>
-    public override sealed bool CanFocus { get => base.CanFocus; set => base.CanFocus = value; }
+    public sealed override bool CanFocus
+    {
+        get => base.CanFocus;
+        set => base.CanFocus = value;
+    }
 
     /// <summary>
     ///     Gets or sets the text to render in control when no value has been entered yet and the <see cref="View"/> does
@@ -468,7 +472,7 @@ public class TextField : View
         get => _desiredCursorVisibility;
         set
         {
-            if (((_desiredCursorVisibility != value) || (_visibility != value)) && HasFocus)
+            if ((_desiredCursorVisibility != value || _visibility != value) && HasFocus)
             {
                 Application.Driver.SetCursorVisibility (value);
             }
@@ -495,7 +499,8 @@ public class TextField : View
     /// <summary>Gets the left offset position.</summary>
     public int ScrollOffset { get; private set; }
 
-    /// <summary>Sets the secret property.
+    /// <summary>
+    ///     Sets the secret property.
     ///     <remarks>This makes the text entry suitable for entering passwords.</remarks>
     /// </summary>
     public bool Secret { get; set; }
@@ -527,7 +532,11 @@ public class TextField : View
     }
 
     /// <summary>The selected text.</summary>
-    public string SelectedText { get => Secret ? null : _selectedText; private set => _selectedText = value; }
+    public string SelectedText
+    {
+        get => Secret ? null : _selectedText;
+        private set => _selectedText = value;
+    }
 
     /// <summary>Sets or gets the text held by the view.</summary>
     public new string Text
@@ -613,7 +622,7 @@ public class TextField : View
     /// <summary>Copy the selected text to the clipboard.</summary>
     public virtual void Copy ()
     {
-        if (Secret || (SelectedLength == 0))
+        if (Secret || SelectedLength == 0)
         {
             return;
         }
@@ -624,7 +633,7 @@ public class TextField : View
     /// <summary>Cut the selected text to the clipboard.</summary>
     public virtual void Cut ()
     {
-        if (ReadOnly || Secret || (SelectedLength == 0))
+        if (ReadOnly || Secret || SelectedLength == 0)
         {
             return;
         }
@@ -722,7 +731,7 @@ public class TextField : View
 
         if (SelectedLength == 0)
         {
-            if ((_text.Count == 0) || (_text.Count == _cursorPosition))
+            if (_text.Count == 0 || _text.Count == _cursorPosition)
             {
                 return;
             }
@@ -891,7 +900,7 @@ public class TextField : View
             int x = PositionCursor (ev);
             int sbw = x;
 
-            if ((x == _text.Count)
+            if (x == _text.Count
                 || (x > 0 && (char)_text [x - 1].Value != ' ')
                 || (x > 0 && (char)_text [x].Value == ' '))
             {
@@ -1106,7 +1115,7 @@ public class TextField : View
         _preTextChangedCursorPos = _cursorPosition;
 
         // Ignore other control characters.
-        if (!a.IsKeyCodeAtoZ && ((a.KeyCode < KeyCode.Space) || (a.KeyCode > KeyCode.CharMask)))
+        if (!a.IsKeyCodeAtoZ && (a.KeyCode < KeyCode.Space || a.KeyCode > KeyCode.CharMask))
         {
             return false;
         }
@@ -1299,8 +1308,8 @@ public class TextField : View
             need = true;
         }
         else if (Frame.Width > 0
-                 && ((ScrollOffset + _cursorPosition - (Frame.Width + offB) == 0)
-                     || (TextModel.DisplaySize (_text, ScrollOffset, _cursorPosition).size >= Frame.Width + offB)))
+                 && (ScrollOffset + _cursorPosition - (Frame.Width + offB) == 0
+                     || TextModel.DisplaySize (_text, ScrollOffset, _cursorPosition).size >= Frame.Width + offB))
         {
             ScrollOffset = Math.Max (
                                      TextModel.CalculateLeftColumn (
@@ -1831,7 +1840,7 @@ public class TextField : View
 
             SetNeedsDisplay ();
         }
-        else if ((SelectedLength > 0) || (_selectedText != null))
+        else if (SelectedLength > 0 || _selectedText != null)
         {
             ClearAllSelection ();
         }
@@ -1865,9 +1874,9 @@ public class TextField : View
     private void RenderCaption ()
     {
         if (HasFocus
-            || (Caption == null)
-            || (Caption.Length == 0)
-            || (Text?.Length > 0))
+            || Caption == null
+            || Caption.Length == 0
+            || Text?.Length > 0)
         {
             return;
         }
@@ -1890,7 +1899,7 @@ public class TextField : View
     {
         Application.Driver.GetCursorVisibility (out _visibility);
 
-        if ((_desiredCursorVisibility != _savedCursorVisibility) || (_visibility != _savedCursorVisibility))
+        if (_desiredCursorVisibility != _savedCursorVisibility || _visibility != _savedCursorVisibility)
         {
             DesiredCursorVisibility = _savedCursorVisibility;
         }

@@ -8,7 +8,7 @@ using static Terminal.Gui.NetEvents;
 
 namespace Terminal.Gui;
 
-class NetWinVTConsole
+internal class NetWinVTConsole
 {
     private const uint DISABLE_NEWLINE_AUTO_RETURN = 8;
     private const uint ENABLE_ECHO_INPUT = 4;
@@ -117,13 +117,13 @@ class NetWinVTConsole
         }
     }
 
-    [DllImport ("kernel32.dll")] private extern static bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
-    [DllImport ("kernel32.dll")] private extern static uint GetLastError ();
-    [DllImport ("kernel32.dll", SetLastError = true)] private extern static nint GetStdHandle (int nStdHandle);
-    [DllImport ("kernel32.dll")] private extern static bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
+    [DllImport ("kernel32.dll")] private static extern bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
+    [DllImport ("kernel32.dll")] private static extern uint GetLastError ();
+    [DllImport ("kernel32.dll", SetLastError = true)] private static extern nint GetStdHandle (int nStdHandle);
+    [DllImport ("kernel32.dll")] private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
 }
 
-class NetEvents : IDisposable
+internal class NetEvents : IDisposable
 {
     private readonly ManualResetEventSlim _inputReady = new (false);
     private CancellationTokenSource _inputReadyCancellationTokenSource;
@@ -738,7 +738,7 @@ class NetEvents : IDisposable
         public WindowPositionEvent WindowPositionEvent;
         public RequestResponseEvent RequestResponseEvent;
 
-        public override readonly string ToString ()
+        public readonly override string ToString ()
         {
             return EventType switch
                    {
@@ -798,7 +798,7 @@ class NetEvents : IDisposable
     }
 }
 
-class NetDriver : ConsoleDriver
+internal class NetDriver : ConsoleDriver
 {
     private const int COLOR_BLACK = 30;
     private const int COLOR_BLUE = 34;
@@ -817,12 +817,10 @@ class NetDriver : ConsoleDriver
     private const int COLOR_WHITE = 37;
     private const int COLOR_YELLOW = 33;
     private NetMainLoop _mainLoopDriver;
-
     public bool IsWinPlatform { get; private set; }
-
     public NetWinVTConsole NetWinConsole { get; private set; }
 
-    public override bool SupportsTrueColor => (Environment.OSVersion.Platform == PlatformID.Unix)
+    public override bool SupportsTrueColor => Environment.OSVersion.Platform == PlatformID.Unix
                                               || (IsWinPlatform && Environment.OSVersion.Version.Build >= 14931);
 
     public override void Refresh ()
@@ -856,9 +854,9 @@ class NetDriver : ConsoleDriver
     {
         if (RunningUnitTests
             || _winSizeChanging
-            || (Console.WindowHeight < 1)
-            || (Contents.Length != Rows * Cols)
-            || (Rows != Console.WindowHeight))
+            || Console.WindowHeight < 1
+            || Contents.Length != Rows * Cols
+            || Rows != Console.WindowHeight)
         {
             return;
         }
@@ -1038,7 +1036,7 @@ class NetDriver : ConsoleDriver
     {
         PlatformID p = Environment.OSVersion.Platform;
 
-        if ((p == PlatformID.Win32NT) || (p == PlatformID.Win32S) || (p == PlatformID.Win32Windows))
+        if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
         {
             IsWinPlatform = true;
 
@@ -1157,7 +1155,7 @@ class NetDriver : ConsoleDriver
 
     #region Size and Position Handling
 
-    volatile private bool _winSizeChanging;
+    private volatile bool _winSizeChanging;
 
     private void SetWindowPosition (int col, int row)
     {
@@ -1621,7 +1619,7 @@ class NetDriver : ConsoleDriver
 ///     cross platform but lacks things like file descriptor monitoring.
 /// </summary>
 /// <remarks>This implementation is used for NetDriver.</remarks>
-class NetMainLoop : IMainLoopDriver
+internal class NetMainLoop : IMainLoopDriver
 {
     /// <summary>Initializes the class with the console driver.</summary>
     /// <remarks>Passing a consoleDriver is provided to capture windows resizing.</remarks>
@@ -1685,7 +1683,7 @@ class NetMainLoop : IMainLoopDriver
 
         if (!_eventReadyTokenSource.IsCancellationRequested)
         {
-            return (_resultQueue.Count > 0) || _mainLoop.CheckTimersAndIdleHandlers (out _);
+            return _resultQueue.Count > 0 || _mainLoop.CheckTimersAndIdleHandlers (out _);
         }
 
         _eventReadyTokenSource.Dispose ();

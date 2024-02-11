@@ -249,9 +249,9 @@ public partial class Toplevel : View
         int nx, ny;
 
         if (!_dragPosition.HasValue
-            && ((mouseEvent.Flags == MouseFlags.Button1Pressed)
-                || (mouseEvent.Flags == MouseFlags.Button2Pressed)
-                || (mouseEvent.Flags == MouseFlags.Button3Pressed)))
+            && (mouseEvent.Flags == MouseFlags.Button1Pressed
+                || mouseEvent.Flags == MouseFlags.Button2Pressed
+                || mouseEvent.Flags == MouseFlags.Button3Pressed))
         {
             SetFocus ();
             Application.BringOverlappedTopToFront ();
@@ -272,7 +272,7 @@ public partial class Toplevel : View
             return true;
         }
 
-        if ((mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) || (mouseEvent.Flags == MouseFlags.Button3Pressed))
+        if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) || mouseEvent.Flags == MouseFlags.Button3Pressed)
         {
             if (_dragPosition.HasValue)
             {
@@ -495,18 +495,18 @@ public partial class Toplevel : View
             maxWidth -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
         }
 
-        if (((superView != top) || (top?.SuperView != null) || (top != Application.Top && top.Modal) || (top?.SuperView == null && top.IsOverlapped))
+        if ((superView != top || top?.SuperView != null || (top != Application.Top && top.Modal) || (top?.SuperView == null && top.IsOverlapped))
 
             // BUGBUG: Prevously PositionToplevel required LayotuStyle.Computed
-            && ((top.Frame.X + top.Frame.Width > maxWidth) || (ny > top.Frame.Y)) /*&& top.LayoutStyle == LayoutStyle.Computed*/)
+            && (top.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y) /*&& top.LayoutStyle == LayoutStyle.Computed*/)
         {
-            if (((top.X == null) || top.X is Pos.PosAbsolute) && top.Frame.X != nx)
+            if ((top.X == null || top.X is Pos.PosAbsolute) && top.Frame.X != nx)
             {
                 top.X = nx;
                 layoutSubviews = true;
             }
 
-            if (((top.Y == null) || top.Y is Pos.PosAbsolute) && top.Frame.Y != ny)
+            if ((top.Y == null || top.Y is Pos.PosAbsolute) && top.Frame.Y != ny)
             {
                 top.Y = ny;
                 layoutSubviews = true;
@@ -581,8 +581,8 @@ public partial class Toplevel : View
     {
         if (IsOverlappedContainer
             && Running
-            && ((Application.Current == this)
-                || (Application.Current?.Modal == false)
+            && (Application.Current == this
+                || Application.Current?.Modal == false
                 || (Application.Current?.Modal == true && Application.Current?.Running == false)))
         {
             foreach (Toplevel child in Application.OverlappedChildren)
@@ -703,7 +703,7 @@ public partial class Toplevel : View
         int maxWidth;
         View superView;
 
-        if ((top?.SuperView == null) || (top == Application.Top) || (top?.SuperView == Application.Top))
+        if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)
         {
             maxWidth = Driver.Cols;
             superView = Application.Top;
@@ -738,7 +738,7 @@ public partial class Toplevel : View
         //System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
         bool menuVisible, statusVisible;
 
-        if ((top?.SuperView == null) || (top == Application.Top) || (top?.SuperView == Application.Top))
+        if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)
         {
             menuVisible = Application.Top.MenuBar?.Visible == true;
             menuBar = Application.Top.MenuBar;
@@ -756,7 +756,7 @@ public partial class Toplevel : View
             menuBar = ((Toplevel)t).MenuBar;
         }
 
-        if ((top?.SuperView == null) || (top == Application.Top) || (top?.SuperView == Application.Top))
+        if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)
         {
             maxWidth = menuVisible ? 1 : 0;
         }
@@ -767,7 +767,7 @@ public partial class Toplevel : View
 
         ny = Math.Max (targetY, maxWidth);
 
-        if ((top?.SuperView == null) || (top == Application.Top) || (top?.SuperView == Application.Top))
+        if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)
         {
             statusVisible = Application.Top.StatusBar?.Visible == true;
             statusBar = Application.Top.StatusBar;
@@ -785,7 +785,7 @@ public partial class Toplevel : View
             statusBar = ((Toplevel)t).StatusBar;
         }
 
-        if ((top?.SuperView == null) || (top == Application.Top) || (top?.SuperView == Application.Top))
+        if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)
         {
             maxWidth = statusVisible ? Driver.Rows - 1 : Driver.Rows;
         }
@@ -1064,7 +1064,7 @@ public partial class Toplevel : View
 
     private bool OutsideTopFrame (Toplevel top)
     {
-        if ((top.Frame.X > Driver.Cols) || (top.Frame.Y > Driver.Rows))
+        if (top.Frame.X > Driver.Cols || top.Frame.Y > Driver.Rows)
         {
             return true;
         }
@@ -1102,7 +1102,7 @@ public class ToplevelEqualityComparer : IEqualityComparer<Toplevel>
             return true;
         }
 
-        if ((x == null) || (y == null))
+        if (x == null || y == null)
         {
             return false;
         }

@@ -188,7 +188,6 @@ public class ListViewWithSelection : Scenario
         }
 
         public int Count => Scenarios != null ? Scenarios.Count : 0;
-
         public int Length { get; private set; }
 
         public void Render (

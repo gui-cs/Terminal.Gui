@@ -180,7 +180,7 @@ public class CheckBox : View
 
     private string GetFormatterText ()
     {
-        if (AutoSize || string.IsNullOrEmpty (Text) || (Frame.Width <= 2))
+        if (AutoSize || string.IsNullOrEmpty (Text) || Frame.Width <= 2)
         {
             return Text;
         }

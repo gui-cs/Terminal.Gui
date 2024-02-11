@@ -240,8 +240,8 @@ public partial class View
                             );
 
         return !((ValidatePosDim && (!(Width is Dim.DimAbsolute) || !(Height is Dim.DimAbsolute)))
-                 || (_frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength ())
-                 || (_frame.Size.Height != rect.Size.Height - GetHotKeySpecifierLength (false)));
+                 || _frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength ()
+                 || _frame.Size.Height != rect.Size.Height - GetHotKeySpecifierLength (false));
     }
 
     private bool IsValidAutoSizeHeight (Dim height)
@@ -250,7 +250,7 @@ public partial class View
         int dimValue = height.Anchor (0);
 
         return !((ValidatePosDim && !(height is Dim.DimAbsolute))
-                 || (dimValue != rect.Size.Height - GetHotKeySpecifierLength (false)));
+                 || dimValue != rect.Size.Height - GetHotKeySpecifierLength (false));
     }
 
     private bool IsValidAutoSizeWidth (Dim width)
@@ -259,7 +259,7 @@ public partial class View
         int dimValue = width.Anchor (0);
 
         return !((ValidatePosDim && !(width is Dim.DimAbsolute))
-                 || (dimValue != rect.Size.Width - GetHotKeySpecifierLength ()));
+                 || dimValue != rect.Size.Width - GetHotKeySpecifierLength ());
     }
 
     /// <summary>Sets the size of the View to the minimum width or height required to fit <see cref="Text"/>.</summary>
@@ -313,7 +313,7 @@ public partial class View
 
                     // TODO: v2 - This uses frame.Width; it should only use Bounds
                     if (_frame.Width < colWidth
-                        && ((Width == null) || (Bounds.Width >= 0 && Width is Dim.DimAbsolute && Width.Anchor (0) >= 0 && Width.Anchor (0) < colWidth)))
+                        && (Width == null || (Bounds.Width >= 0 && Width is Dim.DimAbsolute && Width.Anchor (0) >= 0 && Width.Anchor (0) < colWidth)))
                     {
                         sizeRequired = new Size (colWidth, Bounds.Height);
 
@@ -322,7 +322,7 @@ public partial class View
 
                     break;
                 default:
-                    if (_frame.Height < 1 && ((Height == null) || (Height is Dim.DimAbsolute && Height.Anchor (0) == 0)))
+                    if (_frame.Height < 1 && (Height == null || (Height is Dim.DimAbsolute && Height.Anchor (0) == 0)))
                     {
                         sizeRequired = new Size (Bounds.Width, 1);
 

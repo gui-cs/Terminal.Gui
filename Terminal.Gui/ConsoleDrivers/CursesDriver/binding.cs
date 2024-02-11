@@ -62,7 +62,6 @@ public partial class Curses
     private static NativeMethods methods;
     private static char [] r = new char [1];
     private static nint stdscr;
-
     public static int ColorPairs => methods.COLOR_PAIRS ();
 
     public static int Cols
@@ -93,7 +92,7 @@ public partial class Curses
     //
     public static int addch (int ch)
     {
-        if ((ch < 127) || (ch > 0xffff))
+        if (ch < 127 || ch > 0xffff)
         {
             return methods.addch (ch);
         }
@@ -133,7 +132,7 @@ public partial class Curses
             l = 1;
         }
 
-        if ((l != lines) || (c != cols))
+        if (l != lines || c != cols)
         {
             lines = l;
             cols = c;
@@ -259,7 +258,7 @@ public partial class Curses
 
     public static int mvaddch (int y, int x, int ch)
     {
-        if ((ch < 127) || (ch > 0xffff))
+        if (ch < 127 || ch > 0xffff)
         {
             return methods.mvaddch (y, x, ch);
         }
@@ -290,7 +289,7 @@ public partial class Curses
     public static int savetty () { return methods.savetty (); }
     public static int scrollok (nint win, bool bf) { return methods.scrollok (win, bf); }
     public static int set_escdelay (int size) { return methods.set_escdelay (size); }
-    [DllImport ("libc")] public extern static int setlocale (int cate, [MarshalAs (UnmanagedType.LPStr)] string locale);
+    [DllImport ("libc")] public static extern int setlocale (int cate, [MarshalAs (UnmanagedType.LPStr)] string locale);
     public static int setscrreg (int top, int bot) { return methods.setscrreg (top, bot); }
     public static int start_color () { return methods.start_color (); }
     public static int StartColor () { return methods.start_color (); }
@@ -432,7 +431,7 @@ public partial class Curses
 }
 
 #pragma warning disable RCS1102 // Make class static.'
-class Delegates
+internal class Delegates
 {
 #pragma warning restore RCS1102 // Make class static.
 #pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
@@ -582,7 +581,7 @@ class Delegates
     public delegate nint curses_version ();
 }
 
-class NativeMethods
+internal class NativeMethods
 {
     public NativeMethods (UnmanagedLibrary lib)
     {

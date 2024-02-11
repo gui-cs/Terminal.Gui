@@ -206,7 +206,7 @@ public class ListView : View
                 return;
             }
 
-            if ((value < 0) || (MaxLength > 0 && value >= MaxLength))
+            if (value < 0 || (MaxLength > 0 && value >= MaxLength))
             {
                 throw new ArgumentException ("value");
             }
@@ -226,12 +226,12 @@ public class ListView : View
         get => _selected;
         set
         {
-            if ((_source == null) || (_source.Count == 0))
+            if (_source == null || _source.Count == 0)
             {
                 return;
             }
 
-            if ((value < -1) || (value >= _source.Count))
+            if (value < -1 || value >= _source.Count)
             {
                 throw new ArgumentException ("value");
             }
@@ -270,7 +270,7 @@ public class ListView : View
                 return;
             }
 
-            if ((value < 0) || (_source.Count > 0 && value >= _source.Count))
+            if (value < 0 || (_source.Count > 0 && value >= _source.Count))
             {
                 throw new ArgumentException ("value");
             }
@@ -396,9 +396,9 @@ public class ListView : View
             return true;
         }
 
-        if ((me.Y + _top >= _source.Count)
-            || (me.Y + _top < 0)
-            || (me.Y + _top > _top + Bounds.Height))
+        if (me.Y + _top >= _source.Count
+            || me.Y + _top < 0
+            || me.Y + _top > _top + Bounds.Height)
         {
             return true;
         }
@@ -643,7 +643,7 @@ public class ListView : View
 
             Move (0, row);
 
-            if ((_source == null) || (item >= _source.Count))
+            if (_source == null || item >= _source.Count)
             {
                 for (var c = 0; c < f.Width; c++)
                 {
@@ -695,7 +695,7 @@ public class ListView : View
     /// <returns></returns>
     public virtual bool OnOpenSelectedItem ()
     {
-        if ((_source.Count <= _selected) || (_selected < 0) || (OpenSelectedItem == null))
+        if (_source.Count <= _selected || _selected < 0 || OpenSelectedItem == null)
         {
             return false;
         }
@@ -819,7 +819,7 @@ public class ListView : View
     /// </remarks>
     public void SetSource (IList source)
     {
-        if (source == null && ((Source == null) || !(Source is ListWrapper)))
+        if (source == null && (Source == null || !(Source is ListWrapper)))
         {
             Source = null;
         }
@@ -840,7 +840,7 @@ public class ListView : View
         return Task.Factory.StartNew (
                                       () =>
                                       {
-                                          if (source == null && ((Source == null) || !(Source is ListWrapper)))
+                                          if (source == null && (Source == null || !(Source is ListWrapper)))
                                           {
                                               Source = null;
                                           }
@@ -950,7 +950,7 @@ public class ListWrapper : IListDataSource
     /// <inheritdoc/>
     public int StartsWith (string search)
     {
-        if ((_source == null) || (_source?.Count == 0))
+        if (_source == null || _source?.Count == 0)
         {
             return -1;
         }
@@ -980,7 +980,7 @@ public class ListWrapper : IListDataSource
 
     private int GetMaxLengthItem ()
     {
-        if ((_source == null) || (_source?.Count == 0))
+        if (_source == null || _source?.Count == 0)
         {
             return 0;
         }

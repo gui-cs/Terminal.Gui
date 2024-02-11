@@ -161,7 +161,7 @@ public struct Rect
     ///     Compares two Rectangle objects. The return value is based on the equivalence of the Location and Size
     ///     properties of the two Rectangles.
     /// </remarks>
-    public static bool operator != (Rect left, Rect right) { return (left.Location != right.Location) || (left.Size != right.Size); }
+    public static bool operator != (Rect left, Rect right) { return left.Location != right.Location || left.Size != right.Size; }
 
     // -----------------------
     // Public Constructors
@@ -265,9 +265,9 @@ public struct Rect
 
     /// <summary>IntersectsWith Method</summary>
     /// <remarks>Checks if a Rectangle intersects with this one.</remarks>
-    public bool IntersectsWith (Rect rect) { return !((Left >= rect.Right) || (Right <= rect.Left) || (Top >= rect.Bottom) || (Bottom <= rect.Top)); }
+    public bool IntersectsWith (Rect rect) { return !(Left >= rect.Right || Right <= rect.Left || Top >= rect.Bottom || Bottom <= rect.Top); }
 
-    private bool IntersectsWithInclusive (Rect r) { return !((Left > r.Right) || (Right < r.Left) || (Top > r.Bottom) || (Bottom < r.Top)); }
+    private bool IntersectsWithInclusive (Rect r) { return !(Left > r.Right || Right < r.Left || Top > r.Bottom || Bottom < r.Top); }
 
     /// <summary>Offset Method</summary>
     /// <remarks>Moves the Rectangle a specified distance.</remarks>

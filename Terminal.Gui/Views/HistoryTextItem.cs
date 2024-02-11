@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-partial class HistoryText
+internal partial class HistoryText
 {
     public class HistoryTextItem : EventArgs
     {

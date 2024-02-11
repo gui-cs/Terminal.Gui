@@ -3307,9 +3307,7 @@ A B C
         }
 
         public bool IsPicked { get; set; }
-
         public string Kind { get; }
-
         public string Name { get; }
     }
 }

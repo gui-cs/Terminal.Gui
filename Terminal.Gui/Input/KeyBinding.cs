@@ -97,7 +97,7 @@ public class KeyBindings
             throw new ArgumentException (@"At least one command must be specified", nameof (commands));
         }
 
-        if ((key == null) || !key.IsValid)
+        if (key == null || !key.IsValid)
         {
             //throw new ArgumentException ("Invalid Key", nameof (commands));
             return;

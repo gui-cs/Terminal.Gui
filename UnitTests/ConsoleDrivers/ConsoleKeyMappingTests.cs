@@ -5,7 +5,6 @@ namespace Terminal.Gui.ConsoleDrivers;
 public class ConsoleKeyMappingTests
 {
 #if ENABLE_VK_PACKET_NON_WINDOWS
-
     // This test (and the GetConsoleKeyInfoFromKeyCode API) are bogus. They make no sense outside of
     // the context of Windows and knowing they keyboard layout. They should be removed.
     [Theory]

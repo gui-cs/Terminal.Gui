@@ -32,7 +32,11 @@ public class AppendAutocomplete : AutocompleteBase
     public override ColorScheme ColorScheme { get; set; }
 
     /// <inheritdoc/>
-    public override View HostControl { get => textField; set => textField = (TextField)value; }
+    public override View HostControl
+    {
+        get => textField;
+        set => textField = (TextField)value;
+    }
 
     /// <inheritdoc/>
     public override void ClearSuggestions ()

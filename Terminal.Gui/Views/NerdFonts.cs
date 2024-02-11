@@ -5,7 +5,7 @@ using System.IO.Abstractions;
 
 namespace Terminal.Gui;
 
-class NerdFonts
+internal class NerdFonts
 {
     private readonly char _nf_cod_file = '';
     private readonly char _nf_cod_folder = '';

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
-class DictionaryJsonConverter<T> : JsonConverter<Dictionary<string, T>>
+internal class DictionaryJsonConverter<T> : JsonConverter<Dictionary<string, T>>
 {
     public override Dictionary<string, T> Read (
         ref Utf8JsonReader reader,

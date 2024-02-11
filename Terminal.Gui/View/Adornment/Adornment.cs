@@ -48,7 +48,11 @@ public class Adornment : View
     ///     Adornments cannot be used as sub-views (see <see cref="Parent"/>); this method always throws an
     ///     <see cref="InvalidOperationException"/>. TODO: Are we sure?
     /// </summary>
-    public override View SuperView { get => null; set => throw new NotImplementedException (); }
+    public override View SuperView
+    {
+        get => null;
+        set => throw new NotImplementedException ();
+    }
 
     /// <summary>
     ///     Adornments only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas, so setting this

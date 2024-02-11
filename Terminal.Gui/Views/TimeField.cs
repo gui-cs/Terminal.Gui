@@ -79,7 +79,11 @@ public class TimeField : TextField
     private TimeSpan _time;
 
     /// <inheritdoc/>
-    public override int CursorPosition { get => base.CursorPosition; set => base.CursorPosition = Math.Max (Math.Min (value, FieldLength), 1); }
+    public override int CursorPosition
+    {
+        get => base.CursorPosition;
+        set => base.CursorPosition = Math.Max (Math.Min (value, FieldLength), 1);
+    }
 
     /// <summary>Get or sets whether <see cref="TimeField"/> uses the short or long time format.</summary>
     public bool IsShortFormat
@@ -128,7 +132,6 @@ public class TimeField : TextField
     }
 
     private int FieldLength => _isShort ? _shortFieldLen : _longFieldLen;
-
     private string Format => _isShort ? _shortFormat : _longFormat;
 
     /// <inheritdoc/>

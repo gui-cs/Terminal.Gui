@@ -815,7 +815,7 @@ public class TableEditor : Scenario
 
         for (var i = 0; i < runes.Count; i++)
         {
-            if ((dr == null) || (i % dt.Columns.Count == 0))
+            if (dr == null || i % dt.Columns.Count == 0)
             {
                 dr = dt.Rows.Add ();
             }
@@ -848,7 +848,7 @@ public class TableEditor : Scenario
 
     private void EditCurrentCell (object sender, CellActivatedEventArgs e)
     {
-        if (e.Table is not DataTableSource || (_currentTable == null))
+        if (e.Table is not DataTableSource || _currentTable == null)
         {
             return;
         }
@@ -923,7 +923,7 @@ public class TableEditor : Scenario
             return null;
         }
 
-        if ((_tableView.SelectedColumn < 0) || (_tableView.SelectedColumn > _tableView.Table.Columns))
+        if (_tableView.SelectedColumn < 0 || _tableView.SelectedColumn > _tableView.Table.Columns)
         {
             return null;
         }

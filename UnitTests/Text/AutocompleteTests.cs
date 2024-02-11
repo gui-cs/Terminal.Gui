@@ -29,7 +29,7 @@ public class AutocompleteTests
             Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
             Application.Refresh ();
 
-            if ((i < 4) || (i > 5))
+            if (i < 4 || i > 5)
             {
                 TestHelpers.AssertDriverContentsWithFrameAre (
                                                               @"

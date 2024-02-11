@@ -5,7 +5,7 @@ using Terminal.Gui;
 
 namespace UICatalog;
 
-class KeyBindingsDialog : Dialog
+internal class KeyBindingsDialog : Dialog
 {
     // TODO: Update to use Key instead of KeyCode
     private static readonly Dictionary<Command, KeyCode> CurrentBindings = new ();
@@ -132,9 +132,7 @@ class KeyBindingsDialog : Dialog
 
         private readonly object _lockKnownViews = new ();
         private Dictionary<Command, KeyCode> _keybindings;
-
         public static ViewTracker Instance { get; private set; }
-
         internal static void Initialize () { Instance = new ViewTracker (Application.Top); }
 
         internal void StartUsingNewKeyMap (Dictionary<Command, KeyCode> currentBindings)

@@ -67,12 +67,12 @@ public partial class View
     /// <param name="ch">Ch.</param>
     public void AddRune (int col, int row, Rune ch)
     {
-        if ((row < 0) || (col < 0))
+        if (row < 0 || col < 0)
         {
             return;
         }
 
-        if ((row > _frame.Height - 1) || (col > _frame.Width - 1))
+        if (row > _frame.Height - 1 || col > _frame.Width - 1)
         {
             return;
         }
@@ -330,7 +330,7 @@ public partial class View
     /// <param name="row">the row to move to, in view-relative coordinates.</param>
     public void Move (int col, int row)
     {
-        if ((Driver == null) || (Driver?.Rows == 0))
+        if (Driver == null || Driver?.Rows == 0)
         {
             return;
         }
@@ -536,10 +536,10 @@ public partial class View
 
         _superView?.SetSubViewNeedsDisplay ();
 
-        if ((_needsDisplayRect.X < Bounds.X)
-            || (_needsDisplayRect.Y < Bounds.Y)
-            || (_needsDisplayRect.Width > Bounds.Width)
-            || (_needsDisplayRect.Height > Bounds.Height))
+        if (_needsDisplayRect.X < Bounds.X
+            || _needsDisplayRect.Y < Bounds.Y
+            || _needsDisplayRect.Width > Bounds.Width
+            || _needsDisplayRect.Height > Bounds.Height)
         {
             Margin?.SetNeedsDisplay (Margin.Bounds);
             Border?.SetNeedsDisplay (Border.Bounds);

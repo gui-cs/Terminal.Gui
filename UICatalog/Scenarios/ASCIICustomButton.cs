@@ -69,7 +69,6 @@ public class ASCIICustomButtonTest : Scenario
     {
         private FrameView _border;
         private Label _fill;
-
         public string Description => $"Description of: {Id}";
 
         public void CustomInitialize ()
@@ -153,7 +152,6 @@ public class ASCIICustomButtonTest : Scenario
         }
 
         public event Action<ASCIICustomButton> PointerEnter;
-
         private void This_MouseClick (object sender, MouseEventEventArgs obj) { OnMouseEvent (obj.MouseEvent); }
     }
 

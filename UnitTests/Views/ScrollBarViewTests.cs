@@ -1314,11 +1314,8 @@ This is a test             ",
     public class HostView : View
     {
         public int Cols { get; set; }
-
         public int Left { get; set; }
-
         public int Lines { get; set; }
-
         public int Top { get; set; }
     }
 

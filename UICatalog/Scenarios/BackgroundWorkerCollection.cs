@@ -219,7 +219,6 @@ public class BackgroundWorkerCollection : Scenario
         }
 
         public bool Completed { get; }
-
         public DateTime? StartStaging { get; }
     }
 
@@ -297,11 +296,8 @@ public class BackgroundWorkerCollection : Scenario
         private readonly Label _label;
         private readonly ListView _listView;
         private readonly Button _start;
-
         public Staging Staging { get; private set; }
-
         public event Action<StagingUIController> ReportClosed;
-
         public void Run () { Application.Run (this); }
 
         private void OnReportClosed (object sender, EventArgs e)
@@ -347,7 +343,7 @@ public class BackgroundWorkerCollection : Scenario
 
         public void CancelWorker ()
         {
-            if ((_stagingWorkers == null) || (_stagingWorkers.Count == 0))
+            if (_stagingWorkers == null || _stagingWorkers.Count == 0)
             {
                 WriteLog ($"Worker is not running at {DateTime.Now}!");
 

@@ -63,13 +63,21 @@ public class Thickness : IEquatable<Thickness>
     ///     Gets the total width of the left and right sides of the rectangle. Sets the width of the left and rigth sides
     ///     of the rectangle to half the specified value.
     /// </summary>
-    public int Horizontal { get => Left + Right; set => Left = Right = value / 2; }
+    public int Horizontal
+    {
+        get => Left + Right;
+        set => Left = Right = value / 2;
+    }
 
     /// <summary>
     ///     Gets the total height of the top and bottom sides of the rectangle. Sets the height of the top and bottom
     ///     sides of the rectangle to half the specified value.
     /// </summary>
-    public int Vertical { get => Top + Bottom; set => Top = Bottom = value / 2; }
+    public int Vertical
+    {
+        get => Top + Bottom;
+        set => Top = Bottom = value / 2;
+    }
 
     // IEquitable
     /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
@@ -105,7 +113,7 @@ public class Thickness : IEquatable<Thickness>
     /// <returns>The inner rectangle remaining to be drawn.</returns>
     public Rect Draw (Rect rect, string label = null)
     {
-        if ((rect.Size.Width < 1) || (rect.Size.Height < 1))
+        if (rect.Size.Width < 1 || rect.Size.Height < 1)
         {
             return Rect.Empty;
         }
@@ -225,7 +233,7 @@ public class Thickness : IEquatable<Thickness>
     public override bool Equals (object obj)
     {
         //Check for null and compare run-time types.
-        if ((obj == null) || !GetType ().Equals (obj.GetType ()))
+        if (obj == null || !GetType ().Equals (obj.GetType ()))
         {
             return false;
         }

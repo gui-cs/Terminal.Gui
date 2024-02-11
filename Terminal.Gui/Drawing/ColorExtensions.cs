@@ -2,7 +2,7 @@ using System.Collections.Frozen;
 
 namespace Terminal.Gui;
 
-static class ColorExtensions
+internal static class ColorExtensions
 {
     private static FrozenDictionary<Color, ColorName> colorToNameMap;
 

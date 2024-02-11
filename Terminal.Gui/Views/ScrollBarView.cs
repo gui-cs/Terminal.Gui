@@ -307,7 +307,7 @@ public class ScrollBarView : View
         barsize -= 2;
         int pos = Position;
 
-        if (mouseEvent.Flags != MouseFlags.Button1Released && ((Application.MouseGrabView == null) || (Application.MouseGrabView != this)))
+        if (mouseEvent.Flags != MouseFlags.Button1Released && (Application.MouseGrabView == null || Application.MouseGrabView != this))
         {
             Application.GrabMouse (this);
         }
@@ -320,10 +320,10 @@ public class ScrollBarView : View
         }
 
         if (_showScrollIndicator
-            && ((mouseEvent.Flags == MouseFlags.WheeledDown)
-                || (mouseEvent.Flags == MouseFlags.WheeledUp)
-                || (mouseEvent.Flags == MouseFlags.WheeledRight)
-                || (mouseEvent.Flags == MouseFlags.WheeledLeft)))
+            && (mouseEvent.Flags == MouseFlags.WheeledDown
+                || mouseEvent.Flags == MouseFlags.WheeledUp
+                || mouseEvent.Flags == MouseFlags.WheeledRight
+                || mouseEvent.Flags == MouseFlags.WheeledLeft))
         {
             return Host.MouseEvent (mouseEvent);
         }
@@ -352,7 +352,7 @@ public class ScrollBarView : View
             //	b1 = Math.Max (b1 - 1, 0);
             //}
 
-            if ((_lastLocation > -1)
+            if (_lastLocation > -1
                 || (location >= posTopLeftTee
                     && location <= posBottomRightTee
                     && mouseEvent.Flags.HasFlag (
@@ -451,9 +451,9 @@ public class ScrollBarView : View
     /// <inheritdoc/>
     public override void OnDrawContent (Rect contentArea)
     {
-        if ((ColorScheme == null) || ((!_showScrollIndicator || (Size == 0)) && AutoHideScrollBars && Visible))
+        if (ColorScheme == null || ((!_showScrollIndicator || Size == 0) && AutoHideScrollBars && Visible))
         {
-            if ((!_showScrollIndicator || (Size == 0)) && AutoHideScrollBars && Visible)
+            if ((!_showScrollIndicator || Size == 0) && AutoHideScrollBars && Visible)
             {
                 ShowHideScrollBars (false);
             }
@@ -461,7 +461,7 @@ public class ScrollBarView : View
             return;
         }
 
-        if ((Size == 0) || (_vertical && Bounds.Height == 0) || (!_vertical && Bounds.Width == 0))
+        if (Size == 0 || (_vertical && Bounds.Height == 0) || (!_vertical && Bounds.Width == 0))
         {
             return;
         }
@@ -535,7 +535,7 @@ public class ScrollBarView : View
                 {
                     Move (col, y + 1);
 
-                    if (((y < by1) || (y > by2)) && ((_position > 0 && !hasTopTee) || (hasTopTee && hasBottomTee)))
+                    if ((y < by1 || y > by2) && ((_position > 0 && !hasTopTee) || (hasTopTee && hasBottomTee)))
                     {
                         special = Glyphs.Stipple;
                     }
@@ -554,7 +554,7 @@ public class ScrollBarView : View
                                 _posTopTee = y;
                                 special = Glyphs.TopTee;
                             }
-                            else if (((_position == 0 && y == bh - 1) || (y >= by2) || (by2 == 0)) && !hasBottomTee)
+                            else if (((_position == 0 && y == bh - 1) || y >= by2 || by2 == 0) && !hasBottomTee)
                             {
                                 hasBottomTee = true;
                                 _posBottomTee = y;
@@ -626,7 +626,7 @@ public class ScrollBarView : View
 
                 for (var x = 0; x < bw; x++)
                 {
-                    if (((x < bx1) || (x >= bx2 + 1)) && ((_position > 0 && !hasLeftTee) || (hasLeftTee && hasRightTee)))
+                    if ((x < bx1 || x >= bx2 + 1) && ((_position > 0 && !hasLeftTee) || (hasLeftTee && hasRightTee)))
                     {
                         special = Glyphs.Stipple;
                     }
@@ -645,7 +645,7 @@ public class ScrollBarView : View
                                 _posLeftTee = x;
                                 special = Glyphs.LeftTee;
                             }
-                            else if (((_position == 0 && x == bw - 1) || (x >= bx2) || (bx2 == 0)) && !hasRightTee)
+                            else if (((_position == 0 && x == bw - 1) || x >= bx2 || bx2 == 0) && !hasRightTee)
                             {
                                 hasRightTee = true;
                                 _posRightTee = x;
@@ -708,7 +708,7 @@ public class ScrollBarView : View
     {
         int barsize = scrollBarView._vertical ? scrollBarView.Bounds.Height : scrollBarView.Bounds.Width;
 
-        if ((barsize == 0) || (barsize >= scrollBarView._size))
+        if (barsize == 0 || barsize >= scrollBarView._size)
         {
             if (scrollBarView._showScrollIndicator)
             {
@@ -795,10 +795,10 @@ public class ScrollBarView : View
 
     private void ContentBottomRightCorner_MouseClick (object sender, MouseEventEventArgs me)
     {
-        if ((me.MouseEvent.Flags == MouseFlags.WheeledDown)
-            || (me.MouseEvent.Flags == MouseFlags.WheeledUp)
-            || (me.MouseEvent.Flags == MouseFlags.WheeledRight)
-            || (me.MouseEvent.Flags == MouseFlags.WheeledLeft))
+        if (me.MouseEvent.Flags == MouseFlags.WheeledDown
+            || me.MouseEvent.Flags == MouseFlags.WheeledUp
+            || me.MouseEvent.Flags == MouseFlags.WheeledRight
+            || me.MouseEvent.Flags == MouseFlags.WheeledLeft)
         {
             MouseEvent (me.MouseEvent);
         }

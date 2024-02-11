@@ -22,7 +22,7 @@ public static class ConsoleKeyMapping
     ///     by setting the top bit of the return value. If there is no translation, the function returns 0. See Remarks.
     /// </returns>
     [DllImport ("user32.dll", EntryPoint = "MapVirtualKeyExW", CharSet = CharSet.Unicode)]
-    private extern static uint MapVirtualKeyEx (VK vk, uint uMapType, nint dwhkl);
+    private static extern uint MapVirtualKeyEx (VK vk, uint uMapType, nint dwhkl);
 
     /// <summary>Retrieves the active input locale identifier (formerly called the keyboard layout).</summary>
     /// <param name="idThread">0 for current thread</param>
@@ -31,12 +31,12 @@ public static class ConsoleKeyMapping
     ///     for the input language and the high word contains a device handle to the physical layout of the keyboard.
     /// </returns>
     [DllImport ("user32.dll", EntryPoint = "GetKeyboardLayout", CharSet = CharSet.Unicode)]
-    private extern static nint GetKeyboardLayout (nint idThread);
+    private static extern nint GetKeyboardLayout (nint idThread);
 
     //[DllImport ("user32.dll", EntryPoint = "GetKeyboardLayoutNameW", CharSet = CharSet.Unicode)]
     //extern static uint GetKeyboardLayoutName (uint idThread);
-    [DllImport ("user32.dll")] private extern static nint GetForegroundWindow ();
-    [DllImport ("user32.dll")] private extern static nint GetWindowThreadProcessId (nint hWnd, nint ProcessId);
+    [DllImport ("user32.dll")] private static extern nint GetForegroundWindow ();
+    [DllImport ("user32.dll")] private static extern nint GetWindowThreadProcessId (nint hWnd, nint ProcessId);
     /// <summary>
     ///     Translates the specified virtual-key code and keyboard state to the corresponding Unicode character or
     ///     characters using the Win32 API MapVirtualKey.
@@ -82,7 +82,7 @@ public static class ConsoleKeyMapping
     /// <param name="pwszKLID"></param>
     /// <returns></returns>
     [DllImport ("user32.dll")]
-    private extern static bool GetKeyboardLayoutName ([Out] StringBuilder pwszKLID);
+    private static extern bool GetKeyboardLayoutName ([Out] StringBuilder pwszKLID);
 
     /// <summary>
     ///     Retrieves the name of the active input locale identifier (formerly called the keyboard layout) for the calling

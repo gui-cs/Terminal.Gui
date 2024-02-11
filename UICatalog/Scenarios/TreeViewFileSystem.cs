@@ -462,7 +462,7 @@ public class TreeViewFileSystem : Scenario
             int? location = _treeViewFiles.GetObjectRow (selected);
 
             //selected object is offscreen or somehow not found
-            if ((location == null) || (location < 0) || (location > _treeViewFiles.Frame.Height))
+            if (location == null || location < 0 || location > _treeViewFiles.Frame.Height)
             {
                 return;
             }

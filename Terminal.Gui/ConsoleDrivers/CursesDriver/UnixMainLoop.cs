@@ -11,7 +11,7 @@ namespace Terminal.Gui;
 ///     In addition to the general functions of the MainLoop, the Unix version can watch file descriptors using the
 ///     AddWatch methods.
 /// </remarks>
-class UnixMainLoop : IMainLoopDriver
+internal class UnixMainLoop : IMainLoopDriver
 {
     /// <summary>Condition on which to wake up from file descriptor activity.  These match the Linux/BSD poll definitions.</summary>
     [Flags]
@@ -104,7 +104,7 @@ class UnixMainLoop : IMainLoopDriver
             _winChanged = true;
         }
 
-        return checkTimersResult || (n >= KEY_RESIZE);
+        return checkTimersResult || n >= KEY_RESIZE;
     }
 
     void IMainLoopDriver.Iteration ()
@@ -186,9 +186,9 @@ class UnixMainLoop : IMainLoopDriver
         }
     }
 
-    [DllImport ("libc")] private extern static int pipe ([In] [Out] int [] pipes);
-    [DllImport ("libc")] private extern static int poll ([In] [Out] Pollfd [] ufds, uint nfds, int timeout);
-    [DllImport ("libc")] private extern static int read (int fd, nint buf, nint n);
+    [DllImport ("libc")] private static extern int pipe ([In] [Out] int [] pipes);
+    [DllImport ("libc")] private static extern int poll ([In] [Out] Pollfd [] ufds, uint nfds, int timeout);
+    [DllImport ("libc")] private static extern int read (int fd, nint buf, nint n);
 
     private void UpdatePollMap ()
     {
@@ -210,7 +210,7 @@ class UnixMainLoop : IMainLoopDriver
         }
     }
 
-    [DllImport ("libc")] private extern static int write (int fd, nint buf, nint n);
+    [DllImport ("libc")] private static extern int write (int fd, nint buf, nint n);
 
     [StructLayout (LayoutKind.Sequential)]
     private struct Pollfd

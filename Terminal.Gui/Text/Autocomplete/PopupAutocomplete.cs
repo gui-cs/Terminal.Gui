@@ -125,7 +125,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
             return false;
         }
 
-        if ((popup == null) || (Suggestions.Count == 0))
+        if (popup == null || Suggestions.Count == 0)
         {
             ManipulatePopup ();
 
@@ -187,7 +187,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
             return ReopenSuggestions ();
         }
 
-        if (closed || (Suggestions.Count == 0))
+        if (closed || Suggestions.Count == 0)
         {
             Visible = false;
 
@@ -249,7 +249,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
         {
             ProcessKey (new Key ((KeyCode)Suggestions [0].Title [0]));
         }
-        else if (!Visible || (HostControl?.HasFocus == false) || (Suggestions.Count == 0))
+        else if (!Visible || HostControl?.HasFocus == false || Suggestions.Count == 0)
         {
             LastPopupPos = null;
             Visible = false;

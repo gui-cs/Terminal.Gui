@@ -258,7 +258,7 @@ public class Dialogs : Scenario
                 Buttons = buttons.ToArray ()
             };
 
-            if ((height != 0) || (width != 0))
+            if (height != 0 || width != 0)
             {
                 dialog.Height = height;
                 dialog.Width = width;

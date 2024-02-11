@@ -62,7 +62,11 @@ public class ColumnStyle
     ///     is rendered and whether it can be selected. Defaults to true.
     /// </summary>
     /// <remarks>If <see cref="MaxWidth"/> is 0 then <see cref="Visible"/> will always return false.</remarks>
-    public bool Visible { get => MaxWidth >= 0 && visible; set => visible = value; }
+    public bool Visible
+    {
+        get => MaxWidth >= 0 && visible;
+        set => visible = value;
+    }
 
     /// <summary>
     ///     Returns the alignment for the cell based on <paramref name="cellValue"/> and <see cref="AlignmentGetter"/>/

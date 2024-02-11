@@ -62,7 +62,6 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     }
 
     private readonly Type _driverType;
-
     private bool AutoInit { get; }
 
     public override void After (MethodInfo methodUnderTest)
@@ -171,7 +170,7 @@ public class TestDateAttribute : BeforeAfterTestAttribute
     public override void Before (MethodInfo methodUnderTest) { Assert.Equal (CultureInfo.CurrentCulture, CultureInfo.InvariantCulture); }
 }
 
-partial class TestHelpers
+internal partial class TestHelpers
 {
 #pragma warning disable xUnit1013 // Public method should be marked as test
     /// <summary>
@@ -395,7 +394,7 @@ partial class TestHelpers
             {
                 Rune rune = row [c];
 
-                if ((rune != (Rune)' ') || (row.Sum (x => x.GetColumns ()) == w))
+                if (rune != (Rune)' ' || row.Sum (x => x.GetColumns ()) == w)
                 {
                     break;
                 }

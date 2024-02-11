@@ -93,7 +93,8 @@ public class SyntaxHighlighting : Scenario
     private TextView _textView;
     private ColorScheme _white;
 
-    /// <summary>Reads an object instance from an Json file.
+    /// <summary>
+    ///     Reads an object instance from an Json file.
     ///     <para>Object type must have a parameterless constructor.</para>
     /// </summary>
     /// <typeparam name="T">The type of object to read from the file.</typeparam>
@@ -420,7 +421,7 @@ public static class EventExtensions
                                            );
 
             if (eventFieldInfo != null
-                && ((eventFieldInfo.FieldType == typeof (MulticastDelegate))
+                && (eventFieldInfo.FieldType == typeof (MulticastDelegate)
                     || eventFieldInfo.FieldType.IsSubclassOf (
                                                               typeof (MulticastDelegate)
                                                              )))

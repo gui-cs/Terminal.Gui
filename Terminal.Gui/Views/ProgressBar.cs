@@ -134,8 +134,8 @@ public class ProgressBar : View
         get => string.IsNullOrEmpty (base.Text) ? $"{_fraction * 100:F0}%" : base.Text;
         set
         {
-            if ((ProgressBarStyle == ProgressBarStyle.MarqueeBlocks)
-                || (ProgressBarStyle == ProgressBarStyle.MarqueeContinuous))
+            if (ProgressBarStyle == ProgressBarStyle.MarqueeBlocks
+                || ProgressBarStyle == ProgressBarStyle.MarqueeContinuous)
             {
                 base.Text = value;
             }
@@ -214,7 +214,7 @@ public class ProgressBar : View
     /// </remarks>
     public void Pulse ()
     {
-        if ((_activityPos == null) || (_activityPos.Length == 0))
+        if (_activityPos == null || _activityPos.Length == 0)
         {
             PopulateActivityPos ();
         }

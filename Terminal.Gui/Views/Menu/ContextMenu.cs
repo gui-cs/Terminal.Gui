@@ -161,7 +161,7 @@ public sealed class ContextMenu : IDisposable
 
         if (rect.Right >= frame.Right)
         {
-            if ((frame.Right - rect.Width >= 0) || !ForceMinimumPosToZero)
+            if (frame.Right - rect.Width >= 0 || !ForceMinimumPosToZero)
             {
                 position.X = frame.Right - rect.Width;
             }
@@ -177,7 +177,7 @@ public sealed class ContextMenu : IDisposable
 
         if (rect.Bottom >= frame.Bottom)
         {
-            if ((frame.Bottom - rect.Height - 1 >= 0) || !ForceMinimumPosToZero)
+            if (frame.Bottom - rect.Height - 1 >= 0 || !ForceMinimumPosToZero)
             {
                 if (Host == null)
                 {

@@ -52,19 +52,39 @@ public class ColorScheme : IEquatable<ColorScheme>
     private readonly Attribute _normal;
 
     /// <summary>The default foreground and background color for text when the view is disabled.</summary>
-    public Attribute Disabled { get => _disabled; init => _disabled = value; }
+    public Attribute Disabled
+    {
+        get => _disabled;
+        init => _disabled = value;
+    }
 
     /// <summary>The foreground and background color for text when the view has the focus.</summary>
-    public Attribute Focus { get => _focus; init => _focus = value; }
+    public Attribute Focus
+    {
+        get => _focus;
+        init => _focus = value;
+    }
 
     /// <summary>The foreground and background color for for text in a focused view that indicates a <see cref="View.HotKey"/>.</summary>
-    public Attribute HotFocus { get => _hotFocus; init => _hotFocus = value; }
+    public Attribute HotFocus
+    {
+        get => _hotFocus;
+        init => _hotFocus = value;
+    }
 
     /// <summary>The foreground and background color for text in a non-focused view that indicates a <see cref="View.HotKey"/>.</summary>
-    public Attribute HotNormal { get => _hotNormal; init => _hotNormal = value; }
+    public Attribute HotNormal
+    {
+        get => _hotNormal;
+        init => _hotNormal = value;
+    }
 
     /// <summary>The foreground and background color for text when the view is not focused, hot, or disabled.</summary>
-    public Attribute Normal { get => _normal; init => _normal = value; }
+    public Attribute Normal
+    {
+        get => _normal;
+        init => _normal = value;
+    }
 
     /// <summary>Compares two <see cref="ColorScheme"/> objects for equality.</summary>
     /// <param name="other"></param>

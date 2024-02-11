@@ -574,9 +574,7 @@ Item 6",
     private class NewListDataSource : IListDataSource
     {
         public int Count => throw new NotImplementedException ();
-
         public int Length => throw new NotImplementedException ();
-
         public bool IsMarked (int item) { throw new NotImplementedException (); }
 
         public void Render (

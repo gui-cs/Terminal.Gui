@@ -10,7 +10,7 @@ using System.Collections.ObjectModel;
 namespace Terminal.Gui;
 
 /// <summary>Interface to create a platform specific <see cref="MainLoop"/> driver.</summary>
-interface IMainLoopDriver
+internal interface IMainLoopDriver
 {
     /// <summary>Must report whether there are any events pending, or even block waiting for events.</summary>
     /// <returns><c>true</c>, if there were pending events, <c>false</c> otherwise.</returns>
@@ -36,7 +36,7 @@ interface IMainLoopDriver
 ///     Monitoring of file descriptors is only available on Unix, there does not seem to be a way of supporting this
 ///     on Windows.
 /// </remarks>
-class MainLoop : IDisposable
+internal class MainLoop : IDisposable
 {
     /// <summary>Creates a new MainLoop.</summary>
     /// <remarks>Use <see cref="Dispose"/> to release resources.</remarks>

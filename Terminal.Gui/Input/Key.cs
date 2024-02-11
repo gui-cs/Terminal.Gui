@@ -259,7 +259,7 @@ public class Key : EventArgs, IEquatable<Key>
     /// </remarks>
     public static bool GetIsKeyCodeAtoZ (KeyCode keyCode)
     {
-        if (((keyCode & KeyCode.AltMask) != 0) || ((keyCode & KeyCode.CtrlMask) != 0))
+        if ((keyCode & KeyCode.AltMask) != 0 || (keyCode & KeyCode.CtrlMask) != 0)
         {
             return false;
         }
@@ -495,7 +495,7 @@ public class Key : EventArgs, IEquatable<Key>
         }
 
         // Handle special cases and modifiers on their own
-        if (key != KeyCode.SpecialMask && ((baseKey != KeyCode.Null) || hasModifiers))
+        if (key != KeyCode.SpecialMask && (baseKey != KeyCode.Null || hasModifiers))
         {
             if ((key & KeyCode.SpecialMask) != 0 && (baseKey & ~KeyCode.Space) is >= KeyCode.A and <= KeyCode.Z)
             {

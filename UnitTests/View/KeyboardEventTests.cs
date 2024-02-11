@@ -445,17 +445,11 @@ public class KeyboardEventTests
     public class OnKeyTestView : View
     {
         public OnKeyTestView () { CanFocus = true; }
-
         public bool CancelVirtualMethods { set; private get; }
-
         public bool OnInvokingKeyBindingsContinued { get; set; }
-
         public bool OnKeyDownContinued { get; set; }
-
         public bool OnKeyPressedContinued { get; set; }
-
         public bool OnKeyUpContinued { get; set; }
-
         public override string Text { get; set; }
 
         public override bool? OnInvokingKeyBindings (Key keyEvent)

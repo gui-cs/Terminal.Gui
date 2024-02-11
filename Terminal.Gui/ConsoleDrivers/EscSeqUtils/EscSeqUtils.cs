@@ -461,7 +461,7 @@ public static class EscSeqUtils
     /// <returns>The c1Control returned by <see cref="GetC1ControlChar(char)"/>, code, values and terminating.</returns>
     public static (string c1Control, string code, string [] values, string terminating) GetEscapeResult (char [] kChar)
     {
-        if ((kChar == null) || (kChar.Length == 0))
+        if (kChar == null || kChar.Length == 0)
         {
             return (null, null, null, null);
         }
@@ -500,7 +500,7 @@ public static class EscSeqUtils
             {
                 valueIdx++;
             }
-            else if ((valueIdx == nSep - 1) || (i == kChar.Length - 1))
+            else if (valueIdx == nSep - 1 || i == kChar.Length - 1)
             {
                 terminating += c.ToString ();
             }
@@ -584,7 +584,7 @@ public static class EscSeqUtils
             {
                 value += c.ToString ();
             }
-            else if ((c == 'm') || (c == 'M'))
+            else if (c == 'm' || c == 'M')
             {
                 //pos.Y = int.Parse (value) + Console.WindowTop - 1;
                 pos.Y = int.Parse (value) - 1;
@@ -807,10 +807,10 @@ public static class EscSeqUtils
 
         if ((!isButtonClicked
              && !isButtonDoubleClicked
-             && ((buttonState == MouseFlags.Button1Pressed)
-                 || (buttonState == MouseFlags.Button2Pressed)
-                 || (buttonState == MouseFlags.Button3Pressed)
-                 || (buttonState == MouseFlags.Button4Pressed))
+             && (buttonState == MouseFlags.Button1Pressed
+                 || buttonState == MouseFlags.Button2Pressed
+                 || buttonState == MouseFlags.Button3Pressed
+                 || buttonState == MouseFlags.Button4Pressed)
              && lastMouseButtonPressed == null)
             || (isButtonPressed
                 && lastMouseButtonPressed != null
@@ -844,20 +844,20 @@ public static class EscSeqUtils
             }
         }
         else if (isButtonDoubleClicked
-                 && ((buttonState == MouseFlags.Button1Pressed)
-                     || (buttonState == MouseFlags.Button2Pressed)
-                     || (buttonState == MouseFlags.Button3Pressed)
-                     || (buttonState == MouseFlags.Button4Pressed)))
+                 && (buttonState == MouseFlags.Button1Pressed
+                     || buttonState == MouseFlags.Button2Pressed
+                     || buttonState == MouseFlags.Button3Pressed
+                     || buttonState == MouseFlags.Button4Pressed))
         {
             mouseFlags [0] = GetButtonTripleClicked (buttonState);
             isButtonDoubleClicked = false;
             isButtonTripleClicked = true;
         }
         else if (isButtonClicked
-                 && ((buttonState == MouseFlags.Button1Pressed)
-                     || (buttonState == MouseFlags.Button2Pressed)
-                     || (buttonState == MouseFlags.Button3Pressed)
-                     || (buttonState == MouseFlags.Button4Pressed)))
+                 && (buttonState == MouseFlags.Button1Pressed
+                     || buttonState == MouseFlags.Button2Pressed
+                     || buttonState == MouseFlags.Button3Pressed
+                     || buttonState == MouseFlags.Button4Pressed))
         {
             mouseFlags [0] = GetButtonDoubleClicked (buttonState);
             isButtonClicked = false;
@@ -886,10 +886,10 @@ public static class EscSeqUtils
         //} 
         else if (!isButtonClicked
                  && !isButtonDoubleClicked
-                 && ((buttonState == MouseFlags.Button1Released)
-                     || (buttonState == MouseFlags.Button2Released)
-                     || (buttonState == MouseFlags.Button3Released)
-                     || (buttonState == MouseFlags.Button4Released)))
+                 && (buttonState == MouseFlags.Button1Released
+                     || buttonState == MouseFlags.Button2Released
+                     || buttonState == MouseFlags.Button3Released
+                     || buttonState == MouseFlags.Button4Released))
         {
             mouseFlags [0] = buttonState;
             isButtonPressed = false;
@@ -1154,19 +1154,19 @@ public static class EscSeqUtils
         return mf;
     }
 
-    private async static Task ProcessButtonClickedAsync ()
+    private static async Task ProcessButtonClickedAsync ()
     {
         await Task.Delay (300);
         isButtonClicked = false;
     }
 
-    private async static Task ProcessButtonDoubleClickedAsync ()
+    private static async Task ProcessButtonDoubleClickedAsync ()
     {
         await Task.Delay (300);
         isButtonDoubleClicked = false;
     }
 
-    private async static Task ProcessContinuousButtonPressedAsync (
+    private static async Task ProcessContinuousButtonPressedAsync (
         MouseFlags mouseFlag,
         Action<MouseFlags, Point> continuousButtonPressedHandler
     )

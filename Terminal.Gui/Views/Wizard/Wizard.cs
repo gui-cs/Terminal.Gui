@@ -124,7 +124,11 @@ public class Wizard : Dialog
     public Button BackButton { get; }
 
     /// <summary>Gets or sets the currently active <see cref="WizardStep"/>.</summary>
-    public WizardStep CurrentStep { get => _currentStep; set => GoToStep (value); }
+    public WizardStep CurrentStep
+    {
+        get => _currentStep;
+        set => GoToStep (value);
+    }
 
     /// <summary>
     ///     Determines whether the <see cref="Wizard"/> is displayed as modal pop-up or not. The default is

@@ -195,7 +195,11 @@ public class TabView : View
 
     /// <summary>When there are too many tabs to render, this indicates the first tab to render on the screen.</summary>
     /// <value></value>
-    public int TabScrollOffset { get => _tabScrollOffset; set => _tabScrollOffset = EnsureValidScrollOffsets (value); }
+    public int TabScrollOffset
+    {
+        get => _tabScrollOffset;
+        set => _tabScrollOffset = EnsureValidScrollOffsets (value);
+    }
 
     /// <summary>Adds the given <paramref name="tab"/> to <see cref="Tabs"/>.</summary>
     /// <param name="tab"></param>
@@ -210,7 +214,7 @@ public class TabView : View
         _tabs.Add (tab);
         _tabsBar.Add (tab);
 
-        if ((SelectedTab == null) || andSelect)
+        if (SelectedTab == null || andSelect)
         {
             SelectedTab = tab;
 
@@ -287,7 +291,7 @@ public class TabView : View
     /// <summary>Updates <see cref="TabScrollOffset"/> to ensure that <see cref="SelectedTab"/> is visible.</summary>
     public void EnsureSelectedTabIsVisible ()
     {
-        if (!IsInitialized || (SelectedTab == null))
+        if (!IsInitialized || SelectedTab == null)
         {
             return;
         }
@@ -331,7 +335,7 @@ public class TabView : View
     /// <param name="tab"></param>
     public void RemoveTab (Tab tab)
     {
-        if ((tab == null) || !_tabs.Contains (tab))
+        if (tab == null || !_tabs.Contains (tab))
         {
             return;
         }
@@ -342,7 +346,7 @@ public class TabView : View
         _tabs.Remove (tab);
 
         // if the currently selected tab is no longer a member of Tabs
-        if ((SelectedTab == null) || !Tabs.Contains (SelectedTab))
+        if (SelectedTab == null || !Tabs.Contains (SelectedTab))
         {
             // select the tab closest to the one that disappeared
             int toSelect = Math.Max (idx - 1, 0);
@@ -377,7 +381,7 @@ public class TabView : View
         }
 
         // if there is only one tab anyway or nothing is selected
-        if ((Tabs.Count == 1) || (SelectedTab == null))
+        if (Tabs.Count == 1 || SelectedTab == null)
         {
             SelectedTab = Tabs.ElementAt (0);
             SetNeedsDisplay ();
@@ -547,7 +551,7 @@ public class TabView : View
 
     /// <summary>Raises the <see cref="TabClicked"/> event.</summary>
     /// <param name="tabMouseEventArgs"></param>
-    protected private virtual void OnTabClicked (TabMouseEventArgs tabMouseEventArgs) { TabClicked?.Invoke (this, tabMouseEventArgs); }
+    private protected virtual void OnTabClicked (TabMouseEventArgs tabMouseEventArgs) { TabClicked?.Invoke (this, tabMouseEventArgs); }
 
     private class TabRowView : View
     {
@@ -1391,11 +1395,8 @@ public class TabView : View
         public bool IsSelected { get; }
 
         public Tab Tab { get; }
-
         public string TextToRender { get; }
-
         public int Width { get; }
-
         public int X { get; set; }
     }
 }

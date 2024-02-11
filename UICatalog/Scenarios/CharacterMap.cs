@@ -286,7 +286,7 @@ public class CharacterMap : Scenario
     }
 }
 
-class CharMap : ScrollView
+internal class CharMap : ScrollView
 {
     private const CursorVisibility _cursor = CursorVisibility.Default;
     private const int COLUMN_WIDTH = 3;
@@ -510,9 +510,7 @@ class CharMap : ScrollView
     }
 
     private static int RowLabelWidth => $"U+{MaxCodePoint:x5}".Length + 1;
-
     private static int RowWidth => RowLabelWidth + COLUMN_WIDTH * 16;
-
     public event EventHandler<ListViewItemEventArgs> Hover;
 
     public override void OnDrawContent (Rect contentArea)
@@ -542,7 +540,7 @@ class CharMap : ScrollView
     //public void CharMap_DrawContent (object s, DrawEventArgs a)
     public override void OnDrawContentComplete (Rect contentArea)
     {
-        if ((contentArea.Height == 0) || (contentArea.Width == 0))
+        if (contentArea.Height == 0 || contentArea.Width == 0)
         {
             return;
         }
@@ -642,7 +640,7 @@ class CharMap : ScrollView
                 int width = rune.GetColumns ();
 
                 // are we at first row of the row?
-                if (!ShowGlyphWidths || ((y - ContentOffset.Y) % _rowHeight > 0))
+                if (!ShowGlyphWidths || (y - ContentOffset.Y) % _rowHeight > 0)
                 {
                     if (width > 0)
                     {
@@ -696,7 +694,7 @@ class CharMap : ScrollView
                                      : ColorScheme.HotNormal
                                 );
 
-            if (!ShowGlyphWidths || ((y - ContentOffset.Y) % _rowHeight > 0))
+            if (!ShowGlyphWidths || (y - ContentOffset.Y) % _rowHeight > 0)
             {
                 Driver.AddStr ($"U+{val / 16:x5}_ ");
             }
@@ -780,7 +778,7 @@ class CharMap : ScrollView
         if (me.Y > 0)
         { }
 
-        if ((me.X < RowLabelWidth) || (me.X > RowLabelWidth + 16 * COLUMN_WIDTH - 1))
+        if (me.X < RowLabelWidth || me.X > RowLabelWidth + 16 * COLUMN_WIDTH - 1)
         {
             me.X = Cursor.X;
         }
@@ -1082,7 +1080,7 @@ public class UcdApiClient
     }
 }
 
-class UnicodeRange
+internal class UnicodeRange
 {
     public static List<UnicodeRange> Ranges = GetRanges ();
 

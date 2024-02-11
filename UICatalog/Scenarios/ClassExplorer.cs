@@ -199,7 +199,7 @@ public class ClassExplorer : Scenario
         object val = e.NewValue;
         object [] all = _treeView.GetAllSelectedObjects ().ToArray ();
 
-        if ((val == null) || val is ShowForType)
+        if (val == null || val is ShowForType)
         {
             return;
         }
@@ -302,7 +302,6 @@ public class ClassExplorer : Scenario
         }
 
         public Showable ToShow { get; }
-
         public Type Type { get; }
 
         // Make sure to implement Equals methods on your objects if you intend to return new instances every time in ChildGetter

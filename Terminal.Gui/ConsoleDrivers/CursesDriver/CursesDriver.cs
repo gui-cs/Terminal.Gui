@@ -9,7 +9,7 @@ using Unix.Terminal;
 namespace Terminal.Gui;
 
 /// <summary>This is the Curses driver for the gui.cs/Terminal framework.</summary>
-class CursesDriver : ConsoleDriver
+internal class CursesDriver : ConsoleDriver
 {
     private CursorVisibility? _currentCursorVisibility;
     private CursorVisibility? _initialCursorVisibility;
@@ -600,7 +600,7 @@ class CursesDriver : ConsoleDriver
                 k = (KeyCode)wch | KeyCode.ShiftMask;
             }
 
-            if ((wch == '\n') || (wch == '\r'))
+            if (wch == '\n' || wch == '\r')
             {
                 k = KeyCode.Enter;
             }
@@ -635,7 +635,7 @@ class CursesDriver : ConsoleDriver
             code = Curses.get_wch (out wch2);
             var consoleKeyInfo = new ConsoleKeyInfo ((char)wch2, 0, false, false, false);
 
-            if ((wch2 == 0) || (wch2 == 27) || (wch2 == Curses.KeyMouse))
+            if (wch2 == 0 || wch2 == 27 || wch2 == Curses.KeyMouse)
             {
                 EscSeqUtils.DecodeEscSeq (
                                           null,
@@ -937,7 +937,7 @@ class CursesDriver : ConsoleDriver
     #endregion
 }
 
-static class Platform
+internal static class Platform
 {
     private static int _suspendSignal;
 
@@ -1010,6 +1010,6 @@ static class Platform
         }
     }
 
-    [DllImport ("libc")] private extern static int killpg (int pgrp, int pid);
-    [DllImport ("libc")] private extern static int uname (nint buf);
+    [DllImport ("libc")] private static extern int killpg (int pgrp, int pid);
+    [DllImport ("libc")] private static extern int uname (nint buf);
 }

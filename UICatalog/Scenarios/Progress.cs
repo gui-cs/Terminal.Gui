@@ -250,18 +250,17 @@ public class Progress : Scenario
         internal readonly Action PulseBtnClick = null;
         internal Action StartBtnClick;
         internal Action StopBtnClick;
-
         internal ProgressBar ActivityProgressBar { get; }
-
         internal FrameView LeftFrame { get; }
-
         internal ProgressBar PulseProgressBar { get; }
-
         internal TextField Speed { get; }
-
         internal SpinnerView Spinner { get; }
 
-        internal bool Started { get => _startedLabel.Text == "Started"; private set => _startedLabel.Text = value ? "Started" : "Stopped"; }
+        internal bool Started
+        {
+            get => _startedLabel.Text == "Started";
+            private set => _startedLabel.Text = value ? "Started" : "Stopped";
+        }
 
         internal void Pulse ()
         {

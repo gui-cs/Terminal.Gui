@@ -44,7 +44,7 @@ public class RuneCell : IEquatable<RuneCell>
     }
 }
 
-class TextModel
+internal class TextModel
 {
     private List<List<RuneCell>> _lines = new ();
     private (Point startPointToFind, Point currentPointToFind, bool found) _toFind;
@@ -179,7 +179,7 @@ class TextModel
             wasNewLine = false;
         }
 
-        if ((line.Count > 0) || wasNewLine)
+        if (line.Count > 0 || wasNewLine)
         {
             Append (line);
         }
@@ -217,7 +217,7 @@ class TextModel
         {
             _lines [pos] = new List<RuneCell> (runes);
         }
-        else if ((_lines.Count == 0) || (_lines.Count > 0 && pos >= _lines.Count))
+        else if (_lines.Count == 0 || (_lines.Count > 0 && pos >= _lines.Count))
         {
             _lines.Add (runes);
         }
@@ -334,7 +334,7 @@ class TextModel
                         {
                             lastValidCol = nCol;
 
-                            if ((runeType == RuneType.IsWhiteSpace) || (runeType == RuneType.IsUnknow))
+                            if (runeType == RuneType.IsWhiteSpace || runeType == RuneType.IsUnknow)
                             {
                                 runeType = GetRuneType (nRune);
                             }
@@ -418,7 +418,7 @@ class TextModel
 
             ProcMovePrev (ref col, ref row, rune);
 
-            if ((fromCol != col) || (fromRow != row))
+            if (fromCol != col || fromRow != row)
             {
                 return (col, row);
             }
@@ -537,7 +537,7 @@ class TextModel
 
             ProcMoveNext (ref col, ref row, rune);
 
-            if ((fromCol != col) || (fromRow != row))
+            if (fromCol != col || fromRow != row)
             {
                 return (col, row);
             }
@@ -565,7 +565,7 @@ class TextModel
     // Returns the left column in a range of the string.
     internal static int CalculateLeftColumn (List<Rune> t, int start, int end, int width, int tabWidth = 0)
     {
-        if ((t == null) || (t.Count == 0))
+        if (t == null || t.Count == 0)
         {
             return 0;
         }
@@ -594,7 +594,7 @@ class TextModel
                 break;
             }
 
-            if ((end < t.Count && col > 0 && start < end && col == start) || (end - col == width - 1))
+            if ((end < t.Count && col > 0 && start < end && col == start) || end - col == width - 1)
             {
                 break;
             }
@@ -632,7 +632,7 @@ class TextModel
         int tabWidth = 0
     )
     {
-        if ((t == null) || (t.Count == 0))
+        if (t == null || t.Count == 0)
         {
             return (0, 0);
         }
@@ -687,7 +687,7 @@ class TextModel
         bool matchWholeWord = false
     )
     {
-        if ((text == null) || (_lines.Count == 0))
+        if (text == null || _lines.Count == 0)
         {
             gaveFullTurn = false;
 
@@ -730,7 +730,7 @@ class TextModel
         bool matchWholeWord = false
     )
     {
-        if ((text == null) || (_lines.Count == 0))
+        if (text == null || _lines.Count == 0)
         {
             gaveFullTurn = false;
 
@@ -800,7 +800,7 @@ class TextModel
                 size += tabWidth + 1;
             }
 
-            if ((i == pX) || (size > pX))
+            if (i == pX || size > pX)
             {
                 return i - start;
             }
@@ -854,7 +854,7 @@ class TextModel
                     col += textToReplace!.Length - matchText.Length;
                 }
 
-                if ((col < 0) || (col + 1 > txt.Length))
+                if (col < 0 || col + 1 > txt.Length)
                 {
                     break;
                 }
@@ -979,7 +979,7 @@ class TextModel
                 continue;
             }
 
-            if (col > -1 && ((i == start.Y && col >= start.X) || (i > start.Y)) && txt.Contains (matchText))
+            if (col > -1 && ((i == start.Y && col >= start.X) || i > start.Y) && txt.Contains (matchText))
             {
                 return (new Point (col, i), true);
             }
@@ -1024,7 +1024,7 @@ class TextModel
                 continue;
             }
 
-            if (col > -1 && ((i <= linesCount && col <= start.X) || (i < start.Y)) && txt.Contains (matchText))
+            if (col > -1 && ((i <= linesCount && col <= start.X) || i < start.Y) && txt.Contains (matchText))
             {
                 return (new Point (col, i), true);
             }
@@ -1076,7 +1076,7 @@ class TextModel
         int start = index > 0 ? index - 1 : 0;
         int end = index + txt.Length;
 
-        if (((start == 0) || Rune.IsWhiteSpace ((Rune)source [start])) && ((end == source.Length) || Rune.IsWhiteSpace ((Rune)source [end])))
+        if ((start == 0 || Rune.IsWhiteSpace ((Rune)source [start])) && (end == source.Length || Rune.IsWhiteSpace ((Rune)source [end])))
         {
             return true;
         }
@@ -1251,7 +1251,7 @@ class TextModel
     }
 }
 
-partial class HistoryText
+internal partial class HistoryText
 {
     public enum LineStatus
     {
@@ -1264,9 +1264,7 @@ partial class HistoryText
     private readonly List<HistoryTextItem> _historyTextItems = new ();
     private int _idxHistoryText = -1;
     private string? _originalText;
-
     public bool HasHistoryChanges => _idxHistoryText > -1;
-
     public bool IsFromHistory { get; private set; }
 
     public void Add (List<List<RuneCell>> lines, Point curPos, LineStatus lineStatus = LineStatus.Original)
@@ -1360,8 +1358,8 @@ partial class HistoryText
         if (historyTextItem.IsUndoing)
         {
             if (_idxHistoryText - 1 > -1
-                && ((_historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Added)
-                    || (_historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Removed)
+                && (_historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Added
+                    || _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Removed
                     || (historyTextItem.LineStatus == LineStatus.Replaced && _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Original)))
             {
                 _idxHistoryText--;
@@ -1413,8 +1411,8 @@ partial class HistoryText
 
             OnChangeText (historyTextItem);
 
-            while ((_historyTextItems [_idxHistoryText].LineStatus == LineStatus.Removed)
-                   || (_historyTextItems [_idxHistoryText].LineStatus == LineStatus.Added))
+            while (_historyTextItems [_idxHistoryText].LineStatus == LineStatus.Removed
+                   || _historyTextItems [_idxHistoryText].LineStatus == LineStatus.Added)
             {
                 _idxHistoryText--;
             }
@@ -1422,9 +1420,9 @@ partial class HistoryText
         else if (!historyTextItem.IsUndoing)
         {
             if (_idxHistoryText + 1 < _historyTextItems.Count
-                && ((historyTextItem.LineStatus == LineStatus.Original)
-                    || (_historyTextItems [_idxHistoryText + 1].LineStatus == LineStatus.Added)
-                    || (_historyTextItems [_idxHistoryText + 1].LineStatus == LineStatus.Removed)))
+                && (historyTextItem.LineStatus == LineStatus.Original
+                    || _historyTextItems [_idxHistoryText + 1].LineStatus == LineStatus.Added
+                    || _historyTextItems [_idxHistoryText + 1].LineStatus == LineStatus.Removed))
             {
                 _idxHistoryText++;
                 historyTextItem = new HistoryTextItem (_historyTextItems [_idxHistoryText]);
@@ -1460,8 +1458,8 @@ partial class HistoryText
 
             OnChangeText (historyTextItem);
 
-            while ((_historyTextItems [_idxHistoryText].LineStatus == LineStatus.Removed)
-                   || (_historyTextItems [_idxHistoryText].LineStatus == LineStatus.Added))
+            while (_historyTextItems [_idxHistoryText].LineStatus == LineStatus.Removed
+                   || _historyTextItems [_idxHistoryText].LineStatus == LineStatus.Added)
             {
                 _idxHistoryText++;
             }
@@ -1469,13 +1467,12 @@ partial class HistoryText
     }
 }
 
-class WordWrapManager
+internal class WordWrapManager
 {
     public WordWrapManager (TextModel model) { Model = model; }
     private int _frameWidth;
     private bool _isWrapModelRefreshing;
     private List<WrappedLine> _wrappedModelLines = new ();
-
     public TextModel Model { get; private set; }
 
     public void AddLine (int row, int col)
@@ -1549,7 +1546,7 @@ class WordWrapManager
             WrappedLine wLine = _wrappedModelLines! [i];
             WrappedLine wLineToCompare = wModelLines [i];
 
-            if ((wLine.ModelLine != modelLine) || (wLineToCompare.ModelLine != modelLine))
+            if (wLine.ModelLine != modelLine || wLineToCompare.ModelLine != modelLine)
             {
                 break;
             }
@@ -1600,7 +1597,7 @@ class WordWrapManager
             line.RemoveAt (modelCol);
         }
 
-        if ((line.Count > _frameWidth) || (row + 1 < _wrappedModelLines.Count && _wrappedModelLines [row + 1].ModelLine == modelRow))
+        if (line.Count > _frameWidth || (row + 1 < _wrappedModelLines.Count && _wrappedModelLines [row + 1].ModelLine == modelRow))
         {
             return true;
         }
@@ -2612,7 +2609,11 @@ public class TextView : View
     }
 
     /// <inheritdoc/>
-    public override bool CanFocus { get => base.CanFocus; set => base.CanFocus = value; }
+    public override bool CanFocus
+    {
+        get => base.CanFocus;
+        set => base.CanFocus = value;
+    }
 
     /// <summary>Get the <see cref="ContextMenu"/> for this view.</summary>
     public ContextMenu? ContextMenu { get; }
@@ -2675,7 +2676,11 @@ public class TextView : View
     ///     Indicates whatever the text was changed or not. <see langword="true"/> if the text was changed
     ///     <see langword="false"/> otherwise.
     /// </summary>
-    public bool IsDirty { get => _historyText.IsDirty (Text); set => _historyText.Clear (Text); }
+    public bool IsDirty
+    {
+        get => _historyText.IsDirty (Text);
+        set => _historyText.Clear (Text);
+    }
 
     /// <summary>Gets or sets the left column.</summary>
     public int LeftColumn
@@ -2891,7 +2896,11 @@ public class TextView : View
     }
 
     /// <summary>Gets or sets the top row.</summary>
-    public int TopRow { get => _topRow; set => _topRow = Math.Max (Math.Min (value, Lines - 1), 0); }
+    public int TopRow
+    {
+        get => _topRow;
+        set => _topRow = Math.Max (Math.Min (value, Lines - 1), 0);
+    }
 
     /// <summary>
     ///     Tracks whether the text view should be considered "used", that is, that the user has moved in the entry, so
@@ -3502,8 +3511,8 @@ public class TextView : View
             ProcessMouseClick (ev, out List<RuneCell> line);
             (int col, int row)? newPos;
 
-            if ((CurrentColumn == line.Count)
-                || (CurrentColumn > 0 && ((line [CurrentColumn - 1].Rune.Value != ' ') || (line [CurrentColumn].Rune.Value == ' '))))
+            if (CurrentColumn == line.Count
+                || (CurrentColumn > 0 && (line [CurrentColumn - 1].Rune.Value != ' ' || line [CurrentColumn].Rune.Value == ' ')))
             {
                 newPos = _model.WordBackward (CurrentColumn, CurrentRow);
 
@@ -3747,7 +3756,7 @@ public class TextView : View
         ResetColumnTrack ();
 
         // Ignore control characters and other special keys
-        if (!a.IsKeyCodeAtoZ && ((a.KeyCode < KeyCode.Space) || (a.KeyCode > KeyCode.CharMask)))
+        if (!a.IsKeyCodeAtoZ && (a.KeyCode < KeyCode.Space || a.KeyCode > KeyCode.CharMask))
         {
             return false;
         }
@@ -3784,7 +3793,7 @@ public class TextView : View
         SetWrapModel ();
         string? contents = Clipboard.Contents;
 
-        if (_copyWithoutSelection && contents.FirstOrDefault (x => (x == '\n') || (x == '\r')) == 0)
+        if (_copyWithoutSelection && contents.FirstOrDefault (x => x == '\n' || x == '\r') == 0)
         {
             List<RuneCell> runeList = contents == null ? new List<RuneCell> () : TextModel.ToRuneCellList (contents);
             List<RuneCell> currentLine = GetCurrentLine ();
@@ -3843,7 +3852,7 @@ public class TextView : View
     {
         ProcessAutocomplete ();
 
-        if (!CanFocus || !Enabled || (Application.Driver == null))
+        if (!CanFocus || !Enabled || Application.Driver == null)
         {
             return;
         }
@@ -3923,7 +3932,7 @@ public class TextView : View
         string? textToReplace = null
     )
     {
-        if (_isReadOnly || (_model.Count == 0))
+        if (_isReadOnly || _model.Count == 0)
         {
             return false;
         }
@@ -4140,7 +4149,7 @@ public class TextView : View
             need = true;
         }
         else if (!_wordWrap
-                 && ((CurrentColumn - _leftColumn + RightOffset > Frame.Width + offB.width) || (dSize.size + RightOffset >= Frame.Width + offB.width)))
+                 && (CurrentColumn - _leftColumn + RightOffset > Frame.Width + offB.width || dSize.size + RightOffset >= Frame.Width + offB.width))
         {
             _leftColumn = TextModel.CalculateLeftColumn (
                                                          line,
@@ -4558,7 +4567,7 @@ public class TextView : View
 
     private IEnumerable<(int col, int row, RuneCell rune)> ForwardIterator (int col, int row)
     {
-        if ((col < 0) || (row < 0))
+        if (col < 0 || row < 0)
         {
             yield break;
         }
@@ -4619,7 +4628,7 @@ public class TextView : View
         long selection;
         long point;
 
-        if ((startRow == null) || (startCol == null) || (cRow == null) || (cCol == null))
+        if (startRow == null || startCol == null || cRow == null || cCol == null)
         {
             selection = ((long)(uint)_selectionStartRow << 32) | (uint)_selectionStartColumn;
             point = ((long)(uint)CurrentRow << 32) | (uint)CurrentColumn;
@@ -5030,7 +5039,7 @@ public class TextView : View
                                  );
             }
 
-            if ((_model.Count > 0) || _lastWasKill)
+            if (_model.Count > 0 || _lastWasKill)
             {
                 string val = Environment.NewLine;
 
@@ -5118,7 +5127,7 @@ public class TextView : View
             {
                 _model.RemoveLine (CurrentRow);
 
-                if ((_model.Count > 0) || _lastWasKill)
+                if (_model.Count > 0 || _lastWasKill)
                 {
                     string val = Environment.NewLine;
 
@@ -5269,7 +5278,7 @@ public class TextView : View
 
         _historyText.Add (new List<List<RuneCell>> { new (GetCurrentLine ()) }, CursorPosition);
 
-        if ((currentLine.Count == 0) || (CurrentColumn == currentLine.Count))
+        if (currentLine.Count == 0 || CurrentColumn == currentLine.Count)
         {
             DeleteTextForwards ();
 
@@ -5798,7 +5807,7 @@ public class TextView : View
 
             while (cell.ColorScheme == null)
             {
-                if (((colWithColor == 0) || (cell.ColorScheme == null)) && cRow > 0)
+                if ((colWithColor == 0 || cell.ColorScheme == null) && cRow > 0)
                 {
                     line = GetLine (--cRow);
                     colWithColor = line.Count - 1;

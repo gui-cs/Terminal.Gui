@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui;
 
-class FakeMainLoop : IMainLoopDriver
+internal class FakeMainLoop : IMainLoopDriver
 {
     public FakeMainLoop (ConsoleDriver consoleDriver = null)
     {

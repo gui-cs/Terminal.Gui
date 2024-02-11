@@ -49,7 +49,7 @@ public class MenuBarItem : MenuItem
     /// <value>The children.</value>
     public MenuItem [] Children { get; set; }
 
-    internal bool IsTopLevel => Parent == null && ((Children == null) || (Children.Length == 0)) && Action != null;
+    internal bool IsTopLevel => Parent == null && (Children == null || Children.Length == 0) && Action != null;
 
     /// <summary>Get the index of a child <see cref="MenuItem"/>.</summary>
     /// <param name="children"></param>
@@ -378,7 +378,6 @@ public class MenuBar : View
                 menuBarItem.AddKeyBindings (this);
             }
 #if SUPPORT_ALT_TO_ACTIVATE_MENU
-
             // Enable the Alt key as a menu activator
             Initialized += (s, e) =>
                            {
@@ -581,7 +580,7 @@ public class MenuBar : View
             mbar.CleanUp ();
         }
 
-        if (!Enabled || (_openMenu != null))
+        if (!Enabled || _openMenu != null)
         {
             return;
         }
@@ -826,7 +825,7 @@ public class MenuBar : View
 
                     LastFocused.SetFocus ();
                 }
-                else if ((_openSubMenu == null) || (_openSubMenu.Count == 0))
+                else if (_openSubMenu == null || _openSubMenu.Count == 0)
                 {
                     CloseAllMenus ();
                 }
@@ -938,7 +937,7 @@ public class MenuBar : View
                                                                                  )
                                               : null;
 
-                    if (((_selectedSub == -1) || (_openSubMenu == null) || (_openSubMenu?.Count - 1 == _selectedSub)) && subMenu == null)
+                    if ((_selectedSub == -1 || _openSubMenu == null || _openSubMenu?.Count - 1 == _selectedSub) && subMenu == null)
                     {
                         if (_openSubMenu != null && !CloseMenu (false, true))
                         {
@@ -947,7 +946,7 @@ public class MenuBar : View
 
                         NextMenu (false, ignoreUseSubMenusSingleFrame);
                     }
-                    else if ((subMenu != null)
+                    else if (subMenu != null
                              || (openCurrentMenu._currentChild > -1
                                  && !openCurrentMenu.BarItems
                                                     .Children [openCurrentMenu._currentChild]
@@ -1259,7 +1258,7 @@ public class MenuBar : View
                 }
             }
 
-            if ((child == null) || !child.IsEnabled ())
+            if (child == null || !child.IsEnabled ())
             {
                 if (forward)
                 {
@@ -1393,7 +1392,7 @@ public class MenuBar : View
 
     private void RemoveSubMenu (int index, bool ignoreUseSubMenusSingleFrame = false)
     {
-        if ((_openSubMenu == null)
+        if (_openSubMenu == null
             || (UseSubMenusSingleFrame
                 && !ignoreUseSubMenusSingleFrame
                 && _openSubMenu.Count == 0))
@@ -1609,7 +1608,7 @@ public class MenuBar : View
 
                 if (hotKey != KeyCode.Null)
                 {
-                    bool matches = (key == hotKey) || (key == (hotKey | KeyCode.AltMask));
+                    bool matches = key == hotKey || key == (hotKey | KeyCode.AltMask);
 
                     if (IsMenuOpen)
                     {
@@ -1637,7 +1636,7 @@ public class MenuBar : View
     {
         menuItemToSelect = null;
 
-        if ((key == KeyCode.Null) || (menuBarItem?.Children == null))
+        if (key == KeyCode.Null || menuBarItem?.Children == null)
         {
             return false;
         }
@@ -1700,10 +1699,10 @@ public class MenuBar : View
 
         _handled = false;
 
-        if ((me.Flags == MouseFlags.Button1Pressed)
-            || (me.Flags == MouseFlags.Button1DoubleClicked)
-            || (me.Flags == MouseFlags.Button1TripleClicked)
-            || (me.Flags == MouseFlags.Button1Clicked)
+        if (me.Flags == MouseFlags.Button1Pressed
+            || me.Flags == MouseFlags.Button1DoubleClicked
+            || me.Flags == MouseFlags.Button1TripleClicked
+            || me.Flags == MouseFlags.Button1Clicked
             || (me.Flags == MouseFlags.ReportMousePosition && _selected > -1)
             || (me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) && _selected > -1))
         {
@@ -1736,9 +1735,9 @@ public class MenuBar : View
                             Activate (i);
                         }
                     }
-                    else if ((me.Flags == MouseFlags.Button1Pressed)
-                             || (me.Flags == MouseFlags.Button1DoubleClicked)
-                             || (me.Flags == MouseFlags.Button1TripleClicked))
+                    else if (me.Flags == MouseFlags.Button1Pressed
+                             || me.Flags == MouseFlags.Button1DoubleClicked
+                             || me.Flags == MouseFlags.Button1TripleClicked)
                     {
                         if (IsMenuOpen && !Menus [i].IsTopLevel)
                         {
@@ -1751,7 +1750,7 @@ public class MenuBar : View
                     }
                     else if (_selected != i
                              && _selected > -1
-                             && ((me.Flags == MouseFlags.ReportMousePosition)
+                             && (me.Flags == MouseFlags.ReportMousePosition
                                  || (me.Flags == MouseFlags.Button1Pressed && me.Flags == MouseFlags.ReportMousePosition)))
                     {
                         if (IsMenuOpen)
@@ -1879,9 +1878,9 @@ public class MenuBar : View
             }
         }
         else if (!IsMenuOpen
-                 && ((me.Flags == MouseFlags.Button1Pressed)
-                     || (me.Flags == MouseFlags.Button1DoubleClicked)
-                     || (me.Flags == MouseFlags.Button1TripleClicked)
+                 && (me.Flags == MouseFlags.Button1Pressed
+                     || me.Flags == MouseFlags.Button1DoubleClicked
+                     || me.Flags == MouseFlags.Button1TripleClicked
                      || me.Flags.HasFlag (
                                           MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                          )))
@@ -1906,7 +1905,7 @@ public class MenuBar : View
 
     private MenuBar GetMouseGrabViewInstance (View view)
     {
-        if ((view == null) || (Application.MouseGrabView == null))
+        if (view == null || Application.MouseGrabView == null)
         {
             return null;
         }

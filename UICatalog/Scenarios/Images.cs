@@ -115,7 +115,7 @@ public class Images : Scenario
             }
 
             // if we have not got a cached resized image of this size
-            if ((_matchSize == null) || (bounds.Width != _matchSize.Width) || (bounds.Height != _matchSize.Height))
+            if (_matchSize == null || bounds.Width != _matchSize.Width || bounds.Height != _matchSize.Height)
             {
                 // generate one
                 _matchSize = _fullResImage.Clone (x => x.Resize (bounds.Width, bounds.Height));

@@ -172,7 +172,7 @@ public class CsvEditor : Scenario
                                            "Cancel"
                                           );
 
-            if ((result <= -1) || (result >= 4))
+            if (result <= -1 || result >= 4)
             {
                 return;
             }
@@ -429,7 +429,7 @@ public class CsvEditor : Scenario
             _selectedCellLabel.Text = $"{_tableView.SelectedRow},{_tableView.SelectedColumn}";
         }
 
-        if ((_tableView.Table == null) || (_tableView.SelectedColumn == -1))
+        if (_tableView.Table == null || _tableView.SelectedColumn == -1)
         {
             return;
         }
@@ -526,7 +526,7 @@ public class CsvEditor : Scenario
 
     private void Save ()
     {
-        if ((_tableView.Table == null) || string.IsNullOrWhiteSpace (_currentFile))
+        if (_tableView.Table == null || string.IsNullOrWhiteSpace (_currentFile))
         {
             MessageBox.ErrorQuery ("No file loaded", "No file is currently loaded", "Ok");
 

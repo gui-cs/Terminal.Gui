@@ -16,7 +16,6 @@ public class Localization : Scenario
     private CultureInfo [] _cultureInfoSource;
     private OpenMode _currentOpenMode = OpenMode.File;
     private ComboBox _languageComboBox;
-
     public CultureInfo CurrentCulture { get; private set; } = Thread.CurrentThread.CurrentUICulture;
 
     public void Quit ()

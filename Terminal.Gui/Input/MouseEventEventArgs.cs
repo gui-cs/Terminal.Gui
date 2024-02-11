@@ -20,7 +20,11 @@ public class MouseEventEventArgs : EventArgs
     ///     This property forwards to the <see cref="MouseEvent.Handled"/> property and is provided as a convenience and
     ///     for backwards compatibility
     /// </remarks>
-    public bool Handled { get => MouseEvent.Handled; set => MouseEvent.Handled = value; }
+    public bool Handled
+    {
+        get => MouseEvent.Handled;
+        set => MouseEvent.Handled = value;
+    }
 
     // TODO: Merge MouseEvent and MouseEventEventArgs into a single class.
     /// <summary>The <see cref="Terminal.Gui.MouseEvent"/> for the event.</summary>

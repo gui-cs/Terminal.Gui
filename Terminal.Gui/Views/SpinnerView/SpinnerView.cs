@@ -68,20 +68,32 @@ public class SpinnerView : View
     public bool IsAsciiOnly => GetIsAsciiOnly ();
 
     /// <summary>Gets or sets the animation frames used to animate the spinner.</summary>
-    public string [] Sequence { get => _sequence; set => SetSequence (value); }
+    public string [] Sequence
+    {
+        get => _sequence;
+        set => SetSequence (value);
+    }
 
     /// <summary>
     ///     Gets or sets whether spinner should go back and forth through the frames rather than going to the end and
     ///     starting again at the beginning.
     /// </summary>
-    public bool SpinBounce { get => _bounce; set => SetBounce (value); }
+    public bool SpinBounce
+    {
+        get => _bounce;
+        set => SetBounce (value);
+    }
 
     /// <summary>Gets or sets the number of milliseconds to wait between characters in the animation.</summary>
     /// <remarks>
     ///     This is the maximum speed the spinner will rotate at.  You still need to call
     ///     <see cref="SpinnerView.AdvanceAnimation()"/> or <see cref="SpinnerView.AutoSpin"/> to advance/start animation.
     /// </remarks>
-    public int SpinDelay { get => _delay; set => SetDelay (value); }
+    public int SpinDelay
+    {
+        get => _delay;
+        set => SetDelay (value);
+    }
 
     /// <summary>
     ///     Gets or sets whether spinner should go through the frames in reverse order. If SpinBounce is true, this sets
@@ -90,7 +102,11 @@ public class SpinnerView : View
     public bool SpinReverse { get; set; }
 
     /// <summary>Gets or sets the Style used to animate the spinner.</summary>
-    public SpinnerStyle Style { get => _style; set => SetStyle (value); }
+    public SpinnerStyle Style
+    {
+        get => _style;
+        set => SetStyle (value);
+    }
 
     /// <summary>
     ///     Advances the animation frame and notifies main loop that repainting needs to happen. Repeated calls are

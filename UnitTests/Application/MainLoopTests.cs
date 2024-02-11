@@ -21,7 +21,7 @@ public class MainLoopTests
     // - wait = false
 
     // TODO: Add IMainLoop tests
-    volatile private static int tbCounter;
+    private static volatile int tbCounter;
     private static int three;
     private static int total;
     private static int two;
@@ -787,7 +787,7 @@ public class MainLoopTests
                  );
     }
 
-    private async static void RunAsyncTest (object sender, EventArgs e)
+    private static async void RunAsyncTest (object sender, EventArgs e)
     {
         Assert.Equal (clickMe, btn.Text);
         Assert.Equal (zero, total);

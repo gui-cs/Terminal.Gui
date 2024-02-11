@@ -308,7 +308,7 @@ public class HexView : View
         int empty = x % 3;
         int item = x / 3;
 
-        if (!leftSide && item > 0 && ((empty == 0) || (x == block * 14 + 14 - 1 - block * 2)))
+        if (!leftSide && item > 0 && (empty == 0 || x == block * 14 + 14 - 1 - block * 2))
         {
             return true;
         }
@@ -385,7 +385,7 @@ public class HexView : View
                     int offset = line * nblocks * bsize + block * bsize + b;
                     byte value = GetData (data, offset, out bool edited);
 
-                    if ((offset + displayStart == position) || edited)
+                    if (offset + displayStart == position || edited)
                     {
                         SetAttribute (leftSide ? activeColor : trackingColor);
                     }
@@ -428,7 +428,7 @@ public class HexView : View
                     }
                 }
 
-                if ((offset + displayStart == position) || edited)
+                if (offset + displayStart == position || edited)
                 {
                     SetAttribute (leftSide ? trackingColor : activeColor);
                 }
@@ -478,7 +478,7 @@ public class HexView : View
         }
 
         // Ignore control characters and other special keys
-        if ((keyEvent.KeyCode < KeyCode.Space) || (keyEvent.KeyCode > KeyCode.CharMask))
+        if (keyEvent.KeyCode < KeyCode.Space || keyEvent.KeyCode > KeyCode.CharMask)
         {
             return false;
         }

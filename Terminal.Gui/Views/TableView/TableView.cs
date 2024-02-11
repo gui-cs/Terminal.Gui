@@ -374,7 +374,11 @@ public class TableView : View
     ///     Vertical scroll offset.  The index of the first row in <see cref="Table"/> to display in the first non header
     ///     line of the control when rendering the view.
     /// </summary>
-    public int RowOffset { get => rowOffset; set => rowOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Rows - 1, value)); }
+    public int RowOffset
+    {
+        get => rowOffset;
+        set => rowOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Rows - 1, value));
+    }
 
     /// <summary>The index of <see cref="DataTable.Columns"/> in <see cref="Table"/> that the user has currently selected</summary>
     public int SelectedColumn
@@ -567,7 +571,7 @@ public class TableView : View
     /// </remarks>
     public void EnsureSelectedCellIsVisible ()
     {
-        if ((Table == null) || (Table.Columns <= 0))
+        if (Table == null || Table.Columns <= 0)
         {
             return;
         }
@@ -705,7 +709,7 @@ public class TableView : View
     /// <returns></returns>
     public IEnumerable<Point> GetAllSelectedCells ()
     {
-        if (TableIsNullOrInvisible () || (Table.Rows == 0))
+        if (TableIsNullOrInvisible () || Table.Rows == 0)
         {
             return Enumerable.Empty<Point> ();
         }
@@ -778,7 +782,7 @@ public class TableView : View
             return true;
         }
 
-        return row == SelectedRow && ((col == SelectedColumn) || FullRowSelect);
+        return row == SelectedRow && (col == SelectedColumn || FullRowSelect);
     }
 
     ///<inheritdoc/>
@@ -948,7 +952,7 @@ public class TableView : View
             int rowToRender = RowOffset + (line - headerLinesConsumed);
 
             //if we have run off the end of the table
-            if (TableIsNullOrInvisible () || (rowToRender < 0))
+            if (TableIsNullOrInvisible () || rowToRender < 0)
             {
                 continue;
             }
@@ -1108,7 +1112,7 @@ public class TableView : View
     /// </summary>
     public void SelectAll ()
     {
-        if (TableIsNullOrInvisible () || !MultiSelect || (Table.Rows == 0))
+        if (TableIsNullOrInvisible () || !MultiSelect || Table.Rows == 0)
         {
             return;
         }
@@ -1151,7 +1155,7 @@ public class TableView : View
         if (extendExistingSelection)
         {
             // If we are extending current selection but there isn't one
-            if ((MultiSelectedRegions.Count == 0) || MultiSelectedRegions.All (m => m.IsToggled))
+            if (MultiSelectedRegions.Count == 0 || MultiSelectedRegions.All (m => m.IsToggled))
             {
                 // Create a new region between the old active cell and the new cell
                 TableSelection rect = CreateTableSelection (SelectedColumn, SelectedRow, col, row);
@@ -1582,7 +1586,7 @@ public class TableView : View
     /// <returns></returns>
     private string GetRepresentation (object value, ColumnStyle colStyle)
     {
-        if ((value == null) || (value == DBNull.Value))
+        if (value == null || value == DBNull.Value)
         {
             return NullSymbol;
         }
@@ -1601,7 +1605,7 @@ public class TableView : View
     private bool IsColumnVisible (int columnIndex)
     {
         // if the column index provided is out of bounds
-        if ((columnIndex < 0) || (columnIndex >= table.Columns))
+        if (columnIndex < 0 || columnIndex >= table.Columns)
         {
             return false;
         }
@@ -1974,7 +1978,7 @@ public class TableView : View
             return false;
         }
 
-        return Style.AlwaysShowHeaders || (rowOffset == 0);
+        return Style.AlwaysShowHeaders || rowOffset == 0;
     }
 
     /// <summary>
@@ -1984,8 +1988,8 @@ public class TableView : View
     /// <returns></returns>
     private bool TableIsNullOrInvisible ()
     {
-        return (Table == null)
-               || (Table.Columns <= 0)
+        return Table == null
+               || Table.Columns <= 0
                || Enumerable.Range (0, Table.Columns)
                             .All (
                                   c => (Style.GetColumnStyleIfAny (c)?.Visible ?? true) == false
@@ -2114,7 +2118,7 @@ public class TableView : View
     )
     {
         // if the column index provided is out of bounds
-        if ((columnIndex < 0) || (columnIndex >= table.Columns))
+        if (columnIndex < 0 || columnIndex >= table.Columns)
         {
             idx = columnIndex;
 

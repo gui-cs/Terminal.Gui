@@ -5,7 +5,7 @@ namespace Terminal.Gui.ViewsTests;
 
 #region Helper Classes
 
-class FakeHAxis : HorizontalAxis
+internal class FakeHAxis : HorizontalAxis
 {
     public List<Point> DrawAxisLinePoints = new ();
     public List<int> LabelPoints = new ();
@@ -23,7 +23,7 @@ class FakeHAxis : HorizontalAxis
     }
 }
 
-class FakeVAxis : VerticalAxis
+internal class FakeVAxis : VerticalAxis
 {
     public List<Point> DrawAxisLinePoints = new ();
     public List<int> LabelPoints = new ();
@@ -888,11 +888,8 @@ public class BarSeriesTests
     private class FakeBarSeries : BarSeries
     {
         public List<Point> BarScreenEnds { get; } = new ();
-
         public List<Point> BarScreenStarts { get; } = new ();
-
         public GraphCellToRender FinalColor { get; private set; }
-
         protected override GraphCellToRender AdjustColor (GraphCellToRender graphCellToRender) { return FinalColor = base.AdjustColor (graphCellToRender); }
 
         protected override void DrawBarLine (GraphView graph, Point start, Point end, BarSeriesBar beingDrawn)

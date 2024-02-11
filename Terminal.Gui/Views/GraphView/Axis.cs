@@ -135,7 +135,7 @@ public class HorizontalAxis : Axis
     /// <summary>Draws the horizontal x axis labels and <see cref="Axis.Increment"/> ticks</summary>
     public override void DrawAxisLabels (GraphView graph)
     {
-        if (!Visible || (Increment == 0))
+        if (!Visible || Increment == 0)
         {
             return;
         }
@@ -312,7 +312,7 @@ public class VerticalAxis : Axis
     /// <param name="graph"></param>
     public override void DrawAxisLabels (GraphView graph)
     {
-        if (!Visible || (Increment == 0))
+        if (!Visible || Increment == 0)
         {
             return;
         }
@@ -490,7 +490,11 @@ public class AxisIncrementToRender
 
     /// <summary>The text (if any) that should be displayed at this axis increment</summary>
     /// <value></value>
-    internal string Text { get => _text; set => _text = value ?? ""; }
+    internal string Text
+    {
+        get => _text;
+        set => _text = value ?? "";
+    }
 }
 
 /// <summary>Delegate for custom formatting of axis labels.  Determines what should be displayed at a given label</summary>

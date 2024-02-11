@@ -7441,7 +7441,7 @@ TAB to jump between text field",
         tv.InsertText ("\r\naaa\r\nbbb");
         PlatformID p = Environment.OSVersion.Platform;
 
-        if ((p == PlatformID.Win32NT) || (p == PlatformID.Win32S) || (p == PlatformID.Win32Windows))
+        if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
         {
             Assert.Equal ("\r\naaa\r\nbbb", tv.Text);
         }
@@ -7517,7 +7517,7 @@ TAB to jump between text field",
         tv.InsertText ("\naaa\nbbb");
         PlatformID p = Environment.OSVersion.Platform;
 
-        if ((p == PlatformID.Win32NT) || (p == PlatformID.Win32S) || (p == PlatformID.Win32Windows))
+        if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
         {
             Assert.Equal ("\r\naaa\r\nbbb", tv.Text);
         }
@@ -9076,7 +9076,7 @@ line.
     {
         string [] lines = _textView.Text.Split (Environment.NewLine);
 
-        if ((lines == null) || (lines.Length == 0))
+        if (lines == null || lines.Length == 0)
         {
             return 0;
         }
@@ -9119,7 +9119,7 @@ line.
                 break;
             }
 
-            if ((cCol < line.Length && col > 0 && start < cCol && col == start) || (cCol - col == width - 1))
+            if ((cCol < line.Length && col > 0 && start < cCol && col == start) || cCol - col == width - 1)
             {
                 break;
             }

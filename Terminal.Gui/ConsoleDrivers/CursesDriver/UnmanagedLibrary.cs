@@ -24,7 +24,7 @@ namespace Unix.Terminal;
 ///     into delegates to native methods. See
 ///     http://stackoverflow.com/questions/13461989/p-invoke-to-dynamically-loaded-library-on-mono.
 /// </summary>
-class UnmanagedLibrary
+internal class UnmanagedLibrary
 {
     private const string UnityEngineApplicationClassName = "UnityEngine.Application, UnityEngine";
     private const string XamarinAndroidObjectClassName = "Java.Lang.Object, Mono.Android";
@@ -38,10 +38,8 @@ class UnmanagedLibrary
 		static bool IsMono, IsUnity, IsXamarinIOS, IsXamarinAndroid, IsXamarin;
 #endif
     private static bool IsNetCore;
-
     public static bool IsMacOSPlatform { get; }
-
-    [DllImport ("libc")] private extern static int uname (nint buf);
+    [DllImport ("libc")] private static extern int uname (nint buf);
 
     private static string GetUname ()
     {
@@ -76,9 +74,9 @@ class UnmanagedLibrary
         IsMacOSPlatform = platform == PlatformID.Unix && GetUname () == "Darwin";
         IsLinux = platform == PlatformID.Unix && !IsMacOSPlatform;
 
-        IsWindows = (platform == PlatformID.Win32NT)
-                    || (platform == PlatformID.Win32S)
-                    || (platform == PlatformID.Win32Windows);
+        IsWindows = platform == PlatformID.Win32NT
+                    || platform == PlatformID.Win32S
+                    || platform == PlatformID.Win32Windows;
         Is64Bit = Marshal.SizeOf (typeof (nint)) == 8;
         IsMono = Type.GetType ("Mono.Runtime") != null;
 
@@ -101,7 +99,6 @@ class UnmanagedLibrary
     private const int RTLD_LAZY = 1;
     private const int RTLD_GLOBAL = 8;
     public readonly string LibraryPath;
-
     public nint NativeLibraryHandle { get; }
 
     //
@@ -264,20 +261,20 @@ class UnmanagedLibrary
 
     private static class Windows
     {
-        [DllImport ("kernel32.dll")] internal extern static nint GetProcAddress (nint hModule, string procName);
-        [DllImport ("kernel32.dll")] internal extern static nint LoadLibrary (string filename);
+        [DllImport ("kernel32.dll")] internal static extern nint GetProcAddress (nint hModule, string procName);
+        [DllImport ("kernel32.dll")] internal static extern nint LoadLibrary (string filename);
     }
 
     private static class Linux
     {
-        [DllImport ("libdl.so")] internal extern static nint dlopen (string filename, int flags);
-        [DllImport ("libdl.so")] internal extern static nint dlsym (nint handle, string symbol);
+        [DllImport ("libdl.so")] internal static extern nint dlopen (string filename, int flags);
+        [DllImport ("libdl.so")] internal static extern nint dlsym (nint handle, string symbol);
     }
 
     private static class MacOSX
     {
-        [DllImport ("libSystem.dylib")] internal extern static nint dlopen (string filename, int flags);
-        [DllImport ("libSystem.dylib")] internal extern static nint dlsym (nint handle, string symbol);
+        [DllImport ("libSystem.dylib")] internal static extern nint dlopen (string filename, int flags);
+        [DllImport ("libSystem.dylib")] internal static extern nint dlsym (nint handle, string symbol);
     }
 
     /// <summary>
@@ -287,8 +284,8 @@ class UnmanagedLibrary
     /// </summary>
     private static class Mono
     {
-        [DllImport ("__Internal")] internal extern static nint dlopen (string filename, int flags);
-        [DllImport ("__Internal")] internal extern static nint dlsym (nint handle, string symbol);
+        [DllImport ("__Internal")] internal static extern nint dlopen (string filename, int flags);
+        [DllImport ("__Internal")] internal static extern nint dlsym (nint handle, string symbol);
     }
 
     /// <summary>
@@ -311,7 +308,7 @@ class UnmanagedLibrary
                                                );
         }
 
-        [DllImport ("libcoreclr.so")] internal extern static nint dlopen (string filename, int flags);
-        [DllImport ("libcoreclr.so")] internal extern static nint dlsym (nint handle, string symbol);
+        [DllImport ("libcoreclr.so")] internal static extern nint dlopen (string filename, int flags);
+        [DllImport ("libcoreclr.so")] internal static extern nint dlsym (nint handle, string symbol);
     }
 }

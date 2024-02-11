@@ -42,11 +42,8 @@ public partial class Curses
         }
 
         internal Window (nint handle) { Handle = handle; }
-
         public static Window Standard { get; }
-
         public static Window Current { get; }
-
         public int wtimeout (int delay) { return Curses.wtimeout (Handle, delay); }
         public int notimeout (bool bf) { return Curses.notimeout (Handle, bf); }
         public int keypad (bool bf) { return Curses.keypad (Handle, bf); }

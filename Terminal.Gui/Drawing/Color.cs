@@ -9,7 +9,8 @@ using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
-/// <summary>Represents a 24-bit color encoded in ARGB32 format.
+/// <summary>
+///     Represents a 24-bit color encoded in ARGB32 format.
 ///     <para/>
 /// </summary>
 /// <seealso cref="Attribute"/>
@@ -221,9 +222,11 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
 
     /// <summary>Gets the "closest" named color to this <see cref="Color"/> value.</summary>
     /// <param name="inputColor"></param>
-    /// <remarks>Distance is defined here as the Euclidean distance between each color interpreted as a <see cref="Vector3"/>.
+    /// <remarks>
+    ///     Distance is defined here as the Euclidean distance between each color interpreted as a <see cref="Vector3"/>.
     ///     <para/>
-    ///     The order of the values in the passed Vector3 must be</remarks>
+    ///     The order of the values in the passed Vector3 must be
+    /// </remarks>
     /// <returns></returns>
     [SkipLocalsInit]
     internal static ColorName GetClosestNamedColor (Color inputColor)

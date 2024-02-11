@@ -36,7 +36,7 @@ public class FrameView : View
     /// <inheritdoc/>
     public override bool OnEnter (View view)
     {
-        if ((Subviews.Count == 0) || !Subviews.Any (subview => subview.CanFocus))
+        if (Subviews.Count == 0 || !Subviews.Any (subview => subview.CanFocus))
         {
             Application.Driver?.SetCursorVisibility (CursorVisibility.Invisible);
         }

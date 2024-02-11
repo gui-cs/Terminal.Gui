@@ -120,7 +120,11 @@ public class TextFormatter
 
     /// <summary>Controls the horizontal text-alignment property.</summary>
     /// <value>The text alignment.</value>
-    public TextAlignment Alignment { get => _textAlignment; set => _textAlignment = EnableNeedsFormat (value); }
+    public TextAlignment Alignment
+    {
+        get => _textAlignment;
+        set => _textAlignment = EnableNeedsFormat (value);
+    }
 
     /// <summary>Gets or sets whether the <see cref="Size"/> should be automatically changed to fit the <see cref="Text"/>.</summary>
     /// <remarks>
@@ -182,7 +186,11 @@ public class TextFormatter
     }
 
     /// <summary>The position in the text of the hot key. The hot key will be rendered using the hot color.</summary>
-    public int HotKeyPos { get => _hotKeyPos; internal set => _hotKeyPos = value; }
+    public int HotKeyPos
+    {
+        get => _hotKeyPos;
+        internal set => _hotKeyPos = value;
+    }
 
     /// <summary>
     ///     The specifier character for the hot key (e.g. '_'). Set to '\xffff' to disable hot key support for this View
@@ -192,7 +200,11 @@ public class TextFormatter
 
     /// <summary>Gets or sets a value indicating whether multi line is allowed.</summary>
     /// <remarks>Multi line is ignored if <see cref="WordWrap"/> is <see langword="true"/>.</remarks>
-    public bool MultiLine { get => _multiLine; set => _multiLine = EnableNeedsFormat (value); }
+    public bool MultiLine
+    {
+        get => _multiLine;
+        set => _multiLine = EnableNeedsFormat (value);
+    }
 
     /// <summary>Gets or sets whether the <see cref="TextFormatter"/> needs to format the text.</summary>
     /// <remarks>
@@ -208,7 +220,11 @@ public class TextFormatter
     ///     <see cref="TextFormatter.WordWrap"/> is enabled. If <see langword="true"/> trailing spaces at the end of wrapped
     ///     lines will be removed when <see cref="Text"/> is formatted for display. The default is <see langword="false"/>.
     /// </summary>
-    public bool PreserveTrailingSpaces { get => _preserveTrailingSpaces; set => _preserveTrailingSpaces = EnableNeedsFormat (value); }
+    public bool PreserveTrailingSpaces
+    {
+        get => _preserveTrailingSpaces;
+        set => _preserveTrailingSpaces = EnableNeedsFormat (value);
+    }
 
     /// <summary>Gets or sets the size <see cref="Text"/> will be constrained to when formatted.</summary>
     /// <remarks>
@@ -235,7 +251,11 @@ public class TextFormatter
     }
 
     /// <summary>Gets or sets the number of columns used for a tab.</summary>
-    public int TabWidth { get => _tabWidth; set => _tabWidth = EnableNeedsFormat (value); }
+    public int TabWidth
+    {
+        get => _tabWidth;
+        set => _tabWidth = EnableNeedsFormat (value);
+    }
 
     /// <summary>The text to be formatted. This string is never modified.</summary>
     public virtual string Text
@@ -255,10 +275,18 @@ public class TextFormatter
 
     /// <summary>Controls the vertical text-alignment property.</summary>
     /// <value>The text vertical alignment.</value>
-    public VerticalTextAlignment VerticalAlignment { get => _textVerticalAlignment; set => _textVerticalAlignment = EnableNeedsFormat (value); }
+    public VerticalTextAlignment VerticalAlignment
+    {
+        get => _textVerticalAlignment;
+        set => _textVerticalAlignment = EnableNeedsFormat (value);
+    }
 
     /// <summary>Gets or sets whether word wrap will be used to fit <see cref="Text"/> to <see cref="Size"/>.</summary>
-    public bool WordWrap { get => _wordWrap; set => _wordWrap = EnableNeedsFormat (value); }
+    public bool WordWrap
+    {
+        get => _wordWrap;
+        set => _wordWrap = EnableNeedsFormat (value);
+    }
 
     /// <summary>Draws the text held by <see cref="TextFormatter"/> to <see cref="ConsoleDriver"/> using the colors specified.</summary>
     /// <remarks>
@@ -328,7 +356,7 @@ public class TextFormatter
                                        );
         }
 
-        if ((maxBounds.Width == 0) || (maxBounds.Height == 0))
+        if (maxBounds.Width == 0 || maxBounds.Height == 0)
         {
             return;
         }
@@ -364,7 +392,7 @@ public class TextFormatter
             int x, y;
 
             // Horizontal Alignment
-            if ((Alignment == TextAlignment.Right) || (Alignment == TextAlignment.Justified && !IsLeftToRight (Direction)))
+            if (Alignment == TextAlignment.Right || (Alignment == TextAlignment.Justified && !IsLeftToRight (Direction)))
             {
                 if (isVertical)
                 {
@@ -418,7 +446,7 @@ public class TextFormatter
             }
 
             // Vertical Alignment
-            if ((VerticalAlignment == VerticalTextAlignment.Bottom) || (VerticalAlignment == VerticalTextAlignment.Justified && !IsTopToBottom (Direction)))
+            if (VerticalAlignment == VerticalTextAlignment.Bottom || (VerticalAlignment == VerticalTextAlignment.Justified && !IsTopToBottom (Direction)))
             {
                 if (isVertical)
                 {
@@ -474,7 +502,7 @@ public class TextFormatter
 
                 if (lastZeroWidthPos == null)
                 {
-                    if ((idx < 0) || (x + current + colOffset < 0))
+                    if (idx < 0 || x + current + colOffset < 0)
                     {
                         current++;
 
@@ -649,7 +677,7 @@ public class TextFormatter
     /// <returns>The size required to hold the formatted text.</returns>
     public Size FormatAndGetSize ()
     {
-        if (string.IsNullOrEmpty (Text) || (Size.Height == 0) || (Size.Width == 0))
+        if (string.IsNullOrEmpty (Text) || Size.Height == 0 || Size.Width == 0)
         {
             return Size.Empty;
         }
@@ -676,7 +704,7 @@ public class TextFormatter
     public List<string> GetLines ()
     {
         // With this check, we protect against subclasses with overrides of Text
-        if (string.IsNullOrEmpty (Text) || (Size.Height == 0) || (Size.Width == 0))
+        if (string.IsNullOrEmpty (Text) || Size.Height == 0 || Size.Width == 0)
         {
             _lines = new List<string> { string.Empty };
             NeedsFormat = false;
@@ -1170,7 +1198,7 @@ public class TextFormatter
 
                 if (length > cWidth)
                 {
-                    if ((to >= runes.Count) || (length > 1 && cWidth <= 1))
+                    if (to >= runes.Count || (length > 1 && cWidth <= 1))
                     {
                         incomplete = true;
                     }
@@ -1212,7 +1240,7 @@ public class TextFormatter
             return cLength switch
                    {
                        > 0 when to < runes.Count && runes [to].Value != ' ' && runes [to].Value != '\t' => from,
-                       > 0 when to < runes.Count && ((runes [to].Value == ' ') || (runes [to].Value == '\t')) => from,
+                       > 0 when to < runes.Count && (runes [to].Value == ' ' || runes [to].Value == '\t') => from,
                        _ => to
                    };
         }
@@ -1224,7 +1252,7 @@ public class TextFormatter
                                                tabWidth
                                               );
 
-            if (IsVerticalDirection (textDirection) || preserveTrailingSpaces || (str.GetColumns () <= width))
+            if (IsVerticalDirection (textDirection) || preserveTrailingSpaces || str.GetColumns () <= width)
             {
                 lines.Add (str);
             }
@@ -1486,7 +1514,7 @@ public class TextFormatter
 
         List<string> lineResult = new ();
 
-        if (string.IsNullOrEmpty (text) || (width == 0))
+        if (string.IsNullOrEmpty (text) || width == 0)
         {
             lineResult.Add (string.Empty);
 
@@ -1731,7 +1759,7 @@ public class TextFormatter
     /// <returns>The index of the last Rune in <paramref name="runes"/> that fit in <paramref name="columns"/>.</returns>
     public static int GetLengthThatFits (List<Rune> runes, int columns, int tabWidth = 0)
     {
-        if ((runes == null) || (runes.Count == 0))
+        if (runes == null || runes.Count == 0)
         {
             return 0;
         }
@@ -1766,7 +1794,7 @@ public class TextFormatter
             return tabWidth;
         }
 
-        if ((runeWidth < 0) || (runeWidth > 0))
+        if (runeWidth < 0 || runeWidth > 0)
         {
             return Math.Max (runeWidth, 1);
         }
@@ -1967,7 +1995,7 @@ public class TextFormatter
         bool firstUpperCase = false
     )
     {
-        if (string.IsNullOrEmpty (text) || (hotKeySpecifier == (Rune)0xFFFF))
+        if (string.IsNullOrEmpty (text) || hotKeySpecifier == (Rune)0xFFFF)
         {
             hotPos = -1;
             hotKey = KeyCode.Null;
@@ -2030,7 +2058,7 @@ public class TextFormatter
 
             var newHotKey = (KeyCode)curHotKey.Value;
 
-            if (newHotKey != KeyCode.Null && !((newHotKey == KeyCode.Space) || Rune.IsControl (curHotKey)))
+            if (newHotKey != KeyCode.Null && !(newHotKey == KeyCode.Space || Rune.IsControl (curHotKey)))
             {
                 if ((newHotKey & ~KeyCode.Space) is >= KeyCode.A and <= KeyCode.Z)
                 {

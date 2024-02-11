@@ -1312,9 +1312,7 @@ oot two
     private class EqualityTestObject
     {
         public int Age { get; set; }
-
         public string Name { get; set; }
-
         public override bool Equals (object obj) { return obj is EqualityTestObject eto && Equals (Name, eto.Name); }
         public override int GetHashCode () { return Name?.GetHashCode () ?? base.GetHashCode (); }
     }
@@ -1324,14 +1322,12 @@ oot two
     private class Factory
     {
         public Car [] Cars { get; set; }
-
         public override string ToString () { return "Factory"; }
     }
 
     private class Car
     {
         public string Name { get; set; }
-
         public override string ToString () { return Name; }
     }
 

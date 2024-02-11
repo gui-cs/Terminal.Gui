@@ -89,7 +89,7 @@ public static partial class Application
                 return top;
             }
 
-            if ((type != null && top.GetType () != type) || (exclude?.Contains (top.Data.ToString ()) == true))
+            if ((type != null && top.GetType () != type) || exclude?.Contains (top.Data.ToString ()) == true)
             {
                 continue;
             }
@@ -132,7 +132,7 @@ public static partial class Application
                 _topLevels.MoveNext ();
                 var isOverlapped = false;
 
-                while ((_topLevels.Peek () == OverlappedTop) || !_topLevels.Peek ().Visible)
+                while (_topLevels.Peek () == OverlappedTop || !_topLevels.Peek ().Visible)
                 {
                     if (!isOverlapped && _topLevels.Peek () == OverlappedTop)
                     {
@@ -163,7 +163,7 @@ public static partial class Application
                 _topLevels.MovePrevious ();
                 var isOverlapped = false;
 
-                while ((_topLevels.Peek () == OverlappedTop) || !_topLevels.Peek ().Visible)
+                while (_topLevels.Peek () == OverlappedTop || !_topLevels.Peek ().Visible)
                 {
                     if (!isOverlapped && _topLevels.Peek () == OverlappedTop)
                     {

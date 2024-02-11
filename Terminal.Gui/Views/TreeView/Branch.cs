@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui;
 
-class Branch<T> where T : class
+internal class Branch<T> where T : class
 {
     /// <summary>
     ///     Declares a new branch of <paramref name="tree"/> in which the users object <paramref name="model"/> is

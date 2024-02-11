@@ -413,13 +413,13 @@ public class LineCanvas : IDisposable
         bool useDouble = intersects.Any (i => i?.Line.Style == LineStyle.Double);
 
         bool useDashed = intersects.Any (
-                                         i => (i?.Line.Style == LineStyle.Dashed)
-                                              || (i?.Line.Style == LineStyle.RoundedDashed)
+                                         i => i?.Line.Style == LineStyle.Dashed
+                                              || i?.Line.Style == LineStyle.RoundedDashed
                                         );
 
         bool useDotted = intersects.Any (
-                                         i => (i?.Line.Style == LineStyle.Dotted)
-                                              || (i?.Line.Style == LineStyle.RoundedDotted)
+                                         i => i?.Line.Style == LineStyle.Dotted
+                                              || i?.Line.Style == LineStyle.RoundedDotted
                                         );
 
         // horiz and vert lines same as Single for Rounded
@@ -723,11 +723,11 @@ public class LineCanvas : IDisposable
             bool useRounded = intersects.Any (
                                               i => i?.Line.Length != 0
                                                    && (
-                                                          (i?.Line.Style == LineStyle.Rounded)
-                                                          || (i?.Line.Style
-                                                              == LineStyle.RoundedDashed)
-                                                          || (i?.Line.Style
-                                                              == LineStyle.RoundedDotted))
+                                                          i?.Line.Style == LineStyle.Rounded
+                                                          || i?.Line.Style
+                                                          == LineStyle.RoundedDashed
+                                                          || i?.Line.Style
+                                                          == LineStyle.RoundedDotted)
                                              );
 
             // Note that there aren't any glyphs for intersections of double lines with heavy lines
@@ -745,17 +745,17 @@ public class LineCanvas : IDisposable
             bool thickHorizontal = intersects.Any (
                                                    l => l?.Line.Orientation == Orientation.Horizontal
                                                         && (
-                                                               (l.Line.Style == LineStyle.Heavy)
-                                                               || (l.Line.Style == LineStyle.HeavyDashed)
-                                                               || (l.Line.Style == LineStyle.HeavyDotted))
+                                                               l.Line.Style == LineStyle.Heavy
+                                                               || l.Line.Style == LineStyle.HeavyDashed
+                                                               || l.Line.Style == LineStyle.HeavyDotted)
                                                   );
 
             bool thickVertical = intersects.Any (
                                                  l => l?.Line.Orientation == Orientation.Vertical
                                                       && (
-                                                             (l.Line.Style == LineStyle.Heavy)
-                                                             || (l.Line.Style == LineStyle.HeavyDashed)
-                                                             || (l.Line.Style == LineStyle.HeavyDotted))
+                                                             l.Line.Style == LineStyle.Heavy
+                                                             || l.Line.Style == LineStyle.HeavyDashed
+                                                             || l.Line.Style == LineStyle.HeavyDotted)
                                                 );
 
             if (doubleHorizontal)
@@ -894,7 +894,7 @@ public class LineCanvas : IDisposable
     }
 }
 
-class IntersectionDefinition
+internal class IntersectionDefinition
 {
     internal IntersectionDefinition (Point point, IntersectionType type, StraightLine line)
     {
@@ -914,7 +914,7 @@ class IntersectionDefinition
 }
 
 /// <summary>The type of Rune that we will use before considering double width, curved borders etc</summary>
-enum IntersectionRuneType
+internal enum IntersectionRuneType
 {
     None,
     Dot,
@@ -931,7 +931,7 @@ enum IntersectionRuneType
     VLine
 }
 
-enum IntersectionType
+internal enum IntersectionType
 {
     /// <summary>There is no intersection</summary>
     None,

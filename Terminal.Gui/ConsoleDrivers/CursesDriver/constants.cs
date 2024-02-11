@@ -172,7 +172,6 @@ public partial class Curses
 
     // see #949
     public static int LC_ALL { get; }
-
     static Curses () { LC_ALL = RuntimeInformation.IsOSPlatform (OSPlatform.OSX) ? 0 : 6; }
     public static int ColorPair (int n) { return 0 + n * 256; }
 }

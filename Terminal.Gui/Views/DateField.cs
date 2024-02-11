@@ -49,7 +49,11 @@ public class DateField : TextField
     }
 
     /// <inheritdoc/>
-    public override int CursorPosition { get => base.CursorPosition; set => base.CursorPosition = Math.Max (Math.Min (value, FormatLength), 1); }
+    public override int CursorPosition
+    {
+        get => base.CursorPosition;
+        set => base.CursorPosition = Math.Max (Math.Min (value, FormatLength), 1);
+    }
 
     /// <summary>Gets or sets the date of the <see cref="DateField"/>.</summary>
     /// <remarks></remarks>

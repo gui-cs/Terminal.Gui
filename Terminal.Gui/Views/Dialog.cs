@@ -152,7 +152,7 @@ public class Dialog : Window
 
     private void LayoutButtons ()
     {
-        if ((_buttons.Count == 0) || !IsInitialized)
+        if (_buttons.Count == 0 || !IsInitialized)
         {
             return;
         }

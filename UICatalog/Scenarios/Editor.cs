@@ -337,7 +337,7 @@ public class Editor : Scenario
 
         Win.KeyDown += (s, e) =>
                        {
-                           if (_winDialog != null && ((e.KeyCode == KeyCode.Esc) || (e == Application.QuitKey)))
+                           if (_winDialog != null && (e.KeyCode == KeyCode.Esc || e == Application.QuitKey))
                            {
                                DisposeWinDialog ();
                            }

@@ -195,7 +195,7 @@ public class BarSeries : ISeries
                 screenEnd.X = Math.Min (graph.Bounds.Width - 1, screenEnd.X);
 
                 // if bar is off the screen
-                if ((screenStart.Y < 0) || (screenStart.Y > drawBounds.Height - graph.MarginBottom))
+                if (screenStart.Y < 0 || screenStart.Y > drawBounds.Height - graph.MarginBottom)
                 {
                     continue;
                 }
@@ -209,7 +209,7 @@ public class BarSeries : ISeries
                 screenEnd.Y = Math.Max (0, screenEnd.Y);
 
                 // if bar is off the screen
-                if ((screenStart.X < graph.MarginLeft) || (screenStart.X > graph.MarginLeft + drawBounds.Width - 1))
+                if (screenStart.X < graph.MarginLeft || screenStart.X > graph.MarginLeft + drawBounds.Width - 1)
                 {
                     continue;
                 }

@@ -97,7 +97,7 @@ public static class StringExtensions
             return null;
         }
 
-        if (string.IsNullOrEmpty (str) || (n == 1))
+        if (string.IsNullOrEmpty (str) || n == 1)
         {
             return str;
         }

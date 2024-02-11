@@ -390,7 +390,7 @@ public static class ConfigurationManager
         }
 
         // If value type, just use copy constructor.
-        if (source.GetType ().IsValueType || (source.GetType () == typeof (string)))
+        if (source.GetType ().IsValueType || source.GetType () == typeof (string))
         {
             return source;
         }

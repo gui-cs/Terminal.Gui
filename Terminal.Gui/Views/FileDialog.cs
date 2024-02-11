@@ -308,7 +308,11 @@ public class FileDialog : Dialog
     ///     Gets or Sets a value indicating whether to allow selecting multiple existing files/directories. Defaults to
     ///     false.
     /// </summary>
-    public bool AllowsMultipleSelection { get => _tableView.MultiSelect; set => _tableView.MultiSelect = value; }
+    public bool AllowsMultipleSelection
+    {
+        get => _tableView.MultiSelect;
+        set => _tableView.MultiSelect = value;
+    }
 
     /// <summary>Gets a value indicating whether the <see cref="FileDialog"/> was closed without confirming a selection.</summary>
     public bool Canceled { get; private set; } = true;
@@ -872,7 +876,7 @@ public class FileDialog : Dialog
 
     private IFileSystemInfo [] GetFocusedFiles ()
     {
-        if (!_tableView.HasFocus || !_tableView.CanFocus || (FileOperationsHandler == null))
+        if (!_tableView.HasFocus || !_tableView.CanFocus || FileOperationsHandler == null)
         {
             return null;
         }
@@ -1225,7 +1229,7 @@ public class FileDialog : Dialog
     //		}
     private void RestartSearch ()
     {
-        if (_disposed || (State?.Directory == null))
+        if (_disposed || State?.Directory == null)
         {
             return;
         }
@@ -1236,7 +1240,7 @@ public class FileDialog : Dialog
         }
 
         // user is clearing search terms
-        if ((_tbFind.Text == null) || (_tbFind.Text.Length == 0))
+        if (_tbFind.Text == null || _tbFind.Text.Length == 0)
         {
             // Wait for search cancellation (if any) to finish
             // then push the current dir state
@@ -1378,7 +1382,7 @@ public class FileDialog : Dialog
 
     private void TableView_SelectedCellChanged (object sender, SelectedCellChangedEventArgs obj)
     {
-        if (!_tableView.HasFocus || (obj.NewRow == -1) || (obj.Table.Rows == 0))
+        if (!_tableView.HasFocus || obj.NewRow == -1 || obj.Table.Rows == 0)
         {
             return;
         }

@@ -11,7 +11,7 @@ namespace Terminal.Gui;
 ///     data to/from <see cref="ConfigurationManager"/> JSON documents.
 /// </summary>
 /// <typeparam name="scopeT"></typeparam>
-class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT : Scope<scopeT>
+internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT : Scope<scopeT>
 {
     public override scopeT Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {

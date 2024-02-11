@@ -147,7 +147,7 @@ public class SliderStyle
 }
 
 /// <summary>All <see cref="Slider{T}"/> configuration are grouped in this class.</summary>
-class SliderConfiguration
+internal class SliderConfiguration
 {
     internal bool _allowEmpty;
     internal bool _autoSize;
@@ -298,7 +298,7 @@ public class Slider<T> : View
     /// <param name="newFocusedOption"></param>
     public virtual bool OnOptionFocused (int newFocusedOption, SliderEventArgs<T> args)
     {
-        if ((newFocusedOption > _options.Count - 1) || (newFocusedOption < 0))
+        if (newFocusedOption > _options.Count - 1 || newFocusedOption < 0)
         {
             return true;
         }
@@ -427,7 +427,11 @@ public class Slider<T> : View
     }
 
     /// <summary>Slider Orientation. <see cref="Gui.Orientation"></see></summary>
-    public Orientation Orientation { get => _config._sliderOrientation; set => OnOrientationChanged (value); }
+    public Orientation Orientation
+    {
+        get => _config._sliderOrientation;
+        set => OnOrientationChanged (value);
+    }
 
     /// <summary>
     ///     Fired when the slider orientation has changed. Can be cancelled by setting
@@ -497,7 +501,7 @@ public class Slider<T> : View
             // _options should never be null
             _options = value ?? throw new ArgumentNullException (nameof (value));
 
-            if (!IsInitialized || (_options.Count == 0))
+            if (!IsInitialized || _options.Count == 0)
             {
                 return;
             }
@@ -508,7 +512,11 @@ public class Slider<T> : View
     }
 
     /// <summary>Allow range start and end be in the same option, as a single option.</summary>
-    public bool RangeAllowSingle { get => _config._rangeAllowSingle; set => _config._rangeAllowSingle = value; }
+    public bool RangeAllowSingle
+    {
+        get => _config._rangeAllowSingle;
+        set => _config._rangeAllowSingle = value;
+    }
 
     /// <summary>Show/Hide spacing before and after the first and last option.</summary>
     public bool ShowEndSpacing
@@ -644,7 +652,7 @@ public class Slider<T> : View
     {
         var size = 0;
 
-        if ((_options.Count == 0) || !IsInitialized)
+        if (_options.Count == 0 || !IsInitialized)
         {
             return;
         }
@@ -760,7 +768,7 @@ public class Slider<T> : View
     /// <summary>Adjust the dimensions of the Slider to the best value if <see cref="AutoSize"/> is true.</summary>
     public void SetBoundsBestFit ()
     {
-        if (!IsInitialized || (AutoSize == false))
+        if (!IsInitialized || AutoSize == false)
         {
             return;
         }
@@ -872,7 +880,7 @@ public class Slider<T> : View
     {
         position = (-1, -1);
 
-        if ((option < 0) || (option >= _options.Count ()))
+        if (option < 0 || option >= _options.Count ())
         {
             return false;
         }
@@ -919,7 +927,7 @@ public class Slider<T> : View
                 int option = cx / (_config._innerSpacing + 1);
                 bool valid = cx % (_config._innerSpacing + 1) == 0;
 
-                if (!valid || (option < 0) || (option > _options.Count - 1))
+                if (!valid || option < 0 || option > _options.Count - 1)
                 {
                     continue;
                 }
@@ -944,7 +952,7 @@ public class Slider<T> : View
                 int option = cy / (_config._innerSpacing + 1);
                 bool valid = cy % (_config._innerSpacing + 1) == 0;
 
-                if (!valid || (option < 0) || (option > _options.Count - 1))
+                if (!valid || option < 0 || option > _options.Count - 1)
                 {
                     continue;
                 }
@@ -1205,7 +1213,7 @@ public class Slider<T> : View
                 }
 
                 // Draw Spacing
-                if (_config._showEndSpacing || (i < _options.Count - 1))
+                if (_config._showEndSpacing || i < _options.Count - 1)
                 {
                     // Skip if is the Last Spacing.
                     Driver?.SetAttribute (

@@ -396,14 +396,22 @@ public class TreeView<T> : View, ITreeView where T : class
     ///     Setting a value of less than 0 will result in a offset of 0. To see changes in the UI call
     ///     <see cref="View.SetNeedsDisplay()"/>.
     /// </remarks>
-    public int ScrollOffsetHorizontal { get => scrollOffsetHorizontal; set => scrollOffsetHorizontal = Math.Max (0, value); }
+    public int ScrollOffsetHorizontal
+    {
+        get => scrollOffsetHorizontal;
+        set => scrollOffsetHorizontal = Math.Max (0, value);
+    }
 
     /// <summary>The amount of tree view that has been scrolled off the top of the screen (by the user scrolling down).</summary>
     /// <remarks>
     ///     Setting a value of less than 0 will result in a offset of 0. To see changes in the UI call
     ///     <see cref="View.SetNeedsDisplay()"/>.
     /// </remarks>
-    public int ScrollOffsetVertical { get => scrollOffsetVertical; set => scrollOffsetVertical = Math.Max (0, value); }
+    public int ScrollOffsetVertical
+    {
+        get => scrollOffsetVertical;
+        set => scrollOffsetVertical = Math.Max (0, value);
+    }
 
     /// <summary>
     ///     The currently selected object in the tree. When <see cref="MultiSelect"/> is true this is the object at which
@@ -824,7 +832,7 @@ public class TreeView<T> : View, ITreeView where T : class
     {
         Branch<T> branch = ObjectToBranch (o);
 
-        if ((branch == null) || !branch.IsExpanded)
+        if (branch == null || !branch.IsExpanded)
         {
             return new T [0];
         }
@@ -1568,7 +1576,7 @@ public class TreeView<T> : View, ITreeView where T : class
         int idx = y + ScrollOffsetVertical;
 
         // click is outside any visible nodes
-        if ((idx < 0) || (idx >= map.Count))
+        if (idx < 0 || idx >= map.Count)
         {
             return null;
         }
@@ -1588,7 +1596,7 @@ public class TreeView<T> : View, ITreeView where T : class
     private Branch<T> ObjectToBranch (T toFind) { return BuildLineMap ().FirstOrDefault (o => o.Model.Equals (toFind)); }
 }
 
-class TreeSelection<T> where T : class
+internal class TreeSelection<T> where T : class
 {
     /// <summary>Creates a new selection between two branches in the tree</summary>
     /// <param name="from"></param>
@@ -1612,8 +1620,6 @@ class TreeSelection<T> where T : class
     }
 
     private readonly HashSet<T> included = new ();
-
     public Branch<T> Origin { get; }
-
     public bool Contains (T model) { return included.Contains (model); }
 }

@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace Terminal.Gui;
 
 /// <summary>Json converter fro the <see cref="Attribute"/> class.</summary>
-class AttributeJsonConverter : JsonConverter<Attribute>
+internal class AttributeJsonConverter : JsonConverter<Attribute>
 {
     private static AttributeJsonConverter _instance;
 
@@ -37,7 +37,7 @@ class AttributeJsonConverter : JsonConverter<Attribute>
         {
             if (reader.TokenType == JsonTokenType.EndObject)
             {
-                if ((foreground == null) || (background == null))
+                if (foreground == null || background == null)
                 {
                     throw new JsonException ("Both Foreground and Background colors must be provided.");
                 }

@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-class FileDialogHistory
+internal class FileDialogHistory
 {
     public FileDialogHistory (FileDialog dlg) { this.dlg = dlg; }
     private readonly Stack<FileDialogState> back = new ();
@@ -69,7 +69,7 @@ class FileDialogHistory
         }
 
         // if changing to a new directory push onto the Back history
-        if ((back.Count == 0) || (back.Peek ().Directory.FullName != state.Directory.FullName))
+        if (back.Count == 0 || back.Peek ().Directory.FullName != state.Directory.FullName)
         {
             back.Push (state);
 

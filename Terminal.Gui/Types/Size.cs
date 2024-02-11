@@ -40,7 +40,7 @@ public struct Size
     ///     Compares two Size objects. The return value is based on the equivalence of the Width and Height properties of
     ///     the two Sizes.
     /// </remarks>
-    public static bool operator != (Size sz1, Size sz2) { return (sz1.Width != sz2.Width) || (sz1.Height != sz2.Height); }
+    public static bool operator != (Size sz1, Size sz2) { return sz1.Width != sz2.Width || sz1.Height != sz2.Height; }
 
     /// <summary>Subtraction Operator</summary>
     /// <remarks>Subtracts two Size structures.</remarks>
@@ -68,7 +68,7 @@ public struct Size
     /// <remarks>Creates a Size from specified dimensions.</remarks>
     public Size (int width, int height)
     {
-        if ((width < 0) || (height < 0))
+        if (width < 0 || height < 0)
         {
             throw new ArgumentException ("Either Width and Height must be greater or equal to 0.");
         }

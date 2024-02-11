@@ -371,7 +371,7 @@ public class TileView : View
     {
         Tile [] oldTiles = Tiles.ToArray ();
 
-        if ((idx < 0) || (idx >= oldTiles.Length))
+        if (idx < 0 || idx >= oldTiles.Length)
         {
             return null;
         }
@@ -758,7 +758,7 @@ public class TileView : View
 
     private void Setup (Rect contentArea)
     {
-        if (contentArea.IsEmpty || (contentArea.Height <= 0) || (contentArea.Width <= 0))
+        if (contentArea.IsEmpty || contentArea.Height <= 0 || contentArea.Width <= 0)
         {
             return;
         }
@@ -826,9 +826,7 @@ public class TileView : View
         }
 
         public int Depth { get; }
-
         public TileView Parent { get; }
-
         public Tile Tile { get; }
 
         /// <summary>
@@ -886,14 +884,12 @@ public class TileView : View
         private Pos dragOrignalPos;
         private Point? dragPosition;
         public Point? moveRuneRenderLocation;
-
         public int Idx { get; }
-
         public TileView Parent { get; }
 
         public void DrawSplitterSymbol ()
         {
-            if ((dragPosition != null) || CanFocus)
+            if (dragPosition != null || CanFocus)
             {
                 Point location = moveRuneRenderLocation ?? new Point (Bounds.Width / 2, Bounds.Height / 2);
 

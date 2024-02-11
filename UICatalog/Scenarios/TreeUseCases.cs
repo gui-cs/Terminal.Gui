@@ -160,9 +160,7 @@ public class TreeUseCases : Scenario
     private class Army : GameObject
     {
         public string Designation { get; set; }
-
         public List<Unit> Units { get; set; }
-
         public override string ToString () { return Designation; }
     }
 
@@ -172,7 +170,6 @@ public class TreeUseCases : Scenario
     private class GameObjectTreeBuilder : ITreeBuilder<GameObject>
     {
         public bool SupportsCanExpand => true;
-
         public bool CanExpand (GameObject model) { return model is Army; }
 
         public IEnumerable<GameObject> GetChildren (GameObject model)
@@ -194,23 +191,29 @@ public class TreeUseCases : Scenario
 
         // ITreeNode member:
         public override IList<ITreeNode> Children => Rooms.Cast<ITreeNode> ().ToList ();
-
         public List<Room> Rooms { get; set; }
 
-        public override string Text { get => Address; set => Address = value; }
+        public override string Text
+        {
+            get => Address;
+            set => Address = value;
+        }
     }
 
     private class Room : TreeNode
     {
         public string Name { get; set; }
 
-        public override string Text { get => Name; set => Name = value; }
+        public override string Text
+        {
+            get => Name;
+            set => Name = value;
+        }
     }
 
     private class Unit : GameObject
     {
         public string Name { get; set; }
-
         public override string ToString () { return Name; }
     }
 }

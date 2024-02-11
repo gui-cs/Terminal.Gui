@@ -119,7 +119,7 @@ public struct RectangleF : IEquatable<RectangleF>
     ///     a <see cref='Terminal.Gui.RectangleF.Height'/> of 0.
     /// </summary>
     [Browsable (false)]
-    public bool IsEmpty => (Width <= 0) || (Height <= 0);
+    public bool IsEmpty => Width <= 0 || Height <= 0;
 
     /// <summary>
     ///     Tests whether <paramref name="obj"/> is a <see cref='Terminal.Gui.RectangleF'/> with the same location and

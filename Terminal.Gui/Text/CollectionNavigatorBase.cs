@@ -103,7 +103,7 @@ public abstract class CollectionNavigatorBase
             }
 
             // if no changes to current state manifested
-            if ((idxCandidate == currentIndex) || (idxCandidate == -1))
+            if (idxCandidate == currentIndex || idxCandidate == -1)
             {
                 // clear history and treat as a fresh letter
                 ClearSearchString ();

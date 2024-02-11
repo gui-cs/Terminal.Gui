@@ -311,9 +311,9 @@ public class Border : Adornment
             LineCanvas lc = Parent?.LineCanvas;
 
             bool drawTop = Thickness.Top > 0 && Frame.Width > 1 && Frame.Height > 1;
-            bool drawLeft = Thickness.Left > 0 && ((Frame.Height > 1) || (Thickness.Top == 0));
+            bool drawLeft = Thickness.Left > 0 && (Frame.Height > 1 || Thickness.Top == 0);
             bool drawBottom = Thickness.Bottom > 0 && Frame.Width > 1;
-            bool drawRight = Thickness.Right > 0 && ((Frame.Height > 1) || (Thickness.Top == 0));
+            bool drawRight = Thickness.Right > 0 && (Frame.Height > 1 || Thickness.Top == 0);
 
             Attribute prevAttr = Driver.GetAttribute ();
 
@@ -330,7 +330,7 @@ public class Border : Adornment
             {
                 // ╔╡Title╞═════╗
                 // ╔╡╞═════╗
-                if ((borderBounds.Width < 4) || string.IsNullOrEmpty (Parent?.Title))
+                if (borderBounds.Width < 4 || string.IsNullOrEmpty (Parent?.Title))
                 {
                     // ╔╡╞╗ should be ╔══╗
                     lc.AddLine (

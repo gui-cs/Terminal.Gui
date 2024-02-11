@@ -109,7 +109,11 @@ public class ComboBox : View
     }
 
     /// <summary>Gets or sets if the drop-down list can be hide with a button click event.</summary>
-    public bool HideDropdownListOnClick { get => _hideDropdownListOnClick; set => _hideDropdownListOnClick = _listview.HideDropdownListOnClick = value; }
+    public bool HideDropdownListOnClick
+    {
+        get => _hideDropdownListOnClick;
+        set => _hideDropdownListOnClick = _listview.HideDropdownListOnClick = value;
+    }
 
     /// <summary>Gets the drop down list state, expanded or collapsed.</summary>
     public bool IsShow { get; private set; }
@@ -133,7 +137,11 @@ public class ComboBox : View
     }
 
     /// <summary>Current search text</summary>
-    public string SearchText { get => _search.Text; set => SetSearchText (value); }
+    public string SearchText
+    {
+        get => _search.Text;
+        set => SetSearchText (value);
+    }
 
     /// <summary>Gets the index of the currently selected item in the <see cref="Source"/></summary>
     /// <value>The selected item or -1 none selected.</value>
@@ -143,7 +151,7 @@ public class ComboBox : View
         set
         {
             if (_selectedItem != value
-                && ((value == -1)
+                && (value == -1
                     || (_source != null && value > -1 && value < _source.Count)))
             {
                 _selectedItem = _lastSelectedItem = value;
@@ -184,7 +192,11 @@ public class ComboBox : View
     }
 
     /// <summary>The currently selected list item</summary>
-    public new string Text { get => _text; set => SetSearchText (value); }
+    public new string Text
+    {
+        get => _text;
+        set => SetSearchText (value);
+    }
 
     /// <summary>
     ///     Collapses the drop down list.  Returns true if the state chagned or false if it was already collapsed and no
@@ -387,7 +399,7 @@ public class ComboBox : View
     /// <returns></returns>
     private int CalculatetHeight ()
     {
-        if (!IsInitialized || (Bounds.Height == 0))
+        if (!IsInitialized || Bounds.Height == 0)
         {
             return 0;
         }
@@ -593,7 +605,7 @@ public class ComboBox : View
 
     private void ProcessLayout ()
     {
-        if (Bounds.Height < _minimumHeight && ((Height == null) || Height is Dim.DimAbsolute))
+        if (Bounds.Height < _minimumHeight && (Height == null || Height is Dim.DimAbsolute))
         {
             Height = _minimumHeight;
         }
@@ -691,7 +703,7 @@ public class ComboBox : View
         IsShow = false;
         _listview.TabStop = false;
 
-        if ((_listview.Source.Count == 0) || ((_searchset?.Count ?? 0) == 0))
+        if (_listview.Source.Count == 0 || (_searchset?.Count ?? 0) == 0)
         {
             _text = "";
             HideList ();
@@ -771,7 +783,12 @@ public class ComboBox : View
         private bool _hideDropdownListOnClick;
         private int _highlighted = -1;
         private bool _isFocusing;
-        public bool HideDropdownListOnClick { get => _hideDropdownListOnClick; set => _hideDropdownListOnClick = WantContinuousButtonPressed = value; }
+
+        public bool HideDropdownListOnClick
+        {
+            get => _hideDropdownListOnClick;
+            set => _hideDropdownListOnClick = WantContinuousButtonPressed = value;
+        }
 
         public override bool MouseEvent (MouseEvent me)
         {
@@ -857,7 +874,7 @@ public class ComboBox : View
 
                 Move (0, row);
 
-                if ((Source == null) || (item >= Source.Count))
+                if (Source == null || item >= Source.Count)
                 {
                     for (var c = 0; c < f.Width; c++)
                     {
