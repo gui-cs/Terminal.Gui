@@ -128,7 +128,7 @@ internal class UICatalogApp
                                 {
                                     var options = new Options
                                     {
-                                        Driver = context.ParseResult.GetValueForOption (driverOption),
+                                        Driver = context.ParseResult.GetValueForOption (driverOption)!,
                                         Scenario = context.ParseResult.GetValueForArgument (scenarioArgument)
                                         /* etc. */
                                     };
