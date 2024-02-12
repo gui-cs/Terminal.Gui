@@ -1,204 +1,239 @@
-﻿using System;
-using Xunit;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests {
-	public class StatusBarTests {
-		readonly ITestOutputHelper output;
+namespace Terminal.Gui.ViewsTests;
 
-		public StatusBarTests (ITestOutputHelper output)
-		{
-			this.output = output;
-		}
+public class StatusBarTests
+{
+    private readonly ITestOutputHelper output;
+    public StatusBarTests (ITestOutputHelper output) { this.output = output; }
 
-		[Fact]
-		public void StatusItem_Constructor ()
-		{
-			Application.Init ();
-			var si = new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit", null);
-			Assert.Equal (KeyCode.CtrlMask | KeyCode.Q, si.Shortcut);
-			Assert.Equal ($"{Application.QuitKey} to Quit", si.Title);
-			Assert.Null (si.Action);
-			si = new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit", () => { });
-			Assert.NotNull (si.Action);
-			Application.Shutdown ();
-		}
+    [Fact]
+    public void AddItemAt_RemoveItem_Replacing ()
+    {
+        var sb = new StatusBar (
+                                new StatusItem []
+                                {
+                                    new (KeyCode.CtrlMask | KeyCode.Q, "~^O~ Open", null),
+                                    new (KeyCode.CtrlMask | KeyCode.Q, "~^S~ Save", null),
+                                    new (KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null)
+                                }
+                               );
 
-		[Fact]
-		public void StatusBar_Constructor_Default ()
-		{
-			var sb = new StatusBar ();
+        sb.AddItemAt (2, new StatusItem (KeyCode.CtrlMask | KeyCode.Q, "~^C~ Close", null));
 
-			Assert.Empty (sb.Items);
-			Assert.False (sb.CanFocus);
-			Assert.Equal (Colors.ColorSchemes ["Menu"], sb.ColorScheme);
-			Assert.Equal (0, sb.X);
-			Assert.Equal ("AnchorEnd(1)", sb.Y.ToString ());
-			Assert.Equal (Dim.Fill (), sb.Width);
-			Assert.Equal (1, sb.Height);
+        Assert.Equal ("~^O~ Open", sb.Items [0].Title);
+        Assert.Equal ("~^S~ Save", sb.Items [1].Title);
+        Assert.Equal ("~^C~ Close", sb.Items [2].Title);
+        Assert.Equal ("~^Q~ Quit", sb.Items [^1].Title);
 
-			var driver = new FakeDriver ();
-			Application.Init (driver);
+        Assert.Equal ("~^S~ Save", sb.RemoveItem (1).Title);
 
-			sb = new StatusBar ();
+        Assert.Equal ("~^O~ Open", sb.Items [0].Title);
+        Assert.Equal ("~^C~ Close", sb.Items [1].Title);
+        Assert.Equal ("~^Q~ Quit", sb.Items [^1].Title);
 
-			driver.SetCursorVisibility (CursorVisibility.Default);
-			driver.GetCursorVisibility (out CursorVisibility cv);
-			Assert.Equal (CursorVisibility.Default, cv);
-			Assert.True (FakeConsole.CursorVisible);
+        sb.Items [1] = new StatusItem (KeyCode.CtrlMask | KeyCode.A, "~^A~ Save As", null);
 
-			Application.Iteration += (s, a) => {
-				Assert.Equal (24, sb.Frame.Y);
+        Assert.Equal ("~^O~ Open", sb.Items [0].Title);
+        Assert.Equal ("~^A~ Save As", sb.Items [1].Title);
+        Assert.Equal ("~^Q~ Quit", sb.Items [^1].Title);
+    }
 
-				driver.SetWindowSize (driver.Cols, 15);
+    [Fact]
+    [AutoInitShutdown]
+    public void CanExecute_ProcessHotKey ()
+    {
+        Window win = null;
 
-				Assert.Equal (14, sb.Frame.Y);
+        var statusBar = new StatusBar (
+                                       new StatusItem []
+                                       {
+                                           new (
+                                                KeyCode.CtrlMask | KeyCode.N,
+                                                "~^N~ New",
+                                                New,
+                                                CanExecuteNew
+                                               ),
+                                           new (
+                                                KeyCode.CtrlMask | KeyCode.C,
+                                                "~^C~ Close",
+                                                Close,
+                                                CanExecuteClose
+                                               )
+                                       }
+                                      );
+        Toplevel top = Application.Top;
+        top.Add (statusBar);
 
-				sb.OnEnter (null);
-				driver.GetCursorVisibility (out cv);
-				Assert.Equal (CursorVisibility.Invisible, cv);
-				Assert.False (FakeConsole.CursorVisible);
+        bool CanExecuteNew () { return win == null; }
 
-				Application.RequestStop ();
-			};
+        void New () { win = new Window (); }
 
-			Application.Top.Add (sb);
+        bool CanExecuteClose () { return win != null; }
 
-			Application.Run ();
+        void Close () { win = null; }
 
-			Application.Shutdown ();
-		}
+        Application.Begin (top);
 
-		[Fact]
-		[AutoInitShutdown]
-		public void Run_Action_With_Key_And_Mouse ()
-		{
-			var msg = "";
-			var sb = new StatusBar (new StatusItem [] { new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit", () => msg = "Quiting...") });
-			Application.Top.Add (sb);
+        Assert.Null (win);
+        Assert.True (CanExecuteNew ());
+        Assert.False (CanExecuteClose ());
 
-			var iteration = 0;
+        Assert.True (top.NewKeyDownEvent (new Key (KeyCode.N | KeyCode.CtrlMask)));
+        Application.MainLoop.RunIteration ();
+        Assert.NotNull (win);
+        Assert.False (CanExecuteNew ());
+        Assert.True (CanExecuteClose ());
+    }
 
-			Application.Iteration += (s, a) => {
-				if (iteration == 0) {
-					Assert.Equal ("", msg);
-					sb.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.Q));
-				} else if (iteration == 1) {
-					Assert.Equal ("Quiting...", msg);
-					msg = "";
-					sb.MouseEvent (new MouseEvent () { X = 1, Y = 24, Flags = MouseFlags.Button1Clicked });
-				} else {
-					Assert.Equal ("Quiting...", msg);
+    [Fact]
+    [AutoInitShutdown]
+    public void Redraw_Output ()
+    {
+        var sb = new StatusBar (
+                                new StatusItem []
+                                {
+                                    new (KeyCode.CtrlMask | KeyCode.O, "~^O~ Open", null),
+                                    new (Application.QuitKey, $"{Application.QuitKey} to Quit!", null)
+                                }
+                               );
+        Application.Top.Add (sb);
 
-					Application.RequestStop ();
-				}
-				iteration++;
-			};
+        sb.OnDrawContent (sb.Bounds);
 
-			Application.Run ();
-		}
-
-		[Fact]
-		[AutoInitShutdown]
-		public void Redraw_Output ()
-		{
-			var sb = new StatusBar (new StatusItem [] {
-				new StatusItem (KeyCode.CtrlMask | KeyCode.O, "~^O~ Open", null),
-				new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit!", null)
-			});
-			Application.Top.Add (sb);
-
-			sb.OnDrawContent (sb.Bounds);
-
-			string expected = @$"
-^O Open {CM.Glyphs.VLine} Ctrl+Q to Quit!
+        var expected = @$"
+^O Open {
+    CM.Glyphs.VLine
+} Ctrl+Q to Quit!
 ";
-			TestHelpers.AssertDriverContentsAre (expected, output);
-		}
+        TestHelpers.AssertDriverContentsAre (expected, output);
+    }
 
-		[Fact]
-		[AutoInitShutdown]
-		public void Redraw_Output_CTRLQ ()
-		{
-			var sb = new StatusBar (new StatusItem [] {
-				new StatusItem (KeyCode.CtrlMask | KeyCode.O, "~CTRL-O~ Open", null),
-				new StatusItem (KeyCode.CtrlMask | KeyCode.Q, "~CTRL-Q~ Quit", null)
-			});
-			Application.Top.Add (sb);
-			sb.OnDrawContent (sb.Bounds);
+    [Fact]
+    [AutoInitShutdown]
+    public void Redraw_Output_CTRLQ ()
+    {
+        var sb = new StatusBar (
+                                new StatusItem []
+                                {
+                                    new (KeyCode.CtrlMask | KeyCode.O, "~CTRL-O~ Open", null),
+                                    new (KeyCode.CtrlMask | KeyCode.Q, "~CTRL-Q~ Quit", null)
+                                }
+                               );
+        Application.Top.Add (sb);
+        sb.OnDrawContent (sb.Bounds);
 
-			string expected = @$"
-CTRL-O Open {CM.Glyphs.VLine} CTRL-Q Quit
+        var expected = @$"
+CTRL-O Open {
+    CM.Glyphs.VLine
+} CTRL-Q Quit
 ";
 
-			TestHelpers.AssertDriverContentsAre (expected, output);
-		}
+        TestHelpers.AssertDriverContentsAre (expected, output);
+    }
 
-		[Fact]
-		public void AddItemAt_RemoveItem_Replacing ()
-		{
-			var sb = new StatusBar (new StatusItem [] {
-				new StatusItem (KeyCode.CtrlMask | KeyCode.Q, "~^O~ Open", null),
-				new StatusItem (KeyCode.CtrlMask | KeyCode.Q, "~^S~ Save", null),
-				new StatusItem (KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null)
-			});
+    [Fact]
+    [AutoInitShutdown]
+    public void Run_Action_With_Key_And_Mouse ()
+    {
+        var msg = "";
 
-			sb.AddItemAt (2, new StatusItem (KeyCode.CtrlMask | KeyCode.Q, "~^C~ Close", null));
+        var sb = new StatusBar (
+                                new StatusItem []
+                                {
+                                    new (
+                                         Application.QuitKey,
+                                         $"{Application.QuitKey} to Quit",
+                                         () => msg = "Quiting..."
+                                        )
+                                }
+                               );
+        Application.Top.Add (sb);
 
-			Assert.Equal ("~^O~ Open", sb.Items [0].Title);
-			Assert.Equal ("~^S~ Save", sb.Items [1].Title);
-			Assert.Equal ("~^C~ Close", sb.Items [2].Title);
-			Assert.Equal ("~^Q~ Quit", sb.Items [^1].Title);
+        var iteration = 0;
 
-			Assert.Equal ("~^S~ Save", sb.RemoveItem (1).Title);
+        Application.Iteration += (s, a) =>
+                                 {
+                                     if (iteration == 0)
+                                     {
+                                         Assert.Equal ("", msg);
+                                         sb.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.Q));
+                                     }
+                                     else if (iteration == 1)
+                                     {
+                                         Assert.Equal ("Quiting...", msg);
+                                         msg = "";
+                                         sb.MouseEvent (new MouseEvent { X = 1, Y = 24, Flags = MouseFlags.Button1Clicked });
+                                     }
+                                     else
+                                     {
+                                         Assert.Equal ("Quiting...", msg);
 
-			Assert.Equal ("~^O~ Open", sb.Items [0].Title);
-			Assert.Equal ("~^C~ Close", sb.Items [1].Title);
-			Assert.Equal ("~^Q~ Quit", sb.Items [^1].Title);
+                                         Application.RequestStop ();
+                                     }
 
-			sb.Items [1] = new StatusItem (KeyCode.CtrlMask | KeyCode.A, "~^A~ Save As", null);
+                                     iteration++;
+                                 };
 
-			Assert.Equal ("~^O~ Open", sb.Items [0].Title);
-			Assert.Equal ("~^A~ Save As", sb.Items [1].Title);
-			Assert.Equal ("~^Q~ Quit", sb.Items [^1].Title);
-		}
+        Application.Run ();
+    }
 
-		[Fact, AutoInitShutdown]
-		public void CanExecute_ProcessHotKey ()
-		{
-			Window win = null;
-			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem (KeyCode.CtrlMask | KeyCode.N, "~^N~ New", New, CanExecuteNew),
-				new StatusItem (KeyCode.CtrlMask | KeyCode.C, "~^C~ Close", Close, CanExecuteClose)
-			});
-			var top = Application.Top;
-			top.Add (statusBar);
+    [Fact]
+    public void StatusBar_Constructor_Default ()
+    {
+        var sb = new StatusBar ();
 
-			bool CanExecuteNew () => win == null;
+        Assert.Empty (sb.Items);
+        Assert.False (sb.CanFocus);
+        Assert.Equal (Colors.ColorSchemes ["Menu"], sb.ColorScheme);
+        Assert.Equal (0, sb.X);
+        Assert.Equal ("AnchorEnd(1)", sb.Y.ToString ());
+        Assert.Equal (Dim.Fill (), sb.Width);
+        Assert.Equal (1, sb.Height);
 
-			void New ()
-			{
-				win = new Window ();
-			}
+        var driver = new FakeDriver ();
+        Application.Init (driver);
 
-			bool CanExecuteClose () => win != null;
+        sb = new StatusBar ();
 
-			void Close ()
-			{
-				win = null;
-			}
+        driver.SetCursorVisibility (CursorVisibility.Default);
+        driver.GetCursorVisibility (out CursorVisibility cv);
+        Assert.Equal (CursorVisibility.Default, cv);
+        Assert.True (FakeConsole.CursorVisible);
 
-			Application.Begin (top);
+        Application.Iteration += (s, a) =>
+                                 {
+                                     Assert.Equal (24, sb.Frame.Y);
 
-			Assert.Null (win);
-			Assert.True (CanExecuteNew ());
-			Assert.False (CanExecuteClose ());
+                                     driver.SetWindowSize (driver.Cols, 15);
 
-			Assert.True (top.NewKeyDownEvent (new (KeyCode.N | KeyCode.CtrlMask)));
-			Application.MainLoop.RunIteration ();
-			Assert.NotNull (win);
-			Assert.False (CanExecuteNew ());
-			Assert.True (CanExecuteClose ());
-		}
-	}
+                                     Assert.Equal (14, sb.Frame.Y);
+
+                                     sb.OnEnter (null);
+                                     driver.GetCursorVisibility (out cv);
+                                     Assert.Equal (CursorVisibility.Invisible, cv);
+                                     Assert.False (FakeConsole.CursorVisible);
+
+                                     Application.RequestStop ();
+                                 };
+
+        Application.Top.Add (sb);
+
+        Application.Run ();
+
+        Application.Shutdown ();
+    }
+
+    [Fact]
+    public void StatusItem_Constructor ()
+    {
+        Application.Init ();
+        var si = new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit", null);
+        Assert.Equal (KeyCode.CtrlMask | KeyCode.Q, si.Shortcut);
+        Assert.Equal ($"{Application.QuitKey} to Quit", si.Title);
+        Assert.Null (si.Action);
+        si = new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit", () => { });
+        Assert.NotNull (si.Action);
+        Application.Shutdown ();
+    }
 }

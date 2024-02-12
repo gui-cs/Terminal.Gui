@@ -1,210 +1,213 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terminal.Gui;
 
-namespace UICatalog {
+namespace UICatalog;
 
-	class KeyBindingsDialog : Dialog {
-		// TODO: Update to use Key instead of KeyCode
-		static Dictionary<Command,KeyCode> CurrentBindings = new Dictionary<Command,KeyCode>();
-		private Command[] commands;
-		private ListView commandsListView;
-		private Label keyLabel;
+internal class KeyBindingsDialog : Dialog
+{
+    // TODO: Update to use Key instead of KeyCode
+    private static readonly Dictionary<Command, KeyCode> CurrentBindings = new ();
 
-		/// <summary>
-		/// Tracks views as they are created in UICatalog so that their keybindings can
-		/// be managed.
-		/// </summary>
-		private class ViewTracker {
+    private readonly Command [] _commands;
+    private readonly ListView _commandsListView;
+    private readonly Label _keyLabel;
 
-			public static ViewTracker Instance;
+    public KeyBindingsDialog ()
+    {
+        Title = "Keybindings";
 
-			/// <summary>
-			/// All views seen so far and a bool to indicate if we have applied keybindings to them
-			/// </summary>
-			Dictionary<View, bool> knownViews = new Dictionary<View, bool> ();
+        //Height = 50;
+        //Width = 10;
+        if (ViewTracker.Instance == null)
+        {
+            ViewTracker.Initialize ();
+        }
 
-			private object lockKnownViews = new object ();
-			private Dictionary<Command, KeyCode> keybindings;
+        // known commands that views can support
+        _commands = Enum.GetValues (typeof (Command)).Cast<Command> ().ToArray ();
 
-			public ViewTracker (View top)
-			{
-				RecordView (top);
+        _commandsListView = new ListView
+        {
+            Width = Dim.Percent (50),
+            Height = Dim.Percent (100) - 1,
+            Source = new ListWrapper (_commands),
+            SelectedItem = 0
+        };
 
-				// Refresh known windows
-				Application.AddTimeout (TimeSpan.FromMilliseconds (100), () => {
+        Add (_commandsListView);
 
-					lock (lockKnownViews) {
-						RecordView (Application.Top);
+        _keyLabel = new Label { Text = "Key: None", Width = Dim.Fill (), X = Pos.Percent (50), Y = 0 };
+        Add (_keyLabel);
 
-						ApplyKeyBindingsToAllKnownViews ();
-					}
+        var btnChange = new Button { X = Pos.Percent (50), Y = 1, Text = "Ch_ange" };
+        Add (btnChange);
+        btnChange.Clicked += RemapKey;
 
-					return true;
-				});
-			}
+        var close = new Button { Text = "Ok" };
 
-			private void RecordView (View view)
-			{
-				if (!knownViews.ContainsKey (view)) {
-					knownViews.Add (view, false);
-				}
+        close.Clicked += (s, e) =>
+                         {
+                             Application.RequestStop ();
+                             ViewTracker.Instance.StartUsingNewKeyMap (CurrentBindings);
+                         };
+        AddButton (close);
 
-				// may already have subviews that were added to it
-				// before we got to it
-				foreach (var sub in view.Subviews) {
-					RecordView (sub);
-				}
-				// TODO: BUG: Based on my new understanding of Added event I think this is wrong
-				// (and always was wrong). Parents don't get to be told when new views are added
-				// to them
+        var cancel = new Button { Text = "Cancel" };
+        cancel.Clicked += (s, e) => Application.RequestStop ();
+        AddButton (cancel);
 
-				view.Added += (s,e)=>RecordView(e.Child);
-			}
+        // Register event handler as the last thing in constructor to prevent early calls
+        // before it is even shown (e.g. OnEnter)
+        _commandsListView.SelectedItemChanged += CommandsListView_SelectedItemChanged;
 
-			internal static void Initialize ()
-			{
-				Instance = new ViewTracker (Application.Top);
-			}
+        // Setup to show first ListView entry
+        SetTextBoxToShowBinding (_commands.First ());
+    }
 
-			internal void StartUsingNewKeyMap (Dictionary<Command, KeyCode> currentBindings)
-			{
-				lock (lockKnownViews) {
+    private void CommandsListView_SelectedItemChanged (object sender, ListViewItemEventArgs obj) { SetTextBoxToShowBinding ((Command)obj.Value); }
 
-					// change our knowledge of what keys to bind
-					this.keybindings = currentBindings;
+    private void RemapKey (object sender, EventArgs e)
+    {
+        Command cmd = _commands [_commandsListView.SelectedItem];
+        KeyCode? key = null;
 
-					// Mark that we have not applied the key bindings yet to any views
-					foreach (var view in knownViews.Keys) {
-						knownViews [view] = false;
-					}
-				}
-			}
+        // prompt user to hit a key
+        var dlg = new Dialog { Title = "Enter Key" };
 
-			private void ApplyKeyBindingsToAllKnownViews ()
-			{
-				if(keybindings == null) {
-					return;
-				}
+        dlg.KeyDown += (s, k) =>
+                       {
+                           key = k.KeyCode;
+                           Application.RequestStop ();
+                       };
+        Application.Run (dlg);
 
-				// Key is the view Value is whether we have already done it
-				foreach (var viewDone in knownViews) {
+        if (key.HasValue)
+        {
+            CurrentBindings [cmd] = key.Value;
+            SetTextBoxToShowBinding (cmd);
+        }
+    }
 
-					var view = viewDone.Key;
-					var done = viewDone.Value;
+    private void SetTextBoxToShowBinding (Command cmd)
+    {
+        if (CurrentBindings.ContainsKey (cmd))
+        {
+            _keyLabel.Text = "Key: " + CurrentBindings [cmd];
+        }
+        else
+        {
+            _keyLabel.Text = "Key: None";
+        }
 
-					if (done) {
-						// we have already applied keybindings to this view
-						continue;
-					}
+        SetNeedsDisplay ();
+    }
 
-					var supported = new HashSet<Command>(view.GetSupportedCommands ());
+    /// <summary>Tracks views as they are created in UICatalog so that their keybindings can be managed.</summary>
+    private class ViewTracker
+    {
+        /// <summary>All views seen so far and a bool to indicate if we have applied keybindings to them</summary>
+        private readonly Dictionary<View, bool> _knownViews = new ();
 
-					foreach (var kvp in keybindings) {
-						
-						// if the view supports the keybinding
-						if(supported.Contains(kvp.Key))
-						{
-							// if the key was bound to any other commands clear that
-							view.KeyBindings.Remove (kvp.Value);
-							view.KeyBindings.Add (kvp.Value,kvp.Key);
-						}
+        private readonly object _lockKnownViews = new ();
+        private Dictionary<Command, KeyCode> _keybindings;
 
-						// mark that we have done this view so don't need to set keybindings again on it
-						knownViews [view] = true;
-					}
-				}
-			}
-		}
+        private ViewTracker (View top)
+        {
+            RecordView (top);
 
-		public KeyBindingsDialog () : base()
-		{
-			Title = "Keybindings";
-			//Height = 50;
-			//Width = 10;
-			if (ViewTracker.Instance == null) {
-				ViewTracker.Initialize ();
-			}
-			
-			// known commands that views can support
-			commands = Enum.GetValues (typeof (Command)).Cast<Command>().ToArray();
+            // Refresh known windows
+            Application.AddTimeout (
+                                    TimeSpan.FromMilliseconds (100),
+                                    () =>
+                                    {
+                                        lock (_lockKnownViews)
+                                        {
+                                            RecordView (Application.Top);
 
-			commandsListView = new ListView (commands) {
-				Width = Dim.Percent (50),
-				Height = Dim.Percent (100) - 1,
-			};
+                                            ApplyKeyBindingsToAllKnownViews ();
+                                        }
 
-			Add (commandsListView);
+                                        return true;
+                                    }
+                                   );
+        }
 
-			keyLabel = new Label () {
-				Text = "Key: None",
-				Width = Dim.Fill(),
-				X = Pos.Percent(50),
-				Y = 0
-			};
-			Add (keyLabel);
+        public static ViewTracker Instance { get; private set; }
+        internal static void Initialize () { Instance = new ViewTracker (Application.Top); }
 
-			var btnChange = new Button ("Ch_ange") {
-				X = Pos.Percent (50),
-				Y = 1,
-			};
-			Add (btnChange);
-			btnChange.Clicked += RemapKey;
+        internal void StartUsingNewKeyMap (Dictionary<Command, KeyCode> currentBindings)
+        {
+            lock (_lockKnownViews)
+            {
+                // change our knowledge of what keys to bind
+                _keybindings = currentBindings;
 
-			var close = new Button ("Ok");
-			close.Clicked += (s,e) => {
-				Application.RequestStop ();
-				ViewTracker.Instance.StartUsingNewKeyMap (CurrentBindings);
-			};
-			AddButton (close);
+                // Mark that we have not applied the key bindings yet to any views
+                foreach (View view in _knownViews.Keys)
+                {
+                    _knownViews [view] = false;
+                }
+            }
+        }
 
-			var cancel = new Button ("Cancel");
-			cancel.Clicked += (s,e)=>Application.RequestStop();
-			AddButton (cancel);
+        private void ApplyKeyBindingsToAllKnownViews ()
+        {
+            if (_keybindings == null)
+            {
+                return;
+            }
 
-			// Register event handler as the last thing in constructor to prevent early calls
-			// before it is even shown (e.g. OnEnter)
-			commandsListView.SelectedItemChanged += CommandsListView_SelectedItemChanged;
+            // Key is the view Value is whether we have already done it
+            foreach (KeyValuePair<View, bool> viewDone in _knownViews)
+            {
+                View view = viewDone.Key;
+                bool done = viewDone.Value;
 
-			// Setup to show first ListView entry
-			SetTextBoxToShowBinding (commands.First());
-		}
+                if (done)
+                {
+                    // we have already applied keybindings to this view
+                    continue;
+                }
 
-		private void RemapKey (object sender, EventArgs e)
-		{
-			var cmd = commands [commandsListView.SelectedItem];
-			KeyCode? key = null;
+                HashSet<Command> supported = new (view.GetSupportedCommands ());
 
-			// prompt user to hit a key
-			var dlg = new Dialog () { Title = "Enter Key" };
-			dlg.KeyDown += (s, k) => {
-				key = k.KeyCode;
-				Application.RequestStop ();
-			};
-			Application.Run (dlg);
+                foreach (KeyValuePair<Command, KeyCode> kvp in _keybindings)
+                {
+                    // if the view supports the keybinding
+                    if (supported.Contains (kvp.Key))
+                    {
+                        // if the key was bound to any other commands clear that
+                        view.KeyBindings.Remove (kvp.Value);
+                        view.KeyBindings.Add (kvp.Value, kvp.Key);
+                    }
 
-			if(key.HasValue) {
-				CurrentBindings [cmd] = key.Value;
-				SetTextBoxToShowBinding (cmd);
-			}
-		}
+                    // mark that we have done this view so don't need to set keybindings again on it
+                    _knownViews [view] = true;
+                }
+            }
+        }
 
-		private void SetTextBoxToShowBinding (Command cmd)
-		{
-			if (CurrentBindings.ContainsKey (cmd)) {
-				keyLabel.Text = "Key: " + CurrentBindings [cmd].ToString ();
-			} else {
-				keyLabel.Text = "Key: None";
-			}
-			SetNeedsDisplay ();
-		}
+        private void RecordView (View view)
+        {
+            if (!_knownViews.ContainsKey (view))
+            {
+                _knownViews.Add (view, false);
+            }
 
-		private void CommandsListView_SelectedItemChanged (object sender, ListViewItemEventArgs obj)
-		{
-			SetTextBoxToShowBinding ((Command)obj.Value);
-		}
-	}
+            // may already have subviews that were added to it
+            // before we got to it
+            foreach (View sub in view.Subviews)
+            {
+                RecordView (sub);
+            }
+
+            // TODO: BUG: Based on my new understanding of Added event I think this is wrong
+            // (and always was wrong). Parents don't get to be told when new views are added
+            // to them
+
+            view.Added += (s, e) => RecordView (e.Child);
+        }
+    }
 }

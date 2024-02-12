@@ -1,181 +1,212 @@
-﻿using System;
-using Xunit;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.DriverTests;
 
-public class KeyCodeTests {
-	readonly ITestOutputHelper _output;
+public class KeyCodeTests
+{
+    private readonly ITestOutputHelper _output;
+    public KeyCodeTests (ITestOutputHelper output) { _output = output; }
 
-	public KeyCodeTests (ITestOutputHelper output)
-	{
-		_output = output;
-	}
+    [Fact]
+    public void Key_Enum_Ambiguity_Check ()
+    {
+        KeyCode key = KeyCode.Y | KeyCode.CtrlMask;
 
-	enum SimpleEnum { Zero, One, Two, Three, Four, Five }
+        // This will not be well compared.
+        Assert.True (key.HasFlag (KeyCode.Q | KeyCode.CtrlMask));
+        Assert.True ((key & (KeyCode.Q | KeyCode.CtrlMask)) != 0);
+        Assert.Equal (KeyCode.Y | KeyCode.CtrlMask, key);
+        Assert.Equal ("Y, CtrlMask", key.ToString ());
 
-	[Flags]
-	enum FlaggedEnum { Zero, One, Two, Three, Four, Five }
+        // This will be well compared, because the Key.CtrlMask have a high value.
+        Assert.False (key == Application.QuitKey);
 
-	enum SimpleHighValueEnum { Zero, One, Two, Three, Four, Last = 0x40000000 }
+        switch (key)
+        {
+            case KeyCode.Q | KeyCode.CtrlMask:
+                // Never goes here.
+                break;
+            case KeyCode.Y | KeyCode.CtrlMask:
+                Assert.True (key == (KeyCode.Y | KeyCode.CtrlMask));
 
-	[Flags]
-	enum FlaggedHighValueEnum { Zero, One, Two, Three, Four, Last = 0x40000000 }
+                break;
+        }
+    }
 
-	[Fact]
-	public void SimpleEnum_And_FlagedEnum ()
-	{
-		var simple = SimpleEnum.Three | SimpleEnum.Five;
+    [Fact]
+    public void Key_ToString ()
+    {
+        KeyCode k = KeyCode.Y | KeyCode.CtrlMask;
+        Assert.Equal ("Y, CtrlMask", k.ToString ());
 
-		// Nothing will not be well compared here.
-		Assert.True (simple.HasFlag (SimpleEnum.Zero | SimpleEnum.Five));
-		Assert.True (simple.HasFlag (SimpleEnum.One | SimpleEnum.Five));
-		Assert.True (simple.HasFlag (SimpleEnum.Two | SimpleEnum.Five));
-		Assert.True (simple.HasFlag (SimpleEnum.Three | SimpleEnum.Five));
-		Assert.True (simple.HasFlag (SimpleEnum.Four | SimpleEnum.Five));
-		Assert.True ((simple & (SimpleEnum.Zero | SimpleEnum.Five)) != 0);
-		Assert.True ((simple & (SimpleEnum.One | SimpleEnum.Five)) != 0);
-		Assert.True ((simple & (SimpleEnum.Two | SimpleEnum.Five)) != 0);
-		Assert.True ((simple & (SimpleEnum.Three | SimpleEnum.Five)) != 0);
-		Assert.True ((simple & (SimpleEnum.Four | SimpleEnum.Five)) != 0);
-		Assert.Equal (7, (int)simple); // As it is not flagged only shows as number.
-		Assert.Equal ("7", simple.ToString ());
-		Assert.False (simple == (SimpleEnum.Zero | SimpleEnum.Five));
-		Assert.False (simple == (SimpleEnum.One | SimpleEnum.Five));
-		Assert.True (simple == (SimpleEnum.Two | SimpleEnum.Five));
-		Assert.True (simple == (SimpleEnum.Three | SimpleEnum.Five));
-		Assert.False (simple == (SimpleEnum.Four | SimpleEnum.Five));
+        k = KeyCode.CtrlMask | KeyCode.Y;
+        Assert.Equal ("Y, CtrlMask", k.ToString ());
 
-		var flagged = FlaggedEnum.Three | FlaggedEnum.Five;
+        k = KeyCode.Space;
+        Assert.Equal ("Space", k.ToString ());
 
-		// Nothing will not be well compared here.
-		Assert.True (flagged.HasFlag (FlaggedEnum.Zero | FlaggedEnum.Five));
-		Assert.True (flagged.HasFlag (FlaggedEnum.One | FlaggedEnum.Five));
-		Assert.True (flagged.HasFlag (FlaggedEnum.Two | FlaggedEnum.Five));
-		Assert.True (flagged.HasFlag (FlaggedEnum.Three | FlaggedEnum.Five));
-		Assert.True (flagged.HasFlag (FlaggedEnum.Four | FlaggedEnum.Five));
-		Assert.True ((flagged & (FlaggedEnum.Zero | FlaggedEnum.Five)) != 0);
-		Assert.True ((flagged & (FlaggedEnum.One | FlaggedEnum.Five)) != 0);
-		Assert.True ((flagged & (FlaggedEnum.Two | FlaggedEnum.Five)) != 0);
-		Assert.True ((flagged & (FlaggedEnum.Three | FlaggedEnum.Five)) != 0);
-		Assert.True ((flagged & (FlaggedEnum.Four | FlaggedEnum.Five)) != 0);
-		Assert.Equal (FlaggedEnum.Two | FlaggedEnum.Five, flagged); // As it is flagged shows as bitwise.
-		Assert.Equal ("Two, Five", flagged.ToString ());
-		Assert.False (flagged == (FlaggedEnum.Zero | FlaggedEnum.Five));
-		Assert.False (flagged == (FlaggedEnum.One | FlaggedEnum.Five));
-		Assert.True (flagged == (FlaggedEnum.Two | FlaggedEnum.Five));
-		Assert.True (flagged == (FlaggedEnum.Three | FlaggedEnum.Five));
-		Assert.False (flagged == (FlaggedEnum.Four | FlaggedEnum.Five));
-	}
+        k = KeyCode.D;
+        Assert.Equal ("D", k.ToString ());
 
-	[Fact]
-	public void SimpleHighValueEnum_And_FlaggedHighValueEnum ()
-	{
-		var simple = SimpleHighValueEnum.Three | SimpleHighValueEnum.Last;
+        k = (KeyCode)'d';
+        Assert.Equal ("d", ((char)k).ToString ());
 
-		// This will not be well compared.
-		Assert.True (simple.HasFlag (SimpleHighValueEnum.Zero | SimpleHighValueEnum.Last));
-		Assert.True (simple.HasFlag (SimpleHighValueEnum.One | SimpleHighValueEnum.Last));
-		Assert.True (simple.HasFlag (SimpleHighValueEnum.Two | SimpleHighValueEnum.Last));
-		Assert.True (simple.HasFlag (SimpleHighValueEnum.Three | SimpleHighValueEnum.Last));
-		Assert.False (simple.HasFlag (SimpleHighValueEnum.Four | SimpleHighValueEnum.Last));
-		Assert.True ((simple & (SimpleHighValueEnum.Zero | SimpleHighValueEnum.Last)) != 0);
-		Assert.True ((simple & (SimpleHighValueEnum.One | SimpleHighValueEnum.Last)) != 0);
-		Assert.True ((simple & (SimpleHighValueEnum.Two | SimpleHighValueEnum.Last)) != 0);
-		Assert.True ((simple & (SimpleHighValueEnum.Three | SimpleHighValueEnum.Last)) != 0);
-		Assert.True ((simple & (SimpleHighValueEnum.Four | SimpleHighValueEnum.Last)) != 0);
+        k = KeyCode.D;
+        Assert.Equal ("D", k.ToString ());
 
-		// This will be well compared, because the SimpleHighValueEnum.Last have a high value.
-		Assert.Equal (1073741827, (int)simple); // As it is not flagged only shows as number.
-		Assert.Equal ("1073741827", simple.ToString ()); // As it is not flagged only shows as number.
-		Assert.False (simple == (SimpleHighValueEnum.Zero | SimpleHighValueEnum.Last));
-		Assert.False (simple == (SimpleHighValueEnum.One | SimpleHighValueEnum.Last));
-		Assert.False (simple == (SimpleHighValueEnum.Two | SimpleHighValueEnum.Last));
-		Assert.True (simple == (SimpleHighValueEnum.Three | SimpleHighValueEnum.Last));
-		Assert.False (simple == (SimpleHighValueEnum.Four | SimpleHighValueEnum.Last));
+        // In a console this will always returns Key.D
+        k = KeyCode.D | KeyCode.ShiftMask;
+        Assert.Equal ("D, ShiftMask", k.ToString ());
+    }
 
-		var flagged = FlaggedHighValueEnum.Three | FlaggedHighValueEnum.Last;
+    [Fact]
+    public void KeyEnum_ShouldHaveCorrectValues ()
+    {
+        Assert.Equal (0, (int)KeyCode.Null);
+        Assert.Equal (8, (int)KeyCode.Backspace);
+        Assert.Equal (9, (int)KeyCode.Tab);
 
-		// This will not be well compared.
-		Assert.True (flagged.HasFlag (FlaggedHighValueEnum.Zero | FlaggedHighValueEnum.Last));
-		Assert.True (flagged.HasFlag (FlaggedHighValueEnum.One | FlaggedHighValueEnum.Last));
-		Assert.True (flagged.HasFlag (FlaggedHighValueEnum.Two | FlaggedHighValueEnum.Last));
-		Assert.True (flagged.HasFlag (FlaggedHighValueEnum.Three | FlaggedHighValueEnum.Last));
-		Assert.False (flagged.HasFlag (FlaggedHighValueEnum.Four | FlaggedHighValueEnum.Last));
-		Assert.True ((flagged & (FlaggedHighValueEnum.Zero | FlaggedHighValueEnum.Last)) != 0);
-		Assert.True ((flagged & (FlaggedHighValueEnum.One | FlaggedHighValueEnum.Last)) != 0);
-		Assert.True ((flagged & (FlaggedHighValueEnum.Two | FlaggedHighValueEnum.Last)) != 0);
-		Assert.True ((flagged & (FlaggedHighValueEnum.Three | FlaggedHighValueEnum.Last)) != 0);
-		Assert.True ((flagged & (FlaggedHighValueEnum.Four | FlaggedHighValueEnum.Last)) != 0);
+        // Continue for other keys...
+    }
 
-		// This will be well compared, because the SimpleHighValueEnum.Last have a high value.
-		Assert.Equal (FlaggedHighValueEnum.Three | FlaggedHighValueEnum.Last, flagged); // As it is flagged shows as bitwise.
-		Assert.Equal ("Three, Last", flagged.ToString ()); // As it is flagged shows as bitwise.
-		Assert.False (flagged == (FlaggedHighValueEnum.Zero | FlaggedHighValueEnum.Last));
-		Assert.False (flagged == (FlaggedHighValueEnum.One | FlaggedHighValueEnum.Last));
-		Assert.False (flagged == (FlaggedHighValueEnum.Two | FlaggedHighValueEnum.Last));
-		Assert.True (flagged == (FlaggedHighValueEnum.Three | FlaggedHighValueEnum.Last));
-		Assert.False (flagged == (FlaggedHighValueEnum.Four | FlaggedHighValueEnum.Last));
-	}
+    [Fact]
+    public void SimpleEnum_And_FlagedEnum ()
+    {
+        SimpleEnum simple = SimpleEnum.Three | SimpleEnum.Five;
 
-	[Fact]
-	public void Key_Enum_Ambiguity_Check ()
-	{
-		var key = KeyCode.Y | KeyCode.CtrlMask;
+        // Nothing will not be well compared here.
+        Assert.True (simple.HasFlag (SimpleEnum.Zero | SimpleEnum.Five));
+        Assert.True (simple.HasFlag (SimpleEnum.One | SimpleEnum.Five));
+        Assert.True (simple.HasFlag (SimpleEnum.Two | SimpleEnum.Five));
+        Assert.True (simple.HasFlag (SimpleEnum.Three | SimpleEnum.Five));
+        Assert.True (simple.HasFlag (SimpleEnum.Four | SimpleEnum.Five));
+        Assert.True ((simple & (SimpleEnum.Zero | SimpleEnum.Five)) != 0);
+        Assert.True ((simple & (SimpleEnum.One | SimpleEnum.Five)) != 0);
+        Assert.True ((simple & (SimpleEnum.Two | SimpleEnum.Five)) != 0);
+        Assert.True ((simple & (SimpleEnum.Three | SimpleEnum.Five)) != 0);
+        Assert.True ((simple & (SimpleEnum.Four | SimpleEnum.Five)) != 0);
+        Assert.Equal (7, (int)simple); // As it is not flagged only shows as number.
+        Assert.Equal ("7", simple.ToString ());
+        Assert.False (simple == (SimpleEnum.Zero | SimpleEnum.Five));
+        Assert.False (simple == (SimpleEnum.One | SimpleEnum.Five));
+        Assert.True (simple == (SimpleEnum.Two | SimpleEnum.Five));
+        Assert.True (simple == (SimpleEnum.Three | SimpleEnum.Five));
+        Assert.False (simple == (SimpleEnum.Four | SimpleEnum.Five));
 
-		// This will not be well compared.
-		Assert.True (key.HasFlag (KeyCode.Q | KeyCode.CtrlMask));
-		Assert.True ((key & (KeyCode.Q | KeyCode.CtrlMask)) != 0);
-		Assert.Equal (KeyCode.Y | KeyCode.CtrlMask, key);
-		Assert.Equal ("Y, CtrlMask", key.ToString ());
+        FlaggedEnum flagged = FlaggedEnum.Three | FlaggedEnum.Five;
 
-		// This will be well compared, because the Key.CtrlMask have a high value.
-		Assert.False ((Key)key == Application.QuitKey);
-		switch (key) {
-		case KeyCode.Q | KeyCode.CtrlMask:
-			// Never goes here.
-			break;
-		case KeyCode.Y | KeyCode.CtrlMask:
-			Assert.True (key == (KeyCode.Y | KeyCode.CtrlMask));
-			break;
-		default:
-			// Never goes here.
-			break;
-		}
-	}
+        // Nothing will not be well compared here.
+        Assert.True (flagged.HasFlag (FlaggedEnum.Zero | FlaggedEnum.Five));
+        Assert.True (flagged.HasFlag (FlaggedEnum.One | FlaggedEnum.Five));
+        Assert.True (flagged.HasFlag (FlaggedEnum.Two | FlaggedEnum.Five));
+        Assert.True (flagged.HasFlag (FlaggedEnum.Three | FlaggedEnum.Five));
+        Assert.True (flagged.HasFlag (FlaggedEnum.Four | FlaggedEnum.Five));
+        Assert.True ((flagged & (FlaggedEnum.Zero | FlaggedEnum.Five)) != 0);
+        Assert.True ((flagged & (FlaggedEnum.One | FlaggedEnum.Five)) != 0);
+        Assert.True ((flagged & (FlaggedEnum.Two | FlaggedEnum.Five)) != 0);
+        Assert.True ((flagged & (FlaggedEnum.Three | FlaggedEnum.Five)) != 0);
+        Assert.True ((flagged & (FlaggedEnum.Four | FlaggedEnum.Five)) != 0);
+        Assert.Equal (FlaggedEnum.Two | FlaggedEnum.Five, flagged); // As it is flagged shows as bitwise.
+        Assert.Equal ("Two, Five", flagged.ToString ());
+        Assert.False (flagged == (FlaggedEnum.Zero | FlaggedEnum.Five));
+        Assert.False (flagged == (FlaggedEnum.One | FlaggedEnum.Five));
+        Assert.True (flagged == (FlaggedEnum.Two | FlaggedEnum.Five));
+        Assert.True (flagged == (FlaggedEnum.Three | FlaggedEnum.Five));
+        Assert.False (flagged == (FlaggedEnum.Four | FlaggedEnum.Five));
+    }
 
-	[Fact]
-	public void KeyEnum_ShouldHaveCorrectValues ()
-	{
-		Assert.Equal (0, (int)KeyCode.Null);
-		Assert.Equal (8, (int)KeyCode.Backspace);
-		Assert.Equal (9, (int)KeyCode.Tab);
-		// Continue for other keys...
-	}
+    [Fact]
+    public void SimpleHighValueEnum_And_FlaggedHighValueEnum ()
+    {
+        SimpleHighValueEnum simple = SimpleHighValueEnum.Three | SimpleHighValueEnum.Last;
 
-	[Fact]
-	public void Key_ToString ()
-	{
-		var k = KeyCode.Y | KeyCode.CtrlMask;
-		Assert.Equal ("Y, CtrlMask", k.ToString ());
+        // This will not be well compared.
+        Assert.True (simple.HasFlag (SimpleHighValueEnum.Zero | SimpleHighValueEnum.Last));
+        Assert.True (simple.HasFlag (SimpleHighValueEnum.One | SimpleHighValueEnum.Last));
+        Assert.True (simple.HasFlag (SimpleHighValueEnum.Two | SimpleHighValueEnum.Last));
+        Assert.True (simple.HasFlag (SimpleHighValueEnum.Three | SimpleHighValueEnum.Last));
+        Assert.False (simple.HasFlag (SimpleHighValueEnum.Four | SimpleHighValueEnum.Last));
+        Assert.True ((simple & (SimpleHighValueEnum.Zero | SimpleHighValueEnum.Last)) != 0);
+        Assert.True ((simple & (SimpleHighValueEnum.One | SimpleHighValueEnum.Last)) != 0);
+        Assert.True ((simple & (SimpleHighValueEnum.Two | SimpleHighValueEnum.Last)) != 0);
+        Assert.True ((simple & (SimpleHighValueEnum.Three | SimpleHighValueEnum.Last)) != 0);
+        Assert.True ((simple & (SimpleHighValueEnum.Four | SimpleHighValueEnum.Last)) != 0);
 
-		k = KeyCode.CtrlMask | KeyCode.Y;
-		Assert.Equal ("Y, CtrlMask", k.ToString ());
+        // This will be well compared, because the SimpleHighValueEnum.Last have a high value.
+        Assert.Equal (1073741827, (int)simple); // As it is not flagged only shows as number.
+        Assert.Equal ("1073741827", simple.ToString ()); // As it is not flagged only shows as number.
+        Assert.False (simple == (SimpleHighValueEnum.Zero | SimpleHighValueEnum.Last));
+        Assert.False (simple == (SimpleHighValueEnum.One | SimpleHighValueEnum.Last));
+        Assert.False (simple == (SimpleHighValueEnum.Two | SimpleHighValueEnum.Last));
+        Assert.True (simple == (SimpleHighValueEnum.Three | SimpleHighValueEnum.Last));
+        Assert.False (simple == (SimpleHighValueEnum.Four | SimpleHighValueEnum.Last));
 
-		k = KeyCode.Space;
-		Assert.Equal ("Space", k.ToString ());
+        FlaggedHighValueEnum flagged = FlaggedHighValueEnum.Three | FlaggedHighValueEnum.Last;
 
-		k = KeyCode.D;
-		Assert.Equal ("D", k.ToString ());
+        // This will not be well compared.
+        Assert.True (flagged.HasFlag (FlaggedHighValueEnum.Zero | FlaggedHighValueEnum.Last));
+        Assert.True (flagged.HasFlag (FlaggedHighValueEnum.One | FlaggedHighValueEnum.Last));
+        Assert.True (flagged.HasFlag (FlaggedHighValueEnum.Two | FlaggedHighValueEnum.Last));
+        Assert.True (flagged.HasFlag (FlaggedHighValueEnum.Three | FlaggedHighValueEnum.Last));
+        Assert.False (flagged.HasFlag (FlaggedHighValueEnum.Four | FlaggedHighValueEnum.Last));
+        Assert.True ((flagged & (FlaggedHighValueEnum.Zero | FlaggedHighValueEnum.Last)) != 0);
+        Assert.True ((flagged & (FlaggedHighValueEnum.One | FlaggedHighValueEnum.Last)) != 0);
+        Assert.True ((flagged & (FlaggedHighValueEnum.Two | FlaggedHighValueEnum.Last)) != 0);
+        Assert.True ((flagged & (FlaggedHighValueEnum.Three | FlaggedHighValueEnum.Last)) != 0);
+        Assert.True ((flagged & (FlaggedHighValueEnum.Four | FlaggedHighValueEnum.Last)) != 0);
 
-		k = (KeyCode)'d';
-		Assert.Equal ("d", ((char)k).ToString ());
+        // This will be well compared, because the SimpleHighValueEnum.Last have a high value.
+        Assert.Equal (
+                      FlaggedHighValueEnum.Three | FlaggedHighValueEnum.Last,
+                      flagged
+                     ); // As it is flagged shows as bitwise.
+        Assert.Equal ("Three, Last", flagged.ToString ()); // As it is flagged shows as bitwise.
+        Assert.False (flagged == (FlaggedHighValueEnum.Zero | FlaggedHighValueEnum.Last));
+        Assert.False (flagged == (FlaggedHighValueEnum.One | FlaggedHighValueEnum.Last));
+        Assert.False (flagged == (FlaggedHighValueEnum.Two | FlaggedHighValueEnum.Last));
+        Assert.True (flagged == (FlaggedHighValueEnum.Three | FlaggedHighValueEnum.Last));
+        Assert.False (flagged == (FlaggedHighValueEnum.Four | FlaggedHighValueEnum.Last));
+    }
 
-		k = KeyCode.D;
-		Assert.Equal ("D", k.ToString ());
+    [Flags]
+    private enum FlaggedEnum
+    {
+        Zero,
+        One,
+        Two,
+        Three,
+        Four,
+        Five
+    }
 
-		// In a console this will always returns Key.D
-		k = KeyCode.D | KeyCode.ShiftMask;
-		Assert.Equal ("D, ShiftMask", k.ToString ());
-	}
+    [Flags]
+    private enum FlaggedHighValueEnum
+    {
+        Zero,
+        One,
+        Two,
+        Three,
+        Four,
+        Last = 0x40000000
+    }
+
+    private enum SimpleEnum
+    {
+        Zero,
+        One,
+        Two,
+        Three,
+        Four,
+        Five
+    }
+
+    private enum SimpleHighValueEnum
+    {
+        Zero,
+        One,
+        Two,
+        Three,
+        Four,
+        Last = 0x40000000
+    }
 }
