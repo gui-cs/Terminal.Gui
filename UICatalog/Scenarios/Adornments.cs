@@ -224,6 +224,15 @@ public class Adornments : Scenario
             _foregroundColorPicker.X = -1;
             _foregroundColorPicker.Y = Pos.Bottom (copyTop) + 1;
             _foregroundColorPicker.SelectedColor = Color.Foreground.GetClosestNamedColor ();
+            _foregroundColorPicker.ColorChanged += (o, a) =>
+                                                       AttributeChanged?.Invoke (
+                                                                                 this,
+                                                                                 new Attribute (
+                                                                                                _foregroundColorPicker.SelectedColor,
+                                                                                                _backgroundColorPicker.SelectedColor
+                                                                                               )
+                                                                                );
+            Add (_foregroundColorPicker);
 
             // Background ColorPicker.
             _backgroundColorPicker.X = Pos.Right (_foregroundColorPicker) - 1;

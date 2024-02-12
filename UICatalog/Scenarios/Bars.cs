@@ -6,7 +6,7 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Bars", "Illustrates Bar views (e.g. StatusBar)")]
 [ScenarioCategory ("Controls")]
-public class bars : Scenario
+public class Bars : Scenario
 {
     public override void Init ()
     {
