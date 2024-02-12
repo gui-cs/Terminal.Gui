@@ -1,6 +1,4 @@
-﻿using static Terminal.Gui.Pos;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     Describes the position of a <see cref="View"/> which can be an absolute value, a percentage, centered, or
@@ -26,13 +24,13 @@ namespace Terminal.Gui;
 ///                 <term>Pos Object</term> <description>Description</description>
 ///             </listheader>
 ///             <item>
-///                <term>
+///                 <term>
 ///                     <see cref="Dim.Auto"/>
-///                </term>
-///                <description>
-///                     Creates a <see cref="Dim" /> object that automatically sizes the view to fit
+///                 </term>
+///                 <description>
+///                     Creates a <see cref="Dim"/> object that automatically sizes the view to fit
 ///                     all of the view's SubViews.
-///                </description>
+///                 </description>
 ///             </item>
 ///             <item>
 ///                 <term>
@@ -525,51 +523,51 @@ public class Pos
 /// </remarks>
 public class Dim
 {
-
     /// <summary>
-    /// Specifies how <see cref="DimAuto" /> will compute the dimension.
+    ///     Specifies how <see cref="DimAuto"/> will compute the dimension.
     /// </summary>
     public enum DimAutoStyle
     {
         /// <summary>
-        /// The dimension will be computed using both the view's <see cref="View.Text"/> and
-        /// <see cref="View.Subviews" />.
-        /// The larger of the corresponding text dimension or Subview in <see cref="View.Subviews" />
-        /// with the largest corresponding position plus dimension will determine the dimension.
+        ///     The dimension will be computed using both the view's <see cref="View.Text"/> and
+        ///     <see cref="View.Subviews"/>.
+        ///     The larger of the corresponding text dimension or Subview in <see cref="View.Subviews"/>
+        ///     with the largest corresponding position plus dimension will determine the dimension.
         /// </summary>
         Auto,
 
         /// <summary>
-        /// The Subview in <see cref="View.Subviews" /> with the largest corresponding position plus dimension
-        /// will determine the dimension.
-        /// The corresponding dimension of the view's <see cref="View.Text"/> will be ignored.
+        ///     The Subview in <see cref="View.Subviews"/> with the largest corresponding position plus dimension
+        ///     will determine the dimension.
+        ///     The corresponding dimension of the view's <see cref="View.Text"/> will be ignored.
         /// </summary>
         Subviews,
 
         /// <summary>
-        /// The corresponding dimension of the view's <see cref="View.Text" />, formatted using the <see cref="View.TextFormatter"/> settings,
-        /// will be used to determine the dimension. 
-        /// The corresponding dimensions of the <see cref="View.Subviews"/> will be ignored.
+        ///     The corresponding dimension of the view's <see cref="View.Text"/>, formatted using the
+        ///     <see cref="View.TextFormatter"/> settings,
+        ///     will be used to determine the dimension.
+        ///     The corresponding dimensions of the <see cref="View.Subviews"/> will be ignored.
         /// </summary>
         Text
     }
 
     /// <summary>
-    /// Creates a <see cref="Dim" /> object that automatically sizes the view to fit all of the view's SubViews and/or Text.
+    ///     Creates a <see cref="Dim"/> object that automatically sizes the view to fit all of the view's SubViews and/or Text.
     /// </summary>
     /// <example>
-    /// This initializes a <see cref="View" /> with two SubViews. The view will be automatically sized to fit the two
-    /// SubViews.
-    /// <code>
+    ///     This initializes a <see cref="View"/> with two SubViews. The view will be automatically sized to fit the two
+    ///     SubViews.
+    ///     <code>
     /// var button = new Button () { Text = "Click Me!", X = 1, Y = 1, Width = 10, Height = 1 };
     /// var textField = new TextField { Text = "Type here", X = 1, Y = 2, Width = 20, Height = 1 };
     /// var view = new Window () { Title = "MyWindow", X = 0, Y = 0, Width = Dim.AutoSize (), Height = Dim.AutoSize () };
     /// view.Add (button, textField);
     /// </code>
     /// </example>
-    /// <returns>The AutoSize <see cref="Dim" /> object.</returns>
+    /// <returns>The AutoSize <see cref="Dim"/> object.</returns>
     /// <param name="style">
-    /// Specifies how <see cref="DimAuto" /> will compute the dimension. The default is <see cref="DimAutoStyle.Auto" />. 
+    ///     Specifies how <see cref="DimAuto"/> will compute the dimension. The default is <see cref="DimAutoStyle.Auto"/>.
     /// </param>
     /// <param name="min">Specifies the minimum dimension that view will be automatically sized to.</param>
     /// <param name="max">Specifies the maximum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
@@ -579,6 +577,7 @@ public class Dim
         {
             throw new NotImplementedException (@"max is not implemented");
         }
+
         return new DimAuto (style, min, max);
     }
 
@@ -724,11 +723,11 @@ public class Dim
             _style = style;
         }
 
-        public override string ToString () => $"Auto({_style},{_min},{_max})";
+        public override bool Equals (object other) { return other is DimAuto auto && auto._min == _min && auto._max == _max && auto._style == _style; }
 
-        public override int GetHashCode () => HashCode.Combine (base.GetHashCode (), _min, _max, _style);
+        public override int GetHashCode () { return HashCode.Combine (base.GetHashCode (), _min, _max, _style); }
 
-        public override bool Equals (object other) => other is DimAuto auto && auto._min == _min && auto._max == _max && auto._style == _style;
+        public override string ToString () { return $"Auto({_style},{_min},{_max})"; }
     }
 
     internal class DimCombine : Dim

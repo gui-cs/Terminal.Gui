@@ -174,7 +174,9 @@ public class DimAutoDemo : Scenario
             Height = Fill (10)
         };
 
-        var btn = new Button { Text = "AnchorEnd", Y = Pos.AnchorEnd (1)
+        var btn = new Button
+        {
+            Text = "AnchorEnd", Y = Pos.AnchorEnd (1)
         };
 
         // TODO: We should really fix AnchorEnd to do this automatically. 
