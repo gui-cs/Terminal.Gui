@@ -1,37 +1,26 @@
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.IO.Abstractions.TestingHelpers;
-using System.Linq;
-using Terminal.Gui;
-using Xunit;
-using Xunit.Abstractions;
+namespace Terminal.Gui.FileServicesTests;
 
-namespace Terminal.Gui.FileServicesTests {
-
-	public class NerdFontTests
+public class NerdFontTests
+{
+    [Fact]
+    public void TestAllExtensionsMapToKnownGlyphs ()
     {
-        [Fact]
-        public void TestAllFilenamesMapToKnownGlyphs()
-        {
-            var f = new NerdFonts();
-            foreach(var k in f.FilenameToIcon)
-            {
-                Assert.Contains(k.Value, f.Glyphs.Keys);
-            }
-        }
+        var f = new NerdFonts ();
 
-
-        [Fact]
-        public void TestAllExtensionsMapToKnownGlyphs()
+        foreach (KeyValuePair<string, string> k in f.ExtensionToIcon)
         {
-            var f = new NerdFonts();
-            foreach(var k in f.ExtensionToIcon)
-            {
-                Assert.Contains(k.Value, f.Glyphs.Keys);
-            }
+            Assert.Contains (k.Value, f.Glyphs.Keys);
         }
     }
 
+    [Fact]
+    public void TestAllFilenamesMapToKnownGlyphs ()
+    {
+        var f = new NerdFonts ();
+
+        foreach (KeyValuePair<string, string> k in f.FilenameToIcon)
+        {
+            Assert.Contains (k.Value, f.Glyphs.Keys);
+        }
+    }
 }

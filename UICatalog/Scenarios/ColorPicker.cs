@@ -16,13 +16,11 @@ public class ColorPickers : Scenario {
 	/// </summary>
 	ColorPicker _backgroundColorPicker;
 
-	/// <summary>
-	/// Setup the scenario.
-	/// </summary>
-	public override void Setup ()
-	{
-		// Scenario Window's.
-		Win.Title = GetName ();
+    /// <summary>Setup the scenario.</summary>
+    public override void Setup ()
+    {
+        // Scenario Window's.
+        Win.Title = GetName ();
 
 		// Foreground ColorPicker.
 		_foregroundColorPicker = new ColorPicker () {

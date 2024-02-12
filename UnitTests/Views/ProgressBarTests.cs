@@ -1,1439 +1,1601 @@
 ﻿using System.Text;
-using Xunit;
 
-namespace Terminal.Gui.ViewsTests {
-	public class ProgressBarTests {
-		[Fact]
-		[AutoInitShutdown]
-		public void Default_Constructor ()
-		{
-			var pb = new ProgressBar ();
-			pb.BeginInit();
-			pb.EndInit();
+namespace Terminal.Gui.ViewsTests;
 
-			Assert.False (pb.CanFocus);
-			Assert.Equal (0, pb.Fraction);
-			Assert.Equal (new Attribute (Color.BrightGreen, Color.Gray),
-				new Attribute (pb.ColorScheme.HotNormal.Foreground, pb.ColorScheme.HotNormal.Background));
-			Assert.Equal (Colors.ColorSchemes ["Base"].Normal, pb.ColorScheme.Normal);
-			Assert.Equal (1, pb.Height);
-			Assert.Equal (ProgressBarStyle.Blocks, pb.ProgressBarStyle);
-			Assert.Equal (ProgressBarFormat.Simple, pb.ProgressBarFormat);
-			Assert.Equal (CM.Glyphs.BlocksMeterSegment, pb.SegmentCharacter);
-		}
+public class ProgressBarTests
+{
+    [Fact]
+    [AutoInitShutdown]
+    public void Default_Constructor ()
+    {
+        var pb = new ProgressBar ();
+        pb.BeginInit ();
+        pb.EndInit ();
 
-		[Fact]
-		[AutoInitShutdown]
-		public void ProgressBarStyle_Setter ()
-		{
-			var driver = ((FakeDriver)Application.Driver);
+        Assert.False (pb.CanFocus);
+        Assert.Equal (0, pb.Fraction);
 
-			var pb = new ProgressBar ();
+        Assert.Equal (
+                      new Attribute (Color.BrightGreen, Color.Gray),
+                      new Attribute (pb.ColorScheme.HotNormal.Foreground, pb.ColorScheme.HotNormal.Background)
+                     );
+        Assert.Equal (Colors.ColorSchemes ["Base"].Normal, pb.ColorScheme.Normal);
+        Assert.Equal (1, pb.Height);
+        Assert.Equal (ProgressBarStyle.Blocks, pb.ProgressBarStyle);
+        Assert.Equal (ProgressBarFormat.Simple, pb.ProgressBarFormat);
+        Assert.Equal (CM.Glyphs.BlocksMeterSegment, pb.SegmentCharacter);
+    }
 
-			pb.ProgressBarStyle = ProgressBarStyle.Blocks;
-			Assert.Equal (CM.Glyphs.BlocksMeterSegment, pb.SegmentCharacter);
+    [Fact]
+    [AutoInitShutdown]
+    public void Fraction_Redraw ()
+    {
+        var driver = (FakeDriver)Application.Driver;
 
-			pb.ProgressBarStyle = ProgressBarStyle.Continuous;
-			Assert.Equal (CM.Glyphs.ContinuousMeterSegment, pb.SegmentCharacter);
+        var pb = new ProgressBar { Width = 5 };
 
-			pb.ProgressBarStyle = ProgressBarStyle.MarqueeBlocks;
-			Assert.Equal (CM.Glyphs.BlocksMeterSegment, pb.SegmentCharacter);
+        pb.BeginInit ();
+        pb.EndInit ();
+        pb.LayoutSubviews ();
 
-			pb.ProgressBarStyle = ProgressBarStyle.MarqueeContinuous;
-			Assert.Equal (CM.Glyphs.ContinuousMeterSegment, pb.SegmentCharacter);
-		}
+        for (var i = 0; i <= pb.Frame.Width; i++)
+        {
+            pb.Fraction += 0.2F;
+            pb.Draw ();
 
-		[Fact]
-		[AutoInitShutdown]
-		public void ProgressBarFormat_Setter ()
-		{
-			var pb = new ProgressBar ();
+            if (i == 0)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+            }
+            else if (i == 1)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+            }
+            else if (i == 2)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+            }
+            else if (i == 3)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+            }
+            else if (i == 4)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+            }
+            else if (i == 5)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+            }
+        }
+    }
 
-			pb.ProgressBarFormat = ProgressBarFormat.Simple;
-			Assert.Equal (1, pb.Height);
+    [Fact]
+    [AutoInitShutdown]
+    public void ProgressBarFormat_MarqueeBlocks_MarqueeContinuous_Setter ()
+    {
+        var driver = (FakeDriver)Application.Driver;
 
-			pb.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
-			Assert.Equal (1, pb.Height);
-		}
+        var pb1 = new ProgressBar { ProgressBarStyle = ProgressBarStyle.MarqueeBlocks };
+        var pb2 = new ProgressBar { ProgressBarStyle = ProgressBarStyle.MarqueeContinuous };
 
-		[Fact]
-		[AutoInitShutdown]
-		public void ProgressBarFormat_MarqueeBlocks_MarqueeContinuous_Setter ()
-		{
-			var driver = ((FakeDriver)Application.Driver);
+        pb1.ProgressBarFormat = ProgressBarFormat.Simple;
+        Assert.Equal (ProgressBarFormat.Simple, pb1.ProgressBarFormat);
+        Assert.Equal (1, pb1.Height);
+        pb2.ProgressBarFormat = ProgressBarFormat.Simple;
+        Assert.Equal (ProgressBarFormat.Simple, pb2.ProgressBarFormat);
+        Assert.Equal (1, pb2.Height);
 
-			var pb1 = new ProgressBar () { ProgressBarStyle = ProgressBarStyle.MarqueeBlocks };
-			var pb2 = new ProgressBar () { ProgressBarStyle = ProgressBarStyle.MarqueeContinuous };
+        pb1.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
+        Assert.Equal (ProgressBarFormat.SimplePlusPercentage, pb1.ProgressBarFormat);
+        Assert.Equal (1, pb1.Height);
+        pb2.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
+        Assert.Equal (ProgressBarFormat.SimplePlusPercentage, pb2.ProgressBarFormat);
+        Assert.Equal (1, pb2.Height);
+    }
 
-			pb1.ProgressBarFormat = ProgressBarFormat.Simple;
-			Assert.Equal (ProgressBarFormat.Simple, pb1.ProgressBarFormat);
-			Assert.Equal (1, pb1.Height);
-			pb2.ProgressBarFormat = ProgressBarFormat.Simple;
-			Assert.Equal (ProgressBarFormat.Simple, pb2.ProgressBarFormat);
-			Assert.Equal (1, pb2.Height);
+    [Fact]
+    [AutoInitShutdown]
+    public void ProgressBarFormat_Setter ()
+    {
+        var pb = new ProgressBar ();
 
-			pb1.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
-			Assert.Equal (ProgressBarFormat.SimplePlusPercentage, pb1.ProgressBarFormat);
-			Assert.Equal (1, pb1.Height);
-			pb2.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
-			Assert.Equal (ProgressBarFormat.SimplePlusPercentage, pb2.ProgressBarFormat);
-			Assert.Equal (1, pb2.Height);
+        pb.ProgressBarFormat = ProgressBarFormat.Simple;
+        Assert.Equal (1, pb.Height);
 
-		}
+        pb.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
+        Assert.Equal (1, pb.Height);
+    }
 
-		[Fact]
-		[AutoInitShutdown]
-		public void Text_Setter_Not_Marquee ()
-		{
-			var pb = new ProgressBar () { Fraction = 0.25F };
+    [Fact]
+    [AutoInitShutdown]
+    public void ProgressBarStyle_Setter ()
+    {
+        var driver = (FakeDriver)Application.Driver;
 
-			pb.ProgressBarFormat = ProgressBarFormat.Simple;
-			pb.Text = "blabla";
-			Assert.Equal ("25%", pb.Text);
+        var pb = new ProgressBar ();
 
-			pb.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
-			pb.Text = "bleble";
-			Assert.Equal ("25%", pb.Text);
+        pb.ProgressBarStyle = ProgressBarStyle.Blocks;
+        Assert.Equal (CM.Glyphs.BlocksMeterSegment, pb.SegmentCharacter);
 
-		}
+        pb.ProgressBarStyle = ProgressBarStyle.Continuous;
+        Assert.Equal (CM.Glyphs.ContinuousMeterSegment, pb.SegmentCharacter);
 
-		[Fact]
-		[AutoInitShutdown]
-		public void Text_Setter_Marquee ()
-		{
-			var pb = new ProgressBar () { Fraction = 0.25F, ProgressBarStyle = ProgressBarStyle.MarqueeBlocks };
+        pb.ProgressBarStyle = ProgressBarStyle.MarqueeBlocks;
+        Assert.Equal (CM.Glyphs.BlocksMeterSegment, pb.SegmentCharacter);
 
-			pb.ProgressBarFormat = ProgressBarFormat.Simple;
-			pb.Text = "blabla";
-			Assert.Equal ("blabla", pb.Text);
+        pb.ProgressBarStyle = ProgressBarStyle.MarqueeContinuous;
+        Assert.Equal (CM.Glyphs.ContinuousMeterSegment, pb.SegmentCharacter);
+    }
 
-			pb.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
-			pb.Text = "bleble";
-			Assert.Equal ("bleble", pb.Text);
-		}
+    [Fact]
+    [AutoInitShutdown]
+    public void Pulse_Redraw_BidirectionalMarquee_False ()
+    {
+        var driver = (FakeDriver)Application.Driver;
 
-		[Fact]
-		[AutoInitShutdown]
-		public void Pulse_Redraw_BidirectionalMarquee_True_Default ()
-		{
-			var driver = ((FakeDriver)Application.Driver);
+        var pb = new ProgressBar
+        {
+            Width = 15, ProgressBarStyle = ProgressBarStyle.MarqueeBlocks, BidirectionalMarquee = false
+        };
 
-			var pb = new ProgressBar () {
-				Width = 15,
-				ProgressBarStyle = ProgressBarStyle.MarqueeBlocks
-			};
+        pb.BeginInit ();
+        pb.EndInit ();
+        pb.LayoutSubviews ();
 
-			pb.BeginInit ();
-			pb.EndInit ();
-			pb.LayoutSubviews ();
+        for (var i = 0; i < 38; i++)
+        {
+            pb.Pulse ();
+            pb.Draw ();
 
-			for (int i = 0; i < 38; i++) {
-				pb.Pulse ();
-				pb.Draw ();
-				if (i == 0) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 1) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 2) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 3) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 4) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 5) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 6) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 7) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 8) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 9) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 10) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 11) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 12) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 13) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 14) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
-				} else if (i == 15) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
-				} else if (i == 16) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
-				} else if (i == 17) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
-				} else if (i == 18) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
-				} else if (i == 19) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
-				} else if (i == 20) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
-				} else if (i == 21) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
-				} else if (i == 22) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
-				} else if (i == 23) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 24) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 25) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 26) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 27) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 28) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 29) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 30) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 31) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 32) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 33) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 34) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 35) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 36) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 37) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				}
-			}
-		}
+            if (i == 0)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 1)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 2)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 3)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 4)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 5)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 6)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 7)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 8)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 9)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 10)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 11)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 12)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 13)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 14)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+            }
+            else if (i == 15)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+            }
+            else if (i == 16)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+            }
+            else if (i == 17)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+            }
+            else if (i == 18)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+            }
+            else if (i == 19)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 20)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 21)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 22)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 23)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 24)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 25)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 26)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 27)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 28)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 29)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 30)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 31)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 32)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 33)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+            }
+            else if (i == 34)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+            }
+            else if (i == 35)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+            }
+            else if (i == 36)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+            }
+            else if (i == 37)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+            }
+        }
+    }
 
-		[Fact]
-		[AutoInitShutdown]
-		public void Pulse_Redraw_BidirectionalMarquee_False ()
-		{
-			var driver = ((FakeDriver)Application.Driver);
+    [Fact]
+    [AutoInitShutdown]
+    public void Pulse_Redraw_BidirectionalMarquee_True_Default ()
+    {
+        var driver = (FakeDriver)Application.Driver;
 
-			var pb = new ProgressBar () {
-				Width = 15,
-				ProgressBarStyle = ProgressBarStyle.MarqueeBlocks,
-				BidirectionalMarquee = false
-			};
+        var pb = new ProgressBar { Width = 15, ProgressBarStyle = ProgressBarStyle.MarqueeBlocks };
 
-			pb.BeginInit ();
-			pb.EndInit ();
-			pb.LayoutSubviews ();
+        pb.BeginInit ();
+        pb.EndInit ();
+        pb.LayoutSubviews ();
 
-			for (int i = 0; i < 38; i++) {
-				pb.Pulse ();
-				pb.Draw ();
-				if (i == 0) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 1) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 2) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 3) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 4) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 5) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 6) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 7) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 8) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 9) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 10) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 11) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 12) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 13) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 14) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
-				} else if (i == 15) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
-				} else if (i == 16) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
-				} else if (i == 17) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
-				} else if (i == 18) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
-				} else if (i == 19) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 20) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 21) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 22) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 23) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 24) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 25) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 26) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 27) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 28) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 29) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 30) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 31) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 32) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
-				} else if (i == 33) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
-				} else if (i == 34) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
-				} else if (i == 35) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
-				} else if (i == 36) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
-				} else if (i == 37) {
-					Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
-				}
-			}
-		}
+        for (var i = 0; i < 38; i++)
+        {
+            pb.Pulse ();
+            pb.Draw ();
 
-		[Fact]
-		[AutoInitShutdown]
-		public void Fraction_Redraw ()
-		{
-			var driver = ((FakeDriver)Application.Driver);
+            if (i == 0)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 1)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 2)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 3)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 4)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 5)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 6)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 7)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 8)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 9)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 10)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 11)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 12)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 13)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 14)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+            }
+            else if (i == 15)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+            }
+            else if (i == 16)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+            }
+            else if (i == 17)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+            }
+            else if (i == 18)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+            }
+            else if (i == 19)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+            }
+            else if (i == 20)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+            }
+            else if (i == 21)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+            }
+            else if (i == 22)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+            }
+            else if (i == 23)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 24)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 25)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 26)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 27)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 28)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 29)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 30)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 31)
+            {
+                Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 32)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 33)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 34)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 35)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 36)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+            else if (i == 37)
+            {
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
+                Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
+            }
+        }
+    }
 
-			var pb = new ProgressBar () {
-				Width = 5
-			};
+    [Fact]
+    [AutoInitShutdown]
+    public void Text_Setter_Marquee ()
+    {
+        var pb = new ProgressBar { Fraction = 0.25F, ProgressBarStyle = ProgressBarStyle.MarqueeBlocks };
 
-			pb.BeginInit ();
-			pb.EndInit ();
-			pb.LayoutSubviews ();
+        pb.ProgressBarFormat = ProgressBarFormat.Simple;
+        pb.Text = "blabla";
+        Assert.Equal ("blabla", pb.Text);
 
-			for (int i = 0; i <= pb.Frame.Width; i++) {
-				pb.Fraction += 0.2F;
-				pb.Draw ();
-				if (i == 0) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-				} else if (i == 1) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-				} else if (i == 2) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-				} else if (i == 3) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-				} else if (i == 4) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-				} else if (i == 5) {
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-					Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-					Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-				}
-			}
-		}
-	}
+        pb.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
+        pb.Text = "bleble";
+        Assert.Equal ("bleble", pb.Text);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Text_Setter_Not_Marquee ()
+    {
+        var pb = new ProgressBar { Fraction = 0.25F };
+
+        pb.ProgressBarFormat = ProgressBarFormat.Simple;
+        pb.Text = "blabla";
+        Assert.Equal ("25%", pb.Text);
+
+        pb.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
+        pb.Text = "bleble";
+        Assert.Equal ("25%", pb.Text);
+    }
 }

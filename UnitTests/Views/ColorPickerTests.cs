@@ -1,4 +1,4 @@
-﻿using Xunit;
+using Xunit;
 
 namespace Terminal.Gui.ViewsTests;
 
@@ -11,11 +11,11 @@ public class ColorPickerTests {
 		Assert.Equal (new Point (0, 0), colorPicker.Cursor);
 		Assert.True (colorPicker.CanFocus);
 
-		colorPicker.BeginInit ();
-		colorPicker.EndInit ();
-		colorPicker.LayoutSubviews ();
-		Assert.Equal (new Rect (0, 0, 32, 4), colorPicker.Frame);
-	}
+        colorPicker.BeginInit ();
+        colorPicker.EndInit ();
+        colorPicker.LayoutSubviews ();
+        Assert.Equal (new Rect (0, 0, 32, 4), colorPicker.Frame);
+    }
 
 	[Fact]
 	[AutoInitShutdown]
@@ -78,7 +78,7 @@ public class ColorPickerTests {
 		Application.Top.Add (colorPicker);
 		Application.Begin (Application.Top);
 
-		Assert.False (colorPicker.MouseEvent (new MouseEvent ()));
+        Assert.False (colorPicker.MouseEvent (new MouseEvent ()));
 
 		Assert.True (colorPicker.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked, X = 4, Y = 1 }));
 		Assert.Equal (Color.Blue, colorPicker.SelectedColor);

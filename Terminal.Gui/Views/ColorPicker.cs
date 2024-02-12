@@ -1,13 +1,10 @@
 ﻿namespace Terminal.Gui;
 
-/// <summary>
-/// Event arguments for the <see cref="Color"/> events.
-/// </summary>
-public class ColorEventArgs : EventArgs {
-	/// <summary>
-	/// Initializes a new instance of <see cref="ColorEventArgs"/>
-	/// </summary>
-	public ColorEventArgs () { }
+/// <summary>Event arguments for the <see cref="Color"/> events.</summary>
+public class ColorEventArgs : EventArgs
+{
+    /// <summary>Initializes a new instance of <see cref="ColorEventArgs"/></summary>
+    public ColorEventArgs () { }
 
 	/// <summary>
 	/// The new Color.
@@ -96,18 +93,19 @@ public class ColorPicker : View {
 		}
 	}
 
-	/// <summary>
-	/// Height of a color box
-	/// </summary>
-	public int BoxHeight {
-		get => _boxHeight;
-		set {
-			if (_boxHeight != value) {
-				_boxHeight = value;
-				SetNeedsLayout ();
-			}
-		}
-	}
+    /// <summary>Width of a color box</summary>
+    public int BoxWidth
+    {
+        get => _boxWidth;
+        set
+        {
+            if (_boxWidth != value)
+            {
+                _boxWidth = value;
+                SetNeedsLayout ();
+            }
+        }
+    }
 
 	/// <summary>
 	/// Cursor for the selected color.
@@ -165,10 +163,8 @@ public class ColorPicker : View {
 		}
 	}
 
-	/// <summary>
-	/// Fired when a color is picked.
-	/// </summary>
-	public event EventHandler<ColorEventArgs> ColorChanged;
+    /// <summary>Fired when a color is picked.</summary>
+    public event EventHandler<ColorEventArgs> ColorChanged;
 
 	void SetInitialProperties ()
 	{
@@ -297,15 +293,39 @@ public class ColorPicker : View {
 		}
 	}
 
-	/// <summary>
-	/// Draw a box for one color.
-	/// </summary>
-	/// <param name="x">X location.</param>
-	/// <param name="y">Y location</param>
-	/// <param name="selected"></param>
-	void DrawColorBox (int x, int y, bool selected)
-	{
-		var index = 0;
+    ///<inheritdoc/>
+    public override bool OnEnter (View view)
+    {
+        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+        return base.OnEnter (view);
+    }
+
+    /// <summary>Add the commands.</summary>
+    private void AddCommands ()
+    {
+        AddCommand (Command.Left, () => MoveLeft ());
+        AddCommand (Command.Right, () => MoveRight ());
+        AddCommand (Command.LineUp, () => MoveUp ());
+        AddCommand (Command.LineDown, () => MoveDown ());
+    }
+
+    /// <summary>Add the KeyBindinds.</summary>
+    private void AddKeyBindings ()
+    {
+        KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
+        KeyBindings.Add (KeyCode.CursorRight, Command.Right);
+        KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
+        KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
+    }
+
+    /// <summary>Draw a box for one color.</summary>
+    /// <param name="x">X location.</param>
+    /// <param name="y">Y location</param>
+    /// <param name="selected"></param>
+    private void DrawColorBox (int x, int y, bool selected)
+    {
+        var index = 0;
 
 		for (var zoomedY = 0; zoomedY < BoxHeight; zoomedY++) {
 			for (var zoomedX = 0; zoomedX < BoxWidth; zoomedX++) {
@@ -315,10 +335,11 @@ public class ColorPicker : View {
 			}
 		}
 
-		if (selected) {
-			DrawFocusRect (new Rect (x * BoxWidth, y * BoxHeight, BoxWidth, BoxHeight));
-		}
-	}
+        if (selected)
+        {
+            DrawFocusRect (new Rect (x * BoxWidth, y * BoxHeight, BoxWidth, BoxHeight));
+        }
+    }
 
 	void DrawFocusRect (Rect rect)
 	{
