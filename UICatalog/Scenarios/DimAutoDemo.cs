@@ -1,3 +1,4 @@
+using System;
 using Terminal.Gui;
 using static Terminal.Gui.Dim;
 
@@ -5,168 +6,182 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("DimAuto", "Demonstrates Dim.Auto")]
 [ScenarioCategory ("Layout")]
-public class DimAutoDemo : Scenario {
-	public override void Init ()
-	{
-		Application.Init ();
-		ConfigurationManager.Themes.Theme = Theme;
-		ConfigurationManager.Apply ();
-		Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
-	}
+public class DimAutoDemo : Scenario
+{
+    public override void Init ()
+    {
+        Application.Init ();
+        ConfigurationManager.Themes.Theme = Theme;
+        ConfigurationManager.Apply ();
+        Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
+    }
 
-	public override void Setup ()
-	{
-		var view = new FrameView () {
-			Title = "Type to make View grow",
-			X = 1,
-			Y = 1,
-			Width = Dim.Auto (style: DimAutoStyle.Subviews, min: 40),
-			Height = Dim.Auto (style: DimAutoStyle.Subviews, min: 10)
-		};
-		view.ValidatePosDim = true;
+    public override void Setup ()
+    {
+        var view = new FrameView
+        {
+            Title = "Type to make View grow",
+            X = 1,
+            Y = 1,
+            Width = Auto (DimAutoStyle.Subviews, 40),
+            Height = Auto (DimAutoStyle.Subviews, 10)
+        };
+        view.ValidatePosDim = true;
 
-		var textEdit = new TextView { Text = "", X = 1, Y = 0, Width = 20, Height = 4 };
-		view.Add (textEdit);
+        var textEdit = new TextView { Text = "", X = 1, Y = 0, Width = 20, Height = 4 };
+        view.Add (textEdit);
 
-		var hlabel = new Label {
-			Text = textEdit.Text,
-			X = Pos.Left (textEdit) + 1,
-			Y = Pos.Bottom (textEdit),
-			AutoSize = false,
-			Width = Dim.Auto (style: DimAutoStyle.Text, min: 20),
-			Height = 1,
-			ColorScheme = Colors.ColorSchemes ["Error"]
-		};
-		view.Add (hlabel);
+        var hlabel = new Label
+        {
+            Text = textEdit.Text,
+            X = Pos.Left (textEdit) + 1,
+            Y = Pos.Bottom (textEdit),
+            AutoSize = false,
+            Width = Auto (DimAutoStyle.Text, 20),
+            Height = 1,
+            ColorScheme = Colors.ColorSchemes ["Error"]
+        };
+        view.Add (hlabel);
 
-		var vlabel = new Label {
-			Text = textEdit.Text,
-			X = Pos.Left (textEdit),
-			Y = Pos.Bottom (textEdit) + 1,
-			AutoSize = false,
-			Width = 1,
-			Height = Dim.Auto (style: DimAutoStyle.Text, min: 8),
-			ColorScheme = Colors.ColorSchemes ["Error"],
-			//TextDirection = TextDirection.TopBottom_LeftRight
-		};
-		vlabel.Id = "vlabel";
-		view.Add (vlabel);
+        var vlabel = new Label
+        {
+            Text = textEdit.Text,
+            X = Pos.Left (textEdit),
+            Y = Pos.Bottom (textEdit) + 1,
+            AutoSize = false,
+            Width = 1,
+            Height = Auto (DimAutoStyle.Text, 8),
+            ColorScheme = Colors.ColorSchemes ["Error"]
 
-		var heightAuto = new View () {
-			X = Pos.Right (vlabel) + 1,
-			Y = Pos.Bottom (hlabel) + 1,
-			Width = 20,
-			Height = Dim.Auto (),
-			ColorScheme = Colors.ColorSchemes ["Error"],
-			Title = "W: 20, H: Auto",
-			BorderStyle = LineStyle.Rounded
-		};
-		heightAuto.Id = "heightAuto";
-		view.Add (heightAuto);
+            //TextDirection = TextDirection.TopBottom_LeftRight
+        };
+        vlabel.Id = "vlabel";
+        view.Add (vlabel);
 
-		var widthAuto = new View () {
-			X = Pos.Right (heightAuto) + 1,
-			Y = Pos.Bottom (hlabel) + 1,
-			Width = Dim.Auto (),
-			Height = 5,
-			ColorScheme = Colors.ColorSchemes ["Error"],
-			Title = "W: Auto, H: 5",
-			BorderStyle = LineStyle.Rounded
-		};
-		widthAuto.Id = "widthAuto";
-		view.Add (widthAuto);
+        var heightAuto = new View
+        {
+            X = Pos.Right (vlabel) + 1,
+            Y = Pos.Bottom (hlabel) + 1,
+            Width = 20,
+            Height = Auto (),
+            ColorScheme = Colors.ColorSchemes ["Error"],
+            Title = "W: 20, H: Auto",
+            BorderStyle = LineStyle.Rounded
+        };
+        heightAuto.Id = "heightAuto";
+        view.Add (heightAuto);
 
-		var bothAuto = new View () {
-			X = Pos.Right (widthAuto) + 1,
-			Y = Pos.Bottom (hlabel) + 1,
-			Width = Dim.Auto (),
-			Height = Dim.Auto (),
-			ColorScheme = Colors.ColorSchemes ["Error"],
-			Title = "W: Auto, H: Auto",
-			BorderStyle = LineStyle.Rounded
-		};
-		bothAuto.Id = "bothAuto";
-		view.Add (bothAuto);
+        var widthAuto = new View
+        {
+            X = Pos.Right (heightAuto) + 1,
+            Y = Pos.Bottom (hlabel) + 1,
+            Width = Auto (),
+            Height = 5,
+            ColorScheme = Colors.ColorSchemes ["Error"],
+            Title = "W: Auto, H: 5",
+            BorderStyle = LineStyle.Rounded
+        };
+        widthAuto.Id = "widthAuto";
+        view.Add (widthAuto);
 
-		textEdit.ContentsChanged += (s, e) => {
-			hlabel.Text = textEdit.Text;
-			vlabel.Text = textEdit.Text;
-			heightAuto.Text = textEdit.Text;
-			widthAuto.Text = textEdit.Text;
-			bothAuto.Text = textEdit.Text;
-		};
+        var bothAuto = new View
+        {
+            X = Pos.Right (widthAuto) + 1,
+            Y = Pos.Bottom (hlabel) + 1,
+            Width = Auto (),
+            Height = Auto (),
+            ColorScheme = Colors.ColorSchemes ["Error"],
+            Title = "W: Auto, H: Auto",
+            BorderStyle = LineStyle.Rounded
+        };
+        bothAuto.Id = "bothAuto";
+        view.Add (bothAuto);
 
-		var movingButton = new Button () {
-			Text = "_Move down",
-			X = Pos.Right (vlabel),
-			Y = Pos.Bottom (vlabel),
-			Width = 10
-		};
-		movingButton.Clicked += (s, e) => {
-			movingButton.Y = movingButton.Frame.Y + 1;
-		};
-		view.Add (movingButton);
+        textEdit.ContentsChanged += (s, e) =>
+                                    {
+                                        hlabel.Text = textEdit.Text;
+                                        vlabel.Text = textEdit.Text;
+                                        heightAuto.Text = textEdit.Text;
+                                        widthAuto.Text = textEdit.Text;
+                                        bothAuto.Text = textEdit.Text;
+                                    };
 
-		var resetButton = new Button () {
-			Text = "_Reset Button",
-			X = Pos.Right(movingButton),
-			Y = Pos.Top (movingButton),
-		};
+        var movingButton = new Button
+        {
+            Text = "_Move down",
+            X = Pos.Right (vlabel),
+            Y = Pos.Bottom (vlabel),
+            Width = 10
+        };
+        movingButton.Clicked += (s, e) => { movingButton.Y = movingButton.Frame.Y + 1; };
+        view.Add (movingButton);
 
-		resetButton.Clicked += (s, e) => {
-			movingButton.Y = Pos.Bottom (hlabel);
-		};
-		view.Add (resetButton);
+        var resetButton = new Button
+        {
+            Text = "_Reset Button",
+            X = Pos.Right (movingButton),
+            Y = Pos.Top (movingButton)
+        };
 
-		var dlgButton = new Button () {
-			Text = "Open Test _Dialog",
-			X = Pos.Right (view),
-			Y = Pos.Top (view)
-		};
-		dlgButton.Clicked += DlgButton_Clicked;
+        resetButton.Clicked += (s, e) => { movingButton.Y = Pos.Bottom (hlabel); };
+        view.Add (resetButton);
 
-		Application.Top.Add (view, dlgButton);
-	}
+        var dlgButton = new Button
+        {
+            Text = "Open Test _Dialog",
+            X = Pos.Right (view),
+            Y = Pos.Top (view)
+        };
+        dlgButton.Clicked += DlgButton_Clicked;
 
-	private void DlgButton_Clicked (object sender, System.EventArgs e)
-	{
-		var dlg = new Dialog () {
-			Title = "Test Dialog"
-		};
+        Application.Top.Add (view, dlgButton);
+    }
 
-		//var ok = new Button ("Bye") { IsDefault = true };
-		//ok.Clicked += (s, _) => Application.RequestStop (dlg);
-		//dlg.AddButton (ok);
+    private void DlgButton_Clicked (object sender, EventArgs e)
+    {
+        var dlg = new Dialog
+        {
+            Title = "Test Dialog"
+        };
 
-		//var cancel = new Button ("Abort") { };
-		//cancel.Clicked += (s, _) => Application.RequestStop (dlg);
-		//dlg.AddButton (cancel);
+        //var ok = new Button ("Bye") { IsDefault = true };
+        //ok.Clicked += (s, _) => Application.RequestStop (dlg);
+        //dlg.AddButton (ok);
 
-		var label = new Label ("This is a label (AutoSize = false; Dim.Auto(3/20). Press Esc to close. Even more text.") {
-			AutoSize = false,
-			X = Pos.Center (),
-			Y = 0,
-			Height = Dim.Auto (min: 3),
-			Width = Dim.Auto (min: 20),
-			ColorScheme = Colors.ColorSchemes ["Menu"]
-		};
+        //var cancel = new Button ("Abort") { };
+        //cancel.Clicked += (s, _) => Application.RequestStop (dlg);
+        //dlg.AddButton (cancel);
 
-		var text = new TextField () {
-			Text = "TextField... X = 1; Y = Pos.Bottom (label), Width = Dim.Fill (1); Height = Dim.Fill(1)",
-			TextFormatter = new TextFormatter () { WordWrap = true },
-			X = 20,
-			Y = Pos.Bottom (label),
-			Width = Dim.Fill (20),
-			Height = Dim.Fill (10)
-		};
-		var btn = new Button ("AnchorEnd") {
-			Y = Pos.AnchorEnd (1)
-		};
-		// TODO: We should really fix AnchorEnd to do this automatically. 
-		btn.X = Pos.AnchorEnd () - (Pos.Right (btn) - Pos.Left (btn));
-		dlg.Add (label);
-		dlg.Add (text);
-		dlg.Add (btn);
-		Application.Run (dlg);
-	}
+        var label = new Label ("This is a label (AutoSize = false; Dim.Auto(3/20). Press Esc to close. Even more text.")
+        {
+            AutoSize = false,
+            X = Pos.Center (),
+            Y = 0,
+            Height = Auto (min: 3),
+            Width = Auto (min: 20),
+            ColorScheme = Colors.ColorSchemes ["Menu"]
+        };
+
+        var text = new TextField
+        {
+            Text = "TextField... X = 1; Y = Pos.Bottom (label), Width = Dim.Fill (1); Height = Dim.Fill(1)",
+            TextFormatter = new TextFormatter { WordWrap = true },
+            X = 20,
+            Y = Pos.Bottom (label),
+            Width = Fill (20),
+            Height = Fill (10)
+        };
+
+        var btn = new Button ("AnchorEnd")
+        {
+            Y = Pos.AnchorEnd (1)
+        };
+
+        // TODO: We should really fix AnchorEnd to do this automatically. 
+        btn.X = Pos.AnchorEnd () - (Pos.Right (btn) - Pos.Left (btn));
+        dlg.Add (label);
+        dlg.Add (text);
+        dlg.Add (btn);
+        Application.Run (dlg);
+    }
 }
