@@ -5,23 +5,19 @@ namespace Terminal.Gui.ViewsTests;
 public class WindowTests
 {
     private readonly ITestOutputHelper _output;
-
     public WindowTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [AutoInitShutdown]
     public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
     {
-        var menu = new MenuBar (
-                                new MenuBarItem []
-                                {
-                                    new (
-                                         "Child",
-                                         new MenuItem []
-                                         {
-                                             new ("_Create Child", "", null)
-                                         })
-                                });
+        var menu = new MenuBar
+        {
+            Menus =
+            [
+                new MenuBarItem ("Child", new MenuItem [] { new ("_Create Child", "", null) })
+            ]
+        };
         var win = new Window ();
         win.Add (menu);
         Application.Top.Add (win);
@@ -35,23 +31,17 @@ public class WindowTests
     [AutoInitShutdown]
     public void MenuBar_And_StatusBar_Inside_Window ()
     {
-        var menu = new MenuBar (
-                                new MenuBarItem []
-                                {
-                                    new (
-                                         "File",
-                                         new MenuItem []
-                                         {
-                                             new ("Open", "", null),
-                                             new ("Quit", "", null)
-                                         }),
-                                    new (
-                                         "Edit",
-                                         new MenuItem []
-                                         {
-                                             new ("Copy", "", null)
-                                         })
-                                });
+        var menu = new MenuBar
+        {
+            Menus =
+            [
+                new MenuBarItem ("File", new MenuItem [] { new ("Open", "", null), new ("Quit", "", null) }),
+                new MenuBarItem (
+                                 "Edit",
+                                 new MenuItem [] { new ("Copy", "", null) }
+                                )
+            ]
+        };
 
         var sb = new StatusBar (
                                 new StatusItem []
@@ -59,14 +49,10 @@ public class WindowTests
                                     new (KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null),
                                     new (KeyCode.CtrlMask | KeyCode.O, "~^O~ Open", null),
                                     new (KeyCode.CtrlMask | KeyCode.C, "~^C~ Copy", null)
-                                });
+                                }
+                               );
 
-        var fv = new FrameView ("Frame View")
-        {
-            Y = 1,
-            Width = Dim.Fill (),
-            Height = Dim.Fill (1)
-        };
+        var fv = new FrameView { Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1), Title = "Frame View" };
         var win = new Window ();
         win.Add (menu, sb, fv);
         Toplevel top = Application.Top;
@@ -86,7 +72,8 @@ public class WindowTests
 │└────────────────┘│
 │ ^Q Quit │ ^O Open│
 └──────────────────┘",
-                                                      _output);
+                                                      _output
+                                                     );
 
         ((FakeDriver)Application.Driver).SetBufferSize (40, 20);
 
@@ -112,7 +99,8 @@ public class WindowTests
 │└────────────────────────────────────┘│
 │ ^Q Quit │ ^O Open │ ^C Copy          │
 └──────────────────────────────────────┘",
-                                                      _output);
+                                                      _output
+                                                     );
 
         ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 
@@ -128,7 +116,8 @@ public class WindowTests
 │└────────────────┘│
 │ ^Q Quit │ ^O Open│
 └──────────────────┘",
-                                                      _output);
+                                                      _output
+                                                     );
     }
 
     [Fact]
@@ -163,7 +152,7 @@ public class WindowTests
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
 
         // Empty Rect
-        r = new Window (Rect.Empty) { Title = "title" };
+        r = new Window { Frame = Rect.Empty, Title = "title" };
         Assert.NotNull (r);
         Assert.Equal ("title", r.Title);
         Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
@@ -189,7 +178,7 @@ public class WindowTests
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
 
         // Rect with values
-        r = new Window (new Rect (1, 2, 3, 4)) { Title = "title" };
+        r = new Window { Frame = new Rect (1, 2, 3, 4), Title = "title" };
         Assert.Equal ("title", r.Title);
         Assert.NotNull (r);
         Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);

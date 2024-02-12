@@ -5,7 +5,6 @@ namespace Terminal.Gui.ViewsTests;
 public class ToplevelTests
 {
     private readonly ITestOutputHelper _output;
-
     public ToplevelTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
@@ -26,119 +25,181 @@ public class ToplevelTests
     }
 
 #if BROKE_IN_2927
-		// BUGBUG: The name of this test does not match what it does. 
-		[Fact]
-		[AutoInitShutdown]
-		public void Application_Top_GetLocationThatFits_To_Driver_Rows_And_Cols ()
-		{
-			var iterations = 0;
+    // BUGBUG: The name of this test does not match what it does. 
+    [Fact]
+    [AutoInitShutdown]
+    public void Application_Top_GetLocationThatFits_To_Driver_Rows_And_Cols ()
+    {
+        var iterations = 0;
 
-			Application.Iteration += (s, a) => {
-				switch (iterations) {
-				case 0:
-					Assert.False (Application.Top.AutoSize);
-					Assert.Equal ("Top1", Application.Top.Text);
-					Assert.Equal (0, Application.Top.Frame.X);
-					Assert.Equal (0, Application.Top.Frame.Y);
-					Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
-					Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
+        Application.Iteration += (s, a) =>
+                                 {
+                                     switch (iterations)
+                                     {
+                                         case 0:
+                                             Assert.False (Application.Top.AutoSize);
+                                             Assert.Equal ("Top1", Application.Top.Text);
+                                             Assert.Equal (0, Application.Top.Frame.X);
+                                             Assert.Equal (0, Application.Top.Frame.Y);
+                                             Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
+                                             Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
 
-					Application.OnKeyPressed (new (Key.CtrlMask | Key.R));
-					break;
-				case 1:
-					Assert.Equal ("Top2", Application.Top.Text);
-					Assert.Equal (0, Application.Top.Frame.X);
-					Assert.Equal (0, Application.Top.Frame.Y);
-					Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
-					Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
+                                             Application.OnKeyPressed (new (Key.CtrlMask | Key.R));
 
-					Application.OnKeyPressed (new (Key.CtrlMask | Key.C));
-					break;
-				case 3:
-					Assert.Equal ("Top1", Application.Top.Text);
-					Assert.Equal (0, Application.Top.Frame.X);
-					Assert.Equal (0, Application.Top.Frame.Y);
-					Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
-					Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
+                                             break;
+                                         case 1:
+                                             Assert.Equal ("Top2", Application.Top.Text);
+                                             Assert.Equal (0, Application.Top.Frame.X);
+                                             Assert.Equal (0, Application.Top.Frame.Y);
+                                             Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
+                                             Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
 
-					Application.OnKeyPressed (new (Key.CtrlMask | Key.R));
-					break;
-				case 4:
-					Assert.Equal ("Top2", Application.Top.Text);
-					Assert.Equal (0, Application.Top.Frame.X);
-					Assert.Equal (0, Application.Top.Frame.Y);
-					Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
-					Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
+                                             Application.OnKeyPressed (new (Key.CtrlMask | Key.C));
 
-					Application.OnKeyPressed (new (Key.CtrlMask | Key.C));
-					break;
-				case 6:
-					Assert.Equal ("Top1", Application.Top.Text);
-					Assert.Equal (0, Application.Top.Frame.X);
-					Assert.Equal (0, Application.Top.Frame.Y);
-					Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
-					Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
+                                             break;
+                                         case 3:
+                                             Assert.Equal ("Top1", Application.Top.Text);
+                                             Assert.Equal (0, Application.Top.Frame.X);
+                                             Assert.Equal (0, Application.Top.Frame.Y);
+                                             Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
+                                             Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
 
-					Application.OnKeyPressed (new (Key.CtrlMask | Key.Q));
-					break;
-				}
-				iterations++;
-			};
+                                             Application.OnKeyPressed (new (Key.CtrlMask | Key.R));
 
-			Application.Run (Top1 ());
+                                             break;
+                                         case 4:
+                                             Assert.Equal ("Top2", Application.Top.Text);
+                                             Assert.Equal (0, Application.Top.Frame.X);
+                                             Assert.Equal (0, Application.Top.Frame.Y);
+                                             Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
+                                             Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
 
-			Toplevel Top1 ()
-			{
-				var top = Application.Top;
-				top.Text = "Top1";
-				var menu = new MenuBar (new MenuBarItem [] {
-					new MenuBarItem ("_Options", new MenuItem [] {
-						new MenuItem ("_Run Top2", "", () => Application.Run (Top2 ()), null, null, Key.CtrlMask | Key.R),
-						new MenuItem ("_Quit", "", () => Application.RequestStop(), null, null, Key.CtrlMask | Key.Q)
-					})
-				});
-				top.Add (menu);
+                                             Application.OnKeyPressed (new (Key.CtrlMask | Key.C));
 
-				var statusBar = new StatusBar (new [] {
-					new StatusItem(Key.CtrlMask | Key.R, "~^R~ Run Top2", () => Application.Run (Top2 ())),
-					new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Application.RequestStop())
-				});
-				top.Add (statusBar);
+                                             break;
+                                         case 6:
+                                             Assert.Equal ("Top1", Application.Top.Text);
+                                             Assert.Equal (0, Application.Top.Frame.X);
+                                             Assert.Equal (0, Application.Top.Frame.Y);
+                                             Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
+                                             Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
 
-				var t1 = new Toplevel ();
-				top.Add (t1);
+                                             Application.OnKeyPressed (new (Key.CtrlMask | Key.Q));
 
-				return top;
-			}
+                                             break;
+                                     }
 
-			Toplevel Top2 ()
-			{
-				var top = new Toplevel (Application.Top.Frame);
-				top.Text = "Top2";
-				var win = new Window () { Width = Dim.Fill (), Height = Dim.Fill () };
-				var menu = new MenuBar (new MenuBarItem [] {
-					new MenuBarItem ("_Stage", new MenuItem [] {
-						new MenuItem ("_Close", "", () => Application.RequestStop(), null, null, Key.CtrlMask | Key.C)
-					})
-				});
-				top.Add (menu);
+                                     iterations++;
+                                 };
 
-				var statusBar = new StatusBar (new [] {
-					new StatusItem(Key.CtrlMask | Key.C, "~^C~ Close", () => Application.RequestStop()),
-				});
-				top.Add (statusBar);
+        Application.Run (Top1 ());
 
-				win.Add (new ListView () {
-					X = 0,
-					Y = 0,
-					Width = Dim.Fill (),
-					Height = Dim.Fill ()
-				});
-				top.Add (win);
+        Toplevel Top1 ()
+        {
+            var top = Application.Top;
+            top.Text = "Top1";
 
-				return top;
-			}
-		}
+            var menu = new MenuBar (
+                                    new MenuBarItem []
+                                    {
+                                        new MenuBarItem (
+                                                         "_Options",
+                                                         new MenuItem []
+                                                         {
+                                                             new MenuItem (
+                                                                           "_Run Top2",
+                                                                           "",
+                                                                           () => Application.Run (Top2 ()),
+                                                                           null,
+                                                                           null,
+                                                                           Key.CtrlMask | Key.R
+                                                                          ),
+                                                             new MenuItem (
+                                                                           "_Quit",
+                                                                           "",
+                                                                           () => Application
+                                                                               .RequestStop (),
+                                                                           null,
+                                                                           null,
+                                                                           Key.CtrlMask | Key.Q
+                                                                          )
+                                                         }
+                                                        )
+                                    }
+                                   );
+            top.Add (menu);
+
+            var statusBar = new StatusBar (
+                                           new []
+                                           {
+                                               new StatusItem (
+                                                               Key.CtrlMask | Key.R,
+                                                               "~^R~ Run Top2",
+                                                               () => Application.Run (Top2 ())
+                                                              ),
+                                               new StatusItem (
+                                                               Application.QuitKey,
+                                                               $"{Application.QuitKey} to Quit",
+                                                               () => Application.RequestStop ()
+                                                              )
+                                           }
+                                          );
+            top.Add (statusBar);
+
+            var t1 = new Toplevel ();
+            top.Add (t1);
+
+            return top;
+        }
+
+        Toplevel Top2 ()
+        {
+            var top = new Toplevel (Application.Top.Frame);
+            top.Text = "Top2";
+            var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
+
+            var menu = new MenuBar (
+                                    new MenuBarItem []
+                                    {
+                                        new MenuBarItem (
+                                                         "_Stage",
+                                                         new MenuItem []
+                                                         {
+                                                             new MenuItem (
+                                                                           "_Close",
+                                                                           "",
+                                                                           () => Application
+                                                                               .RequestStop (),
+                                                                           null,
+                                                                           null,
+                                                                           Key.CtrlMask | Key.C
+                                                                          )
+                                                         }
+                                                        )
+                                    }
+                                   );
+            top.Add (menu);
+
+            var statusBar = new StatusBar (
+                                           new []
+                                           {
+                                               new StatusItem (
+                                                               Key.CtrlMask | Key.C,
+                                                               "~^C~ Close",
+                                                               () => Application.RequestStop ()
+                                                              ),
+                                           }
+                                          );
+            top.Add (statusBar);
+
+            win.Add (
+                     new ListView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () }
+                    );
+            top.Add (win);
+
+            return top;
+        }
+    }
 #endif
     [Fact]
     [AutoInitShutdown]
@@ -339,21 +400,64 @@ public class ToplevelTests
         var isRunning = false;
 
         var win1 = new Window { Id = "win1", Width = Dim.Percent (50f), Height = Dim.Fill () };
-        var lblTf1W1 = new Label ("Enter text in TextField on Win1:") { Id = "lblTf1W1" };
-        var tf1W1 = new TextField ("Text1 on Win1") { Id = "tf1W1", X = Pos.Right (lblTf1W1) + 1, Width = Dim.Fill () };
-        var lblTvW1 = new Label ("Enter text in TextView on Win1:") { Id = "lblTvW1", Y = Pos.Bottom (lblTf1W1) + 1 };
-        var tvW1 = new TextView { Id = "tvW1", X = Pos.Left (tf1W1), Width = Dim.Fill (), Height = 2, Text = "First line Win1\nSecond line Win1" };
-        var lblTf2W1 = new Label ("Enter text in TextField on Win1:") { Id = "lblTf2W1", Y = Pos.Bottom (lblTvW1) + 1 };
-        var tf2W1 = new TextField ("Text2 on Win1") { Id = "tf2W1", X = Pos.Left (tf1W1), Width = Dim.Fill () };
+        var lblTf1W1 = new Label { Id = "lblTf1W1", Text = "Enter text in TextField on Win1:" };
+
+        var tf1W1 = new TextField
+        {
+            Id = "tf1W1", X = Pos.Right (lblTf1W1) + 1, Width = Dim.Fill (), Text = "Text1 on Win1"
+        };
+
+        var lblTvW1 = new Label
+        {
+            Id = "lblTvW1", Y = Pos.Bottom (lblTf1W1) + 1, Text = "Enter text in TextView on Win1:"
+        };
+
+        var tvW1 = new TextView
+        {
+            Id = "tvW1",
+            X = Pos.Left (tf1W1),
+            Width = Dim.Fill (),
+            Height = 2,
+            Text = "First line Win1\nSecond line Win1"
+        };
+
+        var lblTf2W1 = new Label
+        {
+            Id = "lblTf2W1", Y = Pos.Bottom (lblTvW1) + 1, Text = "Enter text in TextField on Win1:"
+        };
+        var tf2W1 = new TextField { Id = "tf2W1", X = Pos.Left (tf1W1), Width = Dim.Fill (), Text = "Text2 on Win1" };
         win1.Add (lblTf1W1, tf1W1, lblTvW1, tvW1, lblTf2W1, tf2W1);
 
-        var win2 = new Window { Id = "win2", X = Pos.Right (win1) + 1, Width = Dim.Percent (50f), Height = Dim.Fill () };
-        var lblTf1W2 = new Label ("Enter text in TextField on Win2:") { Id = "lblTf1W2" };
-        var tf1W2 = new TextField ("Text1 on Win2") { Id = "tf1W2", X = Pos.Right (lblTf1W2) + 1, Width = Dim.Fill () };
-        var lblTvW2 = new Label ("Enter text in TextView on Win2:") { Id = "lblTvW2", Y = Pos.Bottom (lblTf1W2) + 1 };
-        var tvW2 = new TextView { Id = "tvW2", X = Pos.Left (tf1W2), Width = Dim.Fill (), Height = 2, Text = "First line Win1\nSecond line Win2" };
-        var lblTf2W2 = new Label ("Enter text in TextField on Win2:") { Id = "lblTf2W2", Y = Pos.Bottom (lblTvW2) + 1 };
-        var tf2W2 = new TextField ("Text2 on Win2") { Id = "tf2W2", X = Pos.Left (tf1W2), Width = Dim.Fill () };
+        var win2 = new Window
+        {
+            Id = "win2", X = Pos.Right (win1) + 1, Width = Dim.Percent (50f), Height = Dim.Fill ()
+        };
+        var lblTf1W2 = new Label { Id = "lblTf1W2", Text = "Enter text in TextField on Win2:" };
+
+        var tf1W2 = new TextField
+        {
+            Id = "tf1W2", X = Pos.Right (lblTf1W2) + 1, Width = Dim.Fill (), Text = "Text1 on Win2"
+        };
+
+        var lblTvW2 = new Label
+        {
+            Id = "lblTvW2", Y = Pos.Bottom (lblTf1W2) + 1, Text = "Enter text in TextView on Win2:"
+        };
+
+        var tvW2 = new TextView
+        {
+            Id = "tvW2",
+            X = Pos.Left (tf1W2),
+            Width = Dim.Fill (),
+            Height = 2,
+            Text = "First line Win1\nSecond line Win2"
+        };
+
+        var lblTf2W2 = new Label
+        {
+            Id = "lblTf2W2", Y = Pos.Bottom (lblTvW2) + 1, Text = "Enter text in TextField on Win2:"
+        };
+        var tf2W2 = new TextField { Id = "tf2W2", X = Pos.Left (tf1W2), Width = Dim.Fill (), Text = "Text2 on Win2" };
         win2.Add (lblTf1W2, tf1W2, lblTvW2, tvW2, lblTf2W2, tf2W2);
 
         Toplevel top = Application.Top;
@@ -395,9 +499,9 @@ public class ToplevelTests
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tvW1, top.MostFocused);
 #if UNIX_KEY_BINDINGS
-			Assert.True (Application.OnKeyDown (new (Key.I | Key.CtrlMask)));
-			Assert.Equal (win1, top.Focused);
-			Assert.Equal (tf2W1, top.MostFocused);
+        Assert.True (Application.OnKeyDown (new (Key.I | Key.CtrlMask)));
+        Assert.Equal (win1, top.Focused);
+        Assert.Equal (tf2W1, top.MostFocused);
 #endif
         Assert.True (Application.OnKeyDown (new Key (KeyCode.Tab | KeyCode.ShiftMask)));
         Assert.Equal (win1, top.Focused);
@@ -424,7 +528,7 @@ public class ToplevelTests
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tvW1, top.MostFocused);
 #if UNIX_KEY_BINDINGS
-			Assert.True (Application.OnKeyDown (new (Key.B | Key.CtrlMask)));
+        Assert.True (Application.OnKeyDown (new (Key.B | Key.CtrlMask)));
 #else
         Assert.True (Application.OnKeyDown (new Key (KeyCode.CursorLeft)));
 #endif
@@ -440,7 +544,7 @@ public class ToplevelTests
         Assert.Equal (tvW1, top.MostFocused);
         Assert.Equal (new Point (16, 1), tvW1.CursorPosition);
 #if UNIX_KEY_BINDINGS
-			Assert.True (Application.OnKeyDown (new (Key.F | Key.CtrlMask)));
+        Assert.True (Application.OnKeyDown (new (Key.F | Key.CtrlMask)));
 #else
         Assert.True (Application.OnKeyDown (new Key (KeyCode.CursorRight)));
 #endif
@@ -448,7 +552,7 @@ public class ToplevelTests
         Assert.Equal (tf2W1, top.MostFocused);
 
 #if UNIX_KEY_BINDINGS
-			Assert.True (Application.OnKeyDown (new (Key.L | Key.CtrlMask)));
+        Assert.True (Application.OnKeyDown (new (Key.L | Key.CtrlMask)));
 #else
         Assert.True (Application.OnKeyDown (new Key (KeyCode.F5)));
 #endif
@@ -467,21 +571,29 @@ public class ToplevelTests
         var isRunning = true;
 
         var win1 = new Window { Id = "win1", Width = Dim.Percent (50f), Height = Dim.Fill () };
-        var lblTf1W1 = new Label ("Enter text in TextField on Win1:");
-        var tf1W1 = new TextField ("Text1 on Win1") { X = Pos.Right (lblTf1W1) + 1, Width = Dim.Fill () };
-        var lblTvW1 = new Label ("Enter text in TextView on Win1:") { Y = Pos.Bottom (lblTf1W1) + 1 };
-        var tvW1 = new TextView { X = Pos.Left (tf1W1), Width = Dim.Fill (), Height = 2, Text = "First line Win1\nSecond line Win1" };
-        var lblTf2W1 = new Label ("Enter text in TextField on Win1:") { Y = Pos.Bottom (lblTvW1) + 1 };
-        var tf2W1 = new TextField ("Text2 on Win1") { X = Pos.Left (tf1W1), Width = Dim.Fill () };
+        var lblTf1W1 = new Label { Text = "Enter text in TextField on Win1:" };
+        var tf1W1 = new TextField { X = Pos.Right (lblTf1W1) + 1, Width = Dim.Fill (), Text = "Text1 on Win1" };
+        var lblTvW1 = new Label { Y = Pos.Bottom (lblTf1W1) + 1, Text = "Enter text in TextView on Win1:" };
+
+        var tvW1 = new TextView
+        {
+            X = Pos.Left (tf1W1), Width = Dim.Fill (), Height = 2, Text = "First line Win1\nSecond line Win1"
+        };
+        var lblTf2W1 = new Label { Y = Pos.Bottom (lblTvW1) + 1, Text = "Enter text in TextField on Win1:" };
+        var tf2W1 = new TextField { X = Pos.Left (tf1W1), Width = Dim.Fill (), Text = "Text2 on Win1" };
         win1.Add (lblTf1W1, tf1W1, lblTvW1, tvW1, lblTf2W1, tf2W1);
 
         var win2 = new Window { Id = "win2", Width = Dim.Percent (50f), Height = Dim.Fill () };
-        var lblTf1W2 = new Label ("Enter text in TextField on Win2:");
-        var tf1W2 = new TextField ("Text1 on Win2") { X = Pos.Right (lblTf1W2) + 1, Width = Dim.Fill () };
-        var lblTvW2 = new Label ("Enter text in TextView on Win2:") { Y = Pos.Bottom (lblTf1W2) + 1 };
-        var tvW2 = new TextView { X = Pos.Left (tf1W2), Width = Dim.Fill (), Height = 2, Text = "First line Win1\nSecond line Win2" };
-        var lblTf2W2 = new Label ("Enter text in TextField on Win2:") { Y = Pos.Bottom (lblTvW2) + 1 };
-        var tf2W2 = new TextField ("Text2 on Win2") { X = Pos.Left (tf1W2), Width = Dim.Fill () };
+        var lblTf1W2 = new Label { Text = "Enter text in TextField on Win2:" };
+        var tf1W2 = new TextField { X = Pos.Right (lblTf1W2) + 1, Width = Dim.Fill (), Text = "Text1 on Win2" };
+        var lblTvW2 = new Label { Y = Pos.Bottom (lblTf1W2) + 1, Text = "Enter text in TextView on Win2:" };
+
+        var tvW2 = new TextView
+        {
+            X = Pos.Left (tf1W2), Width = Dim.Fill (), Height = 2, Text = "First line Win1\nSecond line Win2"
+        };
+        var lblTf2W2 = new Label { Y = Pos.Bottom (lblTvW2) + 1, Text = "Enter text in TextField on Win2:" };
+        var tf2W2 = new TextField { X = Pos.Left (tf1W2), Width = Dim.Fill (), Text = "Text2 on Win2" };
         win2.Add (lblTf1W2, tf1W2, lblTvW2, tvW2, lblTf2W2, tf2W2);
 
         win1.Closing += (s, e) => isRunning = false;
@@ -521,7 +633,10 @@ public class ToplevelTests
         Assert.False (isRunning);
         Assert.False (win1.Running);
         Assert.Equal (win1, Application.OverlappedChildren [0]);
-        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+
+        Assert.True (
+                     Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask))
+                    );
 
         Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.F5))); // refresh
 
@@ -530,9 +645,17 @@ public class ToplevelTests
         Assert.Equal (tvW1, win1.MostFocused);
         Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Tab)));
         Assert.Equal ($"\tFirst line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
-        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.ShiftMask)));
+
+        Assert.True (
+                     Application.OverlappedChildren [0]
+                                .NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.ShiftMask))
+                    );
         Assert.Equal ($"First line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
-        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask)));
+
+        Assert.True (
+                     Application.OverlappedChildren [0]
+                                .NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask))
+                    );
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tf2W1, win1.MostFocused);
         Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Tab)));
@@ -545,11 +668,14 @@ public class ToplevelTests
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tvW1, win1.MostFocused);
 #if UNIX_KEY_BINDINGS
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.I | Key.CtrlMask)));
-			Assert.Equal (win1, Application.OverlappedChildren [0]);
-			Assert.Equal (tf2W1, win1.MostFocused);
+        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.I | Key.CtrlMask)));
+        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (tf2W1, win1.MostFocused);
 #endif
-        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.ShiftMask)));
+        Assert.True (
+                     Application.OverlappedChildren [0]
+                                .NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.ShiftMask))
+                    );
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tvW1, win1.MostFocused);
         Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
@@ -561,12 +687,20 @@ public class ToplevelTests
         Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Tab)));
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tf1W1, win1.MostFocused);
-        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask)));
+
+        Assert.True (
+                     Application.OverlappedChildren [0]
+                                .NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask))
+                    );
         Assert.Equal (win2, Application.OverlappedChildren [0]);
         Assert.Equal (tf1W2, win2.MostFocused);
         tf2W2.SetFocus ();
         Assert.True (tf2W2.HasFocus);
-        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask)));
+
+        Assert.True (
+                     Application.OverlappedChildren [0]
+                                .NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask))
+                    );
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tf1W1, win1.MostFocused);
         Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (Application.AlternateForwardKey));
@@ -579,7 +713,7 @@ public class ToplevelTests
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tvW1, win1.MostFocused);
 #if UNIX_KEY_BINDINGS
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.B | Key.CtrlMask)));
+        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.B | Key.CtrlMask)));
 #else
         Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
 #endif
@@ -589,12 +723,16 @@ public class ToplevelTests
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tvW1, win1.MostFocused);
         Assert.Equal (new Point (0, 0), tvW1.CursorPosition);
-        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.End | KeyCode.CtrlMask)));
+
+        Assert.True (
+                     Application.OverlappedChildren [0]
+                                .NewKeyDownEvent (new Key (KeyCode.End | KeyCode.CtrlMask))
+                    );
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tvW1, win1.MostFocused);
         Assert.Equal (new Point (16, 1), tvW1.CursorPosition);
 #if UNIX_KEY_BINDINGS
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.F | Key.CtrlMask)));
+        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.F | Key.CtrlMask)));
 #else
         Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.CursorRight)));
 #endif
@@ -602,7 +740,7 @@ public class ToplevelTests
         Assert.Equal (tf2W1, win1.MostFocused);
 
 #if UNIX_KEY_BINDINGS
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.L | Key.CtrlMask)));
+        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.L | Key.CtrlMask)));
 #endif
     }
 
@@ -619,9 +757,23 @@ public class ToplevelTests
 
         void View_Added (object sender, SuperViewChangedEventArgs e)
         {
-            Assert.Throws<NullReferenceException> (() => Application.Top.AlternateForwardKeyChanged += (s, e) => alternateForwardKey = (KeyCode)e.OldKey);
-            Assert.Throws<NullReferenceException> (() => Application.Top.AlternateBackwardKeyChanged += (s, e) => alternateBackwardKey = (KeyCode)e.OldKey);
-            Assert.Throws<NullReferenceException> (() => Application.Top.QuitKeyChanged += (s, e) => quitKey = (KeyCode)e.OldKey);
+            Assert.Throws<NullReferenceException> (
+                                                   () =>
+                                                       Application.Top.AlternateForwardKeyChanged +=
+                                                           (s, e) => alternateForwardKey = (KeyCode)e.OldKey
+                                                  );
+
+            Assert.Throws<NullReferenceException> (
+                                                   () =>
+                                                       Application.Top.AlternateBackwardKeyChanged +=
+                                                           (s, e) => alternateBackwardKey = (KeyCode)e.OldKey
+                                                  );
+
+            Assert.Throws<NullReferenceException> (
+                                                   () =>
+                                                       Application.Top.QuitKeyChanged += (s, e) =>
+                                                                                             quitKey = (KeyCode)e.OldKey
+                                                  );
             Assert.False (wasAdded);
             wasAdded = true;
             view.Added -= View_Added;
@@ -733,7 +885,8 @@ public class ToplevelTests
 │             │
 └─────────────┘
 ",
-                                                                                       _output);
+                                                                                       _output
+                                                                                      );
                                      }
                                      else if (iterations == 2)
                                      {
@@ -742,12 +895,9 @@ public class ToplevelTests
                                          // Grab the mouse
                                          Application.OnMouseEvent (
                                                                    new MouseEventEventArgs (
-                                                                                            new MouseEvent
-                                                                                            {
-                                                                                                X = 3,
-                                                                                                Y = 2,
-                                                                                                Flags = MouseFlags.Button1Pressed
-                                                                                            }));
+                                                                                            new MouseEvent { X = 3, Y = 2, Flags = MouseFlags.Button1Pressed }
+                                                                                           )
+                                                                  );
 
                                          Assert.Equal (Application.Current, Application.MouseGrabView);
                                          Assert.Equal (new Rect (2, 2, 10, 3), Application.MouseGrabView.Frame);
@@ -765,7 +915,9 @@ public class ToplevelTests
                                                                                                 Y = 2,
                                                                                                 Flags = MouseFlags.Button1Pressed
                                                                                                         | MouseFlags.ReportMousePosition
-                                                                                            }));
+                                                                                            }
+                                                                                           )
+                                                                  );
                                          Application.Refresh ();
 
                                          Assert.Equal (Application.Current, Application.MouseGrabView);
@@ -784,7 +936,8 @@ public class ToplevelTests
 │└────────┘   │
 │             │
 └─────────────┘",
-                                                                                       _output);
+                                                                                       _output
+                                                                                      );
 
                                          Assert.Equal (Application.Current, Application.MouseGrabView);
                                      }
@@ -801,7 +954,9 @@ public class ToplevelTests
                                                                                                 Y = 1,
                                                                                                 Flags = MouseFlags.Button1Pressed
                                                                                                         | MouseFlags.ReportMousePosition
-                                                                                            }));
+                                                                                            }
+                                                                                           )
+                                                                  );
                                          Application.Refresh ();
 
                                          Assert.Equal (Application.Current, Application.MouseGrabView);
@@ -820,7 +975,8 @@ public class ToplevelTests
 │             │
 │             │
 └─────────────┘",
-                                                                                       _output);
+                                                                                       _output
+                                                                                      );
 
                                          Assert.Equal (Application.Current, Application.MouseGrabView);
                                          Assert.Equal (new Rect (1, 1, 10, 3), Application.MouseGrabView.Frame);
@@ -832,12 +988,9 @@ public class ToplevelTests
                                          // Ungrab the mouse
                                          Application.OnMouseEvent (
                                                                    new MouseEventEventArgs (
-                                                                                            new MouseEvent
-                                                                                            {
-                                                                                                X = 2,
-                                                                                                Y = 1,
-                                                                                                Flags = MouseFlags.Button1Released
-                                                                                            }));
+                                                                                            new MouseEvent { X = 2, Y = 1, Flags = MouseFlags.Button1Released }
+                                                                                           )
+                                                                  );
                                          Application.Refresh ();
 
                                          Assert.Null (Application.MouseGrabView);
@@ -859,13 +1012,7 @@ public class ToplevelTests
     [AutoInitShutdown]
     public void Mouse_Drag_On_Top_With_Superview_Not_Null ()
     {
-        var win = new Window
-        {
-            X = 3,
-            Y = 2,
-            Width = 10,
-            Height = 5
-        };
+        var win = new Window { X = 3, Y = 2, Width = 10, Height = 5 };
         Toplevel top = Application.Top;
         top.Add (win);
 
@@ -895,10 +1042,11 @@ public class ToplevelTests
                                                                    new MouseEventEventArgs (
                                                                                             new MouseEvent
                                                                                             {
-                                                                                                X = win.Frame.X,
-                                                                                                Y = win.Frame.Y,
+                                                                                                X = win.Frame.X, Y = win.Frame.Y,
                                                                                                 Flags = MouseFlags.Button1Pressed
-                                                                                            }));
+                                                                                            }
+                                                                                           )
+                                                                  );
 
                                          Assert.Equal (win, Application.MouseGrabView);
                                          Assert.Equal (location, Application.MouseGrabView.Frame);
@@ -919,7 +1067,9 @@ public class ToplevelTests
                                                                                                 Y = win.Frame.Y + movey,
                                                                                                 Flags = MouseFlags.Button1Pressed
                                                                                                         | MouseFlags.ReportMousePosition
-                                                                                            }));
+                                                                                            }
+                                                                                           )
+                                                                  );
 
                                          Assert.Equal (win, Application.MouseGrabView);
                                      }
@@ -947,7 +1097,9 @@ public class ToplevelTests
                                                                                                 Y = win.Frame.Y + movey,
                                                                                                 Flags = MouseFlags.Button1Pressed
                                                                                                         | MouseFlags.ReportMousePosition
-                                                                                            }));
+                                                                                            }
+                                                                                           )
+                                                                  );
 
                                          Assert.Equal (win, Application.MouseGrabView);
                                      }
@@ -970,10 +1122,11 @@ public class ToplevelTests
                                                                    new MouseEventEventArgs (
                                                                                             new MouseEvent
                                                                                             {
-                                                                                                X = win.Frame.X + movex,
-                                                                                                Y = win.Frame.Y + movey,
+                                                                                                X = win.Frame.X + movex, Y = win.Frame.Y + movey,
                                                                                                 Flags = MouseFlags.Button1Released
-                                                                                            }));
+                                                                                            }
+                                                                                           )
+                                                                  );
 
                                          Assert.Null (Application.MouseGrabView);
                                      }
@@ -1035,7 +1188,10 @@ public class ToplevelTests
         Application.End (rs);
 
         Assert.True (isEnter);
-        Assert.False (isLeave); // Leave event cannot be trigger because it v.Enter was performed and v is focused
+
+        Assert.False (
+                      isLeave
+                     ); // Leave event cannot be trigger because it v.Enter was performed and v is focused
         Assert.True (v.HasFocus);
     }
 
@@ -1132,7 +1288,10 @@ public class ToplevelTests
         Assert.False (isEnterDiag);
         Assert.True (isLeaveDiag);
         Assert.True (isEnterTop);
-        Assert.False (isLeaveTop); // Leave event cannot be trigger because it v.Enter was performed and v is focused
+
+        Assert.False (
+                      isLeaveTop
+                     ); // Leave event cannot be trigger because it v.Enter was performed and v is focused
         Assert.True (vt.HasFocus);
         Assert.Equal (1, steps [0]);
         Assert.Equal (2, steps [1]);
@@ -1145,7 +1304,7 @@ public class ToplevelTests
     [AutoInitShutdown]
     public void PositionCursor_SetCursorVisibility_To_Invisible_If_Focused_Is_Null ()
     {
-        var tf = new TextField ("test") { Width = 5 };
+        var tf = new TextField { Width = 5, Text = "test" };
         var view = new View { Width = 10, Height = 10 };
         view.Add (tf);
         Application.Top.Add (view);
@@ -1179,7 +1338,7 @@ public class ToplevelTests
     {
         Toplevel top = Application.Top;
         var subTop = new Toplevel ();
-        var view = new View (new Rect (0, 0, 20, 10));
+        var view = new View { Frame = new Rect (0, 0, 20, 10) };
         subTop.Add (view);
         top.Add (subTop);
 
@@ -1253,16 +1412,14 @@ public class ToplevelTests
       │                                   ░
       │                                   ▼
    ◄├──────┤░░░░░░░░░░░░░░░░░░░░░░░░░░░░░► ",
-                                                      _output);
+                                                      _output
+                                                     );
 
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (
-                                                           new MouseEvent
-                                                           {
-                                                               X = 6,
-                                                               Y = 6,
-                                                               Flags = MouseFlags.Button1Pressed
-                                                           }));
+                                                           new MouseEvent { X = 6, Y = 6, Flags = MouseFlags.Button1Pressed }
+                                                          )
+                                 );
         Assert.Equal (win, Application.MouseGrabView);
         Assert.Equal (new Rect (3, 3, 194, 94), win.Frame);
 
@@ -1272,8 +1429,11 @@ public class ToplevelTests
                                                            {
                                                                X = 9,
                                                                Y = 9,
-                                                               Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-                                                           }));
+                                                               Flags = MouseFlags.Button1Pressed
+                                                                       | MouseFlags.ReportMousePosition
+                                                           }
+                                                          )
+                                 );
         Assert.Equal (win, Application.MouseGrabView);
         top.SetNeedsLayout ();
         top.LayoutSubviews ();
@@ -1298,7 +1458,8 @@ public class ToplevelTests
          │                                ░
          │                                ▼
    ◄├──────┤░░░░░░░░░░░░░░░░░░░░░░░░░░░░░► ",
-                                                      _output);
+                                                      _output
+                                                     );
 
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (
@@ -1306,8 +1467,11 @@ public class ToplevelTests
                                                            {
                                                                X = 5,
                                                                Y = 5,
-                                                               Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-                                                           }));
+                                                               Flags = MouseFlags.Button1Pressed
+                                                                       | MouseFlags.ReportMousePosition
+                                                           }
+                                                          )
+                                 );
         Assert.Equal (win, Application.MouseGrabView);
         top.SetNeedsLayout ();
         top.LayoutSubviews ();
@@ -1332,26 +1496,21 @@ public class ToplevelTests
      │                                    ░
      │                                    ▼
    ◄├──────┤░░░░░░░░░░░░░░░░░░░░░░░░░░░░░► ",
-                                                      _output);
+                                                      _output
+                                                     );
 
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (
-                                                           new MouseEvent
-                                                           {
-                                                               X = 5,
-                                                               Y = 5,
-                                                               Flags = MouseFlags.Button1Released
-                                                           }));
+                                                           new MouseEvent { X = 5, Y = 5, Flags = MouseFlags.Button1Released }
+                                                          )
+                                 );
         Assert.Null (Application.MouseGrabView);
 
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (
-                                                           new MouseEvent
-                                                           {
-                                                               X = 4,
-                                                               Y = 4,
-                                                               Flags = MouseFlags.ReportMousePosition
-                                                           }));
+                                                           new MouseEvent { X = 4, Y = 4, Flags = MouseFlags.ReportMousePosition }
+                                                          )
+                                 );
         Assert.Equal (scrollView, Application.MouseGrabView);
     }
 
@@ -1374,18 +1533,16 @@ public class ToplevelTests
 │                  │
 └──────────────────┘
 ",
-                                                      _output);
+                                                      _output
+                                                     );
 
         Assert.Null (Application.MouseGrabView);
 
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (
-                                                           new MouseEvent
-                                                           {
-                                                               X = 0,
-                                                               Y = 0,
-                                                               Flags = MouseFlags.Button1Pressed
-                                                           }));
+                                                           new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed }
+                                                          )
+                                 );
 
         Assert.Equal (window, Application.MouseGrabView);
 
@@ -1395,8 +1552,11 @@ public class ToplevelTests
                                                            {
                                                                X = -11,
                                                                Y = -4,
-                                                               Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-                                                           }));
+                                                               Flags = MouseFlags.Button1Pressed
+                                                                       | MouseFlags.ReportMousePosition
+                                                           }
+                                                          )
+                                 );
 
         Application.Refresh ();
         Assert.Equal (new Rect (0, 0, 40, 10), top.Frame);
@@ -1408,7 +1568,8 @@ public class ToplevelTests
 │                  │
 └──────────────────┘
 ",
-                                                      _output);
+                                                      _output
+                                                     );
 
         // Changes Top size to same size as Dialog more menu and scroll bar
         ((FakeDriver)Application.Driver).SetBufferSize (20, 3);
@@ -1419,8 +1580,11 @@ public class ToplevelTests
                                                            {
                                                                X = -1,
                                                                Y = -1,
-                                                               Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-                                                           }));
+                                                               Flags = MouseFlags.Button1Pressed
+                                                                       | MouseFlags.ReportMousePosition
+                                                           }
+                                                          )
+                                 );
 
         Application.Refresh ();
         Assert.Equal (new Rect (0, 0, 20, 3), top.Frame);
@@ -1432,7 +1596,8 @@ public class ToplevelTests
 │                  │
 └──────────────────┘
 ",
-                                                      _output);
+                                                      _output
+                                                     );
 
         // Changes Top size smaller than Dialog size
         ((FakeDriver)Application.Driver).SetBufferSize (19, 2);
@@ -1443,8 +1608,11 @@ public class ToplevelTests
                                                            {
                                                                X = -1,
                                                                Y = -1,
-                                                               Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-                                                           }));
+                                                               Flags = MouseFlags.Button1Pressed
+                                                                       | MouseFlags.ReportMousePosition
+                                                           }
+                                                          )
+                                 );
 
         Application.Refresh ();
         Assert.Equal (new Rect (0, 0, 19, 2), top.Frame);
@@ -1455,7 +1623,8 @@ public class ToplevelTests
 ──────────────────┐
                   │
 ",
-                                                      _output);
+                                                      _output
+                                                     );
 
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (
@@ -1463,8 +1632,11 @@ public class ToplevelTests
                                                            {
                                                                X = 18,
                                                                Y = 1,
-                                                               Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-                                                           }));
+                                                               Flags = MouseFlags.Button1Pressed
+                                                                       | MouseFlags.ReportMousePosition
+                                                           }
+                                                          )
+                                 );
 
         Application.Refresh ();
         Assert.Equal (new Rect (0, 0, 19, 2), top.Frame);
@@ -1473,7 +1645,8 @@ public class ToplevelTests
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
                   ┌",
-                                                      _output);
+                                                      _output
+                                                     );
 
         // On a real app we can't go beyond the SuperView bounds
         Application.OnMouseEvent (
@@ -1482,8 +1655,11 @@ public class ToplevelTests
                                                            {
                                                                X = 19,
                                                                Y = 2,
-                                                               Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-                                                           }));
+                                                               Flags = MouseFlags.Button1Pressed
+                                                                       | MouseFlags.ReportMousePosition
+                                                           }
+                                                          )
+                                 );
 
         Application.Refresh ();
         Assert.Equal (new Rect (0, 0, 19, 2), top.Frame);
@@ -1499,17 +1675,18 @@ public class ToplevelTests
         var window = new Window { Width = 10, Height = 3 };
 
         window.Add (
-                    new Label (
-                               "Test")
+                    new Label
                     {
                         X = Pos.Center (),
                         Y = Pos.Center (),
+                        AutoSize = false,
                         Width = Dim.Fill (),
                         Height = Dim.Fill (),
                         TextAlignment = TextAlignment.Centered,
                         VerticalTextAlignment = VerticalTextAlignment.Middle,
-                        AutoSize = false
-                    });
+                        Text = "Test"
+                    }
+                   );
 
         RunState rs = Application.Begin (window);
 
@@ -1521,16 +1698,14 @@ public class ToplevelTests
 ┌────────┐
 │  Test  │
 └────────┘",
-                                                      _output);
+                                                      _output
+                                                     );
 
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (
-                                                           new MouseEvent
-                                                           {
-                                                               X = 0,
-                                                               Y = 0,
-                                                               Flags = MouseFlags.Button1Pressed
-                                                           }));
+                                                           new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed }
+                                                          )
+                                 );
 
         var firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -1543,7 +1718,8 @@ public class ToplevelTests
 ┌────────┐
 │  Test  │
 └────────┘",
-                                                      _output);
+                                                      _output
+                                                     );
 
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (
@@ -1551,8 +1727,11 @@ public class ToplevelTests
                                                            {
                                                                X = 1,
                                                                Y = 1,
-                                                               Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-                                                           }));
+                                                               Flags = MouseFlags.Button1Pressed
+                                                                       | MouseFlags.ReportMousePosition
+                                                           }
+                                                          )
+                                 );
 
         firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -1564,7 +1743,8 @@ public class ToplevelTests
  ┌────────┐
  │  Test  │
  └────────┘",
-                                                      _output);
+                                                      _output
+                                                     );
 
         Application.End (rs);
     }
@@ -1619,9 +1799,10 @@ public class ToplevelTests
 │                  │
 │                  │
 └──────────────────┘",
-                                                      _output);
+                                                      _output
+                                                     );
 
-        var btnPopup = new Button ("Popup");
+        var btnPopup = new Button { Text = "Popup" };
         var testWindow = new Window { X = 2, Y = 1, Width = 15, Height = 10 };
         testWindow.Add (btnPopup);
 
@@ -1668,7 +1849,11 @@ public class ToplevelTests
                                                       @$"
 ┌──────────────────┐
 │ ┌─────────────┐  │
-│ │{CM.Glyphs.LeftBracket} Popup {CM.Glyphs.RightBracket}    │  │
+│ │{
+    CM.Glyphs.LeftBracket
+} Popup {
+    CM.Glyphs.RightBracket
+}    │  │
 │ │             │  │
 │ │             │  │
 │ │             │  │
@@ -1686,16 +1871,14 @@ public class ToplevelTests
 │                  │
 │                  │
 └──────────────────┘",
-                                                      _output);
+                                                      _output
+                                                     );
 
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (
-                                                           new MouseEvent
-                                                           {
-                                                               X = 5,
-                                                               Y = 2,
-                                                               Flags = MouseFlags.Button1Clicked
-                                                           }));
+                                                           new MouseEvent { X = 5, Y = 2, Flags = MouseFlags.Button1Clicked }
+                                                          )
+                                 );
         Application.Top.Draw ();
 
         var firstIteration = false;
@@ -1705,7 +1888,11 @@ public class ToplevelTests
                                                       @$"
 ┌──────────────────┐
 │ ┌─────────────┐  │
-│ │{CM.Glyphs.LeftBracket} Popup {CM.Glyphs.RightBracket}    │  │
+│ │{
+    CM.Glyphs.LeftBracket
+} Popup {
+    CM.Glyphs.RightBracket
+}    │  │
 │┌────────────────┐│
 ││viewAddedToTop  ││
 ││                ││
@@ -1723,7 +1910,8 @@ public class ToplevelTests
 ││Three           ││
 │└────────────────┘│
 └──────────────────┘",
-                                                      _output);
+                                                      _output
+                                                     );
 
         Application.End (rs);
     }
@@ -1732,16 +1920,13 @@ public class ToplevelTests
     [AutoInitShutdown]
     public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
     {
-        var menu = new MenuBar (
-                                new MenuBarItem []
-                                {
-                                    new (
-                                         "Child",
-                                         new MenuItem []
-                                         {
-                                             new ("_Create Child", "", null)
-                                         })
-                                });
+        var menu = new MenuBar
+        {
+            Menus =
+            [
+                new MenuBarItem ("Child", new MenuItem [] { new ("_Create Child", "", null) })
+            ]
+        };
         var topChild = new Toplevel ();
         topChild.Add (menu);
         Application.Top.Add (topChild);
@@ -1809,7 +1994,8 @@ public class ToplevelTests
                                     }
 
                                     return true;
-                                });
+                                }
+                               );
 
         t.Ready += FirstWindow;
 
@@ -1843,7 +2029,8 @@ public class ToplevelTests
                                         }
 
                                         return true;
-                                    });
+                                    }
+                                   );
 
             Application.Run (firstWindow);
         }
@@ -1872,7 +2059,8 @@ public class ToplevelTests
                                         }
 
                                         return true;
-                                    });
+                                    }
+                                   );
 
             Application.Run (testWindow);
         }

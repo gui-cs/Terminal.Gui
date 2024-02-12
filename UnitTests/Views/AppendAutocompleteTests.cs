@@ -5,7 +5,6 @@ namespace Terminal.Gui.TextTests;
 public class AppendAutocompleteTests
 {
     private readonly ITestOutputHelper output;
-
     public AppendAutocompleteTests (ITestOutputHelper output) { this.output = output; }
 
     [Fact]
@@ -225,16 +224,8 @@ public class AppendAutocompleteTests
 
     private TextField GetTextFieldsInView ()
     {
-        var tf = new TextField
-        {
-            Width = 10
-        };
-
-        var tf2 = new TextField
-        {
-            Y = 1,
-            Width = 10
-        };
+        var tf = new TextField { Width = 10 };
+        var tf2 = new TextField { Y = 1, Width = 10 };
 
         Toplevel top = Application.Top;
         top.Add (tf);
