@@ -10,6 +10,6 @@ public class SizeChangedEventArgs : EventArgs
     /// <summary>Set to <see langword="true"/> to cause the resize to be cancelled, if appropriate.</summary>
     public bool Cancel { get; set; }
 
-    /// <summary>Gets the size the event describes. This should reflect the new/current size after the event.</summary>
+    /// <summary>Gets the size the event describes.  This should reflect the new/current size after the event resolved.</summary>
     public Size Size { get; }
 }

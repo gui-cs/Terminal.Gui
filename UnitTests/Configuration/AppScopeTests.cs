@@ -1,89 +1,86 @@
-﻿using Xunit;
-using Terminal.Gui;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.Json;
+﻿using System.Text.Json;
 using static Terminal.Gui.ConfigurationManager;
 
-namespace Terminal.Gui.ConfigurationTests {
-	public class AppScopeTests {
-		public static readonly JsonSerializerOptions _jsonOptions = new () {
-			Converters = {
-				//new AttributeJsonConverter (),
-				//new ColorJsonConverter ()
-				}
-		};
+namespace Terminal.Gui.ConfigurationTests;
 
-		public class AppSettingsTestClass {
-			[SerializableConfigurationProperty (Scope = typeof (AppScope))]
-			public static bool? TestProperty { get; set; } = null;
-		}
+public class AppScopeTests
+{
+    public static readonly JsonSerializerOptions _jsonOptions = new ()
+    {
+        Converters =
+        {
+            //new AttributeJsonConverter (),
+            //new ColorJsonConverter ()
+        }
+    };
 
-		[Fact]
-		public void TestNullable ()
-		{
-			AppSettingsTestClass.TestProperty = null;
-			Assert.Null (AppSettingsTestClass.TestProperty);
+    [Fact]
+    [AutoInitShutdown]
+    public void Apply_ShouldApplyUpdatedProperties ()
+    {
+        Reset ();
+        Assert.Null (AppSettingsTestClass.TestProperty);
+        Assert.NotEmpty (AppSettings);
+        Assert.Null (AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue);
 
-			ConfigurationManager.Initialize ();
-			ConfigurationManager.GetHardCodedDefaults ();
-			ConfigurationManager.Apply ();
-			Assert.Null (AppSettingsTestClass.TestProperty);
+        AppSettingsTestClass.TestProperty = true;
+        Reset ();
+        Assert.True (AppSettingsTestClass.TestProperty);
+        Assert.NotEmpty (AppSettings);
+        Assert.Null (AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue as bool?);
 
-			AppSettingsTestClass.TestProperty = true;
-			ConfigurationManager.Initialize ();
-			ConfigurationManager.GetHardCodedDefaults ();
-			Assert.NotNull (AppSettingsTestClass.TestProperty);
-			ConfigurationManager.Apply ();
-			Assert.NotNull (AppSettingsTestClass.TestProperty);
-		}
+        AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue = false;
+        Assert.False (AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue as bool?);
 
-		[Fact, AutoInitShutdown]
-		public void Apply_ShouldApplyUpdatedProperties ()
-		{
-			ConfigurationManager.Reset ();
-			Assert.Null (AppSettingsTestClass.TestProperty);
-			Assert.NotEmpty (ConfigurationManager.AppSettings);
-			Assert.Null (ConfigurationManager.AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue);
-			
-			AppSettingsTestClass.TestProperty = true;
-			ConfigurationManager.Reset ();
-			Assert.True (AppSettingsTestClass.TestProperty);
-			Assert.NotEmpty (ConfigurationManager.AppSettings);
-			Assert.Null (ConfigurationManager.AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue as bool?);
-			
-			ConfigurationManager.AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue = false;
-			Assert.False (ConfigurationManager.AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue as bool?);
-			
-			// ConfigurationManager.Settings should NOT apply theme settings
-			ConfigurationManager.Settings.Apply ();
-			Assert.True (AppSettingsTestClass.TestProperty);
+        // ConfigurationManager.Settings should NOT apply theme settings
+        Settings.Apply ();
+        Assert.True (AppSettingsTestClass.TestProperty);
 
-			// ConfigurationManager.Themes should NOT apply theme settings
-			ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
-			Assert.True (AppSettingsTestClass.TestProperty);
+        // ConfigurationManager.Themes should NOT apply theme settings
+        ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
+        Assert.True (AppSettingsTestClass.TestProperty);
 
-			// ConfigurationManager.AppSettings should NOT apply theme settings
-			ConfigurationManager.AppSettings.Apply ();
-			Assert.False (AppSettingsTestClass.TestProperty);
+        // ConfigurationManager.AppSettings should NOT apply theme settings
+        AppSettings.Apply ();
+        Assert.False (AppSettingsTestClass.TestProperty);
+    }
 
-		}
+    [Fact]
+    public void TestNullable ()
+    {
+        AppSettingsTestClass.TestProperty = null;
+        Assert.Null (AppSettingsTestClass.TestProperty);
 
-		[Fact]
-		public void TestSerialize_RoundTrip ()
-		{
-			ConfigurationManager.Reset ();
+        Initialize ();
+        GetHardCodedDefaults ();
+        Apply ();
+        Assert.Null (AppSettingsTestClass.TestProperty);
 
-			var initial = ConfigurationManager.AppSettings;
+        AppSettingsTestClass.TestProperty = true;
+        Initialize ();
+        GetHardCodedDefaults ();
+        Assert.NotNull (AppSettingsTestClass.TestProperty);
+        Apply ();
+        Assert.NotNull (AppSettingsTestClass.TestProperty);
+    }
 
-			var serialized = JsonSerializer.Serialize<AppScope> (ConfigurationManager.AppSettings, _jsonOptions);
-			var deserialized = JsonSerializer.Deserialize<AppScope> (serialized, _jsonOptions);
+    [Fact]
+    public void TestSerialize_RoundTrip ()
+    {
+        Reset ();
 
-			Assert.NotEqual (initial, deserialized);
-			Assert.Equal (deserialized.Count, initial.Count);
-		}
-	}
+        AppScope initial = AppSettings;
+
+        string serialized = JsonSerializer.Serialize (AppSettings, _jsonOptions);
+        var deserialized = JsonSerializer.Deserialize<AppScope> (serialized, _jsonOptions);
+
+        Assert.NotEqual (initial, deserialized);
+        Assert.Equal (deserialized.Count, initial.Count);
+    }
+
+    public class AppSettingsTestClass
+    {
+        [SerializableConfigurationProperty (Scope = typeof (AppScope))]
+        public static bool? TestProperty { get; set; }
+    }
 }

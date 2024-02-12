@@ -269,13 +269,10 @@ public class DimAutoTests
 
         superView.BeginInit ();
         superView.EndInit ();
-
         Assert.Throws<InvalidOperationException> (() => superView.Add (subView));
 
         subView.Width = 10;
         superView.Add (subView);
-        superView.BeginInit ();
-        superView.EndInit ();
         superView.SetRelativeLayout (new Rect (0, 0, 0, 0));
         superView.LayoutSubviews (); // no throw
 

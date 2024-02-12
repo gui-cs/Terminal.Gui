@@ -3,32 +3,21 @@
 public partial class View
 {
     private static readonly IList<View> _empty = new List<View> (0).AsReadOnly ();
-
     internal bool _addingView;
-
     private List<View> _subviews; // This is null, and allocated on demand.
-
     private View _superView;
 
-    /// <summary>
-    ///     Indicates whether the view was added to <see cref="SuperView"/>.
-    /// </summary>
+    /// <summary>Indicates whether the view was added to <see cref="SuperView"/>.</summary>
     public bool IsAdded { get; private set; }
 
-    /// <summary>
-    ///     Returns a value indicating if this View is currently on Top (Active)
-    /// </summary>
+    /// <summary>Returns a value indicating if this View is currently on Top (Active)</summary>
     public bool IsCurrentTop => Application.Current == this;
 
-    /// <summary>
-    ///     This returns a list of the subviews contained by this view.
-    /// </summary>
+    /// <summary>This returns a list of the subviews contained by this view.</summary>
     /// <value>The subviews.</value>
     public IList<View> Subviews => _subviews?.AsReadOnly () ?? _empty;
 
-    /// <summary>
-    ///     Returns the container for this view, or null if this view has not been added to a container.
-    /// </summary>
+    /// <summary>Returns the container for this view, or null if this view has not been added to a container.</summary>
     /// <value>The super view.</value>
     public virtual View SuperView
     {
@@ -40,12 +29,10 @@ public partial class View
     // to make the same mistakes our users make when they poke at the Subviews.
     internal IList<View> InternalSubviews => _subviews ?? _empty;
 
-    /// <summary>
-    ///     Adds a subview (child) to this view.
-    /// </summary>
+    /// <summary>Adds a subview (child) to this view.</summary>
     /// <remarks>
-    ///     The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property.
-    ///     See also <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/>
+    ///     The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also
+    ///     <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/>
     /// </remarks>
     public virtual void Add (View view)
     {
@@ -103,13 +90,11 @@ public partial class View
         SetNeedsDisplay ();
     }
 
-    /// <summary>
-    ///     Adds the specified views (children) to the view.
-    /// </summary>
+    /// <summary>Adds the specified views (children) to the view.</summary>
     /// <param name="views">Array of one or more views (can be optional parameter).</param>
     /// <remarks>
-    ///     The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property.
-    ///     See also <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/>
+    ///     The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also
+    ///     <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/>
     /// </remarks>
     public void Add (params View [] views)
     {
@@ -124,18 +109,12 @@ public partial class View
         }
     }
 
-    /// <summary>
-    ///     Event fired when this view is added to another.
-    /// </summary>
+    /// <summary>Event fired when this view is added to another.</summary>
     public event EventHandler<SuperViewChangedEventArgs> Added;
 
-    /// <summary>
-    ///     Moves the subview backwards in the hierarchy, only one step
-    /// </summary>
+    /// <summary>Moves the subview backwards in the hierarchy, only one step</summary>
     /// <param name="subview">The subview to send backwards</param>
-    /// <remarks>
-    ///     If you want to send the view all the way to the back use SendSubviewToBack.
-    /// </remarks>
+    /// <remarks>If you want to send the view all the way to the back use SendSubviewToBack.</remarks>
     public void BringSubviewForward (View subview)
     {
         PerformActionForSubview (
@@ -149,16 +128,13 @@ public partial class View
                                          _subviews.Remove (x);
                                          _subviews.Insert (idx + 1, x);
                                      }
-                                 });
+                                 }
+                                );
     }
 
-    /// <summary>
-    ///     Brings the specified subview to the front so it is drawn on top of any other views.
-    /// </summary>
+    /// <summary>Brings the specified subview to the front so it is drawn on top of any other views.</summary>
     /// <param name="subview">The subview to send to the front</param>
-    /// <remarks>
-    ///     <seealso cref="SendSubviewToBack"/>.
-    /// </remarks>
+    /// <remarks><seealso cref="SendSubviewToBack"/>.</remarks>
     public void BringSubviewToFront (View subview)
     {
         PerformActionForSubview (
@@ -167,12 +143,11 @@ public partial class View
                                  {
                                      _subviews.Remove (x);
                                      _subviews.Add (x);
-                                 });
+                                 }
+                                );
     }
 
-    /// <summary>
-    ///     Get the top superview of a given <see cref="View"/>.
-    /// </summary>
+    /// <summary>Get the top superview of a given <see cref="View"/>.</summary>
     /// <returns>The superview view.</returns>
     public View GetTopSuperView (View view = null, View superview = null)
     {
@@ -191,9 +166,7 @@ public partial class View
         return top;
     }
 
-    /// <summary>
-    ///     Method invoked when a subview is being added to this view.
-    /// </summary>
+    /// <summary>Method invoked when a subview is being added to this view.</summary>
     /// <param name="e">Event where <see cref="ViewEventArgs.View"/> is the subview being added.</param>
     public virtual void OnAdded (SuperViewChangedEventArgs e)
     {
@@ -203,9 +176,7 @@ public partial class View
         view.Added?.Invoke (this, e);
     }
 
-    /// <summary>
-    ///     Method invoked when a subview is being removed from this view.
-    /// </summary>
+    /// <summary>Method invoked when a subview is being removed from this view.</summary>
     /// <param name="e">Event args describing the subview being removed.</param>
     public virtual void OnRemoved (SuperViewChangedEventArgs e)
     {
@@ -214,11 +185,8 @@ public partial class View
         view.Removed?.Invoke (this, e);
     }
 
-    /// <summary>
-    ///     Removes a subview added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.
-    /// </summary>
-    /// <remarks>
-    /// </remarks>
+    /// <summary>Removes a subview added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.</summary>
+    /// <remarks></remarks>
     public virtual void Remove (View view)
     {
         if (view == null || _subviews == null)
@@ -250,9 +218,7 @@ public partial class View
         }
     }
 
-    /// <summary>
-    ///     Removes all subviews (children) added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.
-    /// </summary>
+    /// <summary>Removes all subviews (children) added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.</summary>
     public virtual void RemoveAll ()
     {
         if (_subviews == null)
@@ -266,18 +232,12 @@ public partial class View
         }
     }
 
-    /// <summary>
-    ///     Event fired when this view is removed from another.
-    /// </summary>
+    /// <summary>Event fired when this view is removed from another.</summary>
     public event EventHandler<SuperViewChangedEventArgs> Removed;
 
-    /// <summary>
-    ///     Moves the subview backwards in the hierarchy, only one step
-    /// </summary>
+    /// <summary>Moves the subview backwards in the hierarchy, only one step</summary>
     /// <param name="subview">The subview to send backwards</param>
-    /// <remarks>
-    ///     If you want to send the view all the way to the back use SendSubviewToBack.
-    /// </remarks>
+    /// <remarks>If you want to send the view all the way to the back use SendSubviewToBack.</remarks>
     public void SendSubviewBackwards (View subview)
     {
         PerformActionForSubview (
@@ -291,16 +251,13 @@ public partial class View
                                          _subviews.Remove (x);
                                          _subviews.Insert (idx - 1, x);
                                      }
-                                 });
+                                 }
+                                );
     }
 
-    /// <summary>
-    ///     Sends the specified subview to the front so it is the first view drawn
-    /// </summary>
+    /// <summary>Sends the specified subview to the front so it is the first view drawn</summary>
     /// <param name="subview">The subview to send to the front</param>
-    /// <remarks>
-    ///     <seealso cref="BringSubviewToFront(View)"/>.
-    /// </remarks>
+    /// <remarks><seealso cref="BringSubviewToFront(View)"/>.</remarks>
     public void SendSubviewToBack (View subview)
     {
         PerformActionForSubview (
@@ -309,7 +266,8 @@ public partial class View
                                  {
                                      _subviews.Remove (x);
                                      _subviews.Insert (0, subview);
-                                 });
+                                 }
+                                );
     }
 
     private void PerformActionForSubview (View subview, Action<View> action)
@@ -325,25 +283,25 @@ public partial class View
 
     #region Focus
 
-    internal enum Direction
+    /// <summary>Exposed as `internal` for unit tests. Indicates focus navigation direction.</summary>
+    internal enum NavigationDirection
     {
+        /// <summary>Navigate forward.</summary>
         Forward,
+
+        /// <summary>Navigate backwards.</summary>
         Backward
     }
 
-    /// <summary>
-    ///     Event fired when the view gets focus.
-    /// </summary>
+    /// <summary>Event fired when the view gets focus.</summary>
     public event EventHandler<FocusEventArgs> Enter;
 
-    /// <summary>
-    ///     Event fired when the view looses focus.
-    /// </summary>
+    /// <summary>Event fired when the view looses focus.</summary>
     public event EventHandler<FocusEventArgs> Leave;
 
-    private Direction _focusDirection;
+    private NavigationDirection _focusDirection;
 
-    internal Direction FocusDirection
+    internal NavigationDirection FocusDirection
     {
         get => SuperView?.FocusDirection ?? _focusDirection;
         set
@@ -393,9 +351,7 @@ public partial class View
         }
     }
 
-    /// <summary>
-    ///     Event fired when the <see cref="CanFocus"/> value is being changed.
-    /// </summary>
+    /// <summary>Event fired when the <see cref="CanFocus"/> value is being changed.</summary>
     public event EventHandler CanFocusChanged;
 
     /// <inheritdoc/>
@@ -534,15 +490,11 @@ public partial class View
         return false;
     }
 
-    /// <summary>
-    ///     Returns the currently focused view inside this view, or null if nothing is focused.
-    /// </summary>
+    /// <summary>Returns the currently focused view inside this view, or null if nothing is focused.</summary>
     /// <value>The focused.</value>
     public View Focused { get; private set; }
 
-    /// <summary>
-    ///     Returns the most focused view in the chain of subviews (the leaf view that has the focus).
-    /// </summary>
+    /// <summary>Returns the most focused view in the chain of subviews (the leaf view that has the focus).</summary>
     /// <value>The most focused View.</value>
     public View MostFocused
     {
@@ -564,9 +516,7 @@ public partial class View
         }
     }
 
-    /// <summary>
-    ///     Causes the specified subview to have focus.
-    /// </summary>
+    /// <summary>Causes the specified subview to have focus.</summary>
     /// <param name="view">View.</param>
     private void SetFocus (View view)
     {
@@ -633,9 +583,7 @@ public partial class View
         }
     }
 
-    /// <summary>
-    ///     Causes the specified view and the entire parent hierarchy to have the focused order updated.
-    /// </summary>
+    /// <summary>Causes the specified view and the entire parent hierarchy to have the focused order updated.</summary>
     public void SetFocus ()
     {
         if (!CanBeVisible (this) || !Enabled)
@@ -659,14 +607,14 @@ public partial class View
     }
 
     /// <summary>
-    ///     Finds the first view in the hierarchy that wants to get the focus if nothing is currently focused, otherwise, does
-    ///     nothing.
+    ///     Finds the first view in the hierarchy that wants to get the focus if nothing is currently focused, otherwise,
+    ///     does nothing.
     /// </summary>
     public void EnsureFocus ()
     {
         if (Focused == null && _subviews?.Count > 0)
         {
-            if (FocusDirection == Direction.Forward)
+            if (FocusDirection == NavigationDirection.Forward)
             {
                 FocusFirst ();
             }
@@ -677,9 +625,7 @@ public partial class View
         }
     }
 
-    /// <summary>
-    ///     Focuses the first focusable subview if one exists.
-    /// </summary>
+    /// <summary>Focuses the first focusable subview if one exists.</summary>
     public void FocusFirst ()
     {
         if (!CanBeVisible (this))
@@ -705,9 +651,7 @@ public partial class View
         }
     }
 
-    /// <summary>
-    ///     Focuses the last focusable subview if one exists.
-    /// </summary>
+    /// <summary>Focuses the last focusable subview if one exists.</summary>
     public void FocusLast ()
     {
         if (!CanBeVisible (this))
@@ -737,9 +681,7 @@ public partial class View
         }
     }
 
-    /// <summary>
-    ///     Focuses the previous view.
-    /// </summary>
+    /// <summary>Focuses the previous view.</summary>
     /// <returns><see langword="true"/> if previous was focused, <see langword="false"/> otherwise.</returns>
     public bool FocusPrev ()
     {
@@ -748,7 +690,7 @@ public partial class View
             return false;
         }
 
-        FocusDirection = Direction.Backward;
+        FocusDirection = NavigationDirection.Backward;
 
         if (_tabIndexes == null || _tabIndexes.Count == 0)
         {
@@ -805,9 +747,7 @@ public partial class View
         return false;
     }
 
-    /// <summary>
-    ///     Focuses the next view.
-    /// </summary>
+    /// <summary>Focuses the next view.</summary>
     /// <returns><see langword="true"/> if next was focused, <see langword="false"/> otherwise.</returns>
     public bool FocusNext ()
     {
@@ -816,7 +756,7 @@ public partial class View
             return false;
         }
 
-        FocusDirection = Direction.Forward;
+        FocusDirection = NavigationDirection.Forward;
 
         if (_tabIndexes == null || _tabIndexes.Count == 0)
         {
@@ -882,9 +822,7 @@ public partial class View
         return view.Focused != null ? GetMostFocused (view.Focused) : view;
     }
 
-    /// <summary>
-    ///     Positions the cursor in the right position based on the currently focused view in the chain.
-    /// </summary>
+    /// <summary>Positions the cursor in the right position based on the currently focused view in the chain.</summary>
     /// Views that are focusable should override
     /// <see cref="PositionCursor"/>
     /// to ensure
@@ -905,7 +843,10 @@ public partial class View
         {
             SuperView.EnsureFocus ();
         }
-        else if (Focused?.Visible == true && Focused?.Enabled == true && Focused?.Frame.Width > 0 && Focused.Frame.Height > 0)
+        else if (Focused?.Visible == true
+                 && Focused?.Enabled == true
+                 && Focused?.Frame.Width > 0
+                 && Focused.Frame.Height > 0)
         {
             Focused.PositionCursor ();
         }

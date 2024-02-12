@@ -1,167 +1,164 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Xunit;
+﻿using System.Text;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.DriverTests;
 
-public class ContentsTests {
-	readonly ITestOutputHelper output;
+public class ContentsTests
+{
+    private readonly ITestOutputHelper output;
 
-	public ContentsTests (ITestOutputHelper output)
-	{
-		ConsoleDriver.RunningUnitTests = true;
-		this.output = output;
-	}
+    public ContentsTests (ITestOutputHelper output)
+    {
+        ConsoleDriver.RunningUnitTests = true;
+        this.output = output;
+    }
 
+    [Theory]
+    [InlineData (typeof (FakeDriver))]
+    [InlineData (typeof (NetDriver))]
 
-	[Theory]
-	[InlineData (typeof (FakeDriver))]
-	[InlineData (typeof (NetDriver))]
-	//[InlineData (typeof (ANSIDriver))]
-	//[InlineData (typeof (CursesDriver))] // TODO: Uncomment when #2796 and #2615 are fixed
-	//[InlineData (typeof (WindowsDriver))] // TODO: Uncomment when #2610 is fixed
-	public void AddStr_Combining_Character_1st_Column (Type driverType)
-	{
-		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-		driver.Init ();
-		string expected = "\u0301!";
-		driver.AddStr ("\u0301!"); // acute accent + exclamation mark
-		TestHelpers.AssertDriverContentsAre (expected, output, driver);
+    //[InlineData (typeof (ANSIDriver))]
+    //[InlineData (typeof (CursesDriver))] // TODO: Uncomment when #2796 and #2615 are fixed
+    //[InlineData (typeof (WindowsDriver))] // TODO: Uncomment when #2610 is fixed
+    public void AddStr_Combining_Character_1st_Column (Type driverType)
+    {
+        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        driver.Init ();
+        var expected = "\u0301!";
+        driver.AddStr ("\u0301!"); // acute accent + exclamation mark
+        TestHelpers.AssertDriverContentsAre (expected, output, driver);
 
-		driver.End ();
-	}
+        driver.End ();
+    }
 
-	[Theory]
-	[InlineData (typeof (FakeDriver))]
-	[InlineData (typeof (NetDriver))]
-	//[InlineData (typeof (ANSIDriver))]
-	//[InlineData (typeof (CursesDriver))] // TODO: Uncomment when #2796 and #2615 are fixed
-	//[InlineData (typeof (WindowsDriver))] // TODO: Uncomment when #2610 is fixed
-	public void AddStr_With_Combining_Characters (Type driverType)
-	{
-		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-		driver.Init ();
+    [Theory]
+    [InlineData (typeof (FakeDriver))]
+    [InlineData (typeof (NetDriver))]
 
-		var acuteaccent = new Rune (0x0301); // Combining acute accent (é)
-		string combined = "e" + acuteaccent;
-		string expected = "é";
+    //[InlineData (typeof (ANSIDriver))]
+    //[InlineData (typeof (CursesDriver))] // TODO: Uncomment when #2796 and #2615 are fixed
+    //[InlineData (typeof (WindowsDriver))] // TODO: Uncomment when #2610 is fixed
+    public void AddStr_With_Combining_Characters (Type driverType)
+    {
+        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        driver.Init ();
 
-		driver.AddStr (combined);
-		TestHelpers.AssertDriverContentsAre (expected, output, driver);
+        var acuteaccent = new Rune (0x0301); // Combining acute accent (é)
+        string combined = "e" + acuteaccent;
+        var expected = "é";
 
-		// 3 char combine
-		// a + ogonek + acute = <U+0061, U+0328, U+0301> ( ą́ )
-		var ogonek = new Rune (0x0328); // Combining ogonek (a small hook or comma shape)
-		combined = "a" + ogonek + acuteaccent;
-		expected = ("a" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
+        driver.AddStr (combined);
+        TestHelpers.AssertDriverContentsAre (expected, output, driver);
 
-		driver.Move (0, 0);
-		driver.AddStr (combined);
-		TestHelpers.AssertDriverContentsAre (expected, output, driver);
+        // 3 char combine
+        // a + ogonek + acute = <U+0061, U+0328, U+0301> ( ą́ )
+        var ogonek = new Rune (0x0328); // Combining ogonek (a small hook or comma shape)
+        combined = "a" + ogonek + acuteaccent;
+        expected = ("a" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
 
-		// e + ogonek + acute = <U+0061, U+0328, U+0301> ( ę́́ )
-		combined = "e" + ogonek + acuteaccent;
-		expected = ("e" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
+        driver.Move (0, 0);
+        driver.AddStr (combined);
+        TestHelpers.AssertDriverContentsAre (expected, output, driver);
 
-		driver.Move (0, 0);
-		driver.AddStr (combined);
-		TestHelpers.AssertDriverContentsAre (expected, output, driver);
+        // e + ogonek + acute = <U+0061, U+0328, U+0301> ( ę́́ )
+        combined = "e" + ogonek + acuteaccent;
+        expected = ("e" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
 
-		// i + ogonek + acute = <U+0061, U+0328, U+0301> ( į́́́ )
-		combined = "i" + ogonek + acuteaccent;
-		expected = ("i" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
+        driver.Move (0, 0);
+        driver.AddStr (combined);
+        TestHelpers.AssertDriverContentsAre (expected, output, driver);
 
-		driver.Move (0, 0);
-		driver.AddStr (combined);
-		TestHelpers.AssertDriverContentsAre (expected, output, driver);
+        // i + ogonek + acute = <U+0061, U+0328, U+0301> ( į́́́ )
+        combined = "i" + ogonek + acuteaccent;
+        expected = ("i" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
 
-		// u + ogonek + acute = <U+0061, U+0328, U+0301> ( ų́́́́ )
-		combined = "u" + ogonek + acuteaccent;
-		expected = ("u" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
+        driver.Move (0, 0);
+        driver.AddStr (combined);
+        TestHelpers.AssertDriverContentsAre (expected, output, driver);
 
-		driver.Move (0, 0);
-		driver.AddStr (combined);
-		TestHelpers.AssertDriverContentsAre (expected, output, driver);
+        // u + ogonek + acute = <U+0061, U+0328, U+0301> ( ų́́́́ )
+        combined = "u" + ogonek + acuteaccent;
+        expected = ("u" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
 
-		driver.End ();
-	}
+        driver.Move (0, 0);
+        driver.AddStr (combined);
+        TestHelpers.AssertDriverContentsAre (expected, output, driver);
 
-	[Theory]
-	[InlineData (typeof (FakeDriver))]
-	[InlineData (typeof (NetDriver))]
-	//[InlineData (typeof (ANSIDriver))]
-	[InlineData (typeof (WindowsDriver))]
-	[InlineData (typeof (CursesDriver))]
-	public void Move_Bad_Coordinates (Type driverType)
-	{
-		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-		driver.Init ();
+        driver.End ();
+    }
 
-		Assert.Equal (0, driver.Col);
-		Assert.Equal (0, driver.Row);
+    [Theory]
+    [InlineData (typeof (FakeDriver))]
+    [InlineData (typeof (NetDriver))]
 
-		driver.Move (-1, 0);
-		Assert.Equal (-1, driver.Col);
-		Assert.Equal (0, driver.Row);
+    //[InlineData (typeof (ANSIDriver))]
+    [InlineData (typeof (WindowsDriver))]
+    [InlineData (typeof (CursesDriver))]
+    public void Move_Bad_Coordinates (Type driverType)
+    {
+        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        driver.Init ();
 
-		driver.Move (0, -1);
-		Assert.Equal (0, driver.Col);
-		Assert.Equal (-1, driver.Row);
+        Assert.Equal (0, driver.Col);
+        Assert.Equal (0, driver.Row);
 
-		driver.Move (driver.Cols, 0);
-		Assert.Equal (driver.Cols, driver.Col);
-		Assert.Equal (0, driver.Row);
+        driver.Move (-1, 0);
+        Assert.Equal (-1, driver.Col);
+        Assert.Equal (0, driver.Row);
 
-		driver.Move (0, driver.Rows);
-		Assert.Equal (0, driver.Col);
-		Assert.Equal (driver.Rows, driver.Row);
+        driver.Move (0, -1);
+        Assert.Equal (0, driver.Col);
+        Assert.Equal (-1, driver.Row);
 
-		driver.Move (500, 500);
-		Assert.Equal (500, driver.Col);
-		Assert.Equal (500, driver.Row);
-		driver.End ();
-	}
+        driver.Move (driver.Cols, 0);
+        Assert.Equal (driver.Cols, driver.Col);
+        Assert.Equal (0, driver.Row);
 
-	// TODO: Add these unit tests
+        driver.Move (0, driver.Rows);
+        Assert.Equal (0, driver.Col);
+        Assert.Equal (driver.Rows, driver.Row);
 
-	// AddRune moves correctly
+        driver.Move (500, 500);
+        Assert.Equal (500, driver.Col);
+        Assert.Equal (500, driver.Row);
+        driver.End ();
+    }
 
-	// AddRune with wide characters are handled correctly
+    // TODO: Add these unit tests
 
-	// AddRune with wide characters and Col < 0 are handled correctly
+    // AddRune moves correctly
 
-	// AddRune with wide characters and Col == Cols - 1 are handled correctly
+    // AddRune with wide characters are handled correctly
 
-	// AddRune with wide characters and Col == Cols are handled correctly
+    // AddRune with wide characters and Col < 0 are handled correctly
 
-	// AddStr moves correctly
+    // AddRune with wide characters and Col == Cols - 1 are handled correctly
 
-	// AddStr with wide characters moves correctly
+    // AddRune with wide characters and Col == Cols are handled correctly
 
-	// AddStr where Col is negative works
+    // AddStr moves correctly
 
-	// AddStr where Col is negative and characters include wide / combining characters works
+    // AddStr with wide characters moves correctly
 
-	// AddStr where Col is near Cols and characters include wide / combining characters works
+    // AddStr where Col is negative works
 
-	// Clipping works correctly
+    // AddStr where Col is negative and characters include wide / combining characters works
 
-	// Clipping works correctly with wide characters
+    // AddStr where Col is near Cols and characters include wide / combining characters works
 
-	// Clipping works correctly with combining characters
+    // Clipping works correctly
 
-	// Clipping works correctly with combining characters and wide characters
+    // Clipping works correctly with wide characters
 
-	// ResizeScreen works correctly
+    // Clipping works correctly with combining characters
 
-	// Refresh works correctly
+    // Clipping works correctly with combining characters and wide characters
 
-	// IsDirty tests
+    // ResizeScreen works correctly
+
+    // Refresh works correctly
+
+    // IsDirty tests
 }

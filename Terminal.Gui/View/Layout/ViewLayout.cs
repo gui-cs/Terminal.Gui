@@ -15,34 +15,25 @@ namespace Terminal.Gui;
 ///         <see cref="View.Height"/> objects are relative to the <see cref="View.SuperView"/> and are computed at layout
 ///         time.
 ///     </para>
-///     <para>Indicates the LayoutStyle for the <see cref="View"/>.</para>
-///     <para>
-///         If Absolute, the <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and
-///         <see cref="View.Height"/> objects are all absolute values and are not relative. The position and size of the
-///         view is described by <see cref="View.Frame"/>.
-///     </para>
-///     <para>
-///         If Computed, one or more of the <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, or
-///         <see cref="View.Height"/> objects are relative to the <see cref="View.SuperView"/> and are computed at layout
-///         time.
-///     </para>
 /// </summary>
 public enum LayoutStyle
 {
     /// <summary>
-    ///     Indicates the <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and <see cref="View.Height"/>
-    ///     objects are all absolute values and are not relative. The position and size of the view is described by
-    ///     <see cref="View.Frame"/>.
+    ///     Indicates the <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and
+    ///     <see cref="View.Height"/> objects are all absolute values and are not relative. The position and size of the view
+    ///     is described by <see cref="View.Frame"/>.
     /// </summary>
     Absolute,
 
-    /// <summary>
-    ///     Indicates one or more of the <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, or
-    ///     <see cref="View.Height"/> objects are relative to the <see cref="View.SuperView"/> and are computed at layout time.
-    ///     The position and size of the view will be computed based on these objects at layout time. <see cref="View.Frame"/>
-    ///     will provide the absolute computed values.
-    /// </summary>
-    Computed
+	/// <summary>
+	/// Indicates one or more of the <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, or
+	/// <see cref="View.Height"/>
+	/// objects are relative to the <see cref="View.SuperView"/> and are computed at layout time.  The position and size of the
+	/// view
+	/// will be computed based on these objects at layout time. <see cref="View.Frame"/> will provide the absolute computed
+	/// values.
+	/// </summary>
+	Computed
 }
 
 public partial class View
@@ -76,6 +67,13 @@ public partial class View
         get => _autoSize;
         set
         {
+            if (Width != Dim.Sized (0) && Height != Dim.Sized (0))
+            {
+                Debug.WriteLine (
+                                 $@"WARNING: {GetType ().Name} - Setting {nameof (AutoSize)} invalidates {nameof (Width)} and {nameof (Height)}."
+                                );
+            }
+
             bool v = ResizeView (value);
             TextFormatter.AutoSize = v;
 
@@ -90,10 +88,10 @@ public partial class View
     }
 
     /// <summary>
-    ///     The adornment (specified as a <see cref="Thickness"/>) inside of the view that offsets the <see cref="Bounds"/>
-    ///     from the <see cref="Margin"/>. The Border provides the space for a visual border (drawn using line-drawing glyphs)
-    ///     and the Title. The Border expands inward; in other words if `Border.Thickness.Top == 2` the border and title will
-    ///     take up the first row and the second row will be filled with spaces.
+    ///     The adornment (specified as a <see cref="Thickness"/>) inside of the view that offsets the
+    ///     <see cref="Bounds"/> from the <see cref="Margin"/>. The Border provides the space for a visual border (drawn using
+    ///     line-drawing glyphs) and the Title. The Border expands inward; in other words if `Border.Thickness.Top == 2` the
+    ///     border and title will take up the first row and the second row will be filled with spaces.
     /// </summary>
     /// <remarks>
     ///     <para><see cref="BorderStyle"/> provides a simple helper for turning a simple border frame on or off.</para>
@@ -102,8 +100,8 @@ public partial class View
     ///         View's content and are not clipped by the View's Clip Area.
     ///     </para>
     ///     <para>
-    ///         Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will change
-    ///         the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
+    ///         Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
+    ///         change the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
     ///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
     ///     </para>
     /// </remarks>
@@ -143,14 +141,14 @@ public partial class View
     }
 
     /// <summary>
-    ///     The bounds represent the View-relative rectangle used for this view; the area inside of the view where subviews and
-    ///     content are presented.
+    ///     The bounds represent the View-relative rectangle used for this view; the area inside of the view where
+    ///     subviews and content are presented.
     /// </summary>
     /// <value>The rectangle describing the location and size of the area where the views' subviews and content are drawn.</value>
     /// <remarks>
     ///     <para>
     ///         If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/> the value of Bounds is indeterminate until
-    ///         the view has been initialized (<see cref="IsInitialized"/> is true) and <see cref="LayoutSubviews"/> has been
+    ///         the view has been initialized ( <see cref="IsInitialized"/> is true) and <see cref="LayoutSubviews"/> has been
     ///         called.
     ///     </para>
     ///     <para>
@@ -174,7 +172,9 @@ public partial class View
 #if DEBUG
             if (LayoutStyle == LayoutStyle.Computed && !IsInitialized)
             {
-                Debug.WriteLine ($"WARNING: Bounds is being accessed before the View has been initialized. This is likely a bug in {this}");
+                Debug.WriteLine (
+                                 $"WARNING: Bounds is being accessed before the View has been initialized. This is likely a bug in {this}"
+                                );
             }
 #endif // DEBUG
 
@@ -184,8 +184,18 @@ public partial class View
                 return new Rect (default (Point), Frame.Size);
             }
 
-            int width = Math.Max (0, Frame.Size.Width - Margin.Thickness.Horizontal - Border.Thickness.Horizontal - Padding.Thickness.Horizontal);
-            int height = Math.Max (0, Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical);
+            int width = Math.Max (
+                                  0,
+                                  Frame.Size.Width
+                                  - Margin.Thickness.Horizontal
+                                  - Border.Thickness.Horizontal
+                                  - Padding.Thickness.Horizontal
+                                 );
+
+            int height = Math.Max (
+                                   0,
+                                   Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical
+                                  );
 
             return new Rect (Point.Empty, new Size (width, height));
         }
@@ -196,14 +206,22 @@ public partial class View
 #if DEBUG
             if (value.Location != Point.Empty)
             {
-                Debug.WriteLine ($"WARNING: Bounds.Location must always be 0,0. Location ({value.Location}) is ignored. {this}");
+                Debug.WriteLine (
+                                 $"WARNING: Bounds.Location must always be 0,0. Location ({value.Location}) is ignored. {this}"
+                                );
             }
 #endif // DEBUG
             Frame = new Rect (
                               Frame.Location,
                               new Size (
-                                        value.Size.Width + Margin.Thickness.Horizontal + Border.Thickness.Horizontal + Padding.Thickness.Horizontal,
-                                        value.Size.Height + Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical
+                                        value.Size.Width
+                                        + Margin.Thickness.Horizontal
+                                        + Border.Thickness.Horizontal
+                                        + Padding.Thickness.Horizontal,
+                                        value.Size.Height
+                                        + Margin.Thickness.Vertical
+                                        + Border.Thickness.Vertical
+                                        + Padding.Thickness.Vertical
                                        )
                              );
         }
@@ -222,8 +240,9 @@ public partial class View
     ///     </para>
     ///     <para>This causes <see cref="LayoutStyle"/> to be <see cref="LayoutStyle.Absolute"/>.</para>
     ///     <para>
-    ///         Altering the Frame will eventually (when the view hierarchy is next laid out via  see cref="LayoutSubviews"/>)
-    ///         cause <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/> methods to be called.
+    ///         Altering the Frame will eventually (when the view hierarchy is next laid out via  see
+    ///         cref="LayoutSubviews"/>) cause <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/>
+    ///         methods to be called.
     ///     </para>
     /// </remarks>
     public Rect Frame
@@ -251,15 +270,12 @@ public partial class View
         }
     }
 
-    /// <summary>
-    ///     Gets or sets the height dimension of the view. Gets or sets whether validation of <see cref="Pos"/> and
-    ///     <see cref="Dim"/> occurs.
-    /// </summary>
+    /// <summary>Gets or sets the height dimension of the view.</summary>
     /// <value>The <see cref="Dim"/> object representing the height of the view (the number of rows).</value>
     /// <remarks>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Dim.Fill(int)"/>) the value is indeterminate until the view has
-    ///         been initialized (<see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been
+    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been
     ///         called.
     ///     </para>
     ///     <para>
@@ -279,24 +295,29 @@ public partial class View
         {
             _height = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Height)} cannot be null");
 
-            if (ValidatePosDim)
+            if (AutoSize)
             {
-                CheckDimAuto ();
-                bool isValidNewAutSize = AutoSize && IsValidAutoSizeHeight (_height);
-
-                if (IsAdded && AutoSize && !isValidNewAutSize)
-                {
-                    throw new InvalidOperationException ("Must set AutoSize to false before setting the Height.");
-                }
+                throw new InvalidOperationException (@$"Must set AutoSize to false before setting {nameof (Height)}.");
             }
 
+            //if (ValidatePosDim) {
+            bool isValidNewAutoSize = AutoSize && IsValidAutoSizeHeight (_height);
+
+            if (IsAdded && AutoSize && !isValidNewAutoSize)
+            {
+                throw new InvalidOperationException (
+                                                     @$"Must set AutoSize to false before setting the {nameof (Height)}."
+                                                    );
+            }
+
+            //}
             OnResizeNeeded ();
         }
     }
 
     /// <summary>
-    ///     Controls how the View's <see cref="Frame"/> is computed during <see cref="LayoutSubviews"/>. If the style is set to
-    ///     <see cref="LayoutStyle.Absolute"/>, LayoutSubviews does not change the <see cref="Frame"/>. If the style is
+    ///     Controls how the View's <see cref="Frame"/> is computed during <see cref="LayoutSubviews"/>. If the style is
+    ///     set to <see cref="LayoutStyle.Absolute"/>, LayoutSubviews does not change the <see cref="Frame"/>. If the style is
     ///     <see cref="LayoutStyle.Computed"/> the <see cref="Frame"/> is updated using the <see cref="X"/>, <see cref="Y"/>,
     ///     <see cref="Width"/>, and <see cref="Height"/> properties.
     /// </summary>
@@ -319,7 +340,10 @@ public partial class View
     {
         get
         {
-            if (_x is Pos.PosAbsolute && _y is Pos.PosAbsolute && _width is Dim.DimAbsolute && _height is Dim.DimAbsolute)
+            if (_x is Pos.PosAbsolute
+                && _y is Pos.PosAbsolute
+                && _width is Dim.DimAbsolute
+                && _height is Dim.DimAbsolute)
             {
                 return LayoutStyle.Absolute;
             }
@@ -329,8 +353,8 @@ public partial class View
     }
 
     /// <summary>
-    ///     The frame (specified as a <see cref="Thickness"/>) that separates a View from other SubViews of the same SuperView.
-    ///     The margin offsets the <see cref="Bounds"/> from the <see cref="Frame"/>.
+    ///     The frame (specified as a <see cref="Thickness"/>) that separates a View from other SubViews of the same
+    ///     SuperView. The margin offsets the <see cref="Bounds"/> from the <see cref="Frame"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -346,8 +370,8 @@ public partial class View
     public Margin Margin { get; private set; }
 
     /// <summary>
-    ///     The frame (specified as a <see cref="Thickness"/>) inside of the view that offsets the <see cref="Bounds"/> from
-    ///     the <see cref="Border"/>.
+    ///     The frame (specified as a <see cref="Thickness"/>) inside of the view that offsets the <see cref="Bounds"/>
+    ///     from the <see cref="Border"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -355,8 +379,8 @@ public partial class View
     ///         View's content and are not clipped by the View's Clip Area.
     ///     </para>
     ///     <para>
-    ///         Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will change
-    ///         the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
+    ///         Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
+    ///         change the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
     ///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
     ///     </para>
     /// </remarks>
@@ -376,7 +400,7 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Dim.Fill(int)"/>) the value is indeterminate until the view has
-    ///         been initialized (<see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been
+    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been
     ///         called.
     ///     </para>
     ///     <para>
@@ -396,15 +420,16 @@ public partial class View
         {
             _width = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Width)} cannot be null");
 
-            if (ValidatePosDim)
+            if (AutoSize)
             {
-                CheckDimAuto ();
-                bool isValidNewAutSize = AutoSize && IsValidAutoSizeWidth (_width);
+                throw new InvalidOperationException (@$"Must set AutoSize to false before setting {nameof (Width)}.");
+            }
 
-                if (IsAdded && AutoSize && !isValidNewAutSize)
-                {
-                    throw new InvalidOperationException ("Must set AutoSize to false before set the Width.");
-                }
+            bool isValidNewAutoSize = AutoSize && IsValidAutoSizeWidth (_width);
+
+            if (IsAdded && AutoSize && !isValidNewAutoSize)
+            {
+                throw new InvalidOperationException (@$"Must set AutoSize to false before setting {nameof (Width)}.");
             }
 
             OnResizeNeeded ();
@@ -416,7 +441,7 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
-    ///         initialized (<see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been called.
+    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been called.
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
@@ -443,7 +468,7 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
-    ///         initialized (<see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been called.
+    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been called.
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
@@ -465,14 +490,105 @@ public partial class View
         }
     }
 
+    /// <summary>
+    /// Throws an <see cref="InvalidOperationException"/> if any SubViews are using Dim objects that depend on this
+    /// Views dimensions.
+    /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
+    void CheckDimAuto ()
+    {
+        if (!ValidatePosDim || !IsInitialized || (Width is not Dim.DimAuto && Height is not Dim.DimAuto))
+        {
+            return;
+        }
+
+        void ThrowInvalid (View view, object checkPosDim, string name)
+        {
+            // TODO: Figure out how to make CheckDimAuto deal with PosCombine
+            object bad = null;
+            switch (checkPosDim)
+            {
+                case Pos pos and not Pos.PosAbsolute and not Pos.PosView and not Pos.PosCombine:
+                    bad = pos;
+                    break;
+                case Pos pos and Pos.PosCombine:
+                    // Recursively check for not Absolute or not View
+                    ThrowInvalid (view, (pos as Pos.PosCombine)._left, name);
+                    ThrowInvalid (view, (pos as Pos.PosCombine)._right, name);
+                    break;
+
+                case Dim dim and not Dim.DimAbsolute and not Dim.DimView and not Dim.DimCombine:
+                    bad = dim;
+                    break;
+                case Dim dim and Dim.DimCombine:
+                    // Recursively check for not Absolute or not View
+                    ThrowInvalid (view, (dim as Dim.DimCombine)._left, name);
+                    ThrowInvalid (view, (dim as Dim.DimCombine)._right, name);
+                    break;
+            }
+
+            if (bad != null)
+            {
+                throw new InvalidOperationException (
+                                                     @$"{view.GetType ().Name}.{name} = {bad.GetType ().Name} which depends on the SuperView's dimensions and the SuperView uses Dim.Auto.");
+            }
+        }
+
+        // Verify none of the subviews are using Dim objects that depend on the SuperView's dimensions.
+        foreach (var view in Subviews)
+        {
+            if (Width is Dim.DimAuto { _min: null })
+            {
+                ThrowInvalid (view, view.Width, nameof (view.Width));
+                ThrowInvalid (view, view.X, nameof (view.X));
+            }
+            if (Height is Dim.DimAuto { _min: null })
+            {
+                ThrowInvalid (view, view.Height, nameof (view.Height));
+                ThrowInvalid (view, view.Y, nameof (view.Y));
+            }
+        }
+    }
+
+    // Diagnostics to highlight when X or Y is read before the view has been initialized
+    Pos VerifyIsInitialized (Pos pos, string member)
+    {
+#if DEBUG
+        if (LayoutStyle == LayoutStyle.Computed && !IsInitialized)
+        {
+            Debug.WriteLine ($"WARNING: \"{this}\" has not been initialized; {member} is indeterminate {pos}. This is potentially a bug.");
+        }
+#endif // DEBUG
+        return pos;
+    }
+    // Diagnostics to highlight when Width or Height is read before the view has been initialized
+    Dim VerifyIsInitialized (Dim dim, string member)
+    {
+#if DEBUG
+        if (LayoutStyle == LayoutStyle.Computed && !IsInitialized)
+        {
+            Debug.WriteLine ($"WARNING: \"{this}\" has not been initialized; {member} is indeterminate: {dim}. This is potentially a bug.");
+        }
+#endif // DEBUG		
+        return dim;
+    }
+
     internal bool LayoutNeeded { get; private set; } = true;
 
     /// <summary>
-    ///     Event called only once when the <see cref="View"/> is being initialized for the first time. Allows configurations
-    ///     and assignments to be performed before the <see cref="View"/> being shown. This derived from
+    ///     Event called only once when the <see cref="View"/> is being initialized for the first time. Allows
+    ///     configurations and assignments to be performed before the <see cref="View"/> being shown. This derived from
     ///     <see cref="ISupportInitializeNotification"/> to allow notify all the views that are being initialized.
     /// </summary>
     public event EventHandler Initialized;
+
+    /// <summary>Converts a <see cref="Bounds"/>-relative region to a screen-relative region.</summary>
+    public Rect BoundsToScreen (Rect region)
+    {
+        BoundsToScreen (region.X, region.Y, out int x, out int y, false);
+
+        return new Rect (x, y, region.Width, region.Height);
+    }
 
     /// <summary>
     ///     Converts a <see cref="Bounds"/>-relative coordinate to a screen-relative coordinate. The output is optionally
@@ -483,8 +599,8 @@ public partial class View
     /// <param name="rx">Absolute column; screen-relative.</param>
     /// <param name="ry">Absolute row; screen-relative.</param>
     /// <param name="clamped">
-    ///     If <see langword="true"/>, <paramref name="rx"/> and <paramref name="ry"/> will be clamped to the screen dimensions
-    ///     (will never be negative and will always be less than <see cref="ConsoleDriver.Cols"/> and
+    ///     If <see langword="true"/>, <paramref name="rx"/> and <paramref name="ry"/> will be clamped to the
+    ///     screen dimensions (will never be negative and will always be less than <see cref="ConsoleDriver.Cols"/> and
     ///     <see cref="ConsoleDriver.Rows"/>, respectively.
     /// </param>
     public virtual void BoundsToScreen (int x, int y, out int rx, out int ry, bool clamped = true)
@@ -511,14 +627,6 @@ public partial class View
         }
     }
 
-    /// <summary>Converts a <see cref="Bounds"/>-relative region to a screen-relative region.</summary>
-    public Rect BoundsToScreen (Rect region)
-    {
-        BoundsToScreen (region.X, region.Y, out int x, out int y, false);
-
-        return new Rect (x, y, region.Width, region.Height);
-    }
-
     /// <summary>Finds which view that belong to the <paramref name="start"/> superview at the provided location.</summary>
     /// <param name="start">The superview where to look for.</param>
     /// <param name="x">The column location in the superview.</param>
@@ -526,8 +634,8 @@ public partial class View
     /// <param name="resx">The found view screen relative column location.</param>
     /// <param name="resy">The found view screen relative row location.</param>
     /// <returns>
-    ///     The view that was found at the <praramref name="x"/> and <praramref name="y"/> coordinates. <see langword="null"/>
-    ///     if no view was found.
+    ///     The view that was found at the <praramref name="x"/> and <praramref name="y"/> coordinates.
+    ///     <see langword="null"/> if no view was found.
     /// </returns>
     public static View FindDeepestView (View start, int x, int y, out int resx, out int resy)
     {
@@ -608,27 +716,42 @@ public partial class View
     }
 
     /// <summary>
-    ///     Helper to get the X and Y offset of the Bounds from the Frame. This is the sum of the Left and Top properties of
-    ///     <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/>.
+    ///     Helper to get the X and Y offset of the Bounds from the Frame. This is the sum of the Left and Top properties
+    ///     of <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/>.
     /// </summary>
     public Point GetBoundsOffset ()
     {
-        return new Point (Padding?.Thickness.GetInside (Padding.Frame).X ?? 0, Padding?.Thickness.GetInside (Padding.Frame).Y ?? 0);
+        return new Point (
+                          Padding?.Thickness.GetInside (Padding.Frame).X ?? 0,
+                          Padding?.Thickness.GetInside (Padding.Frame).Y ?? 0
+                         );
     }
 
     /// <summary>Fired after the View's <see cref="LayoutSubviews"/> method has completed.</summary>
     /// <remarks>
-    ///     Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has otherwise
-    ///     changed.
+    ///     Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has
+    ///     otherwise changed.
     /// </remarks>
     public event EventHandler<LayoutEventArgs> LayoutComplete;
 
     /// <summary>Fired after the View's <see cref="LayoutSubviews"/> method has completed.</summary>
     /// <remarks>
-    ///     Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has otherwise
-    ///     changed.
+    ///     Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has
+    ///     otherwise changed.
     /// </remarks>
     public event EventHandler<LayoutEventArgs> LayoutStarted;
+    
+    /// <summary>Converts a screen-relative coordinate to a bounds-relative coordinate.</summary>
+    /// <returns>The coordinate relative to this view's <see cref="Bounds"/>.</returns>
+    /// <param name="x">Screen-relative column.</param>
+    /// <param name="y">Screen-relative row.</param>
+    public Point ScreenToBounds (int x, int y)
+    {
+        Point screen = ScreenToFrame (x, y);
+        Point boundsOffset = GetBoundsOffset ();
+
+        return new Point (screen.X - boundsOffset.X, screen.Y - boundsOffset.Y);
+    }
 
     /// <summary>
     ///     Invoked when a view starts executing or when the dimensions of the view have changed, for example in response to
@@ -705,21 +828,9 @@ public partial class View
         OnLayoutComplete (new LayoutEventArgs { OldBounds = oldBounds });
     }
 
-    /// <summary>Converts a screen-relative coordinate to a bounds-relative coordinate.</summary>
-    /// <returns>The coordinate relative to this view's <see cref="Bounds"/>.</returns>
-    /// <param name="x">Screen-relative column.</param>
-    /// <param name="y">Screen-relative row.</param>
-    public Point ScreenToBounds (int x, int y)
-    {
-        Point screen = ScreenToFrame (x, y);
-        Point boundsOffset = GetBoundsOffset ();
-
-        return new Point (screen.X - boundsOffset.X, screen.Y - boundsOffset.Y);
-    }
-
     /// <summary>
-    ///     Converts a screen-relative coordinate to a Frame-relative coordinate. Frame-relative means relative to the View's
-    ///     <see cref="SuperView"/>'s <see cref="Bounds"/>.
+    ///     Converts a screen-relative coordinate to a Frame-relative coordinate. Frame-relative means relative to the
+    ///     View's <see cref="SuperView"/>'s <see cref="Bounds"/>.
     /// </summary>
     /// <returns>The coordinate relative to the <see cref="SuperView"/>'s <see cref="Bounds"/>.</returns>
     /// <param name="x">Screen-relative column.</param>
@@ -807,8 +918,8 @@ public partial class View
     }
 
     /// <summary>
-    ///     This internal method is overridden by Adornment to do nothing to prevent recursion during View construction. And,
-    ///     because Adornments don't have Adornments. It's internal to support unit tests.
+    ///     This internal method is overridden by Adornment to do nothing to prevent recursion during View construction.
+    ///     And, because Adornments don't have Adornments. It's internal to support unit tests.
     /// </summary>
     /// <param name="adornmentType"></param>
     /// <exception cref="ArgumentNullException"></exception>
@@ -881,20 +992,20 @@ public partial class View
     }
 
     /// <summary>
-    ///     Raises the <see cref="LayoutComplete"/> event. Called from  <see cref="LayoutSubviews"/> before all sub-views have
-    ///     been laid out.
+    ///     Raises the <see cref="LayoutComplete"/> event. Called from  <see cref="LayoutSubviews"/> before all sub-views
+    ///     have been laid out.
     /// </summary>
     internal virtual void OnLayoutComplete (LayoutEventArgs args) { LayoutComplete?.Invoke (this, args); }
 
     /// <summary>
-    ///     Raises the <see cref="LayoutStarted"/> event. Called from  <see cref="LayoutSubviews"/> before any subviews have
-    ///     been laid out.
+    ///     Raises the <see cref="LayoutStarted"/> event. Called from  <see cref="LayoutSubviews"/> before any subviews
+    ///     have been laid out.
     /// </summary>
     internal virtual void OnLayoutStarted (LayoutEventArgs args) { LayoutStarted?.Invoke (this, args); }
 
     /// <summary>
-    ///     Called whenever the view needs to be resized. This is called whenever <see cref="Frame"/>, <see cref="View.X"/>,
-    ///     <see cref="View.Y"/>, <see cref="View.Width"/>, or <see cref="View.Height"/> changes.
+    ///     Called whenever the view needs to be resized. This is called whenever <see cref="Frame"/>,
+    ///     <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, or <see cref="View.Height"/> changes.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -916,17 +1027,21 @@ public partial class View
         // TODO: Determine what, if any of the below is actually needed here.
         if (IsInitialized)
         {
-            SetFrameToFitText ();
+            if (AutoSize)
+            {
+                SetFrameToFitText ();
+                SetTextFormatterSize ();
+            }
+
             LayoutAdornments ();
-            SetTextFormatterSize ();
             SetNeedsLayout ();
             SetNeedsDisplay ();
         }
     }
 
     /// <summary>
-    ///     Sets the internal <see cref="LayoutNeeded"/> flag for this View and all of it's subviews and it's SuperView. The
-    ///     main loop will call SetRelativeLayout and LayoutSubviews for any view with <see cref="LayoutNeeded"/> set.
+    ///     Sets the internal <see cref="LayoutNeeded"/> flag for this View and all of it's subviews and it's SuperView.
+    ///     The main loop will call SetRelativeLayout and LayoutSubviews for any view with <see cref="LayoutNeeded"/> set.
     /// </summary>
     internal void SetNeedsLayout ()
     {
@@ -974,16 +1089,22 @@ public partial class View
             autosize = GetTextAutoSize ();
         }
 
-        // TODO: Since GetNewLocationAndDimension does not depend on View, it can be moved into PosDim.cs
-        // TODO: to make architecture more clean. Do this after DimAuto is implemented and the 
-        // TODO: View.AutoSize stuff is removed.
+		// TODO: Since GetNewLocationAndDimension does not depend on View, it can be moved into PosDim.cs
+		// TODO: to make architecture more clean. Do this after DimAuto is implemented and the 
+		// TODO: View.AutoSize stuff is removed.
 
         // Returns the new dimension (width or height) and location (x or y) for the View given
         //   the superview's Bounds
         //   the current Pos (View.X or View.Y)
         //   the current Dim (View.Width or View.Height)
         // This method is called recursively if pos is Pos.PosCombine
-        (int newLocation, int newDimension) GetNewLocationAndDimension (bool width, Rect superviewBounds, Pos pos, Dim dim, int autosizeDimension)
+        (int newLocation, int newDimension) GetNewLocationAndDimension (
+            bool width,
+            Rect superviewBounds,
+            Pos pos,
+            Dim dim,
+            int autosizeDimension
+        )
         {
             // Gets the new dimension (width or height, dependent on `width`) of the given Dim given:
             //   location: the current location (x or y)
@@ -993,26 +1114,19 @@ public partial class View
             int GetNewDimension (Dim d, int location, int dimension, int autosize)
             {
                 int newDimension;
-
                 switch (d)
                 {
                     case Dim.DimCombine combine:
-                        // TODO: Move combine logic into DimCombine?
-                        int leftNewDim = GetNewDimension (combine._left, location, dimension, autosize);
-                        int rightNewDim = GetNewDimension (combine._right, location, dimension, autosize);
-
-                        if (combine._add)
-                        {
-                            newDimension = leftNewDim + rightNewDim;
-                        }
-                        else
-                        {
-                            newDimension = leftNewDim - rightNewDim;
-                        }
-
-                        newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
-
-                        break;
+					// TODO: Move combine logic into DimCombine?
+					var leftNewDim = GetNewDimension (combine._left, location, dimension, autosize);
+					var rightNewDim = GetNewDimension (combine._right, location, dimension, autosize);
+					if (combine._add) {
+						newDimension = leftNewDim + rightNewDim;
+					} else {
+						newDimension = leftNewDim - rightNewDim;
+					}
+					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
+					break;
 
                     case Dim.DimFactor factor when !factor.IsFromRemaining ():
                         newDimension = d.Anchor (dimension);
@@ -1053,25 +1167,26 @@ public partial class View
                         break;
 
                     case Dim.DimAbsolute:
-                        // DimAbsoulte.Anchor (int width) ignores width and returns n
+                        // DimAbsolute.Anchor (int width) ignores width and returns n
                         newDimension = Math.Max (d.Anchor (0), 0);
+
+                        // BUGBUG: AutoSize does two things: makes text fit AND changes the view's dimensions
                         newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
 
                         break;
 
-                    case Dim.DimFill:
-                    default:
-                        newDimension = Math.Max (d.Anchor (dimension - location), 0);
-                        newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
+				case Dim.DimFill:
+				default:
+					newDimension = Math.Max (d.Anchor (dimension - location), 0);
+					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
+					break;
+				}
 
-                        break;
-                }
+				return newDimension;
+			}
 
-                return newDimension;
-            }
-
-            int newDimension, newLocation;
-            int superviewDimension = width ? superviewBounds.Width : superviewBounds.Height;
+			int newDimension, newLocation;
+			var superviewDimension = width ? superviewBounds.Width : superviewBounds.Height;
 
             // Determine new location
             switch (pos)
@@ -1081,16 +1196,33 @@ public partial class View
                     // using a location of 0
                     newDimension = Math.Max (GetNewDimension (dim, 0, superviewDimension, autosizeDimension), 0);
                     newLocation = posCenter.Anchor (superviewDimension - newDimension);
-                    newDimension = Math.Max (GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension), 0);
+
+                    newDimension = Math.Max (
+                                             GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension),
+                                             0
+                                            );
 
                     break;
 
                 case Pos.PosCombine combine:
                     // TODO: Move combine logic into PosCombine?
-                    // TODO: Move combine logic into PosCombine?
                     int left, right;
-                    (left, newDimension) = GetNewLocationAndDimension (width, superviewBounds, combine._left, dim, autosizeDimension);
-                    (right, newDimension) = GetNewLocationAndDimension (width, superviewBounds, combine._right, dim, autosizeDimension);
+
+                    (left, newDimension) = GetNewLocationAndDimension (
+                                                                       width,
+                                                                       superviewBounds,
+                                                                       combine._left,
+                                                                       dim,
+                                                                       autosizeDimension
+                                                                      );
+
+                    (right, newDimension) = GetNewLocationAndDimension (
+                                                                        width,
+                                                                        superviewBounds,
+                                                                        combine._right,
+                                                                        dim,
+                                                                        autosizeDimension
+                                                                       );
 
                     if (combine._add)
                     {
@@ -1101,7 +1233,10 @@ public partial class View
                         newLocation = left - right;
                     }
 
-                    newDimension = Math.Max (GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension), 0);
+                    newDimension = Math.Max (
+                                             GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension),
+                                             0
+                                            );
 
                     break;
 
@@ -1112,65 +1247,80 @@ public partial class View
                 case Pos.PosView:
                 default:
                     newLocation = pos?.Anchor (superviewDimension) ?? 0;
-                    newDimension = Math.Max (GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension), 0);
+
+                    newDimension = Math.Max (
+                                             GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension),
+                                             0
+                                            );
 
                     break;
             }
 
-            return (newLocation, newDimension);
+			return (newLocation, newDimension);
+		}
+
+		// horizontal/width
+		(newX, newW) = GetNewLocationAndDimension (true, superviewBounds, _x, _width, autosize.Width);
+
+		// vertical/height
+		(newY, newH) = GetNewLocationAndDimension (false, superviewBounds, _y, _height, autosize.Height);
+
+		var r = new Rect (newX, newY, newW, newH);
+		if (Frame != r) {
+			// Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height, making
+			// the view LayoutStyle.Absolute.
+			_frame = r;
+			if (_x is Pos.PosAbsolute) {
+				_x = Frame.X;
+			}
+			if (_y is Pos.PosAbsolute) {
+				_y = Frame.Y;
+			}
+			if (_width is Dim.DimAbsolute) {
+				_width = Frame.Width;
+			}
+			if (_height is Dim.DimAbsolute) {
+				_height = Frame.Height;
+			}
+
+            SetNeedsLayout ();
+            SetNeedsDisplay ();
         }
 
-        // horizontal/width
-        (newX, newW) = GetNewLocationAndDimension (true, superviewBounds, _x, _width, autosize.Width);
-
-        // vertical/height
-        (newY, newH) = GetNewLocationAndDimension (false, superviewBounds, _y, _height, autosize.Height);
-
-        var r = new Rect (newX, newY, newW, newH);
-
-        if (Frame != r)
+        if (AutoSize)
         {
-            // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height, making
-            // the view LayoutStyle.Absolute.
-            _frame = r;
-
-            if (_x is Pos.PosAbsolute)
+            if (autosize.Width == 0 || autosize.Height == 0)
             {
-                _x = Frame.X;
-            }
+                // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height, making
+                // the view LayoutStyle.Absolute.
+                _frame = new Rect (Frame.Location, autosize);
 
-            if (_y is Pos.PosAbsolute)
-            {
-                _y = Frame.Y;
-            }
+                if (autosize.Width == 0)
+                {
+                    _width = 0;
+                }
 
-            if (_width is Dim.DimAbsolute)
-            {
-                _width = Frame.Width;
+                if (autosize.Height == 0)
+                {
+                    _height = 0;
+                }
             }
-
-            if (_height is Dim.DimAbsolute)
-            {
-                _height = Frame.Height;
-            }
-
-            if (IsInitialized)
-            {
-                // TODO: Figure out what really is needed here. All unit tests (except AutoSize) pass as-is
-                SetTextFormatterSize ();
-                SetNeedsLayout ();
-            }
-
-            // BUGBUG: Why is this AFTER setting Frame? Seems duplicative.
-            if (!SetFrameToFitText ())
+            else if (!SetFrameToFitText ())
             {
                 SetTextFormatterSize ();
             }
+
+            SetNeedsLayout ();
+            SetNeedsDisplay ();
         }
     }
 
     // https://en.wikipedia.org/wiki/Topological_sorting
-    internal static List<View> TopologicalSort (View superView, IEnumerable<View> nodes, ICollection<(View From, View To)> edges)
+    internal static List<View> TopologicalSort (
+        View superView,
+        IEnumerable<View> nodes,
+        ICollection<(View From, View To)> edges
+    )
     {
         List<View> result = new ();
 
@@ -1244,11 +1394,14 @@ public partial class View
             {
                 if (ReferenceEquals (from.SuperView, to))
                 {
-                    throw new InvalidOperationException ($"ComputedLayout for \"{superView}\": \"{to}\" references a SubView (\"{from}\").");
+                    throw new InvalidOperationException (
+                                                         $"ComputedLayout for \"{superView}\": \"{to}\" references a SubView (\"{from}\")."
+                                                        );
                 }
 
                 throw new InvalidOperationException (
-                                                     $"ComputedLayout for \"{superView}\": \"{from}\" linked with \"{to}\" was not found. Did you forget to add it to {superView}?");
+                                                     $"ComputedLayout for \"{superView}\": \"{from}\" linked with \"{to}\" was not found. Did you forget to add it to {superView}?"
+                                                    );
             }
         }
 
@@ -1257,6 +1410,7 @@ public partial class View
     } // TopologicalSort
 
     /// <summary>Determines if the View's <see cref="Height"/> can be set to a new value.</summary>
+    /// <remarks>TrySetHeight can only be called when AutoSize is true (or being set to true).</remarks>
     /// <param name="desiredHeight"></param>
     /// <param name="resultHeight">
     ///     Contains the width that would result if <see cref="Height"/> were set to
@@ -1306,6 +1460,7 @@ public partial class View
     }
 
     /// <summary>Determines if the View's <see cref="Width"/> can be set to a new value.</summary>
+    /// <remarks>TrySetWidth can only be called when AutoSize is true (or being set to true).</remarks>
     /// <param name="desiredWidth"></param>
     /// <param name="resultWidth">
     ///     Contains the width that would result if <see cref="Width"/> were set to
@@ -1354,72 +1509,6 @@ public partial class View
         return canSetWidth;
     }
 
-    /// <summary>
-    ///     Throws an <see cref="InvalidOperationException"/> if any SubViews are using Dim objects that depend on this Views
-    ///     dimensions.
-    /// </summary>
-    /// <exception cref="InvalidOperationException"></exception>
-    private void CheckDimAuto ()
-    {
-        if (!ValidatePosDim || !IsInitialized || (Width is not Dim.DimAuto && Height is not Dim.DimAuto))
-        {
-            return;
-        }
-
-        void ThrowInvalid (View view, object checkPosDim, string name)
-        {
-            // TODO: Figure out how to make CheckDimAuto deal with PosCombine
-            object bad = null;
-
-            switch (checkPosDim)
-            {
-                case Pos pos and not Pos.PosAbsolute and not Pos.PosView and not Pos.PosCombine:
-                    bad = pos;
-
-                    break;
-                case Pos pos and Pos.PosCombine:
-                    // Recursively check for not Absolute or not View
-                    ThrowInvalid (view, (pos as Pos.PosCombine)._left, name);
-                    ThrowInvalid (view, (pos as Pos.PosCombine)._right, name);
-
-                    break;
-
-                case Dim dim and not Dim.DimAbsolute and not Dim.DimView and not Dim.DimCombine:
-                    bad = dim;
-
-                    break;
-                case Dim dim and Dim.DimCombine:
-                    // Recursively check for not Absolute or not View
-                    ThrowInvalid (view, (dim as Dim.DimCombine)._left, name);
-                    ThrowInvalid (view, (dim as Dim.DimCombine)._right, name);
-
-                    break;
-            }
-
-            if (bad != null)
-            {
-                throw new InvalidOperationException (
-                                                     @$"{view.GetType ().Name}.{name} = {bad.GetType ().Name} which depends on the SuperView's dimensions and the SuperView uses Dim.Auto.");
-            }
-        }
-
-        // Verify none of the subviews are using Dim objects that depend on the SuperView's dimensions.
-        foreach (View view in Subviews)
-        {
-            if (Width is Dim.DimAuto { _min: null })
-            {
-                ThrowInvalid (view, view.Width, nameof (view.Width));
-                ThrowInvalid (view, view.X, nameof (view.X));
-            }
-
-            if (Height is Dim.DimAuto { _min: null })
-            {
-                ThrowInvalid (view, view.Height, nameof (view.Height));
-                ThrowInvalid (view, view.Y, nameof (view.Y));
-            }
-        }
-    }
-
     private void LayoutSubview (View v, Rect contentArea)
     {
         //if (v.LayoutStyle == LayoutStyle.Computed) {
@@ -1432,10 +1521,15 @@ public partial class View
     }
 
     /// <summary>Resizes the View to fit the specified size. Factors in the HotKey.</summary>
+    /// <remarks>ResizeBoundsToFit can only be called when AutoSize is true (or being set to true).</remarks>
     /// <param name="size"></param>
     /// <returns>whether the Bounds was changed or not</returns>
     private bool ResizeBoundsToFit (Size size)
     {
+        //if (AutoSize == false) {
+        //	throw new InvalidOperationException ("ResizeBoundsToFit can only be called when AutoSize is true");
+        //}
+
         var boundsChanged = false;
         bool canSizeW = TrySetWidth (size.Width - GetHotKeySpecifierLength (), out int rW);
         bool canSizeH = TrySetHeight (size.Height - GetHotKeySpecifierLength (false), out int rH);
@@ -1460,6 +1554,9 @@ public partial class View
         return boundsChanged;
     }
 
+    /// <summary>If <paramref name="autoSize"/> is true, resizes the view.</summary>
+    /// <param name="autoSize"></param>
+    /// <returns></returns>
     private bool ResizeView (bool autoSize)
     {
         if (!autoSize)
@@ -1486,28 +1583,5 @@ public partial class View
 
         return boundsChanged;
     }
-
-    // Diagnostics to highlight when X or Y is read before the view has been initialized
-    private Pos VerifyIsInitialized (Pos pos, string member)
-    {
-#if DEBUG
-        if (LayoutStyle == LayoutStyle.Computed && !IsInitialized)
-        {
-            Debug.WriteLine ($"WARNING: \"{this}\" has not been initialized; {member} is indeterminate {pos}. This is potentially a bug.");
-        }
-#endif // DEBUG
-        return pos;
-    }
-
-    // Diagnostics to highlight when Width or Height is read before the view has been initialized
-    private Dim VerifyIsInitialized (Dim dim, string member)
-    {
-#if DEBUG
-        if (LayoutStyle == LayoutStyle.Computed && !IsInitialized)
-        {
-            Debug.WriteLine ($"WARNING: \"{this}\" has not been initialized; {member} is indeterminate: {dim}. This is potentially a bug.");
-        }
-#endif // DEBUG		
-        return dim;
-    }
+  
 }

@@ -110,7 +110,7 @@ public partial class View
     /// <summary>
     ///     Gets or sets the <see cref="Gui.TextFormatter"/> used to format <see cref="Text"/>.
     /// </summary>
-    public TextFormatter TextFormatter { get; set; }
+    public TextFormatter TextFormatter { get; init; } = new ();
 
     /// <summary>
     ///     Gets or sets how the View's <see cref="Text"/> is aligned vertically when drawn. Changing this property will
@@ -261,7 +261,7 @@ public partial class View
                 TextFormatter.Size = new Size (SuperView?.Bounds.Width ?? 0, Bounds.Size.Height + GetHotKeySpecifierLength ());
             }
 
-            w = TextFormatter.GetFormattedSize ().Width;
+            w = TextFormatter.FormatAndGetSize ().Width;
         }
         else
         {
@@ -273,7 +273,7 @@ public partial class View
         if (Height is Dim.DimAuto heightAuto && heightAuto._style != Dim.DimAutoStyle.Subviews)
         {
             TextFormatter.NeedsFormat = true;
-            h = TextFormatter.GetFormattedSize ().Height;
+            h = TextFormatter.FormatAndGetSize ().Height;
         }
 
         TextFormatter.Size = new Size (w, h);
@@ -353,7 +353,7 @@ public partial class View
             switch (TextFormatter.IsVerticalDirection (TextDirection))
             {
                 case true:
-                    int colWidth = TextFormatter.GetSumMaxCharWidth (new List<string> { TextFormatter.Text }, 0, 1);
+                    int colWidth = TextFormatter.GetSumMaxCharWidth (TextFormatter.Text, 0, 1);
 
                     // TODO: v2 - This uses frame.Width; it should only use Bounds
                     if (_frame.Width < colWidth

@@ -111,6 +111,7 @@ public class DimAutoDemo : Scenario
             Text = "_Move down",
             X = Pos.Right (vlabel),
             Y = Pos.Bottom (vlabel),
+            AutoSize = false,
             Width = 10
         };
         movingButton.Clicked += (s, e) => { movingButton.Y = movingButton.Frame.Y + 1; };
@@ -152,8 +153,9 @@ public class DimAutoDemo : Scenario
         //cancel.Clicked += (s, _) => Application.RequestStop (dlg);
         //dlg.AddButton (cancel);
 
-        var label = new Label ("This is a label (AutoSize = false; Dim.Auto(3/20). Press Esc to close. Even more text.")
+        var label = new Label
         {
+            Text = "This is a label (AutoSize = false; Dim.Auto(3/20). Press Esc to close. Even more text.",
             AutoSize = false,
             X = Pos.Center (),
             Y = 0,
@@ -172,9 +174,7 @@ public class DimAutoDemo : Scenario
             Height = Fill (10)
         };
 
-        var btn = new Button ("AnchorEnd")
-        {
-            Y = Pos.AnchorEnd (1)
+        var btn = new Button { Text = "AnchorEnd", Y = Pos.AnchorEnd (1)
         };
 
         // TODO: We should really fix AnchorEnd to do this automatically. 
