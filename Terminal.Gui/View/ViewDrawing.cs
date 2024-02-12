@@ -390,7 +390,7 @@ public partial class View
                                  HasFocus ? GetFocusColor () : GetNormalColor (),
                                  HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
                                  Rect.Empty,
-                                 false
+                                 TextFormatter.FillRemaining
                                 );
             SetSubViewNeedsDisplay ();
         }

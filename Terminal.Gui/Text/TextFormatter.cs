@@ -170,6 +170,13 @@ public class TextFormatter
         }
     }
 
+    /// <summary>
+    ///     Determines if the bounds width will be used or only the text width will be used,
+    ///     If <see langword="true"/> all the bounds area will be filled with whitespaces and the same background color
+    ///     showing a perfect rectangle.
+    /// </summary>
+    public bool FillRemaining { get; set; }
+
     /// <summary>Gets or sets the hot key. Fires the <see cref="HotKeyChanged"/> event.</summary>
     public Key HotKey
     {
