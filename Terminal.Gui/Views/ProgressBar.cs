@@ -193,8 +193,7 @@ public class ProgressBar : View
                       BoundsToScreen (Bounds),
                       attr,
                       ColorScheme.Normal,
-                      SuperView?.BoundsToScreen (SuperView.Bounds) ?? default (Rect),
-                      false
+                      SuperView?.BoundsToScreen (SuperView.Bounds) ?? default (Rect)
                      );
         }
     }

@@ -419,7 +419,6 @@ ssb
                  new Attribute (ColorName.White, ColorName.Black),
                  new Attribute (ColorName.Blue, ColorName.Black),
                  default (Rect),
-                 true,
                  driver
                 );
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output, driver);
@@ -433,7 +432,7 @@ ssb
     {
         ((FakeDriver)Application.Driver).SetBufferSize (22, 5);
 
-        Attribute [] attrs = new []
+        Attribute [] attrs =
         {
             Attribute.Default, new Attribute (ColorName.Green, ColorName.BrightMagenta),
             new Attribute (ColorName.Blue, ColorName.Cyan)
@@ -443,9 +442,7 @@ ssb
         tf.Draw (
                  new Rect (1, 1, 19, 3),
                  attrs [1],
-                 attrs [2],
-                 default (Rect),
-                 tf.FillRemaining);
+                 attrs [2]);
 
         Assert.False (tf.FillRemaining);
 
@@ -471,9 +468,7 @@ ssb
         tf.Draw (
                  new Rect (1, 1, 19, 3),
                  attrs [1],
-                 attrs [2],
-                 default (Rect),
-                 tf.FillRemaining);
+                 attrs [2]);
 
         TestHelpers.AssertDriverAttributesAre (
                                                @"
@@ -2069,7 +2064,6 @@ ssb
                  new Attribute (ColorName.White, ColorName.Black),
                  new Attribute (ColorName.Blue, ColorName.Black),
                  default (Rect),
-                 true,
                  driver
                 );
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output, driver);
@@ -2108,7 +2102,6 @@ ssb
                  new Attribute (ColorName.White, ColorName.Black),
                  new Attribute (ColorName.Blue, ColorName.Black),
                  default (Rect),
-                 true,
                  driver
                 );
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output, driver);
@@ -2147,7 +2140,6 @@ ssb
                  new Attribute (ColorName.White, ColorName.Black),
                  new Attribute (ColorName.Blue, ColorName.Black),
                  default (Rect),
-                 true,
                  driver
                 );
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output, driver);

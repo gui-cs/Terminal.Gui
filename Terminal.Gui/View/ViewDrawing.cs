@@ -389,8 +389,7 @@ public partial class View
                                  BoundsToScreen (contentArea),
                                  HasFocus ? GetFocusColor () : GetNormalColor (),
                                  HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
-                                 Rect.Empty,
-                                 TextFormatter.FillRemaining
+                                 Rect.Empty
                                 );
             SetSubViewNeedsDisplay ();
         }

@@ -141,7 +141,7 @@ public class Adornment : View
             }
         }
 
-        TextFormatter?.Draw (screenBounds, normalAttr, normalAttr, Rect.Empty, TextFormatter.FillRemaining);
+        TextFormatter?.Draw (screenBounds, normalAttr, normalAttr, Rect.Empty);
 
         //base.OnDrawContent (contentArea);
     }

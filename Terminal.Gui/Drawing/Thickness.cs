@@ -221,7 +221,7 @@ public class Thickness : IEquatable<Thickness>
                 Alignment = TextAlignment.Centered,
                 VerticalAlignment = VerticalTextAlignment.Bottom
             };
-            tf.Draw (rect, Application.Driver.CurrentAttribute, Application.Driver.CurrentAttribute, rect, false);
+            tf.Draw (rect, Application.Driver.CurrentAttribute, Application.Driver.CurrentAttribute, rect);
         }
 
         return GetInside (rect);
