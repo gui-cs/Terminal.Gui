@@ -558,7 +558,7 @@ public class Dim
     /// <example>
     ///     This initializes a <see cref="View"/> with two SubViews. The view will be automatically sized to fit the two
     ///     SubViews.
-    ///     <code>
+    /// <code>
     /// var button = new Button () { Text = "Click Me!", X = 1, Y = 1, Width = 10, Height = 1 };
     /// var textField = new TextField { Text = "Type here", X = 1, Y = 2, Width = 20, Height = 1 };
     /// var view = new Window () { Title = "MyWindow", X = 0, Y = 0, Width = Dim.AutoSize (), Height = Dim.AutoSize () };
