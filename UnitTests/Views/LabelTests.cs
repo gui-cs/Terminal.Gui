@@ -179,7 +179,7 @@ Test
         tf1.Text = "This TextFormatter (tf1) without fill will not be cleared on rewritten.";
         Size tf1Size = tf1.Size;
 
-        var tf2 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom };
+        var tf2 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom, FillRemaining = true };
         tf2.Text = "This TextFormatter (tf2) with fill will be cleared on rewritten.";
         Size tf2Size = tf2.Size;
 
@@ -191,9 +191,7 @@ Test
         tf1.Draw (
                   new Rect (new Point (0, 1), tf1Size),
                   label.GetNormalColor (),
-                  label.ColorScheme.HotNormal,
-                  default (Rect),
-                  false
+                  label.ColorScheme.HotNormal
                  );
 
         tf2.Draw (new Rect (new Point (0, 2), tf2Size), label.GetNormalColor (), label.ColorScheme.HotNormal);
@@ -215,9 +213,7 @@ This TextFormatter (tf2) with fill will be cleared on rewritten.
         tf1.Draw (
                   new Rect (new Point (0, 1), tf1Size),
                   label.GetNormalColor (),
-                  label.ColorScheme.HotNormal,
-                  default (Rect),
-                  false
+                  label.ColorScheme.HotNormal
                  );
 
         tf2.Text = "This TextFormatter (tf2) is rewritten.";
