@@ -305,7 +305,7 @@ public partial class View
         get => SuperView?.FocusDirection ?? _focusDirection;
         set
         {
-            if (SuperView != null)
+            if (SuperView is { })
             {
                 SuperView.FocusDirection = value;
             }
@@ -341,7 +341,7 @@ public partial class View
         }
 
         // Remove focus down the chain of subviews if focus is removed
-        if (!value && Focused != null)
+        if (!value && Focused is { })
         {
             View f = Focused;
             f.OnLeave (view);
@@ -387,7 +387,7 @@ public partial class View
 
                 if (value && _tabIndex == -1)
                 {
-                    TabIndex = SuperView != null ? SuperView._tabIndexes.IndexOf (this) : -1;
+                    TabIndex = SuperView is { } ? SuperView._tabIndexes.IndexOf (this) : -1;
                 }
 
                 TabStop = value;
@@ -402,11 +402,11 @@ public partial class View
                     SetHasFocus (false, this);
                     SuperView?.EnsureFocus ();
 
-                    if (SuperView != null && SuperView.Focused is null)
+                    if (SuperView is { } && SuperView.Focused is null)
                     {
                         SuperView.FocusNext ();
 
-                        if (SuperView.Focused is null && Application.Current != null)
+                        if (SuperView.Focused is null && Application.Current is { })
                         {
                             Application.Current.FocusNext ();
                         }
@@ -415,7 +415,7 @@ public partial class View
                     }
                 }
 
-                if (_subviews != null && IsInitialized)
+                if (_subviews is { } && IsInitialized)
                 {
                     foreach (View view in _subviews)
                     {
@@ -506,7 +506,7 @@ public partial class View
 
             View most = Focused.MostFocused;
 
-            if (most != null)
+            if (most is { })
             {
                 return most;
             }
@@ -561,7 +561,7 @@ public partial class View
             throw new ArgumentException ("the specified view is not part of the hierarchy of this view");
         }
 
-        if (Focused != null)
+        if (Focused is { })
         {
             Focused.SetHasFocus (false, view);
         }
@@ -572,7 +572,7 @@ public partial class View
         Focused.EnsureFocus ();
 
         // Send focus upwards
-        if (SuperView != null)
+        if (SuperView is { })
         {
             SuperView.SetFocus (this);
         }
@@ -595,7 +595,7 @@ public partial class View
             return;
         }
 
-        if (SuperView != null)
+        if (SuperView is { })
         {
             SuperView.SetFocus (this);
         }
@@ -737,7 +737,7 @@ public partial class View
             }
         }
 
-        if (Focused != null)
+        if (Focused is { })
         {
             Focused.SetHasFocus (false, this);
             Focused = null;
@@ -802,7 +802,7 @@ public partial class View
             }
         }
 
-        if (Focused != null)
+        if (Focused is { })
         {
             Focused.SetHasFocus (false, this);
             Focused = null;
@@ -818,7 +818,7 @@ public partial class View
             return null;
         }
 
-        return view.Focused != null ? GetMostFocused (view.Focused) : view;
+        return view.Focused is { } ? GetMostFocused (view.Focused) : view;
     }
 
     /// <summary>Positions the cursor in the right position based on the currently focused view in the chain.</summary>
@@ -838,7 +838,7 @@ public partial class View
 
         // BUGBUG: v2 - This needs to support children of Frames too
 
-        if (Focused is null && SuperView != null)
+        if (Focused is null && SuperView is { })
         {
             SuperView.EnsureFocus ();
         }

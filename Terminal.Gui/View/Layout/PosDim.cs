@@ -298,7 +298,7 @@ public class Pos
     {
         var view = left as PosView;
 
-        if (view != null)
+        if (view is { })
         {
             view.Target.SetNeedsLayout ();
         }

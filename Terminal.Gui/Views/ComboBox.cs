@@ -56,7 +56,7 @@ public class ComboBox : View
                      // Determine if this view is hosted inside a dialog and is the only control
                      for (View view = SuperView; view != null; view = view.SuperView)
                      {
-                         if (view is Dialog && SuperView != null && SuperView.Subviews.Count == 1 && SuperView.Subviews [0] == this)
+                         if (view is Dialog && SuperView is { } && SuperView.Subviews.Count == 1 && SuperView.Subviews [0] == this)
                          {
                              _autoHide = false;
 
@@ -128,7 +128,7 @@ public class ComboBox : View
 
             if (_search.ReadOnly)
             {
-                if (_search.ColorScheme != null)
+                if (_search.ColorScheme is { })
                 {
                     _search.ColorScheme = new ColorScheme (_search.ColorScheme) { Normal = _search.ColorScheme.Focus };
                 }
@@ -152,7 +152,7 @@ public class ComboBox : View
         {
             if (_selectedItem != value
                 && (value == -1
-                    || (_source != null && value > -1 && value < _source.Count)))
+                    || (_source is { } && value > -1 && value < _source.Count)))
             {
                 _selectedItem = _lastSelectedItem = value;
 
@@ -181,7 +181,7 @@ public class ComboBox : View
             _source = value;
 
             // Only need to refresh list if its been added to a container view
-            if (SuperView != null && SuperView.Subviews.Contains (this))
+            if (SuperView is { } && SuperView.Subviews.Contains (this))
             {
                 SelectedItem = -1;
                 _search.Text = "";
@@ -885,7 +885,7 @@ public class ComboBox : View
                     var rowEventArgs = new ListViewRowEventArgs (item);
                     OnRowRender (rowEventArgs);
 
-                    if (rowEventArgs.RowAttribute != null && current != rowEventArgs.RowAttribute)
+                    if (rowEventArgs.RowAttribute is { } && current != rowEventArgs.RowAttribute)
                     {
                         current = (Attribute)rowEventArgs.RowAttribute;
                         Driver.SetAttribute (current);

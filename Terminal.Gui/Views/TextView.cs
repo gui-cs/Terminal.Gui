@@ -296,7 +296,7 @@ internal class TextModel
             RuneCell? cell = RuneAt (col, row);
             Rune rune;
 
-            if (cell != null)
+            if (cell is { })
             {
                 rune = cell.Rune;
             }
@@ -1328,7 +1328,7 @@ internal partial class HistoryText
     {
         HistoryTextItem? found = _historyTextItems.FindLast (x => x.LineStatus == lineStatus);
 
-        if (found != null)
+        if (found is { })
         {
             found.Lines = lines;
             found.CursorPosition = curPos;
@@ -2744,7 +2744,7 @@ public class TextView : View
 
                 SetNeedsDisplay ();
             }
-            else if (_multiline && _savedHeight != null)
+            else if (_multiline && _savedHeight is { })
             {
                 //var lyout = LayoutStyle;
                 //if (LayoutStyle == LayoutStyle.Computed) {
@@ -2932,7 +2932,7 @@ public class TextView : View
                 _wrapManager = new WordWrapManager (_model);
                 _model = _wrapManager.WrapModel (_frameWidth, out _, out _, out _, out _);
             }
-            else if (!_wordWrap && _wrapManager != null)
+            else if (!_wordWrap && _wrapManager is { })
             {
                 _model = _wrapManager.Model;
             }
@@ -3529,7 +3529,7 @@ public class TextView : View
 
             newPos = _model.WordForward (CurrentColumn, CurrentRow);
 
-            if (newPos != null && newPos.HasValue)
+            if (newPos is { } && newPos.HasValue)
             {
                 CurrentColumn = CurrentRow == newPos.Value.row ? newPos.Value.col : line.Count;
             }
@@ -3737,7 +3737,7 @@ public class TextView : View
     /// <inheritdoc/>
     public override bool OnLeave (View view)
     {
-        if (Application.MouseGrabView != null && Application.MouseGrabView == this)
+        if (Application.MouseGrabView is { } && Application.MouseGrabView == this)
         {
             Application.UngrabMouse ();
         }
@@ -4028,7 +4028,7 @@ public class TextView : View
         var ev = new RuneCellEventArgs (line, idxCol, unwrappedPos);
         DrawNormalColor?.Invoke (this, ev);
 
-        if (line [idxCol].ColorScheme != null)
+        if (line [idxCol].ColorScheme is { })
         {
             ColorScheme? colorScheme = line [idxCol].ColorScheme;
             Driver.SetAttribute (Enabled ? colorScheme!.Focus : colorScheme!.Disabled);
@@ -4054,7 +4054,7 @@ public class TextView : View
         var ev = new RuneCellEventArgs (line, idxCol, unwrappedPos);
         DrawReadOnlyColor?.Invoke (this, ev);
 
-        ColorScheme? colorScheme = line [idxCol].ColorScheme != null ? line [idxCol].ColorScheme : ColorScheme;
+        ColorScheme? colorScheme = line [idxCol].ColorScheme is { } ? line [idxCol].ColorScheme : ColorScheme;
         Attribute attribute;
 
         if (colorScheme!.Disabled.Foreground == colorScheme.Focus.Background)
@@ -4084,7 +4084,7 @@ public class TextView : View
         var ev = new RuneCellEventArgs (line, idxCol, unwrappedPos);
         DrawSelectionColor?.Invoke (this, ev);
 
-        if (line [idxCol].ColorScheme != null)
+        if (line [idxCol].ColorScheme is { })
         {
             ColorScheme? colorScheme = line [idxCol].ColorScheme;
 
@@ -4118,7 +4118,7 @@ public class TextView : View
         var ev = new RuneCellEventArgs (line, idxCol, unwrappedPos);
         DrawUsedColor?.Invoke (this, ev);
 
-        if (line [idxCol].ColorScheme != null)
+        if (line [idxCol].ColorScheme is { })
         {
             ColorScheme? colorScheme = line [idxCol].ColorScheme;
             SetValidUsedColor (colorScheme!);
@@ -4742,11 +4742,11 @@ public class TextView : View
     {
         SetWrapModel ();
 
-        if (obj != null)
+        if (obj is { })
         {
             int startLine = obj.CursorPosition.Y;
 
-            if (obj.RemovedOnAdded != null)
+            if (obj.RemovedOnAdded is { })
             {
                 int offset;
 
@@ -4908,7 +4908,7 @@ public class TextView : View
             addedLines.Add (new List<RuneCell> (lines [i]));
         }
 
-        if (rest != null)
+        if (rest is { })
         {
             List<RuneCell> last = _model.GetLine (CurrentRow + lines.Count - 1);
             lastp = last.Count;
@@ -4921,7 +4921,7 @@ public class TextView : View
 
         // Now adjust column and row positions
         CurrentRow += lines.Count - 1;
-        CurrentColumn = rest != null ? lastp : lines [lines.Count - 1].Count;
+        CurrentColumn = rest is { } ? lastp : lines [lines.Count - 1].Count;
         Adjust ();
 
         _historyText.Add (
@@ -5424,7 +5424,7 @@ public class TextView : View
 
     private bool MoveNextView ()
     {
-        if (Application.OverlappedTop != null)
+        if (Application.OverlappedTop is { })
         {
             return SuperView?.FocusNext () == true;
         }
@@ -5490,7 +5490,7 @@ public class TextView : View
 
     private bool MovePreviousView ()
     {
-        if (Application.OverlappedTop != null)
+        if (Application.OverlappedTop is { })
         {
             return SuperView?.FocusPrev () == true;
         }
@@ -5760,7 +5760,7 @@ public class TextView : View
         RuneCell cell = line [colWithColor];
         int colWithoutColor = Math.Max (col - 1, 0);
 
-        if (cell.ColorScheme != null && colWithColor == 0 && lineToSet [colWithoutColor].ColorScheme != null)
+        if (cell.ColorScheme is { } && colWithColor == 0 && lineToSet [colWithoutColor].ColorScheme is { })
         {
             for (int r = row - 1; r > -1; r--)
             {
@@ -5793,7 +5793,7 @@ public class TextView : View
                                                 rc => rc.ColorScheme != null
                                                );
 
-                if (colWithColor > -1 && l [colWithColor].ColorScheme != null)
+                if (colWithColor > -1 && l [colWithColor].ColorScheme is { })
                 {
                     cell = l [colWithColor];
 
@@ -5820,7 +5820,7 @@ public class TextView : View
             }
         }
 
-        if (cell.ColorScheme != null && colWithColor > -1 && colWithoutColor < lineToSet.Count && lineToSet [colWithoutColor].ColorScheme is null)
+        if (cell.ColorScheme is { } && colWithColor > -1 && colWithoutColor < lineToSet.Count && lineToSet [colWithoutColor].ColorScheme is null)
         {
             while (lineToSet [colWithoutColor].ColorScheme is null)
             {
@@ -6288,7 +6288,7 @@ public class TextView : View
 
     private void SetClipboard (string text)
     {
-        if (text != null)
+        if (text is { })
         {
             Clipboard.Contents = text;
         }
@@ -6362,7 +6362,7 @@ public class TextView : View
     /// <summary>Restore from original model.</summary>
     private void SetWrapModel ([CallerMemberName] string? caller = null)
     {
-        if (_currentCaller != null)
+        if (_currentCaller is { })
         {
             return;
         }
@@ -6442,7 +6442,7 @@ public class TextView : View
     {
         Autocomplete.HostControl = this;
 
-        if (Application.Top != null)
+        if (Application.Top is { })
         {
             Application.Top.AlternateForwardKeyChanged += Top_AlternateForwardKeyChanged!;
             Application.Top.AlternateBackwardKeyChanged += Top_AlternateBackwardKeyChanged!;
@@ -6493,7 +6493,7 @@ public class TextView : View
     /// <summary>Update the original model.</summary>
     private void UpdateWrapModel ([CallerMemberName] string? caller = null)
     {
-        if (_currentCaller != null && _currentCaller != caller)
+        if (_currentCaller is { } && _currentCaller != caller)
         {
             return;
         }
@@ -6523,7 +6523,7 @@ public class TextView : View
             SetNeedsDisplay ();
         }
 
-        if (_currentCaller != null)
+        if (_currentCaller is { })
         {
             throw new InvalidOperationException (
                                                  $"WordWrap settings was changed after the {_currentCaller} call."
@@ -6533,7 +6533,7 @@ public class TextView : View
 
     private void WrapTextModel ()
     {
-        if (_wordWrap && _wrapManager != null)
+        if (_wordWrap && _wrapManager is { })
         {
             _model = _wrapManager.WrapModel (
                                              _frameWidth,

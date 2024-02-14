@@ -50,7 +50,7 @@ public partial class View
             OnResizeNeeded ();
 
 #if DEBUG
-            if (_text != null && string.IsNullOrEmpty (Id))
+            if (_text is { } && string.IsNullOrEmpty (Id))
             {
                 Id = _text;
             }
@@ -183,7 +183,7 @@ public partial class View
     /// <summary>Can be overridden if the <see cref="Terminal.Gui.TextFormatter.Text"/> has different format than the default.</summary>
     protected virtual void UpdateTextFormatterText ()
     {
-        if (TextFormatter != null)
+        if (TextFormatter is { })
         {
             TextFormatter.Text = _text;
         }

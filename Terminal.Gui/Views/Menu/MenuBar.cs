@@ -58,7 +58,7 @@ public class MenuBarItem : MenuItem
     {
         var i = 0;
 
-        if (Children != null)
+        if (Children is { })
         {
             foreach (MenuItem child in Children)
             {
@@ -102,7 +102,7 @@ public class MenuBarItem : MenuItem
             return;
         }
 
-        foreach (MenuItem menuItem in Children.Where (m => m != null))
+        foreach (MenuItem menuItem in Children.Where (m => m is { }))
         {
             if (menuItem.HotKey != default (Rune))
             {
@@ -136,7 +136,7 @@ public class MenuBarItem : MenuItem
 
         SetTitle (title ?? "");
 
-        if (parent != null)
+        if (parent is { })
         {
             Parent = parent;
         }
@@ -353,7 +353,7 @@ public class MenuBar : View
             // TODO: Bindings (esp for hotkey) should be added across and then down. This currently does down then across. 
             // TODO: As a result, _File._Save will have precedence over in "_File _Edit _ScrollbarView"
             // TODO: Also: Hotkeys should not work for sub-menus if they are not visible!
-            foreach (MenuBarItem menuBarItem in Menus?.Where (m => m != null)!)
+            foreach (MenuBarItem menuBarItem in Menus?.Where (m => m is { })!)
             {
                 if (menuBarItem.HotKey != default (Rune))
                 {
@@ -381,7 +381,7 @@ public class MenuBar : View
             // Enable the Alt key as a menu activator
             Initialized += (s, e) =>
                            {
-                               if (SuperView != null)
+                               if (SuperView is { })
                                {
                                    SuperView.KeyUp += SuperView_KeyUp;
                                }
@@ -445,7 +445,7 @@ public class MenuBar : View
             {
                 _ocm = value;
 
-                if (_ocm != null && _ocm._currentChild > -1)
+                if (_ocm is { } && _ocm._currentChild > -1)
                 {
                     OnMenuOpened ();
                 }
@@ -575,12 +575,12 @@ public class MenuBar : View
     {
         MenuBar mbar = GetMouseGrabViewInstance (this);
 
-        if (mbar != null)
+        if (mbar is { })
         {
             mbar.CleanUp ();
         }
 
-        if (!Enabled || _openMenu != null)
+        if (!Enabled || _openMenu is { })
         {
             return;
         }
@@ -698,7 +698,7 @@ public class MenuBar : View
     {
         _isCleaning = true;
 
-        if (_openMenu != null)
+        if (_openMenu is { })
         {
             CloseAllMenus ();
         }
@@ -709,7 +709,7 @@ public class MenuBar : View
         _selected = -1;
         CanFocus = _initialCanFocus;
 
-        if (_lastFocused != null)
+        if (_lastFocused is { })
         {
             _lastFocused.SetFocus ();
         }
@@ -723,7 +723,7 @@ public class MenuBar : View
     {
         if (!_isMenuOpening && !_isMenuClosing)
         {
-            if (_openSubMenu != null && !CloseMenu (false, true, true))
+            if (_openSubMenu is { } && !CloseMenu (false, true, true))
             {
                 return;
             }
@@ -733,7 +733,7 @@ public class MenuBar : View
                 return;
             }
 
-            if (LastFocused != null && LastFocused != this)
+            if (LastFocused is { } && LastFocused != this)
             {
                 _selected = -1;
             }
@@ -741,7 +741,7 @@ public class MenuBar : View
             Application.UngrabMouse ();
         }
 
-        if (openCurrentMenu != null)
+        if (openCurrentMenu is { })
         {
             openCurrentMenu = null;
         }
@@ -756,7 +756,7 @@ public class MenuBar : View
     {
         MenuBarItem mbi = isSubMenu ? openCurrentMenu.BarItems : _openMenu?.BarItems;
 
-        if (UseSubMenusSingleFrame && mbi != null && !ignoreUseSubMenusSingleFrame && mbi.Parent != null)
+        if (UseSubMenusSingleFrame && mbi is { } && !ignoreUseSubMenusSingleFrame && mbi.Parent is { })
         {
             return false;
         }
@@ -769,7 +769,7 @@ public class MenuBar : View
         {
             _isMenuClosing = false;
 
-            if (args.CurrentMenu.Parent != null)
+            if (args.CurrentMenu.Parent is { })
             {
                 _openMenu._currentChild =
                     ((MenuBarItem)args.CurrentMenu.Parent).Children.IndexOf (args.CurrentMenu);
@@ -781,14 +781,14 @@ public class MenuBar : View
         switch (isSubMenu)
         {
             case false:
-                if (_openMenu != null)
+                if (_openMenu is { })
                 {
                     Application.Current.Remove (_openMenu);
                 }
 
                 SetNeedsDisplay ();
 
-                if (_previousFocused != null && _previousFocused is Menu && _openMenu != null && _previousFocused.ToString () != openCurrentMenu.ToString ())
+                if (_previousFocused is { } && _previousFocused is Menu && _openMenu is { } && _previousFocused.ToString () != openCurrentMenu.ToString ())
                 {
                     _previousFocused.SetFocus ();
                 }
@@ -804,19 +804,19 @@ public class MenuBar : View
                 LastFocused = _lastFocused;
                 _lastFocused = null;
 
-                if (LastFocused != null && LastFocused.CanFocus)
+                if (LastFocused is { } && LastFocused.CanFocus)
                 {
                     if (!reopen)
                     {
                         _selected = -1;
                     }
 
-                    if (_openSubMenu != null)
+                    if (_openSubMenu is { })
                     {
                         _openSubMenu = null;
                     }
 
-                    if (openCurrentMenu != null)
+                    if (openCurrentMenu is { })
                     {
                         Application.Current.Remove (openCurrentMenu);
                         openCurrentMenu.Dispose ();
@@ -939,7 +939,7 @@ public class MenuBar : View
 
                     if ((_selectedSub == -1 || _openSubMenu is null || _openSubMenu?.Count - 1 == _selectedSub) && subMenu is null)
                     {
-                        if (_openSubMenu != null && !CloseMenu (false, true))
+                        if (_openSubMenu is { } && !CloseMenu (false, true))
                         {
                             return;
                         }
@@ -989,7 +989,7 @@ public class MenuBar : View
             return;
         }
 
-        if (newMenu.NewMenuBarItem != null)
+        if (newMenu.NewMenuBarItem is { })
         {
             Menus [index] = newMenu.NewMenuBarItem;
         }
@@ -1002,12 +1002,12 @@ public class MenuBar : View
                 // Open a submenu below a MenuBar
                 _lastFocused ??= SuperView is null ? Application.Current?.MostFocused : SuperView.MostFocused;
 
-                if (_openSubMenu != null && !CloseMenu (false, true))
+                if (_openSubMenu is { } && !CloseMenu (false, true))
                 {
                     return;
                 }
 
-                if (_openMenu != null)
+                if (_openMenu is { })
                 {
                     Application.Current.Remove (_openMenu);
                     _openMenu.Dispose ();
@@ -1029,7 +1029,7 @@ public class MenuBar : View
                     locationOffset = GetScreenOffset ();
                 }
 
-                if (SuperView != null && SuperView != Application.Current)
+                if (SuperView is { } && SuperView != Application.Current)
                 {
                     locationOffset.X += SuperView.Border.Thickness.Left;
                     locationOffset.Y += SuperView.Border.Thickness.Top;
@@ -1176,7 +1176,7 @@ public class MenuBar : View
 
     internal void RemoveAllOpensSubMenus ()
     {
-        if (_openSubMenu != null)
+        if (_openSubMenu is { })
         {
             foreach (Menu item in _openSubMenu)
             {
@@ -1422,7 +1422,7 @@ public class MenuBar : View
             openCurrentMenu = menu;
             openCurrentMenu.SetFocus ();
 
-            if (_openSubMenu != null)
+            if (_openSubMenu is { })
             {
                 menu = _openSubMenu [i];
                 Application.Current.Remove (menu);
@@ -1534,13 +1534,13 @@ public class MenuBar : View
         {
             Activate (_menuBarItemToActivate);
         }
-        else if (_menuItemToSelect != null)
+        else if (_menuItemToSelect is { })
         {
             Run (_menuItemToSelect.Action);
         }
         else
         {
-            if (IsMenuOpen && _openMenu != null)
+            if (IsMenuOpen && _openMenu is { })
             {
                 CloseAllMenus ();
             }
@@ -1654,7 +1654,7 @@ public class MenuBar : View
 
             MenuBarItem subMenu = menuBarItem.SubMenu (menuItem);
 
-            if (subMenu != null)
+            if (subMenu is { })
             {
                 if (FindShortcutInChildMenu (key, subMenu, out menuItemToSelect))
                 {
@@ -1681,7 +1681,7 @@ public class MenuBar : View
     /// <inheritdoc/>
     public override bool OnLeave (View view)
     {
-        if (((!(view is MenuBar) && !(view is Menu)) || (!(view is MenuBar) && !(view is Menu) && _openMenu != null)) && !_isCleaning && !_reopen)
+        if (((!(view is MenuBar) && !(view is Menu)) || (!(view is MenuBar) && !(view is Menu) && _openMenu is { })) && !_isCleaning && !_reopen)
         {
             CleanUp ();
         }
@@ -1709,7 +1709,7 @@ public class MenuBar : View
             int pos = _xOrigin;
             Point locationOffset = default;
 
-            if (SuperView != null)
+            if (SuperView is { })
             {
                 locationOffset.X += SuperView.Border.Thickness.Left;
                 locationOffset.Y += SuperView.Border.Thickness.Top;
@@ -1801,13 +1801,13 @@ public class MenuBar : View
 
     internal bool HandleGrabView (MouseEvent me, View current)
     {
-        if (Application.MouseGrabView != null)
+        if (Application.MouseGrabView is { })
         {
             if (me.View is MenuBar || me.View is Menu)
             {
                 MenuBar mbar = GetMouseGrabViewInstance (me.View);
 
-                if (mbar != null)
+                if (mbar is { })
                 {
                     if (me.Flags == MouseFlags.Button1Clicked)
                     {

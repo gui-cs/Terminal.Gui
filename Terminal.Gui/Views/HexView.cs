@@ -233,7 +233,7 @@ public class HexView : View
             source.WriteByte (kv.Value);
             source.Flush ();
 
-            if (stream != null)
+            if (stream is { })
             {
                 stream.Position = kv.Key;
                 stream.WriteByte (kv.Value);

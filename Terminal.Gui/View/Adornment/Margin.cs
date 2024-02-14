@@ -25,7 +25,7 @@ public class Margin : Adornment
     {
         get
         {
-            if (base.ColorScheme != null)
+            if (base.ColorScheme is { })
             {
                 return base.ColorScheme;
             }

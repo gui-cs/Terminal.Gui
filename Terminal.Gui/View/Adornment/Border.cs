@@ -63,7 +63,7 @@ public class Border : Adornment
     {
         get
         {
-            if (base.ColorScheme != null)
+            if (base.ColorScheme is { })
             {
                 return base.ColorScheme;
             }
@@ -317,7 +317,7 @@ public class Border : Adornment
 
             Attribute prevAttr = Driver.GetAttribute ();
 
-            if (ColorScheme != null)
+            if (ColorScheme is { })
             {
                 Driver.SetAttribute (GetNormalColor ());
             }
@@ -482,7 +482,7 @@ public class Border : Adornment
                 {
                     prevAttr = Driver.GetAttribute ();
 
-                    if (ColorScheme != null)
+                    if (ColorScheme is { })
                     {
                         Driver.SetAttribute (HasFocus ? GetHotNormalColor () : GetNormalColor ());
                     }

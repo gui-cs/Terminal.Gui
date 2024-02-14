@@ -35,11 +35,11 @@ public class ConfigProperty
     /// <returns></returns>
     public bool Apply ()
     {
-        if (PropertyValue != null)
+        if (PropertyValue is { })
         {
             try
             {
-                if (PropertyInfo?.GetValue (null) != null)
+                if (PropertyInfo?.GetValue (null) is { })
                 {
                     PropertyInfo?.SetValue (null, DeepMemberwiseCopy (PropertyValue, PropertyInfo?.GetValue (null)));
                 }
@@ -47,7 +47,7 @@ public class ConfigProperty
             catch (TargetInvocationException tie)
             {
                 // Check if there is an inner exception
-                if (tie.InnerException != null)
+                if (tie.InnerException is { })
                 {
                     // Handle the inner exception separately without catching the outer exception
                     Exception? innerException = tie.InnerException;
@@ -103,7 +103,7 @@ public class ConfigProperty
 
         Type? ut = Nullable.GetUnderlyingType (PropertyInfo!.PropertyType);
 
-        if (source.GetType () != PropertyInfo!.PropertyType && ut != null && source.GetType () != ut)
+        if (source.GetType () != PropertyInfo!.PropertyType && ut is { } && source.GetType () != ut)
         {
             throw new ArgumentException (
                                          $"The source object ({
@@ -116,7 +116,7 @@ public class ConfigProperty
                                         );
         }
 
-        if (PropertyValue != null)
+        if (PropertyValue is { })
         {
             PropertyValue = DeepMemberwiseCopy (source, PropertyValue);
         }

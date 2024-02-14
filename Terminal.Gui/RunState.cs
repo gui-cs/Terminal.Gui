@@ -30,7 +30,7 @@ public class RunState : IDisposable
     /// <param name="disposing">If set to <see langword="true"/> we are disposing and should dispose held objects.</param>
     protected virtual void Dispose (bool disposing)
     {
-        if (Toplevel != null && disposing)
+        if (Toplevel is { } && disposing)
         {
             throw new InvalidOperationException (
                                                  "You must clean up (Dispose) the Toplevel before calling Application.RunState.Dispose"

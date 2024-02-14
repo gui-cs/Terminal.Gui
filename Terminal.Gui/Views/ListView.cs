@@ -172,7 +172,7 @@ public class ListView : View
         {
             _allowsMultipleSelection = value;
 
-            if (Source != null && !_allowsMultipleSelection)
+            if (Source is { } && !_allowsMultipleSelection)
             {
                 // Clear all selections except selected 
                 for (var i = 0; i < Source.Count; i++)
@@ -655,7 +655,7 @@ public class ListView : View
                 var rowEventArgs = new ListViewRowEventArgs (item);
                 OnRowRender (rowEventArgs);
 
-                if (rowEventArgs.RowAttribute != null && current != rowEventArgs.RowAttribute)
+                if (rowEventArgs.RowAttribute is { } && current != rowEventArgs.RowAttribute)
                 {
                     current = (Attribute)rowEventArgs.RowAttribute;
                     Driver.SetAttribute (current);
@@ -873,7 +873,7 @@ public class ListWrapper : IListDataSource
     /// <inheritdoc/>
     public ListWrapper (IList source)
     {
-        if (source != null)
+        if (source is { })
         {
             _count = source.Count;
             _marks = new BitArray (_count);
@@ -883,7 +883,7 @@ public class ListWrapper : IListDataSource
     }
 
     /// <inheritdoc/>
-    public int Count => _source != null ? _source.Count : 0;
+    public int Count => _source is { } ? _source.Count : 0;
 
     /// <inheritdoc/>
     public int Length { get; }

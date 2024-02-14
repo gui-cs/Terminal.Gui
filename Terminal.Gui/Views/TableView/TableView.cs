@@ -865,7 +865,7 @@ public class TableView : View
 
             Point? hit = ScreenToCell (boundsX, boundsY);
 
-            if (hit != null)
+            if (hit is { })
             {
                 if (MultiSelect && HasControlOrAlt (me))
                 {
@@ -885,7 +885,7 @@ public class TableView : View
         {
             Point? hit = ScreenToCell (boundsX, boundsY);
 
-            if (hit != null)
+            if (hit is { })
             {
                 OnCellActivated (new CellActivatedEventArgs (Table, hit.Value.X, hit.Value.Y));
             }
@@ -1027,7 +1027,7 @@ public class TableView : View
 
         Point? screenPoint = CellToScreen (SelectedColumn, SelectedRow);
 
-        if (screenPoint != null)
+        if (screenPoint is { })
         {
             Move (screenPoint.Value.X, screenPoint.Value.Y);
         }
@@ -1082,7 +1082,7 @@ public class TableView : View
         if (clientY < headerHeight)
         {
             headerIfAny = col?.Column;
-            offsetX = col != null ? clientX - col.X : null;
+            offsetX = col is { } ? clientX - col.X : null;
 
             return null;
         }
@@ -1096,7 +1096,7 @@ public class TableView : View
             return null;
         }
 
-        if (col != null && rowIdx >= 0)
+        if (col is { } && rowIdx >= 0)
         {
             offsetX = clientX - col.X;
 
@@ -1303,7 +1303,7 @@ public class TableView : View
         }
 
         // Don't require more space than the style allows
-        if (colStyle != null)
+        if (colStyle is { })
         {
             // enforce maximum cell width based on style
             if (spaceRequired > colStyle.MaxWidth)
@@ -1591,7 +1591,7 @@ public class TableView : View
             return NullSymbol;
         }
 
-        return colStyle != null ? colStyle.GetRepresentation (value) : value.ToString ();
+        return colStyle is { } ? colStyle.GetRepresentation (value) : value.ToString ();
     }
 
     private bool HasControlOrAlt (MouseEvent me) { return me.Flags.HasFlag (MouseFlags.ButtonAlt) || me.Flags.HasFlag (MouseFlags.ButtonCtrl); }
@@ -1870,7 +1870,7 @@ public class TableView : View
 
             ColorScheme scheme;
 
-            if (colorSchemeGetter != null)
+            if (colorSchemeGetter is { })
             {
                 // user has a delegate for defining row color per cell, call it
                 scheme = colorSchemeGetter (

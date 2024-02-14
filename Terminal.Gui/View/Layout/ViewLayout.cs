@@ -526,7 +526,7 @@ public partial class View
 
         View super = SuperView;
 
-        while (super != null)
+        while (super is { })
         {
             boundsOffset = super.GetBoundsOffset ();
             rx += super.Frame.X + boundsOffset.X;
@@ -563,7 +563,7 @@ public partial class View
 
         Rect startFrame = start.Frame;
 
-        if (start.InternalSubviews != null)
+        if (start.InternalSubviews is { })
         {
             int count = start.InternalSubviews.Count;
 
@@ -605,7 +605,7 @@ public partial class View
         Rect ret = Frame;
         View super = SuperView;
 
-        while (super != null)
+        while (super is { })
         {
             Point boundsOffset = super.GetBoundsOffset ();
             ret.X += super.Frame.X + boundsOffset.X;
@@ -701,7 +701,7 @@ public partial class View
 
         // If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.
         // Use LayoutSubview with the Frame of the 'from' 
-        if (SuperView != null && GetTopSuperView () != null && LayoutNeeded && edges.Count > 0)
+        if (SuperView is { } && GetTopSuperView () is { } && LayoutNeeded && edges.Count > 0)
         {
             foreach ((View from, View to) in edges)
             {
@@ -738,7 +738,7 @@ public partial class View
         Point superViewBoundsOffset = SuperView?.GetBoundsOffset () ?? Point.Empty;
         var ret = new Point (x - Frame.X - superViewBoundsOffset.X, y - Frame.Y - superViewBoundsOffset.Y);
 
-        if (SuperView != null)
+        if (SuperView is { })
         {
             Point superFrame = SuperView.ScreenToFrame (x - superViewBoundsOffset.X, y - superViewBoundsOffset.Y);
             ret = new Point (superFrame.X - Frame.X, superFrame.Y - Frame.Y);
@@ -918,7 +918,7 @@ public partial class View
         // First try SuperView.Bounds, then Application.Top, then Driver.Bounds.
         // Finally, if none of those are valid, use int.MaxValue (for Unit tests).
         Rect relativeBounds = SuperView is { IsInitialized: true } ? SuperView.Bounds :
-                              Application.Top != null && Application.Top.IsInitialized ? Application.Top.Bounds :
+                              Application.Top is { } && Application.Top.IsInitialized ? Application.Top.Bounds :
                               Application.Driver?.Bounds ?? new Rect (0, 0, int.MaxValue, int.MaxValue);
         SetRelativeLayout (relativeBounds);
 
@@ -970,10 +970,10 @@ public partial class View
     /// </param>
     internal void SetRelativeLayout (Rect superviewBounds)
     {
-        Debug.Assert (_x != null);
-        Debug.Assert (_y != null);
-        Debug.Assert (_width != null);
-        Debug.Assert (_height != null);
+        Debug.Assert (_x is { });
+        Debug.Assert (_y is { });
+        Debug.Assert (_width is { });
+        Debug.Assert (_height is { });
 
         int newX, newW, newY, newH;
         var autosize = Size.Empty;
@@ -1319,7 +1319,7 @@ public partial class View
                 break;
             case Dim.DimFactor factor:
                 // Tries to get the SuperView height otherwise the view height.
-                int sh = SuperView != null ? SuperView.Frame.Height : h;
+                int sh = SuperView is { } ? SuperView.Frame.Height : h;
 
                 if (factor.IsFromRemaining ())
                 {
@@ -1369,7 +1369,7 @@ public partial class View
                 break;
             case Dim.DimFactor factor:
                 // Tries to get the SuperView Width otherwise the view Width.
-                int sw = SuperView != null ? SuperView.Frame.Width : w;
+                int sw = SuperView is { } ? SuperView.Frame.Width : w;
 
                 if (factor.IsFromRemaining ())
                 {

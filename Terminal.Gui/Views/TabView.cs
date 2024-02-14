@@ -151,9 +151,9 @@ public class TabView : View
 
             Tab old = _selectedTab;
 
-            if (_selectedTab != null)
+            if (_selectedTab is { })
             {
-                if (_selectedTab.View != null)
+                if (_selectedTab.View is { })
                 {
                     // remove old content
                     _contentView.Remove (_selectedTab.View);
@@ -162,10 +162,10 @@ public class TabView : View
 
             _selectedTab = value;
 
-            if (value != null)
+            if (value is { })
             {
                 // add new content
-                if (_selectedTab.View != null)
+                if (_selectedTab.View is { })
                 {
                     _contentView.Add (_selectedTab.View);
                 }
@@ -447,7 +447,7 @@ public class TabView : View
         // Starting at the first or scrolled to tab
         foreach (Tab tab in Tabs.Skip (TabScrollOffset))
         {
-            if (prevTab != null)
+            if (prevTab is { })
             {
                 tab.X = Pos.Right (prevTab);
             }
@@ -537,7 +537,7 @@ public class TabView : View
 
     private void UnSetCurrentTabs ()
     {
-        if (_tabLocations != null)
+        if (_tabLocations is { })
         {
             foreach (TabToRender tabToRender in _tabLocations)
             {
@@ -627,11 +627,11 @@ public class TabView : View
             {
                 var scrollIndicatorHit = 0;
 
-                if (me.View != null && me.View.Id == "rightScrollIndicator")
+                if (me.View is { } && me.View.Id == "rightScrollIndicator")
                 {
                     scrollIndicatorHit = 1;
                 }
-                else if (me.View != null && me.View.Id == "leftScrollIndicator")
+                else if (me.View is { } && me.View.Id == "leftScrollIndicator")
                 {
                     scrollIndicatorHit = -1;
                 }
@@ -645,7 +645,7 @@ public class TabView : View
                     return true;
                 }
 
-                if (hit != null)
+                if (hit is { })
                 {
                     _host.SelectedTab = hit;
                     SetNeedsDisplay ();

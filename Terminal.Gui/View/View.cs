@@ -157,7 +157,7 @@ public partial class View : Responder, ISupportInitializeNotification
                 OnEnabledChanged ();
                 SetNeedsDisplay ();
 
-                if (_subviews != null)
+                if (_subviews is { })
                 {
                     foreach (View view in _subviews)
                     {
@@ -198,7 +198,7 @@ public partial class View : Responder, ISupportInitializeNotification
                 _title = value;
                 SetNeedsDisplay ();
 #if DEBUG
-                if (_title != null && string.IsNullOrEmpty (Id))
+                if (_title is { } && string.IsNullOrEmpty (Id))
                 {
                     Id = _title;
                 }
@@ -438,7 +438,7 @@ public partial class View : Responder, ISupportInitializeNotification
 
         OnResizeNeeded ();
 
-        if (_subviews != null)
+        if (_subviews is { })
         {
             foreach (View view in _subviews)
             {

@@ -282,7 +282,7 @@ internal class CursesDriver : ConsoleDriver
         StopReportingMouseMoves ();
         SetCursorVisibility (CursorVisibility.Default);
 
-        if (_mainLoopDriver != null)
+        if (_mainLoopDriver is { })
         {
             _mainLoopDriver.RemoveWatch (_processInputToken);
         }

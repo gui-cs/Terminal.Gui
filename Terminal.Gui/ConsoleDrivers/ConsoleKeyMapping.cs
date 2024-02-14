@@ -184,7 +184,7 @@ public static class ConsoleKeyMapping
         ConsoleModifiers mod = GetModifiers (consoleKeyInfo.Modifiers);
         ScanCodeMapping scode = GetScanCode ("VirtualKey", (uint)consoleKeyInfo.Key, mod);
 
-        if (scode != null)
+        if (scode is { })
         {
             return scode.ScanCode;
         }
@@ -206,7 +206,7 @@ public static class ConsoleKeyMapping
             ConsoleModifiers mod = GetModifiers (modifiers);
             ScanCodeMapping scode = GetScanCode ("VirtualKey", keyValue, mod);
 
-            if (scode != null)
+            if (scode is { })
             {
                 return new ConsoleKeyInfo (
                                            (char)scode.UnicodeChar,
@@ -561,7 +561,7 @@ public static class ConsoleKeyMapping
             scode = GetScanCode ("VirtualKey", decodedChar, mod);
         }
 
-        if (isConsoleKey && scode != null)
+        if (isConsoleKey && scode is { })
         {
             consoleKey = (uint)scode.VirtualKey;
             keyChar = scode.UnicodeChar;
@@ -572,7 +572,7 @@ public static class ConsoleKeyMapping
         {
             scode = unicodeChar != 0 ? GetScanCode ("UnicodeChar", decodedChar, mod) : null;
 
-            if (scode != null)
+            if (scode is { })
             {
                 consoleKey = (uint)scode.VirtualKey;
                 keyChar = scode.UnicodeChar;
@@ -593,7 +593,7 @@ public static class ConsoleKeyMapping
                     consoleKey = char.ToUpper (stFormD [i]);
                     scode = GetScanCode ("VirtualKey", char.ToUpper (stFormD [i]), 0);
 
-                    if (scode != null)
+                    if (scode is { })
                     {
                         scanCode = scode.ScanCode;
                     }
@@ -605,7 +605,7 @@ public static class ConsoleKeyMapping
         {
             scode = GetScanCode ("VirtualKey", keyChar, mod);
 
-            if (scode != null)
+            if (scode is { })
             {
                 consoleKey = (uint)scode.VirtualKey;
                 keyChar = scode.UnicodeChar;
@@ -2520,7 +2520,7 @@ public static class ConsoleKeyMapping
             // try to get the ConsoleKey
             ScanCodeMapping scode = _scanCodes.FirstOrDefault (e => e.UnicodeChar == keyChar);
 
-            if (scode != null)
+            if (scode is { })
             {
                 consoleKey = (ConsoleKey)scode.VirtualKey;
             }

@@ -393,7 +393,7 @@ public partial class Toplevel : View
             base.OnDrawContent (contentArea);
 
             // This is causing the menus drawn incorrectly if UseSubMenusSingleFrame is true
-            //if (this.MenuBar != null && this.MenuBar.IsMenuOpen && this.MenuBar.openMenu != null) {
+            //if (this.MenuBar is { } && this.MenuBar.IsMenuOpen && this.MenuBar.openMenu is { }) {
             //	// TODO: Hack until we can get compositing working right.
             //	this.MenuBar.openMenu.Redraw (this.MenuBar.openMenu.Bounds);
             //}
@@ -490,12 +490,12 @@ public partial class Toplevel : View
         var layoutSubviews = false;
         var maxWidth = 0;
 
-        if (superView.Margin != null && superView == top.SuperView)
+        if (superView.Margin is { } && superView == top.SuperView)
         {
             maxWidth -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
         }
 
-        if ((superView != top || top?.SuperView != null || (top != Application.Top && top.Modal) || (top?.SuperView is null && top.IsOverlapped))
+        if ((superView != top || top?.SuperView is { } || (top != Application.Top && top.Modal) || (top?.SuperView is null && top.IsOverlapped))
 
             // BUGBUG: Prevously PositionToplevel required LayotuStyle.Computed
             && (top.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y) /*&& top.LayoutStyle == LayoutStyle.Computed*/)
@@ -551,7 +551,7 @@ public partial class Toplevel : View
     /// <inheritdoc/>
     public override void Remove (View view)
     {
-        if (this is Toplevel Toplevel && Toplevel.MenuBar != null)
+        if (this is Toplevel Toplevel && Toplevel.MenuBar is { })
         {
             RemoveMenuStatusBar (view);
         }
@@ -715,7 +715,7 @@ public partial class Toplevel : View
             superView = top.SuperView;
         }
 
-        if (superView.Margin != null && superView == top.SuperView)
+        if (superView.Margin is { } && superView == top.SuperView)
         {
             maxWidth -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
         }
@@ -794,7 +794,7 @@ public partial class Toplevel : View
             maxWidth = statusVisible ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
         }
 
-        if (superView.Margin != null && superView == top.SuperView)
+        if (superView.Margin is { } && superView == top.SuperView)
         {
             maxWidth -= superView.GetAdornmentsThickness ().Top + superView.GetAdornmentsThickness ().Bottom;
         }
@@ -948,7 +948,7 @@ public partial class Toplevel : View
 
                 focusProcessed = true;
 
-                if (SuperView.Focused != null && SuperView.Focused != this)
+                if (SuperView.Focused is { } && SuperView.Focused != this)
                 {
                     return;
                 }
@@ -1074,7 +1074,7 @@ public partial class Toplevel : View
 
     private void QuitToplevel ()
     {
-        if (Application.OverlappedTop != null)
+        if (Application.OverlappedTop is { })
         {
             Application.OverlappedTop.RequestStop ();
         }

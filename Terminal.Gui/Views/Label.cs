@@ -77,7 +77,7 @@ public class Label : View
 
         if (mouseEvent.Flags == MouseFlags.Button1Clicked)
         {
-            if (!HasFocus && SuperView != null)
+            if (!HasFocus && SuperView is { })
             {
                 if (!SuperView.HasFocus)
                 {

@@ -262,7 +262,7 @@ public static class EscSeqUtils
                     return;
                 }
 
-                if (escSeqRequests != null && escSeqRequests.HasResponse (terminator))
+                if (escSeqRequests is { } && escSeqRequests.HasResponse (terminator))
                 {
                     isResponse = true;
                     escSeqRequests.Remove (terminator);
@@ -867,7 +867,7 @@ public static class EscSeqUtils
                  || buttonState == MouseFlags.Button3Pressed
                  || buttonState == MouseFlags.Button4Pressed)
              && lastMouseButtonPressed is null)
-            || (isButtonPressed && lastMouseButtonPressed != null && buttonState.HasFlag (MouseFlags.ReportMousePosition)))
+            || (isButtonPressed && lastMouseButtonPressed is { } && buttonState.HasFlag (MouseFlags.ReportMousePosition)))
         {
             mouseFlags [0] = buttonState;
             lastMouseButtonPressed = buttonState;
@@ -1038,7 +1038,7 @@ public static class EscSeqUtils
         {
             foreach (ManagementObject mo in mos.Get ())
             {
-                if (mo ["ParentProcessId"] != null)
+                if (mo ["ParentProcessId"] is { })
                 {
                     try
                     {
@@ -1237,7 +1237,7 @@ public static class EscSeqUtils
                 break;
             }
 
-            if (isButtonPressed && lastMouseButtonPressed != null && (mouseFlag & MouseFlags.ReportMousePosition) == 0)
+            if (isButtonPressed && lastMouseButtonPressed is { } && (mouseFlag & MouseFlags.ReportMousePosition) == 0)
             {
                 Application.Invoke (() => continuousButtonPressedHandler (mouseFlag, point ?? Point.Empty));
             }

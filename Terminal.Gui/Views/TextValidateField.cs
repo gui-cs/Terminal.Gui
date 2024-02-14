@@ -365,7 +365,7 @@ namespace Terminal.Gui
 
             private void SetupText ()
             {
-                if (_text != null && IsValid)
+                if (_text is { } && IsValid)
                 {
                     return;
                 }

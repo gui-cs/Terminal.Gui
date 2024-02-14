@@ -170,7 +170,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     {
         Point? hit = _tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? headerIfAny, out int? offsetX);
 
-        if (hit is null || headerIfAny != null || !IsInTreeColumn (hit.Value.X, false) || offsetX is null)
+        if (hit is null || headerIfAny is { } || !IsInTreeColumn (hit.Value.X, false) || offsetX is null)
         {
             return;
         }

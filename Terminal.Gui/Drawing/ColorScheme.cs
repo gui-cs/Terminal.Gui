@@ -215,7 +215,7 @@ public static class Colors
     {
         public bool Equals (string x, string y)
         {
-            if (x != null && y != null)
+            if (x is { } && y is { })
             {
                 return string.Equals (x, y, StringComparison.InvariantCultureIgnoreCase);
             }

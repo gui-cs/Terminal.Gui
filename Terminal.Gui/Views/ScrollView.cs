@@ -420,7 +420,7 @@ public class ScrollView : View
 
         bool? result = InvokeKeyBindings (a);
 
-        if (result != null)
+        if (result is { })
         {
             return (bool)result;
         }
@@ -728,7 +728,7 @@ public class ScrollView : View
 
     private void View_MouseLeave (object sender, MouseEventEventArgs e)
     {
-        if (Application.MouseGrabView != null && Application.MouseGrabView != _vertical && Application.MouseGrabView != _horizontal)
+        if (Application.MouseGrabView is { } && Application.MouseGrabView != _vertical && Application.MouseGrabView != _horizontal)
         {
             Application.UngrabMouse ();
         }

@@ -432,11 +432,11 @@ public static class ConfigurationManager
             object? sourceVal = sourceProp.GetValue (source);
             object? destVal = destProp.GetValue (destination);
 
-            if (sourceVal != null)
+            if (sourceVal is { })
             {
                 try
                 {
-                    if (destVal != null)
+                    if (destVal is { })
                     {
                         // Recurse
                         destProp.SetValue (destination, DeepMemberwiseCopy (sourceVal, destVal));
@@ -483,7 +483,7 @@ public static class ConfigurationManager
         ThemeManager.GetHardCodedDefaults ();
         AppSettings?.RetrieveValues ();
 
-        foreach (KeyValuePair<string, ConfigProperty> p in Settings!.Where (cp => cp.Value.PropertyInfo != null))
+        foreach (KeyValuePair<string, ConfigProperty> p in Settings!.Where (cp => cp.Value.PropertyInfo is { }))
         {
             Settings! [p.Key].PropertyValue = p.Value.PropertyInfo?.GetValue (null);
         }

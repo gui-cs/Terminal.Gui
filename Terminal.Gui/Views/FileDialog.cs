@@ -257,7 +257,7 @@ public class FileDialog : Dialog
                              {
                                  IFileSystemInfo selected = _treeView.SelectedObject;
 
-                                 if (selected != null)
+                                 if (selected is { })
                                  {
                                      if (!_treeView.CanExpand (selected) || _treeView.IsExpanded (selected))
                                      {
@@ -705,7 +705,7 @@ public class FileDialog : Dialog
 
         if (!IsCompatibleWithOpenMode (_tbPath.Text, out string reason))
         {
-            if (reason != null)
+            if (reason is { })
             {
                 _feedback = reason;
                 SetNeedsDisplay ();
@@ -746,7 +746,7 @@ public class FileDialog : Dialog
         _tbPath.ClearAllSelection ();
         _tbPath.Autocomplete.ClearSuggestions ();
 
-        if (State != null)
+        if (State is { })
         {
             State.RefreshChildren ();
             WriteStateToTableView ();
@@ -842,7 +842,7 @@ public class FileDialog : Dialog
     {
         IFileSystemInfo [] toDelete = GetFocusedFiles ();
 
-        if (toDelete != null && FileOperationsHandler.Delete (toDelete))
+        if (toDelete is { } && FileOperationsHandler.Delete (toDelete))
         {
             RefreshState ();
         }
@@ -1025,7 +1025,7 @@ public class FileDialog : Dialog
             {
                 FileSystemInfoStats add = State?.Children [p.Y];
 
-                if (add != null)
+                if (add is { })
                 {
                     toReturn.Add (add);
                 }
@@ -1054,11 +1054,11 @@ public class FileDialog : Dialog
 
     private void New ()
     {
-        if (State != null)
+        if (State is { })
         {
             IFileSystemInfo created = FileOperationsHandler.New (_fileSystem, State.Directory);
 
-            if (created != null)
+            if (created is { })
             {
                 RefreshState ();
                 RestoreSelection (created);
@@ -1070,7 +1070,7 @@ public class FileDialog : Dialog
     {
         Point? clickedCell = _tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
 
-        if (clickedCol != null)
+        if (clickedCol is { })
         {
             if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
             {
@@ -1085,7 +1085,7 @@ public class FileDialog : Dialog
         }
         else
         {
-            if (clickedCell != null && e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
+            if (clickedCell is { } && e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
                 // right click in rest of table
                 ShowCellContextMenu (clickedCell, e);
@@ -1149,7 +1149,7 @@ public class FileDialog : Dialog
 
             _tbPath.Autocomplete.ClearSuggestions ();
 
-            if (pathText != null)
+            if (pathText is { })
             {
                 Path = pathText;
             }
@@ -1199,7 +1199,7 @@ public class FileDialog : Dialog
         {
             IFileSystemInfo newNamed = FileOperationsHandler.Rename (_fileSystem, toRename.Single ());
 
-            if (newNamed != null)
+            if (newNamed is { })
             {
                 RefreshState ();
                 RestoreSelection (newNamed);
@@ -1219,7 +1219,7 @@ public class FileDialog : Dialog
 
     //			ClearFeedback ();
 
-    //			if (allowedTypeMenuBar != null &&
+    //			if (allowedTypeMenuBar is { } &&
     //				keyEvent.ConsoleDriverKey == Key.Tab &&
     //				allowedTypeMenuBar.IsMenuOpen) {
     //				allowedTypeMenuBar.CloseMenu (false, false, false);
@@ -1469,7 +1469,7 @@ public class FileDialog : Dialog
             return true;
         }
 
-        if (reason != null)
+        if (reason is { })
         {
             _feedback = reason;
             SetNeedsDisplay ();

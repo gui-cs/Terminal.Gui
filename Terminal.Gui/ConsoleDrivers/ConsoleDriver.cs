@@ -488,7 +488,7 @@ public abstract class ConsoleDriver
         get => _currentAttribute;
         set
         {
-            if (Application.Driver != null)
+            if (Application.Driver is { })
             {
                 _currentAttribute = new Attribute (value.Foreground, value.Background);
 

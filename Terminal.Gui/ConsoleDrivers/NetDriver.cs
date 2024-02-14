@@ -292,7 +292,7 @@ internal class NetEvents : IDisposable
                         break;
                     }
 
-                    if (consoleKeyInfo.KeyChar == (char)KeyCode.Esc && _isEscSeq && _cki != null)
+                    if (consoleKeyInfo.KeyChar == (char)KeyCode.Esc && _isEscSeq && _cki is { })
                     {
                         ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki, ref mod);
                         _cki = null;
@@ -1727,7 +1727,7 @@ internal class NetMainLoop : IMainLoopDriver
 
     private void NetInputHandler ()
     {
-        while (_mainLoop != null)
+        while (_mainLoop is { })
         {
             try
             {

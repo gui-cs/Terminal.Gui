@@ -42,7 +42,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
             hostControl = value;
             top = hostControl.SuperView;
 
-            if (top != null)
+            if (top is { })
             {
                 top.DrawContent += Top_DrawContent;
                 top.DrawContentComplete += Top_DrawContentComplete;
@@ -114,7 +114,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
             }
 
             // not in the popup
-            if (Visible && HostControl != null)
+            if (Visible && HostControl is { })
             {
                 Visible = false;
                 closed = false;
@@ -467,7 +467,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
         {
             SelectedIdx = me.Y - ScrollOffset;
 
-            if (LastPopupPos != null)
+            if (LastPopupPos is { })
             {
                 RenderOverlay ((Point)LastPopupPos);
             }
@@ -522,7 +522,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
             top?.Add (popup);
         }
 
-        if (!Visible && popup != null)
+        if (!Visible && popup is { })
         {
             top?.Remove (popup);
             popup.Dispose ();

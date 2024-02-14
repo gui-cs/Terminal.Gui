@@ -36,7 +36,7 @@ internal class FileDialogHistory
         forward.Push (dlg.State);
         dlg.PushState (goTo, false, true, false, restorePath);
 
-        if (restoreSelection != null)
+        if (restoreSelection is { })
         {
             dlg.RestoreSelection (restoreSelection.FileSystemInfo);
         }
@@ -84,7 +84,7 @@ internal class FileDialogHistory
     {
         IDirectoryInfo parent = dlg.State?.Directory.Parent;
 
-        if (parent != null)
+        if (parent is { })
         {
             back.Push (new FileDialogState (parent, dlg));
             dlg.PushState (parent, false);

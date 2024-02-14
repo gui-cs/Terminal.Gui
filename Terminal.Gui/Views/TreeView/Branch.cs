@@ -16,7 +16,7 @@ internal class Branch<T> where T : class
         this.tree = tree;
         Model = model;
 
-        if (parentBranchIfAny != null)
+        if (parentBranchIfAny is { })
         {
             Depth = parentBranchIfAny.Depth + 1;
             Parent = parentBranchIfAny;
@@ -194,12 +194,12 @@ internal class Branch<T> where T : class
         Attribute modelColor = textColor;
 
         // if custom color delegate invoke it
-        if (tree.ColorGetter != null)
+        if (tree.ColorGetter is { })
         {
             ColorScheme modelScheme = tree.ColorGetter (Model);
 
             // if custom color scheme is defined for this Model
-            if (modelScheme != null)
+            if (modelScheme is { })
             {
                 // use it
                 modelColor = isSelected ? modelScheme.Focus : modelScheme.Normal;
@@ -379,7 +379,7 @@ internal class Branch<T> where T : class
     {
         Collapse ();
 
-        if (ChildBranches != null)
+        if (ChildBranches is { })
         {
             foreach (KeyValuePair<T, Branch<T>> child in ChildBranches)
             {
@@ -393,7 +393,7 @@ internal class Branch<T> where T : class
     {
         Expand ();
 
-        if (ChildBranches != null)
+        if (ChildBranches is { })
         {
             foreach (KeyValuePair<T, Branch<T>> child in ChildBranches)
             {
@@ -482,7 +482,7 @@ internal class Branch<T> where T : class
         Refresh (false);
 
         // if we know about our children
-        if (ChildBranches != null)
+        if (ChildBranches is { })
         {
             if (IsExpanded)
             {
@@ -506,7 +506,7 @@ internal class Branch<T> where T : class
     {
         Branch<T> cur = Parent;
 
-        while (cur != null)
+        while (cur is { })
         {
             yield return cur;
 

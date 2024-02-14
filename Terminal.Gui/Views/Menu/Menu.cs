@@ -311,7 +311,7 @@ internal sealed class Menu : View
         int maxW = (items.Max (z => z?.Width) ?? 0) + borderOffset;
         int maxH = items.Length + borderOffset;
 
-        if (parent != null && x + maxW > Driver.Cols)
+        if (parent is { } && x + maxW > Driver.Cols)
         {
             minX = Math.Max (parent.Frame.Right - parent.Frame.Width - maxW, 0);
         }
@@ -411,7 +411,7 @@ internal sealed class Menu : View
 #if SUPPORT_ALT_TO_ACTIVATE_MENU
         Initialized += (s, e) =>
                        {
-                           if (SuperView != null)
+                           if (SuperView is { })
                            {
                                SuperView.KeyUp += SuperView_KeyUp;
                            }
@@ -421,7 +421,7 @@ internal sealed class Menu : View
 
     public Menu ()
     {
-        if (Application.Current != null)
+        if (Application.Current is { })
         {
             Application.Current.DrawContentComplete += Current_DrawContentComplete;
             Application.Current.SizeChanging += Current_TerminalResized;
@@ -501,7 +501,7 @@ internal sealed class Menu : View
             return;
         }
 
-        foreach (MenuItem menuItem in menuBarItem.Children.Where (m => m != null))
+        foreach (MenuItem menuItem in menuBarItem.Children.Where (m => m is { }))
         {
             KeyBindings.Add ((KeyCode)menuItem.HotKey.Value, Command.ToggleExpandCollapse);
 
@@ -536,7 +536,7 @@ internal sealed class Menu : View
         {
             _host.Activate (1, _menuBarItemToActivate);
         }
-        else if (_menuItemToSelect != null)
+        else if (_menuItemToSelect is { })
         {
             var m = _menuItemToSelect as MenuBarItem;
 
@@ -656,7 +656,7 @@ internal sealed class Menu : View
 
         bool? handled = base.OnInvokingKeyBindings (keyEvent);
 
-        if (handled != null && (bool)handled)
+        if (handled is { } && (bool)handled)
         {
             return true;
         }
@@ -721,7 +721,7 @@ internal sealed class Menu : View
 
         Point locationOffset = _host.GetScreenOffsetFromCurrent ();
 
-        if (SuperView != null && SuperView != Application.Current)
+        if (SuperView is { } && SuperView != Application.Current)
         {
             locationOffset.X += SuperView.Border.Thickness.Left;
             locationOffset.Y += SuperView.Border.Thickness.Top;
@@ -828,13 +828,13 @@ internal sealed class Menu : View
                 {
                     Driver.AddRune (Glyphs.HLine);
                 }
-                else if (i == 0 && p == 0 && _host.UseSubMenusSingleFrame && item.Parent.Parent != null)
+                else if (i == 0 && p == 0 && _host.UseSubMenusSingleFrame && item.Parent.Parent is { })
                 {
                     Driver.AddRune (Glyphs.LeftArrow);
                 }
 
                 // This `- 3` is left border + right border + one row in from right
-                else if (p == Frame.Width - 3 && _barItems.SubMenu (_barItems.Children [i]) != null)
+                else if (p == Frame.Width - 3 && _barItems.SubMenu (_barItems.Children [i]) is { })
                 {
                     Driver.AddRune (Glyphs.RightArrow);
                 }
@@ -894,7 +894,7 @@ internal sealed class Menu : View
                 {
                     DrawHotString (textToDraw, ColorScheme.Disabled, ColorScheme.Disabled);
                 }
-                else if (i == 0 && _host.UseSubMenusSingleFrame && item.Parent.Parent != null)
+                else if (i == 0 && _host.UseSubMenusSingleFrame && item.Parent.Parent is { })
                 {
                     var tf = new TextFormatter
                     {
@@ -1171,7 +1171,7 @@ internal sealed class Menu : View
 
     private void SetParentSetNeedsDisplay ()
     {
-        if (_host._openSubMenu != null)
+        if (_host._openSubMenu is { })
         {
             foreach (Menu menu in _host._openSubMenu)
             {
@@ -1283,11 +1283,11 @@ internal sealed class Menu : View
 
         MenuBarItem subMenu = _barItems.SubMenu (_barItems.Children [_currentChild]);
 
-        if (subMenu != null)
+        if (subMenu is { })
         {
             int pos = -1;
 
-            if (_host._openSubMenu != null)
+            if (_host._openSubMenu is { })
             {
                 pos = _host._openSubMenu.FindIndex (o => o?._barItems == subMenu);
             }
@@ -1334,7 +1334,7 @@ internal sealed class Menu : View
             }
         }
 
-        if (v != null)
+        if (v is { })
         {
             pos = Subviews.IndexOf (v);
         }
@@ -1352,7 +1352,7 @@ internal sealed class Menu : View
 
     protected override void Dispose (bool disposing)
     {
-        if (Application.Current != null)
+        if (Application.Current is { })
         {
             Application.Current.DrawContentComplete -= Current_DrawContentComplete;
             Application.Current.SizeChanging -= Current_TerminalResized;

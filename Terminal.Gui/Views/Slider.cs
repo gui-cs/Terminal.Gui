@@ -664,7 +664,7 @@ public class Slider<T> : View
         if (AutoSize)
         {
             // Max size is SuperView's Bounds. Min Size is size that will fit.
-            if (SuperView != null)
+            if (SuperView is { })
             {
                 // Calculate the size of the slider based on the size of the SuperView's Bounds.
                 if (_config._sliderOrientation == Orientation.Horizontal)

@@ -33,7 +33,7 @@ public sealed class ContextMenu : IDisposable
     {
         if (IsShow)
         {
-            if (_menuBar.SuperView != null)
+            if (_menuBar.SuperView is { })
             {
                 Hide ();
             }
@@ -113,7 +113,7 @@ public sealed class ContextMenu : IDisposable
             IsShow = false;
         }
 
-        if (_container != null)
+        if (_container is { })
         {
             _container.Closing -= Container_Closing;
         }
@@ -135,7 +135,7 @@ public sealed class ContextMenu : IDisposable
     /// <summary>Shows (opens) the ContextMenu, displaying the <see cref="MenuItem"/>s it contains.</summary>
     public void Show ()
     {
-        if (_menuBar != null)
+        if (_menuBar is { })
         {
             Hide ();
         }
@@ -145,7 +145,7 @@ public sealed class ContextMenu : IDisposable
         Rect frame = Application.Driver.Bounds;
         Point position = Position;
 
-        if (Host != null)
+        if (Host is { })
         {
             Host.BoundsToScreen (frame.X, frame.Y, out int x, out int y);
             var pos = new Point (x, y);

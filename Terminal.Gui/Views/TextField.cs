@@ -1078,7 +1078,7 @@ public class TextField : View
     /// <inheritdoc/>
     public override bool OnLeave (View view)
     {
-        if (Application.MouseGrabView != null && Application.MouseGrabView == this)
+        if (Application.MouseGrabView is { } && Application.MouseGrabView == this)
         {
             Application.UngrabMouse ();
         }
@@ -1840,7 +1840,7 @@ public class TextField : View
 
             SetNeedsDisplay ();
         }
-        else if (SelectedLength > 0 || _selectedText != null)
+        else if (SelectedLength > 0 || _selectedText is { })
         {
             ClearAllSelection ();
         }

@@ -513,7 +513,7 @@ public class FakeDriver : ConsoleDriver
 
         protected override string GetClipboardDataImpl ()
         {
-            if (FakeException != null)
+            if (FakeException is { })
             {
                 throw FakeException;
             }
@@ -528,7 +528,7 @@ public class FakeDriver : ConsoleDriver
                 throw new ArgumentNullException (nameof (text));
             }
 
-            if (FakeException != null)
+            if (FakeException is { })
             {
                 throw FakeException;
             }

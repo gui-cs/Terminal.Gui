@@ -163,7 +163,7 @@ public partial class View
 
         Rect prevClip = ClipToBounds ();
 
-        if (ColorScheme != null)
+        if (ColorScheme is { })
         {
             //Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
             Driver?.SetAttribute (GetNormalColor ());
@@ -178,7 +178,7 @@ public partial class View
             OnDrawContent (Bounds);
         }
 
-        if (Driver != null)
+        if (Driver is { })
         {
             Driver.Clip = prevClip;
         }
@@ -371,14 +371,14 @@ public partial class View
     {
         if (NeedsDisplay)
         {
-            if (SuperView != null)
+            if (SuperView is { })
             {
                 Clear (BoundsToScreen (contentArea));
             }
 
             if (!string.IsNullOrEmpty (TextFormatter.Text))
             {
-                if (TextFormatter != null)
+                if (TextFormatter is { })
                 {
                     TextFormatter.NeedsFormat = true;
                 }
@@ -396,7 +396,7 @@ public partial class View
 
         // Draw subviews
         // TODO: Implement OnDrawSubviews (cancelable);
-        if (_subviews != null && SubViewNeedsDisplay)
+        if (_subviews is { } && SubViewNeedsDisplay)
         {
             IEnumerable<View> subviewsNeedingDraw = _subviews.Where (
                                                                      view => view.Visible
@@ -566,7 +566,7 @@ public partial class View
     {
         SubViewNeedsDisplay = true;
 
-        if (_superView != null && !_superView.SubViewNeedsDisplay)
+        if (_superView is { } && !_superView.SubViewNeedsDisplay)
         {
             _superView.SetSubViewNeedsDisplay ();
         }

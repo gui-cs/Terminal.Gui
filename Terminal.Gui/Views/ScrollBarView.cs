@@ -167,7 +167,7 @@ public class ScrollBarView : View
                     Position = pos;
                 }
 
-                if (OtherScrollBarView != null && OtherScrollBarView._keepContentAlwaysInViewport != value)
+                if (OtherScrollBarView is { } && OtherScrollBarView._keepContentAlwaysInViewport != value)
                 {
                     OtherScrollBarView.KeepContentAlwaysInViewport = value;
                 }
@@ -186,7 +186,7 @@ public class ScrollBarView : View
         get => _otherScrollBarView;
         set
         {
-            if (value != null && ((value.IsVertical && _vertical) || (!value.IsVertical && !_vertical)))
+            if (value is { } && ((value.IsVertical && _vertical) || (!value.IsVertical && !_vertical)))
             {
                 throw new ArgumentException (
                                              $"There is already a {(_vertical ? "vertical" : "horizontal")} ScrollBarView."
@@ -311,7 +311,7 @@ public class ScrollBarView : View
         {
             Application.GrabMouse (this);
         }
-        else if (mouseEvent.Flags == MouseFlags.Button1Released && Application.MouseGrabView != null && Application.MouseGrabView == this)
+        else if (mouseEvent.Flags == MouseFlags.Button1Released && Application.MouseGrabView is { } && Application.MouseGrabView == this)
         {
             _lastLocation = -1;
             Application.UngrabMouse ();
@@ -720,7 +720,7 @@ public class ScrollBarView : View
                 scrollBarView.Visible = false;
             }
         }
-        else if (barsize > 0 && barsize == scrollBarView._size && scrollBarView.OtherScrollBarView != null && pending)
+        else if (barsize > 0 && barsize == scrollBarView._size && scrollBarView.OtherScrollBarView is { } && pending)
         {
             if (scrollBarView._showScrollIndicator)
             {
@@ -732,7 +732,7 @@ public class ScrollBarView : View
                 scrollBarView.Visible = false;
             }
 
-            if (scrollBarView.OtherScrollBarView != null && scrollBarView._showBothScrollIndicator)
+            if (scrollBarView.OtherScrollBarView is { } && scrollBarView._showBothScrollIndicator)
             {
                 scrollBarView.OtherScrollBarView.ShowScrollIndicator = false;
             }
@@ -742,13 +742,13 @@ public class ScrollBarView : View
                 scrollBarView.OtherScrollBarView.Visible = false;
             }
         }
-        else if (barsize > 0 && barsize == _size && scrollBarView.OtherScrollBarView != null && !pending)
+        else if (barsize > 0 && barsize == _size && scrollBarView.OtherScrollBarView is { } && !pending)
         {
             pending = true;
         }
         else
         {
-            if (scrollBarView.OtherScrollBarView != null && pending)
+            if (scrollBarView.OtherScrollBarView is { } && pending)
             {
                 if (!scrollBarView._showBothScrollIndicator)
                 {
@@ -788,7 +788,7 @@ public class ScrollBarView : View
     //private void Host_CanFocusChanged ()
     //{
     //	CanFocus = Host.CanFocus;
-    //	if (otherScrollBarView != null) {
+    //	if (otherScrollBarView is { }) {
     //		otherScrollBarView.CanFocus = CanFocus;
     //	}
     //}
@@ -819,7 +819,7 @@ public class ScrollBarView : View
 
         if (Host != null
             && ((_contentBottomRightCorner is null && OtherScrollBarView is null)
-                || (_contentBottomRightCorner is null && OtherScrollBarView != null && OtherScrollBarView._contentBottomRightCorner is null)))
+                || (_contentBottomRightCorner is null && OtherScrollBarView is { } && OtherScrollBarView._contentBottomRightCorner is null)))
         {
             _contentBottomRightCorner = new ContentBottomRightCorner { Visible = Host.Visible };
 
@@ -860,7 +860,7 @@ public class ScrollBarView : View
     {
         Enabled = Host.Enabled;
 
-        if (_otherScrollBarView != null)
+        if (_otherScrollBarView is { })
         {
             _otherScrollBarView.Enabled = Enabled;
         }
@@ -874,7 +874,7 @@ public class ScrollBarView : View
         {
             Visible = Host.Visible;
 
-            if (_otherScrollBarView != null)
+            if (_otherScrollBarView is { })
             {
                 _otherScrollBarView.Visible = Visible;
             }
@@ -973,7 +973,7 @@ public class ScrollBarView : View
     {
         if (!_hosted || (_hosted && !_autoHideScrollBars))
         {
-            if (_contentBottomRightCorner != null && _contentBottomRightCorner.Visible)
+            if (_contentBottomRightCorner is { } && _contentBottomRightCorner.Visible)
             {
                 _contentBottomRightCorner.Visible = false;
             }
@@ -989,7 +989,7 @@ public class ScrollBarView : View
 
         bool pending = CheckBothScrollBars (this);
 
-        if (_otherScrollBarView != null)
+        if (_otherScrollBarView is { })
         {
             CheckBothScrollBars (_otherScrollBarView, pending);
         }
@@ -997,43 +997,43 @@ public class ScrollBarView : View
         SetWidthHeight ();
         SetRelativeLayout (SuperView?.Frame ?? Host.Frame);
 
-        if (_otherScrollBarView != null)
+        if (_otherScrollBarView is { })
         {
             OtherScrollBarView.SetRelativeLayout (SuperView?.Frame ?? Host.Frame);
         }
 
         if (_showBothScrollIndicator)
         {
-            if (_contentBottomRightCorner != null)
+            if (_contentBottomRightCorner is { })
             {
                 _contentBottomRightCorner.Visible = true;
             }
-            else if (_otherScrollBarView != null && _otherScrollBarView._contentBottomRightCorner != null)
+            else if (_otherScrollBarView is { } && _otherScrollBarView._contentBottomRightCorner is { })
             {
                 _otherScrollBarView._contentBottomRightCorner.Visible = true;
             }
         }
         else if (!_showScrollIndicator)
         {
-            if (_contentBottomRightCorner != null)
+            if (_contentBottomRightCorner is { })
             {
                 _contentBottomRightCorner.Visible = false;
             }
-            else if (_otherScrollBarView != null && _otherScrollBarView._contentBottomRightCorner != null)
+            else if (_otherScrollBarView is { } && _otherScrollBarView._contentBottomRightCorner is { })
             {
                 _otherScrollBarView._contentBottomRightCorner.Visible = false;
             }
 
-            if (Application.MouseGrabView != null && Application.MouseGrabView == this)
+            if (Application.MouseGrabView is { } && Application.MouseGrabView == this)
             {
                 Application.UngrabMouse ();
             }
         }
-        else if (_contentBottomRightCorner != null)
+        else if (_contentBottomRightCorner is { })
         {
             _contentBottomRightCorner.Visible = false;
         }
-        else if (_otherScrollBarView != null && _otherScrollBarView._contentBottomRightCorner != null)
+        else if (_otherScrollBarView is { } && _otherScrollBarView._contentBottomRightCorner is { })
         {
             _otherScrollBarView._contentBottomRightCorner.Visible = false;
         }
@@ -1058,16 +1058,16 @@ public class ScrollBarView : View
             Draw ();
         }
 
-        if (_otherScrollBarView != null && _otherScrollBarView._showScrollIndicator)
+        if (_otherScrollBarView is { } && _otherScrollBarView._showScrollIndicator)
         {
             _otherScrollBarView.Draw ();
         }
 
-        if (_contentBottomRightCorner != null && _contentBottomRightCorner.Visible)
+        if (_contentBottomRightCorner is { } && _contentBottomRightCorner.Visible)
         {
             _contentBottomRightCorner.Draw ();
         }
-        else if (_otherScrollBarView != null && _otherScrollBarView._contentBottomRightCorner != null && _otherScrollBarView._contentBottomRightCorner.Visible)
+        else if (_otherScrollBarView is { } && _otherScrollBarView._contentBottomRightCorner is { } && _otherScrollBarView._contentBottomRightCorner.Visible)
         {
             _otherScrollBarView._contentBottomRightCorner.Draw ();
         }

@@ -340,7 +340,7 @@ public class TextFormatter
         bool isVertical = IsVerticalDirection (Direction);
         Rect maxBounds = bounds;
 
-        if (driver != null)
+        if (driver is { })
         {
             maxBounds = containerBounds == default (Rect)
                             ? bounds
@@ -548,7 +548,7 @@ public class TextFormatter
                     {
                         int foundIdx = lastZeroWidthPos.IndexOf (
                                                                  p =>
-                                                                     p != null && p.Value.Y == current
+                                                                     p is { } && p.Value.Y == current
                                                                 );
 
                         if (foundIdx > -1)
@@ -618,7 +618,7 @@ public class TextFormatter
 
                             int foundIdx = lastZeroWidthPos.IndexOf (
                                                                      p =>
-                                                                         p != null && p.Value.Y == current
+                                                                         p is { } && p.Value.Y == current
                                                                     );
 
                             if (foundIdx == -1)
