@@ -155,7 +155,7 @@ public static class ConsoleKeyMapping
                 ScanCodeMapping sCode =
                     _scanCodes.FirstOrDefault (e => e.UnicodeChar == keyValue && e.Modifiers == modifiers);
 
-                if (sCode == null && modifiers == (ConsoleModifiers.Alt | ConsoleModifiers.Control))
+                if (sCode is null && modifiers == (ConsoleModifiers.Alt | ConsoleModifiers.Control))
                 {
                     return _scanCodes.FirstOrDefault (e => e.UnicodeChar == keyValue && e.Modifiers == 0);
                 }
@@ -164,7 +164,7 @@ public static class ConsoleKeyMapping
             case "VirtualKey":
                 sCode = _scanCodes.FirstOrDefault (e => e.VirtualKey == (VK)keyValue && e.Modifiers == modifiers);
 
-                if (sCode == null && modifiers == (ConsoleModifiers.Alt | ConsoleModifiers.Control))
+                if (sCode is null && modifiers == (ConsoleModifiers.Alt | ConsoleModifiers.Control))
                 {
                     return _scanCodes.FirstOrDefault (e => e.VirtualKey == (VK)keyValue && e.Modifiers == 0);
                 }
@@ -328,12 +328,12 @@ public static class ConsoleKeyMapping
         {
             ScanCodeMapping sCode = _scanCodes.FirstOrDefault (e => e.UnicodeChar == keyValue);
 
-            if (sCode == null)
+            if (sCode is null)
             {
                 consoleKey = (byte)(keyValue & byte.MaxValue);
                 sCode = _scanCodes.FirstOrDefault (e => e.VirtualKey == (VK)consoleKey);
 
-                if (sCode == null)
+                if (sCode is null)
                 {
                     consoleKey = 0;
                     outputChar = keyValue;
@@ -568,7 +568,7 @@ public static class ConsoleKeyMapping
             scanCode = scode.ScanCode;
         }
 
-        if (scode == null)
+        if (scode is null)
         {
             scode = unicodeChar != 0 ? GetScanCode ("UnicodeChar", decodedChar, mod) : null;
 

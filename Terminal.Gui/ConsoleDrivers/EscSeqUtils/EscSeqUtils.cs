@@ -200,7 +200,7 @@ public static class EscSeqUtils
         switch (c1Control)
         {
             case "ESC":
-                if (values == null && string.IsNullOrEmpty (terminator))
+                if (values is null && string.IsNullOrEmpty (terminator))
                 {
                     key = ConsoleKey.Escape;
 
@@ -515,7 +515,7 @@ public static class EscSeqUtils
     /// </returns>
     public static (string c1Control, string code, string [] values, string terminating) GetEscapeResult (char [] kChar)
     {
-        if (kChar == null || kChar.Length == 0)
+        if (kChar is null || kChar.Length == 0)
         {
             return (null, null, null, null);
         }
@@ -866,7 +866,7 @@ public static class EscSeqUtils
                  || buttonState == MouseFlags.Button2Pressed
                  || buttonState == MouseFlags.Button3Pressed
                  || buttonState == MouseFlags.Button4Pressed)
-             && lastMouseButtonPressed == null)
+             && lastMouseButtonPressed is null)
             || (isButtonPressed && lastMouseButtonPressed != null && buttonState.HasFlag (MouseFlags.ReportMousePosition)))
         {
             mouseFlags [0] = buttonState;
@@ -1131,7 +1131,7 @@ public static class EscSeqUtils
     /// <returns>The <see cref="ConsoleKeyInfo"/> resized.</returns>
     public static ConsoleKeyInfo [] ResizeArray (ConsoleKeyInfo consoleKeyInfo, ConsoleKeyInfo [] cki)
     {
-        Array.Resize (ref cki, cki == null ? 1 : cki.Length + 1);
+        Array.Resize (ref cki, cki is null ? 1 : cki.Length + 1);
         cki [cki.Length - 1] = consoleKeyInfo;
 
         return cki;
@@ -1232,7 +1232,7 @@ public static class EscSeqUtils
 
             View view = Application.WantContinuousButtonPressedView;
 
-            if (view == null)
+            if (view is null)
             {
                 break;
             }

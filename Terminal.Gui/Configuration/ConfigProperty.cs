@@ -96,7 +96,7 @@ public class ConfigProperty
 
     internal object? UpdateValueFrom (object source)
     {
-        if (source == null)
+        if (source is null)
         {
             return PropertyValue;
         }

@@ -270,7 +270,7 @@ public class TextFormatter
         get => _text;
         set
         {
-            bool textWasNull = _text == null && value != null;
+            bool textWasNull = _text is null && value != null;
             _text = EnableNeedsFormat (value);
 
             if ((AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) || (textWasNull && Size.IsEmpty))
@@ -505,7 +505,7 @@ public class TextFormatter
             {
                 Rune lastRuneUsed = rune;
 
-                if (lastZeroWidthPos == null)
+                if (lastZeroWidthPos is null)
                 {
                     if (idx < 0 || x + current + colOffset < 0)
                     {
@@ -540,7 +540,7 @@ public class TextFormatter
                         rune = runes [idx];
                     }
 
-                    if (lastZeroWidthPos == null)
+                    if (lastZeroWidthPos is null)
                     {
                         driver?.Move (x, current);
                     }
@@ -611,7 +611,7 @@ public class TextFormatter
                     {
                         if (runeWidth == 0)
                         {
-                            if (lastZeroWidthPos == null)
+                            if (lastZeroWidthPos is null)
                             {
                                 lastZeroWidthPos = new List<Point?> ();
                             }
@@ -1764,7 +1764,7 @@ public class TextFormatter
     /// <returns>The index of the last Rune in <paramref name="runes"/> that fit in <paramref name="columns"/>.</returns>
     public static int GetLengthThatFits (List<Rune> runes, int columns, int tabWidth = 0)
     {
-        if (runes == null || runes.Count == 0)
+        if (runes is null || runes.Count == 0)
         {
             return 0;
         }

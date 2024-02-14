@@ -372,7 +372,7 @@ public class ComboBox : View
     /// </remarks>
     public void SetSource (IList source)
     {
-        if (source == null)
+        if (source is null)
         {
             Source = null;
         }
@@ -605,7 +605,7 @@ public class ComboBox : View
 
     private void ProcessLayout ()
     {
-        if (Bounds.Height < _minimumHeight && (Height == null || Height is Dim.DimAbsolute))
+        if (Bounds.Height < _minimumHeight && (Height is null || Height is Dim.DimAbsolute))
         {
             Height = _minimumHeight;
         }
@@ -723,7 +723,7 @@ public class ComboBox : View
 
     private void SetSearchSet ()
     {
-        if (Source == null)
+        if (Source is null)
         {
             return;
         }
@@ -873,7 +873,7 @@ public class ComboBox : View
 
                 Move (0, row);
 
-                if (Source == null || item >= Source.Count)
+                if (Source is null || item >= Source.Count)
                 {
                     for (var c = 0; c < f.Width; c++)
                     {

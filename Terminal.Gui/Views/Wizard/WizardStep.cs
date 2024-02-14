@@ -143,7 +143,7 @@ public class WizardStep : FrameView
     /// <remarks></remarks>
     public override void Remove (View view)
     {
-        if (view == null)
+        if (view is null)
         {
             return;
         }

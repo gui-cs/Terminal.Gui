@@ -489,7 +489,7 @@ public class TableView : View
         ColumnToRender colHit = viewPort.FirstOrDefault (c => c.Column == tableColumn);
 
         // current column is outside the scroll area
-        if (colHit == null)
+        if (colHit is null)
         {
             return null;
         }
@@ -571,7 +571,7 @@ public class TableView : View
     /// </remarks>
     public void EnsureSelectedCellIsVisible ()
     {
-        if (Table == null || Table.Columns <= 0)
+        if (Table is null || Table.Columns <= 0)
         {
             return;
         }
@@ -1586,7 +1586,7 @@ public class TableView : View
     /// <returns></returns>
     private string GetRepresentation (object value, ColumnStyle colStyle)
     {
-        if (value == null || value == DBNull.Value)
+        if (value is null || value == DBNull.Value)
         {
             return NullSymbol;
         }
@@ -1885,7 +1885,7 @@ public class TableView : View
                                            );
 
                 // if users custom color getter returned null, use the row scheme
-                if (scheme == null)
+                if (scheme is null)
                 {
                     scheme = rowScheme;
                 }

@@ -309,7 +309,7 @@ public class StatusBar : View
 
     private void Run (Action action)
     {
-        if (action == null)
+        if (action is null)
         {
             return;
         }

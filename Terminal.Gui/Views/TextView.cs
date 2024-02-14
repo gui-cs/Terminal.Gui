@@ -61,7 +61,7 @@ internal class TextModel
 
     public bool CloseFile ()
     {
-        if (FilePath == null)
+        if (FilePath is null)
         {
             throw new ArgumentNullException (nameof (FilePath));
         }
@@ -148,7 +148,7 @@ internal class TextModel
 
     public void LoadStream (Stream input)
     {
-        if (input == null)
+        if (input is null)
         {
             throw new ArgumentNullException (nameof (input));
         }
@@ -565,7 +565,7 @@ internal class TextModel
     // Returns the left column in a range of the string.
     internal static int CalculateLeftColumn (List<Rune> t, int start, int end, int width, int tabWidth = 0)
     {
-        if (t == null || t.Count == 0)
+        if (t is null || t.Count == 0)
         {
             return 0;
         }
@@ -632,7 +632,7 @@ internal class TextModel
         int tabWidth = 0
     )
     {
-        if (t == null || t.Count == 0)
+        if (t is null || t.Count == 0)
         {
             return (0, 0);
         }
@@ -687,7 +687,7 @@ internal class TextModel
         bool matchWholeWord = false
     )
     {
-        if (text == null || _lines.Count == 0)
+        if (text is null || _lines.Count == 0)
         {
             gaveFullTurn = false;
 
@@ -730,7 +730,7 @@ internal class TextModel
         bool matchWholeWord = false
     )
     {
-        if (text == null || _lines.Count == 0)
+        if (text is null || _lines.Count == 0)
         {
             gaveFullTurn = false;
 
@@ -3218,7 +3218,7 @@ public class TextView : View
     {
         ColorScheme? cs = ColorScheme;
 
-        if (ColorScheme == null)
+        if (ColorScheme is null)
         {
             cs = new ColorScheme ();
         }
@@ -3485,7 +3485,7 @@ public class TextView : View
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
 
-            if (Application.MouseGrabView == null)
+            if (Application.MouseGrabView is null)
             {
                 Application.GrabMouse (this);
             }
@@ -3770,10 +3770,10 @@ public class TextView : View
     /// <summary>Invoke the <see cref="UnwrappedCursorPosition"/> event with the unwrapped <see cref="CursorPosition"/>.</summary>
     public virtual void OnUnwrappedCursorPosition (int? cRow = null, int? cCol = null)
     {
-        int? row = cRow == null ? CurrentRow : cRow;
-        int? col = cCol == null ? CurrentColumn : cCol;
+        int? row = cRow is null ? CurrentRow : cRow;
+        int? col = cCol is null ? CurrentColumn : cCol;
 
-        if (cRow == null && cCol == null && _wordWrap)
+        if (cRow is null && cCol is null && _wordWrap)
         {
             row = _wrapManager!.GetModelLineFromWrappedLines (CurrentRow);
             col = _wrapManager.GetModelColFromWrappedLines (CurrentRow, CurrentColumn);
@@ -3795,7 +3795,7 @@ public class TextView : View
 
         if (_copyWithoutSelection && contents.FirstOrDefault (x => x == '\n' || x == '\r') == 0)
         {
-            List<RuneCell> runeList = contents == null ? new List<RuneCell> () : TextModel.ToRuneCellList (contents);
+            List<RuneCell> runeList = contents is null ? new List<RuneCell> () : TextModel.ToRuneCellList (contents);
             List<RuneCell> currentLine = GetCurrentLine ();
 
             _historyText.Add (new List<List<RuneCell>> { new (currentLine) }, CursorPosition);
@@ -3852,7 +3852,7 @@ public class TextView : View
     {
         ProcessAutocomplete ();
 
-        if (!CanFocus || !Enabled || Application.Driver == null)
+        if (!CanFocus || !Enabled || Application.Driver is null)
         {
             return;
         }
@@ -4628,7 +4628,7 @@ public class TextView : View
         long selection;
         long point;
 
-        if (startRow == null || startCol == null || cRow == null || cCol == null)
+        if (startRow is null || startCol is null || cRow is null || cCol is null)
         {
             selection = ((long)(uint)_selectionStartRow << 32) | (uint)_selectionStartColumn;
             point = ((long)(uint)CurrentRow << 32) | (uint)CurrentColumn;
@@ -4675,7 +4675,7 @@ public class TextView : View
         var maxrow = (int)(end >> 32);
         var startCol = (int)(start & 0xffffffff);
         var endCol = (int)(end & 0xffffffff);
-        List<RuneCell> line = model == null ? _model.GetLine (startRow) : model.GetLine (startRow);
+        List<RuneCell> line = model is null ? _model.GetLine (startRow) : model.GetLine (startRow);
 
         if (startRow == maxrow)
         {
@@ -4695,7 +4695,7 @@ public class TextView : View
                                     );
         }
 
-        line = model == null ? _model.GetLine (maxrow) : model.GetLine (maxrow);
+        line = model is null ? _model.GetLine (maxrow) : model.GetLine (maxrow);
         res = res + Environment.NewLine + StringFromRunes (line.GetRange (0, endCol));
 
         return res;
@@ -5768,7 +5768,7 @@ public class TextView : View
 
                 for (int c = l.Count - 1; c > -1; c--)
                 {
-                    if (l [c].ColorScheme == null)
+                    if (l [c].ColorScheme is null)
                     {
                         l [c].ColorScheme = cell.ColorScheme;
                     }
@@ -5782,7 +5782,7 @@ public class TextView : View
             return;
         }
 
-        if (cell.ColorScheme == null)
+        if (cell.ColorScheme is null)
         {
             for (int r = row; r > -1; r--)
             {
@@ -5805,9 +5805,9 @@ public class TextView : View
         {
             int cRow = row;
 
-            while (cell.ColorScheme == null)
+            while (cell.ColorScheme is null)
             {
-                if ((colWithColor == 0 || cell.ColorScheme == null) && cRow > 0)
+                if ((colWithColor == 0 || cell.ColorScheme is null) && cRow > 0)
                 {
                     line = GetLine (--cRow);
                     colWithColor = line.Count - 1;
@@ -5820,9 +5820,9 @@ public class TextView : View
             }
         }
 
-        if (cell.ColorScheme != null && colWithColor > -1 && colWithoutColor < lineToSet.Count && lineToSet [colWithoutColor].ColorScheme == null)
+        if (cell.ColorScheme != null && colWithColor > -1 && colWithoutColor < lineToSet.Count && lineToSet [colWithoutColor].ColorScheme is null)
         {
-            while (lineToSet [colWithoutColor].ColorScheme == null)
+            while (lineToSet [colWithoutColor].ColorScheme is null)
             {
                 lineToSet [colWithoutColor].ColorScheme = cell.ColorScheme;
                 colWithoutColor--;
@@ -6415,7 +6415,7 @@ public class TextView : View
 
     private string StringFromRunes (List<RuneCell> cells)
     {
-        if (cells == null)
+        if (cells is null)
         {
             throw new ArgumentNullException (nameof (cells));
         }

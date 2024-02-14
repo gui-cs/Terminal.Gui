@@ -179,7 +179,7 @@ public sealed class ContextMenu : IDisposable
         {
             if (frame.Bottom - rect.Height - 1 >= 0 || !ForceMinimumPosToZero)
             {
-                if (Host == null)
+                if (Host is null)
                 {
                     position.Y = frame.Bottom - rect.Height - 1;
                 }

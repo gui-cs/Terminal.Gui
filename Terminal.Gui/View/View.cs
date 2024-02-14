@@ -139,7 +139,7 @@ public partial class View : Responder, ISupportInitializeNotification
             {
                 if (value)
                 {
-                    if (SuperView == null || SuperView?.Enabled == true)
+                    if (SuperView is null || SuperView?.Enabled == true)
                     {
                         base.Enabled = value;
                     }

@@ -445,7 +445,7 @@ public class ScrollView : View
     /// <param name="view">The view to remove from the scrollview.</param>
     public override void Remove (View view)
     {
-        if (view == null)
+        if (view is null)
         {
             return;
         }

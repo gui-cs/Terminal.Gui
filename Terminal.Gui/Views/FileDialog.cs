@@ -876,7 +876,7 @@ public class FileDialog : Dialog
 
     private IFileSystemInfo [] GetFocusedFiles ()
     {
-        if (!_tableView.HasFocus || !_tableView.CanFocus || FileOperationsHandler == null)
+        if (!_tableView.HasFocus || !_tableView.CanFocus || FileOperationsHandler is null)
         {
             return null;
         }
@@ -1229,7 +1229,7 @@ public class FileDialog : Dialog
     //		}
     private void RestartSearch ()
     {
-        if (_disposed || State?.Directory == null)
+        if (_disposed || State?.Directory is null)
         {
             return;
         }
@@ -1240,7 +1240,7 @@ public class FileDialog : Dialog
         }
 
         // user is clearing search terms
-        if (_tbFind.Text == null || _tbFind.Text.Length == 0)
+        if (_tbFind.Text is null || _tbFind.Text.Length == 0)
         {
             // Wait for search cancellation (if any) to finish
             // then push the current dir state
@@ -1259,7 +1259,7 @@ public class FileDialog : Dialog
 
     private void ShowCellContextMenu (Point? clickedCell, MouseEventEventArgs e)
     {
-        if (clickedCell == null)
+        if (clickedCell is null)
         {
             return;
         }
@@ -1394,7 +1394,7 @@ public class FileDialog : Dialog
 
         FileSystemInfoStats stats = RowToStats (obj.NewRow);
 
-        if (stats == null)
+        if (stats is null)
         {
             return;
         }
@@ -1439,7 +1439,7 @@ public class FileDialog : Dialog
 
     private void TreeView_SelectionChanged (object sender, SelectionChangedEventArgs<IFileSystemInfo> e)
     {
-        if (e.NewValue == null)
+        if (e.NewValue is null)
         {
             return;
         }
@@ -1487,7 +1487,7 @@ public class FileDialog : Dialog
 
     private void WriteStateToTableView ()
     {
-        if (State == null)
+        if (State is null)
         {
             return;
         }
@@ -1511,7 +1511,7 @@ public class FileDialog : Dialog
                                                                   _fileDialog.State?.Children [idx]
                                                                  );
 
-            if (val == null)
+            if (val is null)
             {
                 return string.Empty;
             }

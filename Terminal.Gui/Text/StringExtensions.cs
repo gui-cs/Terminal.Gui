@@ -55,7 +55,7 @@ public static class StringExtensions
     /// <remarks>This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.</remarks>
     /// <param name="str">The string to measure.</param>
     /// <returns></returns>
-    public static int GetColumns (this string str) { return str == null ? 0 : str.EnumerateRunes ().Sum (r => Math.Max (r.GetColumns (), 0)); }
+    public static int GetColumns (this string str) { return str is null ? 0 : str.EnumerateRunes ().Sum (r => Math.Max (r.GetColumns (), 0)); }
 
     /// <summary>Gets the number of runes in the string.</summary>
     /// <remarks>This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.</remarks>

@@ -11,7 +11,7 @@ public partial class View
     {
         get
         {
-            if (_colorScheme == null)
+            if (_colorScheme is null)
             {
                 return SuperView?.ColorScheme;
             }
@@ -100,7 +100,7 @@ public partial class View
     /// <param name="regionScreen">The screen-relative rectangle to clear.</param>
     public void Clear (Rect regionScreen)
     {
-        if (Driver == null)
+        if (Driver is null)
         {
             return;
         }
@@ -123,7 +123,7 @@ public partial class View
     /// </remarks>
     public Rect ClipToBounds ()
     {
-        if (Driver == null)
+        if (Driver is null)
         {
             return Rect.Empty;
         }
@@ -279,7 +279,7 @@ public partial class View
     {
         ColorScheme cs = ColorScheme;
 
-        if (ColorScheme == null)
+        if (ColorScheme is null)
         {
             cs = new ColorScheme ();
         }
@@ -297,7 +297,7 @@ public partial class View
     {
         ColorScheme cs = ColorScheme;
 
-        if (ColorScheme == null)
+        if (ColorScheme is null)
         {
             cs = new ColorScheme ();
         }
@@ -315,7 +315,7 @@ public partial class View
     {
         ColorScheme cs = ColorScheme;
 
-        if (ColorScheme == null)
+        if (ColorScheme is null)
         {
             cs = new ColorScheme ();
         }
@@ -329,7 +329,7 @@ public partial class View
     /// <param name="row">the row to move to, in view-relative coordinates.</param>
     public void Move (int col, int row)
     {
-        if (Driver == null || Driver?.Rows == 0)
+        if (Driver is null || Driver?.Rows == 0)
         {
             return;
         }
@@ -544,7 +544,7 @@ public partial class View
             Padding?.SetNeedsDisplay (Padding.Bounds);
         }
 
-        if (_subviews == null)
+        if (_subviews is null)
         {
             return;
         }

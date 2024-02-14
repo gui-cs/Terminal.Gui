@@ -214,7 +214,7 @@ public class TabView : View
         _tabs.Add (tab);
         _tabsBar.Add (tab);
 
-        if (SelectedTab == null || andSelect)
+        if (SelectedTab is null || andSelect)
         {
             SelectedTab = tab;
 
@@ -291,7 +291,7 @@ public class TabView : View
     /// <summary>Updates <see cref="TabScrollOffset"/> to ensure that <see cref="SelectedTab"/> is visible.</summary>
     public void EnsureSelectedTabIsVisible ()
     {
-        if (!IsInitialized || SelectedTab == null)
+        if (!IsInitialized || SelectedTab is null)
         {
             return;
         }
@@ -335,7 +335,7 @@ public class TabView : View
     /// <param name="tab"></param>
     public void RemoveTab (Tab tab)
     {
-        if (tab == null || !_tabs.Contains (tab))
+        if (tab is null || !_tabs.Contains (tab))
         {
             return;
         }
@@ -346,7 +346,7 @@ public class TabView : View
         _tabs.Remove (tab);
 
         // if the currently selected tab is no longer a member of Tabs
-        if (SelectedTab == null || !Tabs.Contains (SelectedTab))
+        if (SelectedTab is null || !Tabs.Contains (SelectedTab))
         {
             // select the tab closest to the one that disappeared
             int toSelect = Math.Max (idx - 1, 0);
@@ -381,7 +381,7 @@ public class TabView : View
         }
 
         // if there is only one tab anyway or nothing is selected
-        if (Tabs.Count == 1 || SelectedTab == null)
+        if (Tabs.Count == 1 || SelectedTab is null)
         {
             SelectedTab = Tabs.ElementAt (0);
             SetNeedsDisplay ();
@@ -672,7 +672,7 @@ public class TabView : View
 
         public override void OnDrawContentComplete (Rect contentArea)
         {
-            if (_host._tabLocations == null)
+            if (_host._tabLocations is null)
             {
                 return;
             }
@@ -1259,7 +1259,7 @@ public class TabView : View
                         tab.Margin.Thickness = new Thickness (0, 0, 0, topLine);
                     }
                 }
-                else if (selected == null)
+                else if (selected is null)
                 {
                     if (_host.Style.TabsOnBottom)
                     {
@@ -1332,7 +1332,7 @@ public class TabView : View
 
             TabToRender selected = _host._tabLocations.FirstOrDefault (t => t.IsSelected);
 
-            if (selected == null)
+            if (selected is null)
             {
                 return;
             }

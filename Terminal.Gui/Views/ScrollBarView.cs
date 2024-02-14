@@ -57,12 +57,12 @@ public class ScrollBarView : View
     /// </param>
     public ScrollBarView (View host, bool isVertical, bool showBothScrollIndicator = true)
     {
-        if (host == null)
+        if (host is null)
         {
             throw new ArgumentNullException ("The host parameter can't be null.");
         }
 
-        if (host.SuperView == null)
+        if (host.SuperView is null)
         {
             throw new ArgumentNullException ("The host SuperView parameter can't be null.");
         }
@@ -307,7 +307,7 @@ public class ScrollBarView : View
         barsize -= 2;
         int pos = Position;
 
-        if (mouseEvent.Flags != MouseFlags.Button1Released && (Application.MouseGrabView == null || Application.MouseGrabView != this))
+        if (mouseEvent.Flags != MouseFlags.Button1Released && (Application.MouseGrabView is null || Application.MouseGrabView != this))
         {
             Application.GrabMouse (this);
         }
@@ -451,7 +451,7 @@ public class ScrollBarView : View
     /// <inheritdoc/>
     public override void OnDrawContent (Rect contentArea)
     {
-        if (ColorScheme == null || ((!_showScrollIndicator || Size == 0) && AutoHideScrollBars && Visible))
+        if (ColorScheme is null || ((!_showScrollIndicator || Size == 0) && AutoHideScrollBars && Visible))
         {
             if ((!_showScrollIndicator || Size == 0) && AutoHideScrollBars && Visible)
             {
@@ -818,8 +818,8 @@ public class ScrollBarView : View
         }
 
         if (Host != null
-            && ((_contentBottomRightCorner == null && OtherScrollBarView == null)
-                || (_contentBottomRightCorner == null && OtherScrollBarView != null && OtherScrollBarView._contentBottomRightCorner == null)))
+            && ((_contentBottomRightCorner is null && OtherScrollBarView is null)
+                || (_contentBottomRightCorner is null && OtherScrollBarView != null && OtherScrollBarView._contentBottomRightCorner is null)))
         {
             _contentBottomRightCorner = new ContentBottomRightCorner { Visible = Host.Visible };
 
@@ -892,7 +892,7 @@ public class ScrollBarView : View
         SetWidthHeight ();
         SetRelativeLayout (SuperView?.Frame ?? Host?.Frame ?? Frame);
 
-        if (OtherScrollBarView == null)
+        if (OtherScrollBarView is null)
         {
             // Only do this once if both scrollbars are enabled
             ShowHideScrollBars ();

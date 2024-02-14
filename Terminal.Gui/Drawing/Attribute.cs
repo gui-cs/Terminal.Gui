@@ -72,7 +72,7 @@ public readonly struct Attribute : IEquatable<Attribute>
         Background = background;
 
         // TODO: Once CursesDriver supports truecolor all the PlatformColor stuff goes away
-        if (Application.Driver == null)
+        if (Application.Driver is null)
         {
             PlatformColor = -1;
 

@@ -48,7 +48,7 @@ public class EscSeqRequests
         {
             EscSeqReqStatus found = Statuses.Find (x => x.Terminator == terminator);
 
-            if (found == null)
+            if (found is null)
             {
                 Statuses.Add (new EscSeqReqStatus (terminator, numReq));
             }
@@ -71,7 +71,7 @@ public class EscSeqRequests
         {
             EscSeqReqStatus found = Statuses.Find (x => x.Terminator == terminator);
 
-            if (found == null)
+            if (found is null)
             {
                 return false;
             }
@@ -102,7 +102,7 @@ public class EscSeqRequests
         {
             EscSeqReqStatus found = Statuses.Find (x => x.Terminator == terminator);
 
-            if (found == null)
+            if (found is null)
             {
                 return;
             }

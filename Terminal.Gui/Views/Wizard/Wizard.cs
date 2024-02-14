@@ -247,7 +247,7 @@ public class Wizard : Dialog
     {
         LinkedListNode<WizardStep> step = null;
 
-        if (CurrentStep == null)
+        if (CurrentStep is null)
         {
             // Get first step, assume it is next
             step = _steps.First;
@@ -289,7 +289,7 @@ public class Wizard : Dialog
     {
         LinkedListNode<WizardStep> step = null;
 
-        if (CurrentStep == null)
+        if (CurrentStep is null)
         {
             // Get last step, assume it is previous
             step = _steps.Last;
@@ -532,7 +532,7 @@ public class Wizard : Dialog
 
     private void UpdateButtonsAndTitle ()
     {
-        if (CurrentStep == null)
+        if (CurrentStep is null)
         {
             return;
         }

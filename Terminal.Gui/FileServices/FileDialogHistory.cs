@@ -28,7 +28,7 @@ internal class FileDialogHistory
         }
 
         // nowhere to go
-        if (goTo == null)
+        if (goTo is null)
         {
             return false;
         }
@@ -63,7 +63,7 @@ internal class FileDialogHistory
 
     internal void Push (FileDialogState state, bool clearForward)
     {
-        if (state == null)
+        if (state is null)
         {
             return;
         }

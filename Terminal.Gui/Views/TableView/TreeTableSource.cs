@@ -136,7 +136,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 
         T obj = _tree.GetObjectOnRow (_tableView.SelectedRow);
 
-        if (obj == null)
+        if (obj is null)
         {
             return;
         }
@@ -170,7 +170,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     {
         Point? hit = _tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? headerIfAny, out int? offsetX);
 
-        if (hit == null || headerIfAny != null || !IsInTreeColumn (hit.Value.X, false) || offsetX == null)
+        if (hit is null || headerIfAny != null || !IsInTreeColumn (hit.Value.X, false) || offsetX is null)
         {
             return;
         }

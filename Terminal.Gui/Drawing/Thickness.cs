@@ -217,7 +217,7 @@ public class Thickness : IEquatable<Thickness>
             // Draw the diagnostics label on the bottom
             var tf = new TextFormatter
             {
-                Text = label == null ? string.Empty : $"{label} {this}",
+                Text = label is null ? string.Empty : $"{label} {this}",
                 Alignment = TextAlignment.Centered,
                 VerticalAlignment = VerticalTextAlignment.Bottom
             };
@@ -233,7 +233,7 @@ public class Thickness : IEquatable<Thickness>
     public override bool Equals (object obj)
     {
         //Check for null and compare run-time types.
-        if (obj == null || !GetType ().Equals (obj.GetType ()))
+        if (obj is null || !GetType ().Equals (obj.GetType ()))
         {
             return false;
         }

@@ -422,7 +422,7 @@ public class Pos
                     break;
             }
 
-            if (Target == null)
+            if (Target is null)
             {
                 throw new NullReferenceException (nameof (Target));
             }
@@ -726,7 +726,7 @@ public class Dim
 
         public override string ToString ()
         {
-            if (Target == null)
+            if (Target is null)
             {
                 throw new NullReferenceException ();
             }

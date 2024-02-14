@@ -215,7 +215,7 @@ public partial class View
 
     private void SetHotKey ()
     {
-        if (TextFormatter == null || HotKeySpecifier == new Rune ('\xFFFF'))
+        if (TextFormatter is null || HotKeySpecifier == new Rune ('\xFFFF'))
         {
             return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
         }
@@ -263,7 +263,7 @@ public partial class View
                 return;
             }
 
-            if (SuperView?._tabIndexes == null || SuperView?._tabIndexes.Count == 1)
+            if (SuperView?._tabIndexes is null || SuperView?._tabIndexes.Count == 1)
             {
                 _tabIndex = 0;
 

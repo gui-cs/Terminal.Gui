@@ -177,7 +177,7 @@ public partial class View
 #endif // DEBUG
 
             // BUGBUG: I think there's a bug here. This should be && not ||
-            if (Margin == null || Border == null || Padding == null)
+            if (Margin is null || Border is null || Padding is null)
             {
                 return new Rect (default (Point), Frame.Size);
             }
@@ -556,7 +556,7 @@ public partial class View
     {
         resy = resx = 0;
 
-        if (start == null || !start.Frame.Contains (x, y))
+        if (start is null || !start.Frame.Contains (x, y))
         {
             return null;
         }
@@ -581,7 +581,7 @@ public partial class View
                     {
                         View deep = FindDeepestView (v, rx, ry, out resx, out resy);
 
-                        if (deep == null)
+                        if (deep is null)
                         {
                             return v;
                         }
@@ -846,7 +846,7 @@ public partial class View
     /// <summary>Overriden by <see cref="Adornment"/> to do nothing, as the <see cref="Adornment"/> does not have adornments.</summary>
     internal virtual void LayoutAdornments ()
     {
-        if (Margin == null)
+        if (Margin is null)
         {
             return; // CreateAdornments () has not been called yet
         }
@@ -1248,7 +1248,7 @@ public partial class View
             if (from == to)
             {
                 // if not yet added to the result, add it and remove from edge
-                if (result.Find (v => v == from) == null)
+                if (result.Find (v => v == from) is null)
                 {
                     result.Add (from);
                 }
@@ -1258,13 +1258,13 @@ public partial class View
             else if (from.SuperView == to.SuperView)
             {
                 // if 'from' is not yet added to the result, add it
-                if (result.Find (v => v == from) == null)
+                if (result.Find (v => v == from) is null)
                 {
                     result.Add (from);
                 }
 
                 // if 'to' is not yet added to the result, add it
-                if (result.Find (v => v == to) == null)
+                if (result.Find (v => v == to) is null)
                 {
                     result.Add (to);
                 }

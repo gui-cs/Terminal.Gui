@@ -23,7 +23,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
     {
         get
         {
-            if (colorScheme == null)
+            if (colorScheme is null)
             {
                 colorScheme = Colors.ColorSchemes ["Menu"];
             }
@@ -125,7 +125,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
             return false;
         }
 
-        if (popup == null || Suggestions.Count == 0)
+        if (popup is null || Suggestions.Count == 0)
         {
             ManipulatePopup ();
 
@@ -516,7 +516,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
 
     private void ManipulatePopup ()
     {
-        if (Visible && popup == null)
+        if (Visible && popup is null)
         {
             popup = new Popup (this) { Frame = Rect.Empty };
             top?.Add (popup);
@@ -568,7 +568,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
 
         public override void OnDrawContent (Rect contentArea)
         {
-            if (autocomplete.LastPopupPos == null)
+            if (autocomplete.LastPopupPos is null)
             {
                 return;
             }

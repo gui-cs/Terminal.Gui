@@ -523,7 +523,7 @@ public class FakeDriver : ConsoleDriver
 
         protected override void SetClipboardDataImpl (string text)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException (nameof (text));
             }

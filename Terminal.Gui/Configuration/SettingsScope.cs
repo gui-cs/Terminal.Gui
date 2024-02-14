@@ -102,7 +102,7 @@ public class SettingsScope : Scope<SettingsScope>
     /// <param name="resourceName"></param>
     public SettingsScope? UpdateFromResource (Assembly assembly, string resourceName)
     {
-        if (resourceName == null || string.IsNullOrEmpty (resourceName))
+        if (resourceName is null || string.IsNullOrEmpty (resourceName))
         {
             Debug.WriteLine (
                              $"ConfigurationManager: Resource \"{resourceName}\" does not exist in \"{assembly.GetName ().Name}\"."
@@ -113,7 +113,7 @@ public class SettingsScope : Scope<SettingsScope>
 
         using Stream? stream = assembly.GetManifestResourceStream (resourceName)!;
 
-        if (stream == null)
+        if (stream is null)
         {
             Debug.WriteLine (
                              $"ConfigurationManager: Failed to read resource \"{resourceName}\" from \"{assembly.GetName ().Name}\"."

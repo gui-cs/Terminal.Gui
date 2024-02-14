@@ -199,7 +199,7 @@ public static partial class Application
         bool calledViaRunT = false
     )
     {
-        if (_initialized && driver == null)
+        if (_initialized && driver is null)
         {
             return;
         }
@@ -235,7 +235,7 @@ public static partial class Application
             ForceDriver = driverName;
         }
 
-        if (Driver == null)
+        if (Driver is null)
         {
             PlatformID p = Environment.OSVersion.Platform;
 
@@ -377,7 +377,7 @@ public static partial class Application
     /// </remarks>
     public static RunState Begin (Toplevel Toplevel)
     {
-        if (Toplevel == null)
+        if (Toplevel is null)
         {
             throw new ArgumentNullException (nameof (Toplevel));
         }
@@ -435,7 +435,7 @@ public static partial class Application
             {
                 Toplevel dup = _topLevels.FirstOrDefault (x => x.Id == Toplevel.Id);
 
-                if (dup == null)
+                if (dup is null)
                 {
                     _topLevels.Push (Toplevel);
                 }
@@ -447,7 +447,7 @@ public static partial class Application
             }
         }
 
-        if (Top == null || Toplevel.IsOverlappedContainer)
+        if (Top is null || Toplevel.IsOverlappedContainer)
         {
             Top = Toplevel;
         }
@@ -629,7 +629,7 @@ public static partial class Application
             }
             catch (Exception error)
             {
-                if (errorHandler == null)
+                if (errorHandler is null)
                 {
                     throw;
                 }
@@ -767,12 +767,12 @@ public static partial class Application
     /// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
     public static void RunLoop (RunState state)
     {
-        if (state == null)
+        if (state is null)
         {
             throw new ArgumentNullException (nameof (state));
         }
 
-        if (state.Toplevel == null)
+        if (state.Toplevel is null)
         {
             throw new ObjectDisposedException ("state");
         }
@@ -885,7 +885,7 @@ public static partial class Application
     /// </remarks>
     public static void RequestStop (Toplevel top = null)
     {
-        if (OverlappedTop == null || top == null || (OverlappedTop == null && top != null))
+        if (OverlappedTop is null || top is null || (OverlappedTop is null && top != null))
         {
             top = Current;
         }
@@ -1011,7 +1011,7 @@ public static partial class Application
     /// <param name="runState">The <see cref="RunState"/> returned by the <see cref="Begin(Toplevel)"/> method.</param>
     public static void End (RunState runState)
     {
-        if (runState == null)
+        if (runState is null)
         {
             throw new ArgumentNullException (nameof (runState));
         }
@@ -1333,7 +1333,7 @@ public static partial class Application
     /// <param name="view">View that will receive all mouse events until <see cref="UngrabMouse"/> is invoked.</param>
     public static void GrabMouse (View view)
     {
-        if (view == null)
+        if (view is null)
         {
             return;
         }
@@ -1348,7 +1348,7 @@ public static partial class Application
     /// <summary>Releases the mouse grab, so mouse events will be routed to the view on which the mouse is.</summary>
     public static void UngrabMouse ()
     {
-        if (MouseGrabView == null)
+        if (MouseGrabView is null)
         {
             return;
         }
@@ -1362,7 +1362,7 @@ public static partial class Application
 
     private static bool OnGrabbingMouse (View view)
     {
-        if (view == null)
+        if (view is null)
         {
             return false;
         }
@@ -1375,7 +1375,7 @@ public static partial class Application
 
     private static bool OnUnGrabbingMouse (View view)
     {
-        if (view == null)
+        if (view is null)
         {
             return false;
         }
@@ -1388,7 +1388,7 @@ public static partial class Application
 
     private static void OnGrabbedMouse (View view)
     {
-        if (view == null)
+        if (view is null)
         {
             return;
         }
@@ -1398,7 +1398,7 @@ public static partial class Application
 
     private static void OnUnGrabbedMouse (View view)
     {
-        if (view == null)
+        if (view is null)
         {
             return;
         }
@@ -1487,7 +1487,7 @@ public static partial class Application
             }
         }
 
-        if ((view == null || view == OverlappedTop)
+        if ((view is null || view == OverlappedTop)
             && Current is { Modal: false }
             && OverlappedTop != null
             && a.MouseEvent.Flags != MouseFlags.ReportMousePosition
@@ -1551,7 +1551,7 @@ public static partial class Application
                         View = view
                     };
 
-                    if (_mouseEnteredView == null)
+                    if (_mouseEnteredView is null)
                     {
                         _mouseEnteredView = view;
                         view.OnMouseEnter (me);
@@ -1603,7 +1603,7 @@ public static partial class Application
                     View = view
                 };
 
-                if (_mouseEnteredView == null)
+                if (_mouseEnteredView is null)
                 {
                     _mouseEnteredView = view;
                     view.OnMouseEnter (me);

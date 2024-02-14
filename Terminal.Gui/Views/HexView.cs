@@ -173,7 +173,7 @@ public class HexView : View
         get => source;
         set
         {
-            if (value == null)
+            if (value is null)
             {
                 throw new ArgumentNullException ("source");
             }

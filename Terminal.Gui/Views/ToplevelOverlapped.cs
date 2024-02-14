@@ -77,7 +77,7 @@ public static partial class Application
     /// <returns>The matched view.</returns>
     public static Toplevel GetTopOverlappedChild (Type type = null, string [] exclude = null)
     {
-        if (OverlappedTop == null)
+        if (OverlappedTop is null)
         {
             return null;
         }
@@ -186,7 +186,7 @@ public static partial class Application
 
     private static bool OverlappedChildNeedsDisplay ()
     {
-        if (OverlappedTop == null)
+        if (OverlappedTop is null)
         {
             return false;
         }
@@ -206,7 +206,7 @@ public static partial class Application
 
     private static bool SetCurrentOverlappedAsTop ()
     {
-        if (OverlappedTop == null && Current != Top && Current?.SuperView == null && Current?.Modal == false)
+        if (OverlappedTop is null && Current != Top && Current?.SuperView is null && Current?.Modal == false)
         {
             Top = Current;
 

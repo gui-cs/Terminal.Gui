@@ -35,7 +35,7 @@ public class TreeView : TreeView<ITreeNode>
     public TreeView ()
     {
         TreeBuilder = new TreeNodeBuilder ();
-        AspectGetter = o => o == null ? "Null" : o.Text ?? o?.ToString () ?? "Unamed Node";
+        AspectGetter = o => o is null ? "Null" : o.Text ?? o?.ToString () ?? "Unamed Node";
     }
 }
 
@@ -526,7 +526,7 @@ public class TreeView<T> : View, ITreeView where T : class
             multiSelectedRegions.Clear ();
         }
 
-        if (SelectedObject == null)
+        if (SelectedObject is null)
         {
             SelectedObject = roots.Keys.FirstOrDefault ();
         }
@@ -577,7 +577,7 @@ public class TreeView<T> : View, ITreeView where T : class
     {
         T o = SelectedObject;
 
-        if (o == null)
+        if (o is null)
         {
             return;
         }
@@ -619,7 +619,7 @@ public class TreeView<T> : View, ITreeView where T : class
     {
         T o = SelectedObject;
 
-        if (o == null)
+        if (o is null)
         {
             return;
         }
@@ -755,7 +755,7 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <param name="toExpand">The object to expand.</param>
     public void Expand (T toExpand)
     {
-        if (toExpand == null)
+        if (toExpand is null)
         {
             return;
         }
@@ -769,7 +769,7 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <param name="toExpand">The object to expand.</param>
     public void ExpandAll (T toExpand)
     {
-        if (toExpand == null)
+        if (toExpand is null)
         {
             return;
         }
@@ -832,7 +832,7 @@ public class TreeView<T> : View, ITreeView where T : class
     {
         Branch<T> branch = ObjectToBranch (o);
 
-        if (branch == null || !branch.IsExpanded)
+        if (branch is null || !branch.IsExpanded)
         {
             return new T [0];
         }
@@ -949,7 +949,7 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <param name="toSelect"></param>
     public void GoTo (T toSelect)
     {
-        if (ObjectToBranch (toSelect) == null)
+        if (ObjectToBranch (toSelect) is null)
         {
             return;
         }
@@ -1052,7 +1052,7 @@ public class TreeView<T> : View, ITreeView where T : class
             // The line they clicked on a branch
             Branch<T> clickedBranch = HitTest (me.Y);
 
-            if (clickedBranch == null)
+            if (clickedBranch is null)
             {
                 return false;
             }
@@ -1102,7 +1102,7 @@ public class TreeView<T> : View, ITreeView where T : class
             // The line they clicked on a branch
             Branch<T> clickedBranch = HitTest (me.Y);
 
-            if (clickedBranch == null)
+            if (clickedBranch is null)
             {
                 return false;
             }
@@ -1141,12 +1141,12 @@ public class TreeView<T> : View, ITreeView where T : class
     ///<inheritdoc/>
     public override void OnDrawContent (Rect contentArea)
     {
-        if (roots == null)
+        if (roots is null)
         {
             return;
         }
 
-        if (TreeBuilder == null)
+        if (TreeBuilder is null)
         {
             Move (0, 0);
             Driver.AddStr (NoBuilderError);
@@ -1181,7 +1181,7 @@ public class TreeView<T> : View, ITreeView where T : class
     {
         Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
 
-        if (SelectedObject == null && Objects.Any ())
+        if (SelectedObject is null && Objects.Any ())
         {
             SelectedObject = Objects.First ();
         }
@@ -1369,7 +1369,7 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <param name="all"></param>
     protected void CollapseImpl (T toCollapse, bool all)
     {
-        if (toCollapse == null)
+        if (toCollapse is null)
         {
             return;
         }
@@ -1377,7 +1377,7 @@ public class TreeView<T> : View, ITreeView where T : class
         Branch<T> branch = ObjectToBranch (toCollapse);
 
         // Nothing to collapse
-        if (branch == null)
+        if (branch is null)
         {
             return;
         }
@@ -1391,7 +1391,7 @@ public class TreeView<T> : View, ITreeView where T : class
             branch.Collapse ();
         }
 
-        if (SelectedObject != null && ObjectToBranch (SelectedObject) == null)
+        if (SelectedObject != null && ObjectToBranch (SelectedObject) is null)
         {
             // If the old selection suddenly became invalid then clear it
             SelectedObject = null;

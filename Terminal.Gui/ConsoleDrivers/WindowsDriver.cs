@@ -998,7 +998,7 @@ internal class WindowsDriver : ConsoleDriver
     public WindowsConsole WinConsole { get; private set; }
 
     /// <inheritdoc/>
-    public override bool EnsureCursorVisibility () { return WinConsole == null || WinConsole.EnsureCursorVisibility (); }
+    public override bool EnsureCursorVisibility () { return WinConsole is null || WinConsole.EnsureCursorVisibility (); }
 
     public WindowsConsole.KeyEventRecord FromVKPacketToKeyEventRecord (WindowsConsole.KeyEventRecord keyEvent)
     {
@@ -1143,7 +1143,7 @@ internal class WindowsDriver : ConsoleDriver
     {
         _cachedCursorVisibility = visibility;
 
-        return WinConsole == null || WinConsole.SetCursorVisibility (visibility);
+        return WinConsole is null || WinConsole.SetCursorVisibility (visibility);
     }
 
     #region Not Implemented
@@ -1709,7 +1709,7 @@ internal class WindowsDriver : ConsoleDriver
 
             View view = Application.WantContinuousButtonPressedView;
 
-            if (view == null)
+            if (view is null)
             {
                 break;
             }
@@ -1797,7 +1797,7 @@ internal class WindowsDriver : ConsoleDriver
             Y = mouseEvent.MousePosition.Y
         };
 
-        if ((mouseEvent.ButtonState != 0 && mouseEvent.EventFlags == 0 && _lastMouseButtonPressed == null && !_isButtonDoubleClicked)
+        if ((mouseEvent.ButtonState != 0 && mouseEvent.EventFlags == 0 && _lastMouseButtonPressed is null && !_isButtonDoubleClicked)
             || (_lastMouseButtonPressed == null
                 && mouseEvent.EventFlags.HasFlag (WindowsConsole.EventFlags.MouseMoved)
                 && mouseEvent.ButtonState != 0

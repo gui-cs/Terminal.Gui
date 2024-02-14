@@ -201,7 +201,7 @@ public class ListView : View
         get => _left;
         set
         {
-            if (_source == null)
+            if (_source is null)
             {
                 return;
             }
@@ -226,7 +226,7 @@ public class ListView : View
         get => _selected;
         set
         {
-            if (_source == null || _source.Count == 0)
+            if (_source is null || _source.Count == 0)
             {
                 return;
             }
@@ -265,7 +265,7 @@ public class ListView : View
         get => _top;
         set
         {
-            if (_source == null)
+            if (_source is null)
             {
                 return;
             }
@@ -363,7 +363,7 @@ public class ListView : View
             SetFocus ();
         }
 
-        if (_source == null)
+        if (_source is null)
         {
             return false;
         }
@@ -643,7 +643,7 @@ public class ListView : View
 
             Move (0, row);
 
-            if (_source == null || item >= _source.Count)
+            if (_source is null || item >= _source.Count)
             {
                 for (var c = 0; c < f.Width; c++)
                 {
@@ -695,7 +695,7 @@ public class ListView : View
     /// <returns></returns>
     public virtual bool OnOpenSelectedItem ()
     {
-        if (_source.Count <= _selected || _selected < 0 || OpenSelectedItem == null)
+        if (_source.Count <= _selected || _selected < 0 || OpenSelectedItem is null)
         {
             return false;
         }
@@ -819,7 +819,7 @@ public class ListView : View
     /// </remarks>
     public void SetSource (IList source)
     {
-        if (source == null && (Source == null || !(Source is ListWrapper)))
+        if (source is null && (Source is null || !(Source is ListWrapper)))
         {
             Source = null;
         }
@@ -840,7 +840,7 @@ public class ListView : View
         return Task.Factory.StartNew (
                                       () =>
                                       {
-                                          if (source == null && (Source == null || !(Source is ListWrapper)))
+                                          if (source is null && (Source is null || !(Source is ListWrapper)))
                                           {
                                               Source = null;
                                           }
@@ -903,7 +903,7 @@ public class ListWrapper : IListDataSource
         container.Move (col, line);
         object t = _source? [item];
 
-        if (t == null)
+        if (t is null)
         {
             RenderUstr (driver, "", col, line, width);
         }
@@ -950,7 +950,7 @@ public class ListWrapper : IListDataSource
     /// <inheritdoc/>
     public int StartsWith (string search)
     {
-        if (_source == null || _source?.Count == 0)
+        if (_source is null || _source?.Count == 0)
         {
             return -1;
         }
@@ -980,7 +980,7 @@ public class ListWrapper : IListDataSource
 
     private int GetMaxLengthItem ()
     {
-        if (_source == null || _source?.Count == 0)
+        if (_source is null || _source?.Count == 0)
         {
             return 0;
         }
