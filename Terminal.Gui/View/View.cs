@@ -202,7 +202,7 @@ public partial class View : Responder, ISupportInitializeNotification
                 {
                     Id = _title;
                 }
-#endif // DEBUG
+#endif
                 OnTitleChanged (old, _title);
             }
         }
