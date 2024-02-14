@@ -170,6 +170,13 @@ public class TextFormatter
         }
     }
 
+    /// <summary>
+    ///     Determines if the bounds width will be used or only the text width will be used,
+    ///     If <see langword="true"/> all the bounds area will be filled with whitespaces and the same background color
+    ///     showing a perfect rectangle.
+    /// </summary>
+    public bool FillRemaining { get; set; }
+
     /// <summary>Gets or sets the hot key. Fires the <see cref="HotKeyChanged"/> event.</summary>
     public Key HotKey
     {
@@ -297,7 +304,6 @@ public class TextFormatter
     /// <param name="normalColor">The color to use for all text except the hotkey</param>
     /// <param name="hotColor">The color to use to draw the hotkey</param>
     /// <param name="containerBounds">Specifies the screen-relative location and maximum container size.</param>
-    /// <param name="fillRemaining">Determines if the bounds width will be used (default) or only the text width will be used.</param>
     /// <param name="driver">The console driver currently used by the application.</param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public void Draw (
@@ -305,7 +311,6 @@ public class TextFormatter
         Attribute normalColor,
         Attribute hotColor,
         Rect containerBounds = default,
-        bool fillRemaining = true,
         ConsoleDriver driver = null
     )
     {
@@ -509,7 +514,7 @@ public class TextFormatter
                         continue;
                     }
 
-                    if (!fillRemaining && idx > runes.Length - 1)
+                    if (!FillRemaining && idx > runes.Length - 1)
                     {
                         break;
                     }
