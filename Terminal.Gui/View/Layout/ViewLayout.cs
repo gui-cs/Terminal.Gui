@@ -1064,14 +1064,17 @@ public partial class View
                         var text = 0;
                         var subviews = 0;
 
+                        int superviewSize = width ? superviewBounds.Width : superviewBounds.Height;
+                        int autoMin = auto._min?.Anchor (superviewSize) ?? 0;
+
+                        if (superviewSize < autoMin)
+                        {
+                            Debug.WriteLine ($"WARNING: DimAuto specifies a min size ({autoMin}), but the SuperView's bounds are smaller ({superviewSize}).");
+                        }
+
                         if (auto._style is Dim.DimAutoStyle.Text or Dim.DimAutoStyle.Auto)
                         {
-                            if (Id == "vlabel")
-                            { }
-
-                            text = int.Max (
-                                            width ? TextFormatter.Size.Width : TextFormatter.Size.Height,
-                                            auto._min?.Anchor (width ? superviewBounds.Width : superviewBounds.Height) ?? 0);
+                            text = int.Max (width ? TextFormatter.Size.Width : TextFormatter.Size.Height, autoMin);
                         }
 
                         if (auto._style is Dim.DimAutoStyle.Subviews or Dim.DimAutoStyle.Auto)
@@ -1085,9 +1088,9 @@ public partial class View
 
                         int max = int.Max (text, subviews);
 
-                        newDimension = int.Max (
-                                                width ? max + thickness.Left + thickness.Right : max + thickness.Top + thickness.Bottom,
-                                                auto._min?.Anchor (width ? superviewBounds.Width : superviewBounds.Height) ?? 0);
+                        newDimension = int.Max (width ? max + thickness.Left + thickness.Right : max + thickness.Top + thickness.Bottom, autoMin);
+                        // If _max is set, use it. Otherwise, use superview;'s size to constrain
+                        newDimension = int.Min (newDimension, auto._max?.Anchor (superviewSize) ?? superviewSize);
 
                         break;
 
@@ -1101,6 +1104,12 @@ public partial class View
                         break;
 
                     case Dim.DimFill:
+                        // Fills the remaining space. 
+                        newDimension = Math.Max (d.Anchor (dimension - location), 0 /* width ? superviewBounds.Width : superviewBounds.Height*/);
+                        newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
+
+                        break;
+
                     default:
                         newDimension = Math.Max (d.Anchor (dimension - location), 0);
                         newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
@@ -1468,6 +1477,7 @@ public partial class View
                     bad = pos;
 
                     break;
+
                 case Pos pos and Pos.PosCombine:
                     // Recursively check for not Absolute or not View
                     ThrowInvalid (view, (pos as Pos.PosCombine)._left, name);
@@ -1479,6 +1489,7 @@ public partial class View
                     bad = dim;
 
                     break;
+
                 case Dim dim and Dim.DimCombine:
                     // Recursively check for not Absolute or not View
                     ThrowInvalid (view, (dim as Dim.DimCombine)._left, name);
@@ -1590,9 +1601,9 @@ public partial class View
     private Pos VerifyIsInitialized (Pos pos, string member)
     {
 #if DEBUG
-        if (LayoutStyle == LayoutStyle.Computed && !IsInitialized)
+        if (pos is not Pos.PosAbsolute && LayoutStyle == LayoutStyle.Computed && !IsInitialized)
         {
-            Debug.WriteLine ($"WARNING: \"{this}\" has not been initialized; {member} is indeterminate {pos}. This is potentially a bug.");
+            Debug.WriteLine ($"WARNING: \"{this}\" has not been initialized; {member} is indeterminate ({pos}). This is potentially a bug.");
         }
 #endif // DEBUG
         return pos;
@@ -1602,9 +1613,9 @@ public partial class View
     private Dim VerifyIsInitialized (Dim dim, string member)
     {
 #if DEBUG
-        if (LayoutStyle == LayoutStyle.Computed && !IsInitialized)
+        if (dim is not Dim.DimAbsolute && LayoutStyle == LayoutStyle.Computed && !IsInitialized)
         {
-            Debug.WriteLine ($"WARNING: \"{this}\" has not been initialized; {member} is indeterminate: {dim}. This is potentially a bug.");
+            Debug.WriteLine ($"WARNING: \"{this}\" has not been initialized; {member} is indeterminate: ({dim}). This is potentially a bug.");
         }
 #endif // DEBUG		
         return dim;

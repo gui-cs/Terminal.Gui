@@ -47,7 +47,7 @@ public class DimAutoTests
         superView.BeginInit ();
         superView.EndInit ();
 
-        superView.SetRelativeLayout (new Rect (0, 0, 0, 0));
+        superView.SetRelativeLayout (new Rect (0, 0, 10, 10));
         superView.LayoutSubviews (); // no throw
 
         Assert.Equal (10, superView.Frame.Width);
@@ -79,7 +79,7 @@ public class DimAutoTests
         superView.BeginInit ();
         superView.EndInit ();
 
-        superView.SetRelativeLayout (new Rect (0, 0, 0, 0));
+        superView.SetRelativeLayout (new Rect (0, 0, 10, 10));
         superView.LayoutSubviews (); // no throw
 
         Assert.Equal (10, superView.Frame.Width);
@@ -87,7 +87,7 @@ public class DimAutoTests
 
         subView.X = -1;
         subView.Y = -1;
-        superView.SetRelativeLayout (new Rect (0, 0, 0, 0));
+        superView.SetRelativeLayout (new Rect (0, 0, 10, 10));
         superView.LayoutSubviews (); // no throw
 
         Assert.Equal (5, subView.Frame.Width);
@@ -121,7 +121,7 @@ public class DimAutoTests
         superView.BeginInit ();
         superView.EndInit ();
 
-        superView.SetRelativeLayout (new Rect (0, 0, 0, 0));
+        superView.SetRelativeLayout (new Rect (0, 0, 10, 10));
         superView.LayoutSubviews (); // no throw
 
         Assert.Equal (10, superView.Frame.Width);
@@ -129,7 +129,7 @@ public class DimAutoTests
 
         subView.Width = 3;
         subView.Height = 3;
-        superView.SetRelativeLayout (new Rect (0, 0, 0, 0));
+        superView.SetRelativeLayout (new Rect (0, 0, 10, 10));
         superView.LayoutSubviews (); // no throw
 
         Assert.Equal (3, subView.Frame.Width);
@@ -176,7 +176,7 @@ public class DimAutoTests
 
         superView.BeginInit ();
         superView.EndInit ();
-        superView.SetRelativeLayout (new Rect (0, 0, 0, 0));
+        superView.SetRelativeLayout (new Rect (0, 0, 10, 10));
         Assert.Equal (new Rect (0, 0, 10, expectedHeight), superView.Frame);
     }
 
@@ -194,7 +194,7 @@ public class DimAutoTests
 
         superView.BeginInit ();
         superView.EndInit ();
-        superView.SetRelativeLayout (new Rect (0, 0, 0, 0));
+        superView.SetRelativeLayout (new Rect (0, 0, 10, 10));
         Assert.Equal (new Rect (0, 0, 0, 0), superView.Frame);
 
         superView.SetRelativeLayout (new Rect (0, 0, 10, 10));
@@ -241,7 +241,7 @@ public class DimAutoTests
 
         superView.BeginInit ();
         superView.EndInit ();
-        superView.SetRelativeLayout (new Rect (0, 0, 0, 0));
+        superView.SetRelativeLayout (new Rect (0, 0, 10, 10));
         Assert.Equal (new Rect (0, 0, expectedWidth, expectedHeight), superView.Frame);
     }
 
@@ -273,7 +273,7 @@ public class DimAutoTests
 
         subView.Width = 10;
         superView.Add (subView);
-        superView.SetRelativeLayout (new Rect (0, 0, 0, 0));
+        superView.SetRelativeLayout (new Rect (0, 0, 10, 10));
         superView.LayoutSubviews (); // no throw
 
         subView.Width = Dim.Fill ();
@@ -468,8 +468,77 @@ public class DimAutoTests
 
         superView.BeginInit ();
         superView.EndInit ();
-        superView.SetRelativeLayout (new Rect (0, 0, 0, 0));
+        superView.SetRelativeLayout (new Rect (0, 0, 10, 10));
         Assert.Equal (new Rect (0, 0, expectedWidth, 10), superView.Frame);
+    }
+
+    // Test that when a view has Width set to DimAuto (min: x) the width is never < x even if SetRelativeLayout is called with smaller bounds
+    [Theory]
+    [InlineData (0, 0)]
+    [InlineData (1, 1)]
+    [InlineData (3, 3)]
+    [InlineData (4, 4)]
+    [InlineData (5, 4)] // This is clearly invalid, but we choose to not throw but log a debug message
+    public void Width_Auto_Min (int min, int expectedWidth)
+    {
+        var superView = new View
+        {
+            X = 0,
+            Y = 0,
+            Width = Dim.Auto (min: min),
+            Height = 1,
+            ValidatePosDim = true
+        };
+        
+        superView.BeginInit ();
+        superView.EndInit ();
+        superView.SetRelativeLayout (new Rect (0, 0, 4, 1));
+        Assert.Equal (expectedWidth, superView.Frame.Width);
+    }
+
+    // Test Dim.Fill - Fill should not impact width of the DimAuto superview
+    [Theory]
+    [InlineData (0, 0, 0, 10, 10)]
+    [InlineData (0, 1, 0, 10, 10)]
+    [InlineData (0, 11, 0, 10, 10)]
+    [InlineData (0, 10, 0, 10, 10)]
+    [InlineData (0, 5, 0, 10, 10)]
+    [InlineData (1, 5, 0, 10, 9)]
+    [InlineData (1, 10, 0, 10, 9)]
+    [InlineData (0, 0, 1, 10, 9)]
+    [InlineData (0, 10, 1, 10, 9)]
+    [InlineData (0, 5, 1, 10, 9)]
+    [InlineData (1, 5, 1, 10, 8)]
+    [InlineData (1, 10, 1, 10, 8)]
+    public void Width_Fill_Fills (int subX, int superMinWidth, int fill, int expectedSuperWidth, int expectedSubWidth)
+    {
+        var superView = new View
+        {
+            X = 0,
+            Y = 0,
+            Width = Dim.Auto (min:superMinWidth),
+            Height = 1,
+            ValidatePosDim = true
+        };
+
+        var subView = new View
+        {
+            X = subX,
+            Y = 0,
+            Width = Dim.Fill (fill),
+            Height = 1,
+            ValidatePosDim = true
+        };
+
+        superView.Add (subView);
+
+        superView.BeginInit ();
+        superView.EndInit ();
+        superView.SetRelativeLayout (new Rect (0, 0, 10, 1));
+        Assert.Equal (expectedSuperWidth, superView.Frame.Width);
+        superView.LayoutSubviews ();
+        Assert.Equal (expectedSubWidth, subView.Frame.Width);
+        Assert.Equal (expectedSuperWidth, superView.Frame.Width);
     }
 
     // Test variations of Frame

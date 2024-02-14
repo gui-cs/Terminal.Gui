@@ -111,8 +111,6 @@ public class DimAutoDemo : Scenario
             Text = "_Move down",
             X = Pos.Right (vlabel),
             Y = Pos.Bottom (vlabel),
-            AutoSize = false,
-            Width = 10
         };
         movingButton.Clicked += (s, e) => { movingButton.Y = movingButton.Frame.Y + 1; };
         view.Add (movingButton);
@@ -155,6 +153,7 @@ public class DimAutoDemo : Scenario
 
         var label = new Label
         {
+            ValidatePosDim = true,
             Text = "This is a label (AutoSize = false; Dim.Auto(3/20). Press Esc to close. Even more text.",
             AutoSize = false,
             X = Pos.Center (),
@@ -166,24 +165,25 @@ public class DimAutoDemo : Scenario
 
         var text = new TextField
         {
-            Text = "TextField... X = 1; Y = Pos.Bottom (label), Width = Dim.Fill (1); Height = Dim.Fill(1)",
+            ValidatePosDim = true,
+            Text = "TextField: X=1; Y=Pos.Bottom (label)+1, Width=Dim.Fill (0); Height=1",
             TextFormatter = new TextFormatter { WordWrap = true },
-            X = 20,
-            Y = Pos.Bottom (label),
-            Width = Fill (20),
-            Height = Fill (10)
+            X = 0,
+            Y = Pos.Bottom (label) + 1,
+            Width = Fill (10),
+            Height = 1
         };
 
-        var btn = new Button
-        {
-            Text = "AnchorEnd", Y = Pos.AnchorEnd (1)
-        };
+        //var btn = new Button
+        //{
+        //    Text = "AnchorEnd", Y = Pos.AnchorEnd (1)
+        //};
 
-        // TODO: We should really fix AnchorEnd to do this automatically. 
-        btn.X = Pos.AnchorEnd () - (Pos.Right (btn) - Pos.Left (btn));
+        //// TODO: We should really fix AnchorEnd to do this automatically. 
+        //btn.X = Pos.AnchorEnd () - (Pos.Right (btn) - Pos.Left (btn));
         dlg.Add (label);
         dlg.Add (text);
-        dlg.Add (btn);
+        //dlg.Add (btn);
         Application.Run (dlg);
     }
 }
