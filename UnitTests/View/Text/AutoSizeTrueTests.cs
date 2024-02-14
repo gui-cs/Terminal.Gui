@@ -919,30 +919,30 @@ public class AutoSizeTrueTests
         Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
 
-        Size size = view.GetAutoSize ();
+        Size size = view.GetTextAutoSize();
         Assert.Equal (new Size (text.Length, 1), size);
 
         view.Text = $"{text}\n{text}";
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (text.Length, 2), size);
 
         view.Text = $"{text}\n{text}\n{text}+";
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (text.Length + 1, 3), size);
 
         text = string.Empty;
         view.Text = text;
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (0, 0), size);
 
         text = "1";
         view.Text = text;
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (1, 1), size);
 
         text = "界";
         view.Text = text;
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (2, 1), size);
     }
 
@@ -958,30 +958,30 @@ public class AutoSizeTrueTests
         Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
 
-        Size size = view.GetAutoSize ();
+        Size size = view.GetTextAutoSize();
         Assert.Equal (new Size (text.Length, 1), size);
 
         view.Text = $"{text}\n{text}";
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (text.Length, 2), size);
 
         view.Text = $"{text}\n{text}\n{text}+";
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (text.Length + 1, 3), size);
 
         text = string.Empty;
         view.Text = text;
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (0, 0), size);
 
         text = "1";
         view.Text = text;
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (1, 1), size);
 
         text = "界";
         view.Text = text;
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (2, 1), size);
     }
 
@@ -997,30 +997,30 @@ public class AutoSizeTrueTests
         Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
 
-        Size size = view.GetAutoSize ();
+        Size size = view.GetTextAutoSize();
         Assert.Equal (new Size (text.Length, 1), size);
 
         view.Text = $"{text}\n{text}";
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (text.Length, 2), size);
 
         view.Text = $"{text}\n{text}\n{text}+";
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (text.Length + 1, 3), size);
 
         text = string.Empty;
         view.Text = text;
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (0, 0), size);
 
         text = "1";
         view.Text = text;
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (1, 1), size);
 
         text = "界";
         view.Text = text;
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (2, 1), size);
     }
 
@@ -1036,30 +1036,30 @@ public class AutoSizeTrueTests
         Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
 
-        Size size = view.GetAutoSize ();
+        Size size = view.GetTextAutoSize();
         Assert.Equal (new Size (text.Length, 1), size);
 
         view.Text = $"{text}\n{text}";
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (text.Length, 2), size);
 
         view.Text = $"{text}\n{text}\n{text}+";
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (text.Length + 1, 3), size);
 
         text = string.Empty;
         view.Text = text;
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (0, 0), size);
 
         text = "1";
         view.Text = text;
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (1, 1), size);
 
         text = "界";
         view.Text = text;
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (2, 1), size);
     }
 
@@ -1075,30 +1075,30 @@ public class AutoSizeTrueTests
         Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
 
-        Size size = view.GetAutoSize ();
+        Size size = view.GetTextAutoSize();
         Assert.Equal (new Size (1, text.Length), size);
 
         view.Text = $"{text}\n{text}";
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (2, text.Length), size);
 
         view.Text = $"{text}\n{text}\n{text}+";
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (3, text.Length + 1), size);
 
         text = string.Empty;
         view.Text = text;
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (0, 0), size);
 
         text = "1";
         view.Text = text;
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (1, 1), size);
 
         text = "界";
         view.Text = text;
-        size = view.GetAutoSize ();
+        size = view.GetTextAutoSize();
         Assert.Equal (new Size (2, 1), size);
     }
 

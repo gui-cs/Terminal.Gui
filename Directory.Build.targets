@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);DIMAUTO</DefineConstants>
+  </PropertyGroup>
+</Project>
