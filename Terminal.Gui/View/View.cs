@@ -282,7 +282,22 @@ public partial class View : Responder, ISupportInitializeNotification
 
     /// <summary>Pretty prints the View</summary>
     /// <returns></returns>
-    public override string ToString () { return $"{GetType ().Name}({Id}){Frame}"; }
+    public override string ToString ()
+    {
+        string id = Id;
+
+        if (string.IsNullOrEmpty (id))
+        {
+            if (!string.IsNullOrEmpty (Title))
+            {
+                id = Title;
+            } else if (!string.IsNullOrEmpty (Text))
+            {
+                id = Text;
+            }
+        }
+        return $"{GetType ().Name}({id}){Frame}";
+    }
 
     /// <summary>Event fired when the <see cref="Visible"/> value is being changed.</summary>
     public event EventHandler VisibleChanged;

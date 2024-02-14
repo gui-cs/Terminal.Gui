@@ -22,155 +22,152 @@ public class Bars : Scenario
     private void SetupContentMenu ()
     {
         Application.Top.Add (new Label { Text = "Right Click for Context Menu", X = Pos.Center (), Y = 4 });
+        Application.Top.MouseClick += ShowContextMenu;
+    }
 
-        Application.Top.MouseClick += (s, e) =>
+    private void ShowContextMenu (object s, MouseEventEventArgs e)
+    {
+        if (e.MouseEvent.Flags != MouseFlags.Button3Clicked)
+        {
+            return;
+        }
+
+        var contextMenu = new Bar
+        {
+            X = e.MouseEvent.X, Y = e.MouseEvent.Y,
+            Orientation = Orientation.Vertical,
+            StatusBarStyle = false,
+            BorderStyle = LineStyle.Rounded,
+            Modal = true,
+        };
+
+        var newMenu = new Shortcut
+        {
+            Title = "_New...",
+            Text = "Create a new file",
+            Key = Key.N.WithCtrl,
+
+            //AutoSize = true,
+            Width = Dim.Fill (),
+            CanFocus = true
+        };
+
+        newMenu.Accept += (s, e) =>
+                          {
+                              contextMenu.RequestStop ();
+
+                              Application.AddTimeout (
+                                                      new TimeSpan (0),
+                                                      () =>
+                                                      {
+                                                          MessageBox.Query ("File", "New");
+
+                                                          return false;
+                                                      });
+                          };
+
+        var open = new Shortcut
+        {
+            Title = "_Open...",
+            Text = "Show the File Open Dialog",
+            Key = Key.O.WithCtrl,
+
+            //AutoSize = true,
+            Width = Dim.Fill (),
+            CanFocus = true
+        };
+
+        open.Accept += (s, e) =>
+                       {
+                           contextMenu.RequestStop ();
+
+                           Application.AddTimeout (
+                                                   new TimeSpan (0),
+                                                   () =>
+                                                   {
+                                                       MessageBox.Query ("File", "Open");
+
+                                                       return false;
+                                                   });
+                       };
+
+        var save = new Shortcut
+        {
+            Title = "_Save...",
+            Text = "Save",
+            Key = Key.S.WithCtrl,
+
+            //AutoSize = true,
+            Width = Dim.Fill (),
+            CanFocus = true
+        };
+
+        save.Accept += (s, e) =>
+                       {
+                           contextMenu.RequestStop ();
+
+                           Application.AddTimeout (
+                                                   new TimeSpan (0),
+                                                   () =>
+                                                   {
+                                                       MessageBox.Query ("File", "Save");
+
+                                                       return false;
+                                                   });
+                       };
+
+        var saveAs = new Shortcut
+        {
+            Title = "Save _As...",
+            Text = "Save As",
+            Key = Key.A.WithCtrl,
+
+            //AutoSize = true,
+            Width = Dim.Fill (),
+            CanFocus = true
+        };
+
+        saveAs.Accept += (s, e) =>
+                         {
+                             contextMenu.RequestStop ();
+
+                             Application.AddTimeout (
+                                                     new TimeSpan (0),
+                                                     () =>
+                                                     {
+                                                         MessageBox.Query ("File", "Save As");
+
+                                                         return false;
+                                                     });
+                         };
+
+        contextMenu.Add (newMenu, open, save, saveAs);
+
+        contextMenu.KeyBindings.Add (Key.Esc, Command.QuitToplevel);
+
+        contextMenu.LayoutComplete += (s, e) =>
                                       {
-                                          if (e.MouseEvent.Flags != MouseFlags.Button3Clicked)
-                                          {
-                                              return;
-                                          }
-
-                                          var menuWindow = new Window
-                                          {
-                                              X = e.MouseEvent.X,
-                                              Y = e.MouseEvent.Y,
-                                              BorderStyle = LineStyle.None
-                                          };
-
-                                          var contextMenu = new Bar
-                                          {
-                                              //Title = "Menu Demo",
-                                              Orientation = Orientation.Vertical,
-                                              StatusBarStyle = false,
-                                              AutoSize = true,
-                                              BorderStyle = LineStyle.Single
-                                          };
-
-                                          var newMenu = new Shortcut
-                                          {
-                                              Title = "_New...",
-                                              Text = "Create a new file",
-                                              Key = Key.N.WithCtrl,
-                                              AutoSize = true,
-                                              Width = Dim.Fill (),
-                                              CanFocus = true
-                                          };
-
-                                          newMenu.Accept += (s, e) =>
-                                                            {
-                                                                menuWindow.RequestStop ();
-
-                                                                Application.AddTimeout (
-                                                                                        new TimeSpan (0),
-                                                                                        () =>
-                                                                                        {
-                                                                                            MessageBox.Query ("File", "New");
-
-                                                                                            return false;
-                                                                                        });
-                                                            };
-
-                                          var open = new Shortcut
-                                          {
-                                              Title = "_Open...",
-                                              Text = "Show the File Open Dialog",
-                                              Key = Key.O.WithCtrl,
-                                              AutoSize = true,
-                                              Width = Dim.Fill (),
-                                              CanFocus = true
-                                          };
-
-                                          open.Accept += (s, e) =>
-                                                         {
-                                                             menuWindow.RequestStop ();
-
-                                                             Application.AddTimeout (
-                                                                                     new TimeSpan (0),
-                                                                                     () =>
-                                                                                     {
-                                                                                         MessageBox.Query ("File", "Open");
-
-                                                                                         return false;
-                                                                                     });
-                                                         };
-
-                                          var save = new Shortcut
-                                          {
-                                              Title = "_Save...",
-                                              Text = "Save",
-                                              Key = Key.S.WithCtrl,
-                                              AutoSize = true,
-                                              Width = Dim.Fill (),
-                                              CanFocus = true
-                                          };
-
-                                          save.Accept += (s, e) =>
-                                                         {
-                                                             menuWindow.RequestStop ();
-
-                                                             Application.AddTimeout (
-                                                                                     new TimeSpan (0),
-                                                                                     () =>
-                                                                                     {
-                                                                                         MessageBox.Query ("File", "Save");
-
-                                                                                         return false;
-                                                                                     });
-                                                         };
-
-                                          var saveAs = new Shortcut
-                                          {
-                                              Title = "Save _As...",
-                                              Text = "Save As",
-                                              Key = Key.S.WithCtrl,
-                                              AutoSize = true,
-                                              Width = Dim.Fill (),
-                                              CanFocus = true
-                                          };
-
-                                          saveAs.Accept += (s, e) =>
-                                                           {
-                                                               menuWindow.RequestStop ();
-
-                                                               Application.AddTimeout (
-                                                                                       new TimeSpan (0),
-                                                                                       () =>
-                                                                                       {
-                                                                                           MessageBox.Query ("File", "Save As");
-
-                                                                                           return false;
-                                                                                       });
-                                                           };
-
-                                          contextMenu.Add (newMenu, open, save, saveAs);
-
-                                          menuWindow.KeyBindings.Add (Key.Esc, Command.QuitToplevel);
-
-                                          menuWindow.LayoutComplete += (s, e) =>
-                                                                       {
-                                                                           menuWindow.Width = contextMenu.Frame.Width;
-                                                                           menuWindow.Height = contextMenu.Frame.Height;
-                                                                       };
-                                          menuWindow.Add (contextMenu);
-
-                                          void Application_MouseEvent (object sender, MouseEventEventArgs e)
-                                          {
-                                              // If user clicks outside of the menuWindow, close it
-                                              if (!menuWindow.Frame.Contains (e.MouseEvent.X, e.MouseEvent.Y))
-                                              {
-                                                  if (e.MouseEvent.Flags is (MouseFlags.Button1Clicked or MouseFlags.Button3Clicked))
-                                                  {
-                                                      menuWindow.RequestStop ();
-                                                  }
-                                              }
-                                          }
-
-                                          Application.MouseEvent += Application_MouseEvent;
-
-                                          Application.Run (menuWindow);
-
-                                          Application.MouseEvent -= Application_MouseEvent;
+                                          contextMenu.Width = contextMenu.Frame.Width;
+                                          contextMenu.Height = contextMenu.Frame.Height;
                                       };
+ 
+        void Application_MouseEvent (object sender, MouseEventEventArgs e)
+        {
+            // If user clicks outside of the menuWindow, close it
+            if (!contextMenu.Frame.Contains (e.MouseEvent.X, e.MouseEvent.Y))
+            {
+                if (e.MouseEvent.Flags is (MouseFlags.Button1Clicked or MouseFlags.Button3Clicked))
+                {
+                    contextMenu.RequestStop ();
+                }
+            }
+        }
+
+        Application.MouseEvent += Application_MouseEvent;
+
+        Application.Run (contextMenu);
+
+        Application.MouseEvent -= Application_MouseEvent;
     }
 
     private void SetupMenuBar ()
@@ -204,9 +201,10 @@ public class Bars : Scenario
                                    {
                                        X = view.Frame.X + 1,
                                        Y = view.Frame.Y + 1,
-                                       Width = 40,
-                                       Height = 10,
-                                       ColorScheme = view.ColorScheme
+                                       Width = 70,
+                                       Height = 5,
+                                       ColorScheme = view.ColorScheme,
+                                       BorderStyle = LineStyle.None
                                    };
 
                                    menuWindow.KeyBindings.Add (Key.Esc, Command.QuitToplevel);
@@ -215,10 +213,7 @@ public class Bars : Scenario
                                    {
                                        Orientation = Orientation.Vertical,
                                        StatusBarStyle = false,
-                                       X = 0,
-                                       Y = 0,
-                                       Width = Dim.Fill (),
-                                       Height = Dim.Fill ()
+                                       BorderStyle = LineStyle.Dotted
                                    };
 
                                    var newMenu = new Shortcut
@@ -373,7 +368,7 @@ public class Bars : Scenario
             KeyBindingScope = KeyBindingScope.HotKey,
             Command = Command.Accept,
             X = Pos.Center (),
-            Y = Pos.Center (),
+            Y = Pos.Center ()
         };
 
         var shortcut2 = new Shortcut
@@ -384,7 +379,7 @@ public class Bars : Scenario
             KeyBindingScope = KeyBindingScope.HotKey,
             Command = Command.Accept,
             X = Pos.Left (shortcut1),
-            Y = Pos.Bottom (shortcut1),
+            Y = Pos.Bottom (shortcut1)
         };
 
         Application.Top.Add (shortcut1, shortcut2);

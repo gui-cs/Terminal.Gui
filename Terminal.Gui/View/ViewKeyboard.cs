@@ -1,30 +1,40 @@
-﻿namespace Terminal.Gui;
+﻿using System.ComponentModel;
+
+namespace Terminal.Gui;
 
 public partial class View
 {
     private void AddCommands ()
     {
         // By default, the Default command is bound to the HotKey enabling focus
-        AddCommand (
-                    Command.Default,
-                    () =>
-                    {
-                        if (CanFocus)
-                        {
-                            SetFocus ();
-
-                            return true;
-                        }
-
-                        return false;
-                    }
-                   );
+        AddCommand (Command.Default, () => OnDefaultCommand());
 
         // By default the Accept command does nothing
         AddCommand (Command.Accept, () => false);
     }
 
     #region HotKey Support
+
+    public event EventHandler<CancelEventArgs> DefaultCommand;
+
+    public bool OnDefaultCommand ()
+    {
+        var args = new CancelEventArgs ();
+        DefaultCommand?.Invoke (this, args);
+        if (args.Cancel)
+        {
+            return args.Cancel;
+        }
+
+        if (CanFocus)
+        {
+            SetFocus ();
+
+            return true;
+        }
+
+        return false;
+    }
 
     /// <summary>Invoked when the <see cref="HotKey"/> is changed.</summary>
     public event EventHandler<KeyChangedEventArgs> HotKeyChanged;
@@ -84,6 +94,7 @@ public partial class View
             if (AddKeyBindingsForHotKey (_hotKey, value))
             {
                 // This will cause TextFormatter_HotKeyChanged to be called, firing HotKeyChanged
+                // BUGBUG: _hotkey should be set BEFORE setting TextFormatter.HotKey
                 _hotKey = TextFormatter.HotKey = value;
             }
         }

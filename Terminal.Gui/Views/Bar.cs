@@ -22,7 +22,7 @@ public class Shortcut : View
     {
         CanFocus = true;
         Height = 1;
-        AutoSize = true;
+        //AutoSize = true;
 
         AddCommand (
                     Gui.Command.Default,
@@ -39,7 +39,10 @@ public class Shortcut : View
         _container = new View { Id = "_container", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
         _container.MouseClick += Container_MouseClick;
 
-        CommandView = new View { Id = "_commandView", CanFocus = false, AutoSize = true, X = 0, Y = Pos.Center (), HotKeySpecifier = new Rune ('_') };
+        CommandView = new View
+        {
+            Id = "_commandView", CanFocus = false, AutoSize = true, X = 0, Y = Pos.Center (), HotKeySpecifier = new Rune ('_')
+        };
 
         HelpView = new View { Id = "_helpView", CanFocus = false, AutoSize = true, Y = Pos.Center () };
         HelpView.TextAlignment = TextAlignment.Right;
@@ -62,7 +65,7 @@ public class Shortcut : View
         TitleChanged += Shortcut_TitleChanged;
         Initialized += Shortcut_Initialized;
 
-        _container.Add (_commandView, HelpView, KeyView);
+        _container.Add (HelpView, KeyView);
         Add (_container);
     }
 
@@ -157,14 +160,15 @@ public class Shortcut : View
             _commandView.X = 0;
             _commandView.Y = Pos.Center ();
             _commandView.MouseClick += SubView_MouseClick;
+            _commandView.DefaultCommand += SubView_DefaultCommand;
             _commandView.Margin.Thickness = new Thickness (1, 0, 1, 0);
 
             _commandView.HotKeyChanged += (s, e) =>
                                           {
-                                              if (_commandView.HotKey != Key.Empty)
+                                              if (e.NewKey != Key.Empty)
                                               {
                                                   // Add it 
-                                                  AddKeyBindingsForHotKey (Key.Empty, _commandView.HotKey);
+                                                  AddKeyBindingsForHotKey (e.OldKey, e.NewKey);
                                               }
                                           };
 
@@ -329,6 +333,18 @@ public class Shortcut : View
 
     private void Container_MouseClick (object sender, MouseEventEventArgs e) { e.Handled = OnAccept (); }
 
+    public int GetNaturalWidth ()
+    {
+        CommandView.SetRelativeLayout (Driver.Bounds);
+        HelpView.SetRelativeLayout (Driver.Bounds);
+        KeyView.SetRelativeLayout (Driver.Bounds);
+
+        return CommandView.Frame.Width
+               + (HelpView.Visible && HelpView.Text.Length > 0 ? HelpView.Frame.Width : 0)
+               + (KeyView.Visible && KeyView.Text.Length > 0 ? KeyView.Frame.Width : 0)
+               + GetAdornmentsThickness ().Horizontal;
+    }
+
     private void SetSubViewLayout ()
     {
         if (!IsInitialized)
@@ -336,21 +352,12 @@ public class Shortcut : View
             return;
         }
 
-        if (AutoSize)
+        if (Width is not Dim.DimFill)
         {
-            CommandView.SetRelativeLayout (Driver.Bounds);
-            HelpView.SetRelativeLayout (Driver.Bounds);
-            KeyView.SetRelativeLayout (Driver.Bounds);
-
-            _container.Width = _commandView.Frame.Width
-                               + (HelpView.Visible && HelpView.Text.Length > 0 ? HelpView.Frame.Width : 0)
-                               + (KeyView.Visible && KeyView.Text.Length > 0 ? KeyView.Frame.Width : 0);
-            Frame = new Rect (Frame.X, Frame.Y, _container.Frame.Width + GetAdornmentsThickness ().Horizontal, Frame.Height);
+            Width = GetNaturalWidth ();
         }
 
-        //Width = Dim.Fill ();
-        //Height = 1;
-        HelpView.X = Pos.AnchorEnd (KeyView.Text.GetColumns () + 1 + HelpView.Text.GetColumns () + 1) - 1;
+        HelpView.X = Pos.AnchorEnd (KeyView.Text.GetColumns () + 1 + HelpView.Text.GetColumns () + 1) - 2;
         KeyView.X = Pos.AnchorEnd (KeyView.Text.GetColumns () + 1) - 1;
     }
 
@@ -375,7 +382,17 @@ public class Shortcut : View
     {
         e.Handled = OnAccept ();
 
-        if (CanFocus)
+        if (!e.Handled && CanFocus)
+        {
+            SetFocus ();
+        }
+    }
+
+    private void SubView_DefaultCommand (object sender, CancelEventArgs e)
+    {
+        e.Cancel = OnAccept ();
+
+        if (!e.Cancel && CanFocus)
         {
             SetFocus ();
         }
@@ -410,7 +427,7 @@ public class Shortcut : View
 /// <remarks>
 ///     Views added to a Bar will be positioned horizontally from left to right.
 /// </remarks>
-public class Bar : View
+public class Bar : Toplevel
 {
     private bool _autoSize;
 
@@ -445,7 +462,7 @@ public class Bar : View
     {
         if (Orientation == Orientation.Horizontal)
         {
-            view.AutoSize = true;
+            //view.AutoSize = true;
         }
 
         if (StatusBarStyle)
@@ -491,23 +508,23 @@ public class Bar : View
 
     private void Bar_LayoutComplete (object sender, LayoutEventArgs e)
     {
-        View prevSubView = null;
+        View prevBarItem = null;
 
         switch (Orientation)
         {
             case Orientation.Horizontal:
                 for (var index = 0; index < Subviews.Count; index++)
                 {
-                    View subview = Subviews [index];
+                    View barItem = Subviews [index];
 
-                    if (!subview.Visible)
+                    if (!barItem.Visible)
                     {
                         continue;
                     }
 
-                    if (prevSubView == null)
+                    if (prevBarItem == null)
                     {
-                        subview.X = 0;
+                        barItem.X = 0;
                     }
                     else
                     {
@@ -515,16 +532,17 @@ public class Bar : View
                         //Subviews [^1].AutoSize = true;
 
                         // Align the view to the right of the previous view
-                        subview.X = Pos.Right (prevSubView);
+                        barItem.X = Pos.Right (prevBarItem);
                     }
 
-                    subview.Y = Pos.Center ();
-                    prevSubView = subview;
+                    barItem.Y = Pos.Center ();
+                    prevBarItem = barItem;
                 }
 
                 break;
+
             case Orientation.Vertical:
-                var maxSubviewWidth = 0;
+                var maxBarItemWidth = 0;
 
                 for (var index = 0; index < Subviews.Count; index++)
                 {
@@ -535,7 +553,7 @@ public class Bar : View
                         continue;
                     }
 
-                    if (prevSubView == null)
+                    if (prevBarItem == null)
                     {
                         barItem.Y = 0;
                     }
@@ -545,13 +563,19 @@ public class Bar : View
                         //Subviews [^1].AutoSize = true;
 
                         // Align the view to the bottom of the previous view
-                        barItem.Y = Pos.Bottom (prevSubView);
+                        barItem.Y = Pos.Bottom (prevBarItem);
                     }
 
-                    prevSubView = barItem;
+                    prevBarItem = barItem;
 
-                    barItem.SetRelativeLayout (Driver.Bounds);
-                    maxSubviewWidth = Math.Max (maxSubviewWidth, barItem.Frame.Width);
+                    if (barItem is Shortcut shortcut)
+                    {
+                        maxBarItemWidth = Math.Max (maxBarItemWidth, shortcut.GetNaturalWidth ());
+                    }
+                    else
+                    {
+                        maxBarItemWidth = Math.Max (maxBarItemWidth, barItem.Frame.Width);
+                    }
 
                     barItem.X = 0;
                 }
@@ -560,31 +584,16 @@ public class Bar : View
                 {
                     var shortcut = Subviews [index] as Shortcut;
 
-                    if (shortcut == null || !shortcut.Visible)
+                    if (shortcut is { Visible: false })
                     {
                         continue;
                     }
 
-                    if (AutoSize)
-                    {
-                        shortcut._container.Width = int.Max (
-                                                             maxSubviewWidth,
-                                                             shortcut.CommandView.Frame.Width
-                                                             + (shortcut.HelpView.Visible && shortcut.HelpView.Text.Length > 0
-                                                                    ? shortcut.HelpView.Frame.Width
-                                                                    : 0)
-                                                             + (shortcut.KeyView.Visible && shortcut.KeyView.Text.Length > 0
-                                                                    ? shortcut.KeyView.Frame.Width
-                                                                    : 0));
-                        shortcut.AutoSize = false;
-                        shortcut.Width = maxSubviewWidth;
-                    }
-
-                    //Width = Dim.Fill ();
-                    //Height = 1;
+                    shortcut._container.Width = Dim.Fill ();
+                    shortcut.Width = Dim.Fill ();
                 }
 
-                Width = maxSubviewWidth + GetAdornmentsThickness ().Horizontal;
+                Width = maxBarItemWidth + GetAdornmentsThickness ().Horizontal;
                 Height = Subviews.Count + GetAdornmentsThickness ().Vertical;
 
                 break;
@@ -593,10 +602,10 @@ public class Bar : View
 
     private void SetInitialProperties ()
     {
-        AutoSize = false;
+        //AutoSize = false;
         ColorScheme = Colors.ColorSchemes ["Menu"];
         CanFocus = true;
 
-        LayoutComplete += Bar_LayoutComplete;
+        LayoutStarted += Bar_LayoutComplete;
     }
 }
