@@ -1,30 +1,66 @@
-﻿namespace Terminal.Gui;
+﻿using System.ComponentModel;
+
+namespace Terminal.Gui;
 
 public partial class View
 {
     private void AddCommands ()
     {
-        // By default, the Default command is bound to the HotKey enabling focus
-        AddCommand (
-                    Command.Default,
-                    () =>
-                    {
-                        if (CanFocus)
-                        {
-                            SetFocus ();
+        // By default, the Default command sets the focus to this view.
+        AddCommand (Command.Default, () => OnDefaultCommand());
 
-                            return true;
-                        }
-
-                        return false;
-                    }
-                   );
-
-        // By default the Accept command does nothing
+        // By default, the Accept command does nothing.
         AddCommand (Command.Accept, () => false);
     }
 
     #region HotKey Support
+
+    /// <summary>
+    /// Cancelable event fired when the default command (<see cref="Command.Default"/>) is invoked. Set <see cref="CancelEventArgs.Cancel"/>
+    /// to cancel the event.
+    /// </summary>
+    public event EventHandler<CancelEventArgs> DefaultCommand;
+
+    /// <summary>
+    /// Called when the default command (<see cref="Command.Default"/>) is invoked. Fires the <see cref="DefaultCommand"/>
+    /// event. Calls <see cref="SetFocus"/> to cause this view to be focused.
+    /// </summary>
+    /// <returns>If <see langword="true"/> the command was canceled.</returns>
+    public bool OnDefaultCommand ()
+    {
+        var args = new CancelEventArgs ();
+        DefaultCommand?.Invoke (this, args);
+        if (args.Cancel)
+        {
+            return args.Cancel;
+        }
+
+        if (!CanFocus)
+        {
+            return false;
+        }
+
+        SetFocus ();
+        return true;
+    }
+
+    /// <summary>
+    /// Cancelable event fired when the <see cref="Command.Accept"/> command is invoked. Set <see cref="CancelEventArgs.Cancel"/>
+    /// to cancel the event.
+    /// </summary>
+    public event EventHandler<CancelEventArgs> Accept;
+
+    /// <summary>
+    /// Called when the <see cref="Command.Accept"/> command is invoked. Fires the <see cref="Accept"/>
+    /// event.
+    /// </summary>
+    /// <returns>If <see langword="true"/> the command was canceled.</returns>
+    public bool OnAccept ()
+    {
+        var args = new CancelEventArgs ();
+        Accept?.Invoke (this, args);
+        return args.Cancel;
+    }
 
     /// <summary>Invoked when the <see cref="HotKey"/> is changed.</summary>
     public event EventHandler<KeyChangedEventArgs> HotKeyChanged;
@@ -84,6 +120,7 @@ public partial class View
             if (AddKeyBindingsForHotKey (_hotKey, value))
             {
                 // This will cause TextFormatter_HotKeyChanged to be called, firing HotKeyChanged
+                // BUGBUG: _hotkey should be set BEFORE setting TextFormatter.HotKey
                 _hotKey = TextFormatter.HotKey = value;
             }
         }
@@ -714,6 +751,42 @@ public partial class View
                                                      GetType ().Name
                                                  })"
                                                 );
+            }
+
+            // each command has its own return value
+            bool? thisReturn = InvokeCommand (command);
+
+            // if we haven't got anything yet, the current command result should be used
+            toReturn ??= thisReturn;
+
+            // if ever see a true then that's what we will return
+            if (thisReturn ?? false)
+            {
+                toReturn = true;
+            }
+        }
+
+        return toReturn;
+    }
+
+    /// <summary>
+    ///     Invokes the specified commands.
+    /// </summary>
+    /// <param name="commands"></param>
+    /// <returns>
+    ///     <see langword="null"/> if no command was found.
+    ///     <see langword="true"/> if the command was invoked and it handled the command.
+    ///     <see langword="false"/> if the command was invoked and it did not handle the command.
+    /// </returns>
+    public bool? InvokeCommands (Command [] commands)
+    {
+        bool? toReturn = null;
+
+        foreach (Command command in commands)
+        {
+            if (!CommandImplementations.ContainsKey (command))
+            {
+                throw new NotSupportedException (@$"{command} is not supported by ({GetType ().Name}).");
             }
 
             // each command has its own return value
