@@ -91,18 +91,18 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         By default, when the Hot Key is set, key bindings are added for both the base key (e.g.
-    ///         <see cref="KeyCode.D3"/>) and the Alt-shifted key (e.g. <see cref="KeyCode.D3"/> |
-    ///         <see cref="KeyCode.AltMask"/>). This behavior can be overriden by overriding
+    ///         <see cref="Key.D3"/>) and the Alt-shifted key (e.g. <see cref="Key.D3"/>.
+    ///         <see cref="Key.WithAlt"/>). This behavior can be overriden by overriding
     ///         <see cref="AddKeyBindingsForHotKey"/>.
     ///     </para>
     ///     <para>
-    ///         By default, when the HotKey is set to <see cref="Key.A"/> through <see cref="KeyCode.Z"/> key bindings will
+    ///         By default, when the HotKey is set to <see cref="Key.A"/> through <see cref="Key.Z"/> key bindings will
     ///         be added for both the un-shifted and shifted versions. This means if the HotKey is <see cref="Key.A"/>, key
     ///         bindings for <c>Key.A</c> and <c>Key.A.WithShift</c> will be added. This behavior can be overriden by
     ///         overriding <see cref="AddKeyBindingsForHotKey"/>.
     ///     </para>
     ///     <para>If the hot key is changed, the <see cref="HotKeyChanged"/> event is fired.</para>
-    ///     <para>Set to <see cref="KeyCode.Null"/> to disable the hot key.</para>
+    ///     <para>Set to <see cref="Key.Empty"/> to disable the hot key.</para>
     /// </remarks>
     public virtual Key HotKey
     {
@@ -152,7 +152,7 @@ public partial class View
     /// <exception cref="ArgumentException"></exception>
     public virtual bool AddKeyBindingsForHotKey (Key prevHotKey, Key hotKey)
     {
-        if ((KeyCode)_hotKey == hotKey)
+        if (_hotKey == hotKey)
         {
             return false;
         }
@@ -195,7 +195,7 @@ public partial class View
             KeyBindings.Remove (prevHotKey.WithAlt);
         }
 
-        if (_hotKey.KeyCode is >= KeyCode.A and <= KeyCode.Z)
+        if (_hotKey.IsKeyCodeAtoZ)
         {
             // Remove the shift version
             if (KeyBindings.TryGet (prevHotKey.WithShift, out _))
@@ -211,7 +211,7 @@ public partial class View
         }
 
         // Add the new 
-        if (newKey != KeyCode.Null)
+        if (newKey != Key.Empty)
         {
             // Add the base and Alt key
             KeyBindings.Add (newKey, KeyBindingScope.HotKey, Command.Default, Command.Accept);
@@ -259,14 +259,14 @@ public partial class View
 
         if (TextFormatter.FindHotKey (_text, HotKeySpecifier, out _, out Key hk))
         {
-            if (_hotKey.KeyCode != hk)
+            if (_hotKey != hk)
             {
                 HotKey = hk;
             }
         }
         else
         {
-            HotKey = KeyCode.Null;
+            HotKey = Key.Empty;
         }
     }
 
@@ -690,14 +690,14 @@ public partial class View
         // Now, process any key bindings in the subviews that are tagged to KeyBindingScope.HotKey.
         foreach (View view in Subviews.Where (
                                               v => v.KeyBindings.TryGet (
-                                                                         keyEvent.KeyCode,
+                                                                         keyEvent,
                                                                          KeyBindingScope.HotKey,
                                                                          out KeyBinding _
                                                                         )
                                              ))
         {
             // TODO: I think this TryGet is not needed due to the one in the lambda above. Use `Get` instead?
-            if (view.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.HotKey, out KeyBinding binding))
+            if (view.KeyBindings.TryGet (keyEvent, KeyBindingScope.HotKey, out KeyBinding binding))
             {
                 keyEvent.Scope = KeyBindingScope.HotKey;
                 handled = view.OnInvokingKeyBindings (keyEvent);
@@ -728,10 +728,9 @@ public partial class View
     ///     commands were invoked and at least one handled the command. <see langword="false"/> if commands were invoked and at
     ///     none handled the command.
     /// </returns>
-    protected bool? InvokeKeyBindings (Key keyEvent)
+    protected bool? InvokeKeyBindings (Key key)
     {
         bool? toReturn = null;
-        KeyCode key = keyEvent.KeyCode;
 
         if (!KeyBindings.TryGet (key, out KeyBinding binding))
         {
@@ -746,7 +745,7 @@ public partial class View
                                                  @$"A KeyBinding was set up for the command {
                                                      command
                                                  } ({
-                                                     keyEvent.KeyCode
+                                                     key
                                                  }) but that command is not supported by this View ({
                                                      GetType ().Name
                                                  })"

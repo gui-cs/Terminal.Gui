@@ -13,6 +13,7 @@ public class Label : View
     /// <inheritdoc/>
     public Label ()
     {
+        HotKeySpecifier = (Rune)'_';
         Height = 1;
         AutoSize = true;
 

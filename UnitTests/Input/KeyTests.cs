@@ -546,4 +546,51 @@ public class KeyTests
         Key CAD = Key.Delete.WithCtrl.WithAlt;
         Assert.Equal (KeyCode.Delete | KeyCode.CtrlMask | KeyCode.AltMask, CAD);
     }
+
+    // Test Equals
+    [Fact]
+    public void Equals_ShouldReturnTrue_WhenEqual ()
+    {
+        var a = new Key (KeyCode.A);
+        var b = new Key (KeyCode.A);
+        Assert.True (a.Equals (b));
+    }
+
+    [Fact]
+    public void Equals_Scope_Changed_ShouldReturnTrue_WhenEqual ()
+    {
+        var a = new Key (KeyCode.A);
+        a.Scope = KeyBindingScope.HotKey;
+        var b = new Key (KeyCode.A);
+        b.Scope = KeyBindingScope.HotKey;
+        Assert.True (a.Equals (b));
+    }
+
+    [Fact]
+    public void Equals_Scope_Changed_ShouldReturnFalse_WhenNotEqual ()
+    {
+        var a = new Key (KeyCode.A);
+        a.Scope = KeyBindingScope.HotKey;
+        var b = new Key (KeyCode.A);
+        Assert.False (a.Equals (b));
+    }
+
+    [Fact]
+    public void Equals_Handled_Changed_ShouldReturnTrue_WhenEqual ()
+    {
+        var a = new Key (KeyCode.A);
+        a.Handled = true;
+        var b = new Key (KeyCode.A);
+        b.Handled = true;
+        Assert.True (a.Equals (b));
+    }
+
+    [Fact]
+    public void Equals_Handled_Changed_ShouldReturnFalse_WhenNotEqual ()
+    {
+        var a = new Key (KeyCode.A);
+        a.Handled = true;
+        var b = new Key (KeyCode.A);
+        Assert.False (a.Equals (b));
+    }
 }

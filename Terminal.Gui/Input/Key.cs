@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace Terminal.Gui;
 
@@ -78,6 +80,17 @@ public class Key : EventArgs, IEquatable<Key>
     /// <param name="k">The key</param>
     public Key (KeyCode k) { KeyCode = k; }
 
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="key">The Key to copy</param>
+    public Key (Key key)
+    {
+        KeyCode = key.KeyCode;
+        Handled = key.Handled;
+        Scope = key.Scope;
+    }
+
     /// <summary>Constructs a new <see cref="Key"/> from a char.</summary>
     /// <remarks>
     ///     <para>
@@ -144,12 +157,18 @@ public class Key : EventArgs, IEquatable<Key>
     /// </remarks>
     public Rune AsRune => ToRune (KeyCode);
 
+    private bool _handled = false;
+
     /// <summary>
     ///     Indicates if the current Key event has already been processed and the driver should stop notifying any other
-    ///     event subscriber. Its important to set this value to true specially when updating any View's layout from inside the
+    ///     event subscriber. It's important to set this value to true specially when updating any View's layout from inside the
     ///     subscriber method.
     /// </summary>
-    public bool Handled { get; set; } = false;
+    public bool Handled
+    {
+        get => _handled;
+        set => _handled = value;
+    }
 
     /// <summary>Gets a value indicating whether the Alt key was pressed (real or synthesized)</summary>
     /// <value><see langword="true"/> if is alternate; otherwise, <see langword="false"/>.</value>
@@ -182,6 +201,8 @@ public class Key : EventArgs, IEquatable<Key>
     /// </summary>
     public bool IsValid => this != Empty && NoAlt.NoShift.NoCtrl != Empty;
 
+    private readonly KeyCode _keyCode;
+
     /// <summary>The encoded key value.</summary>
     /// <para>
     ///     IMPORTANT: Lowercase alpha keys are encoded (in <see cref="Gui.KeyCode"/>) as values between 65 and 90
@@ -190,7 +211,21 @@ public class Key : EventArgs, IEquatable<Key>
     ///     for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
     /// </para>
     /// <remarks>This property is the backing data for the <see cref="Key"/>. It is a <see cref="KeyCode"/> enum value.</remarks>
-    public KeyCode KeyCode { get; init; }
+    public KeyCode KeyCode
+    {
+        get => _keyCode;
+        init
+        {
+#if DEBUG
+            if (GetIsKeyCodeAtoZ (value) && (value & KeyCode.Space) != 0)
+            {
+                throw new ArgumentException ("Invalid KeyCode: KeyCode.Space | KeyCode.A/Z is invalid.", nameof (value));
+            }
+
+#endif
+            _keyCode = value;
+        }
+    }
 
     /// <summary>
     ///     Helper for removing a shift modifier from a <see cref="Key"/>.
@@ -199,7 +234,7 @@ public class Key : EventArgs, IEquatable<Key>
     /// var AltDelete = ControlAltDelete.NoCtrl;
     /// </code>
     /// </summary>
-    public Key NoAlt => new (KeyCode & ~KeyCode.AltMask);
+    public Key NoAlt => new (this) { KeyCode = KeyCode & ~KeyCode.AltMask };
 
     /// <summary>
     ///     Helper for removing a shift modifier from a <see cref="Key"/>.
@@ -208,7 +243,7 @@ public class Key : EventArgs, IEquatable<Key>
     /// var AltDelete = ControlAltDelete.NoCtrl;
     /// </code>
     /// </summary>
-    public Key NoCtrl => new (KeyCode & ~KeyCode.CtrlMask);
+    public Key NoCtrl => new (this) { KeyCode = KeyCode & ~KeyCode.CtrlMask };
 
     /// <summary>
     ///     Helper for removing a shift modifier from a <see cref="Key"/>.
@@ -217,10 +252,16 @@ public class Key : EventArgs, IEquatable<Key>
     /// var AltDelete = ControlAltDelete.NoCtrl;
     /// </code>
     /// </summary>
-    public Key NoShift => new (KeyCode & ~KeyCode.ShiftMask);
+    public Key NoShift => new (this) { KeyCode = KeyCode & ~KeyCode.ShiftMask };
+
+    private KeyBindingScope _scope = KeyBindingScope.Focused;
 
     /// <summary>Enables passing the key binding scope with the event. Default is <see cref="KeyBindingScope.Focused"/>.</summary>
-    public KeyBindingScope Scope { get; set; } = KeyBindingScope.Focused;
+    public KeyBindingScope Scope
+    {
+        get => _scope;
+        set => _scope = value;
+    }
 
     /// <summary>
     ///     Helper for specifying a shifted <see cref="Key"/>.
@@ -228,7 +269,7 @@ public class Key : EventArgs, IEquatable<Key>
     /// var ControlAltDelete = new Key(Key.Delete).WithAlt.WithDel;
     /// </code>
     /// </summary>
-    public Key WithAlt => new (KeyCode | KeyCode.AltMask);
+    public Key WithAlt => new (this) { KeyCode = KeyCode | KeyCode.AltMask };
 
     /// <summary>
     ///     Helper for specifying a shifted <see cref="Key"/>.
@@ -236,7 +277,7 @@ public class Key : EventArgs, IEquatable<Key>
     /// var ControlAltDelete = new Key(Key.Delete).WithAlt.WithDel;
     /// </code>
     /// </summary>
-    public Key WithCtrl => new (KeyCode | KeyCode.CtrlMask);
+    public Key WithCtrl => new (this) { KeyCode = KeyCode | KeyCode.CtrlMask };
 
     /// <summary>
     ///     Helper for specifying a shifted <see cref="Key"/>.
@@ -244,7 +285,7 @@ public class Key : EventArgs, IEquatable<Key>
     /// var ControlAltDelete = new Key(Key.Delete).WithAlt.WithDel;
     /// </code>
     /// </summary>
-    public Key WithShift => new (KeyCode | KeyCode.ShiftMask);
+    public Key WithShift => new (this) { KeyCode = KeyCode | KeyCode.ShiftMask };
 
     /// <summary>
     ///     Tests if a KeyCode represents a key in the range of <see cref="KeyCode.A"/> to <see cref="KeyCode.Z"/>,
@@ -369,7 +410,10 @@ public class Key : EventArgs, IEquatable<Key>
     public static implicit operator string (Key key) { return key.ToString (); }
 
     /// <inheritdoc/>
-    public override bool Equals (object obj) { return obj is Key k && k.KeyCode == KeyCode; }
+    public override bool Equals (object obj)
+    {
+        return obj is Key k && k.KeyCode == KeyCode && k.Scope == Scope && k.Handled == Handled;
+    }
 
     bool IEquatable<Key>.Equals (Key other) { return Equals (other); }
 

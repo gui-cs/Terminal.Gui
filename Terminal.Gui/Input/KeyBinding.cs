@@ -241,7 +241,8 @@ public class KeyBindings
     /// <returns><see langword="true"/> if the Key is bound; otherwise <see langword="false"/>.</returns>
     public bool TryGet (Key key, KeyBindingScope scope, out KeyBinding binding)
     {
-        if (key.IsValid && Bindings.TryGetValue (key, out binding))
+        var keyWithScope = new Key (key) { Scope = scope };
+        if (keyWithScope.IsValid && Bindings.TryGetValue (keyWithScope, out binding))
         {
             if (binding.Scope == scope)
             {

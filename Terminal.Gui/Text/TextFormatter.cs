@@ -2072,6 +2072,8 @@ public class TextFormatter
 
                 hotKey = newHotKey;
 
+                hotKey.Scope = KeyBindingScope.HotKey;
+
                 return true;
             }
         }
