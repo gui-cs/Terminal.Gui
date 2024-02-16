@@ -18,7 +18,7 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
 
     /// <summary>The <see cref="ConsoleDriver"/>-specific color value.</summary>
     [JsonIgnore (Condition = JsonIgnoreCondition.Always)]
-    internal int PlatformColor { get; }
+    internal int PlatformColor { get; init; }
 
     /// <summary>The foreground color.</summary>
     [JsonConverter (typeof (ColorJsonConverter))]
@@ -39,9 +39,7 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     /// <summary>Initializes a new instance from an existing instance.</summary>
     public Attribute (in Attribute attr)
     {
-        PlatformColor = -1;
-        Foreground = attr.Foreground;
-        Background = attr.Background;
+        this = attr with { PlatformColor = -1 };
     }
 
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
