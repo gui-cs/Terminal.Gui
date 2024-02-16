@@ -96,9 +96,6 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     public Attribute (in Color color) : this (color, color) { }
 
     /// <inheritdoc/>
-    public bool Equals (Attribute other) { return PlatformColor == other.PlatformColor && Foreground == other.Foreground && Background == other.Background; }
-
-    /// <inheritdoc/>
     public override int GetHashCode () { return HashCode.Combine (PlatformColor, Foreground, Background); }
 
     /// <inheritdoc/>
