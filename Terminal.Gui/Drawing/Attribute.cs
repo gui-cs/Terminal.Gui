@@ -14,7 +14,7 @@ namespace Terminal.Gui;
 public readonly record struct Attribute : IEqualityOperators<Attribute, Attribute, bool>
 {
     /// <summary>Default empty attribute.</summary>
-    public static readonly Attribute Default = new (Color.White, ColorName.Black);
+    public static Attribute Default => new (Color.White, ColorName.Black);
 
     /// <summary>The <see cref="ConsoleDriver"/>-specific color value.</summary>
     [JsonIgnore (Condition = JsonIgnoreCondition.Always)]
