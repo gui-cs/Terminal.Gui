@@ -5,10 +5,12 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 
+using System.ComponentModel;
+
 namespace Terminal.Gui;
 
 /// <summary>An <see cref="EventArgs"/> which allows passing a cancelable new text value event.</summary>
-public class TextChangingEventArgs : EventArgs
+public class TextChangingEventArgs : CancelEventArgs
 {
     /// <summary>Initializes a new instance of <see cref="TextChangingEventArgs"/></summary>
     /// <param name="newText">The new <see cref="TextField.Text"/> to be replaced.</param>
