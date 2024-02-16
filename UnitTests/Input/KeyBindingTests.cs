@@ -232,8 +232,36 @@ public class KeyBindingTests
         Assert.Contains (Command.Left, binding.Commands);
 
         // negative test
-        binding = keyBindings.Get (key, (KeyBindingScope)(-1));
+        binding = keyBindings.Get (key, (KeyBindingScope)0);
         Assert.Null (binding);
+
+        Command [] resultCommands = keyBindings.GetCommands (key);
+        Assert.Contains (Command.Right, resultCommands);
+        Assert.Contains (Command.Left, resultCommands);
+    }
+
+    [Theory]
+    [InlineData (KeyBindingScope.Focused)]
+    [InlineData (KeyBindingScope.HotKey)]
+    [InlineData (KeyBindingScope.Application)]
+    public void Scope_TryGet_Filters (KeyBindingScope scope)
+    {
+        var keyBindings = new KeyBindings ();
+        Command [] commands = { Command.Right, Command.Left };
+
+        var key = new Key (Key.A);
+        keyBindings.Add (key, scope, commands);
+        bool success = keyBindings.TryGet (key, out KeyBinding binding);
+        Assert.Contains (Command.Right, binding.Commands);
+        Assert.Contains (Command.Left, binding.Commands);
+
+        success = keyBindings.TryGet (key, scope, out binding);
+        Assert.Contains (Command.Right, binding.Commands);
+        Assert.Contains (Command.Left, binding.Commands);
+
+        // negative test
+        success = keyBindings.TryGet (key, (KeyBindingScope)0, out binding);
+        Assert.False (success);
 
         Command [] resultCommands = keyBindings.GetCommands (key);
         Assert.Contains (Command.Right, resultCommands);
