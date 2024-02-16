@@ -160,8 +160,10 @@ public class TimeFieldTests
         Assert.True (tf.NewKeyDownEvent (Key.D1));
         Assert.Equal (" 12:02:19", tf.Text);
         Assert.Equal (2, tf.CursorPosition);
+#if UNIX_KEY_BINDINGS
         Assert.True (tf.NewKeyDownEvent (Key.D.WithAlt));
         Assert.Equal (" 10:02:19", tf.Text);
+#endif
     }
 
     [Fact]

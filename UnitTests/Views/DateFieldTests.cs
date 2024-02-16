@@ -141,8 +141,10 @@ public class DateFieldTests
         Assert.True (df.NewKeyDownEvent (Key.D1));
         Assert.Equal (" 12/02/1971", df.Text);
         Assert.Equal (2, df.CursorPosition);
+#if UNIX_KEY_BINDINGS
         Assert.True (df.NewKeyDownEvent (Key.D.WithAlt));
         Assert.Equal (" 10/02/1971", df.Text);
+#endif
     }
 
     [Fact]
