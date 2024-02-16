@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Management;
 using System.Runtime.InteropServices;
 
@@ -44,7 +44,7 @@ public static class EscSeqUtils
     /// <summary>
     ///     Escape key code (ASCII 27/0x1B).
     /// </summary>
-    public static readonly char KeyEsc = (char)KeyCode.Esc;
+    public const char KeyEsc = (char)KeyCode.Esc;
 
     /// <summary>
     ///     ESC [ - The CSI (Control Sequence Introducer).
