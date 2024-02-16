@@ -7,6 +7,31 @@ public class LabelTests
     private readonly ITestOutputHelper _output;
     public LabelTests (ITestOutputHelper output) { _output = output; }
 
+    // Test that Title and Text are the same
+    [Fact]
+    public void Text_Mirrors_Title ()
+    {
+        var label = new Label ();
+        label.Title = "Hello";
+        Assert.Equal ("Hello", label.Title);
+        Assert.Equal ("Hello", label.TitleTextFormatter.Text);
+
+        Assert.Equal ("Hello", label.Text);
+        Assert.Equal ("Hello", label.TextFormatter.Text);
+    }
+
+    [Fact]
+    public void Title_Mirrors_Text ()
+    {
+        var label = new Label ();
+        label.Text = "Hello";
+        Assert.Equal ("Hello", label.Text);
+        Assert.Equal ("Hello", label.TextFormatter.Text);
+
+        Assert.Equal ("Hello", label.Title);
+        Assert.Equal ("Hello", label.TitleTextFormatter.Text);
+    }
+
     [Fact]
     [AutoInitShutdown]
     public void AutoSize_Stays_True_AnchorEnd ()
@@ -421,4 +446,69 @@ e
         Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rect (0, 0, 30, 5), pos);
     }
+
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Full_Border ()
+    {
+        var label = new Label { Text = "Test", /*Width = 6, Height = 3, */BorderStyle = LineStyle.Single };
+        Application.Top.Add (label);
+        Application.Begin (Application.Top);
+
+        Assert.Equal (new Rect (0, 0, 6, 3), label.Frame);
+        Assert.Equal (new Rect (0, 0, 4, 1), label.Bounds);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌┤Te├┐
+│Test│
+└────┘",
+                                                      _output
+                                                     );
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void With_Top_Margin_Without_Top_Border ()
+    {
+        var label = new Label { Text = "Test", /*Width = 6, Height = 3,*/ BorderStyle = LineStyle.Single };
+        label.Margin.Thickness = new Thickness (0, 1, 0, 0);
+        label.Border.Thickness = new Thickness (1, 0, 1, 1);
+        Application.Top.Add (label);
+        Application.Begin (Application.Top);
+
+        Assert.Equal (new Rect (0, 0, 6, 3), label.Frame);
+        Assert.Equal (new Rect (0, 0, 4, 1), label.Bounds);
+        Application.Begin (Application.Top);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+│Test│
+└────┘",
+                                                      _output
+                                                     );
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Without_Top_Border ()
+    {
+        var label = new Label { Text = "Test", /* Width = 6, Height = 3, */BorderStyle = LineStyle.Single };
+        label.Border.Thickness = new Thickness (1, 0, 1, 1);
+        Application.Top.Add (label);
+        Application.Begin (Application.Top);
+
+        Assert.Equal (new Rect (0, 0, 6, 2), label.Frame);
+        Assert.Equal (new Rect (0, 0, 4, 1), label.Bounds);
+        Application.Begin (Application.Top);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+│Test│
+└────┘",
+                                                      _output
+                                                     );
+    }
+
 }

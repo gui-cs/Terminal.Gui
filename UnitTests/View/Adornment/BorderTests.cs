@@ -17,7 +17,8 @@ public class BorderTests
 
         view.ColorScheme = new ColorScheme
         {
-            Normal = new Attribute (Color.Red, Color.Green), Focus = new Attribute (Color.Green, Color.Red)
+            Normal = new Attribute (Color.Red, Color.Green), 
+            Focus = new Attribute (Color.Green, Color.Red)
         };
         Assert.NotEqual (view.ColorScheme.Normal.Foreground, view.ColorScheme.Focus.Foreground);
         Assert.Equal (ColorName.Red, view.Border.GetNormalColor ().Foreground.GetClosestNamedColor ());

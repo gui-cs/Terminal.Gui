@@ -215,7 +215,7 @@ public class Text : Scenario
         dateField.TextChanged += (s, prev) => { labelMirroringDateField.Text = dateField.Text; };
 
         // TimeField
-        label = new Label { Text = "Ti_meField:", Y = Pos.Top (dateField), X = Pos.Right (labelMirroringDateField) + 5 };
+        label = new Label { Text = "T_imeField:", Y = Pos.Top (dateField), X = Pos.Right (labelMirroringDateField) + 5 };
         Win.Add (label);
 
         _timeField = new TimeField

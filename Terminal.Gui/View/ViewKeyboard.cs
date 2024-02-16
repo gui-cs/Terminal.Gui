@@ -66,7 +66,7 @@ public partial class View
     public event EventHandler<KeyChangedEventArgs> HotKeyChanged;
 
     private Key _hotKey = new ();
-    private void TextFormatter_HotKeyChanged (object sender, KeyChangedEventArgs e) { HotKeyChanged?.Invoke (this, e); }
+    private void TitleTextFormatter_HotKeyChanged (object sender, KeyChangedEventArgs e) { HotKeyChanged?.Invoke (this, e); }
 
     /// <summary>
     ///     Gets or sets the hot key defined for this view. Pressing the hot key on the keyboard while this view has focus will
@@ -242,11 +242,11 @@ public partial class View
         set
         {
             TitleTextFormatter.HotKeySpecifier = value;
-            SetHotKey ();
+            SetHotKeyFromTitle ();
         }
     }
 
-    private void SetHotKey ()
+    private void SetHotKeyFromTitle ()
     {
         if (TitleTextFormatter == null || HotKeySpecifier == new Rune ('\xFFFF'))
         {

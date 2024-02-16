@@ -382,6 +382,7 @@ public class TextField : View
         KeyBindings.Add (Key.F.WithCtrl, Command.Right);
 
         KeyBindings.Add (Key.K.WithCtrl, Command.CutToEndLine);
+        KeyBindings.Add (Key.K.WithCtrl.WithShift, Command.CutToStartLine);
 
         KeyBindings.Add (Key.Z.WithCtrl, Command.Undo);
 

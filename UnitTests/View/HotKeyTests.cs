@@ -83,7 +83,7 @@ public class HotKeyTests
     [InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask, false)]
     public void KeyPress_Runs_Default_HotKey_Command (KeyCode mask, bool expected)
     {
-        var view = new View { HotKeySpecifier = (Rune)'^', Text = "^Test" };
+        var view = new View { HotKeySpecifier = (Rune)'^', Title = "^Test" };
         view.CanFocus = true;
         Assert.False (view.HasFocus);
         view.NewKeyDownEvent (KeyCode.T | mask);
@@ -107,7 +107,7 @@ public class HotKeyTests
     [Fact]
     public void ProcessKeyDown_Invokes_HotKey_Command_With_SuperView ()
     {
-        var view = new View { HotKeySpecifier = (Rune)'^', Text = "^Test" };
+        var view = new View { HotKeySpecifier = (Rune)'^', Title = "^Test" };
 
         var superView = new View ();
         superView.Add (view);
@@ -285,26 +285,26 @@ public class HotKeyTests
 
     // BUGBUG: '!' should be supported. Line 968 of TextFormatter filters on char.IsLetterOrDigit 
     //[InlineData ("Test^!", (Key)'!')]
-    public void Text_Change_Sets_HotKey (string text, KeyCode expectedHotKey)
+    public void Title_Change_Sets_HotKey (string title, KeyCode expectedHotKey)
     {
-        var view = new View { HotKeySpecifier = new Rune ('^'), Text = "^Hello" };
+        var view = new View { HotKeySpecifier = new Rune ('^'), Title = "^Hello" };
         Assert.Equal (KeyCode.H, view.HotKey);
 
-        view.Text = text;
+        view.Title = title;
         Assert.Equal (expectedHotKey, view.HotKey);
     }
 
     [Theory]
     [InlineData ("^Test")]
-    public void Text_Empty_Sets_HotKey_To_Null (string text)
+    public void Title_Empty_Sets_HotKey_To_Null (string title)
     {
-        var view = new View { HotKeySpecifier = (Rune)'^', Text = text };
+        var view = new View { HotKeySpecifier = (Rune)'^', Title = title };
 
-        Assert.Equal (text, view.Text);
+        Assert.Equal (title, view.Title);
         Assert.Equal (KeyCode.T, view.HotKey);
 
-        view.Text = string.Empty;
-        Assert.Equal ("", view.Text);
+        view.Title = string.Empty;
+        Assert.Equal ("", view.Title);
         Assert.Equal (KeyCode.Null, view.HotKey);
     }
 }

@@ -7,6 +7,32 @@ public class CheckBoxTests
     private readonly ITestOutputHelper _output;
     public CheckBoxTests (ITestOutputHelper output) { _output = output; }
 
+
+    // Test that Title and Text are the same
+    [Fact]
+    public void Text_Mirrors_Title ()
+    {
+        var view = new CheckBox ();
+        view.Title = "Hello";
+        Assert.Equal ("Hello", view.Title);
+        Assert.Equal ($"Hello", view.TitleTextFormatter.Text);
+
+        Assert.Equal ("Hello", view.Text);
+        Assert.Equal ($"{CM.Glyphs.UnChecked} Hello", view.TextFormatter.Text);
+    }
+
+    [Fact]
+    public void Title_Mirrors_Text ()
+    {
+        var view = new CheckBox ();
+        view.Text = "Hello";
+        Assert.Equal ("Hello", view.Text);
+        Assert.Equal ($"{CM.Glyphs.UnChecked} Hello", view.TextFormatter.Text);
+
+        Assert.Equal ("Hello", view.Title);
+        Assert.Equal ($"Hello", view.TitleTextFormatter.Text);
+    }
+
     [Fact]
     [AutoInitShutdown]
     public void AllowNullChecked_Get_Set ()

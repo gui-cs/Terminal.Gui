@@ -18,7 +18,6 @@ public class CheckBox : View
         _charNullChecked = Glyphs.NullChecked;
         _charChecked = Glyphs.Checked;
         _charUnChecked = Glyphs.UnChecked;
-        HotKeySpecifier = (Rune)'_';
 
         // Ensures a height of 1 if AutoSize is set to false
         Height = 1;
@@ -27,25 +26,35 @@ public class CheckBox : View
         AutoSize = true;
 
         // Things this view knows how to do
-        AddCommand (Command.ToggleChecked, () => ToggleChecked ());
-
-        AddCommand (
-                    Command.Accept,
-                    () =>
-                    {
-                        if (!HasFocus)
-                        {
-                            SetFocus ();
-                        }
-
-                        ToggleChecked ();
-
-                        return true;
-                    }
-                   );
+        AddCommand (Command.ToggleChecked,ToggleChecked);
+        AddCommand (Command.Accept, ToggleChecked);
 
         // Default keybindings for this view
         KeyBindings.Add (Key.Space, Command.ToggleChecked);
+
+        TitleChanged += Checkbox_TitleChanged;
+        //TextChanged += Label_TextChanged;
+    }
+
+    private void Checkbox_TitleChanged (object sender, StringEventArgs e)
+    {
+        base.Text = e.New;
+        TextFormatter.HotKeySpecifier = HotKeySpecifier;
+    }
+
+    public override string Text
+    {
+        get => base.Title;
+        set => base.Text = base.Title = value;
+    }
+
+    public override Rune HotKeySpecifier
+    {
+        get => base.HotKeySpecifier;
+        set
+        {
+            TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
+        }
     }
 
     /// <summary>
@@ -79,42 +88,42 @@ public class CheckBox : View
         }
     }
 
-    /// <inheritdoc/>
-    public override Key HotKey
-    {
-        get => base.HotKey;
-        set
-        {
-            if (value is null)
-            {
-                throw new ArgumentException (nameof (value));
-            }
+    ///// <inheritdoc/>
+    //public override Key HotKey
+    //{
+    //    get => base.HotKey;
+    //    set
+    //    {
+    //        if (value is null)
+    //        {
+    //            throw new ArgumentException (nameof (value));
+    //        }
 
-            Key prev = base.HotKey;
+    //        Key prev = base.HotKey;
 
-            if (prev != value)
-            {
-                base.HotKey = TextFormatter.HotKey = value;
+    //        if (prev != value)
+    //        {
+    //            base.HotKey = TitleTextFormatter.HotKey = value;
 
-                // Also add Alt+HotKey
-                if (prev != Key.Empty && KeyBindings.TryGet (prev.WithAlt, out _))
-                {
-                    if (value == Key.Empty)
-                    {
-                        KeyBindings.Remove (prev.WithAlt);
-                    }
-                    else
-                    {
-                        KeyBindings.Replace (prev.WithAlt, value.WithAlt);
-                    }
-                }
-                else if (value != Key.Empty)
-                {
-                    KeyBindings.Add (value.WithAlt, Command.Accept);
-                }
-            }
-        }
-    }
+    //            // Also add Alt+HotKey
+    //            if (prev != Key.Empty && KeyBindings.TryGet (prev.WithAlt, out _))
+    //            {
+    //                if (value == Key.Empty)
+    //                {
+    //                    KeyBindings.Remove (prev.WithAlt);
+    //                }
+    //                else
+    //                {
+    //                    KeyBindings.Replace (prev.WithAlt, value.WithAlt);
+    //                }
+    //            }
+    //            else if (value != Key.Empty)
+    //            {
+    //                KeyBindings.Add (value.WithAlt, Command.Accept);
+    //            }
+    //        }
+    //    }
+    //}
 
     /// <inheritdoc/>
     public override bool MouseEvent (MouseEvent me)
@@ -171,16 +180,16 @@ public class CheckBox : View
     private Rune GetCheckedState ()
     {
         return Checked switch
-               {
-                   true => _charChecked,
-                   false => _charUnChecked,
-                   var _ => _charNullChecked
-               };
+        {
+            true => _charChecked,
+            false => _charUnChecked,
+            var _ => _charNullChecked
+        };
     }
 
     private string GetFormatterText ()
     {
-        if (AutoSize || string.IsNullOrEmpty (Text) || Frame.Width <= 2)
+        if (AutoSize || string.IsNullOrEmpty (Title) || Frame.Width <= 2)
         {
             return Text;
         }
@@ -188,7 +197,7 @@ public class CheckBox : View
         return Text [..Math.Min (Frame.Width - 2, Text.GetRuneCount ())];
     }
 
-    private bool ToggleChecked ()
+    private bool? ToggleChecked ()
     {
         if (!HasFocus)
         {

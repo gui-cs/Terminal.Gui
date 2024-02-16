@@ -15,7 +15,6 @@ public class Label : View
     /// <inheritdoc/>
     public Label ()
     {
-        HotKeySpecifier = (Rune)'_';
         Height = 1;
         AutoSize = true;
 
@@ -42,6 +41,14 @@ public class Label : View
         set => base.Text = base.Title = value;
     }
 
+    public override Rune HotKeySpecifier
+    {
+        get => base.HotKeySpecifier;
+        set
+        {
+            TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
+        }
+    }
 
     private new bool? FocusNext ()
     {

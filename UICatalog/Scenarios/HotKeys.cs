@@ -101,7 +101,36 @@ public class HotKeys : Scenario
         };
         Application.Top.Add (buttonWithFrame);
 
-        var button = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "_Press me!" };
+
+
+        var checkboxWithFrameLabel = new Label { Text = "_Checkbox with Frame:", X = 0, Y = Pos.Bottom (buttonWithFrame) + 1 };
+        Application.Top.Add (checkboxWithFrameLabel);
+
+        var checkboxWithFrameFocusable = new CheckBox
+        {
+            AutoSize = false,
+            Title = "C_heckbox with Frame (focusable)",
+            CanFocus = true,
+            X = Pos.Right (checkboxWithFrameLabel) + 1, Y = Pos.Top (checkboxWithFrameLabel), Width = 40, Height = 3,
+            BorderStyle = LineStyle.Dashed,
+        };
+        Application.Top.Add (checkboxWithFrameFocusable);
+
+        checkboxWithFrameLabel = new Label { Text = "Checkb_ox with Frame:", X = 0, Y = Pos.Bottom (checkboxWithFrameFocusable) + 1 };
+        Application.Top.Add (checkboxWithFrameLabel);
+
+        var checkboxWithFrame = new CheckBox
+        {
+            AutoSize = false,
+            Title = "Checkbox with Frame (not focusable)",
+            X = Pos.Right (checkboxWithFrameLabel) + 1, Y = Pos.Top (checkboxWithFrameLabel), Width = 40, Height = 3,
+            CanFocus = false,
+            BorderStyle = LineStyle.Dashed,
+        };
+        Application.Top.Add (checkboxWithFrame);
+
+
+        var button = new Button { X = Pos.Center (), Y = Pos.AnchorEnd (1), Text = "_Press me!" };
         Application.Top.Add (button);
 
         Application.Run (Application.Top);

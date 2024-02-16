@@ -88,13 +88,13 @@ public class TextTests
         Assert.Equal ("Hello World", view.Text);
     }
 
-    // Setting Text sets the HotKey
+    // Setting Text does NOT set the HotKey
     [Fact]
-    public void TextSetsHotKey ()
+    public void Text_Does_Not_Set_HotKey ()
     {
         var view = new View { HotKeySpecifier = (Rune)'_', Text = "_Hello World" };
 
-        Assert.Equal (Key.H, view.HotKey);
+        Assert.NotEqual (Key.H, view.HotKey);
     }
 
     // Test view.UpdateTextFormatterText overridden in a subclass updates TextFormatter.Text

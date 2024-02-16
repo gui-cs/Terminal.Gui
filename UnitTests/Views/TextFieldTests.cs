@@ -609,7 +609,11 @@ public class TextFieldTests
         Assert.True (tf.NewKeyDownEvent (Key.CursorUp.WithShift.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal ("is a", tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (Key.B.WithShift.WithAlt)));
+#if UNIX_KEY_BINDINGS
+        Assert.True (tf.NewKeyDownEvent (Key.B.WithShift.WithAlt));
+#else
+        Assert.True (tf.NewKeyDownEvent (Key.CursorUp.WithShift.WithCtrl));
+#endif
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal ("is is a", tf.SelectedText);
         tf.CursorPosition = 3;
@@ -621,7 +625,11 @@ public class TextFieldTests
         Assert.True (tf.NewKeyDownEvent (Key.CursorDown.WithShift.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal ("is a ", tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (Key.F.WithShift.WithAlt)));
+#if UNIX_KEY_BINDINGS
+        Assert.True (tf.NewKeyDownEvent (Key.F.WithShift.WithAlt));
+#else
+        Assert.True (tf.NewKeyDownEvent (Key.CursorRight.WithShift.WithCtrl));
+#endif
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal ("is a test.", tf.SelectedText);
         Assert.Equal (13, tf.CursorPosition);
@@ -662,7 +670,11 @@ public class TextFieldTests
         Assert.Equal ("is is a test.", tf.Text);
         Assert.True (tf.NewKeyDownEvent (Key.Y.WithCtrl));
         Assert.Equal ("is is a t", tf.Text);
+#if UNIX_KEY_BINDINGS
         Assert.True (tf.NewKeyDownEvent (Key.Backspace.WithAlt));
+#else
+        Assert.True (tf.NewKeyDownEvent (Key.Z.WithCtrl));
+#endif
         Assert.Equal ("is is a test.", tf.Text);
         Assert.True (tf.NewKeyDownEvent (Key.Y.WithCtrl));
         Assert.Equal ("is is a t", tf.Text);
@@ -672,7 +684,11 @@ public class TextFieldTests
         Assert.True (tf.NewKeyDownEvent (Key.CursorUp.WithCtrl));
         Assert.Equal ("is is a t", tf.Text);
         Assert.Equal (6, tf.CursorPosition);
-        Assert.True (tf.NewKeyDownEvent (new Key (Key.B.WithAlt)));
+#if UNIX_KEY_BINDINGS
+        Assert.True (tf.NewKeyDownEvent (Key.B.WithAlt));
+#else
+        Assert.True (tf.NewKeyDownEvent (Key.CursorLeft.WithCtrl));
+#endif
         Assert.Equal ("is is a t", tf.Text);
         Assert.Equal (3, tf.CursorPosition);
         Assert.True (tf.NewKeyDownEvent (Key.CursorRight.WithCtrl));
@@ -681,7 +697,11 @@ public class TextFieldTests
         Assert.True (tf.NewKeyDownEvent (Key.CursorDown.WithCtrl));
         Assert.Equal ("is is a t", tf.Text);
         Assert.Equal (8, tf.CursorPosition);
-        Assert.True (tf.NewKeyDownEvent (new Key (Key.F.WithAlt)));
+#if UNIX_KEY_BINDINGS
+        Assert.True (tf.NewKeyDownEvent (Key.F.WithAlt));
+#else
+        Assert.True (tf.NewKeyDownEvent (Key.CursorRight.WithCtrl));
+#endif
         Assert.Equal ("is is a t", tf.Text);
         Assert.Equal (9, tf.CursorPosition);
         Assert.True (tf.Used);
@@ -703,7 +723,11 @@ public class TextFieldTests
         Assert.Equal ("is is a t", tf.Text);
         Assert.Equal ("is a", Clipboard.Contents);
         Assert.Equal (7, tf.CursorPosition);
+#if UNIX_KEY_BINDINGS
         Assert.True (tf.NewKeyDownEvent (Key.K.WithAlt));
+#else
+        Assert.True (tf.NewKeyDownEvent (Key.K.WithCtrl.WithShift));
+#endif
         Assert.Equal (" t", tf.Text);
         Assert.Equal ("is is a", Clipboard.Contents);
         tf.Text = "TAB to jump between text fields.";

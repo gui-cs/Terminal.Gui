@@ -36,8 +36,6 @@ public class Button : View
         TextAlignment = TextAlignment.Centered;
         VerticalTextAlignment = VerticalTextAlignment.Middle;
 
-        HotKeySpecifier = new Rune ('_');
-
         _leftBracket = Glyphs.LeftBracket;
         _rightBracket = Glyphs.RightBracket;
         _leftDefault = Glyphs.LeftDefaultIndicator;
@@ -78,7 +76,16 @@ public class Button : View
         get => base.Title;
         set => base.Text = base.Title = value;
     }
-    
+
+    public override Rune HotKeySpecifier
+    {
+        get => base.HotKeySpecifier;
+        set
+        {
+            TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
+        }
+    }
+
     /// <summary>Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.</summary>
     /// <value><c>true</c> if is default; otherwise, <c>false</c>.</value>
     public bool IsDefault

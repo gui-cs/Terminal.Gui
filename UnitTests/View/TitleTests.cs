@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using System.Text;
+using Xunit.Abstractions;
 
 //using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
 
@@ -65,5 +66,14 @@ public class TitleTests
         r.Title = expectedDuring = "title";
         Assert.Equal (expectedAfter, r.Title);
         r.Dispose ();
+    }
+
+    // Setting Text does NOT set the HotKey
+    [Fact]
+    public void Title_Does_Set_HotKey ()
+    {
+        var view = new View { HotKeySpecifier = (Rune)'_', Title = "_Hello World" };
+
+        Assert.Equal (Key.H, view.HotKey);
     }
 }

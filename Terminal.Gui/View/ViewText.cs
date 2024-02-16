@@ -33,10 +33,6 @@ public partial class View
     ///         The text will word-wrap to additional lines if it does not fit horizontally. If <see cref="Bounds"/>'s height
     ///         is 1, the text will be clipped.
     ///     </para>
-    ///     <para>
-    ///         Set the <see cref="HotKeySpecifier"/> to enable hotkey support. To disable hotkey support set
-    ///         <see cref="HotKeySpecifier"/> to <c>(Rune)0xffff</c>.
-    ///     </para>
     ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Bounds"/> will be adjusted to fit the text.</para>
     /// </remarks>
     public virtual string Text
@@ -155,7 +151,15 @@ public partial class View
     ///     Gets the width or height of the <see cref="TextFormatter.HotKeySpecifier"/> characters in the
     ///     <see cref="Text"/> property.
     /// </summary>
-    /// <remarks>Only the first HotKey specifier found in <see cref="Text"/> is supported.</remarks>
+    /// <remarks>
+    ///     <para>
+    ///         This is for <see cref="Text"/>, not <see cref="Title"/>. For <see cref="Text"/> to show the hotkey,
+    ///         set <c>View.</c><see cref="TextFormatter.HotKeySpecifier"/> to the desired character.
+    ///     </para>
+    ///     <para>
+    ///         Only the first HotKey specifier found in <see cref="Text"/> is supported.
+    ///     </para>
+    /// </remarks>
     /// <param name="isWidth">
     ///     If <see langword="true"/> (the default) the width required for the HotKey specifier is returned.
     ///     Otherwise the height is returned.
@@ -169,13 +173,13 @@ public partial class View
     {
         if (isWidth)
         {
-            return TextFormatter.IsHorizontalDirection (TextDirection) && TextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
-                       ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+            return TextFormatter.IsHorizontalDirection (TextDirection) && TextFormatter.Text?.Contains ((char)TextFormatter.HotKeySpecifier.Value) == true
+                       ? Math.Max (TextFormatter.HotKeySpecifier.GetColumns (), 0)
                        : 0;
         }
 
-        return TextFormatter.IsVerticalDirection (TextDirection) && TextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
-                   ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+        return TextFormatter.IsVerticalDirection (TextDirection) && TextFormatter.Text?.Contains ((char)TextFormatter.HotKeySpecifier.Value) == true
+                   ? Math.Max (TextFormatter.HotKeySpecifier.GetColumns (), 0)
                    : 0;
     }
 

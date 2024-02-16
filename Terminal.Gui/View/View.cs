@@ -276,8 +276,22 @@ public partial class View : Responder, ISupportInitializeNotification
 
     /// <summary>
     ///     The title to be displayed for this <see cref="View"/>. The title will be displayed if <see cref="Border"/>.
-    ///     <see cref="Thickness.Top"/> is greater than 0.
+    ///     <see cref="Thickness.Top"/> is greater than 0. The title can be used to set the <see cref="HotKey"/>
+    ///     for the view by prefixing character with <see cref="HotKeySpecifier"/> (e.g. <c>"T_itle"</c>).
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Set the <see cref="HotKeySpecifier"/> to enable hotkey support. To disable Title-based hotkey support set
+    ///         <see cref="HotKeySpecifier"/> to <c>(Rune)0xffff</c>.
+    ///     </para>
+    ///     <para>
+    ///         Only the first HotKey specifier found in <see cref="Title"/> is supported.
+    ///     </para>
+    ///     <para>
+    ///         To cause the hotkey to be rendered with <see cref="Text"/>,
+    ///         set <c>View.</c><see cref="TextFormatter.HotKeySpecifier"/> to the desired character.
+    ///     </para>
+    /// </remarks>
     /// <value>The title.</value>
     public string Title
     {
@@ -288,9 +302,8 @@ public partial class View : Responder, ISupportInitializeNotification
             {
                 string old = _title;
                 _title = value;
-                TitleTextFormatter.HotKeySpecifier = HotKeySpecifier;
                 TitleTextFormatter.Text = _title;
-                HotKey = TitleTextFormatter.HotKey;
+                SetHotKeyFromTitle ();
                 SetNeedsDisplay ();
 #if DEBUG
                 if (_title != null && string.IsNullOrEmpty (Id))
@@ -357,7 +370,8 @@ public partial class View : Responder, ISupportInitializeNotification
     public View ()
     {
         HotKeySpecifier = (Rune)'_';
-        TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
+        TitleTextFormatter.HotKeyChanged += TitleTextFormatter_HotKeyChanged;
+
         TextDirection = TextDirection.LeftRight_TopBottom;
         Text = string.Empty;
 
@@ -444,8 +458,6 @@ public partial class View : Responder, ISupportInitializeNotification
         // These calls were moved from BeginInit as they access Bounds which is indeterminate until EndInit is called.
         UpdateTextDirection (TextDirection);
         UpdateTextFormatterText ();
-        SetHotKey ();
-
         OnResizeNeeded ();
 
         if (_subviews != null)
