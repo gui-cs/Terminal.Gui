@@ -86,7 +86,7 @@ public class TextFieldTests
         Assert.Equal ("A", tf.Text);
 
         // cancel the next keystroke
-        tf.TextChanging += (s, e) => e.Cancel = e.NewText == "AB";
+        tf.TextChanging += (s, e) => e.Cancel = e.New == "AB";
         tf.NewKeyDownEvent (Key.B.WithShift);
 
         // B was canceled so should just be A
@@ -362,9 +362,9 @@ public class TextFieldTests
 
         void _textField_TextChanging (object sender, StringEventArgs e)
         {
-            if (e.NewText.GetRuneCount () > 11)
+            if (e.New.GetRuneCount () > 11)
             {
-                e.NewText = e.NewText [..11];
+                e.New = e.New [..11];
             }
         }
 
@@ -426,8 +426,8 @@ public class TextFieldTests
         var oldText = "";
         var tf = new TextField { Width = 10, Text = "-1" };
 
-        tf.TextChanging += (s, e) => newText = e.NewText;
-        tf.TextChanged += (s, e) => oldText = e.OldText;
+        tf.TextChanging += (s, e) => newText = e.New;
+        tf.TextChanged += (s, e) => oldText = e.Old;
 
         Application.Top.Add (tf);
         Application.Begin (Application.Top);
@@ -998,7 +998,7 @@ public class TextFieldTests
     [TextFieldTestsAutoInitShutdown]
     public void TextChanged_Event ()
     {
-        _textField.TextChanged += (s, e) => { Assert.Equal ("TAB to jump between text fields.", e.OldText); };
+        _textField.TextChanged += (s, e) => { Assert.Equal ("TAB to jump between text fields.", e.Old); };
 
         _textField.Text = "changed";
         Assert.Equal ("changed", _textField.Text);
@@ -1012,7 +1012,7 @@ public class TextFieldTests
 
         _textField.TextChanging += (s, e) =>
                                    {
-                                       Assert.Equal ("changing", e.NewText);
+                                       Assert.Equal ("changing", e.New);
 
                                        if (cancel)
                                        {

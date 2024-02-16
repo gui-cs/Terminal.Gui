@@ -436,9 +436,9 @@ public class TimeField : TextField
         {
             var spaces = 0;
 
-            for (var i = 0; i < e.NewText.Length; i++)
+            for (var i = 0; i < e.New.Length; i++)
             {
-                if (e.NewText [i] == ' ')
+                if (e.New [i] == ' ')
                 {
                     spaces++;
                 }
@@ -449,17 +449,17 @@ public class TimeField : TextField
             }
 
             spaces += FieldLength;
-            string trimedText = e.NewText [..spaces];
+            string trimedText = e.New [..spaces];
             spaces -= FieldLength;
             trimedText = trimedText.Replace (new string (' ', spaces), " ");
 
-            if (trimedText != e.NewText)
+            if (trimedText != e.New)
             {
-                e.NewText = trimedText;
+                e.New = trimedText;
             }
 
             if (!TimeSpan.TryParseExact (
-                                         e.NewText.Trim (),
+                                         e.New.Trim (),
                                          Format.Trim (),
                                          CultureInfo.CurrentCulture,
                                          TimeSpanStyles.None,

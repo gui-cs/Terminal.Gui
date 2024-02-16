@@ -39,7 +39,7 @@ public class Text : Scenario
         textField.TextChanging += TextField_TextChanging;
         void TextField_TextChanging (object sender, StringEventArgs e)
         {
-            singleWordGenerator.AllSuggestions = Regex.Matches (e.NewText, "\\w+")
+            singleWordGenerator.AllSuggestions = Regex.Matches (e.New, "\\w+")
                                                       .Select (s => s.Value)
                                                       .Distinct ()
                                                       .ToList ();

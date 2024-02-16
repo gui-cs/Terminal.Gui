@@ -606,7 +606,7 @@ public class WizardTests
         Assert.Equal (string.Empty, r.Title);
 
         var expected = string.Empty;
-        r.TitleChanged += (s, args) => { Assert.Equal (r.Title, args.NewTitle); };
+        r.TitleChanged += (s, args) => { Assert.Equal (r.Title, args.New); };
 
         expected = "title";
         r.Title = expected;
@@ -630,7 +630,7 @@ public class WizardTests
 
         r.TitleChanging += (s, args) =>
                            {
-                               Assert.Equal (expectedDuring, args.NewTitle);
+                               Assert.Equal (expectedDuring, args.New);
                                args.Cancel = cancel;
                            };
 

@@ -580,11 +580,11 @@ public class Wizard : Dialog
         // gets the first step if CurrentStep == null
     }
 
-    private void Wizard_TitleChanged (object sender, TitleEventArgs e)
+    private void Wizard_TitleChanged (object sender, StringEventArgs e)
     {
         if (string.IsNullOrEmpty (_wizardTitle))
         {
-            _wizardTitle = e.NewTitle;
+            _wizardTitle = e.New;
         }
     }
 }

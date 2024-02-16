@@ -264,7 +264,7 @@ public class Adornments : Scenario
         {
             try
             {
-                if (string.IsNullOrEmpty (e.NewText))
+                if (string.IsNullOrEmpty (e.New))
                 {
                     e.Cancel = true;
                     ((TextField)sender).Text = "0";
@@ -277,7 +277,7 @@ public class Adornments : Scenario
                     case var s when s == _topEdit.ToString ():
                         Thickness = new Thickness (
                                                    Thickness.Left,
-                                                   int.Parse (e.NewText),
+                                                   int.Parse (e.New),
                                                    Thickness.Right,
                                                    Thickness.Bottom
                                                   );
@@ -285,7 +285,7 @@ public class Adornments : Scenario
                         break;
                     case var s when s == _leftEdit.ToString ():
                         Thickness = new Thickness (
-                                                   int.Parse (e.NewText),
+                                                   int.Parse (e.New),
                                                    Thickness.Top,
                                                    Thickness.Right,
                                                    Thickness.Bottom
@@ -296,7 +296,7 @@ public class Adornments : Scenario
                         Thickness = new Thickness (
                                                    Thickness.Left,
                                                    Thickness.Top,
-                                                   int.Parse (e.NewText),
+                                                   int.Parse (e.New),
                                                    Thickness.Bottom
                                                   );
 
@@ -306,7 +306,7 @@ public class Adornments : Scenario
                                                    Thickness.Left,
                                                    Thickness.Top,
                                                    Thickness.Right,
-                                                   int.Parse (e.NewText)
+                                                   int.Parse (e.New)
                                                   );
 
                         break;
@@ -314,7 +314,7 @@ public class Adornments : Scenario
             }
             catch
             {
-                if (!string.IsNullOrEmpty (e.NewText))
+                if (!string.IsNullOrEmpty (e.New))
                 {
                     e.Cancel = true;
                 }

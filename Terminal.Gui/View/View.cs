@@ -249,7 +249,7 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
     public virtual void OnTitleChanged (string oldTitle, string newTitle)
     {
-        var args = new TitleEventArgs (oldTitle, newTitle);
+        var args = new StringEventArgs (oldTitle, newTitle);
         TitleChanged?.Invoke (this, args);
     }
 
@@ -262,7 +262,7 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <returns>`true` if an event handler canceled the Title change.</returns>
     public virtual bool OnTitleChanging (string oldTitle, string newTitle)
     {
-        var args = new TitleEventArgs (oldTitle, newTitle);
+        var args = new StringEventArgs (oldTitle, newTitle);
         TitleChanging?.Invoke (this, args);
 
         return args.Cancel;
@@ -272,13 +272,13 @@ public partial class View : Responder, ISupportInitializeNotification
     public override void OnVisibleChanged () { VisibleChanged?.Invoke (this, EventArgs.Empty); }
 
     /// <summary>Event fired after the <see cref="View.Title"/> has been changed.</summary>
-    public event EventHandler<TitleEventArgs> TitleChanged;
+    public event EventHandler<StringEventArgs> TitleChanged;
 
     /// <summary>
-    ///     Event fired when the <see cref="View.Title"/> is changing. Set <see cref="TitleEventArgs.Cancel"/> to `true`
+    ///     Event fired when the <see cref="View.Title"/> is changing. Set <see cref="StringEventArgs.Cancel"/> to `true`
     ///     to cancel the Title change.
     /// </summary>
-    public event EventHandler<TitleEventArgs> TitleChanging;
+    public event EventHandler<StringEventArgs> TitleChanging;
 
     /// <summary>Pretty prints the View</summary>
     /// <returns></returns>

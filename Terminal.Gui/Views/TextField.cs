@@ -565,7 +565,7 @@ public class TextField : View
             }
 
             ClearAllSelection ();
-            _text = newText.NewText.EnumerateRunes ().ToList ();
+            _text = newText.New.EnumerateRunes ().ToList ();
 
             if (!Secret && !_historyText.IsFromHistory)
             {
@@ -583,8 +583,8 @@ public class TextField : View
 
             TextChanged?.Invoke (this, new StringEventArgs
             {
-                NewText = StringExtensions.ToString (_text),
-                OldText = oldText
+                New = StringExtensions.ToString (_text),
+                Old = oldText
             });
 
             ProcessAutocomplete ();
@@ -1140,7 +1140,7 @@ public class TextField : View
     /// <returns>Returns the <see cref="StringEventArgs"/></returns>
     public virtual StringEventArgs OnTextChanging (string newText)
     {
-        var ev = new StringEventArgs { NewText = newText };
+        var ev = new StringEventArgs { New = newText };
         TextChanging?.Invoke (this, ev);
 
         return ev;
