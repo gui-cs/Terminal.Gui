@@ -835,7 +835,7 @@ internal class CursesDriver : ConsoleDriver
     ///     bits, and the background color is stored in the least significant 4 bits. The Terminal.GUi Color values are
     ///     converted to curses color encoding before being encoded.
     /// </remarks>
-    public override Attribute MakeColor (Color foreground, Color background)
+    public override Attribute MakeColor (in Color foreground, in Color background)
     {
         if (!RunningUnitTests)
         {

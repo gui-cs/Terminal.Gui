@@ -67,7 +67,7 @@ public readonly struct Attribute : IEquatable<Attribute>, IEqualityOperators<Att
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="foreground">Foreground</param>
     /// <param name="background">Background</param>
-    public Attribute (Color foreground, Color background)
+    public Attribute (in Color foreground, in Color background)
     {
         Foreground = foreground;
         Background = background;
@@ -94,10 +94,8 @@ public readonly struct Attribute : IEquatable<Attribute>, IEqualityOperators<Att
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="foregroundName">Foreground</param>
     /// <param name="backgroundName">Background</param>
-    public Attribute (in ColorName foregroundName, in ColorName backgroundName) : this (
-                                                                                        new Color (foregroundName),
-                                                                                        new Color (backgroundName)
-                                                                                       )
+    public Attribute (in ColorName foregroundName, in ColorName backgroundName)
+        : this (new Color (in foregroundName), new Color (in backgroundName))
     { }
 
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
