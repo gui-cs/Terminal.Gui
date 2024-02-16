@@ -397,6 +397,7 @@ public class TextField : View
 
         KeyBindings.Add (Key.CursorRight.WithCtrl, Command.WordRight);
         KeyBindings.Add (Key.CursorDown.WithCtrl, Command.WordRight);
+
         KeyBindings.Add (Key.F.WithAlt, Command.WordRight);
 
         KeyBindings.Add (Key.Delete.WithCtrl, Command.KillWordForwards);

@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using System.Reflection.Metadata.Ecma335;
+
+namespace Terminal.Gui;
 
 /// <summary>
 ///     The Label <see cref="View"/> displays a string at a given position and supports multiple lines separated by
@@ -18,24 +20,22 @@ public class Label : View
         AutoSize = true;
 
         // Things this view knows how to do
-        AddCommand (
-                    Command.Default,
-                    () =>
-                    {
-                        // BUGBUG: This is a hack, but it does work.
-                        bool can = CanFocus;
-                        CanFocus = true;
-                        SetFocus ();
-                        SuperView.FocusNext ();
-                        CanFocus = can;
-
-                        return true;
-                    }
-                   );
-        AddCommand (Command.Accept, () => AcceptKey ());
+        AddCommand (Command.Default, FocusNext);
+        AddCommand (Command.Accept, AcceptKey);
 
         // Default key bindings for this view
         KeyBindings.Add (Key.Space, Command.Accept);
+    }
+
+    private new bool? FocusNext ()
+    {
+        var me = SuperView?.Subviews.IndexOf (this) ?? -1;
+        if (me != -1 && me < SuperView?.Subviews.Count - 1)
+        {
+            SuperView?.Subviews [me + 1].SetFocus ();
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -78,6 +78,11 @@ public class Label : View
 
         if (mouseEvent.Flags == MouseFlags.Button1Clicked)
         {
+            if (!CanFocus)
+            {
+                FocusNext ();
+            }
+
             if (!HasFocus && SuperView != null)
             {
                 if (!SuperView.HasFocus)
@@ -97,7 +102,7 @@ public class Label : View
         return false;
     }
 
-    private bool AcceptKey ()
+    private bool? AcceptKey ()
     {
         if (!HasFocus)
         {

@@ -63,7 +63,6 @@ public class TimeField : TextField
         KeyBindings.Add (Key.D.WithCtrl, Command.DeleteCharRight);
 
         KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
-        KeyBindings.Add (Key.D.WithAlt, Command.DeleteCharLeft);
 
         KeyBindings.Add (Key.Home, Command.LeftHome);
         KeyBindings.Add (Key.A.WithCtrl, Command.LeftHome);
@@ -76,6 +75,10 @@ public class TimeField : TextField
 
         KeyBindings.Add (Key.CursorRight, Command.Right);
         KeyBindings.Add (Key.F.WithCtrl, Command.Right);
+
+#if UNIX_KEY_BINDINGS
+        KeyBindings.Add (Key.D.WithAlt, Command.DeleteCharLeft);
+#endif
     }
 
     /// <inheritdoc/>
