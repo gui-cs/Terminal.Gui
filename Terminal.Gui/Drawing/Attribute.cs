@@ -1,4 +1,5 @@
 #nullable enable
+using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
@@ -10,7 +11,7 @@ namespace Terminal.Gui;
 ///     <see cref="ColorScheme"/> class to define color schemes that can be used in an application.
 /// </remarks>
 [JsonConverter (typeof (AttributeJsonConverter))]
-public readonly struct Attribute : IEquatable<Attribute>
+public readonly struct Attribute : IEquatable<Attribute>, IEqualityOperators<Attribute, Attribute, bool>
 {
     /// <summary>Default empty attribute.</summary>
     public static readonly Attribute Default = new (Color.White, ColorName.Black);

@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Globalization;
+using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
@@ -13,7 +14,7 @@ namespace Terminal.Gui;
 ///     </para>
 /// </remarks>
 [JsonConverter (typeof (ColorSchemeJsonConverter))]
-public class ColorScheme : IEquatable<ColorScheme>
+public class ColorScheme : IEquatable<ColorScheme>, IEqualityOperators<ColorScheme, ColorScheme, bool>
 {
     private readonly Attribute _disabled;
     private readonly Attribute _focus;
