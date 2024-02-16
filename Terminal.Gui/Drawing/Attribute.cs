@@ -57,7 +57,7 @@ public readonly struct Attribute : IEquatable<Attribute>, IEqualityOperators<Att
     /// <param name="platformColor">platform-dependent color value.</param>
     /// <param name="foreground">Foreground</param>
     /// <param name="background">Background</param>
-    internal Attribute (int platformColor, in Color foreground, in Color background)
+    internal Attribute (int platformColor, Color foreground, Color background)
     {
         Foreground = foreground;
         Background = background;
@@ -81,7 +81,7 @@ public readonly struct Attribute : IEquatable<Attribute>, IEqualityOperators<Att
     ///     <see cref="Background"/> will be set to the specified color.
     /// </summary>
     /// <param name="colorName">Value.</param>
-    internal Attribute (ColorName colorName) : this (colorName, colorName) { }
+    internal Attribute (in ColorName colorName) : this (in colorName, in colorName) { }
 
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="foregroundName">Foreground</param>
@@ -93,19 +93,19 @@ public readonly struct Attribute : IEquatable<Attribute>, IEqualityOperators<Att
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="foregroundName">Foreground</param>
     /// <param name="background">Background</param>
-    public Attribute (ColorName foregroundName, Color background) : this (new Color (foregroundName), background) { }
+    public Attribute (in ColorName foregroundName, in Color background) : this (new Color (foregroundName), in background) { }
 
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="foreground">Foreground</param>
     /// <param name="backgroundName">Background</param>
-    public Attribute (Color foreground, ColorName backgroundName) : this (foreground, new Color (backgroundName)) { }
+    public Attribute (in Color foreground, in ColorName backgroundName) : this (foreground, new Color (backgroundName)) { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Attribute"/> struct with the same colors for the foreground and
     ///     background.
     /// </summary>
     /// <param name="color">The color.</param>
-    public Attribute (Color color) : this (color, color) { }
+    public Attribute (in Color color) : this (color, color) { }
 
     /// <summary>Compares two attributes for equality.</summary>
     /// <param name="left"></param>
