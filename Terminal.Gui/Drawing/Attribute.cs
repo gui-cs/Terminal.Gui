@@ -31,9 +31,7 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     /// <summary>Initializes a new instance with default values.</summary>
     public Attribute ()
     {
-        PlatformColor = -1;
-        Foreground = Default.Foreground;
-        Background = Default.Background;
+        this = Default with { PlatformColor = -1 };
     }
 
     /// <summary>Initializes a new instance from an existing instance.</summary>
