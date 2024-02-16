@@ -1,5 +1,4 @@
-#nullable enable
-using System.Globalization;
+﻿#nullable enable
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
@@ -12,6 +11,7 @@ public static class Colors
 {
     static Colors ()
     {
+        ColorSchemes = new (5, StringComparer.InvariantCultureIgnoreCase);
         Reset ();
     }
 
@@ -61,25 +61,17 @@ public static class Colors
     /// </remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]
     [JsonConverter (typeof (DictionaryJsonConverter<ColorScheme>))]
-    public static Dictionary<string, ColorScheme>
-        ColorSchemes { get; private set; } // Serialization requires this to have a setter (private set;)
+    public static Dictionary<string, ColorScheme> ColorSchemes { get; private set; }
 
     /// <summary>Resets the <see cref="ColorSchemes"/> dictionary to the default values.</summary>
     public static Dictionary<string, ColorScheme> Reset ()
     {
-        ColorSchemes ??= new Dictionary<string, ColorScheme> (
-                                                              5,
-                                                              CultureInfo.InvariantCulture.CompareInfo
-                                                                         .GetStringComparer (
-                                                                                             CompareOptions.IgnoreCase
-                                                                                            )
-                                                             );
         ColorSchemes.Clear ();
-        ColorSchemes.Add ("TopLevel", new ColorScheme ());
-        ColorSchemes.Add ("Base", new ColorScheme ());
-        ColorSchemes.Add ("Dialog", new ColorScheme ());
-        ColorSchemes.Add ("Menu", new ColorScheme ());
-        ColorSchemes.Add ("Error", new ColorScheme ());
+        ColorSchemes.Add ("TopLevel", new ());
+        ColorSchemes.Add ("Base", new ());
+        ColorSchemes.Add ("Dialog", new ());
+        ColorSchemes.Add ("Menu", new ());
+        ColorSchemes.Add ("Error", new ());
 
         return ColorSchemes;
     }
