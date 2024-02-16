@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Globalization;
 using System.Text.Json.Serialization;
 
@@ -82,20 +82,5 @@ public static class Colors
         ColorSchemes.Add ("Error", new ColorScheme ());
 
         return ColorSchemes;
-    }
-
-    private class SchemeNameComparerIgnoreCase : IEqualityComparer<string>
-    {
-        public bool Equals (string x, string y)
-        {
-            if (x is { } && y is { })
-            {
-                return string.Equals (x, y, StringComparison.InvariantCultureIgnoreCase);
-            }
-
-            return false;
-        }
-
-        public int GetHashCode (string obj) { return obj.ToLowerInvariant ().GetHashCode (); }
     }
 }
