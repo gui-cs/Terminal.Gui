@@ -23,7 +23,7 @@ public partial class View
 
     /// <summary>
     /// Called when the default command (<see cref="Command.Default"/>) is invoked. Fires the <see cref="DefaultCommand"/>
-    /// event. Calls <see cref="SetFocus"/> to cause this view to be focused.
+    /// event. Causes this view to be focused.
     /// </summary>
     /// <returns>If <see langword="true"/> the command was canceled.</returns>
     public bool OnDefaultCommand ()
@@ -718,12 +718,12 @@ public partial class View
     public event EventHandler<Key> InvokingKeyBindings;
 
     /// <summary>
-    ///     Invokes any binding that is registered on this <see cref="View"/> and matches the <paramref name="keyEvent"/>
+    ///     Invokes any binding that is registered on this <see cref="View"/> and matches the <paramref name="key"/>
     ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </summary>
-    /// <param name="keyEvent">The key event passed.</param>
+    /// <param name="key">The key event passed.</param>
     /// <returns>
-    ///     <see langword="null"/> if no command was bound the <paramref name="keyEvent"/>. <see langword="true"/> if
+    ///     <see langword="null"/> if no command was bound the <paramref name="key"/>. <see langword="true"/> if
     ///     commands were invoked and at least one handled the command. <see langword="false"/> if commands were invoked and at
     ///     none handled the command.
     /// </returns>
