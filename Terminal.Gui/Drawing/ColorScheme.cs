@@ -1,5 +1,4 @@
 #nullable enable
-using System.Globalization;
 using System.Numerics;
 using System.Text.Json.Serialization;
 
@@ -14,7 +13,7 @@ namespace Terminal.Gui;
 ///     </para>
 /// </remarks>
 [JsonConverter (typeof (ColorSchemeJsonConverter))]
-public class ColorScheme : IEquatable<ColorScheme>, IEqualityOperators<ColorScheme, ColorScheme, bool>
+public record ColorScheme : IEqualityOperators<ColorScheme, ColorScheme, bool>
 {
     private readonly Attribute _disabled;
     private readonly Attribute _focus;
@@ -87,7 +86,7 @@ public class ColorScheme : IEquatable<ColorScheme>, IEqualityOperators<ColorSche
     /// <summary>Compares two <see cref="ColorScheme"/> objects for equality.</summary>
     /// <param name="other"></param>
     /// <returns>true if the two objects are equal</returns>
-    public bool Equals (ColorScheme? other)
+    public virtual bool Equals (ColorScheme? other)
     {
         return other is { }
                && EqualityComparer<Attribute>.Default.Equals (_normal, other._normal)
@@ -96,11 +95,6 @@ public class ColorScheme : IEquatable<ColorScheme>, IEqualityOperators<ColorSche
                && EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus)
                && EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
     }
-
-    /// <summary>Compares two <see cref="ColorScheme"/> objects for equality.</summary>
-    /// <param name="obj"></param>
-    /// <returns>true if the two objects are equal</returns>
-    public override bool Equals (object? obj) { return Equals (obj as ColorScheme); }
 
     /// <summary>Returns a hashcode for this instance.</summary>
     /// <returns>hashcode for this instance</returns>
@@ -115,18 +109,6 @@ public class ColorScheme : IEquatable<ColorScheme>, IEqualityOperators<ColorSche
 
         return hashCode;
     }
-
-    /// <summary>Compares two <see cref="ColorScheme"/> objects for equality.</summary>
-    /// <param name="left"></param>
-    /// <param name="right"></param>
-    /// <returns><c>true</c> if the two objects are equivalent</returns>
-    public static bool operator == (ColorScheme left, ColorScheme right) { return EqualityComparer<ColorScheme>.Default.Equals (left, right); }
-
-    /// <summary>Compares two <see cref="ColorScheme"/> objects for inequality.</summary>
-    /// <param name="left"></param>
-    /// <param name="right"></param>
-    /// <returns><c>true</c> if the two objects are not equivalent</returns>
-    public static bool operator != (ColorScheme left, ColorScheme right) { return !(left == right); }
 
     /// <inheritdoc/>
     public override string ToString () { return $"Normal: {Normal}; Focus: {Focus}; HotNormal: {HotNormal}; HotFocus: {HotFocus}; Disabled: {Disabled}"; }
