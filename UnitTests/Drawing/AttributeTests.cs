@@ -345,19 +345,6 @@ public class AttributeTests
     }
 
     [Fact]
-    public void PlatformColorConstructor ()
-    {
-        // Arrange & Act
-        var attribute = new Attribute (42);
-
-        // Assert
-        //Assert.True (attribute.Initialized);
-        Assert.Equal (42, attribute.PlatformColor);
-        Assert.Equal (new Color (Color.White), attribute.Foreground);
-        Assert.Equal (new Color (Color.Black), attribute.Background);
-    }
-
-    [Fact]
     public void ToString_ShouldReturnFormattedStringWithForegroundAndBackground ()
     {
         // Arrange

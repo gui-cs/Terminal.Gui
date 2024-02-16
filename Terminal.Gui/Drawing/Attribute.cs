@@ -44,15 +44,6 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
         Background = attr.Background;
     }
 
-    /// <summary>Initializes a new instance with platform specific color value.</summary>
-    /// <param name="platformColor">Value.</param>
-    internal Attribute (int platformColor)
-    {
-        PlatformColor = platformColor;
-        Foreground = Default.Foreground;
-        Background = Default.Background;
-    }
-
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="platformColor">platform-dependent color value.</param>
     /// <param name="foreground">Foreground</param>
