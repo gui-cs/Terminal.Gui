@@ -13,7 +13,7 @@ internal class ColorSchemeJsonConverter : JsonConverter<ColorScheme>
     {
         get
         {
-            if (instance == null)
+            if (instance is null)
             {
                 instance = new ColorSchemeJsonConverter ();
             }

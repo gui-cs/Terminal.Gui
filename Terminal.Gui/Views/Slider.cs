@@ -327,7 +327,7 @@ public class Slider<T> : View
     /// <param name="orientation">Initial slider orientation.</param>
     public Slider (List<T> options, Orientation orientation = Orientation.Horizontal)
     {
-        if (options == null)
+        if (options is null)
         {
             SetInitialProperties (null, orientation);
         }
@@ -664,7 +664,7 @@ public class Slider<T> : View
         if (AutoSize)
         {
             // Max size is SuperView's Bounds. Min Size is size that will fit.
-            if (SuperView != null)
+            if (SuperView is { })
             {
                 // Calculate the size of the slider based on the size of the SuperView's Bounds.
                 if (_config._sliderOrientation == Orientation.Horizontal)
@@ -998,7 +998,7 @@ public class Slider<T> : View
     {
         // TODO: make this more surgical to reduce repaint
 
-        if (_options == null && _options.Count > 0)
+        if (_options is null && _options.Count > 0)
         {
             return;
         }
@@ -1033,7 +1033,7 @@ public class Slider<T> : View
 
     private string AlignText (string text, int width, TextAlignment textAlignment)
     {
-        if (text == null)
+        if (text is null)
         {
             return "";
         }

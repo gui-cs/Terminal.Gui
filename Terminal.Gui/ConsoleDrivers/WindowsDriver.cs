@@ -985,7 +985,7 @@ internal class WindowsDriver : ConsoleDriver
         // TODO: if some other Windows-based terminal supports true color, update this logic to not
         // force 16color mode (.e.g ConEmu which really doesn't work well at all).
         _isWindowsTerminal = _isWindowsTerminal =
-                                 Environment.GetEnvironmentVariable ("WT_SESSION") != null || Environment.GetEnvironmentVariable ("VSAPPIDNAME") != null;
+                                 Environment.GetEnvironmentVariable ("WT_SESSION") is { } || Environment.GetEnvironmentVariable ("VSAPPIDNAME") != null;
 
         if (!_isWindowsTerminal)
         {
@@ -998,7 +998,7 @@ internal class WindowsDriver : ConsoleDriver
     public WindowsConsole WinConsole { get; private set; }
 
     /// <inheritdoc/>
-    public override bool EnsureCursorVisibility () { return WinConsole == null || WinConsole.EnsureCursorVisibility (); }
+    public override bool EnsureCursorVisibility () { return WinConsole is null || WinConsole.EnsureCursorVisibility (); }
 
     public WindowsConsole.KeyEventRecord FromVKPacketToKeyEventRecord (WindowsConsole.KeyEventRecord keyEvent)
     {
@@ -1049,7 +1049,7 @@ internal class WindowsDriver : ConsoleDriver
     /// <inheritdoc/>
     public override bool GetCursorVisibility (out CursorVisibility visibility)
     {
-        if (WinConsole != null)
+        if (WinConsole is { })
         {
             return WinConsole.GetCursorVisibility (out visibility);
         }
@@ -1143,7 +1143,7 @@ internal class WindowsDriver : ConsoleDriver
     {
         _cachedCursorVisibility = visibility;
 
-        return WinConsole == null || WinConsole.SetCursorVisibility (visibility);
+        return WinConsole is null || WinConsole.SetCursorVisibility (visibility);
     }
 
     #region Not Implemented
@@ -1274,7 +1274,7 @@ internal class WindowsDriver : ConsoleDriver
 
     internal override void End ()
     {
-        if (_mainLoopDriver != null)
+        if (_mainLoopDriver is { })
         {
 #if HACK_CHECK_WINCHANGED
 
@@ -1302,7 +1302,7 @@ internal class WindowsDriver : ConsoleDriver
         {
             try
             {
-                if (WinConsole != null)
+                if (WinConsole is { })
                 {
                     // BUGBUG: The results from GetConsoleOutputWindow are incorrect when called from Init. 
                     // Our thread in WindowsMainLoop.CheckWin will get the correct results. See #if HACK_CHECK_WINCHANGED
@@ -1709,7 +1709,7 @@ internal class WindowsDriver : ConsoleDriver
 
             View view = Application.WantContinuousButtonPressedView;
 
-            if (view == null)
+            if (view is null)
             {
                 break;
             }
@@ -1783,7 +1783,7 @@ internal class WindowsDriver : ConsoleDriver
         // be fired with it's bit set to 0. So when the button is up ButtonState will be 0.
         // To map to the correct driver events we save the last pressed mouse button so we can
         // map to the correct clicked event.
-        if ((_lastMouseButtonPressed != null || _isButtonReleased) && mouseEvent.ButtonState != 0)
+        if ((_lastMouseButtonPressed is { } || _isButtonReleased) && mouseEvent.ButtonState != 0)
         {
             _lastMouseButtonPressed = null;
 
@@ -1797,7 +1797,7 @@ internal class WindowsDriver : ConsoleDriver
             Y = mouseEvent.MousePosition.Y
         };
 
-        if ((mouseEvent.ButtonState != 0 && mouseEvent.EventFlags == 0 && _lastMouseButtonPressed == null && !_isButtonDoubleClicked)
+        if ((mouseEvent.ButtonState != 0 && mouseEvent.EventFlags == 0 && _lastMouseButtonPressed is null && !_isButtonDoubleClicked)
             || (_lastMouseButtonPressed == null
                 && mouseEvent.EventFlags.HasFlag (WindowsConsole.EventFlags.MouseMoved)
                 && mouseEvent.ButtonState != 0
@@ -1876,7 +1876,7 @@ internal class WindowsDriver : ConsoleDriver
             _isButtonPressed = false;
             _isButtonReleased = true;
 
-            if (_point != null && ((Point)_point).X == mouseEvent.MousePosition.X && ((Point)_point).Y == mouseEvent.MousePosition.Y)
+            if (_point is { } && ((Point)_point).X == mouseEvent.MousePosition.X && ((Point)_point).Y == mouseEvent.MousePosition.Y)
             {
                 _processButtonClick = true;
             }
@@ -1998,7 +1998,7 @@ internal class WindowsDriver : ConsoleDriver
         mouseFlag = SetControlKeyStates (mouseEvent, mouseFlag);
 
         //System.Diagnostics.Debug.WriteLine (
-        //	$"point.X:{(point != null ? ((Point)point).X : -1)};point.Y:{(point != null ? ((Point)point).Y : -1)}");
+        //	$"point.X:{(point is { } ? ((Point)point).X : -1)};point.Y:{(point is { } ? ((Point)point).Y : -1)}");
 
         return new MouseEvent
         {
@@ -2137,7 +2137,7 @@ internal class WindowsMainLoop : IMainLoopDriver
 
     private void WindowsInputHandler ()
     {
-        while (_mainLoop != null)
+        while (_mainLoop is { })
         {
             try
             {
@@ -2170,14 +2170,14 @@ internal class WindowsMainLoop : IMainLoopDriver
     private Size _windowSize;
     private void CheckWinChange ()
     {
-        while (_mainLoop != null)
+        while (_mainLoop is { })
         {
             _winChange.Wait ();
             _winChange.Reset ();
 
             // Check if the window size changed every half second. 
             // We do this to minimize the weird tearing seen on Windows when resizing the console
-            while (_mainLoop != null)
+            while (_mainLoop is { })
             {
                 Task.Delay (500).Wait ();
                 _windowSize = _winConsole.GetConsoleBufferWindow (out _);

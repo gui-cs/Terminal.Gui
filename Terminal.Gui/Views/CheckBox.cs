@@ -68,7 +68,7 @@ public class CheckBox : View
         get => _checked;
         set
         {
-            if (value == null && !AllowNullChecked)
+            if (value is null && !AllowNullChecked)
             {
                 return;
             }

@@ -316,7 +316,7 @@ public static class MessageBox
         var count = 0;
         List<Button> buttonList = new ();
 
-        if (buttons != null)
+        if (buttons is { })
         {
             if (defaultButton > buttons.Length - 1)
             {

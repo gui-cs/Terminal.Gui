@@ -225,12 +225,12 @@ public class LineCanvas : IDisposable
             {
                 IntersectionDefinition? [] intersects = _lines
                                                         .Select (l => l.Intersects (x, y))
-                                                        .Where (i => i != null)
+                                                        .Where (i => i is { })
                                                         .ToArray ();
 
                 Cell? cell = GetCellForIntersects (Application.Driver, intersects);
 
-                if (cell != null)
+                if (cell is { })
                 {
                     map.Add (new Point (x, y), cell);
                 }
@@ -260,12 +260,12 @@ public class LineCanvas : IDisposable
             {
                 IntersectionDefinition? [] intersects = _lines
                                                         .Select (l => l.Intersects (x, y))
-                                                        .Where (i => i != null)
+                                                        .Where (i => i is { })
                                                         .ToArray ();
 
                 Rune? rune = GetRuneForIntersects (Application.Driver, intersects);
 
-                if (rune != null)
+                if (rune is { })
                 {
                     map.Add (new Point (x, y), rune.Value);
                 }
@@ -299,7 +299,7 @@ public class LineCanvas : IDisposable
     {
         StraightLine? l = _lines.LastOrDefault ();
 
-        if (l != null)
+        if (l is { })
         {
             _lines.Remove (l);
         }

@@ -50,7 +50,7 @@ public partial class View
             OnResizeNeeded ();
 
 #if DEBUG
-            if (_text != null && string.IsNullOrEmpty (Id))
+            if (_text is { } && string.IsNullOrEmpty (Id))
             {
                 Id = _text;
             }
@@ -183,7 +183,7 @@ public partial class View
     /// <summary>Can be overridden if the <see cref="Terminal.Gui.TextFormatter.Text"/> has different format than the default.</summary>
     protected virtual void UpdateTextFormatterText ()
     {
-        if (TextFormatter != null)
+        if (TextFormatter is { })
         {
             TextFormatter.Text = _text;
         }
@@ -313,7 +313,7 @@ public partial class View
 
                     // TODO: v2 - This uses frame.Width; it should only use Bounds
                     if (_frame.Width < colWidth
-                        && (Width == null || (Bounds.Width >= 0 && Width is Dim.DimAbsolute && Width.Anchor (0) >= 0 && Width.Anchor (0) < colWidth)))
+                        && (Width is null || (Bounds.Width >= 0 && Width is Dim.DimAbsolute && Width.Anchor (0) >= 0 && Width.Anchor (0) < colWidth)))
                     {
                         sizeRequired = new Size (colWidth, Bounds.Height);
 
@@ -322,7 +322,7 @@ public partial class View
 
                     break;
                 default:
-                    if (_frame.Height < 1 && (Height == null || (Height is Dim.DimAbsolute && Height.Anchor (0) == 0)))
+                    if (_frame.Height < 1 && (Height is null || (Height is Dim.DimAbsolute && Height.Anchor (0) == 0)))
                     {
                         sizeRequired = new Size (Bounds.Width, 1);
 

@@ -312,7 +312,7 @@ public class TileView : View
         _tiles = new List<Tile> ();
         _splitterDistances = new List<Pos> ();
 
-        if (_splitterLines != null)
+        if (_splitterLines is { })
         {
             foreach (TileViewLineView sl in _splitterLines)
             {
@@ -580,7 +580,7 @@ public class TileView : View
     {
         TileView root = this;
 
-        while (root.parentTileView != null)
+        while (root.parentTileView is { })
         {
             root = root.parentTileView;
         }
@@ -891,7 +891,7 @@ public class TileView : View
 
         public void DrawSplitterSymbol ()
         {
-            if (dragPosition != null || CanFocus)
+            if (dragPosition is { } || CanFocus)
             {
                 Point location = moveRuneRenderLocation ?? new Point (Bounds.Width / 2, Bounds.Height / 2);
 

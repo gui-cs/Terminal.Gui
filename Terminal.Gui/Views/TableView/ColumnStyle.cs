@@ -76,7 +76,7 @@ public class ColumnStyle
     /// <returns></returns>
     public TextAlignment GetAlignment (object cellValue)
     {
-        if (AlignmentGetter != null)
+        if (AlignmentGetter is { })
         {
             return AlignmentGetter (cellValue);
         }
@@ -100,7 +100,7 @@ public class ColumnStyle
             }
         }
 
-        if (RepresentationGetter != null)
+        if (RepresentationGetter is { })
         {
             return RepresentationGetter (value);
         }

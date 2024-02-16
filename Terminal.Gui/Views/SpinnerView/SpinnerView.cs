@@ -189,7 +189,7 @@ public class SpinnerView : View
 
     private void AddAutoSpinTimeout ()
     {
-        if (_timeout != null)
+        if (_timeout is { })
         {
             return;
         }
@@ -251,7 +251,7 @@ public class SpinnerView : View
 
     private void RemoveAutoSpinTimeout ()
     {
-        if (_timeout != null)
+        if (_timeout is { })
         {
             Application.RemoveTimeout (_timeout);
             _timeout = null;

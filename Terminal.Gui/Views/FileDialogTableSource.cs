@@ -65,7 +65,7 @@ internal class FileDialogTableSource : ITableSource
             case 1:
                 return stats?.HumanReadableLength ?? string.Empty;
             case 2:
-                if (stats == null || stats.IsParent || stats.LastWriteTime == null)
+                if (stats is null || stats.IsParent || stats.LastWriteTime is null)
                 {
                     return string.Empty;
                 }

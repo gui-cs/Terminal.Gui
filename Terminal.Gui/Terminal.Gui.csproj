@@ -38,6 +38,7 @@
   <!-- Dependencies -->
   <!-- =================================================================== -->
   <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
     <PackageReference Include="System.IO.Abstractions" Version="20.0.4" />
     <PackageReference Include="System.Text.Json" Version="8.0.1" />
@@ -83,6 +84,8 @@
   </ItemGroup>
   <ItemGroup>
     <Using Include="System.Text" />
+    <Using Include="JetBrains.Annotations" />
+    <Using Include="System.Diagnostics.Contracts.PureAttribute" Alias="PureAttribute" />
   </ItemGroup>
   <!-- =================================================================== -->
   <!-- Nuget  -->

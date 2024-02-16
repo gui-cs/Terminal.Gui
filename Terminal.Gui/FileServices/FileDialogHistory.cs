@@ -28,7 +28,7 @@ internal class FileDialogHistory
         }
 
         // nowhere to go
-        if (goTo == null)
+        if (goTo is null)
         {
             return false;
         }
@@ -36,7 +36,7 @@ internal class FileDialogHistory
         forward.Push (dlg.State);
         dlg.PushState (goTo, false, true, false, restorePath);
 
-        if (restoreSelection != null)
+        if (restoreSelection is { })
         {
             dlg.RestoreSelection (restoreSelection.FileSystemInfo);
         }
@@ -63,7 +63,7 @@ internal class FileDialogHistory
 
     internal void Push (FileDialogState state, bool clearForward)
     {
-        if (state == null)
+        if (state is null)
         {
             return;
         }
@@ -84,7 +84,7 @@ internal class FileDialogHistory
     {
         IDirectoryInfo parent = dlg.State?.Directory.Parent;
 
-        if (parent != null)
+        if (parent is { })
         {
             back.Push (new FileDialogState (parent, dlg));
             dlg.PushState (parent, false);

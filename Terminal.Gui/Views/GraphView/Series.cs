@@ -64,7 +64,7 @@ public class MultiBarSeries : ISeries
     {
         subSeries = new BarSeries [numberOfBarsPerCategory];
 
-        if (colors != null && colors.Length != numberOfBarsPerCategory)
+        if (colors is { } && colors.Length != numberOfBarsPerCategory)
         {
             throw new ArgumentException (
                                          "Number of colors must match the number of bars",
@@ -81,7 +81,7 @@ public class MultiBarSeries : ISeries
             // Only draw labels for the first bar in each category
             subSeries [i].DrawLabels = i == 0;
 
-            if (colors != null)
+            if (colors is { })
             {
                 subSeries [i].OverrideBarColor = colors [i];
             }

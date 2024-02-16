@@ -262,7 +262,7 @@ internal class NetEvents : IDisposable
                     if ((consoleKeyInfo.KeyChar == (char)KeyCode.Esc && !_isEscSeq)
                         || (consoleKeyInfo.KeyChar != (char)KeyCode.Esc && _isEscSeq))
                     {
-                        if (_cki == null && consoleKeyInfo.KeyChar != (char)KeyCode.Esc && _isEscSeq)
+                        if (_cki is null && consoleKeyInfo.KeyChar != (char)KeyCode.Esc && _isEscSeq)
                         {
                             _cki = EscSeqUtils.ResizeArray (
                                                             new ConsoleKeyInfo (
@@ -292,7 +292,7 @@ internal class NetEvents : IDisposable
                         break;
                     }
 
-                    if (consoleKeyInfo.KeyChar == (char)KeyCode.Esc && _isEscSeq && _cki != null)
+                    if (consoleKeyInfo.KeyChar == (char)KeyCode.Esc && _isEscSeq && _cki is { })
                     {
                         ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki, ref mod);
                         _cki = null;
@@ -1646,7 +1646,7 @@ internal class NetMainLoop : IMainLoopDriver
     /// <exception cref="ArgumentNullException"></exception>
     public NetMainLoop (ConsoleDriver consoleDriver = null)
     {
-        if (consoleDriver == null)
+        if (consoleDriver is null)
         {
             throw new ArgumentNullException (nameof (consoleDriver));
         }
@@ -1727,7 +1727,7 @@ internal class NetMainLoop : IMainLoopDriver
 
     private void NetInputHandler ()
     {
-        while (_mainLoop != null)
+        while (_mainLoop is { })
         {
             try
             {
@@ -1760,7 +1760,7 @@ internal class NetMainLoop : IMainLoopDriver
 
             try
             {
-                while (_resultQueue.Peek () == null)
+                while (_resultQueue.Peek () is null)
                 {
                     _resultQueue.Dequeue ();
                 }

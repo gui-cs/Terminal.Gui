@@ -23,8 +23,10 @@ public class ResponderTests
     [Fact]
     public void Disposing_Event_Notify_All_Subscribers_On_The_First_Container ()
     {
+    #if DEBUG_IDISPOSABLE
         // Only clear before because need to test after assert
         Responder.Instances.Clear ();
+    #endif
 
         var container1 = new View { Id = "Container1" };
         var count = 0;
@@ -57,14 +59,18 @@ public class ResponderTests
 
         container1.Dispose ();
 
+    #if DEBUG_IDISPOSABLE
         Assert.Empty (Responder.Instances);
+    #endif
     }
 
     [Fact]
     public void Disposing_Event_Notify_All_Subscribers_On_The_Second_Container ()
     {
+    #if DEBUG_IDISPOSABLE
         // Only clear before because need to test after assert
         Responder.Instances.Clear ();
+    #endif
 
         var container1 = new View { Id = "Container1" };
 
@@ -97,7 +103,9 @@ public class ResponderTests
 
         container2.Dispose ();
 
+    #if DEBUG_IDISPOSABLE
         Assert.Empty (Responder.Instances);
+    #endif
     }
 
     [Fact]
@@ -256,8 +264,9 @@ public class ResponderTests
     public void Responder_Not_Notifying_Dispose ()
     {
         // Only clear before because need to test after assert
+    #if DEBUG_IDISPOSABLE
         Responder.Instances.Clear ();
-
+    #endif
         var container1 = new View { Id = "Container1" };
 
         var view = new View { Id = "View" };
@@ -279,7 +288,9 @@ public class ResponderTests
         Assert.Null (view.SuperView);
 
         // Trying access disposed properties
+    #if DEBUG_IDISPOSABLE
         Assert.True (container2.Subviews [0].WasDisposed);
+    #endif
         Assert.False (container2.Subviews [0].CanFocus);
         Assert.Null (container2.Subviews [0].Margin);
         Assert.Null (container2.Subviews [0].Border);
@@ -288,7 +299,9 @@ public class ResponderTests
 
         container2.Dispose ();
 
+    #if DEBUG_IDISPOSABLE
         Assert.Empty (Responder.Instances);
+    #endif
     }
 
     public class DerivedView : View

@@ -1,4 +1,5 @@
 #nullable enable
+using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
@@ -10,14 +11,15 @@ namespace Terminal.Gui;
 ///     <see cref="ColorScheme"/> class to define color schemes that can be used in an application.
 /// </remarks>
 [JsonConverter (typeof (AttributeJsonConverter))]
-public readonly struct Attribute : IEquatable<Attribute>
+public readonly record struct Attribute : IEqualityOperators<Attribute, Attribute, bool>
 {
     /// <summary>Default empty attribute.</summary>
-    public static readonly Attribute Default = new (Color.White, ColorName.Black);
+    [JsonIgnore]
+    public static Attribute Default => new (Color.White, ColorName.Black);
 
     /// <summary>The <see cref="ConsoleDriver"/>-specific color value.</summary>
     [JsonIgnore (Condition = JsonIgnoreCondition.Always)]
-    internal int PlatformColor { get; }
+    internal int PlatformColor { get; init; }
 
     /// <summary>The foreground color.</summary>
     [JsonConverter (typeof (ColorJsonConverter))]
@@ -30,33 +32,20 @@ public readonly struct Attribute : IEquatable<Attribute>
     /// <summary>Initializes a new instance with default values.</summary>
     public Attribute ()
     {
-        PlatformColor = -1;
-        Foreground = Default.Foreground;
-        Background = Default.Background;
+        this = Default with { PlatformColor = -1 };
     }
 
     /// <summary>Initializes a new instance from an existing instance.</summary>
     public Attribute (in Attribute attr)
     {
-        PlatformColor = -1;
-        Foreground = attr.Foreground;
-        Background = attr.Background;
-    }
-
-    /// <summary>Initializes a new instance with platform specific color value.</summary>
-    /// <param name="platformColor">Value.</param>
-    internal Attribute (int platformColor)
-    {
-        PlatformColor = platformColor;
-        Foreground = Default.Foreground;
-        Background = Default.Background;
+        this = attr with { PlatformColor = -1 };
     }
 
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="platformColor">platform-dependent color value.</param>
     /// <param name="foreground">Foreground</param>
     /// <param name="background">Background</param>
-    internal Attribute (int platformColor, in Color foreground, in Color background)
+    internal Attribute (int platformColor, Color foreground, Color background)
     {
         Foreground = foreground;
         Background = background;
@@ -66,21 +55,13 @@ public readonly struct Attribute : IEquatable<Attribute>
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="foreground">Foreground</param>
     /// <param name="background">Background</param>
-    public Attribute (Color foreground, Color background)
+    public Attribute (in Color foreground, in Color background)
     {
         Foreground = foreground;
         Background = background;
 
-        // TODO: Once CursesDriver supports truecolor all the PlatformColor stuff goes away
-        if (Application.Driver == null)
-        {
-            PlatformColor = -1;
-
-            return;
-        }
-
-        Attribute make = Application.Driver.MakeColor (foreground, background);
-        PlatformColor = make.PlatformColor;
+        // TODO: Once CursesDriver supports true color all the PlatformColor stuff goes away
+        PlatformColor = Application.Driver?.MakeColor(in foreground, in background).PlatformColor ?? -1;
     }
 
     /// <summary>
@@ -88,51 +69,31 @@ public readonly struct Attribute : IEquatable<Attribute>
     ///     <see cref="Background"/> will be set to the specified color.
     /// </summary>
     /// <param name="colorName">Value.</param>
-    internal Attribute (ColorName colorName) : this (colorName, colorName) { }
+    internal Attribute (in ColorName colorName) : this (in colorName, in colorName) { }
 
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="foregroundName">Foreground</param>
     /// <param name="backgroundName">Background</param>
-    public Attribute (in ColorName foregroundName, in ColorName backgroundName) : this (
-                                                                                        new Color (foregroundName),
-                                                                                        new Color (backgroundName)
-                                                                                       )
+    public Attribute (in ColorName foregroundName, in ColorName backgroundName)
+        : this (new Color (in foregroundName), new Color (in backgroundName))
     { }
 
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="foregroundName">Foreground</param>
     /// <param name="background">Background</param>
-    public Attribute (ColorName foregroundName, Color background) : this (new Color (foregroundName), background) { }
+    public Attribute (in ColorName foregroundName, in Color background) : this (new Color (in foregroundName), in background) { }
 
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="foreground">Foreground</param>
     /// <param name="backgroundName">Background</param>
-    public Attribute (Color foreground, ColorName backgroundName) : this (foreground, new Color (backgroundName)) { }
+    public Attribute (in Color foreground, in ColorName backgroundName) : this (in foreground, new Color (in backgroundName)) { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Attribute"/> struct with the same colors for the foreground and
     ///     background.
     /// </summary>
     /// <param name="color">The color.</param>
-    public Attribute (Color color) : this (color, color) { }
-
-    /// <summary>Compares two attributes for equality.</summary>
-    /// <param name="left"></param>
-    /// <param name="right"></param>
-    /// <returns></returns>
-    public static bool operator == (Attribute left, Attribute right) { return left.Equals (right); }
-
-    /// <summary>Compares two attributes for inequality.</summary>
-    /// <param name="left"></param>
-    /// <param name="right"></param>
-    /// <returns></returns>
-    public static bool operator != (Attribute left, Attribute right) { return !(left == right); }
-
-    /// <inheritdoc/>
-    public override bool Equals (object? obj) { return obj is Attribute other && Equals (other); }
-
-    /// <inheritdoc/>
-    public bool Equals (Attribute other) { return PlatformColor == other.PlatformColor && Foreground == other.Foreground && Background == other.Background; }
+    public Attribute (in Color color) : this (color, color) { }
 
     /// <inheritdoc/>
     public override int GetHashCode () { return HashCode.Combine (PlatformColor, Foreground, Background); }

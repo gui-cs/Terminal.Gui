@@ -1166,7 +1166,11 @@ At 0,0
         // BUGBUG: IsInitialized must be true to process calculation
         r.BeginInit ();
         r.EndInit ();
+    #if DEBUG
         Assert.Equal ("View(Vertical View)(0,0,1,13)", r.ToString ());
+    #else
+        Assert.Equal ("View()(0,0,1,13)", r.ToString ());
+    #endif
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
         Assert.Equal (new Rect (0, 0, 1, 13), r.Bounds);
@@ -1174,7 +1178,11 @@ At 0,0
         Assert.Null (r.Focused);
         Assert.Null (r.ColorScheme);
         Assert.False (r.IsCurrentTop);
+    #if DEBUG
         Assert.Equal ("Vertical View", r.Id);
+    #else
+        Assert.Equal (string.Empty, r.Id);
+    #endif
         Assert.Empty (r.Subviews);
         Assert.False (r.WantContinuousButtonPressed);
         Assert.False (r.WantMousePositionReports);

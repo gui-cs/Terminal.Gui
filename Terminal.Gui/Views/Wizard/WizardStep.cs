@@ -90,7 +90,7 @@ public class WizardStep : FrameView
         //helpTextView.DrawContent += (s,e) => {
         //	scrollBar.Size = helpTextView.Lines;
         //	scrollBar.Position = helpTextView.TopRow;
-        //	if (scrollBar.OtherScrollBarView != null) {
+        //	if (scrollBar.OtherScrollBarView is { }) {
         //		scrollBar.OtherScrollBarView.Size = helpTextView.Maxlength;
         //		scrollBar.OtherScrollBarView.Position = helpTextView.LeftColumn;
         //	}
@@ -143,7 +143,7 @@ public class WizardStep : FrameView
     /// <remarks></remarks>
     public override void Remove (View view)
     {
-        if (view == null)
+        if (view is null)
         {
             return;
         }

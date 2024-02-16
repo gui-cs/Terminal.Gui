@@ -61,7 +61,7 @@ public partial class View
 
         if (mouseEvent.Flags == MouseFlags.Button1Clicked)
         {
-            if (CanFocus && !HasFocus && SuperView != null)
+            if (CanFocus && !HasFocus && SuperView is { })
             {
                 SuperView.SetFocus (this);
                 SetNeedsDisplay ();

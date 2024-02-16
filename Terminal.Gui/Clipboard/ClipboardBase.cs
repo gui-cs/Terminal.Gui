@@ -17,7 +17,7 @@ public abstract class ClipboardBase : IClipboard
         {
             string result = GetClipboardDataImpl ();
 
-            if (result == null)
+            if (result is null)
             {
                 return string.Empty;
             }
@@ -35,7 +35,7 @@ public abstract class ClipboardBase : IClipboard
     /// <exception cref="NotSupportedException">Thrown if it was not possible to paste to the OS clipboard.</exception>
     public void SetClipboardData (string text)
     {
-        if (text == null)
+        if (text is null)
         {
             throw new ArgumentNullException (nameof (text));
         }

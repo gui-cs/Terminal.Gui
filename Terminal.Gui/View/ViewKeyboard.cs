@@ -199,7 +199,7 @@ public partial class View
     {
         get
         {
-            if (TextFormatter != null)
+            if (TextFormatter is { })
             {
                 return TextFormatter.HotKeySpecifier;
             }
@@ -215,7 +215,7 @@ public partial class View
 
     private void SetHotKey ()
     {
-        if (TextFormatter == null || HotKeySpecifier == new Rune ('\xFFFF'))
+        if (TextFormatter is null || HotKeySpecifier == new Rune ('\xFFFF'))
         {
             return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
         }
@@ -263,7 +263,7 @@ public partial class View
                 return;
             }
 
-            if (SuperView?._tabIndexes == null || SuperView?._tabIndexes.Count == 1)
+            if (SuperView?._tabIndexes is null || SuperView?._tabIndexes.Count == 1)
             {
                 _tabIndex = 0;
 
@@ -401,7 +401,7 @@ public partial class View
 
         bool? handled = OnInvokingKeyBindings (keyEvent);
 
-        if (handled != null && (bool)handled)
+        if (handled is { } && (bool)handled)
         {
             return true;
         }
@@ -643,7 +643,7 @@ public partial class View
         //   `InvokeKeyBindings` returns `true`. Continue passing the event (return `false` from `OnInvokeKeyBindings`).
         bool? handled = InvokeKeyBindings (keyEvent);
 
-        if (handled != null && (bool)handled)
+        if (handled is { } && (bool)handled)
         {
             // Stop processing if any key binding handled the key.
             // DO NOT stop processing if there are no matching key bindings or none of the key bindings handled the key
@@ -665,7 +665,7 @@ public partial class View
                 keyEvent.Scope = KeyBindingScope.HotKey;
                 handled = view.OnInvokingKeyBindings (keyEvent);
 
-                if (handled != null && (bool)handled)
+                if (handled is { } && (bool)handled)
                 {
                     return true;
                 }
@@ -765,7 +765,7 @@ public partial class View
         // if there is already an implementation of this command
         // replace that implementation
         // else record how to perform the action (this should be the normal case)
-        if (CommandImplementations != null)
+        if (CommandImplementations is { })
         {
             CommandImplementations [command] = f;
         }

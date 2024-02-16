@@ -78,7 +78,7 @@ public class ThemeManager : IDictionary<string, ThemeScope>
                    Dictionary<string, ThemeScope>; // themes ?? new Dictionary<string, ThemeScope> ();
         set =>
 
-            //if (themes == null || value == null) {
+            //if (themes is null || value is null) {
             //	themes = value;
             //} else {
             //	themes = (Dictionary<string, ThemeScope>)DeepMemberwiseCopy (value!, themes!)!;

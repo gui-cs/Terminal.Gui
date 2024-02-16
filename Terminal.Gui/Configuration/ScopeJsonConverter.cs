@@ -39,7 +39,7 @@ internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT :
             string? propertyName = reader.GetString ();
             reader.Read ();
 
-            if (propertyName != null && scope!.TryGetValue (propertyName, out ConfigProperty? configProp))
+            if (propertyName is { } && scope!.TryGetValue (propertyName, out ConfigProperty? configProp))
             {
                 // This property name was found in the Scope's ScopeProperties dictionary
                 // Figure out if it needs a JsonConverter and if so, create one
@@ -54,7 +54,7 @@ internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT :
                     {
                         var factory = (JsonConverterFactory)converter;
 
-                        if (propertyType != null && factory.CanConvert (propertyType))
+                        if (propertyType is { } && factory.CanConvert (propertyType))
                         {
                             converter = factory.CreateConverter (propertyType, options);
                         }
@@ -106,7 +106,7 @@ internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT :
                                                                p.GetCustomAttribute (typeof (JsonIncludeAttribute)) as
                                                                    JsonIncludeAttribute;
 
-                                                           if (jia != null)
+                                                           if (jia is { })
                                                            {
                                                                var jpna =
                                                                    p.GetCustomAttribute (
@@ -130,7 +130,7 @@ internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT :
                                                       )
                                                .FirstOrDefault ();
 
-                if (property != null)
+                if (property is { })
                 {
                     PropertyInfo prop = scope.GetType ().GetProperty (propertyName!)!;
                     prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, options));
@@ -196,7 +196,7 @@ internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT :
                     }
                 }
 
-                if (p.Value.PropertyValue != null)
+                if (p.Value.PropertyValue is { })
                 {
                     converter.GetType ()
                              .GetMethod ("Write")

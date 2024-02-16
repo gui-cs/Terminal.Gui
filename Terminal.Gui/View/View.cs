@@ -139,7 +139,7 @@ public partial class View : Responder, ISupportInitializeNotification
             {
                 if (value)
                 {
-                    if (SuperView == null || SuperView?.Enabled == true)
+                    if (SuperView is null || SuperView?.Enabled == true)
                     {
                         base.Enabled = value;
                     }
@@ -157,7 +157,7 @@ public partial class View : Responder, ISupportInitializeNotification
                 OnEnabledChanged ();
                 SetNeedsDisplay ();
 
-                if (_subviews != null)
+                if (_subviews is { })
                 {
                     foreach (View view in _subviews)
                     {
@@ -198,11 +198,11 @@ public partial class View : Responder, ISupportInitializeNotification
                 _title = value;
                 SetNeedsDisplay ();
 #if DEBUG
-                if (_title != null && string.IsNullOrEmpty (Id))
+                if (_title is { } && string.IsNullOrEmpty (Id))
                 {
                     Id = _title;
                 }
-#endif // DEBUG
+#endif
                 OnTitleChanged (old, _title);
             }
         }
@@ -438,7 +438,7 @@ public partial class View : Responder, ISupportInitializeNotification
 
         OnResizeNeeded ();
 
-        if (_subviews != null)
+        if (_subviews is { })
         {
             foreach (View view in _subviews)
             {

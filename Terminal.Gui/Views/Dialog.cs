@@ -80,7 +80,7 @@ public class Dialog : Window
         get => _buttons.ToArray ();
         init
         {
-            if (value == null)
+            if (value is null)
             {
                 return;
             }
@@ -105,7 +105,7 @@ public class Dialog : Window
     /// <param name="button">Button to add.</param>
     public void AddButton (Button button)
     {
-        if (button == null)
+        if (button is null)
         {
             return;
         }
