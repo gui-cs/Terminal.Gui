@@ -81,12 +81,12 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="foregroundName">Foreground</param>
     /// <param name="background">Background</param>
-    public Attribute (in ColorName foregroundName, in Color background) : this (new Color (foregroundName), in background) { }
+    public Attribute (in ColorName foregroundName, in Color background) : this (new Color (in foregroundName), in background) { }
 
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="foreground">Foreground</param>
     /// <param name="backgroundName">Background</param>
-    public Attribute (in Color foreground, in ColorName backgroundName) : this (foreground, new Color (backgroundName)) { }
+    public Attribute (in Color foreground, in ColorName backgroundName) : this (in foreground, new Color (in backgroundName)) { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Attribute"/> struct with the same colors for the foreground and
