@@ -183,7 +183,7 @@ public class DateField : TextField
         }
     }
 
-    private void DateField_Changing (object sender, TextChangingEventArgs e)
+    private void DateField_Changing (object sender, TextEventArgs e)
     {
         try
         {

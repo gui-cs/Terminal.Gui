@@ -430,7 +430,7 @@ public class TimeField : TextField
         return true;
     }
 
-    private void TextField_TextChanging (object sender, TextChangingEventArgs e)
+    private void TextField_TextChanging (object sender, TextEventArgs e)
     {
         try
         {

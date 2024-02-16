@@ -552,7 +552,7 @@ public class TextField : View
                 return;
             }
 
-            TextChangingEventArgs newText = OnTextChanging (value.Replace ("\t", "").Split ("\n") [0]);
+            TextEventArgs newText = OnTextChanging (value.Replace ("\t", "").Split ("\n") [0]);
 
             if (newText.Cancel)
             {
@@ -1133,10 +1133,10 @@ public class TextField : View
 
     /// <summary>Virtual method that invoke the <see cref="TextChanging"/> event if it's defined.</summary>
     /// <param name="newText">The new text to be replaced.</param>
-    /// <returns>Returns the <see cref="TextChangingEventArgs"/></returns>
-    public virtual TextChangingEventArgs OnTextChanging (string newText)
+    /// <returns>Returns the <see cref="TextEventArgs"/></returns>
+    public virtual TextEventArgs OnTextChanging (string newText)
     {
-        var ev = new TextChangingEventArgs (newText);
+        var ev = new TextEventArgs (newText);
         TextChanging?.Invoke (this, ev);
 
         return ev;
@@ -1269,7 +1269,7 @@ public class TextField : View
     public event EventHandler<TextChangedEventArgs> TextChanged;
 
     /// <summary>Changing event, raised before the <see cref="Text"/> changes and can be canceled or changing the new text.</summary>
-    public event EventHandler<TextChangingEventArgs> TextChanging;
+    public event EventHandler<TextEventArgs> TextChanging;
 
     /// <summary>Undoes the latest changes.</summary>
     public void Undo ()

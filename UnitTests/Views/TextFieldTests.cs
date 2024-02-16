@@ -360,7 +360,7 @@ public class TextFieldTests
 
         _textField.TextChanging += _textField_TextChanging;
 
-        void _textField_TextChanging (object sender, TextChangingEventArgs e)
+        void _textField_TextChanging (object sender, TextEventArgs e)
         {
             if (e.NewText.GetRuneCount () > 11)
             {
