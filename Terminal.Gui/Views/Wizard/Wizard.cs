@@ -110,7 +110,7 @@ public class Wizard : Dialog
         if (Modal)
         {
             KeyBindings.Clear (Command.QuitToplevel);
-            KeyBindings.Add (KeyCode.Esc, Command.QuitToplevel);
+            KeyBindings.Add (Key.Esc, Command.QuitToplevel);
         }
 
         SetNeedsLayout ();
@@ -408,17 +408,15 @@ public class Wizard : Dialog
     ///     <see cref="OnProcessKeyDown"/> to instead fire the <see cref="Cancelled"/> event when Wizard is being used as a
     ///     non-modal (see <see cref="Wizard.Modal"/>.
     /// </summary>
-    /// <param name="a"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public override bool OnProcessKeyDown (Key a)
+    public override bool OnProcessKeyDown (Key key)
     {
         //// BUGBUG: Why is this not handled by a key binding???
         if (!Modal)
         {
-            switch (a.KeyCode)
+            if (key == Key.Esc)
             {
-                // BUGBUG: This should be handled by Dialog 
-                case KeyCode.Esc:
                     var args = new WizardButtonEventArgs ();
                     Cancelled?.Invoke (this, args);
 

@@ -610,11 +610,11 @@ public class AutoSizeTrueTests
                                  {
                                      while (count < 21)
                                      {
-                                         field.NewKeyDownEvent (new Key (KeyCode.Enter));
+                                         field.NewKeyDownEvent (Key.Enter);
 
                                          if (count == 20)
                                          {
-                                             field.NewKeyDownEvent (new Key (KeyCode.Enter));
+                                             field.NewKeyDownEvent (Key.Enter);
 
                                              break;
                                          }
@@ -714,11 +714,11 @@ public class AutoSizeTrueTests
                                  {
                                      while (count > -1)
                                      {
-                                         field.NewKeyDownEvent (new Key (KeyCode.Enter));
+                                         field.NewKeyDownEvent (Key.Enter);
 
                                          if (count == 0)
                                          {
-                                             field.NewKeyDownEvent (new Key (KeyCode.Enter));
+                                             field.NewKeyDownEvent (Key.Enter);
 
                                              break;
                                          }

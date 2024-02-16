@@ -88,7 +88,6 @@ public class Key : EventArgs, IEquatable<Key>
     {
         KeyCode = key.KeyCode;
         Handled = key.Handled;
-        Scope = key.Scope;
     }
 
     /// <summary>Constructs a new <see cref="Key"/> from a char.</summary>
@@ -219,7 +218,7 @@ public class Key : EventArgs, IEquatable<Key>
 #if DEBUG
             if (GetIsKeyCodeAtoZ (value) && (value & KeyCode.Space) != 0)
             {
-                throw new ArgumentException ("Invalid KeyCode: KeyCode.Space | KeyCode.A/Z is invalid.", nameof (value));
+                throw new ArgumentException ($"Invalid KeyCode: {value} is invalid.", nameof (value));
             }
 
 #endif
@@ -253,15 +252,6 @@ public class Key : EventArgs, IEquatable<Key>
     /// </code>
     /// </summary>
     public Key NoShift => new (this) { KeyCode = KeyCode & ~KeyCode.ShiftMask };
-
-    private KeyBindingScope _scope = KeyBindingScope.Focused;
-
-    /// <summary>Enables passing the key binding scope with the event. Default is <see cref="KeyBindingScope.Focused"/>.</summary>
-    public KeyBindingScope Scope
-    {
-        get => _scope;
-        set => _scope = value;
-    }
 
     /// <summary>
     ///     Helper for specifying a shifted <see cref="Key"/>.
@@ -412,7 +402,7 @@ public class Key : EventArgs, IEquatable<Key>
     /// <inheritdoc/>
     public override bool Equals (object obj)
     {
-        return obj is Key k && k.KeyCode == KeyCode && k.Scope == Scope && k.Handled == Handled;
+        return obj is Key k && k.KeyCode == KeyCode && k.Handled == Handled;
     }
 
     bool IEquatable<Key>.Equals (Key other) { return Equals (other); }
@@ -588,7 +578,7 @@ public class Key : EventArgs, IEquatable<Key>
     {
         if (string.IsNullOrEmpty (text))
         {
-            key = new Key (KeyCode.Null);
+            key = Key.Empty;
 
             return true;
         }
@@ -609,15 +599,15 @@ public class Key : EventArgs, IEquatable<Key>
             switch (parts [0])
             {
                 case "Ctrl":
-                    key = new Key (KeyCode.CtrlMask);
+                    key = KeyCode.CtrlMask;
 
                     return true;
                 case "Alt":
-                    key = new Key (KeyCode.AltMask);
+                    key = KeyCode.AltMask;
 
                     return true;
                 case "Shift":
-                    key = new Key (KeyCode.ShiftMask);
+                    key = KeyCode.ShiftMask;
 
                     return true;
             }
@@ -671,6 +661,10 @@ public class Key : EventArgs, IEquatable<Key>
                 }
             }
 
+            if (GetIsKeyCodeAtoZ (keyCode) && (keyCode & KeyCode.Space) != 0)
+            {
+                keyCode = keyCode & ~KeyCode.Space;
+            }
             key = new Key (keyCode | modifiers);
 
             return true;
@@ -687,6 +681,10 @@ public class Key : EventArgs, IEquatable<Key>
                     return true;
                 }
 
+                if (GetIsKeyCodeAtoZ (parsedKeyCode) && (parsedKeyCode & KeyCode.Space) != 0)
+                {
+                    parsedKeyCode = parsedKeyCode & ~KeyCode.Space;
+                }
                 key = new Key (parsedKeyCode | modifiers);
 
                 return true;

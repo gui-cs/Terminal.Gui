@@ -124,14 +124,14 @@ public class TabView : View
                    );
 
         // Default keybindings for this view
-        KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
-        KeyBindings.Add (KeyCode.CursorRight, Command.Right);
-        KeyBindings.Add (KeyCode.Home, Command.LeftHome);
-        KeyBindings.Add (KeyCode.End, Command.RightEnd);
-        KeyBindings.Add (KeyCode.CursorDown, Command.NextView);
-        KeyBindings.Add (KeyCode.CursorUp, Command.PreviousView);
-        KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
-        KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
+        KeyBindings.Add (Key.CursorLeft, Command.Left);
+        KeyBindings.Add (Key.CursorRight, Command.Right);
+        KeyBindings.Add (Key.Home, Command.LeftHome);
+        KeyBindings.Add (Key.End, Command.RightEnd);
+        KeyBindings.Add (Key.CursorDown, Command.NextView);
+        KeyBindings.Add (Key.CursorUp, Command.PreviousView);
+        KeyBindings.Add (Key.PageDown, Command.PageDown);
+        KeyBindings.Add (Key.PageUp, Command.PageUp);
     }
 
     /// <summary>

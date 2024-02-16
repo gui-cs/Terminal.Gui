@@ -342,80 +342,80 @@ public class TextField : View
 
         // Default keybindings for this view
         // We follow this as closely as possible: https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
-        KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
-        KeyBindings.Add (KeyCode.D | KeyCode.CtrlMask, Command.DeleteCharRight);
+        KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
+        KeyBindings.Add (Key.D.WithCtrl, Command.DeleteCharRight);
 
-        KeyBindings.Add (KeyCode.Backspace, Command.DeleteCharLeft);
+        KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
 
-        KeyBindings.Add (KeyCode.Home | KeyCode.ShiftMask, Command.LeftHomeExtend);
-        KeyBindings.Add (KeyCode.Home | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.LeftHomeExtend);
-        KeyBindings.Add (KeyCode.A | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.LeftHomeExtend);
+        KeyBindings.Add (Key.Home.WithShift, Command.LeftHomeExtend);
+        KeyBindings.Add (Key.Home.WithShift.WithCtrl, Command.LeftHomeExtend);
+        KeyBindings.Add (Key.A.WithShift.WithCtrl, Command.LeftHomeExtend);
 
-        KeyBindings.Add (KeyCode.End | KeyCode.ShiftMask, Command.RightEndExtend);
-        KeyBindings.Add (KeyCode.End | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.RightEndExtend);
-        KeyBindings.Add (KeyCode.E | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.RightEndExtend);
+        KeyBindings.Add (Key.End.WithShift, Command.RightEndExtend);
+        KeyBindings.Add (Key.End.WithShift.WithCtrl, Command.RightEndExtend);
+        KeyBindings.Add (Key.E.WithShift.WithCtrl, Command.RightEndExtend);
 
-        KeyBindings.Add (KeyCode.Home, Command.LeftHome);
-        KeyBindings.Add (KeyCode.Home | KeyCode.CtrlMask, Command.LeftHome);
-        KeyBindings.Add (KeyCode.A | KeyCode.CtrlMask, Command.LeftHome);
+        KeyBindings.Add (Key.Home, Command.LeftHome);
+        KeyBindings.Add (Key.Home.WithCtrl, Command.LeftHome);
+        KeyBindings.Add (Key.A.WithCtrl, Command.LeftHome);
 
-        KeyBindings.Add (KeyCode.CursorLeft | KeyCode.ShiftMask, Command.LeftExtend);
-        KeyBindings.Add (KeyCode.CursorUp | KeyCode.ShiftMask, Command.LeftExtend);
+        KeyBindings.Add (Key.CursorLeft.WithShift, Command.LeftExtend);
+        KeyBindings.Add (Key.CursorUp.WithShift, Command.LeftExtend);
 
-        KeyBindings.Add (KeyCode.CursorRight | KeyCode.ShiftMask, Command.RightExtend);
-        KeyBindings.Add (KeyCode.CursorDown | KeyCode.ShiftMask, Command.RightExtend);
+        KeyBindings.Add (Key.CursorRight.WithShift, Command.RightExtend);
+        KeyBindings.Add (Key.CursorDown.WithShift, Command.RightExtend);
 
-        KeyBindings.Add (KeyCode.CursorLeft | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.WordLeftExtend);
-        KeyBindings.Add (KeyCode.CursorUp | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.WordLeftExtend);
-        KeyBindings.Add (('B' + KeyCode.ShiftMask) | KeyCode.AltMask, Command.WordLeftExtend);
+        KeyBindings.Add (Key.CursorLeft.WithShift.WithCtrl, Command.WordLeftExtend);
+        KeyBindings.Add (Key.CursorUp.WithShift.WithCtrl, Command.WordLeftExtend);
+        KeyBindings.Add (Key.B.WithShift.WithAlt, Command.WordLeftExtend);
 
-        KeyBindings.Add (KeyCode.CursorRight | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.WordRightExtend);
-        KeyBindings.Add (KeyCode.CursorDown | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.WordRightExtend);
-        KeyBindings.Add (('F' + KeyCode.ShiftMask) | KeyCode.AltMask, Command.WordRightExtend);
+        KeyBindings.Add (Key.CursorRight.WithShift.WithCtrl, Command.WordRightExtend);
+        KeyBindings.Add (Key.CursorDown.WithShift.WithCtrl, Command.WordRightExtend);
+        KeyBindings.Add (Key.F.WithShift.WithAlt, Command.WordRightExtend);
 
-        KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
-        KeyBindings.Add (KeyCode.B | KeyCode.CtrlMask, Command.Left);
+        KeyBindings.Add (Key.CursorLeft, Command.Left);
+        KeyBindings.Add (Key.B.WithCtrl, Command.Left);
 
-        KeyBindings.Add (KeyCode.End, Command.RightEnd);
-        KeyBindings.Add (KeyCode.End | KeyCode.CtrlMask, Command.RightEnd);
-        KeyBindings.Add (KeyCode.E | KeyCode.CtrlMask, Command.RightEnd);
+        KeyBindings.Add (Key.End, Command.RightEnd);
+        KeyBindings.Add (Key.End.WithCtrl, Command.RightEnd);
+        KeyBindings.Add (Key.E.WithCtrl, Command.RightEnd);
 
-        KeyBindings.Add (KeyCode.CursorRight, Command.Right);
-        KeyBindings.Add (KeyCode.F | KeyCode.CtrlMask, Command.Right);
+        KeyBindings.Add (Key.CursorRight, Command.Right);
+        KeyBindings.Add (Key.F.WithCtrl, Command.Right);
 
-        KeyBindings.Add (KeyCode.K | KeyCode.CtrlMask, Command.CutToEndLine);
-        KeyBindings.Add (KeyCode.K | KeyCode.AltMask, Command.CutToStartLine);
+        KeyBindings.Add (Key.K.WithCtrl, Command.CutToEndLine);
+        KeyBindings.Add (Key.K.WithAlt, Command.CutToStartLine);
 
-        KeyBindings.Add (KeyCode.Z | KeyCode.CtrlMask, Command.Undo);
-        KeyBindings.Add (KeyCode.Backspace | KeyCode.AltMask, Command.Undo);
+        KeyBindings.Add (Key.Z.WithCtrl, Command.Undo);
+        KeyBindings.Add (Key.Backspace.WithAlt, Command.Undo);
 
-        KeyBindings.Add (KeyCode.Y | KeyCode.CtrlMask, Command.Redo);
+        KeyBindings.Add (Key.Y.WithCtrl, Command.Redo);
 
-        KeyBindings.Add (KeyCode.CursorLeft | KeyCode.CtrlMask, Command.WordLeft);
-        KeyBindings.Add (KeyCode.CursorUp | KeyCode.CtrlMask, Command.WordLeft);
-        KeyBindings.Add ('B' + KeyCode.AltMask, Command.WordLeft);
+        KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.WordLeft);
+        KeyBindings.Add (Key.CursorUp.WithCtrl, Command.WordLeft);
+        KeyBindings.Add (Key.B.WithAlt, Command.WordLeft);
 
-        KeyBindings.Add (KeyCode.CursorRight | KeyCode.CtrlMask, Command.WordRight);
-        KeyBindings.Add (KeyCode.CursorDown | KeyCode.CtrlMask, Command.WordRight);
-        KeyBindings.Add ('F' + KeyCode.AltMask, Command.WordRight);
+        KeyBindings.Add (Key.CursorRight.WithCtrl, Command.WordRight);
+        KeyBindings.Add (Key.CursorDown.WithCtrl, Command.WordRight);
+        KeyBindings.Add (Key.F.WithAlt, Command.WordRight);
 
-        KeyBindings.Add (KeyCode.Delete | KeyCode.CtrlMask, Command.KillWordForwards);
-        KeyBindings.Add (KeyCode.Backspace | KeyCode.CtrlMask, Command.KillWordBackwards);
-        KeyBindings.Add (KeyCode.Insert, Command.ToggleOverwrite);
-        KeyBindings.Add (KeyCode.C | KeyCode.CtrlMask, Command.Copy);
-        KeyBindings.Add (KeyCode.X | KeyCode.CtrlMask, Command.Cut);
-        KeyBindings.Add (KeyCode.V | KeyCode.CtrlMask, Command.Paste);
-        KeyBindings.Add (KeyCode.T | KeyCode.CtrlMask, Command.SelectAll);
+        KeyBindings.Add (Key.Delete.WithCtrl, Command.KillWordForwards);
+        KeyBindings.Add (Key.Backspace.WithCtrl, Command.KillWordBackwards);
+        KeyBindings.Add (Key.InsertChar, Command.ToggleOverwrite);
+        KeyBindings.Add (Key.C.WithCtrl, Command.Copy);
+        KeyBindings.Add (Key.X.WithCtrl, Command.Cut);
+        KeyBindings.Add (Key.V.WithCtrl, Command.Paste);
+        KeyBindings.Add (Key.T.WithCtrl, Command.SelectAll);
 
-        KeyBindings.Add (KeyCode.R | KeyCode.CtrlMask, Command.DeleteAll);
-        KeyBindings.Add (KeyCode.D | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.DeleteAll);
+        KeyBindings.Add (Key.R.WithCtrl, Command.DeleteAll);
+        KeyBindings.Add (Key.D.WithCtrl.WithShift, Command.DeleteAll);
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
         ContextMenu = new ContextMenu { Host = this, MenuItems = BuildContextMenuBarItem () };
         ContextMenu.KeyChanged += ContextMenu_KeyChanged;
 
-        KeyBindings.Add (ContextMenu.Key.KeyCode, KeyBindingScope.HotKey, Command.ShowContextMenu);
+        KeyBindings.Add (ContextMenu.Key, KeyBindingScope.HotKey, Command.ShowContextMenu);
     }
 
     /// <summary>

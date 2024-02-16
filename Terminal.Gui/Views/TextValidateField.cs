@@ -462,15 +462,15 @@ namespace Terminal.Gui
                        );
 
             // Default keybindings for this view
-            KeyBindings.Add (KeyCode.Home, Command.LeftHome);
-            KeyBindings.Add (KeyCode.End, Command.RightEnd);
+            KeyBindings.Add (Key.Home, Command.LeftHome);
+            KeyBindings.Add (Key.End, Command.RightEnd);
 
-            KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
-            KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
+            KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
+            KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
 
-            KeyBindings.Add (KeyCode.Backspace, Command.DeleteCharLeft);
-            KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
-            KeyBindings.Add (KeyCode.CursorRight, Command.Right);
+            KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
+            KeyBindings.Add (Key.CursorLeft, Command.Left);
+            KeyBindings.Add (Key.CursorRight, Command.Right);
         }
 
         /// <summary>This property returns true if the input is valid.</summary>

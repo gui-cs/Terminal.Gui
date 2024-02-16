@@ -367,26 +367,26 @@ Item 6",
         lv.BeginInit ();
         lv.EndInit ();
         Assert.Equal (-1, lv.SelectedItem);
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (lv.NewKeyDownEvent (Key.CursorDown));
         Assert.Equal (0, lv.SelectedItem);
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.CursorUp)));
+        Assert.True (lv.NewKeyDownEvent (Key.CursorUp));
         Assert.Equal (0, lv.SelectedItem);
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.PageDown)));
+        Assert.True (lv.NewKeyDownEvent (Key.PageDown));
         Assert.Equal (2, lv.SelectedItem);
         Assert.Equal (2, lv.TopItem);
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.PageUp)));
+        Assert.True (lv.NewKeyDownEvent (Key.PageUp));
         Assert.Equal (0, lv.SelectedItem);
         Assert.Equal (0, lv.TopItem);
         Assert.False (lv.Source.IsMarked (lv.SelectedItem));
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.Space)));
+        Assert.True (lv.NewKeyDownEvent (Key.Space));
         Assert.True (lv.Source.IsMarked (lv.SelectedItem));
         var opened = false;
         lv.OpenSelectedItem += (s, _) => opened = true;
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (lv.NewKeyDownEvent (Key.Enter));
         Assert.True (opened);
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.End)));
+        Assert.True (lv.NewKeyDownEvent (Key.End));
         Assert.Equal (2, lv.SelectedItem);
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.Home)));
+        Assert.True (lv.NewKeyDownEvent (Key.Home));
         Assert.Equal (0, lv.SelectedItem);
     }
 
@@ -405,9 +405,9 @@ Item 6",
         Assert.Equal (-1, lv.SelectedItem);
 
         // bind shift down to move down twice in control
-        lv.KeyBindings.Add (KeyCode.CursorDown | KeyCode.ShiftMask, Command.LineDown, Command.LineDown);
+        lv.KeyBindings.Add (Key.CursorDown.WithShift, Command.LineDown, Command.LineDown);
 
-        var ev = new Key (KeyCode.CursorDown | KeyCode.ShiftMask);
+        var ev = Key.CursorDown.WithShift;
 
         Assert.True (lv.NewKeyDownEvent (ev), "The first time we move down 2 it should be possible");
 
@@ -437,9 +437,9 @@ Item 6",
         Assert.False (lv.Source.IsMarked (1));
         Assert.False (lv.Source.IsMarked (2));
 
-        lv.KeyBindings.Add (KeyCode.Space | KeyCode.ShiftMask, Command.ToggleChecked, Command.LineDown);
+        lv.KeyBindings.Add (Key.Space.WithShift, Command.ToggleChecked, Command.LineDown);
 
-        var ev = new Key (KeyCode.Space | KeyCode.ShiftMask);
+        var ev = Key.Space.WithShift;
 
         // view should indicate that it has accepted and consumed the event
         Assert.True (lv.NewKeyDownEvent (ev));
@@ -568,7 +568,7 @@ Item 6",
     public void SettingEmptyKeybindingThrows ()
     {
         var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
-        Assert.Throws<ArgumentException> (() => lv.KeyBindings.Add (KeyCode.Space));
+        Assert.Throws<ArgumentException> (() => lv.KeyBindings.Add (Key.Space));
     }
 
     private class NewListDataSource : IListDataSource

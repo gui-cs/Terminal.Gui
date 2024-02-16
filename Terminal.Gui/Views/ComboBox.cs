@@ -84,16 +84,16 @@ public class ComboBox : View
         AddCommand (Command.UnixEmulation, () => UnixEmulation ());
 
         // Default keybindings for this view
-        KeyBindings.Add (KeyCode.Enter, Command.Accept);
-        KeyBindings.Add (KeyCode.F4, Command.ToggleExpandCollapse);
-        KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
-        KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
-        KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
-        KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
-        KeyBindings.Add (KeyCode.Home, Command.TopHome);
-        KeyBindings.Add (KeyCode.End, Command.BottomEnd);
-        KeyBindings.Add (KeyCode.Esc, Command.Cancel);
-        KeyBindings.Add (KeyCode.U | KeyCode.CtrlMask, Command.UnixEmulation);
+        KeyBindings.Add (Key.Enter, Command.Accept);
+        KeyBindings.Add (Key.F4, Command.ToggleExpandCollapse);
+        KeyBindings.Add (Key.CursorDown, Command.LineDown);
+        KeyBindings.Add (Key.CursorUp, Command.LineUp);
+        KeyBindings.Add (Key.PageDown, Command.PageDown);
+        KeyBindings.Add (Key.PageUp, Command.PageUp);
+        KeyBindings.Add (Key.Home, Command.TopHome);
+        KeyBindings.Add (Key.End, Command.BottomEnd);
+        KeyBindings.Add (Key.Esc, Command.Cancel);
+        KeyBindings.Add (Key.U.WithCtrl, Command.UnixEmulation);
     }
 
     /// <inheritdoc/>

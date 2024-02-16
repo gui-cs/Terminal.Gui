@@ -35,7 +35,7 @@ public class Label : View
         AddCommand (Command.Accept, () => AcceptKey ());
 
         // Default key bindings for this view
-        KeyBindings.Add (KeyCode.Space, Command.Accept);
+        KeyBindings.Add (Key.Space, Command.Accept);
     }
 
     /// <summary>

@@ -2003,7 +2003,7 @@ public class TextFormatter
         if (string.IsNullOrEmpty (text) || hotKeySpecifier == (Rune)0xFFFF)
         {
             hotPos = -1;
-            hotKey = KeyCode.Null;
+            hotKey = Key.Empty;
 
             return false;
         }
@@ -2072,7 +2072,7 @@ public class TextFormatter
 
                 hotKey = newHotKey;
 
-                hotKey.Scope = KeyBindingScope.HotKey;
+                //hotKey.Scope = KeyBindingScope.HotKey;
 
                 return true;
             }

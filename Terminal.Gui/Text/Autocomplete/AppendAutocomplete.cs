@@ -64,19 +64,19 @@ public class AppendAutocomplete : AutocompleteBase
     /// <inheritdoc/>
     public override bool ProcessKey (Key a)
     {
-        KeyCode key = a.KeyCode;
+        Key key = a.KeyCode;
 
         if (key == SelectionKey)
         {
             return AcceptSelectionIfAny ();
         }
 
-        if (key == KeyCode.CursorUp)
+        if (key == Key.CursorUp)
         {
             return CycleSuggestion (1);
         }
 
-        if (key == KeyCode.CursorDown)
+        if (key == Key.CursorDown)
         {
             return CycleSuggestion (-1);
         }

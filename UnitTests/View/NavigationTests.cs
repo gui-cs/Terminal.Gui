@@ -323,13 +323,13 @@ public class NavigationTests
         Assert.True (view2.CanFocus);
         Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.Tab)));
+        Assert.True (Application.Top.NewKeyDownEvent (Key.Tab));
         Assert.True (view1.CanFocus);
         Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
         Assert.True (view2.CanFocus);
         Assert.True (view2.HasFocus);
 
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.Tab)));
+        Assert.True (Application.Top.NewKeyDownEvent (Key.Tab));
         Assert.True (view1.CanFocus);
         Assert.True (view1.HasFocus);
         Assert.True (view2.CanFocus);
@@ -362,13 +362,13 @@ public class NavigationTests
         Assert.True (view2.CanFocus);
         Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask)));
+        Assert.True (Application.Top.NewKeyDownEvent (Key.Tab.WithCtrl));
         Assert.True (view1.CanFocus);
         Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
         Assert.True (view2.CanFocus);
         Assert.True (view2.HasFocus);
 
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask)));
+        Assert.True (Application.Top.NewKeyDownEvent (Key.Tab.WithCtrl));
         Assert.True (view1.CanFocus);
         Assert.True (view1.HasFocus);
         Assert.True (view2.CanFocus);
@@ -412,14 +412,14 @@ public class NavigationTests
         Assert.True (view2.CanFocus);
         Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask)));
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask)));
+        Assert.True (Application.Top.NewKeyDownEvent (Key.Tab.WithCtrl));
+        Assert.True (Application.Top.NewKeyDownEvent (Key.Tab.WithCtrl));
         Assert.True (view1.CanFocus);
         Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
         Assert.True (view2.CanFocus);
         Assert.True (view2.HasFocus);
 
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask)));
+        Assert.True (Application.Top.NewKeyDownEvent (Key.Tab.WithCtrl));
         Assert.True (view1.CanFocus);
         Assert.True (view1.HasFocus);
         Assert.True (view2.CanFocus);
@@ -443,7 +443,7 @@ public class NavigationTests
         view.Clicked += (s, e) => wasClicked = !wasClicked;
         Application.Top.Add (view);
 
-        view.NewKeyDownEvent (new Key (KeyCode.Space));
+        view.NewKeyDownEvent (Key.Space);
         Assert.True (wasClicked);
         view.MouseEvent (new MouseEvent { Flags = MouseFlags.Button1Clicked });
         Assert.False (wasClicked);
@@ -452,7 +452,7 @@ public class NavigationTests
         Assert.True (view.HasFocus);
 
         view.Enabled = false;
-        view.NewKeyDownEvent (new Key (KeyCode.Space));
+        view.NewKeyDownEvent (Key.Space);
         Assert.False (wasClicked);
         view.MouseEvent (new MouseEvent { Flags = MouseFlags.Button1Clicked });
         Assert.False (wasClicked);
@@ -481,7 +481,7 @@ public class NavigationTests
                                  {
                                      iterations++;
 
-                                     win.NewKeyDownEvent (new Key (KeyCode.Enter));
+                                     win.NewKeyDownEvent (Key.Enter);
                                      Assert.True (wasClicked);
                                      button.MouseEvent (new MouseEvent { Flags = MouseFlags.Button1Clicked });
                                      Assert.False (wasClicked);
@@ -493,7 +493,7 @@ public class NavigationTests
                                      Assert.True (win.HasFocus);
 
                                      win.Enabled = false;
-                                     button.NewKeyDownEvent (new Key (KeyCode.Enter));
+                                     button.NewKeyDownEvent (Key.Enter);
                                      Assert.False (wasClicked);
                                      button.MouseEvent (new MouseEvent { Flags = MouseFlags.Button1Clicked });
                                      Assert.False (wasClicked);
@@ -538,16 +538,16 @@ public class NavigationTests
         frm.Add (frmSubview);
         top.Add (frm);
 
-        top.NewKeyDownEvent (new Key (KeyCode.Tab));
+        top.NewKeyDownEvent (Key.Tab);
         Assert.Equal ("WindowSubview", top.MostFocused.Text);
-        top.NewKeyDownEvent (new Key (KeyCode.Tab));
+        top.NewKeyDownEvent (Key.Tab);
         Assert.Equal ("FrameSubview", top.MostFocused.Text);
-        top.NewKeyDownEvent (new Key (KeyCode.Tab));
+        top.NewKeyDownEvent (Key.Tab);
         Assert.Equal ("WindowSubview", top.MostFocused.Text);
 
-        top.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.ShiftMask));
+        top.NewKeyDownEvent (Key.Tab.WithShift);
         Assert.Equal ("FrameSubview", top.MostFocused.Text);
-        top.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.ShiftMask));
+        top.NewKeyDownEvent (Key.Tab.WithShift);
         Assert.Equal ("WindowSubview", top.MostFocused.Text);
         top.Dispose ();
     }
@@ -599,7 +599,7 @@ public class NavigationTests
         Assert.False (removed);
         Assert.Null (view3);
 
-        Assert.True (top1.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask)));
+        Assert.True (top1.NewKeyDownEvent (Key.Tab.WithCtrl));
         Assert.True (top1.HasFocus);
         Assert.False (view1.HasFocus);
         Assert.True (view2.HasFocus);
@@ -607,7 +607,7 @@ public class NavigationTests
         Assert.NotNull (view3);
 
         Exception exception =
-            Record.Exception (() => top1.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask)));
+            Record.Exception (() => top1.NewKeyDownEvent (Key.Tab.WithCtrl));
         Assert.Null (exception);
         Assert.True (removed);
         Assert.Null (view3);

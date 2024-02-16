@@ -46,7 +46,7 @@ public abstract class AutocompleteBase : IAutocomplete
 
     // TODO: Update to use Key instead of KeyCode
     /// <inheritdoc/>
-    public virtual KeyCode Reopen { get; set; } = KeyCode.Space | KeyCode.CtrlMask | KeyCode.AltMask;
+    public virtual KeyCode Reopen { get; set; } = (KeyCode)Key.Space.WithCtrl.WithAlt;
 
     /// <inheritdoc/>
     public virtual AutocompleteContext Context { get; set; }

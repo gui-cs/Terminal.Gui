@@ -371,15 +371,15 @@ public class TreeViewTests
         Assert.False (called);
 
         // no object is selected yet so no event should happen
-        tree.NewKeyDownEvent (new Key (KeyCode.Enter));
+        tree.NewKeyDownEvent (Key.Enter);
 
         Assert.Null (activated);
         Assert.False (called);
 
         // down to select factory
-        tree.NewKeyDownEvent (new Key (KeyCode.CursorDown));
+        tree.NewKeyDownEvent (Key.CursorDown);
 
-        tree.NewKeyDownEvent (new Key (KeyCode.Enter));
+        tree.NewKeyDownEvent (Key.Enter);
 
         Assert.True (called);
         Assert.Same (f, activated);
@@ -408,22 +408,22 @@ public class TreeViewTests
         Assert.False (called);
 
         // no object is selected yet so no event should happen
-        tree.NewKeyDownEvent (new Key (KeyCode.Enter));
+        tree.NewKeyDownEvent (Key.Enter);
 
         Assert.Null (activated);
         Assert.False (called);
 
         // down to select factory
-        tree.NewKeyDownEvent (new Key (KeyCode.CursorDown));
+        tree.NewKeyDownEvent (Key.CursorDown);
 
-        tree.NewKeyDownEvent (new Key (KeyCode.Enter));
+        tree.NewKeyDownEvent (Key.Enter);
 
         // Enter is not the activation key in this unit test
         Assert.Null (activated);
         Assert.False (called);
 
         // Delete is the activation key in this test so should result in activation occurring
-        tree.NewKeyDownEvent (new Key (KeyCode.Delete));
+        tree.NewKeyDownEvent (Key.Delete);
 
         Assert.True (called);
         Assert.Same (f, activated);

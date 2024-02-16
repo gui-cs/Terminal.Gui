@@ -10,10 +10,11 @@ namespace Terminal.Gui;
 /// <remarks>
 ///     <para>Key bindings are scoped to the most-focused view (<see cref="Focused"/>) by default.</para>
 /// </remarks>
+[Flags]
 public enum KeyBindingScope
 {
     /// <summary>The key binding is scoped to just the view that has focus.</summary>
-    Focused = 0,
+    Focused = 1,
 
     /// <summary>
     ///     The key binding is scoped to the View's SuperView and will be triggered even when the View does not have focus, as
@@ -29,7 +30,7 @@ public enum KeyBindingScope
     ///         </para>
     ///     </remarks>
     /// </summary>
-    HotKey,
+    HotKey = 2,
 
     /// <summary>
     ///     The key binding will be triggered regardless of which view has focus. This is typically used for global
@@ -39,7 +40,7 @@ public enum KeyBindingScope
     ///     Application-scoped key bindings are only invoked if the key down event was not handled by the focused view or
     ///     any of its subviews, and if the key down event was not bound to a <see cref="View.HotKey"/>.
     /// </remarks>
-    Application
+    Application = 4
 }
 
 /// <summary>Provides a collection of <see cref="Command"/> objects that are scoped to <see cref="KeyBindingScope"/>.</summary>
@@ -64,6 +65,7 @@ public class KeyBinding
 /// <summary>A class that provides a collection of <see cref="KeyBinding"/> objects bound to a <see cref="Key"/>.</summary>
 public class KeyBindings
 {
+    // TODO: Add a dictionary comparer that ignores Scope
     /// <summary>The collection of <see cref="KeyBinding"/> objects.</summary>
     public Dictionary<Key, KeyBinding> Bindings { get; } = new ();
 
@@ -92,15 +94,15 @@ public class KeyBindings
     /// </param>
     public void Add (Key key, KeyBindingScope scope, params Command [] commands)
     {
-        if (commands.Length == 0)
-        {
-            throw new ArgumentException (@"At least one command must be specified", nameof (commands));
-        }
-
         if (key == null || !key.IsValid)
         {
             //throw new ArgumentException ("Invalid Key", nameof (commands));
             return;
+        }
+        
+        if (commands.Length == 0)
+        {
+            throw new ArgumentException (@"At least one command must be specified", nameof (commands));
         }
 
         if (TryGet (key, out KeyBinding _))
@@ -241,10 +243,9 @@ public class KeyBindings
     /// <returns><see langword="true"/> if the Key is bound; otherwise <see langword="false"/>.</returns>
     public bool TryGet (Key key, KeyBindingScope scope, out KeyBinding binding)
     {
-        var keyWithScope = new Key (key) { Scope = scope };
-        if (keyWithScope.IsValid && Bindings.TryGetValue (keyWithScope, out binding))
+        if (key.IsValid && Bindings.TryGetValue (key, out binding))
         {
-            if (binding.Scope == scope)
+            if (scope.HasFlag (binding.Scope))
             {
                 return true;
             }

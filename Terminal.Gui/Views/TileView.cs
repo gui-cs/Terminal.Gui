@@ -880,10 +880,10 @@ public class TileView : View
 
             AddCommand (Command.LineDown, () => { return MoveSplitter (0, 1); });
 
-            KeyBindings.Add (KeyCode.CursorRight, Command.Right);
-            KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
-            KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
-            KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
+            KeyBindings.Add (Key.CursorRight, Command.Right);
+            KeyBindings.Add (Key.CursorLeft, Command.Left);
+            KeyBindings.Add (Key.CursorUp, Command.LineUp);
+            KeyBindings.Add (Key.CursorDown, Command.LineDown);
         }
 
         public int Idx { get; }

@@ -71,11 +71,11 @@ public class RadioGroup : View
                    );
 
         // Default keybindings for this view
-        KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
-        KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
-        KeyBindings.Add (KeyCode.Home, Command.TopHome);
-        KeyBindings.Add (KeyCode.End, Command.BottomEnd);
-        KeyBindings.Add (KeyCode.Space, Command.Accept);
+        KeyBindings.Add (Key.CursorUp, Command.LineUp);
+        KeyBindings.Add (Key.CursorDown, Command.LineDown);
+        KeyBindings.Add (Key.Home, Command.TopHome);
+        KeyBindings.Add (Key.End, Command.BottomEnd);
+        KeyBindings.Add (Key.Space, Command.Accept);
 
         LayoutStarted += RadioGroup_LayoutStarted;
     }
@@ -124,7 +124,7 @@ public class RadioGroup : View
             {
                 if (TextFormatter.FindHotKey (label, HotKeySpecifier, out _, out Key hotKey))
                 {
-                    AddKeyBindingsForHotKey (hotKey, KeyCode.Null);
+                    AddKeyBindingsForHotKey (hotKey, Key.Empty);
                 }
             }
 
@@ -135,7 +135,7 @@ public class RadioGroup : View
             {
                 if (TextFormatter.FindHotKey (label, HotKeySpecifier, out _, out Key hotKey))
                 {
-                    AddKeyBindingsForHotKey (KeyCode.Null, hotKey);
+                    AddKeyBindingsForHotKey (Key.Empty, hotKey);
                 }
             }
 
@@ -228,7 +228,7 @@ public class RadioGroup : View
             Driver.AddStr ($"{(i == _selected ? Glyphs.Selected : Glyphs.UnSelected)} ");
             TextFormatter.FindHotKey (rl, HotKeySpecifier, out int hotPos, out Key hotKey);
 
-            if (hotPos != -1 && hotKey != KeyCode.Null)
+            if (hotPos != -1 && hotKey != Key.Empty)
             {
                 Rune [] rlRunes = rl.ToRunes ();
 
@@ -316,7 +316,7 @@ public class RadioGroup : View
                     && key.NoAlt.NoCtrl.NoShift == hotKey)
                 {
                     SelectedItem = i;
-                    keyEvent.Scope = KeyBindingScope.HotKey;
+                    //keyEvent.Scope = KeyBindingScope.HotKey;
 
                     break;
                 }

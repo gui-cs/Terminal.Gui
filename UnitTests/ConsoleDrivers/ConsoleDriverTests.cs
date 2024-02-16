@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using System.Text;
+using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
@@ -42,7 +43,7 @@ public class ConsoleDriverTests
         foreach (char r in text.Reverse ())
         {
             ConsoleKey ck = char.IsLetter (r) ? (ConsoleKey)char.ToUpper (r) : (ConsoleKey)r;
-            var cki = new ConsoleKeyInfo (r, ck, false, false, false);
+            var cki = new ConsoleKeyInfo (r, ck, char.IsUpper(r), false, false);
             mKeys.Push (cki);
         }
 
@@ -55,8 +56,8 @@ public class ConsoleDriverTests
 
         view.KeyDown += (s, e) =>
                         {
-                            Assert.Equal (text [idx], (char)e.KeyCode);
-                            rText += (char)e.KeyCode;
+                            Assert.Equal (new Rune(text [idx]), e.AsRune);
+                            rText += e.AsRune;
                             Assert.Equal (rText, text.Substring (0, idx + 1));
                             e.Handled = true;
                             idx++;

@@ -494,7 +494,7 @@ public class PosTests
                                  {
                                      while (count < 20)
                                      {
-                                         field.NewKeyDownEvent (new Key (KeyCode.Enter));
+                                         field.NewKeyDownEvent (Key.Enter);
                                      }
 
                                      Application.RequestStop ();
@@ -562,7 +562,7 @@ public class PosTests
                                  {
                                      while (count > 0)
                                      {
-                                         field.NewKeyDownEvent (new Key (KeyCode.Enter));
+                                         field.NewKeyDownEvent (Key.Enter);
                                      }
 
                                      Application.RequestStop ();

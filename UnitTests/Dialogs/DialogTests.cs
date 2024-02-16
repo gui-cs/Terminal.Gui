@@ -1020,7 +1020,7 @@ public class DialogTests
 
                          if (iterations == 0)
                          {
-                             Assert.True (btn1.NewKeyDownEvent (new Key (KeyCode.Space)));
+                             Assert.True (btn1.NewKeyDownEvent (Key.Space));
                          }
                          else if (iterations == 1)
                          {
@@ -1043,7 +1043,7 @@ public class DialogTests
   └───────────────────────┘";
                              TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-                             Assert.True (btn2.NewKeyDownEvent (new Key (KeyCode.Space)));
+                             Assert.True (btn2.NewKeyDownEvent (Key.Space));
                          }
                          else if (iterations == 2)
                          {
@@ -1070,13 +1070,13 @@ public class DialogTests
                                                                            _output
                                                                           );
 
-                             Assert.True (Current.NewKeyDownEvent (new Key (KeyCode.Enter)));
+                             Assert.True (Current.NewKeyDownEvent (Key.Enter));
                          }
                          else if (iterations == 3)
                          {
                              TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-                             Assert.True (btn3.NewKeyDownEvent (new Key (KeyCode.Space)));
+                             Assert.True (btn3.NewKeyDownEvent (Key.Space));
                          }
                          else if (iterations == 4)
                          {

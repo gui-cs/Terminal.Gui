@@ -7,7 +7,7 @@ public partial class View
     private void AddCommands ()
     {
         // By default, the Default command sets the focus to this view.
-        AddCommand (Command.Default, () => OnDefaultCommand());
+        AddCommand (Command.Default, () => OnDefaultCommand ());
 
         // By default, the Accept command does nothing.
         AddCommand (Command.Accept, () => false);
@@ -660,16 +660,15 @@ public partial class View
     /// </returns>
     public virtual bool? OnInvokingKeyBindings (Key keyEvent)
     {
-        // fire event
-        // BUGBUG: KeyEventArgs doesn't include scope, so the event never sees it.
-        if (keyEvent.Scope == KeyBindingScope.Application || keyEvent.Scope == KeyBindingScope.HotKey)
+        // fire event only if there's an app or hotkey binding for the key
+        if (KeyBindings.TryGet (keyEvent, KeyBindingScope.Application | KeyBindingScope.HotKey, out KeyBinding _))
         {
             InvokingKeyBindings?.Invoke (this, keyEvent);
-
             if (keyEvent.Handled)
             {
                 return true;
             }
+
         }
 
         // * If no key binding was found, `InvokeKeyBindings` returns `null`.
@@ -699,7 +698,7 @@ public partial class View
             // TODO: I think this TryGet is not needed due to the one in the lambda above. Use `Get` instead?
             if (view.KeyBindings.TryGet (keyEvent, KeyBindingScope.HotKey, out KeyBinding binding))
             {
-                keyEvent.Scope = KeyBindingScope.HotKey;
+                //keyEvent.Scope = KeyBindingScope.HotKey;
                 handled = view.OnInvokingKeyBindings (keyEvent);
 
                 if (handled != null && (bool)handled)
@@ -742,13 +741,7 @@ public partial class View
             if (!CommandImplementations.ContainsKey (command))
             {
                 throw new NotSupportedException (
-                                                 @$"A KeyBinding was set up for the command {
-                                                     command
-                                                 } ({
-                                                     key
-                                                 }) but that command is not supported by this View ({
-                                                     GetType ().Name
-                                                 })"
+                                                 @$"A KeyBinding was set up for the command {command} ({key}) but that command is not supported by this View ({GetType ().Name})"
                                                 );
             }
 

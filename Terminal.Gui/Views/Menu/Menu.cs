@@ -467,13 +467,13 @@ internal sealed class Menu : View
         AddCommand (Command.Default, () => _host?.SelectItem (_menuItemToSelect));
 
         // Default key bindings for this view
-        KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
-        KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
-        KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
-        KeyBindings.Add (KeyCode.CursorRight, Command.Right);
-        KeyBindings.Add (KeyCode.Esc, Command.Cancel);
-        KeyBindings.Add (KeyCode.Enter, Command.Accept);
-        KeyBindings.Add (KeyCode.F9, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
+        KeyBindings.Add (Key.CursorUp, Command.LineUp);
+        KeyBindings.Add (Key.CursorDown, Command.LineDown);
+        KeyBindings.Add (Key.CursorLeft, Command.Left);
+        KeyBindings.Add (Key.CursorRight, Command.Right);
+        KeyBindings.Add (Key.Esc, Command.Cancel);
+        KeyBindings.Add (Key.Enter, Command.Accept);
+        KeyBindings.Add (Key.F9, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
 
         KeyBindings.Add (
                          KeyCode.CtrlMask | KeyCode.Space,
@@ -610,7 +610,7 @@ internal sealed class Menu : View
                 {
                     _menuBarItemToActivate = -1;
                     _menuItemToSelect = c;
-                    keyEvent.Scope = KeyBindingScope.HotKey;
+                    //keyEvent.Scope = KeyBindingScope.HotKey;
 
                     return base.OnInvokingKeyBindings (keyEvent);
                 }
@@ -619,7 +619,7 @@ internal sealed class Menu : View
 
                 if (FindShortcutInChildMenu (key, subMenu))
                 {
-                    keyEvent.Scope = KeyBindingScope.HotKey;
+                    //keyEvent.Scope = KeyBindingScope.HotKey;
 
                     return base.OnInvokingKeyBindings (keyEvent);
                 }

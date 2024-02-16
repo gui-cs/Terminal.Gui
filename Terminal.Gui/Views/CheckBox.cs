@@ -99,7 +99,7 @@ public class CheckBox : View
                 // Also add Alt+HotKey
                 if (prev != Key.Empty && KeyBindings.TryGet (prev.WithAlt, out _))
                 {
-                    if (value.KeyCode == KeyCode.Null)
+                    if (value == Key.Empty)
                     {
                         KeyBindings.Remove (prev.WithAlt);
                     }

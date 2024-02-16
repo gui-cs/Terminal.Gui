@@ -73,10 +73,10 @@ public class GraphView : View
                     }
                    );
 
-        KeyBindings.Add (KeyCode.CursorRight, Command.ScrollRight);
-        KeyBindings.Add (KeyCode.CursorLeft, Command.ScrollLeft);
-        KeyBindings.Add (KeyCode.CursorUp, Command.ScrollUp);
-        KeyBindings.Add (KeyCode.CursorDown, Command.ScrollDown);
+        KeyBindings.Add (Key.CursorRight, Command.ScrollRight);
+        KeyBindings.Add (Key.CursorLeft, Command.ScrollLeft);
+        KeyBindings.Add (Key.CursorUp, Command.ScrollUp);
+        KeyBindings.Add (Key.CursorDown, Command.ScrollDown);
 
         // Not bound by default (preserves backwards compatibility)
         //KeyBindings.Add (Key.PageUp, Command.PageUp);

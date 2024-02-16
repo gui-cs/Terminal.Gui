@@ -128,7 +128,7 @@ public class FileDialog : Dialog
             FullRowSelect = true,
             CollectionNavigator = new FileDialogCollectionNavigator (this)
         };
-        _tableView.KeyBindings.Add (KeyCode.Space, Command.ToggleChecked);
+        _tableView.KeyBindings.Add (Key.Space, Command.ToggleChecked);
         _tableView.MouseClick += OnTableViewMouseClick;
         _tableView.Style.InvertSelectedCellFirstCharacter = true;
         Style.TableStyle = _tableView.Style;
@@ -200,7 +200,7 @@ public class FileDialog : Dialog
             CaptionColor = new Color (Color.Black),
             Width = 30,
             Y = Pos.AnchorEnd (1),
-            HotKey = KeyCode.F | KeyCode.AltMask
+            HotKey = Key.F.WithAlt
         };
         _spinnerView = new SpinnerView { X = Pos.Right (_tbFind) + 1, Y = Pos.AnchorEnd (1), Visible = false };
 
@@ -248,10 +248,10 @@ public class FileDialog : Dialog
         _tableView.KeyUp += (s, k) => k.Handled = TableView_KeyUp (k);
         _tableView.SelectedCellChanged += TableView_SelectedCellChanged;
 
-        _tableView.KeyBindings.Add (KeyCode.Home, Command.TopHome);
-        _tableView.KeyBindings.Add (KeyCode.End, Command.BottomEnd);
-        _tableView.KeyBindings.Add (KeyCode.Home | KeyCode.ShiftMask, Command.TopHomeExtend);
-        _tableView.KeyBindings.Add (KeyCode.End | KeyCode.ShiftMask, Command.BottomEndExtend);
+        _tableView.KeyBindings.Add (Key.Home, Command.TopHome);
+        _tableView.KeyBindings.Add (Key.End, Command.BottomEnd);
+        _tableView.KeyBindings.Add (Key.Home.WithShift, Command.TopHomeExtend);
+        _tableView.KeyBindings.Add (Key.End.WithShift, Command.BottomEndExtend);
 
         _treeView.KeyDown += (s, k) =>
                              {

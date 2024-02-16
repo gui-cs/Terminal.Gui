@@ -508,16 +508,16 @@ public class ButtonTests
         Application.Begin (Application.Top);
 
         Assert.Equal (KeyCode.T, btn.HotKey);
-        Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.T)));
+        Assert.True (btn.NewKeyDownEvent (Key.T));
         Assert.True (clicked);
 
         clicked = false;
-        Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.T | KeyCode.AltMask)));
+        Assert.True (btn.NewKeyDownEvent (Key.T.WithAlt));
         Assert.True (clicked);
 
         clicked = false;
         btn.HotKey = KeyCode.E;
-        Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.E | KeyCode.AltMask)));
+        Assert.True (btn.NewKeyDownEvent (Key.E.WithAlt));
         Assert.True (clicked);
     }
 
@@ -555,22 +555,22 @@ public class ButtonTests
         Assert.Equal (1, pressed);
 
         // Set a new binding of b for the click (Accept) event
-        btn.KeyBindings.Add (KeyCode.B, Command.Default, Command.Accept);
+        btn.KeyBindings.Add (Key.B, Command.Default, Command.Accept);
 
         // now pressing B should call the button click event
-        Application.OnKeyDown (new Key (KeyCode.B));
+        Application.OnKeyDown (Key.B);
         Assert.Equal (2, pressed);
 
         // now pressing Shift-B should NOT call the button click event
-        Application.OnKeyDown (new Key (KeyCode.ShiftMask | KeyCode.B));
+        Application.OnKeyDown (Key.B.WithShift);
         Assert.Equal (2, pressed);
 
         // now pressing Alt-B should NOT call the button click event
-        Application.OnKeyDown (new Key (KeyCode.AltMask | KeyCode.B));
+        Application.OnKeyDown (Key.B.WithAlt);
         Assert.Equal (2, pressed);
 
         // now pressing Shift-Alt-B should NOT call the button click event
-        Application.OnKeyDown (new Key (KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.B));
+        Application.OnKeyDown (Key.B.WithAlt.WithShift);
         Assert.Equal (2, pressed);
     }
 
@@ -586,11 +586,11 @@ public class ButtonTests
 
         // Hot key. Both alone and with alt
         Assert.Equal (KeyCode.T, btn.HotKey);
-        Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.T)));
+        Assert.True (btn.NewKeyDownEvent (Key.T));
         Assert.True (clicked);
         clicked = false;
 
-        Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.T | KeyCode.AltMask)));
+        Assert.True (btn.NewKeyDownEvent (Key.T.WithAlt));
         Assert.True (clicked);
         clicked = false;
 
@@ -604,28 +604,28 @@ public class ButtonTests
         // IsDefault = false
         // Space and Enter should work
         Assert.False (btn.IsDefault);
-        Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (btn.NewKeyDownEvent (Key.Enter));
         Assert.True (clicked);
         clicked = false;
 
         // IsDefault = true
         // Space and Enter should work
         btn.IsDefault = true;
-        Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (btn.NewKeyDownEvent (Key.Enter));
         Assert.True (clicked);
         clicked = false;
 
         // Toplevel does not handle Enter, so it should get passed on to button
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (Application.Top.NewKeyDownEvent (Key.Enter));
         Assert.True (clicked);
         clicked = false;
 
         // Direct
-        Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (btn.NewKeyDownEvent (Key.Enter));
         Assert.True (clicked);
         clicked = false;
 
-        Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.Space)));
+        Assert.True (btn.NewKeyDownEvent (Key.Space));
         Assert.True (clicked);
         clicked = false;
 

@@ -188,7 +188,7 @@ public class KeyboardEventTests
                                    Assert.Equal (KeyCode.N, e.KeyCode);
                                };
 
-        view.NewKeyDownEvent (new Key (KeyCode.N));
+        view.NewKeyDownEvent (Key.N);
         Assert.True (keyPressInvoked);
         Assert.True (invokingKeyBindingsInvoked);
         Assert.True (processKeyPressInvoked);
@@ -197,7 +197,7 @@ public class KeyboardEventTests
         invokingKeyBindingsInvoked = false;
         processKeyPressInvoked = false;
         setHandledTo = true;
-        view.NewKeyDownEvent (new Key (KeyCode.N));
+        view.NewKeyDownEvent (Key.N);
         Assert.True (keyPressInvoked);
         Assert.True (invokingKeyBindingsInvoked);
         Assert.False (processKeyPressInvoked);
@@ -241,7 +241,7 @@ public class KeyboardEventTests
                                    keyPressed = true;
                                };
 
-        view.NewKeyDownEvent (new Key (KeyCode.A));
+        view.NewKeyDownEvent (Key.A);
         Assert.True (keyDown);
         Assert.True (invokingKeyBindings);
         Assert.False (keyPressed);
@@ -289,7 +289,7 @@ public class KeyboardEventTests
                                    keyPressed = true;
                                };
 
-        view.NewKeyDownEvent (new Key (KeyCode.A));
+        view.NewKeyDownEvent (Key.A);
         Assert.True (keyDown);
         Assert.False (invokingKeyBindings);
         Assert.False (keyPressed);
@@ -328,14 +328,14 @@ public class KeyboardEventTests
                                    Assert.Equal (KeyCode.N, e.KeyCode);
                                };
 
-        view.NewKeyDownEvent (new Key (KeyCode.N));
+        view.NewKeyDownEvent (Key.N);
         Assert.True (invokingKeyBindingsInvoked);
         Assert.True (processKeyPressInvoked);
 
         invokingKeyBindingsInvoked = false;
         processKeyPressInvoked = false;
         setHandledTo = true;
-        view.NewKeyDownEvent (new Key (KeyCode.N));
+        view.NewKeyDownEvent (Key.N);
         Assert.False (invokingKeyBindingsInvoked);
         Assert.False (processKeyPressInvoked);
     }
@@ -378,7 +378,7 @@ public class KeyboardEventTests
                                    keyPressed = true;
                                };
 
-        view.NewKeyDownEvent (new Key (KeyCode.A));
+        view.NewKeyDownEvent (Key.A);
         Assert.True (keyDown);
         Assert.True (invokingKeyBindings);
         Assert.True (keyPressed);
@@ -406,7 +406,7 @@ public class KeyboardEventTests
                           keyUp = true;
                       };
 
-        view.NewKeyUpEvent (new Key (KeyCode.A));
+        view.NewKeyUpEvent (Key.A);
         Assert.True (keyUp);
 
         Assert.False (view.OnKeyUpContinued);
@@ -424,7 +424,7 @@ public class KeyboardEventTests
         var view = new KeyBindingsTestView ();
         view.CommandReturns = toReturn;
 
-        bool? result = view.OnInvokingKeyBindings (new Key (KeyCode.A));
+        bool? result = view.OnInvokingKeyBindings (Key.A);
         Assert.Equal (expected, result);
     }
 
@@ -435,7 +435,7 @@ public class KeyboardEventTests
         {
             CanFocus = true;
             AddCommand (Command.Default, () => CommandReturns);
-            KeyBindings.Add (KeyCode.A, Command.Default);
+            KeyBindings.Add (Key.A, Command.Default);
         }
 
         public bool? CommandReturns { get; set; }

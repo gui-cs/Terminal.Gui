@@ -59,7 +59,7 @@ public class TimeField : TextField
         AddCommand (Command.Right, () => MoveRight ());
 
         // Default keybindings for this view
-        KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
+        KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
         KeyBindings.Add (Key.D.WithCtrl, Command.DeleteCharRight);
 
         KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);

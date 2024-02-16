@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using UICatalog.Scenarios;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.InputTests;
 
@@ -196,16 +197,17 @@ public class KeyBindingTests
         var keyBindings = new KeyBindings ();
         Command [] commands = { Command.Right, Command.Left };
 
+        var key = new Key (Key.A);
         keyBindings.Add (Key.A, scope, commands);
-        KeyBinding binding = keyBindings.Get (Key.A);
+        KeyBinding binding = keyBindings.Get (key);
         Assert.Contains (Command.Right, binding.Commands);
         Assert.Contains (Command.Left, binding.Commands);
 
-        binding = keyBindings.Get (Key.A, scope);
+        binding = keyBindings.Get (key, scope);
         Assert.Contains (Command.Right, binding.Commands);
         Assert.Contains (Command.Left, binding.Commands);
 
-        Command [] resultCommands = keyBindings.GetCommands (Key.A);
+        Command [] resultCommands = keyBindings.GetCommands (key);
         Assert.Contains (Command.Right, resultCommands);
         Assert.Contains (Command.Left, resultCommands);
     }
@@ -219,20 +221,21 @@ public class KeyBindingTests
         var keyBindings = new KeyBindings ();
         Command [] commands = { Command.Right, Command.Left };
 
-        keyBindings.Add (Key.A, scope, commands);
-        KeyBinding binding = keyBindings.Get (Key.A);
+        var key = new Key (Key.A);
+        keyBindings.Add (key, scope, commands);
+        KeyBinding binding = keyBindings.Get (key);
         Assert.Contains (Command.Right, binding.Commands);
         Assert.Contains (Command.Left, binding.Commands);
 
-        binding = keyBindings.Get (Key.A, scope);
+        binding = keyBindings.Get (key, scope);
         Assert.Contains (Command.Right, binding.Commands);
         Assert.Contains (Command.Left, binding.Commands);
 
         // negative test
-        binding = keyBindings.Get (Key.A, (KeyBindingScope)(-1));
+        binding = keyBindings.Get (key, (KeyBindingScope)(-1));
         Assert.Null (binding);
 
-        Command [] resultCommands = keyBindings.GetCommands (Key.A);
+        Command [] resultCommands = keyBindings.GetCommands (key);
         Assert.Contains (Command.Right, resultCommands);
         Assert.Contains (Command.Left, resultCommands);
     }

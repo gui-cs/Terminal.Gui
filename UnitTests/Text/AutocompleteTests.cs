@@ -26,7 +26,7 @@ public class AutocompleteTests
 
         for (var i = 0; i < 7; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+            Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
             Application.Refresh ();
 
             if (i < 4 || i > 5)
@@ -64,7 +64,7 @@ This a long line and against TextView.
                                                       _output
                                                      );
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.G)));
+        Assert.True (tv.NewKeyDownEvent (Key.G));
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -74,7 +74,7 @@ This ag long line and against TextView.
                                                       _output
                                                      );
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorLeft));
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -84,7 +84,7 @@ This ag long line and against TextView.
                                                       _output
                                                      );
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorLeft));
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -94,7 +94,7 @@ This ag long line and against TextView.
                                                       _output
                                                      );
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorLeft));
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -105,7 +105,7 @@ This ag long line and against TextView.",
 
         for (var i = 0; i < 3; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+            Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
             Application.Refresh ();
 
             TestHelpers.AssertDriverContentsWithFrameAre (
@@ -116,7 +116,7 @@ This ag long line and against TextView.
                                                          );
         }
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -127,7 +127,7 @@ This a long line and against TextView.
                                                       _output
                                                      );
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.N)));
+        Assert.True (tv.NewKeyDownEvent (Key.N));
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -137,7 +137,7 @@ This an long line and against TextView.
                                                       _output
                                                      );
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -172,7 +172,7 @@ This an long line and against TextView.",
         Assert.Equal ("feature", g.AllSuggestions [^1]);
         Assert.Equal (0, tv.Autocomplete.SelectedIdx);
         Assert.Empty (tv.Autocomplete.Suggestions);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.F | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.F.WithShift));
         top.Draw ();
         Assert.Equal ("F Fortunately super feature.", tv.Text);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
@@ -181,7 +181,7 @@ This an long line and against TextView.",
         Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
         Assert.Equal (0, tv.Autocomplete.SelectedIdx);
         Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [tv.Autocomplete.SelectedIdx].Replacement);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorDown));
         top.Draw ();
         Assert.Equal ("F Fortunately super feature.", tv.Text);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
@@ -190,7 +190,7 @@ This an long line and against TextView.",
         Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
         Assert.Equal (1, tv.Autocomplete.SelectedIdx);
         Assert.Equal ("feature", tv.Autocomplete.Suggestions [tv.Autocomplete.SelectedIdx].Replacement);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorDown));
         top.Draw ();
         Assert.Equal ("F Fortunately super feature.", tv.Text);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
@@ -199,7 +199,7 @@ This an long line and against TextView.",
         Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
         Assert.Equal (0, tv.Autocomplete.SelectedIdx);
         Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [tv.Autocomplete.SelectedIdx].Replacement);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorUp)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorUp));
         top.Draw ();
         Assert.Equal ("F Fortunately super feature.", tv.Text);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
@@ -208,7 +208,7 @@ This an long line and against TextView.",
         Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
         Assert.Equal (1, tv.Autocomplete.SelectedIdx);
         Assert.Equal ("feature", tv.Autocomplete.Suggestions [tv.Autocomplete.SelectedIdx].Replacement);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorUp)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorUp));
         top.Draw ();
         Assert.Equal ("F Fortunately super feature.", tv.Text);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
