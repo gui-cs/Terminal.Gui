@@ -66,7 +66,7 @@ public class ComboBox : View
 
                      SetNeedsLayout ();
                      SetNeedsDisplay ();
-                     Search_Changed (this, new TextChangedEventArgs (Text));
+                     Search_Changed (this, new TextEventArgs (Text));
                  };
 
         // Things this view knows how to do
@@ -185,7 +185,7 @@ public class ComboBox : View
             {
                 SelectedItem = -1;
                 _search.Text = "";
-                Search_Changed (this, new TextChangedEventArgs (""));
+                Search_Changed (this, new TextEventArgs (""));
                 SetNeedsDisplay ();
             }
         }
@@ -651,7 +651,7 @@ public class ComboBox : View
         SetSearchSet ();
     }
 
-    private void Search_Changed (object sender, TextChangedEventArgs e)
+    private void Search_Changed (object sender, TextEventArgs e)
     {
         if (_source is null)
         {
@@ -659,13 +659,13 @@ public class ComboBox : View
             return;
         }
 
-        if (string.IsNullOrEmpty (_search.Text) && string.IsNullOrEmpty (e.OldValue))
+        if (string.IsNullOrEmpty (_search.Text) && string.IsNullOrEmpty (e.OldText))
         {
             ResetSearchSet ();
         }
-        else if (_search.Text != e.OldValue)
+        else if (_search.Text != e.OldText)
         {
-            if (_search.Text.Length < e.OldValue.Length)
+            if (_search.Text.Length < e.OldText.Length)
             {
                 _selectedItem = -1;
             }
@@ -714,7 +714,7 @@ public class ComboBox : View
 
         SetValue (_listview.SelectedItem > -1 ? _searchset [_listview.SelectedItem] : _text);
         _search.CursorPosition = _search.Text.GetColumns ();
-        Search_Changed (this, new TextChangedEventArgs (_search.Text));
+        Search_Changed (this, new TextEventArgs (_search.Text));
         OnOpenSelectedItem ();
         Reset (true);
         HideList ();

@@ -581,7 +581,7 @@ public class TextField : View
                                  );
             }
 
-            TextChanged?.Invoke (this, new TextChangedEventArgs (oldText));
+            TextChanged?.Invoke (this, new TextEventArgs (oldText));
 
             ProcessAutocomplete ();
 
@@ -1266,7 +1266,7 @@ public class TextField : View
     ///         <see cref="string"/> containing the old value.
     ///     </remarks>
     /// </summary>
-    public event EventHandler<TextChangedEventArgs> TextChanged;
+    public event EventHandler<TextEventArgs> TextChanged;
 
     /// <summary>Changing event, raised before the <see cref="Text"/> changes and can be canceled or changing the new text.</summary>
     public event EventHandler<TextEventArgs> TextChanging;

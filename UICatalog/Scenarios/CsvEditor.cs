@@ -556,7 +556,7 @@ public class CsvEditor : Scenario
         }
     }
 
-    private void SelectedCellLabel_TextChanged (object sender, TextChangedEventArgs e)
+    private void SelectedCellLabel_TextChanged (object sender, TextEventArgs e)
     {
         // if user is in the text control and editing the selected cell
         if (!_selectedCellLabel.HasFocus)

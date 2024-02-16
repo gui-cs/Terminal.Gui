@@ -427,7 +427,7 @@ public class TextFieldTests
         var tf = new TextField { Width = 10, Text = "-1" };
 
         tf.TextChanging += (s, e) => newText = e.NewText;
-        tf.TextChanged += (s, e) => oldText = e.OldValue;
+        tf.TextChanged += (s, e) => oldText = e.OldText;
 
         Application.Top.Add (tf);
         Application.Begin (Application.Top);
@@ -998,7 +998,7 @@ public class TextFieldTests
     [TextFieldTestsAutoInitShutdown]
     public void TextChanged_Event ()
     {
-        _textField.TextChanged += (s, e) => { Assert.Equal ("TAB to jump between text fields.", e.OldValue); };
+        _textField.TextChanged += (s, e) => { Assert.Equal ("TAB to jump between text fields.", e.OldText); };
 
         _textField.Text = "changed";
         Assert.Equal ("changed", _textField.Text);

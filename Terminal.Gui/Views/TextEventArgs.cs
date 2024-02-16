@@ -18,4 +18,7 @@ public class TextEventArgs : CancelEventArgs
 
     /// <summary>The new text to be replaced.</summary>
     public string NewText { get; set; }
+
+    /// <summary>The old text.</summary>
+    public string OldText { get; set; }
 }
