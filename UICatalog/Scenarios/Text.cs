@@ -37,7 +37,7 @@ public class Text : Scenario
         var singleWordGenerator = new SingleWordSuggestionGenerator ();
         textField.Autocomplete.SuggestionGenerator = singleWordGenerator;
         textField.TextChanging += TextField_TextChanging;
-        void TextField_TextChanging (object sender, TextEventArgs e)
+        void TextField_TextChanging (object sender, StringEventArgs e)
         {
             singleWordGenerator.AllSuggestions = Regex.Matches (e.NewText, "\\w+")
                                                       .Select (s => s.Value)

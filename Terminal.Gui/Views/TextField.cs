@@ -552,7 +552,7 @@ public class TextField : View
                 return;
             }
 
-            TextEventArgs newText = OnTextChanging (value.Replace ("\t", "").Split ("\n") [0]);
+            StringEventArgs newText = OnTextChanging (value.Replace ("\t", "").Split ("\n") [0]);
 
             if (newText.Cancel)
             {
@@ -581,7 +581,11 @@ public class TextField : View
                                  );
             }
 
-            TextChanged?.Invoke (this, new TextEventArgs (oldText));
+            TextChanged?.Invoke (this, new StringEventArgs
+            {
+                NewText = StringExtensions.ToString (_text),
+                OldText = oldText
+            });
 
             ProcessAutocomplete ();
 
@@ -1133,10 +1137,10 @@ public class TextField : View
 
     /// <summary>Virtual method that invoke the <see cref="TextChanging"/> event if it's defined.</summary>
     /// <param name="newText">The new text to be replaced.</param>
-    /// <returns>Returns the <see cref="TextEventArgs"/></returns>
-    public virtual TextEventArgs OnTextChanging (string newText)
+    /// <returns>Returns the <see cref="StringEventArgs"/></returns>
+    public virtual StringEventArgs OnTextChanging (string newText)
     {
-        var ev = new TextEventArgs (newText);
+        var ev = new StringEventArgs { NewText = newText };
         TextChanging?.Invoke (this, ev);
 
         return ev;
@@ -1266,10 +1270,10 @@ public class TextField : View
     ///         <see cref="string"/> containing the old value.
     ///     </remarks>
     /// </summary>
-    public event EventHandler<TextEventArgs> TextChanged;
+    public event EventHandler<StringEventArgs> TextChanged;
 
     /// <summary>Changing event, raised before the <see cref="Text"/> changes and can be canceled or changing the new text.</summary>
-    public event EventHandler<TextEventArgs> TextChanging;
+    public event EventHandler<StringEventArgs> TextChanging;
 
     /// <summary>Undoes the latest changes.</summary>
     public void Undo ()

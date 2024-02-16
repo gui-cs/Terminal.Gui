@@ -260,7 +260,7 @@ public class Adornments : Scenario
             Width = GetAdornmentsThickness ().Horizontal + _foregroundColorPicker.Frame.Width * 2 - 3;
         }
 
-        private void Edit_TextChanging (object sender, TextEventArgs e)
+        private void Edit_TextChanging (object sender, StringEventArgs e)
         {
             try
             {
