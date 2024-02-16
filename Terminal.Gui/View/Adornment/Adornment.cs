@@ -134,7 +134,7 @@ public class Adornment : View
 
         if (!string.IsNullOrEmpty (TextFormatter.Text))
         {
-            if (TextFormatter != null)
+            if (TextFormatter is { })
             {
                 TextFormatter.Size = Frame.Size;
                 TextFormatter.NeedsFormat = true;

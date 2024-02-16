@@ -615,31 +615,45 @@ public class DimTests
 
         t.Ready += (s, e) =>
                    {
-                       Assert.Equal ("Absolute(100)", w.Width.ToString ());
-                       Assert.Equal ("Absolute(100)", w.Height.ToString ());
-                       Assert.Equal (100, w.Frame.Width);
-                       Assert.Equal (100, w.Frame.Height);
+                                            Assert.Equal ("Absolute(100)", w.Width.ToString ());
+                                            Assert.Equal ("Absolute(100)", w.Height.ToString ());
+                                            Assert.Equal (100, w.Frame.Width);
+                                            Assert.Equal (100, w.Frame.Height);
 
-                       Assert.Equal ("Factor(0.5,False)", f1.Width.ToString ());
-                       Assert.Equal ("Absolute(5)", f1.Height.ToString ());
-                       Assert.Equal (49, f1.Frame.Width); // 50-1=49
-                       Assert.Equal (5, f1.Frame.Height);
+                                            Assert.Equal ("Factor(0.5,False)", f1.Width.ToString ());
+                                            Assert.Equal ("Absolute(5)", f1.Height.ToString ());
+                                            Assert.Equal (49, f1.Frame.Width); // 50-1=49
+                                            Assert.Equal (5, f1.Frame.Height);
 
-                       Assert.Equal ("Fill(0)", f2.Width.ToString ());
-                       Assert.Equal ("Absolute(5)", f2.Height.ToString ());
-                       Assert.Equal (49, f2.Frame.Width); // 50-1=49
-                       Assert.Equal (5, f2.Frame.Height);
+                                            Assert.Equal ("Fill(0)", f2.Width.ToString ());
+                                            Assert.Equal ("Absolute(5)", f2.Height.ToString ());
+                                            Assert.Equal (49, f2.Frame.Width); // 50-1=49
+                                            Assert.Equal (5, f2.Frame.Height);
 
+                    #if DEBUG
                        Assert.Equal ("Combine(View(Width,FrameView(f1)(0,0,49,5))-Absolute(2))", v1.Width.ToString ());
+                    #else
+                       Assert.Equal ("Combine(View(Width,FrameView()(0,0,49,5))-Absolute(2))", v1.Width.ToString ());
+                    #endif
                        Assert.Equal ("Combine(Fill(0)-Absolute(2))", v1.Height.ToString ());
                        Assert.Equal (47, v1.Frame.Width); // 49-2=47
                        Assert.Equal (89, v1.Frame.Height); // 98-5-2-2=89
 
+                   #if DEBUG
                        Assert.Equal (
                                      "Combine(View(Width,FrameView(f2)(49,0,49,5))-Absolute(2))",
                                      v2.Width.ToString ()
+                   #else
+                       Assert.Equal (
+                                     "Combine(View(Width,FrameView()(49,0,49,5))-Absolute(2))",
+                                     v2.Width.ToString ()
+                   #endif
                                     );
+                   #if DEBUG
                        Assert.Equal ("Combine(Fill(0)-Absolute(2))", v2.Height.ToString ());
+                   #else
+                       Assert.Equal ("Combine(Fill(0)-Absolute(2))", v2.Height.ToString ());
+                   #endif
                        Assert.Equal (47, v2.Frame.Width); // 49-2=47
                        Assert.Equal (89, v2.Frame.Height); // 98-5-2-2=89
 
@@ -652,22 +666,17 @@ public class DimTests
                        Assert.Equal ("Absolute(50)", v4.Height.ToString ());
                        Assert.Equal (50, v4.Frame.Width);
                        Assert.Equal (50, v4.Frame.Height);
-
-                       Assert.Equal (
-                                     "Combine(View(Width,Button(v1)(2,7,47,89))-View(Width,Button(v3)(0,0,9,9)))",
-                                     v5.Width.ToString ()
-                                    );
-
-                       Assert.Equal (
-                                     "Combine(View(Height,Button(v1)(2,7,47,89))-View(Height,Button(v3)(0,0,9,9)))",
-                                     v5.Height.ToString ()
-                                    );
-                       Assert.Equal (38, v5.Frame.Width); // 47-9=38
+                   #if DEBUG
+                       Assert.Equal ("Combine(View(Width,Button(v1)(2,7,47,89))-View(Width,Button(v3)(0,0,9,9)))", v5.Width.ToString ());
+                    #else
+                       Assert.Equal ("Combine(View(Height,Button()(2,7,47,89))-View(Height,Button()(0,0,9,9)))", v5.Height.ToString ( ));
+                   #endif
+                       Assert.Equal (38, v5.Frame.Width);  // 47-9=38
                        Assert.Equal (80, v5.Frame.Height); // 89-9=80
 
                        Assert.Equal ("Factor(0.2,True)", v6.Width.ToString ());
                        Assert.Equal ("Factor(0.2,True)", v6.Height.ToString ());
-                       Assert.Equal (9, v6.Frame.Width); // 47*20%=9
+                       Assert.Equal (9, v6.Frame.Width);   // 47*20%=9
                        Assert.Equal (18, v6.Frame.Height); // 89*20%=18
 
                        w.Width = 200;
@@ -693,31 +702,34 @@ public class DimTests
                        Assert.Equal (5, f2.Frame.Height);
 
                        v1.Text = "Button1";
+                   #if DEBUG
                        Assert.Equal ("Combine(View(Width,FrameView(f1)(0,0,99,5))-Absolute(2))", v1.Width.ToString ());
+                   #else
+                       Assert.Equal ("Combine(View(Width,FrameView()(0,0,99,5))-Absolute(2))", v1.Width.ToString ());
+                   #endif
                        Assert.Equal ("Combine(Fill(0)-Absolute(2))", v1.Height.ToString ());
-                       Assert.Equal (97, v1.Frame.Width); // 99-2=97
+                       Assert.Equal (97, v1.Frame.Width);   // 99-2=97
                        Assert.Equal (189, v1.Frame.Height); // 198-2-7=189
 
                        v2.Text = "Button2";
 
-                       Assert.Equal (
-                                     "Combine(View(Width,FrameView(f2)(99,0,99,5))-Absolute(2))",
-                                     v2.Width.ToString ()
-                                    );
+                   #if DEBUG
+                   Assert.Equal ( "Combine(View(Width,FrameView(f2)(99,0,99,5))-Absolute(2))", v2.Width.ToString ());
+                   #else
+                       Assert.Equal ( "Combine(View(Width,FrameView()(99,0,99,5))-Absolute(2))", v2.Width.ToString ());
+                   #endif
                        Assert.Equal ("Combine(Fill(0)-Absolute(2))", v2.Height.ToString ());
-                       Assert.Equal (97, v2.Frame.Width); // 99-2=97
+                       Assert.Equal (97, v2.Frame.Width);   // 99-2=97
                        Assert.Equal (189, v2.Frame.Height); // 198-2-7=189
 
                        v3.Text = "Button3";
                        Assert.Equal ("Factor(0.1,False)", v3.Width.ToString ());
                        Assert.Equal ("Factor(0.1,False)", v3.Height.ToString ());
 
-                       Assert.Equal (
-                                     19,
-                                     v3.Frame
-                                       .Width
-                                    ); // 198*10%=19 * Percent is related to the super-view if it isn't null otherwise the view width
-                       Assert.Equal (19, v3.Frame.Height); // 199*10%=19
+                       // 198*10%=19 * Percent is related to the super-view if it isn't null otherwise the view width
+                       Assert.Equal (19, v3.Frame.Width );
+                       // 199*10%=19
+                       Assert.Equal (19, v3.Frame.Height);
 
                        v4.Text = "Button4";
                        v4.AutoSize = false;
@@ -733,22 +745,21 @@ public class DimTests
 
                        v5.Text = "Button5";
 
-                       Assert.Equal (
-                                     "Combine(View(Width,Button(v1)(2,7,97,189))-View(Width,Button(v3)(0,0,19,19)))",
-                                     v5.Width.ToString ()
-                                    );
+                   #if DEBUG
+                       Assert.Equal ("Combine(View(Width,Button(v1)(2,7,97,189))-View(Width,Button(v3)(0,0,19,19)))", v5.Width.ToString ());
+                       Assert.Equal ("Combine(View(Height,Button(v1)(2,7,97,189))-View(Height,Button(v3)(0,0,19,19)))", v5.Height.ToString ());
+                   #else
+                       Assert.Equal ("Combine(View(Width,Button()(2,7,97,189))-View(Width,Button()(0,0,19,19)))", v5.Width.ToString ());
+                       Assert.Equal ("Combine(View(Height,Button()(2,7,97,189))-View(Height,Button()(0,0,19,19)))", v5.Height.ToString ());
+                   #endif
 
-                       Assert.Equal (
-                                     "Combine(View(Height,Button(v1)(2,7,97,189))-View(Height,Button(v3)(0,0,19,19)))",
-                                     v5.Height.ToString ()
-                                    );
-                       Assert.Equal (78, v5.Frame.Width); // 97-9=78
+                       Assert.Equal (78, v5.Frame.Width);   // 97-9=78
                        Assert.Equal (170, v5.Frame.Height); // 189-19=170
 
                        v6.Text = "Button6";
                        Assert.Equal ("Factor(0.2,True)", v6.Width.ToString ());
                        Assert.Equal ("Factor(0.2,True)", v6.Height.ToString ());
-                       Assert.Equal (19, v6.Frame.Width); // 99*20%=19
+                       Assert.Equal (19, v6.Frame.Width);  // 99*20%=19
                        Assert.Equal (38, v6.Frame.Height); // 198-7*20=18
                    };
 

@@ -213,7 +213,7 @@ public class ProgressBar : View
     /// </remarks>
     public void Pulse ()
     {
-        if (_activityPos == null || _activityPos.Length == 0)
+        if (_activityPos is null || _activityPos.Length == 0)
         {
             PopulateActivityPos ();
         }

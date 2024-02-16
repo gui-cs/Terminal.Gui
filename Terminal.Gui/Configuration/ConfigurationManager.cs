@@ -145,7 +145,7 @@ public static class ConfigurationManager
     {
         get
         {
-            if (_settings == null)
+            if (_settings is null)
             {
                 throw new InvalidOperationException (
                                                      "ConfigurationManager has not been initialized. Call ConfigurationManager.Reset() before accessing the Settings property."
@@ -320,7 +320,7 @@ public static class ConfigurationManager
     {
         Debug.WriteLine (@"ConfigurationManager.Reset()");
 
-        if (_allConfigProperties == null)
+        if (_allConfigProperties is null)
         {
             Initialize ();
         }
@@ -364,12 +364,12 @@ public static class ConfigurationManager
     /// <returns><paramref name="destination"/> updated from <paramref name="source"/></returns>
     internal static object? DeepMemberwiseCopy (object? source, object? destination)
     {
-        if (destination == null)
+        if (destination is null)
         {
             throw new ArgumentNullException (nameof (destination));
         }
 
-        if (source == null)
+        if (source is null)
         {
             return null!;
         }
@@ -432,11 +432,11 @@ public static class ConfigurationManager
             object? sourceVal = sourceProp.GetValue (source);
             object? destVal = destProp.GetValue (destination);
 
-            if (sourceVal != null)
+            if (sourceVal is { })
             {
                 try
                 {
-                    if (destVal != null)
+                    if (destVal is { })
                     {
                         // Recurse
                         destProp.SetValue (destination, DeepMemberwiseCopy (sourceVal, destVal));
@@ -474,7 +474,7 @@ public static class ConfigurationManager
     /// </remarks>
     internal static void GetHardCodedDefaults ()
     {
-        if (_allConfigProperties == null)
+        if (_allConfigProperties is null)
         {
             throw new InvalidOperationException ("Initialize must be called first.");
         }
@@ -483,7 +483,7 @@ public static class ConfigurationManager
         ThemeManager.GetHardCodedDefaults ();
         AppSettings?.RetrieveValues ();
 
-        foreach (KeyValuePair<string, ConfigProperty> p in Settings!.Where (cp => cp.Value.PropertyInfo != null))
+        foreach (KeyValuePair<string, ConfigProperty> p in Settings!.Where (cp => cp.Value.PropertyInfo is { }))
         {
             Settings! [p.Key].PropertyValue = p.Value.PropertyInfo?.GetValue (null);
         }

@@ -365,7 +365,7 @@ namespace Terminal.Gui
 
             private void SetupText ()
             {
-                if (_text != null && IsValid)
+                if (_text is { } && IsValid)
                 {
                     return;
                 }
@@ -478,7 +478,7 @@ namespace Terminal.Gui
         {
             get
             {
-                if (_provider == null)
+                if (_provider is null)
                 {
                     return false;
                 }
@@ -512,7 +512,7 @@ namespace Terminal.Gui
         {
             get
             {
-                if (_provider == null)
+                if (_provider is null)
                 {
                     return string.Empty;
                 }
@@ -521,7 +521,7 @@ namespace Terminal.Gui
             }
             set
             {
-                if (_provider == null)
+                if (_provider is null)
                 {
                     return;
                 }
@@ -557,7 +557,7 @@ namespace Terminal.Gui
         /// <inheritdoc/>
         public override void OnDrawContent (Rect contentArea)
         {
-            if (_provider == null)
+            if (_provider is null)
             {
                 Move (0, 0);
                 Driver.AddStr ("Error: ITextValidateProvider not set!");
@@ -617,7 +617,7 @@ namespace Terminal.Gui
         /// <inheritdoc/>
         public override bool OnProcessKeyDown (Key a)
         {
-            if (_provider == null)
+            if (_provider is null)
             {
                 return false;
             }

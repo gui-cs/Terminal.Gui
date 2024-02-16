@@ -103,7 +103,7 @@ public static partial class Application
         EndAfterFirstIteration = false;
 
         // Driver stuff
-        if (Driver != null)
+        if (Driver is { })
         {
             Driver.SizeChanged -= Driver_SizeChanged;
             Driver.KeyDown -= Driver_KeyDown;
@@ -199,7 +199,7 @@ public static partial class Application
         bool calledViaRunT = false
     )
     {
-        if (_initialized && driver == null)
+        if (_initialized && driver is null)
         {
             return;
         }
@@ -216,7 +216,7 @@ public static partial class Application
         }
 
         // For UnitTests
-        if (driver != null)
+        if (driver is { })
         {
             Driver = driver;
         }
@@ -235,7 +235,7 @@ public static partial class Application
             ForceDriver = driverName;
         }
 
-        if (Driver == null)
+        if (Driver is null)
         {
             PlatformID p = Environment.OSVersion.Platform;
 
@@ -255,7 +255,7 @@ public static partial class Application
                 List<Type> drivers = GetDriverTypes ();
                 Type driverType = drivers.FirstOrDefault (t => t.Name.ToLower () == ForceDriver.ToLower ());
 
-                if (driverType != null)
+                if (driverType is { })
                 {
                     Driver = (ConsoleDriver)Activator.CreateInstance (driverType);
                 }
@@ -377,12 +377,12 @@ public static partial class Application
     /// </remarks>
     public static RunState Begin (Toplevel Toplevel)
     {
-        if (Toplevel == null)
+        if (Toplevel is null)
         {
             throw new ArgumentNullException (nameof (Toplevel));
         }
 
-        if (Toplevel.IsOverlappedContainer && OverlappedTop != Toplevel && OverlappedTop != null)
+        if (Toplevel.IsOverlappedContainer && OverlappedTop != Toplevel && OverlappedTop is { })
         {
             throw new InvalidOperationException ("Only one Overlapped Container is allowed.");
         }
@@ -404,12 +404,12 @@ public static partial class Application
             // If Top was already initialized with Init, and Begin has never been called
             // Top was not added to the Toplevels Stack. It will thus never get disposed.
             // Clean it up here:
-            if (Top != null && Toplevel != Top && !_topLevels.Contains (Top))
+            if (Top is { } && Toplevel != Top && !_topLevels.Contains (Top))
             {
                 Top.Dispose ();
                 Top = null;
             }
-            else if (Top != null && Toplevel != Top && _topLevels.Contains (Top))
+            else if (Top is { } && Toplevel != Top && _topLevels.Contains (Top))
             {
                 Top.OnLeave (Toplevel);
             }
@@ -421,7 +421,7 @@ public static partial class Application
                 var count = 1;
                 var id = (_topLevels.Count + count).ToString ();
 
-                while (_topLevels.Count > 0 && _topLevels.FirstOrDefault (x => x.Id == id) != null)
+                while (_topLevels.Count > 0 && _topLevels.FirstOrDefault (x => x.Id == id) is { })
                 {
                     count++;
                     id = (_topLevels.Count + count).ToString ();
@@ -435,7 +435,7 @@ public static partial class Application
             {
                 Toplevel dup = _topLevels.FirstOrDefault (x => x.Id == Toplevel.Id);
 
-                if (dup == null)
+                if (dup is null)
                 {
                     _topLevels.Push (Toplevel);
                 }
@@ -447,7 +447,7 @@ public static partial class Application
             }
         }
 
-        if (Top == null || Toplevel.IsOverlappedContainer)
+        if (Top is null || Toplevel.IsOverlappedContainer)
         {
             Top = Toplevel;
         }
@@ -474,7 +474,7 @@ public static partial class Application
                   && Toplevel != OverlappedTop
                   && Current?.Modal == true
                   && !_topLevels.Peek ().Modal)
-                 || (OverlappedTop != null && Toplevel != OverlappedTop && Current?.Running == false))
+                 || (OverlappedTop is { } && Toplevel != OverlappedTop && Current?.Running == false))
         {
             refreshDriver = false;
             MoveCurrent (Toplevel);
@@ -536,7 +536,7 @@ public static partial class Application
     {
         if (_initialized)
         {
-            if (Driver != null)
+            if (Driver is { })
             {
                 // Init() has been called and we have a driver, so just run the app.
                 var top = new T ();
@@ -629,7 +629,7 @@ public static partial class Application
             }
             catch (Exception error)
             {
-                if (errorHandler == null)
+                if (errorHandler is null)
                 {
                     throw;
                 }
@@ -767,12 +767,12 @@ public static partial class Application
     /// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
     public static void RunLoop (RunState state)
     {
-        if (state == null)
+        if (state is null)
         {
             throw new ArgumentNullException (nameof (state));
         }
 
-        if (state.Toplevel == null)
+        if (state.Toplevel is null)
         {
             throw new ObjectDisposedException ("state");
         }
@@ -885,7 +885,7 @@ public static partial class Application
     /// </remarks>
     public static void RequestStop (Toplevel top = null)
     {
-        if (OverlappedTop == null || top == null || (OverlappedTop == null && top != null))
+        if (OverlappedTop is null || top is null || (OverlappedTop is null && top is { }))
         {
             top = Current;
         }
@@ -1011,12 +1011,12 @@ public static partial class Application
     /// <param name="runState">The <see cref="RunState"/> returned by the <see cref="Begin(Toplevel)"/> method.</param>
     public static void End (RunState runState)
     {
-        if (runState == null)
+        if (runState is null)
         {
             throw new ArgumentNullException (nameof (runState));
         }
 
-        if (OverlappedTop != null)
+        if (OverlappedTop is { })
         {
             OverlappedTop.OnChildUnloaded (runState.Toplevel);
         }
@@ -1044,7 +1044,7 @@ public static partial class Application
 
         // If there is a OverlappedTop that is not the RunState.Toplevel then runstate.TopLevel 
         // is a child of MidTop and we should notify the OverlappedTop that it is closing
-        if (OverlappedTop != null && !runState.Toplevel.Modal && runState.Toplevel != OverlappedTop)
+        if (OverlappedTop is { } && !runState.Toplevel.Modal && runState.Toplevel != OverlappedTop)
         {
             OverlappedTop.OnChildClosed (runState.Toplevel);
         }
@@ -1137,7 +1137,7 @@ public static partial class Application
             return null;
         }
 
-        if (_topLevels != null)
+        if (_topLevels is { })
         {
             int count = _topLevels.Count;
 
@@ -1169,11 +1169,11 @@ public static partial class Application
 
     private static View FindTopFromView (View view)
     {
-        View top = view?.SuperView != null && view?.SuperView != Top
+        View top = view?.SuperView is { } && view?.SuperView != Top
                        ? view.SuperView
                        : view;
 
-        while (top?.SuperView != null && top?.SuperView != Top)
+        while (top?.SuperView is { } && top?.SuperView != Top)
         {
             top = top.SuperView;
         }
@@ -1247,10 +1247,10 @@ public static partial class Application
             return false;
         }
 
-        if ((OverlappedTop != null && top?.Modal == true && _topLevels.Peek () != top)
-            || (OverlappedTop != null && Current != OverlappedTop && Current?.Modal == false && top == OverlappedTop)
-            || (OverlappedTop != null && Current?.Modal == false && top != Current)
-            || (OverlappedTop != null && Current?.Modal == true && top == OverlappedTop))
+        if ((OverlappedTop is { } && top?.Modal == true && _topLevels.Peek () != top)
+            || (OverlappedTop is { } && Current != OverlappedTop && Current?.Modal == false && top == OverlappedTop)
+            || (OverlappedTop is { } && Current?.Modal == false && top != Current)
+            || (OverlappedTop is { } && Current?.Modal == true && top == OverlappedTop))
         {
             lock (_topLevels)
             {
@@ -1333,7 +1333,7 @@ public static partial class Application
     /// <param name="view">View that will receive all mouse events until <see cref="UngrabMouse"/> is invoked.</param>
     public static void GrabMouse (View view)
     {
-        if (view == null)
+        if (view is null)
         {
             return;
         }
@@ -1348,7 +1348,7 @@ public static partial class Application
     /// <summary>Releases the mouse grab, so mouse events will be routed to the view on which the mouse is.</summary>
     public static void UngrabMouse ()
     {
-        if (MouseGrabView == null)
+        if (MouseGrabView is null)
         {
             return;
         }
@@ -1362,7 +1362,7 @@ public static partial class Application
 
     private static bool OnGrabbingMouse (View view)
     {
-        if (view == null)
+        if (view is null)
         {
             return false;
         }
@@ -1375,7 +1375,7 @@ public static partial class Application
 
     private static bool OnUnGrabbingMouse (View view)
     {
-        if (view == null)
+        if (view is null)
         {
             return false;
         }
@@ -1388,7 +1388,7 @@ public static partial class Application
 
     private static void OnGrabbedMouse (View view)
     {
-        if (view == null)
+        if (view is null)
         {
             return;
         }
@@ -1398,7 +1398,7 @@ public static partial class Application
 
     private static void OnUnGrabbedMouse (View view)
     {
-        if (view == null)
+        if (view is null)
         {
             return;
         }
@@ -1433,7 +1433,7 @@ public static partial class Application
 
         var view = View.FindDeepestView (Current, a.MouseEvent.X, a.MouseEvent.Y, out int screenX, out int screenY);
 
-        if (view != null && view.WantContinuousButtonPressed)
+        if (view is { } && view.WantContinuousButtonPressed)
         {
             WantContinuousButtonPressedView = view;
         }
@@ -1442,7 +1442,7 @@ public static partial class Application
             WantContinuousButtonPressedView = null;
         }
 
-        if (view != null)
+        if (view is { })
         {
             a.MouseEvent.View = view;
         }
@@ -1454,7 +1454,7 @@ public static partial class Application
             return;
         }
 
-        if (MouseGrabView != null)
+        if (MouseGrabView is { })
         {
             // If the mouse is grabbed, send the event to the view that grabbed it.
             // The coordinates are relative to the Bounds of the view that grabbed the mouse.
@@ -1487,7 +1487,7 @@ public static partial class Application
             }
         }
 
-        if ((view == null || view == OverlappedTop)
+        if ((view is null || view == OverlappedTop)
             && Current is { Modal: false }
             && OverlappedTop != null
             && a.MouseEvent.Flags != MouseFlags.ReportMousePosition
@@ -1496,7 +1496,7 @@ public static partial class Application
             View top = FindDeepestTop (Top, a.MouseEvent.X, a.MouseEvent.Y, out _, out _);
             view = View.FindDeepestView (top, a.MouseEvent.X, a.MouseEvent.Y, out screenX, out screenY);
 
-            if (view != null && view != OverlappedTop && top != Current)
+            if (view is { } && view != OverlappedTop && top != Current)
             {
                 MoveCurrent ((Toplevel)top);
             }
@@ -1525,7 +1525,7 @@ public static partial class Application
             return false;
         }
 
-        if (view != null)
+        if (view is { })
         {
             // Work inside-out (Padding, Border, Margin)
             // TODO: Debate whether inside-out or outside-in is the right strategy
@@ -1551,7 +1551,7 @@ public static partial class Application
                         View = view
                     };
 
-                    if (_mouseEnteredView == null)
+                    if (_mouseEnteredView is null)
                     {
                         _mouseEnteredView = view;
                         view.OnMouseEnter (me);
@@ -1603,7 +1603,7 @@ public static partial class Application
                     View = view
                 };
 
-                if (_mouseEnteredView == null)
+                if (_mouseEnteredView is null)
                 {
                     _mouseEnteredView = view;
                     view.OnMouseEnter (me);
@@ -1782,7 +1782,8 @@ public static partial class Application
                 if (view.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.Application, out KeyBinding _))
                 {
                     bool? handled = view.OnInvokingKeyBindings (keyEvent);
-                    if (handled != null && (bool)handled)
+
+                    if (handled is { } && (bool)handled)
                     {
                         return true;
                     }

@@ -53,7 +53,7 @@ public class DefaultFileOperations : IFileOperations
     public IFileSystemInfo Rename (IFileSystem fileSystem, IFileSystemInfo toRename)
     {
         // Don't allow renaming C: or D: or / (on linux) etc
-        if (toRename is IDirectoryInfo dir && dir.Parent == null)
+        if (toRename is IDirectoryInfo dir && dir.Parent is null)
         {
             return null;
         }

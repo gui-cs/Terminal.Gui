@@ -36,17 +36,17 @@ public partial class View
     /// </remarks>
     public virtual void Add (View view)
     {
-        if (view == null)
+        if (view is null)
         {
             return;
         }
 
-        if (_subviews == null)
+        if (_subviews is null)
         {
             _subviews = new List<View> ();
         }
 
-        if (_tabIndexes == null)
+        if (_tabIndexes is null)
         {
             _tabIndexes = new List<View> ();
         }
@@ -97,7 +97,7 @@ public partial class View
     /// </remarks>
     public void Add (params View [] views)
     {
-        if (views == null)
+        if (views is null)
         {
             return;
         }
@@ -188,7 +188,7 @@ public partial class View
     /// <remarks></remarks>
     public virtual void Remove (View view)
     {
-        if (view == null || _subviews == null)
+        if (view is null || _subviews is null)
         {
             return;
         }
@@ -220,7 +220,7 @@ public partial class View
     /// <summary>Removes all subviews (children) added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.</summary>
     public virtual void RemoveAll ()
     {
-        if (_subviews == null)
+        if (_subviews is null)
         {
             return;
         }
@@ -305,7 +305,7 @@ public partial class View
         get => SuperView?.FocusDirection ?? _focusDirection;
         set
         {
-            if (SuperView != null)
+            if (SuperView is { })
             {
                 SuperView.FocusDirection = value;
             }
@@ -341,7 +341,7 @@ public partial class View
         }
 
         // Remove focus down the chain of subviews if focus is removed
-        if (!value && Focused != null)
+        if (!value && Focused is { })
         {
             View f = Focused;
             f.OnLeave (view);
@@ -387,7 +387,7 @@ public partial class View
 
                 if (value && _tabIndex == -1)
                 {
-                    TabIndex = SuperView != null ? SuperView._tabIndexes.IndexOf (this) : -1;
+                    TabIndex = SuperView is { } ? SuperView._tabIndexes.IndexOf (this) : -1;
                 }
 
                 TabStop = value;
@@ -402,11 +402,11 @@ public partial class View
                     SetHasFocus (false, this);
                     SuperView?.EnsureFocus ();
 
-                    if (SuperView != null && SuperView.Focused == null)
+                    if (SuperView is { } && SuperView.Focused is null)
                     {
                         SuperView.FocusNext ();
 
-                        if (SuperView.Focused == null && Application.Current != null)
+                        if (SuperView.Focused is null && Application.Current is { })
                         {
                             Application.Current.FocusNext ();
                         }
@@ -415,7 +415,7 @@ public partial class View
                     }
                 }
 
-                if (_subviews != null && IsInitialized)
+                if (_subviews is { } && IsInitialized)
                 {
                     foreach (View view in _subviews)
                     {
@@ -499,14 +499,14 @@ public partial class View
     {
         get
         {
-            if (Focused == null)
+            if (Focused is null)
             {
                 return null;
             }
 
             View most = Focused.MostFocused;
 
-            if (most != null)
+            if (most is { })
             {
                 return most;
             }
@@ -519,7 +519,7 @@ public partial class View
     /// <param name="view">View.</param>
     private void SetFocus (View view)
     {
-        if (view == null)
+        if (view is null)
         {
             return;
         }
@@ -556,12 +556,12 @@ public partial class View
             }
         }
 
-        if (c == null)
+        if (c is null)
         {
             throw new ArgumentException ("the specified view is not part of the hierarchy of this view");
         }
 
-        if (Focused != null)
+        if (Focused is { })
         {
             Focused.SetHasFocus (false, view);
         }
@@ -572,7 +572,7 @@ public partial class View
         Focused.EnsureFocus ();
 
         // Send focus upwards
-        if (SuperView != null)
+        if (SuperView is { })
         {
             SuperView.SetFocus (this);
         }
@@ -595,7 +595,7 @@ public partial class View
             return;
         }
 
-        if (SuperView != null)
+        if (SuperView is { })
         {
             SuperView.SetFocus (this);
         }
@@ -611,7 +611,7 @@ public partial class View
     /// </summary>
     public void EnsureFocus ()
     {
-        if (Focused == null && _subviews?.Count > 0)
+        if (Focused is null && _subviews?.Count > 0)
         {
             if (FocusDirection == NavigationDirection.Forward)
             {
@@ -632,7 +632,7 @@ public partial class View
             return;
         }
 
-        if (_tabIndexes == null)
+        if (_tabIndexes is null)
         {
             SuperView?.SetFocus (this);
 
@@ -658,7 +658,7 @@ public partial class View
             return;
         }
 
-        if (_tabIndexes == null)
+        if (_tabIndexes is null)
         {
             SuperView?.SetFocus (this);
 
@@ -691,12 +691,12 @@ public partial class View
 
         FocusDirection = NavigationDirection.Backward;
 
-        if (_tabIndexes == null || _tabIndexes.Count == 0)
+        if (_tabIndexes is null || _tabIndexes.Count == 0)
         {
             return false;
         }
 
-        if (Focused == null)
+        if (Focused is null)
         {
             FocusLast ();
 
@@ -737,7 +737,7 @@ public partial class View
             }
         }
 
-        if (Focused != null)
+        if (Focused is { })
         {
             Focused.SetHasFocus (false, this);
             Focused = null;
@@ -757,12 +757,12 @@ public partial class View
 
         FocusDirection = NavigationDirection.Forward;
 
-        if (_tabIndexes == null || _tabIndexes.Count == 0)
+        if (_tabIndexes is null || _tabIndexes.Count == 0)
         {
             return false;
         }
 
-        if (Focused == null)
+        if (Focused is null)
         {
             FocusFirst ();
 
@@ -802,7 +802,7 @@ public partial class View
             }
         }
 
-        if (Focused != null)
+        if (Focused is { })
         {
             Focused.SetHasFocus (false, this);
             Focused = null;
@@ -813,12 +813,12 @@ public partial class View
 
     private View GetMostFocused (View view)
     {
-        if (view == null)
+        if (view is null)
         {
             return null;
         }
 
-        return view.Focused != null ? GetMostFocused (view.Focused) : view;
+        return view.Focused is { } ? GetMostFocused (view.Focused) : view;
     }
 
     /// <summary>Positions the cursor in the right position based on the currently focused view in the chain.</summary>
@@ -838,7 +838,7 @@ public partial class View
 
         // BUGBUG: v2 - This needs to support children of Frames too
 
-        if (Focused == null && SuperView != null)
+        if (Focused is null && SuperView is { })
         {
             SuperView.EnsureFocus ();
         }

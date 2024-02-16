@@ -68,7 +68,7 @@ public class Wizard : Dialog
     //	}
     //	set {
     //		wizardTitle = value;
-    //		base.Title = $"{wizardTitle}{(steps.Count > 0 && currentStep != null ? " - " + currentStep.Title : string.Empty)}";
+    //		base.Title = $"{wizardTitle}{(steps.Count > 0 && currentStep is { } ? " - " + currentStep.Title : string.Empty)}";
     //	}
     //}
     private string _wizardTitle = string.Empty;
@@ -169,7 +169,7 @@ public class Wizard : Dialog
             }
             else
             {
-                if (SuperView != null)
+                if (SuperView is { })
                 {
                     ColorScheme = SuperView.ColorScheme;
                 }
@@ -247,7 +247,7 @@ public class Wizard : Dialog
     {
         LinkedListNode<WizardStep> step = null;
 
-        if (CurrentStep == null)
+        if (CurrentStep is null)
         {
             // Get first step, assume it is next
             step = _steps.First;
@@ -257,14 +257,14 @@ public class Wizard : Dialog
             // Get the step after current
             step = _steps.Find (CurrentStep);
 
-            if (step != null)
+            if (step is { })
             {
                 step = step.Next;
             }
         }
 
         // step now points to the potential next step
-        while (step != null)
+        while (step is { })
         {
             if (step.Value.Enabled)
             {
@@ -289,7 +289,7 @@ public class Wizard : Dialog
     {
         LinkedListNode<WizardStep> step = null;
 
-        if (CurrentStep == null)
+        if (CurrentStep is null)
         {
             // Get last step, assume it is previous
             step = _steps.Last;
@@ -299,14 +299,14 @@ public class Wizard : Dialog
             // Get the step before current
             step = _steps.Find (CurrentStep);
 
-            if (step != null)
+            if (step is { })
             {
                 step = step.Previous;
             }
         }
 
         // step now points to the potential previous step
-        while (step != null)
+        while (step is { })
         {
             if (step.Value.Enabled)
             {
@@ -327,7 +327,7 @@ public class Wizard : Dialog
     {
         WizardStep previous = GetPreviousStep ();
 
-        if (previous != null)
+        if (previous is { })
         {
             GoToStep (previous);
         }
@@ -341,7 +341,7 @@ public class Wizard : Dialog
     {
         WizardStep nextStep = GetNextStep ();
 
-        if (nextStep != null)
+        if (nextStep is { })
         {
             GoToStep (nextStep);
         }
@@ -352,7 +352,7 @@ public class Wizard : Dialog
     /// <returns>True if the transition to the step succeeded. False if the step was not found or the operation was cancelled.</returns>
     public bool GoToStep (WizardStep newStep)
     {
-        if (OnStepChanging (_currentStep, newStep) || (newStep != null && !newStep.Enabled))
+        if (OnStepChanging (_currentStep, newStep) || (newStep is { } && !newStep.Enabled))
         {
             return false;
         }
@@ -530,7 +530,7 @@ public class Wizard : Dialog
 
     private void UpdateButtonsAndTitle ()
     {
-        if (CurrentStep == null)
+        if (CurrentStep is null)
         {
             return;
         }

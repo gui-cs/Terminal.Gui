@@ -125,7 +125,7 @@ internal class MainLoop : IDisposable
     /// </remarks>
     internal object AddTimeout (TimeSpan time, Func<bool> callback)
     {
-        if (callback == null)
+        if (callback is null)
         {
             throw new ArgumentNullException (nameof (callback));
         }

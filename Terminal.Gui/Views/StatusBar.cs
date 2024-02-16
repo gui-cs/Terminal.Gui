@@ -83,7 +83,7 @@ public class StatusBar : View
     /// <param name="items">A list of status bar items.</param>
     public StatusBar (StatusItem [] items)
     {
-        if (items != null)
+        if (items is { })
         {
             Items = items;
         }
@@ -265,7 +265,7 @@ public class StatusBar : View
 
     private Attribute DetermineColorSchemeFor (StatusItem item)
     {
-        if (item != null)
+        if (item is { })
         {
             if (item.IsEnabled ())
             {
@@ -309,7 +309,7 @@ public class StatusBar : View
 
     private void Run (Action action)
     {
-        if (action == null)
+        if (action is null)
         {
             return;
         }

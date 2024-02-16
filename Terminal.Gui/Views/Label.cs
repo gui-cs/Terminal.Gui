@@ -106,7 +106,7 @@ public class Label : View
                 FocusNext ();
             }
 
-            if (!HasFocus && SuperView != null)
+            if (!HasFocus && SuperView is { })
             {
                 if (!SuperView.HasFocus)
                 {

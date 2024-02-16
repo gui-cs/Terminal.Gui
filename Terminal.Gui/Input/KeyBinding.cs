@@ -94,7 +94,7 @@ public class KeyBindings
     /// </param>
     public void Add (Key key, KeyBindingScope scope, params Command [] commands)
     {
-        if (key == null || !key.IsValid)
+        if (key is null || !key.IsValid)
         {
             //throw new ArgumentException ("Invalid Key", nameof (commands));
             return;

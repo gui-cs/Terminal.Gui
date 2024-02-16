@@ -400,7 +400,7 @@ public class RadioGroup : View
 
     private static Rect MakeRect (int x, int y, List<string> radioLabels)
     {
-        if (radioLabels == null)
+        if (radioLabels is null)
         {
             return new Rect (x, y, 0, 0);
         }

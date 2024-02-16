@@ -124,7 +124,7 @@ public class ListTableSource : ITableSource
     /// <returns></returns>
     private int CalculateMaxLength ()
     {
-        if (List == null || Count == 0)
+        if (List is null || Count == 0)
         {
             return 0;
         }

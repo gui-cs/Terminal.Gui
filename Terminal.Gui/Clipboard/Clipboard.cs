@@ -33,7 +33,7 @@ public static class Clipboard
                 {
                     string clipData = Application.Driver.Clipboard.GetClipboardData ();
 
-                    if (clipData == null)
+                    if (clipData is null)
                     {
                         // throw new InvalidOperationException ($"{Application.Driver.GetType ().Name}.GetClipboardData returned null instead of string.Empty");
                         clipData = string.Empty;
@@ -55,7 +55,7 @@ public static class Clipboard
             {
                 if (IsSupported)
                 {
-                    if (value == null)
+                    if (value is null)
                     {
                         value = string.Empty;
                     }

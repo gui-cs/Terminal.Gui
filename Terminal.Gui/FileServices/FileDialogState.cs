@@ -55,13 +55,13 @@ internal class FileDialogState
             }
 
             // if theres a UI filter in place too
-            if (Parent.CurrentFilter != null)
+            if (Parent.CurrentFilter is { })
             {
                 children = children.Where (MatchesApiFilter).ToList ();
             }
 
             // allow navigating up as '..'
-            if (dir.Parent != null)
+            if (dir.Parent is { })
             {
                 children.Add (new FileSystemInfoStats (dir.Parent, Parent.Style.Culture) { IsParent = true });
             }

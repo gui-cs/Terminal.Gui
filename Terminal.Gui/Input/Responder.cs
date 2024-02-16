@@ -132,7 +132,7 @@ public class Responder : IDisposable
                                            | BindingFlags.DeclaredOnly
                                           );
 
-        if (m == null)
+        if (m is null)
         {
             return false;
         }

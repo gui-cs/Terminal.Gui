@@ -763,7 +763,7 @@ public class TextField : View
     {
         ColorScheme cs = ColorScheme;
 
-        if (ColorScheme == null)
+        if (ColorScheme is null)
         {
             cs = new ColorScheme ();
         }
@@ -804,7 +804,7 @@ public class TextField : View
         ClearAllSelection ();
         (int col, int row)? newPos = GetModel ().WordBackward (_cursorPosition, 0);
 
-        if (newPos == null)
+        if (newPos is null)
         {
             return;
         }
@@ -827,7 +827,7 @@ public class TextField : View
         ClearAllSelection ();
         (int col, int row)? newPos = GetModel ().WordForward (_cursorPosition, 0);
 
-        if (newPos == null)
+        if (newPos is null)
         {
             return;
         }
@@ -891,7 +891,7 @@ public class TextField : View
             _isButtonReleased = false;
             PrepareSelection (x);
 
-            if (Application.MouseGrabView == null)
+            if (Application.MouseGrabView is null)
             {
                 Application.GrabMouse (this);
             }
@@ -914,7 +914,7 @@ public class TextField : View
             {
                 (int col, int row)? newPosBw = GetModel ().WordBackward (x, 0);
 
-                if (newPosBw == null)
+                if (newPosBw is null)
                 {
                     return true;
                 }
@@ -930,7 +930,7 @@ public class TextField : View
 
             (int col, int row)? newPosFw = GetModel ().WordForward (x, 0);
 
-            if (newPosFw == null)
+            if (newPosFw is null)
             {
                 return true;
             }
@@ -1086,7 +1086,7 @@ public class TextField : View
     /// <inheritdoc/>
     public override bool OnLeave (View view)
     {
-        if (Application.MouseGrabView != null && Application.MouseGrabView == this)
+        if (Application.MouseGrabView is { } && Application.MouseGrabView == this)
         {
             Application.UngrabMouse ();
         }
@@ -1240,7 +1240,7 @@ public class TextField : View
         //if (string.IsNullOrEmpty (Clipboard.Contents))
         //	return true;
         //var clip = TextModel.ToRunes (Clipboard.Contents);
-        //if (clip == null)
+        //if (clip is null)
         //	return true;
 
         //if (point == text.Count) {
@@ -1457,7 +1457,7 @@ public class TextField : View
     {
         ColorScheme cs = ColorScheme;
 
-        if (ColorScheme == null)
+        if (ColorScheme is null)
         {
             cs = new ColorScheme ();
         }
@@ -1480,7 +1480,7 @@ public class TextField : View
 
     private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItem obj)
     {
-        if (obj == null)
+        if (obj is null)
         {
             return;
         }
@@ -1671,7 +1671,7 @@ public class TextField : View
         ClearAllSelection ();
         (int col, int row)? newPos = GetModel ().WordBackward (_cursorPosition, 0);
 
-        if (newPos == null)
+        if (newPos is null)
         {
             return;
         }
@@ -1697,7 +1697,7 @@ public class TextField : View
             {
                 (int col, int row)? newPos = GetModel ().WordBackward (x, 0);
 
-                if (newPos == null)
+                if (newPos is null)
                 {
                     return;
                 }
@@ -1717,7 +1717,7 @@ public class TextField : View
         ClearAllSelection ();
         (int col, int row)? newPos = GetModel ().WordForward (_cursorPosition, 0);
 
-        if (newPos == null)
+        if (newPos is null)
         {
             return;
         }
@@ -1737,7 +1737,7 @@ public class TextField : View
             int x = _start > -1 && _start > _cursorPosition ? _start : _cursorPosition;
             (int col, int row)? newPos = GetModel ().WordForward (x, 0);
 
-            if (newPos == null)
+            if (newPos is null)
             {
                 return;
             }
@@ -1848,7 +1848,7 @@ public class TextField : View
 
             SetNeedsDisplay ();
         }
-        else if (SelectedLength > 0 || _selectedText != null)
+        else if (SelectedLength > 0 || _selectedText is { })
         {
             ClearAllSelection ();
         }

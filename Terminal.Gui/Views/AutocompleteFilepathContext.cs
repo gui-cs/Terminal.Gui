@@ -25,7 +25,7 @@ internal class FilepathSuggestionGenerator : ISuggestionGenerator
             state = fileState.State;
         }
 
-        if (state == null)
+        if (state is null)
         {
             return Enumerable.Empty<Suggestion> ();
         }

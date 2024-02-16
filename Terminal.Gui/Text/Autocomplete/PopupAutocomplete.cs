@@ -23,7 +23,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
     {
         get
         {
-            if (colorScheme == null)
+            if (colorScheme is null)
             {
                 colorScheme = Colors.ColorSchemes ["Menu"];
             }
@@ -42,7 +42,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
             hostControl = value;
             top = hostControl.SuperView;
 
-            if (top != null)
+            if (top is { })
             {
                 top.DrawContent += Top_DrawContent;
                 top.DrawContentComplete += Top_DrawContentComplete;
@@ -114,7 +114,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
             }
 
             // not in the popup
-            if (Visible && HostControl != null)
+            if (Visible && HostControl is { })
             {
                 Visible = false;
                 closed = false;
@@ -125,7 +125,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
             return false;
         }
 
-        if (popup == null || Suggestions.Count == 0)
+        if (popup is null || Suggestions.Count == 0)
         {
             ManipulatePopup ();
 
@@ -467,7 +467,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
         {
             SelectedIdx = me.Y - ScrollOffset;
 
-            if (LastPopupPos != null)
+            if (LastPopupPos is { })
             {
                 RenderOverlay ((Point)LastPopupPos);
             }
@@ -516,13 +516,13 @@ public abstract class PopupAutocomplete : AutocompleteBase
 
     private void ManipulatePopup ()
     {
-        if (Visible && popup == null)
+        if (Visible && popup is null)
         {
             popup = new Popup (this) { Frame = Rect.Empty };
             top?.Add (popup);
         }
 
-        if (!Visible && popup != null)
+        if (!Visible && popup is { })
         {
             top?.Remove (popup);
             popup.Dispose ();
@@ -568,7 +568,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
 
         public override void OnDrawContent (Rect contentArea)
         {
-            if (autocomplete.LastPopupPos == null)
+            if (autocomplete.LastPopupPos is null)
             {
                 return;
             }

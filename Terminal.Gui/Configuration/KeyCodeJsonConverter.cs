@@ -126,7 +126,7 @@ internal class KeyCodeJsonConverter : JsonConverter<KeyCode>
 
         var keyName = (value & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask & ~KeyCode.AltMask).ToString ();
 
-        if (keyName != null)
+        if (keyName is { })
         {
             writer.WriteString ("Key", keyName);
         }
