@@ -38,7 +38,6 @@
   <!-- Dependencies -->
   <!-- =================================================================== -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
     <PackageReference Include="System.IO.Abstractions" Version="20.0.15" />
     <PackageReference Include="System.Text.Json" Version="8.0.2" />
     <PackageReference Include="System.Management" Version="8.0.0" />
