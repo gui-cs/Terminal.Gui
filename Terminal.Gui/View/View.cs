@@ -114,7 +114,6 @@ namespace Terminal.Gui;
 public partial class View : Responder, ISupportInitializeNotification
 {
     private bool _oldEnabled;
-    private string _title = string.Empty;
 
     /// <summary>Gets or sets whether a view is cleared if the <see cref="Visible"/> property is <see langword="false"/>.</summary>
     public bool ClearOnVisibleFalse { get; set; } = true;
@@ -182,32 +181,6 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <remarks>The id should be unique across all Views that share a SuperView.</remarks>
     public string Id { get; set; } = "";
 
-    /// <summary>
-    ///     The title to be displayed for this <see cref="View"/>. The title will be displayed if <see cref="Border"/>.
-    ///     <see cref="Thickness.Top"/> is greater than 0.
-    /// </summary>
-    /// <value>The title.</value>
-    public string Title
-    {
-        get => _title;
-        set
-        {
-            if (!OnTitleChanging (_title, value))
-            {
-                string old = _title;
-                _title = value;
-                SetNeedsDisplay ();
-#if DEBUG
-                if (_title != null && string.IsNullOrEmpty (Id))
-                {
-                    Id = _title;
-                }
-#endif // DEBUG
-                OnTitleChanged (old, _title);
-            }
-        }
-    }
-
     /// <inheritdoc/>
     /// >
     public override bool Visible
@@ -244,41 +217,8 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <inheritdoc/>
     public override void OnEnabledChanged () { EnabledChanged?.Invoke (this, EventArgs.Empty); }
 
-    /// <summary>Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.</summary>
-    /// <param name="oldTitle">The <see cref="View.Title"/> that is/has been replaced.</param>
-    /// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
-    public virtual void OnTitleChanged (string oldTitle, string newTitle)
-    {
-        var args = new StringEventArgs (oldTitle, newTitle);
-        TitleChanged?.Invoke (this, args);
-    }
-
-    /// <summary>
-    ///     Called before the <see cref="View.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can
-    ///     be cancelled.
-    /// </summary>
-    /// <param name="oldTitle">The <see cref="View.Title"/> that is/has been replaced.</param>
-    /// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
-    /// <returns>`true` if an event handler canceled the Title change.</returns>
-    public virtual bool OnTitleChanging (string oldTitle, string newTitle)
-    {
-        var args = new StringEventArgs (oldTitle, newTitle);
-        TitleChanging?.Invoke (this, args);
-
-        return args.Cancel;
-    }
-
     /// <inheritdoc/>
     public override void OnVisibleChanged () { VisibleChanged?.Invoke (this, EventArgs.Empty); }
-
-    /// <summary>Event fired after the <see cref="View.Title"/> has been changed.</summary>
-    public event EventHandler<StringEventArgs> TitleChanged;
-
-    /// <summary>
-    ///     Event fired when the <see cref="View.Title"/> is changing. Set <see cref="StringEventArgs.Cancel"/> to `true`
-    ///     to cancel the Title change.
-    /// </summary>
-    public event EventHandler<StringEventArgs> TitleChanging;
 
     /// <summary>Pretty prints the View</summary>
     /// <returns></returns>
@@ -328,6 +268,75 @@ public partial class View : Responder, ISupportInitializeNotification
         return true;
     }
 
+    #region Title
+    private string _title = string.Empty;
+
+    /// <summary>Gets the <see cref="Gui.TextFormatter"/> used to format <see cref="Title"/>.</summary>
+    internal TextFormatter TitleTextFormatter { get; init; } = new ();
+
+    /// <summary>
+    ///     The title to be displayed for this <see cref="View"/>. The title will be displayed if <see cref="Border"/>.
+    ///     <see cref="Thickness.Top"/> is greater than 0.
+    /// </summary>
+    /// <value>The title.</value>
+    public string Title
+    {
+        get => _title;
+        set
+        {
+            if (!OnTitleChanging (_title, value))
+            {
+                string old = _title;
+                _title = value;
+                TitleTextFormatter.HotKeySpecifier = HotKeySpecifier;
+                TitleTextFormatter.Text = _title;
+                HotKey = TitleTextFormatter.HotKey;
+                SetNeedsDisplay ();
+#if DEBUG
+                if (_title != null && string.IsNullOrEmpty (Id))
+                {
+                    Id = _title;
+                }
+#endif // DEBUG
+                OnTitleChanged (old, _title);
+            }
+        }
+    }
+
+    /// <summary>Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.</summary>
+    /// <param name="oldTitle">The <see cref="View.Title"/> that is/has been replaced.</param>
+    /// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
+    public virtual void OnTitleChanged (string oldTitle, string newTitle)
+    {
+        var args = new StringEventArgs (oldTitle, newTitle);
+        TitleChanged?.Invoke (this, args);
+    }
+
+    /// <summary>
+    ///     Called before the <see cref="View.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can
+    ///     be cancelled.
+    /// </summary>
+    /// <param name="oldTitle">The <see cref="View.Title"/> that is/has been replaced.</param>
+    /// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
+    /// <returns>`true` if an event handler canceled the Title change.</returns>
+    public virtual bool OnTitleChanging (string oldTitle, string newTitle)
+    {
+        var args = new StringEventArgs (oldTitle, newTitle);
+        TitleChanging?.Invoke (this, args);
+
+        return args.Cancel;
+    }
+
+    /// <summary>Event fired after the <see cref="View.Title"/> has been changed.</summary>
+    public event EventHandler<StringEventArgs> TitleChanged;
+
+    /// <summary>
+    ///     Event fired when the <see cref="View.Title"/> is changing. Set <see cref="StringEventArgs.Cancel"/> to `true`
+    ///     to cancel the Title change.
+    /// </summary>
+    public event EventHandler<StringEventArgs> TitleChanging;
+    #endregion
+
     #region Constructors and Initialization
 
     /// <summary>Initializes a new instance of <see cref="View"/>.</summary>
@@ -347,6 +356,7 @@ public partial class View : Responder, ISupportInitializeNotification
     /// </remarks>
     public View ()
     {
+        HotKeySpecifier = (Rune)'_';
         TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
         TextDirection = TextDirection.LeftRight_TopBottom;
         Text = string.Empty;

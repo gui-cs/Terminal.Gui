@@ -45,7 +45,6 @@ public partial class View
         set
         {
             _text = value;
-            SetHotKey ();
             UpdateTextFormatterText ();
             OnResizeNeeded ();
 

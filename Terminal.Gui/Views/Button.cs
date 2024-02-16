@@ -62,8 +62,23 @@ public class Button : View
                    );
         KeyBindings.Add (Key.Space, Command.Default, Command.Accept);
         KeyBindings.Add (Key.Enter, Command.Default, Command.Accept);
+
+        TitleChanged += Button_TitleChanged;
+        //TextChanged += Label_TextChanged;
     }
 
+    private void Button_TitleChanged (object sender, StringEventArgs e)
+    {
+        base.Text = e.New;
+        TextFormatter.HotKeySpecifier = HotKeySpecifier;
+    }
+
+    public override string Text
+    {
+        get => base.Title;
+        set => base.Text = base.Title = value;
+    }
+    
     /// <summary>Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.</summary>
     /// <value><c>true</c> if is default; otherwise, <c>false</c>.</value>
     public bool IsDefault

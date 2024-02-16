@@ -121,7 +121,8 @@ public partial class View
             {
                 // This will cause TextFormatter_HotKeyChanged to be called, firing HotKeyChanged
                 // BUGBUG: _hotkey should be set BEFORE setting TextFormatter.HotKey
-                _hotKey = TextFormatter.HotKey = value;
+                _hotKey = value;
+                TitleTextFormatter.HotKey = value;
             }
         }
     }
@@ -236,28 +237,23 @@ public partial class View
     {
         get
         {
-            if (TextFormatter != null)
-            {
-                return TextFormatter.HotKeySpecifier;
-            }
-
-            return new Rune ('\xFFFF');
+            return TitleTextFormatter.HotKeySpecifier;
         }
         set
         {
-            TextFormatter.HotKeySpecifier = value;
+            TitleTextFormatter.HotKeySpecifier = value;
             SetHotKey ();
         }
     }
 
     private void SetHotKey ()
     {
-        if (TextFormatter == null || HotKeySpecifier == new Rune ('\xFFFF'))
+        if (TitleTextFormatter == null || HotKeySpecifier == new Rune ('\xFFFF'))
         {
             return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
         }
 
-        if (TextFormatter.FindHotKey (_text, HotKeySpecifier, out _, out Key hk))
+        if (TextFormatter.FindHotKey (_title, HotKeySpecifier, out _, out Key hk))
         {
             if (_hotKey != hk)
             {

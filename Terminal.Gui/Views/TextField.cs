@@ -367,11 +367,9 @@ public class TextField : View
 
         KeyBindings.Add (Key.CursorLeft.WithShift.WithCtrl, Command.WordLeftExtend);
         KeyBindings.Add (Key.CursorUp.WithShift.WithCtrl, Command.WordLeftExtend);
-        KeyBindings.Add (Key.B.WithShift.WithAlt, Command.WordLeftExtend);
 
         KeyBindings.Add (Key.CursorRight.WithShift.WithCtrl, Command.WordRightExtend);
         KeyBindings.Add (Key.CursorDown.WithShift.WithCtrl, Command.WordRightExtend);
-        KeyBindings.Add (Key.F.WithShift.WithAlt, Command.WordRightExtend);
 
         KeyBindings.Add (Key.CursorLeft, Command.Left);
         KeyBindings.Add (Key.B.WithCtrl, Command.Left);
@@ -384,21 +382,25 @@ public class TextField : View
         KeyBindings.Add (Key.F.WithCtrl, Command.Right);
 
         KeyBindings.Add (Key.K.WithCtrl, Command.CutToEndLine);
-        KeyBindings.Add (Key.K.WithAlt, Command.CutToStartLine);
 
         KeyBindings.Add (Key.Z.WithCtrl, Command.Undo);
-        KeyBindings.Add (Key.Backspace.WithAlt, Command.Undo);
 
         KeyBindings.Add (Key.Y.WithCtrl, Command.Redo);
 
         KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.WordLeft);
         KeyBindings.Add (Key.CursorUp.WithCtrl, Command.WordLeft);
-        KeyBindings.Add (Key.B.WithAlt, Command.WordLeft);
 
         KeyBindings.Add (Key.CursorRight.WithCtrl, Command.WordRight);
         KeyBindings.Add (Key.CursorDown.WithCtrl, Command.WordRight);
 
+#if UNIX_KEY_BINDINGS
+        KeyBindings.Add (Key.F.WithShift.WithAlt, Command.WordRightExtend);
+        KeyBindings.Add (Key.K.WithAlt, Command.CutToStartLine);
+        KeyBindings.Add (Key.B.WithShift.WithAlt, Command.WordLeftExtend);
+        KeyBindings.Add (Key.B.WithAlt, Command.WordLeft);
         KeyBindings.Add (Key.F.WithAlt, Command.WordRight);
+        KeyBindings.Add (Key.Backspace.WithAlt, Command.Undo);
+#endif
 
         KeyBindings.Add (Key.Delete.WithCtrl, Command.KillWordForwards);
         KeyBindings.Add (Key.Backspace.WithCtrl, Command.KillWordBackwards);

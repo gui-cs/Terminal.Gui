@@ -25,7 +25,23 @@ public class Label : View
 
         // Default key bindings for this view
         KeyBindings.Add (Key.Space, Command.Accept);
+
+        TitleChanged += Label_TitleChanged;
+        //TextChanged += Label_TextChanged;
     }
+
+    private void Label_TitleChanged (object sender, StringEventArgs e)
+    {
+        base.Text = e.New;
+        TextFormatter.HotKeySpecifier = HotKeySpecifier;
+    }
+
+    public override string Text
+    {
+        get => base.Title;
+        set => base.Text = base.Title = value;
+    }
+
 
     private new bool? FocusNext ()
     {

@@ -193,24 +193,28 @@ public class Border : Adornment
         Driver.Clip = savedClip;
     }
 
-    /// <summary>Draws the title for a Window-style view.</summary>
-    /// <param name="region">Screen relative region where the title will be drawn.</param>
-    /// <param name="title">The title.</param>
-    public void DrawTitle (Rect region, string title)
-    {
-        int width = region.Width;
+    ///// <summary>Draws the title for a Window-style view.</summary>
+    ///// <param name="region">Screen relative region where the title will be drawn.</param>
+    ///// <param name="title">The title.</param>
+    //public void DrawTitle (Rect region, string title)
+    //{
+    //    int width = region.Width;
 
-        if (!string.IsNullOrEmpty (title))
-        {
-            Driver.Move (region.X + 2, region.Y);
+    //    if (!string.IsNullOrEmpty (title))
+    //    {
+    //        //Driver.Move (region.X + 2, region.Y);
 
-            //Driver.AddRune (' ');
-            string str = title.EnumerateRunes ().Sum (r => Math.Max (r.GetColumns (), 1)) >= width
-                             ? TextFormatter.Format (title, width, false, false) [0]
-                             : title;
-            Driver.AddStr (str);
-        }
-    }
+    //        ////Driver.AddRune (' ');
+    //        //string str = title.EnumerateRunes ().Sum (r => Math.Max (r.GetColumns (), 1)) >= width
+    //        //                 ? TextFormatter.Format (title, width, false, false) [0]
+    //        //                 : title;
+    //        //Driver.AddStr (str);
+            
+    //        Parent.TitleTextFormatter.Draw (region, Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor (),
+    //                            Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetHotNormalColor (),
+    //                            region);
+    //    }
+    //}
 
     /// <inheritdoc/>
     public override void OnDrawContent (Rect contentArea)
@@ -260,9 +264,11 @@ public class Border : Adornment
         var titleBarsLength = 0; // the little vertical thingies
 
         int maxTitleWidth = Math.Min (
-                                      Parent.Title.GetColumns (),
+                                      Parent.Title.GetColumns (), 
                                       Math.Min (screenBounds.Width - 4, borderBounds.Width - 4)
-                                     );
+                                      );
+        Parent.TitleTextFormatter.Size = new Size (maxTitleWidth, 1);
+
         int sideLineLength = borderBounds.Height;
         bool canDrawBorder = borderBounds.Width > 0 && borderBounds.Height > 0;
 
@@ -300,10 +306,13 @@ public class Border : Adornment
 
         if (canDrawBorder && Thickness.Top > 0 && maxTitleWidth > 0 && !string.IsNullOrEmpty (Parent?.Title))
         {
-            Attribute prevAttr = Driver.GetAttribute ();
-            Driver.SetAttribute (Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor ());
-            DrawTitle (new Rect (borderBounds.X, titleY, maxTitleWidth, 1), Parent?.Title);
-            Driver.SetAttribute (prevAttr);
+            //Attribute prevAttr = Driver.GetAttribute ();
+            //Driver.SetAttribute (Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor ());
+            //DrawTitle (new Rect (borderBounds.X + 2, titleY, maxTitleWidth, 1), Parent?.Title);
+            //Driver.SetAttribute (prevAttr);
+            Parent.TitleTextFormatter.Draw (new Rect (borderBounds.X + 2, titleY, maxTitleWidth, 1), Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor (),
+                                            Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetHotNormalColor ());
+
         }
 
         if (canDrawBorder && LineStyle != LineStyle.None)
@@ -480,19 +489,21 @@ public class Border : Adornment
                 // Redraw title 
                 if (drawTop && maxTitleWidth > 0 && !string.IsNullOrEmpty (Parent?.Title))
                 {
-                    prevAttr = Driver.GetAttribute ();
+                    //prevAttr = Driver.GetAttribute ();
 
-                    if (ColorScheme != null)
-                    {
-                        Driver.SetAttribute (HasFocus ? GetHotNormalColor () : GetNormalColor ());
-                    }
-                    else
-                    {
-                        Driver.SetAttribute (Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor ());
-                    }
+                    //if (ColorScheme != null)
+                    //{
+                    //    Driver.SetAttribute (HasFocus ? GetHotNormalColor () : GetNormalColor ());
+                    //}
+                    //else
+                    //{
+                    //    Driver.SetAttribute (Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor ());
+                    //}
 
-                    DrawTitle (new Rect (borderBounds.X, titleY, Parent.Title.GetColumns (), 1), Parent?.Title);
-                    Driver.SetAttribute (prevAttr);
+                    //DrawTitle (new Rect (borderBounds.X, titleY, Parent.Title.GetColumns (), 1), Parent?.Title);
+                    //Driver.SetAttribute (prevAttr);
+                    Parent.TitleTextFormatter.Draw (new Rect (borderBounds.X + 2, titleY, maxTitleWidth, 1), Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor (),
+                                                    Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetHotNormalColor ());
                 }
 
                 //Left
