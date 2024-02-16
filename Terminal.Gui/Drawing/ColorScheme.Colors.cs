@@ -63,7 +63,8 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
     /// </remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]
     [JsonConverter (typeof (DictionaryJsonConverter<ColorScheme?>))]
-    public static Dictionary<string, ColorScheme?> ColorSchemes { get; }
+    [UsedImplicitly]
+    public static Dictionary<string, ColorScheme?> ColorSchemes { get; private set; }
 
     /// <inheritdoc/>
     public IEnumerator<KeyValuePair<string, ColorScheme?>> GetEnumerator () { return ColorSchemes.GetEnumerator (); }
