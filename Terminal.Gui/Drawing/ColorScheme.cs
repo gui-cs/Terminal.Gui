@@ -100,14 +100,7 @@ public record ColorScheme : IEqualityOperators<ColorScheme, ColorScheme, bool>
     /// <returns>hashcode for this instance</returns>
     public override int GetHashCode ()
     {
-        int hashCode = -1242460230;
-        hashCode = hashCode * -1521134295 + _normal.GetHashCode ();
-        hashCode = hashCode * -1521134295 + _focus.GetHashCode ();
-        hashCode = hashCode * -1521134295 + _hotNormal.GetHashCode ();
-        hashCode = hashCode * -1521134295 + _hotFocus.GetHashCode ();
-        hashCode = hashCode * -1521134295 + _disabled.GetHashCode ();
-
-        return hashCode;
+        return HashCode.Combine (_normal, _focus, _hotNormal, _hotFocus, _disabled);
     }
 
     /// <inheritdoc/>
