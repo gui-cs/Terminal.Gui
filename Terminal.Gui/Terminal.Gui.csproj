@@ -85,6 +85,7 @@
   <ItemGroup>
     <Using Include="System.Text" />
     <Using Include="JetBrains.Annotations" />
+    <Using Include="System.Diagnostics.Contracts.PureAttribute" Alias="PureAttribute" />
   </ItemGroup>
   <!-- =================================================================== -->
   <!-- Nuget  -->
