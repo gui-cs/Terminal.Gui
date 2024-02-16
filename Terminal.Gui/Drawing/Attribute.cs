@@ -11,7 +11,7 @@ namespace Terminal.Gui;
 ///     <see cref="ColorScheme"/> class to define color schemes that can be used in an application.
 /// </remarks>
 [JsonConverter (typeof (AttributeJsonConverter))]
-public readonly struct Attribute : IEquatable<Attribute>, IEqualityOperators<Attribute, Attribute, bool>
+public readonly record struct Attribute : IEqualityOperators<Attribute, Attribute, bool>
 {
     /// <summary>Default empty attribute.</summary>
     public static readonly Attribute Default = new (Color.White, ColorName.Black);
@@ -106,21 +106,6 @@ public readonly struct Attribute : IEquatable<Attribute>, IEqualityOperators<Att
     /// </summary>
     /// <param name="color">The color.</param>
     public Attribute (in Color color) : this (color, color) { }
-
-    /// <summary>Compares two attributes for equality.</summary>
-    /// <param name="left"></param>
-    /// <param name="right"></param>
-    /// <returns></returns>
-    public static bool operator == (Attribute left, Attribute right) { return left.Equals (right); }
-
-    /// <summary>Compares two attributes for inequality.</summary>
-    /// <param name="left"></param>
-    /// <param name="right"></param>
-    /// <returns></returns>
-    public static bool operator != (Attribute left, Attribute right) { return !(left == right); }
-
-    /// <inheritdoc/>
-    public override bool Equals (object? obj) { return obj is Attribute other && Equals (other); }
 
     /// <inheritdoc/>
     public bool Equals (Attribute other) { return PlatformColor == other.PlatformColor && Foreground == other.Foreground && Background == other.Background; }
