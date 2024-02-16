@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Globalization;
 using System.Numerics;
 using System.Text.Json.Serialization;
@@ -27,12 +27,9 @@ public class ColorScheme : IEquatable<ColorScheme>, IEqualityOperators<ColorSche
 
     /// <summary>Creates a new instance, initialized with the values from <paramref name="scheme"/>.</summary>
     /// <param name="scheme">The scheme to initialize the new instance with.</param>
-    public ColorScheme (ColorScheme scheme)
+    public ColorScheme (ColorScheme? scheme)
     {
-        if (scheme is null)
-        {
-            throw new ArgumentNullException (nameof (scheme));
-        }
+        ArgumentNullException.ThrowIfNull (scheme);
 
         _normal = scheme.Normal;
         _focus = scheme.Focus;
