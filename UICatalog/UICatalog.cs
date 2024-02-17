@@ -495,7 +495,7 @@ internal class UICatalogApp
                 Height = Dim.Fill (1),
                 AllowsMarking = false,
                 CanFocus = true,
-                Title = "Categories",
+                Title = "_Categories",
                 BorderStyle = LineStyle.Single,
                 SuperViewRendersLineCanvas = true,
                 Source = new ListWrapper (_categories)
@@ -515,7 +515,7 @@ internal class UICatalogApp
 
                 //AllowsMarking = false,
                 CanFocus = true,
-                Title = "Scenarios",
+                Title = "_Scenarios",
                 BorderStyle = LineStyle.Single,
                 SuperViewRendersLineCanvas = true
             };

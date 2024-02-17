@@ -17,7 +17,7 @@ public class Adornments : Scenario
         ConfigurationManager.Apply ();
         Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
 
-        var view = new Window { Title = "The Window" };
+        var view = new Window { Title = "The _Window" };
         var tf1 = new TextField { Width = 10, Text = "TextField" };
         var color = new ColorPicker { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd (11) };
         color.BorderStyle = LineStyle.RoundedDotted;
@@ -97,7 +97,7 @@ public class Adornments : Scenario
     {
         private readonly ColorPicker _backgroundColorPicker = new ()
         {
-            Title = "BG",
+            Title = "_BG",
             BoxWidth = 1,
             BoxHeight = 1,
             BorderStyle = LineStyle.Single,
@@ -106,7 +106,7 @@ public class Adornments : Scenario
 
         private readonly ColorPicker _foregroundColorPicker = new ()
         {
-            Title = "FG",
+            Title = "_FG",
             BoxWidth = 1,
             BoxHeight = 1,
             BorderStyle = LineStyle.Single,
@@ -343,7 +343,7 @@ public class Adornments : Scenario
                 {
                     X = 0,
                     Y = 0,
-                    Title = "Margin",
+                    Title = "_Margin",
                     Thickness = _viewToEdit.Margin.Thickness,
                     Color = new Attribute (_viewToEdit.Margin.ColorScheme.Normal),
                     SuperViewRendersLineCanvas = true
@@ -356,7 +356,7 @@ public class Adornments : Scenario
                 {
                     X = Pos.Left (_marginEditor),
                     Y = Pos.Bottom (_marginEditor),
-                    Title = "Border",
+                    Title = "B_order",
                     Thickness = _viewToEdit.Border.Thickness,
                     Color = new Attribute (_viewToEdit.Border.ColorScheme.Normal),
                     SuperViewRendersLineCanvas = true
@@ -373,7 +373,7 @@ public class Adornments : Scenario
                     Y = Pos.Top (_borderEditor),
                     SelectedItem = (int)_viewToEdit.Border.LineStyle,
                     BorderStyle = LineStyle.Double,
-                    Title = "Border Style",
+                    Title = "Border St_yle",
                     SuperViewRendersLineCanvas = true,
                     RadioLabels = borderStyleEnum.Select (
                                                           e => e.ToString ()
@@ -435,7 +435,7 @@ public class Adornments : Scenario
                 {
                     X = Pos.Left (_borderEditor),
                     Y = Pos.Bottom (rbBorderStyle),
-                    Title = "Padding",
+                    Title = "_Padding",
                     Thickness = _viewToEdit.Padding.Thickness,
                     Color = new Attribute (_viewToEdit.Padding.ColorScheme.Normal),
                     SuperViewRendersLineCanvas = true

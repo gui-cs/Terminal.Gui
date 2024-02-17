@@ -265,7 +265,7 @@ public class Border : Adornment
 
         int maxTitleWidth = Math.Max (0,
                                       Math.Min (
-                                          Parent.Title.GetColumns (),
+                                          Parent.TitleTextFormatter.FormatAndGetSize ().Width,
                                           Math.Min (screenBounds.Width - 4, borderBounds.Width - 4)
                                           )
                                       );
@@ -310,7 +310,7 @@ public class Border : Adornment
         {
             Parent.TitleTextFormatter.Draw (new Rect (borderBounds.X + 2, titleY, maxTitleWidth, 1),
                                             Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor (),
-                                            Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor ());
+                                            Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetHotNormalColor ());
         }
 
         if (canDrawBorder && LineStyle != LineStyle.None)
