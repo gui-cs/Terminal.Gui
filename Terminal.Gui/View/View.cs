@@ -344,7 +344,7 @@ public partial class View : Responder, ISupportInitializeNotification
     public event EventHandler<StringEventArgs> TitleChanged;
 
     /// <summary>
-    ///     Event fired when the <see cref="View.Title"/> is changing. Set <see cref="StringEventArgs.Cancel"/> to `true`
+    ///     Event fired when the <see cref="View.Title"/> is changing. Set <see cref="CancelEventArgs.Cancel"/> to `true`
     ///     to cancel the Title change.
     /// </summary>
     public event EventHandler<StringEventArgs> TitleChanging;

@@ -71,19 +71,18 @@ public class Button : View
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 
+    /// <inheritdoc />
     public override string Text
     {
         get => base.Title;
         set => base.Text = base.Title = value;
     }
 
+    /// <inheritdoc />
     public override Rune HotKeySpecifier
     {
         get => base.HotKeySpecifier;
-        set
-        {
-            TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
-        }
+        set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
     }
 
     /// <summary>Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.</summary>

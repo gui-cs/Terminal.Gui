@@ -657,7 +657,7 @@ public class FileDialog : Dialog
         ApplySort ();
     }
 
-    private void Accept (IEnumerable<FileSystemInfoStats> toMultiAccept)
+    private new void Accept (IEnumerable<FileSystemInfoStats> toMultiAccept)
     {
         if (!AllowsMultipleSelection)
         {
@@ -676,7 +676,7 @@ public class FileDialog : Dialog
         FinishAccept ();
     }
 
-    private void Accept (IFileInfo f)
+    private new void Accept (IFileInfo f)
     {
         if (!IsCompatibleWithOpenMode (f.FullName, out string reason))
         {
@@ -696,7 +696,7 @@ public class FileDialog : Dialog
         FinishAccept ();
     }
 
-    private void Accept (bool allowMulti)
+    private new void Accept (bool allowMulti)
     {
         if (allowMulti && TryAcceptMulti ())
         {

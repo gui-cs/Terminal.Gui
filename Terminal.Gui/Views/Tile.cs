@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using System.ComponentModel;
+
+namespace Terminal.Gui;
 
 /// <summary>
 ///     A single <see cref="ContentView"/> presented in a <see cref="TileView"/>. To create new instances use
@@ -82,8 +84,8 @@ public class Tile
     public event EventHandler<StringEventArgs> TitleChanged;
 
     /// <summary>
-    ///     Event fired when the <see cref="Title"/> is changing. Set <see cref="StringEventArgs.Cancel"/> to <c>true</c>
-    ///     to cancel the Title change.
+    ///     Event fired when the <see cref="Title"/> is changing.
+    ///     <see cref="CancelEventArgs.Cancel"/> can be set to <c>true</c> to cancel the change.
     /// </summary>
     public event EventHandler<StringEventArgs> TitleChanging;
 }
