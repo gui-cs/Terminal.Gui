@@ -6,7 +6,7 @@ public class LineCanvas : IDisposable
 {
     private readonly List<StraightLine> _lines = [];
 
-    private readonly Dictionary<IntersectionRuneType, IntersectionRuneResolver> runeResolvers = new ()
+    private readonly Dictionary<IntersectionRuneType, IntersectionRuneResolver> _runeResolvers = new ()
     {
         {
             IntersectionRuneType.ULCorner,
@@ -67,7 +67,7 @@ public class LineCanvas : IDisposable
     ///     Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the line that is
     ///     furthest left/top and Size is defined by the line that extends the furthest right/bottom.
     /// </summary>
-    public Rect Bounds
+    public Rectangle Bounds
     {
         get
         {
@@ -78,7 +78,7 @@ public class LineCanvas : IDisposable
                     return _cachedBounds;
                 }
 
-                Rect bounds = _lines [0].Bounds;
+                Rectangle bounds = _lines [0].Bounds;
 
                 for (var i = 1; i < _lines.Count; i++)
                 {
@@ -312,7 +312,7 @@ public class LineCanvas : IDisposable
 
     private void ConfigurationManager_Applied (object? sender, ConfigurationManagerEventArgs e)
     {
-        foreach (KeyValuePair<IntersectionRuneType, IntersectionRuneResolver> irr in runeResolvers)
+        foreach (KeyValuePair<IntersectionRuneType, IntersectionRuneResolver> irr in _runeResolvers)
         {
             irr.Value.SetGlyphs ();
         }
@@ -358,7 +358,7 @@ public class LineCanvas : IDisposable
 
         IntersectionRuneType runeType = GetRuneTypeForIntersects (intersects);
 
-        if (runeResolvers.TryGetValue (runeType, out IntersectionRuneResolver? resolver))
+        if (_runeResolvers.TryGetValue (runeType, out IntersectionRuneResolver? resolver))
         {
             return resolver.GetRuneForIntersects (driver, intersects);
         }
