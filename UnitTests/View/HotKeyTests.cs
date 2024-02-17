@@ -28,9 +28,9 @@ public class HotKeyTests
 
         // As passed
         Command [] commands = view.KeyBindings.GetCommands (key);
-        Assert.Contains (Command.Accept, commands);
+        Assert.Contains (Command.Default, commands);
         commands = view.KeyBindings.GetCommands (key | KeyCode.AltMask);
-        Assert.Contains (Command.Accept, commands);
+        Assert.Contains (Command.Default, commands);
 
         KeyCode baseKey = key & ~KeyCode.ShiftMask;
 
@@ -38,13 +38,13 @@ public class HotKeyTests
         if (baseKey is >= KeyCode.A and <= KeyCode.Z)
         {
             commands = view.KeyBindings.GetCommands (key | KeyCode.ShiftMask);
-            Assert.Contains (Command.Accept, commands);
+            Assert.Contains (Command.Default, commands);
             commands = view.KeyBindings.GetCommands (key & ~KeyCode.ShiftMask);
-            Assert.Contains (Command.Accept, commands);
+            Assert.Contains (Command.Default, commands);
             commands = view.KeyBindings.GetCommands (key | KeyCode.AltMask);
-            Assert.Contains (Command.Accept, commands);
+            Assert.Contains (Command.Default, commands);
             commands = view.KeyBindings.GetCommands ((key & ~KeyCode.ShiftMask) | KeyCode.AltMask);
-            Assert.Contains (Command.Accept, commands);
+            Assert.Contains (Command.Default, commands);
         }
         else
         {
@@ -130,16 +130,16 @@ public class HotKeyTests
 
         // Verify key bindings were set
         Command [] commands = view.KeyBindings.GetCommands (KeyCode.A);
-        Assert.Contains (Command.Accept, commands);
+        Assert.Contains (Command.Default, commands);
 
         commands = view.KeyBindings.GetCommands (KeyCode.A | KeyCode.ShiftMask);
-        Assert.Contains (Command.Accept, commands);
+        Assert.Contains (Command.Default, commands);
 
         commands = view.KeyBindings.GetCommands (KeyCode.A | KeyCode.AltMask);
-        Assert.Contains (Command.Accept, commands);
+        Assert.Contains (Command.Default, commands);
 
         commands = view.KeyBindings.GetCommands (KeyCode.A | KeyCode.ShiftMask | KeyCode.AltMask);
-        Assert.Contains (Command.Accept, commands);
+        Assert.Contains (Command.Default, commands);
 
         // Now set again
         view.HotKey = KeyCode.B;
@@ -147,16 +147,16 @@ public class HotKeyTests
         Assert.Equal (KeyCode.B, view.HotKey);
 
         commands = view.KeyBindings.GetCommands (KeyCode.A);
-        Assert.DoesNotContain (Command.Accept, commands);
+        Assert.DoesNotContain (Command.Default, commands);
 
         commands = view.KeyBindings.GetCommands (KeyCode.A | KeyCode.ShiftMask);
-        Assert.DoesNotContain (Command.Accept, commands);
+        Assert.DoesNotContain (Command.Default, commands);
 
         commands = view.KeyBindings.GetCommands (KeyCode.A | KeyCode.AltMask);
-        Assert.DoesNotContain (Command.Accept, commands);
+        Assert.DoesNotContain (Command.Default, commands);
 
         commands = view.KeyBindings.GetCommands (KeyCode.A | KeyCode.ShiftMask | KeyCode.AltMask);
-        Assert.DoesNotContain (Command.Accept, commands);
+        Assert.DoesNotContain (Command.Default, commands);
     }
 
     [Theory]
@@ -195,7 +195,7 @@ public class HotKeyTests
 
         // As passed
         Command [] commands = view.KeyBindings.GetCommands (view.HotKey);
-        Assert.Contains (Command.Accept, commands);
+        Assert.Contains (Command.Default, commands);
 
         Key baseKey = view.HotKey.NoShift;
 
@@ -203,13 +203,13 @@ public class HotKeyTests
         if (baseKey.IsKeyCodeAtoZ)
         {
             commands = view.KeyBindings.GetCommands (view.HotKey.WithShift);
-            Assert.Contains (Command.Accept, commands);
+            Assert.Contains (Command.Default, commands);
             commands = view.KeyBindings.GetCommands (view.HotKey.NoShift);
-            Assert.Contains (Command.Accept, commands);
+            Assert.Contains (Command.Default, commands);
             commands = view.KeyBindings.GetCommands (view.HotKey.WithAlt);
-            Assert.Contains (Command.Accept, commands);
+            Assert.Contains (Command.Default, commands);
             commands = view.KeyBindings.GetCommands (view.HotKey.NoShift.WithAlt);
-            Assert.Contains (Command.Accept, commands);
+            Assert.Contains (Command.Default, commands);
         }
         else
         {

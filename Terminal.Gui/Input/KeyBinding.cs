@@ -151,8 +151,10 @@ public class KeyBindings
     /// <param name="command"></param>
     public void Clear (params Command [] command)
     {
-        foreach (KeyValuePair<Key, KeyBinding> kvp in Bindings.Where (kvp => kvp.Value.Commands.SequenceEqual (command))
-                                                              .ToArray ())
+        var kvps = Bindings
+                   .Where (kvp => kvp.Value.Commands.SequenceEqual (command))
+                   .ToArray ();
+        foreach (KeyValuePair<Key, KeyBinding> kvp in kvps)
         {
             Bindings.Remove (kvp.Key);
         }

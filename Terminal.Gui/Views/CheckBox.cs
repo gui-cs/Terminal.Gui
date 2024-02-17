@@ -26,8 +26,9 @@ public class CheckBox : View
         AutoSize = true;
 
         // Things this view knows how to do
-        AddCommand (Command.ToggleChecked,ToggleChecked);
+        AddCommand (Command.ToggleChecked, ToggleChecked);
         AddCommand (Command.Accept, ToggleChecked);
+        AddCommand (Command.Default, ToggleChecked);
 
         // Default keybindings for this view
         KeyBindings.Add (Key.Space, Command.ToggleChecked);

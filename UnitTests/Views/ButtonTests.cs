@@ -575,14 +575,16 @@ public class ButtonTests
         Assert.Equal (1, pressed);
 
         // remove the default keybinding (Space)
-        btn.KeyBindings.Clear (Command.Default, Command.Accept);
+        btn.KeyBindings.Clear (Command.Default);
+        btn.KeyBindings.Clear (Command.Accept);
 
         // After clearing the default keystroke the Space button no longer does anything for the Button
         Application.OnKeyDown (new Key ((KeyCode)' '));
         Assert.Equal (1, pressed);
 
         // Set a new binding of b for the click (Accept) event
-        btn.KeyBindings.Add (Key.B, Command.Default, Command.Accept);
+        btn.KeyBindings.Add (Key.B, Command.Default);
+        btn.KeyBindings.Add (Key.B, Command.Accept);
 
         // now pressing B should call the button click event
         Application.OnKeyDown (Key.B);
