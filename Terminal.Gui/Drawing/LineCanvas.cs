@@ -95,7 +95,7 @@ public class LineCanvas : IDisposable
                     bounds.Height = 1;
                 }
 
-                _cachedBounds = new Rect (bounds.X, bounds.Y, bounds.Width, bounds.Height);
+                _cachedBounds = bounds;
             }
 
             return _cachedBounds;
