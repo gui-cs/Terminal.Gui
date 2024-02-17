@@ -4,7 +4,7 @@ namespace Terminal.Gui;
 /// <summary>Facilitates box drawing and line intersection detection and rendering.  Does not support diagonal lines.</summary>
 public class LineCanvas : IDisposable
 {
-    private readonly List<StraightLine> _lines = new ();
+    private readonly List<StraightLine> _lines = [];
 
     private readonly Dictionary<IntersectionRuneType, IntersectionRuneResolver> runeResolvers = new ()
     {
