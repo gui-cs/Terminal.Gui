@@ -6,11 +6,11 @@ public partial class View
 {
     private void AddCommands ()
     {
-        // By default, the Default command sets the focus to this view.
-        AddCommand (Command.Default, () => OnDefaultCommand ());
+        // By default, the Default command raises the DefaultCommand event and sets the focus to this view
+        AddCommand (Command.Default, OnDefaultCommand);
 
-        // By default, the Accept command does nothing.
-        AddCommand (Command.Accept, () => false);
+        // By default, the Accept command raises the Accept event
+        AddCommand (Command.Accept, OnAccept);
     }
 
     #region HotKey Support
@@ -26,7 +26,7 @@ public partial class View
     /// event. Causes this view to be focused.
     /// </summary>
     /// <returns>If <see langword="true"/> the command was canceled.</returns>
-    public bool OnDefaultCommand ()
+    public bool? OnDefaultCommand ()
     {
         var args = new CancelEventArgs ();
         DefaultCommand?.Invoke (this, args);
@@ -55,7 +55,7 @@ public partial class View
     /// event.
     /// </summary>
     /// <returns>If <see langword="true"/> the command was canceled.</returns>
-    public bool OnAccept ()
+    public bool? OnAccept ()
     {
         var args = new CancelEventArgs ();
         Accept?.Invoke (this, args);
@@ -215,14 +215,14 @@ public partial class View
         if (newKey != Key.Empty)
         {
             // Add the base and Alt key
-            KeyBindings.Add (newKey, KeyBindingScope.HotKey, Command.Default, Command.Accept);
-            KeyBindings.Add (newKey.WithAlt, KeyBindingScope.HotKey, Command.Default, Command.Accept);
+            KeyBindings.Add (newKey, KeyBindingScope.HotKey, Command.Default);
+            KeyBindings.Add (newKey.WithAlt, KeyBindingScope.HotKey, Command.Default);
 
             // If the Key is A..Z, add ShiftMask and AltMask | ShiftMask
             if (newKey.IsKeyCodeAtoZ)
             {
-                KeyBindings.Add (newKey.WithShift, KeyBindingScope.HotKey, Command.Default, Command.Accept);
-                KeyBindings.Add (newKey.WithShift.WithAlt, KeyBindingScope.HotKey, Command.Default, Command.Accept);
+                KeyBindings.Add (newKey.WithShift, KeyBindingScope.HotKey, Command.Default);
+                KeyBindings.Add (newKey.WithShift.WithAlt, KeyBindingScope.HotKey, Command.Default);
             }
         }
 

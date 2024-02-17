@@ -269,6 +269,7 @@ public partial class View : Responder, ISupportInitializeNotification
     }
 
     #region Title
+
     private string _title = string.Empty;
 
     /// <summary>Gets the <see cref="Gui.TextFormatter"/> used to format <see cref="Title"/>.</summary>
@@ -303,6 +304,12 @@ public partial class View : Responder, ISupportInitializeNotification
                 string old = _title;
                 _title = value;
                 TitleTextFormatter.Text = _title;
+                TitleTextFormatter.Size = new Size (
+                                                    TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
+                                                    - (TitleTextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
+                                                           ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+                                                           : 0),
+                                                    1);
                 SetHotKeyFromTitle ();
                 SetNeedsDisplay ();
 #if DEBUG
@@ -348,6 +355,7 @@ public partial class View : Responder, ISupportInitializeNotification
     ///     to cancel the Title change.
     /// </summary>
     public event EventHandler<StringEventArgs> TitleChanging;
+
     #endregion
 
     #region Constructors and Initialization

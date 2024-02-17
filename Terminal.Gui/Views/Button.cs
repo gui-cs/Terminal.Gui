@@ -48,18 +48,20 @@ public class Button : View
         AutoSize = true;
 
         // Override default behavior of View
-        // Command.Default sets focus
-        AddCommand (
-                    Command.Accept,
-                    () =>
-                    {
-                        OnClicked ();
+        AddCommand (Command.Default, () =>
+                                     {
+                                         SetFocus ();
+                                         OnClicked ();
+                                         return true;
+                                     });
 
-                        return true;
-                    }
-                   );
-        KeyBindings.Add (Key.Space, Command.Default, Command.Accept);
-        KeyBindings.Add (Key.Enter, Command.Default, Command.Accept);
+        AddCommand (Command.Accept, () =>
+                                    {
+                                        OnClicked ();
+                                        return true;
+                                    });
+        KeyBindings.Add (Key.Space, Command.Default);
+        KeyBindings.Add (Key.Enter, Command.Default);
 
         TitleChanged += Button_TitleChanged;
         //TextChanged += Label_TextChanged;

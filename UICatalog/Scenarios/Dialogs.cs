@@ -274,7 +274,7 @@ public class Dialogs : Scenario
                 dialog.Width = width;
             }
 
-            var add = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Add a button" };
+            var add = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "_Add a button" };
 
             add.Clicked += (s, e) =>
                            {
@@ -313,7 +313,7 @@ public class Dialogs : Scenario
             {
                 X = Pos.Center (),
                 Y = Pos.Center () + 1,
-                Text = $"Add a {char.ConvertFromUtf32 (CODE_POINT)} to each button"
+                Text = $"A_dd a {char.ConvertFromUtf32 (CODE_POINT)} to each button"
             };
 
             addChar.Clicked += (s, e) =>
