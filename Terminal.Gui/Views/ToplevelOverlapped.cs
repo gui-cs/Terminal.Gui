@@ -65,7 +65,7 @@ public static partial class Application
 
         View top = FindTopFromView (Top?.MostFocused);
 
-        if (top is { } && Top.Subviews.Count > 1 && Top.Subviews [Top.Subviews.Count - 1] != top)
+        if (top is Toplevel &&  Top.Subviews.Count > 1 && Top.Subviews [Top.Subviews.Count - 1] != top)
         {
             Top.BringSubviewToFront (top);
         }
