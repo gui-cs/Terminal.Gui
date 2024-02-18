@@ -7,17 +7,17 @@
 
 namespace Terminal.Gui;
 
-/// <summary>Button is a <see cref="View"/> that provides an item that invokes raises the <see cref="Accept"/> event.</summary>
+/// <summary>Button is a <see cref="View"/> that provides an item that invokes raises the <see cref="View.Accept"/> event.</summary>
 /// <remarks>
 ///     <para>
-///         Provides a button showing text that raises the <see cref="Accept"/> event when clicked on with a mouse or
+///         Provides a button showing text that raises the <see cref="View.Accept"/> event when clicked on with a mouse or
 ///         when the user presses SPACE, ENTER, or the <see cref="View.HotKey"/>. The hot key is the first letter or digit
 ///         following the first underscore ('_') in the button text.
 ///     </para>
 ///     <para>Use <see cref="View.HotKeySpecifier"/> to change the hot key specifier from the default of ('_').</para>
 ///     <para>
 ///         When the button is configured as the default (<see cref="IsDefault"/>) and the user presses the ENTER key, if
-///         no other <see cref="View"/> processes the key, the <see cref="Button"/>'s <see cref="Accept"/> event will will
+///         no other <see cref="View"/> processes the key, the <see cref="Button"/>'s <see cref="View.Accept"/> event will
 ///         be fired.
 ///     </para>
 /// </remarks>
@@ -67,9 +67,9 @@ public class Button : View
         //TextChanged += Label_TextChanged;
     }
 
-    private void Button_TitleChanged (object sender, StringEventArgs e)
+    private void Button_TitleChanged (object sender, StateEventArgs<string> e)
     {
-        base.Text = e.New;
+        base.Text = e.NewValue;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 

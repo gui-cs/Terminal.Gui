@@ -66,7 +66,7 @@ public class ComboBox : View
 
                      SetNeedsLayout ();
                      SetNeedsDisplay ();
-                     Search_Changed (this, new StringEventArgs { Old = Text });
+                     Search_Changed (this, new StateEventArgs<string> (string.Empty, Text));
                  };
 
         // Things this view knows how to do
@@ -185,7 +185,7 @@ public class ComboBox : View
             {
                 SelectedItem = -1;
                 _search.Text = string.Empty;
-                Search_Changed (this, new StringEventArgs { Old = string.Empty });
+                Search_Changed (this, new StateEventArgs<string> (string.Empty, _search.Text)); 
                 SetNeedsDisplay ();
             }
         }
@@ -651,21 +651,21 @@ public class ComboBox : View
         SetSearchSet ();
     }
 
-    private void Search_Changed (object sender, StringEventArgs e)
+    private void Search_Changed (object sender, StateEventArgs<string> e)
     {
         if (_source is null)
         {
-            // Object initialization		
+            // Object initialization
             return;
         }
 
-        if (string.IsNullOrEmpty (_search.Text) && string.IsNullOrEmpty (e.Old))
+        if (string.IsNullOrEmpty (_search.Text) && string.IsNullOrEmpty (e.OldValue))
         {
             ResetSearchSet ();
         }
-        else if (_search.Text != e.Old)
+        else if (_search.Text != e.OldValue)
         {
-            if (_search.Text.Length < e.Old.Length)
+            if (_search.Text.Length < e.OldValue.Length)
             {
                 _selectedItem = -1;
             }
@@ -714,7 +714,7 @@ public class ComboBox : View
 
         SetValue (_listview.SelectedItem > -1 ? _searchset [_listview.SelectedItem] : _text);
         _search.CursorPosition = _search.Text.GetColumns ();
-        Search_Changed (this, new StringEventArgs { Old = _search.Text });
+        Search_Changed (this, new StateEventArgs<string> (_search.Text, _search.Text));
         OnOpenSelectedItem ();
         Reset (true);
         HideList ();

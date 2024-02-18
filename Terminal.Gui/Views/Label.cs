@@ -29,9 +29,9 @@ public class Label : View
         //TextChanged += Label_TextChanged;
     }
 
-    private void Label_TitleChanged (object sender, StringEventArgs e)
+    private void Label_TitleChanged (object sender, StateEventArgs<string> e)
     {
-        base.Text = e.New;
+        base.Text = e.NewValue;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 

@@ -38,9 +38,9 @@ public class CheckBox : View
         //TextChanged += Label_TextChanged;
     }
 
-    private void Checkbox_TitleChanged (object? sender, StringEventArgs e)
+    private void Checkbox_TitleChanged (object? sender, StateEventArgs<string> e)
     {
-        base.Text = e.New;
+        base.Text = e.NewValue;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 

@@ -34,24 +34,46 @@ public partial class View
     ///         is 1, the text will be clipped.
     ///     </para>
     ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Bounds"/> will be adjusted to fit the text.</para>
+    ///     <para>When the text changes, the <see cref="TextChanged"/> is fired.</para>
     /// </remarks>
     public virtual string Text
     {
         get => _text;
         set
         {
+            if (value == _text)
+            {
+                return;
+            }
+
+            string old = _text;
             _text = value;
             UpdateTextFormatterText ();
             OnResizeNeeded ();
-
 #if DEBUG
             if (_text is { } && string.IsNullOrEmpty (Id))
             {
                 Id = _text;
             }
 #endif
+            OnTextChanged (old, Text);
         }
     }
+
+    /// <summary>
+    /// Called when the <see cref="Text"/> has changed. Fires the <see cref="TextChanged"/> event.
+    /// </summary>
+    /// <param name="oldValue"></param>
+    /// <param name="newValue"></param>
+    public void OnTextChanged (string oldValue, string newValue)
+    {
+        TextChanged?.Invoke (this, new StateEventArgs<string> (oldValue, newValue));
+    }
+
+    /// <summary>
+    ///     Text changed event, raised when the text has changed.
+    /// </summary>
+    public event EventHandler<StateEventArgs<string>> TextChanged;
 
     /// <summary>
     ///     Gets or sets how the View's <see cref="Text"/> is aligned horizontally when drawn. Changing this property will

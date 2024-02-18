@@ -1,3 +1,4 @@
+using System.Data;
 using System.Globalization;
 using Terminal.Gui.Resources;
 
@@ -555,7 +556,7 @@ public class TextField : View
                 return;
             }
 
-            StringEventArgs newText = OnTextChanging (value.Replace ("\t", "").Split ("\n") [0]);
+            StateEventArgs<string> newText = OnTextChanging (value.Replace ("\t", "").Split ("\n") [0]);
 
             if (newText.Cancel)
             {
@@ -568,7 +569,7 @@ public class TextField : View
             }
 
             ClearAllSelection ();
-            _text = newText.New.EnumerateRunes ().ToList ();
+            _text = newText.NewValue.EnumerateRunes ().ToList ();
 
             if (!Secret && !_historyText.IsFromHistory)
             {
@@ -584,11 +585,7 @@ public class TextField : View
                                  );
             }
 
-            TextChanged?.Invoke (this, new StringEventArgs
-            {
-                New = StringExtensions.ToString (_text),
-                Old = oldText
-            });
+            OnTextChanged (oldText, StringExtensions.ToString (_text));
 
             ProcessAutocomplete ();
 
@@ -1141,9 +1138,9 @@ public class TextField : View
     /// <summary>Virtual method that invoke the <see cref="TextChanging"/> event if it's defined.</summary>
     /// <param name="newText">The new text to be replaced.</param>
     /// <returns>Returns the <see cref="StringEventArgs"/></returns>
-    public virtual StringEventArgs OnTextChanging (string newText)
+    public virtual StateEventArgs<string> OnTextChanging (string newText)
     {
-        var ev = new StringEventArgs { New = newText };
+        StateEventArgs<string> ev = new (string.Empty, newText);
         TextChanging?.Invoke (this, ev);
 
         return ev;
@@ -1266,17 +1263,17 @@ public class TextField : View
         SetNeedsDisplay ();
     }
 
-    /// <summary>
-    ///     Changed event, raised when the text has changed.
-    ///     <remarks>
-    ///         This event is raised when the <see cref="Text"/> changes. The passed <see cref="EventArgs"/> is a
-    ///         <see cref="string"/> containing the old value.
-    ///     </remarks>
-    /// </summary>
-    public event EventHandler<StringEventArgs> TextChanged;
+    ///// <summary>
+    /////     Changed event, raised when the text has changed.
+    /////     <remarks>
+    /////         This event is raised when the <see cref="Text"/> changes. The passed <see cref="EventArgs"/> is a
+    /////         <see cref="string"/> containing the old value.
+    /////     </remarks>
+    ///// </summary>
+    //public event EventHandler<StateEventArgs<string>> TextChanged;
 
     /// <summary>Changing event, raised before the <see cref="Text"/> changes and can be canceled or changing the new text.</summary>
-    public event EventHandler<StringEventArgs> TextChanging;
+    public event EventHandler<StateEventArgs<string>> TextChanging;
 
     /// <summary>Undoes the latest changes.</summary>
     public void Undo ()

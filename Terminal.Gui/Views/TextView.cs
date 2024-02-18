@@ -2869,6 +2869,7 @@ public class TextView : View
         }
         set
         {
+            var old = Text;
             ResetPosition ();
             _model.LoadString (value);
 
@@ -2878,7 +2879,7 @@ public class TextView : View
                 _model = _wrapManager.WrapModel (_frameWidth, out _, out _, out _, out _);
             }
 
-            TextChanged?.Invoke (this, EventArgs.Empty);
+            OnTextChanged (old,Text);
             SetNeedsDisplay ();
 
             _historyText.Clear (Text);
@@ -3717,7 +3718,7 @@ public class TextView : View
     {
         if (key == Key.Space.WithCtrl)
         {
-                return true;
+            return true;
         }
 
         return base.OnKeyUp (key);
@@ -3982,12 +3983,12 @@ public class TextView : View
         SetNeedsDisplay ();
     }
 
-    /// <summary>Raised when the <see cref="Text"/> property of the <see cref="TextView"/> changes.</summary>
-    /// <remarks>
-    ///     The <see cref="Text"/> property of <see cref="TextView"/> only changes when it is explicitly set, not as the
-    ///     user types. To be notified as the user changes the contents of the TextView see <see cref="IsDirty"/>.
-    /// </remarks>
-    public event EventHandler? TextChanged;
+    ///// <summary>Raised when the <see cref="Text"/> property of the <see cref="TextView"/> changes.</summary>
+    ///// <remarks>
+    /////     The <see cref="Text"/> property of <see cref="TextView"/> only changes when it is explicitly set, not as the
+    /////     user types. To be notified as the user changes the contents of the TextView see <see cref="IsDirty"/>.
+    ///// </remarks>
+    //public event EventHandler? TextChanged;
 
     /// <summary>Undoes the latest changes.</summary>
     public void Undo ()

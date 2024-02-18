@@ -39,7 +39,7 @@ public class StateEventArgs<T> : CancelEventArgs
     }
 
     /// <summary>The new state</summary>
-    public T NewValue { get; }
+    public T NewValue { get; set; }
 
     /// <summary>The previous state</summary>
     public T OldValue { get; }

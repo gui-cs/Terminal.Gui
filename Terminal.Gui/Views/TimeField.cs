@@ -430,15 +430,15 @@ public class TimeField : TextField
         return true;
     }
 
-    private void TextField_TextChanging (object sender, StringEventArgs e)
+    private void TextField_TextChanging (object sender, StateEventArgs<string> e)
     {
         try
         {
             var spaces = 0;
 
-            for (var i = 0; i < e.New.Length; i++)
+            for (var i = 0; i < e.NewValue.Length; i++)
             {
-                if (e.New [i] == ' ')
+                if (e.NewValue [i] == ' ')
                 {
                     spaces++;
                 }
@@ -449,17 +449,17 @@ public class TimeField : TextField
             }
 
             spaces += FieldLength;
-            string trimedText = e.New [..spaces];
+            string trimedText = e.NewValue [..spaces];
             spaces -= FieldLength;
             trimedText = trimedText.Replace (new string (' ', spaces), " ");
 
-            if (trimedText != e.New)
+            if (trimedText != e.NewValue)
             {
-                e.New = trimedText;
+                e.NewValue = trimedText;
             }
 
             if (!TimeSpan.TryParseExact (
-                                         e.New.Trim (),
+                                         e.NewValue.Trim (),
                                          Format.Trim (),
                                          CultureInfo.CurrentCulture,
                                          TimeSpanStyles.None,

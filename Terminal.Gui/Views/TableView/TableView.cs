@@ -433,7 +433,7 @@ public class TableView : View
     }
 
     /// <summary>
-    ///     The symbol to add after each cell value and header value to visually seperate values (if not using vertical
+    ///     The symbol to add after each cell value and header value to visually separate values (if not using vertical
     ///     gridlines)
     /// </summary>
     public char SeparatorSymbol { get; set; } = ' ';
@@ -461,12 +461,12 @@ public class TableView : View
     }
 
     /// <summary>
-    ///     This event is raised when a cell is activated e.g. by double clicking or pressing
+    ///     This event is raised when a cell is activated e.g. by double-clicking or pressing
     ///     <see cref="CellActivationKey"/>
     /// </summary>
     public event EventHandler<CellActivatedEventArgs> CellActivated;
 
-    /// <summary>This event is raised when a cell is toggled (see <see cref="Command.ToggleChecked"/></summary>
+    /// <summary>This event is raised when a cell is toggled (see <see cref="Command.Select"/></summary>
     public event EventHandler<CellToggledEventArgs> CellToggled;
 
     /// <summary>
@@ -1488,7 +1488,7 @@ public class TableView : View
     /// <param name="pt1Y">Origin point for the selection in Y</param>
     /// <param name="pt2X">End point for the selection in X</param>
     /// <param name="pt2Y">End point for the selection in Y</param>
-    /// <param name="toggle">True if selection is result of <see cref="Command.ToggleChecked"/></param>
+    /// <param name="toggle">True if selection is result of <see cref="Command.Select"/></param>
     /// <returns></returns>
     private TableSelection CreateTableSelection (int pt1X, int pt1Y, int pt2X, int pt2Y, bool toggle = false)
     {

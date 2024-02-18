@@ -183,15 +183,15 @@ public class DateField : TextField
         }
     }
 
-    private void DateField_Changing (object sender, StringEventArgs e)
+    private void DateField_Changing (object sender, StateEventArgs<string> e)
     {
         try
         {
             var spaces = 0;
 
-            for (var i = 0; i < e.New.Length; i++)
+            for (var i = 0; i < e.NewValue.Length; i++)
             {
-                if (e.New [i] == ' ')
+                if (e.NewValue [i] == ' ')
                 {
                     spaces++;
                 }
@@ -202,14 +202,14 @@ public class DateField : TextField
             }
 
             spaces += FormatLength;
-            string trimedText = e.New [..spaces];
+            string trimedText = e.NewValue [..spaces];
             spaces -= FormatLength;
             trimedText = trimedText.Replace (new string (' ', spaces), " ");
             var date = Convert.ToDateTime (trimedText).ToString (_format.Trim ());
 
-            if ($" {date}" != e.New)
+            if ($" {date}" != e.NewValue)
             {
-                e.New = $" {date}".Replace (RightToLeftMark, "");
+                e.NewValue = $" {date}".Replace (RightToLeftMark, "");
             }
 
             AdjCursorPosition (CursorPosition);
