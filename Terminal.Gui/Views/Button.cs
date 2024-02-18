@@ -48,7 +48,7 @@ public class Button : View
         AutoSize = true;
 
         // Override default behavior of View
-        AddCommand (Command.Default, () =>
+        AddCommand (Command.HotKey, () =>
                                      {
                                          SetFocus ();
                                          OnClicked ();
@@ -60,8 +60,8 @@ public class Button : View
                                         OnClicked ();
                                         return true;
                                     });
-        KeyBindings.Add (Key.Space, Command.Default);
-        KeyBindings.Add (Key.Enter, Command.Default);
+        KeyBindings.Add (Key.Space, Command.HotKey);
+        KeyBindings.Add (Key.Enter, Command.HotKey);
 
         TitleChanged += Button_TitleChanged;
         //TextChanged += Label_TextChanged;

@@ -6,8 +6,8 @@ public partial class View
 {
     private void AddCommands ()
     {
-        // By default, the Default command raises the DefaultCommand event and sets the focus to this view
-        AddCommand (Command.Default, OnDefaultCommand);
+        // By default, the HotKey command sets the focus
+        AddCommand (Command.HotKey, OnDefaultCommand);
 
         // By default, the Accept command raises the Accept event
         AddCommand (Command.Accept, OnAccept);
@@ -16,13 +16,13 @@ public partial class View
     #region HotKey Support
 
     /// <summary>
-    /// Cancelable event fired when the default command (<see cref="Command.Default"/>) is invoked. Set <see cref="CancelEventArgs.Cancel"/>
+    /// Cancelable event fired when the HotKey command (<see cref="Command.HotKey"/>) is invoked. Set <see cref="CancelEventArgs.Cancel"/>
     /// to cancel the event.
     /// </summary>
     public event EventHandler<CancelEventArgs> DefaultCommand;
 
     /// <summary>
-    /// Called when the default command (<see cref="Command.Default"/>) is invoked. Fires the <see cref="DefaultCommand"/>
+    /// Called when the HotKey command (<see cref="Command.HotKey"/>) is invoked. Fires the <see cref="DefaultCommand"/>
     /// event. Causes this view to be focused.
     /// </summary>
     /// <returns>If <see langword="true"/> the command was canceled.</returns>
@@ -70,7 +70,7 @@ public partial class View
 
     /// <summary>
     ///     Gets or sets the hot key defined for this view. Pressing the hot key on the keyboard while this view has focus will
-    ///     invoke the <see cref="Command.Default"/> and <see cref="Command.Accept"/> commands. <see cref="Command.Default"/>
+    ///     invoke the <see cref="Command.HotKey"/> and <see cref="Command.Accept"/> commands. <see cref="Command.HotKey"/>
     ///     causes the view to be focused and <see cref="Command.Accept"/> does nothing. By default, the HotKey is
     ///     automatically set to the first character of <see cref="Text"/> that is prefixed with with
     ///     <see cref="HotKeySpecifier"/>.
@@ -133,18 +133,14 @@ public partial class View
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         By default key bindings are added for both the base key (e.g. <see cref="Key.D3"/>) and the Alt-shifted key
-    ///         (e.g. <c>Key.D3.WithAlt</c> This behavior can be overriden by overriding <see cref="AddKeyBindingsForHotKey"/>.
+    ///         By default, key bindings are added for both the base key (e.g. <see cref="Key.D3"/>) and the Alt-shifted key
+    ///         (e.g. <c>Key.D3.WithAlt</c>) This behavior can be overriden by overriding <see cref="AddKeyBindingsForHotKey"/>.
     ///     </para>
     ///     <para>
     ///         By default, when <paramref name="hotKey"/> is <see cref="Key.A"/> through <see cref="Key.Z"/> key bindings
     ///         will be added for both the un-shifted and shifted versions. This means if the HotKey is <see cref="Key.A"/>,
     ///         key bindings for <c>Key.A</c> and <c>Key.A.WithShift</c> will be added. This behavior can be overriden by
     ///         overriding <see cref="AddKeyBindingsForHotKey"/>.
-    ///     </para>
-    ///     <para>
-    ///         For each of the bound keys <see cref="Command.Default"/> causes the view to be focused and
-    ///         <see cref="Command.Accept"/> does nothing.
     ///     </para>
     /// </remarks>
     /// <param name="prevHotKey">The HotKey <paramref name="hotKey"/> is replacing. Key bindings for this key will be removed.</param>
@@ -215,14 +211,14 @@ public partial class View
         if (newKey != Key.Empty)
         {
             // Add the base and Alt key
-            KeyBindings.Add (newKey, KeyBindingScope.HotKey, Command.Default);
-            KeyBindings.Add (newKey.WithAlt, KeyBindingScope.HotKey, Command.Default);
+            KeyBindings.Add (newKey, KeyBindingScope.HotKey, Command.HotKey);
+            KeyBindings.Add (newKey.WithAlt, KeyBindingScope.HotKey, Command.HotKey);
 
             // If the Key is A..Z, add ShiftMask and AltMask | ShiftMask
             if (newKey.IsKeyCodeAtoZ)
             {
-                KeyBindings.Add (newKey.WithShift, KeyBindingScope.HotKey, Command.Default);
-                KeyBindings.Add (newKey.WithShift.WithAlt, KeyBindingScope.HotKey, Command.Default);
+                KeyBindings.Add (newKey.WithShift, KeyBindingScope.HotKey, Command.HotKey);
+                KeyBindings.Add (newKey.WithShift.WithAlt, KeyBindingScope.HotKey, Command.HotKey);
             }
         }
 

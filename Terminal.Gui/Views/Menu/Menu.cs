@@ -464,7 +464,7 @@ internal sealed class Menu : View
                    );
         AddCommand (Command.Select, () => _host?.SelectItem (_menuItemToSelect));
         AddCommand (Command.ToggleExpandCollapse, () => SelectOrRun ());
-        AddCommand (Command.Default, () => _host?.SelectItem (_menuItemToSelect));
+        AddCommand (Command.HotKey, () => _host?.SelectItem (_menuItemToSelect));
 
         // Default key bindings for this view
         KeyBindings.Add (Key.CursorUp, Command.LineUp);

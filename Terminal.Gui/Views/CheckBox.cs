@@ -29,7 +29,7 @@ public class CheckBox : View
         // Things this view knows how to do
         AddCommand (Command.ToggleChecked, ToggleChecked);
         AddCommand (Command.Accept, ToggleChecked);
-        AddCommand (Command.Default, ToggleChecked);
+        AddCommand (Command.HotKey, ToggleChecked);
 
         // Default keybindings for this view
         KeyBindings.Add (Key.Space, Command.ToggleChecked);

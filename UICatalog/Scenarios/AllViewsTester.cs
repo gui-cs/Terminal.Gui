@@ -291,7 +291,7 @@ public class AllViewsTester : Scenario
         _curView = CreateClass (_viewClasses.First ().Value);
     }
 
-    // TODO: Add Command.Default handler (pop a message box?)
+    // TODO: Add Command.HotKey handler (pop a message box?)
     private View CreateClass (Type type)
     {
         // If we are to create a generic Type

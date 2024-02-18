@@ -444,7 +444,7 @@ public class KeyboardTests
         public ScopedKeyBindingView ()
         {
             AddCommand (Command.Save, () => ApplicationCommand = true);
-            AddCommand (Command.Default, () => HotKeyCommand = true);
+            AddCommand (Command.HotKey, () => HotKeyCommand = true);
             AddCommand (Command.Left, () => FocusedCommand = true);
 
             KeyBindings.Add (Key.A, KeyBindingScope.Application, Command.Save);

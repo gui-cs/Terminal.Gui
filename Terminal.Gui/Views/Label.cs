@@ -19,7 +19,7 @@ public class Label : View
         AutoSize = true;
 
         // Things this view knows how to do
-        AddCommand (Command.Default, FocusNext);
+        AddCommand (Command.HotKey, FocusNext);
         AddCommand (Command.Accept, AcceptKey);
 
         // Default key bindings for this view

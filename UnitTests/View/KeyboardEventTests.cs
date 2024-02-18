@@ -434,8 +434,8 @@ public class KeyboardEventTests
         public KeyBindingsTestView ()
         {
             CanFocus = true;
-            AddCommand (Command.Default, () => CommandReturns);
-            KeyBindings.Add (Key.A, Command.Default);
+            AddCommand (Command.HotKey, () => CommandReturns);
+            KeyBindings.Add (Key.A, Command.HotKey);
         }
 
         public bool? CommandReturns { get; set; }

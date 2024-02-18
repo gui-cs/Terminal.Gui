@@ -37,13 +37,13 @@ public class KeyBindingTests
     public void Add_Single_Adds ()
     {
         var keyBindings = new KeyBindings ();
-        keyBindings.Add (Key.A, Command.Default);
+        keyBindings.Add (Key.A, Command.HotKey);
         Command [] resultCommands = keyBindings.GetCommands (Key.A);
-        Assert.Contains (Command.Default, resultCommands);
+        Assert.Contains (Command.HotKey, resultCommands);
 
-        keyBindings.Add (Key.B, Command.Default);
+        keyBindings.Add (Key.B, Command.HotKey);
         resultCommands = keyBindings.GetCommands (Key.B);
-        Assert.Contains (Command.Default, resultCommands);
+        Assert.Contains (Command.HotKey, resultCommands);
     }
 
     // Clear
@@ -51,8 +51,7 @@ public class KeyBindingTests
     public void Clear_Clears ()
     {
         var keyBindings = new KeyBindings ();
-        keyBindings.Add (Key.A, Command.Default);
-        keyBindings.Add (Key.B, Command.Default);
+        keyBindings.Add (Key.B, Command.HotKey);
         keyBindings.Clear ();
         Command [] resultCommands = keyBindings.GetCommands (Key.A);
         Assert.Empty (resultCommands);
@@ -80,9 +79,9 @@ public class KeyBindingTests
     public void GetCommands_WithCommands_ReturnsCommands ()
     {
         var keyBindings = new KeyBindings ();
-        keyBindings.Add (Key.A, Command.Default);
+        keyBindings.Add (Key.A, Command.HotKey);
         Command [] resultCommands = keyBindings.GetCommands (Key.A);
-        Assert.Contains (Command.Default, resultCommands);
+        Assert.Contains (Command.HotKey, resultCommands);
     }
 
     [Fact]
@@ -156,8 +155,8 @@ public class KeyBindingTests
     public void GetKeyFromCommands_WithCommands_ReturnsKey ()
     {
         var keyBindings = new KeyBindings ();
-        keyBindings.Add (Key.A, Command.Default);
-        Key resultKey = keyBindings.GetKeyFromCommands (Command.Default);
+        keyBindings.Add (Key.A, Command.HotKey);
+        Key resultKey = keyBindings.GetKeyFromCommands (Command.HotKey);
         Assert.Equal (Key.A, resultKey);
     }
 
@@ -165,26 +164,26 @@ public class KeyBindingTests
     public void Replace_Key ()
     {
         var keyBindings = new KeyBindings ();
-        keyBindings.Add (Key.A, Command.Default);
-        keyBindings.Add (Key.B, Command.Default);
-        keyBindings.Add (Key.C, Command.Default);
-        keyBindings.Add (Key.D, Command.Default);
+        keyBindings.Add (Key.A, Command.HotKey);
+        keyBindings.Add (Key.B, Command.HotKey);
+        keyBindings.Add (Key.C, Command.HotKey);
+        keyBindings.Add (Key.D, Command.HotKey);
 
         keyBindings.Replace (Key.A, Key.E);
         Assert.Empty (keyBindings.GetCommands (Key.A));
-        Assert.Contains (Command.Default, keyBindings.GetCommands (Key.E));
+        Assert.Contains (Command.HotKey, keyBindings.GetCommands (Key.E));
 
         keyBindings.Replace (Key.B, Key.E);
         Assert.Empty (keyBindings.GetCommands (Key.B));
-        Assert.Contains (Command.Default, keyBindings.GetCommands (Key.E));
+        Assert.Contains (Command.HotKey, keyBindings.GetCommands (Key.E));
 
         keyBindings.Replace (Key.C, Key.E);
         Assert.Empty (keyBindings.GetCommands (Key.C));
-        Assert.Contains (Command.Default, keyBindings.GetCommands (Key.E));
+        Assert.Contains (Command.HotKey, keyBindings.GetCommands (Key.E));
 
         keyBindings.Replace (Key.D, Key.E);
         Assert.Empty (keyBindings.GetCommands (Key.D));
-        Assert.Contains (Command.Default, keyBindings.GetCommands (Key.E));
+        Assert.Contains (Command.HotKey, keyBindings.GetCommands (Key.E));
     }
 
     // Add with scope does the right things
@@ -281,9 +280,9 @@ public class KeyBindingTests
     public void TryGet_WithCommands_ReturnsTrue ()
     {
         var keyBindings = new KeyBindings ();
-        keyBindings.Add (Key.A, Command.Default);
+        keyBindings.Add (Key.A, Command.HotKey);
         bool result = keyBindings.TryGet (Key.A, out KeyBinding bindings);
         Assert.True (result);
-        Assert.Contains (Command.Default, bindings.Commands);
+        Assert.Contains (Command.HotKey, bindings.Commands);
     }
 }
