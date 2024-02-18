@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+namespace Terminal.Gui;
 
 /// <summary>The <see cref="CheckBox"/> <see cref="View"/> shows an on/off toggle that the user can set</summary>
 public class CheckBox : View
@@ -37,7 +38,7 @@ public class CheckBox : View
         //TextChanged += Label_TextChanged;
     }
 
-    private void Checkbox_TitleChanged (object sender, StringEventArgs e)
+    private void Checkbox_TitleChanged (object? sender, StringEventArgs e)
     {
         base.Text = e.New;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
@@ -110,7 +111,7 @@ public class CheckBox : View
     }
 
     /// <summary>Called when the <see cref="Checked"/> property changes. Invokes the <see cref="Toggled"/> event.</summary>
-    public virtual void OnToggled (ToggleEventArgs e) { Toggled?.Invoke (this, e); }
+    public virtual void OnToggled (StateEventArgs<bool?> e) { Toggled?.Invoke (this, e); }
 
     /// <inheritdoc/>
     public override void PositionCursor () { Move (0, 0); }
@@ -120,7 +121,7 @@ public class CheckBox : View
     ///     Client code can hook up to this event, it is raised when the <see cref="CheckBox"/> is activated either with
     ///     the mouse or the keyboard. The passed <c>bool</c> contains the previous state.
     /// </remarks>
-    public event EventHandler<ToggleEventArgs> Toggled;
+    public event EventHandler<StateEventArgs<bool?>>? Toggled;
 
     /// <inheritdoc/>
     protected override void UpdateTextFormatterText ()
@@ -192,7 +193,7 @@ public class CheckBox : View
             Checked = !Checked;
         }
 
-        OnToggled (new ToggleEventArgs (previousChecked, Checked));
+        OnToggled (new StateEventArgs<bool?> (previousChecked, Checked));
         SetNeedsDisplay ();
 
         return true;
