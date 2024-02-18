@@ -242,7 +242,7 @@ public class VkeyPacketSimulator : Scenario
                              }
                          };
 
-        btnInput.Clicked += (s, e) =>
+        btnInput.Accept += (s, e) =>
                             {
                                 if (!tvInput.HasFocus && _keyboardStrokes.Count == 0)
                                 {
@@ -250,7 +250,7 @@ public class VkeyPacketSimulator : Scenario
                                 }
                             };
 
-        btnOutput.Clicked += (s, e) =>
+        btnOutput.Accept += (s, e) =>
                              {
                                  if (!tvOutput.HasFocus && _keyboardStrokes.Count == 0)
                                  {

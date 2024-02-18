@@ -143,7 +143,7 @@ public class ASCIICustomButtonTest : Scenario
                     SetNeedsDisplay ();
                 }
 
-                OnClicked ();
+                OnAccept ();
 
                 return true;
             }
@@ -224,7 +224,7 @@ public class ASCIICustomButtonTest : Scenario
                     Height = BUTTON_HEIGHT
                 };
                 button.CustomInitialize ();
-                button.Clicked += Button_Clicked;
+                button.Accept += Button_Clicked;
                 button.PointerEnter += Button_PointerEnter;
                 button.MouseClick += Button_MouseClick;
                 button.KeyDown += Button_KeyPress;
@@ -243,7 +243,7 @@ public class ASCIICustomButtonTest : Scenario
                 Height = BUTTON_HEIGHT
             };
             closeButton.CustomInitialize ();
-            closeButton.Clicked += Button_Clicked;
+            closeButton.Accept += Button_Clicked;
             closeButton.PointerEnter += Button_PointerEnter;
             closeButton.MouseClick += Button_MouseClick;
             closeButton.KeyDown += Button_KeyPress;

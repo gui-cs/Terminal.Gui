@@ -279,15 +279,15 @@ public class MenuBarScenario : Scenario
         menuBar.LayoutComplete += (s, e) => { _focusedView.Text = Application.Top.MostFocused?.ToString () ?? "None"; };
 
         var openBtn = new Button { X = Pos.Center (), Y = 4, Text = "_Open Menu", IsDefault = true };
-        openBtn.Clicked += (s, e) => { menuBar.OpenMenu (); };
+        openBtn.Accept += (s, e) => { menuBar.OpenMenu (); };
         Application.Top.Add (openBtn);
 
         var hideBtn = new Button { X = Pos.Center (), Y = Pos.Bottom (openBtn), Text = "Toggle Menu._Visible" };
-        hideBtn.Clicked += (s, e) => { menuBar.Visible = !menuBar.Visible; };
+        hideBtn.Accept += (s, e) => { menuBar.Visible = !menuBar.Visible; };
         Application.Top.Add (hideBtn);
 
         var enableBtn = new Button { X = Pos.Center (), Y = Pos.Bottom (hideBtn), Text = "_Toggle Menu.Enable" };
-        enableBtn.Clicked += (s, e) => { menuBar.Enabled = !menuBar.Enabled; };
+        enableBtn.Accept += (s, e) => { menuBar.Enabled = !menuBar.Enabled; };
         Application.Top.Add (enableBtn);
 
         Application.Top.Add (menuBar);

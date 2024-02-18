@@ -1806,7 +1806,7 @@ public class ToplevelTests
         var testWindow = new Window { X = 2, Y = 1, Width = 15, Height = 10 };
         testWindow.Add (btnPopup);
 
-        btnPopup.Clicked += (s, e) =>
+        btnPopup.Accept += (s, e) =>
                             {
                                 Rect viewToScreen = btnPopup.BoundsToScreen (top.Frame);
 

@@ -451,7 +451,7 @@ public static class MessageBox
             int buttonId = n;
             Button b = buttonList [n];
 
-            b.Clicked += (s, e) =>
+            b.Accept += (s, e) =>
                          {
                              Clicked = buttonId;
                              Application.RequestStop ();

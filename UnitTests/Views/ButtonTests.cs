@@ -530,7 +530,7 @@ public class ButtonTests
     {
         var clicked = false;
         var btn = new Button { Text = "_Test" };
-        btn.Clicked += (s, e) => clicked = true;
+        btn.Accept += (s, e) => clicked = true;
         Application.Top.Add (btn);
         Application.Begin (Application.Top);
 
@@ -559,7 +559,7 @@ public class ButtonTests
         var pressed = 0;
         var btn = new Button { Text = "Press Me" };
 
-        btn.Clicked += (s, e) => pressed++;
+        btn.Accept += (s, e) => pressed++;
 
         // The Button class supports the Default and Accept command
         Assert.Contains (Command.HotKey, btn.GetSupportedCommands ());
@@ -609,7 +609,7 @@ public class ButtonTests
     {
         var clicked = false;
         var btn = new Button { Text = "_Test" };
-        btn.Clicked += (s, e) => clicked = true;
+        btn.Accept += (s, e) => clicked = true;
         Application.Top.Add (btn);
         Application.Begin (Application.Top);
 

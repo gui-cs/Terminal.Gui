@@ -58,7 +58,7 @@ public class ComboBoxIteration : Scenario
 
         var btnTwo = new Button { X = Pos.Right (comboBox) + 1, Text = "Two" };
 
-        btnTwo.Clicked += (s, e) =>
+        btnTwo.Accept += (s, e) =>
                           {
                               items = new List<string> { "one", "two" };
                               comboBox.SetSource (items);
@@ -69,7 +69,7 @@ public class ComboBoxIteration : Scenario
 
         var btnThree = new Button { X = Pos.Right (comboBox) + 1, Y = Pos.Top (comboBox), Text = "Three" };
 
-        btnThree.Clicked += (s, e) =>
+        btnThree.Accept += (s, e) =>
                             {
                                 items = new List<string> { "one", "two", "three" };
                                 comboBox.SetSource (items);

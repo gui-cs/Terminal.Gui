@@ -35,7 +35,7 @@ public class Adornments : Scenario
 
         var button = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };
 
-        button.Clicked += (s, e) =>
+        button.Accept += (s, e) =>
                               MessageBox.Query (20, 7, "Hi", $"Am I a {view.GetType ().Name}?", "Yes", "No");
 
         var label = new TextView
@@ -207,7 +207,7 @@ public class Adornments : Scenario
 
             var copyTop = new Button { X = Pos.Center () + 1, Y = Pos.Bottom (_bottomEdit), Text = "Cop_y Top" };
 
-            copyTop.Clicked += (s, e) =>
+            copyTop.Accept += (s, e) =>
                                {
                                    Thickness = new Thickness (Thickness.Top);
 

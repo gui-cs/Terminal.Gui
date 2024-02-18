@@ -440,7 +440,7 @@ public class NavigationTests
     {
         var wasClicked = false;
         var view = new Button { Text = "Click Me" };
-        view.Clicked += (s, e) => wasClicked = !wasClicked;
+        view.Accept += (s, e) => wasClicked = !wasClicked;
         Application.Top.Add (view);
 
         view.NewKeyDownEvent (Key.Space);
@@ -470,7 +470,7 @@ public class NavigationTests
         var wasClicked = false;
         var button = new Button { Text = "Click Me" };
         button.IsDefault = true;
-        button.Clicked += (s, e) => wasClicked = !wasClicked;
+        button.Accept += (s, e) => wasClicked = !wasClicked;
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (button);
         Application.Top.Add (win);

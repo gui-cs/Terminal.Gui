@@ -31,7 +31,7 @@ public class InvertColors : Scenario
 
         var button = new Button { X = Pos.Center (), Y = foreColors.Length + 1, Text = "Invert color!" };
 
-        button.Clicked += (s, e) =>
+        button.Accept += (s, e) =>
                           {
                               foreach (Label label in labels)
                               {

@@ -203,7 +203,7 @@ public class DynamicStatusBar : Scenario
             {
                 X = Pos.X (_lblShortcut), Y = Pos.Bottom (TextShortcut) + 1, Text = "Clear Shortcut"
             };
-            _btnShortcut.Clicked += (s, e) => { TextShortcut.Text = ""; };
+            _btnShortcut.Accept += (s, e) => { TextShortcut.Text = ""; };
             Add (_btnShortcut);
         }
 
@@ -255,7 +255,7 @@ public class DynamicStatusBar : Scenario
 
             var _btnOk = new Button { IsDefault = true, Text = "OK" };
 
-            _btnOk.Clicked += (s, e) =>
+            _btnOk.Accept += (s, e) =>
                               {
                                   if (string.IsNullOrEmpty (TextTitle.Text))
                                   {
@@ -277,7 +277,7 @@ public class DynamicStatusBar : Scenario
                               };
             var _btnCancel = new Button { Text = "Cancel" };
 
-            _btnCancel.Clicked += (s, e) =>
+            _btnCancel.Accept += (s, e) =>
                                   {
                                       TextTitle.Text = string.Empty;
                                       Application.RequestStop ();
@@ -406,7 +406,7 @@ public class DynamicStatusBar : Scenario
             };
             Add (_frmStatusBarDetails);
 
-            _btnUp.Clicked += (s, e) =>
+            _btnUp.Accept += (s, e) =>
                               {
                                   int i = _lstItems.SelectedItem;
                                   StatusItem statusItem = DataContext.Items.Count > 0 ? DataContext.Items [i].StatusItem : null;
@@ -429,7 +429,7 @@ public class DynamicStatusBar : Scenario
                                   }
                               };
 
-            _btnDown.Clicked += (s, e) =>
+            _btnDown.Accept += (s, e) =>
                                 {
                                     int i = _lstItems.SelectedItem;
                                     StatusItem statusItem = DataContext.Items.Count > 0 ? DataContext.Items [i].StatusItem : null;
@@ -459,12 +459,12 @@ public class DynamicStatusBar : Scenario
             Add (_btnOk);
 
             var _btnCancel = new Button { X = Pos.Right (_btnOk) + 3, Y = Pos.Top (_btnOk), Text = "Cancel" };
-            _btnCancel.Clicked += (s, e) => { SetFrameDetails (_currentEditStatusItem); };
+            _btnCancel.Accept += (s, e) => { SetFrameDetails (_currentEditStatusItem); };
             Add (_btnCancel);
 
             _lstItems.SelectedItemChanged += (s, e) => { SetFrameDetails (); };
 
-            _btnOk.Clicked += (s, e) =>
+            _btnOk.Accept += (s, e) =>
                               {
                                   if (string.IsNullOrEmpty (_frmStatusBarDetails.TextTitle.Text) && _currentEditStatusItem != null)
                                   {
@@ -487,7 +487,7 @@ public class DynamicStatusBar : Scenario
                                   }
                               };
 
-            _btnAdd.Clicked += (s, e) =>
+            _btnAdd.Accept += (s, e) =>
                                {
                                    if (StatusBar == null)
                                    {
@@ -517,7 +517,7 @@ public class DynamicStatusBar : Scenario
                                    SetFrameDetails ();
                                };
 
-            _btnRemove.Clicked += (s, e) =>
+            _btnRemove.Accept += (s, e) =>
                                   {
                                       StatusItem statusItem = DataContext.Items.Count > 0
                                                                   ? DataContext.Items [_lstItems.SelectedItem].StatusItem
@@ -546,7 +546,7 @@ public class DynamicStatusBar : Scenario
                                    SetFrameDetails (statusItem);
                                };
 
-            _btnAddStatusBar.Clicked += (s, e) =>
+            _btnAddStatusBar.Accept += (s, e) =>
                                         {
                                             if (_statusBar != null)
                                             {
@@ -557,7 +557,7 @@ public class DynamicStatusBar : Scenario
                                             Add (_statusBar);
                                         };
 
-            _btnRemoveStatusBar.Clicked += (s, e) =>
+            _btnRemoveStatusBar.Accept += (s, e) =>
                                            {
                                                if (_statusBar == null)
                                                {

@@ -941,18 +941,18 @@ internal class CharMap : ScrollView
 
             var dlg = new Dialog { Title = title, Buttons = [copyGlyph, copyCP, cancel] };
 
-            copyGlyph.Clicked += (s, a) =>
+            copyGlyph.Accept += (s, a) =>
                                  {
                                      CopyGlyph ();
                                      dlg.RequestStop ();
                                  };
 
-            copyCP.Clicked += (s, a) =>
+            copyCP.Accept += (s, a) =>
                               {
                                   CopyCodePoint ();
                                   dlg.RequestStop ();
                               };
-            cancel.Clicked += (s, a) => dlg.RequestStop ();
+            cancel.Accept += (s, a) => dlg.RequestStop ();
 
             var rune = (Rune)SelectedCodePoint;
             var label = new Label { Text = "IsAscii: ", X = 0, Y = 0 };

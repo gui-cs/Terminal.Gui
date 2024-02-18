@@ -1115,7 +1115,7 @@ This is a test
         var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
         var label = new Label { AutoSize = false, Width = 14, Height = 5, Text = text };
         var btn = new Button { X = 14, Text = "Click Me!" };
-        btn.Clicked += (s, e) => clicked = true;
+        btn.Accept += (s, e) => clicked = true;
         Application.Top.Add (label, btn);
 
         var sbv = new ScrollBarView (label, true, false) { Size = 5 };

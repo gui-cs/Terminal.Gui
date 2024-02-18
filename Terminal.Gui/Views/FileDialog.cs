@@ -67,7 +67,7 @@ public class FileDialog : Dialog
         {
             Y = Pos.AnchorEnd (1), X = Pos.Function (CalculateOkButtonPosX), IsDefault = true, Text = Style.OkButtonText
         };
-        _btnOk.Clicked += (s, e) => Accept (true);
+        _btnOk.Accept += (s, e) => Accept (true);
 
         _btnOk.KeyDown += (s, k) =>
                           {
@@ -83,19 +83,19 @@ public class FileDialog : Dialog
                                   NavigateIf (k, KeyCode.CursorUp, _tableView);
                                   NavigateIf (k, KeyCode.CursorRight, _btnOk);
                               };
-        _btnCancel.Clicked += (s, e) => { Application.RequestStop (); };
+        _btnCancel.Accept += (s, e) => { Application.RequestStop (); };
 
         _btnUp = new Button { X = 0, Y = 1, NoPadding = true };
         _btnUp.Text = GetUpButtonText ();
-        _btnUp.Clicked += (s, e) => _history.Up ();
+        _btnUp.Accept += (s, e) => _history.Up ();
 
         _btnBack = new Button { X = Pos.Right (_btnUp) + 1, Y = 1, NoPadding = true };
         _btnBack.Text = GetBackButtonText ();
-        _btnBack.Clicked += (s, e) => _history.Back ();
+        _btnBack.Accept += (s, e) => _history.Back ();
 
         _btnForward = new Button { X = Pos.Right (_btnBack) + 1, Y = 1, NoPadding = true };
         _btnForward.Text = GetForwardButtonText ();
-        _btnForward.Clicked += (s, e) => _history.Forward ();
+        _btnForward.Accept += (s, e) => _history.Forward ();
 
         _tbPath = new TextField { Width = Dim.Fill (), CaptionColor = new Color (Color.Black) };
 
@@ -184,7 +184,7 @@ public class FileDialog : Dialog
 
         _btnToggleSplitterCollapse = new Button { Y = Pos.AnchorEnd (1), Text = GetToggleSplitterText (false) };
 
-        _btnToggleSplitterCollapse.Clicked += (s, e) =>
+        _btnToggleSplitterCollapse.Accept += (s, e) =>
                                               {
                                                   Tile tile = _splitContainer.Tiles.ElementAt (0);
 

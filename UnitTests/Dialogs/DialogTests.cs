@@ -982,18 +982,18 @@ public class DialogTests
         Button btn3 = null;
         string expected = null;
 
-        btn1.Clicked += (s, e) =>
+        btn1.Accept += (s, e) =>
                         {
                             btn2 = new Button { Text = "Show Sub" };
                             btn3 = new Button { Text = "Close" };
-                            btn3.Clicked += (s, e) => RequestStop ();
+                            btn3.Accept += (s, e) => RequestStop ();
 
-                            btn2.Clicked += (s, e) =>
+                            btn2.Accept += (s, e) =>
                                             {
                                                 // Don't test MessageBox in Dialog unit tests!
                                                 var subBtn = new Button { Text = "Ok", IsDefault = true };
                                                 var subDlg = new Dialog { Text = "ya", Width = 20, Height = 5, Buttons = [subBtn] };
-                                                subBtn.Clicked += (s, e) => RequestStop (subDlg);
+                                                subBtn.Accept += (s, e) => RequestStop (subDlg);
                                                 Run (subDlg);
                                             };
                             var dlg = new Dialog { Buttons = [btn2, btn3] };
