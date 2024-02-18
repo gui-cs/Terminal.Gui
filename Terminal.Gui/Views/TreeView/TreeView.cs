@@ -273,7 +273,7 @@ public class TreeView<T> : View, ITreeView where T : class
                    );
 
         AddCommand (
-                    Command.Accept,
+                    Command.Select,
                     () =>
                     {
                         ActivateSelectedObjectIfAny ();
@@ -303,7 +303,7 @@ public class TreeView<T> : View, ITreeView where T : class
         KeyBindings.Add (Key.Home, Command.TopHome);
         KeyBindings.Add (Key.End, Command.BottomEnd);
         KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
-        KeyBindings.Add (ObjectActivationKey, Command.Accept);
+        KeyBindings.Add (ObjectActivationKey, Command.Select);
     }
 
     /// <summary>
