@@ -88,43 +88,6 @@ public class CheckBox : View
         }
     }
 
-    ///// <inheritdoc/>
-    //public override Key HotKey
-    //{
-    //    get => base.HotKey;
-    //    set
-    //    {
-    //        if (value is null)
-    //        {
-    //            throw new ArgumentException (nameof (value));
-    //        }
-
-    //        Key prev = base.HotKey;
-
-    //        if (prev != value)
-    //        {
-    //            base.HotKey = TitleTextFormatter.HotKey = value;
-
-    //            // Also add Alt+HotKey
-    //            if (prev != Key.Empty && KeyBindings.TryGet (prev.WithAlt, out _))
-    //            {
-    //                if (value == Key.Empty)
-    //                {
-    //                    KeyBindings.Remove (prev.WithAlt);
-    //                }
-    //                else
-    //                {
-    //                    KeyBindings.Replace (prev.WithAlt, value.WithAlt);
-    //                }
-    //            }
-    //            else if (value != Key.Empty)
-    //            {
-    //                KeyBindings.Add (value.WithAlt, Command.Accept);
-    //            }
-    //        }
-    //    }
-    //}
-
     /// <inheritdoc/>
     public override bool MouseEvent (MouseEvent me)
     {
