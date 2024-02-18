@@ -437,7 +437,7 @@ Item 6",
         Assert.False (lv.Source.IsMarked (1));
         Assert.False (lv.Source.IsMarked (2));
 
-        lv.KeyBindings.Add (Key.Space.WithShift, Command.ToggleChecked, Command.LineDown);
+        lv.KeyBindings.Add (Key.Space.WithShift, Command.Accept, Command.LineDown);
 
         var ev = Key.Space.WithShift;
 

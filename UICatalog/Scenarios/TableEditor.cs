@@ -767,7 +767,7 @@ public class TableEditor : Scenario
                                      }
                                  };
 
-        _tableView.KeyBindings.Add (Key.Space, Command.ToggleChecked);
+        _tableView.KeyBindings.Add (Key.Space, Command.Accept);
     }
 
     protected override void Dispose (bool disposing)

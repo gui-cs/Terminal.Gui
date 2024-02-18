@@ -128,7 +128,7 @@ public class FileDialog : Dialog
             FullRowSelect = true,
             CollectionNavigator = new FileDialogCollectionNavigator (this)
         };
-        _tableView.KeyBindings.Add (Key.Space, Command.ToggleChecked);
+        _tableView.KeyBindings.Add (Key.Space, Command.Accept);
         _tableView.MouseClick += OnTableViewMouseClick;
         _tableView.Style.InvertSelectedCellFirstCharacter = true;
         Style.TableStyle = _tableView.Style;

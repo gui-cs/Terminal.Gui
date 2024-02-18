@@ -27,12 +27,12 @@ public class CheckBox : View
         AutoSize = true;
 
         // Things this view knows how to do
-        AddCommand (Command.ToggleChecked, ToggleChecked);
         AddCommand (Command.Accept, ToggleChecked);
         AddCommand (Command.HotKey, ToggleChecked);
 
         // Default keybindings for this view
-        KeyBindings.Add (Key.Space, Command.ToggleChecked);
+        KeyBindings.Add (Key.Space, Command.Accept);
+        //KeyBindings.Add (Key.Enter, Command.Accept);
 
         TitleChanged += Checkbox_TitleChanged;
         //TextChanged += Label_TextChanged;

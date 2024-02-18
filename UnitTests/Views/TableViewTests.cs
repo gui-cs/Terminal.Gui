@@ -3014,21 +3014,21 @@ A B C
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
 
         tableView.MultiSelect = true;
-        tableView.KeyBindings.Add (Key.Space, Command.ToggleChecked);
+        tableView.KeyBindings.Add (Key.Space, Command.Select);
 
         Point selectedCell = tableView.GetAllSelectedCells ().Single ();
         Assert.Equal (0, selectedCell.X);
         Assert.Equal (0, selectedCell.Y);
 
         // Go Right
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (Key.CursorRight );
 
         selectedCell = tableView.GetAllSelectedCells ().Single ();
         Assert.Equal (1, selectedCell.X);
         Assert.Equal (0, selectedCell.Y);
 
         // Toggle Select
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.Space });
+        tableView.NewKeyDownEvent (Key.Space);
         TableSelection m = tableView.MultiSelectedRegions.Single ();
         Assert.True (m.IsToggled);
         Assert.Equal (1, m.Origin.X);
@@ -3038,7 +3038,7 @@ A B C
         Assert.Equal (0, selectedCell.Y);
 
         // Go Left
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorLeft });
+        tableView.NewKeyDownEvent (Key.CursorLeft);
 
         // Both Toggled and Moved to should be selected
         Assert.Equal (2, tableView.GetAllSelectedCells ().Count ());
@@ -3050,7 +3050,7 @@ A B C
         Assert.Equal (0, s2.Y);
 
         // Go Down
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorDown });
+        tableView.NewKeyDownEvent (Key.CursorDown );
 
         // Both Toggled and Moved to should be selected but not 0,0
         // which we moved down from
@@ -3087,7 +3087,7 @@ A B C
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         tableView.FullRowSelect = true;
         tableView.MultiSelect = true;
-        tableView.KeyBindings.Add (Key.Space, Command.ToggleChecked);
+        tableView.KeyBindings.Add (Key.Space, Command.Select);
 
         // Toggle Select Cell 0,0
         tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.Space });
@@ -3124,7 +3124,7 @@ A B C
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         tableView.MultiSelect = true;
-        tableView.KeyBindings.Add (Key.Space, Command.ToggleChecked);
+        tableView.KeyBindings.Add (Key.Space, Command.Select);
 
         // Make a square selection
         tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.ShiftMask | KeyCode.CursorDown });
@@ -3166,7 +3166,7 @@ A B C
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         tableView.MultiSelect = true;
-        tableView.KeyBindings.Add (Key.Space, Command.ToggleChecked);
+        tableView.KeyBindings.Add (Key.Space, Command.Select);
 
         // Make first square selection (0,0 to 1,1)
         tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.ShiftMask | KeyCode.CursorDown });

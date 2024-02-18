@@ -9,13 +9,10 @@ public enum Command
     /// <summary>Invoked when the HotKey for the View has been pressed.</summary>
     HotKey,
 
-    /// <summary>Toggle the checked state.</summary>
-    ToggleChecked,
-
-    /// <summary>Accepts the current state (e.g. selection, button press etc).</summary>
+    /// <summary>Accepts the current state (e.g. list selection, button press, toggle, etc).</summary>
     Accept,
 
-    /// <summary>Moves selection to an item (e.g. highlighting a different menu item) without necessarily accepting it.</summary>
+    /// <summary>Selects an item (e.g. a list item or menu item) without necessarily accepting it.</summary>
     Select,
 
     /// <summary>Moves down one item (cell, line, etc...).</summary>

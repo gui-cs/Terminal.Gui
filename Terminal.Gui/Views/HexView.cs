@@ -54,7 +54,7 @@ public class HexView : View
         AddCommand (Command.Right, () => MoveRight ());
         AddCommand (Command.LineDown, () => MoveDown (bytesPerLine));
         AddCommand (Command.LineUp, () => MoveUp (bytesPerLine));
-        AddCommand (Command.ToggleChecked, () => ToggleSide ());
+        AddCommand (Command.Accept, () => ToggleSide ());
         AddCommand (Command.PageUp, () => MoveUp (bytesPerLine * Frame.Height));
         AddCommand (Command.PageDown, () => MoveDown (bytesPerLine * Frame.Height));
         AddCommand (Command.TopHome, () => MoveHome ());
@@ -73,7 +73,7 @@ public class HexView : View
         KeyBindings.Add (Key.CursorRight, Command.Right);
         KeyBindings.Add (Key.CursorDown, Command.LineDown);
         KeyBindings.Add (Key.CursorUp, Command.LineUp);
-        KeyBindings.Add (Key.Enter, Command.ToggleChecked);
+        KeyBindings.Add (Key.Enter, Command.Accept);
 
         KeyBindings.Add (Key.V.WithAlt, Command.PageUp);
         KeyBindings.Add (Key.PageUp, Command.PageUp);

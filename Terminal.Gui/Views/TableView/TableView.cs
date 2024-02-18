@@ -273,7 +273,7 @@ public class TableView : View
                    );
 
         AddCommand (
-                    Command.ToggleChecked,
+                    Command.Select, // was Command.ToggleChecked
                     () =>
                     {
                         ToggleCurrentCellSelection ();
@@ -307,6 +307,7 @@ public class TableView : View
 
         KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
         KeyBindings.Add (CellActivationKey, Command.Accept);
+        KeyBindings.Add (Key.Space, Command.Select);
     }
 
     // TODO: Update to use Key instead of KeyCode
