@@ -2952,7 +2952,7 @@ public class TextView : View
 
     /// <summary>Raised when the contents of the <see cref="TextView"/> are changed.</summary>
     /// <remarks>
-    ///     Unlike the <see cref="TextChanged"/> event, this event is raised whenever the user types or otherwise changes
+    ///     Unlike the <see cref="View.TextChanged"/> event, this event is raised whenever the user types or otherwise changes
     ///     the contents of the <see cref="TextView"/>.
     /// </remarks>
     public event EventHandler<ContentsChangedEventArgs>? ContentsChanged;
