@@ -2853,7 +2853,7 @@ public class TextView : View
 
     /// <summary>Sets or gets the text in the <see cref="TextView"/>.</summary>
     /// <remarks>
-    ///     The <see cref="TextChanged"/> event is fired whenever this property is set. Note, however, that Text is not
+    ///     The <see cref="View.TextChanged"/> event is fired whenever this property is set. Note, however, that Text is not
     ///     set by <see cref="TextView"/> as the user types.
     /// </remarks>
     public override string Text

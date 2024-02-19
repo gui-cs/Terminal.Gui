@@ -86,7 +86,7 @@ public class TextFieldTests
         Assert.Equal ("A", tf.Text);
 
         // cancel the next keystroke
-        tf.TextChanging += (s, e) => e.Cancel = e.New == "AB";
+        tf.TextChanging += (s, e) => e.Cancel = e.NewValue == "AB";
         tf.NewKeyDownEvent (Key.B.WithShift);
 
         // B was canceled so should just be A
@@ -360,11 +360,11 @@ public class TextFieldTests
 
         _textField.TextChanging += _textField_TextChanging;
 
-        void _textField_TextChanging (object sender, StringEventArgs e)
+        void _textField_TextChanging (object sender, StateEventArgs<string> e)
         {
-            if (e.New.GetRuneCount () > 11)
+            if (e.NewValue.GetRuneCount () > 11)
             {
-                e.New = e.New [..11];
+                e.NewValue = e.NewValue [..11];
             }
         }
 
@@ -426,8 +426,8 @@ public class TextFieldTests
         var oldText = "";
         var tf = new TextField { Width = 10, Text = "-1" };
 
-        tf.TextChanging += (s, e) => newText = e.New;
-        tf.TextChanged += (s, e) => oldText = e.Old;
+        tf.TextChanging += (s, e) => newText = e.NewValue;
+        tf.TextChanged += (s, e) => oldText = e.OldValue;
 
         Application.Top.Add (tf);
         Application.Begin (Application.Top);
@@ -1022,7 +1022,7 @@ public class TextFieldTests
     [TextFieldTestsAutoInitShutdown]
     public void TextChanged_Event ()
     {
-        _textField.TextChanged += (s, e) => { Assert.Equal ("TAB to jump between text fields.", e.Old); };
+        _textField.TextChanged += (s, e) => { Assert.Equal ("TAB to jump between text fields.", e.OldValue); };
 
         _textField.Text = "changed";
         Assert.Equal ("changed", _textField.Text);
@@ -1036,7 +1036,7 @@ public class TextFieldTests
 
         _textField.TextChanging += (s, e) =>
                                    {
-                                       Assert.Equal ("changing", e.New);
+                                       Assert.Equal ("changing", e.NewValue);
 
                                        if (cancel)
                                        {
