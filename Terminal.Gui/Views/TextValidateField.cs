@@ -206,7 +206,7 @@ namespace Terminal.Gui
 
                 if (result)
                 {
-                    OnTextChanged (new StringEventArgs { New = oldValue });
+                    OnTextChanged (new StringEventArgs { NewValue = oldValue });
                 }
 
                 return result;
@@ -220,7 +220,7 @@ namespace Terminal.Gui
 
                 if (result)
                 {
-                    OnTextChanged (new StringEventArgs { New = oldValue });
+                    OnTextChanged (new StringEventArgs { NewValue = oldValue });
                 }
 
                 return result;
@@ -333,7 +333,7 @@ namespace Terminal.Gui
                 {
                     string oldValue = Text;
                     _text.RemoveAt (pos);
-                    OnTextChanged (new StringEventArgs { New = Text, Old = oldValue });
+                    OnTextChanged (new StringEventArgs { NewValue = Text, OldValue = oldValue });
                 }
 
                 return true;
@@ -349,7 +349,7 @@ namespace Terminal.Gui
                 {
                     string oldValue = Text;
                     _text.Insert (pos, (Rune)ch);
-                    OnTextChanged (new StringEventArgs { New = Text, Old = oldValue });
+                    OnTextChanged (new StringEventArgs { NewValue = Text, OldValue = oldValue });
 
                     return true;
                 }

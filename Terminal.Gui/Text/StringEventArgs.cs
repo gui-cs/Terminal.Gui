@@ -15,12 +15,12 @@ public class StringEventArgs : CancelEventArgs
     /// <param name="newString">The new string.</param>
     public StringEventArgs (string oldString, string newString)
     {
-        Old = oldString;
-        New = newString;
+        OldValue = oldString;
+        NewValue = newString;
     }
     /// <summary>The new string.</summary>
-    public string New { get; set; }
+    public string NewValue { get; set; }
 
     /// <summary>The old string.</summary>
-    public string Old { get; set; }
+    public string OldValue { get; set; }
 }
