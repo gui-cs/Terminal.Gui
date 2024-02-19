@@ -57,7 +57,9 @@ public abstract class PopupAutocomplete : AutocompleteBase
     /// </summary>
     public virtual int ScrollOffset { get; set; }
 
+    #nullable enable
     private Point? LastPopupPos { get; set; }
+    #nullable restore
 
     /// <inheritdoc/>
     public override void EnsureSelectedIdxIsValid ()
@@ -566,6 +568,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
 
         public override bool MouseEvent (MouseEvent mouseEvent) { return autocomplete.MouseEvent (mouseEvent); }
 
+        #nullable enable
         public override void OnDrawContent (Rect contentArea)
         {
             if (!autocomplete.LastPopupPos.HasValue)
@@ -575,5 +578,6 @@ public abstract class PopupAutocomplete : AutocompleteBase
 
             autocomplete.RenderOverlay ((Point)autocomplete.LastPopupPos);
         }
+        #nullable restore
     }
 }
