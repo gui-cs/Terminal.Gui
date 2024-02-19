@@ -49,7 +49,7 @@ public static class EscSeqUtils
     /// <summary>
     ///     ESC [ - The CSI (Control Sequence Introducer).
     /// </summary>
-    public static readonly string CSI = $"{KeyEsc}[";
+    public const string CSI = "\u001B[";
 
     /// <summary>
     ///     ESC [ ? 1047 h - Activate xterm alternative buffer (no backscroll)
