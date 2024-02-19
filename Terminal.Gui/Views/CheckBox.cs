@@ -35,7 +35,6 @@ public class CheckBox : View
         //KeyBindings.Add (Key.Enter, Command.Accept);
 
         TitleChanged += Checkbox_TitleChanged;
-        //TextChanged += Label_TextChanged;
     }
 
     private void Checkbox_TitleChanged (object? sender, StateEventArgs<string> e)

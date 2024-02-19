@@ -26,7 +26,6 @@ public class Label : View
         KeyBindings.Add (Key.Space, Command.Accept);
 
         TitleChanged += Label_TitleChanged;
-        //TextChanged += Label_TextChanged;
     }
 
     private void Label_TitleChanged (object sender, StateEventArgs<string> e)

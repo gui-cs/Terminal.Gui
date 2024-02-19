@@ -64,7 +64,6 @@ public class Button : View
         KeyBindings.Add (Key.Enter, Command.HotKey);
 
         TitleChanged += Button_TitleChanged;
-        //TextChanged += Label_TextChanged;
     }
 
     private void Button_TitleChanged (object sender, StateEventArgs<string> e)
