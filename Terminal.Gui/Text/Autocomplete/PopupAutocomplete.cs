@@ -555,7 +555,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
         ManipulatePopup ();
     }
 
-    private class Popup : View
+    private sealed class Popup : View
     {
         private readonly PopupAutocomplete autocomplete;
 
