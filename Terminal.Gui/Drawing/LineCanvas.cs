@@ -82,9 +82,7 @@ public class LineCanvas : IDisposable
 
                 for (var i = 1; i < _lines.Count; i++)
                 {
-                    StraightLine line = _lines [i];
-                    Rect lineBounds = line.Bounds;
-                    bounds = Rect.Union (bounds, lineBounds);
+                    bounds = Rectangle.Union (bounds, _lines [i].Bounds);
                 }
 
                 if (bounds.Width == 0)
