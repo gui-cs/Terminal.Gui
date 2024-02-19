@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+namespace Terminal.Gui;
 
 /// <summary>
 ///     Renders an overlay on another view at a given point that allows selecting from a range of 'autocomplete'
@@ -568,7 +568,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
 
         public override void OnDrawContent (Rect contentArea)
         {
-            if (autocomplete.LastPopupPos is null)
+            if (!autocomplete.LastPopupPos.HasValue)
             {
                 return;
             }
