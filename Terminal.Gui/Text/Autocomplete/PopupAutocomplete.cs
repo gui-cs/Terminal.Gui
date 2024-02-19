@@ -569,14 +569,14 @@ public abstract class PopupAutocomplete : AutocompleteBase
         public override bool MouseEvent (MouseEvent mouseEvent) { return autocomplete.MouseEvent (mouseEvent); }
 
         #nullable enable
-        public override void OnDrawContent (Rect contentArea)
+        public override void OnDrawContent (Rectangle contentArea)
         {
             if (!autocomplete.LastPopupPos.HasValue)
             {
                 return;
             }
 
-            autocomplete.RenderOverlay ((Point)autocomplete.LastPopupPos);
+            autocomplete.RenderOverlay (autocomplete.LastPopupPos.Value);
         }
         #nullable restore
     }
