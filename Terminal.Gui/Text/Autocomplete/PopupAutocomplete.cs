@@ -557,26 +557,26 @@ public abstract class PopupAutocomplete : AutocompleteBase
 
     private sealed class Popup : View
     {
-        private readonly PopupAutocomplete autocomplete;
+        private readonly PopupAutocomplete _autoComplete;
 
-        public Popup (PopupAutocomplete autocomplete)
+        public Popup (PopupAutocomplete autoComplete)
         {
-            this.autocomplete = autocomplete;
+            this._autoComplete = autoComplete;
             CanFocus = true;
             WantMousePositionReports = true;
         }
 
-        public override bool MouseEvent (MouseEvent mouseEvent) { return autocomplete.MouseEvent (mouseEvent); }
+        public override bool MouseEvent (MouseEvent mouseEvent) { return _autoComplete.MouseEvent (mouseEvent); }
 
         #nullable enable
         public override void OnDrawContent (Rectangle contentArea)
         {
-            if (!autocomplete.LastPopupPos.HasValue)
+            if (!_autoComplete.LastPopupPos.HasValue)
             {
                 return;
             }
 
-            autocomplete.RenderOverlay (autocomplete.LastPopupPos.Value);
+            _autoComplete.RenderOverlay (_autoComplete.LastPopupPos.Value);
         }
         #nullable restore
     }
