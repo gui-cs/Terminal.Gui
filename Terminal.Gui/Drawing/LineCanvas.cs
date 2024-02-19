@@ -85,14 +85,13 @@ public class LineCanvas : IDisposable
                     bounds = Rectangle.Union (bounds, _lines [i].Bounds);
                 }
 
-                if (bounds.Width == 0)
+                if (bounds is {Width: 0} or {Height: 0})
                 {
-                    bounds.Width = 1;
-                }
-
-                if (bounds.Height == 0)
-                {
-                    bounds.Height = 1;
+                    bounds = bounds with
+                    {
+                        Width = Math.Clamp (bounds.Width, 1, short.MaxValue),
+                        Height = Math.Clamp (bounds.Height, 1, short.MaxValue)
+                    };
                 }
 
                 _cachedBounds = bounds;
