@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.ComponentModel;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -390,6 +391,32 @@ Item 6",
         Assert.Equal (0, lv.SelectedItem);
     }
 
+    [Fact]
+    public void HotKey_Command_SetsFocus ()
+    {
+        var view = new ListView ();
+
+        view.CanFocus = true;
+        Assert.False (view.HasFocus);
+        view.InvokeCommand (Command.HotKey);
+        Assert.True (view.HasFocus);
+    }
+
+    [Fact]
+    public void HotKey_Command_Does_Not_Accept ()
+    {
+        var listView = new ListView ();
+        var accepted = false;
+
+        listView.Accept += OnAccept;
+        listView.InvokeCommand (Command.HotKey);
+
+        Assert.False (accepted);
+
+        return;
+        void OnAccept (object sender, CancelEventArgs e) { accepted = true; }
+    }
+
     /// <summary>
     ///     Tests that when none of the Commands in a chained keybinding are possible the
     ///     <see cref="View.NewKeyDownEvent"/> returns the appropriate result
@@ -437,7 +464,7 @@ Item 6",
         Assert.False (lv.Source.IsMarked (1));
         Assert.False (lv.Source.IsMarked (2));
 
-        lv.KeyBindings.Add (Key.Space.WithShift, Command.Accept, Command.LineDown);
+        lv.KeyBindings.Add (Key.Space.WithShift, Command.Select, Command.LineDown);
 
         var ev = Key.Space.WithShift;
 

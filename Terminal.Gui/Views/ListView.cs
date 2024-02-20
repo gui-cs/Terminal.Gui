@@ -114,7 +114,7 @@ public class ListView : View
         AddCommand (Command.TopHome, () => MoveHome ());
         AddCommand (Command.BottomEnd, () => MoveEnd ());
         AddCommand (Command.OpenSelectedItem, () => OnOpenSelectedItem ());
-        AddCommand (Command.Accept, () => MarkUnmarkRow ());
+        AddCommand (Command.Select, () => MarkUnmarkRow ());
 
         // Default keybindings for all ListViews
         KeyBindings.Add (Key.CursorUp, Command.LineUp);
@@ -150,7 +150,7 @@ public class ListView : View
 
             if (_allowsMarking)
             {
-                KeyBindings.Add (Key.Space, Command.Accept);
+                KeyBindings.Add (Key.Space, Command.Select);
             }
             else
             {
