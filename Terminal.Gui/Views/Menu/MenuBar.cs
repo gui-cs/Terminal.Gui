@@ -654,46 +654,6 @@ public class MenuBar : View
         SetNeedsDisplay ();
     }
 
-    internal void AltKeyUpHandler (Key key)
-    {
-        if (key.IsShift)
-        {
-            key.Handled = true;
-
-            // User pressed Alt 
-            if (!IsMenuOpen && _openMenu is null && !_openedByAltKey)
-            {
-                // There's no open menu, the first menu item should be highlighted.
-                // The right way to do this is to SetFocus(MenuBar), but for some reason
-                // that faults.
-
-                GetMouseGrabViewInstance (this)?.CleanUp ();
-
-                IsMenuOpen = true;
-                _openedByAltKey = true;
-                _selected = 0;
-                CanFocus = true;
-
-                _lastFocused = SuperView == null
-                                   ? Application.Current.MostFocused
-                                   : SuperView.MostFocused;
-                SetFocus ();
-                SetNeedsDisplay ();
-                Application.GrabMouse (this);
-            }
-            else if (!_openedByHotKey)
-            {
-                // There's an open menu. Close it.
-                CleanUp ();
-            }
-            else
-            {
-                _openedByAltKey = false;
-                _openedByHotKey = false;
-            }
-        }
-    }
-
     internal void CleanUp ()
     {
         _isCleaning = true;

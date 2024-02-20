@@ -767,7 +767,7 @@ public class TextFieldTests
     }
 
     [Fact]
-    public void ProcessKey_Backspace_From_End ()
+    public void Backspace_From_End ()
     {
         var tf = new TextField { Text = "ABC" };
         tf.EnsureFocus ();
@@ -794,7 +794,7 @@ public class TextFieldTests
     }
 
     [Fact]
-    public void ProcessKey_Backspace_From_Middle ()
+    public void Backspace_From_Middle ()
     {
         var tf = new TextField { Text = "ABC" };
         tf.EnsureFocus ();
@@ -917,35 +917,40 @@ public class TextFieldTests
     }
 
     [Fact]
-    [AutoInitShutdown]
-    public void Test_RootKeyEvent_Cancel ()
+    public void KeyDown_Handled_Prevents_Input ()
     {
-        Application.KeyDown += SuppressKey;
-
         var tf = new TextField ();
+        tf.KeyDown += HandleJKey;
 
-        Application.Top.Add (tf);
-        Application.Begin (Application.Top);
-
-        Application.Driver.SendKeys ('A', ConsoleKey.A, false, false, false);
+        tf.NewKeyDownEvent (Key.A);
         Assert.Equal ("a", tf.Text);
 
         // SuppressKey suppresses the 'j' key
-        Application.Driver.SendKeys ('J', ConsoleKey.J, false, false, false);
+        tf.NewKeyDownEvent (Key.J);
         Assert.Equal ("a", tf.Text);
 
-        Application.KeyDown -= SuppressKey;
+        tf.KeyDown -= HandleJKey;
 
         // Now that the delegate has been removed we can type j again
-        Application.Driver.SendKeys ('J', ConsoleKey.J, false, false, false);
+        tf.NewKeyDownEvent (Key.J);
         Assert.Equal ("aj", tf.Text);
+
+        return;
+
+        void HandleJKey (object s, Key arg)
+        {
+            if (arg.AsRune == new Rune ('j'))
+            {
+                arg.Handled = true;
+            }
+        }
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void Test_RootMouseKeyEvent_Cancel ()
+    public void MouseEvent_Handled_Prevents_RightClick ()
     {
-        Application.MouseEvent += SuppressRightClick;
+        Application.MouseEvent += HandleRightClick;
 
         var tf = new TextField { Width = 10 };
         var clickCounter = 0;
@@ -965,7 +970,7 @@ public class TextFieldTests
         Application.OnMouseEvent (new MouseEventEventArgs (mouseEvent));
         Assert.Equal (1, clickCounter);
 
-        Application.MouseEvent -= SuppressRightClick;
+        Application.MouseEvent -= HandleRightClick;
 
         // Get a fresh instance that represents a right click.
         // Should no longer be ignored as the callback was removed
@@ -977,13 +982,23 @@ public class TextFieldTests
         // Which is correct, because the user did NOT click with the left mouse button.
         Application.OnMouseEvent (new MouseEventEventArgs (mouseEvent));
         Assert.Equal (1, clickCounter);
+
+        return;
+
+        void HandleRightClick (object sender, MouseEventEventArgs arg)
+        {
+            if (arg.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
+            {
+                arg.Handled = true;
+            }
+        }
     }
 
     [InlineData ("a")] // Lower than selection
     [InlineData ("aaaaaaaaaaa")] // Greater than selection
     [InlineData ("aaaa")] // Equal than selection
     [Theory]
-    public void TestSetTextAndMoveCursorToEnd_WhenExistingSelection (string newText)
+    public void SetTextAndMoveCursorToEnd_WhenExistingSelection (string newText)
     {
         var tf = new TextField ();
         tf.Text = "fish";
@@ -1053,7 +1068,7 @@ public class TextFieldTests
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void TextField_SpaceHandling ()
+    public void SpaceHandling ()
     {
         var tf = new TextField { Width = 10, Text = " " };
 
@@ -1778,22 +1793,6 @@ Les Miśerables",
         Assert.Same (tf, top.Focused);
 
         return tf;
-    }
-
-    private void SuppressKey (object s, Key arg)
-    {
-        if (arg.AsRune == new Rune ('j'))
-        {
-            arg.Handled = true;
-        }
-    }
-
-    private void SuppressRightClick (object sender, MouseEventEventArgs arg)
-    {
-        if (arg.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
-        {
-            arg.Handled = true;
-        }
     }
 
     // This class enables test functions annotated with the [InitShutdown] attribute
