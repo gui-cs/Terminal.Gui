@@ -154,7 +154,7 @@ public class ListView : View
             }
             else
             {
-                KeyBindings.Remove (KeyCode.Space);
+                KeyBindings.Remove (Key.Space);
             }
 
             SetNeedsDisplay ();
