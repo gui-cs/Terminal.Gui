@@ -272,15 +272,8 @@ public class TreeView<T> : View, ITreeView where T : class
                     }
                    );
 
-        AddCommand (
-                    Command.Select,
-                    () =>
-                    {
-                        ActivateSelectedObjectIfAny ();
-
-                        return true;
-                    }
-                   );
+        AddCommand (Command.Select, ActivateSelectedObjectIfAny);
+        AddCommand (Command.Accept, ActivateSelectedObjectIfAny);
 
         // Default keybindings for this view
         KeyBindings.Add (Key.PageUp, Command.PageUp);
@@ -459,15 +452,25 @@ public class TreeView<T> : View, ITreeView where T : class
     ///     <para>Triggers the <see cref="ObjectActivated"/> event with the <see cref="SelectedObject"/>.</para>
     ///     <para>This method also ensures that the selected object is visible.</para>
     /// </summary>
-    public void ActivateSelectedObjectIfAny ()
+    /// <returns><see langword="true"/> if <see cref="ObjectActivated"/> was fired.</returns>
+    public bool? ActivateSelectedObjectIfAny ()
     {
+        if (OnAccept () == true)
+        {
+            return false;
+        }
+
         T o = SelectedObject;
 
         if (o is { })
         {
-            OnObjectActivated (new ObjectActivatedEventArgs<T> (this, o));
+            // TODO: Should this be cancelable?
+            ObjectActivatedEventArgs<T> e = new (this, o);
+            OnObjectActivated (e);
             PositionCursor ();
+            return true;
         }
+        return false;
     }
 
     /// <summary>Adds a new root level object unless it is already a root of the tree.</summary>
