@@ -20,7 +20,7 @@ public class Label : View
 
         // Things this view knows how to do
         AddCommand (Command.HotKey, FocusNext);
-        AddCommand (Command.Accept, AcceptKey);
+        AddCommand (Command.Accept, OnAccept);
 
         // Default key bindings for this view
         KeyBindings.Add (Key.Space, Command.Accept);
@@ -58,19 +58,6 @@ public class Label : View
 
         return true;
     }
-
-    /// <summary>
-    ///     The event fired when the user clicks the primary mouse button within the Bounds of this <see cref="View"/> or
-    ///     if the user presses the action key while this view is focused. (TODO: IsDefault)
-    /// </summary>
-    /// <remarks>
-    ///     Client code can hook up to this event, it is raised when the button is activated either with the mouse or the
-    ///     keyboard.
-    /// </remarks>
-    public event EventHandler Clicked;
-
-    /// <summary>Virtual method to invoke the <see cref="Clicked"/> event.</summary>
-    public virtual void OnClicked () { Clicked?.Invoke (this, EventArgs.Empty); }
 
     /// <inheritdoc/>
     public override bool OnEnter (View view)
@@ -115,23 +102,11 @@ public class Label : View
                 SetNeedsDisplay ();
             }
 
-            OnClicked ();
+            OnAccept ();
 
             return true;
         }
 
         return false;
-    }
-
-    private bool? AcceptKey ()
-    {
-        if (!HasFocus)
-        {
-            SetFocus ();
-        }
-
-        OnClicked ();
-
-        return true;
     }
 }

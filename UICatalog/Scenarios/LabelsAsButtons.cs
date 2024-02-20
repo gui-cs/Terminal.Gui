@@ -29,7 +29,7 @@ public class LabelsAsLabels : Scenario
             CanFocus = true,
             Text = "_Quit"
         };
-        defaultLabel.Clicked += (s, e) => Application.RequestStop ();
+        defaultLabel.Accept += (s, e) => Application.RequestStop ();
         Win.Add (defaultLabel);
 
         var swapLabel = new Label
@@ -37,20 +37,20 @@ public class LabelsAsLabels : Scenario
             X = 50, HotKeySpecifier = (Rune)'_', CanFocus = true, Text = "S_wap Default (Absolute Layout)"
         };
 
-        swapLabel.Clicked += (s, e) =>
-                             {
-                                 //defaultLabel.IsDefault = !defaultLabel.IsDefault;
-                                 //swapLabel.IsDefault = !swapLabel.IsDefault;
-                             };
+        swapLabel.Accept += (s, e) =>
+                            {
+                                //defaultLabel.IsDefault = !defaultLabel.IsDefault;
+                                //swapLabel.IsDefault = !swapLabel.IsDefault;
+                            };
         Win.Add (swapLabel);
 
         static void DoMessage (Label Label, string txt)
         {
-            Label.Clicked += (s, e) =>
-                             {
-                                 string btnText = Label.Text;
-                                 MessageBox.Query ("Message", $"Did you click {txt}?", "Yes", "No");
-                             };
+            Label.Accept += (s, e) =>
+                            {
+                                string btnText = Label.Text;
+                                MessageBox.Query ("Message", $"Did you click {txt}?", "Yes", "No");
+                            };
         }
 
         var colorLabelsLabel = new Label { X = 0, Y = Pos.Bottom (editLabel) + 1, Text = "Color Labels:" };
@@ -105,7 +105,7 @@ public class LabelsAsLabels : Scenario
                      Text = "a Newline\nin the Label"
                  }
                 );
-        Label.Clicked += (s, e) => MessageBox.Query ("Message", "Question?", "Yes", "No");
+        Label.Accept += (s, e) => MessageBox.Query ("Message", "Question?", "Yes", "No");
 
         var textChanger = new Label
         {
@@ -116,7 +116,7 @@ public class LabelsAsLabels : Scenario
             Text = "Te_xt Changer"
         };
         Win.Add (textChanger);
-        textChanger.Clicked += (s, e) => textChanger.Text += "!";
+        textChanger.Accept += (s, e) => textChanger.Text += "!";
 
         Win.Add (
                  Label = new Label
@@ -141,14 +141,14 @@ public class LabelsAsLabels : Scenario
         Win.Add (removeLabel);
 
         // This in interesting test case because `moveBtn` and below are laid out relative to this one!
-        removeLabel.Clicked += (s, e) =>
-                               {
-                                   // Now this throw a InvalidOperationException on the TopologicalSort method as is expected.
-                                   //Win.Remove (removeLabel);
+        removeLabel.Accept += (s, e) =>
+                              {
+                                  // Now this throw a InvalidOperationException on the TopologicalSort method as is expected.
+                                  //Win.Remove (removeLabel);
 
-                                   removeLabel.Visible = false;
-                                   Win.SetNeedsDisplay ();
-                               };
+                                  removeLabel.Visible = false;
+                                  Win.SetNeedsDisplay ();
+                              };
 
         var computedFrame = new FrameView
         {
@@ -173,13 +173,13 @@ public class LabelsAsLabels : Scenario
             Text = "Move This \u263b Label _via Pos"
         };
 
-        moveBtn.Clicked += (s, e) =>
-                           {
-                               moveBtn.X = moveBtn.Frame.X + 5;
+        moveBtn.Accept += (s, e) =>
+                          {
+                              moveBtn.X = moveBtn.Frame.X + 5;
 
-                               // This is already fixed with the call to SetNeedDisplay() in the Pos Dim.
-                               //computedFrame.LayoutSubviews (); // BUGBUG: This call should not be needed. View.X is not causing relayout correctly
-                           };
+                              // This is already fixed with the call to SetNeedDisplay() in the Pos Dim.
+                              //computedFrame.LayoutSubviews (); // BUGBUG: This call should not be needed. View.X is not causing relayout correctly
+                          };
         computedFrame.Add (moveBtn);
 
         // Demonstrates how changing the View.Frame property can SIZE Views (#583)
@@ -195,12 +195,12 @@ public class LabelsAsLabels : Scenario
             Text = "Size This \u263a Label _via Pos"
         };
 
-        sizeBtn.Clicked += (s, e) =>
-                           {
-                               sizeBtn.Width = sizeBtn.Frame.Width + 5;
+        sizeBtn.Accept += (s, e) =>
+                          {
+                              sizeBtn.Width = sizeBtn.Frame.Width + 5;
 
-                               //computedFrame.LayoutSubviews (); // FIXED: This call should not be needed. View.X is not causing relayout correctly
-                           };
+                              //computedFrame.LayoutSubviews (); // FIXED: This call should not be needed. View.X is not causing relayout correctly
+                          };
         computedFrame.Add (sizeBtn);
 
         var absoluteFrame = new FrameView
@@ -222,15 +222,15 @@ public class LabelsAsLabels : Scenario
             Text = "Move This Label via Frame"
         };
 
-        moveBtnA.Clicked += (s, e) =>
-                            {
-                                moveBtnA.Frame = new Rect (
-                                                           moveBtnA.Frame.X + 5,
-                                                           moveBtnA.Frame.Y,
-                                                           moveBtnA.Frame.Width,
-                                                           moveBtnA.Frame.Height
-                                                          );
-                            };
+        moveBtnA.Accept += (s, e) =>
+                           {
+                               moveBtnA.Frame = new Rect (
+                                                          moveBtnA.Frame.X + 5,
+                                                          moveBtnA.Frame.Y,
+                                                          moveBtnA.Frame.Width,
+                                                          moveBtnA.Frame.Height
+                                                         );
+                           };
         absoluteFrame.Add (moveBtnA);
 
         // Demonstrates how changing the View.Frame property can SIZE Views (#583)
@@ -244,15 +244,15 @@ public class LabelsAsLabels : Scenario
             Text = " ~  s  gui.cs   master ↑10 = Со_хранить"
         };
 
-        sizeBtnA.Clicked += (s, e) =>
-                            {
-                                sizeBtnA.Frame = new Rect (
-                                                           sizeBtnA.Frame.X,
-                                                           sizeBtnA.Frame.Y,
-                                                           sizeBtnA.Frame.Width + 5,
-                                                           sizeBtnA.Frame.Height
-                                                          );
-                            };
+        sizeBtnA.Accept += (s, e) =>
+                           {
+                               sizeBtnA.Frame = new Rect (
+                                                          sizeBtnA.Frame.X,
+                                                          sizeBtnA.Frame.Y,
+                                                          sizeBtnA.Frame.Width + 5,
+                                                          sizeBtnA.Frame.Height
+                                                         );
+                           };
         absoluteFrame.Add (sizeBtnA);
 
         var label = new Label
@@ -319,7 +319,7 @@ public class LabelsAsLabels : Scenario
             CanFocus = true,
             Text = mhkb
         };
-        moveHotKeyBtn.Clicked += (s, e) => { moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text); };
+        moveHotKeyBtn.Accept += (s, e) => { moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text); };
         Win.Add (moveHotKeyBtn);
 
         var muhkb = " ~  s  gui.cs   master ↑10 = Сохранить";
@@ -335,7 +335,7 @@ public class LabelsAsLabels : Scenario
             CanFocus = true,
             Text = muhkb
         };
-        moveUnicodeHotKeyBtn.Clicked += (s, e) => { moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text); };
+        moveUnicodeHotKeyBtn.Accept += (s, e) => { moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text); };
         Win.Add (moveUnicodeHotKeyBtn);
 
         radioGroup.SelectedItemChanged += (s, args) =>
