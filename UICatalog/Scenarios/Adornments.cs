@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Terminal.Gui;
 
@@ -187,37 +188,41 @@ public class Adornments : Scenario
             var editWidth = 3;
 
             _topEdit = new TextField { X = Pos.Center (), Y = 0, Width = editWidth };
-            _topEdit.TextChanging += Edit_TextChanging;
+
+            _topEdit.Accept += Edit_Accept;
             Add (_topEdit);
 
             _leftEdit = new TextField
             {
                 X = Pos.Left (_topEdit) - editWidth, Y = Pos.Bottom (_topEdit), Width = editWidth
             };
-            _leftEdit.TextChanging += Edit_TextChanging;
+
+            _leftEdit.Accept += Edit_Accept;
             Add (_leftEdit);
 
             _rightEdit = new TextField { X = Pos.Right (_topEdit), Y = Pos.Bottom (_topEdit), Width = editWidth };
-            _rightEdit.TextChanging += Edit_TextChanging;
+
+            _rightEdit.Accept += Edit_Accept;
             Add (_rightEdit);
 
             _bottomEdit = new TextField { X = Pos.Center (), Y = Pos.Bottom (_leftEdit), Width = editWidth };
-            _bottomEdit.TextChanging += Edit_TextChanging;
+
+            _bottomEdit.Accept += Edit_Accept;
             Add (_bottomEdit);
 
             var copyTop = new Button { X = Pos.Center () + 1, Y = Pos.Bottom (_bottomEdit), Text = "Cop_y Top" };
 
             copyTop.Accept += (s, e) =>
-                               {
-                                   Thickness = new Thickness (Thickness.Top);
+                              {
+                                  Thickness = new Thickness (Thickness.Top);
 
-                                   if (string.IsNullOrEmpty (_topEdit.Text))
-                                   {
-                                       _topEdit.Text = "0";
-                                   }
+                                  if (string.IsNullOrEmpty (_topEdit.Text))
+                                  {
+                                      _topEdit.Text = "0";
+                                  }
 
-                                   _bottomEdit.Text = _leftEdit.Text = _rightEdit.Text = _topEdit.Text;
-                               };
+                                  _bottomEdit.Text = _leftEdit.Text = _rightEdit.Text = _topEdit.Text;
+                              };
             Add (copyTop);
 
             // Foreground ColorPicker.
@@ -258,67 +263,17 @@ public class Adornments : Scenario
             LayoutSubviews ();
             Height = GetAdornmentsThickness ().Vertical + 4 + 4;
             Width = GetAdornmentsThickness ().Horizontal + _foregroundColorPicker.Frame.Width * 2 - 3;
+
+
         }
 
-        private void Edit_TextChanging (object sender, StateEventArgs<string> e)
+        private void Edit_Accept (object sender, CancelEventArgs e)
         {
-            try
-            {
-                if (string.IsNullOrEmpty (e.NewValue))
-                {
-                    e.Cancel = true;
-                    ((TextField)sender).Text = "0";
-
-                    return;
-                }
-
-                switch (sender.ToString ())
-                {
-                    case var s when s == _topEdit.ToString ():
-                        Thickness = new Thickness (
-                                                   Thickness.Left,
-                                                   int.Parse (e.NewValue),
-                                                   Thickness.Right,
-                                                   Thickness.Bottom
-                                                  );
-
-                        break;
-                    case var s when s == _leftEdit.ToString ():
-                        Thickness = new Thickness (
-                                                   int.Parse (e.NewValue),
-                                                   Thickness.Top,
-                                                   Thickness.Right,
-                                                   Thickness.Bottom
-                                                  );
-
-                        break;
-                    case var s when s == _rightEdit.ToString ():
-                        Thickness = new Thickness (
-                                                   Thickness.Left,
-                                                   Thickness.Top,
-                                                   int.Parse (e.NewValue),
-                                                   Thickness.Bottom
-                                                  );
-
-                        break;
-                    case var s when s == _bottomEdit.ToString ():
-                        Thickness = new Thickness (
-                                                   Thickness.Left,
-                                                   Thickness.Top,
-                                                   Thickness.Right,
-                                                   int.Parse (e.NewValue)
-                                                  );
-
-                        break;
-                }
-            }
-            catch
-            {
-                if (!string.IsNullOrEmpty (e.NewValue))
-                {
-                    e.Cancel = true;
-                }
-            }
+            e.Cancel = true;
+            Thickness = new Thickness(int.Parse(_leftEdit.Text),
+                                      int.Parse(_topEdit.Text),
+                                      int.Parse (_rightEdit.Text),
+                                      int.Parse (_bottomEdit.Text));
         }
     }
 

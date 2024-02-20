@@ -341,6 +341,10 @@ public class TextField : View
                     }
                    );
 
+        // OnAccept returns true if the event is canceled. By Default
+        // Pressing ENTER should be ignored (Invoke(Command.Accept) should return false).
+        AddCommand (Command.Accept, () => OnAccept() != true);
+
         // Default keybindings for this view
         // We follow this as closely as possible: https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
         KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
@@ -421,6 +425,7 @@ public class TextField : View
         ContextMenu.KeyChanged += ContextMenu_KeyChanged;
 
         KeyBindings.Add (ContextMenu.Key, KeyBindingScope.HotKey, Command.ShowContextMenu);
+        KeyBindings.Add (Key.Enter, Command.Accept);
     }
 
     /// <summary>

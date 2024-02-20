@@ -1,6 +1,8 @@
-﻿using System.Globalization;
+﻿using System.ComponentModel;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
+using CsvHelper;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -741,6 +743,77 @@ public class TextFieldTests
         Assert.Equal ("to jump between text fields", tf.SelectedText);
         Assert.True (tf.NewKeyDownEvent (Key.D.WithCtrl.WithShift));
         Assert.Equal ("", tf.Text);
+    }
+
+
+    [Fact]
+    public void HotKey_Command_SetsFocus ()
+    {
+        var view = new TextField ();
+
+        view.CanFocus = true;
+        Assert.False (view.HasFocus);
+        view.InvokeCommand (Command.HotKey);
+        Assert.True (view.HasFocus);
+    }
+
+    [Fact]
+    public void HotKey_Command_Does_Not_Accept ()
+    {
+        var view = new TextField ();
+        var accepted = false;
+        view.Accept += OnAccept;
+        view.InvokeCommand (Command.HotKey);
+
+        Assert.False (accepted);
+
+        return;
+        void OnAccept (object sender, CancelEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void Accept_Command_Fires_Accept ()
+    {
+        var view = new TextField ();
+
+        var accepted = false;
+        view.Accept += Accept;
+        view.InvokeCommand (Command.Accept);
+        Assert.True (accepted);
+
+        return;
+
+        void Accept (object sender, CancelEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void Accept_Cancel_Event_HandlesCommand ()
+    {
+        //var super = new View ();
+        var view = new TextField ();
+        //super.Add (view);
+
+        //var superAcceptedInvoked = false;
+
+        var tfAcceptedInvoked = false;
+        var cancel = false;
+        view.Accept += TextViewAccept;
+        Assert.True (view.InvokeCommand (Command.Accept));
+        Assert.True (tfAcceptedInvoked);
+
+        tfAcceptedInvoked = false;
+        cancel = true;
+        view.Accept += TextViewAccept;
+        Assert.False (view.InvokeCommand (Command.Accept));
+        Assert.True (tfAcceptedInvoked);
+
+        return;
+
+        void TextViewAccept (object sender, CancelEventArgs e)
+        {
+            tfAcceptedInvoked = true;
+            e.Cancel = cancel;
+        }
     }
 
     [Fact]

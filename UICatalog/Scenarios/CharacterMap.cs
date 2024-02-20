@@ -3,6 +3,7 @@
 //#define BASE_DRAW_CONTENT
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
@@ -64,8 +65,18 @@ public class CharacterMap : Scenario
         };
         Application.Top.Add (_errorLabel);
 
+#if TEXT_CHANGED_TO_JUMP
         jumpEdit.TextChanged += JumpEdit_TextChanged;
+#else
+        jumpEdit.Accept += JumpEditOnAccept;
 
+        void JumpEditOnAccept (object sender, CancelEventArgs e)
+        {
+            JumpEdit_TextChanged (sender, new StateEventArgs<string> (jumpEdit.Text, jumpEdit.Text));
+            // Cancel the event to prevent ENTER from being handled elsewhere
+            e.Cancel = true;
+        }
+#endif
         _categoryList = new TableView { X = Pos.Right (_charMap), Y = Pos.Bottom (jumpLabel), Height = Dim.Fill () };
 
         _categoryList.FullRowSelect = true;
