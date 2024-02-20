@@ -192,30 +192,7 @@ public class Border : Adornment
 
         Driver.Clip = savedClip;
     }
-
-    ///// <summary>Draws the title for a Window-style view.</summary>
-    ///// <param name="region">Screen relative region where the title will be drawn.</param>
-    ///// <param name="title">The title.</param>
-    //public void DrawTitle (Rect region, string title)
-    //{
-    //    int width = region.Width;
-
-    //    if (!string.IsNullOrEmpty (title))
-    //    {
-    //        //Driver.Move (region.X + 2, region.Y);
-
-    //        ////Driver.AddRune (' ');
-    //        //string str = title.EnumerateRunes ().Sum (r => Math.Max (r.GetColumns (), 1)) >= width
-    //        //                 ? TextFormatter.Format (title, width, false, false) [0]
-    //        //                 : title;
-    //        //Driver.AddStr (str);
-
-    //        Parent.TitleTextFormatter.Draw (region, Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor (),
-    //                            Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetHotNormalColor (),
-    //                            region);
-    //    }
-    //}
-
+    
     /// <inheritdoc/>
     public override void OnDrawContent (Rect contentArea)
     {
