@@ -686,6 +686,25 @@ public class ButtonTests
     }
 
     [Fact]
+    public void Accept_Cancel_Event_OnAccept_Returns_True ()
+    {
+        var button = new Button ();
+        var acceptInvoked = false;
+
+        button.Accept += ButtonAccept;
+
+        var ret = button.OnAccept ();
+        Assert.True (ret);
+        Assert.True (acceptInvoked);
+
+        return;
+        void ButtonAccept (object sender, CancelEventArgs e)
+        {
+            acceptInvoked = true;
+            e.Cancel = true;
+        }
+    }
+    [Fact]
     public void Setting_Empty_Text_Sets_HoKey_To_KeyNull ()
     {
         var super = new View ();
