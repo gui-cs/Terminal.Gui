@@ -16,7 +16,6 @@ public class RadioGroup : View
     /// </summary>
     public RadioGroup ()
     {
-        HotKeySpecifier = new Rune ('_');
         CanFocus = true;
 
         // Things this view knows how to do
@@ -65,8 +64,7 @@ public class RadioGroup : View
                     () =>
                     {
                         SelectItem ();
-
-                        return true;
+                        return !OnAccept ();
                     }
                    );
 
@@ -316,8 +314,6 @@ public class RadioGroup : View
                     && key.NoAlt.NoCtrl.NoShift == hotKey)
                 {
                     SelectedItem = i;
-                    //keyEvent.Scope = KeyBindingScope.HotKey;
-
                     break;
                 }
             }
@@ -343,6 +339,7 @@ public class RadioGroup : View
         return args.Cancel;
     }
 
+    // TODO: This should be cancelable
     /// <summary>Called whenever the current selected item changes. Invokes the <see cref="SelectedItemChanged"/> event.</summary>
     /// <param name="selectedItem"></param>
     /// <param name="previousSelectedItem"></param>
@@ -377,6 +374,7 @@ public class RadioGroup : View
     /// <summary>Allow to invoke the <see cref="SelectedItemChanged"/> after their creation.</summary>
     public void Refresh () { OnSelectedItemChanged (_selected, -1); }
 
+    // TODO: This should use StateEventArgs<int> and should be cancelable.
     /// <summary>Invoked when the selected radio label has changed.</summary>
     public event EventHandler<SelectedItemChangedArgs> SelectedItemChanged;
 

@@ -32,7 +32,6 @@ public class CheckBox : View
 
         // Default keybindings for this view
         KeyBindings.Add (Key.Space, Command.Accept);
-        //KeyBindings.Add (Key.Enter, Command.Accept);
 
         TitleChanged += Checkbox_TitleChanged;
     }

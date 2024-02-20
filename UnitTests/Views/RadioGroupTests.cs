@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using System.ComponentModel;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
@@ -62,14 +63,14 @@ public class RadioGroupTests
     public void KeyBindings_Are_Added_Correctly ()
     {
         var rg = new RadioGroup { RadioLabels = new [] { "_Left", "_Right" } };
-        Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L));
-        Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.R));
+        Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.L));
+        Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.R));
 
-        Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.ShiftMask));
-        Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.AltMask));
+        Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.L.WithShift));
+        Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.L.WithAlt));
 
-        Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.R | KeyCode.ShiftMask));
-        Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.R | KeyCode.AltMask));
+        Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.R.WithShift));
+        Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.R.WithAlt));
     }
 
     [Fact]
@@ -86,7 +87,7 @@ public class RadioGroupTests
     }
 
     [Fact]
-    public void KeyBindings_HotKeys ()
+    public void HotKeys_Select_RadioLabels ()
     {
         var rg = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
         Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L));
@@ -131,6 +132,36 @@ public class RadioGroupTests
         Assert.Equal (3, rg.SelectedItem);
         Assert.True (superView.NewKeyDownEvent (Key.R.WithAlt));
         Assert.Equal (1, rg.SelectedItem);
+    }
+
+    [Fact]
+    public void HotKey_Command_Does_Not_Accept ()
+    {
+        var group = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
+        var accepted = false;
+
+        group.Accept += OnAccept;
+        group.InvokeCommand (Command.HotKey);
+
+        Assert.False (accepted);
+
+        return;
+        void OnAccept (object sender, CancelEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void Accept_Command_Fires_Accept ()
+    {
+        var group = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
+        var accepted = false;
+
+        group.Accept += OnAccept;
+        group.InvokeCommand (Command.Accept);
+
+        Assert.True (accepted);
+
+        return;
+        void OnAccept (object sender, CancelEventArgs e) { accepted = true; }
     }
 
     [Fact]
