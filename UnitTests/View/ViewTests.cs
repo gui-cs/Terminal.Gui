@@ -703,52 +703,19 @@ At 0,0
         var view = new View { Frame = rect };
     }
 
-    [Theory]
-    [TestRespondersDisposed]
-    [InlineData (1)]
-    [InlineData (2)]
-    [InlineData (3)]
-    public void LabelChangeText_RendersCorrectly_Constructors (int choice)
+    [Fact]
+    [SetupFakeDriver]
+    public void SetText_RendersCorrectly ()
     {
-        var driver = new FakeDriver ();
-        Application.Init (driver);
+        View view;
+        var text = "test";
 
-        try
-        {
-            // Create a label with a short text 
-            Label lbl;
-            var text = "test";
+        view = new Label { Text = text };
+        view.BeginInit ();
+        view.EndInit ();
+        view.Draw ();
 
-            if (choice == 1)
-            {
-                // An object initializer should call the default constructor.
-                lbl = new Label { Text = text };
-            }
-            else if (choice == 2)
-            {
-                // Calling the default constructor followed by the object initializer.
-                lbl = new Label { Text = text };
-            }
-            else
-            {
-                // Calling the Text constructor.
-                lbl = new Label { Text = text };
-            }
-
-            Application.Top.Add (lbl);
-            Application.Begin (Application.Top);
-
-            // should have the initial text
-            Assert.Equal ((Rune)'t', driver.Contents [0, 0].Rune);
-            Assert.Equal ((Rune)'e', driver.Contents [0, 1].Rune);
-            Assert.Equal ((Rune)'s', driver.Contents [0, 2].Rune);
-            Assert.Equal ((Rune)'t', driver.Contents [0, 3].Rune);
-            Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-        }
-        finally
-        {
-            Application.Shutdown ();
-        }
+        TestHelpers.AssertDriverContentsWithFrameAre ( text, _output);
     }
 
     [Fact]
@@ -841,11 +808,11 @@ At 0,0
         // BUGBUG: IsInitialized must be true to process calculation
         r.BeginInit ();
         r.EndInit ();
-    #if DEBUG
+#if DEBUG
         Assert.Equal ("View(Vertical View)(0,0,1,13)", r.ToString ());
-    #else
+#else
         Assert.Equal ("View()(0,0,1,13)", r.ToString ());
-    #endif
+#endif
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
         Assert.Equal (new Rect (0, 0, 1, 13), r.Bounds);
@@ -853,11 +820,11 @@ At 0,0
         Assert.Null (r.Focused);
         Assert.Null (r.ColorScheme);
         Assert.False (r.IsCurrentTop);
-    #if DEBUG
+#if DEBUG
         Assert.Equal ("Vertical View", r.Id);
-    #else
+#else
         Assert.Equal (string.Empty, r.Id);
-    #endif
+#endif
         Assert.Empty (r.Subviews);
         Assert.False (r.WantContinuousButtonPressed);
         Assert.False (r.WantMousePositionReports);
