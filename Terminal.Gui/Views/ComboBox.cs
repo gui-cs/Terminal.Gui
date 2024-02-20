@@ -6,6 +6,7 @@
 //
 
 using System.Collections;
+using System.ComponentModel;
 
 namespace Terminal.Gui;
 
@@ -30,6 +31,7 @@ public class ComboBox : View
         _listview = new ComboListView (this, HideDropdownListOnClick) { CanFocus = true, TabStop = false };
 
         _search.TextChanged += Search_Changed;
+        _search.Accept += Search_Accept;
 
         _listview.Y = Pos.Bottom (_search);
         _listview.OpenSelectedItem += (sender, a) => Selected ();
@@ -650,6 +652,9 @@ public class ComboBox : View
 
         SetSearchSet ();
     }
+
+    // Tell TextField to handle Accept Command (Enter)
+    void Search_Accept (object sender, CancelEventArgs e) { e.Cancel = true; }
 
     private void Search_Changed (object sender, StateEventArgs<string> e)
     {
