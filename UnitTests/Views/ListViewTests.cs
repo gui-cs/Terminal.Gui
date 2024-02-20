@@ -417,6 +417,72 @@ Item 6",
         void OnAccept (object sender, CancelEventArgs e) { accepted = true; }
     }
 
+
+    [Fact]
+    public void Accept_Command_Accepts_and_Opens_Selected_Item ()
+    {
+        List<string> source = ["One", "Two", "Three"];
+        var listView = new ListView {Source = new ListWrapper (source) };
+        listView.SelectedItem = 0;
+
+        var accepted = false;
+        var opened = false;
+        string selectedValue = string.Empty;
+
+        listView.Accept += Accept;
+        listView.OpenSelectedItem += OpenSelectedItem;
+
+        listView.InvokeCommand (Command.Accept);
+
+        Assert.True (accepted);
+        Assert.True (opened);
+        Assert.Equal (source [0], selectedValue);
+
+        return;
+
+        void OpenSelectedItem (object sender, ListViewItemEventArgs e)
+        {
+            opened = true;
+            selectedValue = e.Value.ToString ();
+        }
+        void Accept (object sender, CancelEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void Accept_Cancel_Event_Prevents_OpenSelectedItem ()
+    {
+        List<string> source = ["One", "Two", "Three"];
+        var listView = new ListView { Source = new ListWrapper (source) };
+        listView.SelectedItem = 0;
+
+        var accepted = false;
+        var opened = false;
+        string selectedValue = string.Empty;
+
+        listView.Accept += Accept;
+        listView.OpenSelectedItem += OpenSelectedItem;
+
+        listView.InvokeCommand (Command.Accept);
+
+        Assert.True (accepted);
+        Assert.False (opened);
+        Assert.Equal (string.Empty, selectedValue);
+
+        return;
+
+        void OpenSelectedItem (object sender, ListViewItemEventArgs e)
+        {
+            opened = true;
+            selectedValue = e.Value.ToString ();
+        }
+
+        void Accept (object sender, CancelEventArgs e)
+        {
+            accepted = true;
+            e.Cancel = true;
+        }
+    }
+
     /// <summary>
     ///     Tests that when none of the Commands in a chained keybinding are possible the
     ///     <see cref="View.NewKeyDownEvent"/> returns the appropriate result

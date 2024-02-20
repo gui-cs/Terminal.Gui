@@ -113,6 +113,7 @@ public class ListView : View
         AddCommand (Command.PageDown, () => MovePageDown ());
         AddCommand (Command.TopHome, () => MoveHome ());
         AddCommand (Command.BottomEnd, () => MoveEnd ());
+        AddCommand (Command.Accept, () => OnOpenSelectedItem ());
         AddCommand (Command.OpenSelectedItem, () => OnOpenSelectedItem ());
         AddCommand (Command.Select, () => MarkUnmarkRow ());
 
@@ -691,9 +692,10 @@ public class ListView : View
         return base.OnEnter (view);
     }
 
+    // TODO: This should be cancelable
     /// <summary>Invokes the <see cref="OpenSelectedItem"/> event if it is defined.</summary>
-    /// <returns></returns>
-    public virtual bool OnOpenSelectedItem ()
+    /// <returns><see langword="true"/> if the <see cref="OpenSelectedItem"/> event was fired.</returns>
+    public bool OnOpenSelectedItem ()
     {
         if (_source.Count <= _selected || _selected < 0 || OpenSelectedItem is null)
         {
@@ -702,8 +704,12 @@ public class ListView : View
 
         object value = _source.ToList () [_selected];
 
-        OpenSelectedItem?.Invoke (this, new ListViewItemEventArgs (_selected, value));
+        if (OnAccept () == true)
+        {
+            return false;
+        }
 
+        OpenSelectedItem?.Invoke (this, new ListViewItemEventArgs (_selected, value));
         return true;
     }
 
