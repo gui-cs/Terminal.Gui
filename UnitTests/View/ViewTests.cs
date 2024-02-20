@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.ComponentModel;
+using System.Text;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
@@ -1155,4 +1156,23 @@ At 0,0
             return true;
         }
     }
+
+    // OnAccept/Accept tests
+
+    // OnAccept fires Accept event
+    [Fact]
+    public void OnAccept_Fires_Accept ()
+    {
+        var view = new View ();
+        var accepted = false;
+
+        view.Accept += ViewOnAccept;
+
+        view.OnAccept ();
+        Assert.True (accepted);
+
+        return;
+        void ViewOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+    }
+
 }
