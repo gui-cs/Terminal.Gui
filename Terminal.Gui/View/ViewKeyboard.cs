@@ -7,7 +7,7 @@ public partial class View
     private void AddCommands ()
     {
         // By default, the HotKey command sets the focus
-        AddCommand (Command.HotKey, OnDefaultCommand);
+        AddCommand (Command.HotKey, OnHotKey);
 
         // By default, the Accept command raises the Accept event
         AddCommand (Command.Accept, OnAccept);
@@ -16,32 +16,19 @@ public partial class View
     #region HotKey Support
 
     /// <summary>
-    /// Cancelable event fired when the HotKey command (<see cref="Command.HotKey"/>) is invoked. Set <see cref="CancelEventArgs.Cancel"/>
-    /// to cancel the event.
-    /// </summary>
-    public event EventHandler<CancelEventArgs> DefaultCommand;
-
-    /// <summary>
-    /// Called when the HotKey command (<see cref="Command.HotKey"/>) is invoked. Fires the <see cref="DefaultCommand"/>
-    /// event. Causes this view to be focused.
+    /// Called when the HotKey command (<see cref="Command.HotKey"/>) is invoked. Causes this view to be focused.
     /// </summary>
     /// <returns>If <see langword="true"/> the command was canceled.</returns>
-    public bool? OnDefaultCommand ()
+    private bool? OnHotKey ()
     {
-        var args = new CancelEventArgs ();
-        DefaultCommand?.Invoke (this, args);
-        if (args.Cancel)
+        if (CanFocus)
         {
-            return args.Cancel;
+            SetFocus ();
+
+            return true;
         }
 
-        if (!CanFocus)
-        {
-            return false;
-        }
-
-        SetFocus ();
-        return true;
+        return false;
     }
 
     /// <summary>
