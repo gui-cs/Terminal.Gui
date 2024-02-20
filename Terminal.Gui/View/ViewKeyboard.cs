@@ -41,7 +41,7 @@ public partial class View
     /// Called when the <see cref="Command.Accept"/> command is invoked. Fires the <see cref="Accept"/>
     /// event.
     /// </summary>
-    /// <returns>If <see langword="true"/> the command was canceled.</returns>
+    /// <returns>If <see langword="true"/> the event was canceled.</returns>
     public bool? OnAccept ()
     {
         var args = new CancelEventArgs ();

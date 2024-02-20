@@ -20,7 +20,6 @@ public class Label : View
 
         // Things this view knows how to do
         AddCommand (Command.HotKey, FocusNext);
-        AddCommand (Command.Accept, OnAccept);
 
         // Default key bindings for this view
         KeyBindings.Add (Key.Space, Command.Accept);

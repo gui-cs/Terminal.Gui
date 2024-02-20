@@ -27,8 +27,8 @@ public class CheckBox : View
         AutoSize = true;
 
         // Things this view knows how to do
-        AddCommand (Command.Accept, ToggleChecked);
-        AddCommand (Command.HotKey, ToggleChecked);
+        AddCommand (Command.Accept, OnToggled);
+        AddCommand (Command.HotKey, OnToggled);
 
         // Default keybindings for this view
         KeyBindings.Add (Key.Space, Command.Accept);
@@ -96,9 +96,7 @@ public class CheckBox : View
             return false;
         }
 
-        ToggleChecked ();
-
-        return true;
+        return OnToggled () == true;
     }
 
     /// <inheritdoc/>
@@ -110,15 +108,59 @@ public class CheckBox : View
     }
 
     /// <summary>Called when the <see cref="Checked"/> property changes. Invokes the <see cref="Toggled"/> event.</summary>
-    public virtual void OnToggled (StateEventArgs<bool?> e) { Toggled?.Invoke (this, e); }
+    /// <remarks>
+    /// </remarks>
+    /// <returns>If <see langword="true"/> the <see cref="Toggled"/> event was canceled.</returns>
+    public bool? OnToggled ()
+    {
+        StateEventArgs<bool?> e = new (Checked, false);
+
+        if (AllowNullChecked)
+        {
+            switch (Checked)
+            {
+                case null:
+                    e.NewValue = true;
+
+                    break;
+                case true:
+                    e.NewValue = false;
+
+                    break;
+                case false:
+                    e.NewValue = null;
+
+                    break;
+            }
+        }
+        else
+        {
+            e.NewValue = !Checked;
+        }
+
+        Toggled?.Invoke (this, e);
+        if (e.Cancel)
+        {
+            return e.Cancel;
+        }
+
+        Checked = e.NewValue;
+
+        SetNeedsDisplay ();
+        SetFocus ();
+        OnAccept ();
+
+        return true;
+    }
 
     /// <inheritdoc/>
     public override void PositionCursor () { Move (0, 0); }
 
-    /// <summary>Toggled event, raised when the <see cref="CheckBox"/>  is toggled.</summary>
+    /// <summary>Toggled event, raised when the <see cref="CheckBox"/> is toggled.</summary>
     /// <remarks>
-    ///     Client code can hook up to this event, it is raised when the <see cref="CheckBox"/> is activated either with
-    ///     the mouse or the keyboard. The passed <c>bool</c> contains the previous state.
+    /// <para>
+    ///    This event can be cancelled. If cancelled, the <see cref="CheckBox"/> will not change its state.
+    /// </para>
     /// </remarks>
     public event EventHandler<StateEventArgs<bool?>>? Toggled;
 
@@ -158,43 +200,5 @@ public class CheckBox : View
         }
 
         return Text [..Math.Min (Frame.Width - 2, Text.GetRuneCount ())];
-    }
-
-    private bool? ToggleChecked ()
-    {
-        if (!HasFocus)
-        {
-            SetFocus ();
-        }
-
-        bool? previousChecked = Checked;
-
-        if (AllowNullChecked)
-        {
-            switch (previousChecked)
-            {
-                case null:
-                    Checked = true;
-
-                    break;
-                case true:
-                    Checked = false;
-
-                    break;
-                case false:
-                    Checked = null;
-
-                    break;
-            }
-        }
-        else
-        {
-            Checked = !Checked;
-        }
-
-        OnToggled (new StateEventArgs<bool?> (previousChecked, Checked));
-        SetNeedsDisplay ();
-
-        return true;
     }
 }

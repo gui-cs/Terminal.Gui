@@ -51,15 +51,9 @@ public class Button : View
         AddCommand (Command.HotKey, () =>
                                      {
                                          SetFocus ();
-                                         OnAccept ();
-                                         return true;
+                                         return !OnAccept ();
                                      });
 
-        AddCommand (Command.Accept, () =>
-                                    {
-                                        OnAccept ();
-                                        return true;
-                                    });
         KeyBindings.Add (Key.Space, Command.HotKey);
         KeyBindings.Add (Key.Enter, Command.HotKey);
 

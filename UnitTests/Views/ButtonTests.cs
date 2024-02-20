@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using System.ComponentModel;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
@@ -667,6 +668,21 @@ public class ButtonTests
         Assert.True (btn.NewKeyDownEvent (btn.HotKey));
         Assert.True (clicked);
         clicked = false;
+    }
+
+    [Fact]
+    public void HotKey_Command_Accepts ()
+    {
+        var button = new Button ();
+        var accepted = false;
+
+        button.Accept += ButtonOnAccept;
+        button.InvokeCommand (Command.HotKey);
+
+        Assert.True (accepted);
+
+        return;
+        void ButtonOnAccept (object sender, CancelEventArgs e) { accepted = true; }
     }
 
     [Fact]

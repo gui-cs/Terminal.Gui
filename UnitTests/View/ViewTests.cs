@@ -1158,8 +1158,6 @@ At 0,0
     }
 
     // OnAccept/Accept tests
-
-    // OnAccept fires Accept event
     [Fact]
     public void OnAccept_Fires_Accept ()
     {
@@ -1175,4 +1173,48 @@ At 0,0
         void ViewOnAccept (object sender, CancelEventArgs e) { accepted = true; }
     }
 
+    [Fact]
+    public void Accept_Cancel_Event_OnAccept_Returns_True ()
+    {
+        var view = new View ();
+        var acceptInvoked = false;
+
+        view.Accept += ViewOnAccept;
+
+        var ret = view.OnAccept ();
+        Assert.True (ret);
+        Assert.True (acceptInvoked);
+
+        return;
+        void ViewOnAccept (object sender, CancelEventArgs e) { 
+            acceptInvoked = true;
+            e.Cancel = true;
+        }
+    }
+
+    [Fact]
+    public void Accept_Command_Invokes_Accept_Event ()
+    {
+        var view = new View ();
+        var accepted = false;
+
+        view.Accept += ViewOnAccept;
+
+        view.InvokeCommand (Command.Accept);
+        Assert.True (accepted);
+
+        return;
+        void ViewOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void HotKey_Command_SetsFocus ()
+    {
+        var view = new View ();
+
+        view.CanFocus = true;
+        Assert.False (view.HasFocus);
+        view.InvokeCommand (Command.HotKey);
+        Assert.True (view.HasFocus);
+    }
 }
