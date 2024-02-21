@@ -542,6 +542,7 @@ public partial class View
         }
     }
 
+    #nullable enable
     /// <summary>Finds which view that belong to the <paramref name="start"/> superview at the provided location.</summary>
     /// <param name="start">The superview where to look for.</param>
     /// <param name="x">The column location in the superview.</param>
@@ -597,6 +598,7 @@ public partial class View
 
         return start;
     }
+    #nullable restore
 
     /// <summary>Gets the <see cref="Frame"/> with a screen-relative location.</summary>
     /// <returns>The location and size of the view in screen-relative coordinates.</returns>
