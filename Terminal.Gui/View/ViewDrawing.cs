@@ -199,6 +199,16 @@ public partial class View
         }
     }
 
+    /// <summary>Event invoked when the adornments area of the View is to be drawn.</summary>
+    /// <remarks>
+    ///     <para>Will be invoked before any subviews added with <see cref="Add(View)"/> have been drawn.</para>
+    ///     <para>
+    ///         Rect provides the view-relative rectangle describing the currently visible viewport into the
+    ///         <see cref="View"/> .
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<DrawEventArgs> DrawAdornments;
+
     /// <summary>Event invoked when the content area of the View is to be drawn.</summary>
     /// <remarks>
     ///     <para>Will be invoked before any subviews added with <see cref="Add(View)"/> have been drawn.</para>
@@ -357,6 +367,8 @@ public partial class View
         {
             return false;
         }
+
+        DrawAdornments?.Invoke (this, new DrawEventArgs (Bounds));
 
         // Each of these renders lines to either this View's LineCanvas 
         // Those lines will be finally rendered in OnRenderLineCanvas
