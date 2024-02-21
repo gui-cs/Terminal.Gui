@@ -1599,7 +1599,7 @@ public static partial class Application
 
         return;
 
-        bool AdornmentHandledMouseEvent (Adornment frame)
+        bool AdornmentHandledMouseEvent (Adornment? frame)
         {
             if (frame?.Thickness.Contains (frame.FrameToScreen (), a.MouseEvent.X, a.MouseEvent.Y) ?? false)
             {
