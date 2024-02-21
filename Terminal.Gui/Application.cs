@@ -1128,17 +1128,15 @@ public static partial class Application
     #nullable enable
     private static View? FindDeepestTop (Toplevel start, int x, int y)
     {
-        Rectangle startFrame = start.Frame;
-
-        if (!startFrame.Contains (x, y))
+        if (!start.Frame.Contains (x, y))
         {
             return null;
         }
 
         if (_topLevels is { Count: > 0 })
         {
-            int rx = x - startFrame.X;
-            int ry = y - startFrame.Y;
+            int rx = x - start.Frame.X;
+            int ry = y - start.Frame.Y;
 
             foreach (Toplevel t in _topLevels)
             {
