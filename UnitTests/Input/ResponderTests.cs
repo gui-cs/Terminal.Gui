@@ -158,10 +158,10 @@ public class ResponderTests
     [TestRespondersDisposed]
     public void IsOverridden_True_IfOverridden ()
     {
-        // MouseEvent is defined on Responder IS overriden on ScrollBarView (but not View)
+        // MouseEvent is defined on Responder IS overriden on ScrollBar (but not View)
         Assert.True (
                      Responder.IsOverridden (
-                                             new ScrollBarView { Text = "ScrollBarView overrides MouseEvent" },
+                                             new ScrollBar { Text = "ScrollBar overrides MouseEvent" },
                                              "MouseEvent"
                                             )
                     );
@@ -177,17 +177,17 @@ public class ResponderTests
                                             )
                     );
 
-        // ScrollBarView overrides both MouseEvent (from Responder) and Redraw (from View)
+        // ScrollBar overrides both MouseEvent (from Responder) and Redraw (from View)
         Assert.True (
                      Responder.IsOverridden (
-                                             new ScrollBarView { Text = "ScrollBarView overrides MouseEvent" },
+                                             new ScrollBar { Text = "ScrollBar overrides MouseEvent" },
                                              "MouseEvent"
                                             )
                     );
 
         Assert.True (
                      Responder.IsOverridden (
-                                             new ScrollBarView { Text = "ScrollBarView overrides OnDrawContent" },
+                                             new ScrollBar { Text = "ScrollBar overrides OnDrawContent" },
                                              "OnDrawContent"
                                             )
                     );

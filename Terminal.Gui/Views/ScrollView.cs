@@ -28,8 +28,8 @@ namespace Terminal.Gui;
 public class ScrollView : View
 {
     private readonly ContentView _contentView;
-    private readonly ScrollBarView _horizontal;
-    private readonly ScrollBarView _vertical;
+    private readonly ScrollBar _horizontal;
+    private readonly ScrollBar _vertical;
     private View _contentBottomRightCorner;
     private Point _contentOffset;
     private Size _contentSize;
@@ -43,7 +43,7 @@ public class ScrollView : View
         _contentView = new ContentView ();
         base.Add (_contentView);
 
-        _vertical = new ScrollBarView
+        _vertical = new ScrollBar
         {
             X = Pos.AnchorEnd (1),
             Y = 0,
@@ -52,7 +52,7 @@ public class ScrollView : View
             IsVertical = true
         };
 
-        _horizontal = new ScrollBarView
+        _horizontal = new ScrollBar
         {
             X = 0,
             Y = Pos.AnchorEnd (1),
@@ -60,11 +60,11 @@ public class ScrollView : View
             Size = 1,
             IsVertical = false
         };
-        _vertical.OtherScrollBarView = _horizontal;
-        _horizontal.OtherScrollBarView = _vertical;
+        _vertical.OtherScrollBar = _horizontal;
+        _horizontal.OtherScrollBar = _vertical;
 
         // The _horizontal will be automatically added
-        // through the OtherScrollBarView property
+        // through the OtherScrollBar property
         base.Add (_vertical);
 
         CanFocus = true;
@@ -220,7 +220,7 @@ public class ScrollView : View
 
                 if (value)
                 {
-                    _horizontal.OtherScrollBarView = _vertical;
+                    _horizontal.OtherScrollBar = _vertical;
 
                     if (!Subviews.Contains (_horizontal))
                     {
@@ -229,7 +229,7 @@ public class ScrollView : View
 
                     _horizontal.ShowScrollIndicator = true;
                     _horizontal.AutoHideScrollBars = AutoHideScrollBars;
-                    _horizontal.OtherScrollBarView.ShowScrollIndicator = true;
+                    _horizontal.OtherScrollBar.ShowScrollIndicator = true;
                     _horizontal.MouseEnter += View_MouseEnter;
                     _horizontal.MouseLeave += View_MouseLeave;
                 }
@@ -258,7 +258,7 @@ public class ScrollView : View
 
                 if (value)
                 {
-                    _vertical.OtherScrollBarView = _horizontal;
+                    _vertical.OtherScrollBar = _horizontal;
 
                     if (!Subviews.Contains (_vertical))
                     {
@@ -267,7 +267,7 @@ public class ScrollView : View
 
                     _vertical.ShowScrollIndicator = true;
                     _vertical.AutoHideScrollBars = AutoHideScrollBars;
-                    _vertical.OtherScrollBarView.ShowScrollIndicator = true;
+                    _vertical.OtherScrollBar.ShowScrollIndicator = true;
                     _vertical.MouseEnter += View_MouseEnter;
                     _vertical.MouseLeave += View_MouseLeave;
                 }
@@ -286,12 +286,12 @@ public class ScrollView : View
     /// <param name="view">The view to add to the scrollview.</param>
     public override void Add (View view)
     {
-        if (view is ScrollBarView.ContentBottomRightCorner)
+        if (view is ScrollBar.ContentBottomRightCorner)
         {
             _contentBottomRightCorner = view;
             base.Add (view);
         }
-        else if (view is ScrollBarView)
+        else if (view is ScrollBar)
         {
             base.Add (view);
         }

@@ -53,7 +53,7 @@ public class WizardStep : FrameView
         base.Add (_helpTextView);
 
         // BUGBUG: v2 - Disabling scrolling for now
-        //var scrollBar = new ScrollBarView (helpTextView, true);
+        //var scrollBar = new ScrollBar (helpTextView, true);
 
         //scrollBar.ChangedPosition += (s,e) => {
         //	helpTextView.TopRow = scrollBar.Position;
@@ -63,10 +63,10 @@ public class WizardStep : FrameView
         //	helpTextView.SetNeedsDisplay ();
         //};
 
-        //scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
-        //	helpTextView.LeftColumn = scrollBar.OtherScrollBarView.Position;
-        //	if (helpTextView.LeftColumn != scrollBar.OtherScrollBarView.Position) {
-        //		scrollBar.OtherScrollBarView.Position = helpTextView.LeftColumn;
+        //scrollBar.OtherScrollBar.ChangedPosition += (s,e) => {
+        //	helpTextView.LeftColumn = scrollBar.OtherScrollBar.Position;
+        //	if (helpTextView.LeftColumn != scrollBar.OtherScrollBar.Position) {
+        //		scrollBar.OtherScrollBar.Position = helpTextView.LeftColumn;
         //	}
         //	helpTextView.SetNeedsDisplay ();
         //};
@@ -79,10 +79,10 @@ public class WizardStep : FrameView
         //	}
         //};
 
-        //scrollBar.OtherScrollBarView.VisibleChanged += (s,e) => {
-        //	if (scrollBar.OtherScrollBarView.Visible && helpTextView.BottomOffset == 0) {
+        //scrollBar.OtherScrollBar.VisibleChanged += (s,e) => {
+        //	if (scrollBar.OtherScrollBar.Visible && helpTextView.BottomOffset == 0) {
         //		helpTextView.BottomOffset = 1;
-        //	} else if (!scrollBar.OtherScrollBarView.Visible && helpTextView.BottomOffset == 1) {
+        //	} else if (!scrollBar.OtherScrollBar.Visible && helpTextView.BottomOffset == 1) {
         //		helpTextView.BottomOffset = 0;
         //	}
         //};
@@ -90,9 +90,9 @@ public class WizardStep : FrameView
         //helpTextView.DrawContent += (s,e) => {
         //	scrollBar.Size = helpTextView.Lines;
         //	scrollBar.Position = helpTextView.TopRow;
-        //	if (scrollBar.OtherScrollBarView is { }) {
-        //		scrollBar.OtherScrollBarView.Size = helpTextView.Maxlength;
-        //		scrollBar.OtherScrollBarView.Position = helpTextView.LeftColumn;
+        //	if (scrollBar.OtherScrollBar is { }) {
+        //		scrollBar.OtherScrollBar.Size = helpTextView.Maxlength;
+        //		scrollBar.OtherScrollBar.Position = helpTextView.LeftColumn;
         //	}
         //	scrollBar.LayoutSubviews ();
         //	scrollBar.Refresh ();
