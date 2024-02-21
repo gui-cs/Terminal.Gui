@@ -183,7 +183,7 @@ public class ScrollViewTests
             Width = 10,
             Height = 10,
             ContentSize = new Size (23, 23),
-            KeepContentAlwaysInViewport = false
+            KeepContentAlwaysInViewPort = false
         };
         var bottomLabel = new Label { X = 15, Y = 15, Text = "At 15,15" };
         Application.Top.Add (topLabel, sv, bottomLabel);
@@ -344,7 +344,7 @@ public class ScrollViewTests
         Assert.Equal (Point.Empty, sv.ContentOffset);
         Assert.Equal (Size.Empty, sv.ContentSize);
         Assert.True (sv.AutoHideScrollBars);
-        Assert.True (sv.KeepContentAlwaysInViewport);
+        Assert.True (sv.KeepContentAlwaysInViewPort);
 
         sv = new ScrollView { X = 1, Y = 2, Width = 20, Height = 10 };
         Assert.Equal (LayoutStyle.Absolute, sv.LayoutStyle);
@@ -353,7 +353,7 @@ public class ScrollViewTests
         Assert.Equal (Point.Empty, sv.ContentOffset);
         Assert.Equal (Size.Empty, sv.ContentSize);
         Assert.True (sv.AutoHideScrollBars);
-        Assert.True (sv.KeepContentAlwaysInViewport);
+        Assert.True (sv.KeepContentAlwaysInViewPort);
     }
 
     [Fact]
@@ -923,7 +923,7 @@ public class ScrollViewTests
         sv.BeginInit ();
         sv.EndInit ();
 
-        Assert.True (sv.KeepContentAlwaysInViewport);
+        Assert.True (sv.KeepContentAlwaysInViewPort);
         Assert.True (sv.AutoHideScrollBars);
         Assert.True (sv.ShowVerticalScrollIndicator);
         Assert.True (sv.ShowHorizontalScrollIndicator);
@@ -991,8 +991,8 @@ public class ScrollViewTests
         Assert.True (sv.OnKeyDown (new Key (KeyCode.Home | KeyCode.CtrlMask)));
         Assert.Equal (new Point (0, 0), sv.ContentOffset);
 
-        sv.KeepContentAlwaysInViewport = false;
-        Assert.False (sv.KeepContentAlwaysInViewport);
+        sv.KeepContentAlwaysInViewPort = false;
+        Assert.False (sv.KeepContentAlwaysInViewPort);
         Assert.True (sv.AutoHideScrollBars);
         Assert.True (sv.ShowVerticalScrollIndicator);
         Assert.True (sv.ShowHorizontalScrollIndicator);

@@ -193,15 +193,15 @@ public class ScrollView : View
     }
 
     /// <summary>Get or sets if the view-port is kept always visible in the area of this <see cref="ScrollView"/></summary>
-    public bool KeepContentAlwaysInViewport
+    public bool KeepContentAlwaysInViewPort
     {
-        get => _horizontal?.KeepContentAlwaysInViewport ?? _vertical.KeepContentAlwaysInViewport;
+        get => _horizontal?.KeepContentAlwaysInViewPort ?? _vertical.KeepContentAlwaysInViewPort;
         set
         {
-            if (_horizontal.KeepContentAlwaysInViewport || _vertical.KeepContentAlwaysInViewport != value)
+            if (_horizontal.KeepContentAlwaysInViewPort || _vertical.KeepContentAlwaysInViewPort != value)
             {
-                _vertical.KeepContentAlwaysInViewport = value;
-                _horizontal.KeepContentAlwaysInViewport = value;
+                _vertical.KeepContentAlwaysInViewPort = value;
+                _horizontal.KeepContentAlwaysInViewPort = value;
             }
         }
     }

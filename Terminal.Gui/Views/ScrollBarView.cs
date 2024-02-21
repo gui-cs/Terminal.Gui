@@ -76,7 +76,7 @@ public class ScrollBarView : View
     }
 
     /// <summary>Get or sets if the view-port is kept always visible in the area of this <see cref="ScrollBarView"/></summary>
-    public bool KeepContentAlwaysInViewport
+    public bool KeepContentAlwaysInViewPort
     {
         get => _keepContentAlwaysInViewport;
         set
@@ -437,15 +437,15 @@ public class ScrollBarView : View
             {
                 bh -= 2;
 
-                int by1 = KeepContentAlwaysInViewport
+                int by1 = KeepContentAlwaysInViewPort
                               ? _position * bh / Size
                               : _position * bh / (Size + bh);
 
-                int by2 = KeepContentAlwaysInViewport
+                int by2 = KeepContentAlwaysInViewPort
                               ? Math.Min ((_position + bh) * bh / Size + 1, bh - 1)
                               : (_position + bh) * bh / (Size + bh);
 
-                if (KeepContentAlwaysInViewport && by1 == by2)
+                if (KeepContentAlwaysInViewPort && by1 == by2)
                 {
                     by1 = Math.Max (by1 - 1, 0);
                 }
@@ -530,15 +530,15 @@ public class ScrollBarView : View
             {
                 bw -= 2;
 
-                int bx1 = KeepContentAlwaysInViewport
+                int bx1 = KeepContentAlwaysInViewPort
                               ? _position * bw / Size
                               : _position * bw / (Size + bw);
 
-                int bx2 = KeepContentAlwaysInViewport
+                int bx2 = KeepContentAlwaysInViewPort
                               ? Math.Min ((_position + bw) * bw / Size + 1, bw - 1)
                               : (_position + bw) * bw / (Size + bw);
 
-                if (KeepContentAlwaysInViewport && bx1 == bx2)
+                if (KeepContentAlwaysInViewPort && bx1 == bx2)
                 {
                     bx1 = Math.Max (bx1 - 1, 0);
                 }
@@ -657,12 +657,12 @@ public class ScrollBarView : View
 
         var pos = 0;
 
-        if (KeepContentAlwaysInViewport && !_vertical && _position + SuperView.Bounds.Width > _size + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0))
+        if (KeepContentAlwaysInViewPort && !_vertical && _position + SuperView.Bounds.Width > _size + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0))
         {
             pos = Math.Max (_size - SuperView.Bounds.Width + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0), 0);
         }
 
-        if (KeepContentAlwaysInViewport && _vertical && _position + SuperView.Bounds.Height > _size + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0))
+        if (KeepContentAlwaysInViewPort && _vertical && _position + SuperView.Bounds.Height > _size + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0))
         {
             pos = Math.Max (_size - SuperView.Bounds.Height + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0), 0);
         }
@@ -672,9 +672,9 @@ public class ScrollBarView : View
             Position = pos;
         }
 
-        if (OtherScrollBarView is { } && OtherScrollBarView.KeepContentAlwaysInViewport != KeepContentAlwaysInViewport)
+        if (OtherScrollBarView is { } && OtherScrollBarView.KeepContentAlwaysInViewPort != KeepContentAlwaysInViewPort)
         {
-            OtherScrollBarView.KeepContentAlwaysInViewport = KeepContentAlwaysInViewport;
+            OtherScrollBarView.KeepContentAlwaysInViewPort = KeepContentAlwaysInViewPort;
         }
 
         if (pos == 0 && refresh)
@@ -844,16 +844,16 @@ public class ScrollBarView : View
 
         if (IsBuiltIn)
         {
-            return isVertical ? KeepContentAlwaysInViewport
+            return isVertical ? KeepContentAlwaysInViewPort
                                     ? SuperView.Bounds.Height
                                     : 0 :
-                   KeepContentAlwaysInViewport ? SuperView.Bounds.Width : 0;
+                   KeepContentAlwaysInViewPort ? SuperView.Bounds.Width : 0;
         }
 
-        return isVertical ? KeepContentAlwaysInViewport
+        return isVertical ? KeepContentAlwaysInViewPort
                                 ? SuperView.Bounds.Height - (_showBothScrollIndicator ? 1 : 0)
                                 : 0 :
-               KeepContentAlwaysInViewport ? SuperView.Bounds.Width - (_showBothScrollIndicator ? 1 : 0) : 0;
+               KeepContentAlwaysInViewPort ? SuperView.Bounds.Width - (_showBothScrollIndicator ? 1 : 0) : 0;
     }
 
     private void ManageScrollBarThickness ()

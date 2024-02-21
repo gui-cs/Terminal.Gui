@@ -487,7 +487,7 @@ This is a tes
                                                         Source = new ListWrapper (source)
                                                     };
                                                     win.Add (listView);
-                                                    var newScrollBarView = new ScrollBarView { IsVertical = true, KeepContentAlwaysInViewport = true };
+                                                    var newScrollBarView = new ScrollBarView { IsVertical = true, KeepContentAlwaysInViewPort = true };
                                                     listView.Add (newScrollBarView);
 
                                                     newScrollBarView.ChangedPosition += (s, e) =>
@@ -966,8 +966,8 @@ This is a test
         Assert.Equal (21, max); // 21+80=101
         Assert.True (sbv.Visible);
         Assert.True (sbv.OtherScrollBarView.Visible);
-        sbv.KeepContentAlwaysInViewport = false;
-        sbv.OtherScrollBarView.KeepContentAlwaysInViewport = false;
+        sbv.KeepContentAlwaysInViewPort = false;
+        sbv.OtherScrollBarView.KeepContentAlwaysInViewPort = false;
         Assert.True (sbv.CanScroll (50, out max, sbv.IsVertical));
         Assert.Equal (39, max); // Keep 1 row visible
         Assert.True (sbv.OtherScrollBarView.CanScroll (150, out max, sbv.OtherScrollBarView.IsVertical));
@@ -984,7 +984,7 @@ This is a test
 
         AddHandlers ();
 
-        _scrollBar.KeepContentAlwaysInViewport = false;
+        _scrollBar.KeepContentAlwaysInViewPort = false;
         _scrollBar.Position = 50;
         Assert.Equal (_scrollBar.Position, _scrollBar.Size - 1);
         Assert.Equal (_scrollBar.Position, _hostView.Top);

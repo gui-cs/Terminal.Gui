@@ -137,8 +137,8 @@ public partial class View
     /// <summary>Get or sets if the view-port is kept always visible in the area of this <see cref="ScrollBarView"/></summary>
     public bool ScrollKeepContentAlwaysInViewPort
     {
-        get => _scrollBar.KeepContentAlwaysInViewport;
-        set => _scrollBar.KeepContentAlwaysInViewport = value;
+        get => _scrollBar.KeepContentAlwaysInViewPort;
+        set => _scrollBar.KeepContentAlwaysInViewPort = value;
     }
 
     /// <summary>

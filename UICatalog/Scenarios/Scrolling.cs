@@ -215,7 +215,7 @@ public class Scrolling : Scenario
                               };
         Win.Add (ahCheckBox);
 
-        keepCheckBox.Toggled += (s, e) => scrollView.KeepContentAlwaysInViewport = (bool)keepCheckBox.Checked;
+        keepCheckBox.Toggled += (s, e) => scrollView.KeepContentAlwaysInViewPort = (bool)keepCheckBox.Checked;
         Win.Add (keepCheckBox);
 
         //var scrollView2 = new ScrollView (new Rect (55, 2, 20, 8)) {
