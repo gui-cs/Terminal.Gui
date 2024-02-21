@@ -547,15 +547,15 @@ public partial class View
     /// <param name="start">The superview where to look for.</param>
     /// <param name="x">The column location in the superview.</param>
     /// <param name="y">The row location in the superview.</param>
-    /// <param name="resx">The found view screen relative column location.</param>
-    /// <param name="resy">The found view screen relative row location.</param>
+    /// <param name="resultX">The found view screen relative column location.</param>
+    /// <param name="resultY">The found view screen relative row location.</param>
     /// <returns>
     ///     The view that was found at the <praramref name="x"/> and <praramref name="y"/> coordinates.
     ///     <see langword="null"/> if no view was found.
     /// </returns>
-    public static View FindDeepestView (View start, int x, int y, out int resx, out int resy)
+    public static View? FindDeepestView (View? start, int x, int y, out int resultX, out int resultY)
     {
-        resy = resx = 0;
+        resultY = resultX = 0;
 
         if (start is null || !start.Frame.Contains (x, y))
         {
@@ -580,7 +580,7 @@ public partial class View
 
                     if (v.Visible && v.Frame.Contains (rx, ry))
                     {
-                        View deep = FindDeepestView (v, rx, ry, out resx, out resy);
+                        View deep = FindDeepestView (v, rx, ry, out resultX, out resultY);
 
                         if (deep is null)
                         {
@@ -593,8 +593,8 @@ public partial class View
             }
         }
 
-        resx = x - startFrame.X;
-        resy = y - startFrame.Y;
+        resultX = x - startFrame.X;
+        resultY = y - startFrame.Y;
 
         return start;
     }
