@@ -48,9 +48,9 @@ public class ListViewWithSelection : Scenario
             Height = Dim.Fill (),
             Width = Dim.Fill (1),
             AllowsMarking = false,
-            AllowsMultipleSelection = false,
-            ScrollBarType = ScrollBarType.Both
+            AllowsMultipleSelection = false
         };
+        _listView.Padding.ScrollBarType = ScrollBarType.Both;
         _listView.RowRender += ListView_RowRender;
         Win.Add (_listView);
 

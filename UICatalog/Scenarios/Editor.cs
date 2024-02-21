@@ -57,9 +57,9 @@ public class Editor : Scenario
             X = 0,
             Y = 0,
             Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            ScrollBarType = ScrollBarType.Both
+            Height = Dim.Fill ()
         };
+        _textView.Padding.ScrollBarType = ScrollBarType.Both;
 
         CreateDemoFile (_fileName);
 

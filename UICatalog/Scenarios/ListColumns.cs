@@ -65,9 +65,9 @@ public class ListColumns : Scenario
                 ShowHorizontalHeaderUnderline = false,
                 ShowHorizontalBottomline = false,
                 ExpandLastColumn = false
-            },
-            ScrollBarType = ScrollBarType.Both
+            }
         };
+        _listColView.Padding.ScrollBarType = ScrollBarType.Both;
         var listColStyle = new ListColumnStyle ();
 
         var menu = new MenuBar

@@ -47,9 +47,9 @@ public class ListsAndCombos : Scenario
             Y = Pos.Bottom (lbListView) + 1,
             Height = Dim.Fill (2),
             Width = Dim.Percent (40),
-            Source = new ListWrapper (items),
-            ScrollBarType = ScrollBarType.Both
+            Source = new ListWrapper (items)
         };
+        listview.Padding.ScrollBarType = ScrollBarType.Both;
         listview.SelectedItemChanged += (s, e) => lbListView.Text = items [listview.SelectedItem];
         Win.Add (lbListView, listview);
 
@@ -68,9 +68,9 @@ public class ListsAndCombos : Scenario
             X = Pos.Right (listview) + 1,
             Y = Pos.Bottom (lbListView) + 1,
             Height = Dim.Fill (2),
-            Width = Dim.Percent (40),
-            ScrollBarType = ScrollBarType.Both
+            Width = Dim.Percent (40)
         };
+        comboBox.Padding.ScrollBarType = ScrollBarType.Both;
         comboBox.SetSource (items);
 
         comboBox.SelectedItemChanged += (s, text) => lbComboBox.Text = text.Value.ToString ();

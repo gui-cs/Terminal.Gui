@@ -498,9 +498,9 @@ internal class UICatalogApp
                 Title = "Categories",
                 BorderStyle = LineStyle.Single,
                 SuperViewRendersLineCanvas = true,
-                Source = new ListWrapper (_categories),
-                ScrollBarType = ScrollBarType.Both
+                Source = new ListWrapper (_categories)
             };
+            CategoryList.Padding.ScrollBarType = ScrollBarType.Both;
             CategoryList.OpenSelectedItem += (s, a) => { ScenarioList!.SetFocus (); };
             CategoryList.SelectedItemChanged += CategoryView_SelectedChanged;
 
@@ -518,9 +518,9 @@ internal class UICatalogApp
                 CanFocus = true,
                 Title = "Scenarios",
                 BorderStyle = LineStyle.Single,
-                SuperViewRendersLineCanvas = true,
-                ScrollBarType = ScrollBarType.Both
+                SuperViewRendersLineCanvas = true
             };
+            ScenarioList.Padding.ScrollBarType = ScrollBarType.Both;
 
             // TableView provides many options for table headers. For simplicity we turn all 
             // of these off. By enabling FullRowSelect and turning off headers, TableView looks just

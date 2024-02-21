@@ -404,9 +404,9 @@ This is a tes
                                                         Y = 0,
                                                         Width = Dim.Fill (),
                                                         Height = Dim.Fill (),
-                                                        Source = new ListWrapper (source),
-                                                        ScrollBarType = ScrollBarType.Horizontal
+                                                        Source = new ListWrapper (source)
                                                     };
+                                                    listView.Padding.ScrollBarType = ScrollBarType.Horizontal;
                                                     win.Add (listView);
 
                                                     Assert.True (listView.ScrollKeepContentAlwaysInViewPort);
@@ -744,9 +744,9 @@ This is a test
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             Text =
-                "This is the help text for the Second Step.\n\nPress the button to see a message box.\n\nEnter name too.",
-            ScrollBarType = ScrollBarType.Both
+                "This is the help text for the Second Step.\n\nPress the button to see a message box.\n\nEnter name too."
         };
+        textView.Padding.ScrollBarType = ScrollBarType.Both;
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (textView);
 
@@ -1061,7 +1061,8 @@ This is a test
         var view = new View { ScrollBarType = ScrollBarType.None };
         Assert.Empty (view.Padding.Subviews);
 
-        view = new View { ScrollBarType = ScrollBarType.Both };
+        view = new View ();
+        view.Padding.ScrollBarType = ScrollBarType.Both;
         Assert.Equal (3, view.Padding.Subviews.Count);
 
         foreach (View sbv in view.Padding.Subviews)
@@ -1076,11 +1077,13 @@ This is a test
             }
         }
 
-        view = new View { ScrollBarType = ScrollBarType.Vertical };
+        view = new View ();
+        view.Padding.ScrollBarType = ScrollBarType.Vertical;
         Assert.Single (view.Padding.Subviews);
         Assert.True (view.Padding.Subviews [0] is ScrollBar);
 
-        view = new View { ScrollBarType = ScrollBarType.Horizontal };
+        view = new View ();
+        view.Padding.ScrollBarType = ScrollBarType.Horizontal;
         Assert.Single (view.Padding.Subviews);
         Assert.True (view.Padding.Subviews [0] is ScrollBar);
     }
@@ -1102,9 +1105,10 @@ This is a test
 
         var view = new View
         {
-            X = Pos.Center (), Y = Pos.Center (), Width = 9, Height = 6, ScrollBarType = ScrollBarType.Both,
+            X = Pos.Center (), Y = Pos.Center (), Width = 9, Height = 6,
             Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line", CanFocus = true
         };
+        view.Padding.ScrollBarType = ScrollBarType.Both;
         view.TextFormatter.WordWrap = false;
         view.TextFormatter.MultiLine = true;
         string [] strings = view.Text.Split ("\n").ToArray ();
@@ -1197,9 +1201,10 @@ This is a test
 
         var view = new View
         {
-            X = Pos.Center (), Y = Pos.Center (), Width = 9, Height = 6, ScrollBarType = ScrollBarType.Both,
+            X = Pos.Center (), Y = Pos.Center (), Width = 9, Height = 6,
             Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line", CanFocus = true
         };
+        view.Padding.ScrollBarType = ScrollBarType.Both;
         view.TextFormatter.WordWrap = false;
         view.TextFormatter.MultiLine = true;
         string [] strings = view.Text.Split ("\n").ToArray ();
@@ -1282,6 +1287,102 @@ This is a test
 000111111113000
 000111111113000
 000333333333000
+000000000000000
+000002222000000
+000000000000000",
+                                               null,
+                                               attrs);
+    }
+
+        [Fact]
+    [SetupFakeDriver]
+    public void ScrollBarType_IsBuiltIn_In_Parent_Inside_Another_Container ()
+    {
+        ((FakeDriver)Application.Driver).SetBufferSize (15, 11);
+
+        var superTop = new View { Width = 15, Height = 11, ColorScheme = new ColorScheme (Attribute.Default) };
+
+        var view = new View
+        {
+            X = Pos.Center (), Y = Pos.Center (), Width = 9, Height = 6,
+            Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line", CanFocus = true,
+            ScrollBarType = ScrollBarType.Both
+        };
+        view.TextFormatter.WordWrap = false;
+        view.TextFormatter.MultiLine = true;
+        string [] strings = view.Text.Split ("\n").ToArray ();
+        view.ScrollColsSize = strings.OrderByDescending (s => s.Length).First ().GetColumns ();
+        view.ScrollRowsSize = strings.Length;
+
+        view.ColorScheme = new ColorScheme
+        {
+            Normal = new Attribute (Color.Green, Color.Red),
+            Focus = new Attribute (Color.Red, Color.Green)
+        };
+
+        var view2 = new View { X = Pos.Center (), Y = Pos.Bottom (view) + 1, Text = "Test", CanFocus = true, AutoSize = true };
+        view2.ColorScheme = view.ColorScheme;
+
+        var top = new View
+            { Width = Dim.Fill (), Height = Dim.Fill (), ColorScheme = new ColorScheme { Normal = Attribute.Default }, BorderStyle = LineStyle.Single };
+        top.Add (view, view2);
+        superTop.Add (top);
+        superTop.BeginInit ();
+        superTop.EndInit ();
+        superTop.FocusFirst ();
+        superTop.LayoutSubviews ();
+        superTop.Draw ();
+        Assert.True (view.HasFocus);
+        Assert.False (view2.HasFocus);
+        Assert.Equal (12, view.ScrollColsSize);
+        Assert.Equal (7, view.ScrollRowsSize);
+        Assert.Equal ("(0,0,9,6)", view.Bounds.ToString ());
+        Assert.Equal ("(0,0,9,6)", view.ContentArea.ToString ());
+        Assert.Equal ("(2,1,9,6)", view.Frame.ToString ());
+        Assert.Equal ("(0,0,9,6)", view.Margin.Bounds.ToString ());
+        Assert.Equal ("(0,0,9,6)", view.Margin.ContentArea.ToString ());
+        Assert.Equal ("(0,0,9,6)", view.Margin.Frame.ToString ());
+        Assert.Equal ("(0,0,9,6)", view.Border.Bounds.ToString ());
+        Assert.Equal ("(0,0,9,6)", view.Border.ContentArea.ToString ());
+        Assert.Equal ("(0,0,9,6)", view.Border.Frame.ToString ());
+        Assert.Equal ("(0,0,9,6)", view.Padding.Bounds.ToString ());
+        Assert.Equal ("(0,0,9,6)", view.Padding.ContentArea.ToString ());
+        Assert.Equal ("(0,0,9,6)", view.Padding.Frame.ToString ());
+        Assert.Equal ("(Left=0,Top=0,Right=0,Bottom=0)", view.Padding.Thickness.ToString ());
+        Assert.Equal ("{Width=9, Height=6}", view.TextFormatter.Size.ToString ());
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌─────────────┐
+│             │
+│  First Li▲  │
+│  Second L┬  │
+│  Third Li│  │
+│  Fourth L┴  │
+│  Fifth Li▼  │
+│  ◄├───┤░►   │
+│             │
+│    Test     │
+└─────────────┘",
+                                                      _output);
+
+        Attribute [] attrs =
+        [
+            Attribute.Default,
+            new Attribute (Color.Red, Color.Green),
+            new Attribute (Color.Green, Color.Red)
+        ];
+
+        TestHelpers.AssertDriverAttributesAre (
+                                               @"
+000000000000000
+000000000000000
+000111111111000
+000111111111000
+000111111111000
+000111111111000
+000111111111000
+000111111111000
 000000000000000
 000002222000000
 000000000000000",

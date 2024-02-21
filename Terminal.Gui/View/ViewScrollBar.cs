@@ -51,27 +51,30 @@ public partial class View
         get => _scrollBarType;
         set
         {
-            if (_scrollBar is { } && _scrollBarType == value)
+            View view = this is Adornment adornment ? adornment.Parent : this;
+
+            if (view._scrollBar is { } && view._scrollBarType == value)
             {
                 return;
             }
 
-            _scrollBarType = value;
-            DisposeScrollBar ();
+            view._scrollBarType = value;
+            view.DisposeScrollBar ();
 
-            switch (_scrollBarType)
+
+            switch (view._scrollBarType)
             {
                 case ScrollBarType.Vertical:
-                    _scrollBar = new ScrollBar { IsVertical = true };
+                    view._scrollBar = new ScrollBar { IsVertical = true };
 
                     break;
                 case ScrollBarType.Horizontal:
-                    _scrollBar = new ScrollBar { IsVertical = false };
+                    view._scrollBar = new ScrollBar { IsVertical = false };
 
                     break;
                 case ScrollBarType.Both:
-                    _scrollBar = new ScrollBar { IsVertical = true };
-                    _scrollBar.OtherScrollBar = new ScrollBar { IsVertical = false, OtherScrollBar = _scrollBar };
+                    view._scrollBar = new ScrollBar { IsVertical = true };
+                    view._scrollBar.OtherScrollBar = new ScrollBar { IsVertical = false, OtherScrollBar = view._scrollBar };
 
                     break;
                 case ScrollBarType.None:
@@ -80,16 +83,16 @@ public partial class View
                     throw new ArgumentOutOfRangeException ();
             }
 
-            Padding.Add (_scrollBar);
-            AddEventHandlersForScrollBars ();
-            AddKeyBindingsForScrolling (_scrollBar);
+            Add (view._scrollBar);
+            view.AddEventHandlersForScrollBars (view._scrollBar);
+            view.AddKeyBindingsForScrolling (view._scrollBar);
 
-            if (_scrollBar.OtherScrollBar != null)
+            if (view._scrollBar.OtherScrollBar != null)
             {
-                AddKeyBindingsForScrolling (_scrollBar.OtherScrollBar);
+                view.AddKeyBindingsForScrolling (view._scrollBar.OtherScrollBar);
             }
 
-            SetNeedsDisplay ();
+            view.SetNeedsDisplay ();
         }
     }
 
@@ -268,18 +271,18 @@ public partial class View
     /// </summary>
     public bool UseNegativeBoundsLocation { get; set; }
 
-    private void AddEventHandlersForScrollBars ()
+    private void AddEventHandlersForScrollBars (ScrollBar scrollBar)
     {
-        if (_scrollBar is null)
+        if (scrollBar is null)
         {
             return;
         }
 
-        _scrollBar.ChangedPosition += ScrollBar_ChangedPosition;
+        scrollBar.ChangedPosition += ScrollBar_ChangedPosition;
 
-        if (_scrollBar.OtherScrollBar != null)
+        if (scrollBar.OtherScrollBar != null)
         {
-            _scrollBar.OtherScrollBar.ChangedPosition += OtherScrollBar_ChangedPosition;
+            scrollBar.OtherScrollBar.ChangedPosition += OtherScrollBar_ChangedPosition;
         }
     }
 

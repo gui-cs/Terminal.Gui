@@ -259,9 +259,9 @@ public class Wizards : Scenario
                                                 Height = Dim.Fill (1),
                                                 WordWrap = true,
                                                 AllowsTab = false,
-                                                ColorScheme = Colors.ColorSchemes ["Base"],
-                                                ScrollBarType = ScrollBarType.Both
+                                                ColorScheme = Colors.ColorSchemes ["Base"]
                                             };
+                                            someText.Padding.ScrollBarType = ScrollBarType.Both;
                                             var help = "This is helpful.";
                                             fourthStep.Add (someText);
 

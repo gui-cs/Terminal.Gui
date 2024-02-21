@@ -6900,7 +6900,8 @@ This is the second line.
             text += $"{i.ToString () [^1]}";
         }
 
-        var tv = new TextView { Width = 10, Height = 10, ScrollBarType = ScrollBarType.Both };
+        var tv = new TextView { Width = 10, Height = 10 };
+        tv.Padding.ScrollBarType = ScrollBarType.Both;
         tv.Text = text;
 
         tv.BeginInit ();
@@ -6946,7 +6947,8 @@ This is the second line.
             text += $"This is the line {i}\n";
         }
 
-        var tv = new TextView { Width = 10, Height = 10, ScrollBarType = ScrollBarType.Both };
+        var tv = new TextView { Width = 10, Height = 10 };
+        tv.Padding.ScrollBarType = ScrollBarType.Both;
         tv.Text = text;
 
         tv.BeginInit ();
