@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 using Xunit.Abstractions;
 
@@ -631,9 +631,9 @@ public class DimTests
                                             Assert.Equal (5, f2.Frame.Height);
 
                     #if DEBUG
-                       Assert.Equal ("Combine(View(Width,FrameView(f1)(0,0,49,5))-Absolute(2))", v1.Width.ToString ());
+                       Assert.Equal ($"Combine(View(Width,FrameView(f1){f1.Border.Frame})-Absolute(2))", v1.Width.ToString ());
                     #else
-                       Assert.Equal ("Combine(View(Width,FrameView()(0,0,49,5))-Absolute(2))", v1.Width.ToString ());
+                       Assert.Equal ($"Combine(View(Width,FrameView(){f1.Border.Frame})-Absolute(2))", v1.Width.ToString ());
                     #endif
                        Assert.Equal ("Combine(Fill(0)-Absolute(2))", v1.Height.ToString ());
                        Assert.Equal (47, v1.Frame.Width); // 49-2=47
@@ -641,11 +641,11 @@ public class DimTests
 
                    #if DEBUG
                        Assert.Equal (
-                                     "Combine(View(Width,FrameView(f2)(49,0,49,5))-Absolute(2))",
+                                     $"Combine(View(Width,FrameView(f2){f2.Frame})-Absolute(2))",
                                      v2.Width.ToString ()
                    #else
                        Assert.Equal (
-                                     "Combine(View(Width,FrameView()(49,0,49,5))-Absolute(2))",
+                                     $"Combine(View(Width,FrameView(){f2.Frame})-Absolute(2))",
                                      v2.Width.ToString ()
                    #endif
                                     );
@@ -667,7 +667,7 @@ public class DimTests
                        Assert.Equal (50, v4.Frame.Width);
                        Assert.Equal (50, v4.Frame.Height);
                    #if DEBUG
-                       Assert.Equal ("Combine(View(Width,Button(v1)(2,7,47,89))-View(Width,Button(v3)(0,0,9,9)))", v5.Width.ToString ());
+                       Assert.Equal ($"Combine(View(Width,Button(v1){v1.Frame})-View(Width,Button(v3){v3.Bounds}))", v5.Width.ToString ());
                     #else
                        Assert.Equal ("Combine(View(Height,Button()(2,7,47,89))-View(Height,Button()(0,0,9,9)))", v5.Height.ToString ( ));
                    #endif
@@ -703,7 +703,7 @@ public class DimTests
 
                        v1.Text = "Button1";
                    #if DEBUG
-                       Assert.Equal ("Combine(View(Width,FrameView(f1)(0,0,99,5))-Absolute(2))", v1.Width.ToString ());
+                       Assert.Equal ($"Combine(View(Width,FrameView(f1){f1.Frame})-Absolute(2))", v1.Width.ToString ());
                    #else
                        Assert.Equal ("Combine(View(Width,FrameView()(0,0,99,5))-Absolute(2))", v1.Width.ToString ());
                    #endif
@@ -714,7 +714,7 @@ public class DimTests
                        v2.Text = "Button2";
 
                    #if DEBUG
-                   Assert.Equal ( "Combine(View(Width,FrameView(f2)(99,0,99,5))-Absolute(2))", v2.Width.ToString ());
+                   Assert.Equal ( $"Combine(View(Width,FrameView(f2){f2.Frame})-Absolute(2))", v2.Width.ToString ());
                    #else
                        Assert.Equal ( "Combine(View(Width,FrameView()(99,0,99,5))-Absolute(2))", v2.Width.ToString ());
                    #endif
@@ -746,8 +746,8 @@ public class DimTests
                        v5.Text = "Button5";
 
                    #if DEBUG
-                       Assert.Equal ("Combine(View(Width,Button(v1)(2,7,97,189))-View(Width,Button(v3)(0,0,19,19)))", v5.Width.ToString ());
-                       Assert.Equal ("Combine(View(Height,Button(v1)(2,7,97,189))-View(Height,Button(v3)(0,0,19,19)))", v5.Height.ToString ());
+                       Assert.Equal ($"Combine(View(Width,Button(v1){v1.Frame})-View(Width,Button(v3){v3.Frame}))", v5.Width.ToString ());
+                       Assert.Equal ($"Combine(View(Height,Button(v1){v1.Frame})-View(Height,Button(v3){v3.Frame}))", v5.Height.ToString ());
                    #else
                        Assert.Equal ("Combine(View(Width,Button()(2,7,97,189))-View(Width,Button()(0,0,19,19)))", v5.Width.ToString ());
                        Assert.Equal ("Combine(View(Height,Button()(2,7,97,189))-View(Height,Button()(0,0,19,19)))", v5.Height.ToString ());
