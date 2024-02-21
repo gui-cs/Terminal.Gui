@@ -1414,8 +1414,6 @@ public static partial class Application
     /// <param name="a">The mouse event with coordinates relative to the screen.</param>
     public static void OnMouseEvent (MouseEventEventArgs a)
     {
-        static bool OutsideRect (Point p, Rectangle r) { return p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom; }
-
         if (IsMouseDisabled)
         {
             return;
@@ -1621,6 +1619,10 @@ public static partial class Application
                 BringOverlappedTopToFront ();
             }
         }
+
+        return;
+
+        static bool OutsideRect (Point p, Rectangle r) { return p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom; }
     }
     #nullable restore
 
