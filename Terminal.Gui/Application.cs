@@ -1208,7 +1208,7 @@ public static partial class Application
 
         // The Current and the top are both not running Toplevel then
         // the top must be moved above the first not running Toplevel.
-        if (OverlappedTop != null
+        if (OverlappedTop is { }
             && top != OverlappedTop
             && top != Current
             && Current?.Running == false
