@@ -176,9 +176,9 @@ public class ScrollBar : View
         }
     }
 
-    internal bool IsBuiltIn => SuperView is Adornment;
-
     private bool _showBothScrollIndicator => OtherScrollBar?._showScrollIndicator == true && _showScrollIndicator;
+
+    private bool IsBuiltIn => SuperView is Adornment;
 
     /// <summary>This event is raised when the position on the scrollbar has changed.</summary>
     public event EventHandler ChangedPosition;
@@ -1005,11 +1005,11 @@ public class ScrollBar : View
             Height = _vertical ? SuperView is Adornment ? Dim.Fill () : Dim.Fill (1) : 1;
 
             _otherScrollBar.Width = _otherScrollBar._vertical ? 1 :
-                                        SuperView is Adornment ? Dim.Fill () : Dim.Fill (1);
+                                    SuperView is Adornment ? Dim.Fill () : Dim.Fill (1);
 
             _otherScrollBar.Height = _otherScrollBar._vertical
-                                             ? SuperView is Adornment ? Dim.Fill () : Dim.Fill (1)
-                                             : 1;
+                                         ? SuperView is Adornment ? Dim.Fill () : Dim.Fill (1)
+                                         : 1;
         }
         else if (_showScrollIndicator)
         {
