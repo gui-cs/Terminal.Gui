@@ -1412,7 +1412,7 @@ public static partial class Application
     /// <summary>Called when a mouse event occurs. Raises the <see cref="MouseEvent"/> event.</summary>
     /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
     /// <param name="a">The mouse event with coordinates relative to the screen.</param>
-    public static void OnMouseEvent (MouseEventEventArgs a)
+    internal static void OnMouseEvent (MouseEventEventArgs a)
     {
         if (IsMouseDisabled)
         {
