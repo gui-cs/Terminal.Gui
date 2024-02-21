@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -173,6 +173,8 @@ public class TestDateAttribute : BeforeAfterTestAttribute
 
 internal partial class TestHelpers
 {
+    private const char SpaceChar = ' ';
+    private static readonly Rune SpaceRune = (Rune)SpaceChar;
 #pragma warning disable xUnit1013 // Public method should be marked as test
     /// <summary>
     ///     Verifies <paramref name="expectedAttributes"/> are found at the locations specified by
@@ -330,13 +332,13 @@ internal partial class TestHelpers
 
         for (var r = 0; r < driver.Rows; r++)
         {
-            List<Rune> runes = new ();
+            List<Rune> runes = [];
 
             for (var c = 0; c < driver.Cols; c++)
             {
                 Rune rune = contents [r, c].Rune;
 
-                if (rune != (Rune)' ')
+                if (runeAtCurrentLocation != SpaceRune)
                 {
                     if (x == -1)
                     {
@@ -345,7 +347,7 @@ internal partial class TestHelpers
 
                         for (var i = 0; i < c; i++)
                         {
-                            runes.InsertRange (i, new List<Rune> { (Rune)' ' });
+                            runes.InsertRange (i, [SpaceRune]);
                         }
                     }
 

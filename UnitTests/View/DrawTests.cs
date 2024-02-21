@@ -12,7 +12,7 @@ public class DrawTests
     [AutoInitShutdown]
     public void CJK_Compatibility_Ideographs_ConsoleWidth_ColumnWidth_Equal_Two ()
     {
-        var us = "\U0000f900";
+        const string us = "\U0000f900";
         var r = (Rune)0xf900;
 
         Assert.Equal ("豈", us);
