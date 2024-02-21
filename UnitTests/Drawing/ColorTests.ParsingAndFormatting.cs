@@ -84,7 +84,7 @@ public partial class ColorTests
                 )]
     public void TryParse_string_Returns_False_For_Invalid_Inputs (string? input)
     {
-        bool tryParseStatus = Color.TryParse (input, out Color? color);
+        bool tryParseStatus = Color.TryParse (input ?? string.Empty, out Color? color);
         Assert.False (tryParseStatus);
         Assert.Null (color);
     }

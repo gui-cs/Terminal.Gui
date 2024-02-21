@@ -79,7 +79,7 @@ public class ProgressBarStyles : Scenario
             colorPicker.ColorChanged += (s, e) => { dialog.RequestStop (); };
             Application.Run (dialog);
 
-            ColorName retColor = colorPicker.SelectedColor;
+            ColorName retColor = colorPicker.SelectedColor.GetClosestNamedColor ();
             colorPicker.Dispose ();
 
             return retColor;

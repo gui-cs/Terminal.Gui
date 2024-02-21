@@ -23,13 +23,9 @@
       "commandLineArgs": "dotnet UICatalog.dll --driver NetDriver",
       "distributionName": ""
     },
-    "Sliders": {
+    "Color Picker": {
       "commandName": "Project",
-      "commandLineArgs": "Sliders"
-    },
-    "Wizards": {
-      "commandName": "Project",
-      "commandLineArgs": "Wizards"
+      "commandLineArgs": "\"Color Picker\""
     },
     "Dialogs": {
       "commandName": "Project",
@@ -38,6 +34,10 @@
     "Buttons": {
       "commandName": "Project",
       "commandLineArgs": "Buttons"
+    },
+    "Wizards": {
+      "commandName": "Project",
+      "commandLineArgs": "Wizards"
     },
     "WizardAsView": {
       "commandName": "Project",
