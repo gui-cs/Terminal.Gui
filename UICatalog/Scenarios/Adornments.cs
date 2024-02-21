@@ -224,7 +224,6 @@ public class Adornments : Scenario
             _foregroundColorPicker.X = -1;
             _foregroundColorPicker.Y = Pos.Bottom (copyTop) + 1;
             _foregroundColorPicker.SelectedColor = Color.Foreground.GetClosestNamedColor ();
-
             _foregroundColorPicker.ColorChanged += (o, a) =>
                                                        AttributeChanged?.Invoke (
                                                                                  this,
@@ -415,8 +414,21 @@ public class Adornments : Scenario
                     //Width = Dim.Width (_borderEditor),
                     Checked = true,
                     SuperViewRendersLineCanvas = true,
-                    Text = "Show Title"
+                    Text = "Sho_w Title"
                 };
+
+                ckbTitle.Toggled += (sender, args) => {
+                                        if (ckbTitle.Checked == true)
+                                        {
+                                            _viewToEdit.Title = _origTitle;
+                                        }
+                                        else
+                                        {
+                                            _viewToEdit.Title = string.Empty;
+                                        }
+                                    };
+                Add (ckbTitle);
+
 
                 ckbTitle.Toggled += (sender, args) =>
                                     {

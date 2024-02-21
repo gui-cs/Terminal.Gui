@@ -26,6 +26,8 @@ public class AllViewsTests
                 continue;
             }
 
+            _output.WriteLine ($"Testing {type}");
+
             view.X = Pos.Center ();
             view.Y = Pos.Center ();
 

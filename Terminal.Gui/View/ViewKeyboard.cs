@@ -1,30 +1,40 @@
-﻿namespace Terminal.Gui;
+﻿using System.ComponentModel;
+
+namespace Terminal.Gui;
 
 public partial class View
 {
     private void AddCommands ()
     {
         // By default, the Default command is bound to the HotKey enabling focus
-        AddCommand (
-                    Command.Default,
-                    () =>
-                    {
-                        if (CanFocus)
-                        {
-                            SetFocus ();
-
-                            return true;
-                        }
-
-                        return false;
-                    }
-                   );
+        AddCommand (Command.Default, () => OnDefaultCommand());
 
         // By default the Accept command does nothing
         AddCommand (Command.Accept, () => false);
     }
 
     #region HotKey Support
+
+    public event EventHandler<CancelEventArgs> DefaultCommand;
+
+    public bool OnDefaultCommand ()
+    {
+        var args = new CancelEventArgs ();
+        DefaultCommand?.Invoke (this, args);
+        if (args.Cancel)
+        {
+            return args.Cancel;
+        }
+
+        if (CanFocus)
+        {
+            SetFocus ();
+
+            return true;
+        }
+
+        return false;
+    }
 
     /// <summary>Invoked when the <see cref="HotKey"/> is changed.</summary>
     public event EventHandler<KeyChangedEventArgs> HotKeyChanged;
@@ -84,6 +94,7 @@ public partial class View
             if (AddKeyBindingsForHotKey (_hotKey, value))
             {
                 // This will cause TextFormatter_HotKeyChanged to be called, firing HotKeyChanged
+                // BUGBUG: _hotkey should be set BEFORE setting TextFormatter.HotKey
                 _hotKey = TextFormatter.HotKey = value;
             }
         }
@@ -714,6 +725,42 @@ public partial class View
                                                      GetType ().Name
                                                  })"
                                                 );
+            }
+
+            // each command has its own return value
+            bool? thisReturn = InvokeCommand (command);
+
+            // if we haven't got anything yet, the current command result should be used
+            toReturn ??= thisReturn;
+
+            // if ever see a true then that's what we will return
+            if (thisReturn ?? false)
+            {
+                toReturn = true;
+            }
+        }
+
+        return toReturn;
+    }
+
+    /// <summary>
+    ///     Invokes the specified commands.
+    /// </summary>
+    /// <param name="commands"></param>
+    /// <returns>
+    ///     <see langword="null"/> if no command was found.
+    ///     <see langword="true"/> if the command was invoked and it handled the command.
+    ///     <see langword="false"/> if the command was invoked and it did not handle the command.
+    /// </returns>
+    public bool? InvokeCommands (Command [] commands)
+    {
+        bool? toReturn = null;
+
+        foreach (Command command in commands)
+        {
+            if (!CommandImplementations.ContainsKey (command))
+            {
+                throw new NotSupportedException (@$"{command} is not supported by ({GetType ().Name}).");
             }
 
             // each command has its own return value
