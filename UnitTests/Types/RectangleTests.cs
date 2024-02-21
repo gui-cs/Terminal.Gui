@@ -507,4 +507,13 @@ public class RectangleTests
         Rectangle result = Rectangle.Union (r1, r2);
         Assert.Equal (new Rectangle (0, 0, 2, 2), result);
     }
+
+    [Theory]
+    [CombinatorialData]
+    public void ToString_ReturnsExpectedString ([CombinatorialValues(-1,0,1)]int x, [CombinatorialValues(-1,0,1)]int y, [CombinatorialValues(1,10)]int width, [CombinatorialValues(1,10)]int height)
+    {
+        Rectangle r = new (x, y, width, height);
+        string expectedString = $"({r.X},{r.Y},{r.Width},{r.Height})";
+        Assert.Equal (expectedString, r.ToString ());
+    }
 }
