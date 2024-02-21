@@ -580,12 +580,7 @@ public partial class View
                 {
                     View? deep = FindDeepestView (v, rx, ry, out resultX, out resultY);
 
-                    if (deep is null)
-                    {
-                        return v;
-                    }
-
-                    return deep;
+                    return deep ?? v;
                 }
             }
         }
