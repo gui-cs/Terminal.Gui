@@ -50,54 +50,9 @@ public class WizardStep : FrameView
 
         _helpTextView.ReadOnly = true;
         _helpTextView.WordWrap = true;
+        _helpTextView.ScrollBarType = ScrollBarType.Both;
         base.Add (_helpTextView);
 
-        // BUGBUG: v2 - Disabling scrolling for now
-        //var scrollBar = new ScrollBar (helpTextView, true);
-
-        //scrollBar.ChangedPosition += (s,e) => {
-        //	helpTextView.TopRow = scrollBar.Position;
-        //	if (helpTextView.TopRow != scrollBar.Position) {
-        //		scrollBar.Position = helpTextView.TopRow;
-        //	}
-        //	helpTextView.SetNeedsDisplay ();
-        //};
-
-        //scrollBar.OtherScrollBar.ChangedPosition += (s,e) => {
-        //	helpTextView.LeftColumn = scrollBar.OtherScrollBar.Position;
-        //	if (helpTextView.LeftColumn != scrollBar.OtherScrollBar.Position) {
-        //		scrollBar.OtherScrollBar.Position = helpTextView.LeftColumn;
-        //	}
-        //	helpTextView.SetNeedsDisplay ();
-        //};
-
-        //scrollBar.VisibleChanged += (s,e) => {
-        //	if (scrollBar.Visible && helpTextView.RightOffset == 0) {
-        //		helpTextView.RightOffset = 1;
-        //	} else if (!scrollBar.Visible && helpTextView.RightOffset == 1) {
-        //		helpTextView.RightOffset = 0;
-        //	}
-        //};
-
-        //scrollBar.OtherScrollBar.VisibleChanged += (s,e) => {
-        //	if (scrollBar.OtherScrollBar.Visible && helpTextView.BottomOffset == 0) {
-        //		helpTextView.BottomOffset = 1;
-        //	} else if (!scrollBar.OtherScrollBar.Visible && helpTextView.BottomOffset == 1) {
-        //		helpTextView.BottomOffset = 0;
-        //	}
-        //};
-
-        //helpTextView.DrawContent += (s,e) => {
-        //	scrollBar.Size = helpTextView.Lines;
-        //	scrollBar.Position = helpTextView.TopRow;
-        //	if (scrollBar.OtherScrollBar is { }) {
-        //		scrollBar.OtherScrollBar.Size = helpTextView.Maxlength;
-        //		scrollBar.OtherScrollBar.Position = helpTextView.LeftColumn;
-        //	}
-        //	scrollBar.LayoutSubviews ();
-        //	scrollBar.Refresh ();
-        //};
-        //base.Add (scrollBar);
         ShowHide ();
     }
 
