@@ -570,12 +570,9 @@ public partial class View
 
         _scrollBar.ChangedPosition -= ScrollBar_ChangedPosition;
 
-        //_scrollBar.VisibleChanged -= ScrollBar_VisibleChanged;
-        if (_scrollBar.OtherScrollBarView != null)
+        if (_scrollBar.OtherScrollBar is { })
         {
-            _scrollBar.OtherScrollBarView.ChangedPosition -= OtherScrollBarView_ChangedPosition;
-
-            //_scrollBar.OtherScrollBarView.VisibleChanged -= OtherScrollBarView_VisibleChanged;
+            _scrollBar.OtherScrollBar.ChangedPosition -= OtherScrollBar_ChangedPosition;
         }
 
         _scrollBar.RemoveAll ();
