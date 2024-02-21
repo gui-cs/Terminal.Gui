@@ -287,5 +287,5 @@ public struct Rectangle
 
     /// <summary>ToString Method</summary>
     /// <remarks>Formats the Rectangle as a string in (x,y,w,h) notation.</remarks>
-    public override string ToString () { return $"({X},{Y},{Width},{Height})"; }
+    public override string ToString () { return $"{{X={X},Y={Y},Width={Width},Height={Height}}}"; }
 }

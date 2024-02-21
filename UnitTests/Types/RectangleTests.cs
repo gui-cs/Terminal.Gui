@@ -513,7 +513,7 @@ public class RectangleTests
     public void ToString_ReturnsExpectedString ([CombinatorialValues(-1,0,1)]int x, [CombinatorialValues(-1,0,1)]int y, [CombinatorialValues(1,10)]int width, [CombinatorialValues(1,10)]int height)
     {
         Rectangle r = new (x, y, width, height);
-        string expectedString = $"({r.X},{r.Y},{r.Width},{r.Height})";
+        string expectedString = $"{{X={r.X},Y={r.Y},Width={r.Width},Height={r.Height}}}";
         Assert.Equal (expectedString, r.ToString ());
     }
 }
