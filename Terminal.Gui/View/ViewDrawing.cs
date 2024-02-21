@@ -185,12 +185,18 @@ public partial class View
 
         OnRenderLineCanvas ();
 
-        // Invoke DrawContentCompleteEvent
-        OnDrawContentComplete (Bounds);
-
         // BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
         ClearLayoutNeeded ();
         ClearNeedsDisplay ();
+
+        // Invoke DrawContentCompleteEvent
+        dev = new DrawEventArgs (Bounds);
+        DrawContentComplete?.Invoke (this, dev);
+
+        if (!dev.Cancel)
+        {
+            OnDrawContentComplete (Bounds);
+        }
     }
 
     /// <summary>Event invoked when the content area of the View is to be drawn.</summary>
@@ -384,7 +390,7 @@ public partial class View
                 }
             }
 
-            // This should NOT clear 
+            // This should NOT clear
             TextFormatter?.Draw (
                                  BoundsToScreen (contentArea),
                                  HasFocus ? GetFocusColor () : GetNormalColor (),
@@ -434,7 +440,7 @@ public partial class View
     ///     This method will be called after any subviews removed with <see cref="Remove(View)"/> have been completed
     ///     drawing.
     /// </remarks>
-    public virtual void OnDrawContentComplete (Rect contentArea) { DrawContentComplete?.Invoke (this, new DrawEventArgs (contentArea)); }
+    public virtual void OnDrawContentComplete (Rect contentArea) { }
 
     // TODO: Make this cancelable
     /// <summary>
