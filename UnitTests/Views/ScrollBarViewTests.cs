@@ -26,7 +26,7 @@ public class ScrollBarViewTests
         Assert.Equal (1, _scrollBar.Bounds.Width);
 
         Assert.Equal (
-                      "Combine(View(Height,HostView()(0,0,80,25))-Absolute(1))",
+                      $"Combine(View(Height,HostView(){_hostView.Frame})-Absolute(1))",
                       _scrollBar.Height.ToString ()
                      );
         Assert.Equal (24, _scrollBar.Bounds.Height);
@@ -34,7 +34,7 @@ public class ScrollBarViewTests
         Assert.True (_scrollBar.OtherScrollBarView.Visible);
 
         Assert.Equal (
-                      "Combine(View(Width,HostView()(0,0,80,25))-Absolute(1))",
+                      $"Combine(View(Width,HostView(){_hostView.Frame})-Absolute(1))",
                       _scrollBar.OtherScrollBarView.Width.ToString ()
                      );
         Assert.Equal (79, _scrollBar.OtherScrollBarView.Bounds.Width);
@@ -49,7 +49,7 @@ public class ScrollBarViewTests
         Assert.Equal (1, _scrollBar.Bounds.Width);
 
         Assert.Equal (
-                      "Combine(View(Height,HostView()(0,0,80,25))-Absolute(1))",
+                      $"Combine(View(Height,HostView(){_hostView.Frame})-Absolute(1))",
                       _scrollBar.Height.ToString ()
                      );
         Assert.Equal (24, _scrollBar.Bounds.Height);
@@ -57,7 +57,7 @@ public class ScrollBarViewTests
         Assert.True (_scrollBar.OtherScrollBarView.Visible);
 
         Assert.Equal (
-                      "View(Width,HostView()(0,0,80,25))",
+                      $"View(Width,HostView(){_hostView.Frame})",
                       _scrollBar.OtherScrollBarView.Width.ToString ()
                      );
         Assert.Equal (80, _scrollBar.OtherScrollBarView.Bounds.Width);
@@ -72,7 +72,7 @@ public class ScrollBarViewTests
         Assert.Equal (1, _scrollBar.Bounds.Width);
 
         Assert.Equal (
-                      "Combine(View(Height,HostView()(0,0,80,25))-Absolute(1))",
+                      $"Combine(View(Height,HostView(){_hostView.Frame})-Absolute(1))",
                       _scrollBar.Height.ToString ()
                      );
         Assert.Equal (24, _scrollBar.Bounds.Height);
@@ -80,7 +80,7 @@ public class ScrollBarViewTests
         Assert.False (_scrollBar.OtherScrollBarView.Visible);
 
         Assert.Equal (
-                      "View(Width,HostView()(0,0,80,25))",
+                      $"View(Width,HostView(){_hostView.Frame})",
                       _scrollBar.OtherScrollBarView.Width.ToString ()
                      );
         Assert.Equal (80, _scrollBar.OtherScrollBarView.Bounds.Width);
@@ -95,7 +95,7 @@ public class ScrollBarViewTests
         Assert.Equal (1, _scrollBar.Bounds.Width);
 
         Assert.Equal (
-                      "View(Height,HostView()(0,0,80,25))",
+                      $"View(Height,HostView(){_hostView.Frame})",
                       _scrollBar.Height.ToString ()
                      );
         Assert.Equal (25, _scrollBar.Bounds.Height);
@@ -103,7 +103,7 @@ public class ScrollBarViewTests
         Assert.False (_scrollBar.OtherScrollBarView.Visible);
 
         Assert.Equal (
-                      "View(Width,HostView()(0,0,80,25))",
+                      $"View(Width,HostView(){_hostView.Frame})",
                       _scrollBar.OtherScrollBarView.Width.ToString ()
                      );
         Assert.Equal (80, _scrollBar.OtherScrollBarView.Bounds.Width);
@@ -118,7 +118,7 @@ public class ScrollBarViewTests
         Assert.Equal (1, _scrollBar.Bounds.Width);
 
         Assert.Equal (
-                      "Combine(View(Height,HostView()(0,0,80,25))-Absolute(1))",
+                      $"Combine(View(Height,HostView(){_hostView.Frame})-Absolute(1))",
                       _scrollBar.Height.ToString ()
                      );
         Assert.Equal (24, _scrollBar.Bounds.Height);
@@ -126,7 +126,7 @@ public class ScrollBarViewTests
         Assert.True (_scrollBar.OtherScrollBarView.Visible);
 
         Assert.Equal (
-                      "Combine(View(Width,HostView()(0,0,80,25))-Absolute(1))",
+                      $"Combine(View(Width,HostView(){_hostView.Frame})-Absolute(1))",
                       _scrollBar.OtherScrollBarView.Width.ToString ()
                      );
         Assert.Equal (79, _scrollBar.OtherScrollBarView.Bounds.Width);
