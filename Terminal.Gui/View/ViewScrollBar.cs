@@ -270,7 +270,7 @@ public partial class View
 
     private void AddEventHandlersForScrollBars ()
     {
-        if (_scrollBar == null)
+        if (_scrollBar is null)
         {
             return;
         }
@@ -563,7 +563,7 @@ public partial class View
 
     private void DisposeScrollBar ()
     {
-        if (_scrollBar == null)
+        if (_scrollBar is null)
         {
             return;
         }
