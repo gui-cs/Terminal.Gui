@@ -81,6 +81,8 @@ public class TreeView<T> : View, ITreeView where T : class
     {
         CanFocus = true;
 
+        DrawAdornments += TreeView_DrawAdornments;
+
         // Things this view knows how to do
         AddCommand (
                     Command.PageUp,
@@ -391,6 +393,24 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <summary>The root objects in the tree, note that this collection is of root objects only.</summary>
     public IEnumerable<T> Objects => roots.Keys;
 
+    /// <inheritdoc/>
+    public override int ScrollLeftOffset
+    {
+        get => base.ScrollLeftOffset;
+        set
+        {
+            if (base.ScrollLeftOffset != value)
+            {
+                base.ScrollLeftOffset = value;
+            }
+
+            if (ScrollOffsetHorizontal != ScrollLeftOffset)
+            {
+                ScrollOffsetHorizontal = ScrollLeftOffset;
+            }
+        }
+    }
+
     /// <summary>The amount of tree view that has been scrolled to the right (horizontally).</summary>
     /// <remarks>
     ///     Setting a value of less than 0 will result in a offset of 0. To see changes in the UI call
@@ -399,7 +419,7 @@ public class TreeView<T> : View, ITreeView where T : class
     public int ScrollOffsetHorizontal
     {
         get => scrollOffsetHorizontal;
-        set => scrollOffsetHorizontal = Math.Max (0, value);
+        set => ScrollLeftOffset = scrollOffsetHorizontal = Math.Max (0, value);
     }
 
     /// <summary>The amount of tree view that has been scrolled off the top of the screen (by the user scrolling down).</summary>
@@ -410,7 +430,25 @@ public class TreeView<T> : View, ITreeView where T : class
     public int ScrollOffsetVertical
     {
         get => scrollOffsetVertical;
-        set => scrollOffsetVertical = Math.Max (0, value);
+        set => ScrollTopOffset = scrollOffsetVertical = Math.Max (0, value);
+    }
+
+    /// <inheritdoc/>
+    public override int ScrollTopOffset
+    {
+        get => base.ScrollTopOffset;
+        set
+        {
+            if (base.ScrollTopOffset != value)
+            {
+                base.ScrollTopOffset = value;
+            }
+
+            if (ScrollOffsetVertical != ScrollTopOffset)
+            {
+                ScrollOffsetVertical = ScrollTopOffset;
+            }
+        }
     }
 
     /// <summary>
@@ -1594,6 +1632,12 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <param name="toFind"></param>
     /// <returns>The branch for <paramref name="toFind"/> or null if it is not currently exposed in the tree.</returns>
     private Branch<T> ObjectToBranch (T toFind) { return BuildLineMap ().FirstOrDefault (o => o.Model.Equals (toFind)); }
+
+    private void TreeView_DrawAdornments (object sender, DrawEventArgs e)
+    {
+        ScrollRowsSize = ContentHeight;
+        ScrollColsSize = GetContentWidth (true);
+    }
 }
 
 internal class TreeSelection<T> where T : class
