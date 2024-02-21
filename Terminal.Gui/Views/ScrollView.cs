@@ -30,13 +30,9 @@ public class ScrollView : View
     private readonly ContentView _contentView;
     private readonly ScrollBarView _horizontal;
     private readonly ScrollBarView _vertical;
-    private bool _autoHideScrollBars = true;
     private View _contentBottomRightCorner;
     private Point _contentOffset;
     private Size _contentSize;
-    private bool _keepContentAlwaysInViewport = true;
-    private bool _showHorizontalScrollIndicator;
-    private bool _showVerticalScrollIndicator;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Gui.ScrollView"/> class using <see cref="LayoutStyle.Computed"/>
@@ -45,32 +41,32 @@ public class ScrollView : View
     public ScrollView ()
     {
         _contentView = new ContentView ();
+        base.Add (_contentView);
 
         _vertical = new ScrollBarView
         {
             X = Pos.AnchorEnd (1),
             Y = 0,
             Width = 1,
-            Height = Dim.Fill (_showHorizontalScrollIndicator ? 1 : 0),
             Size = 1,
-            IsVertical = true,
-            Host = this
+            IsVertical = true
         };
 
         _horizontal = new ScrollBarView
         {
             X = 0,
             Y = Pos.AnchorEnd (1),
-            Width = Dim.Fill (_showVerticalScrollIndicator ? 1 : 0),
             Height = 1,
             Size = 1,
-            IsVertical = false,
-            Host = this
+            IsVertical = false
         };
-
         _vertical.OtherScrollBarView = _horizontal;
         _horizontal.OtherScrollBarView = _vertical;
-        base.Add (_contentView);
+
+        // The _horizontal will be automatically added
+        // through the OtherScrollBarView property
+        base.Add (_vertical);
+
         CanFocus = true;
 
         MouseEnter += View_MouseEnter;
@@ -135,12 +131,13 @@ public class ScrollView : View
     /// <summary>If true the vertical/horizontal scroll bars won't be showed if it's not needed.</summary>
     public bool AutoHideScrollBars
     {
-        get => _autoHideScrollBars;
+        get => _horizontal?.AutoHideScrollBars ?? _vertical.AutoHideScrollBars;
         set
         {
-            if (_autoHideScrollBars != value)
+            if (_horizontal.AutoHideScrollBars || _vertical.AutoHideScrollBars != value)
             {
-                _autoHideScrollBars = value;
+                _vertical.AutoHideScrollBars = value;
+                _horizontal.AutoHideScrollBars = value;
 
                 if (Subviews.Contains (_vertical))
                 {
@@ -198,43 +195,13 @@ public class ScrollView : View
     /// <summary>Get or sets if the view-port is kept always visible in the area of this <see cref="ScrollView"/></summary>
     public bool KeepContentAlwaysInViewport
     {
-        get => _keepContentAlwaysInViewport;
+        get => _horizontal?.KeepContentAlwaysInViewport ?? _vertical.KeepContentAlwaysInViewport;
         set
         {
-            if (_keepContentAlwaysInViewport != value)
+            if (_horizontal.KeepContentAlwaysInViewport || _vertical.KeepContentAlwaysInViewport != value)
             {
-                _keepContentAlwaysInViewport = value;
-                _vertical.OtherScrollBarView.KeepContentAlwaysInViewport = value;
-                _horizontal.OtherScrollBarView.KeepContentAlwaysInViewport = value;
-                Point p = default;
-
-                if (value && -_contentOffset.X + Bounds.Width > _contentSize.Width)
-                {
-                    p = new Point (
-                                   _contentSize.Width - Bounds.Width + (_showVerticalScrollIndicator ? 1 : 0),
-                                   -_contentOffset.Y
-                                  );
-                }
-
-                if (value && -_contentOffset.Y + Bounds.Height > _contentSize.Height)
-                {
-                    if (p == default (Point))
-                    {
-                        p = new Point (
-                                       -_contentOffset.X,
-                                       _contentSize.Height - Bounds.Height + (_showHorizontalScrollIndicator ? 1 : 0)
-                                      );
-                    }
-                    else
-                    {
-                        p.Y = _contentSize.Height - Bounds.Height + (_showHorizontalScrollIndicator ? 1 : 0);
-                    }
-                }
-
-                if (p != default (Point))
-                {
-                    ContentOffset = p;
-                }
+                _vertical.KeepContentAlwaysInViewport = value;
+                _horizontal.KeepContentAlwaysInViewport = value;
             }
         }
     }
@@ -243,34 +210,37 @@ public class ScrollView : View
     /// <value><c>true</c> if show horizontal scroll indicator; otherwise, <c>false</c>.</value>
     public bool ShowHorizontalScrollIndicator
     {
-        get => _showHorizontalScrollIndicator;
+        get => _horizontal.ShowScrollIndicator;
         set
         {
-            if (value != _showHorizontalScrollIndicator)
+            if (value != _horizontal.ShowScrollIndicator)
             {
-                _showHorizontalScrollIndicator = value;
+                _horizontal.ShowScrollIndicator = value;
                 SetNeedsLayout ();
 
                 if (value)
                 {
                     _horizontal.OtherScrollBarView = _vertical;
-                    base.Add (_horizontal);
-                    _horizontal.ShowScrollIndicator = value;
-                    _horizontal.AutoHideScrollBars = _autoHideScrollBars;
-                    _horizontal.OtherScrollBarView.ShowScrollIndicator = value;
+
+                    if (!Subviews.Contains (_horizontal))
+                    {
+                        base.Add (_horizontal);
+                    }
+
+                    _horizontal.ShowScrollIndicator = true;
+                    _horizontal.AutoHideScrollBars = AutoHideScrollBars;
+                    _horizontal.OtherScrollBarView.ShowScrollIndicator = true;
                     _horizontal.MouseEnter += View_MouseEnter;
                     _horizontal.MouseLeave += View_MouseLeave;
                 }
                 else
                 {
                     base.Remove (_horizontal);
-                    _horizontal.OtherScrollBarView = null;
+                    _horizontal.ShowScrollIndicator = false;
                     _horizontal.MouseEnter -= View_MouseEnter;
                     _horizontal.MouseLeave -= View_MouseLeave;
                 }
             }
-
-            _vertical.Height = Dim.Fill (_showHorizontalScrollIndicator ? 1 : 0);
         }
     }
 
@@ -278,34 +248,37 @@ public class ScrollView : View
     /// <value><c>true</c> if show vertical scroll indicator; otherwise, <c>false</c>.</value>
     public bool ShowVerticalScrollIndicator
     {
-        get => _showVerticalScrollIndicator;
+        get => _vertical.ShowScrollIndicator;
         set
         {
-            if (value != _showVerticalScrollIndicator)
+            if (value != _vertical.ShowScrollIndicator)
             {
-                _showVerticalScrollIndicator = value;
+                _vertical.ShowScrollIndicator = value;
                 SetNeedsLayout ();
 
                 if (value)
                 {
                     _vertical.OtherScrollBarView = _horizontal;
-                    base.Add (_vertical);
-                    _vertical.ShowScrollIndicator = value;
-                    _vertical.AutoHideScrollBars = _autoHideScrollBars;
-                    _vertical.OtherScrollBarView.ShowScrollIndicator = value;
+
+                    if (!Subviews.Contains (_vertical))
+                    {
+                        base.Add (_vertical);
+                    }
+
+                    _vertical.ShowScrollIndicator = true;
+                    _vertical.AutoHideScrollBars = AutoHideScrollBars;
+                    _vertical.OtherScrollBarView.ShowScrollIndicator = true;
                     _vertical.MouseEnter += View_MouseEnter;
                     _vertical.MouseLeave += View_MouseLeave;
                 }
                 else
                 {
                     Remove (_vertical);
-                    _vertical.OtherScrollBarView = null;
+                    _vertical.ShowScrollIndicator = false;
                     _vertical.MouseEnter -= View_MouseEnter;
                     _vertical.MouseLeave -= View_MouseLeave;
                 }
             }
-
-            _horizontal.Width = Dim.Fill (_showVerticalScrollIndicator ? 1 : 0);
         }
     }
 
@@ -316,6 +289,10 @@ public class ScrollView : View
         if (view is ScrollBarView.ContentBottomRightCorner)
         {
             _contentBottomRightCorner = view;
+            base.Add (view);
+        }
+        else if (view is ScrollBarView)
+        {
             base.Add (view);
         }
         else
@@ -355,7 +332,7 @@ public class ScrollView : View
         {
             ScrollUp (1);
         }
-        else if (me.Flags == MouseFlags.WheeledRight && _showHorizontalScrollIndicator)
+        else if (me.Flags == MouseFlags.WheeledRight && _horizontal.ShowScrollIndicator)
         {
             ScrollRight (1);
         }
@@ -476,7 +453,7 @@ public class ScrollView : View
     /// <param name="lines">Number of lines to scroll.</param>
     public bool ScrollDown (int lines)
     {
-        if (_vertical.CanScroll (lines, out _, true))
+        if (_vertical.CanScroll (_vertical.Position + lines, out _, true))
         {
             ContentOffset = new Point (_contentOffset.X, _contentOffset.Y - lines);
 
@@ -506,7 +483,7 @@ public class ScrollView : View
     /// <param name="cols">Number of columns to scroll by.</param>
     public bool ScrollRight (int cols)
     {
-        if (_horizontal.CanScroll (cols, out _))
+        if (_horizontal.CanScroll (_horizontal.Position + cols, out _))
         {
             ContentOffset = new Point (_contentOffset.X - cols, _contentOffset.Y);
 
@@ -534,13 +511,13 @@ public class ScrollView : View
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
-        if (!_showVerticalScrollIndicator)
+        if (!_vertical.ShowScrollIndicator)
         {
             // It was not added to SuperView, so it won't get disposed automatically
             _vertical?.Dispose ();
         }
 
-        if (!_showHorizontalScrollIndicator)
+        if (!_horizontal.ShowScrollIndicator)
         {
             // It was not added to SuperView, so it won't get disposed automatically
             _horizontal?.Dispose ();
@@ -551,7 +528,7 @@ public class ScrollView : View
 
     private void DrawScrollBars ()
     {
-        if (_autoHideScrollBars)
+        if (AutoHideScrollBars)
         {
             ShowHideScrollBars ();
         }
@@ -577,7 +554,12 @@ public class ScrollView : View
 
     private void SetContentBottomRightCornerVisibility ()
     {
-        if (_showHorizontalScrollIndicator && _showVerticalScrollIndicator)
+        if (_contentBottomRightCorner is null)
+        {
+            return;
+        }
+
+        if (_horizontal.ShowScrollIndicator && _vertical.ShowScrollIndicator)
         {
             _contentBottomRightCorner.Visible = true;
         }
