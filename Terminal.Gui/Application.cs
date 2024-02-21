@@ -1408,6 +1408,7 @@ public static partial class Application
     /// </remarks>
     public static event EventHandler<MouseEventEventArgs> MouseEvent;
 
+    #nullable enable
     /// <summary>Called when a mouse event occurs. Fires the <see cref="MouseEvent"/> event.</summary>
     /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
     /// <param name="a">The mouse event with coordinates relative to the screen.</param>
@@ -1621,6 +1622,7 @@ public static partial class Application
             }
         }
     }
+    #nullable restore
 
     #endregion Mouse handling
 
