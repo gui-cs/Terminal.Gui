@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -176,8 +176,8 @@ t     ",
         view.EndInit ();
         view.SetRelativeLayout (Application.Driver.Bounds);
 
-        Assert.Equal ("(0,0,2,2)", view.Frame.ToString ());
-        Assert.Equal ("(0,0,0,0)", view.Bounds.ToString ());
+        Assert.Equal (new (0,0,2,2), view.Frame);
+        Assert.Equal (Rectangle.Empty, view.Bounds);
 
         view.Draw ();
 
@@ -199,16 +199,12 @@ t     ",
         view.EndInit ();
         view.SetRelativeLayout (Application.Driver.Bounds);
 
-        Assert.Equal ("(0,0,2,1)", view.Frame.ToString ());
-        Assert.Equal ("(0,0,0,0)", view.Bounds.ToString ());
+        Assert.Equal (new (0,0,2,1), view.Frame);
+        Assert.Equal (Rectangle.Empty, view.Bounds);
 
         view.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-",
-                                                      _output
-                                                     );
+        TestHelpers.AssertDriverContentsWithFrameAre (string.Empty, _output);
     }
 
     [Fact]
@@ -221,8 +217,8 @@ t     ",
         view.EndInit ();
         view.SetRelativeLayout (Application.Driver.Bounds);
 
-        Assert.Equal ("(0,0,1,2)", view.Frame.ToString ());
-        Assert.Equal ("(0,0,0,0)", view.Bounds.ToString ());
+        Assert.Equal (new (0,0,1,2), view.Frame);
+        Assert.Equal (Rectangle.Empty, view.Bounds);
 
         view.Draw ();
 
@@ -244,8 +240,8 @@ t     ",
         view.EndInit ();
         view.SetRelativeLayout (Application.Driver.Bounds);
 
-        Assert.Equal ("(0,0,1,2)", view.Frame.ToString ());
-        Assert.Equal ("(0,0,0,0)", view.Bounds.ToString ());
+        Assert.Equal (new (0,0,1,2), view.Frame);
+        Assert.Equal (Rectangle.Empty, view.Bounds);
 
         view.Draw ();
 
@@ -268,8 +264,8 @@ t     ",
         view.EndInit ();
         view.SetRelativeLayout (Application.Driver.Bounds);
 
-        Assert.Equal ("(0,0,2,1)", view.Frame.ToString ());
-        Assert.Equal ("(0,0,0,0)", view.Bounds.ToString ());
+        Assert.Equal (new (0,0,2,1), view.Frame);
+        Assert.Equal (Rectangle.Empty, view.Bounds);
 
         view.Draw ();
 
@@ -393,7 +389,7 @@ t     ",
     [AutoInitShutdown]
     public void Draw_Negative_Bounds_Horizontal_Without_New_Lines ()
     {
-        // BUGBUG: This previously assumed the default height of a View was 1. 
+        // BUGBUG: This previously assumed the default height of a View was 1.
         var subView = new View
         {
             Id = "subView",
