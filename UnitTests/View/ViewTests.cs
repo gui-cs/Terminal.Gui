@@ -1084,7 +1084,7 @@ At 0,0
         var r = new View ();
         Assert.NotNull (r);
         Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
-        Assert.Equal ("View()(0,0,0,0)", r.ToString ());
+        Assert.Equal ($"View(){r.Bounds}", r.ToString ());
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
         Assert.Equal (new Rectangle (0, 0, 0, 0), r.Bounds);
@@ -1109,7 +1109,7 @@ At 0,0
         r = new View { Frame = Rectangle.Empty };
         Assert.NotNull (r);
         Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
-        Assert.Equal ("View()(0,0,0,0)", r.ToString ());
+        Assert.Equal ($"View(){r.Bounds}", r.ToString ());
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
         Assert.Equal (new Rectangle (0, 0, 0, 0), r.Bounds);
@@ -1134,7 +1134,7 @@ At 0,0
         r = new View { Frame = new Rectangle (1, 2, 3, 4) };
         Assert.NotNull (r);
         Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
-        Assert.Equal ("View()(1,2,3,4)", r.ToString ());
+        Assert.Equal ($"View(){r.Frame}", r.ToString ());
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
         Assert.Equal (new Rectangle (0, 0, 3, 4), r.Bounds);
@@ -1167,7 +1167,7 @@ At 0,0
         r.BeginInit ();
         r.EndInit ();
     #if DEBUG
-        Assert.Equal ("View(Vertical View)(0,0,1,13)", r.ToString ());
+        Assert.Equal ($"View(Vertical View){r.Bounds}", r.ToString ());
     #else
         Assert.Equal ("View()(0,0,1,13)", r.ToString ());
     #endif

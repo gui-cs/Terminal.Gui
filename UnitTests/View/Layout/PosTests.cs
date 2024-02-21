@@ -201,42 +201,42 @@ public class PosTests
         Pos pos = Pos.Left (v);
 
         Assert.Equal (
-                      "View(side=x,target=View(V)(0,0,0,0))",
+                      $"View(side=x,target=View(V){v.Frame})",
                       pos.ToString ()
                      );
 
         pos = Pos.X (v);
 
         Assert.Equal (
-                      "View(side=x,target=View(V)(0,0,0,0))",
+                      $"View(side=x,target=View(V){v.Frame})",
                       pos.ToString ()
                      );
 
         pos = Pos.Top (v);
 
         Assert.Equal (
-                      "View(side=y,target=View(V)(0,0,0,0))",
+                      $"View(side=y,target=View(V){v.Frame})",
                       pos.ToString ()
                      );
 
         pos = Pos.Y (v);
 
         Assert.Equal (
-                      "View(side=y,target=View(V)(0,0,0,0))",
+                      $"View(side=y,target=View(V){v.Frame})",
                       pos.ToString ()
                      );
 
         pos = Pos.Right (v);
 
         Assert.Equal (
-                      "View(side=right,target=View(V)(0,0,0,0))",
+                      $"View(side=right,target=View(V){v.Frame})",
                       pos.ToString ()
                      );
 
         pos = Pos.Bottom (v);
 
         Assert.Equal (
-                      "View(side=bottom,target=View(V)(0,0,0,0))",
+                      $"View(side=bottom,target=View(V){v.Frame})",
                       pos.ToString ()
                      );
     }
