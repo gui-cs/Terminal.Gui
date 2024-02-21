@@ -429,18 +429,18 @@ internal partial class TestHelpers
         }
 
         // standardize line endings for the comparison
-        expectedLook = expectedLook.Replace ("\r\n", "\n");
-        actualLook = actualLook.Replace ("\r\n", "\n");
+        expectedLook = expectedLook.ReplaceLineEndings ();
+        actualLook = actualLook.ReplaceLineEndings();
 
         // Remove the first and the last line ending from the expectedLook
-        if (expectedLook.StartsWith ("\n"))
+        if (expectedLook.StartsWith (Environment.NewLine))
         {
-            expectedLook = expectedLook [1..];
+            expectedLook = expectedLook [Environment.NewLine.Length..];
         }
 
-        if (expectedLook.EndsWith ("\n"))
+        if (expectedLook.EndsWith (Environment.NewLine))
         {
-            expectedLook = expectedLook [..^1];
+            expectedLook = expectedLook [..^Environment.NewLine.Length];
         }
 
         Assert.Equal (expectedLook, actualLook);
