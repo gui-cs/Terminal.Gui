@@ -560,6 +560,30 @@ public partial class View
             Margin?.SetNeedsDisplay (Margin.Bounds);
             Border?.SetNeedsDisplay (Border.Bounds);
             Padding?.SetNeedsDisplay (Padding.Bounds);
+
+            if (Margin != null)
+            {
+                for (var i = 0; i < 3; i++)
+                {
+                    Adornment adornment = i switch
+                                          {
+                                              0 => Margin,
+                                              1 => Border,
+                                              2 => Padding,
+                                              _ => null
+                                          };
+
+                    if (adornment != null)
+                    {
+                        adornment.SetNeedsDisplay ();
+
+                        foreach (View view in adornment.Subviews)
+                        {
+                            view.SetNeedsDisplay ();
+                        }
+                    }
+                }
+            }
         }
 
         if (_subviews is null)
@@ -595,6 +619,16 @@ public partial class View
     {
         _needsDisplayRect = Rect.Empty;
         SubViewNeedsDisplay = false;
+
+        if (Margin is { })
+        {
+            Margin._needsDisplayRect = Rect.Empty;
+            Margin.SubViewNeedsDisplay = false;
+            Border._needsDisplayRect = Rect.Empty;
+            Border.SubViewNeedsDisplay = false;
+            Padding._needsDisplayRect = Rect.Empty;
+            Padding.SubViewNeedsDisplay = false;
+        }
     }
 
     // Clips a rectangle in screen coordinates to the dimensions currently available on the screen
