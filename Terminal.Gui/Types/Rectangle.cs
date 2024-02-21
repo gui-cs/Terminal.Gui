@@ -261,7 +261,10 @@ public struct Rectangle
 
     /// <summary>GetHashCode Method</summary>
     /// <remarks>Calculates a hashing value.</remarks>
-    public override int GetHashCode () { return (Height + Width) ^ (X + Y); }
+    public override int GetHashCode () { return X ^
+                                                ((Y << 13) | (Y >>> 19)) ^
+                                                ((Width << 26) | (Width >>>  6)) ^
+                                                ((Height <<  7) | (Height >>> 25)); }
 
     /// <summary>IntersectsWith Method</summary>
     /// <remarks>Checks if a Rectangle intersects with this one.</remarks>
