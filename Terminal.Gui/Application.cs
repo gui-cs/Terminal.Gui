@@ -1601,25 +1601,25 @@ public static partial class Application
 
         bool AdornmentHandledMouseEvent (Adornment? frame)
         {
-            if (frame?.Thickness.Contains (frame.FrameToScreen (), a.MouseEvent.X, a.MouseEvent.Y) is true)
+            if (frame?.Thickness.Contains (frame.FrameToScreen (), a.MouseEvent.X, a.MouseEvent.Y) is not true)
             {
-                Point boundsPoint = frame.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
-
-                var me = new MouseEvent
-                {
-                    X = boundsPoint.X,
-                    Y = boundsPoint.Y,
-                    Flags = a.MouseEvent.Flags,
-                    OfX = boundsPoint.X,
-                    OfY = boundsPoint.Y,
-                    View = frame
-                };
-                frame.OnMouseEvent (me);
-
-                return true;
+                return false;
             }
 
-            return false;
+            Point boundsPoint = frame.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
+
+            var me = new MouseEvent
+            {
+                X = boundsPoint.X,
+                Y = boundsPoint.Y,
+                Flags = a.MouseEvent.Flags,
+                OfX = boundsPoint.X,
+                OfY = boundsPoint.Y,
+                View = frame
+            };
+            frame.OnMouseEvent (me);
+
+            return true;
         }
 
         static bool OutsideRect (Point p, Rectangle r) { return p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom; }
