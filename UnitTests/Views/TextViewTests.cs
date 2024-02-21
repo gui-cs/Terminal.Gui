@@ -108,38 +108,6 @@ public class TextViewTests
 
     [Fact]
     [TextViewTestsAutoInitShutdown]
-    public void BottomOffset_Sets_To_Zero_Adjust_TopRow ()
-    {
-        var text = "";
-
-        for (var i = 0; i < 12; i++)
-        {
-            text += $"This is the line {i}\n";
-        }
-
-        var tv = new TextView { Width = 10, Height = 10, BottomOffset = 1 };
-        tv.Text = text;
-
-        tv.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.End));
-
-        Assert.Equal (4, tv.TopRow);
-        Assert.Equal (1, tv.BottomOffset);
-
-        tv.BottomOffset = 0;
-        Assert.Equal (3, tv.TopRow);
-        Assert.Equal (0, tv.BottomOffset);
-
-        tv.BottomOffset = 2;
-        Assert.Equal (5, tv.TopRow);
-        Assert.Equal (2, tv.BottomOffset);
-
-        tv.BottomOffset = 0;
-        Assert.Equal (3, tv.TopRow);
-        Assert.Equal (0, tv.BottomOffset);
-    }
-
-    [Fact]
-    [TextViewTestsAutoInitShutdown]
     public void CanFocus_False_Wont_Focus_With_Mouse ()
     {
         Toplevel top = Application.Top;
@@ -6923,7 +6891,7 @@ This is the second line.
 
     [Fact]
     [TextViewTestsAutoInitShutdown]
-    public void RightOffset_Sets_To_Zero_Adjust_leftColumn ()
+    public void ScrollBarType_IsBuiltIn_Always_Adjust_LeftColumn ()
     {
         var text = "";
 
@@ -6932,25 +6900,83 @@ This is the second line.
             text += $"{i.ToString () [^1]}";
         }
 
-        var tv = new TextView { Width = 10, Height = 10, RightOffset = 1 };
+        var tv = new TextView { Width = 10, Height = 10, ScrollBarType = ScrollBarType.Both };
         tv.Text = text;
 
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        tv.NewKeyDownEvent (new Key (KeyCode.Space));
         tv.NewKeyDownEvent (new Key (KeyCode.End));
 
         Assert.Equal (4, tv.LeftColumn);
-        Assert.Equal (1, tv.RightOffset);
+        Assert.Equal (14, tv.Maxlength);
+        Assert.Equal (tv.LeftColumn, tv.Maxlength - tv.Bounds.Width);
 
-        tv.RightOffset = 0;
+        tv.NewKeyDownEvent (new Key (KeyCode.Backspace));
+        tv.NewKeyDownEvent (new Key (KeyCode.End));
+
         Assert.Equal (3, tv.LeftColumn);
-        Assert.Equal (0, tv.RightOffset);
+        Assert.Equal (13, tv.Maxlength);
+        Assert.Equal (tv.LeftColumn, tv.Maxlength - tv.Bounds.Width);
 
-        tv.RightOffset = 2;
+        tv.NewKeyDownEvent (new Key (KeyCode.Space));
+        tv.NewKeyDownEvent (new Key (KeyCode.Space));
+
         Assert.Equal (5, tv.LeftColumn);
-        Assert.Equal (2, tv.RightOffset);
+        Assert.Equal (15, tv.Maxlength);
+        Assert.Equal (tv.LeftColumn, tv.Maxlength - tv.Bounds.Width);
 
-        tv.RightOffset = 0;
+        tv.NewKeyDownEvent (new Key (KeyCode.Backspace));
+        tv.NewKeyDownEvent (new Key (KeyCode.Backspace));
+
         Assert.Equal (3, tv.LeftColumn);
-        Assert.Equal (0, tv.RightOffset);
+        Assert.Equal (13, tv.Maxlength);
+        Assert.Equal (tv.LeftColumn, tv.Maxlength - tv.Bounds.Width);
+    }
+
+    [Fact]
+    [TextViewTestsAutoInitShutdown]
+    public void ScrollBarType_IsBuiltIn_Always_Adjust_TopRow ()
+    {
+        var text = "";
+
+        for (var i = 0; i < 12; i++)
+        {
+            text += $"This is the line {i}\n";
+        }
+
+        var tv = new TextView { Width = 10, Height = 10, ScrollBarType = ScrollBarType.Both };
+        tv.Text = text;
+
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        tv.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.End));
+
+        Assert.Equal (4, tv.TopRow);
+        Assert.Equal (13, tv.Lines);
+        Assert.Equal (tv.TopRow, tv.Lines - tv.Bounds.Height);
+
+        tv.NewKeyDownEvent (new Key (KeyCode.Backspace));
+
+        Assert.Equal (3, tv.TopRow);
+        Assert.Equal (12, tv.Lines);
+        Assert.Equal (tv.TopRow, tv.Lines - tv.Bounds.Height);
+
+        tv.NewKeyDownEvent (new Key (KeyCode.Enter));
+        tv.NewKeyDownEvent (new Key (KeyCode.Enter));
+
+        Assert.Equal (5, tv.TopRow);
+        Assert.Equal (14, tv.Lines);
+        Assert.Equal (tv.TopRow, tv.Lines - tv.Bounds.Height);
+
+        tv.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.AltMask));
+        tv.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.AltMask));
+
+        Assert.Equal (3, tv.TopRow);
+        Assert.Equal (12, tv.Lines);
+        Assert.Equal (tv.TopRow, tv.Lines - tv.Bounds.Height);
     }
 
     [Fact]
