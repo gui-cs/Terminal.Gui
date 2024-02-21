@@ -29,6 +29,7 @@ public class TableView : View
     // TODO: Update to use Key instead of KeyCode
     private KeyCode cellActivationKey = KeyCode.Enter;
     private int columnOffset;
+    private bool ignoreEnsureSelectedCellIsVisible;
     private int rowOffset;
     private Point? scrollLeftPoint;
     private Point? scrollRightPoint;
@@ -50,6 +51,8 @@ public class TableView : View
         CanFocus = true;
 
         CollectionNavigator = new TableCollectionNavigator (this);
+
+        DrawAdornments += TableView_DrawAdornments;
 
         // Things this view knows how to do
         AddCommand (
@@ -341,7 +344,7 @@ public class TableView : View
         get => columnOffset;
 
         //try to prevent this being set to an out of bounds column
-        set => columnOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Columns - 1, value));
+        set => ScrollLeftOffset = columnOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Columns - 1, value));
     }
 
     /// <summary>True to select the entire row at once.  False to select individual cells.  Defaults to false</summary>
@@ -377,7 +380,44 @@ public class TableView : View
     public int RowOffset
     {
         get => rowOffset;
-        set => rowOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Rows - 1, value));
+        set => ScrollTopOffset = rowOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Rows - 1, value));
+    }
+
+    /// <inheritdoc/>
+    public override int ScrollLeftOffset
+    {
+        get => base.ScrollLeftOffset;
+        set
+        {
+            if (base.ScrollLeftOffset != value)
+            {
+                base.ScrollLeftOffset = value;
+            }
+
+            if (ColumnOffset != ScrollLeftOffset)
+            {
+                ignoreEnsureSelectedCellIsVisible = true;
+                ColumnOffset = ScrollLeftOffset;
+            }
+        }
+    }
+
+    /// <inheritdoc/>
+    public override int ScrollTopOffset
+    {
+        get => base.ScrollTopOffset;
+        set
+        {
+            if (base.ScrollTopOffset != value)
+            {
+                base.ScrollTopOffset = value;
+            }
+
+            if (RowOffset != ScrollTopOffset)
+            {
+                RowOffset = ScrollTopOffset;
+            }
+        }
     }
 
     /// <summary>The index of <see cref="DataTable.Columns"/> in <see cref="Table"/> that the user has currently selected</summary>
@@ -412,6 +452,8 @@ public class TableView : View
         get => selectedRow;
         set
         {
+            ignoreEnsureSelectedCellIsVisible = false;
+
             int oldValue = selectedRow;
 
             selectedRow = TableIsNullOrInvisible () ? 0 : Math.Min (Table.Rows - 1, Math.Max (0, value));
@@ -432,7 +474,7 @@ public class TableView : View
     }
 
     /// <summary>
-    ///     The symbol to add after each cell value and header value to visually seperate values (if not using vertical
+    ///     The symbol to add after each cell value and header value to visually separate values (if not using vertical
     ///     gridlines)
     /// </summary>
     public char SeparatorSymbol { get; set; } = ' ';
@@ -455,6 +497,7 @@ public class TableView : View
         set
         {
             table = value;
+            SetScrollRowsColsSize ();
             Update ();
         }
     }
@@ -1191,7 +1234,10 @@ public class TableView : View
         EnsureValidScrollOffsets ();
         EnsureValidSelection ();
 
-        EnsureSelectedCellIsVisible ();
+        if (!ignoreEnsureSelectedCellIsVisible)
+        {
+            EnsureSelectedCellIsVisible ();
+        }
 
         SetNeedsDisplay ();
     }
@@ -1971,6 +2017,21 @@ public class TableView : View
         AddRune (col, row, symbol);
     }
 
+    private void SetScrollRowsColsSize ()
+    {
+        int scrollColsSize = Table?.Columns + Bounds.Width - 1 ?? 0;
+
+        if (ScrollColsSize != scrollColsSize)
+        {
+            ScrollColsSize = scrollColsSize;
+        }
+
+        if (ScrollRowsSize != Table?.Rows)
+        {
+            ScrollRowsSize = Table?.Rows ?? 0;
+        }
+    }
+
     private bool ShouldRenderHeaders ()
     {
         if (TableIsNullOrInvisible ())
@@ -1994,6 +2055,16 @@ public class TableView : View
                             .All (
                                   c => (Style.GetColumnStyleIfAny (c)?.Visible ?? true) == false
                                  );
+    }
+
+    private void TableView_DrawAdornments (object sender, DrawEventArgs e)
+    {
+        if (Table is null)
+        {
+            return;
+        }
+
+        SetScrollRowsColsSize ();
     }
 
     private void ToggleCurrentCellSelection ()
