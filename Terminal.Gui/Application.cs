@@ -1170,12 +1170,13 @@ public static partial class Application
         return top;
     }
 
+    #nullable enable
     // Only return true if the Current has changed.
     private static bool MoveCurrent (Toplevel top)
     {
         // The Current is modal and the top is not modal Toplevel then
         // the Current must be moved above the first not modal Toplevel.
-        if (OverlappedTop != null
+        if (OverlappedTop is { }
             && top != OverlappedTop
             && top != Current
             && Current?.Modal == true
@@ -1250,6 +1251,7 @@ public static partial class Application
 
         return true;
     }
+    #nullable restore
 
     /// <summary>Invoked when the terminal's size changed. The new size of the terminal is provided.</summary>
     /// <remarks>
