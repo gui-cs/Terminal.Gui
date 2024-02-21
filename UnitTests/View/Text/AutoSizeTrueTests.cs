@@ -868,14 +868,16 @@ public class AutoSizeTrueTests
         win.EndInit ();
 
         Assert.True (label.AutoSize);
-        Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
+        Rectangle expectedLabelBounds = Rectangle.Empty;
+        Assert.Equal (expectedLabelBounds, label.Bounds);
         Assert.True (label.AutoSize);
 
         label.Text = "First line\nSecond line";
         win.LayoutSubviews ();
 
+        expectedLabelBounds = new (0, 0, 11, 2);
         Assert.True (label.AutoSize);
-        Assert.Equal ("(0,0,11,2)", label.Bounds.ToString ());
+        Assert.Equal (expectedLabelBounds, label.Bounds);
 
         label.AutoSize = false;
         label.Width = Dim.Fill ();
@@ -885,17 +887,19 @@ public class AutoSizeTrueTests
         // Here the SetMinWidthHeight ensuring the minimum height
         // #3127: After: (0,0,28,2) because turning off AutoSize leaves
         // Height set to 2.
+        expectedLabelBounds = new (0, 0, 28, 2);
         Assert.False (label.AutoSize);
-        Assert.Equal ("(0,0,28,2)", label.Bounds.ToString ());
+        Assert.Equal (expectedLabelBounds, label.Bounds);
 
         label.Text = "First changed line\nSecond changed line\nNew line";
         win.LayoutSubviews ();
 
         // Here the AutoSize is false and the width 28 (Dim.Fill) and
         // #3127: Before: height 1 because it wasn't set and SetMinWidthHeight ensuring the minimum height
-        // #3127: After: (0,0,28,2) because setting Text leaves Height set to 2..
+        // #3127: After: (0,0,28,2) because setting Text leaves Height set to 2.
+        expectedLabelBounds = new (0, 0, 28, 2);
         Assert.False (label.AutoSize);
-        Assert.Equal ("(0,0,28,2)", label.Bounds.ToString ());
+        Assert.Equal (expectedLabelBounds, label.Bounds);
 
         label.AutoSize = true;
 
@@ -903,8 +907,9 @@ public class AutoSizeTrueTests
 
         // Here the AutoSize ensuring the right size with width 19 (width of longest line)
         // and height 3 because the text has 3 lines
+        expectedLabelBounds = new (0, 0, 19, 3);
         Assert.True (label.AutoSize);
-        Assert.Equal ("(0,0,19,3)", label.Bounds.ToString ());
+        Assert.Equal (expectedLabelBounds, label.Bounds);
     }
 
     [Fact]
@@ -1486,7 +1491,8 @@ public class AutoSizeTrueTests
         super.LayoutSubviews ();
 
         Assert.True (label.AutoSize);
-        Assert.Equal ("(0,0,8,1)", label.Bounds.ToString ());
+        Rectangle expectedLabelBounds = new (0, 0, 8, 1);
+        Assert.Equal (expectedLabelBounds, label.Bounds);
         super.Dispose ();
     }
 

@@ -142,9 +142,10 @@ public class AutoSizeFalseTests
 
         view.Text = "New text";
         super.LayoutSubviews ();
+        Rectangle expectedViewBounds = new (0, 0, 0, 0);
 
         Assert.False (view.AutoSize);
-        Assert.Equal ("(0,0,0,0)", view.Bounds.ToString ());
+        Assert.Equal (expectedViewBounds, view.Bounds);
         super.Dispose ();
     }
 
@@ -158,9 +159,10 @@ public class AutoSizeFalseTests
 
         view.Text = "New text\nNew line";
         super.LayoutSubviews ();
+        Rectangle expectedViewBounds = new (0, 0, 30, 80);
 
         Assert.False (view.AutoSize);
-        Assert.Equal ("(0,0,30,80)", view.Bounds.ToString ());
+        Assert.Equal (expectedViewBounds, view.Bounds);
         Assert.False (view.IsInitialized);
 
         super.BeginInit ();
@@ -168,7 +170,7 @@ public class AutoSizeFalseTests
 
         Assert.True (view.IsInitialized);
         Assert.False (view.AutoSize);
-        Assert.Equal ("(0,0,30,80)", view.Bounds.ToString ());
+        Assert.Equal (expectedViewBounds, view.Bounds);
     }
 
     [Fact]
