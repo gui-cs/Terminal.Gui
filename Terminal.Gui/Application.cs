@@ -1172,7 +1172,7 @@ public static partial class Application
 
     #nullable enable
     // Only return true if the Current has changed.
-    private static bool MoveCurrent (Toplevel top)
+    private static bool MoveCurrent (Toplevel? top)
     {
         // The Current is modal and the top is not modal Toplevel then
         // the Current must be moved above the first not modal Toplevel.
@@ -1483,7 +1483,7 @@ public static partial class Application
             && a.MouseEvent.Flags != MouseFlags.ReportMousePosition
             && a.MouseEvent.Flags != 0)
         {
-            View top = FindDeepestTop (Top, a.MouseEvent.X, a.MouseEvent.Y);
+            View? top = FindDeepestTop (Top, a.MouseEvent.X, a.MouseEvent.Y);
             view = View.FindDeepestView (top, a.MouseEvent.X, a.MouseEvent.Y, out screenX, out screenY);
 
             if (view is { } && view != OverlappedTop && top != Current)
