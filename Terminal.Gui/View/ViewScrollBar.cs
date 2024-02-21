@@ -82,11 +82,11 @@ public partial class View
 
             Padding.Add (_scrollBar);
             AddEventHandlersForScrollBars ();
-            AddScrollKeyBindings (_scrollBar);
+            AddKeyBindingsForScrolling (_scrollBar);
 
             if (_scrollBar.OtherScrollBarView != null)
             {
-                AddScrollKeyBindings (_scrollBar.OtherScrollBarView);
+                AddKeyBindingsForScrolling (_scrollBar.OtherScrollBarView);
             }
 
             SetNeedsDisplay ();
@@ -283,7 +283,7 @@ public partial class View
         }
     }
 
-    private void AddScrollKeyBindings (ScrollBarView scrollBar)
+    private void AddKeyBindingsForScrolling (ScrollBarView scrollBar)
     {
         if (scrollBar.IsVertical)
         {
