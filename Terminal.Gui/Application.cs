@@ -1397,8 +1397,9 @@ public static partial class Application
         UnGrabbedMouse?.Invoke (view, new ViewEventArgs (view));
     }
 
+    #nullable enable
     // Used by OnMouseEvent to track the last view that was clicked on.
-    internal static View _mouseEnteredView;
+    internal static View? _mouseEnteredView;
 
     /// <summary>Event fired when a mouse move or click occurs. Coordinates are screen relative.</summary>
     /// <remarks>
@@ -1410,7 +1411,6 @@ public static partial class Application
     /// </remarks>
     public static event EventHandler<MouseEventEventArgs> MouseEvent;
 
-    #nullable enable
     /// <summary>Called when a mouse event occurs. Raises the <see cref="MouseEvent"/> event.</summary>
     /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
     /// <param name="a">The mouse event with coordinates relative to the screen.</param>

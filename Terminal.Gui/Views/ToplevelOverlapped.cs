@@ -38,11 +38,12 @@ public static partial class Application
         }
     }
 
+    #nullable enable
     /// <summary>
     ///     The <see cref="Toplevel"/> object used for the application on startup which
     ///     <see cref="Toplevel.IsOverlappedContainer"/> is true.
     /// </summary>
-    public static Toplevel OverlappedTop
+    public static Toplevel? OverlappedTop
     {
         get
         {
@@ -54,6 +55,7 @@ public static partial class Application
             return null;
         }
     }
+    #nullable restore
 
     /// <summary>Brings the superview of the most focused overlapped view is on front.</summary>
     public static void BringOverlappedTopToFront ()
