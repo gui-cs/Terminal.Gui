@@ -7,7 +7,6 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Terminal.Gui;
-using Rectangle = Terminal.Gui.Rectangle;
 
 namespace UICatalog.Scenarios;
 
