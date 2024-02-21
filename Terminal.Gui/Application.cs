@@ -1462,7 +1462,7 @@ public static partial class Application
 
             if (MouseGrabView.Bounds.Contains (nme.X, nme.Y) is false)
             {
-                // The mouse has moved outside the bounds of the the view that
+                // The mouse has moved outside the bounds of the view that
                 // grabbed the mouse, so we tell the view that last got 
                 // OnMouseEnter the mouse is leaving
                 // BUGBUG: That sentence makes no sense. Either I'm missing something
