@@ -11,7 +11,7 @@
 namespace Terminal.Gui;
 
 /// <summary>Stores a set of four integers that represent the location and size of a rectangle</summary>
-public struct Rect
+public struct Rectangle
 {
     private int width;
     private int height;
@@ -54,18 +54,18 @@ public struct Rect
 
     /// <summary>Empty Shared Field</summary>
     /// <remarks>An uninitialized Rectangle Structure.</remarks>
-    public static readonly Rect Empty;
+    public static readonly Rectangle Empty;
 
     /// <summary>FromLTRB Shared Method</summary>
     /// <remarks>Produces a Rectangle structure from left, top, right and bottom coordinates.</remarks>
-    public static Rect FromLTRB (
+    public static Rectangle FromLTRB (
         int left,
         int top,
         int right,
         int bottom
     )
     {
-        return new Rect (
+        return new Rectangle (
                          left,
                          top,
                          right - left,
@@ -78,9 +78,9 @@ public struct Rect
     ///     Produces a new Rect by inflating an existing Rect by the specified coordinate values. The rectangle is
     ///     enlarged in both directions along an axis.
     /// </remarks>
-    public static Rect Inflate (Rect rect, int x, int y)
+    public static Rectangle Inflate (Rectangle rect, int x, int y)
     {
-        var r = new Rect (rect.Location, rect.Size);
+        var r = new Rectangle (rect.Location, rect.Size);
         r.Inflate (x, y);
 
         return r;
@@ -110,7 +110,7 @@ public struct Rect
 
     /// <summary>Intersect Shared Method</summary>
     /// <remarks>Produces a new Rectangle by intersecting 2 existing Rectangles. Returns Empty if there is no intersection.</remarks>
-    public static Rect Intersect (Rect a, Rect b)
+    public static Rectangle Intersect (Rectangle a, Rectangle b)
     {
         // MS.NET returns a non-empty rectangle if the two rectangles
         // touch each other
@@ -129,11 +129,11 @@ public struct Rect
 
     /// <summary>Intersect Method</summary>
     /// <remarks>Replaces the Rectangle with the intersection of itself and another Rectangle.</remarks>
-    public void Intersect (Rect rect) { this = Intersect (this, rect); }
+    public void Intersect (Rectangle rect) { this = Intersect (this, rect); }
 
     /// <summary>Produces the uninion of two rectangles.</summary>
     /// <remarks>Produces a new Rectangle from the union of 2 existing Rectangles.</remarks>
-    public static Rect Union (Rect a, Rect b)
+    public static Rectangle Union (Rectangle a, Rectangle b)
     {
         //int x1 = Math.Min (a.X, b.X);
         //int x2 = Math.Max (a.X + a.Width, b.X + b.Width);
@@ -146,7 +146,7 @@ public struct Rect
         int y1 = Math.Min (a.Y, b.Y);
         int y2 = Math.Max (a.Y + Math.Abs (a.Height), b.Y + Math.Abs (b.Height));
 
-        return new Rect (x1, y1, x2 - x1, y2 - y1);
+        return new Rectangle (x1, y1, x2 - x1, y2 - y1);
     }
 
     /// <summary>Equality Operator</summary>
@@ -154,14 +154,14 @@ public struct Rect
     ///     Compares two Rectangle objects. The return value is based on the equivalence of the Location and Size
     ///     properties of the two Rectangles.
     /// </remarks>
-    public static bool operator == (Rect left, Rect right) { return left.Location == right.Location && left.Size == right.Size; }
+    public static bool operator == (Rectangle left, Rectangle right) { return left.Location == right.Location && left.Size == right.Size; }
 
     /// <summary>Inequality Operator</summary>
     /// <remarks>
     ///     Compares two Rectangle objects. The return value is based on the equivalence of the Location and Size
     ///     properties of the two Rectangles.
     /// </remarks>
-    public static bool operator != (Rect left, Rect right) { return left.Location != right.Location || left.Size != right.Size; }
+    public static bool operator != (Rectangle left, Rectangle right) { return left.Location != right.Location || left.Size != right.Size; }
 
     // -----------------------
     // Public Constructors
@@ -169,7 +169,7 @@ public struct Rect
 
     /// <summary>Rectangle Constructor</summary>
     /// <remarks>Creates a Rectangle from Point and Size values.</remarks>
-    public Rect (Point location, Size size)
+    public Rectangle (Point location, Size size)
     {
         X = location.X;
         Y = location.Y;
@@ -181,7 +181,7 @@ public struct Rect
 
     /// <summary>Rectangle Constructor</summary>
     /// <remarks>Creates a Rectangle from a specified x,y location and width and height values.</remarks>
-    public Rect (int x, int y, int width, int height)
+    public Rectangle (int x, int y, int width, int height)
     {
         X = x;
         Y = y;
@@ -245,18 +245,18 @@ public struct Rect
 
     /// <summary>Contains Method</summary>
     /// <remarks>Checks if a Rectangle lies entirely within this Rectangle.</remarks>
-    public bool Contains (Rect rect) { return rect == Intersect (this, rect); }
+    public bool Contains (Rectangle rect) { return rect == Intersect (this, rect); }
 
     /// <summary>Equals Method</summary>
     /// <remarks>Checks equivalence of this Rectangle and another object.</remarks>
     public override bool Equals (object obj)
     {
-        if (!(obj is Rect))
+        if (!(obj is Rectangle))
         {
             return false;
         }
 
-        return this == (Rect)obj;
+        return this == (Rectangle)obj;
     }
 
     /// <summary>GetHashCode Method</summary>
@@ -265,9 +265,9 @@ public struct Rect
 
     /// <summary>IntersectsWith Method</summary>
     /// <remarks>Checks if a Rectangle intersects with this one.</remarks>
-    public bool IntersectsWith (Rect rect) { return !(Left >= rect.Right || Right <= rect.Left || Top >= rect.Bottom || Bottom <= rect.Top); }
+    public bool IntersectsWith (Rectangle rect) { return !(Left >= rect.Right || Right <= rect.Left || Top >= rect.Bottom || Bottom <= rect.Top); }
 
-    private bool IntersectsWithInclusive (Rect r) { return !(Left > r.Right || Right < r.Left || Top > r.Bottom || Bottom < r.Top); }
+    private bool IntersectsWithInclusive (Rectangle r) { return !(Left > r.Right || Right < r.Left || Top > r.Bottom || Bottom < r.Top); }
 
     /// <summary>Offset Method</summary>
     /// <remarks>Moves the Rectangle a specified distance.</remarks>

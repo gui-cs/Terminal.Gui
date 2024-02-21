@@ -103,10 +103,10 @@ public class Border : Adornment
     /// <param name="region">View-relative region for the frame to be drawn.</param>
     /// <param name="clear">If set to <see langword="true"/> it clear the region.</param>
     [Obsolete ("This method is obsolete in v2. Use use LineCanvas or Frame instead.", false)]
-    public void DrawFrame (Rect region, bool clear)
+    public void DrawFrame (Rectangle region, bool clear)
     {
-        Rect savedClip = ClipToBounds ();
-        Rect screenBounds = BoundsToScreen (region);
+        Rectangle savedClip = ClipToBounds ();
+        Rectangle screenBounds = BoundsToScreen (region);
 
         if (clear)
         {
@@ -196,7 +196,7 @@ public class Border : Adornment
     /// <summary>Draws the title for a Window-style view.</summary>
     /// <param name="region">Screen relative region where the title will be drawn.</param>
     /// <param name="title">The title.</param>
-    public void DrawTitle (Rect region, string title)
+    public void DrawTitle (Rectangle region, string title)
     {
         int width = region.Width;
 
@@ -213,7 +213,7 @@ public class Border : Adornment
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         base.OnDrawContent (contentArea);
 
@@ -223,7 +223,7 @@ public class Border : Adornment
         }
 
         //Driver.SetAttribute (Colors.ColorSchemes ["Error"].Normal);
-        Rect screenBounds = BoundsToScreen (Frame);
+        Rectangle screenBounds = BoundsToScreen (Frame);
 
         //OnDrawSubviews (bounds); 
 
@@ -232,7 +232,7 @@ public class Border : Adornment
         // The border adornment (and title) are drawn at the outermost edge of border; 
         // For Border
         // ...thickness extends outward (border/title is always as far in as possible)
-        var borderBounds = new Rect (
+        var borderBounds = new Rectangle (
                                      screenBounds.X + Math.Max (0, Thickness.Left - 1),
                                      screenBounds.Y + Math.Max (0, Thickness.Top - 1),
                                      Math.Max (
@@ -302,7 +302,7 @@ public class Border : Adornment
         {
             Attribute prevAttr = Driver.GetAttribute ();
             Driver.SetAttribute (Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor ());
-            DrawTitle (new Rect (borderBounds.X, titleY, maxTitleWidth, 1), Parent?.Title);
+            DrawTitle (new Rectangle (borderBounds.X, titleY, maxTitleWidth, 1), Parent?.Title);
             Driver.SetAttribute (prevAttr);
         }
 
@@ -491,7 +491,7 @@ public class Border : Adornment
                         Driver.SetAttribute (Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor ());
                     }
 
-                    DrawTitle (new Rect (borderBounds.X, titleY, Parent.Title.GetColumns (), 1), Parent?.Title);
+                    DrawTitle (new Rectangle (borderBounds.X, titleY, Parent.Title.GetColumns (), 1), Parent?.Title);
                     Driver.SetAttribute (prevAttr);
                 }
 

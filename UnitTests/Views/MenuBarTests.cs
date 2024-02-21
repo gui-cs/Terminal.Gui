@@ -368,7 +368,7 @@ public class MenuBarTests
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (40, 15);
 
-        Assert.Equal (new Rect (0, 0, 40, 15), win.Frame);
+        Assert.Equal (new Rectangle (0, 0, 40, 15), win.Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -469,7 +469,7 @@ public class MenuBarTests
 
         RunState rs = Application.Begin (dialog);
 
-        Assert.Equal (new Rect (2, 2, 15, 4), dialog.Frame);
+        Assert.Equal (new Rectangle (2, 2, 15, 4), dialog.Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -598,7 +598,7 @@ public class MenuBarTests
     {
         ((FakeDriver)Application.Driver).SetBufferSize (40, 15);
 
-        Assert.Equal (new Rect (0, 0, 40, 15), Application.Driver.Clip);
+        Assert.Equal (new Rectangle (0, 0, 40, 15), Application.Driver.Clip);
         TestHelpers.AssertDriverContentsWithFrameAre (@"", _output);
 
         List<string> items = new ()
@@ -680,7 +680,7 @@ public class MenuBarTests
 
         RunState rs = Application.Begin (dialog);
 
-        Assert.Equal (new Rect (2, 2, 15, 4), dialog.Frame);
+        Assert.Equal (new Rectangle (2, 2, 15, 4), dialog.Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -797,11 +797,11 @@ public class MenuBarTests
 ──────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 7, 4), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (0, 0, 7, 4), pos);
 
         menu.CloseAllMenus ();
-        menu.Frame = new Rect (-1, -2, menu.Frame.Width, menu.Frame.Height);
+        menu.Frame = new Rectangle (-1, -2, menu.Frame.Width, menu.Frame.Height);
         menu.OpenMenu ();
         Application.Refresh ();
 
@@ -812,10 +812,10 @@ public class MenuBarTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 7, 3), pos);
+        Assert.Equal (new Rectangle (1, 0, 7, 3), pos);
 
         menu.CloseAllMenus ();
-        menu.Frame = new Rect (0, 0, menu.Frame.Width, menu.Frame.Height);
+        menu.Frame = new Rectangle (0, 0, menu.Frame.Width, menu.Frame.Height);
         ((FakeDriver)Application.Driver).SetBufferSize (7, 5);
         menu.OpenMenu ();
         Application.Refresh ();
@@ -828,10 +828,10 @@ public class MenuBarTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 1, 7, 4), pos);
+        Assert.Equal (new Rectangle (0, 1, 7, 4), pos);
 
         menu.CloseAllMenus ();
-        menu.Frame = new Rect (0, 0, menu.Frame.Width, menu.Frame.Height);
+        menu.Frame = new Rectangle (0, 0, menu.Frame.Width, menu.Frame.Height);
         ((FakeDriver)Application.Driver).SetBufferSize (7, 3);
         menu.OpenMenu ();
         Application.Refresh ();
@@ -843,7 +843,7 @@ public class MenuBarTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 7, 3), pos);
+        Assert.Equal (new Rectangle (0, 0, 7, 3), pos);
     }
 
     [Fact]
@@ -874,7 +874,7 @@ wo
         _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
         menu.CloseAllMenus ();
-        menu.Frame = new Rect (-2, -2, menu.Frame.Width, menu.Frame.Height);
+        menu.Frame = new Rectangle (-2, -2, menu.Frame.Width, menu.Frame.Height);
         menu.OpenMenu ();
         Application.Refresh ();
 
@@ -885,7 +885,7 @@ wo
         _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
         menu.CloseAllMenus ();
-        menu.Frame = new Rect (0, 0, menu.Frame.Width, menu.Frame.Height);
+        menu.Frame = new Rectangle (0, 0, menu.Frame.Width, menu.Frame.Height);
         ((FakeDriver)Application.Driver).SetBufferSize (3, 2);
         menu.OpenMenu ();
         Application.Refresh ();
@@ -898,7 +898,7 @@ wo
         _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
         menu.CloseAllMenus ();
-        menu.Frame = new Rect (0, 0, menu.Frame.Width, menu.Frame.Height);
+        menu.Frame = new Rectangle (0, 0, menu.Frame.Width, menu.Frame.Height);
         ((FakeDriver)Application.Driver).SetBufferSize (3, 1);
         menu.OpenMenu ();
         Application.Refresh ();
@@ -934,8 +934,8 @@ wo
 └──────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 1, 8, 4), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (0, 1, 8, 4), pos);
     }
 
     [Fact]
@@ -2855,7 +2855,7 @@ Edit
  Numbers
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
         Assert.True (menu.NewKeyDownEvent (menu.Key));
         Application.Top.Draw ();
@@ -2957,8 +2957,8 @@ Edit
  Numbers
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 8, 1), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (1, 0, 8, 1), pos);
 
         Assert.True (
                      menu.MouseEvent (
@@ -2977,7 +2977,7 @@ Edit
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 10, 6), pos);
+        Assert.Equal (new Rectangle (1, 0, 10, 6), pos);
 
         Assert.False (
                       menu.MouseEvent (
@@ -3000,7 +3000,7 @@ Edit
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 25, 7), pos);
+        Assert.Equal (new Rectangle (1, 0, 25, 7), pos);
 
         Assert.False (
                       menu.MouseEvent (
@@ -3022,7 +3022,7 @@ Edit
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 10, 6), pos);
+        Assert.Equal (new Rectangle (1, 0, 10, 6), pos);
 
         Assert.False (
                       menu.MouseEvent (
@@ -3036,7 +3036,7 @@ Edit
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 8, 1), pos);
+        Assert.Equal (new Rectangle (1, 0, 8, 1), pos);
     }
 
     [Fact]
@@ -3154,8 +3154,8 @@ Edit
  Numbers
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 8, 1), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (1, 0, 8, 1), pos);
 
         Assert.True (menu.NewKeyDownEvent (menu.Key));
         Application.Top.Draw ();
@@ -3170,7 +3170,7 @@ Edit
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 10, 6), pos);
+        Assert.Equal (new Rectangle (1, 0, 10, 6), pos);
 
         Assert.True (Application.Top.Subviews [1].NewKeyDownEvent (new Key (KeyCode.CursorDown)));
         Assert.True (Application.Top.Subviews [1].NewKeyDownEvent (new Key (KeyCode.Enter)));
@@ -3187,7 +3187,7 @@ Edit
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 15, 7), pos);
+        Assert.Equal (new Rectangle (1, 0, 15, 7), pos);
 
         Assert.True (Application.Top.Subviews [2].NewKeyDownEvent (new Key (KeyCode.Enter)));
         Application.Top.Draw ();
@@ -3202,7 +3202,7 @@ Edit
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 10, 6), pos);
+        Assert.Equal (new Rectangle (1, 0, 10, 6), pos);
 
         Assert.True (Application.Top.Subviews [1].NewKeyDownEvent (new Key (KeyCode.Esc)));
         Application.Top.Draw ();
@@ -3212,7 +3212,7 @@ Edit
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 8, 1), pos);
+        Assert.Equal (new Rectangle (1, 0, 8, 1), pos);
     }
 
     [Fact]
@@ -3264,8 +3264,8 @@ Edit
  Numbers
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 8, 1), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (1, 0, 8, 1), pos);
 
         Assert.True (
                      menu.MouseEvent (
@@ -3284,7 +3284,7 @@ Edit
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 10, 6), pos);
+        Assert.Equal (new Rectangle (1, 0, 10, 6), pos);
 
         Assert.False (
                       menu.MouseEvent (
@@ -3304,7 +3304,7 @@ Edit
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 15, 7), pos);
+        Assert.Equal (new Rectangle (1, 0, 15, 7), pos);
 
         Assert.False (
                       menu.MouseEvent (
@@ -3323,7 +3323,7 @@ Edit
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 10, 6), pos);
+        Assert.Equal (new Rectangle (1, 0, 10, 6), pos);
 
         Assert.False (
                       menu.MouseEvent (
@@ -3337,7 +3337,7 @@ Edit
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 8, 1), pos);
+        Assert.Equal (new Rectangle (1, 0, 8, 1), pos);
     }
 
     [Fact]
@@ -3458,8 +3458,8 @@ Edit
  Numbers
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 8, 1), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (1, 0, 8, 1), pos);
 
         Assert.True (
                      menu.MouseEvent (
@@ -3476,7 +3476,7 @@ Edit
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 8, 4), pos);
+        Assert.Equal (new Rectangle (1, 0, 8, 4), pos);
 
         Assert.False (
                       menu.MouseEvent (
@@ -3494,7 +3494,7 @@ Edit
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 13, 5), pos);
+        Assert.Equal (new Rectangle (1, 0, 13, 5), pos);
 
         Assert.False (
                       menu.MouseEvent (
@@ -3511,7 +3511,7 @@ Edit
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 8, 4), pos);
+        Assert.Equal (new Rectangle (1, 0, 8, 4), pos);
 
         Assert.False (
                       menu.MouseEvent (
@@ -3525,7 +3525,7 @@ Edit
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 8, 1), pos);
+        Assert.Equal (new Rectangle (1, 0, 8, 1), pos);
     }
 
     [Fact]

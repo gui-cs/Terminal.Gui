@@ -312,7 +312,7 @@ internal partial class TestHelpers
     /// <param name="output"></param>
     /// <param name="driver">The ConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
     /// <returns></returns>
-    public static Rect AssertDriverContentsWithFrameAre (
+    public static Rectangle AssertDriverContentsWithFrameAre (
         string expectedLook,
         ITestOutputHelper output,
         ConsoleDriver driver = null
@@ -423,7 +423,7 @@ internal partial class TestHelpers
 
         if (string.Equals (expectedLook, actualLook))
         {
-            return new Rect (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
+            return new Rectangle (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
         }
 
         // standardize line endings for the comparison
@@ -446,7 +446,7 @@ internal partial class TestHelpers
 
         Assert.Equal (expectedLook, actualLook);
 
-        return new Rect (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
+        return new Rectangle (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
     }
 
 #pragma warning disable xUnit1013 // Public method should be marked as test
@@ -582,9 +582,9 @@ internal partial class TestHelpers
 
     private static void AddArguments (Type paramType, List<object> pTypes)
     {
-        if (paramType == typeof (Rect))
+        if (paramType == typeof (Rectangle))
         {
-            pTypes.Add (Rect.Empty);
+            pTypes.Add (Rectangle.Empty);
         }
         else if (paramType == typeof (string))
         {

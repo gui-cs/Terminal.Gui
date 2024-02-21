@@ -108,8 +108,8 @@ public class DrawTests
 │これは広いルーンラインです。│
 └────────────────────────────┘";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 10), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (0, 0, 30, 10), pos);
     }
 
     [Fact]

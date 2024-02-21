@@ -19,7 +19,7 @@ public class ViewEventArgs : EventArgs
 public class LayoutEventArgs : EventArgs
 {
     /// <summary>The view-relative bounds of the <see cref="View"/> before it was laid out.</summary>
-    public Rect OldBounds { get; set; }
+    public Rectangle OldBounds { get; set; }
 }
 
 /// <summary>Event args for draw events</summary>
@@ -30,13 +30,13 @@ public class DrawEventArgs : EventArgs
     ///     Gets the view-relative rectangle describing the currently visible viewport into the
     ///     <see cref="View"/>.
     /// </param>
-    public DrawEventArgs (Rect rect) { Rect = rect; }
+    public DrawEventArgs (Rectangle rect) { Rectangle = rect; }
 
     /// <summary>If set to true, the draw operation will be canceled, if applicable.</summary>
     public bool Cancel { get; set; }
 
     /// <summary>Gets the view-relative rectangle describing the currently visible viewport into the <see cref="View"/>.</summary>
-    public Rect Rect { get; }
+    public Rectangle Rectangle { get; }
 }
 
 /// <summary>Defines the event arguments for <see cref="View.SetFocus()"/></summary>

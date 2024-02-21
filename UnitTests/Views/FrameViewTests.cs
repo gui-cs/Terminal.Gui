@@ -33,7 +33,7 @@ public class FrameViewTests
         fv.BeginInit ();
         fv.EndInit ();
         Assert.Equal (LineStyle.Single, fv.BorderStyle);
-        Assert.Equal (new Rect (1, 2, 10, 20), fv.Frame);
+        Assert.Equal (new Rectangle (1, 2, 10, 20), fv.Frame);
     }
 
     [Fact]
@@ -46,12 +46,12 @@ public class FrameViewTests
         Assert.Equal (string.Empty, fv.Text);
         Application.Top.Add (fv);
         Application.Begin (Application.Top);
-        Assert.Equal (new Rect (0, 0, 0, 0), fv.Frame);
+        Assert.Equal (new Rectangle (0, 0, 0, 0), fv.Frame);
         TestHelpers.AssertDriverContentsWithFrameAre (@"", _output);
 
         fv.Height = 5;
         fv.Width = 5;
-        Assert.Equal (new Rect (0, 0, 5, 5), fv.Frame);
+        Assert.Equal (new Rectangle (0, 0, 5, 5), fv.Frame);
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -66,7 +66,7 @@ public class FrameViewTests
 
         fv.X = 1;
         fv.Y = 2;
-        Assert.Equal (new Rect (1, 2, 5, 5), fv.Frame);
+        Assert.Equal (new Rectangle (1, 2, 5, 5), fv.Frame);
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -81,7 +81,7 @@ public class FrameViewTests
 
         fv.X = -1;
         fv.Y = -2;
-        Assert.Equal (new Rect (-1, -2, 5, 5), fv.Frame);
+        Assert.Equal (new Rectangle (-1, -2, 5, 5), fv.Frame);
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -94,7 +94,7 @@ public class FrameViewTests
 
         fv.X = 7;
         fv.Y = 8;
-        Assert.Equal (new Rect (7, 8, 5, 5), fv.Frame);
+        Assert.Equal (new Rectangle (7, 8, 5, 5), fv.Frame);
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (

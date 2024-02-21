@@ -11,20 +11,20 @@ public class DateFieldTests
         var df = new DateField ();
         Assert.Equal (DateTime.MinValue, df.Date);
         Assert.Equal (1, df.CursorPosition);
-        Assert.Equal (new Rect (0, 0, 12, 1), df.Frame);
+        Assert.Equal (new Rectangle (0, 0, 12, 1), df.Frame);
         Assert.Equal (" 01/01/0001", df.Text);
 
         DateTime date = DateTime.Now;
         df = new DateField (date);
         Assert.Equal (date, df.Date);
         Assert.Equal (1, df.CursorPosition);
-        Assert.Equal (new Rect (0, 0, 12, 1), df.Frame);
+        Assert.Equal (new Rectangle (0, 0, 12, 1), df.Frame);
         Assert.Equal ($" {date.ToString (CultureInfo.InvariantCulture.DateTimeFormat.ShortDatePattern)}", df.Text);
 
         df = new DateField (date) { X = 1, Y = 2 };
         Assert.Equal (date, df.Date);
         Assert.Equal (1, df.CursorPosition);
-        Assert.Equal (new Rect (1, 2, 12, 1), df.Frame);
+        Assert.Equal (new Rectangle (1, 2, 12, 1), df.Frame);
         Assert.Equal ($" {date.ToString (CultureInfo.InvariantCulture.DateTimeFormat.ShortDatePattern)}", df.Text);
     }
 

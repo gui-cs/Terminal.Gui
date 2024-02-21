@@ -615,14 +615,14 @@ public class ListView : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         base.OnDrawContent (contentArea);
 
         Attribute current = ColorScheme.Focus;
         Driver.SetAttribute (current);
         Move (0, 0);
-        Rect f = Bounds;
+        Rectangle f = Bounds;
         int item = _top;
         bool focused = HasFocus;
         int col = _allowsMarking ? 2 : 0;

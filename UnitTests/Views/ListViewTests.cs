@@ -30,12 +30,12 @@ public class ListViewTests
         };
         Assert.NotNull (lv.Source);
         Assert.Equal (-1, lv.SelectedItem);
-        Assert.Equal (new Rect (0, 1, 10, 20), lv.Frame);
+        Assert.Equal (new Rectangle (0, 1, 10, 20), lv.Frame);
 
         lv = new ListView { Y = 1, Width = 10, Height = 20, Source = new NewListDataSource () };
         Assert.NotNull (lv.Source);
         Assert.Equal (-1, lv.SelectedItem);
-        Assert.Equal (new Rect (0, 1, 10, 20), lv.Frame);
+        Assert.Equal (new Rectangle (0, 1, 10, 20), lv.Frame);
     }
 
     [Fact]

@@ -227,7 +227,7 @@ public class TreeTableSourceTests : IDisposable
         var tableView = new TableView ();
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
-        tableView.Bounds = new Rect (0, 0, 40, 6);
+        tableView.Bounds = new Rectangle (0, 0, 40, 6);
 
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.Style.ShowHorizontalHeaderOverline = false;

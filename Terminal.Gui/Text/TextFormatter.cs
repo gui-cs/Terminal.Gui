@@ -216,7 +216,7 @@ public class TextFormatter
     /// <summary>Gets or sets whether the <see cref="TextFormatter"/> needs to format the text.</summary>
     /// <remarks>
     ///     <para>If <see langword="false"/> when Draw is called, the Draw call will be faster.</para>
-    ///     <para>Used by <see cref="Draw(Rect, Attribute, Attribute, Rect, bool, ConsoleDriver)"/></para>
+    ///     <para>Used by <see cref="Draw(Rectangle, Attribute, Attribute, Rectangle, bool, ConsoleDriver)"/></para>
     ///     <para>Set to <see langword="true"/> when any of the properties of <see cref="TextFormatter"/> are set.</para>
     ///     <para>Set to <see langword="false"/> when the text is formatted (if <see cref="GetLines"/> is accessed).</para>
     /// </remarks>
@@ -307,10 +307,10 @@ public class TextFormatter
     /// <param name="driver">The console driver currently used by the application.</param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public void Draw (
-        Rect bounds,
+        Rectangle bounds,
         Attribute normalColor,
         Attribute hotColor,
-        Rect containerBounds = default,
+        Rectangle containerBounds = default,
         ConsoleDriver driver = null
     )
     {
@@ -338,13 +338,13 @@ public class TextFormatter
         }
 
         bool isVertical = IsVerticalDirection (Direction);
-        Rect maxBounds = bounds;
+        Rectangle maxBounds = bounds;
 
         if (driver is { })
         {
-            maxBounds = containerBounds == default (Rect)
+            maxBounds = containerBounds == default (Rectangle)
                             ? bounds
-                            : new Rect (
+                            : new Rectangle (
                                         Math.Max (containerBounds.X, bounds.X),
                                         Math.Max (containerBounds.Y, bounds.Y),
                                         Math.Max (
@@ -1851,7 +1851,7 @@ public class TextFormatter
     /// <param name="direction">The text direction.</param>
     /// <param name="tabWidth">The number of columns used for a tab.</param>
     /// <returns></returns>
-    public static Rect CalcRect (
+    public static Rectangle CalcRect (
         int x,
         int y,
         string text,
@@ -1861,7 +1861,7 @@ public class TextFormatter
     {
         if (string.IsNullOrEmpty (text))
         {
-            return new Rect (new Point (x, y), Size.Empty);
+            return new Rectangle (new Point (x, y), Size.Empty);
         }
 
         int w, h;
@@ -1978,7 +1978,7 @@ public class TextFormatter
             h = vh;
         }
 
-        return new Rect (x, y, w, h);
+        return new Rectangle (x, y, w, h);
     }
 
     /// <summary>Finds the HotKey and its location in text.</summary>

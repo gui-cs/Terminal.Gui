@@ -381,7 +381,7 @@ public class ToplevelTests
         Assert.NotNull (sb);
 
         top.PositionToplevels ();
-        Assert.Equal (new Rect (0, 1, 60, 15), win.Frame);
+        Assert.Equal (new Rectangle (0, 1, 60, 15), win.Frame);
 
         Assert.Null (Toplevel._dragPosition);
         win.MouseEvent (new MouseEvent { X = 6, Y = 0, Flags = MouseFlags.Button1Pressed });
@@ -467,8 +467,8 @@ public class ToplevelTests
         Application.Begin (top);
         top.Running = true;
 
-        Assert.Equal (new Rect (0, 0, 40, 25), win1.Frame);
-        Assert.Equal (new Rect (41, 0, 40, 25), win2.Frame);
+        Assert.Equal (new Rectangle (0, 0, 40, 25), win1.Frame);
+        Assert.Equal (new Rectangle (41, 0, 40, 25), win2.Frame);
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tf1W1, top.MostFocused);
 
@@ -602,7 +602,7 @@ public class ToplevelTests
         Assert.True (top.IsCurrentTop);
         Assert.Equal (top, Application.OverlappedTop);
         Application.Begin (win1);
-        Assert.Equal (new Rect (0, 0, 40, 25), win1.Frame);
+        Assert.Equal (new Rectangle (0, 0, 40, 25), win1.Frame);
         Assert.NotEqual (top, Application.Current);
         Assert.False (top.IsCurrentTop);
         Assert.Equal (win1, Application.Current);
@@ -614,7 +614,7 @@ public class ToplevelTests
         Assert.True (win1.IsOverlapped);
         Assert.Single (Application.OverlappedChildren);
         Application.Begin (win2);
-        Assert.Equal (new Rect (0, 0, 40, 25), win2.Frame);
+        Assert.Equal (new Rectangle (0, 0, 40, 25), win2.Frame);
         Assert.NotEqual (top, Application.Current);
         Assert.False (top.IsCurrentTop);
         Assert.Equal (win2, Application.Current);
@@ -900,7 +900,7 @@ public class ToplevelTests
                                                                   );
 
                                          Assert.Equal (Application.Current, Application.MouseGrabView);
-                                         Assert.Equal (new Rect (2, 2, 10, 3), Application.MouseGrabView.Frame);
+                                         Assert.Equal (new Rectangle (2, 2, 10, 3), Application.MouseGrabView.Frame);
                                      }
                                      else if (iterations == 3)
                                      {
@@ -921,7 +921,7 @@ public class ToplevelTests
                                          Application.Refresh ();
 
                                          Assert.Equal (Application.Current, Application.MouseGrabView);
-                                         Assert.Equal (new Rect (1, 2, 10, 3), Application.MouseGrabView.Frame);
+                                         Assert.Equal (new Rectangle (1, 2, 10, 3), Application.MouseGrabView.Frame);
                                      }
                                      else if (iterations == 4)
                                      {
@@ -960,7 +960,7 @@ public class ToplevelTests
                                          Application.Refresh ();
 
                                          Assert.Equal (Application.Current, Application.MouseGrabView);
-                                         Assert.Equal (new Rect (1, 1, 10, 3), Application.MouseGrabView.Frame);
+                                         Assert.Equal (new Rectangle (1, 1, 10, 3), Application.MouseGrabView.Frame);
                                      }
                                      else if (iterations == 6)
                                      {
@@ -979,7 +979,7 @@ public class ToplevelTests
                                                                                       );
 
                                          Assert.Equal (Application.Current, Application.MouseGrabView);
-                                         Assert.Equal (new Rect (1, 1, 10, 3), Application.MouseGrabView.Frame);
+                                         Assert.Equal (new Rectangle (1, 1, 10, 3), Application.MouseGrabView.Frame);
                                      }
                                      else if (iterations == 7)
                                      {
@@ -1021,7 +1021,7 @@ public class ToplevelTests
         var movex = 0;
         var movey = 0;
 
-        var location = new Rect (win.Frame.X, win.Frame.Y, 7, 3);
+        var location = new Rectangle (win.Frame.X, win.Frame.Y, 7, 3);
 
         Application.Iteration += (s, a) =>
                                  {
@@ -1338,19 +1338,19 @@ public class ToplevelTests
     {
         Toplevel top = Application.Top;
         var subTop = new Toplevel ();
-        var view = new View { Frame = new Rect (0, 0, 20, 10) };
+        var view = new View { Frame = new Rectangle (0, 0, 20, 10) };
         subTop.Add (view);
         top.Add (subTop);
 
         Assert.False (top.IsLoaded);
         Assert.False (subTop.IsLoaded);
-        Assert.Equal (new Rect (0, 0, 20, 10), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 20, 10), view.Frame);
 
         view.LayoutStarted += view_LayoutStarted;
 
         void view_LayoutStarted (object sender, LayoutEventArgs e)
         {
-            Assert.Equal (new Rect (0, 0, 20, 10), view._needsDisplayRect);
+            Assert.Equal (new Rectangle (0, 0, 20, 10), view._needsDisplayRect);
             view.LayoutStarted -= view_LayoutStarted;
         }
 
@@ -1358,16 +1358,16 @@ public class ToplevelTests
 
         Assert.True (top.IsLoaded);
         Assert.True (subTop.IsLoaded);
-        Assert.Equal (new Rect (0, 0, 20, 10), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 20, 10), view.Frame);
 
-        view.Frame = new Rect (1, 3, 10, 5);
-        Assert.Equal (new Rect (1, 3, 10, 5), view.Frame);
-        Assert.Equal (new Rect (0, 0, 10, 5), view._needsDisplayRect);
+        view.Frame = new Rectangle (1, 3, 10, 5);
+        Assert.Equal (new Rectangle (1, 3, 10, 5), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 5), view._needsDisplayRect);
 
         view.OnDrawContent (view.Bounds);
-        view.Frame = new Rect (1, 3, 10, 5);
-        Assert.Equal (new Rect (1, 3, 10, 5), view.Frame);
-        Assert.Equal (new Rect (0, 0, 10, 5), view._needsDisplayRect);
+        view.Frame = new Rectangle (1, 3, 10, 5);
+        Assert.Equal (new Rectangle (1, 3, 10, 5), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 5), view._needsDisplayRect);
     }
 
     // BUGBUG: Broke this test with #2483 - @bdisp I need your help figuring out why
@@ -1389,10 +1389,10 @@ public class ToplevelTests
         top.Add (scrollView);
         Application.Begin (top);
 
-        Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
-        Assert.Equal (new Rect (3, 3, 40, 16), scrollView.Frame);
-        Assert.Equal (new Rect (0, 0, 200, 100), scrollView.Subviews [0].Frame);
-        Assert.Equal (new Rect (3, 3, 194, 94), win.Frame);
+        Assert.Equal (new Rectangle (0, 0, 80, 25), top.Frame);
+        Assert.Equal (new Rectangle (3, 3, 40, 16), scrollView.Frame);
+        Assert.Equal (new Rectangle (0, 0, 200, 100), scrollView.Subviews [0].Frame);
+        Assert.Equal (new Rectangle (3, 3, 194, 94), win.Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1421,7 +1421,7 @@ public class ToplevelTests
                                                           )
                                  );
         Assert.Equal (win, Application.MouseGrabView);
-        Assert.Equal (new Rect (3, 3, 194, 94), win.Frame);
+        Assert.Equal (new Rectangle (3, 3, 194, 94), win.Frame);
 
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (
@@ -1437,7 +1437,7 @@ public class ToplevelTests
         Assert.Equal (win, Application.MouseGrabView);
         top.SetNeedsLayout ();
         top.LayoutSubviews ();
-        Assert.Equal (new Rect (6, 6, 191, 91), win.Frame);
+        Assert.Equal (new Rectangle (6, 6, 191, 91), win.Frame);
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1475,7 +1475,7 @@ public class ToplevelTests
         Assert.Equal (win, Application.MouseGrabView);
         top.SetNeedsLayout ();
         top.LayoutSubviews ();
-        Assert.Equal (new Rect (2, 2, 195, 95), win.Frame);
+        Assert.Equal (new Rectangle (2, 2, 195, 95), win.Frame);
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1524,8 +1524,8 @@ public class ToplevelTests
         ((FakeDriver)Application.Driver).SetBufferSize (40, 10);
         Application.Begin (window);
         Application.Refresh ();
-        Assert.Equal (new Rect (0, 0, 40, 10), top.Frame);
-        Assert.Equal (new Rect (0, 0, 20, 3), window.Frame);
+        Assert.Equal (new Rectangle (0, 0, 40, 10), top.Frame);
+        Assert.Equal (new Rectangle (0, 0, 20, 3), window.Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1559,8 +1559,8 @@ public class ToplevelTests
                                  );
 
         Application.Refresh ();
-        Assert.Equal (new Rect (0, 0, 40, 10), top.Frame);
-        Assert.Equal (new Rect (0, 0, 20, 3), window.Frame);
+        Assert.Equal (new Rectangle (0, 0, 40, 10), top.Frame);
+        Assert.Equal (new Rectangle (0, 0, 20, 3), window.Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1587,8 +1587,8 @@ public class ToplevelTests
                                  );
 
         Application.Refresh ();
-        Assert.Equal (new Rect (0, 0, 20, 3), top.Frame);
-        Assert.Equal (new Rect (0, 0, 20, 3), window.Frame);
+        Assert.Equal (new Rectangle (0, 0, 20, 3), top.Frame);
+        Assert.Equal (new Rectangle (0, 0, 20, 3), window.Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1615,8 +1615,8 @@ public class ToplevelTests
                                  );
 
         Application.Refresh ();
-        Assert.Equal (new Rect (0, 0, 19, 2), top.Frame);
-        Assert.Equal (new Rect (-1, 0, 20, 3), window.Frame);
+        Assert.Equal (new Rectangle (0, 0, 19, 2), top.Frame);
+        Assert.Equal (new Rectangle (-1, 0, 20, 3), window.Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1639,8 +1639,8 @@ public class ToplevelTests
                                  );
 
         Application.Refresh ();
-        Assert.Equal (new Rect (0, 0, 19, 2), top.Frame);
-        Assert.Equal (new Rect (18, 1, 20, 3), window.Frame);
+        Assert.Equal (new Rectangle (0, 0, 19, 2), top.Frame);
+        Assert.Equal (new Rectangle (18, 1, 20, 3), window.Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1662,8 +1662,8 @@ public class ToplevelTests
                                  );
 
         Application.Refresh ();
-        Assert.Equal (new Rect (0, 0, 19, 2), top.Frame);
-        Assert.Equal (new Rect (19, 2, 20, 3), window.Frame);
+        Assert.Equal (new Rectangle (0, 0, 19, 2), top.Frame);
+        Assert.Equal (new Rectangle (19, 2, 20, 3), window.Frame);
         TestHelpers.AssertDriverContentsWithFrameAre (@"", _output);
     }
 
@@ -1691,7 +1691,7 @@ public class ToplevelTests
         RunState rs = Application.Begin (window);
 
         Assert.Null (Application.MouseGrabView);
-        Assert.Equal (new Rect (0, 0, 10, 3), window.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 3), window.Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1711,7 +1711,7 @@ public class ToplevelTests
         Application.RunIteration (ref rs, ref firstIteration);
         Assert.Equal (window, Application.MouseGrabView);
 
-        Assert.Equal (new Rect (0, 0, 10, 3), window.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 3), window.Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1736,7 +1736,7 @@ public class ToplevelTests
         firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
         Assert.Equal (window, Application.MouseGrabView);
-        Assert.Equal (new Rect (1, 1, 10, 3), window.Frame);
+        Assert.Equal (new Rectangle (1, 1, 10, 3), window.Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1758,10 +1758,10 @@ public class ToplevelTests
         ((FakeDriver)Application.Driver).SetBufferSize (20, 20);
 
         var testWindow = new Window { X = 2, Y = 1, Width = 15, Height = 10 };
-        Assert.Equal (new Rect (2, 1, 15, 10), testWindow.Frame);
+        Assert.Equal (new Rectangle (2, 1, 15, 10), testWindow.Frame);
 
         RunState rs = Application.Begin (testWindow);
-        Assert.Equal (new Rect (2, 1, 15, 10), testWindow.Frame);
+        Assert.Equal (new Rectangle (2, 1, 15, 10), testWindow.Frame);
     }
 
     // Don't use Dialog as a Top, use a Window instead - dialog has complex layout behavior that is not needed here.
@@ -1775,7 +1775,7 @@ public class ToplevelTests
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (20, 20);
 
-        Assert.Equal (new Rect (0, 0, 20, 20), win.Frame);
+        Assert.Equal (new Rectangle (0, 0, 20, 20), win.Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1808,7 +1808,7 @@ public class ToplevelTests
 
         btnPopup.Clicked += (s, e) =>
                             {
-                                Rect viewToScreen = btnPopup.BoundsToScreen (top.Frame);
+                                Rectangle viewToScreen = btnPopup.BoundsToScreen (top.Frame);
 
                                 var viewAddedToTop = new View
                                 {
@@ -1825,9 +1825,9 @@ public class ToplevelTests
 
                                 void testWindow_DrawContentComplete (object sender, DrawEventArgs e)
                                 {
-                                    Assert.Equal (new Rect (1, 3, 18, 16), viewAddedToTop.Frame);
+                                    Assert.Equal (new Rectangle (1, 3, 18, 16), viewAddedToTop.Frame);
 
-                                    Rect savedClip = Application.Driver.Clip;
+                                    Rectangle savedClip = Application.Driver.Clip;
                                     Application.Driver.Clip = top.Frame;
                                     viewAddedToTop.Draw ();
                                     top.Move (2, 15);
@@ -1843,7 +1843,7 @@ public class ToplevelTests
                             };
         RunState rs = Application.Begin (testWindow);
 
-        Assert.Equal (new Rect (2, 1, 15, 10), testWindow.Frame);
+        Assert.Equal (new Rectangle (2, 1, 15, 10), testWindow.Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @$"

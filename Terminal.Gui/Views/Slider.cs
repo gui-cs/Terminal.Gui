@@ -775,7 +775,7 @@ public class Slider<T> : View
 
         if (_config._sliderOrientation == Orientation.Horizontal)
         {
-            Bounds = new Rect (
+            Bounds = new Rectangle (
                                Bounds.Location,
                                new Size (
                                          int.Min (
@@ -791,7 +791,7 @@ public class Slider<T> : View
         }
         else
         {
-            Bounds = new Rect (
+            Bounds = new Rectangle (
                                Bounds.Location,
                                new Size (
                                          int.Min (
@@ -994,7 +994,7 @@ public class Slider<T> : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         // TODO: make this more surgical to reduce repaint
 

@@ -156,11 +156,11 @@ public class TileView : View
             return;
         }
 
-        Rect contentArea = Bounds;
+        Rectangle contentArea = Bounds;
 
         if (HasBorder ())
         {
-            contentArea = new Rect (
+            contentArea = new Rectangle (
                                     contentArea.X + 1,
                                     contentArea.Y + 1,
                                     Math.Max (0, contentArea.Width - 2),
@@ -177,7 +177,7 @@ public class TileView : View
     public override bool OnDrawAdornments () { return false; }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         Driver.SetAttribute (ColorScheme.Normal);
         Clear ();
@@ -756,7 +756,7 @@ public class TileView : View
         return false;
     }
 
-    private void Setup (Rect contentArea)
+    private void Setup (Rectangle contentArea)
     {
         if (contentArea.IsEmpty || contentArea.Height <= 0 || contentArea.Width <= 0)
         {
@@ -969,7 +969,7 @@ public class TileView : View
             return false;
         }
 
-        public override void OnDrawContent (Rect contentArea)
+        public override void OnDrawContent (Rectangle contentArea)
         {
             base.OnDrawContent (contentArea);
 

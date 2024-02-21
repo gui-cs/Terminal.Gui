@@ -39,14 +39,14 @@ public abstract class ConsoleDriver
     internal bool [] _dirtyLines;
 
     /// <summary>Gets the dimensions of the terminal.</summary>
-    public Rect Bounds => new (0, 0, Cols, Rows);
+    public Rectangle Bounds => new (0, 0, Cols, Rows);
 
     /// <summary>
     ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
     ///     to.
     /// </summary>
     /// <value>The rectangle describing the bounds of <see cref="Clip"/>.</value>
-    public Rect Clip { get; set; }
+    public Rectangle Clip { get; set; }
 
     /// <summary>Get the operating system clipboard.</summary>
     public IClipboard Clipboard { get; internal set; }
@@ -320,7 +320,7 @@ public abstract class ConsoleDriver
     {
         // TODO: This method is really "Clear Contents" now and should not be abstract (or virtual)
         Contents = new Cell [Rows, Cols];
-        Clip = new Rect (0, 0, Cols, Rows);
+        Clip = new Rectangle (0, 0, Cols, Rows);
         _dirtyLines = new bool [Rows];
 
         lock (Contents)
@@ -353,7 +353,7 @@ public abstract class ConsoleDriver
     /// <summary>Fills the specified rectangle with the specified rune.</summary>
     /// <param name="rect"></param>
     /// <param name="rune"></param>
-    public void FillRect (Rect rect, Rune rune = default)
+    public void FillRect (Rectangle rect, Rune rune = default)
     {
         for (int r = rect.Y; r < rect.Y + rect.Height; r++)
         {
@@ -367,11 +367,11 @@ public abstract class ConsoleDriver
 
     /// <summary>
     ///     Fills the specified rectangle with the specified <see langword="char"/>. This method is a convenience method
-    ///     that calls <see cref="FillRect(Rect, Rune)"/>.
+    ///     that calls <see cref="FillRect(Rectangle, Rune)"/>.
     /// </summary>
     /// <param name="rect"></param>
     /// <param name="c"></param>
-    public void FillRect (Rect rect, char c) { FillRect (rect, new Rune (c)); }
+    public void FillRect (Rectangle rect, char c) { FillRect (rect, new Rune (c)); }
 
     /// <summary>Gets the terminal cursor visibility.</summary>
     /// <param name="visibility">The current <see cref="CursorVisibility"/></param>

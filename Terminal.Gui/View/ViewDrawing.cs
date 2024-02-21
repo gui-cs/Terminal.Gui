@@ -3,7 +3,7 @@
 public partial class View
 {
     // The view-relative region that needs to be redrawn. Marked internal for unit tests.
-    internal Rect _needsDisplayRect = Rect.Empty;
+    internal Rectangle _needsDisplayRect = Rectangle.Empty;
     private ColorScheme _colorScheme;
 
     /// <summary>The color scheme for this view, if it is not defined, it returns the <see cref="SuperView"/>'s color scheme.</summary>
@@ -35,7 +35,7 @@ public partial class View
     /// <summary>Gets or sets whether the view needs to be redrawn.</summary>
     public bool NeedsDisplay
     {
-        get => _needsDisplayRect != Rect.Empty;
+        get => _needsDisplayRect != Rectangle.Empty;
         set
         {
             if (value)
@@ -98,7 +98,7 @@ public partial class View
     /// <summary>Clears the specified screen-relative rectangle with the normal background.</summary>
     /// <remarks></remarks>
     /// <param name="regionScreen">The screen-relative rectangle to clear.</param>
-    public void Clear (Rect regionScreen)
+    public void Clear (Rectangle regionScreen)
     {
         if (Driver is null)
         {
@@ -118,18 +118,18 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         If <see cref="ConsoleDriver.Clip"/> and <see cref="Bounds"/> do not intersect, the clip region will be set to
-    ///         <see cref="Rect.Empty"/>.
+    ///         <see cref="Rectangle.Empty"/>.
     ///     </para>
     /// </remarks>
-    public Rect ClipToBounds ()
+    public Rectangle ClipToBounds ()
     {
         if (Driver is null)
         {
-            return Rect.Empty;
+            return Rectangle.Empty;
         }
 
-        Rect previous = Driver.Clip;
-        Driver.Clip = Rect.Intersect (previous, BoundsToScreen (Bounds));
+        Rectangle previous = Driver.Clip;
+        Driver.Clip = Rectangle.Intersect (previous, BoundsToScreen (Bounds));
 
         return previous;
     }
@@ -140,7 +140,7 @@ public partial class View
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Always use <see cref="Bounds"/> (view-relative) when calling <see cref="OnDrawContent(Rect)"/>, NOT
+    ///         Always use <see cref="Bounds"/> (view-relative) when calling <see cref="OnDrawContent(Rectangle)"/>, NOT
     ///         <see cref="Frame"/> (superview-relative).
     ///     </para>
     ///     <para>
@@ -148,7 +148,7 @@ public partial class View
     ///         was set globally on the driver.
     ///     </para>
     ///     <para>
-    ///         Overrides of <see cref="OnDrawContent(Rect)"/> must ensure they do not set <c>Driver.Clip</c> to a clip
+    ///         Overrides of <see cref="OnDrawContent(Rectangle)"/> must ensure they do not set <c>Driver.Clip</c> to a clip
     ///         region larger than the <ref name="Bounds"/> property, as this will cause the driver to clip the entire region.
     ///     </para>
     /// </remarks>
@@ -161,7 +161,7 @@ public partial class View
 
         OnDrawAdornments ();
 
-        Rect prevClip = ClipToBounds ();
+        Rectangle prevClip = ClipToBounds ();
 
         if (ColorScheme is { })
         {
@@ -367,7 +367,7 @@ public partial class View
     ///     <see cref="View"/>
     /// </param>
     /// <remarks>This method will be called before any subviews added with <see cref="Add(View)"/> have been drawn.</remarks>
-    public virtual void OnDrawContent (Rect contentArea)
+    public virtual void OnDrawContent (Rectangle contentArea)
     {
         if (NeedsDisplay)
         {
@@ -389,7 +389,7 @@ public partial class View
                                  BoundsToScreen (contentArea),
                                  HasFocus ? GetFocusColor () : GetNormalColor (),
                                  HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
-                                 Rect.Empty
+                                 Rectangle.Empty
                                 );
             SetSubViewNeedsDisplay ();
         }
@@ -434,7 +434,7 @@ public partial class View
     ///     This method will be called after any subviews removed with <see cref="Remove(View)"/> have been completed
     ///     drawing.
     /// </remarks>
-    public virtual void OnDrawContentComplete (Rect contentArea) { DrawContentComplete?.Invoke (this, new DrawEventArgs (contentArea)); }
+    public virtual void OnDrawContentComplete (Rectangle contentArea) { DrawContentComplete?.Invoke (this, new DrawEventArgs (contentArea)); }
 
     // TODO: Make this cancelable
     /// <summary>
@@ -451,7 +451,7 @@ public partial class View
         }
 
         // If we have a SuperView, it'll render our frames.
-        if (!SuperViewRendersLineCanvas && LineCanvas.Bounds != Rect.Empty)
+        if (!SuperViewRendersLineCanvas && LineCanvas.Bounds != Rectangle.Empty)
         {
             foreach (KeyValuePair<Point, Cell> p in LineCanvas.GetCellMap ())
             {
@@ -510,7 +510,7 @@ public partial class View
     ///     redrawn will be the <paramref name="region"/>.
     /// </remarks>
     /// <param name="region">The Bounds-relative region that needs to be redrawn.</param>
-    public void SetNeedsDisplay (Rect region)
+    public void SetNeedsDisplay (Rectangle region)
     {
         if (!IsInitialized)
         {
@@ -529,7 +529,7 @@ public partial class View
             int y = Math.Min (_needsDisplayRect.Y, region.Y);
             int w = Math.Max (_needsDisplayRect.Width, region.Width);
             int h = Math.Max (_needsDisplayRect.Height, region.Height);
-            _needsDisplayRect = new Rect (x, y, w, h);
+            _needsDisplayRect = new Rectangle (x, y, w, h);
         }
 
         _superView?.SetSubViewNeedsDisplay ();
@@ -553,7 +553,7 @@ public partial class View
         {
             if (subview.Frame.IntersectsWith (region))
             {
-                Rect subviewRegion = Rect.Intersect (subview.Frame, region);
+                Rectangle subviewRegion = Rectangle.Intersect (subview.Frame, region);
                 subviewRegion.X -= subview.Frame.X;
                 subviewRegion.Y -= subview.Frame.Y;
                 subview.SetNeedsDisplay (subviewRegion);
@@ -575,12 +575,12 @@ public partial class View
     /// <summary>Clears <see cref="NeedsDisplay"/> and <see cref="SubViewNeedsDisplay"/>.</summary>
     protected void ClearNeedsDisplay ()
     {
-        _needsDisplayRect = Rect.Empty;
+        _needsDisplayRect = Rectangle.Empty;
         SubViewNeedsDisplay = false;
     }
 
     // Clips a rectangle in screen coordinates to the dimensions currently available on the screen
-    internal Rect ScreenClip (Rect regionScreen)
+    internal Rectangle ScreenClip (Rectangle regionScreen)
     {
         int x = regionScreen.X < 0 ? 0 : regionScreen.X;
         int y = regionScreen.Y < 0 ? 0 : regionScreen.Y;
@@ -593,6 +593,6 @@ public partial class View
                     ? Driver.Rows - regionScreen.Y
                     : regionScreen.Height;
 
-        return new Rect (x, y, w, h);
+        return new Rectangle (x, y, w, h);
     }
 }

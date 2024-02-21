@@ -143,7 +143,7 @@ public class ProgressBar : View
     }
 
     ///<inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         Driver.SetAttribute (GetHotNormalColor ());
 
@@ -193,7 +193,7 @@ public class ProgressBar : View
                       BoundsToScreen (Bounds),
                       attr,
                       ColorScheme.Normal,
-                      SuperView?.BoundsToScreen (SuperView.Bounds) ?? default (Rect)
+                      SuperView?.BoundsToScreen (SuperView.Bounds) ?? default (Rectangle)
                      );
         }
     }

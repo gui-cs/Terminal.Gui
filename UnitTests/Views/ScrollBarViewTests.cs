@@ -857,8 +857,8 @@ This is a test
 └───────────────────────────────────────────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 45, 20), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (0, 0, 45, 20), pos);
 
         textView.WordWrap = true;
         ((FakeDriver)Application.Driver).SetBufferSize (26, 20);
@@ -896,7 +896,7 @@ This is a test
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 26, 20), pos);
+        Assert.Equal (new Rectangle (0, 0, 26, 20), pos);
 
         ((FakeDriver)Application.Driver).SetBufferSize (10, 10);
         Application.Refresh ();
@@ -924,7 +924,7 @@ This is a test
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 10, 10), pos);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), pos);
     }
 
     [Fact]
@@ -960,7 +960,7 @@ This is a test
     public void Internal_Tests ()
     {
         Toplevel top = Application.Top;
-        Assert.Equal (new Rect (0, 0, 80, 25), top.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 80, 25), top.Bounds);
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
         top.Add (view);
         var sbv = new ScrollBarView (view, true);

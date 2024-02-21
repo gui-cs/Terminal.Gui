@@ -48,7 +48,7 @@ public class LineCanvas : IDisposable
         // TODO: Add other resolvers
     };
 
-    private Rect _cachedBounds;
+    private Rectangle _cachedBounds;
 
     /// <summary>Creates a new instance.</summary>
     public LineCanvas ()
@@ -134,7 +134,7 @@ public class LineCanvas : IDisposable
         Attribute? attribute = default
     )
     {
-        _cachedBounds = Rect.Empty;
+        _cachedBounds = Rectangle.Empty;
         _lines.Add (new StraightLine (start, length, orientation, style, attribute));
     }
 
@@ -142,14 +142,14 @@ public class LineCanvas : IDisposable
     /// <param name="line"></param>
     public void AddLine (StraightLine line)
     {
-        _cachedBounds = Rect.Empty;
+        _cachedBounds = Rectangle.Empty;
         _lines.Add (line);
     }
 
     /// <summary>Clears all lines from the LineCanvas.</summary>
     public void Clear ()
     {
-        _cachedBounds = Rect.Empty;
+        _cachedBounds = Rectangle.Empty;
         _lines.Clear ();
     }
 
@@ -157,7 +157,7 @@ public class LineCanvas : IDisposable
     ///     Clears any cached states from the canvas Call this method if you make changes to lines that have already been
     ///     added.
     /// </summary>
-    public void ClearCache () { _cachedBounds = Rect.Empty; }
+    public void ClearCache () { _cachedBounds = Rectangle.Empty; }
 
     /// <summary>
     ///     Evaluates the lines that have been added to the canvas and returns a map containing the glyphs and their
@@ -200,7 +200,7 @@ public class LineCanvas : IDisposable
     /// </summary>
     /// <param name="inArea">A rectangle to constrain the search by.</param>
     /// <returns>A map of the points within the canvas that intersect with <paramref name="inArea"/>.</returns>
-    public Dictionary<Point, Rune> GetMap (Rect inArea)
+    public Dictionary<Point, Rune> GetMap (Rectangle inArea)
     {
         Dictionary<Point, Rune> map = new ();
 

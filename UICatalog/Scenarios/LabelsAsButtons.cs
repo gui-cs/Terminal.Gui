@@ -224,7 +224,7 @@ public class LabelsAsLabels : Scenario
 
         moveBtnA.Clicked += (s, e) =>
                             {
-                                moveBtnA.Frame = new Rect (
+                                moveBtnA.Frame = new Rectangle (
                                                            moveBtnA.Frame.X + 5,
                                                            moveBtnA.Frame.Y,
                                                            moveBtnA.Frame.Width,
@@ -246,7 +246,7 @@ public class LabelsAsLabels : Scenario
 
         sizeBtnA.Clicked += (s, e) =>
                             {
-                                sizeBtnA.Frame = new Rect (
+                                sizeBtnA.Frame = new Rectangle (
                                                            sizeBtnA.Frame.X,
                                                            sizeBtnA.Frame.Y,
                                                            sizeBtnA.Frame.Width + 5,

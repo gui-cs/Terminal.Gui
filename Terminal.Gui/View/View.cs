@@ -73,7 +73,7 @@ namespace Terminal.Gui;
 ///         a View can be accessed with the <see cref="SuperView"/> property.
 ///     </para>
 ///     <para>
-///         To flag a region of the View's <see cref="Bounds"/> to be redrawn call <see cref="SetNeedsDisplay(Rect)"/>.
+///         To flag a region of the View's <see cref="Bounds"/> to be redrawn call <see cref="SetNeedsDisplay(Rectangle)"/>.
 ///         To flag the entire view for redraw call <see cref="SetNeedsDisplay()"/>.
 ///     </para>
 ///     <para>

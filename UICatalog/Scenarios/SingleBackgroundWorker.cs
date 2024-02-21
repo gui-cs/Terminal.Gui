@@ -209,7 +209,7 @@ public class SingleBackgroundWorker : Scenario
 
         public StagingUIController (DateTime? start, List<string> list)
         {
-            Rect frame = Application.Top.Frame;
+            Rectangle frame = Application.Top.Frame;
             _top = new Toplevel { X = frame.X, Y = frame.Y, Width = frame.Width, Height = frame.Height };
 
             _top.KeyDown += (s, e) =>

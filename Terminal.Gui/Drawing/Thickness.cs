@@ -9,10 +9,10 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Use the helper API (<see cref="GetInside(Rect)"/> to get the rectangle describing the insides of the frame,
+///         Use the helper API (<see cref="GetInside(Rectangle)"/> to get the rectangle describing the insides of the frame,
 ///         with the thickness widths subtracted.
 ///     </para>
-///     <para>Use the helper API (<see cref="Draw(Rect, string)"/> to draw the frame with the specified thickness.</para>
+///     <para>Use the helper API (<see cref="Draw(Rectangle, string)"/> to draw the frame with the specified thickness.</para>
 /// </remarks>
 public class Thickness : IEquatable<Thickness>
 {
@@ -87,15 +87,15 @@ public class Thickness : IEquatable<Thickness>
 
     /// <summary>
     ///     Gets whether the specified coordinates lie within the thickness (inside the bounding rectangle but outside of
-    ///     the rectangle described by <see cref="GetInside(Rect)"/>.
+    ///     the rectangle described by <see cref="GetInside(Rectangle)"/>.
     /// </summary>
     /// <param name="outside">Describes the location and size of the rectangle that contains the thickness.</param>
     /// <param name="x">The x coord to check.</param>
     /// <param name="y">The y coord to check.</param>
     /// <returns><see langword="true"/> if the specified coordinate is within the thickness; <see langword="false"/> otherwise.</returns>
-    public bool Contains (Rect outside, int x, int y)
+    public bool Contains (Rectangle outside, int x, int y)
     {
-        Rect inside = GetInside (outside);
+        Rectangle inside = GetInside (outside);
 
         return outside.Contains (x, y) && !inside.Contains (x, y);
     }
@@ -111,11 +111,11 @@ public class Thickness : IEquatable<Thickness>
     /// <param name="rect">The location and size of the rectangle that bounds the thickness rectangle, in screen coordinates.</param>
     /// <param name="label">The diagnostics label to draw on the bottom of the <see cref="Bottom"/>.</param>
     /// <returns>The inner rectangle remaining to be drawn.</returns>
-    public Rect Draw (Rect rect, string label = null)
+    public Rectangle Draw (Rectangle rect, string label = null)
     {
         if (rect.Size.Width < 1 || rect.Size.Height < 1)
         {
-            return Rect.Empty;
+            return Rectangle.Empty;
         }
 
         var clearChar = (Rune)' ';
@@ -141,20 +141,20 @@ public class Thickness : IEquatable<Thickness>
         // Draw the Top side
         if (Top > 0)
         {
-            Application.Driver.FillRect (new Rect (rect.X, rect.Y, rect.Width, Math.Min (rect.Height, Top)), topChar);
+            Application.Driver.FillRect (new Rectangle (rect.X, rect.Y, rect.Width, Math.Min (rect.Height, Top)), topChar);
         }
 
         // Draw the Left side
         if (Left > 0)
         {
-            Application.Driver.FillRect (new Rect (rect.X, rect.Y, Math.Min (rect.Width, Left), rect.Height), leftChar);
+            Application.Driver.FillRect (new Rectangle (rect.X, rect.Y, Math.Min (rect.Width, Left), rect.Height), leftChar);
         }
 
         // Draw the Right side			
         if (Right > 0)
         {
             Application.Driver.FillRect (
-                                         new Rect (
+                                         new Rectangle (
                                                    Math.Max (0, rect.X + rect.Width - Right),
                                                    rect.Y,
                                                    Math.Min (rect.Width, Right),
@@ -168,7 +168,7 @@ public class Thickness : IEquatable<Thickness>
         if (Bottom > 0)
         {
             Application.Driver.FillRect (
-                                         new Rect (
+                                         new Rectangle (
                                                    rect.X,
                                                    rect.Y + Math.Max (0, rect.Height - Bottom),
                                                    rect.Width,
@@ -266,7 +266,7 @@ public class Thickness : IEquatable<Thickness>
     /// </remarks>
     /// <param name="rect">The source rectangle</param>
     /// <returns></returns>
-    public Rect GetInside (Rect rect)
+    public Rectangle GetInside (Rectangle rect)
     {
         int x = rect.X + Left;
         int y = rect.Y + Top;

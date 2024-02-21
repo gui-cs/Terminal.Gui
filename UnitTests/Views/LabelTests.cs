@@ -132,7 +132,7 @@ public class LabelTests
         Assert.Equal (TextAlignment.Left, label.TextAlignment);
         Assert.True (label.AutoSize);
         Assert.False (label.CanFocus);
-        Assert.Equal (new Rect (0, 0, 0, 0), label.Frame);
+        Assert.Equal (new Rectangle (0, 0, 0, 0), label.Frame);
         Assert.Equal (KeyCode.Null, label.HotKey);
         var expected = @"";
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
@@ -145,7 +145,7 @@ public class LabelTests
         rs = Application.Begin (Application.Top);
 
         Assert.Equal ("Test", label.TextFormatter.Text);
-        Assert.Equal (new Rect (0, 0, 4, 1), label.Frame);
+        Assert.Equal (new Rectangle (0, 0, 4, 1), label.Frame);
 
         expected = @"
 Test
@@ -159,7 +159,7 @@ Test
         rs = Application.Begin (Application.Top);
 
         Assert.Equal ("Test", label.TextFormatter.Text);
-        Assert.Equal (new Rect (3, 4, 4, 1), label.Frame);
+        Assert.Equal (new Rectangle (3, 4, 4, 1), label.Frame);
 
         expected = @"
    Test
@@ -189,12 +189,12 @@ Test
         Assert.True (label.AutoSize);
 
         tf1.Draw (
-                  new Rect (new Point (0, 1), tf1Size),
+                  new Rectangle (new Point (0, 1), tf1Size),
                   label.GetNormalColor (),
                   label.ColorScheme.HotNormal
                  );
 
-        tf2.Draw (new Rect (new Point (0, 2), tf2Size), label.GetNormalColor (), label.ColorScheme.HotNormal);
+        tf2.Draw (new Rectangle (new Point (0, 2), tf2Size), label.GetNormalColor (), label.ColorScheme.HotNormal);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -211,13 +211,13 @@ This TextFormatter (tf2) with fill will be cleared on rewritten.
         tf1.Text = "This TextFormatter (tf1) is rewritten.";
 
         tf1.Draw (
-                  new Rect (new Point (0, 1), tf1Size),
+                  new Rectangle (new Point (0, 1), tf1Size),
                   label.GetNormalColor (),
                   label.ColorScheme.HotNormal
                  );
 
         tf2.Text = "This TextFormatter (tf2) is rewritten.";
-        tf2.Draw (new Rect (new Point (0, 2), tf2Size), label.GetNormalColor (), label.ColorScheme.HotNormal);
+        tf2.Draw (new Rectangle (new Point (0, 2), tf2Size), label.GetNormalColor (), label.ColorScheme.HotNormal);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -238,14 +238,14 @@ This TextFormatter (tf2) is rewritten.
         Application.Begin (Application.Top);
 
         Assert.True (label.AutoSize);
-        Assert.Equal (new Rect (0, 0, 16, 1), label.Frame);
+        Assert.Equal (new Rectangle (0, 0, 16, 1), label.Frame);
 
         var expected = @"
 Demo Simple Rune
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 16, 1), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (0, 0, 16, 1), pos);
     }
 
     [Fact]
@@ -278,8 +278,8 @@ n
 e
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 1, 16), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (0, 0, 1, 16), pos);
     }
 
     [Fact]
@@ -300,8 +300,8 @@ e
 ズ
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 2, 7), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (0, 0, 2, 7), pos);
     }
 
     [Fact]
@@ -378,7 +378,7 @@ e
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
         Assert.Equal ("Say Hello 你", label.TextFormatter.Text);
-        Assert.Equal (new Rect (0, 0, 12, 1), label.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 12, 1), label.Bounds);
 
         var expected = @"
 ┌────────────────────────────┐
@@ -387,8 +387,8 @@ e
 │                            │
 └────────────────────────────┘
 ";
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 5), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (0, 0, 30, 5), pos);
     }
 
     [Fact]
@@ -408,7 +408,7 @@ e
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
         Assert.Equal ("Say Hello 你", label.TextFormatter.Text);
-        Assert.Equal (new Rect (0, 0, 12, 1), label.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 12, 1), label.Bounds);
 
         var expected = @"
 ┌────────────────────────────┐
@@ -418,7 +418,7 @@ e
 └────────────────────────────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 5), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (0, 0, 30, 5), pos);
     }
 }

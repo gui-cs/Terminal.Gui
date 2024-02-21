@@ -203,7 +203,7 @@ public class RadioGroup : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         base.OnDrawContent (contentArea);
 
@@ -398,11 +398,11 @@ public class RadioGroup : View
         }
     }
 
-    private static Rect MakeRect (int x, int y, List<string> radioLabels)
+    private static Rectangle MakeRect (int x, int y, List<string> radioLabels)
     {
         if (radioLabels is null)
         {
-            return new Rect (x, y, 0, 0);
+            return new Rectangle (x, y, 0, 0);
         }
 
         var width = 0;
@@ -412,7 +412,7 @@ public class RadioGroup : View
             width = Math.Max (s.GetColumns () + 2, width);
         }
 
-        return new Rect (x, y, width, radioLabels.Count);
+        return new Rectangle (x, y, width, radioLabels.Count);
     }
 
     private void MoveDown ()
@@ -454,7 +454,7 @@ public class RadioGroup : View
         switch (_orientation)
         {
             case Orientation.Vertical:
-                Rect r = MakeRect (0, 0, radioLabels);
+                Rectangle r = MakeRect (0, 0, radioLabels);
 
                 if (IsInitialized)
                 {

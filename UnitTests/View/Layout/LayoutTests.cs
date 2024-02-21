@@ -190,7 +190,7 @@ public class LayoutTests
         switch (width)
         {
             case 1:
-                Assert.Equal (new Rect (0, 0, 0, 4), subview.Frame);
+                Assert.Equal (new Rectangle (0, 0, 0, 4), subview.Frame);
 
                 expected = @"
 │
@@ -203,7 +203,7 @@ public class LayoutTests
 
                 break;
             case 2:
-                Assert.Equal (new Rect (0, 0, 0, 4), subview.Frame);
+                Assert.Equal (new Rectangle (0, 0, 0, 4), subview.Frame);
 
                 expected = @"
 ┌┐
@@ -216,7 +216,7 @@ public class LayoutTests
 
                 break;
             case 3:
-                Assert.Equal (new Rect (0, 0, 0, 4), subview.Frame);
+                Assert.Equal (new Rectangle (0, 0, 0, 4), subview.Frame);
 
                 expected = @"
 ┌─┐
@@ -229,7 +229,7 @@ public class LayoutTests
 
                 break;
             case 4:
-                Assert.Equal (new Rect (0, 0, 1, 4), subview.Frame);
+                Assert.Equal (new Rectangle (0, 0, 1, 4), subview.Frame);
 
                 expected = @"
 ┌──┐
@@ -242,7 +242,7 @@ public class LayoutTests
 
                 break;
             case 5:
-                Assert.Equal (new Rect (0, 0, 2, 4), subview.Frame);
+                Assert.Equal (new Rectangle (0, 0, 2, 4), subview.Frame);
 
                 expected = @"
 ┌───┐
@@ -255,7 +255,7 @@ public class LayoutTests
 
                 break;
             case 6:
-                Assert.Equal (new Rect (0, 0, 3, 4), subview.Frame);
+                Assert.Equal (new Rectangle (0, 0, 3, 4), subview.Frame);
 
                 expected = @"
 ┌────┐
@@ -268,7 +268,7 @@ public class LayoutTests
 
                 break;
             case 7:
-                Assert.Equal (new Rect (0, 0, 4, 4), subview.Frame);
+                Assert.Equal (new Rectangle (0, 0, 4, 4), subview.Frame);
 
                 expected = @"
 ┌─────┐
@@ -281,7 +281,7 @@ public class LayoutTests
 
                 break;
             case 8:
-                Assert.Equal (new Rect (0, 0, 5, 4), subview.Frame);
+                Assert.Equal (new Rectangle (0, 0, 5, 4), subview.Frame);
 
                 expected = @"
 ┌──────┐
@@ -294,7 +294,7 @@ public class LayoutTests
 
                 break;
             case 9:
-                Assert.Equal (new Rect (1, 0, 5, 4), subview.Frame);
+                Assert.Equal (new Rectangle (1, 0, 5, 4), subview.Frame);
 
                 expected = @"
 ┌───────┐
@@ -307,7 +307,7 @@ public class LayoutTests
 
                 break;
             case 10:
-                Assert.Equal (new Rect (1, 0, 6, 4), subview.Frame);
+                Assert.Equal (new Rectangle (1, 0, 6, 4), subview.Frame);
 
                 expected = @"
 ┌────────┐
@@ -498,7 +498,7 @@ public class LayoutTests
 
         t.Ready += (s, e) =>
                    {
-                       v.Frame = new Rect (2, 2, 10, 10);
+                       v.Frame = new Rectangle (2, 2, 10, 10);
                        Assert.Equal (2, v.X = 2);
                        Assert.Equal (2, v.Y = 2);
                    };
@@ -543,12 +543,12 @@ public class LayoutTests
 └──────────────────┘",
                                                       _output
                                                      );
-        Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
-        Assert.Equal (new Rect (0, 0, 5, 1), view1.Frame);
-        Assert.Equal (new Rect (0, 0, 20, 10), win1.Frame);
-        Assert.Equal (new Rect (0, 2, 10, 3), win2.Frame);
-        Assert.Equal (new Rect (0, 0, 8, 1), view2.Frame);
-        Assert.Equal (new Rect (0, 0, 7, 1), view3.Frame);
+        Assert.Equal (new Rectangle (0, 0, 80, 25), top.Frame);
+        Assert.Equal (new Rectangle (0, 0, 5, 1), view1.Frame);
+        Assert.Equal (new Rectangle (0, 0, 20, 10), win1.Frame);
+        Assert.Equal (new Rectangle (0, 2, 10, 3), win2.Frame);
+        Assert.Equal (new Rectangle (0, 0, 8, 1), view2.Frame);
+        Assert.Equal (new Rectangle (0, 0, 7, 1), view3.Frame);
         var foundView = View.FindDeepestView (top, 9, 4, out int rx, out int ry);
         Assert.Equal (foundView, view2);
 

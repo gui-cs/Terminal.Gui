@@ -142,7 +142,7 @@ public sealed class ContextMenu : IDisposable
 
         _container = Application.Current;
         _container.Closing += Container_Closing;
-        Rect frame = Application.Driver.Bounds;
+        Rectangle frame = Application.Driver.Bounds;
         Point position = Position;
 
         if (Host is { })
@@ -157,7 +157,7 @@ public sealed class ContextMenu : IDisposable
             }
         }
 
-        Rect rect = Menu.MakeFrame (position.X, position.Y, MenuItems.Children);
+        Rectangle rect = Menu.MakeFrame (position.X, position.Y, MenuItems.Children);
 
         if (rect.Right >= frame.Right)
         {

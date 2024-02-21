@@ -157,7 +157,7 @@ public class ColorPicker : View
     }
 
     ///<inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         base.OnDrawContent (contentArea);
 
@@ -223,11 +223,11 @@ public class ColorPicker : View
 
         if (selected)
         {
-            DrawFocusRect (new Rect (x * BoxWidth, y * BoxHeight, BoxWidth, BoxHeight));
+            DrawFocusRect (new Rectangle (x * BoxWidth, y * BoxHeight, BoxWidth, BoxHeight));
         }
     }
 
-    private void DrawFocusRect (Rect rect)
+    private void DrawFocusRect (Rectangle rect)
     {
         var lc = new LineCanvas ();
 

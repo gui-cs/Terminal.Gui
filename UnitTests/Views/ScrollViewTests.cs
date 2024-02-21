@@ -34,7 +34,7 @@ public class ScrollViewTests
         Application.Top.Add (sv);
         Application.Begin (Application.Top);
 
-        Assert.Equal (new Rect (0, 0, 10, 10), sv.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), sv.Bounds);
 
         Assert.False (sv.AutoHideScrollBars);
         Assert.True (sv.ShowHorizontalScrollIndicator);
@@ -58,9 +58,9 @@ public class ScrollViewTests
                                             );
 
         sv.ShowHorizontalScrollIndicator = false;
-        Assert.Equal (new Rect (0, 0, 10, 10), sv.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), sv.Bounds);
         sv.ShowVerticalScrollIndicator = true;
-        Assert.Equal (new Rect (0, 0, 10, 10), sv.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), sv.Bounds);
 
         Assert.False (sv.AutoHideScrollBars);
         Assert.False (sv.ShowHorizontalScrollIndicator);
@@ -339,8 +339,8 @@ public class ScrollViewTests
         var sv = new ScrollView ();
         Assert.Equal (LayoutStyle.Absolute, sv.LayoutStyle);
         Assert.True (sv.CanFocus);
-        Assert.Equal (new Rect (0, 0, 0, 0), sv.Frame);
-        Assert.Equal (Rect.Empty, sv.Frame);
+        Assert.Equal (new Rectangle (0, 0, 0, 0), sv.Frame);
+        Assert.Equal (Rectangle.Empty, sv.Frame);
         Assert.Equal (Point.Empty, sv.ContentOffset);
         Assert.Equal (Size.Empty, sv.ContentSize);
         Assert.True (sv.AutoHideScrollBars);
@@ -349,7 +349,7 @@ public class ScrollViewTests
         sv = new ScrollView { X = 1, Y = 2, Width = 20, Height = 10 };
         Assert.Equal (LayoutStyle.Absolute, sv.LayoutStyle);
         Assert.True (sv.CanFocus);
-        Assert.Equal (new Rect (1, 2, 20, 10), sv.Frame);
+        Assert.Equal (new Rectangle (1, 2, 20, 10), sv.Frame);
         Assert.Equal (Point.Empty, sv.ContentOffset);
         Assert.Equal (Size.Empty, sv.ContentSize);
         Assert.True (sv.AutoHideScrollBars);
@@ -511,7 +511,7 @@ public class ScrollViewTests
     {
         var rule = "0123456789";
         var size = new Size (40, 40);
-        var view = new View { Frame = new Rect (Point.Empty, size) };
+        var view = new View { Frame = new Rectangle (Point.Empty, size) };
 
         view.Add (
                   new Label
@@ -566,8 +566,8 @@ public class ScrollViewTests
 "
             ;
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (new Key (KeyCode.CursorRight)));
         Application.Top.Draw ();
@@ -591,7 +591,7 @@ public class ScrollViewTests
             ;
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (new Key (KeyCode.CursorRight)));
         Application.Top.Draw ();
@@ -615,7 +615,7 @@ public class ScrollViewTests
             ;
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (new Key (KeyCode.CursorRight)));
         Application.Top.Draw ();
@@ -639,7 +639,7 @@ public class ScrollViewTests
             ;
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (new Key (KeyCode.CursorRight)));
         Application.Top.Draw ();
@@ -663,7 +663,7 @@ public class ScrollViewTests
             ;
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (new Key (KeyCode.CursorRight)));
         Application.Top.Draw ();
@@ -687,7 +687,7 @@ public class ScrollViewTests
             ;
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (new Key (KeyCode.CursorRight)));
         Application.Top.Draw ();
@@ -711,7 +711,7 @@ public class ScrollViewTests
             ;
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (new Key (KeyCode.CursorRight)));
         Application.Top.Draw ();
@@ -734,7 +734,7 @@ public class ScrollViewTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (new Key (KeyCode.CtrlMask | KeyCode.End)));
         Application.Top.Draw ();
@@ -757,7 +757,7 @@ public class ScrollViewTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (new Key (KeyCode.CtrlMask | KeyCode.Home)));
         Assert.True (scrollView.OnKeyDown (new Key (KeyCode.CursorDown)));
@@ -781,7 +781,7 @@ public class ScrollViewTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (new Key (KeyCode.CursorDown)));
         Application.Top.Draw ();
@@ -804,7 +804,7 @@ public class ScrollViewTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (new Key (KeyCode.CursorDown)));
         Application.Top.Draw ();
@@ -827,7 +827,7 @@ public class ScrollViewTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (new Key (KeyCode.End)));
         Application.Top.Draw ();
@@ -850,7 +850,7 @@ public class ScrollViewTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
     }
 
     // There still have an issue with lower right corner of the scroll view

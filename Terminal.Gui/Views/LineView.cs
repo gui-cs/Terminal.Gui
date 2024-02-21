@@ -54,7 +54,7 @@ public class LineView : View
     public Rune? StartingAnchor { get; set; }
 
     /// <summary>Draws the line including any starting/ending anchors</summary>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         base.OnDrawContent (contentArea);
 

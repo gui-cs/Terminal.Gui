@@ -282,7 +282,7 @@ public class ComboBox : View
     public virtual void OnCollapsed () { Collapsed?.Invoke (this, EventArgs.Empty); }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         base.OnDrawContent (contentArea);
 
@@ -488,7 +488,7 @@ public class ComboBox : View
             OnOpenSelectedItem ();
         }
 
-        Rect rect = _listview.BoundsToScreen (_listview.IsInitialized ? _listview.Bounds : Rect.Empty);
+        Rectangle rect = _listview.BoundsToScreen (_listview.IsInitialized ? _listview.Bounds : Rectangle.Empty);
         Reset (true);
         _listview.Clear (rect);
         _listview.TabStop = false;
@@ -834,12 +834,12 @@ public class ComboBox : View
             return res;
         }
 
-        public override void OnDrawContent (Rect contentArea)
+        public override void OnDrawContent (Rectangle contentArea)
         {
             Attribute current = ColorScheme.Focus;
             Driver.SetAttribute (current);
             Move (0, 0);
-            Rect f = Frame;
+            Rectangle f = Frame;
             int item = TopItem;
             bool focused = HasFocus;
             int col = AllowsMarking ? 2 : 0;

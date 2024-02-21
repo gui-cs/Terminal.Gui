@@ -14,7 +14,7 @@ public class ViewTests
     [TestRespondersDisposed]
     public void Added_Removed ()
     {
-        var v = new View { Frame = new Rect (0, 0, 10, 24) };
+        var v = new View { Frame = new Rectangle (0, 0, 10, 24) };
         var t = new View ();
 
         v.Added += (s, e) =>
@@ -49,8 +49,8 @@ public class ViewTests
 
         view.DrawContent += (s, e) =>
                             {
-                                Rect savedClip = Application.Driver.Clip;
-                                Application.Driver.Clip = new Rect (1, 1, view.Bounds.Width, view.Bounds.Height);
+                                Rectangle savedClip = Application.Driver.Clip;
+                                Application.Driver.Clip = new Rectangle (1, 1, view.Bounds.Width, view.Bounds.Height);
 
                                 for (var row = 0; row < view.Bounds.Height; row++)
                                 {
@@ -82,8 +82,8 @@ public class ViewTests
 └──────────────────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 20, 10), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (0, 0, 20, 10), pos);
 
         view.Clear (view.Frame);
 
@@ -91,7 +91,7 @@ public class ViewTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (Rect.Empty, pos);
+        Assert.Equal (Rectangle.Empty, pos);
     }
 
     [Fact]
@@ -102,8 +102,8 @@ public class ViewTests
 
         view.DrawContent += (s, e) =>
                             {
-                                Rect savedClip = Application.Driver.Clip;
-                                Application.Driver.Clip = new Rect (1, 1, view.Bounds.Width, view.Bounds.Height);
+                                Rectangle savedClip = Application.Driver.Clip;
+                                Application.Driver.Clip = new Rectangle (1, 1, view.Bounds.Width, view.Bounds.Height);
 
                                 for (var row = 0; row < view.Bounds.Height; row++)
                                 {
@@ -135,8 +135,8 @@ public class ViewTests
 └──────────────────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 20, 10), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (0, 0, 20, 10), pos);
 
         view.Clear (view.Frame);
 
@@ -144,7 +144,7 @@ public class ViewTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (Rect.Empty, pos);
+        Assert.Equal (Rectangle.Empty, pos);
     }
 
     [Theory]
@@ -168,13 +168,13 @@ public class ViewTests
         {
             Assert.True (v.AutoSize);
             Assert.False (v.CanFocus);
-            Assert.Equal (new Rect (0, 0, 100, 1), v.Frame);
+            Assert.Equal (new Rectangle (0, 0, 100, 1), v.Frame);
         }
         else
         {
             Assert.False (v.AutoSize);
             Assert.True (v.CanFocus);
-            Assert.Equal (new Rect (0, 0, 20, 1), v.Frame);
+            Assert.Equal (new Rectangle (0, 0, 20, 1), v.Frame);
         }
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -259,11 +259,11 @@ At 0,0
                                                       _output
                                                      );
 
-        view.Frame = new Rect (3, 3, 10, 1);
-        Assert.Equal (new Rect (3, 3, 10, 1), view.Frame);
+        view.Frame = new Rectangle (3, 3, 10, 1);
+        Assert.Equal (new Rectangle (3, 3, 10, 1), view.Frame);
         Assert.Equal (LayoutStyle.Absolute, view.LayoutStyle);
-        Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-        Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplayRect);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view._needsDisplayRect);
         top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -310,9 +310,9 @@ At 0,0
         view.Y = 3;
         view.Width = 10;
         view.Height = 1;
-        Assert.Equal (new Rect (3, 3, 10, 1), view.Frame);
-        Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-        Assert.Equal (new Rect (0, 0, 30, 2), view._needsDisplayRect);
+        Assert.Equal (new Rectangle (3, 3, 10, 1), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 30, 2), view._needsDisplayRect);
         top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -355,11 +355,11 @@ At 0,0
                                                       _output
                                                      );
 
-        view.Frame = new Rect (1, 1, 10, 1);
-        Assert.Equal (new Rect (1, 1, 10, 1), view.Frame);
+        view.Frame = new Rectangle (1, 1, 10, 1);
+        Assert.Equal (new Rectangle (1, 1, 10, 1), view.Frame);
         Assert.Equal (LayoutStyle.Absolute, view.LayoutStyle);
-        Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-        Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplayRect);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view._needsDisplayRect);
         top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -404,9 +404,9 @@ At 0,0
         view.Y = 1;
         view.Width = 10;
         view.Height = 1;
-        Assert.Equal (new Rect (1, 1, 10, 1), view.Frame);
-        Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-        Assert.Equal (new Rect (0, 0, 30, 2), view._needsDisplayRect);
+        Assert.Equal (new Rectangle (1, 1, 10, 1), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 30, 2), view._needsDisplayRect);
         top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -487,29 +487,29 @@ At 0,0
 
         RunState runState = Application.Begin (top);
 
-        top.LayoutComplete += (s, e) => { Assert.Equal (new Rect (0, 0, 80, 25), top._needsDisplayRect); };
+        top.LayoutComplete += (s, e) => { Assert.Equal (new Rectangle (0, 0, 80, 25), top._needsDisplayRect); };
 
-        frame.LayoutComplete += (s, e) => { Assert.Equal (new Rect (0, 0, 40, 8), frame._needsDisplayRect); };
+        frame.LayoutComplete += (s, e) => { Assert.Equal (new Rectangle (0, 0, 40, 8), frame._needsDisplayRect); };
 
-        label.LayoutComplete += (s, e) => { Assert.Equal (new Rect (0, 0, 38, 1), label._needsDisplayRect); };
+        label.LayoutComplete += (s, e) => { Assert.Equal (new Rectangle (0, 0, 38, 1), label._needsDisplayRect); };
 
-        button.LayoutComplete += (s, e) => { Assert.Equal (new Rect (0, 0, 13, 1), button._needsDisplayRect); };
+        button.LayoutComplete += (s, e) => { Assert.Equal (new Rectangle (0, 0, 13, 1), button._needsDisplayRect); };
 
         Assert.True (label.AutoSize);
-        Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
-        Assert.Equal (new Rect (20, 8, 40, 8), frame.Frame);
+        Assert.Equal (new Rectangle (0, 0, 80, 25), top.Frame);
+        Assert.Equal (new Rectangle (20, 8, 40, 8), frame.Frame);
 
         Assert.Equal (
-                      new Rect (20, 8, 60, 16),
-                      new Rect (
+                      new Rectangle (20, 8, 60, 16),
+                      new Rectangle (
                                 frame.Frame.Left,
                                 frame.Frame.Top,
                                 frame.Frame.Right,
                                 frame.Frame.Bottom
                                )
                      );
-        Assert.Equal (new Rect (0, 0, 30, 1), label.Frame);
-        Assert.Equal (new Rect (0, 1, 13, 1), button.Frame); // this proves frame was set
+        Assert.Equal (new Rectangle (0, 0, 30, 1), label.Frame);
+        Assert.Equal (new Rectangle (0, 1, 13, 1), button.Frame); // this proves frame was set
         Application.End (runState);
     }
 
@@ -605,9 +605,9 @@ At 0,0
                                                       _output
                                                      );
 
-        view.Frame = new Rect (3, 3, 10, 1);
-        Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-        Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplayRect);
+        view.Frame = new Rectangle (3, 3, 10, 1);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view._needsDisplayRect);
         view.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -654,9 +654,9 @@ At 0,0
         view.Y = 3;
         view.Width = 10;
         view.Height = 1;
-        Assert.Equal (new Rect (3, 3, 10, 1), view.Frame);
-        Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-        Assert.Equal (new Rect (0, 0, 30, 2), view._needsDisplayRect);
+        Assert.Equal (new Rectangle (3, 3, 10, 1), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 30, 2), view._needsDisplayRect);
         view.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -699,11 +699,11 @@ At 0,0
                                                       _output
                                                      );
 
-        view.Frame = new Rect (1, 1, 10, 1);
-        Assert.Equal (new Rect (1, 1, 10, 1), view.Frame);
+        view.Frame = new Rectangle (1, 1, 10, 1);
+        Assert.Equal (new Rectangle (1, 1, 10, 1), view.Frame);
         Assert.Equal (LayoutStyle.Absolute, view.LayoutStyle);
-        Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-        Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplayRect);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view._needsDisplayRect);
         view.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -750,9 +750,9 @@ At 0,0
         view.Y = 1;
         view.Width = 10;
         view.Height = 1;
-        Assert.Equal (new Rect (1, 1, 10, 1), view.Frame);
-        Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-        Assert.Equal (new Rect (0, 0, 30, 2), view._needsDisplayRect);
+        Assert.Equal (new Rectangle (1, 1, 10, 1), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 30, 2), view._needsDisplayRect);
         view.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1008,7 +1008,7 @@ At 0,0
     [Fact]
     public void Internal_Tests ()
     {
-        var rect = new Rect (1, 1, 10, 1);
+        var rect = new Rectangle (1, 1, 10, 1);
         var view = new View { Frame = rect };
     }
 
@@ -1087,8 +1087,8 @@ At 0,0
         Assert.Equal ("View()(0,0,0,0)", r.ToString ());
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
-        Assert.Equal (new Rect (0, 0, 0, 0), r.Bounds);
-        Assert.Equal (new Rect (0, 0, 0, 0), r.Frame);
+        Assert.Equal (new Rectangle (0, 0, 0, 0), r.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 0, 0), r.Frame);
         Assert.Null (r.Focused);
         Assert.Null (r.ColorScheme);
         Assert.Equal (0, r.Width);
@@ -1106,14 +1106,14 @@ At 0,0
         r.Dispose ();
 
         // Empty Rect
-        r = new View { Frame = Rect.Empty };
+        r = new View { Frame = Rectangle.Empty };
         Assert.NotNull (r);
         Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
         Assert.Equal ("View()(0,0,0,0)", r.ToString ());
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
-        Assert.Equal (new Rect (0, 0, 0, 0), r.Bounds);
-        Assert.Equal (new Rect (0, 0, 0, 0), r.Frame);
+        Assert.Equal (new Rectangle (0, 0, 0, 0), r.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 0, 0), r.Frame);
         Assert.Null (r.Focused);
         Assert.Null (r.ColorScheme);
         Assert.Equal (0, r.Width);
@@ -1131,14 +1131,14 @@ At 0,0
         r.Dispose ();
 
         // Rect with values
-        r = new View { Frame = new Rect (1, 2, 3, 4) };
+        r = new View { Frame = new Rectangle (1, 2, 3, 4) };
         Assert.NotNull (r);
         Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
         Assert.Equal ("View()(1,2,3,4)", r.ToString ());
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
-        Assert.Equal (new Rect (0, 0, 3, 4), r.Bounds);
-        Assert.Equal (new Rect (1, 2, 3, 4), r.Frame);
+        Assert.Equal (new Rectangle (0, 0, 3, 4), r.Bounds);
+        Assert.Equal (new Rectangle (1, 2, 3, 4), r.Frame);
         Assert.Null (r.Focused);
         Assert.Null (r.ColorScheme);
         Assert.Equal (3, r.Width);
@@ -1173,8 +1173,8 @@ At 0,0
     #endif
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
-        Assert.Equal (new Rect (0, 0, 1, 13), r.Bounds);
-        Assert.Equal (new Rect (0, 0, 1, 13), r.Frame);
+        Assert.Equal (new Rectangle (0, 0, 1, 13), r.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 1, 13), r.Frame);
         Assert.Null (r.Focused);
         Assert.Null (r.ColorScheme);
         Assert.False (r.IsCurrentTop);
@@ -1258,7 +1258,7 @@ At 0,0
         var view = new View { X = 1, Y = 2, Width = 3, Height = 4 };
 
         // Object Initializer Absolute
-        var super = new View { Frame = new Rect (0, 0, 10, 10) };
+        var super = new View { Frame = new Rectangle (0, 0, 10, 10) };
         super.Add (view);
         super.BeginInit ();
         super.EndInit ();
@@ -1269,9 +1269,9 @@ At 0,0
         Assert.Equal (3, view.Width);
         Assert.Equal (4, view.Height);
         Assert.False (view.Frame.IsEmpty);
-        Assert.Equal (new Rect (1, 2, 3, 4), view.Frame);
+        Assert.Equal (new Rectangle (1, 2, 3, 4), view.Frame);
         Assert.False (view.Bounds.IsEmpty);
-        Assert.Equal (new Rect (0, 0, 3, 4), view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 3, 4), view.Bounds);
 
         view.LayoutSubviews ();
 
@@ -1313,7 +1313,7 @@ At 0,0
         view.Y = 2;
         view.Width = 3;
         view.Height = 4;
-        super = new View { Frame = new Rect (0, 0, 10, 10) };
+        super = new View { Frame = new Rectangle (0, 0, 10, 10) };
         super.Add (view);
         super.BeginInit ();
         super.EndInit ();
@@ -1323,9 +1323,9 @@ At 0,0
         Assert.Equal (3, view.Width);
         Assert.Equal (4, view.Height);
         Assert.False (view.Frame.IsEmpty);
-        Assert.Equal (new Rect (1, 2, 3, 4), view.Frame);
+        Assert.Equal (new Rectangle (1, 2, 3, 4), view.Frame);
         Assert.False (view.Bounds.IsEmpty);
-        Assert.Equal (new Rect (0, 0, 3, 4), view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 3, 4), view.Bounds);
         super.Dispose ();
     }
 
@@ -1460,7 +1460,7 @@ At 0,0
         public bool IsKeyUp { get; set; }
         public override string Text { get; set; }
 
-        public override void OnDrawContent (Rect contentArea)
+        public override void OnDrawContent (Rectangle contentArea)
         {
             var idx = 0;
 

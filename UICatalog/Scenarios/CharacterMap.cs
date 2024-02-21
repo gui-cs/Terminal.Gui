@@ -513,7 +513,7 @@ internal class CharMap : ScrollView
     private static int RowWidth => RowLabelWidth + COLUMN_WIDTH * 16;
     public event EventHandler<ListViewItemEventArgs> Hover;
 
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         //if (ShowHorizontalScrollIndicator && ContentSize.Height < (int)(MaxCodePoint / 16 + 2)) {
         //	//ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePoint / 16 + 2));
@@ -538,14 +538,14 @@ internal class CharMap : ScrollView
     }
 
     //public void CharMap_DrawContent (object s, DrawEventArgs a)
-    public override void OnDrawContentComplete (Rect contentArea)
+    public override void OnDrawContentComplete (Rectangle contentArea)
     {
         if (contentArea.Height == 0 || contentArea.Width == 0)
         {
             return;
         }
 
-        var viewport = new Rect (
+        var viewport = new Rectangle (
                                  ContentOffset,
                                  new Size (
                                            Math.Max (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
@@ -553,12 +553,12 @@ internal class CharMap : ScrollView
                                           )
                                 );
 
-        Rect oldClip = ClipToBounds ();
+        Rectangle oldClip = ClipToBounds ();
 
         if (ShowHorizontalScrollIndicator)
         {
             // ClipToBounds doesn't know about the scroll indicators, so if off, subtract one from height
-            Driver.Clip = new Rect (
+            Driver.Clip = new Rectangle (
                                     Driver.Clip.Location,
                                     new Size (Driver.Clip.Width, Driver.Clip.Height - 1)
                                    );
@@ -567,7 +567,7 @@ internal class CharMap : ScrollView
         if (ShowVerticalScrollIndicator)
         {
             // ClipToBounds doesn't know about the scroll indicators, so if off, subtract one from width
-            Driver.Clip = new Rect (
+            Driver.Clip = new Rectangle (
                                     Driver.Clip.Location,
                                     new Size (Driver.Clip.Width - 1, Driver.Clip.Height)
                                    );

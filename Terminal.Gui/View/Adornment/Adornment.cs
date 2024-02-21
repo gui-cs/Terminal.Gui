@@ -31,9 +31,9 @@ public class Adornment : View
     public Adornment (View parent) { Parent = parent; }
 
     /// <summary>Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).</summary>
-    public override Rect Bounds
+    public override Rectangle Bounds
     {
-        get => Thickness?.GetInside (new Rect (Point.Empty, Frame.Size)) ?? new Rect (Point.Empty, Frame.Size);
+        get => Thickness?.GetInside (new Rectangle (Point.Empty, Frame.Size)) ?? new Rectangle (Point.Empty, Frame.Size);
         set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
     }
 
@@ -87,7 +87,7 @@ public class Adornment : View
         // Adornments are *Children* of a View, not SubViews. Thus View.BoundsToScreen will not work.
         // To get the screen-relative coordinates of a Adornment, we need to know who
         // the Parent is
-        Rect parentFrame = Parent?.Frame ?? Frame;
+        Rectangle parentFrame = Parent?.Frame ?? Frame;
         rrow = row + parentFrame.Y;
         rcol = col + parentFrame.X;
 
@@ -97,12 +97,12 @@ public class Adornment : View
     }
 
     /// <inheritdoc/>
-    public override Rect FrameToScreen ()
+    public override Rectangle FrameToScreen ()
     {
         // Adornments are *Children* of a View, not SubViews. Thus View.FrameToScreen will not work.
         // To get the screen-relative coordinates of a Adornment, we need to know who
         // the Parent is
-        Rect ret = Parent?.Frame ?? Frame;
+        Rectangle ret = Parent?.Frame ?? Frame;
         ret.Size = Frame.Size;
 
         ret.Location = Parent?.FrameToScreen ().Location ?? ret.Location;
@@ -117,14 +117,14 @@ public class Adornment : View
     public override bool OnDrawAdornments () { return false; }
 
     /// <summary>Redraws the Adornments that comprise the <see cref="Adornment"/>.</summary>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         if (Thickness == Thickness.Empty)
         {
             return;
         }
 
-        Rect screenBounds = BoundsToScreen (Frame);
+        Rectangle screenBounds = BoundsToScreen (Frame);
 
         Attribute normalAttr = GetNormalColor ();
 
@@ -141,7 +141,7 @@ public class Adornment : View
             }
         }
 
-        TextFormatter?.Draw (screenBounds, normalAttr, normalAttr, Rect.Empty);
+        TextFormatter?.Draw (screenBounds, normalAttr, normalAttr, Rectangle.Empty);
 
         //base.OnDrawContent (contentArea);
     }

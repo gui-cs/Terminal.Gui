@@ -309,7 +309,7 @@ public class Snake : Scenario
 
         public SnakeState State { get; }
 
-        public override void OnDrawContent (Rect contentArea)
+        public override void OnDrawContent (Rectangle contentArea)
         {
             base.OnDrawContent (contentArea);
 

@@ -3602,7 +3602,7 @@ public class TextView : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         _isDrawing = true;
 
@@ -4505,7 +4505,7 @@ public class TextView : View
                 _wrapNeeded = true;
             }
 
-            DoSetNeedsDisplay (new Rect (0, CurrentRow - _topRow, Frame.Width, CurrentRow - _topRow + 1));
+            DoSetNeedsDisplay (new Rectangle (0, CurrentRow - _topRow, Frame.Width, CurrentRow - _topRow + 1));
         }
         else
         {
@@ -4525,7 +4525,7 @@ public class TextView : View
             }
 
             DoSetNeedsDisplay (
-                               new Rect (
+                               new Rectangle (
                                          CurrentColumn - _leftColumn,
                                          CurrentRow - _topRow,
                                          Frame.Width,
@@ -4551,7 +4551,7 @@ public class TextView : View
         }
     }
 
-    private void DoSetNeedsDisplay (Rect rect)
+    private void DoSetNeedsDisplay (Rectangle rect)
     {
         if (_wrapNeeded)
         {
@@ -5086,7 +5086,7 @@ public class TextView : View
 
         UpdateWrapModel ();
 
-        DoSetNeedsDisplay (new Rect (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
+        DoSetNeedsDisplay (new Rectangle (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
 
         _lastWasKill = setLastWasKill;
         DoNeededAction ();
@@ -5191,7 +5191,7 @@ public class TextView : View
 
         UpdateWrapModel ();
 
-        DoSetNeedsDisplay (new Rect (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
+        DoSetNeedsDisplay (new Rectangle (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
 
         _lastWasKill = setLastWasKill;
         DoNeededAction ();
@@ -5261,7 +5261,7 @@ public class TextView : View
 
         UpdateWrapModel ();
 
-        DoSetNeedsDisplay (new Rect (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
+        DoSetNeedsDisplay (new Rectangle (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
         DoNeededAction ();
     }
 
@@ -5320,7 +5320,7 @@ public class TextView : View
 
         UpdateWrapModel ();
 
-        DoSetNeedsDisplay (new Rect (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
+        DoSetNeedsDisplay (new Rectangle (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
         DoNeededAction ();
     }
 
