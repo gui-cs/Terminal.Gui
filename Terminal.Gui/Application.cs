@@ -1601,7 +1601,7 @@ public static partial class Application
 
         bool AdornmentHandledMouseEvent (Adornment? frame)
         {
-            if (frame?.Thickness.Contains (frame.FrameToScreen (), a.MouseEvent.X, a.MouseEvent.Y) ?? false)
+            if (frame?.Thickness.Contains (frame.FrameToScreen (), a.MouseEvent.X, a.MouseEvent.Y) is true)
             {
                 Point boundsPoint = frame.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
 
