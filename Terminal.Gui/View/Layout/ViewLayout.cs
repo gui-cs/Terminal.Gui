@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
 
 namespace Terminal.Gui;
@@ -553,6 +553,8 @@ public partial class View
     ///     The view that was found at the <praramref name="x"/> and <praramref name="y"/> coordinates.
     ///     <see langword="null"/> if no view was found.
     /// </returns>
+    // CONCURRENCY: This method is not thread-safe.
+    // Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
     public static View? FindDeepestView (View? start, int x, int y, out int resultX, out int resultY)
     {
         resultY = resultX = 0;
