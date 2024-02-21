@@ -1125,15 +1125,12 @@ public static partial class Application
         }
     }
 
-    private static View FindDeepestTop (Toplevel start, int x, int y, out int resx, out int resy)
+    private static View FindDeepestTop (Toplevel start, int x, int y)
     {
         Rectangle startFrame = start.Frame;
 
         if (!startFrame.Contains (x, y))
         {
-            resx = 0;
-            resy = 0;
-
             return null;
         }
 
@@ -1155,9 +1152,6 @@ public static partial class Application
                 }
             }
         }
-
-        resx = x - startFrame.X;
-        resy = y - startFrame.Y;
 
         return start;
     }
@@ -1488,7 +1482,7 @@ public static partial class Application
             && a.MouseEvent.Flags != MouseFlags.ReportMousePosition
             && a.MouseEvent.Flags != 0)
         {
-            View top = FindDeepestTop (Top, a.MouseEvent.X, a.MouseEvent.Y, out _, out _);
+            View top = FindDeepestTop (Top, a.MouseEvent.X, a.MouseEvent.Y);
             view = View.FindDeepestView (top, a.MouseEvent.X, a.MouseEvent.Y, out screenX, out screenY);
 
             if (view is { } && view != OverlappedTop && top != Current)
