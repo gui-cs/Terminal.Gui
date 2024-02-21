@@ -1421,7 +1421,7 @@ public static partial class Application
 
         var view = View.FindDeepestView (Current, a.MouseEvent.X, a.MouseEvent.Y, out int screenX, out int screenY);
 
-        if (view is { } && view.WantContinuousButtonPressed)
+        if (view is { WantContinuousButtonPressed: true })
         {
             WantContinuousButtonPressedView = view;
         }
