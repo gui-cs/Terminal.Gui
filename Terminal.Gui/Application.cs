@@ -720,7 +720,7 @@ public static partial class Application
     // provides the sync context set while executing code in Terminal.Gui, to let
     // users use async/await on their code
     //
-    private class MainLoopSyncContext : SynchronizationContext
+    private sealed class MainLoopSyncContext : SynchronizationContext
     {
         public override SynchronizationContext CreateCopy () { return new MainLoopSyncContext (); }
 
