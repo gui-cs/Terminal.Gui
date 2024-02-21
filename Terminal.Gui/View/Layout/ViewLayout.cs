@@ -566,31 +566,26 @@ public partial class View
 
         Rectangle startFrame = start.Frame;
 
-        if (start.InternalSubviews is { })
+        if (start.InternalSubviews is { Count: > 0 })
         {
-            int count = start.InternalSubviews.Count;
+            Point boundsOffset = start.GetBoundsOffset ();
+            int rx = x - (startFrame.X + boundsOffset.X);
+            int ry = y - (startFrame.Y + boundsOffset.Y);
 
-            if (count > 0)
+            for (int i = start.InternalSubviews.Count - 1; i >= 0; i--)
             {
-                Point boundsOffset = start.GetBoundsOffset ();
-                int rx = x - (startFrame.X + boundsOffset.X);
-                int ry = y - (startFrame.Y + boundsOffset.Y);
+                View v = start.InternalSubviews [i];
 
-                for (int i = count - 1; i >= 0; i--)
+                if (v.Visible && v.Frame.Contains (rx, ry))
                 {
-                    View v = start.InternalSubviews [i];
+                    View? deep = FindDeepestView (v, rx, ry, out resultX, out resultY);
 
-                    if (v.Visible && v.Frame.Contains (rx, ry))
+                    if (deep is null)
                     {
-                        View? deep = FindDeepestView (v, rx, ry, out resultX, out resultY);
-
-                        if (deep is null)
-                        {
-                            return v;
-                        }
-
-                        return deep;
+                        return v;
                     }
+
+                    return deep;
                 }
             }
         }
