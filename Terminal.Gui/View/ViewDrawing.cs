@@ -129,7 +129,7 @@ public partial class View
         }
 
         Rect previous = Driver.Clip;
-        Driver.Clip = Rect.Intersect (previous, BoundsToScreen (Bounds));
+        Driver.Clip = Rect.Intersect (previous, BoundsToScreen (ContentArea));
 
         return previous;
     }
