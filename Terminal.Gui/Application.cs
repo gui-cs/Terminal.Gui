@@ -1125,7 +1125,8 @@ public static partial class Application
         }
     }
 
-    private static View FindDeepestTop (Toplevel start, int x, int y)
+    #nullable enable
+    private static View? FindDeepestTop (Toplevel start, int x, int y)
     {
         Rectangle startFrame = start.Frame;
 
@@ -1155,6 +1156,7 @@ public static partial class Application
 
         return start;
     }
+    #nullable restore
 
     private static View FindTopFromView (View view)
     {
