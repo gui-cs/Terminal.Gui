@@ -62,16 +62,16 @@ public class TreeView<T> : View, ITreeView where T : class
     private readonly Stack<TreeSelection<T>> multiSelectedRegions = new ();
 
     /// <summary>Cached result of <see cref="BuildLineMap"/></summary>
-    private IReadOnlyCollection<Branch<T>> cachedLineMap;
+    private IReadOnlyCollection<Branch<T>> _cachedLineMap;
 
-    private CursorVisibility desiredCursorVisibility = CursorVisibility.Invisible;
+    private CursorVisibility _desiredCursorVisibility = CursorVisibility.Invisible;
 
-    private KeyCode objectActivationKey = KeyCode.Enter;
-    private int scrollOffsetHorizontal;
-    private int scrollOffsetVertical;
+    private KeyCode _objectActivationKey = KeyCode.Enter;
+    private int _scrollOffsetHorizontal;
+    private int _scrollOffsetVertical;
 
     /// <summary>private variable for <see cref="SelectedObject"/></summary>
-    private T selectedObject;
+    private T _selectedObject;
 
     /// <summary>
     ///     Creates a new tree view with absolute positioning. Use <see cref="AddObjects(IEnumerable{T})"/> to set set
@@ -340,12 +340,12 @@ public class TreeView<T> : View, ITreeView where T : class
     /// </summary>
     public CursorVisibility DesiredCursorVisibility
     {
-        get => MultiSelect ? desiredCursorVisibility : CursorVisibility.Invisible;
+        get => MultiSelect ? _desiredCursorVisibility : CursorVisibility.Invisible;
         set
         {
-            if (desiredCursorVisibility != value)
+            if (_desiredCursorVisibility != value)
             {
-                desiredCursorVisibility = value;
+                _desiredCursorVisibility = value;
 
                 if (HasFocus)
                 {
@@ -379,13 +379,13 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <summary>Key which when pressed triggers <see cref="TreeView{T}.ObjectActivated"/>. Defaults to Enter.</summary>
     public KeyCode ObjectActivationKey
     {
-        get => objectActivationKey;
+        get => _objectActivationKey;
         set
         {
-            if (objectActivationKey != value)
+            if (_objectActivationKey != value)
             {
                 KeyBindings.Replace (ObjectActivationKey, value);
-                objectActivationKey = value;
+                _objectActivationKey = value;
             }
         }
     }
@@ -418,8 +418,8 @@ public class TreeView<T> : View, ITreeView where T : class
     /// </remarks>
     public int ScrollOffsetHorizontal
     {
-        get => scrollOffsetHorizontal;
-        set => ScrollLeftOffset = scrollOffsetHorizontal = Math.Max (0, value);
+        get => _scrollOffsetHorizontal;
+        set => ScrollLeftOffset = _scrollOffsetHorizontal = Math.Max (0, value);
     }
 
     /// <summary>The amount of tree view that has been scrolled off the top of the screen (by the user scrolling down).</summary>
@@ -429,8 +429,8 @@ public class TreeView<T> : View, ITreeView where T : class
     /// </remarks>
     public int ScrollOffsetVertical
     {
-        get => scrollOffsetVertical;
-        set => ScrollTopOffset = scrollOffsetVertical = Math.Max (0, value);
+        get => _scrollOffsetVertical;
+        set => ScrollTopOffset = _scrollOffsetVertical = Math.Max (0, value);
     }
 
     /// <inheritdoc/>
@@ -457,11 +457,11 @@ public class TreeView<T> : View, ITreeView where T : class
     /// </summary>
     public T SelectedObject
     {
-        get => selectedObject;
+        get => _selectedObject;
         set
         {
-            T oldValue = selectedObject;
-            selectedObject = value;
+            T oldValue = _selectedObject;
+            _selectedObject = value;
 
             if (!ReferenceEquals (oldValue, value))
             {
@@ -722,7 +722,7 @@ public class TreeView<T> : View, ITreeView where T : class
     public bool CanExpand (T o) { return ObjectToBranch (o)?.CanExpand () ?? false; }
 
     /// <summary>Collapses the <see cref="SelectedObject"/></summary>
-    public void Collapse () { Collapse (selectedObject); }
+    public void Collapse () { Collapse (_selectedObject); }
 
     /// <summary>Collapses the supplied object if it is currently expanded .</summary>
     /// <param name="toCollapse">The object to collapse.</param>
@@ -1020,7 +1020,7 @@ public class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <summary>Clears any cached results of the tree state.</summary>
-    public void InvalidateLineMap () { cachedLineMap = null; }
+    public void InvalidateLineMap () { _cachedLineMap = null; }
 
     /// <summary>Returns true if the given object <paramref name="o"/> is exposed in the tree and expanded otherwise false.</summary>
     /// <param name="o"></param>
@@ -1254,7 +1254,7 @@ public class TreeView<T> : View, ITreeView where T : class
                 if (newIndex is int && newIndex != -1)
                 {
                     SelectedObject = map.ElementAt ((int)newIndex).Model;
-                    EnsureVisible (selectedObject);
+                    EnsureVisible (_selectedObject);
                     SetNeedsDisplay ();
 
                     return true;
@@ -1366,7 +1366,7 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <summary>Scrolls the view area up a single line without changing the current selection.</summary>
     public void ScrollUp ()
     {
-        if (scrollOffsetVertical > 0)
+        if (_scrollOffsetVertical > 0)
         {
             ScrollOffsetVertical--;
             SetNeedsDisplay ();
@@ -1496,9 +1496,9 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <returns></returns>
     internal IReadOnlyCollection<Branch<T>> BuildLineMap ()
     {
-        if (cachedLineMap is { })
+        if (_cachedLineMap is { })
         {
-            return cachedLineMap;
+            return _cachedLineMap;
         }
 
         List<Branch<T>> toReturn = new ();
@@ -1513,12 +1513,12 @@ public class TreeView<T> : View, ITreeView where T : class
             }
         }
 
-        cachedLineMap = new ReadOnlyCollection<Branch<T>> (toReturn);
+        _cachedLineMap = new ReadOnlyCollection<Branch<T>> (toReturn);
 
         // Update the collection used for search-typing
-        KeystrokeNavigator.Collection = cachedLineMap.Select (b => AspectGetter (b.Model)).ToArray ();
+        KeystrokeNavigator.Collection = _cachedLineMap.Select (b => AspectGetter (b.Model)).ToArray ();
 
-        return cachedLineMap;
+        return _cachedLineMap;
     }
 
     /// <summary>Raises the DrawLine event</summary>
@@ -1642,7 +1642,7 @@ public class TreeView<T> : View, ITreeView where T : class
 
 internal class TreeSelection<T> where T : class
 {
-    private readonly HashSet<T> included = new ();
+    private readonly HashSet<T> _included = [];
 
     /// <summary>Creates a new selection between two branches in the tree</summary>
     /// <param name="from"></param>
@@ -1651,7 +1651,7 @@ internal class TreeSelection<T> where T : class
     public TreeSelection (Branch<T> from, int toIndex, IReadOnlyCollection<Branch<T>> map)
     {
         Origin = from;
-        included.Add (Origin.Model);
+        _included.Add (Origin.Model);
 
         int oldIdx = map.IndexOf (from);
 
@@ -1661,10 +1661,10 @@ internal class TreeSelection<T> where T : class
         // Select everything between the old and new indexes
         foreach (Branch<T> alsoInclude in map.Skip (lowIndex).Take (highIndex - lowIndex))
         {
-            included.Add (alsoInclude.Model);
+            _included.Add (alsoInclude.Model);
         }
     }
 
     public Branch<T> Origin { get; }
-    public bool Contains (T model) { return included.Contains (model); }
+    public bool Contains (T model) { return _included.Contains (model); }
 }
