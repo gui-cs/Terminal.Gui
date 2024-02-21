@@ -1469,7 +1469,7 @@ internal partial class HistoryText
 
 internal class WordWrapManager
 {
-    private int _frameWidth;
+    private int _boundsWidth;
     private bool _isWrapModelRefreshing;
     private List<WrappedLine> _wrappedModelLines = new ();
     public WordWrapManager (TextModel model) { Model = model; }
@@ -1485,7 +1485,7 @@ internal class WordWrapManager
         line.RemoveRange (modelCol, restCount);
         Model.AddLine (modelRow + 1, rest);
         _isWrapModelRefreshing = true;
-        WrapModel (_frameWidth, out _, out _, out _, out _, modelRow + 1);
+        WrapModel (_boundsWidth, out _, out _, out _, out _, modelRow + 1);
         _isWrapModelRefreshing = false;
     }
 
@@ -1570,7 +1570,7 @@ internal class WordWrapManager
         List<RuneCell> line = GetCurrentLine (GetModelLineFromWrappedLines (row));
         line.Insert (GetModelColFromWrappedLines (row, col), cell);
 
-        if (line.Count > _frameWidth)
+        if (line.Count > _boundsWidth)
         {
             return true;
         }
@@ -1597,7 +1597,7 @@ internal class WordWrapManager
             line.RemoveAt (modelCol);
         }
 
-        if (line.Count > _frameWidth || (row + 1 < _wrappedModelLines.Count && _wrappedModelLines [row + 1].ModelLine == modelRow))
+        if (line.Count > _boundsWidth || (row + 1 < _wrappedModelLines.Count && _wrappedModelLines [row + 1].ModelLine == modelRow))
         {
             return true;
         }
@@ -1649,7 +1649,7 @@ internal class WordWrapManager
             line.AddRange (nextLine);
             Model.RemoveLine (modelRow + 1);
 
-            if (line.Count > _frameWidth)
+            if (line.Count > _boundsWidth)
             {
                 return true;
             }
@@ -1665,7 +1665,7 @@ internal class WordWrapManager
             prevLine.AddRange (line);
             Model.RemoveLine (modelRow);
 
-            if (prevLine.Count > _frameWidth)
+            if (prevLine.Count > _boundsWidth)
             {
                 return true;
             }
@@ -1721,7 +1721,7 @@ internal class WordWrapManager
         Model = model;
 
         WrapModel (
-                   _frameWidth,
+                   _boundsWidth,
                    out nRow,
                    out nCol,
                    out nStartRow,
@@ -1750,7 +1750,7 @@ internal class WordWrapManager
         bool preserveTrailingSpaces = true
     )
     {
-        _frameWidth = width;
+        _boundsWidth = width;
 
         int modelRow = _isWrapModelRefreshing ? row : GetModelLineFromWrappedLines (row);
         int modelCol = _isWrapModelRefreshing ? col : GetModelColFromWrappedLines (row, col);
