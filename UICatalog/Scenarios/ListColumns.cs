@@ -65,7 +65,8 @@ public class ListColumns : Scenario
                 ShowHorizontalHeaderUnderline = false,
                 ShowHorizontalBottomline = false,
                 ExpandLastColumn = false
-            }
+            },
+            ScrollBarType = ScrollBarType.Both
         };
         var listColStyle = new ListColumnStyle ();
 
@@ -330,41 +331,7 @@ public class ListColumns : Scenario
         }
     }
 
-    private void SetupScrollBar ()
-    {
-        var scrollBar = new ScrollBarView (_listColView, true); // (listColView, true, true);
-
-        scrollBar.ChangedPosition += (s, e) =>
-                                     {
-                                         _listColView.RowOffset = scrollBar.Position;
-
-                                         if (_listColView.RowOffset != scrollBar.Position)
-                                         {
-                                             scrollBar.Position = _listColView.RowOffset;
-                                         }
-
-                                         _listColView.SetNeedsDisplay ();
-                                     };
-        /*
-        scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
-            listColView.ColumnOffset = scrollBar.OtherScrollBarView.Position;
-            if (listColView.ColumnOffset != scrollBar.OtherScrollBarView.Position) {
-                scrollBar.OtherScrollBarView.Position = listColView.ColumnOffset;
-            }
-            listColView.SetNeedsDisplay ();
-        };
-        */
-
-        _listColView.DrawContent += (s, e) =>
-                                    {
-                                        scrollBar.Size = _listColView.Table?.Rows ?? 0;
-                                        scrollBar.Position = _listColView.RowOffset;
-
-                                        //scrollBar.OtherScrollBarView.Size = listColView.Table?.Columns - 1 ?? 0;
-                                        //scrollBar.OtherScrollBarView.Position = listColView.ColumnOffset;
-                                        scrollBar.Refresh ();
-                                    };
-    }
+    private void SetupScrollBar () { }
 
     private void TableViewKeyPress (object sender, Key e)
     {

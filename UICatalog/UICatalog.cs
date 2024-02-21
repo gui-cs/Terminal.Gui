@@ -378,7 +378,7 @@ internal class UICatalogApp
         public MenuItem? miUseSubMenusSingleFrame;
         public StatusItem OS;
 
-        // UI Catalog uses TableView for the scenario list instead of a ListView to demonstate how
+        // UI Catalog uses TableView for the scenario list instead of a ListView to demonstrate how
         // TableView works. There's no real reason not to use ListView. Because we use TableView, and TableView
         // doesn't (currently) have CollectionNavigator support built in, we implement it here, within the app.
         public TableView ScenarioList;
@@ -498,7 +498,8 @@ internal class UICatalogApp
                 Title = "Categories",
                 BorderStyle = LineStyle.Single,
                 SuperViewRendersLineCanvas = true,
-                Source = new ListWrapper (_categories)
+                Source = new ListWrapper (_categories),
+                ScrollBarType = ScrollBarType.Both
             };
             CategoryList.OpenSelectedItem += (s, a) => { ScenarioList!.SetFocus (); };
             CategoryList.SelectedItemChanged += CategoryView_SelectedChanged;
@@ -517,7 +518,8 @@ internal class UICatalogApp
                 CanFocus = true,
                 Title = "Scenarios",
                 BorderStyle = LineStyle.Single,
-                SuperViewRendersLineCanvas = true
+                SuperViewRendersLineCanvas = true,
+                ScrollBarType = ScrollBarType.Both
             };
 
             // TableView provides many options for table headers. For simplicity we turn all 

@@ -259,7 +259,8 @@ public class Wizards : Scenario
                                                 Height = Dim.Fill (1),
                                                 WordWrap = true,
                                                 AllowsTab = false,
-                                                ColorScheme = Colors.ColorSchemes ["Base"]
+                                                ColorScheme = Colors.ColorSchemes ["Base"],
+                                                ScrollBarType = ScrollBarType.Both
                                             };
                                             var help = "This is helpful.";
                                             fourthStep.Add (someText);
@@ -282,47 +283,6 @@ public class Wizards : Scenario
                                                                    };
                                             fourthStep.Add (hideHelpBtn);
                                             fourthStep.NextButtonText = "Go To Last Step";
-                                            var scrollBar = new ScrollBarView (someText, true);
-
-                                            scrollBar.ChangedPosition += (s, e) =>
-                                                                         {
-                                                                             someText.TopRow = scrollBar.Position;
-
-                                                                             if (someText.TopRow != scrollBar.Position)
-                                                                             {
-                                                                                 scrollBar.Position = someText.TopRow;
-                                                                             }
-
-                                                                             someText.SetNeedsDisplay ();
-                                                                         };
-
-                                            scrollBar.VisibleChanged += (s, e) =>
-                                                                        {
-                                                                            if (scrollBar.Visible && someText.RightOffset == 0)
-                                                                            {
-                                                                                someText.RightOffset = 1;
-                                                                            }
-                                                                            else if (!scrollBar.Visible && someText.RightOffset == 1)
-                                                                            {
-                                                                                someText.RightOffset = 0;
-                                                                            }
-                                                                        };
-
-                                            someText.DrawContent += (s, e) =>
-                                                                    {
-                                                                        scrollBar.Size = someText.Lines;
-                                                                        scrollBar.Position = someText.TopRow;
-
-                                                                        if (scrollBar.OtherScrollBarView != null)
-                                                                        {
-                                                                            scrollBar.OtherScrollBarView.Size = someText.Maxlength;
-                                                                            scrollBar.OtherScrollBarView.Position = someText.LeftColumn;
-                                                                        }
-
-                                                                        scrollBar.LayoutSubviews ();
-                                                                        scrollBar.Refresh ();
-                                                                    };
-                                            fourthStep.Add (scrollBar);
 
                                             // Add last step
                                             var lastStep = new WizardStep { Title = "The last step" };

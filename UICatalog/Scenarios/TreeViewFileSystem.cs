@@ -174,7 +174,7 @@ public class TreeViewFileSystem : Scenario
         };
         Application.Top.Add (menu);
 
-        _treeViewFiles = new TreeView<IFileSystemInfo> { X = 0, Y = 0, Width = Dim.Percent (50), Height = Dim.Fill () };
+        _treeViewFiles = new TreeView<IFileSystemInfo> { X = 0, Y = 0, Width = Dim.Percent (50), Height = Dim.Fill (), ScrollBarType = ScrollBarType.Both };
         _treeViewFiles.DrawLine += TreeViewFiles_DrawLine;
 
         _detailsFrame = new DetailsFrame (_iconProvider)
@@ -358,41 +358,6 @@ public class TreeViewFileSystem : Scenario
     {
         // When using scroll bar leave the last row of the control free (for over-rendering with scroll bar)
         _treeViewFiles.Style.LeaveLastRow = true;
-
-        var scrollBar = new ScrollBarView (_treeViewFiles, true);
-
-        scrollBar.ChangedPosition += (s, e) =>
-                                     {
-                                         _treeViewFiles.ScrollOffsetVertical = scrollBar.Position;
-
-                                         if (_treeViewFiles.ScrollOffsetVertical != scrollBar.Position)
-                                         {
-                                             scrollBar.Position = _treeViewFiles.ScrollOffsetVertical;
-                                         }
-
-                                         _treeViewFiles.SetNeedsDisplay ();
-                                     };
-
-        scrollBar.OtherScrollBarView.ChangedPosition += (s, e) =>
-                                                        {
-                                                            _treeViewFiles.ScrollOffsetHorizontal = scrollBar.OtherScrollBarView.Position;
-
-                                                            if (_treeViewFiles.ScrollOffsetHorizontal != scrollBar.OtherScrollBarView.Position)
-                                                            {
-                                                                scrollBar.OtherScrollBarView.Position = _treeViewFiles.ScrollOffsetHorizontal;
-                                                            }
-
-                                                            _treeViewFiles.SetNeedsDisplay ();
-                                                        };
-
-        _treeViewFiles.DrawContent += (s, e) =>
-                                      {
-                                          scrollBar.Size = _treeViewFiles.ContentHeight;
-                                          scrollBar.Position = _treeViewFiles.ScrollOffsetVertical;
-                                          scrollBar.OtherScrollBarView.Size = _treeViewFiles.GetContentWidth (true);
-                                          scrollBar.OtherScrollBarView.Position = _treeViewFiles.ScrollOffsetHorizontal;
-                                          scrollBar.Refresh ();
-                                      };
     }
 
     private void ShowColoredExpandableSymbols ()

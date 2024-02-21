@@ -17,7 +17,7 @@ public class ProcessTable : Scenario
         Win.Y = 1; // menu
         Win.Height = Dim.Fill (1); // status bar
 
-        tableView = new TableView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (1) };
+        tableView = new TableView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (), ScrollBarType = ScrollBarType.Both };
 
         // First time
         CreateProcessTable ();

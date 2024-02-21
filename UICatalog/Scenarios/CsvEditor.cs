@@ -605,40 +605,7 @@ public class CsvEditor : Scenario
 
     private void SetTable (DataTable dataTable) { _tableView.Table = new DataTableSource (_currentTable = dataTable); }
 
-    private void SetupScrollBar ()
-    {
-        var scrollBar = new ScrollBarView (_tableView, true);
-
-        scrollBar.ChangedPosition += (s, e) =>
-                                     {
-                                         _tableView.RowOffset = scrollBar.Position;
-
-                                         if (_tableView.RowOffset != scrollBar.Position)
-                                         {
-                                             scrollBar.Position = _tableView.RowOffset;
-                                         }
-
-                                         _tableView.SetNeedsDisplay ();
-                                     };
-        /*
-        scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
-            tableView.LeftItem = scrollBar.OtherScrollBarView.Position;
-            if (tableView.LeftItem != scrollBar.OtherScrollBarView.Position) {
-                scrollBar.OtherScrollBarView.Position = tableView.LeftItem;
-            }
-            tableView.SetNeedsDisplay ();
-        };*/
-
-        _tableView.DrawContent += (s, e) =>
-                                  {
-                                      scrollBar.Size = _tableView.Table?.Rows ?? 0;
-                                      scrollBar.Position = _tableView.RowOffset;
-
-                                      //scrollBar.OtherScrollBarView.Size = tableView.Maxlength - 1;
-                                      //scrollBar.OtherScrollBarView.Position = tableView.LeftItem;
-                                      scrollBar.Refresh ();
-                                  };
-    }
+    private void SetupScrollBar () { _tableView.ScrollBarType = ScrollBarType.Both; }
 
     private void Sort (bool asc)
     {

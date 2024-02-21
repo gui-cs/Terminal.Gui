@@ -28,7 +28,6 @@ public class Editor : Scenario
     private MenuItem _miForceMinimumPosToZero;
     private byte [] _originalText;
     private bool _saved = true;
-    private ScrollBarView _scrollBar;
     private TabView _tabView;
     private string _textToFind;
     private string _textToReplace;
@@ -59,8 +58,7 @@ public class Editor : Scenario
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            BottomOffset = 1,
-            RightOffset = 1
+            ScrollBarType = ScrollBarType.Both
         };
 
         CreateDemoFile (_fileName);
@@ -269,71 +267,6 @@ public class Editor : Scenario
                                              };
 
         Application.Top.Add (statusBar);
-
-        _scrollBar = new ScrollBarView (_textView, true);
-
-        _scrollBar.ChangedPosition += (s, e) =>
-                                      {
-                                          _textView.TopRow = _scrollBar.Position;
-
-                                          if (_textView.TopRow != _scrollBar.Position)
-                                          {
-                                              _scrollBar.Position = _textView.TopRow;
-                                          }
-
-                                          _textView.SetNeedsDisplay ();
-                                      };
-
-        _scrollBar.OtherScrollBarView.ChangedPosition += (s, e) =>
-                                                         {
-                                                             _textView.LeftColumn = _scrollBar.OtherScrollBarView.Position;
-
-                                                             if (_textView.LeftColumn != _scrollBar.OtherScrollBarView.Position)
-                                                             {
-                                                                 _scrollBar.OtherScrollBarView.Position = _textView.LeftColumn;
-                                                             }
-
-                                                             _textView.SetNeedsDisplay ();
-                                                         };
-
-        _scrollBar.VisibleChanged += (s, e) =>
-                                     {
-                                         if (_scrollBar.Visible && _textView.RightOffset == 0)
-                                         {
-                                             _textView.RightOffset = 1;
-                                         }
-                                         else if (!_scrollBar.Visible && _textView.RightOffset == 1)
-                                         {
-                                             _textView.RightOffset = 0;
-                                         }
-                                     };
-
-        _scrollBar.OtherScrollBarView.VisibleChanged += (s, e) =>
-                                                        {
-                                                            if (_scrollBar.OtherScrollBarView.Visible && _textView.BottomOffset == 0)
-                                                            {
-                                                                _textView.BottomOffset = 1;
-                                                            }
-                                                            else if (!_scrollBar.OtherScrollBarView.Visible && _textView.BottomOffset == 1)
-                                                            {
-                                                                _textView.BottomOffset = 0;
-                                                            }
-                                                        };
-
-        _textView.DrawContent += (s, e) =>
-                                 {
-                                     _scrollBar.Size = _textView.Lines;
-                                     _scrollBar.Position = _textView.TopRow;
-
-                                     if (_scrollBar.OtherScrollBarView != null)
-                                     {
-                                         _scrollBar.OtherScrollBarView.Size = _textView.Maxlength;
-                                         _scrollBar.OtherScrollBarView.Position = _textView.LeftColumn;
-                                     }
-
-                                     _scrollBar.LayoutSubviews ();
-                                     _scrollBar.Refresh ();
-                                 };
 
         Win.KeyDown += (s, e) =>
                        {
@@ -786,7 +719,7 @@ public class Editor : Scenario
         item.Title = "Keep Content Always In Viewport";
         item.CheckType |= MenuItemCheckStyle.Checked;
         item.Checked = true;
-        item.Action += () => _scrollBar.KeepContentAlwaysInViewport = (bool)(item.Checked = !item.Checked);
+        item.Action += () => _textView.ScrollKeepContentAlwaysInViewPort = (bool)(item.Checked = !item.Checked);
 
         return new [] { item };
     }
@@ -826,20 +759,7 @@ public class Editor : Scenario
         item.CheckType |= MenuItemCheckStyle.Checked;
         item.Checked = _textView.WordWrap;
 
-        item.Action += () =>
-                       {
-                           _textView.WordWrap = (bool)(item.Checked = !item.Checked);
-
-                           if (_textView.WordWrap)
-                           {
-                               _scrollBar.OtherScrollBarView.ShowScrollIndicator = false;
-                               _textView.BottomOffset = 0;
-                           }
-                           else
-                           {
-                               _textView.BottomOffset = 1;
-                           }
-                       };
+        item.Action += () => { _textView.WordWrap = (bool)(item.Checked = !item.Checked); };
 
         return item;
     }

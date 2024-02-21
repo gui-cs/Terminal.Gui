@@ -47,48 +47,12 @@ public class ListViewWithSelection : Scenario
             Y = 2,
             Height = Dim.Fill (),
             Width = Dim.Fill (1),
-
-            //ColorScheme = Colors.ColorSchemes ["TopLevel"],
             AllowsMarking = false,
-            AllowsMultipleSelection = false
+            AllowsMultipleSelection = false,
+            ScrollBarType = ScrollBarType.Both
         };
         _listView.RowRender += ListView_RowRender;
         Win.Add (_listView);
-
-        var scrollBar = new ScrollBarView (_listView, true);
-
-        scrollBar.ChangedPosition += (s, e) =>
-                                     {
-                                         _listView.TopItem = scrollBar.Position;
-
-                                         if (_listView.TopItem != scrollBar.Position)
-                                         {
-                                             scrollBar.Position = _listView.TopItem;
-                                         }
-
-                                         _listView.SetNeedsDisplay ();
-                                     };
-
-        scrollBar.OtherScrollBarView.ChangedPosition += (s, e) =>
-                                                        {
-                                                            _listView.LeftItem = scrollBar.OtherScrollBarView.Position;
-
-                                                            if (_listView.LeftItem != scrollBar.OtherScrollBarView.Position)
-                                                            {
-                                                                scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
-                                                            }
-
-                                                            _listView.SetNeedsDisplay ();
-                                                        };
-
-        _listView.DrawContent += (s, e) =>
-                                 {
-                                     scrollBar.Size = _listView.Source.Count - 1;
-                                     scrollBar.Position = _listView.TopItem;
-                                     scrollBar.OtherScrollBarView.Size = _listView.MaxLength - 1;
-                                     scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
-                                     scrollBar.Refresh ();
-                                 };
 
         _listView.SetSource (_scenarios);
 
@@ -96,9 +60,9 @@ public class ListViewWithSelection : Scenario
 
         var keepCheckBox = new CheckBox
         {
-            X = Pos.AnchorEnd (k.Length + 3), Y = 0, Text = k, Checked = scrollBar.AutoHideScrollBars
+            X = Pos.AnchorEnd (k.Length + 3), Y = 0, Text = k, Checked = _listView.ScrollAutoHideScrollBars
         };
-        keepCheckBox.Toggled += (s, e) => scrollBar.KeepContentAlwaysInViewport = (bool)keepCheckBox.Checked;
+        keepCheckBox.Toggled += (s, e) => _listView.ScrollKeepContentAlwaysInViewPort = (bool)keepCheckBox.Checked;
         Win.Add (keepCheckBox);
     }
 

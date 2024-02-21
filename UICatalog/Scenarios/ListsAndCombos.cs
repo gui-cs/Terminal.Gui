@@ -47,45 +47,11 @@ public class ListsAndCombos : Scenario
             Y = Pos.Bottom (lbListView) + 1,
             Height = Dim.Fill (2),
             Width = Dim.Percent (40),
-            Source = new ListWrapper (items)
+            Source = new ListWrapper (items),
+            ScrollBarType = ScrollBarType.Both
         };
         listview.SelectedItemChanged += (s, e) => lbListView.Text = items [listview.SelectedItem];
         Win.Add (lbListView, listview);
-
-        var scrollBar = new ScrollBarView (listview, true);
-
-        scrollBar.ChangedPosition += (s, e) =>
-                                     {
-                                         listview.TopItem = scrollBar.Position;
-
-                                         if (listview.TopItem != scrollBar.Position)
-                                         {
-                                             scrollBar.Position = listview.TopItem;
-                                         }
-
-                                         listview.SetNeedsDisplay ();
-                                     };
-
-        scrollBar.OtherScrollBarView.ChangedPosition += (s, e) =>
-                                                        {
-                                                            listview.LeftItem = scrollBar.OtherScrollBarView.Position;
-
-                                                            if (listview.LeftItem != scrollBar.OtherScrollBarView.Position)
-                                                            {
-                                                                scrollBar.OtherScrollBarView.Position = listview.LeftItem;
-                                                            }
-
-                                                            listview.SetNeedsDisplay ();
-                                                        };
-
-        listview.DrawContent += (s, e) =>
-                                {
-                                    scrollBar.Size = listview.Source.Count - 1;
-                                    scrollBar.Position = listview.TopItem;
-                                    scrollBar.OtherScrollBarView.Size = listview.MaxLength - 1;
-                                    scrollBar.OtherScrollBarView.Position = listview.LeftItem;
-                                    scrollBar.Refresh ();
-                                };
 
         // ComboBox
         var lbComboBox = new Label
@@ -102,47 +68,13 @@ public class ListsAndCombos : Scenario
             X = Pos.Right (listview) + 1,
             Y = Pos.Bottom (lbListView) + 1,
             Height = Dim.Fill (2),
-            Width = Dim.Percent (40)
+            Width = Dim.Percent (40),
+            ScrollBarType = ScrollBarType.Both
         };
         comboBox.SetSource (items);
 
         comboBox.SelectedItemChanged += (s, text) => lbComboBox.Text = text.Value.ToString ();
         Win.Add (lbComboBox, comboBox);
-
-        var scrollBarCbx = new ScrollBarView (comboBox.Subviews [1], true);
-
-        scrollBarCbx.ChangedPosition += (s, e) =>
-                                        {
-                                            ((ListView)comboBox.Subviews [1]).TopItem = scrollBarCbx.Position;
-
-                                            if (((ListView)comboBox.Subviews [1]).TopItem != scrollBarCbx.Position)
-                                            {
-                                                scrollBarCbx.Position = ((ListView)comboBox.Subviews [1]).TopItem;
-                                            }
-
-                                            comboBox.SetNeedsDisplay ();
-                                        };
-
-        scrollBarCbx.OtherScrollBarView.ChangedPosition += (s, e) =>
-                                                           {
-                                                               ((ListView)comboBox.Subviews [1]).LeftItem = scrollBarCbx.OtherScrollBarView.Position;
-
-                                                               if (((ListView)comboBox.Subviews [1]).LeftItem != scrollBarCbx.OtherScrollBarView.Position)
-                                                               {
-                                                                   scrollBarCbx.OtherScrollBarView.Position = ((ListView)comboBox.Subviews [1]).LeftItem;
-                                                               }
-
-                                                               comboBox.SetNeedsDisplay ();
-                                                           };
-
-        comboBox.DrawContent += (s, e) =>
-                                {
-                                    scrollBarCbx.Size = comboBox.Source.Count;
-                                    scrollBarCbx.Position = ((ListView)comboBox.Subviews [1]).TopItem;
-                                    scrollBarCbx.OtherScrollBarView.Size = ((ListView)comboBox.Subviews [1]).MaxLength - 1;
-                                    scrollBarCbx.OtherScrollBarView.Position = ((ListView)comboBox.Subviews [1]).LeftItem;
-                                    scrollBarCbx.Refresh ();
-                                };
 
         var btnMoveUp = new Button { X = 1, Y = Pos.Bottom (lbListView), Text = "Move _Up" };
         btnMoveUp.Clicked += (s, e) => { listview.MoveUp (); };
