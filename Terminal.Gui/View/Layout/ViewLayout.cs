@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Diagnostics;
 
 namespace Terminal.Gui;
@@ -580,7 +580,7 @@ public partial class View
 
                     if (v.Visible && v.Frame.Contains (rx, ry))
                     {
-                        View deep = FindDeepestView (v, rx, ry, out resultX, out resultY);
+                        View? deep = FindDeepestView (v, rx, ry, out resultX, out resultY);
 
                         if (deep is null)
                         {
