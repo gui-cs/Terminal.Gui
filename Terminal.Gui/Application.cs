@@ -1506,48 +1506,50 @@ public static partial class Application
 
         if (AdornmentHandledMouseEvent (view.Border, a))
         {
-            if (view is Toplevel)
+            if (view is not Toplevel)
             {
-                // TODO: This is a temporary hack to work around the fact that 
-                // drag handling is handled in Toplevel (See Issue #2537)
-
-                var me = new MouseEvent
-                {
-                    X = screenX,
-                    Y = screenY,
-                    Flags = a.MouseEvent.Flags,
-                    OfX = screenX,
-                    OfY = screenY,
-                    View = view
-                };
-
-                if (_mouseEnteredView is null)
-                {
-                    _mouseEnteredView = view;
-                    view.OnMouseEnter (me);
-                }
-                else if (_mouseEnteredView != view)
-                {
-                    _mouseEnteredView.OnMouseLeave (me);
-                    view.OnMouseEnter (me);
-                    _mouseEnteredView = view;
-                }
-
-                if (!view.WantMousePositionReports && a.MouseEvent.Flags == MouseFlags.ReportMousePosition)
-                {
-                    return;
-                }
-
-                WantContinuousButtonPressedView = view.WantContinuousButtonPressed ? view : null;
-
-                if (view.OnMouseEvent (me))
-                {
-                    // Should we bubble up the event, if it is not handled?
-                    //return;
-                }
-
-                BringOverlappedTopToFront ();
+                return;
             }
+
+            // TODO: This is a temporary hack to work around the fact that 
+            // drag handling is handled in Toplevel (See Issue #2537)
+
+            var me = new MouseEvent
+            {
+                X = screenX,
+                Y = screenY,
+                Flags = a.MouseEvent.Flags,
+                OfX = screenX,
+                OfY = screenY,
+                View = view
+            };
+
+            if (_mouseEnteredView is null)
+            {
+                _mouseEnteredView = view;
+                view.OnMouseEnter (me);
+            }
+            else if (_mouseEnteredView != view)
+            {
+                _mouseEnteredView.OnMouseLeave (me);
+                view.OnMouseEnter (me);
+                _mouseEnteredView = view;
+            }
+
+            if (!view.WantMousePositionReports && a.MouseEvent.Flags == MouseFlags.ReportMousePosition)
+            {
+                return;
+            }
+
+            WantContinuousButtonPressedView = view.WantContinuousButtonPressed ? view : null;
+
+            if (view.OnMouseEvent (me))
+            {
+                // Should we bubble up the event, if it is not handled?
+                //return;
+            }
+
+            BringOverlappedTopToFront ();
 
             return;
         }
