@@ -67,7 +67,7 @@ public class LineCanvas : IDisposable
     ///     Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the line that is
     ///     furthest left/top and Size is defined by the line that extends the furthest right/bottom.
     /// </summary>
-    public Rect Bounds
+    public Rectangle Bounds
     {
         get
         {
@@ -78,11 +78,11 @@ public class LineCanvas : IDisposable
                     return _cachedBounds;
                 }
 
-                Rect bounds = _lines [0].Bounds;
+                Rectangle bounds = _lines [0].Bounds;
 
                 for (var i = 1; i < _lines.Count; i++)
                 {
-                    bounds = Rect.Union (bounds, _lines [i].Bounds);
+                    bounds = Rectangle.Union (bounds, _lines [i].Bounds);
                 }
 
                 if (bounds is {Width: 0} or {Height: 0})
