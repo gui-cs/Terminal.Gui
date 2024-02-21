@@ -81,7 +81,7 @@ public partial class View
             }
 
             Padding.Add (_scrollBar);
-            AddHandlers ();
+            AddEventHandlersForScrollBars ();
             AddScrollKeyBindings (_scrollBar);
 
             if (_scrollBar.OtherScrollBarView != null)
@@ -268,7 +268,7 @@ public partial class View
     /// </summary>
     public bool UseNegativeBoundsLocation { get; set; }
 
-    private void AddHandlers ()
+    private void AddEventHandlersForScrollBars ()
     {
         if (_scrollBar == null)
         {
