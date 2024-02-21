@@ -10,6 +10,7 @@ public class DrawTests
 
     [Fact]
     [AutoInitShutdown]
+    [Trait("Category","Unicode")]
     public void CJK_Compatibility_Ideographs_ConsoleWidth_ColumnWidth_Equal_Two ()
     {
         const string us = "\U0000f900";
