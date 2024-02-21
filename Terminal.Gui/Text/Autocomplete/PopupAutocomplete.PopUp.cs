@@ -16,7 +16,7 @@ public abstract partial class PopupAutocomplete
 
         public override bool MouseEvent (MouseEvent mouseEvent) { return _autoComplete.MouseEvent (mouseEvent); }
 
-        public override void OnDrawContent (Rectangle contentArea)
+        public override void OnDrawContent (Rect contentArea)
         {
             if (!_autoComplete.LastPopupPos.HasValue)
             {
