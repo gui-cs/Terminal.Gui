@@ -136,6 +136,13 @@ public class ComboBox : View
         }
     }
 
+    /// <inheritdoc/>
+    public override ScrollBarType ScrollBarType
+    {
+        get => _listview.ScrollBarType;
+        set => _listview.ScrollBarType = value;
+    }
+
     /// <summary>Current search text</summary>
     public string SearchText
     {
