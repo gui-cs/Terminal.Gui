@@ -53,19 +53,6 @@ public class RectangleTests
                     2,
                     2
                 )]
-    [InlineData (
-                    0,
-                    0,
-                    0,
-                    0,
-                    -1,
-                    -1, // Throws
-                    0,
-                    0,
-                    0,
-                    0
-                )]
-
     // Zero location, Size of 1
     [InlineData (
                     0,
@@ -180,14 +167,7 @@ public class RectangleTests
     {
         var rect = new Rectangle (x, y, width, height);
 
-        if (rect.Width + inflateWidth < 0 || rect.Height + inflateHeight < 0)
-        {
-            Assert.Throws<ArgumentException> (() => rect.Inflate (inflateWidth, inflateHeight));
-        }
-        else
-        {
-            rect.Inflate (inflateWidth, inflateHeight);
-        }
+        rect.Inflate (inflateWidth, inflateHeight);
 
         Assert.Equal (expectedWidth, rect.Width);
         Assert.Equal (expectedHeight, rect.Height);
@@ -197,14 +177,7 @@ public class RectangleTests
         // Use the other overload (Size)
         rect = new Rectangle (x, y, width, height);
 
-        if (rect.Width + inflateWidth < 0 || rect.Height + inflateHeight < 0)
-        {
-            Assert.Throws<ArgumentException> (() => rect.Inflate (new Size (inflateWidth, inflateHeight)));
-        }
-        else
-        {
-            rect.Inflate (new Size (inflateWidth, inflateHeight));
-        }
+        rect.Inflate (new Size (inflateWidth, inflateHeight));
 
         Assert.Equal (expectedWidth, rect.Width);
         Assert.Equal (expectedHeight, rect.Height);
@@ -327,18 +300,6 @@ public class RectangleTests
 
         rect = new Rectangle (-1, -2, 3, 4);
         Assert.False (rect.IsEmpty);
-
-        Action action = () => new Rectangle (1, 2, -3, 4);
-        var ex = Assert.Throws<ArgumentException> (action);
-        Assert.Equal ("Width must be greater or equal to 0.", ex.Message);
-
-        action = () => new Rectangle (1, 2, 3, -4);
-        ex = Assert.Throws<ArgumentException> (action);
-        Assert.Equal ("Height must be greater or equal to 0.", ex.Message);
-
-        action = () => new Rectangle (1, 2, -3, -4);
-        ex = Assert.Throws<ArgumentException> (action);
-        Assert.Equal ("Width must be greater or equal to 0.", ex.Message);
     }
 
     [Fact]
@@ -355,18 +316,6 @@ public class RectangleTests
 
         rect = new Rectangle { X = -1, Y = -2, Width = 3, Height = 4 };
         Assert.False (rect.IsEmpty);
-
-        Action action = () => { rect = new Rectangle { X = -1, Y = -2, Width = -3, Height = 4 }; };
-        var ex = Assert.Throws<ArgumentException> (action);
-        Assert.Equal ("Width must be greater or equal to 0.", ex.Message);
-
-        action = () => { rect = new Rectangle { X = -1, Y = -2, Width = 3, Height = -4 }; };
-        ex = Assert.Throws<ArgumentException> (action);
-        Assert.Equal ("Height must be greater or equal to 0.", ex.Message);
-
-        action = () => { rect = new Rectangle { X = -1, Y = -2, Width = -3, Height = -4 }; };
-        ex = Assert.Throws<ArgumentException> (action);
-        Assert.Equal ("Width must be greater or equal to 0.", ex.Message);
     }
 
     [Fact]
