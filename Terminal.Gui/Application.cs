@@ -1137,25 +1137,20 @@ public static partial class Application
             return null;
         }
 
-        if (_topLevels is { })
+        if (_topLevels is { Count: > 0 })
         {
-            int count = _topLevels.Count;
+            int rx = x - startFrame.X;
+            int ry = y - startFrame.Y;
 
-            if (count > 0)
+            foreach (Toplevel t in _topLevels)
             {
-                int rx = x - startFrame.X;
-                int ry = y - startFrame.Y;
-
-                foreach (Toplevel t in _topLevels)
+                if (t != Current)
                 {
-                    if (t != Current)
+                    if (t != start && t.Visible && t.Frame.Contains (rx, ry))
                     {
-                        if (t != start && t.Visible && t.Frame.Contains (rx, ry))
-                        {
-                            start = t;
+                        start = t;
 
-                            break;
-                        }
+                        break;
                     }
                 }
             }
