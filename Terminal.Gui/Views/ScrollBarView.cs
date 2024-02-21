@@ -160,7 +160,7 @@ public class ScrollBarView : View
     /// <value>The size.</value>
     /// <remarks>
     ///     The <see cref="Size"/> is typically the size of the virtual content. E.g. when a Scrollbar is part of a
-    ///     <see cref="View"/> the Size is set to the appropriate dimension of <see cref="View.SuperView"/>.
+    ///     <see cref="View"/> the Size is set to the appropriate dimension of virtual space.
     /// </remarks>
     public int Size
     {
