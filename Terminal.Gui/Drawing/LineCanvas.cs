@@ -1,58 +1,12 @@
-﻿#nullable enable
+#nullable enable
 namespace Terminal.Gui;
-
-/// <summary>Defines the style of lines for a <see cref="LineCanvas"/>.</summary>
-public enum LineStyle
-{
-    /// <summary>No border is drawn.</summary>
-    None,
-
-    /// <summary>The border is drawn using thin line CM.Glyphs.</summary>
-    Single,
-
-    /// <summary>The border is drawn using thin line glyphs with dashed (double and triple) straight lines.</summary>
-    Dashed,
-
-    /// <summary>The border is drawn using thin line glyphs with short dashed (triple and quadruple) straight lines.</summary>
-    Dotted,
-
-    /// <summary>The border is drawn using thin double line CM.Glyphs.</summary>
-    Double,
-
-    /// <summary>The border is drawn using heavy line CM.Glyphs.</summary>
-    Heavy,
-
-    /// <summary>The border is drawn using heavy line glyphs with dashed (double and triple) straight lines.</summary>
-    HeavyDashed,
-
-    /// <summary>The border is drawn using heavy line glyphs with short dashed (triple and quadruple) straight lines.</summary>
-    HeavyDotted,
-
-    /// <summary>The border is drawn using thin line glyphs with rounded corners.</summary>
-    Rounded,
-
-    /// <summary>The border is drawn using thin line glyphs with rounded corners and dashed (double and triple) straight lines.</summary>
-    RoundedDashed,
-
-    /// <summary>
-    ///     The border is drawn using thin line glyphs with rounded corners and short dashed (triple and quadruple)
-    ///     straight lines.
-    /// </summary>
-    RoundedDotted
-
-    // TODO: Support Ruler
-    ///// <summary> 
-    ///// The border is drawn as a diagnostic ruler ("|123456789...").
-    ///// </summary>
-    //Ruler
-}
 
 /// <summary>Facilitates box drawing and line intersection detection and rendering.  Does not support diagonal lines.</summary>
 public class LineCanvas : IDisposable
 {
-    private readonly List<StraightLine> _lines = new ();
+    private readonly List<StraightLine> _lines = [];
 
-    private readonly Dictionary<IntersectionRuneType, IntersectionRuneResolver> runeResolvers = new ()
+    private readonly Dictionary<IntersectionRuneType, IntersectionRuneResolver> _runeResolvers = new ()
     {
         {
             IntersectionRuneType.ULCorner,
@@ -128,22 +82,19 @@ public class LineCanvas : IDisposable
 
                 for (var i = 1; i < _lines.Count; i++)
                 {
-                    StraightLine line = _lines [i];
-                    Rect lineBounds = line.Bounds;
-                    bounds = Rect.Union (bounds, lineBounds);
+                    bounds = Rect.Union (bounds, _lines [i].Bounds);
                 }
 
-                if (bounds.Width == 0)
+                if (bounds is {Width: 0} or {Height: 0})
                 {
-                    bounds.Width = 1;
+                    bounds = bounds with
+                    {
+                        Width = Math.Clamp (bounds.Width, 1, short.MaxValue),
+                        Height = Math.Clamp (bounds.Height, 1, short.MaxValue)
+                    };
                 }
 
-                if (bounds.Height == 0)
-                {
-                    bounds.Height = 1;
-                }
-
-                _cachedBounds = new Rect (bounds.X, bounds.Y, bounds.Width, bounds.Height);
+                _cachedBounds = bounds;
             }
 
             return _cachedBounds;
@@ -358,7 +309,7 @@ public class LineCanvas : IDisposable
 
     private void ConfigurationManager_Applied (object? sender, ConfigurationManagerEventArgs e)
     {
-        foreach (KeyValuePair<IntersectionRuneType, IntersectionRuneResolver> irr in runeResolvers)
+        foreach (KeyValuePair<IntersectionRuneType, IntersectionRuneResolver> irr in _runeResolvers)
         {
             irr.Value.SetGlyphs ();
         }
@@ -404,7 +355,7 @@ public class LineCanvas : IDisposable
 
         IntersectionRuneType runeType = GetRuneTypeForIntersects (intersects);
 
-        if (runeResolvers.TryGetValue (runeType, out IntersectionRuneResolver? resolver))
+        if (_runeResolvers.TryGetValue (runeType, out IntersectionRuneResolver? resolver))
         {
             return resolver.GetRuneForIntersects (driver, intersects);
         }
@@ -892,68 +843,4 @@ public class LineCanvas : IDisposable
             _normal = Glyphs.URCorner;
         }
     }
-}
-
-internal class IntersectionDefinition
-{
-    internal IntersectionDefinition (Point point, IntersectionType type, StraightLine line)
-    {
-        Point = point;
-        Type = type;
-        Line = line;
-    }
-
-    /// <summary>The line that intersects <see cref="Point"/></summary>
-    internal StraightLine Line { get; }
-
-    /// <summary>The point at which the intersection happens</summary>
-    internal Point Point { get; }
-
-    /// <summary>Defines how <see cref="Line"/> position relates to <see cref="Point"/>.</summary>
-    internal IntersectionType Type { get; }
-}
-
-/// <summary>The type of Rune that we will use before considering double width, curved borders etc</summary>
-internal enum IntersectionRuneType
-{
-    None,
-    Dot,
-    ULCorner,
-    URCorner,
-    LLCorner,
-    LRCorner,
-    TopTee,
-    BottomTee,
-    RightTee,
-    LeftTee,
-    Cross,
-    HLine,
-    VLine
-}
-
-internal enum IntersectionType
-{
-    /// <summary>There is no intersection</summary>
-    None,
-
-    /// <summary>A line passes directly over this point traveling along the horizontal axis</summary>
-    PassOverHorizontal,
-
-    /// <summary>A line passes directly over this point traveling along the vertical axis</summary>
-    PassOverVertical,
-
-    /// <summary>A line starts at this point and is traveling up</summary>
-    StartUp,
-
-    /// <summary>A line starts at this point and is traveling right</summary>
-    StartRight,
-
-    /// <summary>A line starts at this point and is traveling down</summary>
-    StartDown,
-
-    /// <summary>A line starts at this point and is traveling left</summary>
-    StartLeft,
-
-    /// <summary>A line exists at this point who has 0 length</summary>
-    Dot
 }

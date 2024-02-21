@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Interface for all non generic members of <see cref="TreeView{T}"/>.
+///     Interface for all non-generic members of <see cref="TreeView{T}"/>.
 ///     <a href="../docs/treeview.md">See TreeView Deep Dive for more information</a>.
 /// </summary>
 public interface ITreeView

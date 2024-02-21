@@ -1,10 +1,10 @@
-﻿namespace Terminal.Gui;
+namespace Terminal.Gui;
 
 /// <summary>
 ///     Renders an overlay on another view at a given point that allows selecting from a range of 'autocomplete'
 ///     options.
 /// </summary>
-public abstract class PopupAutocomplete : AutocompleteBase
+public abstract partial class PopupAutocomplete : AutocompleteBase
 {
     private bool closed;
     private ColorScheme colorScheme;
@@ -57,7 +57,9 @@ public abstract class PopupAutocomplete : AutocompleteBase
     /// </summary>
     public virtual int ScrollOffset { get; set; }
 
+    #nullable enable
     private Point? LastPopupPos { get; set; }
+    #nullable restore
 
     /// <inheritdoc/>
     public override void EnsureSelectedIdxIsValid ()
@@ -551,29 +553,5 @@ public abstract class PopupAutocomplete : AutocompleteBase
     {
         Visible = false;
         ManipulatePopup ();
-    }
-
-    private class Popup : View
-    {
-        private readonly PopupAutocomplete autocomplete;
-
-        public Popup (PopupAutocomplete autocomplete)
-        {
-            this.autocomplete = autocomplete;
-            CanFocus = true;
-            WantMousePositionReports = true;
-        }
-
-        public override bool MouseEvent (MouseEvent mouseEvent) { return autocomplete.MouseEvent (mouseEvent); }
-
-        public override void OnDrawContent (Rect contentArea)
-        {
-            if (autocomplete.LastPopupPos is null)
-            {
-                return;
-            }
-
-            autocomplete.RenderOverlay ((Point)autocomplete.LastPopupPos);
-        }
     }
 }

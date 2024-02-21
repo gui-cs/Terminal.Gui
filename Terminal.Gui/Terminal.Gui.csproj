@@ -10,6 +10,14 @@
   <!-- =================================================================== -->
   <!-- .NET Build Settings -->
   <!-- =================================================================== -->
+  <PropertyGroup>
+    <TargetFrameworks>net8.0</TargetFrameworks>
+    <LangVersion>12</LangVersion>
+    <RootNamespace>Terminal.Gui</RootNamespace>
+    <AssemblyName>Terminal.Gui</AssemblyName>
+    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL</DefineConstants>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>portable</DebugType>
     <VersionSuffix></VersionSuffix>
@@ -17,13 +25,6 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
     <DebugType>portable</DebugType>
-  </PropertyGroup>
-  <PropertyGroup>
-    <TargetFrameworks>net8.0</TargetFrameworks>
-    <LangVersion>12</LangVersion>
-    <RootNamespace>Terminal.Gui</RootNamespace>
-    <AssemblyName>Terminal.Gui</AssemblyName>
-    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
   </PropertyGroup>
   <!-- =================================================================== -->
   <!-- Configuration Manager -->
@@ -39,12 +40,17 @@
   <!-- =================================================================== -->
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
-    <PackageReference Include="System.IO.Abstractions" Version="20.0.15" />
-    <PackageReference Include="System.Text.Json" Version="8.0.2" />
-    <PackageReference Include="System.Management" Version="8.0.0" />
-    <PackageReference Include="Wcwidth" Version="2.0.0" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
     <!-- Enable Nuget Source Link for github -->
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+    <PackageReference Include="System.IO.Abstractions" Version="20.0.15" />
+    <PackageReference Include="System.Text.Json" Version="8.0.2" />
+    <PackageReference Include="Wcwidth" Version="2.0.0" />
+  </ItemGroup>
+  <!-- =================================================================== -->
+  <!-- Namespaces for which internal items are visible -->
+  <!-- =================================================================== -->
+  <ItemGroup>
     <InternalsVisibleTo Include="UnitTests" />
   </ItemGroup>
   <PropertyGroup>
@@ -82,6 +88,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Using Include="JetBrains.Annotations" />
+    <Using Include="System.Diagnostics.Contracts.PureAttribute" Alias="PureAttribute" />
     <Using Include="System.Text" />
     <Using Include="JetBrains.Annotations" />
     <Using Include="System.Diagnostics.Contracts.PureAttribute" Alias="PureAttribute" />

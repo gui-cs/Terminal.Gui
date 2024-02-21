@@ -1143,19 +1143,6 @@ public class EscSeqUtilsTests
     }
 
     [Fact]
-    public void GetParentProcess_Tests ()
-    {
-        if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
-        {
-            Assert.NotNull (EscSeqUtils.GetParentProcess (Process.GetCurrentProcess ()));
-        }
-        else
-        {
-            Assert.Null (EscSeqUtils.GetParentProcess (Process.GetCurrentProcess ()));
-        }
-    }
-
-    [Fact]
     public void ResizeArray_ConsoleKeyInfo ()
     {
         ConsoleKeyInfo [] expectedCkInfos = null;
