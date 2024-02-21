@@ -37,6 +37,8 @@ public enum LayoutStyle
 public partial class View
 {
     private bool _autoSize;
+
+    private Rect _bounds;
     private Rect _frame;
     private Dim _height = Dim.Sized (0);
     private Dim _width = Dim.Sized (0);
@@ -188,14 +190,13 @@ public partial class View
                                   - Margin.Thickness.Horizontal
                                   - Border.Thickness.Horizontal
                                   - Padding.Thickness.Horizontal
-                                 );
+                                  - _bounds.Location.X);
 
             int height = Math.Max (
                                    0,
-                                   Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical
-                                  );
+                                   Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical - _bounds.Location.Y);
 
-            return new Rect (Point.Empty, new Size (width, height));
+            return new Rect (_bounds.Location, new Size (width, height));
         }
         set
         {
@@ -209,6 +210,13 @@ public partial class View
                                 );
             }
 #endif // DEBUG
+            if (ScrollBarType != ScrollBarType.None && UseNegativeBoundsLocation)
+            {
+                _bounds = value;
+
+                return;
+            }
+
             Frame = new Rect (
                               Frame.Location,
                               new Size (
@@ -222,6 +230,31 @@ public partial class View
                                         + Padding.Thickness.Vertical
                                        )
                              );
+        }
+    }
+
+    /// <summary>
+    ///     The content area represent the View-relative rectangle used for this view. The area inside the view where subviews
+    ///     and content are presented. The Location is always (0,0). It will be mainly used for clipping a region.
+    /// </summary>
+    public virtual Rect ContentArea
+    {
+        get
+        {
+            if (Margin == null || Border == null || Padding == null)
+            {
+                return new Rect (default (Point), Frame.Size);
+            }
+
+            int width = Math.Max (
+                                  0,
+                                  Frame.Size.Width - Margin.Thickness.Horizontal - Border.Thickness.Horizontal - Padding.Thickness.Horizontal);
+
+            int height = Math.Max (
+                                   0,
+                                   Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical);
+
+            return new Rect (Point.Empty, new Size (width, height));
         }
     }
 
@@ -528,7 +561,32 @@ public partial class View
 
         while (super is { })
         {
-            boundsOffset = super.GetBoundsOffset ();
+            if (super is Adornment adornment)
+            {
+                boundsOffset = super.FrameToScreen ().Location;
+                View parent = adornment.Parent;
+
+                switch (super)
+                {
+                    case Gui.Margin:
+                        break;
+                    case Gui.Border:
+                        boundsOffset.X -= parent.Margin.Thickness.Left;
+                        boundsOffset.Y -= parent.Margin.Thickness.Top;
+
+                        break;
+                    case Gui.Padding:
+                        boundsOffset.X -= parent.Margin.Thickness.Left + parent.Border.Thickness.Left;
+                        boundsOffset.Y -= parent.Margin.Thickness.Top + parent.Border.Thickness.Top;
+
+                        break;
+                }
+            }
+            else
+            {
+                boundsOffset = super.GetBoundsOffset ();
+            }
+
             rx += super.Frame.X + boundsOffset.X;
             ry += super.Frame.Y + boundsOffset.Y;
             super = super.SuperView;
@@ -748,7 +806,17 @@ public partial class View
     }
 
     /// <summary>Indicates that the view does not need to be laid out.</summary>
-    protected void ClearLayoutNeeded () { LayoutNeeded = false; }
+    protected void ClearLayoutNeeded ()
+    {
+        LayoutNeeded = false;
+
+        if (Margin is { })
+        {
+            Margin.LayoutNeeded = false;
+            Border.LayoutNeeded = false;
+            Margin.LayoutNeeded = false;
+        }
+    }
 
     internal void CollectAll (View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
     {
@@ -953,6 +1021,30 @@ public partial class View
         foreach (View view in Subviews)
         {
             view.SetNeedsLayout ();
+        }
+
+        if (Margin != null)
+        {
+            for (var i = 0; i < 3; i++)
+            {
+                Adornment adornment = i switch
+                                      {
+                                          0 => Margin,
+                                          1 => Border,
+                                          2 => Padding,
+                                          _ => null
+                                      };
+
+                if (adornment != null)
+                {
+                    adornment.SetNeedsLayout ();
+
+                    foreach (View view in adornment.Subviews)
+                    {
+                        view.SetNeedsLayout ();
+                    }
+                }
+            }
         }
 
         TextFormatter.NeedsFormat = true;

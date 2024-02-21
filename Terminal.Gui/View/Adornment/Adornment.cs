@@ -37,6 +37,11 @@ public class Adornment : View
         set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
     }
 
+    /// <summary>
+    ///     Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).
+    /// </summary>
+    public override Rect ContentArea => Thickness?.GetInside (new Rect (Point.Empty, Frame.Size)) ?? new Rect (Point.Empty, Frame.Size);
+
     /// <summary>The Parent of this Adornment (the View this Adornment surrounds).</summary>
     /// <remarks>
     ///     Adornments are distinguished from typical View classes in that they are not sub-views, but have a parent/child
@@ -107,6 +112,22 @@ public class Adornment : View
 
         ret.Location = Parent?.FrameToScreen ().Location ?? ret.Location;
 
+        switch (this)
+        {
+            case Gui.Margin:
+                break;
+            case Gui.Border:
+                ret.X += Parent != null ? Parent.Margin.Thickness.Left : 0;
+                ret.Y += Parent != null ? Parent.Margin.Thickness.Top : 0;
+
+                break;
+            case Gui.Padding:
+                ret.X += Parent != null ? Parent.Margin.Thickness.Left + Parent.Border.Thickness.Left : 0;
+                ret.Y += Parent != null ? Parent.Margin.Thickness.Top + Parent.Border.Thickness.Top : 0;
+
+                break;
+        }
+
         // We now have coordinates relative to our View. If our View's SuperView has
         // a SuperView, keep going...
         return ret;
@@ -143,7 +164,12 @@ public class Adornment : View
 
         TextFormatter?.Draw (screenBounds, normalAttr, normalAttr, Rect.Empty);
 
-        //base.OnDrawContent (contentArea);
+        LayoutSubviews ();
+
+        base.OnDrawContent (contentArea);
+
+        ClearLayoutNeeded ();
+        ClearNeedsDisplay ();
     }
 
     /// <summary>Does nothing for Adornment</summary>
