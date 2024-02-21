@@ -4,6 +4,7 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
+[Trait("Category","Output")]
 public class DrawTests
 {
     private readonly ITestOutputHelper _output;
@@ -73,6 +74,7 @@ public class DrawTests
     // TODO: Refactor this test to not depend on TextView etc... Make it as primitive as possible
     [Fact]
     [AutoInitShutdown]
+    [Trait("Category","Unicode")]
     public void Clipping_AddRune_Left_Or_Right_Replace_Previous_Or_Next_Wide_Rune_With_Space ()
     {
         var tv = new TextView
@@ -124,6 +126,7 @@ public class DrawTests
 
     [Fact]
     [AutoInitShutdown]
+    [Trait("Category","Output")]
     public void Colors_On_TextAlignment_Right_And_Bottom ()
     {
         var viewRight = new View
