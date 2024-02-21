@@ -1,7 +1,3 @@
-﻿using System.Diagnostics;
-using System.Management;
-using System.Runtime.InteropServices;
-
 namespace Terminal.Gui;
 
 /// <summary>
@@ -44,12 +40,12 @@ public static class EscSeqUtils
     /// <summary>
     ///     Escape key code (ASCII 27/0x1B).
     /// </summary>
-    public static readonly char KeyEsc = (char)KeyCode.Esc;
+    public const char KeyEsc = (char)KeyCode.Esc;
 
     /// <summary>
     ///     ESC [ - The CSI (Control Sequence Introducer).
     /// </summary>
-    public static readonly string CSI = $"{KeyEsc}[";
+    public const string CSI = "\u001B[";
 
     /// <summary>
     ///     ESC [ ? 1047 h - Activate xterm alternative buffer (no backscroll)
@@ -1017,42 +1013,6 @@ public static class EscSeqUtils
         //foreach (var mf in mouseFlags) {
         //	System.Diagnostics.Debug.WriteLine ($"mouseFlags: {mf} X: {pos.X} Y: {pos.Y}");
         //}
-    }
-
-    // TODO: Move this out of here and into ConsoleDriver or somewhere else.
-    /// <summary>
-    ///     Get the terminal that holds the console driver.
-    /// </summary>
-    /// <param name="process">The process.</param>
-    /// <returns>If supported the executable console process, null otherwise.</returns>
-    public static Process GetParentProcess (Process process)
-    {
-        if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
-        {
-            return null;
-        }
-
-        string query = "SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = " + process.Id;
-
-        using (var mos = new ManagementObjectSearcher (query))
-        {
-            foreach (ManagementObject mo in mos.Get ())
-            {
-                if (mo ["ParentProcessId"] is { })
-                {
-                    try
-                    {
-                        var id = Convert.ToInt32 (mo ["ParentProcessId"]);
-
-                        return Process.GetProcessById (id);
-                    }
-                    catch
-                    { }
-                }
-            }
-        }
-
-        return null;
     }
 
     /// <summary>

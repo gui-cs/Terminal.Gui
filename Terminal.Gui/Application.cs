@@ -253,7 +253,7 @@ public static partial class Application
             else
             {
                 List<Type> drivers = GetDriverTypes ();
-                Type driverType = drivers.FirstOrDefault (t => t.Name.ToLower () == ForceDriver.ToLower ());
+                Type driverType = drivers.FirstOrDefault (t => t.Name.Equals (ForceDriver, StringComparison.InvariantCultureIgnoreCase));
 
                 if (driverType is { })
                 {
