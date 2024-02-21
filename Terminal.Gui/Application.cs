@@ -1844,7 +1844,3 @@ public static partial class Application
 
     #endregion Keyboard handling
 }
-
-/// <summary>Event arguments for the <see cref="Application.Iteration"/> event.</summary>
-public class IterationEventArgs
-{ }
