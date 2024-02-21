@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -330,43 +330,44 @@ internal partial class TestHelpers
 
         Cell [,] contents = driver.Contents;
 
-        for (var r = 0; r < driver.Rows; r++)
+
+        for (var rowIndex = 0; rowIndex < driver.Rows; rowIndex++)
         {
             List<Rune> runes = [];
 
-            for (var c = 0; c < driver.Cols; c++)
+            for (var colIndex = 0; colIndex < driver.Cols; colIndex++)
             {
-                Rune rune = contents [r, c].Rune;
+                Rune runeAtCurrentLocation = contents [rowIndex, colIndex].Rune;
 
                 if (runeAtCurrentLocation != SpaceRune)
                 {
                     if (x == -1)
                     {
-                        x = c;
-                        y = r;
+                        x = colIndex;
+                        y = rowIndex;
 
-                        for (var i = 0; i < c; i++)
+                        for (int i = 0; i < colIndex; i++)
                         {
                             runes.InsertRange (i, [SpaceRune]);
                         }
                     }
 
-                    if (rune.GetColumns () > 1)
+                    if (runeAtCurrentLocation.GetColumns () > 1)
                     {
-                        c++;
+                        colIndex++;
                     }
 
-                    if (c + 1 > w)
+                    if (colIndex + 1 > w)
                     {
-                        w = c + 1;
+                        w = colIndex + 1;
                     }
 
-                    h = r - y + 1;
+                    h = rowIndex - y + 1;
                 }
 
                 if (x > -1)
                 {
-                    runes.Add (rune);
+                    runes.Add (runeAtCurrentLocation);
                 }
 
                 // See Issue #2616
