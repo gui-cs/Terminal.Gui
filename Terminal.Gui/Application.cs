@@ -1460,7 +1460,7 @@ public static partial class Application
                 View = view
             };
 
-            if (OutsideRect (new Point (nme.X, nme.Y), MouseGrabView.Bounds))
+            if (MouseGrabView.Bounds.Contains (nme.X, nme.Y) is false)
             {
                 // The mouse has moved outside the bounds of the the view that
                 // grabbed the mouse, so we tell the view that last got 
@@ -1623,8 +1623,6 @@ public static partial class Application
 
             return true;
         }
-
-        static bool OutsideRect (Point p, Rectangle r) { return p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom; }
     }
     #nullable restore
 
