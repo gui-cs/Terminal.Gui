@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Diagnostics;
 
 namespace Terminal.Gui;
@@ -550,7 +550,7 @@ public partial class View
     /// <param name="resultX">The found view screen relative column location.</param>
     /// <param name="resultY">The found view screen relative row location.</param>
     /// <returns>
-    ///     The view that was found at the <praramref name="x"/> and <praramref name="y"/> coordinates.
+    ///     The view that was found at the <paramref name="x"/> and <paramref name="y"/> coordinates.
     ///     <see langword="null"/> if no view was found.
     /// </returns>
     // CONCURRENCY: This method is not thread-safe.
