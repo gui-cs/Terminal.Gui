@@ -443,9 +443,6 @@ internal partial class TestHelpers
             expectedLook = expectedLook [..^1];
         }
 
-        output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
-        output?.WriteLine (" But Was:" + Environment.NewLine + actualLook);
-
         Assert.Equal (expectedLook, actualLook);
 
         return new Rectangle (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
