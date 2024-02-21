@@ -303,8 +303,7 @@ internal class CharMap : ScrollView
 
         ContentSize = new Size (
                                 RowWidth,
-                                (MaxCodePoint / 16 + (ShowHorizontalScrollIndicator ? 2 : 1)) * _rowHeight
-                               );
+                                MaxCodePoint / 16 * _rowHeight + 1 + _rowHeight);
 
         AddCommand (
                     Command.ScrollUp,
