@@ -94,7 +94,7 @@ public class ListView : View
     private int _lastSelectedItem = -1;
     private int _selected = -1;
     private IListDataSource _source;
-    private int _top, _left;
+    private int _topItem, _leftItem;
 
     /// <summary>
     ///     Initializes a new instance of <see cref="ListView"/>. Set the <see cref="Source"/> property to display
@@ -103,6 +103,8 @@ public class ListView : View
     public ListView ()
     {
         CanFocus = true;
+
+        DrawAdornments += ListView_DrawAdornments;
 
         // Things this view knows how to do
         AddCommand (Command.LineUp, () => MoveUp ());
@@ -198,7 +200,7 @@ public class ListView : View
     /// <value>The left position.</value>
     public int LeftItem
     {
-        get => _left;
+        get => _leftItem;
         set
         {
             if (_source is null)
@@ -211,13 +213,49 @@ public class ListView : View
                 throw new ArgumentException ("value");
             }
 
-            _left = value;
+            ScrollLeftOffset = _leftItem = value;
             SetNeedsDisplay ();
         }
     }
 
     /// <summary>Gets the widest item in the list.</summary>
     public int MaxLength => _source?.Length ?? 0;
+
+    /// <inheritdoc/>
+    public override int ScrollLeftOffset
+    {
+        get => base.ScrollLeftOffset;
+        set
+        {
+            if (base.ScrollLeftOffset != value)
+            {
+                base.ScrollLeftOffset = value;
+            }
+
+            if (LeftItem != ScrollLeftOffset)
+            {
+                _left = ScrollLeftOffset;
+            }
+        }
+    }
+
+    /// <inheritdoc/>
+    public override int ScrollTopOffset
+    {
+        get => base.ScrollTopOffset;
+        set
+        {
+            if (base.ScrollTopOffset != value)
+            {
+                base.ScrollTopOffset = value;
+            }
+
+            if (TopItem != ScrollTopOffset)
+            {
+                _top = ScrollTopOffset;
+            }
+        }
+    }
 
     /// <summary>Gets or sets the index of the currently selected item.</summary>
     /// <value>The selected item.</value>
@@ -254,6 +292,7 @@ public class ListView : View
             _top = 0;
             _selected = -1;
             _lastSelectedItem = -1;
+            SetScrollRowsColsSize ();
             SetNeedsDisplay ();
         }
     }
@@ -262,7 +301,7 @@ public class ListView : View
     /// <value>The top item.</value>
     public int TopItem
     {
-        get => _top;
+        get => _topItem;
         set
         {
             if (_source is null)
@@ -275,9 +314,21 @@ public class ListView : View
                 throw new ArgumentException ("value");
             }
 
-            _top = Math.Max (value, 0);
+            ScrollTopOffset = _topItem = Math.Max (value, 0);
             SetNeedsDisplay ();
         }
+    }
+
+    private int _left
+    {
+        get => _leftItem;
+        set => ScrollLeftOffset = _leftItem = value;
+    }
+
+    private int _top
+    {
+        get => _topItem;
+        set => ScrollTopOffset = _topItem = value;
     }
 
     /// <summary>
@@ -857,7 +908,24 @@ public class ListView : View
                                      );
     }
 
-    private void ListView_LayoutStarted (object sender, LayoutEventArgs e) { EnsureSelectedItemVisible (); }
+    private void ListView_DrawAdornments (object sender, DrawEventArgs e) { SetScrollRowsColsSize (); }
+
+    private void ListView_LayoutStarted (object sender, LayoutEventArgs e)
+    {
+        SetScrollRowsColsSize ();
+        EnsureSelectedItemVisible ();
+    }
+
+    private void SetScrollRowsColsSize ()
+    {
+        try
+        {
+            ScrollRowsSize = Source?.Count ?? 0;
+            ScrollColsSize = MaxLength;
+        }
+        catch (NotImplementedException)
+        { }
+    }
 }
 
 /// <summary>
@@ -1016,7 +1084,8 @@ public class ListWrapper : IListDataSource
 
     private void RenderUstr (ConsoleDriver driver, string ustr, int col, int line, int width, int start = 0)
     {
-        string u = TextFormatter.ClipAndJustify (ustr, width, TextAlignment.Left);
+        string str = start > ustr.GetColumns () ? string.Empty : ustr.Substring (start);
+        string u = TextFormatter.ClipAndJustify (str, width, TextAlignment.Left);
         driver.AddStr (u);
         width -= u.GetColumns ();
 
