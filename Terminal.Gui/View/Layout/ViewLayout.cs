@@ -564,13 +564,11 @@ public partial class View
             return null;
         }
 
-        Rectangle startFrame = start.Frame;
-
         if (start.InternalSubviews is { Count: > 0 })
         {
             Point boundsOffset = start.GetBoundsOffset ();
-            int rx = x - (startFrame.X + boundsOffset.X);
-            int ry = y - (startFrame.Y + boundsOffset.Y);
+            int rx = x - (start.Frame.X + boundsOffset.X);
+            int ry = y - (start.Frame.Y + boundsOffset.Y);
 
             for (int i = start.InternalSubviews.Count - 1; i >= 0; i--)
             {
@@ -585,8 +583,8 @@ public partial class View
             }
         }
 
-        resultX = x - startFrame.X;
-        resultY = y - startFrame.Y;
+        resultX = x - start.Frame.X;
+        resultY = y - start.Frame.Y;
 
         return start;
     }
