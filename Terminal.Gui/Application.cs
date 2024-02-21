@@ -1494,12 +1494,12 @@ public static partial class Application
         {
             // Work inside-out (Padding, Border, Margin)
             // TODO: Debate whether inside-out or outside-in is the right strategy
-            if (AdornmentHandledMouseEvent (view?.Padding))
+            if (AdornmentHandledMouseEvent (view?.Padding, a))
             {
                 return;
             }
 
-            if (AdornmentHandledMouseEvent (view?.Border))
+            if (AdornmentHandledMouseEvent (view?.Border, a))
             {
                 if (view is Toplevel)
                 {
@@ -1547,7 +1547,7 @@ public static partial class Application
                 return;
             }
 
-            if (AdornmentHandledMouseEvent (view?.Margin))
+            if (AdornmentHandledMouseEvent (view?.Margin, a))
             {
                 return;
             }
@@ -1599,20 +1599,20 @@ public static partial class Application
 
         return;
 
-        bool AdornmentHandledMouseEvent (Adornment? frame)
+        static bool AdornmentHandledMouseEvent (Adornment? frame, MouseEventEventArgs args)
         {
-            if (frame?.Thickness.Contains (frame.FrameToScreen (), a.MouseEvent.X, a.MouseEvent.Y) is not true)
+            if (frame?.Thickness.Contains (frame.FrameToScreen (), args.MouseEvent.X, args.MouseEvent.Y) is not true)
             {
                 return false;
             }
 
-            Point boundsPoint = frame.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
+            Point boundsPoint = frame.ScreenToBounds (args.MouseEvent.X, args.MouseEvent.Y);
 
             var me = new MouseEvent
             {
                 X = boundsPoint.X,
                 Y = boundsPoint.Y,
-                Flags = a.MouseEvent.Flags,
+                Flags = args.MouseEvent.Flags,
                 OfX = boundsPoint.X,
                 OfY = boundsPoint.Y,
                 View = frame
