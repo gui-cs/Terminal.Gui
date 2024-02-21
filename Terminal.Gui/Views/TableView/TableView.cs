@@ -27,16 +27,16 @@ public class TableView : View
     public const int DefaultMinAcceptableWidth = 100;
 
     // TODO: Update to use Key instead of KeyCode
-    private KeyCode cellActivationKey = KeyCode.Enter;
-    private int columnOffset;
-    private bool ignoreEnsureSelectedCellIsVisible;
-    private int rowOffset;
-    private Point? scrollLeftPoint;
-    private Point? scrollRightPoint;
-    private int selectedColumn;
-    private int selectedRow;
-    private TableStyle style = new ();
-    private ITableSource table;
+    private KeyCode _cellActivationKey = KeyCode.Enter;
+    private int _columnOffset;
+    private bool _ignoreEnsureSelectedCellIsVisible;
+    private int _rowOffset;
+    private Point? _scrollLeftPoint;
+    private Point? _scrollRightPoint;
+    private int _selectedColumn;
+    private int _selectedRow;
+    private TableStyle _style = new ();
+    private ITableSource _table;
 
     /// <summary>Initializes a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
     /// <param name="table">The table to display in the control</param>
@@ -316,17 +316,17 @@ public class TableView : View
     /// <summary>The key which when pressed should trigger <see cref="CellActivated"/> event.  Defaults to Enter.</summary>
     public KeyCode CellActivationKey
     {
-        get => cellActivationKey;
+        get => _cellActivationKey;
         set
         {
-            if (cellActivationKey != value)
+            if (_cellActivationKey != value)
             {
-                KeyBindings.Replace (cellActivationKey, value);
+                KeyBindings.Replace (_cellActivationKey, value);
 
                 // of API user is mixing and matching old and new methods of keybinding then they may have lost
                 // the old binding (e.g. with ClearKeybindings) so KeyBindings.Replace alone will fail
                 KeyBindings.Add (value, Command.Accept);
-                cellActivationKey = value;
+                _cellActivationKey = value;
             }
         }
     }
@@ -341,10 +341,10 @@ public class TableView : View
     /// <remarks>This property allows very wide tables to be rendered with horizontal scrolling</remarks>
     public int ColumnOffset
     {
-        get => columnOffset;
+        get => _columnOffset;
 
         //try to prevent this being set to an out of bounds column
-        set => ScrollLeftOffset = columnOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Columns - 1, value));
+        set => ScrollLeftOffset = _columnOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Columns - 1, value));
     }
 
     /// <summary>True to select the entire row at once.  False to select individual cells.  Defaults to false</summary>
@@ -379,8 +379,8 @@ public class TableView : View
     /// </summary>
     public int RowOffset
     {
-        get => rowOffset;
-        set => ScrollTopOffset = rowOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Rows - 1, value));
+        get => _rowOffset;
+        set => ScrollTopOffset = _rowOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Rows - 1, value));
     }
 
     /// <inheritdoc/>
@@ -396,7 +396,7 @@ public class TableView : View
 
             if (ColumnOffset != ScrollLeftOffset)
             {
-                ignoreEnsureSelectedCellIsVisible = true;
+                _ignoreEnsureSelectedCellIsVisible = true;
                 ColumnOffset = ScrollLeftOffset;
             }
         }
@@ -423,15 +423,15 @@ public class TableView : View
     /// <summary>The index of <see cref="DataTable.Columns"/> in <see cref="Table"/> that the user has currently selected</summary>
     public int SelectedColumn
     {
-        get => selectedColumn;
+        get => _selectedColumn;
         set
         {
-            int oldValue = selectedColumn;
+            int oldValue = _selectedColumn;
 
             //try to prevent this being set to an out of bounds column
-            selectedColumn = TableIsNullOrInvisible () ? 0 : Math.Min (Table.Columns - 1, Math.Max (0, value));
+            _selectedColumn = TableIsNullOrInvisible () ? 0 : Math.Min (Table.Columns - 1, Math.Max (0, value));
 
-            if (oldValue != selectedColumn)
+            if (oldValue != _selectedColumn)
             {
                 OnSelectedCellChanged (
                                        new SelectedCellChangedEventArgs (
@@ -449,16 +449,16 @@ public class TableView : View
     /// <summary>The index of <see cref="DataTable.Rows"/> in <see cref="Table"/> that the user has currently selected</summary>
     public int SelectedRow
     {
-        get => selectedRow;
+        get => _selectedRow;
         set
         {
-            ignoreEnsureSelectedCellIsVisible = false;
+            _ignoreEnsureSelectedCellIsVisible = false;
 
-            int oldValue = selectedRow;
+            int oldValue = _selectedRow;
 
-            selectedRow = TableIsNullOrInvisible () ? 0 : Math.Min (Table.Rows - 1, Math.Max (0, value));
+            _selectedRow = TableIsNullOrInvisible () ? 0 : Math.Min (Table.Rows - 1, Math.Max (0, value));
 
-            if (oldValue != selectedRow)
+            if (oldValue != _selectedRow)
             {
                 OnSelectedCellChanged (
                                        new SelectedCellChangedEventArgs (
@@ -466,7 +466,7 @@ public class TableView : View
                                                                          SelectedColumn,
                                                                          SelectedColumn,
                                                                          oldValue,
-                                                                         selectedRow
+                                                                         _selectedRow
                                                                         )
                                       );
             }
@@ -482,10 +482,10 @@ public class TableView : View
     /// <summary>Contains options for changing how the table is rendered</summary>
     public TableStyle Style
     {
-        get => style;
+        get => _style;
         set
         {
-            style = value;
+            _style = value;
             Update ();
         }
     }
@@ -493,10 +493,10 @@ public class TableView : View
     /// <summary>The data table to render in the view.  Setting this property automatically updates and redraws the control.</summary>
     public ITableSource Table
     {
-        get => table;
+        get => _table;
         set
         {
-            table = value;
+            _table = value;
             SetScrollRowsColsSize ();
             Update ();
         }
@@ -888,18 +888,18 @@ public class TableView : View
 
         if (me.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
-            if (scrollLeftPoint != null
-                && scrollLeftPoint.Value.X == boundsX
-                && scrollLeftPoint.Value.Y == boundsY)
+            if (_scrollLeftPoint != null
+                && _scrollLeftPoint.Value.X == boundsX
+                && _scrollLeftPoint.Value.Y == boundsY)
             {
                 ColumnOffset--;
                 EnsureValidScrollOffsets ();
                 SetNeedsDisplay ();
             }
 
-            if (scrollRightPoint != null
-                && scrollRightPoint.Value.X == boundsX
-                && scrollRightPoint.Value.Y == boundsY)
+            if (_scrollRightPoint != null
+                && _scrollRightPoint.Value.X == boundsX
+                && _scrollRightPoint.Value.Y == boundsY)
             {
                 ColumnOffset++;
                 EnsureValidScrollOffsets ();
@@ -944,8 +944,8 @@ public class TableView : View
 
         Move (0, 0);
 
-        scrollRightPoint = null;
-        scrollLeftPoint = null;
+        _scrollRightPoint = null;
+        _scrollLeftPoint = null;
 
         // What columns to render at what X offset in viewport
         ColumnToRender [] columnsToRender = CalculateViewport (Bounds).ToArray ();
@@ -1166,7 +1166,7 @@ public class TableView : View
         MultiSelectedRegions.Push (
                                    new TableSelection (
                                                        new Point (SelectedColumn, SelectedRow),
-                                                       new Rect (0, 0, Table.Columns, table.Rows)
+                                                       new Rect (0, 0, Table.Columns, _table.Rows)
                                                       )
                                   );
         Update ();
@@ -1186,7 +1186,7 @@ public class TableView : View
     {
         // if we are trying to increase the column index then
         // we are moving right otherwise we are moving left
-        bool lookRight = col > selectedColumn;
+        bool lookRight = col > _selectedColumn;
 
         col = GetNearestVisibleColumn (col, lookRight, true);
 
@@ -1234,7 +1234,7 @@ public class TableView : View
         EnsureValidScrollOffsets ();
         EnsureValidSelection ();
 
-        if (!ignoreEnsureSelectedCellIsVisible)
+        if (!_ignoreEnsureSelectedCellIsVisible)
         {
             EnsureSelectedCellIsVisible ();
         }
@@ -1329,7 +1329,7 @@ public class TableView : View
     /// <returns></returns>
     private int CalculateMaxCellWidth (int col, int rowsToRender, ColumnStyle colStyle)
     {
-        int spaceRequired = table.ColumnNames [col].EnumerateRunes ().Sum (c => c.GetColumns ());
+        int spaceRequired = _table.ColumnNames [col].EnumerateRunes ().Sum (c => c.GetColumns ());
 
         // if table has no rows
         if (RowOffset < 0)
@@ -1651,7 +1651,7 @@ public class TableView : View
     private bool IsColumnVisible (int columnIndex)
     {
         // if the column index provided is out of bounds
-        if (columnIndex < 0 || columnIndex >= table.Columns)
+        if (columnIndex < 0 || columnIndex >= _table.Columns)
         {
             return false;
         }
@@ -1706,7 +1706,7 @@ public class TableView : View
         ClearLine (row, Bounds.Width);
 
         //render start of line
-        if (style.ShowVerticalHeaderLines)
+        if (_style.ShowVerticalHeaderLines)
         {
             AddRune (0, row, Glyphs.VLine);
         }
@@ -1716,7 +1716,7 @@ public class TableView : View
             ColumnToRender current = columnsToRender [i];
 
             ColumnStyle colStyle = Style.GetColumnStyleIfAny (current.Column);
-            string colName = table.ColumnNames [current.Column];
+            string colName = _table.ColumnNames [current.Column];
 
             RenderSeparator (current.X - 1, row, true);
 
@@ -1731,7 +1731,7 @@ public class TableView : View
         }
 
         //render end of line
-        if (style.ShowVerticalHeaderLines)
+        if (_style.ShowVerticalHeaderLines)
         {
             AddRune (Bounds.Width - 1, row, Glyphs.VLine);
         }
@@ -1831,7 +1831,7 @@ public class TableView : View
                     if (Style.ShowHorizontalScrollIndicators && moreColumnsToLeft)
                     {
                         rune = Glyphs.LeftArrow;
-                        scrollLeftPoint = new Point (c, row);
+                        _scrollLeftPoint = new Point (c, row);
                     }
                 }
 
@@ -1852,7 +1852,7 @@ public class TableView : View
                     if (Style.ShowHorizontalScrollIndicators && moreColumnsToRight)
                     {
                         rune = Glyphs.RightArrow;
-                        scrollRightPoint = new Point (c, row);
+                        _scrollRightPoint = new Point (c, row);
                     }
                 }
 
@@ -1956,7 +1956,7 @@ public class TableView : View
             string render = TruncateOrPad (val, representation, current.Width, colStyle);
 
             // While many cells can be selected (see MultiSelectedRegions) only one cell is the primary (drives navigation etc)
-            bool isPrimaryCell = current.Column == selectedColumn && rowToRender == selectedRow;
+            bool isPrimaryCell = current.Column == _selectedColumn && rowToRender == _selectedRow;
 
             RenderCell (cellColor, render, isPrimaryCell);
 
@@ -1981,7 +1981,7 @@ public class TableView : View
                 Driver.SetAttribute (Enabled ? rowScheme.Normal : rowScheme.Disabled);
             }
 
-            if (style.AlwaysUseNormalColorForVerticalCellLines && style.ShowVerticalCellLines)
+            if (_style.AlwaysUseNormalColorForVerticalCellLines && _style.ShowVerticalCellLines)
             {
                 Driver.SetAttribute (rowScheme.Normal);
             }
@@ -1994,7 +1994,7 @@ public class TableView : View
             }
         }
 
-        if (style.ShowVerticalCellLines)
+        if (_style.ShowVerticalCellLines)
         {
             Driver.SetAttribute (rowScheme.Normal);
 
@@ -2011,7 +2011,7 @@ public class TableView : View
             return;
         }
 
-        bool renderLines = isHeader ? style.ShowVerticalHeaderLines : style.ShowVerticalCellLines;
+        bool renderLines = isHeader ? _style.ShowVerticalHeaderLines : _style.ShowVerticalCellLines;
 
         Rune symbol = renderLines ? Glyphs.VLine : (Rune)SeparatorSymbol;
         AddRune (col, row, symbol);
@@ -2039,7 +2039,7 @@ public class TableView : View
             return false;
         }
 
-        return Style.AlwaysShowHeaders || rowOffset == 0;
+        return Style.AlwaysShowHeaders || _rowOffset == 0;
     }
 
     /// <summary>
@@ -2069,7 +2069,7 @@ public class TableView : View
 
     private void ToggleCurrentCellSelection ()
     {
-        var e = new CellToggledEventArgs (Table, selectedColumn, selectedRow);
+        var e = new CellToggledEventArgs (Table, _selectedColumn, _selectedRow);
         OnCellToggled (e);
 
         if (e.Cancel)
@@ -2082,7 +2082,7 @@ public class TableView : View
             return;
         }
 
-        TableSelection [] regions = GetMultiSelectedRegionsContaining (selectedColumn, selectedRow).ToArray ();
+        TableSelection [] regions = GetMultiSelectedRegionsContaining (_selectedColumn, _selectedRow).ToArray ();
         TableSelection [] toggles = regions.Where (s => s.IsToggled).ToArray ();
 
         // Toggle it off
@@ -2115,10 +2115,10 @@ public class TableView : View
                 // Toggle on a single cell selection
                 MultiSelectedRegions.Push (
                                            CreateTableSelection (
-                                                                 selectedColumn,
+                                                                 _selectedColumn,
                                                                  SelectedRow,
-                                                                 selectedColumn,
-                                                                 selectedRow,
+                                                                 _selectedColumn,
+                                                                 _selectedRow,
                                                                  true
                                                                 )
                                           );
@@ -2189,7 +2189,7 @@ public class TableView : View
     )
     {
         // if the column index provided is out of bounds
-        if (columnIndex < 0 || columnIndex >= table.Columns)
+        if (columnIndex < 0 || columnIndex >= _table.Columns)
         {
             idx = columnIndex;
 
