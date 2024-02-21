@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+namespace Terminal.Gui;
 
 public partial class View
 {
@@ -358,7 +358,15 @@ public partial class View
 
     private bool _oldCanFocus;
 
-    /// <inheritdoc/>
+    /// <summary>Gets or sets a value indicating whether this <see cref="View"/> can focus.</summary>
+    /// <remarks>
+    ///     Override of <see cref="Responder"/>.<see cref="Responder.CanFocus"/>.
+    ///     <para/>
+    ///     Get accessor directly returns <see cref="Responder"/>.<see cref="Responder.CanFocus"/>.
+    ///     <para/>
+    ///     Set accessor validates <see langword="value"/> before setting <see cref="Responder"/>.
+    ///     <see cref="Responder.CanFocus"/>.
+    /// </remarks>
     public override bool CanFocus
     {
         get => base.CanFocus;
