@@ -26,6 +26,11 @@ public class AllViewsTests
                 continue;
             }
 
+            var frame = new View { X = 0, Y = 0, Width = 50, Height = 50 };
+            frame.Add (view);
+            frame.BeginInit ();
+            frame.EndInit ();
+
             view.X = Pos.Center ();
             view.Y = Pos.Center ();
 
@@ -36,10 +41,6 @@ public class AllViewsTests
             view.Width = 10;
             view.Height = 10;
 
-            var frame = new View { X = 0, Y = 0, Width = 50, Height = 50 };
-            frame.Add (view);
-            frame.BeginInit ();
-            frame.EndInit ();
             frame.LayoutSubviews ();
 
             // What's the natural width/height?
