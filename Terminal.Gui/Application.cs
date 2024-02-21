@@ -716,53 +716,6 @@ public static partial class Application
     /// </summary>
     public static bool EndAfterFirstIteration { get; set; }
 
-    //
-    // provides the sync context set while executing code in Terminal.Gui, to let
-    // users use async/await on their code
-    //
-    private sealed class MainLoopSyncContext : SynchronizationContext
-    {
-        public override SynchronizationContext CreateCopy () { return new MainLoopSyncContext (); }
-
-        public override void Post (SendOrPostCallback d, object state)
-        {
-            MainLoop.AddIdle (
-                              () =>
-                              {
-                                  d (state);
-
-                                  return false;
-                              }
-                             );
-        }
-
-        //_mainLoop.Driver.Wakeup ();
-        public override void Send (SendOrPostCallback d, object state)
-        {
-            if (Thread.CurrentThread.ManagedThreadId == _mainThreadId)
-            {
-                d (state);
-            }
-            else
-            {
-                var wasExecuted = false;
-
-                Invoke (
-                        () =>
-                        {
-                            d (state);
-                            wasExecuted = true;
-                        }
-                       );
-
-                while (!wasExecuted)
-                {
-                    Thread.Sleep (15);
-                }
-            }
-        }
-    }
-
     /// <summary>Building block API: Runs the main loop for the created <see cref="Toplevel"/>.</summary>
     /// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
     public static void RunLoop (RunState state)
