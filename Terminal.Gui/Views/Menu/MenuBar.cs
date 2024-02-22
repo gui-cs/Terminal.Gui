@@ -313,12 +313,12 @@ public class MenuBar : View
         AddCommand (Command.Select, () => Run (_menuItemToSelect?.Action));
 
         // Default key bindings for this view
-        KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
-        KeyBindings.Add (KeyCode.CursorRight, Command.Right);
-        KeyBindings.Add (KeyCode.Esc, Command.Cancel);
-        KeyBindings.Add (KeyCode.CursorDown, Command.Accept);
-        KeyBindings.Add (KeyCode.Enter, Command.Accept);
-        KeyBindings.Add ((KeyCode)Key, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
+        KeyBindings.Add (Key.CursorLeft, Command.Left);
+        KeyBindings.Add (Key.CursorRight, Command.Right);
+        KeyBindings.Add (Key.Esc, Command.Cancel);
+        KeyBindings.Add (Key.CursorDown, Command.Accept);
+        KeyBindings.Add (Key.Enter, Command.Accept);
+        KeyBindings.Add (Key, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
 
         KeyBindings.Add (
                          KeyCode.CtrlMask | KeyCode.Space,
@@ -588,7 +588,7 @@ public class MenuBar : View
         _selected = 0;
         SetNeedsDisplay ();
 
-        _previousFocused = SuperView is null ? Application.Current.Focused : SuperView.Focused;
+        _previousFocused = SuperView is null ? Application.Current?.Focused : SuperView.Focused;
         OpenMenu (_selected);
 
         if (!SelectEnabledItem (
@@ -652,46 +652,6 @@ public class MenuBar : View
 
         OpenMenu (idx, sIdx, subMenu);
         SetNeedsDisplay ();
-    }
-
-    internal void AltKeyUpHandler (Key e)
-    {
-        if (e.KeyCode == KeyCode.AltMask)
-        {
-            e.Handled = true;
-
-            // User pressed Alt 
-            if (!IsMenuOpen && _openMenu is null && !_openedByAltKey)
-            {
-                // There's no open menu, the first menu item should be highlighted.
-                // The right way to do this is to SetFocus(MenuBar), but for some reason
-                // that faults.
-
-                GetMouseGrabViewInstance (this)?.CleanUp ();
-
-                IsMenuOpen = true;
-                _openedByAltKey = true;
-                _selected = 0;
-                CanFocus = true;
-
-                _lastFocused = SuperView == null
-                                   ? Application.Current.MostFocused
-                                   : SuperView.MostFocused;
-                SetFocus ();
-                SetNeedsDisplay ();
-                Application.GrabMouse (this);
-            }
-            else if (!_openedByHotKey)
-            {
-                // There's an open menu. Close it.
-                CleanUp ();
-            }
-            else
-            {
-                _openedByAltKey = false;
-                _openedByHotKey = false;
-            }
-        }
     }
 
     internal void CleanUp ()
@@ -1554,14 +1514,12 @@ public class MenuBar : View
     }
 
     /// <inheritdoc/>
-    public override bool? OnInvokingKeyBindings (Key keyEvent)
+    public override bool? OnInvokingKeyBindings (Key key)
     {
         // This is a bit of a hack. We want to handle the key bindings for menu bar but
         // InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.
         // So before we call the base class we set SelectedItem appropriately.
         // TODO: Figure out if there's a way to have KeyBindings pass context instead. Maybe a KeyBindingContext property?
-
-        KeyCode key = keyEvent.KeyCode;
 
         if (KeyBindings.TryGet (key, out _))
         {
@@ -1572,12 +1530,12 @@ public class MenuBar : View
             for (var i = 0; i < Menus.Length; i++)
             {
                 // Recurse through the menu to find one with the shortcut.
-                if (FindShortcutInChildMenu (key, Menus [i], out _menuItemToSelect))
+                if (FindShortcutInChildMenu (key.KeyCode, Menus [i], out _menuItemToSelect))
                 {
                     _menuBarItemToActivate = i;
-                    keyEvent.Scope = KeyBindingScope.HotKey;
+                    //keyEvent.Scope = KeyBindingScope.HotKey;
 
-                    return base.OnInvokingKeyBindings (keyEvent);
+                    return base.OnInvokingKeyBindings (key);
                 }
 
                 // Now see if any of the menu bar items have a hot key that matches
@@ -1603,12 +1561,11 @@ public class MenuBar : View
                 // No submenu item matched (or the menu is closed)
 
                 // Check if one of the menu bar item has a hot key that matches
-                int hotKeyValue = Menus [i]?.HotKey.Value ?? default (int);
-                var hotKey = (KeyCode)hotKeyValue;
+                var hotKey = new Key ((char)Menus [i]?.HotKey.Value);
 
-                if (hotKey != KeyCode.Null)
+                if (hotKey != Key.Empty)
                 {
-                    bool matches = key == hotKey || key == (hotKey | KeyCode.AltMask);
+                    bool matches = key == hotKey || key == hotKey.WithAlt || key == hotKey.NoShift.WithAlt;
 
                     if (IsMenuOpen)
                     {
@@ -1619,7 +1576,7 @@ public class MenuBar : View
                     if (matches)
                     {
                         _menuBarItemToActivate = i;
-                        keyEvent.Scope = KeyBindingScope.HotKey;
+                        //keyEvent.Scope = KeyBindingScope.HotKey;
 
                         break;
                     }
@@ -1627,7 +1584,7 @@ public class MenuBar : View
             }
         }
 
-        return base.OnInvokingKeyBindings (keyEvent);
+        return base.OnInvokingKeyBindings (key);
     }
 
     // TODO: Update to use Key instead of KeyCode

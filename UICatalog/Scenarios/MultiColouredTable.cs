@@ -100,13 +100,13 @@ public class MultiColouredTable : Scenario
 
         var ok = new Button { Text = "Ok", IsDefault = true };
 
-        ok.Clicked += (s, e) =>
+        ok.Accept += (s, e) =>
                       {
                           okPressed = true;
                           Application.RequestStop ();
                       };
         var cancel = new Button { Text = "Cancel" };
-        cancel.Clicked += (s, e) => { Application.RequestStop (); };
+        cancel.Accept += (s, e) => { Application.RequestStop (); };
         var d = new Dialog { Title = title, Buttons = [ok, cancel] };
 
         var lbl = new Label { X = 0, Y = 1, Text = label };

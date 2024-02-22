@@ -84,7 +84,7 @@ public class Scrolling : Scenario
         Application.Top.Loaded += Top_Loaded;
 
         var pressMeButton = new Button { X = 3, Y = 3, Text = "Press me!" };
-        pressMeButton.Clicked += (s, e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
+        pressMeButton.Accept += (s, e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
         scrollView.Add (pressMeButton);
 
         var aLongButton = new Button
@@ -95,7 +95,7 @@ public class Scrolling : Scenario
             Width = Dim.Fill (3),
             Text = "A very long button. Should be wide enough to demo clipping!"
         };
-        aLongButton.Clicked += (s, e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
+        aLongButton.Accept += (s, e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
         scrollView.Add (aLongButton);
 
         scrollView.Add (
@@ -137,7 +137,7 @@ public class Scrolling : Scenario
         // TODO: Use Pos.Width instead of (Right-Left) when implemented (#502)
         anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
 
-        anchorButton.Clicked += (s, e) =>
+        anchorButton.Accept += (s, e) =>
                                 {
                                     // This demonstrates how to have a dynamically sized button
                                     // Each time the button is clicked the button's text gets longer

@@ -77,13 +77,13 @@ public class ListsAndCombos : Scenario
         Win.Add (lbComboBox, comboBox);
 
         var btnMoveUp = new Button { X = 1, Y = Pos.Bottom (lbListView), Text = "Move _Up" };
-        btnMoveUp.Clicked += (s, e) => { listview.MoveUp (); };
+        btnMoveUp.Accept += (s, e) => { listview.MoveUp (); };
 
         var btnMoveDown = new Button
         {
             X = Pos.Right (btnMoveUp) + 1, Y = Pos.Bottom (lbListView), Text = "Move _Down"
         };
-        btnMoveDown.Clicked += (s, e) => { listview.MoveDown (); };
+        btnMoveDown.Accept += (s, e) => { listview.MoveDown (); };
 
         Win.Add (btnMoveUp, btnMoveDown);
     }

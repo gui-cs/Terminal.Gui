@@ -169,11 +169,11 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     ///     Handle key events before <see cref="HostControl"/> e.g. to make key events like up/down apply to the
     ///     autocomplete control instead of changing the cursor position in the underlying text view.
     /// </summary>
-    /// <param name="a">The key event.</param>
+    /// <param name="key">The key event.</param>
     /// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
-    public override bool ProcessKey (Key a)
+    public override bool ProcessKey (Key key)
     {
-        if (SuggestionGenerator.IsWordChar ((Rune)a))
+        if (SuggestionGenerator.IsWordChar ((Rune)key))
         {
             Visible = true;
             ManipulatePopup ();
@@ -182,7 +182,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
             return false;
         }
 
-        if (a.KeyCode == Reopen)
+        if (key == Reopen)
         {
             Context.Canceled = false;
 
@@ -201,14 +201,14 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
             return false;
         }
 
-        if (a.KeyCode == KeyCode.CursorDown)
+        if (key == Key.CursorDown)
         {
             MoveDown ();
 
             return true;
         }
 
-        if (a.KeyCode == KeyCode.CursorUp)
+        if (key == Key.CursorUp)
         {
             MoveUp ();
 
@@ -227,12 +227,12 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
             return false;
         }*/
 
-        if (a.KeyCode == SelectionKey)
+        if (key == SelectionKey)
         {
             return Select ();
         }
 
-        if (a.KeyCode == CloseKey)
+        if (key == CloseKey)
         {
             Close ();
             Context.Canceled = true;
@@ -249,7 +249,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     {
         if (!Context.Canceled && Suggestions.Count > 0 && !Visible && HostControl?.HasFocus == true)
         {
-            ProcessKey (new Key ((KeyCode)Suggestions [0].Title [0]));
+            ProcessKey (new Key (Suggestions [0].Title [0]));
         }
         else if (!Visible || HostControl?.HasFocus == false || Suggestions.Count == 0)
         {

@@ -827,7 +827,7 @@ public class Editor : Scenario
             AutoSize = false,
             Text = "Find _Next"
         };
-        btnFindNext.Clicked += (s, e) => FindNext ();
+        btnFindNext.Accept += (s, e) => FindNext ();
         d.Add (btnFindNext);
 
         var btnFindPrevious = new Button
@@ -840,7 +840,7 @@ public class Editor : Scenario
             AutoSize = false,
             Text = "Find _Previous"
         };
-        btnFindPrevious.Clicked += (s, e) => FindPrevious ();
+        btnFindPrevious.Accept += (s, e) => FindPrevious ();
         d.Add (btnFindPrevious);
 
         txtToFind.TextChanged += (s, e) =>
@@ -860,7 +860,7 @@ public class Editor : Scenario
             AutoSize = false,
             Text = "Cancel"
         };
-        btnCancel.Clicked += (s, e) => { DisposeWinDialog (); };
+        btnCancel.Accept += (s, e) => { DisposeWinDialog (); };
         d.Add (btnCancel);
 
         var ckbMatchCase = new CheckBox
@@ -1077,7 +1077,7 @@ public class Editor : Scenario
             AutoSize = false,
             Text = "Replace _Next"
         };
-        btnFindNext.Clicked += (s, e) => ReplaceNext ();
+        btnFindNext.Accept += (s, e) => ReplaceNext ();
         d.Add (btnFindNext);
 
         label = new Label { X = Pos.Left (label), Y = Pos.Top (label) + 1, Text = "Replace:" };
@@ -1102,7 +1102,7 @@ public class Editor : Scenario
             AutoSize = false,
             Text = "Replace _Previous"
         };
-        btnFindPrevious.Clicked += (s, e) => ReplacePrevious ();
+        btnFindPrevious.Accept += (s, e) => ReplacePrevious ();
         d.Add (btnFindPrevious);
 
         var btnReplaceAll = new Button
@@ -1115,7 +1115,7 @@ public class Editor : Scenario
             AutoSize = false,
             Text = "Replace _All"
         };
-        btnReplaceAll.Clicked += (s, e) => ReplaceAll ();
+        btnReplaceAll.Accept += (s, e) => ReplaceAll ();
         d.Add (btnReplaceAll);
 
         txtToFind.TextChanged += (s, e) =>
@@ -1136,7 +1136,7 @@ public class Editor : Scenario
             AutoSize = false,
             Text = "Cancel"
         };
-        btnCancel.Clicked += (s, e) => { DisposeWinDialog (); };
+        btnCancel.Accept += (s, e) => { DisposeWinDialog (); };
         d.Add (btnCancel);
 
         var ckbMatchCase = new CheckBox

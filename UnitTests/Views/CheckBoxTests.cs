@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using System.ComponentModel;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
@@ -6,6 +7,32 @@ public class CheckBoxTests
 {
     private readonly ITestOutputHelper _output;
     public CheckBoxTests (ITestOutputHelper output) { _output = output; }
+
+
+    // Test that Title and Text are the same
+    [Fact]
+    public void Text_Mirrors_Title ()
+    {
+        var view = new CheckBox ();
+        view.Title = "Hello";
+        Assert.Equal ("Hello", view.Title);
+        Assert.Equal ($"Hello", view.TitleTextFormatter.Text);
+
+        Assert.Equal ("Hello", view.Text);
+        Assert.Equal ($"{CM.Glyphs.UnChecked} Hello", view.TextFormatter.Text);
+    }
+
+    [Fact]
+    public void Title_Mirrors_Text ()
+    {
+        var view = new CheckBox ();
+        view.Text = "Hello";
+        Assert.Equal ("Hello", view.Text);
+        Assert.Equal ($"{CM.Glyphs.UnChecked} Hello", view.TextFormatter.Text);
+
+        Assert.Equal ("Hello", view.Title);
+        Assert.Equal ($"Hello", view.TitleTextFormatter.Text);
+    }
 
     [Fact]
     [AutoInitShutdown]
@@ -17,26 +44,24 @@ public class CheckBoxTests
         Application.Begin (top);
 
         Assert.False (checkBox.Checked);
-        Assert.True (checkBox.NewKeyDownEvent (new Key (KeyCode.Space)));
+        Assert.True (checkBox.NewKeyDownEvent (Key.Space));
         Assert.True (checkBox.Checked);
         Assert.True (checkBox.MouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
         Assert.False (checkBox.Checked);
 
         checkBox.AllowNullChecked = true;
-        Assert.True (checkBox.NewKeyDownEvent (new Key (KeyCode.Space)));
+        Assert.True (checkBox.NewKeyDownEvent (Key.Space));
         Assert.Null (checkBox.Checked);
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @$"
-{
-    CM.Glyphs.NullChecked
-} Check this out 你",
+{CM.Glyphs.NullChecked} Check this out 你",
                                                       _output
                                                      );
         Assert.True (checkBox.MouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
         Assert.True (checkBox.Checked);
-        Assert.True (checkBox.NewKeyDownEvent (new Key (KeyCode.Space)));
+        Assert.True (checkBox.NewKeyDownEvent (Key.Space));
         Assert.False (checkBox.Checked);
         Assert.True (checkBox.MouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
         Assert.Null (checkBox.Checked);
@@ -65,9 +90,7 @@ public class CheckBoxTests
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│         {
-    CM.Glyphs.UnChecked
-} Check this out 你│
+│         {CM.Glyphs.UnChecked} Check this out 你│
 │                            │
 └────────────────────────────┘
 ";
@@ -82,9 +105,7 @@ public class CheckBoxTests
         expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {
-    CM.Glyphs.UnChecked
-} Check this out 你 changed│
+│ {CM.Glyphs.UnChecked} Check this out 你 changed│
 │                            │
 └────────────────────────────┘
 ";
@@ -112,9 +133,7 @@ public class CheckBoxTests
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│         {
-    CM.Glyphs.UnChecked
-} Check this out 你│
+│         {CM.Glyphs.UnChecked} Check this out 你│
 │                            │
 └────────────────────────────┘
 ";
@@ -129,9 +148,7 @@ public class CheckBoxTests
         expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {
-    CM.Glyphs.UnChecked
-} Check this out 你 changed│
+│ {CM.Glyphs.UnChecked} Check this out 你 changed│
 │                            │
 └────────────────────────────┘
 ";
@@ -257,59 +274,69 @@ public class CheckBoxTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void KeyBindings_Command ()
     {
         var toggled = false;
         var ckb = new CheckBox ();
         ckb.Toggled += (s, e) => toggled = true;
-        Application.Top.Add (ckb);
-        Application.Begin (Application.Top);
 
         Assert.False (ckb.Checked);
         Assert.False (toggled);
-        Assert.Equal (KeyCode.Null, ckb.HotKey);
+        Assert.Equal (Key.Empty, ckb.HotKey);
 
         ckb.Text = "_Test";
-        Assert.Equal (KeyCode.T, ckb.HotKey);
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.T)));
+        Assert.Equal (Key.T, ckb.HotKey);
+        Assert.True (ckb.NewKeyDownEvent (Key.T));
         Assert.True (ckb.Checked);
         Assert.True (toggled);
 
         ckb.Text = "T_est";
         toggled = false;
-        Assert.Equal (KeyCode.E, ckb.HotKey);
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.E | KeyCode.AltMask)));
+        Assert.Equal (Key.E, ckb.HotKey);
+        Assert.True (ckb.NewKeyDownEvent (Key.E.WithAlt));
         Assert.True (toggled);
         Assert.False (ckb.Checked);
 
         toggled = false;
-        Assert.Equal (KeyCode.E, ckb.HotKey);
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.E)));
+        Assert.Equal (Key.E, ckb.HotKey);
+        Assert.True (ckb.NewKeyDownEvent (Key.E));
         Assert.True (toggled);
         Assert.True (ckb.Checked);
 
         toggled = false;
-        Assert.True (Application.Top.NewKeyDownEvent (new Key ((KeyCode)' ')));
+        Assert.True (ckb.NewKeyDownEvent (Key.Space));
         Assert.True (toggled);
         Assert.False (ckb.Checked);
 
         toggled = false;
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.Space)));
+        Assert.True (ckb.NewKeyDownEvent (Key.Space));
         Assert.True (toggled);
         Assert.True (ckb.Checked);
-        Assert.True (ckb.AutoSize);
 
-        Application.Refresh ();
+        toggled = false;
+        Assert.False (ckb.NewKeyDownEvent (Key.Enter));
+        Assert.False (toggled);
+        Assert.True (ckb.Checked);
+    }
 
-        var expected = @$"
-{
-    CM.Glyphs.Checked
-} Test
-";
+    [Fact]
+    public void Accept_Cancel_Event_OnAccept_Returns_True ()
+    {
+        var ckb = new CheckBox ();
+        var acceptInvoked = false;
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 6, 1), pos);
+        ckb.Accept += ViewOnAccept;
+
+        var ret = ckb.OnAccept ();
+        Assert.True (ret);
+        Assert.True (acceptInvoked);
+
+        return;
+        void ViewOnAccept (object sender, CancelEventArgs e)
+        {
+            acceptInvoked = true;
+            e.Cancel = true;
+        }
     }
 
     [Fact]
@@ -340,9 +367,7 @@ public class CheckBoxTests
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│    {
-    CM.Glyphs.UnChecked
-} Check this out 你     │
+│    {CM.Glyphs.UnChecked} Check this out 你     │
 │                            │
 └────────────────────────────┘
 ";
@@ -356,9 +381,7 @@ public class CheckBoxTests
         expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│    {
-    CM.Glyphs.Checked
-} Check this out 你     │
+│    {CM.Glyphs.Checked} Check this out 你     │
 │                            │
 └────────────────────────────┘
 ";
@@ -407,12 +430,8 @@ public class CheckBoxTests
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {
-    CM.Glyphs.UnChecked
-}   Check  first  out  你  │
-│ {
-    CM.Glyphs.UnChecked
-}  Check  second  out  你  │
+│ {CM.Glyphs.UnChecked}   Check  first  out  你  │
+│ {CM.Glyphs.UnChecked}  Check  second  out  你  │
 │                            │
 └────────────────────────────┘
 ";
@@ -431,12 +450,8 @@ public class CheckBoxTests
         expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {
-    CM.Glyphs.Checked
-}   Check  first  out  你  │
-│ {
-    CM.Glyphs.Checked
-}  Check  second  out  你  │
+│ {CM.Glyphs.Checked}   Check  first  out  你  │
+│ {CM.Glyphs.Checked}  Check  second  out  你  │
 │                            │
 └────────────────────────────┘
 ";
@@ -471,9 +486,7 @@ public class CheckBoxTests
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {
-    CM.Glyphs.UnChecked
-} Check this out 你        │
+│ {CM.Glyphs.UnChecked} Check this out 你        │
 │                            │
 └────────────────────────────┘
 ";
@@ -487,9 +500,7 @@ public class CheckBoxTests
         expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {
-    CM.Glyphs.Checked
-} Check this out 你        │
+│ {CM.Glyphs.Checked} Check this out 你        │
 │                            │
 └────────────────────────────┘
 ";
@@ -526,9 +537,7 @@ public class CheckBoxTests
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│       Check this out 你 {
-    CM.Glyphs.UnChecked
-}  │
+│       Check this out 你 {CM.Glyphs.UnChecked}  │
 │                            │
 └────────────────────────────┘
 ";
@@ -542,14 +551,53 @@ public class CheckBoxTests
         expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│       Check this out 你 {
-    CM.Glyphs.Checked
-}  │
+│       Check this out 你 {CM.Glyphs.Checked}  │
 │                            │
 └────────────────────────────┘
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rect (0, 0, 30, 5), pos);
+    }
+
+    [Fact]
+    public void HotKey_Command_Fires_Accept ()
+    {
+        var cb = new CheckBox ();
+        var accepted = false;
+
+        cb.Accept += ButtonOnAccept;
+        cb.InvokeCommand (Command.HotKey);
+
+        Assert.True (accepted);
+
+        return;
+        void ButtonOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+    }
+
+    [Theory]
+    [InlineData (true)]
+    [InlineData (false)]
+    [InlineData (null)]
+    public void Toggled_Cancel_Event_Prevents_Toggle (bool? initialState)
+    {
+        var ckb = new CheckBox () { AllowNullChecked = true };
+        var checkedInvoked = false;
+
+        ckb.Toggled += CheckBoxToggled;
+
+        ckb.Checked = initialState;
+        Assert.Equal(initialState, ckb.Checked);
+        var ret = ckb.OnToggled ();
+        Assert.True (ret);
+        Assert.True (checkedInvoked);
+        Assert.Equal (initialState, ckb.Checked);
+
+        return;
+        void CheckBoxToggled (object sender, CancelEventArgs e)
+        {
+            checkedInvoked = true;
+            e.Cancel = true;
+        }
     }
 }

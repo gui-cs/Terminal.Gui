@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using JetBrains.Annotations;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -66,9 +67,9 @@ public class ListViewWithSelection : Scenario
         Win.Add (keepCheckBox);
     }
 
-    private void _customRenderCB_Toggled (object sender, ToggleEventArgs e)
+    private void _customRenderCB_Toggled (object sender, StateEventArgs<bool?> stateEventArgs)
     {
-        if (e.OldValue == true)
+        if (stateEventArgs.OldValue == true)
         {
             _listView.SetSource (_scenarios);
         }
@@ -80,16 +81,16 @@ public class ListViewWithSelection : Scenario
         Win.SetNeedsDisplay ();
     }
 
-    private void AllowMarkingCB_Toggled (object sender, ToggleEventArgs e)
+    private void AllowMarkingCB_Toggled (object sender, [NotNull] StateEventArgs<bool?> stateEventArgs)
     {
-        _listView.AllowsMarking = (bool)!e.OldValue;
+        _listView.AllowsMarking = (bool)!stateEventArgs.OldValue;
         _allowMultipleCB.Visible = _listView.AllowsMarking;
         Win.SetNeedsDisplay ();
     }
 
-    private void AllowMultipleCB_Toggled (object sender, ToggleEventArgs e)
+    private void AllowMultipleCB_Toggled (object sender, [NotNull] StateEventArgs<bool?> stateEventArgs)
     {
-        _listView.AllowsMultipleSelection = (bool)!e.OldValue;
+        _listView.AllowsMultipleSelection = (bool)!stateEventArgs.OldValue;
         Win.SetNeedsDisplay ();
     }
 

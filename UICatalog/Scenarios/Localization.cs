@@ -150,14 +150,14 @@ public class Localization : Scenario
         {
             X = Pos.Right (_allowAnyCheckBox) + 1, Y = Pos.Bottom (textAndFileDialogLabel) + 1, Text = "Open"
         };
-        openDialogButton.Clicked += (sender, e) => ShowFileDialog (false);
+        openDialogButton.Accept += (sender, e) => ShowFileDialog (false);
         Win.Add (openDialogButton);
 
         var saveDialogButton = new Button
         {
             X = Pos.Right (openDialogButton) + 1, Y = Pos.Bottom (textAndFileDialogLabel) + 1, Text = "Save"
         };
-        saveDialogButton.Clicked += (sender, e) => ShowFileDialog (true);
+        saveDialogButton.Accept += (sender, e) => ShowFileDialog (true);
         Win.Add (saveDialogButton);
 
         var wizardLabel = new Label
@@ -171,7 +171,7 @@ public class Localization : Scenario
         Win.Add (wizardLabel);
 
         var wizardButton = new Button { X = 2, Y = Pos.Bottom (wizardLabel) + 1, Text = "Open _wizard" };
-        wizardButton.Clicked += (sender, e) => ShowWizard ();
+        wizardButton.Accept += (sender, e) => ShowWizard ();
         Win.Add (wizardButton);
 
         Win.Unloaded += (sender, e) => Quit ();

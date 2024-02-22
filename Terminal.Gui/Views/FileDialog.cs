@@ -67,7 +67,7 @@ public class FileDialog : Dialog
         {
             Y = Pos.AnchorEnd (1), X = Pos.Function (CalculateOkButtonPosX), IsDefault = true, Text = Style.OkButtonText
         };
-        _btnOk.Clicked += (s, e) => Accept (true);
+        _btnOk.Accept += (s, e) => Accept (true);
 
         _btnOk.KeyDown += (s, k) =>
                           {
@@ -83,19 +83,19 @@ public class FileDialog : Dialog
                                   NavigateIf (k, KeyCode.CursorUp, _tableView);
                                   NavigateIf (k, KeyCode.CursorRight, _btnOk);
                               };
-        _btnCancel.Clicked += (s, e) => { Application.RequestStop (); };
+        _btnCancel.Accept += (s, e) => { Application.RequestStop (); };
 
         _btnUp = new Button { X = 0, Y = 1, NoPadding = true };
         _btnUp.Text = GetUpButtonText ();
-        _btnUp.Clicked += (s, e) => _history.Up ();
+        _btnUp.Accept += (s, e) => _history.Up ();
 
         _btnBack = new Button { X = Pos.Right (_btnUp) + 1, Y = 1, NoPadding = true };
         _btnBack.Text = GetBackButtonText ();
-        _btnBack.Clicked += (s, e) => _history.Back ();
+        _btnBack.Accept += (s, e) => _history.Back ();
 
         _btnForward = new Button { X = Pos.Right (_btnBack) + 1, Y = 1, NoPadding = true };
         _btnForward.Text = GetForwardButtonText ();
-        _btnForward.Clicked += (s, e) => _history.Forward ();
+        _btnForward.Accept += (s, e) => _history.Forward ();
 
         _tbPath = new TextField { Width = Dim.Fill (), CaptionColor = new Color (Color.Black) };
 
@@ -128,7 +128,7 @@ public class FileDialog : Dialog
             FullRowSelect = true,
             CollectionNavigator = new FileDialogCollectionNavigator (this)
         };
-        _tableView.KeyBindings.Add (KeyCode.Space, Command.ToggleChecked);
+        _tableView.KeyBindings.Add (Key.Space, Command.Select);
         _tableView.MouseClick += OnTableViewMouseClick;
         _tableView.Style.InvertSelectedCellFirstCharacter = true;
         Style.TableStyle = _tableView.Style;
@@ -184,7 +184,7 @@ public class FileDialog : Dialog
 
         _btnToggleSplitterCollapse = new Button { Y = Pos.AnchorEnd (1), Text = GetToggleSplitterText (false) };
 
-        _btnToggleSplitterCollapse.Clicked += (s, e) =>
+        _btnToggleSplitterCollapse.Accept += (s, e) =>
                                               {
                                                   Tile tile = _splitContainer.Tiles.ElementAt (0);
 
@@ -200,7 +200,7 @@ public class FileDialog : Dialog
             CaptionColor = new Color (Color.Black),
             Width = 30,
             Y = Pos.AnchorEnd (1),
-            HotKey = KeyCode.F | KeyCode.AltMask
+            HotKey = Key.F.WithAlt
         };
         _spinnerView = new SpinnerView { X = Pos.Right (_tbFind) + 1, Y = Pos.AnchorEnd (1), Visible = false };
 
@@ -248,10 +248,10 @@ public class FileDialog : Dialog
         _tableView.KeyUp += (s, k) => k.Handled = TableView_KeyUp (k);
         _tableView.SelectedCellChanged += TableView_SelectedCellChanged;
 
-        _tableView.KeyBindings.Add (KeyCode.Home, Command.TopHome);
-        _tableView.KeyBindings.Add (KeyCode.End, Command.BottomEnd);
-        _tableView.KeyBindings.Add (KeyCode.Home | KeyCode.ShiftMask, Command.TopHomeExtend);
-        _tableView.KeyBindings.Add (KeyCode.End | KeyCode.ShiftMask, Command.BottomEndExtend);
+        _tableView.KeyBindings.Add (Key.Home, Command.TopHome);
+        _tableView.KeyBindings.Add (Key.End, Command.BottomEnd);
+        _tableView.KeyBindings.Add (Key.Home.WithShift, Command.TopHomeExtend);
+        _tableView.KeyBindings.Add (Key.End.WithShift, Command.BottomEndExtend);
 
         _treeView.KeyDown += (s, k) =>
                              {
@@ -657,7 +657,7 @@ public class FileDialog : Dialog
         ApplySort ();
     }
 
-    private void Accept (IEnumerable<FileSystemInfoStats> toMultiAccept)
+    private new void Accept (IEnumerable<FileSystemInfoStats> toMultiAccept)
     {
         if (!AllowsMultipleSelection)
         {
@@ -676,7 +676,7 @@ public class FileDialog : Dialog
         FinishAccept ();
     }
 
-    private void Accept (IFileInfo f)
+    private new void Accept (IFileInfo f)
     {
         if (!IsCompatibleWithOpenMode (f.FullName, out string reason))
         {
@@ -696,7 +696,7 @@ public class FileDialog : Dialog
         FinishAccept ();
     }
 
-    private void Accept (bool allowMulti)
+    private new void Accept (bool allowMulti)
     {
         if (allowMulti && TryAcceptMulti ())
         {

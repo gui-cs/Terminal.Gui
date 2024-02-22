@@ -91,7 +91,7 @@ public class ProgressBarStyles : Scenario
         };
         editor.Add (fgColorPickerBtn);
 
-        fgColorPickerBtn.Clicked += (s, e) =>
+        fgColorPickerBtn.Accept += (s, e) =>
                                     {
                                         ColorName newColor = ChooseColor (
                                                                           fgColorPickerBtn.Text,
@@ -116,7 +116,7 @@ public class ProgressBarStyles : Scenario
         };
         editor.Add (bgColorPickerBtn);
 
-        bgColorPickerBtn.Clicked += (s, e) =>
+        bgColorPickerBtn.Accept += (s, e) =>
                                     {
                                         ColorName newColor = ChooseColor (
                                                                           fgColorPickerBtn.Text,
@@ -177,7 +177,7 @@ public class ProgressBarStyles : Scenario
         };
         editor.Add (continuousPB);
 
-        button.Clicked += (s, e) =>
+        button.Accept += (s, e) =>
                           {
                               if (_fractionTimer == null)
                               {

@@ -65,6 +65,15 @@ public class TextTests
         Assert.Equal ("Hello World", view.TextFormatter.Text);
     }
 
+    // Setting Text does NOT set the HotKey
+    [Fact]
+    public void Text_Does_Not_Set_HotKey ()
+    {
+        var view = new View { HotKeySpecifier = (Rune)'_', Text = "_Hello World" };
+
+        Assert.NotEqual (Key.H, view.HotKey);
+    }
+
     // Test that TextFormatter is init only
     [Fact]
     public void TextFormatterIsInitOnly ()
@@ -72,11 +81,10 @@ public class TextTests
         var view = new View ();
 
         // Use reflection to ensure the TextFormatter property is `init` only
-        Assert.True (
-                     typeof (View).GetMethod ("set_TextFormatter")
-                                  .ReturnParameter.GetRequiredCustomModifiers ()
-                                  .Contains (typeof (IsExternalInit))
-                    );
+        Assert.Contains (
+                         typeof (IsExternalInit),
+                         typeof (View).GetMethod ("set_TextFormatter")
+                                      .ReturnParameter.GetRequiredCustomModifiers ());
     }
 
     // Test that the Text property is set correctly.
@@ -86,15 +94,6 @@ public class TextTests
         var view = new View { Text = "Hello World" };
 
         Assert.Equal ("Hello World", view.Text);
-    }
-
-    // Setting Text sets the HotKey
-    [Fact]
-    public void TextSetsHotKey ()
-    {
-        var view = new View { HotKeySpecifier = (Rune)'_', Text = "_Hello World" };
-
-        Assert.Equal (Key.H, view.HotKey);
     }
 
     // Test view.UpdateTextFormatterText overridden in a subclass updates TextFormatter.Text

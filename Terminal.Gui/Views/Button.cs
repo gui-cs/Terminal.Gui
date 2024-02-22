@@ -7,17 +7,17 @@
 
 namespace Terminal.Gui;
 
-/// <summary>Button is a <see cref="View"/> that provides an item that invokes raises the <see cref="Clicked"/> event.</summary>
+/// <summary>Button is a <see cref="View"/> that provides an item that invokes raises the <see cref="View.Accept"/> event.</summary>
 /// <remarks>
 ///     <para>
-///         Provides a button showing text that raises the <see cref="Clicked"/> event when clicked on with a mouse or
+///         Provides a button showing text that raises the <see cref="View.Accept"/> event when clicked on with a mouse or
 ///         when the user presses SPACE, ENTER, or the <see cref="View.HotKey"/>. The hot key is the first letter or digit
 ///         following the first underscore ('_') in the button text.
 ///     </para>
 ///     <para>Use <see cref="View.HotKeySpecifier"/> to change the hot key specifier from the default of ('_').</para>
 ///     <para>
 ///         When the button is configured as the default (<see cref="IsDefault"/>) and the user presses the ENTER key, if
-///         no other <see cref="View"/> processes the key, the <see cref="Button"/>'s <see cref="Clicked"/> event will will
+///         no other <see cref="View"/> processes the key, the <see cref="Button"/>'s <see cref="View.Accept"/> event will
 ///         be fired.
 ///     </para>
 /// </remarks>
@@ -36,8 +36,6 @@ public class Button : View
         TextAlignment = TextAlignment.Centered;
         VerticalTextAlignment = VerticalTextAlignment.Middle;
 
-        HotKeySpecifier = new Rune ('_');
-
         _leftBracket = Glyphs.LeftBracket;
         _rightBracket = Glyphs.RightBracket;
         _leftDefault = Glyphs.LeftDefaultIndicator;
@@ -50,18 +48,36 @@ public class Button : View
         AutoSize = true;
 
         // Override default behavior of View
-        // Command.Default sets focus
-        AddCommand (
-                    Command.Accept,
-                    () =>
-                    {
-                        OnClicked ();
+        AddCommand (Command.HotKey, () =>
+                                     {
+                                         SetFocus ();
+                                         return !OnAccept ();
+                                     });
 
-                        return true;
-                    }
-                   );
-        KeyBindings.Add (Key.Space, Command.Default, Command.Accept);
-        KeyBindings.Add (Key.Enter, Command.Default, Command.Accept);
+        KeyBindings.Add (Key.Space, Command.HotKey);
+        KeyBindings.Add (Key.Enter, Command.HotKey);
+
+        TitleChanged += Button_TitleChanged;
+    }
+
+    private void Button_TitleChanged (object sender, StateEventArgs<string> e)
+    {
+        base.Text = e.NewValue;
+        TextFormatter.HotKeySpecifier = HotKeySpecifier;
+    }
+
+    /// <inheritdoc />
+    public override string Text
+    {
+        get => base.Title;
+        set => base.Text = base.Title = value;
+    }
+
+    /// <inheritdoc />
+    public override Rune HotKeySpecifier
+    {
+        get => base.HotKeySpecifier;
+        set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
     }
 
     /// <summary>Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.</summary>
@@ -83,16 +99,6 @@ public class Button : View
     /// <summary></summary>
     public bool NoPadding { get; set; }
 
-    /// <summary>
-    ///     The event fired when the user clicks the primary mouse button within the Bounds of this <see cref="View"/> or
-    ///     if the user presses the action key while this view is focused. (TODO: IsDefault)
-    /// </summary>
-    /// <remarks>
-    ///     Client code can hook up to this event, it is raised when the button is activated either with the mouse or the
-    ///     keyboard.
-    /// </remarks>
-    public event EventHandler Clicked;
-
     /// <inheritdoc/>
     public override bool MouseEvent (MouseEvent me)
     {
@@ -107,7 +113,7 @@ public class Button : View
                     Draw ();
                 }
 
-                OnClicked ();
+                OnAccept ();
             }
 
             return true;
@@ -115,9 +121,6 @@ public class Button : View
 
         return false;
     }
-
-    /// <summary>Virtual method to invoke the <see cref="Clicked"/> event.</summary>
-    public virtual void OnClicked () { Clicked?.Invoke (this, EventArgs.Empty); }
 
     /// <inheritdoc/>
     public override bool OnEnter (View view)

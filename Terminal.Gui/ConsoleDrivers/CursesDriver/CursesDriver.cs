@@ -567,7 +567,7 @@ internal class CursesDriver : ConsoleDriver
             }
             else
             {
-                key = new Key (KeyCode.Esc);
+                key = Key.Esc;
             }
 
             OnKeyDown (key);

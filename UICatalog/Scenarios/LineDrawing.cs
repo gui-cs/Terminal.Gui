@@ -208,7 +208,7 @@ public class LineDrawing : Scenario
 
             _addLayerBtn = new Button { Text = "New Layer", X = Pos.Center (), Y = Pos.Bottom (_stylePicker) };
 
-            _addLayerBtn.Clicked += (s, a) => AddLayer?.Invoke ();
+            _addLayerBtn.Accept += (s, a) => AddLayer?.Invoke ();
             Add (_colorPicker, _stylePicker, _addLayerBtn);
         }
 

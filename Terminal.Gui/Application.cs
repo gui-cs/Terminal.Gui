@@ -1832,7 +1832,7 @@ public static partial class Application
         {
             foreach (View view in topLevel.Subviews.Where (
                                                            v => v.KeyBindings.TryGet (
-                                                                                      keyEvent.KeyCode,
+                                                                                      keyEvent,
                                                                                       KeyBindingScope.Application,
                                                                                       out KeyBinding _
                                                                                      )
@@ -1840,7 +1840,6 @@ public static partial class Application
             {
                 if (view.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.Application, out KeyBinding _))
                 {
-                    keyEvent.Scope = KeyBindingScope.Application;
                     bool? handled = view.OnInvokingKeyBindings (keyEvent);
 
                     if (handled is { } && (bool)handled)

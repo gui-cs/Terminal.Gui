@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using System.ComponentModel;
+
+namespace Terminal.Gui;
 
 /// <summary>
 ///     A single <see cref="ContentView"/> presented in a <see cref="TileView"/>. To create new instances use
@@ -59,7 +61,7 @@ public class Tile
     /// <param name="newTitle">The new <see cref="Title"/> to be replaced.</param>
     public virtual void OnTitleChanged (string oldTitle, string newTitle)
     {
-        var args = new TitleEventArgs (oldTitle, newTitle);
+        var args = new StringEventArgs (oldTitle, newTitle);
         TitleChanged?.Invoke (this, args);
     }
 
@@ -72,18 +74,18 @@ public class Tile
     /// <returns><c>true</c> if an event handler cancelled the Title change.</returns>
     public virtual bool OnTitleChanging (string oldTitle, string newTitle)
     {
-        var args = new TitleEventArgs (oldTitle, newTitle);
+        var args = new StringEventArgs (oldTitle, newTitle);
         TitleChanging?.Invoke (this, args);
 
         return args.Cancel;
     }
 
     /// <summary>Event fired after the <see cref="Title"/> has been changed.</summary>
-    public event EventHandler<TitleEventArgs> TitleChanged;
+    public event EventHandler<StringEventArgs> TitleChanged;
 
     /// <summary>
-    ///     Event fired when the <see cref="Title"/> is changing. Set <see cref="TitleEventArgs.Cancel"/> to <c>true</c>
-    ///     to cancel the Title change.
+    ///     Event fired when the <see cref="Title"/> is changing.
+    ///     <see cref="CancelEventArgs.Cancel"/> can be set to <c>true</c> to cancel the change.
     /// </summary>
-    public event EventHandler<TitleEventArgs> TitleChanging;
+    public event EventHandler<StringEventArgs> TitleChanging;
 }

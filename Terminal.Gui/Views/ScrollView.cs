@@ -89,23 +89,23 @@ public class ScrollView : View
         AddCommand (Command.RightEnd, () => ScrollRight (_contentSize.Width));
 
         // Default keybindings for this view
-        KeyBindings.Add (KeyCode.CursorUp, Command.ScrollUp);
-        KeyBindings.Add (KeyCode.CursorDown, Command.ScrollDown);
-        KeyBindings.Add (KeyCode.CursorLeft, Command.ScrollLeft);
-        KeyBindings.Add (KeyCode.CursorRight, Command.ScrollRight);
+        KeyBindings.Add (Key.CursorUp, Command.ScrollUp);
+        KeyBindings.Add (Key.CursorDown, Command.ScrollDown);
+        KeyBindings.Add (Key.CursorLeft, Command.ScrollLeft);
+        KeyBindings.Add (Key.CursorRight, Command.ScrollRight);
 
-        KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
-        KeyBindings.Add ((KeyCode)'v' | KeyCode.AltMask, Command.PageUp);
+        KeyBindings.Add (Key.PageUp, Command.PageUp);
+        KeyBindings.Add (Key.V.WithAlt, Command.PageUp);
 
-        KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
-        KeyBindings.Add (KeyCode.V | KeyCode.CtrlMask, Command.PageDown);
+        KeyBindings.Add (Key.PageDown, Command.PageDown);
+        KeyBindings.Add (Key.V.WithCtrl, Command.PageDown);
 
-        KeyBindings.Add (KeyCode.PageUp | KeyCode.CtrlMask, Command.PageLeft);
-        KeyBindings.Add (KeyCode.PageDown | KeyCode.CtrlMask, Command.PageRight);
-        KeyBindings.Add (KeyCode.Home, Command.TopHome);
-        KeyBindings.Add (KeyCode.End, Command.BottomEnd);
-        KeyBindings.Add (KeyCode.Home | KeyCode.CtrlMask, Command.LeftHome);
-        KeyBindings.Add (KeyCode.End | KeyCode.CtrlMask, Command.RightEnd);
+        KeyBindings.Add (Key.PageUp.WithCtrl, Command.PageLeft);
+        KeyBindings.Add (Key.PageDown.WithCtrl, Command.PageRight);
+        KeyBindings.Add (Key.Home, Command.TopHome);
+        KeyBindings.Add (Key.End, Command.BottomEnd);
+        KeyBindings.Add (Key.Home.WithCtrl, Command.LeftHome);
+        KeyBindings.Add (Key.End.WithCtrl, Command.RightEnd);
 
         Initialized += (s, e) =>
                        {

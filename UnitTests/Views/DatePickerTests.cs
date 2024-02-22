@@ -58,11 +58,11 @@ public class DatePickerTests
         datePicker.FocusNext ();
 
         // Change month to December
-        Assert.True (datePicker.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (datePicker.NewKeyDownEvent (Key.Enter));
         Assert.Equal (12, datePicker.Date.Month);
 
         // Date should not change as next month button is disabled
-        Assert.False (datePicker.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.False (datePicker.NewKeyDownEvent (Key.Enter));
         Assert.Equal (12, datePicker.Date.Month);
     }
 
@@ -82,11 +82,11 @@ public class DatePickerTests
         datePicker.FocusNext ();
 
         // Change month to January 
-        Assert.True (datePicker.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (datePicker.NewKeyDownEvent (Key.Enter));
         Assert.Equal (1, datePicker.Date.Month);
 
         // Date should not change as previous month button is disabled
-        Assert.False (datePicker.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.False (datePicker.NewKeyDownEvent (Key.Enter));
         Assert.Equal (1, datePicker.Date.Month);
     }
 }

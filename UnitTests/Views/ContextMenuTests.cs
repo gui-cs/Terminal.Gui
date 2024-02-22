@@ -511,37 +511,7 @@ public class ContextMenuTests
         top.RequestStop ();
         Assert.False (ContextMenu.IsShow);
     }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void Key_Changing ()
-    {
-        var lbl = new Label { Text = "Original" };
-
-        var cm = new ContextMenu ();
-
-        lbl.KeyDown += (s, e) =>
-                       {
-                           if (e == cm.Key)
-                           {
-                               lbl.Text = "Replaced";
-                               e.Handled = true;
-                           }
-                       };
-
-        Toplevel top = Application.Top;
-        top.Add (lbl);
-        Application.Begin (top);
-
-        Assert.True (lbl.NewKeyDownEvent (cm.Key));
-        Assert.Equal ("Replaced", lbl.Text);
-
-        lbl.Text = "Original";
-        cm.Key = KeyCode.Space | KeyCode.CtrlMask;
-        Assert.True (lbl.NewKeyDownEvent (cm.Key));
-        Assert.Equal ("Replaced", lbl.Text);
-    }
-
+    
     [Fact]
     [AutoInitShutdown]
     public void Key_Open_And_Close_The_ContextMenu ()
@@ -550,9 +520,9 @@ public class ContextMenuTests
         Application.Top.Add (tf);
         Application.Begin (Application.Top);
 
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.F10 | KeyCode.ShiftMask)));
+        Assert.True (Application.OnKeyDown (ContextMenu.DefaultKey));
         Assert.True (tf.ContextMenu.MenuBar.IsMenuOpen);
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.F10 | KeyCode.ShiftMask)));
+        Assert.True (Application.OnKeyDown (ContextMenu.DefaultKey));
         Assert.Null (tf.ContextMenu.MenuBar);
     }
 
@@ -560,14 +530,14 @@ public class ContextMenuTests
     [AutoInitShutdown]
     public void KeyChanged_Event ()
     {
-        var oldKey = KeyCode.Null;
+        var oldKey = Key.Empty;
         var cm = new ContextMenu ();
 
-        cm.KeyChanged += (s, e) => oldKey = (KeyCode)e.OldKey;
+        cm.KeyChanged += (s, e) => oldKey = e.OldKey;
 
-        cm.Key = KeyCode.Space | KeyCode.CtrlMask;
-        Assert.Equal (KeyCode.Space | KeyCode.CtrlMask, cm.Key);
-        Assert.Equal (KeyCode.F10 | KeyCode.ShiftMask, oldKey);
+        cm.Key = Key.Space.WithCtrl;
+        Assert.Equal (Key.Space.WithCtrl, cm.Key);
+        Assert.Equal (ContextMenu.DefaultKey, oldKey);
     }
 
     [Fact]

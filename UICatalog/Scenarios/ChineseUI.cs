@@ -33,7 +33,7 @@ public class ChineseUI : Scenario
 
         var btn = new Button { X = 1, Y = 1, Text = "你" }; // v1: A
 
-        btn.Clicked += (s, e) =>
+        btn.Accept += (s, e) =>
                        {
                            int result = MessageBox.Query (
                                                           "Confirm",

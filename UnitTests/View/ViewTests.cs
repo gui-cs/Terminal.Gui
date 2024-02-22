@@ -1,7 +1,6 @@
-﻿using System.Text;
+﻿using System.ComponentModel;
+using System.Text;
 using Xunit.Abstractions;
-
-// Alias Console to MockConsole so we don't accidentally use Console
 
 namespace Terminal.Gui.ViewTests;
 
@@ -9,37 +8,6 @@ public class ViewTests
 {
     private readonly ITestOutputHelper _output;
     public ViewTests (ITestOutputHelper output) { _output = output; }
-
-    [Fact]
-    [TestRespondersDisposed]
-    public void Added_Removed ()
-    {
-        var v = new View { Frame = new Rect (0, 0, 10, 24) };
-        var t = new View ();
-
-        v.Added += (s, e) =>
-                   {
-                       Assert.Same (v.SuperView, e.Parent);
-                       Assert.Same (t, e.Parent);
-                       Assert.Same (v, e.Child);
-                   };
-
-        v.Removed += (s, e) =>
-                     {
-                         Assert.Same (t, e.Parent);
-                         Assert.Same (v, e.Child);
-                         Assert.True (v.SuperView == null);
-                     };
-
-        t.Add (v);
-        Assert.True (t.Subviews.Count == 1);
-
-        t.Remove (v);
-        Assert.True (t.Subviews.Count == 0);
-
-        t.Dispose ();
-        v.Dispose ();
-    }
 
     [Fact]
     [AutoInitShutdown]
@@ -541,43 +509,6 @@ At 0,0
 
     [Fact]
     [AutoInitShutdown]
-    public void GetTopSuperView_Test ()
-    {
-        var v1 = new View ();
-        var fv1 = new FrameView ();
-        fv1.Add (v1);
-        var tf1 = new TextField ();
-        var w1 = new Window ();
-        w1.Add (fv1, tf1);
-        var top1 = new Toplevel ();
-        top1.Add (w1);
-
-        var v2 = new View ();
-        var fv2 = new FrameView ();
-        fv2.Add (v2);
-        var tf2 = new TextField ();
-        var w2 = new Window ();
-        w2.Add (fv2, tf2);
-        var top2 = new Toplevel ();
-        top2.Add (w2);
-
-        Assert.Equal (top1, v1.GetTopSuperView ());
-        Assert.Equal (top2, v2.GetTopSuperView ());
-
-        v1.Dispose ();
-        fv1.Dispose ();
-        tf1.Dispose ();
-        w1.Dispose ();
-        top1.Dispose ();
-        v2.Dispose ();
-        fv2.Dispose ();
-        tf2.Dispose ();
-        w2.Dispose ();
-        top2.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
     public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Frame ()
     {
         var label = new Label { Text = "At 0,0" };
@@ -767,245 +698,6 @@ At 0,0
     }
 
     [Fact]
-    [TestRespondersDisposed]
-    public void Initialized_Event_Comparing_With_Added_Event ()
-    {
-        Application.Init (new FakeDriver ());
-
-        var top = new Toplevel { Id = "0" }; // Frame: 0, 0, 80, 25; Bounds: 0, 0, 80, 25
-
-        var winAddedToTop = new Window
-        {
-            Id = "t", Width = Dim.Fill (), Height = Dim.Fill ()
-        }; // Frame: 0, 0, 80, 25; Bounds: 0, 0, 78, 23
-
-        var v1AddedToWin = new View
-        {
-            Id = "v1", Width = Dim.Fill (), Height = Dim.Fill ()
-        }; // Frame: 1, 1, 78, 23 (because Windows has a border)
-
-        var v2AddedToWin = new View
-        {
-            Id = "v2", Width = Dim.Fill (), Height = Dim.Fill ()
-        }; // Frame: 1, 1, 78, 23 (because Windows has a border)
-
-        var svAddedTov1 = new View
-        {
-            Id = "sv1", Width = Dim.Fill (), Height = Dim.Fill ()
-        }; // Frame: 1, 1, 78, 23 (same as it's superview v1AddedToWin)
-
-        int tc = 0, wc = 0, v1c = 0, v2c = 0, sv1c = 0;
-
-        winAddedToTop.Added += (s, e) =>
-                               {
-                                   Assert.Equal (e.Parent.Frame.Width, winAddedToTop.Frame.Width);
-                                   Assert.Equal (e.Parent.Frame.Height, winAddedToTop.Frame.Height);
-                               };
-
-        v1AddedToWin.Added += (s, e) =>
-                              {
-                                  Assert.Equal (e.Parent.Frame.Width, v1AddedToWin.Frame.Width);
-                                  Assert.Equal (e.Parent.Frame.Height, v1AddedToWin.Frame.Height);
-                              };
-
-        v2AddedToWin.Added += (s, e) =>
-                              {
-                                  Assert.Equal (e.Parent.Frame.Width, v2AddedToWin.Frame.Width);
-                                  Assert.Equal (e.Parent.Frame.Height, v2AddedToWin.Frame.Height);
-                              };
-
-        svAddedTov1.Added += (s, e) =>
-                             {
-                                 Assert.Equal (e.Parent.Frame.Width, svAddedTov1.Frame.Width);
-                                 Assert.Equal (e.Parent.Frame.Height, svAddedTov1.Frame.Height);
-                             };
-
-        top.Initialized += (s, e) =>
-                           {
-                               tc++;
-                               Assert.Equal (1, tc);
-                               Assert.Equal (1, wc);
-                               Assert.Equal (1, v1c);
-                               Assert.Equal (1, v2c);
-                               Assert.Equal (1, sv1c);
-
-                               Assert.True (top.CanFocus);
-                               Assert.True (winAddedToTop.CanFocus);
-                               Assert.False (v1AddedToWin.CanFocus);
-                               Assert.False (v2AddedToWin.CanFocus);
-                               Assert.False (svAddedTov1.CanFocus);
-
-                               Application.Refresh ();
-                           };
-
-        winAddedToTop.Initialized += (s, e) =>
-                                     {
-                                         wc++;
-                                         Assert.Equal (top.Bounds.Width, winAddedToTop.Frame.Width);
-                                         Assert.Equal (top.Bounds.Height, winAddedToTop.Frame.Height);
-                                     };
-
-        v1AddedToWin.Initialized += (s, e) =>
-                                    {
-                                        v1c++;
-
-                                        // Top.Frame: 0, 0, 80, 25; Top.Bounds: 0, 0, 80, 25
-                                        // BUGBUG: This is wrong, it should be 78, 23. This test has always been broken.
-                                        // in no way should the v1AddedToWin.Frame be the same as the Top.Frame/Bounds
-                                        // as it is a subview of winAddedToTop, which has a border!
-                                        //Assert.Equal (top.Bounds.Width,  v1AddedToWin.Frame.Width);
-                                        //Assert.Equal (top.Bounds.Height, v1AddedToWin.Frame.Height);
-                                    };
-
-        v2AddedToWin.Initialized += (s, e) =>
-                                    {
-                                        v2c++;
-
-                                        // Top.Frame: 0, 0, 80, 25; Top.Bounds: 0, 0, 80, 25
-                                        // BUGBUG: This is wrong, it should be 78, 23. This test has always been broken.
-                                        // in no way should the v2AddedToWin.Frame be the same as the Top.Frame/Bounds
-                                        // as it is a subview of winAddedToTop, which has a border!
-                                        //Assert.Equal (top.Bounds.Width,  v2AddedToWin.Frame.Width);
-                                        //Assert.Equal (top.Bounds.Height, v2AddedToWin.Frame.Height);
-                                    };
-
-        svAddedTov1.Initialized += (s, e) =>
-                                   {
-                                       sv1c++;
-
-                                       // Top.Frame: 0, 0, 80, 25; Top.Bounds: 0, 0, 80, 25
-                                       // BUGBUG: This is wrong, it should be 78, 23. This test has always been broken.
-                                       // in no way should the svAddedTov1.Frame be the same as the Top.Frame/Bounds
-                                       // because sv1AddedTov1 is a subview of v1AddedToWin, which is a subview of
-                                       // winAddedToTop, which has a border!
-                                       //Assert.Equal (top.Bounds.Width,  svAddedTov1.Frame.Width);
-                                       //Assert.Equal (top.Bounds.Height, svAddedTov1.Frame.Height);
-                                       Assert.False (svAddedTov1.CanFocus);
-                                       Assert.Throws<InvalidOperationException> (() => svAddedTov1.CanFocus = true);
-                                       Assert.False (svAddedTov1.CanFocus);
-                                   };
-
-        v1AddedToWin.Add (svAddedTov1);
-        winAddedToTop.Add (v1AddedToWin, v2AddedToWin);
-        top.Add (winAddedToTop);
-
-        Application.Iteration += (s, a) =>
-                                 {
-                                     Application.Refresh ();
-                                     top.Running = false;
-                                 };
-
-        Application.Run (top);
-        Application.Shutdown ();
-
-        Assert.Equal (1, tc);
-        Assert.Equal (1, wc);
-        Assert.Equal (1, v1c);
-        Assert.Equal (1, v2c);
-        Assert.Equal (1, sv1c);
-
-        Assert.True (top.CanFocus);
-        Assert.True (winAddedToTop.CanFocus);
-        Assert.False (v1AddedToWin.CanFocus);
-        Assert.False (v2AddedToWin.CanFocus);
-        Assert.False (svAddedTov1.CanFocus);
-
-        v1AddedToWin.CanFocus = true;
-        Assert.False (svAddedTov1.CanFocus); // False because sv1 was disposed and it isn't a subview of v1.
-    }
-
-    [Fact]
-    [TestRespondersDisposed]
-    public void Initialized_Event_Will_Be_Invoked_When_Added_Dynamically ()
-    {
-        Application.Init (new FakeDriver ());
-
-        var t = new Toplevel { Id = "0" };
-
-        var w = new Window { Id = "t", Width = Dim.Fill (), Height = Dim.Fill () };
-        var v1 = new View { Id = "v1", Width = Dim.Fill (), Height = Dim.Fill () };
-        var v2 = new View { Id = "v2", Width = Dim.Fill (), Height = Dim.Fill () };
-
-        int tc = 0, wc = 0, v1c = 0, v2c = 0, sv1c = 0;
-
-        t.Initialized += (s, e) =>
-                         {
-                             tc++;
-                             Assert.Equal (1, tc);
-                             Assert.Equal (1, wc);
-                             Assert.Equal (1, v1c);
-                             Assert.Equal (1, v2c);
-                             Assert.Equal (0, sv1c); // Added after t in the Application.Iteration.
-
-                             Assert.True (t.CanFocus);
-                             Assert.True (w.CanFocus);
-                             Assert.False (v1.CanFocus);
-                             Assert.False (v2.CanFocus);
-
-                             Application.Refresh ();
-                         };
-
-        w.Initialized += (s, e) =>
-                         {
-                             wc++;
-                             Assert.Equal (t.Bounds.Width, w.Frame.Width);
-                             Assert.Equal (t.Bounds.Height, w.Frame.Height);
-                         };
-
-        v1.Initialized += (s, e) =>
-                          {
-                              v1c++;
-
-                              //Assert.Equal (t.Bounds.Width, v1.Frame.Width);
-                              //Assert.Equal (t.Bounds.Height, v1.Frame.Height);
-                          };
-
-        v2.Initialized += (s, e) =>
-                          {
-                              v2c++;
-
-                              //Assert.Equal (t.Bounds.Width,  v2.Frame.Width);
-                              //Assert.Equal (t.Bounds.Height, v2.Frame.Height);
-                          };
-        w.Add (v1, v2);
-        t.Add (w);
-
-        Application.Iteration += (s, a) =>
-                                 {
-                                     var sv1 = new View { Id = "sv1", Width = Dim.Fill (), Height = Dim.Fill () };
-
-                                     sv1.Initialized += (s, e) =>
-                                                        {
-                                                            sv1c++;
-                                                            Assert.NotEqual (t.Frame.Width, sv1.Frame.Width);
-                                                            Assert.NotEqual (t.Frame.Height, sv1.Frame.Height);
-                                                            Assert.False (sv1.CanFocus);
-                                                            Assert.Throws<InvalidOperationException> (() => sv1.CanFocus = true);
-                                                            Assert.False (sv1.CanFocus);
-                                                        };
-
-                                     v1.Add (sv1);
-
-                                     Application.Refresh ();
-                                     t.Running = false;
-                                 };
-
-        Application.Run (t);
-        Application.Shutdown ();
-
-        Assert.Equal (1, tc);
-        Assert.Equal (1, wc);
-        Assert.Equal (1, v1c);
-        Assert.Equal (1, v2c);
-        Assert.Equal (1, sv1c);
-
-        Assert.True (t.CanFocus);
-        Assert.True (w.CanFocus);
-        Assert.False (v1.CanFocus);
-        Assert.False (v2.CanFocus);
-    }
-
-    [Fact]
     public void Internal_Tests ()
     {
         var rect = new Rect (1, 1, 10, 1);
@@ -1013,67 +705,18 @@ At 0,0
     }
 
     [Fact]
-    [TestRespondersDisposed]
-    public void IsAdded_Added_Removed ()
+    [SetupFakeDriver]
+    public void SetText_RendersCorrectly ()
     {
-        var top = new Toplevel ();
-        var view = new View ();
-        Assert.False (view.IsAdded);
-        top.Add (view);
-        Assert.True (view.IsAdded);
-        top.Remove (view);
-        Assert.False (view.IsAdded);
+        View view;
+        var text = "test";
 
-        top.Dispose ();
-        view.Dispose ();
-    }
+        view = new Label { Text = text };
+        view.BeginInit ();
+        view.EndInit ();
+        view.Draw ();
 
-    [Theory]
-    [TestRespondersDisposed]
-    [InlineData (1)]
-    [InlineData (2)]
-    [InlineData (3)]
-    public void LabelChangeText_RendersCorrectly_Constructors (int choice)
-    {
-        var driver = new FakeDriver ();
-        Application.Init (driver);
-
-        try
-        {
-            // Create a label with a short text 
-            Label lbl;
-            var text = "test";
-
-            if (choice == 1)
-            {
-                // An object initializer should call the default constructor.
-                lbl = new Label { Text = text };
-            }
-            else if (choice == 2)
-            {
-                // Calling the default constructor followed by the object initializer.
-                lbl = new Label { Text = text };
-            }
-            else
-            {
-                // Calling the Text constructor.
-                lbl = new Label { Text = text };
-            }
-
-            Application.Top.Add (lbl);
-            Application.Begin (Application.Top);
-
-            // should have the initial text
-            Assert.Equal ((Rune)'t', driver.Contents [0, 0].Rune);
-            Assert.Equal ((Rune)'e', driver.Contents [0, 1].Rune);
-            Assert.Equal ((Rune)'s', driver.Contents [0, 2].Rune);
-            Assert.Equal ((Rune)'t', driver.Contents [0, 3].Rune);
-            Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-        }
-        finally
-        {
-            Application.Shutdown ();
-        }
+        TestHelpers.AssertDriverContentsWithFrameAre ( text, _output);
     }
 
     [Fact]
@@ -1166,11 +809,11 @@ At 0,0
         // BUGBUG: IsInitialized must be true to process calculation
         r.BeginInit ();
         r.EndInit ();
-    #if DEBUG
+#if DEBUG
         Assert.Equal ("View(Vertical View)(0,0,1,13)", r.ToString ());
-    #else
+#else
         Assert.Equal ("View()(0,0,1,13)", r.ToString ());
-    #endif
+#endif
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
         Assert.Equal (new Rect (0, 0, 1, 13), r.Bounds);
@@ -1178,11 +821,11 @@ At 0,0
         Assert.Null (r.Focused);
         Assert.Null (r.ColorScheme);
         Assert.False (r.IsCurrentTop);
-    #if DEBUG
+#if DEBUG
         Assert.Equal ("Vertical View", r.Id);
-    #else
+#else
         Assert.Equal (string.Empty, r.Id);
-    #endif
+#endif
         Assert.Empty (r.Subviews);
         Assert.False (r.WantContinuousButtonPressed);
         Assert.False (r.WantMousePositionReports);
@@ -1512,5 +1155,66 @@ At 0,0
 
             return true;
         }
+    }
+
+    // OnAccept/Accept tests
+    [Fact]
+    public void OnAccept_Fires_Accept ()
+    {
+        var view = new View ();
+        var accepted = false;
+
+        view.Accept += ViewOnAccept;
+
+        view.OnAccept ();
+        Assert.True (accepted);
+
+        return;
+        void ViewOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void Accept_Cancel_Event_OnAccept_Returns_True ()
+    {
+        var view = new View ();
+        var acceptInvoked = false;
+
+        view.Accept += ViewOnAccept;
+
+        var ret = view.OnAccept ();
+        Assert.True (ret);
+        Assert.True (acceptInvoked);
+
+        return;
+        void ViewOnAccept (object sender, CancelEventArgs e) { 
+            acceptInvoked = true;
+            e.Cancel = true;
+        }
+    }
+
+    [Fact]
+    public void Accept_Command_Invokes_Accept_Event ()
+    {
+        var view = new View ();
+        var accepted = false;
+
+        view.Accept += ViewOnAccept;
+
+        view.InvokeCommand (Command.Accept);
+        Assert.True (accepted);
+
+        return;
+        void ViewOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void HotKey_Command_SetsFocus ()
+    {
+        var view = new View ();
+
+        view.CanFocus = true;
+        Assert.False (view.HasFocus);
+        view.InvokeCommand (Command.HotKey);
+        Assert.True (view.HasFocus);
     }
 }

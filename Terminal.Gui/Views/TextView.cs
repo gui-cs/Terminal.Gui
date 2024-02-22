@@ -2412,113 +2412,103 @@ public class TextView : View
                    );
 
         // Default keybindings for this view
-        KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
-        KeyBindings.Add (KeyCode.V | KeyCode.CtrlMask, Command.PageDown);
+        KeyBindings.Add (Key.PageDown, Command.PageDown);
+        KeyBindings.Add (Key.V.WithCtrl, Command.PageDown);
 
-        KeyBindings.Add (KeyCode.PageDown | KeyCode.ShiftMask, Command.PageDownExtend);
+        KeyBindings.Add (Key.PageDown.WithShift, Command.PageDownExtend);
 
-        KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
-        KeyBindings.Add ('V' + KeyCode.AltMask, Command.PageUp);
+        KeyBindings.Add (Key.PageUp, Command.PageUp);
+        KeyBindings.Add (Key.V.WithAlt, Command.PageUp);
 
-        KeyBindings.Add (KeyCode.PageUp | KeyCode.ShiftMask, Command.PageUpExtend);
+        KeyBindings.Add (Key.PageUp.WithShift, Command.PageUpExtend);
 
-        KeyBindings.Add (KeyCode.N | KeyCode.CtrlMask, Command.LineDown);
-        KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
+        KeyBindings.Add (Key.N.WithCtrl, Command.LineDown);
+        KeyBindings.Add (Key.CursorDown, Command.LineDown);
 
-        KeyBindings.Add (KeyCode.CursorDown | KeyCode.ShiftMask, Command.LineDownExtend);
+        KeyBindings.Add (Key.CursorDown.WithShift, Command.LineDownExtend);
 
-        KeyBindings.Add (KeyCode.P | KeyCode.CtrlMask, Command.LineUp);
-        KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
+        KeyBindings.Add (Key.P.WithCtrl, Command.LineUp);
+        KeyBindings.Add (Key.CursorUp, Command.LineUp);
 
-        KeyBindings.Add (KeyCode.CursorUp | KeyCode.ShiftMask, Command.LineUpExtend);
+        KeyBindings.Add (Key.CursorUp.WithShift, Command.LineUpExtend);
 
-        KeyBindings.Add (KeyCode.F | KeyCode.CtrlMask, Command.Right);
-        KeyBindings.Add (KeyCode.CursorRight, Command.Right);
+        KeyBindings.Add (Key.F.WithCtrl, Command.Right);
+        KeyBindings.Add (Key.CursorRight, Command.Right);
 
-        KeyBindings.Add (KeyCode.CursorRight | KeyCode.ShiftMask, Command.RightExtend);
+        KeyBindings.Add (Key.CursorRight.WithShift, Command.RightExtend);
 
-        KeyBindings.Add (KeyCode.B | KeyCode.CtrlMask, Command.Left);
-        KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
+        KeyBindings.Add (Key.B.WithCtrl, Command.Left);
+        KeyBindings.Add (Key.CursorLeft, Command.Left);
 
-        KeyBindings.Add (KeyCode.CursorLeft | KeyCode.ShiftMask, Command.LeftExtend);
+        KeyBindings.Add (Key.CursorLeft.WithShift, Command.LeftExtend);
 
-        KeyBindings.Add (KeyCode.Backspace, Command.DeleteCharLeft);
+        KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
 
-        KeyBindings.Add (KeyCode.Home, Command.StartOfLine);
-        KeyBindings.Add (KeyCode.A | KeyCode.CtrlMask, Command.StartOfLine);
+        KeyBindings.Add (Key.Home, Command.StartOfLine);
+        KeyBindings.Add (Key.A.WithCtrl, Command.StartOfLine);
 
-        KeyBindings.Add (KeyCode.Home | KeyCode.ShiftMask, Command.StartOfLineExtend);
+        KeyBindings.Add (Key.Home.WithShift, Command.StartOfLineExtend);
 
-        KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
-        KeyBindings.Add (KeyCode.D | KeyCode.CtrlMask, Command.DeleteCharRight);
+        KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
+        KeyBindings.Add (Key.D.WithCtrl, Command.DeleteCharRight);
 
-        KeyBindings.Add (KeyCode.End, Command.EndOfLine);
-        KeyBindings.Add (KeyCode.E | KeyCode.CtrlMask, Command.EndOfLine);
+        KeyBindings.Add (Key.End, Command.EndOfLine);
+        KeyBindings.Add (Key.E.WithCtrl, Command.EndOfLine);
 
-        KeyBindings.Add (KeyCode.End | KeyCode.ShiftMask, Command.EndOfLineExtend);
+        KeyBindings.Add (Key.End.WithShift, Command.EndOfLineExtend);
 
-        KeyBindings.Add (KeyCode.K | KeyCode.CtrlMask, Command.CutToEndLine); // kill-to-end
+        KeyBindings.Add (Key.K.WithCtrl, Command.CutToEndLine); // kill-to-end
 
-        KeyBindings.Add (
-                         KeyCode.Delete | KeyCode.CtrlMask | KeyCode.ShiftMask,
-                         Command.CutToEndLine
-                        ); // kill-to-end
+        KeyBindings.Add (Key.Delete.WithCtrl.WithShift, Command.CutToEndLine); // kill-to-end
 
-        KeyBindings.Add (KeyCode.K | KeyCode.AltMask, Command.CutToStartLine); // kill-to-start
+        KeyBindings.Add (Key.K.WithAlt, Command.CutToStartLine); // kill-to-start
 
-        KeyBindings.Add (
-                         KeyCode.Backspace | KeyCode.CtrlMask | KeyCode.ShiftMask,
-                         Command.CutToStartLine
-                        ); // kill-to-start
+        KeyBindings.Add (Key.Backspace.WithCtrl.WithShift, Command.CutToStartLine); // kill-to-start
 
-        KeyBindings.Add (KeyCode.Y | KeyCode.CtrlMask, Command.Paste); // Control-y, yank
-        KeyBindings.Add (KeyCode.Space | KeyCode.CtrlMask, Command.ToggleExtend);
+        KeyBindings.Add (Key.Y.WithCtrl, Command.Paste); // Control-y, yank
+        KeyBindings.Add (Key.Space.WithCtrl, Command.ToggleExtend);
 
-        KeyBindings.Add ('C' + KeyCode.AltMask, Command.Copy);
-        KeyBindings.Add (KeyCode.C | KeyCode.CtrlMask, Command.Copy);
+        KeyBindings.Add (Key.C.WithAlt, Command.Copy);
+        KeyBindings.Add (Key.C.WithCtrl, Command.Copy);
 
-        KeyBindings.Add ('W' + KeyCode.AltMask, Command.Cut);
-        KeyBindings.Add (KeyCode.W | KeyCode.CtrlMask, Command.Cut);
-        KeyBindings.Add (KeyCode.X | KeyCode.CtrlMask, Command.Cut);
+        KeyBindings.Add (Key.W.WithAlt, Command.Cut);
+        KeyBindings.Add (Key.W.WithCtrl, Command.Cut);
+        KeyBindings.Add (Key.X.WithCtrl, Command.Cut);
 
-        KeyBindings.Add (KeyCode.CursorLeft | KeyCode.CtrlMask, Command.WordLeft);
-        KeyBindings.Add ('B' + KeyCode.AltMask, Command.WordLeft);
+        KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.WordLeft);
+        KeyBindings.Add (Key.B.WithAlt, Command.WordLeft);
 
-        KeyBindings.Add (KeyCode.CursorLeft | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.WordLeftExtend);
+        KeyBindings.Add (Key.CursorLeft.WithCtrl.WithShift, Command.WordLeftExtend);
 
-        KeyBindings.Add (KeyCode.CursorRight | KeyCode.CtrlMask, Command.WordRight);
-        KeyBindings.Add ('F' + KeyCode.AltMask, Command.WordRight);
+        KeyBindings.Add (Key.CursorRight.WithCtrl, Command.WordRight);
+        KeyBindings.Add (Key.F.WithAlt, Command.WordRight);
 
-        KeyBindings.Add (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.WordRightExtend);
-        KeyBindings.Add (KeyCode.Delete | KeyCode.CtrlMask, Command.KillWordForwards); // kill-word-forwards
-
-        KeyBindings.Add (
-                         KeyCode.Backspace | KeyCode.CtrlMask,
-                         Command.KillWordBackwards
-                        ); // kill-word-backwards
+        KeyBindings.Add (Key.CursorRight.WithCtrl.WithShift, Command.WordRightExtend);
+        KeyBindings.Add (Key.Delete.WithCtrl, Command.KillWordForwards); // kill-word-forwards
+        KeyBindings.Add (Key.Backspace.WithCtrl, Command.KillWordBackwards); // kill-word-backwards
 
         // BUGBUG: If AllowsReturn is false, Key.Enter should not be bound (so that Toplevel can cause Command.Accept).
-        KeyBindings.Add (KeyCode.Enter, Command.NewLine);
-        KeyBindings.Add (KeyCode.End | KeyCode.CtrlMask, Command.BottomEnd);
-        KeyBindings.Add (KeyCode.End | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.BottomEndExtend);
-        KeyBindings.Add (KeyCode.Home | KeyCode.CtrlMask, Command.TopHome);
-        KeyBindings.Add (KeyCode.Home | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.TopHomeExtend);
-        KeyBindings.Add (KeyCode.T | KeyCode.CtrlMask, Command.SelectAll);
-        KeyBindings.Add (KeyCode.Insert, Command.ToggleOverwrite);
-        KeyBindings.Add (KeyCode.Tab, Command.Tab);
-        KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask, Command.BackTab);
+        KeyBindings.Add (Key.Enter, Command.NewLine);
+        KeyBindings.Add (Key.End.WithCtrl, Command.BottomEnd);
+        KeyBindings.Add (Key.End.WithCtrl.WithShift, Command.BottomEndExtend);
+        KeyBindings.Add (Key.Home.WithCtrl, Command.TopHome);
+        KeyBindings.Add (Key.Home.WithCtrl.WithShift, Command.TopHomeExtend);
+        KeyBindings.Add (Key.T.WithCtrl, Command.SelectAll);
+        KeyBindings.Add (Key.InsertChar, Command.ToggleOverwrite);
+        KeyBindings.Add (Key.Tab, Command.Tab);
+        KeyBindings.Add (Key.Tab.WithShift, Command.BackTab);
 
-        KeyBindings.Add (KeyCode.Tab | KeyCode.CtrlMask, Command.NextView);
-        KeyBindings.Add ((KeyCode)Application.AlternateForwardKey, Command.NextView);
+        KeyBindings.Add (Key.Tab.WithCtrl, Command.NextView);
+        KeyBindings.Add (Application.AlternateForwardKey, Command.NextView);
 
-        KeyBindings.Add (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.PreviousView);
-        KeyBindings.Add ((KeyCode)Application.AlternateBackwardKey, Command.PreviousView);
+        KeyBindings.Add (Key.Tab.WithCtrl.WithShift, Command.PreviousView);
+        KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousView);
 
-        KeyBindings.Add (KeyCode.Z | KeyCode.CtrlMask, Command.Undo);
-        KeyBindings.Add (KeyCode.R | KeyCode.CtrlMask, Command.Redo);
+        KeyBindings.Add (Key.Z.WithCtrl, Command.Undo);
+        KeyBindings.Add (Key.R.WithCtrl, Command.Redo);
 
-        KeyBindings.Add (KeyCode.G | KeyCode.CtrlMask, Command.DeleteAll);
-        KeyBindings.Add (KeyCode.D | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.DeleteAll);
+        KeyBindings.Add (Key.G.WithCtrl, Command.DeleteAll);
+        KeyBindings.Add (Key.D.WithCtrl.WithShift, Command.DeleteAll);
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
@@ -2865,7 +2855,7 @@ public class TextView : View
 
     /// <summary>Sets or gets the text in the <see cref="TextView"/>.</summary>
     /// <remarks>
-    ///     The <see cref="TextChanged"/> event is fired whenever this property is set. Note, however, that Text is not
+    ///     The <see cref="View.TextChanged"/> event is fired whenever this property is set. Note, however, that Text is not
     ///     set by <see cref="TextView"/> as the user types.
     /// </remarks>
     public override string Text
@@ -2881,6 +2871,7 @@ public class TextView : View
         }
         set
         {
+            var old = Text;
             ResetPosition ();
             _model.LoadString (value);
 
@@ -2890,7 +2881,7 @@ public class TextView : View
                 _model = _wrapManager.WrapModel (Bounds.Width, out _, out _, out _, out _);
             }
 
-            TextChanged?.Invoke (this, EventArgs.Empty);
+            OnTextChanged (old,Text);
             SetNeedsDisplay ();
 
             _historyText.Clear (Text);
@@ -2963,7 +2954,7 @@ public class TextView : View
 
     /// <summary>Raised when the contents of the <see cref="TextView"/> are changed.</summary>
     /// <remarks>
-    ///     Unlike the <see cref="TextChanged"/> event, this event is raised whenever the user types or otherwise changes
+    ///     Unlike the <see cref="View.TextChanged"/> event, this event is raised whenever the user types or otherwise changes
     ///     the contents of the <see cref="TextView"/>.
     /// </remarks>
     public event EventHandler<ContentsChangedEventArgs>? ContentsChanged;
@@ -3725,15 +3716,14 @@ public class TextView : View
     }
 
     /// <inheritdoc/>
-    public override bool OnKeyUp (Key a)
+    public override bool OnKeyUp (Key key)
     {
-        switch (a.KeyCode)
+        if (key == Key.Space.WithCtrl)
         {
-            case KeyCode.Space | KeyCode.CtrlMask:
-                return true;
+            return true;
         }
 
-        return base.OnKeyUp (a);
+        return base.OnKeyUp (key);
     }
 
     /// <inheritdoc/>
@@ -3995,12 +3985,12 @@ public class TextView : View
         SetNeedsDisplay ();
     }
 
-    /// <summary>Raised when the <see cref="Text"/> property of the <see cref="TextView"/> changes.</summary>
-    /// <remarks>
-    ///     The <see cref="Text"/> property of <see cref="TextView"/> only changes when it is explicitly set, not as the
-    ///     user types. To be notified as the user changes the contents of the TextView see <see cref="IsDirty"/>.
-    /// </remarks>
-    public event EventHandler? TextChanged;
+    ///// <summary>Raised when the <see cref="Text"/> property of the <see cref="TextView"/> changes.</summary>
+    ///// <remarks>
+    /////     The <see cref="Text"/> property of <see cref="TextView"/> only changes when it is explicitly set, not as the
+    /////     user types. To be notified as the user changes the contents of the TextView see <see cref="IsDirty"/>.
+    ///// </remarks>
+    //public event EventHandler? TextChanged;
 
     /// <summary>Undoes the latest changes.</summary>
     public void Undo ()
@@ -4382,7 +4372,7 @@ public class TextView : View
         DoNeededAction ();
     }
 
-    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey); }
+    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey, e.NewKey); }
 
     private bool DeleteTextBackwards ()
     {
@@ -6489,8 +6479,8 @@ public class TextView : View
         _selectionStartRow = CurrentRow;
     }
 
-    private void Top_AlternateBackwardKeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey); }
-    private void Top_AlternateForwardKeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey); }
+    private void Top_AlternateBackwardKeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey, e.NewKey); }
+    private void Top_AlternateForwardKeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey, e.NewKey); }
 
     // Tries to snap the cursor to the tracking column
     private void TrackColumn ()

@@ -23,22 +23,22 @@ public class ColorPickerTests
         var colorPicker = new ColorPicker ();
         Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
 
-        Assert.True (colorPicker.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+        Assert.True (colorPicker.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (ColorName.Blue, colorPicker.SelectedColor);
 
-        Assert.True (colorPicker.NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (colorPicker.NewKeyDownEvent (Key.CursorDown));
         Assert.Equal (ColorName.BrightBlue, colorPicker.SelectedColor);
 
-        Assert.True (colorPicker.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
+        Assert.True (colorPicker.NewKeyDownEvent (Key.CursorLeft));
         Assert.Equal (ColorName.DarkGray, colorPicker.SelectedColor);
 
-        Assert.True (colorPicker.NewKeyDownEvent (new Key (KeyCode.CursorUp)));
+        Assert.True (colorPicker.NewKeyDownEvent (Key.CursorUp));
         Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
 
-        Assert.True (colorPicker.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
+        Assert.True (colorPicker.NewKeyDownEvent (Key.CursorLeft));
         Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
 
-        Assert.True (colorPicker.NewKeyDownEvent (new Key (KeyCode.CursorUp)));
+        Assert.True (colorPicker.NewKeyDownEvent (Key.CursorUp));
         Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
     }
 

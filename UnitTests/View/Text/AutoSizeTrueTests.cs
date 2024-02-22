@@ -610,11 +610,11 @@ public class AutoSizeTrueTests
                                  {
                                      while (count < 21)
                                      {
-                                         field.NewKeyDownEvent (new Key (KeyCode.Enter));
+                                         field.NewKeyDownEvent (Key.Enter);
 
                                          if (count == 20)
                                          {
-                                             field.NewKeyDownEvent (new Key (KeyCode.Enter));
+                                             field.NewKeyDownEvent (Key.Enter);
 
                                              break;
                                          }
@@ -714,11 +714,11 @@ public class AutoSizeTrueTests
                                  {
                                      while (count > -1)
                                      {
-                                         field.NewKeyDownEvent (new Key (KeyCode.Enter));
+                                         field.NewKeyDownEvent (Key.Enter);
 
                                          if (count == 0)
                                          {
-                                             field.NewKeyDownEvent (new Key (KeyCode.Enter));
+                                             field.NewKeyDownEvent (Key.Enter);
 
                                              break;
                                          }
@@ -2114,7 +2114,7 @@ Y
 
         var horizontalView = new View
         {
-            Id = "horizontalView", AutoSize = true, HotKeySpecifier = (Rune)'_', Text = text
+            Id = "horizontalView", AutoSize = true, Text = text
         };
 
         var verticalView = new View
@@ -2122,7 +2122,6 @@ Y
             Id = "verticalView",
             Y = 3,
             AutoSize = true,
-            HotKeySpecifier = (Rune)'_',
             Text = text,
             TextDirection = TextDirection.TopBottom_LeftRight
         };
@@ -2136,27 +2135,17 @@ Y
         Assert.True (verticalView.AutoSize);
         Assert.Equal (new Size (text.GetColumns (), 1), horizontalView.TextFormatter.Size);
         Assert.Equal (new Size (2, 9), verticalView.TextFormatter.Size);
-        Assert.Equal (new Rect (0, 0, 9, 1), horizontalView.Frame);
-        Assert.Equal ("Absolute(0)", horizontalView.X.ToString ());
-        Assert.Equal ("Absolute(0)", horizontalView.Y.ToString ());
-
-        // BUGBUG - v2 - With v1 AutoSize = true Width/Height should always grow or keep initial value, 
-
-        Assert.Equal ("Absolute(9)", horizontalView.Width.ToString ());
-        Assert.Equal ("Absolute(1)", horizontalView.Height.ToString ());
-        Assert.Equal (new Rect (0, 3, 9, 8), verticalView.Frame);
-        Assert.Equal ("Absolute(0)", verticalView.X.ToString ());
-        Assert.Equal ("Absolute(3)", verticalView.Y.ToString ());
-        Assert.Equal ("Absolute(9)", verticalView.Width.ToString ());
-        Assert.Equal ("Absolute(8)", verticalView.Height.ToString ());
+        Assert.Equal (new Rect (0, 0, 10, 1), horizontalView.Frame);
+        Assert.Equal (new Rect (0, 3, 10, 9), verticalView.Frame);
 
         var expected = @"
 ┌────────────────────┐
-│Finish 終           │
+│Fi_nish 終          │
 │                    │
 │                    │
 │F                   │
 │i                   │
+│_                   │
 │n                   │
 │i                   │
 │s                   │
@@ -2171,12 +2160,10 @@ Y
 │                    │
 │                    │
 │                    │
-│                    │
 └────────────────────┘
 ";
 
         Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 22, 22), pos);
 
         verticalView.Text = "最初_の行二行目";
         Application.Top.Draw ();
@@ -2184,19 +2171,16 @@ Y
         Assert.True (verticalView.AutoSize);
 
         // height was initialized with 8 and can only grow or keep initial value
-        Assert.Equal (new Rect (0, 3, 9, 8), verticalView.Frame);
-        Assert.Equal ("Absolute(0)", verticalView.X.ToString ());
-        Assert.Equal ("Absolute(3)", verticalView.Y.ToString ());
-        Assert.Equal ("Absolute(9)", verticalView.Width.ToString ());
-        Assert.Equal ("Absolute(8)", verticalView.Height.ToString ());
+        Assert.Equal (new Rect (0, 3, 10, 9), verticalView.Frame);
 
         expected = @"
 ┌────────────────────┐
-│Finish 終           │
+│Fi_nish 終          │
 │                    │
 │                    │
 │最                  │
 │初                  │
+│_                   │
 │の                  │
 │行                  │
 │二                  │
@@ -2211,12 +2195,10 @@ Y
 │                    │
 │                    │
 │                    │
-│                    │
 └────────────────────┘
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 22, 22), pos);
         Application.End (rs);
     }
 
@@ -2684,15 +2666,18 @@ Y
         var text = "Say Hello 你";
 
         // Frame: 0, 0, 12, 1
-        var horizontalView = new View { AutoSize = true, HotKeySpecifier = (Rune)'_' };
+        var horizontalView = new View { AutoSize = true };
+        horizontalView.TextFormatter.HotKeySpecifier = (Rune)'_';
         horizontalView.Text = text;
 
         // Frame: 0, 0, 1, 12
         var verticalView = new View
         {
-            AutoSize = true, HotKeySpecifier = (Rune)'_', TextDirection = TextDirection.TopBottom_LeftRight
+            AutoSize = true, TextDirection = TextDirection.TopBottom_LeftRight
         };
         verticalView.Text = text;
+        verticalView.TextFormatter.HotKeySpecifier = (Rune)'_';
+
 
         Application.Top.Add (horizontalView, verticalView);
         Application.Begin (Application.Top);
@@ -2805,69 +2790,6 @@ Y
         Assert.Equal ("Absolute(2)", viewTopBottom_LeftRight.Width.ToString ());
         Assert.Equal ("Absolute(25)", viewTopBottom_LeftRight.Height.ToString ());
         Application.End (rs);
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void Test_Label_Full_Border ()
-    {
-        var label = new Label { Text = "Test", /*Width = 6, Height = 3, */BorderStyle = LineStyle.Single };
-        Application.Top.Add (label);
-        Application.Begin (Application.Top);
-
-        Assert.Equal (new Rect (0, 0, 6, 3), label.Frame);
-        Assert.Equal (new Rect (0, 0, 4, 1), label.Bounds);
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌────┐
-│Test│
-└────┘",
-                                                      _output
-                                                     );
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void Test_Label_With_Top_Margin_Without_Top_Border ()
-    {
-        var label = new Label { Text = "Test", /*Width = 6, Height = 3,*/ BorderStyle = LineStyle.Single };
-        label.Margin.Thickness = new Thickness (0, 1, 0, 0);
-        label.Border.Thickness = new Thickness (1, 0, 1, 1);
-        Application.Top.Add (label);
-        Application.Begin (Application.Top);
-
-        Assert.Equal (new Rect (0, 0, 6, 3), label.Frame);
-        Assert.Equal (new Rect (0, 0, 4, 1), label.Bounds);
-        Application.Begin (Application.Top);
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-│Test│
-└────┘",
-                                                      _output
-                                                     );
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void Test_Label_Without_Top_Border ()
-    {
-        var label = new Label { Text = "Test", /* Width = 6, Height = 3, */BorderStyle = LineStyle.Single };
-        label.Border.Thickness = new Thickness (1, 0, 1, 1);
-        Application.Top.Add (label);
-        Application.Begin (Application.Top);
-
-        Assert.Equal (new Rect (0, 0, 6, 2), label.Frame);
-        Assert.Equal (new Rect (0, 0, 4, 1), label.Bounds);
-        Application.Begin (Application.Top);
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-│Test│
-└────┘",
-                                                      _output
-                                                     );
     }
 
     [Fact]

@@ -19,22 +19,22 @@ public class TextValidateField_NET_Provider_Tests
         };
 
         // Go to the end.
-        field.NewKeyDownEvent (new Key (KeyCode.End));
+        field.NewKeyDownEvent (Key.End);
 
-        field.NewKeyDownEvent (new Key (KeyCode.Backspace));
+        field.NewKeyDownEvent (Key.Backspace);
         Assert.Equal ("--(12_4)--", field.Provider.DisplayText);
         Assert.False (field.IsValid);
 
-        field.NewKeyDownEvent (new Key (KeyCode.Backspace));
+        field.NewKeyDownEvent (Key.Backspace);
         Assert.Equal ("--(1__4)--", field.Provider.DisplayText);
         Assert.False (field.IsValid);
 
-        field.NewKeyDownEvent (new Key (KeyCode.Backspace));
+        field.NewKeyDownEvent (Key.Backspace);
         Assert.Equal ("--(___4)--", field.Provider.DisplayText);
         Assert.False (field.IsValid);
 
         // One more
-        field.NewKeyDownEvent (new Key (KeyCode.Backspace));
+        field.NewKeyDownEvent (Key.Backspace);
         Assert.Equal ("--(___4)--", field.Provider.DisplayText);
         Assert.False (field.IsValid);
     }
@@ -92,19 +92,19 @@ public class TextValidateField_NET_Provider_Tests
         Assert.Equal ("--(1234)--", field.Provider.DisplayText);
         Assert.True (field.IsValid);
 
-        field.NewKeyDownEvent (new Key (KeyCode.Delete));
-        field.NewKeyDownEvent (new Key (KeyCode.Delete));
-        field.NewKeyDownEvent (new Key (KeyCode.Delete));
+        field.NewKeyDownEvent (Key.Delete);
+        field.NewKeyDownEvent (Key.Delete);
+        field.NewKeyDownEvent (Key.Delete);
 
         Assert.Equal ("--(_234)--", field.Provider.DisplayText);
         Assert.False (field.IsValid);
 
-        field.NewKeyDownEvent (new Key (KeyCode.CursorRight));
-        field.NewKeyDownEvent (new Key (KeyCode.CursorRight));
+        field.NewKeyDownEvent (Key.CursorRight);
+        field.NewKeyDownEvent (Key.CursorRight);
 
-        field.NewKeyDownEvent (new Key (KeyCode.Delete));
-        field.NewKeyDownEvent (new Key (KeyCode.Delete));
-        field.NewKeyDownEvent (new Key (KeyCode.Delete));
+        field.NewKeyDownEvent (Key.Delete);
+        field.NewKeyDownEvent (Key.Delete);
+        field.NewKeyDownEvent (Key.Delete);
 
         Assert.Equal ("--(_2_4)--", field.Provider.DisplayText);
         Assert.False (field.IsValid);
@@ -123,9 +123,9 @@ public class TextValidateField_NET_Provider_Tests
             Provider = new NetMaskedTextProvider ("--(0000)--")
         };
 
-        field.NewKeyDownEvent (new Key (KeyCode.End));
+        field.NewKeyDownEvent (Key.End);
 
-        field.NewKeyDownEvent (new Key (KeyCode.D1));
+        field.NewKeyDownEvent (Key.D1);
 
         Assert.Equal ("--(___1)--", field.Provider.DisplayText);
         Assert.Equal ("--(   1)--", field.Text);
@@ -145,11 +145,11 @@ public class TextValidateField_NET_Provider_Tests
             Provider = new NetMaskedTextProvider ("--(0000)--")
         };
 
-        field.NewKeyDownEvent (new Key (KeyCode.CursorRight));
-        field.NewKeyDownEvent (new Key (KeyCode.CursorRight));
-        field.NewKeyDownEvent (new Key (KeyCode.Home));
+        field.NewKeyDownEvent (Key.CursorRight);
+        field.NewKeyDownEvent (Key.CursorRight);
+        field.NewKeyDownEvent (Key.Home);
 
-        field.NewKeyDownEvent (new Key (KeyCode.D1));
+        field.NewKeyDownEvent (Key.D1);
 
         Assert.Equal ("--(1___)--", field.Provider.DisplayText);
         Assert.Equal ("--(1   )--", field.Text);
@@ -222,7 +222,7 @@ public class TextValidateField_NET_Provider_Tests
             Provider = new NetMaskedTextProvider ("--(0000)--")
         };
 
-        field.NewKeyDownEvent (new Key (KeyCode.D1));
+        field.NewKeyDownEvent (Key.D1);
 
         Assert.Equal ("--(1___)--", field.Provider.DisplayText);
         Assert.Equal ("--(1   )--", field.Text);
@@ -241,7 +241,7 @@ public class TextValidateField_NET_Provider_Tests
             Provider = new NetMaskedTextProvider ("--(0000)--")
         };
 
-        field.NewKeyDownEvent (new Key (KeyCode.A));
+        field.NewKeyDownEvent (Key.A);
 
         Assert.Equal ("--(    )--", field.Text);
         Assert.Equal ("--(____)--", field.Provider.DisplayText);
@@ -261,19 +261,19 @@ public class TextValidateField_NET_Provider_Tests
             Provider = new NetMaskedTextProvider ("--(00-00)--")
         };
 
-        field.NewKeyDownEvent (new Key (KeyCode.D1));
+        field.NewKeyDownEvent (Key.D1);
         Assert.Equal ("--(1_-__)--", field.Provider.DisplayText);
         Assert.False (field.IsValid);
 
-        field.NewKeyDownEvent (new Key (KeyCode.D2));
+        field.NewKeyDownEvent (Key.D2);
         Assert.Equal ("--(12-__)--", field.Provider.DisplayText);
         Assert.False (field.IsValid);
 
-        field.NewKeyDownEvent (new Key (KeyCode.D3));
+        field.NewKeyDownEvent (Key.D3);
         Assert.Equal ("--(12-3_)--", field.Provider.DisplayText);
         Assert.False (field.IsValid);
 
-        field.NewKeyDownEvent (new Key (KeyCode.D4));
+        field.NewKeyDownEvent (Key.D4);
         Assert.Equal ("--(12-34)--", field.Provider.DisplayText);
         Assert.True (field.IsValid);
     }
@@ -293,10 +293,10 @@ public class TextValidateField_NET_Provider_Tests
 
         for (var i = 0; i < 10; i++)
         {
-            field.NewKeyDownEvent (new Key (KeyCode.CursorLeft));
+            field.NewKeyDownEvent (Key.CursorLeft);
         }
 
-        field.NewKeyDownEvent (new Key (KeyCode.D1));
+        field.NewKeyDownEvent (Key.D1);
 
         Assert.Equal ("--(1___)--", field.Provider.DisplayText);
         Assert.Equal ("--(1   )--", field.Text);
@@ -316,7 +316,7 @@ public class TextValidateField_NET_Provider_Tests
             Provider = new NetMaskedTextProvider ("--(0000)--")
         };
 
-        field.NewKeyDownEvent (new Key (KeyCode.D1));
+        field.NewKeyDownEvent (Key.D1);
 
         Assert.Equal ("--(1___)--", field.Provider.DisplayText);
         Assert.False (field.IsValid);
@@ -324,7 +324,7 @@ public class TextValidateField_NET_Provider_Tests
 
         field.MouseEvent (new MouseEvent { X = 25, Flags = MouseFlags.Button1Pressed });
 
-        field.NewKeyDownEvent (new Key (KeyCode.D1));
+        field.NewKeyDownEvent (Key.D1);
 
         Assert.Equal ("--(1__1)--", field.Provider.DisplayText);
         Assert.False (field.IsValid);
@@ -343,7 +343,7 @@ public class TextValidateField_NET_Provider_Tests
 
         field.Provider.TextChanged += (sender, e) => wasTextChanged = true;
 
-        field.NewKeyDownEvent (new Key (KeyCode.D1));
+        field.NewKeyDownEvent (Key.D1);
 
         Assert.Equal ("--(1___)--", field.Provider.DisplayText);
         Assert.False (field.IsValid);
@@ -366,10 +366,10 @@ public class TextValidateField_NET_Provider_Tests
 
         for (var i = 0; i < 10; i++)
         {
-            field.NewKeyDownEvent (new Key (KeyCode.CursorRight));
+            field.NewKeyDownEvent (Key.CursorRight);
         }
 
-        field.NewKeyDownEvent (new Key (KeyCode.D1));
+        field.NewKeyDownEvent (Key.D1);
 
         Assert.Equal ("--(___1)--", field.Provider.DisplayText);
         Assert.Equal ("--(   1)--", field.Text);
@@ -408,19 +408,19 @@ public class TextValidateField_NET_Provider_Tests
             Provider = new NetMaskedTextProvider ("--(0000)--")
         };
 
-        field.NewKeyDownEvent (new Key (KeyCode.D1));
+        field.NewKeyDownEvent (Key.D1);
         Assert.Equal ("--(1   )--", field.Text);
         Assert.False (field.IsValid);
 
-        field.NewKeyDownEvent (new Key (KeyCode.D2));
+        field.NewKeyDownEvent (Key.D2);
         Assert.Equal ("--(12  )--", field.Text);
         Assert.False (field.IsValid);
 
-        field.NewKeyDownEvent (new Key (KeyCode.D3));
+        field.NewKeyDownEvent (Key.D3);
         Assert.Equal ("--(123 )--", field.Text);
         Assert.False (field.IsValid);
 
-        field.NewKeyDownEvent (new Key (KeyCode.D4));
+        field.NewKeyDownEvent (Key.D4);
         Assert.Equal ("--(1234)--", field.Text);
         Assert.True (field.IsValid);
     }
@@ -439,26 +439,26 @@ public class TextValidateField_Regex_Provider_Tests
 
         for (var i = 0; i < 4; i++)
         {
-            field.NewKeyDownEvent (new Key (KeyCode.D0));
+            field.NewKeyDownEvent (Key.D0);
         }
 
         Assert.Equal ("0000", field.Text);
         Assert.False (field.IsValid);
 
         // HOME KEY
-        field.NewKeyDownEvent (new Key (KeyCode.Home));
+        field.NewKeyDownEvent (Key.Home);
 
         // END KEY
-        field.NewKeyDownEvent (new Key (KeyCode.End));
+        field.NewKeyDownEvent (Key.End);
 
         // Insert 9
-        field.NewKeyDownEvent (new Key (KeyCode.D9));
+        field.NewKeyDownEvent (Key.D9);
 
         Assert.Equal ("00009", field.Text);
         Assert.True (field.IsValid);
 
         // Insert 9
-        field.NewKeyDownEvent (new Key (KeyCode.D9));
+        field.NewKeyDownEvent (Key.D9);
 
         Assert.Equal ("000099", field.Text);
         Assert.False (field.IsValid);
@@ -471,19 +471,19 @@ public class TextValidateField_Regex_Provider_Tests
         // Accepts 001 too.
         var field = new TextValidateField { Width = 20, Provider = new TextRegexProvider ("^[0-9]?[0-9]?[0-9]|1000$") };
 
-        field.NewKeyDownEvent (new Key (KeyCode.D1));
-        field.NewKeyDownEvent (new Key (KeyCode.D0));
-        field.NewKeyDownEvent (new Key (KeyCode.D0));
-        field.NewKeyDownEvent (new Key (KeyCode.D0));
+        field.NewKeyDownEvent (Key.D1);
+        field.NewKeyDownEvent (Key.D0);
+        field.NewKeyDownEvent (Key.D0);
+        field.NewKeyDownEvent (Key.D0);
 
         Assert.Equal ("1000", field.Text);
         Assert.True (field.IsValid);
 
         // HOME KEY
-        field.NewKeyDownEvent (new Key (KeyCode.Home));
+        field.NewKeyDownEvent (Key.Home);
 
         // DELETE
-        field.NewKeyDownEvent (new Key (KeyCode.Delete));
+        field.NewKeyDownEvent (Key.Delete);
 
         Assert.Equal ("000", field.Text);
         Assert.True (field.IsValid);
@@ -495,7 +495,7 @@ public class TextValidateField_Regex_Provider_Tests
         var field = new TextValidateField { Width = 20, Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$") };
 
         // Input dosen't validates the pattern.
-        field.NewKeyDownEvent (new Key (KeyCode.D1));
+        field.NewKeyDownEvent (Key.D1);
         Assert.Equal ("", field.Text);
         Assert.False (field.IsValid);
 
@@ -518,19 +518,19 @@ public class TextValidateField_Regex_Provider_Tests
             Width = 20, Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false }
         };
 
-        field.NewKeyDownEvent (new Key (KeyCode.D1));
+        field.NewKeyDownEvent (Key.D1);
         Assert.Equal ("1", field.Text);
         Assert.False (field.IsValid);
 
-        field.NewKeyDownEvent (new Key (KeyCode.D2));
+        field.NewKeyDownEvent (Key.D2);
         Assert.Equal ("12", field.Text);
         Assert.False (field.IsValid);
 
-        field.NewKeyDownEvent (new Key (KeyCode.D3));
+        field.NewKeyDownEvent (Key.D3);
         Assert.Equal ("123", field.Text);
         Assert.True (field.IsValid);
 
-        field.NewKeyDownEvent (new Key (KeyCode.D4));
+        field.NewKeyDownEvent (Key.D4);
         Assert.Equal ("1234", field.Text);
         Assert.False (field.IsValid);
     }
@@ -549,14 +549,14 @@ public class TextValidateField_Regex_Provider_Tests
 
         for (var i = 0; i < 10; i++)
         {
-            field.NewKeyDownEvent (new Key (KeyCode.CursorLeft));
+            field.NewKeyDownEvent (Key.CursorLeft);
         }
 
         Assert.Equal ("123", field.Text);
         Assert.True (field.IsValid);
 
         // Insert 4
-        field.NewKeyDownEvent (new Key (KeyCode.D4));
+        field.NewKeyDownEvent (Key.D4);
 
         Assert.Equal ("4123", field.Text);
         Assert.False (field.IsValid);
@@ -603,7 +603,7 @@ public class TextValidateField_Regex_Provider_Tests
 
         field.Provider.TextChanged += (sender, e) => wasTextChanged = true;
 
-        field.NewKeyDownEvent (new Key (KeyCode.D1));
+        field.NewKeyDownEvent (Key.D1);
 
         Assert.Equal ("1", field.Provider.DisplayText);
         Assert.False (field.IsValid);
@@ -625,14 +625,14 @@ public class TextValidateField_Regex_Provider_Tests
 
         for (var i = 0; i < 10; i++)
         {
-            field.NewKeyDownEvent (new Key (KeyCode.CursorRight));
+            field.NewKeyDownEvent (Key.CursorRight);
         }
 
         Assert.Equal ("123", field.Text);
         Assert.True (field.IsValid);
 
         // Insert 4
-        field.NewKeyDownEvent (new Key (KeyCode.D4));
+        field.NewKeyDownEvent (Key.D4);
 
         Assert.Equal ("1234", field.Text);
         Assert.False (field.IsValid);
