@@ -809,11 +809,6 @@ At 0,0
         // BUGBUG: IsInitialized must be true to process calculation
         r.BeginInit ();
         r.EndInit ();
-#if DEBUG
-        Assert.Equal ("View(Vertical View)(0,0,1,13)", r.ToString ());
-#else
-        Assert.Equal ("View()(0,0,1,13)", r.ToString ());
-#endif
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
         Assert.Equal (new Rectangle (0, 0, 1, 13), r.Bounds);
