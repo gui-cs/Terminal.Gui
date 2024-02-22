@@ -938,19 +938,19 @@ public class ScrollViewTests
         Assert.Equal (new Point (0, 0), sv.ContentOffset);
         Assert.True (sv.OnKeyDown (Key.PageDown));
         Assert.Equal (new Point (0, -10), sv.ContentOffset);
-        Assert.True (sv.OnKeyDown (new Key (KeyCode.PageDown)));
+        Assert.True (sv.OnKeyDown (Key.PageDown));
 
         // The other scroll bar is visible, so it need to scroll one more row
         Assert.Equal (new Point (0, -11), sv.ContentOffset);
-        Assert.False (sv.OnKeyDown (new Key (KeyCode.CursorDown)));
+        Assert.False (sv.OnKeyDown (Key.CursorDown));
         Assert.Equal (new Point (0, -11), sv.ContentOffset);
-        Assert.True (sv.OnKeyDown (new Key ((KeyCode)'v' | KeyCode.AltMask)));
+        Assert.True (sv.OnKeyDown (Key.V.WithAlt));
 
         // Scrolled 10 rows and still is hiding one row
         Assert.Equal (new Point (0, -1), sv.ContentOffset);
 
         // Pressing the same key again will set to 0
-        Assert.True (sv.OnKeyDown (new Key ((KeyCode)'v' | KeyCode.AltMask)));
+        Assert.True (sv.OnKeyDown (Key.V.WithAlt));
         Assert.Equal (new Point (0, 0), sv.ContentOffset);
         Assert.True (sv.OnKeyDown (Key.V.WithCtrl));
         Assert.Equal (new Point (0, -10), sv.ContentOffset);
@@ -964,19 +964,19 @@ public class ScrollViewTests
         Assert.Equal (new Point (0, -10), sv.ContentOffset);
         Assert.True (sv.OnKeyDown (Key.PageDown.WithCtrl));
         Assert.Equal (new Point (-20, -10), sv.ContentOffset);
-        Assert.True (sv.OnKeyDown (new Key (KeyCode.CursorRight)));
+        Assert.True (sv.OnKeyDown (Key.CursorRight));
 
         // The other scroll bar is visible, so it need to scroll one more column
         Assert.Equal (new Point (-21, -10), sv.ContentOffset);
-        Assert.True (sv.OnKeyDown (new Key (KeyCode.Home)));
+        Assert.True (sv.OnKeyDown (Key.Home));
 
         // The other scroll bar is visible, so it need to scroll one more column
         Assert.Equal (new Point (-21, 0), sv.ContentOffset);
-        Assert.False (sv.OnKeyDown (new Key (KeyCode.Home)));
+        Assert.False (sv.OnKeyDown (Key.Home));
         Assert.Equal (new Point (-21, 0), sv.ContentOffset);
-        Assert.True (sv.OnKeyDown (new Key (KeyCode.End)));
+        Assert.True (sv.OnKeyDown (Key.End));
         Assert.Equal (new Point (-21, -11), sv.ContentOffset);
-        Assert.False (sv.OnKeyDown (new Key (KeyCode.End)));
+        Assert.False (sv.OnKeyDown (Key.End));
         Assert.Equal (new Point (-21, -11), sv.ContentOffset);
         Assert.True (sv.OnKeyDown (new Key (KeyCode.Home | KeyCode.CtrlMask)));
         Assert.Equal (new Point (0, -11), sv.ContentOffset);
@@ -986,7 +986,7 @@ public class ScrollViewTests
         Assert.Equal (new Point (-21, -11), sv.ContentOffset);
         Assert.False (sv.OnKeyDown (new Key (KeyCode.End | KeyCode.CtrlMask)));
         Assert.Equal (new Point (-21, -11), sv.ContentOffset);
-        Assert.True (sv.OnKeyDown (new Key (KeyCode.Home)));
+        Assert.True (sv.OnKeyDown (Key.Home));
         Assert.Equal (new Point (-21, 0), sv.ContentOffset);
         Assert.True (sv.OnKeyDown (new Key (KeyCode.Home | KeyCode.CtrlMask)));
         Assert.Equal (new Point (0, 0), sv.ContentOffset);
