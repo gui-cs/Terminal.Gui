@@ -232,7 +232,7 @@ public class FileDialogExamples : Scenario
 
     private void SetupHandler (Button btn)
     {
-        btn.Clicked += (s, e) =>
+        btn.Accept += (s, e) =>
                        {
                            try
                            {

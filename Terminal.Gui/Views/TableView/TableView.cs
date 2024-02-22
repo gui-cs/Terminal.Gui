@@ -273,7 +273,7 @@ public class TableView : View
                    );
 
         AddCommand (
-                    Command.ToggleChecked,
+                    Command.Select, // was Command.ToggleChecked
                     () =>
                     {
                         ToggleCurrentCellSelection ();
@@ -283,30 +283,31 @@ public class TableView : View
                    );
 
         // Default keybindings for this view
-        KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
-        KeyBindings.Add (KeyCode.CursorRight, Command.Right);
-        KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
-        KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
-        KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
-        KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
-        KeyBindings.Add (KeyCode.Home, Command.LeftHome);
-        KeyBindings.Add (KeyCode.End, Command.RightEnd);
-        KeyBindings.Add (KeyCode.Home | KeyCode.CtrlMask, Command.TopHome);
-        KeyBindings.Add (KeyCode.End | KeyCode.CtrlMask, Command.BottomEnd);
+        KeyBindings.Add (Key.CursorLeft, Command.Left);
+        KeyBindings.Add (Key.CursorRight, Command.Right);
+        KeyBindings.Add (Key.CursorUp, Command.LineUp);
+        KeyBindings.Add (Key.CursorDown, Command.LineDown);
+        KeyBindings.Add (Key.PageUp, Command.PageUp);
+        KeyBindings.Add (Key.PageDown, Command.PageDown);
+        KeyBindings.Add (Key.Home, Command.LeftHome);
+        KeyBindings.Add (Key.End, Command.RightEnd);
+        KeyBindings.Add (Key.Home.WithCtrl, Command.TopHome);
+        KeyBindings.Add (Key.End.WithCtrl, Command.BottomEnd);
 
-        KeyBindings.Add (KeyCode.CursorLeft | KeyCode.ShiftMask, Command.LeftExtend);
-        KeyBindings.Add (KeyCode.CursorRight | KeyCode.ShiftMask, Command.RightExtend);
-        KeyBindings.Add (KeyCode.CursorUp | KeyCode.ShiftMask, Command.LineUpExtend);
-        KeyBindings.Add (KeyCode.CursorDown | KeyCode.ShiftMask, Command.LineDownExtend);
-        KeyBindings.Add (KeyCode.PageUp | KeyCode.ShiftMask, Command.PageUpExtend);
-        KeyBindings.Add (KeyCode.PageDown | KeyCode.ShiftMask, Command.PageDownExtend);
-        KeyBindings.Add (KeyCode.Home | KeyCode.ShiftMask, Command.LeftHomeExtend);
-        KeyBindings.Add (KeyCode.End | KeyCode.ShiftMask, Command.RightEndExtend);
-        KeyBindings.Add (KeyCode.Home | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.TopHomeExtend);
-        KeyBindings.Add (KeyCode.End | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.BottomEndExtend);
+        KeyBindings.Add (Key.CursorLeft.WithShift, Command.LeftExtend);
+        KeyBindings.Add (Key.CursorRight.WithShift, Command.RightExtend);
+        KeyBindings.Add (Key.CursorUp.WithShift, Command.LineUpExtend);
+        KeyBindings.Add (Key.CursorDown.WithShift, Command.LineDownExtend);
+        KeyBindings.Add (Key.PageUp.WithShift, Command.PageUpExtend);
+        KeyBindings.Add (Key.PageDown.WithShift, Command.PageDownExtend);
+        KeyBindings.Add (Key.Home.WithShift, Command.LeftHomeExtend);
+        KeyBindings.Add (Key.End.WithShift, Command.RightEndExtend);
+        KeyBindings.Add (Key.Home.WithCtrl.WithShift, Command.TopHomeExtend);
+        KeyBindings.Add (Key.End.WithCtrl.WithShift, Command.BottomEndExtend);
 
-        KeyBindings.Add (KeyCode.A | KeyCode.CtrlMask, Command.SelectAll);
+        KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
         KeyBindings.Add (CellActivationKey, Command.Accept);
+        KeyBindings.Add (Key.Space, Command.Select);
     }
 
     // TODO: Update to use Key instead of KeyCode
@@ -432,7 +433,7 @@ public class TableView : View
     }
 
     /// <summary>
-    ///     The symbol to add after each cell value and header value to visually seperate values (if not using vertical
+    ///     The symbol to add after each cell value and header value to visually separate values (if not using vertical
     ///     gridlines)
     /// </summary>
     public char SeparatorSymbol { get; set; } = ' ';
@@ -460,12 +461,12 @@ public class TableView : View
     }
 
     /// <summary>
-    ///     This event is raised when a cell is activated e.g. by double clicking or pressing
+    ///     This event is raised when a cell is activated e.g. by double-clicking or pressing
     ///     <see cref="CellActivationKey"/>
     /// </summary>
     public event EventHandler<CellActivatedEventArgs> CellActivated;
 
-    /// <summary>This event is raised when a cell is toggled (see <see cref="Command.ToggleChecked"/></summary>
+    /// <summary>This event is raised when a cell is toggled (see <see cref="Command.Select"/></summary>
     public event EventHandler<CellToggledEventArgs> CellToggled;
 
     /// <summary>
@@ -1487,7 +1488,7 @@ public class TableView : View
     /// <param name="pt1Y">Origin point for the selection in Y</param>
     /// <param name="pt2X">End point for the selection in X</param>
     /// <param name="pt2Y">End point for the selection in Y</param>
-    /// <param name="toggle">True if selection is result of <see cref="Command.ToggleChecked"/></param>
+    /// <param name="toggle">True if selection is result of <see cref="Command.Select"/></param>
     /// <returns></returns>
     private TableSelection CreateTableSelection (int pt1X, int pt1Y, int pt2X, int pt2Y, bool toggle = false)
     {

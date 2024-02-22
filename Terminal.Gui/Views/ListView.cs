@@ -113,26 +113,27 @@ public class ListView : View
         AddCommand (Command.PageDown, () => MovePageDown ());
         AddCommand (Command.TopHome, () => MoveHome ());
         AddCommand (Command.BottomEnd, () => MoveEnd ());
+        AddCommand (Command.Accept, () => OnOpenSelectedItem ());
         AddCommand (Command.OpenSelectedItem, () => OnOpenSelectedItem ());
-        AddCommand (Command.ToggleChecked, () => MarkUnmarkRow ());
+        AddCommand (Command.Select, () => MarkUnmarkRow ());
 
         // Default keybindings for all ListViews
-        KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
-        KeyBindings.Add (KeyCode.P | KeyCode.CtrlMask, Command.LineUp);
+        KeyBindings.Add (Key.CursorUp, Command.LineUp);
+        KeyBindings.Add (Key.P.WithCtrl, Command.LineUp);
 
-        KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
-        KeyBindings.Add (KeyCode.N | KeyCode.CtrlMask, Command.LineDown);
+        KeyBindings.Add (Key.CursorDown, Command.LineDown);
+        KeyBindings.Add (Key.N.WithCtrl, Command.LineDown);
 
-        KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
+        KeyBindings.Add (Key.PageUp, Command.PageUp);
 
-        KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
-        KeyBindings.Add (KeyCode.V | KeyCode.CtrlMask, Command.PageDown);
+        KeyBindings.Add (Key.PageDown, Command.PageDown);
+        KeyBindings.Add (Key.V.WithCtrl, Command.PageDown);
 
-        KeyBindings.Add (KeyCode.Home, Command.TopHome);
+        KeyBindings.Add (Key.Home, Command.TopHome);
 
-        KeyBindings.Add (KeyCode.End, Command.BottomEnd);
+        KeyBindings.Add (Key.End, Command.BottomEnd);
 
-        KeyBindings.Add (KeyCode.Enter, Command.OpenSelectedItem);
+        KeyBindings.Add (Key.Enter, Command.OpenSelectedItem);
     }
 
     /// <summary>Gets or sets whether this <see cref="ListView"/> allows items to be marked.</summary>
@@ -150,11 +151,11 @@ public class ListView : View
 
             if (_allowsMarking)
             {
-                KeyBindings.Add (KeyCode.Space, Command.ToggleChecked);
+                KeyBindings.Add (Key.Space, Command.Select);
             }
             else
             {
-                KeyBindings.Remove (KeyCode.Space);
+                KeyBindings.Remove (Key.Space);
             }
 
             SetNeedsDisplay ();
@@ -691,9 +692,10 @@ public class ListView : View
         return base.OnEnter (view);
     }
 
+    // TODO: This should be cancelable
     /// <summary>Invokes the <see cref="OpenSelectedItem"/> event if it is defined.</summary>
-    /// <returns></returns>
-    public virtual bool OnOpenSelectedItem ()
+    /// <returns><see langword="true"/> if the <see cref="OpenSelectedItem"/> event was fired.</returns>
+    public bool OnOpenSelectedItem ()
     {
         if (_source.Count <= _selected || _selected < 0 || OpenSelectedItem is null)
         {
@@ -702,8 +704,12 @@ public class ListView : View
 
         object value = _source.ToList () [_selected];
 
-        OpenSelectedItem?.Invoke (this, new ListViewItemEventArgs (_selected, value));
+        if (OnAccept () == true)
+        {
+            return false;
+        }
 
+        OpenSelectedItem?.Invoke (this, new ListViewItemEventArgs (_selected, value));
         return true;
     }
 

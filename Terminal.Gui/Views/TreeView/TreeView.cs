@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Interface for all non generic members of <see cref="TreeView{T}"/>.
+///     Interface for all non-generic members of <see cref="TreeView{T}"/>.
 ///     <a href="../docs/treeview.md">See TreeView Deep Dive for more information</a>.
 /// </summary>
 public interface ITreeView
@@ -272,38 +272,31 @@ public class TreeView<T> : View, ITreeView where T : class
                     }
                    );
 
-        AddCommand (
-                    Command.Accept,
-                    () =>
-                    {
-                        ActivateSelectedObjectIfAny ();
-
-                        return true;
-                    }
-                   );
+        AddCommand (Command.Select, ActivateSelectedObjectIfAny);
+        AddCommand (Command.Accept, ActivateSelectedObjectIfAny);
 
         // Default keybindings for this view
-        KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
-        KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
-        KeyBindings.Add (KeyCode.PageUp | KeyCode.ShiftMask, Command.PageUpExtend);
-        KeyBindings.Add (KeyCode.PageDown | KeyCode.ShiftMask, Command.PageDownExtend);
-        KeyBindings.Add (KeyCode.CursorRight, Command.Expand);
-        KeyBindings.Add (KeyCode.CursorRight | KeyCode.CtrlMask, Command.ExpandAll);
-        KeyBindings.Add (KeyCode.CursorLeft, Command.Collapse);
-        KeyBindings.Add (KeyCode.CursorLeft | KeyCode.CtrlMask, Command.CollapseAll);
+        KeyBindings.Add (Key.PageUp, Command.PageUp);
+        KeyBindings.Add (Key.PageDown, Command.PageDown);
+        KeyBindings.Add (Key.PageUp.WithShift, Command.PageUpExtend);
+        KeyBindings.Add (Key.PageDown.WithShift, Command.PageDownExtend);
+        KeyBindings.Add (Key.CursorRight, Command.Expand);
+        KeyBindings.Add (Key.CursorRight.WithCtrl, Command.ExpandAll);
+        KeyBindings.Add (Key.CursorLeft, Command.Collapse);
+        KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.CollapseAll);
 
-        KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
-        KeyBindings.Add (KeyCode.CursorUp | KeyCode.ShiftMask, Command.LineUpExtend);
-        KeyBindings.Add (KeyCode.CursorUp | KeyCode.CtrlMask, Command.LineUpToFirstBranch);
+        KeyBindings.Add (Key.CursorUp, Command.LineUp);
+        KeyBindings.Add (Key.CursorUp.WithShift, Command.LineUpExtend);
+        KeyBindings.Add (Key.CursorUp.WithCtrl, Command.LineUpToFirstBranch);
 
-        KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
-        KeyBindings.Add (KeyCode.CursorDown | KeyCode.ShiftMask, Command.LineDownExtend);
-        KeyBindings.Add (KeyCode.CursorDown | KeyCode.CtrlMask, Command.LineDownToLastBranch);
+        KeyBindings.Add (Key.CursorDown, Command.LineDown);
+        KeyBindings.Add (Key.CursorDown.WithShift, Command.LineDownExtend);
+        KeyBindings.Add (Key.CursorDown.WithCtrl, Command.LineDownToLastBranch);
 
-        KeyBindings.Add (KeyCode.Home, Command.TopHome);
-        KeyBindings.Add (KeyCode.End, Command.BottomEnd);
-        KeyBindings.Add (KeyCode.A | KeyCode.CtrlMask, Command.SelectAll);
-        KeyBindings.Add (ObjectActivationKey, Command.Accept);
+        KeyBindings.Add (Key.Home, Command.TopHome);
+        KeyBindings.Add (Key.End, Command.BottomEnd);
+        KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
+        KeyBindings.Add (ObjectActivationKey, Command.Select);
     }
 
     /// <summary>
@@ -459,15 +452,25 @@ public class TreeView<T> : View, ITreeView where T : class
     ///     <para>Triggers the <see cref="ObjectActivated"/> event with the <see cref="SelectedObject"/>.</para>
     ///     <para>This method also ensures that the selected object is visible.</para>
     /// </summary>
-    public void ActivateSelectedObjectIfAny ()
+    /// <returns><see langword="true"/> if <see cref="ObjectActivated"/> was fired.</returns>
+    public bool? ActivateSelectedObjectIfAny ()
     {
+        if (OnAccept () == true)
+        {
+            return false;
+        }
+
         T o = SelectedObject;
 
         if (o is { })
         {
-            OnObjectActivated (new ObjectActivatedEventArgs<T> (this, o));
+            // TODO: Should this be cancelable?
+            ObjectActivatedEventArgs<T> e = new (this, o);
+            OnObjectActivated (e);
             PositionCursor ();
+            return true;
         }
+        return false;
     }
 
     /// <summary>Adds a new root level object unless it is already a root of the tree.</summary>

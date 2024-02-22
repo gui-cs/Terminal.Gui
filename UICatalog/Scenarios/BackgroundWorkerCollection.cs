@@ -263,7 +263,7 @@ public class BackgroundWorkerCollection : Scenario
 
             _start = new Button { Text = "Start", IsDefault = true, ClearOnVisibleFalse = false };
 
-            _start.Clicked += (s, e) =>
+            _start.Accept += (s, e) =>
                               {
                                   Staging = new Staging (DateTime.Now);
                                   RequestStop ();
@@ -271,7 +271,7 @@ public class BackgroundWorkerCollection : Scenario
             Add (_start);
 
             _close = new Button { Text = "Close" };
-            _close.Clicked += OnReportClosed;
+            _close.Accept += OnReportClosed;
             Add (_close);
 
             KeyDown += (s, e) =>

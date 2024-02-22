@@ -267,7 +267,7 @@ public class ListColumns : Scenario
         // if user clicks the mouse in TableView
         _listColView.MouseClick += (s, e) => { _listColView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol); };
 
-        _listColView.KeyBindings.Add (KeyCode.Space, Command.ToggleChecked);
+        _listColView.KeyBindings.Add (Key.Space, Command.Accept);
     }
 
     private void CloseExample () { _listColView.Table = null; }
@@ -279,13 +279,13 @@ public class ListColumns : Scenario
         var accepted = false;
         var ok = new Button { Text = "Ok", IsDefault = true };
 
-        ok.Clicked += (s, e) =>
+        ok.Accept += (s, e) =>
                       {
                           accepted = true;
                           Application.RequestStop ();
                       };
         var cancel = new Button { Text = "Cancel" };
-        cancel.Clicked += (s, e) => { Application.RequestStop (); };
+        cancel.Accept += (s, e) => { Application.RequestStop (); };
         var d = new Dialog { Title = prompt, Buttons = [ok, cancel] };
 
         var tf = new TextField { Text = getter (_listColView).ToString (), X = 0, Y = 1, Width = Dim.Fill () };

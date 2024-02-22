@@ -475,47 +475,47 @@ public class ToplevelTests
         Assert.True (isRunning);
         Assert.True (Application.OnKeyDown (Application.QuitKey));
         Assert.False (isRunning);
-        Assert.True (Application.OnKeyDown (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (Application.OnKeyDown (Key.Z.WithCtrl));
 
-        Assert.True (Application.OnKeyDown (new Key (KeyCode.F5))); // refresh
+        Assert.True (Application.OnKeyDown (Key.F5)); // refresh
 
-        Assert.True (Application.OnKeyDown (new Key (KeyCode.Tab)));
+        Assert.True (Application.OnKeyDown (Key.Tab));
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tvW1, top.MostFocused);
-        Assert.True (Application.OnKeyDown (new Key (KeyCode.Tab)));
+        Assert.True (Application.OnKeyDown (Key.Tab));
         Assert.Equal ($"\tFirst line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
-        Assert.True (Application.OnKeyDown (new Key (KeyCode.Tab | KeyCode.ShiftMask)));
+        Assert.True (Application.OnKeyDown (Key.Tab.WithShift));
         Assert.Equal ($"First line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
-        Assert.True (Application.OnKeyDown (new Key (KeyCode.Tab | KeyCode.CtrlMask)));
+        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tf2W1, top.MostFocused);
-        Assert.True (Application.OnKeyDown (new Key (KeyCode.Tab)));
+        Assert.True (Application.OnKeyDown (Key.Tab));
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tf1W1, top.MostFocused);
-        Assert.True (Application.OnKeyDown (new Key (KeyCode.CursorRight)));
+        Assert.True (Application.OnKeyDown (Key.CursorRight));
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tf1W1, top.MostFocused);
-        Assert.True (Application.OnKeyDown (new Key (KeyCode.CursorDown)));
+        Assert.True (Application.OnKeyDown (Key.CursorDown));
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tvW1, top.MostFocused);
 #if UNIX_KEY_BINDINGS
-        Assert.True (Application.OnKeyDown (new (Key.I | Key.CtrlMask)));
+        Assert.True (Application.OnKeyDown (new (Key.I.WithCtrl)));
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tf2W1, top.MostFocused);
 #endif
-        Assert.True (Application.OnKeyDown (new Key (KeyCode.Tab | KeyCode.ShiftMask)));
+        Assert.True (Application.OnKeyDown (Key.Tab.WithShift));
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tvW1, top.MostFocused);
-        Assert.True (Application.OnKeyDown (new Key (KeyCode.CursorLeft)));
+        Assert.True (Application.OnKeyDown (Key.CursorLeft));
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tf1W1, top.MostFocused);
-        Assert.True (Application.OnKeyDown (new Key (KeyCode.CursorUp)));
+        Assert.True (Application.OnKeyDown (Key.CursorUp));
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tf2W1, top.MostFocused);
-        Assert.True (Application.OnKeyDown (new Key (KeyCode.Tab | KeyCode.CtrlMask)));
+        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));
         Assert.Equal (win2, top.Focused);
         Assert.Equal (tf1W2, top.MostFocused);
-        Assert.True (Application.OnKeyDown (new Key (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask)));
+        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl.WithShift));
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tf2W1, top.MostFocused);
         Assert.True (Application.OnKeyDown (Application.AlternateForwardKey));
@@ -524,37 +524,37 @@ public class ToplevelTests
         Assert.True (Application.OnKeyDown (Application.AlternateBackwardKey));
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tf2W1, top.MostFocused);
-        Assert.True (Application.OnKeyDown (new Key (KeyCode.CursorUp)));
+        Assert.True (Application.OnKeyDown (Key.CursorUp));
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tvW1, top.MostFocused);
 #if UNIX_KEY_BINDINGS
-        Assert.True (Application.OnKeyDown (new (Key.B | Key.CtrlMask)));
+        Assert.True (Application.OnKeyDown (new (Key.B.WithCtrl)));
 #else
-        Assert.True (Application.OnKeyDown (new Key (KeyCode.CursorLeft)));
+        Assert.True (Application.OnKeyDown (Key.CursorLeft));
 #endif
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tf1W1, top.MostFocused);
 
-        Assert.True (Application.OnKeyDown (new Key (KeyCode.CursorDown)));
+        Assert.True (Application.OnKeyDown (Key.CursorDown));
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tvW1, top.MostFocused);
         Assert.Equal (new Point (0, 0), tvW1.CursorPosition);
-        Assert.True (Application.OnKeyDown (new Key (KeyCode.End | KeyCode.CtrlMask)));
+        Assert.True (Application.OnKeyDown (Key.End.WithCtrl));
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tvW1, top.MostFocused);
         Assert.Equal (new Point (16, 1), tvW1.CursorPosition);
 #if UNIX_KEY_BINDINGS
-        Assert.True (Application.OnKeyDown (new (Key.F | Key.CtrlMask)));
+        Assert.True (Application.OnKeyDown (new (Key.F.WithCtrl)));
 #else
-        Assert.True (Application.OnKeyDown (new Key (KeyCode.CursorRight)));
+        Assert.True (Application.OnKeyDown (Key.CursorRight));
 #endif
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tf2W1, top.MostFocused);
 
 #if UNIX_KEY_BINDINGS
-        Assert.True (Application.OnKeyDown (new (Key.L | Key.CtrlMask)));
+        Assert.True (Application.OnKeyDown (new (Key.L.WithCtrl)));
 #else
-        Assert.True (Application.OnKeyDown (new Key (KeyCode.F5)));
+        Assert.True (Application.OnKeyDown (Key.F5));
 #endif
     }
 
@@ -635,62 +635,62 @@ public class ToplevelTests
         Assert.Equal (win1, Application.OverlappedChildren [0]);
 
         Assert.True (
-                     Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask))
+                     Application.OverlappedChildren [0].NewKeyDownEvent (Key.Z.WithCtrl)
                     );
 
-        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.F5))); // refresh
+        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (Key.F5)); // refresh
 
-        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Tab)));
+        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (Key.Tab));
         Assert.True (win1.IsCurrentTop);
         Assert.Equal (tvW1, win1.MostFocused);
-        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Tab)));
+        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (Key.Tab));
         Assert.Equal ($"\tFirst line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
 
         Assert.True (
                      Application.OverlappedChildren [0]
-                                .NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.ShiftMask))
+                                .NewKeyDownEvent (Key.Tab.WithShift)
                     );
         Assert.Equal ($"First line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
 
         Assert.True (
                      Application.OverlappedChildren [0]
-                                .NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask))
+                                .NewKeyDownEvent (Key.Tab.WithCtrl)
                     );
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tf2W1, win1.MostFocused);
-        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Tab)));
+        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (Key.Tab));
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tf1W1, win1.MostFocused);
-        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tf1W1, win1.MostFocused);
-        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (Key.CursorDown));
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tvW1, win1.MostFocused);
 #if UNIX_KEY_BINDINGS
-        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.I | Key.CtrlMask)));
+        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.I.WithCtrl)));
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tf2W1, win1.MostFocused);
 #endif
         Assert.True (
                      Application.OverlappedChildren [0]
-                                .NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.ShiftMask))
+                                .NewKeyDownEvent (Key.Tab.WithShift)
                     );
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tvW1, win1.MostFocused);
-        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
+        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (Key.CursorLeft));
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tf1W1, win1.MostFocused);
-        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.CursorUp)));
+        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (Key.CursorUp));
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tf2W1, win1.MostFocused);
-        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Tab)));
+        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (Key.Tab));
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tf1W1, win1.MostFocused);
 
         Assert.True (
                      Application.OverlappedChildren [0]
-                                .NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask))
+                                .NewKeyDownEvent (Key.Tab.WithCtrl)
                     );
         Assert.Equal (win2, Application.OverlappedChildren [0]);
         Assert.Equal (tf1W2, win2.MostFocused);
@@ -699,7 +699,7 @@ public class ToplevelTests
 
         Assert.True (
                      Application.OverlappedChildren [0]
-                                .NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask))
+                                .NewKeyDownEvent (Key.Tab.WithCtrl.WithShift)
                     );
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tf1W1, win1.MostFocused);
@@ -709,38 +709,38 @@ public class ToplevelTests
         Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (Application.AlternateBackwardKey));
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tf1W1, win1.MostFocused);
-        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (Key.CursorDown));
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tvW1, win1.MostFocused);
 #if UNIX_KEY_BINDINGS
-        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.B | Key.CtrlMask)));
+        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.B.WithCtrl)));
 #else
-        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
+        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (Key.CursorLeft));
 #endif
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tf1W1, win1.MostFocused);
-        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (Key.CursorDown));
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tvW1, win1.MostFocused);
         Assert.Equal (new Point (0, 0), tvW1.CursorPosition);
 
         Assert.True (
                      Application.OverlappedChildren [0]
-                                .NewKeyDownEvent (new Key (KeyCode.End | KeyCode.CtrlMask))
+                                .NewKeyDownEvent (Key.End.WithCtrl)
                     );
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tvW1, win1.MostFocused);
         Assert.Equal (new Point (16, 1), tvW1.CursorPosition);
 #if UNIX_KEY_BINDINGS
-        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.F | Key.CtrlMask)));
+        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.F.WithCtrl)));
 #else
-        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+        Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (Key.CursorRight));
 #endif
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tf2W1, win1.MostFocused);
 
 #if UNIX_KEY_BINDINGS
-        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.L | Key.CtrlMask)));
+        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.L.WithCtrl)));
 #endif
     }
 
@@ -835,9 +835,9 @@ public class ToplevelTests
         Assert.Equal (KeyCode.C, Application.QuitKey);
 
         // Replacing the defaults keys to avoid errors on others unit tests that are using it.
-        Application.AlternateForwardKey = KeyCode.PageDown | KeyCode.CtrlMask;
-        Application.AlternateBackwardKey = KeyCode.PageUp | KeyCode.CtrlMask;
-        Application.QuitKey = KeyCode.Q | KeyCode.CtrlMask;
+        Application.AlternateForwardKey = Key.PageDown.WithCtrl;
+        Application.AlternateBackwardKey = Key.PageUp.WithCtrl;
+        Application.QuitKey = Key.Q.WithCtrl;
 
         Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey);
         Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey);
@@ -1806,7 +1806,7 @@ public class ToplevelTests
         var testWindow = new Window { X = 2, Y = 1, Width = 15, Height = 10 };
         testWindow.Add (btnPopup);
 
-        btnPopup.Clicked += (s, e) =>
+        btnPopup.Accept += (s, e) =>
                             {
                                 Rect viewToScreen = btnPopup.BoundsToScreen (top.Frame);
 
@@ -1932,7 +1932,7 @@ public class ToplevelTests
         Application.Top.Add (topChild);
         Application.Begin (Application.Top);
 
-        Exception exception = Record.Exception (() => topChild.NewKeyDownEvent (new Key (KeyCode.AltMask)));
+        Exception exception = Record.Exception (() => topChild.NewKeyDownEvent (KeyCode.AltMask));
         Assert.Null (exception);
     }
 

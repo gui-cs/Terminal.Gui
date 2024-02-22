@@ -23,7 +23,7 @@ public class WindowTests
         Application.Top.Add (win);
         Application.Begin (Application.Top);
 
-        Exception exception = Record.Exception (() => win.NewKeyDownEvent (new Key (KeyCode.AltMask)));
+        Exception exception = Record.Exception (() => win.NewKeyDownEvent (KeyCode.AltMask));
         Assert.Null (exception);
     }
 
@@ -46,9 +46,9 @@ public class WindowTests
         var sb = new StatusBar (
                                 new StatusItem []
                                 {
-                                    new (KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null),
-                                    new (KeyCode.CtrlMask | KeyCode.O, "~^O~ Open", null),
-                                    new (KeyCode.CtrlMask | KeyCode.C, "~^C~ Copy", null)
+                                    new ((KeyCode)Key.Q.WithCtrl, "~^Q~ Quit", null),
+                                    new ((KeyCode)Key.O.WithCtrl, "~^O~ Open", null),
+                                    new ((KeyCode)Key.C.WithCtrl, "~^C~ Copy", null)
                                 }
                                );
 

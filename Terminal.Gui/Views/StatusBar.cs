@@ -105,14 +105,14 @@ public class StatusBar : View
         {
             foreach (StatusItem item in _items)
             {
-                KeyBindings.Remove ((KeyCode)item.Shortcut);
+                KeyBindings.Remove (item.Shortcut);
             }
 
             _items = value;
 
             foreach (StatusItem item in _items)
             {
-                KeyBindings.Add ((KeyCode)item.Shortcut, KeyBindingScope.HotKey, Command.Accept);
+                KeyBindings.Add (item.Shortcut, KeyBindingScope.HotKey, Command.Accept);
             }
         }
     }
@@ -229,7 +229,7 @@ public class StatusBar : View
         // This is a bit of a hack. We want to handle the key bindings for status bar but
         // InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.
         // So before we call the base class we set SelectedItem appropriately.
-        KeyCode key = keyEvent.KeyCode;
+        Key key = new (keyEvent);
 
         if (KeyBindings.TryGet (key, out _))
         {
@@ -239,7 +239,7 @@ public class StatusBar : View
                 if (item.Shortcut == key)
                 {
                     _itemToInvoke = item;
-                    keyEvent.Scope = KeyBindingScope.HotKey;
+                    //keyEvent.Scope = KeyBindingScope.HotKey;
 
                     break;
                 }

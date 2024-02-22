@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Runtime.Serialization;
@@ -37,10 +38,10 @@ public class LoginViewModel : ReactiveObject
 
         _isValid = canLogin.ToProperty (this, x => x.IsValid);
 
-        Login = ReactiveCommand.CreateFromTask<EventArgs> (
-                                                           e => Task.Delay (TimeSpan.FromSeconds (1)),
-                                                           canLogin
-                                                          );
+        Login = ReactiveCommand.CreateFromTask<CancelEventArgs> (
+                                                                 e => Task.Delay (TimeSpan.FromSeconds (1)),
+                                                                 canLogin
+                                                                );
 
         _usernameLength = this
                           .WhenAnyValue (x => x.Username)
@@ -52,7 +53,7 @@ public class LoginViewModel : ReactiveObject
                           .Select (password => password.Length)
                           .ToProperty (this, x => x.PasswordLength);
 
-        Clear = ReactiveCommand.Create<EventArgs> (e => { });
+        Clear = ReactiveCommand.Create<CancelEventArgs> (e => { });
 
         Clear.Subscribe (
                          unit =>
@@ -64,13 +65,13 @@ public class LoginViewModel : ReactiveObject
     }
 
     [IgnoreDataMember]
-    public ReactiveCommand<EventArgs, Unit> Clear { get; }
+    public ReactiveCommand<CancelEventArgs, Unit> Clear { get; }
 
     [IgnoreDataMember]
     public bool IsValid => _isValid.Value;
 
     [IgnoreDataMember]
-    public ReactiveCommand<EventArgs, Unit> Login { get; }
+    public ReactiveCommand<CancelEventArgs, Unit> Login { get; }
 
     [Reactive]
     [DataMember]

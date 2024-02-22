@@ -30,9 +30,9 @@ public class ConfigurationManagerTests
         }
 
         // act
-        Settings ["Application.QuitKey"].PropertyValue = new Key (KeyCode.Q);
-        Settings ["Application.AlternateForwardKey"].PropertyValue = new Key (KeyCode.F);
-        Settings ["Application.AlternateBackwardKey"].PropertyValue = new Key (KeyCode.B);
+        Settings ["Application.QuitKey"].PropertyValue = Key.Q;
+        Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
+        Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
         Settings ["Application.IsMouseDisabled"].PropertyValue = true;
 
         Apply ();
@@ -143,9 +143,9 @@ public class ConfigurationManagerTests
     {
         Reset ();
 
-        Settings ["Application.QuitKey"].PropertyValue = new Key (KeyCode.Q);
-        Settings ["Application.AlternateForwardKey"].PropertyValue = new Key (KeyCode.F);
-        Settings ["Application.AlternateBackwardKey"].PropertyValue = new Key (KeyCode.B);
+        Settings ["Application.QuitKey"].PropertyValue = Key.Q;
+        Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
+        Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
         Settings ["Application.IsMouseDisabled"].PropertyValue = true;
 
         Updated += ConfigurationManager_Updated;
@@ -221,9 +221,9 @@ public class ConfigurationManagerTests
 
         // arrange
         Reset ();
-        Settings ["Application.QuitKey"].PropertyValue = new Key (KeyCode.Q);
-        Settings ["Application.AlternateForwardKey"].PropertyValue = new Key (KeyCode.F);
-        Settings ["Application.AlternateBackwardKey"].PropertyValue = new Key (KeyCode.B);
+        Settings ["Application.QuitKey"].PropertyValue = Key.Q;
+        Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
+        Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
         Settings ["Application.IsMouseDisabled"].PropertyValue = true;
         Settings.Apply ();
 
@@ -245,9 +245,9 @@ public class ConfigurationManagerTests
         Assert.False (Application.IsMouseDisabled);
 
         // arrange
-        Settings ["Application.QuitKey"].PropertyValue = new Key (KeyCode.Q);
-        Settings ["Application.AlternateForwardKey"].PropertyValue = new Key (KeyCode.F);
-        Settings ["Application.AlternateBackwardKey"].PropertyValue = new Key (KeyCode.B);
+        Settings ["Application.QuitKey"].PropertyValue = Key.Q;
+        Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
+        Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
         Settings ["Application.IsMouseDisabled"].PropertyValue = true;
         Settings.Apply ();
 

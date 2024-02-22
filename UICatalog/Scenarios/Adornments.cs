@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Terminal.Gui;
 
@@ -17,7 +18,7 @@ public class Adornments : Scenario
         ConfigurationManager.Apply ();
         Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
 
-        var view = new Window { Title = "The Window" };
+        var view = new Window { Title = "The _Window" };
         var tf1 = new TextField { Width = 10, Text = "TextField" };
         var color = new ColorPicker { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd (11) };
         color.BorderStyle = LineStyle.RoundedDotted;
@@ -35,7 +36,7 @@ public class Adornments : Scenario
 
         var button = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };
 
-        button.Clicked += (s, e) =>
+        button.Accept += (s, e) =>
                               MessageBox.Query (20, 7, "Hi", $"Am I a {view.GetType ().Name}?", "Yes", "No");
 
         var label = new TextView
@@ -97,7 +98,7 @@ public class Adornments : Scenario
     {
         private readonly ColorPicker _backgroundColorPicker = new ()
         {
-            Title = "BG",
+            Title = "_BG",
             BoxWidth = 1,
             BoxHeight = 1,
             BorderStyle = LineStyle.Single,
@@ -106,7 +107,7 @@ public class Adornments : Scenario
 
         private readonly ColorPicker _foregroundColorPicker = new ()
         {
-            Title = "FG",
+            Title = "_FG",
             BoxWidth = 1,
             BoxHeight = 1,
             BorderStyle = LineStyle.Single,
@@ -187,37 +188,41 @@ public class Adornments : Scenario
             var editWidth = 3;
 
             _topEdit = new TextField { X = Pos.Center (), Y = 0, Width = editWidth };
-            _topEdit.TextChanging += Edit_TextChanging;
+
+            _topEdit.Accept += Edit_Accept;
             Add (_topEdit);
 
             _leftEdit = new TextField
             {
                 X = Pos.Left (_topEdit) - editWidth, Y = Pos.Bottom (_topEdit), Width = editWidth
             };
-            _leftEdit.TextChanging += Edit_TextChanging;
+
+            _leftEdit.Accept += Edit_Accept;
             Add (_leftEdit);
 
             _rightEdit = new TextField { X = Pos.Right (_topEdit), Y = Pos.Bottom (_topEdit), Width = editWidth };
-            _rightEdit.TextChanging += Edit_TextChanging;
+
+            _rightEdit.Accept += Edit_Accept;
             Add (_rightEdit);
 
             _bottomEdit = new TextField { X = Pos.Center (), Y = Pos.Bottom (_leftEdit), Width = editWidth };
-            _bottomEdit.TextChanging += Edit_TextChanging;
+
+            _bottomEdit.Accept += Edit_Accept;
             Add (_bottomEdit);
 
             var copyTop = new Button { X = Pos.Center () + 1, Y = Pos.Bottom (_bottomEdit), Text = "Cop_y Top" };
 
-            copyTop.Clicked += (s, e) =>
-                               {
-                                   Thickness = new Thickness (Thickness.Top);
+            copyTop.Accept += (s, e) =>
+                              {
+                                  Thickness = new Thickness (Thickness.Top);
 
-                                   if (string.IsNullOrEmpty (_topEdit.Text))
-                                   {
-                                       _topEdit.Text = "0";
-                                   }
+                                  if (string.IsNullOrEmpty (_topEdit.Text))
+                                  {
+                                      _topEdit.Text = "0";
+                                  }
 
-                                   _bottomEdit.Text = _leftEdit.Text = _rightEdit.Text = _topEdit.Text;
-                               };
+                                  _bottomEdit.Text = _leftEdit.Text = _rightEdit.Text = _topEdit.Text;
+                              };
             Add (copyTop);
 
             // Foreground ColorPicker.
@@ -258,67 +263,17 @@ public class Adornments : Scenario
             LayoutSubviews ();
             Height = GetAdornmentsThickness ().Vertical + 4 + 4;
             Width = GetAdornmentsThickness ().Horizontal + _foregroundColorPicker.Frame.Width * 2 - 3;
+
+
         }
 
-        private void Edit_TextChanging (object sender, TextChangingEventArgs e)
+        private void Edit_Accept (object sender, CancelEventArgs e)
         {
-            try
-            {
-                if (string.IsNullOrEmpty (e.NewText))
-                {
-                    e.Cancel = true;
-                    ((TextField)sender).Text = "0";
-
-                    return;
-                }
-
-                switch (sender.ToString ())
-                {
-                    case var s when s == _topEdit.ToString ():
-                        Thickness = new Thickness (
-                                                   Thickness.Left,
-                                                   int.Parse (e.NewText),
-                                                   Thickness.Right,
-                                                   Thickness.Bottom
-                                                  );
-
-                        break;
-                    case var s when s == _leftEdit.ToString ():
-                        Thickness = new Thickness (
-                                                   int.Parse (e.NewText),
-                                                   Thickness.Top,
-                                                   Thickness.Right,
-                                                   Thickness.Bottom
-                                                  );
-
-                        break;
-                    case var s when s == _rightEdit.ToString ():
-                        Thickness = new Thickness (
-                                                   Thickness.Left,
-                                                   Thickness.Top,
-                                                   int.Parse (e.NewText),
-                                                   Thickness.Bottom
-                                                  );
-
-                        break;
-                    case var s when s == _bottomEdit.ToString ():
-                        Thickness = new Thickness (
-                                                   Thickness.Left,
-                                                   Thickness.Top,
-                                                   Thickness.Right,
-                                                   int.Parse (e.NewText)
-                                                  );
-
-                        break;
-                }
-            }
-            catch
-            {
-                if (!string.IsNullOrEmpty (e.NewText))
-                {
-                    e.Cancel = true;
-                }
-            }
+            e.Cancel = true;
+            Thickness = new Thickness(int.Parse(_leftEdit.Text),
+                                      int.Parse(_topEdit.Text),
+                                      int.Parse (_rightEdit.Text),
+                                      int.Parse (_bottomEdit.Text));
         }
     }
 
@@ -343,7 +298,7 @@ public class Adornments : Scenario
                 {
                     X = 0,
                     Y = 0,
-                    Title = "Margin",
+                    Title = "_Margin",
                     Thickness = _viewToEdit.Margin.Thickness,
                     Color = new Attribute (_viewToEdit.Margin.ColorScheme.Normal),
                     SuperViewRendersLineCanvas = true
@@ -356,7 +311,7 @@ public class Adornments : Scenario
                 {
                     X = Pos.Left (_marginEditor),
                     Y = Pos.Bottom (_marginEditor),
-                    Title = "Border",
+                    Title = "B_order",
                     Thickness = _viewToEdit.Border.Thickness,
                     Color = new Attribute (_viewToEdit.Border.ColorScheme.Normal),
                     SuperViewRendersLineCanvas = true
@@ -373,7 +328,7 @@ public class Adornments : Scenario
                     Y = Pos.Top (_borderEditor),
                     SelectedItem = (int)_viewToEdit.Border.LineStyle,
                     BorderStyle = LineStyle.Double,
-                    Title = "Border Style",
+                    Title = "Border St_yle",
                     SuperViewRendersLineCanvas = true,
                     RadioLabels = borderStyleEnum.Select (
                                                           e => e.ToString ()
@@ -435,7 +390,7 @@ public class Adornments : Scenario
                 {
                     X = Pos.Left (_borderEditor),
                     Y = Pos.Bottom (rbBorderStyle),
-                    Title = "Padding",
+                    Title = "_Padding",
                     Thickness = _viewToEdit.Padding.Thickness,
                     Color = new Attribute (_viewToEdit.Padding.ColorScheme.Normal),
                     SuperViewRendersLineCanvas = true

@@ -23,9 +23,9 @@ public class SettingsScopeTests
         Assert.False ((bool)Settings ["Application.IsMouseDisabled"].PropertyValue);
 
         // act
-        Settings ["Application.QuitKey"].PropertyValue = new Key (KeyCode.Q);
-        Settings ["Application.AlternateForwardKey"].PropertyValue = new Key (KeyCode.F);
-        Settings ["Application.AlternateBackwardKey"].PropertyValue = new Key (KeyCode.B);
+        Settings ["Application.QuitKey"].PropertyValue = Key.Q;
+        Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
+        Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
         Settings ["Application.IsMouseDisabled"].PropertyValue = true;
 
         Settings.Apply ();
@@ -41,14 +41,14 @@ public class SettingsScopeTests
     [AutoInitShutdown]
     public void CopyUpdatedPropertiesFrom_ShouldCopyChangedPropertiesOnly ()
     {
-        Settings ["Application.QuitKey"].PropertyValue = new Key (KeyCode.End);
+        Settings ["Application.QuitKey"].PropertyValue = Key.End;
         ;
 
         var updatedSettings = new SettingsScope ();
 
         ///Don't set Quitkey
-        updatedSettings ["Application.AlternateForwardKey"].PropertyValue = new Key (KeyCode.F);
-        updatedSettings ["Application.AlternateBackwardKey"].PropertyValue = new Key (KeyCode.B);
+        updatedSettings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
+        updatedSettings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
         updatedSettings ["Application.IsMouseDisabled"].PropertyValue = true;
 
         Settings.Update (updatedSettings);

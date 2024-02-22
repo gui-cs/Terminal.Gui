@@ -215,7 +215,7 @@ public class MessageBoxes : Scenario
             X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show MessageBox"
         };
 
-        showMessageBoxButton.Clicked += (s, e) =>
+        showMessageBoxButton.Accept += (s, e) =>
                                         {
                                             try
                                             {

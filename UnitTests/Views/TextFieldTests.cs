@@ -1,6 +1,8 @@
-﻿using System.Globalization;
+﻿using System.ComponentModel;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
+using CsvHelper;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -82,18 +84,18 @@ public class TextFieldTests
     {
         var tf = new TextField ();
         tf.EnsureFocus ();
-        tf.NewKeyDownEvent (new Key (KeyCode.A | KeyCode.ShiftMask));
+        tf.NewKeyDownEvent (Key.A.WithShift);
         Assert.Equal ("A", tf.Text);
 
         // cancel the next keystroke
-        tf.TextChanging += (s, e) => e.Cancel = e.NewText == "AB";
-        tf.NewKeyDownEvent (new Key (KeyCode.B | KeyCode.ShiftMask));
+        tf.TextChanging += (s, e) => e.Cancel = e.NewValue == "AB";
+        tf.NewKeyDownEvent (Key.B.WithShift);
 
         // B was canceled so should just be A
         Assert.Equal ("A", tf.Text);
 
         // now delete the A
-        tf.NewKeyDownEvent (new Key (KeyCode.Backspace));
+        tf.NewKeyDownEvent (Key.Backspace);
 
         Assert.Equal ("", tf.Text);
     }
@@ -360,11 +362,11 @@ public class TextFieldTests
 
         _textField.TextChanging += _textField_TextChanging;
 
-        void _textField_TextChanging (object sender, TextChangingEventArgs e)
+        void _textField_TextChanging (object sender, StateEventArgs<string> e)
         {
-            if (e.NewText.GetRuneCount () > 11)
+            if (e.NewValue.GetRuneCount () > 11)
             {
-                e.NewText = e.NewText [..11];
+                e.NewValue = e.NewValue [..11];
             }
         }
 
@@ -426,7 +428,7 @@ public class TextFieldTests
         var oldText = "";
         var tf = new TextField { Width = 10, Text = "-1" };
 
-        tf.TextChanging += (s, e) => newText = e.NewText;
+        tf.TextChanging += (s, e) => newText = e.NewValue;
         tf.TextChanged += (s, e) => oldText = e.OldValue;
 
         Application.Top.Add (tf);
@@ -439,7 +441,7 @@ public class TextFieldTests
         tf.CursorPosition = 2;
         Assert.Equal (1, tf.SelectedLength);
         Assert.Equal ("1", tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.D2)));
+        Assert.True (tf.NewKeyDownEvent (Key.D2));
         Assert.Equal ("-2", newText);
         Assert.Equal ("-1", oldText);
         Assert.Equal ("-2", tf.Text);
@@ -449,7 +451,7 @@ public class TextFieldTests
         tf.CursorPosition = 2;
         Assert.Equal (1, tf.SelectedLength);
         Assert.Equal ("2", tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Backspace)));
+        Assert.True (tf.NewKeyDownEvent (Key.Backspace));
         Assert.Equal ("-", newText);
         Assert.Equal ("-2", oldText);
         Assert.Equal ("-", tf.Text);
@@ -460,7 +462,7 @@ public class TextFieldTests
         tf.CursorPosition = 2;
         Assert.Equal (1, tf.SelectedLength);
         Assert.Equal ("1", tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Delete)));
+        Assert.True (tf.NewKeyDownEvent (Key.Delete));
         Assert.Equal ("-", newText);
         Assert.Equal ("-1", oldText);
         Assert.Equal ("-", tf.Text);
@@ -471,7 +473,7 @@ public class TextFieldTests
         tf.CursorPosition = 2;
         Assert.Equal (1, tf.SelectedLength);
         Assert.Equal ("1", tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.X | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.X.WithCtrl));
         Assert.Equal ("-", newText);
         Assert.Equal ("-1", oldText);
         Assert.Equal ("-", tf.Text);
@@ -486,7 +488,7 @@ public class TextFieldTests
                     );
         Assert.Equal ("Misérables ", tf.SelectedText);
         Assert.Equal (11, tf.SelectedLength);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Delete)));
+        Assert.True (tf.NewKeyDownEvent (Key.Delete));
         Assert.Equal ("Les movie.", newText);
         Assert.Equal ("Les Misérables movie.", oldText);
         Assert.Equal ("Les movie.", tf.Text);
@@ -504,7 +506,7 @@ public class TextFieldTests
         tf.ClearHistoryChanges ();
         Assert.False (tf.IsDirty);
 
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.A | KeyCode.ShiftMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.A.WithShift));
         Assert.Equal ($"{text}A", tf.Text);
         Assert.True (tf.IsDirty);
     }
@@ -521,171 +523,191 @@ public class TextFieldTests
         Assert.Equal (15, tf.CursorPosition);
         Assert.False (tf.ReadOnly);
 
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Delete)));
+        Assert.True (tf.NewKeyDownEvent (Key.Delete));
         Assert.Equal ("This is a test.", tf.Text);
         tf.CursorPosition = 0;
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Delete)));
+        Assert.True (tf.NewKeyDownEvent (Key.Delete));
         Assert.Equal ("his is a test.", tf.Text);
         tf.ReadOnly = true;
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.D | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.D.WithCtrl));
         Assert.Equal ("his is a test.", tf.Text);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Delete)));
+        Assert.True (tf.NewKeyDownEvent (Key.Delete));
         Assert.Equal ("his is a test.", tf.Text);
         tf.ReadOnly = false;
         tf.CursorPosition = 1;
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Backspace)));
+        Assert.True (tf.NewKeyDownEvent (Key.Backspace));
         Assert.Equal ("is is a test.", tf.Text);
         tf.CursorPosition = 5;
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Home | KeyCode.ShiftMask)));
-        Assert.Equal ("is is a test.", tf.Text);
-        Assert.Equal ("is is", tf.SelectedText);
-        tf.CursorPosition = 5;
-        tf.SelectedStart = -1;
-        Assert.Null (tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Home | KeyCode.ShiftMask | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.Home.WithShift));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal ("is is", tf.SelectedText);
         tf.CursorPosition = 5;
         tf.SelectedStart = -1;
         Assert.Null (tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.A | KeyCode.ShiftMask | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.Home.WithShift.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal ("is is", tf.SelectedText);
         tf.CursorPosition = 5;
         tf.SelectedStart = -1;
         Assert.Null (tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.End | KeyCode.ShiftMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.A.WithShift.WithCtrl));
+        Assert.Equal ("is is a test.", tf.Text);
+        Assert.Equal ("is is", tf.SelectedText);
+        tf.CursorPosition = 5;
+        tf.SelectedStart = -1;
+        Assert.Null (tf.SelectedText);
+        Assert.True (tf.NewKeyDownEvent (Key.End.WithShift));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal (" a test.", tf.SelectedText);
         tf.CursorPosition = 5;
         tf.SelectedStart = -1;
         Assert.Null (tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.End | KeyCode.ShiftMask | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.End.WithShift.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal (" a test.", tf.SelectedText);
         tf.CursorPosition = 5;
         tf.SelectedStart = -1;
         Assert.Null (tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.E | KeyCode.ShiftMask | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.E.WithShift.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal (" a test.", tf.SelectedText);
         tf.CursorPosition = 5;
         tf.SelectedStart = -1;
         Assert.Null (tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Home)));
+        Assert.True (tf.NewKeyDownEvent (Key.Home));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal (0, tf.CursorPosition);
         tf.CursorPosition = 5;
         Assert.Null (tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Home | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.Home.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal (0, tf.CursorPosition);
         tf.CursorPosition = 5;
         Assert.Null (tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.A | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.A.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal (0, tf.CursorPosition);
         tf.CursorPosition = 5;
         tf.SelectedStart = -1;
         Assert.Null (tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.CursorLeft | KeyCode.ShiftMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.CursorLeft.WithShift));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal ("s", tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.CursorUp | KeyCode.ShiftMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.CursorUp.WithShift));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal ("is", tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.CursorRight | KeyCode.ShiftMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.CursorRight.WithShift));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal ("s", tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.CursorDown | KeyCode.ShiftMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.CursorDown.WithShift));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Null (tf.SelectedText);
         tf.CursorPosition = 7;
         tf.SelectedStart = -1;
         Assert.Null (tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.CursorLeft | KeyCode.ShiftMask | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.CursorLeft.WithShift.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal ("a", tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.CursorUp | KeyCode.ShiftMask | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.CursorUp.WithShift.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal ("is a", tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (('B' + KeyCode.ShiftMask) | KeyCode.AltMask)));
+#if UNIX_KEY_BINDINGS
+        Assert.True (tf.NewKeyDownEvent (Key.B.WithShift.WithAlt));
+#else
+        Assert.True (tf.NewKeyDownEvent (Key.CursorUp.WithShift.WithCtrl));
+#endif
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal ("is is a", tf.SelectedText);
         tf.CursorPosition = 3;
         tf.SelectedStart = -1;
         Assert.Null (tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.CursorRight | KeyCode.ShiftMask | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.CursorRight.WithShift.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal ("is ", tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.CursorDown | KeyCode.ShiftMask | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.CursorDown.WithShift.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal ("is a ", tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (('F' + KeyCode.ShiftMask) | KeyCode.AltMask)));
+#if UNIX_KEY_BINDINGS
+        Assert.True (tf.NewKeyDownEvent (Key.F.WithShift.WithAlt));
+#else
+        Assert.True (tf.NewKeyDownEvent (Key.CursorRight.WithShift.WithCtrl));
+#endif
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal ("is a test.", tf.SelectedText);
         Assert.Equal (13, tf.CursorPosition);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
+        Assert.True (tf.NewKeyDownEvent (Key.CursorLeft));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Null (tf.SelectedText);
         Assert.Equal (12, tf.CursorPosition);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
+        Assert.True (tf.NewKeyDownEvent (Key.CursorLeft));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal (11, tf.CursorPosition);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.End)));
+        Assert.True (tf.NewKeyDownEvent (Key.End));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal (13, tf.CursorPosition);
         tf.CursorPosition = 0;
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.End | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.End.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal (13, tf.CursorPosition);
         tf.CursorPosition = 0;
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.E | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.E.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal (13, tf.CursorPosition);
         tf.CursorPosition = 0;
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+        Assert.True (tf.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal (1, tf.CursorPosition);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.F | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.F.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal (2, tf.CursorPosition);
         tf.CursorPosition = 9;
         tf.ReadOnly = true;
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.K.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
         tf.ReadOnly = false;
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.K.WithCtrl));
         Assert.Equal ("is is a t", tf.Text);
         Assert.Equal ("est.", Clipboard.Contents);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.Y.WithCtrl));
         Assert.Equal ("is is a t", tf.Text);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Backspace | KeyCode.AltMask)));
+#if UNIX_KEY_BINDINGS
+        Assert.True (tf.NewKeyDownEvent (Key.Backspace.WithAlt));
+#else
+        Assert.True (tf.NewKeyDownEvent (Key.Z.WithCtrl));
+#endif
         Assert.Equal ("is is a test.", tf.Text);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.Y.WithCtrl));
         Assert.Equal ("is is a t", tf.Text);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.CursorLeft | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.CursorLeft.WithCtrl));
         Assert.Equal ("is is a t", tf.Text);
         Assert.Equal (8, tf.CursorPosition);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.CursorUp | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.CursorUp.WithCtrl));
         Assert.Equal ("is is a t", tf.Text);
         Assert.Equal (6, tf.CursorPosition);
-        Assert.True (tf.NewKeyDownEvent (new Key ('B' + KeyCode.AltMask)));
+#if UNIX_KEY_BINDINGS
+        Assert.True (tf.NewKeyDownEvent (Key.B.WithAlt));
+#else
+        Assert.True (tf.NewKeyDownEvent (Key.CursorLeft.WithCtrl));
+#endif
         Assert.Equal ("is is a t", tf.Text);
         Assert.Equal (3, tf.CursorPosition);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.CursorRight | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.CursorRight.WithCtrl));
         Assert.Equal ("is is a t", tf.Text);
         Assert.Equal (6, tf.CursorPosition);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.CursorDown | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.CursorDown.WithCtrl));
         Assert.Equal ("is is a t", tf.Text);
         Assert.Equal (8, tf.CursorPosition);
-        Assert.True (tf.NewKeyDownEvent (new Key ('F' + KeyCode.AltMask)));
+#if UNIX_KEY_BINDINGS
+        Assert.True (tf.NewKeyDownEvent (Key.F.WithAlt));
+#else
+        Assert.True (tf.NewKeyDownEvent (Key.CursorRight.WithCtrl));
+#endif
         Assert.Equal ("is is a t", tf.Text);
         Assert.Equal (9, tf.CursorPosition);
         Assert.True (tf.Used);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Insert)));
+        Assert.True (tf.NewKeyDownEvent (Key.InsertChar));
         Assert.Equal ("is is a t", tf.Text);
         Assert.Equal (9, tf.CursorPosition);
         Assert.False (tf.Used);
@@ -693,30 +715,105 @@ public class TextFieldTests
         tf.CursorPosition = 7;
         Assert.Equal ("is a", tf.SelectedText);
         Assert.Equal ("est.", Clipboard.Contents);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.C | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.C.WithCtrl));
         Assert.Equal ("is is a t", tf.Text);
         Assert.Equal ("is a", Clipboard.Contents);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.X | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.X.WithCtrl));
         Assert.Equal ("is  t", tf.Text);
         Assert.Equal ("is a", Clipboard.Contents);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.V | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.V.WithCtrl));
         Assert.Equal ("is is a t", tf.Text);
         Assert.Equal ("is a", Clipboard.Contents);
         Assert.Equal (7, tf.CursorPosition);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.AltMask)));
+#if UNIX_KEY_BINDINGS
+        Assert.True (tf.NewKeyDownEvent (Key.K.WithAlt));
+#else
+        Assert.True (tf.NewKeyDownEvent (Key.K.WithCtrl.WithShift));
+#endif
         Assert.Equal (" t", tf.Text);
         Assert.Equal ("is is a", Clipboard.Contents);
         tf.Text = "TAB to jump between text fields.";
         Assert.Equal (0, tf.CursorPosition);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Delete | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.Delete.WithCtrl));
         Assert.Equal ("to jump between text fields.", tf.Text);
         tf.CursorPosition = tf.Text.Length;
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Backspace | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.Backspace.WithCtrl));
         Assert.Equal ("to jump between text fields", tf.Text);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.T | KeyCode.CtrlMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.T.WithCtrl));
         Assert.Equal ("to jump between text fields", tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.D | KeyCode.CtrlMask | KeyCode.ShiftMask)));
+        Assert.True (tf.NewKeyDownEvent (Key.D.WithCtrl.WithShift));
         Assert.Equal ("", tf.Text);
+    }
+
+
+    [Fact]
+    public void HotKey_Command_SetsFocus ()
+    {
+        var view = new TextField ();
+
+        view.CanFocus = true;
+        Assert.False (view.HasFocus);
+        view.InvokeCommand (Command.HotKey);
+        Assert.True (view.HasFocus);
+    }
+
+    [Fact]
+    public void HotKey_Command_Does_Not_Accept ()
+    {
+        var view = new TextField ();
+        var accepted = false;
+        view.Accept += OnAccept;
+        view.InvokeCommand (Command.HotKey);
+
+        Assert.False (accepted);
+
+        return;
+        void OnAccept (object sender, CancelEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void Accept_Command_Fires_Accept ()
+    {
+        var view = new TextField ();
+
+        var accepted = false;
+        view.Accept += Accept;
+        view.InvokeCommand (Command.Accept);
+        Assert.True (accepted);
+
+        return;
+
+        void Accept (object sender, CancelEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void Accept_Cancel_Event_HandlesCommand ()
+    {
+        //var super = new View ();
+        var view = new TextField ();
+        //super.Add (view);
+
+        //var superAcceptedInvoked = false;
+
+        var tfAcceptedInvoked = false;
+        var cancel = false;
+        view.Accept += TextViewAccept;
+        Assert.True (view.InvokeCommand (Command.Accept));
+        Assert.True (tfAcceptedInvoked);
+
+        tfAcceptedInvoked = false;
+        cancel = true;
+        view.Accept += TextViewAccept;
+        Assert.False (view.InvokeCommand (Command.Accept));
+        Assert.True (tfAcceptedInvoked);
+
+        return;
+
+        void TextViewAccept (object sender, CancelEventArgs e)
+        {
+            tfAcceptedInvoked = true;
+            e.Cancel = cancel;
+        }
     }
 
     [Fact]
@@ -743,7 +840,7 @@ public class TextFieldTests
     }
 
     [Fact]
-    public void ProcessKey_Backspace_From_End ()
+    public void Backspace_From_End ()
     {
         var tf = new TextField { Text = "ABC" };
         tf.EnsureFocus ();
@@ -754,23 +851,23 @@ public class TextFieldTests
         Assert.Equal (3, tf.CursorPosition);
 
         // now delete the C
-        tf.NewKeyDownEvent (new Key (KeyCode.Backspace));
+        tf.NewKeyDownEvent (Key.Backspace);
         Assert.Equal ("AB", tf.Text);
         Assert.Equal (2, tf.CursorPosition);
 
         // then delete the B
-        tf.NewKeyDownEvent (new Key (KeyCode.Backspace));
+        tf.NewKeyDownEvent (Key.Backspace);
         Assert.Equal ("A", tf.Text);
         Assert.Equal (1, tf.CursorPosition);
 
         // then delete the A
-        tf.NewKeyDownEvent (new Key (KeyCode.Backspace));
+        tf.NewKeyDownEvent (Key.Backspace);
         Assert.Equal ("", tf.Text);
         Assert.Equal (0, tf.CursorPosition);
     }
 
     [Fact]
-    public void ProcessKey_Backspace_From_Middle ()
+    public void Backspace_From_Middle ()
     {
         var tf = new TextField { Text = "ABC" };
         tf.EnsureFocus ();
@@ -778,20 +875,20 @@ public class TextFieldTests
         Assert.Equal ("ABC", tf.Text);
 
         // now delete the B
-        tf.NewKeyDownEvent (new Key (KeyCode.Backspace));
+        tf.NewKeyDownEvent (Key.Backspace);
         Assert.Equal ("AC", tf.Text);
 
         // then delete the A
-        tf.NewKeyDownEvent (new Key (KeyCode.Backspace));
+        tf.NewKeyDownEvent (Key.Backspace);
         Assert.Equal ("C", tf.Text);
 
         // then delete nothing
-        tf.NewKeyDownEvent (new Key (KeyCode.Backspace));
+        tf.NewKeyDownEvent (Key.Backspace);
         Assert.Equal ("C", tf.Text);
 
         // now delete the C
         tf.CursorPosition = 1;
-        tf.NewKeyDownEvent (new Key (KeyCode.Backspace));
+        tf.NewKeyDownEvent (Key.Backspace);
         Assert.Equal ("", tf.Text);
     }
 
@@ -838,7 +935,7 @@ public class TextFieldTests
         // Cursor is at the end
         Assert.Equal (32, _textField.CursorPosition);
         _textField.CursorPosition = 0;
-        _textField.NewKeyDownEvent (new Key (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask));
+        _textField.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
         var first = true;
         Application.RunIteration (ref rs, ref first);
@@ -867,7 +964,7 @@ public class TextFieldTests
         _textField.SelectedStart = 19;
         _textField.CursorPosition = 12;
         Assert.Equal ("TAB to jump between text fields.", _textField.Text);
-        _textField.NewKeyDownEvent (new Key ((KeyCode)0x75)); // u
+        _textField.NewKeyDownEvent (Key.U); // u
         Assert.Equal ("TAB to jump u text fields.", _textField.Text);
     }
 
@@ -893,35 +990,40 @@ public class TextFieldTests
     }
 
     [Fact]
-    [AutoInitShutdown]
-    public void Test_RootKeyEvent_Cancel ()
+    public void KeyDown_Handled_Prevents_Input ()
     {
-        Application.KeyDown += SuppressKey;
-
         var tf = new TextField ();
+        tf.KeyDown += HandleJKey;
 
-        Application.Top.Add (tf);
-        Application.Begin (Application.Top);
-
-        Application.Driver.SendKeys ('a', ConsoleKey.A, false, false, false);
+        tf.NewKeyDownEvent (Key.A);
         Assert.Equal ("a", tf.Text);
 
         // SuppressKey suppresses the 'j' key
-        Application.Driver.SendKeys ('j', ConsoleKey.J, false, false, false);
+        tf.NewKeyDownEvent (Key.J);
         Assert.Equal ("a", tf.Text);
 
-        Application.KeyDown -= SuppressKey;
+        tf.KeyDown -= HandleJKey;
 
         // Now that the delegate has been removed we can type j again
-        Application.Driver.SendKeys ('j', ConsoleKey.J, false, false, false);
+        tf.NewKeyDownEvent (Key.J);
         Assert.Equal ("aj", tf.Text);
+
+        return;
+
+        void HandleJKey (object s, Key arg)
+        {
+            if (arg.AsRune == new Rune ('j'))
+            {
+                arg.Handled = true;
+            }
+        }
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void Test_RootMouseKeyEvent_Cancel ()
+    public void MouseEvent_Handled_Prevents_RightClick ()
     {
-        Application.MouseEvent += SuppressRightClick;
+        Application.MouseEvent += HandleRightClick;
 
         var tf = new TextField { Width = 10 };
         var clickCounter = 0;
@@ -941,7 +1043,7 @@ public class TextFieldTests
         Application.OnMouseEvent (new MouseEventEventArgs (mouseEvent));
         Assert.Equal (1, clickCounter);
 
-        Application.MouseEvent -= SuppressRightClick;
+        Application.MouseEvent -= HandleRightClick;
 
         // Get a fresh instance that represents a right click.
         // Should no longer be ignored as the callback was removed
@@ -953,22 +1055,32 @@ public class TextFieldTests
         // Which is correct, because the user did NOT click with the left mouse button.
         Application.OnMouseEvent (new MouseEventEventArgs (mouseEvent));
         Assert.Equal (1, clickCounter);
+
+        return;
+
+        void HandleRightClick (object sender, MouseEventEventArgs arg)
+        {
+            if (arg.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
+            {
+                arg.Handled = true;
+            }
+        }
     }
 
     [InlineData ("a")] // Lower than selection
     [InlineData ("aaaaaaaaaaa")] // Greater than selection
     [InlineData ("aaaa")] // Equal than selection
     [Theory]
-    public void TestSetTextAndMoveCursorToEnd_WhenExistingSelection (string newText)
+    public void SetTextAndMoveCursorToEnd_WhenExistingSelection (string newText)
     {
         var tf = new TextField ();
         tf.Text = "fish";
         tf.CursorPosition = tf.Text.Length;
 
-        tf.NewKeyDownEvent (new Key (KeyCode.CursorLeft));
+        tf.NewKeyDownEvent (Key.CursorLeft);
 
-        tf.NewKeyDownEvent (new Key (KeyCode.CursorLeft | KeyCode.ShiftMask));
-        tf.NewKeyDownEvent (new Key (KeyCode.CursorLeft | KeyCode.ShiftMask));
+        tf.NewKeyDownEvent (Key.CursorLeft.WithShift);
+        tf.NewKeyDownEvent (Key.CursorLeft.WithShift);
 
         Assert.Equal (1, tf.CursorPosition);
         Assert.Equal (2, tf.SelectedLength);
@@ -1012,7 +1124,7 @@ public class TextFieldTests
 
         _textField.TextChanging += (s, e) =>
                                    {
-                                       Assert.Equal ("changing", e.NewText);
+                                       Assert.Equal ("changing", e.NewValue);
 
                                        if (cancel)
                                        {
@@ -1029,7 +1141,7 @@ public class TextFieldTests
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void TextField_SpaceHandling ()
+    public void SpaceHandling ()
     {
         var tf = new TextField { Width = 10, Text = " " };
 
@@ -1051,13 +1163,13 @@ public class TextFieldTests
         _textField.Used = false;
         _textField.CursorPosition = 10;
         Assert.Equal ("TAB to jump between text fields.", _textField.Text);
-        _textField.NewKeyDownEvent (new Key ((KeyCode)0x75)); // u
+        _textField.NewKeyDownEvent (Key.U); // u
         Assert.Equal ("TAB to jumu between text fields.", _textField.Text);
-        _textField.NewKeyDownEvent (new Key ((KeyCode)0x73)); // s
+        _textField.NewKeyDownEvent (Key.S); // s
         Assert.Equal ("TAB to jumusbetween text fields.", _textField.Text);
-        _textField.NewKeyDownEvent (new Key ((KeyCode)0x65)); // e
+        _textField.NewKeyDownEvent (Key.E); // e
         Assert.Equal ("TAB to jumuseetween text fields.", _textField.Text);
-        _textField.NewKeyDownEvent (new Key ((KeyCode)0x64)); // d
+        _textField.NewKeyDownEvent (Key.D); // d
         Assert.Equal ("TAB to jumusedtween text fields.", _textField.Text);
     }
 
@@ -1067,13 +1179,13 @@ public class TextFieldTests
     {
         _textField.CursorPosition = 10;
         Assert.Equal ("TAB to jump between text fields.", _textField.Text);
-        _textField.NewKeyDownEvent (new Key ((KeyCode)0x75)); // u
+        _textField.NewKeyDownEvent (Key.U); // u
         Assert.Equal ("TAB to jumup between text fields.", _textField.Text);
-        _textField.NewKeyDownEvent (new Key ((KeyCode)0x73)); // s
+        _textField.NewKeyDownEvent (Key.S); // s
         Assert.Equal ("TAB to jumusp between text fields.", _textField.Text);
-        _textField.NewKeyDownEvent (new Key ((KeyCode)0x65)); // e
+        _textField.NewKeyDownEvent (Key.E); // e
         Assert.Equal ("TAB to jumusep between text fields.", _textField.Text);
-        _textField.NewKeyDownEvent (new Key ((KeyCode)0x64)); // d
+        _textField.NewKeyDownEvent (Key.D); // d
         Assert.Equal ("TAB to jumusedp between text fields.", _textField.Text);
     }
 
@@ -1086,7 +1198,7 @@ public class TextFieldTests
 
         while (_textField.CursorPosition > 0)
         {
-            _textField.NewKeyDownEvent (new Key (KeyCode.CursorLeft | KeyCode.CtrlMask));
+            _textField.NewKeyDownEvent (Key.CursorLeft.WithCtrl);
 
             switch (iteration)
             {
@@ -1157,7 +1269,7 @@ public class TextFieldTests
 
         while (_textField.CursorPosition > 0)
         {
-            _textField.NewKeyDownEvent (new Key (KeyCode.CursorLeft | KeyCode.CtrlMask));
+            _textField.NewKeyDownEvent (Key.CursorLeft.WithCtrl);
 
             switch (iteration)
             {
@@ -1370,26 +1482,26 @@ public class TextFieldTests
         tf.BeginInit ();
         tf.EndInit ();
 
-        tf.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.CursorLeft));
+        tf.NewKeyDownEvent (Key.CursorLeft.WithCtrl);
         Assert.Equal (15, tf.CursorPosition);
-        tf.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.CursorLeft));
+        tf.NewKeyDownEvent (Key.CursorLeft.WithCtrl);
         Assert.Equal (12, tf.CursorPosition);
-        tf.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.CursorLeft));
+        tf.NewKeyDownEvent (Key.CursorLeft.WithCtrl);
         Assert.Equal (10, tf.CursorPosition);
-        tf.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.CursorLeft));
+        tf.NewKeyDownEvent (Key.CursorLeft.WithCtrl);
         Assert.Equal (5, tf.CursorPosition);
-        tf.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.CursorLeft));
+        tf.NewKeyDownEvent (Key.CursorLeft.WithCtrl);
         Assert.Equal (0, tf.CursorPosition);
 
-        tf.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.CursorRight));
+        tf.NewKeyDownEvent (Key.CursorRight.WithCtrl);
         Assert.Equal (5, tf.CursorPosition);
-        tf.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.CursorRight));
+        tf.NewKeyDownEvent (Key.CursorRight.WithCtrl);
         Assert.Equal (10, tf.CursorPosition);
-        tf.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.CursorRight));
+        tf.NewKeyDownEvent (Key.CursorRight.WithCtrl);
         Assert.Equal (12, tf.CursorPosition);
-        tf.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.CursorRight));
+        tf.NewKeyDownEvent (Key.CursorRight.WithCtrl);
         Assert.Equal (15, tf.CursorPosition);
-        tf.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.CursorRight));
+        tf.NewKeyDownEvent (Key.CursorRight.WithCtrl);
         Assert.Equal (22, tf.CursorPosition);
     }
 
@@ -1443,7 +1555,7 @@ public class TextFieldTests
 
         while (_textField.CursorPosition < _textField.Text.Length)
         {
-            _textField.NewKeyDownEvent (new Key (KeyCode.CursorRight | KeyCode.CtrlMask));
+            _textField.NewKeyDownEvent (Key.CursorRight.WithCtrl);
 
             switch (iteration)
             {
@@ -1507,7 +1619,7 @@ public class TextFieldTests
 
         while (_textField.CursorPosition < _textField.Text.Length)
         {
-            _textField.NewKeyDownEvent (new Key (KeyCode.CursorRight | KeyCode.CtrlMask));
+            _textField.NewKeyDownEvent (Key.CursorRight.WithCtrl);
 
             switch (iteration)
             {
@@ -1604,9 +1716,7 @@ public class TextFieldTests
 
         while (_textField.CursorPosition < _textField.Text.Length)
         {
-            _textField.NewKeyDownEvent (
-                                        new Key (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask)
-                                       );
+            _textField.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
             switch (iteration)
             {
@@ -1669,9 +1779,7 @@ public class TextFieldTests
 
         while (_textField.CursorPosition < _textField.Text.Length)
         {
-            _textField.NewKeyDownEvent (
-                                        new Key (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask)
-                                       );
+            _textField.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
             switch (iteration)
             {
@@ -1758,22 +1866,6 @@ Les Miśerables",
         Assert.Same (tf, top.Focused);
 
         return tf;
-    }
-
-    private void SuppressKey (object s, Key arg)
-    {
-        if (arg.AsRune == new Rune ('j'))
-        {
-            arg.Handled = true;
-        }
-    }
-
-    private void SuppressRightClick (object sender, MouseEventEventArgs arg)
-    {
-        if (arg.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
-        {
-            arg.Handled = true;
-        }
     }
 
     // This class enables test functions annotated with the [InitShutdown] attribute

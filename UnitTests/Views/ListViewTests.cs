@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.ComponentModel;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -367,27 +368,119 @@ Item 6",
         lv.BeginInit ();
         lv.EndInit ();
         Assert.Equal (-1, lv.SelectedItem);
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (lv.NewKeyDownEvent (Key.CursorDown));
         Assert.Equal (0, lv.SelectedItem);
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.CursorUp)));
+        Assert.True (lv.NewKeyDownEvent (Key.CursorUp));
         Assert.Equal (0, lv.SelectedItem);
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.PageDown)));
+        Assert.True (lv.NewKeyDownEvent (Key.PageDown));
         Assert.Equal (2, lv.SelectedItem);
         Assert.Equal (2, lv.TopItem);
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.PageUp)));
+        Assert.True (lv.NewKeyDownEvent (Key.PageUp));
         Assert.Equal (0, lv.SelectedItem);
         Assert.Equal (0, lv.TopItem);
         Assert.False (lv.Source.IsMarked (lv.SelectedItem));
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.Space)));
+        Assert.True (lv.NewKeyDownEvent (Key.Space));
         Assert.True (lv.Source.IsMarked (lv.SelectedItem));
         var opened = false;
         lv.OpenSelectedItem += (s, _) => opened = true;
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (lv.NewKeyDownEvent (Key.Enter));
         Assert.True (opened);
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.End)));
+        Assert.True (lv.NewKeyDownEvent (Key.End));
         Assert.Equal (2, lv.SelectedItem);
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.Home)));
+        Assert.True (lv.NewKeyDownEvent (Key.Home));
         Assert.Equal (0, lv.SelectedItem);
+    }
+
+    [Fact]
+    public void HotKey_Command_SetsFocus ()
+    {
+        var view = new ListView ();
+
+        view.CanFocus = true;
+        Assert.False (view.HasFocus);
+        view.InvokeCommand (Command.HotKey);
+        Assert.True (view.HasFocus);
+    }
+
+    [Fact]
+    public void HotKey_Command_Does_Not_Accept ()
+    {
+        var listView = new ListView ();
+        var accepted = false;
+
+        listView.Accept += OnAccept;
+        listView.InvokeCommand (Command.HotKey);
+
+        Assert.False (accepted);
+
+        return;
+        void OnAccept (object sender, CancelEventArgs e) { accepted = true; }
+    }
+
+
+    [Fact]
+    public void Accept_Command_Accepts_and_Opens_Selected_Item ()
+    {
+        List<string> source = ["One", "Two", "Three"];
+        var listView = new ListView {Source = new ListWrapper (source) };
+        listView.SelectedItem = 0;
+
+        var accepted = false;
+        var opened = false;
+        string selectedValue = string.Empty;
+
+        listView.Accept += Accept;
+        listView.OpenSelectedItem += OpenSelectedItem;
+
+        listView.InvokeCommand (Command.Accept);
+
+        Assert.True (accepted);
+        Assert.True (opened);
+        Assert.Equal (source [0], selectedValue);
+
+        return;
+
+        void OpenSelectedItem (object sender, ListViewItemEventArgs e)
+        {
+            opened = true;
+            selectedValue = e.Value.ToString ();
+        }
+        void Accept (object sender, CancelEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void Accept_Cancel_Event_Prevents_OpenSelectedItem ()
+    {
+        List<string> source = ["One", "Two", "Three"];
+        var listView = new ListView { Source = new ListWrapper (source) };
+        listView.SelectedItem = 0;
+
+        var accepted = false;
+        var opened = false;
+        string selectedValue = string.Empty;
+
+        listView.Accept += Accept;
+        listView.OpenSelectedItem += OpenSelectedItem;
+
+        listView.InvokeCommand (Command.Accept);
+
+        Assert.True (accepted);
+        Assert.False (opened);
+        Assert.Equal (string.Empty, selectedValue);
+
+        return;
+
+        void OpenSelectedItem (object sender, ListViewItemEventArgs e)
+        {
+            opened = true;
+            selectedValue = e.Value.ToString ();
+        }
+
+        void Accept (object sender, CancelEventArgs e)
+        {
+            accepted = true;
+            e.Cancel = true;
+        }
     }
 
     /// <summary>
@@ -405,9 +498,9 @@ Item 6",
         Assert.Equal (-1, lv.SelectedItem);
 
         // bind shift down to move down twice in control
-        lv.KeyBindings.Add (KeyCode.CursorDown | KeyCode.ShiftMask, Command.LineDown, Command.LineDown);
+        lv.KeyBindings.Add (Key.CursorDown.WithShift, Command.LineDown, Command.LineDown);
 
-        var ev = new Key (KeyCode.CursorDown | KeyCode.ShiftMask);
+        var ev = Key.CursorDown.WithShift;
 
         Assert.True (lv.NewKeyDownEvent (ev), "The first time we move down 2 it should be possible");
 
@@ -437,9 +530,9 @@ Item 6",
         Assert.False (lv.Source.IsMarked (1));
         Assert.False (lv.Source.IsMarked (2));
 
-        lv.KeyBindings.Add (KeyCode.Space | KeyCode.ShiftMask, Command.ToggleChecked, Command.LineDown);
+        lv.KeyBindings.Add (Key.Space.WithShift, Command.Select, Command.LineDown);
 
-        var ev = new Key (KeyCode.Space | KeyCode.ShiftMask);
+        var ev = Key.Space.WithShift;
 
         // view should indicate that it has accepted and consumed the event
         Assert.True (lv.NewKeyDownEvent (ev));
@@ -568,7 +661,7 @@ Item 6",
     public void SettingEmptyKeybindingThrows ()
     {
         var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
-        Assert.Throws<ArgumentException> (() => lv.KeyBindings.Add (KeyCode.Space));
+        Assert.Throws<ArgumentException> (() => lv.KeyBindings.Add (Key.Space));
     }
 
     private class NewListDataSource : IListDataSource

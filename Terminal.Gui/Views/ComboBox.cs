@@ -6,6 +6,7 @@
 //
 
 using System.Collections;
+using System.ComponentModel;
 
 namespace Terminal.Gui;
 
@@ -30,6 +31,7 @@ public class ComboBox : View
         _listview = new ComboListView (this, HideDropdownListOnClick) { CanFocus = true, TabStop = false };
 
         _search.TextChanged += Search_Changed;
+        _search.Accept += Search_Accept;
 
         _listview.Y = Pos.Bottom (_search);
         _listview.OpenSelectedItem += (sender, a) => Selected ();
@@ -66,7 +68,7 @@ public class ComboBox : View
 
                      SetNeedsLayout ();
                      SetNeedsDisplay ();
-                     Search_Changed (this, new TextChangedEventArgs (Text));
+                     Search_Changed (this, new StateEventArgs<string> (string.Empty, Text));
                  };
 
         // Things this view knows how to do
@@ -84,16 +86,16 @@ public class ComboBox : View
         AddCommand (Command.UnixEmulation, () => UnixEmulation ());
 
         // Default keybindings for this view
-        KeyBindings.Add (KeyCode.Enter, Command.Accept);
-        KeyBindings.Add (KeyCode.F4, Command.ToggleExpandCollapse);
-        KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
-        KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
-        KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
-        KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
-        KeyBindings.Add (KeyCode.Home, Command.TopHome);
-        KeyBindings.Add (KeyCode.End, Command.BottomEnd);
-        KeyBindings.Add (KeyCode.Esc, Command.Cancel);
-        KeyBindings.Add (KeyCode.U | KeyCode.CtrlMask, Command.UnixEmulation);
+        KeyBindings.Add (Key.Enter, Command.Accept);
+        KeyBindings.Add (Key.F4, Command.ToggleExpandCollapse);
+        KeyBindings.Add (Key.CursorDown, Command.LineDown);
+        KeyBindings.Add (Key.CursorUp, Command.LineUp);
+        KeyBindings.Add (Key.PageDown, Command.PageDown);
+        KeyBindings.Add (Key.PageUp, Command.PageUp);
+        KeyBindings.Add (Key.Home, Command.TopHome);
+        KeyBindings.Add (Key.End, Command.BottomEnd);
+        KeyBindings.Add (Key.Esc, Command.Cancel);
+        KeyBindings.Add (Key.U.WithCtrl, Command.UnixEmulation);
     }
 
     /// <inheritdoc/>
@@ -184,8 +186,8 @@ public class ComboBox : View
             if (SuperView is { } && SuperView.Subviews.Contains (this))
             {
                 SelectedItem = -1;
-                _search.Text = "";
-                Search_Changed (this, new TextChangedEventArgs (""));
+                _search.Text = string.Empty;
+                Search_Changed (this, new StateEventArgs<string> (string.Empty, _search.Text)); 
                 SetNeedsDisplay ();
             }
         }
@@ -651,11 +653,14 @@ public class ComboBox : View
         SetSearchSet ();
     }
 
-    private void Search_Changed (object sender, TextChangedEventArgs e)
+    // Tell TextField to handle Accept Command (Enter)
+    void Search_Accept (object sender, CancelEventArgs e) { e.Cancel = true; }
+
+    private void Search_Changed (object sender, StateEventArgs<string> e)
     {
         if (_source is null)
         {
-            // Object initialization		
+            // Object initialization
             return;
         }
 
@@ -714,7 +719,7 @@ public class ComboBox : View
 
         SetValue (_listview.SelectedItem > -1 ? _searchset [_listview.SelectedItem] : _text);
         _search.CursorPosition = _search.Text.GetColumns ();
-        Search_Changed (this, new TextChangedEventArgs (_search.Text));
+        Search_Changed (this, new StateEventArgs<string> (_search.Text, _search.Text));
         OnOpenSelectedItem ();
         Reset (true);
         HideList ();

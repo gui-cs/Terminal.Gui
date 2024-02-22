@@ -1,40 +1,63 @@
-﻿namespace Terminal.Gui;
+﻿using System.ComponentModel;
+
+namespace Terminal.Gui;
 
 public partial class View
 {
     private void AddCommands ()
     {
-        // By default, the Default command is bound to the HotKey enabling focus
-        AddCommand (
-                    Command.Default,
-                    () =>
-                    {
-                        if (CanFocus)
-                        {
-                            SetFocus ();
+        // By default, the HotKey command sets the focus
+        AddCommand (Command.HotKey, OnHotKey);
 
-                            return true;
-                        }
-
-                        return false;
-                    }
-                   );
-
-        // By default the Accept command does nothing
-        AddCommand (Command.Accept, () => false);
+        // By default, the Accept command raises the Accept event
+        AddCommand (Command.Accept, OnAccept);
     }
 
     #region HotKey Support
+
+    /// <summary>
+    /// Called when the HotKey command (<see cref="Command.HotKey"/>) is invoked. Causes this view to be focused.
+    /// </summary>
+    /// <returns>If <see langword="true"/> the command was canceled.</returns>
+    private bool? OnHotKey ()
+    {
+        if (CanFocus)
+        {
+            SetFocus ();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Cancelable event fired when the <see cref="Command.Accept"/> command is invoked. Set <see cref="CancelEventArgs.Cancel"/>
+    /// to cancel the event.
+    /// </summary>
+    public event EventHandler<CancelEventArgs> Accept;
+
+    /// <summary>
+    /// Called when the <see cref="Command.Accept"/> command is invoked. Fires the <see cref="Accept"/>
+    /// event.
+    /// </summary>
+    /// <returns>If <see langword="true"/> the event was canceled.</returns>
+    public bool? OnAccept ()
+    {
+        var args = new CancelEventArgs ();
+        Accept?.Invoke (this, args);
+        return args.Cancel;
+    }
 
     /// <summary>Invoked when the <see cref="HotKey"/> is changed.</summary>
     public event EventHandler<KeyChangedEventArgs> HotKeyChanged;
 
     private Key _hotKey = new ();
-    private void TextFormatter_HotKeyChanged (object sender, KeyChangedEventArgs e) { HotKeyChanged?.Invoke (this, e); }
+    private void TitleTextFormatter_HotKeyChanged (object sender, KeyChangedEventArgs e) { HotKeyChanged?.Invoke (this, e); }
 
     /// <summary>
     ///     Gets or sets the hot key defined for this view. Pressing the hot key on the keyboard while this view has focus will
-    ///     invoke the <see cref="Command.Default"/> and <see cref="Command.Accept"/> commands. <see cref="Command.Default"/>
+    ///     invoke the <see cref="Command.HotKey"/> and <see cref="Command.Accept"/> commands. <see cref="Command.HotKey"/>
     ///     causes the view to be focused and <see cref="Command.Accept"/> does nothing. By default, the HotKey is
     ///     automatically set to the first character of <see cref="Text"/> that is prefixed with with
     ///     <see cref="HotKeySpecifier"/>.
@@ -55,18 +78,18 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         By default, when the Hot Key is set, key bindings are added for both the base key (e.g.
-    ///         <see cref="KeyCode.D3"/>) and the Alt-shifted key (e.g. <see cref="KeyCode.D3"/> |
-    ///         <see cref="KeyCode.AltMask"/>). This behavior can be overriden by overriding
+    ///         <see cref="Key.D3"/>) and the Alt-shifted key (e.g. <see cref="Key.D3"/>.
+    ///         <see cref="Key.WithAlt"/>). This behavior can be overriden by overriding
     ///         <see cref="AddKeyBindingsForHotKey"/>.
     ///     </para>
     ///     <para>
-    ///         By default, when the HotKey is set to <see cref="Key.A"/> through <see cref="KeyCode.Z"/> key bindings will
+    ///         By default, when the HotKey is set to <see cref="Key.A"/> through <see cref="Key.Z"/> key bindings will
     ///         be added for both the un-shifted and shifted versions. This means if the HotKey is <see cref="Key.A"/>, key
     ///         bindings for <c>Key.A</c> and <c>Key.A.WithShift</c> will be added. This behavior can be overriden by
     ///         overriding <see cref="AddKeyBindingsForHotKey"/>.
     ///     </para>
     ///     <para>If the hot key is changed, the <see cref="HotKeyChanged"/> event is fired.</para>
-    ///     <para>Set to <see cref="KeyCode.Null"/> to disable the hot key.</para>
+    ///     <para>Set to <see cref="Key.Empty"/> to disable the hot key.</para>
     /// </remarks>
     public virtual Key HotKey
     {
@@ -84,7 +107,9 @@ public partial class View
             if (AddKeyBindingsForHotKey (_hotKey, value))
             {
                 // This will cause TextFormatter_HotKeyChanged to be called, firing HotKeyChanged
-                _hotKey = TextFormatter.HotKey = value;
+                // BUGBUG: _hotkey should be set BEFORE setting TextFormatter.HotKey
+                _hotKey = value;
+                TitleTextFormatter.HotKey = value;
             }
         }
     }
@@ -95,18 +120,14 @@ public partial class View
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         By default key bindings are added for both the base key (e.g. <see cref="Key.D3"/>) and the Alt-shifted key
-    ///         (e.g. <c>Key.D3.WithAlt</c> This behavior can be overriden by overriding <see cref="AddKeyBindingsForHotKey"/>.
+    ///         By default, key bindings are added for both the base key (e.g. <see cref="Key.D3"/>) and the Alt-shifted key
+    ///         (e.g. <c>Key.D3.WithAlt</c>) This behavior can be overriden by overriding <see cref="AddKeyBindingsForHotKey"/>.
     ///     </para>
     ///     <para>
     ///         By default, when <paramref name="hotKey"/> is <see cref="Key.A"/> through <see cref="Key.Z"/> key bindings
     ///         will be added for both the un-shifted and shifted versions. This means if the HotKey is <see cref="Key.A"/>,
     ///         key bindings for <c>Key.A</c> and <c>Key.A.WithShift</c> will be added. This behavior can be overriden by
     ///         overriding <see cref="AddKeyBindingsForHotKey"/>.
-    ///     </para>
-    ///     <para>
-    ///         For each of the bound keys <see cref="Command.Default"/> causes the view to be focused and
-    ///         <see cref="Command.Accept"/> does nothing.
     ///     </para>
     /// </remarks>
     /// <param name="prevHotKey">The HotKey <paramref name="hotKey"/> is replacing. Key bindings for this key will be removed.</param>
@@ -115,7 +136,7 @@ public partial class View
     /// <exception cref="ArgumentException"></exception>
     public virtual bool AddKeyBindingsForHotKey (Key prevHotKey, Key hotKey)
     {
-        if ((KeyCode)_hotKey == hotKey)
+        if (_hotKey == hotKey)
         {
             return false;
         }
@@ -158,7 +179,7 @@ public partial class View
             KeyBindings.Remove (prevHotKey.WithAlt);
         }
 
-        if (_hotKey.KeyCode is >= KeyCode.A and <= KeyCode.Z)
+        if (_hotKey.IsKeyCodeAtoZ)
         {
             // Remove the shift version
             if (KeyBindings.TryGet (prevHotKey.WithShift, out _))
@@ -174,17 +195,17 @@ public partial class View
         }
 
         // Add the new 
-        if (newKey != KeyCode.Null)
+        if (newKey != Key.Empty)
         {
             // Add the base and Alt key
-            KeyBindings.Add (newKey, KeyBindingScope.HotKey, Command.Default, Command.Accept);
-            KeyBindings.Add (newKey.WithAlt, KeyBindingScope.HotKey, Command.Default, Command.Accept);
+            KeyBindings.Add (newKey, KeyBindingScope.HotKey, Command.HotKey);
+            KeyBindings.Add (newKey.WithAlt, KeyBindingScope.HotKey, Command.HotKey);
 
             // If the Key is A..Z, add ShiftMask and AltMask | ShiftMask
             if (newKey.IsKeyCodeAtoZ)
             {
-                KeyBindings.Add (newKey.WithShift, KeyBindingScope.HotKey, Command.Default, Command.Accept);
-                KeyBindings.Add (newKey.WithShift.WithAlt, KeyBindingScope.HotKey, Command.Default, Command.Accept);
+                KeyBindings.Add (newKey.WithShift, KeyBindingScope.HotKey, Command.HotKey);
+                KeyBindings.Add (newKey.WithShift.WithAlt, KeyBindingScope.HotKey, Command.HotKey);
             }
         }
 
@@ -199,37 +220,32 @@ public partial class View
     {
         get
         {
-            if (TextFormatter is { })
-            {
-                return TextFormatter.HotKeySpecifier;
-            }
-
-            return new Rune ('\xFFFF');
+            return TitleTextFormatter.HotKeySpecifier;
         }
         set
         {
-            TextFormatter.HotKeySpecifier = value;
-            SetHotKey ();
+            TitleTextFormatter.HotKeySpecifier = value;
+            SetHotKeyFromTitle ();
         }
     }
 
-    private void SetHotKey ()
+    private void SetHotKeyFromTitle ()
     {
-        if (TextFormatter is null || HotKeySpecifier == new Rune ('\xFFFF'))
+        if (TitleTextFormatter == null || HotKeySpecifier == new Rune ('\xFFFF'))
         {
             return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
         }
 
-        if (TextFormatter.FindHotKey (_text, HotKeySpecifier, out _, out Key hk))
+        if (TextFormatter.FindHotKey (_title, HotKeySpecifier, out _, out Key hk))
         {
-            if (_hotKey.KeyCode != hk)
+            if (_hotKey != hk)
             {
                 HotKey = hk;
             }
         }
         else
         {
-            HotKey = KeyCode.Null;
+            HotKey = Key.Empty;
         }
     }
 
@@ -623,16 +639,15 @@ public partial class View
     /// </returns>
     public virtual bool? OnInvokingKeyBindings (Key keyEvent)
     {
-        // fire event
-        // BUGBUG: KeyEventArgs doesn't include scope, so the event never sees it.
-        if (keyEvent.Scope == KeyBindingScope.Application || keyEvent.Scope == KeyBindingScope.HotKey)
+        // fire event only if there's an app or hotkey binding for the key
+        if (KeyBindings.TryGet (keyEvent, KeyBindingScope.Application | KeyBindingScope.HotKey, out KeyBinding _))
         {
             InvokingKeyBindings?.Invoke (this, keyEvent);
-
             if (keyEvent.Handled)
             {
                 return true;
             }
+
         }
 
         // * If no key binding was found, `InvokeKeyBindings` returns `null`.
@@ -653,16 +668,16 @@ public partial class View
         // Now, process any key bindings in the subviews that are tagged to KeyBindingScope.HotKey.
         foreach (View view in Subviews.Where (
                                               v => v.KeyBindings.TryGet (
-                                                                         keyEvent.KeyCode,
+                                                                         keyEvent,
                                                                          KeyBindingScope.HotKey,
                                                                          out KeyBinding _
                                                                         )
                                              ))
         {
             // TODO: I think this TryGet is not needed due to the one in the lambda above. Use `Get` instead?
-            if (view.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.HotKey, out KeyBinding binding))
+            if (view.KeyBindings.TryGet (keyEvent, KeyBindingScope.HotKey, out KeyBinding binding))
             {
-                keyEvent.Scope = KeyBindingScope.HotKey;
+                //keyEvent.Scope = KeyBindingScope.HotKey;
                 handled = view.OnInvokingKeyBindings (keyEvent);
 
                 if (handled is { } && (bool)handled)
@@ -682,19 +697,18 @@ public partial class View
     public event EventHandler<Key> InvokingKeyBindings;
 
     /// <summary>
-    ///     Invokes any binding that is registered on this <see cref="View"/> and matches the <paramref name="keyEvent"/>
+    ///     Invokes any binding that is registered on this <see cref="View"/> and matches the <paramref name="key"/>
     ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </summary>
-    /// <param name="keyEvent">The key event passed.</param>
+    /// <param name="key">The key event passed.</param>
     /// <returns>
-    ///     <see langword="null"/> if no command was bound the <paramref name="keyEvent"/>. <see langword="true"/> if
+    ///     <see langword="null"/> if no command was bound the <paramref name="key"/>. <see langword="true"/> if
     ///     commands were invoked and at least one handled the command. <see langword="false"/> if commands were invoked and at
     ///     none handled the command.
     /// </returns>
-    protected bool? InvokeKeyBindings (Key keyEvent)
+    protected bool? InvokeKeyBindings (Key key)
     {
         bool? toReturn = null;
-        KeyCode key = keyEvent.KeyCode;
 
         if (!KeyBindings.TryGet (key, out KeyBinding binding))
         {
@@ -706,14 +720,44 @@ public partial class View
             if (!CommandImplementations.ContainsKey (command))
             {
                 throw new NotSupportedException (
-                                                 @$"A KeyBinding was set up for the command {
-                                                     command
-                                                 } ({
-                                                     keyEvent.KeyCode
-                                                 }) but that command is not supported by this View ({
-                                                     GetType ().Name
-                                                 })"
+                                                 @$"A KeyBinding was set up for the command {command} ({key}) but that command is not supported by this View ({GetType ().Name})"
                                                 );
+            }
+
+            // each command has its own return value
+            bool? thisReturn = InvokeCommand (command);
+
+            // if we haven't got anything yet, the current command result should be used
+            toReturn ??= thisReturn;
+
+            // if ever see a true then that's what we will return
+            if (thisReturn ?? false)
+            {
+                toReturn = true;
+            }
+        }
+
+        return toReturn;
+    }
+
+    /// <summary>
+    ///     Invokes the specified commands.
+    /// </summary>
+    /// <param name="commands"></param>
+    /// <returns>
+    ///     <see langword="null"/> if no command was found.
+    ///     <see langword="true"/> if the command was invoked and it handled the command.
+    ///     <see langword="false"/> if the command was invoked and it did not handle the command.
+    /// </returns>
+    public bool? InvokeCommands (Command [] commands)
+    {
+        bool? toReturn = null;
+
+        foreach (Command command in commands)
+        {
+            if (!CommandImplementations.ContainsKey (command))
+            {
+                throw new NotSupportedException (@$"{command} is not supported by ({GetType ().Name}).");
             }
 
             // each command has its own return value

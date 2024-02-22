@@ -222,7 +222,7 @@ public class DatePicker : View
             Text = GetBackButtonText ()
         };
 
-        _previousMonthButton.Clicked += (sender, e) =>
+        _previousMonthButton.Accept += (sender, e) =>
                                         {
                                             Date = _date.AddMonths (-1);
                                             CreateCalendar ();
@@ -239,7 +239,7 @@ public class DatePicker : View
             Text = GetBackButtonText ()
         };
 
-        _nextMonthButton.Clicked += (sender, e) =>
+        _nextMonthButton.Accept += (sender, e) =>
                                     {
                                         Date = _date.AddMonths (1);
                                         CreateCalendar ();

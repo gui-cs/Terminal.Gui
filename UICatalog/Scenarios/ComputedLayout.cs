@@ -318,7 +318,7 @@ public class ComputedLayout : Scenario
         var anchorButton = new Button { Text = "Button using AnchorEnd", Y = Pos.AnchorEnd () - 1 };
         anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
 
-        anchorButton.Clicked += (s, e) =>
+        anchorButton.Accept += (s, e) =>
                                 {
                                     // This demonstrates how to have a dynamically sized button
                                     // Each time the button is clicked the button's text gets longer
@@ -364,7 +364,7 @@ public class ComputedLayout : Scenario
             Text = "Left", Y = Pos.AnchorEnd () - 1 // Pos.Combine
         };
 
-        leftButton.Clicked += (s, e) =>
+        leftButton.Accept += (s, e) =>
                               {
                                   // This demonstrates how to have a dynamically sized button
                                   // Each time the button is clicked the button's text gets longer
@@ -380,7 +380,7 @@ public class ComputedLayout : Scenario
             Text = "Center", X = Pos.Center (), Y = Pos.AnchorEnd (1) // Pos.AnchorEnd(1)
         };
 
-        centerButton.Clicked += (s, e) =>
+        centerButton.Accept += (s, e) =>
                                 {
                                     // This demonstrates how to have a dynamically sized button
                                     // Each time the button is clicked the button's text gets longer
@@ -393,7 +393,7 @@ public class ComputedLayout : Scenario
         // show positioning vertically using another window and Pos.Bottom
         var rightButton = new Button { Text = "Right", Y = Pos.Y (centerButton) };
 
-        rightButton.Clicked += (s, e) =>
+        rightButton.Accept += (s, e) =>
                                {
                                    // This demonstrates how to have a dynamically sized button
                                    // Each time the button is clicked the button's text gets longer

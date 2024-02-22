@@ -6,8 +6,14 @@ namespace Terminal.Gui;
 /// <summary>Actions which can be performed by the application or bound to keys in a <see cref="View"/> control.</summary>
 public enum Command
 {
-    /// <summary>The default command. For <see cref="View"/> this focuses the view.</summary>
-    Default,
+    /// <summary>Invoked when the HotKey for the View has been pressed.</summary>
+    HotKey,
+
+    /// <summary>Accepts the current state (e.g. list selection, button press, toggle, etc).</summary>
+    Accept,
+
+    /// <summary>Selects an item (e.g. a list item or menu item) without necessarily accepting it.</summary>
+    Select,
 
     /// <summary>Moves down one item (cell, line, etc...).</summary>
     LineDown,
@@ -130,12 +136,6 @@ public enum Command
 
     /// <summary>Open the selected item.</summary>
     OpenSelectedItem,
-
-    /// <summary>Toggle the checked state.</summary>
-    ToggleChecked,
-
-    /// <summary>Accepts the current state (e.g. selection, button press etc).</summary>
-    Accept,
 
     /// <summary>Toggles the Expanded or collapsed state of a a list or item (with subitems).</summary>
     ToggleExpandCollapse,
@@ -262,9 +262,6 @@ public enum Command
 
     /// <summary>Creates a new document.</summary>
     New,
-
-    /// <summary>Moves selection to an item (e.g. highlighting a different menu item) without necessarily accepting it.</summary>
-    Select,
 
     /// <summary>Shows context about the item (e.g. a context menu).</summary>
     ShowContextMenu

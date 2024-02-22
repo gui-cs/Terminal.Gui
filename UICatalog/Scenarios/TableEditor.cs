@@ -767,7 +767,7 @@ public class TableEditor : Scenario
                                      }
                                  };
 
-        _tableView.KeyBindings.Add (KeyCode.Space, Command.ToggleChecked);
+        _tableView.KeyBindings.Add (Key.Space, Command.Accept);
     }
 
     protected override void Dispose (bool disposing)
@@ -869,13 +869,13 @@ public class TableEditor : Scenario
 
         var ok = new Button { Text = "Ok", IsDefault = true };
 
-        ok.Clicked += (s, e) =>
+        ok.Accept += (s, e) =>
                       {
                           okPressed = true;
                           Application.RequestStop ();
                       };
         var cancel = new Button { Text = "Cancel" };
-        cancel.Clicked += (s, e) => { Application.RequestStop (); };
+        cancel.Accept += (s, e) => { Application.RequestStop (); };
         var d = new Dialog { Title = title, Buttons = [ok, cancel] };
 
         var lbl = new Label { X = 0, Y = 1, Text = _tableView.Table.ColumnNames [e.Col] };
@@ -1066,13 +1066,13 @@ public class TableEditor : Scenario
         var accepted = false;
         var ok = new Button { Text = "Ok", IsDefault = true };
 
-        ok.Clicked += (s, e) =>
+        ok.Accept += (s, e) =>
                       {
                           accepted = true;
                           Application.RequestStop ();
                       };
         var cancel = new Button { Text = "Cancel" };
-        cancel.Clicked += (s, e) => { Application.RequestStop (); };
+        cancel.Accept += (s, e) => { Application.RequestStop (); };
         var d = new Dialog { Title = prompt, Buttons = [ok, cancel] };
 
         ColumnStyle style = _tableView.Style.GetOrCreateColumnStyle (col.Value);
