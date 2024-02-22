@@ -1575,7 +1575,7 @@ public static partial class Application
             {
                 view = View.FindDeepestView (view?.Padding, screenX, screenY, out _, out _);
 
-                if (view is { } && AdornmentViewHandledMouseEvent ())
+                if (view is { } && AdornmentSubViewHandledMouseEvent ())
                 {
                     return;
                 }
@@ -1590,7 +1590,7 @@ public static partial class Application
                     // TODO: This is a temporary hack to work around the fact that 
                     // drag handling is handled in Toplevel (See Issue #2537)
 
-                    if (AdornmentViewHandledMouseEvent ())
+                    if (AdornmentSubViewHandledMouseEvent ())
                     {
                         return;
                     }
@@ -1649,7 +1649,7 @@ public static partial class Application
             }
         }
 
-        bool AdornmentViewHandledMouseEvent ()
+        bool AdornmentSubViewHandledMouseEvent ()
         {
             var me = new MouseEvent
             {
