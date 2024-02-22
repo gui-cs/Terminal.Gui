@@ -127,11 +127,11 @@ public class ButtonTests
         Assert.Equal (0, txtToFind.ScrollOffset);
         Assert.Equal (16, txtToFind.CursorPosition);
 
-        Assert.Equal (new Rect (30, 1, 20, 1), btnFindNext.Frame);
-        Assert.Equal (new Rect (30, 2, 20, 1), btnFindPrevious.Frame);
-        Assert.Equal (new Rect (30, 4, 20, 1), btnCancel.Frame);
-//        Assert.Equal (new Rect (0, 3, 12, 1), ckbMatchCase.Frame);
-//        Assert.Equal (new Rect (0, 4, 18, 1), ckbMatchWholeWord.Frame);
+        Assert.Equal (new (30, 1, 20, 1), btnFindNext.Frame);
+        Assert.Equal (new (30, 2, 20, 1), btnFindPrevious.Frame);
+        Assert.Equal (new (30, 4, 20, 1), btnCancel.Frame);
+//        Assert.Equal (new (0, 3, 12, 1), ckbMatchCase.Frame);
+//        Assert.Equal (new (0, 4, 18, 1), ckbMatchWholeWord.Frame);
 
         var btn1 =
             $"{

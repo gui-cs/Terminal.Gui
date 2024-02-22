@@ -490,8 +490,8 @@ e
         Application.Top.Add (label);
         Application.Begin (Application.Top);
 
-        Assert.Equal (new Rect (0, 0, 6, 3), label.Frame);
-        Assert.Equal (new Rect (0, 0, 4, 1), label.Bounds);
+        Assert.Equal (new (0, 0, 6, 3), label.Frame);
+        Assert.Equal (new (0, 0, 4, 1), label.Bounds);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -512,8 +512,8 @@ e
         Application.Top.Add (label);
         Application.Begin (Application.Top);
 
-        Assert.Equal (new Rect (0, 0, 6, 3), label.Frame);
-        Assert.Equal (new Rect (0, 0, 4, 1), label.Bounds);
+        Assert.Equal (new (0, 0, 6, 3), label.Frame);
+        Assert.Equal (new (0, 0, 4, 1), label.Bounds);
         Application.Begin (Application.Top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -533,8 +533,8 @@ e
         Application.Top.Add (label);
         Application.Begin (Application.Top);
 
-        Assert.Equal (new Rect (0, 0, 6, 2), label.Frame);
-        Assert.Equal (new Rect (0, 0, 4, 1), label.Bounds);
+        Assert.Equal (new (0, 0, 6, 2), label.Frame);
+        Assert.Equal (new (0, 0, 4, 1), label.Bounds);
         Application.Begin (Application.Top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (

@@ -285,7 +285,7 @@ public class Border : Adornment
 
         if (canDrawBorder && Thickness.Top > 0 && maxTitleWidth > 0 && !string.IsNullOrEmpty (Parent?.Title))
         {
-            Parent.TitleTextFormatter.Draw (new Rect (borderBounds.X + 2, titleY, maxTitleWidth, 1),
+            Parent.TitleTextFormatter.Draw (new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
                                             Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor (),
                                             Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetHotNormalColor ());
         }
@@ -464,7 +464,7 @@ public class Border : Adornment
                 // Redraw title 
                 if (drawTop && maxTitleWidth > 0 && !string.IsNullOrEmpty (Parent?.Title))
                 {
-                    Parent.TitleTextFormatter.Draw (new Rect (borderBounds.X + 2, titleY, maxTitleWidth, 1),
+                    Parent.TitleTextFormatter.Draw (new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
                                                     Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor (),
                                                     Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor ());
                 }

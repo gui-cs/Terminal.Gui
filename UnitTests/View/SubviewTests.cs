@@ -12,7 +12,7 @@ public class SubviewTests
     [TestRespondersDisposed]
     public void Added_Removed ()
     {
-        var v = new View { Frame = new Rect (0, 0, 10, 24) };
+        var v = new View { Frame = new Rectangle (0, 0, 10, 24) };
         var t = new View ();
 
         v.Added += (s, e) =>

@@ -2141,8 +2141,8 @@ Y
         Assert.True (verticalView.AutoSize);
         Assert.Equal (new Size (text.GetColumns (), 1), horizontalView.TextFormatter.Size);
         Assert.Equal (new Size (2, 9), verticalView.TextFormatter.Size);
-        Assert.Equal (new Rect (0, 0, 10, 1), horizontalView.Frame);
-        Assert.Equal (new Rect (0, 3, 10, 9), verticalView.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), horizontalView.Frame);
+        Assert.Equal (new Rectangle (0, 3, 10, 9), verticalView.Frame);
 
         var expected = @"
 ┌────────────────────┐
@@ -2169,7 +2169,7 @@ Y
 └────────────────────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
         verticalView.Text = "最初_の行二行目";
         Application.Top.Draw ();
@@ -2177,7 +2177,7 @@ Y
         Assert.True (verticalView.AutoSize);
 
         // height was initialized with 8 and can only grow or keep initial value
-        Assert.Equal (new Rect (0, 3, 10, 9), verticalView.Frame);
+        Assert.Equal (new Rectangle (0, 3, 10, 9), verticalView.Frame);
 
         expected = @"
 ┌────────────────────┐
