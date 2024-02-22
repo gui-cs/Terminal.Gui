@@ -5,7 +5,7 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("ScrollBar BuiltIn", "Demonstrates the scroll bar built-in the Padding Adornment.")]
 [ScenarioCategory ("Controls")]
-public class ScrollBarBuiltIn : Scenario
+public class ScrollBars : Scenario
 {
     public override void Init ()
     {
