@@ -48,9 +48,9 @@ public class FileDialogTests
                      );
 
         // continue typing the rest of the path
-        Send ("bob");
+        Send ("BOB");
         Send ('.', ConsoleKey.OemPeriod);
-        Send ("csv");
+        Send ("CSV");
 
         Assert.True (dlg.Canceled);
 
@@ -73,7 +73,7 @@ public class FileDialogTests
 
         dlg.Path = openIn + Path.DirectorySeparatorChar;
 
-        Send ("x");
+        Send ("X");
 
         // nothing selected yet
         Assert.True (dlg.Canceled);
@@ -103,9 +103,9 @@ public class FileDialogTests
 #if BROKE_IN_2927
         Send ('f', ConsoleKey.F, false, true, false);
 #else
-        Application.OnKeyDown (new Key (KeyCode.Tab));
-        Application.OnKeyDown (new Key (KeyCode.Tab));
-        Application.OnKeyDown (new Key (KeyCode.Tab));
+        Application.OnKeyDown (Key.Tab);
+        Application.OnKeyDown (Key.Tab);
+        Application.OnKeyDown (Key.Tab);
 #endif
 
         Assert.IsType<TextField> (dlg.MostFocused);
@@ -359,7 +359,7 @@ public class FileDialogTests
         // so to add to current path user must press End or right
         Send ('>', ConsoleKey.RightArrow);
 
-        Send ("subfolder");
+        Send ("SUBFOLDER");
 
         // Dialog has not yet been confirmed with a choice
         Assert.True (dlg.Canceled);

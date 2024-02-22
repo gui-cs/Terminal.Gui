@@ -64,8 +64,8 @@ namespace Terminal.Gui
 
             /// <summary>Method that invoke the <see cref="TextChanged"/> event if it's defined.</summary>
             /// <param name="oldValue">The previous text before replaced.</param>
-            /// <returns>Returns the <see cref="TextChangedEventArgs"/></returns>
-            void OnTextChanged (TextChangedEventArgs oldValue);
+            /// <returns>Returns the <see cref="StringEventArgs"/></returns>
+            void OnTextChanged (StringEventArgs oldValue);
 
             /// <summary>
             ///     Changed event, raised when the text has changed.
@@ -74,7 +74,7 @@ namespace Terminal.Gui
             ///         <see cref="string"/> containing the old value.
             ///     </remarks>
             /// </summary>
-            event EventHandler<TextChangedEventArgs> TextChanged;
+            event EventHandler<StringEventArgs> TextChanged;
         }
 
         //////////////////////////////////////////////////////////////////////////////
@@ -125,7 +125,7 @@ namespace Terminal.Gui
             }
 
             /// <inheritdoc/>
-            public event EventHandler<TextChangedEventArgs> TextChanged;
+            public event EventHandler<StringEventArgs> TextChanged;
 
             /// <inheritdoc/>
             public string Text
@@ -206,7 +206,7 @@ namespace Terminal.Gui
 
                 if (result)
                 {
-                    OnTextChanged (new TextChangedEventArgs (oldValue));
+                    OnTextChanged (new StringEventArgs { NewValue = oldValue });
                 }
 
                 return result;
@@ -220,14 +220,14 @@ namespace Terminal.Gui
 
                 if (result)
                 {
-                    OnTextChanged (new TextChangedEventArgs (oldValue));
+                    OnTextChanged (new StringEventArgs { NewValue = oldValue });
                 }
 
                 return result;
             }
 
             /// <inheritdoc/>
-            public void OnTextChanged (TextChangedEventArgs oldValue) { TextChanged?.Invoke (this, oldValue); }
+            public void OnTextChanged (StringEventArgs oldValue) { TextChanged?.Invoke (this, oldValue); }
         }
 
         #endregion
@@ -260,7 +260,7 @@ namespace Terminal.Gui
             public bool ValidateOnInput { get; set; } = true;
 
             /// <inheritdoc/>
-            public event EventHandler<TextChangedEventArgs> TextChanged;
+            public event EventHandler<StringEventArgs> TextChanged;
 
             /// <inheritdoc/>
             public string Text
@@ -333,7 +333,7 @@ namespace Terminal.Gui
                 {
                     string oldValue = Text;
                     _text.RemoveAt (pos);
-                    OnTextChanged (new TextChangedEventArgs (oldValue));
+                    OnTextChanged (new StringEventArgs { NewValue = Text, OldValue = oldValue });
                 }
 
                 return true;
@@ -349,7 +349,7 @@ namespace Terminal.Gui
                 {
                     string oldValue = Text;
                     _text.Insert (pos, (Rune)ch);
-                    OnTextChanged (new TextChangedEventArgs (oldValue));
+                    OnTextChanged (new StringEventArgs { NewValue = Text, OldValue = oldValue });
 
                     return true;
                 }
@@ -358,7 +358,7 @@ namespace Terminal.Gui
             }
 
             /// <inheritdoc/>
-            public void OnTextChanged (TextChangedEventArgs oldValue) { TextChanged?.Invoke (this, oldValue); }
+            public void OnTextChanged (StringEventArgs oldValue) { TextChanged?.Invoke (this, oldValue); }
 
             /// <summary>Compiles the regex pattern for validation./></summary>
             private void CompileMask () { _regex = new Regex (StringExtensions.ToString (_pattern), RegexOptions.Compiled); }
@@ -462,15 +462,15 @@ namespace Terminal.Gui
                        );
 
             // Default keybindings for this view
-            KeyBindings.Add (KeyCode.Home, Command.LeftHome);
-            KeyBindings.Add (KeyCode.End, Command.RightEnd);
+            KeyBindings.Add (Key.Home, Command.LeftHome);
+            KeyBindings.Add (Key.End, Command.RightEnd);
 
-            KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
-            KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
+            KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
+            KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
 
-            KeyBindings.Add (KeyCode.Backspace, Command.DeleteCharLeft);
-            KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
-            KeyBindings.Add (KeyCode.CursorRight, Command.Right);
+            KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
+            KeyBindings.Add (Key.CursorLeft, Command.Left);
+            KeyBindings.Add (Key.CursorRight, Command.Right);
         }
 
         /// <summary>This property returns true if the input is valid.</summary>

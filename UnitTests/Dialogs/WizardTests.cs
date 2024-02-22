@@ -38,7 +38,7 @@ public class WizardTests
         var firstIteration = true;
         Application.RunIteration (ref runstate, ref firstIteration);
 
-        wizard.NextFinishButton.OnClicked ();
+        wizard.NextFinishButton.OnAccept ();
         Application.RunIteration (ref runstate, ref firstIteration);
         Application.End (runstate);
         Assert.True (finishedFired);
@@ -64,13 +64,13 @@ public class WizardTests
         Application.RunIteration (ref runstate, ref firstIteration);
 
         Assert.Equal (step1.Title, wizard.CurrentStep.Title);
-        wizard.NextFinishButton.OnClicked ();
+        wizard.NextFinishButton.OnAccept ();
         Assert.False (finishedFired);
         Assert.False (closedFired);
 
         Assert.Equal (step2.Title, wizard.CurrentStep.Title);
         Assert.Equal (wizard.GetLastStep ().Title, wizard.CurrentStep.Title);
-        wizard.NextFinishButton.OnClicked ();
+        wizard.NextFinishButton.OnAccept ();
         Application.End (runstate);
         Assert.True (finishedFired);
         Assert.True (closedFired);
@@ -99,7 +99,7 @@ public class WizardTests
 
         Assert.Equal (step2.Title, wizard.CurrentStep.Title);
         Assert.Equal (wizard.GetLastStep ().Title, wizard.CurrentStep.Title);
-        wizard.NextFinishButton.OnClicked ();
+        wizard.NextFinishButton.OnAccept ();
         Application.End (runstate);
         Assert.True (finishedFired);
         Assert.True (closedFired);
@@ -606,7 +606,7 @@ public class WizardTests
         Assert.Equal (string.Empty, r.Title);
 
         var expected = string.Empty;
-        r.TitleChanged += (s, args) => { Assert.Equal (r.Title, args.NewTitle); };
+        r.TitleChanged += (s, args) => { Assert.Equal (r.Title, args.NewValue); };
 
         expected = "title";
         r.Title = expected;
@@ -630,7 +630,7 @@ public class WizardTests
 
         r.TitleChanging += (s, args) =>
                            {
-                               Assert.Equal (expectedDuring, args.NewTitle);
+                               Assert.Equal (expectedDuring, args.NewValue);
                                args.Cancel = cancel;
                            };
 

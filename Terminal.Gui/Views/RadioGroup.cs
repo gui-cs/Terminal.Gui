@@ -16,7 +16,6 @@ public class RadioGroup : View
     /// </summary>
     public RadioGroup ()
     {
-        HotKeySpecifier = new Rune ('_');
         CanFocus = true;
 
         // Things this view knows how to do
@@ -65,17 +64,16 @@ public class RadioGroup : View
                     () =>
                     {
                         SelectItem ();
-
-                        return true;
+                        return !OnAccept ();
                     }
                    );
 
         // Default keybindings for this view
-        KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
-        KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
-        KeyBindings.Add (KeyCode.Home, Command.TopHome);
-        KeyBindings.Add (KeyCode.End, Command.BottomEnd);
-        KeyBindings.Add (KeyCode.Space, Command.Accept);
+        KeyBindings.Add (Key.CursorUp, Command.LineUp);
+        KeyBindings.Add (Key.CursorDown, Command.LineDown);
+        KeyBindings.Add (Key.Home, Command.TopHome);
+        KeyBindings.Add (Key.End, Command.BottomEnd);
+        KeyBindings.Add (Key.Space, Command.Accept);
 
         LayoutStarted += RadioGroup_LayoutStarted;
     }
@@ -124,7 +122,7 @@ public class RadioGroup : View
             {
                 if (TextFormatter.FindHotKey (label, HotKeySpecifier, out _, out Key hotKey))
                 {
-                    AddKeyBindingsForHotKey (hotKey, KeyCode.Null);
+                    AddKeyBindingsForHotKey (hotKey, Key.Empty);
                 }
             }
 
@@ -135,7 +133,7 @@ public class RadioGroup : View
             {
                 if (TextFormatter.FindHotKey (label, HotKeySpecifier, out _, out Key hotKey))
                 {
-                    AddKeyBindingsForHotKey (KeyCode.Null, hotKey);
+                    AddKeyBindingsForHotKey (Key.Empty, hotKey);
                 }
             }
 
@@ -228,7 +226,7 @@ public class RadioGroup : View
             Driver.AddStr ($"{(i == _selected ? Glyphs.Selected : Glyphs.UnSelected)} ");
             TextFormatter.FindHotKey (rl, HotKeySpecifier, out int hotPos, out Key hotKey);
 
-            if (hotPos != -1 && hotKey != KeyCode.Null)
+            if (hotPos != -1 && hotKey != Key.Empty)
             {
                 Rune [] rlRunes = rl.ToRunes ();
 
@@ -316,8 +314,6 @@ public class RadioGroup : View
                     && key.NoAlt.NoCtrl.NoShift == hotKey)
                 {
                     SelectedItem = i;
-                    keyEvent.Scope = KeyBindingScope.HotKey;
-
                     break;
                 }
             }
@@ -343,6 +339,7 @@ public class RadioGroup : View
         return args.Cancel;
     }
 
+    // TODO: This should be cancelable
     /// <summary>Called whenever the current selected item changes. Invokes the <see cref="SelectedItemChanged"/> event.</summary>
     /// <param name="selectedItem"></param>
     /// <param name="previousSelectedItem"></param>
@@ -377,6 +374,7 @@ public class RadioGroup : View
     /// <summary>Allow to invoke the <see cref="SelectedItemChanged"/> after their creation.</summary>
     public void Refresh () { OnSelectedItemChanged (_selected, -1); }
 
+    // TODO: This should use StateEventArgs<int> and should be cancelable.
     /// <summary>Invoked when the selected radio label has changed.</summary>
     public event EventHandler<SelectedItemChangedArgs> SelectedItemChanged;
 

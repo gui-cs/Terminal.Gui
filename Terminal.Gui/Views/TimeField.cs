@@ -59,11 +59,10 @@ public class TimeField : TextField
         AddCommand (Command.Right, () => MoveRight ());
 
         // Default keybindings for this view
-        KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
+        KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
         KeyBindings.Add (Key.D.WithCtrl, Command.DeleteCharRight);
 
         KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
-        KeyBindings.Add (Key.D.WithAlt, Command.DeleteCharLeft);
 
         KeyBindings.Add (Key.Home, Command.LeftHome);
         KeyBindings.Add (Key.A.WithCtrl, Command.LeftHome);
@@ -76,6 +75,10 @@ public class TimeField : TextField
 
         KeyBindings.Add (Key.CursorRight, Command.Right);
         KeyBindings.Add (Key.F.WithCtrl, Command.Right);
+
+#if UNIX_KEY_BINDINGS
+        KeyBindings.Add (Key.D.WithAlt, Command.DeleteCharLeft);
+#endif
     }
 
     /// <inheritdoc/>
@@ -427,15 +430,15 @@ public class TimeField : TextField
         return true;
     }
 
-    private void TextField_TextChanging (object sender, TextChangingEventArgs e)
+    private void TextField_TextChanging (object sender, StateEventArgs<string> e)
     {
         try
         {
             var spaces = 0;
 
-            for (var i = 0; i < e.NewText.Length; i++)
+            for (var i = 0; i < e.NewValue.Length; i++)
             {
-                if (e.NewText [i] == ' ')
+                if (e.NewValue [i] == ' ')
                 {
                     spaces++;
                 }
@@ -446,17 +449,17 @@ public class TimeField : TextField
             }
 
             spaces += FieldLength;
-            string trimedText = e.NewText [..spaces];
+            string trimedText = e.NewValue [..spaces];
             spaces -= FieldLength;
             trimedText = trimedText.Replace (new string (' ', spaces), " ");
 
-            if (trimedText != e.NewText)
+            if (trimedText != e.NewValue)
             {
-                e.NewText = trimedText;
+                e.NewValue = trimedText;
             }
 
             if (!TimeSpan.TryParseExact (
-                                         e.NewText.Trim (),
+                                         e.NewValue.Trim (),
                                          Format.Trim (),
                                          CultureInfo.CurrentCulture,
                                          TimeSpanStyles.None,

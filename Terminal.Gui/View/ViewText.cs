@@ -33,30 +33,47 @@ public partial class View
     ///         The text will word-wrap to additional lines if it does not fit horizontally. If <see cref="Bounds"/>'s height
     ///         is 1, the text will be clipped.
     ///     </para>
-    ///     <para>
-    ///         Set the <see cref="HotKeySpecifier"/> to enable hotkey support. To disable hotkey support set
-    ///         <see cref="HotKeySpecifier"/> to <c>(Rune)0xffff</c>.
-    ///     </para>
     ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Bounds"/> will be adjusted to fit the text.</para>
+    ///     <para>When the text changes, the <see cref="TextChanged"/> is fired.</para>
     /// </remarks>
     public virtual string Text
     {
         get => _text;
         set
         {
+            if (value == _text)
+            {
+                return;
+            }
+
+            string old = _text;
             _text = value;
-            SetHotKey ();
             UpdateTextFormatterText ();
             OnResizeNeeded ();
-
 #if DEBUG
             if (_text is { } && string.IsNullOrEmpty (Id))
             {
                 Id = _text;
             }
 #endif
+            OnTextChanged (old, Text);
         }
     }
+
+    /// <summary>
+    /// Called when the <see cref="Text"/> has changed. Fires the <see cref="TextChanged"/> event.
+    /// </summary>
+    /// <param name="oldValue"></param>
+    /// <param name="newValue"></param>
+    public void OnTextChanged (string oldValue, string newValue)
+    {
+        TextChanged?.Invoke (this, new StateEventArgs<string> (oldValue, newValue));
+    }
+
+    /// <summary>
+    ///     Text changed event, raised when the text has changed.
+    /// </summary>
+    public event EventHandler<StateEventArgs<string>> TextChanged;
 
     /// <summary>
     ///     Gets or sets how the View's <see cref="Text"/> is aligned horizontally when drawn. Changing this property will
@@ -156,7 +173,15 @@ public partial class View
     ///     Gets the width or height of the <see cref="TextFormatter.HotKeySpecifier"/> characters in the
     ///     <see cref="Text"/> property.
     /// </summary>
-    /// <remarks>Only the first HotKey specifier found in <see cref="Text"/> is supported.</remarks>
+    /// <remarks>
+    ///     <para>
+    ///         This is for <see cref="Text"/>, not <see cref="Title"/>. For <see cref="Text"/> to show the hotkey,
+    ///         set <c>View.</c><see cref="TextFormatter.HotKeySpecifier"/> to the desired character.
+    ///     </para>
+    ///     <para>
+    ///         Only the first HotKey specifier found in <see cref="Text"/> is supported.
+    ///     </para>
+    /// </remarks>
     /// <param name="isWidth">
     ///     If <see langword="true"/> (the default) the width required for the HotKey specifier is returned.
     ///     Otherwise the height is returned.
@@ -170,13 +195,13 @@ public partial class View
     {
         if (isWidth)
         {
-            return TextFormatter.IsHorizontalDirection (TextDirection) && TextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
-                       ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+            return TextFormatter.IsHorizontalDirection (TextDirection) && TextFormatter.Text?.Contains ((char)TextFormatter.HotKeySpecifier.Value) == true
+                       ? Math.Max (TextFormatter.HotKeySpecifier.GetColumns (), 0)
                        : 0;
         }
 
-        return TextFormatter.IsVerticalDirection (TextDirection) && TextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
-                   ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+        return TextFormatter.IsVerticalDirection (TextDirection) && TextFormatter.Text?.Contains ((char)TextFormatter.HotKeySpecifier.Value) == true
+                   ? Math.Max (TextFormatter.HotKeySpecifier.GetColumns (), 0)
                    : 0;
     }
 

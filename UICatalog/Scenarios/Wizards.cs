@@ -103,7 +103,7 @@ public class Wizards : Scenario
             X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "Show Wizard"
         };
 
-        showWizardButton.Clicked += (s, e) =>
+        showWizardButton.Accept += (s, e) =>
                                     {
                                         try
                                         {
@@ -173,7 +173,7 @@ public class Wizards : Scenario
                                                 Text = "Press Me to Rename Step", X = Pos.Right (buttonLbl), Y = Pos.Top (buttonLbl)
                                             };
 
-                                            button.Clicked += (s, e) =>
+                                            button.Accept += (s, e) =>
                                                               {
                                                                   secondStep.Title = "2nd Step";
 
@@ -269,7 +269,7 @@ public class Wizards : Scenario
                                                 Text = "Press me to show/hide help", X = Pos.Center (), Y = Pos.AnchorEnd (1)
                                             };
 
-                                            hideHelpBtn.Clicked += (s, e) =>
+                                            hideHelpBtn.Accept += (s, e) =>
                                                                    {
                                                                        if (fourthStep.HelpText.Length > 0)
                                                                        {

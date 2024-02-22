@@ -14,23 +14,23 @@ public class HexViewTests
 
         Assert.Empty (hv.Edits);
         hv.AllowEdits = false;
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.Home)));
-        Assert.False (hv.NewKeyDownEvent (new Key (KeyCode.A)));
+        Assert.True (hv.NewKeyDownEvent (Key.Home));
+        Assert.False (hv.NewKeyDownEvent (Key.A));
         Assert.Empty (hv.Edits);
         Assert.Equal (126, hv.Source.Length);
 
         hv.AllowEdits = true;
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.D4)));
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.D1)));
+        Assert.True (hv.NewKeyDownEvent (Key.D4));
+        Assert.True (hv.NewKeyDownEvent (Key.D1));
         Assert.Single (hv.Edits);
         Assert.Equal (65, hv.Edits.ToList () [0].Value);
         Assert.Equal ('A', (char)hv.Edits.ToList () [0].Value);
         Assert.Equal (126, hv.Source.Length);
 
         // Appends byte
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.End)));
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.D4)));
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.D2)));
+        Assert.True (hv.NewKeyDownEvent (Key.End));
+        Assert.True (hv.NewKeyDownEvent (Key.D4));
+        Assert.True (hv.NewKeyDownEvent (Key.D2));
         Assert.Equal (2, hv.Edits.Count);
         Assert.Equal (66, hv.Edits.ToList () [1].Value);
         Assert.Equal ('B', (char)hv.Edits.ToList () [1].Value);
@@ -62,8 +62,8 @@ public class HexViewTests
         hv.Source.Read (readBuffer);
         Assert.Equal ("Fest", Encoding.Default.GetString (readBuffer));
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.D5)));
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.D4)));
+        Assert.True (hv.NewKeyDownEvent (Key.D5));
+        Assert.True (hv.NewKeyDownEvent (Key.D4));
         readBuffer [hv.Edits.ToList () [0].Key] = hv.Edits.ToList () [0].Value;
         Assert.Equal ("Test", Encoding.Default.GetString (readBuffer));
 
@@ -103,18 +103,18 @@ public class HexViewTests
 
         Assert.Equal (new Point (1, 1), hv.CursorPosition);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.Enter)));
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorRight | KeyCode.CtrlMask)));
+        Assert.True (hv.NewKeyDownEvent (Key.Enter));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorRight.WithCtrl));
         Assert.Equal (hv.CursorPosition.X, hv.BytesPerLine);
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.Home)));
+        Assert.True (hv.NewKeyDownEvent (Key.Home));
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (new Point (2, 1), hv.CursorPosition);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorDown));
         Assert.Equal (new Point (2, 2), hv.CursorPosition);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.End)));
+        Assert.True (hv.NewKeyDownEvent (Key.End));
         int col = hv.CursorPosition.X;
         int line = hv.CursorPosition.Y;
         int offset = (line - 1) * (hv.BytesPerLine - col);
@@ -131,18 +131,18 @@ public class HexViewTests
 
         Assert.Equal (new Point (1, 1), hv.CursorPosition);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.Enter)));
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorRight | KeyCode.CtrlMask)));
+        Assert.True (hv.NewKeyDownEvent (Key.Enter));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorRight.WithCtrl));
         Assert.Equal (hv.CursorPosition.X, hv.BytesPerLine);
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.Home)));
+        Assert.True (hv.NewKeyDownEvent (Key.Home));
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (new Point (2, 1), hv.CursorPosition);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorDown));
         Assert.Equal (new Point (2, 2), hv.CursorPosition);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.End)));
+        Assert.True (hv.NewKeyDownEvent (Key.End));
         int col = hv.CursorPosition.X;
         int line = hv.CursorPosition.Y;
         int offset = (line - 1) * (hv.BytesPerLine - col);
@@ -157,8 +157,8 @@ public class HexViewTests
         // Needed because HexView relies on LayoutComplete to calc sizes
         hv.LayoutSubviews ();
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.D4)));
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.D1)));
+        Assert.True (hv.NewKeyDownEvent (Key.D4));
+        Assert.True (hv.NewKeyDownEvent (Key.D1));
         Assert.Single (hv.Edits);
         Assert.Equal (65, hv.Edits.ToList () [0].Value);
         Assert.Equal ('A', (char)hv.Edits.ToList () [0].Value);
@@ -178,11 +178,11 @@ public class HexViewTests
 
         Assert.Equal (0, hv.DisplayStart);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.PageDown)));
+        Assert.True (hv.NewKeyDownEvent (Key.PageDown));
         Assert.Equal (4 * hv.Frame.Height, hv.DisplayStart);
         Assert.Equal (hv.Source.Length, hv.Source.Position);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.End)));
+        Assert.True (hv.NewKeyDownEvent (Key.End));
 
         // already on last page and so the DisplayStart is the same as before
         Assert.Equal (4 * hv.Frame.Height, hv.DisplayStart);
@@ -200,8 +200,8 @@ public class HexViewTests
         KeyValuePair<long, byte> keyValuePair = default;
         hv.Edited += (s, e) => keyValuePair = new KeyValuePair<long, byte> (e.Position, e.NewValue);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.D4)));
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.D6)));
+        Assert.True (hv.NewKeyDownEvent (Key.D4));
+        Assert.True (hv.NewKeyDownEvent (Key.D6));
 
         Assert.Equal (0, (int)keyValuePair.Key);
         Assert.Equal (70, keyValuePair.Value);
@@ -228,48 +228,48 @@ public class HexViewTests
         Assert.Equal (4, hv.BytesPerLine);
 
         // right side only needed to press one time
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (hv.NewKeyDownEvent (Key.Enter));
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (2, hv.Position);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorLeft));
         Assert.Equal (1, hv.Position);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorDown));
         Assert.Equal (5, hv.Position);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorUp)));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorUp));
         Assert.Equal (1, hv.Position);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.V | KeyCode.CtrlMask)));
+        Assert.True (hv.NewKeyDownEvent (Key.V.WithCtrl));
         Assert.Equal (41, hv.Position);
 
-        Assert.True (hv.NewKeyDownEvent (new Key ('v' + KeyCode.AltMask)));
+        Assert.True (hv.NewKeyDownEvent (new Key (Key.V.WithAlt)));
         Assert.Equal (1, hv.Position);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.PageDown)));
+        Assert.True (hv.NewKeyDownEvent (Key.PageDown));
         Assert.Equal (41, hv.Position);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.PageUp)));
+        Assert.True (hv.NewKeyDownEvent (Key.PageUp));
         Assert.Equal (1, hv.Position);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.End)));
+        Assert.True (hv.NewKeyDownEvent (Key.End));
         Assert.Equal (64, hv.Position);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.Home)));
+        Assert.True (hv.NewKeyDownEvent (Key.Home));
         Assert.Equal (1, hv.Position);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorRight | KeyCode.CtrlMask)));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorRight.WithCtrl));
         Assert.Equal (4, hv.Position);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorLeft | KeyCode.CtrlMask)));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorLeft.WithCtrl));
         Assert.Equal (1, hv.Position);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorDown | KeyCode.CtrlMask)));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorDown.WithCtrl));
         Assert.Equal (37, hv.Position);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorUp | KeyCode.CtrlMask)));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorUp.WithCtrl));
         Assert.Equal (1, hv.Position);
     }
 
@@ -285,23 +285,23 @@ public class HexViewTests
         Assert.Equal (1, hv.Position);
 
         // left side needed to press twice
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (63, hv.Source.Position);
         Assert.Equal (1, hv.Position);
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (63, hv.Source.Position);
         Assert.Equal (2, hv.Position);
 
         // right side only needed to press one time
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (hv.NewKeyDownEvent (Key.Enter));
         Assert.Equal (63, hv.Source.Position);
         Assert.Equal (2, hv.Position);
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorLeft));
         Assert.Equal (63, hv.Source.Position);
         Assert.Equal (1, hv.Position);
 
         // last position is equal to the source length
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.End)));
+        Assert.True (hv.NewKeyDownEvent (Key.End));
         Assert.Equal (63, hv.Source.Position);
         Assert.Equal (64, hv.Position);
         Assert.Equal (hv.Position - 1, hv.Source.Length);
@@ -319,23 +319,23 @@ public class HexViewTests
         Assert.Equal (1, hv.Position);
 
         // left side needed to press twice
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (126, hv.Source.Position);
         Assert.Equal (1, hv.Position);
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (126, hv.Source.Position);
         Assert.Equal (2, hv.Position);
 
         // right side only needed to press one time
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (hv.NewKeyDownEvent (Key.Enter));
         Assert.Equal (126, hv.Source.Position);
         Assert.Equal (2, hv.Position);
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorLeft));
         Assert.Equal (126, hv.Source.Position);
         Assert.Equal (1, hv.Position);
 
         // last position is equal to the source length
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.End)));
+        Assert.True (hv.NewKeyDownEvent (Key.End));
         Assert.Equal (126, hv.Source.Position);
         Assert.Equal (127, hv.Position);
         Assert.Equal (hv.Position - 1, hv.Source.Length);
@@ -351,9 +351,9 @@ public class HexViewTests
         Application.Top.Add (hv);
         Application.Begin (Application.Top);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorRight))); // left side must press twice
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorRight)); // left side must press twice
+        Assert.True (hv.NewKeyDownEvent (Key.CursorRight));
+        Assert.True (hv.NewKeyDownEvent (Key.CursorDown));
 
         Assert.Equal (12, hexViewEventArgs.BytesPerLine);
         Assert.Equal (new Point (2, 2), hexViewEventArgs.CursorPosition);
@@ -368,7 +368,7 @@ public class HexViewTests
         Application.Top.Add (hv);
         Application.Begin (Application.Top);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.End)));
+        Assert.True (hv.NewKeyDownEvent (Key.End));
         Assert.Equal (62, hv.DisplayStart);
         Assert.Equal (64, hv.Position);
 
@@ -383,7 +383,7 @@ public class HexViewTests
         Assert.Equal (0, hv.DisplayStart);
         Assert.Equal (0, hv.Position - 1);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (KeyCode.End)));
+        Assert.True (hv.NewKeyDownEvent (Key.End));
         Assert.Equal (0, hv.DisplayStart);
         Assert.Equal (64, hv.Position);
 

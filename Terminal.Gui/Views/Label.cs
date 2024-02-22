@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using System.Reflection.Metadata.Ecma335;
+
+namespace Terminal.Gui;
 
 /// <summary>
 ///     The Label <see cref="View"/> displays a string at a given position and supports multiple lines separated by
@@ -17,38 +19,44 @@ public class Label : View
         AutoSize = true;
 
         // Things this view knows how to do
-        AddCommand (
-                    Command.Default,
-                    () =>
-                    {
-                        // BUGBUG: This is a hack, but it does work.
-                        bool can = CanFocus;
-                        CanFocus = true;
-                        SetFocus ();
-                        SuperView.FocusNext ();
-                        CanFocus = can;
-
-                        return true;
-                    }
-                   );
-        AddCommand (Command.Accept, () => AcceptKey ());
+        AddCommand (Command.HotKey, FocusNext);
 
         // Default key bindings for this view
-        KeyBindings.Add (KeyCode.Space, Command.Accept);
+        KeyBindings.Add (Key.Space, Command.Accept);
+
+        TitleChanged += Label_TitleChanged;
     }
 
-    /// <summary>
-    ///     The event fired when the user clicks the primary mouse button within the Bounds of this <see cref="View"/> or
-    ///     if the user presses the action key while this view is focused. (TODO: IsDefault)
-    /// </summary>
-    /// <remarks>
-    ///     Client code can hook up to this event, it is raised when the button is activated either with the mouse or the
-    ///     keyboard.
-    /// </remarks>
-    public event EventHandler Clicked;
+    private void Label_TitleChanged (object sender, StateEventArgs<string> e)
+    {
+        base.Text = e.NewValue;
+        TextFormatter.HotKeySpecifier = HotKeySpecifier;
+    }
 
-    /// <summary>Virtual method to invoke the <see cref="Clicked"/> event.</summary>
-    public virtual void OnClicked () { Clicked?.Invoke (this, EventArgs.Empty); }
+    /// <inheritdoc />
+    public override string Text
+    {
+        get => base.Title;
+        set => base.Text = base.Title = value;
+    }
+
+    /// <inheritdoc />
+    public override Rune HotKeySpecifier
+    {
+        get => base.HotKeySpecifier;
+        set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
+    }
+
+    private new bool? FocusNext ()
+    {
+        var me = SuperView?.Subviews.IndexOf (this) ?? -1;
+        if (me != -1 && me < SuperView?.Subviews.Count - 1)
+        {
+            SuperView?.Subviews [me + 1].SetFocus ();
+        }
+
+        return true;
+    }
 
     /// <inheritdoc/>
     public override bool OnEnter (View view)
@@ -77,6 +85,11 @@ public class Label : View
 
         if (mouseEvent.Flags == MouseFlags.Button1Clicked)
         {
+            if (!CanFocus)
+            {
+                FocusNext ();
+            }
+
             if (!HasFocus && SuperView is { })
             {
                 if (!SuperView.HasFocus)
@@ -88,23 +101,11 @@ public class Label : View
                 SetNeedsDisplay ();
             }
 
-            OnClicked ();
+            OnAccept ();
 
             return true;
         }
 
         return false;
-    }
-
-    private bool AcceptKey ()
-    {
-        if (!HasFocus)
-        {
-            SetFocus ();
-        }
-
-        OnClicked ();
-
-        return true;
     }
 }

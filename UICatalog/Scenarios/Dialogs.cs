@@ -14,12 +14,27 @@ public class Dialogs : Scenario
     {
         var frame = new FrameView { X = Pos.Center (), Y = 1, Width = Dim.Percent (75), Title = "Dialog Options" };
 
-        var label = new Label { X = 0, Y = 0, TextAlignment = TextAlignment.Right, Text = "Width:" };
+        var numButtonsLabel = new Label
+        {
+            X = 0,
+            TextAlignment = TextAlignment.Right,
+            Text = "_Number of Buttons:"
+        };
+
+        var label = new Label {
+            X = 0, 
+            Y = 0,
+            AutoSize = false,
+            Width = Dim.Width (numButtonsLabel),
+            Height = 1,
+            TextAlignment = TextAlignment.Right,
+            Text = "_Width:"
+        };
         frame.Add (label);
 
         var widthEdit = new TextField
         {
-            X = Pos.Right (label) + 1,
+            X = Pos.Right (numButtonsLabel) + 1,
             Y = Pos.Top (label),
             Width = 5,
             Height = 1,
@@ -32,16 +47,16 @@ public class Dialogs : Scenario
             AutoSize = false,
             X = 0,
             Y = Pos.Bottom (label),
-            Width = Dim.Width (label),
+            Width = Dim.Width (numButtonsLabel),
             Height = 1,
             TextAlignment = TextAlignment.Right,
-            Text = "Height:"
+            Text = "_Height:"
         };
         frame.Add (label);
 
         var heightEdit = new TextField
         {
-            X = Pos.Right (label) + 1,
+            X = Pos.Right (numButtonsLabel) + 1,
             Y = Pos.Top (label),
             Width = 5,
             Height = 1,
@@ -67,10 +82,10 @@ public class Dialogs : Scenario
             AutoSize = false,
             X = 0,
             Y = Pos.Bottom (label),
-            Width = Dim.Width (label),
+            Width = Dim.Width (numButtonsLabel),
             Height = 1,
             TextAlignment = TextAlignment.Right,
-            Text = "Title:"
+            Text = "_Title:"
         };
         frame.Add (label);
 
@@ -84,22 +99,13 @@ public class Dialogs : Scenario
         };
         frame.Add (titleEdit);
 
-        label = new Label
-        {
-            AutoSize = false,
-            X = 0,
-            Y = Pos.Bottom (label),
-            Width = Dim.Width (label),
-            Height = 1,
-            TextAlignment = TextAlignment.Right,
-            Text = "Num Buttons:"
-        };
-        frame.Add (label);
+        numButtonsLabel.Y = Pos.Bottom (label);
+        frame.Add (numButtonsLabel);
 
         var numButtonsEdit = new TextField
         {
-            X = Pos.Right (label) + 1,
-            Y = Pos.Top (label),
+            X = Pos.Right (numButtonsLabel) + 1,
+            Y = Pos.Top (numButtonsLabel),
             Width = 5,
             Height = 1,
             Text = "3"
@@ -108,21 +114,25 @@ public class Dialogs : Scenario
 
         var glyphsNotWords = new CheckBox
         {
-            X = Pos.Left (numButtonsEdit),
-            Y = Pos.Bottom (label),
+            X = Pos.Right (numButtonsLabel) + 1,
+            Y = Pos.Bottom (numButtonsLabel),
             TextAlignment = TextAlignment.Right,
-            Text =
-                $"Add {char.ConvertFromUtf32 (CODE_POINT)} to button text to stress wide char support",
+            Text = $"_Add {char.ConvertFromUtf32 (CODE_POINT)} to button text to stress wide char support",
             Checked = false
         };
         frame.Add (glyphsNotWords);
 
         label = new Label
         {
-            X = 0, Y = Pos.Bottom (glyphsNotWords), TextAlignment = TextAlignment.Right, Text = "Button Style:"
+            AutoSize = false,
+            X = 0,
+            Y = Pos.Bottom (glyphsNotWords),
+            Width = Dim.Width (numButtonsLabel),
+            Height = 1,
+            TextAlignment = TextAlignment.Right,
+            Text = "Button St_yle:"
         };
         frame.Add (label);
-
         var styleRadioGroup = new RadioGroup
         {
             X = Pos.Right (label) + 1,
@@ -170,7 +180,7 @@ public class Dialogs : Scenario
             X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show Dialog"
         };
 
-        showDialogButton.Clicked += (s, e) =>
+        showDialogButton.Accept += (s, e) =>
                                     {
                                         Dialog dlg = CreateDemoDialog (
                                                                        widthEdit,
@@ -233,7 +243,7 @@ public class Dialogs : Scenario
                     button = new Button { Text = NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
                 }
 
-                button.Clicked += (s, e) =>
+                button.Accept += (s, e) =>
                                   {
                                       clicked = buttonId;
                                       Application.RequestStop ();
@@ -264,9 +274,9 @@ public class Dialogs : Scenario
                 dialog.Width = width;
             }
 
-            var add = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Add a button" };
+            var add = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "_Add a button" };
 
-            add.Clicked += (s, e) =>
+            add.Accept += (s, e) =>
                            {
                                int buttonId = buttons.Count;
                                Button button;
@@ -284,7 +294,7 @@ public class Dialogs : Scenario
                                    button = new Button { Text = NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
                                }
 
-                               button.Clicked += (s, e) =>
+                               button.Accept += (s, e) =>
                                                  {
                                                      clicked = buttonId;
                                                      Application.RequestStop ();
@@ -303,10 +313,10 @@ public class Dialogs : Scenario
             {
                 X = Pos.Center (),
                 Y = Pos.Center () + 1,
-                Text = $"Add a {char.ConvertFromUtf32 (CODE_POINT)} to each button"
+                Text = $"A_dd a {char.ConvertFromUtf32 (CODE_POINT)} to each button"
             };
 
-            addChar.Clicked += (s, e) =>
+            addChar.Accept += (s, e) =>
                                {
                                    foreach (Button button in buttons)
                                    {

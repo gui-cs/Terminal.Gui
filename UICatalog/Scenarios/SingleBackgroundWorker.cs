@@ -101,7 +101,7 @@ public class SingleBackgroundWorker : Scenario
 
             var cancel = new Button { Text = "Cancel Worker" };
 
-            cancel.Clicked += (s, e) =>
+            cancel.Accept += (s, e) =>
                               {
                                   if (_worker == null)
                                   {

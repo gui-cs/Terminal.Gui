@@ -21,7 +21,7 @@ public class ContextMenus : Scenario
     {
         var text = "Context Menu";
         var width = 20;
-        KeyCode winContextMenuKey = KeyCode.Space | KeyCode.CtrlMask;
+        KeyCode winContextMenuKey = (KeyCode)Key.Space.WithCtrl;
 
         var label = new Label
         {

@@ -103,7 +103,7 @@ public class RuneWidthGreaterThanOne : Scenario
         _label.Text = "Enter your name 你:";
         _text.Text = "gui.cs 你:";
         _button.Text = "Say Hello 你";
-        _button.Clicked += MixedMessage;
+        _button.Accept += MixedMessage;
         _labelR.X = Pos.AnchorEnd (21);
         _labelR.Y = 18;
         _labelR.Text = "This is a test text 你";
@@ -123,7 +123,7 @@ public class RuneWidthGreaterThanOne : Scenario
         _label.Text = "Enter your name:";
         _text.Text = "gui.cs";
         _button.Text = "Say Hello";
-        _button.Clicked += NarrowMessage;
+        _button.Accept += NarrowMessage;
         _labelR.X = Pos.AnchorEnd (19);
         _labelR.Y = 18;
         _labelR.Text = "This is a test text";
@@ -140,15 +140,15 @@ public class RuneWidthGreaterThanOne : Scenario
         switch (_lastRunesUsed)
         {
             case "Narrow":
-                _button.Clicked -= NarrowMessage;
+                _button.Accept -= NarrowMessage;
 
                 break;
             case "Mixed":
-                _button.Clicked -= MixedMessage;
+                _button.Accept -= MixedMessage;
 
                 break;
             case "Wide":
-                _button.Clicked -= WideMessage;
+                _button.Accept -= WideMessage;
 
                 break;
         }
@@ -162,7 +162,7 @@ public class RuneWidthGreaterThanOne : Scenario
         _label.Text = "あなたの名前を入力してください：";
         _text.Text = "ティラミス";
         _button.Text = "こんにちはと言う";
-        _button.Clicked += WideMessage;
+        _button.Accept += WideMessage;
         _labelR.X = Pos.AnchorEnd (29);
         _labelR.Y = 18;
         _labelR.Text = "あなたの名前を入力してください";

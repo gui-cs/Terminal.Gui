@@ -318,7 +318,7 @@ public class FakeDriver : ConsoleDriver
 
             if (keyInfo.KeyChar != (uint)key)
             {
-                return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
+                return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.Key);
             }
 
             if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control)

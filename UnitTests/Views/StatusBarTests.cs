@@ -79,7 +79,7 @@ public class StatusBarTests
         Assert.True (CanExecuteNew ());
         Assert.False (CanExecuteClose ());
 
-        Assert.True (top.NewKeyDownEvent (new Key (KeyCode.N | KeyCode.CtrlMask)));
+        Assert.True (top.NewKeyDownEvent (Key.N.WithCtrl));
         Application.MainLoop.RunIteration ();
         Assert.NotNull (win);
         Assert.False (CanExecuteNew ());
@@ -157,7 +157,7 @@ CTRL-O Open {
                                      if (iteration == 0)
                                      {
                                          Assert.Equal ("", msg);
-                                         sb.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.Q));
+                                         sb.NewKeyDownEvent (Key.Q.WithCtrl);
                                      }
                                      else if (iteration == 1)
                                      {

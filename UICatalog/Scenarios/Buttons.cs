@@ -22,12 +22,12 @@ public class Buttons : Scenario
         // This is the default button (IsDefault = true); if user presses ENTER in the TextField
         // the scenario will quit
         var defaultButton = new Button { X = Pos.Center (), Y = Pos.AnchorEnd (1), IsDefault = true, Text = "_Quit" };
-        defaultButton.Clicked += (s, e) => Application.RequestStop ();
+        defaultButton.Accept += (s, e) => Application.RequestStop ();
         Win.Add (defaultButton);
 
         var swapButton = new Button { X = 50, Text = "S_wap Default (Absolute Layout)" };
 
-        swapButton.Clicked += (s, e) =>
+        swapButton.Accept += (s, e) =>
                               {
                                   defaultButton.IsDefault = !defaultButton.IsDefault;
                                   swapButton.IsDefault = !swapButton.IsDefault;
@@ -36,7 +36,7 @@ public class Buttons : Scenario
 
         static void DoMessage (Button button, string txt)
         {
-            button.Clicked += (s, e) =>
+            button.Accept += (s, e) =>
                               {
                                   string btnText = button.Text;
                                   MessageBox.Query ("Message", $"Did you click {txt}?", "Yes", "No");
@@ -87,11 +87,11 @@ public class Buttons : Scenario
         Win.Add (
                  button = new Button { X = 2, Y = Pos.Bottom (button) + 1, Text = "a Newline\nin the button" }
                 );
-        button.Clicked += (s, e) => MessageBox.Query ("Message", "Question?", "Yes", "No");
+        button.Accept += (s, e) => MessageBox.Query ("Message", "Question?", "Yes", "No");
 
         var textChanger = new Button { X = 2, Y = Pos.Bottom (button) + 1, Text = "Te_xt Changer" };
         Win.Add (textChanger);
-        textChanger.Clicked += (s, e) => textChanger.Text += "!";
+        textChanger.Accept += (s, e) => textChanger.Text += "!";
 
         Win.Add (
                  button = new Button
@@ -109,7 +109,7 @@ public class Buttons : Scenario
         Win.Add (removeButton);
 
         // This in interesting test case because `moveBtn` and below are laid out relative to this one!
-        removeButton.Clicked += (s, e) =>
+        removeButton.Accept += (s, e) =>
                                 {
                                     // Now this throw a InvalidOperationException on the TopologicalSort method as is expected.
                                     //Win.Remove (removeButton);
@@ -139,7 +139,7 @@ public class Buttons : Scenario
             Text = "Move This \u263b Button v_ia Pos"
         };
 
-        moveBtn.Clicked += (s, e) =>
+        moveBtn.Accept += (s, e) =>
                            {
                                moveBtn.X = moveBtn.Frame.X + 5;
 
@@ -160,7 +160,7 @@ public class Buttons : Scenario
             Text = "Size This \u263a Button _via Pos"
         };
 
-        sizeBtn.Clicked += (s, e) =>
+        sizeBtn.Accept += (s, e) =>
                            {
                                sizeBtn.Width = sizeBtn.Frame.Width + 5;
 
@@ -181,7 +181,7 @@ public class Buttons : Scenario
         // Demonstrates how changing the View.Frame property can move Views
         var moveBtnA = new Button { ColorScheme = Colors.ColorSchemes ["Error"], Text = "Move This Button via Frame" };
 
-        moveBtnA.Clicked += (s, e) =>
+        moveBtnA.Accept += (s, e) =>
                             {
                                 moveBtnA.Frame = new Rectangle (
                                                            moveBtnA.Frame.X + 5,
@@ -198,7 +198,7 @@ public class Buttons : Scenario
             Y = 2, ColorScheme = Colors.ColorSchemes ["Error"], Text = " ~  s  gui.cs   master ↑_10 = Сохранить"
         };
 
-        sizeBtnA.Clicked += (s, e) =>
+        sizeBtnA.Accept += (s, e) =>
                             {
                                 sizeBtnA.Frame = new Rectangle (
                                                            sizeBtnA.Frame.X,
@@ -268,7 +268,7 @@ public class Buttons : Scenario
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Text = mhkb
         };
-        moveHotKeyBtn.Clicked += (s, e) => { moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text); };
+        moveHotKeyBtn.Accept += (s, e) => { moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text); };
         Win.Add (moveHotKeyBtn);
 
         var muhkb = " ~  s  gui.cs   master ↑10 = Сохранить";
@@ -283,7 +283,7 @@ public class Buttons : Scenario
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Text = muhkb
         };
-        moveUnicodeHotKeyBtn.Clicked += (s, e) => { moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text); };
+        moveUnicodeHotKeyBtn.Accept += (s, e) => { moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text); };
         Win.Add (moveUnicodeHotKeyBtn);
 
         radioGroup.SelectedItemChanged += (s, args) =>

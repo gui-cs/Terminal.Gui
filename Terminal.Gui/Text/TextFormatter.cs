@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+namespace Terminal.Gui;
 
 /// <summary>Text alignment enumeration, controls how text is displayed.</summary>
 public enum TextAlignment
@@ -216,7 +216,7 @@ public class TextFormatter
     /// <summary>Gets or sets whether the <see cref="TextFormatter"/> needs to format the text.</summary>
     /// <remarks>
     ///     <para>If <see langword="false"/> when Draw is called, the Draw call will be faster.</para>
-    ///     <para>Used by <see cref="Draw(Rectangle, Attribute, Attribute, Rectangle, bool, ConsoleDriver)"/></para>
+    ///     <para>Used by <see cref="Draw"/></para>
     ///     <para>Set to <see langword="true"/> when any of the properties of <see cref="TextFormatter"/> are set.</para>
     ///     <para>Set to <see langword="false"/> when the text is formatted (if <see cref="GetLines"/> is accessed).</para>
     /// </remarks>
@@ -2003,7 +2003,7 @@ public class TextFormatter
         if (string.IsNullOrEmpty (text) || hotKeySpecifier == (Rune)0xFFFF)
         {
             hotPos = -1;
-            hotKey = KeyCode.Null;
+            hotKey = Key.Empty;
 
             return false;
         }
@@ -2071,6 +2071,8 @@ public class TextFormatter
                 }
 
                 hotKey = newHotKey;
+
+                //hotKey.Scope = KeyBindingScope.HotKey;
 
                 return true;
             }

@@ -112,13 +112,13 @@ public class ComboBoxTests
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
 
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.F4)));
+        Assert.True (cb.NewKeyDownEvent (Key.F4));
         Assert.NotNull (cb.Source);
         Assert.True (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
 
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.F4)));
+        Assert.True (cb.NewKeyDownEvent (Key.F4));
         Assert.Null (cb.Source);
         Assert.False (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
@@ -152,30 +152,30 @@ public class ComboBoxTests
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
 
-        Assert.True (cb.Subviews [1].NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (cb.Subviews [1].NewKeyDownEvent (Key.CursorDown));
         Assert.Equal ("", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
 
-        Assert.True (cb.Subviews [1].NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (cb.Subviews [1].NewKeyDownEvent (Key.Enter));
         Assert.Equal ("Two", selected);
         Assert.False (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
 
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.F4)));
+        Assert.True (cb.NewKeyDownEvent (Key.F4));
         Assert.Equal ("Two", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
-        Assert.True (cb.Subviews [1].NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (cb.Subviews [1].NewKeyDownEvent (Key.CursorDown));
         Assert.Equal ("Two", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
         Assert.Equal ("Three", cb.Text);
 
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.Esc)));
+        Assert.True (cb.NewKeyDownEvent (Key.Esc));
         Assert.Equal ("Two", selected);
         Assert.False (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
@@ -208,8 +208,8 @@ public class ComboBoxTests
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
 
-        Assert.True (cb.Subviews [1].NewKeyDownEvent (new Key (KeyCode.CursorDown)));
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.F4)));
+        Assert.True (cb.Subviews [1].NewKeyDownEvent (Key.CursorDown));
+        Assert.True (cb.NewKeyDownEvent (Key.F4));
         Assert.Equal ("Two", selected);
         Assert.False (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
@@ -244,30 +244,30 @@ public class ComboBoxTests
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
 
-        Assert.True (cb.Subviews [1].NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (cb.Subviews [1].NewKeyDownEvent (Key.CursorDown));
         Assert.Equal ("", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
 
-        Assert.True (cb.Subviews [1].NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (cb.Subviews [1].NewKeyDownEvent (Key.Enter));
         Assert.Equal ("Two", selected);
         Assert.False (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
 
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.F4)));
+        Assert.True (cb.NewKeyDownEvent (Key.F4));
         Assert.Equal ("Two", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
-        Assert.True (cb.Subviews [1].NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (cb.Subviews [1].NewKeyDownEvent (Key.CursorDown));
         Assert.Equal ("Two", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
         Assert.Equal ("Three", cb.Text);
 
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.Esc)));
+        Assert.True (cb.NewKeyDownEvent (Key.Esc));
         Assert.Equal ("Two", selected);
         Assert.False (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
@@ -418,7 +418,7 @@ public class ComboBoxTests
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
 
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.F4)));
+        Assert.True (cb.NewKeyDownEvent (Key.F4));
 
         Assert.True (
                      cb.Subviews [1]
@@ -442,7 +442,7 @@ public class ComboBoxTests
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
 
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.F4)));
+        Assert.True (cb.NewKeyDownEvent (Key.F4));
 
         Assert.True (
                      cb.Subviews [1]
@@ -466,7 +466,7 @@ public class ComboBoxTests
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
 
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.F4)));
+        Assert.True (cb.NewKeyDownEvent (Key.F4));
 
         Assert.True (
                      cb.Subviews [1]
@@ -549,7 +549,7 @@ Three ",
                                                attributes
                                               );
 
-        Assert.True (cb.Subviews [1].NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (cb.Subviews [1].NewKeyDownEvent (Key.CursorDown));
         Assert.Equal ("", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
@@ -566,7 +566,7 @@ Three ",
                                                attributes
                                               );
 
-        Assert.True (cb.Subviews [1].NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (cb.Subviews [1].NewKeyDownEvent (Key.CursorDown));
         Assert.Equal ("", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
@@ -583,13 +583,13 @@ Three ",
                                                attributes
                                               );
 
-        Assert.True (cb.Subviews [1].NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (cb.Subviews [1].NewKeyDownEvent (Key.Enter));
         Assert.Equal ("Three", selected);
         Assert.False (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
         Assert.Equal ("Three", cb.Text);
 
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.F4)));
+        Assert.True (cb.NewKeyDownEvent (Key.F4));
         Assert.Equal ("Three", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
@@ -606,7 +606,7 @@ Three ",
                                                attributes
                                               );
 
-        Assert.True (cb.Subviews [1].NewKeyDownEvent (new Key (KeyCode.CursorUp)));
+        Assert.True (cb.Subviews [1].NewKeyDownEvent (Key.CursorUp));
         Assert.Equal ("Three", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
@@ -623,7 +623,7 @@ Three ",
                                                attributes
                                               );
 
-        Assert.True (cb.Subviews [1].NewKeyDownEvent (new Key (KeyCode.CursorUp)));
+        Assert.True (cb.Subviews [1].NewKeyDownEvent (Key.CursorUp));
         Assert.Equal ("Three", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
@@ -640,7 +640,7 @@ Three ",
                                                attributes
                                               );
 
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.F4)));
+        Assert.True (cb.NewKeyDownEvent (Key.F4));
         Assert.Equal ("Three", selected);
         Assert.False (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
@@ -673,7 +673,7 @@ Three ",
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
 
-        Assert.True (cb.Subviews [1].NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (cb.Subviews [1].NewKeyDownEvent (Key.CursorDown));
 
         Assert.True (
                      cb.MouseEvent (
@@ -695,7 +695,7 @@ Three ",
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
 
-        Assert.True (cb.Subviews [1].NewKeyDownEvent (new Key (KeyCode.CursorUp)));
+        Assert.True (cb.Subviews [1].NewKeyDownEvent (Key.CursorUp));
 
         Assert.True (
                      cb.MouseEvent (
@@ -734,30 +734,30 @@ Three ",
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
 
-        Assert.True (cb.Subviews [1].NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (cb.Subviews [1].NewKeyDownEvent (Key.CursorDown));
         Assert.Equal ("", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
 
-        Assert.True (cb.Subviews [1].NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (cb.Subviews [1].NewKeyDownEvent (Key.Enter));
         Assert.Equal ("Two", selected);
         Assert.False (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
 
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.F4)));
+        Assert.True (cb.NewKeyDownEvent (Key.F4));
         Assert.Equal ("Two", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
-        Assert.True (cb.Subviews [1].NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (cb.Subviews [1].NewKeyDownEvent (Key.CursorDown));
         Assert.Equal ("Two", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
 
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.Esc)));
+        Assert.True (cb.NewKeyDownEvent (Key.Esc));
         Assert.Equal ("Two", selected);
         Assert.False (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
@@ -790,8 +790,8 @@ Three ",
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
 
-        Assert.True (cb.Subviews [1].NewKeyDownEvent (new Key (KeyCode.CursorDown)));
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.F4)));
+        Assert.True (cb.Subviews [1].NewKeyDownEvent (Key.CursorDown));
+        Assert.True (cb.NewKeyDownEvent (Key.F4));
         Assert.Equal ("", selected);
         Assert.False (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
@@ -811,28 +811,28 @@ Three ",
         Assert.Equal (string.Empty, cb.Text);
         var opened = false;
         cb.OpenSelectedItem += (s, _) => opened = true;
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (cb.NewKeyDownEvent (Key.Enter));
         Assert.False (opened);
         cb.Text = "Tw";
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (cb.NewKeyDownEvent (Key.Enter));
         Assert.True (opened);
         Assert.Equal ("Tw", cb.Text);
         Assert.False (cb.IsShow);
         cb.SetSource (null);
-        Assert.False (cb.NewKeyDownEvent (new Key (KeyCode.Enter)));
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.F4))); // with no source also expand empty
+        Assert.False (cb.NewKeyDownEvent (Key.Enter));
+        Assert.True (cb.NewKeyDownEvent (Key.F4)); // with no source also expand empty
         Assert.True (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         cb.SetSource (source);
         cb.Text = "";
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.F4))); // collapse
+        Assert.True (cb.NewKeyDownEvent (Key.F4)); // collapse
         Assert.False (cb.IsShow);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.F4))); // expand
+        Assert.True (cb.NewKeyDownEvent (Key.F4)); // expand
         Assert.True (cb.IsShow);
         cb.Collapse ();
         Assert.False (cb.IsShow);
         Assert.True (cb.HasFocus);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.CursorDown))); // losing focus
+        Assert.True (cb.NewKeyDownEvent (Key.CursorDown)); // losing focus
         Assert.False (cb.IsShow);
         Assert.False (cb.HasFocus);
         Application.Top.FocusFirst (); // Gets focus again
@@ -842,27 +842,27 @@ Three ",
         Assert.True (cb.IsShow);
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (cb.NewKeyDownEvent (Key.CursorDown));
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (cb.NewKeyDownEvent (Key.CursorDown));
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
         Assert.Equal ("Three", cb.Text);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (cb.NewKeyDownEvent (Key.CursorDown));
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
         Assert.Equal ("Three", cb.Text);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.CursorUp)));
+        Assert.True (cb.NewKeyDownEvent (Key.CursorUp));
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.CursorUp)));
+        Assert.True (cb.NewKeyDownEvent (Key.CursorUp));
         Assert.True (cb.IsShow);
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.CursorUp)));
+        Assert.True (cb.NewKeyDownEvent (Key.CursorUp));
         Assert.True (cb.IsShow);
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
@@ -876,7 +876,7 @@ One
                                                       _output
                                                      );
 
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.PageDown)));
+        Assert.True (cb.NewKeyDownEvent (Key.PageDown));
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
@@ -890,7 +890,7 @@ Two
                                                       _output
                                                      );
 
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.PageDown)));
+        Assert.True (cb.NewKeyDownEvent (Key.PageDown));
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
         Assert.Equal ("Three", cb.Text);
@@ -903,43 +903,43 @@ Three
 ",
                                                       _output
                                                      );
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.PageUp)));
+        Assert.True (cb.NewKeyDownEvent (Key.PageUp));
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.PageUp)));
+        Assert.True (cb.NewKeyDownEvent (Key.PageUp));
         Assert.True (cb.IsShow);
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.F4)));
+        Assert.True (cb.NewKeyDownEvent (Key.F4));
         Assert.False (cb.IsShow);
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.End)));
+        Assert.True (cb.NewKeyDownEvent (Key.End));
         Assert.False (cb.IsShow);
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.Home)));
+        Assert.True (cb.NewKeyDownEvent (Key.Home));
         Assert.False (cb.IsShow);
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.F4)));
+        Assert.True (cb.NewKeyDownEvent (Key.F4));
         Assert.True (cb.IsShow);
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.End)));
+        Assert.True (cb.NewKeyDownEvent (Key.End));
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
         Assert.Equal ("Three", cb.Text);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.Home)));
+        Assert.True (cb.NewKeyDownEvent (Key.Home));
         Assert.True (cb.IsShow);
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.Esc)));
+        Assert.True (cb.NewKeyDownEvent (Key.Esc));
         Assert.False (cb.IsShow);
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.CursorDown))); // losing focus
+        Assert.True (cb.NewKeyDownEvent (Key.CursorDown)); // losing focus
         Assert.False (cb.HasFocus);
         Assert.False (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
@@ -949,7 +949,7 @@ Three
         Assert.False (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.U | KeyCode.CtrlMask)));
+        Assert.True (cb.NewKeyDownEvent (Key.U.WithCtrl));
         Assert.True (cb.HasFocus);
         Assert.True (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
@@ -974,7 +974,7 @@ Three
         source.Add ("One");
         Assert.Equal (1, cb.Source.Count);
         Assert.Equal (-1, cb.SelectedItem);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.F4)));
+        Assert.True (cb.NewKeyDownEvent (Key.F4));
         Assert.True (cb.IsShow);
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
@@ -985,12 +985,12 @@ Three
         Assert.True (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("T", cb.Text);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (cb.NewKeyDownEvent (Key.Enter));
         Assert.False (cb.IsShow);
         Assert.Equal (2, cb.Source.Count);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("T", cb.Text);
-        Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.Esc)));
+        Assert.True (cb.NewKeyDownEvent (Key.Esc));
         Assert.False (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem); // retains last accept selected item
         Assert.Equal ("", cb.Text); // clear text

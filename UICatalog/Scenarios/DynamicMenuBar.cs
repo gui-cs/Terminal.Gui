@@ -237,7 +237,7 @@ public class DynamicMenuBar : Scenario
             {
                 X = Pos.X (_lblShortcut), Y = Pos.Bottom (TextShortcut) + 1, Text = "Clear Shortcut"
             };
-            _btnShortcut.Clicked += (s, e) => { TextShortcut.Text = ""; };
+            _btnShortcut.Accept += (s, e) => { TextShortcut.Text = ""; };
             Add (_btnShortcut);
 
             CkbIsTopLevel.Toggled += (s, e) =>
@@ -419,7 +419,7 @@ public class DynamicMenuBar : Scenario
 
             var _btnOk = new Button { IsDefault = true, Text = "Ok" };
 
-            _btnOk.Clicked += (s, e) =>
+            _btnOk.Accept += (s, e) =>
                               {
                                   if (string.IsNullOrEmpty (TextTitle.Text))
                                   {
@@ -433,7 +433,7 @@ public class DynamicMenuBar : Scenario
                               };
             var _btnCancel = new Button { Text = "Cancel" };
 
-            _btnCancel.Clicked += (s, e) =>
+            _btnCancel.Accept += (s, e) =>
                                   {
                                       TextTitle.Text = string.Empty;
                                       Application.RequestStop ();
@@ -684,7 +684,7 @@ public class DynamicMenuBar : Scenario
             };
             Add (_frmMenuDetails);
 
-            _btnMenuBarUp.Clicked += (s, e) =>
+            _btnMenuBarUp.Accept += (s, e) =>
                                      {
                                          int i = _currentSelectedMenuBar;
 
@@ -706,7 +706,7 @@ public class DynamicMenuBar : Scenario
                                          }
                                      };
 
-            _btnMenuBarDown.Clicked += (s, e) =>
+            _btnMenuBarDown.Accept += (s, e) =>
                                        {
                                            int i = _currentSelectedMenuBar;
 
@@ -728,7 +728,7 @@ public class DynamicMenuBar : Scenario
                                            }
                                        };
 
-            _btnUp.Clicked += (s, e) =>
+            _btnUp.Accept += (s, e) =>
                               {
                                   int i = _lstMenus.SelectedItem;
                                   MenuItem menuItem = DataContext.Menus.Count > 0 ? DataContext.Menus [i].MenuItem : null;
@@ -750,7 +750,7 @@ public class DynamicMenuBar : Scenario
                                   }
                               };
 
-            _btnDown.Clicked += (s, e) =>
+            _btnDown.Accept += (s, e) =>
                                 {
                                     int i = _lstMenus.SelectedItem;
                                     MenuItem menuItem = DataContext.Menus.Count > 0 ? DataContext.Menus [i].MenuItem : null;
@@ -772,7 +772,7 @@ public class DynamicMenuBar : Scenario
                                     }
                                 };
 
-            _btnPreviowsParent.Clicked += (s, e) =>
+            _btnPreviowsParent.Accept += (s, e) =>
                                           {
                                               if (_currentMenuBarItem != null && _currentMenuBarItem.Parent != null)
                                               {
@@ -805,12 +805,12 @@ public class DynamicMenuBar : Scenario
             Add (_btnOk);
 
             var _btnCancel = new Button { X = Pos.Right (_btnOk) + 3, Y = Pos.Top (_btnOk), Text = "Cancel" };
-            _btnCancel.Clicked += (s, e) => { SetFrameDetails (_currentEditMenuBarItem); };
+            _btnCancel.Accept += (s, e) => { SetFrameDetails (_currentEditMenuBarItem); };
             Add (_btnCancel);
 
             _lstMenus.SelectedItemChanged += (s, e) => { SetFrameDetails (); };
 
-            _btnOk.Clicked += (s, e) =>
+            _btnOk.Accept += (s, e) =>
                               {
                                   if (string.IsNullOrEmpty (_frmMenuDetails.TextTitle.Text) && _currentEditMenuBarItem != null)
                                   {
@@ -836,7 +836,7 @@ public class DynamicMenuBar : Scenario
                                   }
                               };
 
-            _btnAdd.Clicked += (s, e) =>
+            _btnAdd.Accept += (s, e) =>
                                {
                                    if (MenuBar == null)
                                    {
@@ -897,7 +897,7 @@ public class DynamicMenuBar : Scenario
                                    }
                                };
 
-            _btnRemove.Clicked += (s, e) =>
+            _btnRemove.Accept += (s, e) =>
                                   {
                                       MenuItem menuItem = DataContext.Menus.Count > 0
                                                               ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem
@@ -989,7 +989,7 @@ public class DynamicMenuBar : Scenario
                                    SetFrameDetails (menuBarItem);
                                };
 
-            _btnNext.Clicked += (s, e) =>
+            _btnNext.Accept += (s, e) =>
                                 {
                                     if (_menuBar != null && _currentSelectedMenuBar + 1 < _menuBar.Menus.Length)
                                     {
@@ -999,7 +999,7 @@ public class DynamicMenuBar : Scenario
                                     SelectCurrentMenuBarItem ();
                                 };
 
-            _btnPrevious.Clicked += (s, e) =>
+            _btnPrevious.Accept += (s, e) =>
                                     {
                                         if (_currentSelectedMenuBar - 1 > -1)
                                         {
@@ -1018,7 +1018,7 @@ public class DynamicMenuBar : Scenario
                                      }
                                  };
 
-            _btnAddMenuBar.Clicked += (s, e) =>
+            _btnAddMenuBar.Accept += (s, e) =>
                                       {
                                           var frameDetails = new DynamicMenuBarDetails (null);
                                           DynamicMenuItem item = frameDetails.EnterMenuItem ();
@@ -1050,7 +1050,7 @@ public class DynamicMenuBar : Scenario
                                           _menuBar.SetNeedsDisplay ();
                                       };
 
-            _btnRemoveMenuBar.Clicked += (s, e) =>
+            _btnRemoveMenuBar.Accept += (s, e) =>
                                          {
                                              if (_menuBar == null || _menuBar.Menus.Length == 0)
                                              {
