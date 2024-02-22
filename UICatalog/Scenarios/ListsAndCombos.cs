@@ -70,7 +70,7 @@ public class ListsAndCombos : Scenario
             Height = Dim.Fill (2),
             Width = Dim.Percent (40)
         };
-        comboBox.Padding.ScrollBarType = ScrollBarType.Both;
+        comboBox.ScrollBarType = ScrollBarType.Both;
         comboBox.SetSource (items);
 
         comboBox.SelectedItemChanged += (s, text) => lbComboBox.Text = text.Value.ToString ();
