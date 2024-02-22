@@ -15,7 +15,7 @@ public class Line : View
     /// <inheritdoc/>
     public override bool OnDrawAdornments ()
     {
-        Rect screenBounds = BoundsToScreen (Bounds);
+        Rectangle screenBounds = BoundsToScreen (Bounds);
         LineCanvas lc;
 
         lc = SuperView?.LineCanvas;
@@ -37,5 +37,5 @@ public class Line : View
     //}
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea) { OnDrawAdornments (); }
+    public override void OnDrawContent (Rectangle contentArea) { OnDrawAdornments (); }
 }

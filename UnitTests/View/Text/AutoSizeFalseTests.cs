@@ -50,27 +50,27 @@ public class AutoSizeFalseTests
         Assert.False (view4.IsInitialized);
         Assert.False (view5.IsInitialized);
         Assert.False (view1.AutoSize);
-        Assert.Equal (new Rect (0, 0, 10, 5), view1.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 5), view1.Frame);
         Assert.Equal ("Absolute(10)", view1.Width.ToString ());
         Assert.Equal ("Absolute(5)", view1.Height.ToString ());
         Assert.False (view2.AutoSize);
-        Assert.Equal (new Rect (0, 0, 10, 5), view2.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 5), view2.Frame);
         Assert.Equal ("Absolute(10)", view2.Width.ToString ());
         Assert.Equal ("Absolute(5)", view2.Height.ToString ());
         Assert.False (view3.AutoSize);
-        Assert.Equal (new Rect (0, 0, 10, 5), view3.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 5), view3.Frame);
         Assert.Equal ("Absolute(10)", view3.Width.ToString ());
         Assert.Equal ("Absolute(5)", view3.Height.ToString ());
         Assert.False (view4.AutoSize);
-        Assert.Equal (new Rect (0, 0, 10, 5), view4.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 5), view4.Frame);
         Assert.Equal ("Absolute(10)", view4.Width.ToString ());
         Assert.Equal ("Absolute(5)", view4.Height.ToString ());
         Assert.False (view5.AutoSize);
-        Assert.Equal (new Rect (0, 0, 10, 5), view5.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 5), view5.Frame);
         Assert.Equal ("Absolute(10)", view5.Width.ToString ());
         Assert.Equal ("Absolute(5)", view5.Height.ToString ());
         Assert.False (view6.AutoSize);
-        Assert.Equal (new Rect (0, 0, 10, 5), view6.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 5), view6.Frame);
         Assert.Equal ("Absolute(10)", view6.Width.ToString ());
         Assert.Equal ("Absolute(5)", view6.Height.ToString ());
 
@@ -83,27 +83,27 @@ public class AutoSizeFalseTests
         Assert.True (view4.IsInitialized);
         Assert.True (view5.IsInitialized);
         Assert.False (view1.AutoSize);
-        Assert.Equal (new Rect (0, 0, 10, 5), view1.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 5), view1.Frame);
         Assert.Equal ("Absolute(10)", view1.Width.ToString ());
         Assert.Equal ("Absolute(5)", view1.Height.ToString ());
         Assert.False (view2.AutoSize);
-        Assert.Equal (new Rect (0, 0, 10, 5), view2.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 5), view2.Frame);
         Assert.Equal ("Absolute(10)", view2.Width.ToString ());
         Assert.Equal ("Absolute(5)", view2.Height.ToString ());
         Assert.False (view3.AutoSize);
-        Assert.Equal (new Rect (0, 0, 10, 5), view3.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 5), view3.Frame);
         Assert.Equal ("Absolute(10)", view3.Width.ToString ());
         Assert.Equal ("Absolute(5)", view3.Height.ToString ());
         Assert.False (view4.AutoSize);
-        Assert.Equal (new Rect (0, 0, 10, 5), view4.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 5), view4.Frame);
         Assert.Equal ("Absolute(10)", view4.Width.ToString ());
         Assert.Equal ("Absolute(5)", view4.Height.ToString ());
         Assert.False (view5.AutoSize);
-        Assert.Equal (new Rect (0, 0, 10, 5), view5.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 5), view5.Frame);
         Assert.Equal ("Absolute(10)", view5.Width.ToString ());
         Assert.Equal ("Absolute(5)", view5.Height.ToString ());
         Assert.False (view6.AutoSize);
-        Assert.Equal (new Rect (0, 0, 10, 5), view6.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 5), view6.Frame);
         Assert.Equal ("Absolute(10)", view6.Width.ToString ());
         Assert.Equal ("Absolute(5)", view6.Height.ToString ());
     }
@@ -142,25 +142,27 @@ public class AutoSizeFalseTests
 
         view.Text = "New text";
         super.LayoutSubviews ();
+        Rectangle expectedViewBounds = new (0, 0, 0, 0);
 
         Assert.False (view.AutoSize);
-        Assert.Equal ("(0,0,0,0)", view.Bounds.ToString ());
+        Assert.Equal (expectedViewBounds, view.Bounds);
         super.Dispose ();
     }
 
     [Fact]
     public void AutoSize_False_ResizeView_With_Dim_Fill_After_IsInitialized ()
     {
-        var super = new View { Frame = new Rect (0, 0, 30, 80) };
+        var super = new View { Frame = new Rectangle (0, 0, 30, 80) };
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
         super.Add (view);
         Assert.False (view.AutoSize);
 
         view.Text = "New text\nNew line";
         super.LayoutSubviews ();
+        Rectangle expectedViewBounds = new (0, 0, 30, 80);
 
         Assert.False (view.AutoSize);
-        Assert.Equal ("(0,0,30,80)", view.Bounds.ToString ());
+        Assert.Equal (expectedViewBounds, view.Bounds);
         Assert.False (view.IsInitialized);
 
         super.BeginInit ();
@@ -168,7 +170,7 @@ public class AutoSizeFalseTests
 
         Assert.True (view.IsInitialized);
         Assert.False (view.AutoSize);
-        Assert.Equal ("(0,0,30,80)", view.Bounds.ToString ());
+        Assert.Equal (expectedViewBounds, view.Bounds);
     }
 
     [Fact]
@@ -214,8 +216,8 @@ public class AutoSizeFalseTests
     {
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
 
-        view.SetRelativeLayout (new Rect (0, 0, 10, 4));
-        Assert.Equal (new Rect (0, 0, 10, 4), view.Frame);
+        view.SetRelativeLayout (new Rectangle (0, 0, 10, 4));
+        Assert.Equal (new Rectangle (0, 0, 10, 4), view.Frame);
         Assert.Equal (new Size (0, 0), view.TextFormatter.Size);
         Assert.False (view.AutoSize);
         Assert.True (view.TextFormatter.NeedsFormat);
@@ -249,10 +251,10 @@ public class AutoSizeFalseTests
 
         Assert.Equal (5, text.Length);
         Assert.False (view.AutoSize);
-        Assert.Equal (new Rect (0, 0, 3, 1), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 3, 1), view.Frame);
         Assert.Equal (new Size (3, 1), view.TextFormatter.Size);
         Assert.Equal (new List<string> { "Vie" }, view.TextFormatter.GetLines ());
-        Assert.Equal (new Rect (0, 0, 10, 4), frame.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 4), frame.Frame);
 
         frame.LayoutSubviews ();
         frame.Clear ();
@@ -265,8 +267,8 @@ public class AutoSizeFalseTests
 └────────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 10, 4), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (0, 0, 10, 4), pos);
 
         text = "0123456789";
         Assert.Equal (10, text.Length);
@@ -276,7 +278,7 @@ public class AutoSizeFalseTests
         frame.Clear ();
         frame.Draw ();
 
-        Assert.Equal (new Rect (0, 0, 0, 1), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 0, 1), view.Frame);
         Assert.Equal (new Size (0, 1), view.TextFormatter.Size);
         Assert.Equal (new List<string> { string.Empty }, view.TextFormatter.GetLines ());
 
@@ -288,7 +290,7 @@ public class AutoSizeFalseTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 10, 4), pos);
+        Assert.Equal (new Rectangle (0, 0, 10, 4), pos);
     }
 
     [Fact]
@@ -324,8 +326,8 @@ public class AutoSizeFalseTests
 
         Assert.False (horizontalView.AutoSize);
         Assert.False (verticalView.AutoSize);
-        Assert.Equal (new Rect (0, 0, 20, 1), horizontalView.Frame);
-        Assert.Equal (new Rect (0, 3, 1, 20), verticalView.Frame);
+        Assert.Equal (new Rectangle (0, 0, 20, 1), horizontalView.Frame);
+        Assert.Equal (new Rectangle (0, 3, 1, 20), verticalView.Frame);
 
         top.Draw ();
 
@@ -364,7 +366,7 @@ public class AutoSizeFalseTests
 └──────────────────────────────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
         verticalView.Text = $"最初の行{Environment.NewLine}二行目";
         Assert.True (verticalView.TextFormatter.NeedsFormat);
@@ -376,7 +378,7 @@ public class AutoSizeFalseTests
         Assert.True (verticalView.TextFormatter.NeedsFormat);
 
         top.Draw ();
-        Assert.Equal (new Rect (0, 3, 2, 20), verticalView.Frame);
+        Assert.Equal (new Rectangle (0, 3, 2, 20), verticalView.Frame);
 
         expected = @"
 ┌──────────────────────────────┐

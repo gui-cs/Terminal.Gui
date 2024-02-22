@@ -108,14 +108,14 @@ public class LegendAnnotation : View, IAnnotation
     private readonly List<Tuple<GraphCellToRender, string>> _entries = new ();
 
     /// <summary>Creates a new empty legend at the empty screen coordinates.</summary>
-    public LegendAnnotation () : this (Rect.Empty) { }
+    public LegendAnnotation () : this (Rectangle.Empty) { }
 
     /// <summary>Creates a new empty legend at the given screen coordinates.</summary>
     /// <param name="legendBounds">
     ///     Defines the area available for the legend to render in (within the graph).  This is in
     ///     screen units (i.e. not graph space)
     /// </param>
-    public LegendAnnotation (Rect legendBounds)
+    public LegendAnnotation (Rectangle legendBounds)
     {
         X = legendBounds.X;
         Y = legendBounds.Y;

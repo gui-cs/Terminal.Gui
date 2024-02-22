@@ -13,7 +13,7 @@ public class ColorPickerTests
         colorPicker.BeginInit ();
         colorPicker.EndInit ();
         colorPicker.LayoutSubviews ();
-        Assert.Equal (new Rect (0, 0, 32, 4), colorPicker.Frame);
+        Assert.Equal (new Rectangle (0, 0, 32, 4), colorPicker.Frame);
     }
 
     [Fact]

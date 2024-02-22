@@ -21,7 +21,7 @@ public class ComboBoxTests
         Assert.Equal ("Two", cb.Text);
         Assert.NotNull (cb.Source);
         Assert.False (cb.AutoSize);
-        Assert.Equal (new Rect (0, 0, 0, 2), cb.Frame);
+        Assert.Equal (new Rectangle (0, 0, 0, 2), cb.Frame);
         Assert.Equal (1, cb.SelectedItem);
     }
 
@@ -36,7 +36,7 @@ public class ComboBoxTests
         Assert.Equal (string.Empty, cb.Text);
         Assert.Null (cb.Source);
         Assert.False (cb.AutoSize);
-        Assert.Equal (new Rect (0, 0, 0, 2), cb.Frame);
+        Assert.Equal (new Rectangle (0, 0, 0, 2), cb.Frame);
         Assert.Equal (-1, cb.SelectedItem);
 
         cb = new ComboBox { Text = "Test" };
@@ -46,7 +46,7 @@ public class ComboBoxTests
         Assert.Equal ("Test", cb.Text);
         Assert.Null (cb.Source);
         Assert.False (cb.AutoSize);
-        Assert.Equal (new Rect (0, 0, 0, 2), cb.Frame);
+        Assert.Equal (new Rectangle (0, 0, 0, 2), cb.Frame);
         Assert.Equal (-1, cb.SelectedItem);
 
         cb = new ComboBox
@@ -63,7 +63,7 @@ public class ComboBoxTests
         Assert.Equal (string.Empty, cb.Text);
         Assert.NotNull (cb.Source);
         Assert.False (cb.AutoSize);
-        Assert.Equal (new Rect (1, 2, 10, 20), cb.Frame);
+        Assert.Equal (new Rectangle (1, 2, 10, 20), cb.Frame);
         Assert.Equal (-1, cb.SelectedItem);
 
         cb = new ComboBox { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
@@ -73,7 +73,7 @@ public class ComboBoxTests
         Assert.Equal (string.Empty, cb.Text);
         Assert.NotNull (cb.Source);
         Assert.False (cb.AutoSize);
-        Assert.Equal (new Rect (0, 0, 0, 2), cb.Frame);
+        Assert.Equal (new Rectangle (0, 0, 0, 2), cb.Frame);
         Assert.Equal (-1, cb.SelectedItem);
     }
 

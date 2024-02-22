@@ -7,6 +7,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Terminal.Gui;
+using Rectangle = Terminal.Gui.Rectangle;
 
 namespace UICatalog.Scenarios;
 
@@ -160,10 +161,10 @@ public class Animation : Scenario
         private int frameCount;
         private Image<Rgba32> [] fullResImages;
         private Image<Rgba32> [] matchSizes;
-        private Rect oldSize = Rect.Empty;
+        private Rectangle oldSize = Rectangle.Empty;
         public void NextFrame () { currentFrame = (currentFrame + 1) % frameCount; }
 
-        public override void OnDrawContent (Rect contentArea)
+        public override void OnDrawContent (Rectangle contentArea)
         {
             base.OnDrawContent (contentArea);
 

@@ -44,7 +44,7 @@ public class TextFormatterTests
     {
         var testText = "test";
         var expectedSize = new Size ();
-        var testBounds = new Rect (0, 0, 100, 1);
+        var testBounds = new Rectangle (0, 0, 100, 1);
         var tf = new TextFormatter ();
 
         tf.Text = testText;
@@ -91,9 +91,9 @@ public class TextFormatterTests
     [InlineData ("")]
     public void CalcRect_Invalid_Returns_Empty (string text)
     {
-        Assert.Equal (Rect.Empty, TextFormatter.CalcRect (0, 0, text));
-        Assert.Equal (new Rect (new Point (1, 2), Size.Empty), TextFormatter.CalcRect (1, 2, text));
-        Assert.Equal (new Rect (new Point (-1, -2), Size.Empty), TextFormatter.CalcRect (-1, -2, text));
+        Assert.Equal (Rectangle.Empty, TextFormatter.CalcRect (0, 0, text));
+        Assert.Equal (new Rectangle (new Point (1, 2), Size.Empty), TextFormatter.CalcRect (1, 2, text));
+        Assert.Equal (new Rectangle (new Point (-1, -2), Size.Empty), TextFormatter.CalcRect (-1, -2, text));
     }
 
     [Theory]
@@ -109,7 +109,7 @@ public class TextFormatterTests
     [InlineData (" ~  s  gui.cs   master\n↑10", 27, 2)]
     public void CalcRect_MultiLine_Returns_nHigh (string text, int expectedWidth, int expectedLines)
     {
-        Assert.Equal (new Rect (0, 0, expectedWidth, expectedLines), TextFormatter.CalcRect (0, 0, text));
+        Assert.Equal (new Rectangle (0, 0, expectedWidth, expectedLines), TextFormatter.CalcRect (0, 0, text));
         string [] lines = text.Split (text.Contains (Environment.NewLine) ? Environment.NewLine : "\n");
         int maxWidth = lines.Max (s => s.GetColumns ());
         var lineWider = 0;
@@ -124,10 +124,10 @@ public class TextFormatterTests
             }
         }
 
-        Assert.Equal (new Rect (0, 0, maxWidth, expectedLines), TextFormatter.CalcRect (0, 0, text));
+        Assert.Equal (new Rectangle (0, 0, maxWidth, expectedLines), TextFormatter.CalcRect (0, 0, text));
 
         Assert.Equal (
-                      new Rect (
+                      new Rectangle (
                                 0,
                                 0,
                                 lines [lineWider].ToRuneList ().Sum (r => Math.Max (r.GetColumns (), 0)),
@@ -142,8 +142,8 @@ public class TextFormatterTests
     [InlineData (" ~  s  gui.cs   master ↑10")]
     public void CalcRect_SingleLine_Returns_1High (string text)
     {
-        Assert.Equal (new Rect (0, 0, text.GetRuneCount (), 1), TextFormatter.CalcRect (0, 0, text));
-        Assert.Equal (new Rect (0, 0, text.GetColumns (), 1), TextFormatter.CalcRect (0, 0, text));
+        Assert.Equal (new Rectangle (0, 0, text.GetRuneCount (), 1), TextFormatter.CalcRect (0, 0, text));
+        Assert.Equal (new Rectangle (0, 0, text.GetColumns (), 1), TextFormatter.CalcRect (0, 0, text));
     }
 
     [Theory]
@@ -152,7 +152,7 @@ public class TextFormatterTests
     public void CalcRect_With_Combining_Runes (int width, int height, TextDirection textDirection)
     {
         var text = "Les Mise\u0328\u0301rables";
-        Assert.Equal (new Rect (0, 0, width, height), TextFormatter.CalcRect (0, 0, text, textDirection));
+        Assert.Equal (new Rectangle (0, 0, width, height), TextFormatter.CalcRect (0, 0, text, textDirection));
     }
 
     [Theory]
@@ -415,10 +415,10 @@ ssb
         }
 
         tf.Draw (
-                 new Rect (0, 0, width, height),
+                 new Rectangle (0, 0, width, height),
                  new Attribute (ColorName.White, ColorName.Black),
                  new Attribute (ColorName.Blue, ColorName.Black),
-                 default (Rect),
+                 default (Rectangle),
                  driver
                 );
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output, driver);
@@ -440,7 +440,7 @@ ssb
         var tf = new TextFormatter { Size = new Size (14, 3), Text = "Test\nTest long\nTest long long\n", MultiLine = true };
 
         tf.Draw (
-                 new Rect (1, 1, 19, 3),
+                 new Rectangle (1, 1, 19, 3),
                  attrs [1],
                  attrs [2]);
 
@@ -466,7 +466,7 @@ ssb
         tf.FillRemaining = true;
 
         tf.Draw (
-                 new Rect (1, 1, 19, 3),
+                 new Rectangle (1, 1, 19, 3),
                  attrs [1],
                  attrs [2]);
 
@@ -1286,7 +1286,7 @@ ssb
     public void NeedsFormat_Sets ()
     {
         var testText = "test";
-        var testBounds = new Rect (0, 0, 100, 1);
+        var testBounds = new Rectangle (0, 0, 100, 1);
         var tf = new TextFormatter ();
 
         tf.Text = "test";
@@ -2060,10 +2060,10 @@ ssb
         Assert.Equal (new Size (width, height), tf.Size);
 
         tf.Draw (
-                 new Rect (0, 0, width, height),
+                 new Rectangle (0, 0, width, height),
                  new Attribute (ColorName.White, ColorName.Black),
                  new Attribute (ColorName.Blue, ColorName.Black),
-                 default (Rect),
+                 default (Rectangle),
                  driver
                 );
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output, driver);
@@ -2098,10 +2098,10 @@ ssb
         Assert.Equal (new Size (width, height), tf.Size);
 
         tf.Draw (
-                 new Rect (0, 0, width, height),
+                 new Rectangle (0, 0, width, height),
                  new Attribute (ColorName.White, ColorName.Black),
                  new Attribute (ColorName.Blue, ColorName.Black),
-                 default (Rect),
+                 default (Rectangle),
                  driver
                 );
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output, driver);
@@ -2136,10 +2136,10 @@ ssb
         Assert.Equal (new Size (width, height), tf.Size);
 
         tf.Draw (
-                 new Rect (0, 0, width, height),
+                 new Rectangle (0, 0, width, height),
                  new Attribute (ColorName.White, ColorName.Black),
                  new Attribute (ColorName.Blue, ColorName.Black),
-                 default (Rect),
+                 default (Rectangle),
                  driver
                 );
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output, driver);

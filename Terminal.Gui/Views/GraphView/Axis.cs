@@ -140,7 +140,7 @@ public class HorizontalAxis : Axis
             return;
         }
 
-        Rect bounds = graph.Bounds;
+        Rectangle bounds = graph.Bounds;
 
         IEnumerable<AxisIncrementToRender> labels = GetLabels (graph, bounds);
 
@@ -174,7 +174,7 @@ public class HorizontalAxis : Axis
             return;
         }
 
-        Rect bounds = graph.Bounds;
+        Rectangle bounds = graph.Bounds;
 
         graph.Move (0, 0);
 
@@ -225,7 +225,7 @@ public class HorizontalAxis : Axis
         Application.Driver.AddRune (Glyphs.HLine);
     }
 
-    private IEnumerable<AxisIncrementToRender> GetLabels (GraphView graph, Rect bounds)
+    private IEnumerable<AxisIncrementToRender> GetLabels (GraphView graph, Rectangle bounds)
     {
         // if no labels
         if (Increment == 0)
@@ -317,7 +317,7 @@ public class VerticalAxis : Axis
             return;
         }
 
-        Rect bounds = graph.Bounds;
+        Rectangle bounds = graph.Bounds;
         IEnumerable<AxisIncrementToRender> labels = GetLabels (graph, bounds);
 
         foreach (AxisIncrementToRender label in labels)
@@ -356,7 +356,7 @@ public class VerticalAxis : Axis
             return;
         }
 
-        Rect bounds = graph.Bounds;
+        Rectangle bounds = graph.Bounds;
 
         int x = GetAxisXPosition (graph);
 
@@ -412,7 +412,7 @@ public class VerticalAxis : Axis
         return graph.Bounds.Height;
     }
 
-    private IEnumerable<AxisIncrementToRender> GetLabels (GraphView graph, Rect bounds)
+    private IEnumerable<AxisIncrementToRender> GetLabels (GraphView graph, Rectangle bounds)
     {
         // if no labels
         if (Increment == 0)

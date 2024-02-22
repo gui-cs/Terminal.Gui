@@ -46,24 +46,24 @@ public class AdornmentTests
         parent.BeginInit ();
         parent.EndInit ();
 
-        Assert.Equal (new Rect (1, 2, 10, 10), parent.Frame);
-        Assert.Equal (new Rect (0, 0, 10, 10), parent.Bounds);
-        Assert.Equal (new Rect (0, 0, 10, 10), parent.Margin.Frame);
-        Assert.Equal (new Rect (0, 0, 10, 10), parent.Margin.Bounds);
-        Assert.Equal (new Rect (0, 0, 10, 10), parent.Border.Frame);
-        Assert.Equal (new Rect (0, 0, 10, 10), parent.Border.Bounds);
-        Assert.Equal (new Rect (0, 0, 10, 10), parent.Padding.Frame);
-        Assert.Equal (new Rect (0, 0, 10, 10), parent.Padding.Bounds);
+        Assert.Equal (new Rectangle (1, 2, 10, 10), parent.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Border.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Border.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Padding.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Padding.Bounds);
 
         Assert.Null (parent.Margin.SuperView);
         Rect boundsAsScreen = parent.BoundsToScreen (new Rect (1, 2, 5, 5));
-        Assert.Equal (new Rect (2, 4, 5, 5), boundsAsScreen);
+        Assert.Equal (new Rectangle (2, 4, 5, 5), boundsAsScreen);
         boundsAsScreen = parent.Margin.BoundsToScreen (new Rect (1, 2, 5, 5));
-        Assert.Equal (new Rect (2, 4, 5, 5), boundsAsScreen);
+        Assert.Equal (new Rectangle (2, 4, 5, 5), boundsAsScreen);
         boundsAsScreen = parent.Border.BoundsToScreen (new Rect (1, 2, 5, 5));
-        Assert.Equal (new Rect (2, 4, 5, 5), boundsAsScreen);
+        Assert.Equal (new Rectangle (2, 4, 5, 5), boundsAsScreen);
         boundsAsScreen = parent.Padding.BoundsToScreen (new Rect (1, 2, 5, 5));
-        Assert.Equal (new Rect (2, 4, 5, 5), boundsAsScreen);
+        Assert.Equal (new Rectangle (2, 4, 5, 5), boundsAsScreen);
     }
 
     [Fact]
@@ -345,20 +345,20 @@ public class AdornmentTests
         parent.BeginInit ();
         parent.EndInit ();
 
-        Assert.Equal (new Rect (1, 2, 10, 10), parent.Frame);
-        Assert.Equal (new Rect (0, 0, 10, 10), parent.Bounds);
-        Assert.Equal (new Rect (0, 0, 10, 10), parent.Margin.Frame);
-        Assert.Equal (new Rect (0, 0, 10, 10), parent.Margin.Bounds);
-        Assert.Equal (new Rect (0, 0, 10, 10), parent.Border.Frame);
-        Assert.Equal (new Rect (0, 0, 10, 10), parent.Border.Bounds);
-        Assert.Equal (new Rect (0, 0, 10, 10), parent.Padding.Frame);
-        Assert.Equal (new Rect (0, 0, 10, 10), parent.Padding.Bounds);
+        Assert.Equal (new Rectangle (1, 2, 10, 10), parent.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Border.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Border.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Padding.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Padding.Bounds);
 
         Assert.Null (parent.Margin.SuperView);
-        Assert.Equal (new Rect (1, 2, 10, 10), parent.FrameToScreen ());
-        Assert.Equal (new Rect (1, 2, 10, 10), parent.Margin.FrameToScreen ());
-        Assert.Equal (new Rect (1, 2, 10, 10), parent.Border.FrameToScreen ());
-        Assert.Equal (new Rect (1, 2, 10, 10), parent.Padding.FrameToScreen ());
+        Assert.Equal (new Rectangle (1, 2, 10, 10), parent.FrameToScreen ());
+        Assert.Equal (new Rectangle (1, 2, 10, 10), parent.Margin.FrameToScreen ());
+        Assert.Equal (new Rectangle (1, 2, 10, 10), parent.Border.FrameToScreen ());
+        Assert.Equal (new Rectangle (1, 2, 10, 10), parent.Padding.FrameToScreen ());
     }
 
     [Fact]
@@ -391,7 +391,7 @@ public class AdornmentTests
     public void Setting_Bounds_Throws ()
     {
         var adornment = new Adornment (null);
-        Assert.Throws<InvalidOperationException> (() => adornment.Bounds = new Rect (1, 2, 3, 4));
+        Assert.Throws<InvalidOperationException> (() => adornment.Bounds = new Rectangle (1, 2, 3, 4));
     }
 
     [Fact]
@@ -415,12 +415,12 @@ public class AdornmentTests
         parent.BeginInit ();
         parent.EndInit ();
 
-        Assert.Equal (new Rect (0, 0, 10, 10), parent.Frame);
-        Assert.Equal (new Rect (0, 0, 10, 10), parent.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Bounds);
 
         parent.Margin.Thickness = new Thickness (1);
-        Assert.Equal (new Rect (0, 0, 10, 10), parent.Frame);
-        Assert.Equal (new Rect (0, 0, 8, 8), parent.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Frame);
+        Assert.Equal (new Rectangle (0, 0, 8, 8), parent.Bounds);
     }
 
     [Fact]

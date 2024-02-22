@@ -254,7 +254,7 @@ public class GraphViewExample : Scenario
 
         _graphView.AxisY.Minimum = 0;
 
-        var legend = new LegendAnnotation (new Rect (_graphView.Bounds.Width - 20, 0, 20, 5));
+        var legend = new LegendAnnotation (new Rectangle (_graphView.Bounds.Width - 20, 0, 20, 5));
 
         legend.AddEntry (
                          new GraphCellToRender (stiple, series.SubSeries.ElementAt (0).OverrideBarColor),

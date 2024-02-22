@@ -173,6 +173,8 @@ public class TestDateAttribute : BeforeAfterTestAttribute
 
 internal partial class TestHelpers
 {
+    private const char SpaceChar = ' ';
+    private static readonly Rune SpaceRune = (Rune)SpaceChar;
 #pragma warning disable xUnit1013 // Public method should be marked as test
     /// <summary>
     ///     Verifies <paramref name="expectedAttributes"/> are found at the locations specified by
@@ -312,7 +314,7 @@ internal partial class TestHelpers
     /// <param name="output"></param>
     /// <param name="driver">The ConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
     /// <returns></returns>
-    public static Rect AssertDriverContentsWithFrameAre (
+    public static Rectangle AssertDriverContentsWithFrameAre (
         string expectedLook,
         ITestOutputHelper output,
         ConsoleDriver driver = null
@@ -328,43 +330,44 @@ internal partial class TestHelpers
 
         Cell [,] contents = driver.Contents;
 
-        for (var r = 0; r < driver.Rows; r++)
+
+        for (var rowIndex = 0; rowIndex < driver.Rows; rowIndex++)
         {
-            List<Rune> runes = new ();
+            List<Rune> runes = [];
 
-            for (var c = 0; c < driver.Cols; c++)
+            for (var colIndex = 0; colIndex < driver.Cols; colIndex++)
             {
-                Rune rune = contents [r, c].Rune;
+                Rune runeAtCurrentLocation = contents [rowIndex, colIndex].Rune;
 
-                if (rune != (Rune)' ')
+                if (runeAtCurrentLocation != SpaceRune)
                 {
                     if (x == -1)
                     {
-                        x = c;
-                        y = r;
+                        x = colIndex;
+                        y = rowIndex;
 
-                        for (var i = 0; i < c; i++)
+                        for (int i = 0; i < colIndex; i++)
                         {
-                            runes.InsertRange (i, new List<Rune> { (Rune)' ' });
+                            runes.InsertRange (i, [SpaceRune]);
                         }
                     }
 
-                    if (rune.GetColumns () > 1)
+                    if (runeAtCurrentLocation.GetColumns () > 1)
                     {
-                        c++;
+                        colIndex++;
                     }
 
-                    if (c + 1 > w)
+                    if (colIndex + 1 > w)
                     {
-                        w = c + 1;
+                        w = colIndex + 1;
                     }
 
-                    h = r - y + 1;
+                    h = rowIndex - y + 1;
                 }
 
                 if (x > -1)
                 {
-                    runes.Add (rune);
+                    runes.Add (runeAtCurrentLocation);
                 }
 
                 // See Issue #2616
@@ -423,30 +426,27 @@ internal partial class TestHelpers
 
         if (string.Equals (expectedLook, actualLook))
         {
-            return new Rect (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
+            return new Rectangle (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
         }
 
         // standardize line endings for the comparison
-        expectedLook = expectedLook.Replace ("\r\n", "\n");
-        actualLook = actualLook.Replace ("\r\n", "\n");
+        expectedLook = expectedLook.ReplaceLineEndings ();
+        actualLook = actualLook.ReplaceLineEndings();
 
         // Remove the first and the last line ending from the expectedLook
-        if (expectedLook.StartsWith ("\n"))
+        if (expectedLook.StartsWith (Environment.NewLine))
         {
-            expectedLook = expectedLook [1..];
+            expectedLook = expectedLook [Environment.NewLine.Length..];
         }
 
-        if (expectedLook.EndsWith ("\n"))
+        if (expectedLook.EndsWith (Environment.NewLine))
         {
-            expectedLook = expectedLook [..^1];
+            expectedLook = expectedLook [..^Environment.NewLine.Length];
         }
-
-        output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
-        output?.WriteLine (" But Was:" + Environment.NewLine + actualLook);
 
         Assert.Equal (expectedLook, actualLook);
 
-        return new Rect (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
+        return new Rectangle (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
     }
 
 #pragma warning disable xUnit1013 // Public method should be marked as test
@@ -582,9 +582,9 @@ internal partial class TestHelpers
 
     private static void AddArguments (Type paramType, List<object> pTypes)
     {
-        if (paramType == typeof (Rect))
+        if (paramType == typeof (Rectangle))
         {
-            pTypes.Add (Rect.Empty);
+            pTypes.Add (Rectangle.Empty);
         }
         else if (paramType == typeof (string))
         {

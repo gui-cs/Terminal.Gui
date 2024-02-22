@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+namespace Terminal.Gui;
 
 /// <summary>The Border for a <see cref="View"/>.</summary>
 /// <remarks>
@@ -103,10 +103,10 @@ public class Border : Adornment
     /// <param name="region">View-relative region for the frame to be drawn.</param>
     /// <param name="clear">If set to <see langword="true"/> it clear the region.</param>
     [Obsolete ("This method is obsolete in v2. Use use LineCanvas or Frame instead.", false)]
-    public void DrawFrame (Rect region, bool clear)
+    public void DrawFrame (Rectangle region, bool clear)
     {
-        Rect savedClip = ClipToBounds ();
-        Rect screenBounds = BoundsToScreen (region);
+        Rectangle savedClip = ClipToBounds ();
+        Rectangle screenBounds = BoundsToScreen (region);
 
         if (clear)
         {
@@ -215,7 +215,7 @@ public class Border : Adornment
         }
 
         //Driver.SetAttribute (Colors.ColorSchemes ["Error"].Normal);
-        Rect screenBounds = BoundsToScreen (Frame);
+        Rectangle screenBounds = BoundsToScreen (Frame);
 
         //OnDrawSubviews (bounds); 
 
@@ -224,7 +224,7 @@ public class Border : Adornment
         // The border adornment (and title) are drawn at the outermost edge of border; 
         // For Border
         // ...thickness extends outward (border/title is always as far in as possible)
-        var borderBounds = new Rect (
+        var borderBounds = new Rectangle (
                                      screenBounds.X + Math.Max (0, Thickness.Left - 1),
                                      screenBounds.Y + Math.Max (0, Thickness.Top - 1),
                                      Math.Max (
@@ -296,7 +296,7 @@ public class Border : Adornment
 
         if (canDrawBorder && Thickness.Top > 0 && maxTitleWidth > 0 && !string.IsNullOrEmpty (Parent?.Title))
         {
-            Parent.TitleTextFormatter.Draw (new Rect (borderBounds.X + 2, titleY, maxTitleWidth, 1),
+            Parent.TitleTextFormatter.Draw (new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
                                             Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor (),
                                             Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetHotNormalColor ());
         }
@@ -475,7 +475,7 @@ public class Border : Adornment
                 // Redraw title 
                 if (drawTop && maxTitleWidth > 0 && !string.IsNullOrEmpty (Parent?.Title))
                 {
-                    Parent.TitleTextFormatter.Draw (new Rect (borderBounds.X + 2, titleY, maxTitleWidth, 1),
+                    Parent.TitleTextFormatter.Draw (new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
                                                     Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor (),
                                                     Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor ());
                 }

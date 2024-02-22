@@ -122,7 +122,7 @@ public class ScrollView : View
                            }
 
                            SetContentOffset (_contentOffset);
-                           _contentView.Frame = new Rect (ContentOffset, ContentSize);
+                           _contentView.Frame = new Rectangle (ContentOffset, ContentSize);
                            _vertical.ChangedPosition += delegate { ContentOffset = new Point (ContentOffset.X, _vertical.Position); };
                            _horizontal.ChangedPosition += delegate { ContentOffset = new Point (_horizontal.Position, ContentOffset.Y); };
                        };
@@ -184,7 +184,7 @@ public class ScrollView : View
             if (_contentSize != value)
             {
                 _contentSize = value;
-                _contentView.Frame = new Rect (_contentOffset, value);
+                _contentView.Frame = new Rectangle (_contentOffset, value);
                 _vertical.Size = _contentSize.Height;
                 _horizontal.Size = _contentSize.Width;
                 SetNeedsDisplay ();
@@ -357,11 +357,11 @@ public class ScrollView : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         SetViewsNeedsDisplay ();
 
-        Rect savedClip = ClipToBounds ();
+        Rectangle savedClip = ClipToBounds ();
 
         // TODO: It's bad practice for views to always clear a view. It negates clipping.
         Clear ();
@@ -572,7 +572,7 @@ public class ScrollView : View
     private void SetContentOffset (Point offset)
     {
         _contentOffset = new Point (-Math.Abs (offset.X), -Math.Abs (offset.Y));
-        _contentView.Frame = new Rect (_contentOffset, _contentSize);
+        _contentView.Frame = new Rectangle (_contentOffset, _contentSize);
         int p = Math.Max (0, -_contentOffset.Y);
 
         if (_vertical.Position != p)

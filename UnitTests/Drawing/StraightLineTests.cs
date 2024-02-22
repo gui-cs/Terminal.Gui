@@ -322,6 +322,6 @@ public class StraightLineTests
     {
         var sl = new StraightLine (new Point (x, y), length, orientation, LineStyle.Single);
 
-        Assert.Equal (new Rect (expectedX, expectedY, expectedWidth, expectedHeight), sl.Bounds);
+        Assert.Equal (new Rectangle (expectedX, expectedY, expectedWidth, expectedHeight), sl.Bounds);
     }
 }

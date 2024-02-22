@@ -311,13 +311,13 @@ public class TabView : View
     public int EnsureValidScrollOffsets (int value) { return Math.Max (Math.Min (value, Tabs.Count - 1), 0); }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         Driver.SetAttribute (GetNormalColor ());
 
         if (Tabs.Any ())
         {
-            Rect savedClip = ClipToBounds ();
+            Rectangle savedClip = ClipToBounds ();
             _tabsBar.OnDrawContent (contentArea);
             _contentView.SetNeedsDisplay ();
             _contentView.Draw ();
@@ -326,7 +326,7 @@ public class TabView : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContentComplete (Rect contentArea) { _tabsBar.OnDrawContentComplete (contentArea); }
+    public override void OnDrawContentComplete (Rectangle contentArea) { _tabsBar.OnDrawContentComplete (contentArea); }
 
     /// <summary>
     ///     Removes the given <paramref name="tab"/> from <see cref="Tabs"/>. Caller is responsible for disposing the
@@ -437,7 +437,7 @@ public class TabView : View
 
     /// <summary>Returns which tabs to render at each x location.</summary>
     /// <returns></returns>
-    private IEnumerable<TabToRender> CalculateViewport (Rect bounds)
+    private IEnumerable<TabToRender> CalculateViewport (Rectangle bounds)
     {
         UnSetCurrentTabs ();
 
@@ -657,7 +657,7 @@ public class TabView : View
             return false;
         }
 
-        public override void OnDrawContent (Rect contentArea)
+        public override void OnDrawContent (Rectangle contentArea)
         {
             _host._tabLocations = _host.CalculateViewport (Bounds).ToArray ();
 
@@ -670,7 +670,7 @@ public class TabView : View
             Driver.SetAttribute (GetNormalColor ());
         }
 
-        public override void OnDrawContentComplete (Rect contentArea)
+        public override void OnDrawContentComplete (Rectangle contentArea)
         {
             if (_host._tabLocations is null)
             {
@@ -683,7 +683,7 @@ public class TabView : View
             for (var i = 0; i < tabLocations.Length; i++)
             {
                 View tab = tabLocations [i].Tab;
-                Rect vts = tab.BoundsToScreen (tab.Bounds);
+                Rectangle vts = tab.BoundsToScreen (tab.Bounds);
                 var lc = new LineCanvas ();
                 int selectedOffset = _host.Style.ShowTopLine && tabLocations [i].IsSelected ? 0 : 1;
 
@@ -1115,7 +1115,7 @@ public class TabView : View
 
                     int lastSelectedTab = !_host.Style.ShowTopLine && i == selectedTab ? 1 :
                                           _host.Style.TabsOnBottom ? 1 : 0;
-                    Rect tabsBarVts = BoundsToScreen (Bounds);
+                    Rectangle tabsBarVts = BoundsToScreen (Bounds);
                     int lineLength = tabsBarVts.Right - vts.Right;
 
                     // Right horizontal line

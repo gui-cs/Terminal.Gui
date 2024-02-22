@@ -347,7 +347,7 @@ public partial class Toplevel : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         if (!Visible)
         {

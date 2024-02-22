@@ -150,7 +150,7 @@ public partial class View
             y = Bounds.Y;
         }
 
-        Rect rect = TextFormatter.CalcRect (x, y, TextFormatter.Text, TextFormatter.Direction);
+        Rectangle rect = TextFormatter.CalcRect (x, y, TextFormatter.Text, TextFormatter.Direction);
 
         int newWidth = rect.Size.Width
                        - GetHotKeySpecifierLength ()
@@ -257,7 +257,7 @@ public partial class View
 
     private bool IsValidAutoSize (out Size autoSize)
     {
-        Rect rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
+        Rectangle rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
 
         autoSize = new Size (
                              rect.Size.Width - GetHotKeySpecifierLength (),
@@ -271,7 +271,7 @@ public partial class View
 
     private bool IsValidAutoSizeHeight (Dim height)
     {
-        Rect rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
+        Rectangle rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
         int dimValue = height.Anchor (0);
 
         return !((ValidatePosDim && !(height is Dim.DimAbsolute))
@@ -280,7 +280,7 @@ public partial class View
 
     private bool IsValidAutoSizeWidth (Dim width)
     {
-        Rect rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
+        Rectangle rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
         int dimValue = width.Anchor (0);
 
         return !((ValidatePosDim && !(width is Dim.DimAbsolute))
@@ -365,7 +365,7 @@ public partial class View
             // TODO: This is a hack.
             //_width  = size.Width;
             //_height = size.Height;
-            _frame = new Rect (_frame.Location, size);
+            _frame = new Rectangle (_frame.Location, size);
 
             //throw new InvalidOperationException ("This is a hack.");
             return true;

@@ -17,8 +17,8 @@ public class FrameTests
     public void FrameToScreen_NoSuperView (int frameX, int frameY, int expectedScreenX, int expectedScreenY)
     {
         var view = new View { X = frameX, Y = frameY, Width = 10, Height = 10 };
-        var expected = new Rect (expectedScreenX, expectedScreenY, 10, 10);
-        Rect actual = view.FrameToScreen ();
+        var expected = new Rectangle (expectedScreenX, expectedScreenY, 10, 10);
+        Rectangle actual = view.FrameToScreen ();
         Assert.Equal (expected, actual);
     }
 
@@ -42,8 +42,8 @@ public class FrameTests
 
         var view = new View { X = frameX, Y = frameY, Width = 10, Height = 10 };
         super.Add (view);
-        var expected = new Rect (expectedScreenX, expectedScreenY, 10, 10);
-        Rect actual = view.FrameToScreen ();
+        var expected = new Rectangle (expectedScreenX, expectedScreenY, 10, 10);
+        Rectangle actual = view.FrameToScreen ();
         Assert.Equal (expected, actual);
     }
 }

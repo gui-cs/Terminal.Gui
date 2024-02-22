@@ -469,7 +469,7 @@ public class MenuBar : View
     public event EventHandler<MenuOpeningEventArgs> MenuOpening;
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         Move (0, 0);
         Driver.SetAttribute (GetNormalColor ());
@@ -825,7 +825,7 @@ public class MenuBar : View
             return Point.Empty;
         }
 
-        Rect superViewFrame = SuperView is null ? Driver.Bounds : SuperView.Frame;
+        Rectangle superViewFrame = SuperView is null ? Driver.Bounds : SuperView.Frame;
         View sv = SuperView is null ? Application.Current : SuperView;
         Point boundsOffset = sv.GetBoundsOffset ();
 
@@ -842,8 +842,8 @@ public class MenuBar : View
     /// <returns>The location offset.</returns>
     internal Point GetScreenOffsetFromCurrent ()
     {
-        Rect screen = Driver.Bounds;
-        Rect currentFrame = Application.Current.Frame;
+        Rectangle screen = Driver.Bounds;
+        Rectangle currentFrame = Application.Current.Frame;
         Point boundsOffset = Application.Top.GetBoundsOffset ();
 
         return new Point (screen.X - currentFrame.X - boundsOffset.X, screen.Y - currentFrame.Y - boundsOffset.Y);

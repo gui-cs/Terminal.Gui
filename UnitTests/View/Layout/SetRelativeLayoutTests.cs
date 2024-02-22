@@ -10,7 +10,7 @@ public class SetRelativeLayoutTests
     [Fact]
     public void AbsolutePosDim_DontChange ()
     {
-        var screen = new Rect (0, 0, 10, 15);
+        var screen = new Rectangle (0, 0, 10, 15);
 
         var view = new View
         {
@@ -31,7 +31,7 @@ public class SetRelativeLayoutTests
     [Fact]
     public void ComputedPosDim_StayComputed ()
     {
-        var screen = new Rect (0, 0, 10, 15);
+        var screen = new Rectangle (0, 0, 10, 15);
         var view = new View { X = 1, Y = 2, Width = Dim.Fill (), Height = Dim.Fill () };
 
         Assert.Equal ("Absolute(1)", view.X.ToString ());
@@ -48,7 +48,7 @@ public class SetRelativeLayoutTests
     {
         var view = new View { X = 1, Y = 1, Width = Dim.Fill (), Height = Dim.Fill () };
 
-        view.SetRelativeLayout (new Rect (0, 0, 80, 25));
+        view.SetRelativeLayout (new Rectangle (0, 0, 80, 25));
         Assert.Equal ("Fill(0)", view.Width.ToString ());
         Assert.Equal (1, view.Frame.X);
         Assert.Equal (1, view.Frame.Y);
@@ -63,7 +63,7 @@ public class SetRelativeLayoutTests
         view.Y = 0;
         Assert.Equal ("Absolute(0)", view.X.ToString ());
         Assert.Equal ("Fill(0)", view.Width.ToString ());
-        view.SetRelativeLayout (new Rect (0, 0, 80, 25));
+        view.SetRelativeLayout (new Rectangle (0, 0, 80, 25));
         Assert.Equal (0, view.Frame.X);
         Assert.Equal (0, view.Frame.Y);
         Assert.Equal (80, view.Frame.Width);
@@ -77,7 +77,7 @@ public class SetRelativeLayoutTests
     [Fact]
     public void Fill_And_PosCenter ()
     {
-        var screen = new Rect (0, 0, 80, 25);
+        var screen = new Rectangle (0, 0, 80, 25);
         var view = new View { X = Pos.Center (), Y = Pos.Center (), Width = Dim.Fill (), Height = Dim.Fill () };
 
         view.SetRelativeLayout (screen);
@@ -139,7 +139,7 @@ public class SetRelativeLayoutTests
     [Fact]
     public void Fill_Pos_Outside_Bounds ()
     {
-        var screen = new Rect (0, 0, 80, 25);
+        var screen = new Rectangle (0, 0, 80, 25);
 
         var view = new View
         {
@@ -187,7 +187,7 @@ public class SetRelativeLayoutTests
     [Fact]
     public void Fill_Pos_Within_Bounds ()
     {
-        var screen = new Rect (0, 0, 80, 25);
+        var screen = new Rectangle (0, 0, 80, 25);
         var view = new View { X = 1, Y = 1, Width = 5, Height = 4 };
 
         view.SetRelativeLayout (screen);
@@ -351,7 +351,7 @@ public class SetRelativeLayoutTests
         // SetRelativeLayout. In addition, the old test was bogus because it was testing the wrong thing (and 
         // because in v1 Pos.Center was broken in this regard!
 
-        var screen = new Rect (0, 0, 80, 25);
+        var screen = new Rectangle (0, 0, 80, 25);
 
         var view = new View
         {
@@ -385,7 +385,7 @@ public class SetRelativeLayoutTests
     [Fact]
     public void PosCombine_PosCenter_Plus_Absolute ()
     {
-        var screen = new Rect (0, 0, 80, 25);
+        var screen = new Rectangle (0, 0, 80, 25);
 
         var view = new View
         {
@@ -403,7 +403,7 @@ public class SetRelativeLayoutTests
     [Fact]
     public void PosDimFunction ()
     {
-        var screen = new Rect (0, 0, 30, 1);
+        var screen = new Rectangle (0, 0, 30, 1);
         var view = new View { Text = "abc", AutoSize = true }; // BUGBUG: AutoSize or Width must be set
         view.X = Pos.AnchorEnd () - Pos.Function (GetViewWidth);
 

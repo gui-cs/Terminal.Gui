@@ -407,7 +407,7 @@ public class FileDialog : Dialog
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         base.OnDrawContent (contentArea);
 
@@ -516,7 +516,7 @@ public class FileDialog : Dialog
 
             _allowedTypeMenuBar.DrawContentComplete += (s, e) =>
                                                        {
-                                                           _allowedTypeMenuBar.Move (e.Rect.Width - 1, 0);
+                                                           _allowedTypeMenuBar.Move (e.Rectangle.Width - 1, 0);
                                                            Driver.AddRune (Glyphs.DownArrow);
                                                        };
 

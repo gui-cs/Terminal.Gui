@@ -1,8 +1,10 @@
-﻿using System.Text;
+#nullable enable
+using System.Text;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
+[Trait("Category","Output")]
 public class DrawTests
 {
     private readonly ITestOutputHelper _output;
@@ -10,9 +12,10 @@ public class DrawTests
 
     [Fact]
     [AutoInitShutdown]
+    [Trait("Category","Unicode")]
     public void CJK_Compatibility_Ideographs_ConsoleWidth_ColumnWidth_Equal_Two ()
     {
-        var us = "\U0000f900";
+        const string us = "\U0000f900";
         var r = (Rune)0xf900;
 
         Assert.Equal ("豈", us);
@@ -32,14 +35,16 @@ public class DrawTests
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
 
-        var expected = @"
-┌┤豈├────┐
-│豈      │
-│豈      │
-└────────┘";
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        const string expectedOutput = """
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+                                      ┌┤豈├────┐
+                                      │豈      │
+                                      │豈      │
+                                      └────────┘
+                                      """;
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedOutput, _output);
+
+        TestHelpers.AssertDriverContentsAre (expectedOutput, _output);
 
         Attribute [] expectedColors =
         {
@@ -54,11 +59,13 @@ public class DrawTests
         };
 
         TestHelpers.AssertDriverAttributesAre (
-                                               @"
-0011000000
-0000000000
-0111000000
-0000000000",
+                                               """
+
+                                               0011000000
+                                               0000000000
+                                               0111000000
+                                               0000000000
+                                               """,
                                                Application.Driver,
                                                expectedColors
                                               );
@@ -67,20 +74,23 @@ public class DrawTests
     // TODO: Refactor this test to not depend on TextView etc... Make it as primitive as possible
     [Fact]
     [AutoInitShutdown]
+    [Trait("Category","Unicode")]
     public void Clipping_AddRune_Left_Or_Right_Replace_Previous_Or_Next_Wide_Rune_With_Space ()
     {
         var tv = new TextView
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            Text = @"これは広いルーンラインです。
-これは広いルーンラインです。
-これは広いルーンラインです。
-これは広いルーンラインです。
-これは広いルーンラインです。
-これは広いルーンラインです。
-これは広いルーンラインです。
-これは広いルーンラインです。"
+            Text = """
+                   これは広いルーンラインです。
+                   これは広いルーンラインです。
+                   これは広いルーンラインです。
+                   これは広いルーンラインです。
+                   これは広いルーンラインです。
+                   これは広いルーンラインです。
+                   これは広いルーンラインです。
+                   これは広いルーンラインです。
+                   """
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (tv);
@@ -96,24 +106,27 @@ public class DrawTests
         Application.Begin (dg);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 10);
 
-        var expected = @"
-┌────────────────────────────┐
-│これは広いルーンラインです。│
-│�┌────────────┐�ラインです。│
-│�│ワイドルーン│�ラインです。│
-│�└────────────┘�ラインです。│
-│これは広いルーンラインです。│
-│これは広いルーンラインです。│
-│これは広いルーンラインです。│
-│これは広いルーンラインです。│
-└────────────────────────────┘";
+        const string expectedOutput = """
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 10), pos);
+                                      ┌────────────────────────────┐
+                                      │これは広いルーンラインです。│
+                                      │�┌────────────┐�ラインです。│
+                                      │�│ワイドルーン│�ラインです。│
+                                      │�└────────────┘�ラインです。│
+                                      │これは広いルーンラインです。│
+                                      │これは広いルーンラインです。│
+                                      │これは広いルーンラインです。│
+                                      │これは広いルーンラインです。│
+                                      └────────────────────────────┘
+                                      """;
+
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expectedOutput, _output);
+        Assert.Equal (new Rectangle (0, 0, 30, 10), pos);
     }
 
     [Fact]
     [AutoInitShutdown]
+    [Trait("Category","Output")]
     public void Colors_On_TextAlignment_Right_And_Bottom ()
     {
         var viewRight = new View
@@ -142,26 +155,30 @@ public class DrawTests
         ((FakeDriver)Application.Driver).SetBufferSize (7, 7);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-  Test
-      
-      
-T     
-e     
-s     
-t     ",
+                                                      """
+
+                                                        Test
+                                                            
+                                                            
+                                                      T     
+                                                      e     
+                                                      s     
+                                                      t     
+                                                      """,
                                                       _output
                                                      );
 
         TestHelpers.AssertDriverAttributesAre (
-                                               @"
-000000
-0
-0
-0
-0
-0
-0",
+                                               """
+
+                                               000000
+                                               0
+                                               0
+                                               0
+                                               0
+                                               0
+                                               0
+                                               """,
                                                Application.Driver,
                                                Colors.ColorSchemes ["Base"].Normal
                                               );
@@ -176,15 +193,17 @@ t     ",
         view.EndInit ();
         view.SetRelativeLayout (Application.Driver.Bounds);
 
-        Assert.Equal ("(0,0,2,2)", view.Frame.ToString ());
-        Assert.Equal ("(0,0,0,0)", view.Bounds.ToString ());
+        Assert.Equal (new (0,0,2,2), view.Frame);
+        Assert.Equal (Rectangle.Empty, view.Bounds);
 
         view.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌┐
-└┘",
+                                                      """
+
+                                                      ┌┐
+                                                      └┘
+                                                      """,
                                                       _output
                                                      );
     }
@@ -199,16 +218,12 @@ t     ",
         view.EndInit ();
         view.SetRelativeLayout (Application.Driver.Bounds);
 
-        Assert.Equal ("(0,0,2,1)", view.Frame.ToString ());
-        Assert.Equal ("(0,0,0,0)", view.Bounds.ToString ());
+        Assert.Equal (new (0,0,2,1), view.Frame);
+        Assert.Equal (Rectangle.Empty, view.Bounds);
 
         view.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-",
-                                                      _output
-                                                     );
+        TestHelpers.AssertDriverContentsWithFrameAre (string.Empty, _output);
     }
 
     [Fact]
@@ -221,15 +236,17 @@ t     ",
         view.EndInit ();
         view.SetRelativeLayout (Application.Driver.Bounds);
 
-        Assert.Equal ("(0,0,1,2)", view.Frame.ToString ());
-        Assert.Equal ("(0,0,0,0)", view.Bounds.ToString ());
+        Assert.Equal (new (0,0,1,2), view.Frame);
+        Assert.Equal (Rectangle.Empty, view.Bounds);
 
         view.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-│
-│",
+                                                      """
+
+                                                      │
+                                                      │
+                                                      """,
                                                       _output
                                                      );
     }
@@ -244,15 +261,17 @@ t     ",
         view.EndInit ();
         view.SetRelativeLayout (Application.Driver.Bounds);
 
-        Assert.Equal ("(0,0,1,2)", view.Frame.ToString ());
-        Assert.Equal ("(0,0,0,0)", view.Bounds.ToString ());
+        Assert.Equal (new (0,0,1,2), view.Frame);
+        Assert.Equal (Rectangle.Empty, view.Bounds);
 
         view.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-│
-│",
+                                                      """
+
+                                                      │
+                                                      │
+                                                      """,
                                                       _output
                                                      );
     }
@@ -268,15 +287,17 @@ t     ",
         view.EndInit ();
         view.SetRelativeLayout (Application.Driver.Bounds);
 
-        Assert.Equal ("(0,0,2,1)", view.Frame.ToString ());
-        Assert.Equal ("(0,0,0,0)", view.Bounds.ToString ());
+        Assert.Equal (new (0,0,2,1), view.Frame);
+        Assert.Equal (Rectangle.Empty, view.Bounds);
 
         view.Draw ();
 
         // BUGBUG: Wha? Is this right? Shouldn't it be "└┘"???
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌┐",
+                                                      """
+
+                                                      ┌┐
+                                                      """,
                                                       _output
                                                      );
     }
@@ -291,12 +312,41 @@ t     ",
             X = 1,
             Width = 1,
             Height = 7,
-            Text = "s\nu\nb\nV\ni\ne\nw"
+            Text = """
+            s
+            u
+            b
+            V
+            i
+            e
+            w
+            """
         };
 
         var view = new View
         {
-            Id = "view", Width = 2, Height = 20, Text = "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9"
+            Id = "view", Width = 2, Height = 20, Text = """
+            0
+            1
+            2
+            3
+            4
+            5
+            6
+            7
+            8
+            9
+            0
+            1
+            2
+            3
+            4
+            5
+            6
+            7
+            8
+            9
+            """
         };
         view.Add (subView);
         var content = new View { Id = "content", Width = 20, Height = 20 };
@@ -317,12 +367,14 @@ t     ",
         Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- 0s
- 1u
- 2b
- 3V
- 4i",
+                                                      """
+
+                                                       0s
+                                                       1u
+                                                       2b
+                                                       3V
+                                                       4i
+                                                      """,
                                                       _output
                                                      );
 
@@ -330,12 +382,14 @@ t     ",
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- s
- u
- b
- V
- i",
+                                                      """
+
+                                                       s
+                                                       u
+                                                       b
+                                                       V
+                                                       i
+                                                      """,
                                                       _output
                                                      );
 
@@ -348,12 +402,14 @@ t     ",
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- 1u
- 2b
- 3V
- 4i
- 5e",
+                                                      """
+
+                                                       1u
+                                                       2b
+                                                       3V
+                                                       4i
+                                                       5e
+                                                      """,
                                                       _output
                                                      );
 
@@ -361,12 +417,14 @@ t     ",
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- 6w
- 7 
- 8 
- 9 
- 0 ",
+                                                      """
+
+                                                       6w
+                                                       7 
+                                                       8 
+                                                       9 
+                                                       0 
+                                                      """,
                                                       _output
                                                      );
 
@@ -374,8 +432,10 @@ t     ",
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- 9",
+                                                      """
+
+                                                       9
+                                                      """,
                                                       _output
                                                      );
 
@@ -393,7 +453,7 @@ t     ",
     [AutoInitShutdown]
     public void Draw_Negative_Bounds_Horizontal_Without_New_Lines ()
     {
-        // BUGBUG: This previously assumed the default height of a View was 1. 
+        // BUGBUG: This previously assumed the default height of a View was 1.
         var subView = new View
         {
             Id = "subView",
@@ -427,9 +487,11 @@ t     ",
         Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- 01234
- subVi",
+                                                      """
+
+                                                       01234
+                                                       subVi
+                                                      """,
                                                       _output
                                                      );
 
@@ -437,9 +499,11 @@ t     ",
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- 12345
- ubVie",
+                                                      """
+
+                                                       12345
+                                                       ubVie
+                                                      """,
                                                       _output
                                                      );
 
@@ -447,8 +511,10 @@ t     ",
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- ubVie",
+                                                      """
+
+                                                       ubVie
+                                                      """,
                                                       _output
                                                      );
 
@@ -503,12 +569,14 @@ t     ",
         Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- 0s
- 1u
- 2b
- 3V
- 4i",
+                                                      """
+
+                                                       0s
+                                                       1u
+                                                       2b
+                                                       3V
+                                                       4i
+                                                      """,
                                                       _output
                                                      );
 
@@ -516,12 +584,14 @@ t     ",
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- s
- u
- b
- V
- i",
+                                                      """
+
+                                                       s
+                                                       u
+                                                       b
+                                                       V
+                                                       i
+                                                      """,
                                                       _output
                                                      );
 
@@ -534,12 +604,14 @@ t     ",
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- 1u
- 2b
- 3V
- 4i
- 5e",
+                                                      """
+
+                                                       1u
+                                                       2b
+                                                       3V
+                                                       4i
+                                                       5e
+                                                      """,
                                                       _output
                                                      );
 
@@ -547,12 +619,14 @@ t     ",
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- 6w
- 7 
- 8 
- 9 
- 0 ",
+                                                      """
+
+                                                       6w
+                                                       7 
+                                                       8 
+                                                       9 
+                                                       0 
+                                                      """,
                                                       _output
                                                      );
 
@@ -560,8 +634,10 @@ t     ",
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- 9",
+                                                      """
+
+                                                       9
+                                                      """,
                                                       _output
                                                      );
 
@@ -612,11 +688,13 @@ t     ",
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
 
-        var expected = @"
-┌┤𝔹├─────┐
-│𝔹       │
-│𝔹       │
-└────────┘";
+        var expected = """
+
+            ┌┤𝔹├─────┐
+            │𝔹       │
+            │𝔹       │
+            └────────┘
+            """;
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
         TestHelpers.AssertDriverContentsAre (expected, _output);
@@ -634,11 +712,13 @@ t     ",
         };
 
         TestHelpers.AssertDriverAttributesAre (
-                                               @"
-0010000000
-0000000000
-0111000000
-0000000000",
+                                               """
+
+                                               0010000000
+                                               0000000000
+                                               0111000000
+                                               0000000000
+                                               """,
                                                Application.Driver,
                                                expectedColors
                                               );
