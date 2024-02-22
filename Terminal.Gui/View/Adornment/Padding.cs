@@ -38,4 +38,15 @@ public class Padding : Adornment
             Parent?.SetNeedsDisplay ();
         }
     }
+
+    /// <inheritdoc/>
+    public override Rect FrameToScreen ()
+    {
+        Rect ret = base.FrameToScreen ();
+
+        ret.X += Parent != null ? Parent.Margin.Thickness.Left + Parent.Border.Thickness.Left : 0;
+        ret.Y += Parent != null ? Parent.Margin.Thickness.Top + Parent.Border.Thickness.Top : 0;
+
+        return ret;
+    }
 }

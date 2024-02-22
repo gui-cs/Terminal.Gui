@@ -213,6 +213,17 @@ public class Border : Adornment
     }
 
     /// <inheritdoc/>
+    public override Rect FrameToScreen ()
+    {
+        Rect ret = base.FrameToScreen ();
+
+        ret.X += Parent?.Margin.Thickness.Left ?? 0;
+        ret.Y += Parent?.Margin.Thickness.Top ?? 0;
+
+        return ret;
+    }
+
+    /// <inheritdoc/>
     public override void OnDrawContent (Rect contentArea)
     {
         base.OnDrawContent (contentArea);

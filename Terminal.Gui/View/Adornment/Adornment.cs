@@ -112,22 +112,6 @@ public class Adornment : View
 
         ret.Location = Parent?.FrameToScreen ().Location ?? ret.Location;
 
-        switch (this)
-        {
-            case Gui.Margin:
-                break;
-            case Gui.Border:
-                ret.X += Parent != null ? Parent.Margin.Thickness.Left : 0;
-                ret.Y += Parent != null ? Parent.Margin.Thickness.Top : 0;
-
-                break;
-            case Gui.Padding:
-                ret.X += Parent != null ? Parent.Margin.Thickness.Left + Parent.Border.Thickness.Left : 0;
-                ret.Y += Parent != null ? Parent.Margin.Thickness.Top + Parent.Border.Thickness.Top : 0;
-
-                break;
-        }
-
         // We now have coordinates relative to our View. If our View's SuperView has
         // a SuperView, keep going...
         return ret;
