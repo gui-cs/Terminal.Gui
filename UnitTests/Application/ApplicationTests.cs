@@ -39,11 +39,11 @@ public class ApplicationTests
     [AutoInitShutdown]
     public void Begin_Sets_Application_Top_To_Console_Size ()
     {
-        Assert.Equal (new Rect (0, 0, 80, 25), Application.Top.Frame);
+        Assert.Equal (new Rectangle (0, 0, 80, 25), Application.Top.Frame);
         Application.Begin (Application.Top);
-        Assert.Equal (new Rect (0, 0, 80, 25), Application.Top.Frame);
+        Assert.Equal (new Rectangle (0, 0, 80, 25), Application.Top.Frame);
         ((FakeDriver)Application.Driver).SetBufferSize (5, 5);
-        Assert.Equal (new Rect (0, 0, 5, 5), Application.Top.Frame);
+        Assert.Equal (new Rectangle (0, 0, 5, 5), Application.Top.Frame);
     }
 
     [Fact]

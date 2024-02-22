@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 using Xunit.Abstractions;
 
@@ -208,7 +208,7 @@ public class DimTests
         Assert.Equal (2, v.Height = 2);
 
         // Force v to be LayoutStyle.Absolute;
-        v.Frame = new Rect (0, 1, 3, 4);
+        v.Frame = new Rectangle (0, 1, 3, 4);
         Assert.Equal (LayoutStyle.Absolute, v.LayoutStyle);
         t.LayoutSubviews ();
 
@@ -474,13 +474,13 @@ public class DimTests
     [TestRespondersDisposed]
     public void Height_SetsValue ()
     {
-        var testVal = Rect.Empty;
+        var testVal = Rectangle.Empty;
         var testValview = new View { Frame = testVal };
         Dim dim = Dim.Height (testValview);
         Assert.Equal ($"View(Height,View(){testVal})", dim.ToString ());
         testValview.Dispose ();
 
-        testVal = new Rect (1, 2, 3, 4);
+        testVal = new Rectangle (1, 2, 3, 4);
         testValview = new View { Frame = testVal };
         dim = Dim.Height (testValview);
         Assert.Equal ($"View(Height,View(){testVal})", dim.ToString ());
@@ -505,7 +505,7 @@ public class DimTests
         Assert.Equal (dimCombine._right, dimAbsolute);
         Assert.Equal (20, dimCombine.Anchor (100));
 
-        var view = new View { Frame = new Rect (20, 10, 20, 1) };
+        var view = new View { Frame = new Rectangle (20, 10, 20, 1) };
         var dimViewHeight = new Dim.DimView (view, 0);
         Assert.Equal (1, dimViewHeight.Anchor (0));
         var dimViewWidth = new Dim.DimView (view, 1);
@@ -631,9 +631,9 @@ public class DimTests
                                             Assert.Equal (5, f2.Frame.Height);
 
                     #if DEBUG
-                       Assert.Equal ("Combine(View(Width,FrameView(f1)(0,0,49,5))-Absolute(2))", v1.Width.ToString ());
+                       Assert.Equal ($"Combine(View(Width,FrameView(f1){f1.Border.Frame})-Absolute(2))", v1.Width.ToString ());
                     #else
-                       Assert.Equal ("Combine(View(Width,FrameView()(0,0,49,5))-Absolute(2))", v1.Width.ToString ());
+                       Assert.Equal ($"Combine(View(Width,FrameView(){f1.Border.Frame})-Absolute(2))", v1.Width.ToString ());
                     #endif
                        Assert.Equal ("Combine(Fill(0)-Absolute(2))", v1.Height.ToString ());
                        Assert.Equal (47, v1.Frame.Width); // 49-2=47
@@ -641,11 +641,11 @@ public class DimTests
 
                    #if DEBUG
                        Assert.Equal (
-                                     "Combine(View(Width,FrameView(f2)(49,0,49,5))-Absolute(2))",
+                                     $"Combine(View(Width,FrameView(f2){f2.Frame})-Absolute(2))",
                                      v2.Width.ToString ()
                    #else
                        Assert.Equal (
-                                     "Combine(View(Width,FrameView()(49,0,49,5))-Absolute(2))",
+                                     $"Combine(View(Width,FrameView(){f2.Frame})-Absolute(2))",
                                      v2.Width.ToString ()
                    #endif
                                     );
@@ -667,7 +667,7 @@ public class DimTests
                        Assert.Equal (50, v4.Frame.Width);
                        Assert.Equal (50, v4.Frame.Height);
                    #if DEBUG
-                       Assert.Equal ("Combine(View(Width,Button(v1)(2,7,47,89))-View(Width,Button(v3)(0,0,9,9)))", v5.Width.ToString ());
+                       Assert.Equal ($"Combine(View(Width,Button(v1){v1.Frame})-View(Width,Button(v3){v3.Bounds}))", v5.Width.ToString ());
                     #else
                        Assert.Equal ("Combine(View(Height,Button()(2,7,47,89))-View(Height,Button()(0,0,9,9)))", v5.Height.ToString ( ));
                    #endif
@@ -703,7 +703,7 @@ public class DimTests
 
                        v1.Text = "Button1";
                    #if DEBUG
-                       Assert.Equal ("Combine(View(Width,FrameView(f1)(0,0,99,5))-Absolute(2))", v1.Width.ToString ());
+                       Assert.Equal ($"Combine(View(Width,FrameView(f1){f1.Frame})-Absolute(2))", v1.Width.ToString ());
                    #else
                        Assert.Equal ("Combine(View(Width,FrameView()(0,0,99,5))-Absolute(2))", v1.Width.ToString ());
                    #endif
@@ -714,7 +714,7 @@ public class DimTests
                        v2.Text = "Button2";
 
                    #if DEBUG
-                   Assert.Equal ( "Combine(View(Width,FrameView(f2)(99,0,99,5))-Absolute(2))", v2.Width.ToString ());
+                   Assert.Equal ( $"Combine(View(Width,FrameView(f2){f2.Frame})-Absolute(2))", v2.Width.ToString ());
                    #else
                        Assert.Equal ( "Combine(View(Width,FrameView()(99,0,99,5))-Absolute(2))", v2.Width.ToString ());
                    #endif
@@ -746,8 +746,8 @@ public class DimTests
                        v5.Text = "Button5";
 
                    #if DEBUG
-                       Assert.Equal ("Combine(View(Width,Button(v1)(2,7,97,189))-View(Width,Button(v3)(0,0,19,19)))", v5.Width.ToString ());
-                       Assert.Equal ("Combine(View(Height,Button(v1)(2,7,97,189))-View(Height,Button(v3)(0,0,19,19)))", v5.Height.ToString ());
+                       Assert.Equal ($"Combine(View(Width,Button(v1){v1.Frame})-View(Width,Button(v3){v3.Frame}))", v5.Width.ToString ());
+                       Assert.Equal ($"Combine(View(Height,Button(v1){v1.Frame})-View(Height,Button(v3){v3.Frame}))", v5.Height.ToString ());
                    #else
                        Assert.Equal ("Combine(View(Width,Button()(2,7,97,189))-View(Width,Button()(0,0,19,19)))", v5.Width.ToString ());
                        Assert.Equal ("Combine(View(Height,Button()(2,7,97,189))-View(Height,Button()(0,0,19,19)))", v5.Height.ToString ());
@@ -873,13 +873,13 @@ public class DimTests
     [TestRespondersDisposed]
     public void SetsValue ()
     {
-        var testVal = Rect.Empty;
+        var testVal = Rectangle.Empty;
         var testValView = new View { Frame = testVal };
         Dim dim = Dim.Width (testValView);
         Assert.Equal ($"View(Width,View(){testVal})", dim.ToString ());
         testValView.Dispose ();
 
-        testVal = new Rect (1, 2, 3, 4);
+        testVal = new Rectangle (1, 2, 3, 4);
         testValView = new View { Frame = testVal };
         dim = Dim.Width (testValView);
         Assert.Equal ($"View(Width,View(){testVal})", dim.ToString ());
@@ -931,9 +931,9 @@ public class DimTests
     [TestRespondersDisposed]
     public void Width_Equals ()
     {
-        var testRect1 = Rect.Empty;
+        var testRect1 = Rectangle.Empty;
         var view1 = new View { Frame = testRect1 };
-        var testRect2 = Rect.Empty;
+        var testRect2 = Rectangle.Empty;
         var view2 = new View { Frame = testRect2 };
 
         Dim dim1 = Dim.Width (view1);
@@ -945,27 +945,27 @@ public class DimTests
         dim2 = Dim.Width (view2);
         Assert.NotEqual (dim1, dim2);
 
-        testRect1 = new Rect (0, 1, 2, 3);
+        testRect1 = new Rectangle (0, 1, 2, 3);
         view1 = new View { Frame = testRect1 };
-        testRect2 = new Rect (0, 1, 2, 3);
+        testRect2 = new Rectangle (0, 1, 2, 3);
         dim1 = Dim.Width (view1);
         dim2 = Dim.Width (view1);
 
         // FIXED: Dim.Width should support Equals() and this should change to Equal.
         Assert.Equal (dim1, dim2);
 
-        testRect1 = new Rect (0, -1, 2, 3);
+        testRect1 = new Rectangle (0, -1, 2, 3);
         view1 = new View { Frame = testRect1 };
-        testRect2 = new Rect (0, -1, 2, 3);
+        testRect2 = new Rectangle (0, -1, 2, 3);
         dim1 = Dim.Width (view1);
         dim2 = Dim.Width (view1);
 
         // FIXED: Dim.Width should support Equals() and this should change to Equal.
         Assert.Equal (dim1, dim2);
 
-        testRect1 = new Rect (0, -1, 2, 3);
+        testRect1 = new Rectangle (0, -1, 2, 3);
         view1 = new View { Frame = testRect1 };
-        testRect2 = Rect.Empty;
+        testRect2 = Rectangle.Empty;
         view2 = new View { Frame = testRect2 };
         dim1 = Dim.Width (view1);
         dim2 = Dim.Width (view2);

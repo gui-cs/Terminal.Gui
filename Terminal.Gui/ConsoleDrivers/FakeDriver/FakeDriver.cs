@@ -455,7 +455,7 @@ public class FakeDriver : ConsoleDriver
             }
         }
 
-        Clip = new Rect (0, 0, Cols, Rows);
+        Clip = new Rectangle (0, 0, Cols, Rows);
     }
 
     public override void UpdateCursor ()

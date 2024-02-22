@@ -1127,7 +1127,7 @@ public static partial class Application
 
     private static View FindDeepestTop (Toplevel start, int x, int y, out int resx, out int resy)
     {
-        Rect startFrame = start.Frame;
+        Rectangle startFrame = start.Frame;
 
         if (!startFrame.Contains (x, y))
         {
@@ -1286,7 +1286,7 @@ public static partial class Application
 
         foreach (Toplevel t in _topLevels)
         {
-            t.SetRelativeLayout (new Rect (0, 0, args.Size.Width, args.Size.Height));
+            t.SetRelativeLayout (new Rectangle (0, 0, args.Size.Width, args.Size.Height));
             t.LayoutSubviews ();
             t.PositionToplevels ();
             t.OnSizeChanging (new SizeChangedEventArgs (args.Size));
@@ -1424,7 +1424,7 @@ public static partial class Application
     /// <param name="a">The mouse event with coordinates relative to the screen.</param>
     public static void OnMouseEvent (MouseEventEventArgs a)
     {
-        static bool OutsideRect (Point p, Rect r) { return p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom; }
+        static bool OutsideRect (Point p, Rectangle r) { return p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom; }
 
         if (IsMouseDisabled)
         {
@@ -1587,7 +1587,7 @@ public static partial class Application
                 return;
             }
 
-            Rect bounds = view.BoundsToScreen (view.Bounds);
+            Rectangle bounds = view.BoundsToScreen (view.Bounds);
 
             if (bounds.Contains (a.MouseEvent.X, a.MouseEvent.Y))
             {

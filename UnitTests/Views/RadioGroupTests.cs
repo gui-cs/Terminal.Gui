@@ -14,13 +14,13 @@ public class RadioGroupTests
         var rg = new RadioGroup ();
         Assert.True (rg.CanFocus);
         Assert.Empty (rg.RadioLabels);
-        Assert.Equal (Rect.Empty, rg.Frame);
+        Assert.Equal (Rectangle.Empty, rg.Frame);
         Assert.Equal (0, rg.SelectedItem);
 
         rg = new RadioGroup { RadioLabels = new [] { "Test" } };
         Assert.True (rg.CanFocus);
         Assert.Single (rg.RadioLabels);
-        Assert.Equal (new Rect (0, 0, 0, 0), rg.Frame);
+        Assert.Equal (new Rectangle (0, 0, 0, 0), rg.Frame);
         Assert.Equal (0, rg.SelectedItem);
 
         rg = new RadioGroup
@@ -33,7 +33,7 @@ public class RadioGroupTests
         };
         Assert.True (rg.CanFocus);
         Assert.Single (rg.RadioLabels);
-        Assert.Equal (new Rect (1, 2, 20, 5), rg.Frame);
+        Assert.Equal (new Rectangle (1, 2, 20, 5), rg.Frame);
         Assert.Equal (0, rg.SelectedItem);
 
         rg = new RadioGroup { X = 1, Y = 2, RadioLabels = new [] { "Test" } };
@@ -46,7 +46,7 @@ public class RadioGroupTests
 
         Assert.True (rg.CanFocus);
         Assert.Single (rg.RadioLabels);
-        Assert.Equal (new Rect (1, 2, 6, 1), rg.Frame);
+        Assert.Equal (new Rectangle (1, 2, 6, 1), rg.Frame);
         Assert.Equal (0, rg.SelectedItem);
     }
 
@@ -195,8 +195,8 @@ public class RadioGroupTests
 └────────────────────────────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 5), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (0, 0, 30, 5), pos);
 
         rg.Orientation = Orientation.Horizontal;
         Application.Refresh ();
@@ -221,7 +221,7 @@ public class RadioGroupTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 5), pos);
+        Assert.Equal (new Rectangle (0, 0, 30, 5), pos);
 
         rg.HorizontalSpace = 4;
         Application.Refresh ();
@@ -246,7 +246,7 @@ public class RadioGroupTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 5), pos);
+        Assert.Equal (new Rectangle (0, 0, 30, 5), pos);
     }
 
     [Fact]

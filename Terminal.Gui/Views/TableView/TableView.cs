@@ -674,13 +674,13 @@ public class TableView : View
         foreach (TableSelection region in oldRegions)
         {
             // ignore regions entirely below current table state
-            if (region.Rect.Top >= Table.Rows)
+            if (region.Rectangle.Top >= Table.Rows)
             {
                 continue;
             }
 
             // ignore regions entirely too far right of table columns
-            if (region.Rect.Left >= Table.Columns)
+            if (region.Rectangle.Left >= Table.Columns)
             {
                 continue;
             }
@@ -692,11 +692,11 @@ public class TableView : View
                                       );
 
             // ensure regions do not go over edge of table bounds
-            region.Rect = Rect.FromLTRB (
-                                         region.Rect.Left,
-                                         region.Rect.Top,
-                                         Math.Max (Math.Min (region.Rect.Right, Table.Columns), 0),
-                                         Math.Max (Math.Min (region.Rect.Bottom, Table.Rows), 0)
+            region.Rectangle = Rectangle.FromLTRB (
+                                         region.Rectangle.Left,
+                                         region.Rectangle.Top,
+                                         Math.Max (Math.Min (region.Rectangle.Right, Table.Columns), 0),
+                                         Math.Max (Math.Min (region.Rectangle.Bottom, Table.Rows), 0)
                                         );
 
             MultiSelectedRegions.Push (region);
@@ -723,11 +723,11 @@ public class TableView : View
         if (MultiSelect && MultiSelectedRegions.Any ())
         {
             // Quiz any cells for whether they are selected.  For performance we only need to check those between the top left and lower right vertex of selection regions
-            int yMin = MultiSelectedRegions.Min (r => r.Rect.Top);
-            int yMax = MultiSelectedRegions.Max (r => r.Rect.Bottom);
+            int yMin = MultiSelectedRegions.Min (r => r.Rectangle.Top);
+            int yMax = MultiSelectedRegions.Max (r => r.Rectangle.Bottom);
 
-            int xMin = FullRowSelect ? 0 : MultiSelectedRegions.Min (r => r.Rect.Left);
-            int xMax = FullRowSelect ? Table.Columns : MultiSelectedRegions.Max (r => r.Rect.Right);
+            int xMin = FullRowSelect ? 0 : MultiSelectedRegions.Min (r => r.Rectangle.Left);
+            int xMax = FullRowSelect ? Table.Columns : MultiSelectedRegions.Max (r => r.Rectangle.Right);
 
             for (int y = yMin; y < yMax; y++)
             {
@@ -896,7 +896,7 @@ public class TableView : View
     }
 
     ///<inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         base.OnDrawContent (contentArea);
 
@@ -1124,7 +1124,7 @@ public class TableView : View
         MultiSelectedRegions.Push (
                                    new TableSelection (
                                                        new Point (SelectedColumn, SelectedRow),
-                                                       new Rect (0, 0, Table.Columns, table.Rows)
+                                                       new Rectangle (0, 0, Table.Columns, table.Rows)
                                                       )
                                   );
         Update ();
@@ -1335,7 +1335,7 @@ public class TableView : View
     /// <param name="bounds"></param>
     /// <param name="padding"></param>
     /// <returns></returns>
-    private IEnumerable<ColumnToRender> CalculateViewport (Rect bounds, int padding = 1)
+    private IEnumerable<ColumnToRender> CalculateViewport (Rectangle bounds, int padding = 1)
     {
         if (TableIsNullOrInvisible ())
         {
@@ -1499,7 +1499,7 @@ public class TableView : View
         int right = Math.Max (Math.Max (pt1X, pt2X), 0);
 
         // Rect class is inclusive of Top Left but exclusive of Bottom Right so extend by 1
-        return new TableSelection (new Point (pt1X, pt1Y), new Rect (left, top, right - left + 1, bot - top + 1))
+        return new TableSelection (new Point (pt1X, pt1Y), new Rectangle (left, top, right - left + 1, bot - top + 1))
         {
             IsToggled = toggle
         };
@@ -1546,10 +1546,10 @@ public class TableView : View
 
         if (FullRowSelect)
         {
-            return MultiSelectedRegions.Where (r => r.Rect.Bottom > row && r.Rect.Top <= row);
+            return MultiSelectedRegions.Where (r => r.Rectangle.Bottom > row && r.Rectangle.Top <= row);
         }
 
-        return MultiSelectedRegions.Where (r => r.Rect.Contains (col, row));
+        return MultiSelectedRegions.Where (r => r.Rectangle.Contains (col, row));
     }
 
     /// <summary>
@@ -2236,7 +2236,7 @@ public class TableView : View
         public bool IsVeryLast { get; }
 
         /// <summary>
-        ///     The width that the column should occupy as calculated by <see cref="CalculateViewport(Rect, int)"/>.  Note
+        ///     The width that the column should occupy as calculated by <see cref="CalculateViewport(Rectangle, int)"/>.  Note
         ///     that this includes space for padding i.e. the separator between columns.
         /// </summary>
         public int Width { get; internal set; }

@@ -9,29 +9,29 @@ public class TimeFieldTests
         Assert.False (tf.IsShortFormat);
         Assert.Equal (TimeSpan.MinValue, tf.Time);
         Assert.Equal (1, tf.CursorPosition);
-        Assert.Equal (new Rect (0, 0, 10, 1), tf.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), tf.Frame);
 
         TimeSpan time = DateTime.Now.TimeOfDay;
         tf = new TimeField { Time = time };
         Assert.False (tf.IsShortFormat);
         Assert.Equal (time, tf.Time);
         Assert.Equal (1, tf.CursorPosition);
-        Assert.Equal (new Rect (0, 0, 10, 1), tf.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), tf.Frame);
 
         tf = new TimeField { X = 1, Y = 2, Time = time };
         Assert.False (tf.IsShortFormat);
         Assert.Equal (time, tf.Time);
         Assert.Equal (1, tf.CursorPosition);
-        Assert.Equal (new Rect (1, 2, 10, 1), tf.Frame);
+        Assert.Equal (new Rectangle (1, 2, 10, 1), tf.Frame);
 
         tf = new TimeField { X = 3, Y = 4, Time = time, IsShortFormat = true };
         Assert.True (tf.IsShortFormat);
         Assert.Equal (time, tf.Time);
         Assert.Equal (1, tf.CursorPosition);
-        Assert.Equal (new Rect (3, 4, 7, 1), tf.Frame);
+        Assert.Equal (new Rectangle (3, 4, 7, 1), tf.Frame);
 
         tf.IsShortFormat = false;
-        Assert.Equal (new Rect (3, 4, 10, 1), tf.Frame);
+        Assert.Equal (new Rectangle (3, 4, 10, 1), tf.Frame);
         Assert.Equal (10, tf.Width);
     }
 

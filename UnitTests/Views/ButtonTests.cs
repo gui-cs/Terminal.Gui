@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -118,20 +118,20 @@ public class ButtonTests
         Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (54, 11);
 
-        Assert.Equal (new Rect (0, 0, 54, 11), win.Frame);
-        Assert.Equal (new Rect (0, 0, 52, 9), tabView.Frame);
-        Assert.Equal (new Rect (0, 0, 50, 7), tab.Frame);
-        Assert.Equal (new Rect (0, 1, 8, 1), view.Frame);
-        Assert.Equal (new Rect (9, 1, 20, 1), txtToFind.Frame);
+        Assert.Equal (new Rectangle (0, 0, 54, 11), win.Frame);
+        Assert.Equal (new Rectangle (0, 0, 52, 9), tabView.Frame);
+        Assert.Equal (new Rectangle (0, 0, 50, 7), tab.Frame);
+        Assert.Equal (new Rectangle (0, 1, 8, 1), view.Frame);
+        Assert.Equal (new Rectangle (9, 1, 20, 1), txtToFind.Frame);
 
         Assert.Equal (0, txtToFind.ScrollOffset);
         Assert.Equal (16, txtToFind.CursorPosition);
 
-        Assert.Equal (new Rect (30, 1, 20, 1), btnFindNext.Frame);
-        Assert.Equal (new Rect (30, 2, 20, 1), btnFindPrevious.Frame);
-        Assert.Equal (new Rect (30, 4, 20, 1), btnCancel.Frame);
-//        Assert.Equal (new Rect (0, 3, 12, 1), ckbMatchCase.Frame);
-//        Assert.Equal (new Rect (0, 4, 18, 1), ckbMatchWholeWord.Frame);
+        Assert.Equal (new (30, 1, 20, 1), btnFindNext.Frame);
+        Assert.Equal (new (30, 2, 20, 1), btnFindPrevious.Frame);
+        Assert.Equal (new (30, 4, 20, 1), btnCancel.Frame);
+//        Assert.Equal (new (0, 3, 12, 1), ckbMatchCase.Frame);
+//        Assert.Equal (new (0, 4, 18, 1), ckbMatchWholeWord.Frame);
 
         var btn1 =
             $"{
@@ -432,15 +432,15 @@ public class ButtonTests
         Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.True (btn.CanFocus);
-        Assert.Equal (new Rect (0, 0, 4, 1), btn.Bounds);
-        Assert.Equal (new Rect (0, 0, 4, 1), btn.Frame);
+        Assert.Equal (new Rectangle (0, 0, 4, 1), btn.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 4, 1), btn.Frame);
         Assert.Equal ($"{CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
         Assert.False (btn.IsDefault);
         Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.True (btn.CanFocus);
-        Assert.Equal (new Rect (0, 0, 4, 1), btn.Bounds);
-        Assert.Equal (new Rect (0, 0, 4, 1), btn.Frame);
+        Assert.Equal (new Rectangle (0, 0, 4, 1), btn.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 4, 1), btn.Frame);
 
         Assert.Equal (string.Empty, btn.Title);
         Assert.Equal (KeyCode.Null, btn.HotKey);
@@ -478,8 +478,8 @@ public class ButtonTests
         Assert.True (btn.IsDefault);
         Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
         Assert.True (btn.CanFocus);
-        Assert.Equal (new Rect (0, 0, 10, 1), btn.Bounds);
-        Assert.Equal (new Rect (0, 0, 10, 1), btn.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), btn.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), btn.Frame);
         Assert.Equal (KeyCode.T, btn.HotKey);
 
         btn = new Button { X = 1, Y = 2, Text = "_abc", IsDefault = true };
@@ -521,8 +521,8 @@ public class ButtonTests
 ";
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-        Assert.Equal (new Rect (0, 0, 9, 1), btn.Bounds);
-        Assert.Equal (new Rect (1, 2, 9, 1), btn.Frame);
+        Assert.Equal (new Rectangle (0, 0, 9, 1), btn.Bounds);
+        Assert.Equal (new Rectangle (1, 2, 9, 1), btn.Frame);
     }
 
     [Fact]
@@ -762,7 +762,7 @@ public class ButtonTests
         Assert.True (btn.IsInitialized);
         Assert.Equal ("Say Hello 你", btn.Text);
         Assert.Equal ($"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
-        Assert.Equal (new Rect (0, 0, 16, 1), btn.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 16, 1), btn.Bounds);
         var btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
 
         var expected = @$"
@@ -775,8 +775,8 @@ public class ButtonTests
 └────────────────────────────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 5), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (0, 0, 30, 5), pos);
     }
 
     [Fact]
@@ -799,7 +799,7 @@ public class ButtonTests
         Assert.True (btn.IsInitialized);
         Assert.Equal ("Say Hello 你", btn.Text);
         Assert.Equal ($"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
-        Assert.Equal (new Rect (0, 0, 16, 1), btn.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 16, 1), btn.Bounds);
         var btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
 
         var expected = @$"
@@ -812,7 +812,7 @@ public class ButtonTests
 └────────────────────────────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 5), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (0, 0, 30, 5), pos);
     }
 }

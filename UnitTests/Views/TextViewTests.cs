@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using Xunit.Abstractions;
@@ -7460,7 +7460,7 @@ TAB to jump between text field",
         Application.Refresh ();
 
         //this passes
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (
                                                                  @"
 ┌─────────────┐
 │             │
@@ -7480,7 +7480,7 @@ TAB to jump between text field",
                                                                  _output
                                                                 );
 
-        Assert.Equal (new Rect (0, 0, 15, 15), pos);
+        Assert.Equal (new Rectangle (0, 0, 15, 15), pos);
 
         Assert.True (tv.Used);
         tv.Used = false;
@@ -7536,7 +7536,7 @@ TAB to jump between text field",
         Application.Refresh ();
 
         //this passes
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (
                                                                  @"
 ┌─────────────┐
 │             │
@@ -7556,7 +7556,7 @@ TAB to jump between text field",
                                                                  _output
                                                                 );
 
-        Assert.Equal (new Rect (0, 0, 15, 15), pos);
+        Assert.Equal (new Rectangle (0, 0, 15, 15), pos);
 
         Assert.True (tv.Used);
         tv.Used = false;
@@ -8894,7 +8894,7 @@ Line 2.",
         TestHelpers.AssertDriverContentsWithFrameAre ("Line 2.", _output);
 
         Assert.True (_textView.NewKeyDownEvent (Key.H.WithShift));
-        Assert.NotEqual (Rect.Empty, _textView._needsDisplayRect);
+        Assert.NotEqual (Rectangle.Empty, _textView._needsDisplayRect);
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (

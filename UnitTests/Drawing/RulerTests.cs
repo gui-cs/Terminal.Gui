@@ -51,7 +51,7 @@ public class RulerTests
         Application.Top.Add (f);
         Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (len + 5, 5);
-        Assert.Equal (new Rect (0, 0, len + 5, 5), f.Frame);
+        Assert.Equal (new Rectangle (0, 0, len + 5, 5), f.Frame);
 
         var r = new Ruler ();
         Assert.Equal (Orientation.Horizontal, r.Orientation);
@@ -123,7 +123,7 @@ public class RulerTests
         Application.Top.Add (f);
         Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (len + 5, 5);
-        Assert.Equal (new Rect (0, 0, len + 5, 5), f.Frame);
+        Assert.Equal (new Rectangle (0, 0, len + 5, 5), f.Frame);
 
         var r = new Ruler ();
         Assert.Equal (Orientation.Horizontal, r.Orientation);
@@ -168,7 +168,7 @@ public class RulerTests
         Application.Top.Add (f);
         Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (5, len + 5);
-        Assert.Equal (new Rect (0, 0, 5, len + 5), f.Frame);
+        Assert.Equal (new Rectangle (0, 0, 5, len + 5), f.Frame);
 
         var r = new Ruler ();
         r.Orientation = Orientation.Vertical;
@@ -300,7 +300,7 @@ public class RulerTests
         Application.Top.Add (f);
         Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (5, len + 5);
-        Assert.Equal (new Rect (0, 0, 5, len + 5), f.Frame);
+        Assert.Equal (new Rectangle (0, 0, 5, len + 5), f.Frame);
 
         var r = new Ruler ();
         r.Orientation = Orientation.Vertical;

@@ -1330,7 +1330,7 @@ internal class WindowsDriver : ConsoleDriver
         CurrentAttribute = new Attribute (Color.White, Color.Black);
 
         _outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
-        Clip = new Rect (0, 0, Cols, Rows);
+        Clip = new Rectangle (0, 0, Cols, Rows);
 
         _damageRegion = new WindowsConsole.SmallRect
         {
@@ -1725,7 +1725,7 @@ internal class WindowsDriver : ConsoleDriver
     private void ResizeScreen ()
     {
         _outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
-        Clip = new Rect (0, 0, Cols, Rows);
+        Clip = new Rectangle (0, 0, Cols, Rows);
 
         _damageRegion = new WindowsConsole.SmallRect
         {

@@ -980,7 +980,7 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         _isDrawing = true;
 
@@ -1203,8 +1203,8 @@ public class TextField : View
 
         int pos = _cursorPosition - ScrollOffset + Math.Min (Frame.X, 0);
         int offB = OffSetBackground ();
-        Rect containerFrame = SuperView?.BoundsToScreen (SuperView.Bounds) ?? default (Rect);
-        Rect thisFrame = BoundsToScreen (Bounds);
+        Rectangle containerFrame = SuperView?.BoundsToScreen (SuperView.Bounds) ?? default (Rectangle);
+        Rectangle thisFrame = BoundsToScreen (Bounds);
 
         if (pos > -1
             && col >= pos

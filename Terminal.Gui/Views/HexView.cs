@@ -344,7 +344,7 @@ public class HexView : View
     }
 
     ///<inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         Attribute currentAttribute;
         Attribute current = ColorScheme.Focus;
@@ -352,7 +352,7 @@ public class HexView : View
         Move (0, 0);
 
         // BUGBUG: Bounds!!!!
-        Rect frame = Frame;
+        Rectangle frame = Frame;
 
         int nblocks = bytesPerLine / bsize;
         var data = new byte [nblocks * bsize * frame.Height];
@@ -364,7 +364,7 @@ public class HexView : View
 
         for (var line = 0; line < frame.Height; line++)
         {
-            var lineRect = new Rect (0, line, frame.Width, 1);
+            var lineRect = new Rectangle (0, line, frame.Width, 1);
 
             if (!Bounds.Contains (lineRect))
             {
@@ -787,7 +787,7 @@ public class HexView : View
         int line = delta / bytesPerLine;
 
         // BUGBUG: Bounds!
-        SetNeedsDisplay (new Rect (0, line, Frame.Width, 1));
+        SetNeedsDisplay (new Rectangle (0, line, Frame.Width, 1));
     }
 
     private bool ToggleSide ()

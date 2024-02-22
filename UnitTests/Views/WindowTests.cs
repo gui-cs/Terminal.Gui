@@ -132,11 +132,11 @@ public class WindowTests
         Assert.Equal (LayoutStyle.Computed, defaultWindow.LayoutStyle);
 
         // If there's no SuperView, Top, or Driver, the default Fill width is int.MaxValue
-        Assert.Equal ("Window()(0,0,2147483647,2147483647)", defaultWindow.ToString ());
+        Assert.Equal ($"Window(){defaultWindow.Frame}", defaultWindow.ToString ());
         Assert.True (defaultWindow.CanFocus);
         Assert.False (defaultWindow.HasFocus);
-        Assert.Equal (new Rect (0, 0, 2147483645, 2147483645), defaultWindow.Bounds);
-        Assert.Equal (new Rect (0, 0, 2147483647, 2147483647), defaultWindow.Frame);
+        Assert.Equal (new Rectangle (0, 0, 2147483645, 2147483645), defaultWindow.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 2147483647, 2147483647), defaultWindow.Frame);
         Assert.Null (defaultWindow.Focused);
         Assert.NotNull (defaultWindow.ColorScheme);
         Assert.Equal (0, defaultWindow.X);
@@ -152,7 +152,7 @@ public class WindowTests
         Assert.Equal (TextDirection.LeftRight_TopBottom, defaultWindow.TextDirection);
 
         // Empty Rect
-        using var windowWithFrameRectEmpty = new Window { Frame = Rect.Empty, Title = "title" };
+        using var windowWithFrameRectEmpty = new Window { Frame = Rectangle.Empty, Title = "title" };
         Assert.NotNull (windowWithFrameRectEmpty);
         Assert.Equal ("title", windowWithFrameRectEmpty.Title);
         Assert.Equal (LayoutStyle.Absolute, windowWithFrameRectEmpty.LayoutStyle);
@@ -161,14 +161,14 @@ public class WindowTests
         // TODO: Fix things so that this works in release and debug
         // BUG: This also looks like it might be unintended behavior.
     #if DEBUG
-        Assert.Equal ("Window(title)(0,0,0,0)", windowWithFrameRectEmpty.ToString ());
+        Assert.Equal ($"Window(title){windowWithFrameRectEmpty.Frame}", windowWithFrameRectEmpty.ToString ());
     #else
         Assert.Equal ("Window()(0,0,0,0)", windowWithFrameRectEmpty.ToString ());
     #endif
         Assert.True (windowWithFrameRectEmpty.CanFocus);
         Assert.False (windowWithFrameRectEmpty.HasFocus);
-        Assert.Equal (new Rect (0, 0, 0, 0), windowWithFrameRectEmpty.Bounds);
-        Assert.Equal (new Rect (0, 0, 0, 0), windowWithFrameRectEmpty.Frame);
+        Assert.Equal (new Rectangle (0, 0, 0, 0), windowWithFrameRectEmpty.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 0, 0), windowWithFrameRectEmpty.Frame);
         Assert.Null (windowWithFrameRectEmpty.Focused);
         Assert.NotNull (windowWithFrameRectEmpty.ColorScheme);
         Assert.Equal (0, windowWithFrameRectEmpty.X);
@@ -194,14 +194,14 @@ public class WindowTests
         Assert.Equal (LayoutStyle.Absolute, windowWithFrame1234.LayoutStyle);
         Assert.Equal (LayoutStyle.Absolute, windowWithFrame1234.LayoutStyle);
     #if DEBUG
-        Assert.Equal ("Window(title)(1,2,3,4)", windowWithFrame1234.ToString ());
+        Assert.Equal ($"Window(title){windowWithFrame1234.Frame}", windowWithFrame1234.ToString ());
     #else
         Assert.Equal ("Window()(1,2,3,4)", windowWithFrame1234.ToString ());
     #endif
         Assert.True (windowWithFrame1234.CanFocus);
         Assert.False (windowWithFrame1234.HasFocus);
-        Assert.Equal (new Rect (0, 0, 1, 2), windowWithFrame1234.Bounds);
-        Assert.Equal (new Rect (1, 2, 3, 4), windowWithFrame1234.Frame);
+        Assert.Equal (new Rectangle (0, 0, 1, 2), windowWithFrame1234.Bounds);
+        Assert.Equal (new Rectangle (1, 2, 3, 4), windowWithFrame1234.Frame);
         Assert.Null (windowWithFrame1234.Focused);
         Assert.NotNull (windowWithFrame1234.ColorScheme);
         Assert.Equal (1, windowWithFrame1234.X);

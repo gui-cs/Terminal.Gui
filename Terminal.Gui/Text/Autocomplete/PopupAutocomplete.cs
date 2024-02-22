@@ -357,14 +357,14 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
 
         if (PopupInsideContainer)
         {
-            popup.Frame = new Rect (
+            popup.Frame = new Rectangle (
                                     new Point (HostControl.Frame.X + renderAt.X, HostControl.Frame.Y + renderAt.Y),
                                     new Size (width, height)
                                    );
         }
         else
         {
-            popup.Frame = new Rect (
+            popup.Frame = new Rectangle (
                                     new Point (HostControl.Frame.X + renderAt.X, renderAt.Y),
                                     new Size (width, height)
                                    );
@@ -520,7 +520,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     {
         if (Visible && popup is null)
         {
-            popup = new Popup (this) { Frame = Rect.Empty };
+            popup = new Popup (this) { Frame = Rectangle.Empty };
             top?.Add (popup);
         }
 

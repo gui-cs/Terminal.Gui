@@ -99,7 +99,7 @@ public class BorderTests
         switch (width)
         {
             case 1:
-                Assert.Equal (new Rect (0, 0, 1, 5), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 1, 5), win.Frame);
 
                 expected = @"
 ║
@@ -108,7 +108,7 @@ public class BorderTests
 
                 break;
             case 2:
-                Assert.Equal (new Rect (0, 0, 2, 5), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 2, 5), win.Frame);
 
                 expected = @"
 ╔╗
@@ -117,7 +117,7 @@ public class BorderTests
 
                 break;
             case 3:
-                Assert.Equal (new Rect (0, 0, 3, 5), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 3, 5), win.Frame);
 
                 expected = @"
 ╔═╗
@@ -126,7 +126,7 @@ public class BorderTests
 
                 break;
             case 4:
-                Assert.Equal (new Rect (0, 0, 4, 5), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 4, 5), win.Frame);
 
                 expected = @"
  ╒╕ 
@@ -136,7 +136,7 @@ public class BorderTests
 
                 break;
             case 5:
-                Assert.Equal (new Rect (0, 0, 5, 5), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 5, 5), win.Frame);
 
                 expected = @"
  ╒═╕ 
@@ -146,7 +146,7 @@ public class BorderTests
 
                 break;
             case 6:
-                Assert.Equal (new Rect (0, 0, 6, 5), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 6, 5), win.Frame);
 
                 expected = @"
  ╒══╕ 
@@ -156,7 +156,7 @@ public class BorderTests
 
                 break;
             case 7:
-                Assert.Equal (new Rect (0, 0, 7, 5), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 7, 5), win.Frame);
 
                 expected = @"
  ╒═══╕ 
@@ -166,7 +166,7 @@ public class BorderTests
 
                 break;
             case 8:
-                Assert.Equal (new Rect (0, 0, 8, 5), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 8, 5), win.Frame);
 
                 expected = @"
  ╒════╕ 
@@ -176,7 +176,7 @@ public class BorderTests
 
                 break;
             case 9:
-                Assert.Equal (new Rect (0, 0, 9, 5), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 9, 5), win.Frame);
 
                 expected = @"
  ╒════╕  
@@ -186,7 +186,7 @@ public class BorderTests
 
                 break;
             case 10:
-                Assert.Equal (new Rect (0, 0, 10, 5), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 10, 5), win.Frame);
 
                 expected = @"
  ╒════╕   
@@ -232,7 +232,7 @@ public class BorderTests
         switch (width)
         {
             case 1:
-                Assert.Equal (new Rect (0, 0, 1, 4), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 1, 4), win.Frame);
 
                 expected = @"
 ║
@@ -241,7 +241,7 @@ public class BorderTests
 
                 break;
             case 2:
-                Assert.Equal (new Rect (0, 0, 2, 4), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 2, 4), win.Frame);
 
                 expected = @"
 ╔╗
@@ -250,7 +250,7 @@ public class BorderTests
 
                 break;
             case 3:
-                Assert.Equal (new Rect (0, 0, 3, 4), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 3, 4), win.Frame);
 
                 expected = @"
 ╔═╗
@@ -259,7 +259,7 @@ public class BorderTests
 
                 break;
             case 4:
-                Assert.Equal (new Rect (0, 0, 4, 4), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 4, 4), win.Frame);
 
                 expected = @"
  ╒╕ 
@@ -269,7 +269,7 @@ public class BorderTests
 
                 break;
             case 5:
-                Assert.Equal (new Rect (0, 0, 5, 4), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 5, 4), win.Frame);
 
                 expected = @"
  ╒═╕ 
@@ -279,7 +279,7 @@ public class BorderTests
 
                 break;
             case 6:
-                Assert.Equal (new Rect (0, 0, 6, 4), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 6, 4), win.Frame);
 
                 expected = @"
  ╒══╕ 
@@ -289,7 +289,7 @@ public class BorderTests
 
                 break;
             case 7:
-                Assert.Equal (new Rect (0, 0, 7, 4), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 7, 4), win.Frame);
 
                 expected = @"
  ╒═══╕ 
@@ -299,7 +299,7 @@ public class BorderTests
 
                 break;
             case 8:
-                Assert.Equal (new Rect (0, 0, 8, 4), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 8, 4), win.Frame);
 
                 expected = @"
  ╒════╕ 
@@ -309,7 +309,7 @@ public class BorderTests
 
                 break;
             case 9:
-                Assert.Equal (new Rect (0, 0, 9, 4), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 9, 4), win.Frame);
 
                 expected = @"
  ╒════╕  
@@ -319,7 +319,7 @@ public class BorderTests
 
                 break;
             case 10:
-                Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 10, 4), win.Frame);
 
                 expected = @"
  ╒════╕   
@@ -365,7 +365,7 @@ public class BorderTests
         switch (width)
         {
             case 1:
-                Assert.Equal (new Rect (0, 0, 1, 4), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 1, 4), win.Frame);
 
                 expected = @"
 ║
@@ -374,7 +374,7 @@ public class BorderTests
 
                 break;
             case 2:
-                Assert.Equal (new Rect (0, 0, 2, 4), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 2, 4), win.Frame);
 
                 expected = @"
 ╔╗
@@ -383,7 +383,7 @@ public class BorderTests
 
                 break;
             case 3:
-                Assert.Equal (new Rect (0, 0, 3, 4), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 3, 4), win.Frame);
 
                 expected = @"
 ╔═╗
@@ -392,7 +392,7 @@ public class BorderTests
 
                 break;
             case 4:
-                Assert.Equal (new Rect (0, 0, 4, 4), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 4, 4), win.Frame);
 
                 expected = @"
  ╒╕ 
@@ -402,7 +402,7 @@ public class BorderTests
 
                 break;
             case 5:
-                Assert.Equal (new Rect (0, 0, 5, 4), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 5, 4), win.Frame);
 
                 expected = @"
  ╒═╕ 
@@ -412,7 +412,7 @@ public class BorderTests
 
                 break;
             case 6:
-                Assert.Equal (new Rect (0, 0, 6, 4), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 6, 4), win.Frame);
 
                 expected = @"
  ╒══╕ 
@@ -422,7 +422,7 @@ public class BorderTests
 
                 break;
             case 7:
-                Assert.Equal (new Rect (0, 0, 7, 4), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 7, 4), win.Frame);
 
                 expected = @"
  ╒═══╕ 
@@ -432,7 +432,7 @@ public class BorderTests
 
                 break;
             case 8:
-                Assert.Equal (new Rect (0, 0, 8, 4), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 8, 4), win.Frame);
 
                 expected = @"
  ╒════╕ 
@@ -442,7 +442,7 @@ public class BorderTests
 
                 break;
             case 9:
-                Assert.Equal (new Rect (0, 0, 9, 4), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 9, 4), win.Frame);
 
                 expected = @"
  ╒════╕  
@@ -452,7 +452,7 @@ public class BorderTests
 
                 break;
             case 10:
-                Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
+                Assert.Equal (new Rectangle (0, 0, 10, 4), win.Frame);
 
                 expected = @"
  ╒════╕   
@@ -670,8 +670,8 @@ public class BorderTests
 
         var view = new View { X = frameX, Y = frameY, Width = 10, Height = 10 };
         super.Add (view);
-        var expected = new Rect (expectedScreenX, expectedScreenY, 10, 10);
-        Rect actual = view.FrameToScreen ();
+        var expected = new Rectangle (expectedScreenX, expectedScreenY, 10, 10);
+        Rectangle actual = view.FrameToScreen ();
         Assert.Equal (expected, actual);
     }
 
@@ -702,8 +702,8 @@ public class BorderTests
 
         var view = new View { X = frameX, Y = frameY, Width = 10, Height = 10 };
         super.Add (view);
-        var expected = new Rect (expectedScreenX, expectedScreenY, 10, 10);
-        Rect actual = view.FrameToScreen ();
+        var expected = new Rectangle (expectedScreenX, expectedScreenY, 10, 10);
+        Rectangle actual = view.FrameToScreen ();
         Assert.Equal (expected, actual);
     }
 

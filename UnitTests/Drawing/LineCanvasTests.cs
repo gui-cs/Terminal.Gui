@@ -293,7 +293,7 @@ public class LineCanvasTests
         View v = GetCanvas (out LineCanvas lc);
         v.Width = 10;
         v.Height = 10;
-        v.Bounds = new Rect (0, 0, 10, 10);
+        v.Bounds = new Rectangle (0, 0, 10, 10);
 
         lc.AddLine (new Point (x1, y1), len1, o1, s1);
         lc.AddLine (new Point (x2, y2), len2, o2, s2);
@@ -380,7 +380,7 @@ public class LineCanvasTests
         canvas.AddLine (new Point (x, y), length, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new Point (x, y), length, Orientation.Vertical, LineStyle.Single);
 
-        Assert.Equal (new Rect (expectedX, expectedY, expectedWidth, expectedHeight), canvas.Bounds);
+        Assert.Equal (new Rectangle (expectedX, expectedY, expectedWidth, expectedHeight), canvas.Bounds);
     }
 
     [InlineData (
@@ -461,7 +461,7 @@ public class LineCanvasTests
         var canvas = new LineCanvas ();
         canvas.AddLine (new Point (x, y), length, Orientation.Horizontal, LineStyle.Single);
 
-        Assert.Equal (new Rect (expectedX, expectedY, expectedWidth, expectedHeight), canvas.Bounds);
+        Assert.Equal (new Rectangle (expectedX, expectedY, expectedWidth, expectedHeight), canvas.Bounds);
     }
 
     [Fact]
@@ -483,27 +483,27 @@ public class LineCanvasTests
 
         // Add a short horiz line for ╔╡
         lc.AddLine (new Point (x, y), 2, Orientation.Horizontal, LineStyle.Double);
-        Assert.Equal (new Rect (x, y, 2, 1), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 2, 1), lc.Bounds);
 
         //LHS line down
         lc.AddLine (new Point (x, y), height, Orientation.Vertical, LineStyle.Double);
-        Assert.Equal (new Rect (x, y, 2, 2), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 2, 2), lc.Bounds);
 
         //Vertical line before Title, results in a ╡
         lc.AddLine (new Point (x + 1, y), 0, Orientation.Vertical, LineStyle.Single);
-        Assert.Equal (new Rect (x, y, 2, 2), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 2, 2), lc.Bounds);
 
         //Vertical line after Title, results in a ╞
         lc.AddLine (new Point (x + 2, y), 0, Orientation.Vertical, LineStyle.Single);
-        Assert.Equal (new Rect (x, y, 3, 2), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 3, 2), lc.Bounds);
 
         // remainder of top line
         lc.AddLine (new Point (x + 2, y), width - 1, Orientation.Horizontal, LineStyle.Double);
-        Assert.Equal (new Rect (x, y, 4, 2), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 4, 2), lc.Bounds);
 
         //RHS line down
         lc.AddLine (new Point (x + width, y), height, Orientation.Vertical, LineStyle.Double);
-        Assert.Equal (new Rect (x, y, 4, 2), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 4, 2), lc.Bounds);
 
         TestHelpers.AssertEqual (
                                  output,
@@ -533,27 +533,27 @@ public class LineCanvasTests
 
         // Add a short horiz line for ╔╡
         lc.AddLine (new Point (x, y), 2, Orientation.Horizontal, LineStyle.Double);
-        Assert.Equal (new Rect (x, y, 2, 1), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 2, 1), lc.Bounds);
 
         //LHS line down
         lc.AddLine (new Point (x, y), height, Orientation.Vertical, LineStyle.Double);
-        Assert.Equal (new Rect (x, y, 2, 2), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 2, 2), lc.Bounds);
 
         //Vertical line before Title, results in a ╡
         lc.AddLine (new Point (x + 1, y), 0, Orientation.Vertical, LineStyle.Single);
-        Assert.Equal (new Rect (x, y, 2, 2), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 2, 2), lc.Bounds);
 
         //Vertical line after Title, results in a ╞
         lc.AddLine (new Point (x + 2, y), 0, Orientation.Vertical, LineStyle.Single);
-        Assert.Equal (new Rect (x, y, 3, 2), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 3, 2), lc.Bounds);
 
         // remainder of top line
         lc.AddLine (new Point (x + 2, y), width - 1, Orientation.Horizontal, LineStyle.Double);
-        Assert.Equal (new Rect (x, y, 4, 2), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 4, 2), lc.Bounds);
 
         //RHS line down
         lc.AddLine (new Point (x + width, y), height, Orientation.Vertical, LineStyle.Double);
-        Assert.Equal (new Rect (x, y, 4, 2), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 4, 2), lc.Bounds);
 
         TestHelpers.AssertEqual (
                                  output,
@@ -570,13 +570,13 @@ public class LineCanvasTests
     {
         var lc = new LineCanvas ();
 
-        Assert.Equal (Rect.Empty, lc.Bounds);
+        Assert.Equal (Rectangle.Empty, lc.Bounds);
 
         lc.AddLine (new Point (0, 0), 2, Orientation.Horizontal, LineStyle.Double);
-        Assert.NotEqual (Rect.Empty, lc.Bounds);
+        Assert.NotEqual (Rectangle.Empty, lc.Bounds);
 
         lc.Clear ();
-        Assert.Equal (Rect.Empty, lc.Bounds);
+        Assert.Equal (Rectangle.Empty, lc.Bounds);
     }
 
     [InlineData (0, 0, Orientation.Horizontal, "─")]
@@ -873,7 +873,7 @@ public class LineCanvasTests
         //// Left Up
         //canvas.AddLine (new Point (0, 3), -3, Orientation.Vertical, LineStyle.Single);
 
-        Assert.Equal (new Rect (0, 0, 2, 2), canvas.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 2, 2), canvas.Bounds);
 
         Dictionary<Point, Rune> map = canvas.GetMap ();
         Assert.Equal (2, map.Count);
@@ -990,7 +990,7 @@ public class LineCanvasTests
         View v = GetCanvas (out LineCanvas lc);
         v.Width = 10;
         v.Height = 10;
-        v.Bounds = new Rect (0, 0, 10, 10);
+        v.Bounds = new Rectangle (0, 0, 10, 10);
 
         lc.AddLine (new Point (x1, y1), length, o1, s1);
 
@@ -1304,7 +1304,7 @@ public class LineCanvasTests
     /// <returns></returns>
     private View GetCanvas (out LineCanvas canvas, int offsetX = 0, int offsetY = 0)
     {
-        var v = new View { Width = 10, Height = 5, Bounds = new Rect (0, 0, 10, 5) };
+        var v = new View { Width = 10, Height = 5, Bounds = new Rectangle (0, 0, 10, 5) };
         Application.Top.Add (v);
         Application.Begin (Application.Top);
 

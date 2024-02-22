@@ -47,9 +47,9 @@ public class PosTests
         top.Add (win);
         RunState rs = Application.Begin (top);
 
-        Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
-        Assert.Equal (new Rect (0, 0, 80, 25), win.Frame);
-        Assert.Equal (new Rect (68, 22, 10, 1), tv.Frame);
+        Assert.Equal (new Rectangle (0, 0, 80, 25), top.Frame);
+        Assert.Equal (new Rectangle (0, 0, 80, 25), win.Frame);
+        Assert.Equal (new Rectangle (68, 22, 10, 1), tv.Frame);
         Application.End (rs);
     }
 
@@ -77,11 +77,11 @@ public class PosTests
         top.Add (win, menu, status);
         RunState rs = Application.Begin (top);
 
-        Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
-        Assert.Equal (new Rect (0, 0, 80, 1), menu.Frame);
-        Assert.Equal (new Rect (0, 24, 80, 1), status.Frame);
-        Assert.Equal (new Rect (0, 1, 80, 23), win.Frame);
-        Assert.Equal (new Rect (68, 20, 10, 1), tv.Frame);
+        Assert.Equal (new Rectangle (0, 0, 80, 25), top.Frame);
+        Assert.Equal (new Rectangle (0, 0, 80, 1), menu.Frame);
+        Assert.Equal (new Rectangle (0, 24, 80, 1), status.Frame);
+        Assert.Equal (new Rectangle (0, 1, 80, 23), win.Frame);
+        Assert.Equal (new Rectangle (68, 20, 10, 1), tv.Frame);
 
         Application.End (rs);
     }
@@ -201,42 +201,42 @@ public class PosTests
         Pos pos = Pos.Left (v);
 
         Assert.Equal (
-                      "View(side=x,target=View(V)(0,0,0,0))",
+                      $"View(side=x,target=View(V){v.Frame})",
                       pos.ToString ()
                      );
 
         pos = Pos.X (v);
 
         Assert.Equal (
-                      "View(side=x,target=View(V)(0,0,0,0))",
+                      $"View(side=x,target=View(V){v.Frame})",
                       pos.ToString ()
                      );
 
         pos = Pos.Top (v);
 
         Assert.Equal (
-                      "View(side=y,target=View(V)(0,0,0,0))",
+                      $"View(side=y,target=View(V){v.Frame})",
                       pos.ToString ()
                      );
 
         pos = Pos.Y (v);
 
         Assert.Equal (
-                      "View(side=y,target=View(V)(0,0,0,0))",
+                      $"View(side=y,target=View(V){v.Frame})",
                       pos.ToString ()
                      );
 
         pos = Pos.Right (v);
 
         Assert.Equal (
-                      "View(side=right,target=View(V)(0,0,0,0))",
+                      $"View(side=right,target=View(V){v.Frame})",
                       pos.ToString ()
                      );
 
         pos = Pos.Bottom (v);
 
         Assert.Equal (
-                      "View(side=bottom,target=View(V)(0,0,0,0))",
+                      $"View(side=bottom,target=View(V){v.Frame})",
                       pos.ToString ()
                      );
     }
@@ -296,7 +296,7 @@ public class PosTests
         Assert.Equal (posCombine._right, posFactor);
         Assert.Equal (20, posCombine.Anchor (100));
 
-        var view = new View { Frame = new Rect (20, 10, 20, 1) };
+        var view = new View { Frame = new Rectangle (20, 10, 20, 1) };
         var posViewX = new Pos.PosView (view, 0);
         Assert.Equal (20, posViewX.Anchor (0));
         var posViewY = new Pos.PosView (view, 1);
@@ -622,9 +622,9 @@ public class PosTests
 
         Exception exception = Record.Exception (super.LayoutSubviews);
         Assert.Null (exception);
-        Assert.Equal (new Rect (0, 0, 10, 10), super.Frame);
-        Assert.Equal (new Rect (0, 0, 2, 2), view1.Frame);
-        Assert.Equal (new Rect (8, 0, 2, 2), view2.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), super.Frame);
+        Assert.Equal (new Rectangle (0, 0, 2, 2), view1.Frame);
+        Assert.Equal (new Rectangle (8, 0, 2, 2), view2.Frame);
 
         super.Dispose ();
     }
@@ -702,21 +702,21 @@ public class PosTests
     public void PosSide_SetsValue ()
     {
         string side; // used in format string
-        var testRect = Rect.Empty;
+        var testRect = Rectangle.Empty;
         var testInt = 0;
         Pos pos;
 
         // Pos.Left
         side = "x";
         testInt = 0;
-        testRect = Rect.Empty;
+        testRect = Rectangle.Empty;
         pos = Pos.Left (new View ());
         Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
         pos = Pos.Left (new View { Frame = testRect });
         Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
-        testRect = new Rect (1, 2, 3, 4);
+        testRect = new Rectangle (1, 2, 3, 4);
         pos = Pos.Left (new View { Frame = testRect });
         Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
@@ -751,14 +751,14 @@ public class PosTests
         // Pos.X
         side = "x";
         testInt = 0;
-        testRect = Rect.Empty;
+        testRect = Rectangle.Empty;
         pos = Pos.X (new View ());
         Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
         pos = Pos.X (new View { Frame = testRect });
         Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
-        testRect = new Rect (1, 2, 3, 4);
+        testRect = new Rectangle (1, 2, 3, 4);
         pos = Pos.X (new View { Frame = testRect });
         Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
@@ -793,14 +793,14 @@ public class PosTests
         // Pos.Top
         side = "y";
         testInt = 0;
-        testRect = Rect.Empty;
+        testRect = Rectangle.Empty;
         pos = Pos.Top (new View ());
         Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
         pos = Pos.Top (new View { Frame = testRect });
         Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
-        testRect = new Rect (1, 2, 3, 4);
+        testRect = new Rectangle (1, 2, 3, 4);
         pos = Pos.Top (new View { Frame = testRect });
         Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
@@ -835,14 +835,14 @@ public class PosTests
         // Pos.Y
         side = "y";
         testInt = 0;
-        testRect = Rect.Empty;
+        testRect = Rectangle.Empty;
         pos = Pos.Y (new View ());
         Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
         pos = Pos.Y (new View { Frame = testRect });
         Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
-        testRect = new Rect (1, 2, 3, 4);
+        testRect = new Rectangle (1, 2, 3, 4);
         pos = Pos.Y (new View { Frame = testRect });
         Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
@@ -876,7 +876,7 @@ public class PosTests
 
         // Pos.Bottom
         side = "bottom";
-        testRect = Rect.Empty;
+        testRect = Rectangle.Empty;
         testInt = 0;
         pos = Pos.Bottom (new View ());
         Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
@@ -884,7 +884,7 @@ public class PosTests
         pos = Pos.Bottom (new View { Frame = testRect });
         Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
-        testRect = new Rect (1, 2, 3, 4);
+        testRect = new Rectangle (1, 2, 3, 4);
         pos = Pos.Bottom (new View { Frame = testRect });
         Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 

@@ -193,7 +193,7 @@ public partial class View
             return;
         }
 
-        Rect touched = view.Frame;
+        Rectangle touched = view.Frame;
         _subviews.Remove (view);
         _tabIndexes.Remove (view);
         view._superView = null;

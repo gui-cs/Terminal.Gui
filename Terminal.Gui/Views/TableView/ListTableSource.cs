@@ -16,7 +16,7 @@ public class ListTableSource : ITableSource
     public ListColumnStyle Style;
 
     private readonly TableView _tableView;
-    private Rect _lastBounds;
+    private Rectangle _lastBounds;
     private IList _lastList;
     private int _lastMaxCellWidth;
     private int _lastMinCellWidth;

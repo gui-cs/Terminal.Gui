@@ -1205,11 +1205,11 @@ internal class NetDriver : ConsoleDriver
             }
             catch (IOException)
             {
-                Clip = new Rect (0, 0, Cols, Rows);
+                Clip = new Rectangle (0, 0, Cols, Rows);
             }
             catch (ArgumentOutOfRangeException)
             {
-                Clip = new Rect (0, 0, Cols, Rows);
+                Clip = new Rectangle (0, 0, Cols, Rows);
             }
         }
         else
@@ -1217,7 +1217,7 @@ internal class NetDriver : ConsoleDriver
             Console.Out.Write (EscSeqUtils.CSI_SetTerminalWindowSize (Rows, Cols));
         }
 
-        Clip = new Rect (0, 0, Cols, Rows);
+        Clip = new Rectangle (0, 0, Cols, Rows);
     }
 
     #endregion

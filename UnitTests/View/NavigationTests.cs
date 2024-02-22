@@ -816,13 +816,13 @@ public class NavigationTests
         Application.Begin (top);
 
         Assert.Equal (Application.Current, top);
-        Assert.Equal (new Rect (0, 0, 80, 25), new Rect (0, 0, View.Driver.Cols, View.Driver.Rows));
-        Assert.Equal (new Rect (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
-        Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
+        Assert.Equal (new Rectangle (0, 0, 80, 25), new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows));
+        Assert.Equal (new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
+        Assert.Equal (new Rectangle (0, 0, 80, 25), top.Frame);
 
         ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
-        Assert.Equal (new Rect (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
-        Assert.Equal (new Rect (0, 0, 20, 10), top.Frame);
+        Assert.Equal (new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
+        Assert.Equal (new Rectangle (0, 0, 20, 10), top.Frame);
 
         _ = TestHelpers.AssertDriverContentsWithFrameAre (
                                                           @"
@@ -959,16 +959,16 @@ public class NavigationTests
         Application.Begin (top);
 
         Assert.Equal (Application.Current, top);
-        Assert.Equal (new Rect (0, 0, 80, 25), new Rect (0, 0, View.Driver.Cols, View.Driver.Rows));
-        Assert.NotEqual (new Rect (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
-        Assert.Equal (new Rect (3, 2, 20, 10), top.Frame);
+        Assert.Equal (new Rectangle (0, 0, 80, 25), new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows));
+        Assert.NotEqual (new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
+        Assert.Equal (new Rectangle (3, 2, 20, 10), top.Frame);
 
         ((FakeDriver)Application.Driver).SetBufferSize (30, 20);
-        Assert.Equal (new Rect (0, 0, 30, 20), new Rect (0, 0, View.Driver.Cols, View.Driver.Rows));
-        Assert.NotEqual (new Rect (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
-        Assert.Equal (new Rect (3, 2, 20, 10), top.Frame);
+        Assert.Equal (new Rectangle (0, 0, 30, 20), new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows));
+        Assert.NotEqual (new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
+        Assert.Equal (new Rectangle (3, 2, 20, 10), top.Frame);
 
-        Rect frame = TestHelpers.AssertDriverContentsWithFrameAre (
+        Rectangle frame = TestHelpers.AssertDriverContentsWithFrameAre (
                                                                    @"
    ┌──────────────────┐
    │                  │
@@ -985,7 +985,7 @@ public class NavigationTests
 
         // mean the output started at col 3 and line 2
         // which result with a width of 23 and a height of 10 on the output
-        Assert.Equal (new Rect (3, 2, 23, 10), frame);
+        Assert.Equal (new Rectangle (3, 2, 23, 10), frame);
 
         // top
         Assert.Equal (new Point (-3, -2), top.ScreenToFrame (0, 0));

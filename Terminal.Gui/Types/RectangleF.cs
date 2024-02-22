@@ -143,19 +143,19 @@ public struct RectangleF : IEquatable<RectangleF>
 
     /// <summary>
     ///     Determines if the specified point is contained within the rectangular region defined by this
-    ///     <see cref='Terminal.Gui.Rect'/> .
+    ///     <see cref='Rectangle'/> .
     /// </summary>
     public bool Contains (float x, float y) { return X <= x && x < X + Width && Y <= y && y < Y + Height; }
 
     /// <summary>
     ///     Determines if the specified point is contained within the rectangular region defined by this
-    ///     <see cref='Terminal.Gui.Rect'/> .
+    ///     <see cref='Rectangle'/> .
     /// </summary>
     public bool Contains (PointF pt) { return Contains (pt.X, pt.Y); }
 
     /// <summary>
     ///     Determines if the rectangular region represented by <paramref name="rect"/> is entirely contained within the
-    ///     rectangular region represented by this <see cref='Terminal.Gui.Rect'/> .
+    ///     rectangular region represented by this <see cref='Rectangle'/> .
     /// </summary>
     public bool Contains (RectangleF rect)
     {
@@ -168,7 +168,7 @@ public struct RectangleF : IEquatable<RectangleF>
     /// <summary>Gets the hash code for this <see cref='Terminal.Gui.RectangleF'/>.</summary>
     public override int GetHashCode () { return (Height.GetHashCode () + Width.GetHashCode ()) ^ (X.GetHashCode () + Y.GetHashCode ()); }
 
-    /// <summary>Inflates this <see cref='Terminal.Gui.Rect'/> by the specified amount.</summary>
+    /// <summary>Inflates this <see cref='Rectangle'/> by the specified amount.</summary>
     public void Inflate (float x, float y)
     {
         X -= x;
@@ -177,10 +177,10 @@ public struct RectangleF : IEquatable<RectangleF>
         Height += 2 * y;
     }
 
-    /// <summary>Inflates this <see cref='Terminal.Gui.Rect'/> by the specified amount.</summary>
+    /// <summary>Inflates this <see cref='Rectangle'/> by the specified amount.</summary>
     public void Inflate (SizeF size) { Inflate (size.Width, size.Height); }
 
-    /// <summary>Creates a <see cref='Terminal.Gui.Rect'/> that is inflated by the specified amount.</summary>
+    /// <summary>Creates a <see cref='Rectangle'/> that is inflated by the specified amount.</summary>
     public static RectangleF Inflate (RectangleF rect, float x, float y)
     {
         RectangleF r = rect;
@@ -249,8 +249,8 @@ public struct RectangleF : IEquatable<RectangleF>
         Y += y;
     }
 
-    /// <summary>Converts the specified <see cref='Terminal.Gui.Rect'/> to a <see cref='Terminal.Gui.RectangleF'/>.</summary>
-    public static implicit operator RectangleF (Rect r) { return new RectangleF (r.X, r.Y, r.Width, r.Height); }
+    /// <summary>Converts the specified <see cref='Rectangle'/> to a <see cref='Terminal.Gui.RectangleF'/>.</summary>
+    public static implicit operator RectangleF (Rectangle r) { return new RectangleF (r.X, r.Y, r.Width, r.Height); }
 
     /// <summary>
     ///     Converts the <see cref='Terminal.Gui.RectangleF.Location'/> and <see cref='Terminal.Gui.RectangleF.Size'/> of

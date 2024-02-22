@@ -37,7 +37,7 @@ public enum LayoutStyle
 public partial class View
 {
     private bool _autoSize;
-    private Rect _frame;
+    private Rectangle _frame;
     private Dim _height = Dim.Sized (0);
     private Dim _width = Dim.Sized (0);
     private Pos _x = Pos.At (0);
@@ -155,7 +155,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         Altering the Bounds will eventually (when the view is next laid out) cause the
-    ///         <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/> methods to be called.
+    ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
     ///         Because <see cref="Bounds"/> coordinates are relative to the upper-left corner of the <see cref="View"/>, the
@@ -163,7 +163,7 @@ public partial class View
     ///         obtain the size of the area of the view for tasks such as drawing the view's contents.
     ///     </para>
     /// </remarks>
-    public virtual Rect Bounds
+    public virtual Rectangle Bounds
     {
         get
         {
@@ -179,7 +179,7 @@ public partial class View
             // BUGBUG: I think there's a bug here. This should be && not ||
             if (Margin is null || Border is null || Padding is null)
             {
-                return new Rect (default (Point), Frame.Size);
+                return new Rectangle (default (Point), Frame.Size);
             }
 
             int width = Math.Max (
@@ -195,7 +195,7 @@ public partial class View
                                    Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical
                                   );
 
-            return new Rect (Point.Empty, new Size (width, height));
+            return new Rectangle (Point.Empty, new Size (width, height));
         }
         set
         {
@@ -209,7 +209,7 @@ public partial class View
                                 );
             }
 #endif // DEBUG
-            Frame = new Rect (
+            Frame = new Rectangle (
                               Frame.Location,
                               new Size (
                                         value.Size.Width
@@ -239,16 +239,16 @@ public partial class View
     ///     <para>This causes <see cref="LayoutStyle"/> to be <see cref="LayoutStyle.Absolute"/>.</para>
     ///     <para>
     ///         Altering the Frame will eventually (when the view hierarchy is next laid out via  see
-    ///         cref="LayoutSubviews"/>) cause <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/>
+    ///         cref="LayoutSubviews"/>) cause <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/>
     ///         methods to be called.
     ///     </para>
     /// </remarks>
-    public Rect Frame
+    public Rectangle Frame
     {
         get => _frame;
         set
         {
-            _frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
+            _frame = new Rectangle (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
 
             // If Frame gets set, by definition, the View is now LayoutStyle.Absolute, so
             // set all Pos/Dim to Absolute values.
@@ -273,12 +273,12 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Dim.Fill(int)"/>) the value is indeterminate until the view has
-    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been
+    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been
     ///         called.
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
-    ///         <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/> methods to be called.
+    ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
@@ -398,12 +398,12 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Dim.Fill(int)"/>) the value is indeterminate until the view has
-    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been
+    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been
     ///         called.
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
-    ///         <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/> methods to be called.
+    ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
@@ -439,11 +439,11 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
-    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been called.
+    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been called.
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
-    ///         <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/> methods to be called.
+    ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
@@ -466,11 +466,11 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
-    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been called.
+    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been called.
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
-    ///         <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/> methods to be called.
+    ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
@@ -498,11 +498,11 @@ public partial class View
     public event EventHandler Initialized;
 
     /// <summary>Converts a <see cref="Bounds"/>-relative region to a screen-relative region.</summary>
-    public Rect BoundsToScreen (Rect region)
+    public Rectangle BoundsToScreen (Rectangle region)
     {
         BoundsToScreen (region.X, region.Y, out int x, out int y, false);
 
-        return new Rect (x, y, region.Width, region.Height);
+        return new Rectangle (x, y, region.Width, region.Height);
     }
 
     /// <summary>
@@ -561,7 +561,7 @@ public partial class View
             return null;
         }
 
-        Rect startFrame = start.Frame;
+        Rectangle startFrame = start.Frame;
 
         if (start.InternalSubviews is { })
         {
@@ -600,9 +600,9 @@ public partial class View
 
     /// <summary>Gets the <see cref="Frame"/> with a screen-relative location.</summary>
     /// <returns>The location and size of the view in screen-relative coordinates.</returns>
-    public virtual Rect FrameToScreen ()
+    public virtual Rectangle FrameToScreen ()
     {
-        Rect ret = Frame;
+        Rectangle ret = Frame;
         View super = SuperView;
 
         while (super is { })
@@ -683,7 +683,7 @@ public partial class View
 
         LayoutAdornments ();
 
-        Rect oldBounds = Bounds;
+        Rectangle oldBounds = Bounds;
         OnLayoutStarted (new LayoutEventArgs { OldBounds = oldBounds });
 
         SetTextFormatterSize ();
@@ -696,7 +696,7 @@ public partial class View
 
         foreach (View v in ordered)
         {
-            LayoutSubview (v, new Rect (GetBoundsOffset (), Bounds.Size));
+            LayoutSubview (v, new Rectangle (GetBoundsOffset (), Bounds.Size));
         }
 
         // If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.
@@ -853,7 +853,7 @@ public partial class View
 
         if (Margin.Frame.Size != Frame.Size)
         {
-            Margin._frame = new Rect (Point.Empty, Frame.Size);
+            Margin._frame = new Rectangle (Point.Empty, Frame.Size);
             Margin.X = 0;
             Margin.Y = 0;
             Margin.Width = Frame.Size.Width;
@@ -862,11 +862,11 @@ public partial class View
             Margin.SetNeedsDisplay ();
         }
 
-        Rect border = Margin.Thickness.GetInside (Margin.Frame);
+        Rectangle border = Margin.Thickness.GetInside (Margin.Frame);
 
         if (border != Border.Frame)
         {
-            Border._frame = new Rect (new Point (border.Location.X, border.Location.Y), border.Size);
+            Border._frame = new Rectangle (new Point (border.Location.X, border.Location.Y), border.Size);
             Border.X = border.Location.X;
             Border.Y = border.Location.Y;
             Border.Width = border.Size.Width;
@@ -875,11 +875,11 @@ public partial class View
             Border.SetNeedsDisplay ();
         }
 
-        Rect padding = Border.Thickness.GetInside (Border.Frame);
+        Rectangle padding = Border.Thickness.GetInside (Border.Frame);
 
         if (padding != Padding.Frame)
         {
-            Padding._frame = new Rect (new Point (padding.Location.X, padding.Location.Y), padding.Size);
+            Padding._frame = new Rectangle (new Point (padding.Location.X, padding.Location.Y), padding.Size);
             Padding.X = padding.Location.X;
             Padding.Y = padding.Location.Y;
             Padding.Width = padding.Size.Width;
@@ -908,7 +908,7 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         Determines the relative bounds of the <see cref="View"/> and its <see cref="Frame"/>s, and then calls
-    ///         <see cref="SetRelativeLayout(Rect)"/> to update the view.
+    ///         <see cref="SetRelativeLayout(Rectangle)"/> to update the view.
     ///     </para>
     /// </remarks>
     internal void OnResizeNeeded ()
@@ -917,9 +917,9 @@ public partial class View
         // TODO: Until then leave it `internal` and non-virtual
         // First try SuperView.Bounds, then Application.Top, then Driver.Bounds.
         // Finally, if none of those are valid, use int.MaxValue (for Unit tests).
-        Rect relativeBounds = SuperView is { IsInitialized: true } ? SuperView.Bounds :
+        Rectangle relativeBounds = SuperView is { IsInitialized: true } ? SuperView.Bounds :
                               Application.Top is { } && Application.Top.IsInitialized ? Application.Top.Bounds :
-                              Application.Driver?.Bounds ?? new Rect (0, 0, int.MaxValue, int.MaxValue);
+                              Application.Driver?.Bounds ?? new Rectangle (0, 0, int.MaxValue, int.MaxValue);
         SetRelativeLayout (relativeBounds);
 
         // TODO: Determine what, if any of the below is actually needed here.
@@ -968,7 +968,7 @@ public partial class View
     ///     The rectangle describing the SuperView's Bounds (nominally the same as
     ///     <c>this.SuperView.Bounds</c>).
     /// </param>
-    internal void SetRelativeLayout (Rect superviewBounds)
+    internal void SetRelativeLayout (Rectangle superviewBounds)
     {
         Debug.Assert (_x is { });
         Debug.Assert (_y is { });
@@ -996,7 +996,7 @@ public partial class View
         // This method is called recursively if pos is Pos.PosCombine
         (int newLocation, int newDimension) GetNewLocationAndDimension (
             bool width,
-            Rect superviewBounds,
+            Rectangle superviewBounds,
             Pos pos,
             Dim dim,
             int autosizeDimension
@@ -1137,7 +1137,7 @@ public partial class View
         // vertical/height
         (newY, newH) = GetNewLocationAndDimension (false, superviewBounds, _y, _height, autosize.Height);
 
-        var r = new Rect (newX, newY, newW, newH);
+        var r = new Rectangle (newX, newY, newW, newH);
 
         if (Frame != r)
         {
@@ -1175,7 +1175,7 @@ public partial class View
             {
                 // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height, making
                 // the view LayoutStyle.Absolute.
-                _frame = new Rect (Frame.Location, autosize);
+                _frame = new Rectangle (Frame.Location, autosize);
 
                 if (autosize.Width == 0)
                 {
@@ -1391,7 +1391,7 @@ public partial class View
         return canSetWidth;
     }
 
-    private void LayoutSubview (View v, Rect contentArea)
+    private void LayoutSubview (View v, Rectangle contentArea)
     {
         //if (v.LayoutStyle == LayoutStyle.Computed) {
         v.SetRelativeLayout (contentArea);
@@ -1430,7 +1430,7 @@ public partial class View
 
         if (boundsChanged)
         {
-            Bounds = new Rect (Bounds.X, Bounds.Y, canSizeW ? rW : Bounds.Width, canSizeH ? rH : Bounds.Height);
+            Bounds = new Rectangle (Bounds.X, Bounds.Y, canSizeW ? rW : Bounds.Width, canSizeH ? rH : Bounds.Height);
         }
 
         return boundsChanged;

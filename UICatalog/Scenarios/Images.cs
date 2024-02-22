@@ -7,6 +7,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Terminal.Gui;
 using Color = Terminal.Gui.Color;
+using Rectangle = Terminal.Gui.Rectangle;
 
 namespace UICatalog.Scenarios;
 
@@ -105,7 +106,7 @@ public class Images : Scenario
         private Image<Rgba32> _fullResImage;
         private Image<Rgba32> _matchSize;
 
-        public override void OnDrawContent (Rect bounds)
+        public override void OnDrawContent (Rectangle bounds)
         {
             base.OnDrawContent (bounds);
 

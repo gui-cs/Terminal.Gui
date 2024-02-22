@@ -196,9 +196,9 @@ public class AllViewsTests
     // create the right type of argument for the constructor.
     private static void AddArguments (Type paramType, List<object> pTypes)
     {
-        if (paramType == typeof (Rect))
+        if (paramType == typeof (Rectangle))
         {
-            pTypes.Add (Rect.Empty);
+            pTypes.Add (Rectangle.Empty);
         }
         else if (paramType == typeof (string))
         {

@@ -197,7 +197,7 @@ public class GraphView : View
     }
 
     ///<inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         if (CellSize.X == 0 || CellSize.Y == 0)
         {
@@ -256,7 +256,7 @@ public class GraphView : View
 
         SetDriverColorToGraphColor ();
 
-        var drawBounds = new Rect ((int)MarginLeft, 0, graphScreenWidth, graphScreenHeight);
+        var drawBounds = new Rectangle ((int)MarginLeft, 0, graphScreenWidth, graphScreenHeight);
 
         RectangleF graphSpace = ScreenToGraphSpace (drawBounds);
 
@@ -325,7 +325,7 @@ public class GraphView : View
     /// <summary>Returns the section of the graph that is represented by the screen area.</summary>
     /// <param name="screenArea"></param>
     /// <returns></returns>
-    public RectangleF ScreenToGraphSpace (Rect screenArea)
+    public RectangleF ScreenToGraphSpace (Rectangle screenArea)
     {
         // get position of the bottom left
         RectangleF pos = ScreenToGraphSpace (screenArea.Left, screenArea.Bottom - 1);
