@@ -40,9 +40,9 @@ public class Padding : Adornment
     }
 
     /// <inheritdoc/>
-    public override Rect FrameToScreen ()
+    public override Rectangle FrameToScreen ()
     {
-        Rect ret = base.FrameToScreen ();
+        Rectangle ret = base.FrameToScreen ();
 
         ret.X += Parent != null ? Parent.Margin.Thickness.Left + Parent.Border.Thickness.Left : 0;
         ret.Y += Parent != null ? Parent.Margin.Thickness.Top + Parent.Border.Thickness.Top : 0;

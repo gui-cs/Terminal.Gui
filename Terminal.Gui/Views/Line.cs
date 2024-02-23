@@ -30,7 +30,7 @@ public class Line : View
         return true;
     }
 
-    //public override void OnDrawContentComplete (Rect contentArea)
+    //public override void OnDrawContentComplete (Rectangle contentArea)
     //{
     //	var screenBounds = ViewToScreen (Frame);
 

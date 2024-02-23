@@ -3854,7 +3854,7 @@ public class TextView : View
             // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
             //var minRow = Math.Min (Math.Max (Math.Min (selectionStartRow, currentRow) - topRow, 0), Bounds.Height);
             //var maxRow = Math.Min (Math.Max (Math.Max (selectionStartRow, currentRow) - topRow, 0), Bounds.Height);
-            //SetNeedsDisplay (new Rect (0, minRow, Bounds.Width, maxRow));
+            //SetNeedsDisplay (new Rectangle (0, minRow, Bounds.Width, maxRow));
             SetNeedsDisplay ();
         }
 
@@ -4312,7 +4312,7 @@ public class TextView : View
             else
             {
                 // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-                //SetNeedsDisplay (new Rect (0, startRow - topRow, Bounds.Width, startRow - topRow + 1));
+                //SetNeedsDisplay (new Rectangle (0, startRow - topRow, Bounds.Width, startRow - topRow + 1));
                 SetNeedsDisplay ();
             }
 
@@ -4408,7 +4408,7 @@ public class TextView : View
             else
             {
                 // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-                //SetNeedsDisplay (new Rect (0, currentRow - topRow, 1, Bounds.Width));
+                //SetNeedsDisplay (new Rectangle (0, currentRow - topRow, 1, Bounds.Width));
                 SetNeedsDisplay ();
             }
         }
@@ -4818,7 +4818,7 @@ public class TextView : View
         if (!_wrapNeeded)
         {
             // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-            //SetNeedsDisplay (new Rect (0, prow, Math.Max (Bounds.Width, 0), Math.Max (prow + 1, 0)));
+            //SetNeedsDisplay (new Rectangle (0, prow, Math.Max (Bounds.Width, 0), Math.Max (prow + 1, 0)));
             SetNeedsDisplay ();
         }
     }
@@ -4867,7 +4867,7 @@ public class TextView : View
             else
             {
                 // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-                //SetNeedsDisplay (new Rect (0, currentRow - topRow, Bounds.Width, Math.Max (currentRow - topRow + 1, 0)));
+                //SetNeedsDisplay (new Rectangle (0, currentRow - topRow, Bounds.Width, Math.Max (currentRow - topRow + 1, 0)));
                 SetNeedsDisplay ();
             }
 
@@ -6184,7 +6184,7 @@ public class TextView : View
         else
         {
             // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-            //SetNeedsDisplay (new Rect (0, currentRow - topRow, 2, Bounds.Height));
+            //SetNeedsDisplay (new Rectangle (0, currentRow - topRow, 2, Bounds.Height));
             SetNeedsDisplay ();
         }
 

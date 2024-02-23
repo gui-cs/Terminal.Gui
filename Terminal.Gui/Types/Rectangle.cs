@@ -22,7 +22,7 @@ public struct Rectangle
     /// <summary>Gets or sets the y-coordinate of the upper-left corner of this Rectangle structure.</summary>
     public int Y;
 
-    /// <summary>Gets or sets the width of this Rect structure.</summary>
+    /// <summary>Gets or sets the width of this Rectangle structure.</summary>
     public int Width
     {
         get => width;
@@ -73,9 +73,9 @@ public struct Rectangle
                         );
     }
 
-    /// <summary>Produces a new Rect by inflating an existing Rect by the specified coordinate values.</summary>
+    /// <summary>Produces a new Rectangle by inflating an existing Rectangle by the specified coordinate values.</summary>
     /// <remarks>
-    ///     Produces a new Rect by inflating an existing Rect by the specified coordinate values. The rectangle is
+    ///     Produces a new Rectangle by inflating an existing Rectangle by the specified coordinate values. The rectangle is
     ///     enlarged in both directions along an axis.
     /// </remarks>
     public static Rectangle Inflate (Rectangle rect, int x, int y)
@@ -86,7 +86,7 @@ public struct Rectangle
         return r;
     }
 
-    /// <summary>Inflates an existing Rect by the specified coordinate values.</summary>
+    /// <summary>Inflates an existing Rectangle by the specified coordinate values.</summary>
     /// <remarks>
     ///     This method enlarges this rectangle, not a copy of it. The rectangle is enlarged in both directions along an
     ///     axis.
@@ -101,7 +101,7 @@ public struct Rectangle
         Y -= height;
     }
 
-    /// <summary>Inflates an existing Rect by the specified Sizwe.</summary>
+    /// <summary>Inflates an existing Rectangle by the specified Sizwe.</summary>
     /// <remarks>
     ///     This method enlarges this rectangle, not a copy of it. The rectangle is enlarged in both directions along an
     ///     axis.
@@ -139,7 +139,7 @@ public struct Rectangle
         //int x2 = Math.Max (a.X + a.Width, b.X + b.Width);
         //int y1 = Math.Min (a.Y, b.Y);oS
         //int y2 = Math.Max (a.Y + a.Height, b.Y + b.Height);
-        //return new Rect (x1, y1, x2 - x1, y2 - y1);
+        //return new Rectangle (x1, y1, x2 - x1, y2 - y1);
 
         int x1 = Math.Min (a.X, b.X);
         int x2 = Math.Max (a.X + Math.Abs (a.Width), b.X + Math.Abs (b.Width));

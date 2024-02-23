@@ -185,7 +185,7 @@ public class WindowTests
         Assert.Null (windowWithFrameRectEmpty.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, windowWithFrameRectEmpty.TextDirection);
 
-        // Rect with values
+        // Rectangle with values
         using var windowWithFrame1234 = new Window ( );
         windowWithFrame1234.Frame = new  (1, 2, 3, 4);
         windowWithFrame1234.Title = "title";

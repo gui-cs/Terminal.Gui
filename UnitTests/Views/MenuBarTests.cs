@@ -1008,7 +1008,7 @@ wo
 ";
 
         var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new Rect (1, 0, 11, 1), pos);
+        Assert.Equal (new Rectangle (1, 0, 11, 1), pos);
 
         Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.N)));
         Application.MainLoop.RunIteration ();
@@ -1036,7 +1036,7 @@ wo
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new Rect (1, 0, 11, 1), pos);
+        Assert.Equal (new Rectangle (1, 0, 11, 1), pos);
 
         Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
         Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.C)));

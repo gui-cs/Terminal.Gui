@@ -773,7 +773,7 @@ At 0,0
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
         r.Dispose ();
 
-        // Rect with values
+        // Rectangle with values
         r = new View { Frame = new Rectangle (1, 2, 3, 4) };
         Assert.NotNull (r);
         Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);

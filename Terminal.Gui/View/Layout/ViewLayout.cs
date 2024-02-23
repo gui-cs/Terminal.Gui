@@ -237,13 +237,13 @@ public partial class View
     ///     The content area represent the View-relative rectangle used for this view. The area inside the view where subviews
     ///     and content are presented. The Location is always (0,0). It will be mainly used for clipping a region.
     /// </summary>
-    public virtual Rect ContentArea
+    public virtual Rectangle ContentArea
     {
         get
         {
             if (Margin == null || Border == null || Padding == null)
             {
-                return new Rect (default (Point), Frame.Size);
+                return new Rectangle (default (Point), Frame.Size);
             }
 
             int width = Math.Max (
@@ -254,7 +254,7 @@ public partial class View
                                    0,
                                    Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical);
 
-            return new Rect (Point.Empty, new Size (width, height));
+            return new Rectangle (Point.Empty, new Size (width, height));
         }
     }
 

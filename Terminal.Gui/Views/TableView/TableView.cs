@@ -1544,7 +1544,7 @@ public class TableView : View
         int left = Math.Max (Math.Min (pt1X, pt2X), 0);
         int right = Math.Max (Math.Max (pt1X, pt2X), 0);
 
-        // Rect class is inclusive of Top Left but exclusive of Bottom Right so extend by 1
+        // Rectangle class is inclusive of Top Left but exclusive of Bottom Right so extend by 1
         return new TableSelection (new Point (pt1X, pt1Y), new Rectangle (left, top, right - left + 1, bot - top + 1))
         {
             IsToggled = toggle

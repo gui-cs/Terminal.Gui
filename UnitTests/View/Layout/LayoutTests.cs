@@ -45,13 +45,13 @@ public class LayoutTests
         switch (height)
         {
             case 1:
-                //Assert.Equal (new Rect (0, 0, 17, 0), subview.Frame);
+                //Assert.Equal (new Rectangle (0, 0, 17, 0), subview.Frame);
                 expected = @"
 ────────────────────";
 
                 break;
             case 2:
-                //Assert.Equal (new Rect (0, 0, 17, 1), subview.Frame);
+                //Assert.Equal (new Rectangle (0, 0, 17, 1), subview.Frame);
                 expected = @"
 ┌──────────────────┐
 └──────────────────┘
@@ -59,7 +59,7 @@ public class LayoutTests
 
                 break;
             case 3:
-                //Assert.Equal (new Rect (0, 0, 17, 2), subview.Frame);
+                //Assert.Equal (new Rectangle (0, 0, 17, 2), subview.Frame);
                 expected = @"
 ┌──────────────────┐
 │                  │
@@ -68,7 +68,7 @@ public class LayoutTests
 
                 break;
             case 4:
-                //Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+                //Assert.Equal (new Rectangle (0, 0, 17, 3), subview.Frame);
                 expected = @"
 ┌──────────────────┐
 │ ───────────────  │
@@ -77,7 +77,7 @@ public class LayoutTests
 
                 break;
             case 5:
-                //Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+                //Assert.Equal (new Rectangle (0, 0, 17, 3), subview.Frame);
                 expected = @"
 ┌──────────────────┐
 │ ┌─────────────┐  │
@@ -87,7 +87,7 @@ public class LayoutTests
 
                 break;
             case 6:
-                //Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+                //Assert.Equal (new Rectangle (0, 0, 17, 3), subview.Frame);
                 expected = @"
 ┌──────────────────┐
 │ ┌─────────────┐  │
@@ -98,7 +98,7 @@ public class LayoutTests
 
                 break;
             case 7:
-                //Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+                //Assert.Equal (new Rectangle (0, 0, 17, 3), subview.Frame);
                 expected = @"
 ┌──────────────────┐
 │ ┌─────────────┐  │
@@ -110,7 +110,7 @@ public class LayoutTests
 
                 break;
             case 8:
-                //Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+                //Assert.Equal (new Rectangle (0, 0, 17, 3), subview.Frame);
                 expected = @"
 ┌──────────────────┐
 │ ┌─────────────┐  │
@@ -123,7 +123,7 @@ public class LayoutTests
 
                 break;
             case 9:
-                //Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+                //Assert.Equal (new Rectangle (0, 0, 17, 3), subview.Frame);
                 expected = @"
 ┌──────────────────┐
 │                  │
@@ -137,7 +137,7 @@ public class LayoutTests
 
                 break;
             case 10:
-                //Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+                //Assert.Equal (new Rectangle (0, 0, 17, 3), subview.Frame);
                 expected = @"
 ┌──────────────────┐
 │                  │
@@ -337,7 +337,7 @@ public class LayoutTests
         //view.SetNeedsLayout ();
         Application.Top.LayoutSubviews ();
 
-        //view.SetRelativeLayout (new Rect (0, 0, 32, 5));
+        //view.SetRelativeLayout (new Rectangle (0, 0, 32, 5));
         Assert.Equal (32, view.Frame.Width);
         Assert.Equal (5, view.Frame.Height);
     }

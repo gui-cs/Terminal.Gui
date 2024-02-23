@@ -194,9 +194,9 @@ public class Border : Adornment
     }
     
     /// <inheritdoc/>
-    public override Rect FrameToScreen ()
+    public override Rectangle FrameToScreen ()
     {
-        Rect ret = base.FrameToScreen ();
+        Rectangle ret = base.FrameToScreen ();
 
         ret.X += Parent?.Margin.Thickness.Left ?? 0;
         ret.Y += Parent?.Margin.Thickness.Top ?? 0;
@@ -205,7 +205,7 @@ public class Border : Adornment
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle contentArea)
     {
         base.OnDrawContent (contentArea);
 

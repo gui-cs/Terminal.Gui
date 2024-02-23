@@ -40,7 +40,7 @@ public class Adornment : View
     /// <summary>
     ///     Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).
     /// </summary>
-    public override Rect ContentArea => Thickness?.GetInside (new Rect (Point.Empty, Frame.Size)) ?? new Rect (Point.Empty, Frame.Size);
+    public override Rectangle ContentArea => Thickness?.GetInside (new Rectangle (Point.Empty, Frame.Size)) ?? new Rectangle (Point.Empty, Frame.Size);
 
     /// <summary>The Parent of this Adornment (the View this Adornment surrounds).</summary>
     /// <remarks>

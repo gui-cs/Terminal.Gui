@@ -218,13 +218,13 @@ public class Scrolling : Scenario
         keepCheckBox.Toggled += (s, e) => scrollView.KeepContentAlwaysInViewPort = (bool)keepCheckBox.Checked;
         Win.Add (keepCheckBox);
 
-        //var scrollView2 = new ScrollView (new Rect (55, 2, 20, 8)) {
+        //var scrollView2 = new ScrollView (new Rectangle (55, 2, 20, 8)) {
         //	ContentSize = new Size (20, 50),
         //	//ContentOffset = new Point (0, 0),
         //	ShowVerticalScrollIndicator = true,
         //	ShowHorizontalScrollIndicator = true
         //};
-        //var filler = new Filler (new Rect (0, 0, 60, 40));
+        //var filler = new Filler (new Rectangle (0, 0, 60, 40));
         //scrollView2.Add (filler);
         //scrollView2.DrawContent += (s,e) => {
         //	scrollView2.ContentSize = filler.GetContentSize ();
@@ -232,7 +232,7 @@ public class Scrolling : Scenario
         //Win.Add (scrollView2);
 
         //// This is just to debug the visuals of the scrollview when small
-        //var scrollView3 = new ScrollView (new Rect (55, 15, 3, 3)) {
+        //var scrollView3 = new ScrollView (new Rectangle (55, 15, 3, 3)) {
         //	ContentSize = new Size (100, 100),
         //	ShowVerticalScrollIndicator = true,
         //	ShowHorizontalScrollIndicator = true

@@ -254,7 +254,7 @@ public class ConsoleDriverTests
     //";
 
     //					var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-    //					Assert.Equal (new Rect (0, 0, 20, 8), pos);
+    //					Assert.Equal (new Rectangle (0, 0, 20, 8), pos);
 
     //					Assert.True (dlg.ProcessKey (new (Key.Tab)));
     //					dlg.Draw ();
@@ -271,7 +271,7 @@ public class ConsoleDriverTests
     //";
 
     //					pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-    //					Assert.Equal (new Rect (0, 0, 20, 8), pos);
+    //					Assert.Equal (new Rectangle (0, 0, 20, 8), pos);
 
     //					win.RequestStop ();
     //				});

@@ -129,7 +129,7 @@ public partial class View
         }
 
         Rectangle previous = Driver.Clip;
-        Driver.Clip = Rect.Intersect (previous, BoundsToScreen (ContentArea));
+        Driver.Clip = Rectangle.Intersect (previous, BoundsToScreen (ContentArea));
 
         return previous;
     }
@@ -203,7 +203,7 @@ public partial class View
     /// <remarks>
     ///     <para>Will be invoked before any subviews added with <see cref="Add(View)"/> have been drawn.</para>
     ///     <para>
-    ///         Rect provides the view-relative rectangle describing the currently visible viewport into the
+    ///         Rectangle provides the view-relative rectangle describing the currently visible viewport into the
     ///         <see cref="View"/> .
     ///     </para>
     /// </remarks>
@@ -213,7 +213,7 @@ public partial class View
     /// <remarks>
     ///     <para>Will be invoked before any subviews added with <see cref="Add(View)"/> have been drawn.</para>
     ///     <para>
-    ///         Rect provides the view-relative rectangle describing the currently visible viewport into the
+    ///         Rectangle provides the view-relative rectangle describing the currently visible viewport into the
     ///         <see cref="View"/> .
     ///     </para>
     /// </remarks>
@@ -223,7 +223,7 @@ public partial class View
     /// <remarks>
     ///     <para>Will be invoked after any subviews removed with <see cref="Remove(View)"/> have been completed drawing.</para>
     ///     <para>
-    ///         Rect provides the view-relative rectangle describing the currently visible viewport into the
+    ///         Rectangle provides the view-relative rectangle describing the currently visible viewport into the
     ///         <see cref="View"/> .
     ///     </para>
     /// </remarks>
@@ -622,11 +622,11 @@ public partial class View
 
         if (Margin is { })
         {
-            Margin._needsDisplayRect = Rect.Empty;
+            Margin._needsDisplayRect = Rectangle.Empty;
             Margin.SubViewNeedsDisplay = false;
-            Border._needsDisplayRect = Rect.Empty;
+            Border._needsDisplayRect = Rectangle.Empty;
             Border.SubViewNeedsDisplay = false;
-            Padding._needsDisplayRect = Rect.Empty;
+            Padding._needsDisplayRect = Rectangle.Empty;
             Padding.SubViewNeedsDisplay = false;
         }
     }

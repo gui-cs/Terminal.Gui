@@ -790,8 +790,8 @@ This is a test
 └───────────────────────────────────────────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 45, 20), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (0, 0, 45, 20), pos);
 
         textView.WordWrap = true;
         ((FakeDriver)Application.Driver).SetBufferSize (26, 20);
@@ -831,7 +831,7 @@ This is a test
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 26, 20), pos);
+        Assert.Equal (new Rectangle (0, 0, 26, 20), pos);
 
         ((FakeDriver)Application.Driver).SetBufferSize (10, 11);
         Application.Refresh ();
@@ -862,7 +862,7 @@ This is a test
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 10, 11), pos);
+        Assert.Equal (new Rectangle (0, 0, 10, 11), pos);
 
         Assert.False (textView.ReadOnly);
         textView.ReadOnly = true;
@@ -893,7 +893,7 @@ This is a test
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 10, 11), pos);
+        Assert.Equal (new Rectangle (0, 0, 10, 11), pos);
     }
 
     [Fact]
@@ -929,7 +929,7 @@ This is a test
     public void Internal_Tests ()
     {
         Toplevel top = Application.Top;
-        Assert.Equal (new Rect (0, 0, 80, 25), top.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 80, 25), top.Bounds);
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
         var sbv = new ScrollBar { IsVertical = true, OtherScrollBar = new ScrollBar { IsVertical = false } };
         view.Add (sbv);
@@ -1138,18 +1138,18 @@ This is a test
         Assert.False (view2.HasFocus);
         Assert.Equal (12, view.ScrollColsSize);
         Assert.Equal (7, view.ScrollRowsSize);
-        Assert.Equal ("(0,0,8,5)", view.Bounds.ToString ());
-        Assert.Equal ("(0,0,8,5)", view.ContentArea.ToString ());
-        Assert.Equal ("(3,2,9,6)", view.Frame.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Margin.Bounds.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Margin.ContentArea.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Margin.Frame.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Border.Bounds.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Border.ContentArea.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Border.Frame.ToString ());
-        Assert.Equal ("(0,0,8,5)", view.Padding.Bounds.ToString ());
-        Assert.Equal ("(0,0,8,5)", view.Padding.ContentArea.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Padding.Frame.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=8,Height=5}", view.Bounds.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=8,Height=5}", view.ContentArea.ToString ());
+        Assert.Equal ("{X=3,Y=2,Width=9,Height=6}", view.Frame.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Margin.Bounds.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Margin.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Margin.Frame.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Border.Bounds.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Border.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Border.Frame.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=8,Height=5}", view.Padding.Bounds.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=8,Height=5}", view.Padding.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Padding.Frame.ToString ());
         Assert.Equal ("(Left=0,Top=0,Right=1,Bottom=1)", view.Padding.Thickness.ToString ());
         Assert.Equal ("{Width=8, Height=5}", view.TextFormatter.Size.ToString ());
 
@@ -1238,18 +1238,18 @@ This is a test
         Assert.False (view2.HasFocus);
         Assert.Equal (12, view.ScrollColsSize);
         Assert.Equal (7, view.ScrollRowsSize);
-        Assert.Equal ("(0,0,8,5)", view.Bounds.ToString ());
-        Assert.Equal ("(0,0,8,5)", view.ContentArea.ToString ());
-        Assert.Equal ("(2,1,9,6)", view.Frame.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Margin.Bounds.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Margin.ContentArea.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Margin.Frame.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Border.Bounds.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Border.ContentArea.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Border.Frame.ToString ());
-        Assert.Equal ("(0,0,8,5)", view.Padding.Bounds.ToString ());
-        Assert.Equal ("(0,0,8,5)", view.Padding.ContentArea.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Padding.Frame.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=8,Height=5}", view.Bounds.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=8,Height=5}", view.ContentArea.ToString ());
+        Assert.Equal ("{X=2,Y=1,Width=9,Height=6}", view.Frame.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Margin.Bounds.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Margin.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Margin.Frame.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Border.Bounds.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Border.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Border.Frame.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=8,Height=5}", view.Padding.Bounds.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=8,Height=5}", view.Padding.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Padding.Frame.ToString ());
         Assert.Equal ("(Left=0,Top=0,Right=1,Bottom=1)", view.Padding.Thickness.ToString ());
         Assert.Equal ("{Width=8, Height=5}", view.TextFormatter.Size.ToString ());
 
@@ -1336,18 +1336,18 @@ This is a test
         Assert.False (view2.HasFocus);
         Assert.Equal (12, view.ScrollColsSize);
         Assert.Equal (7, view.ScrollRowsSize);
-        Assert.Equal ("(0,0,9,6)", view.Bounds.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.ContentArea.ToString ());
-        Assert.Equal ("(2,1,9,6)", view.Frame.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Margin.Bounds.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Margin.ContentArea.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Margin.Frame.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Border.Bounds.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Border.ContentArea.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Border.Frame.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Padding.Bounds.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Padding.ContentArea.ToString ());
-        Assert.Equal ("(0,0,9,6)", view.Padding.Frame.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Bounds.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.ContentArea.ToString ());
+        Assert.Equal ("{X=2,Y=1,Width=9,Height=6}", view.Frame.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Margin.Bounds.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Margin.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Margin.Frame.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Border.Bounds.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Border.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Border.Frame.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Padding.Bounds.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Padding.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Padding.Frame.ToString ());
         Assert.Equal ("(Left=0,Top=0,Right=0,Bottom=0)", view.Padding.Thickness.ToString ());
         Assert.Equal ("{Width=9, Height=6}", view.TextFormatter.Size.ToString ());
 
