@@ -73,7 +73,7 @@ public partial class View
                     break;
                 case ScrollBarType.Both:
                     view._scrollBar = new ScrollBarView { IsVertical = true };
-                    view._scrollBar.OtherScrollBar = new ScrollBarView { IsVertical = false, OtherScrollBar = view._scrollBar };
+                    view._scrollBar.OtherScrollBarView = new ScrollBarView { IsVertical = false, OtherScrollBarView = view._scrollBar };
 
                     break;
                 case ScrollBarType.None:
@@ -86,9 +86,9 @@ public partial class View
             view.AddEventHandlersForScrollBars (view._scrollBar);
             view.AddKeyBindingsForScrolling (view._scrollBar);
 
-            if (view._scrollBar.OtherScrollBar != null)
+            if (view._scrollBar.OtherScrollBarView != null)
             {
-                view.AddKeyBindingsForScrolling (view._scrollBar.OtherScrollBar);
+                view.AddKeyBindingsForScrolling (view._scrollBar.OtherScrollBarView);
             }
 
             view.SetNeedsDisplay ();
@@ -112,13 +112,13 @@ public partial class View
 
             switch (_scrollBar.IsVertical)
             {
-                case true when _scrollBar.OtherScrollBar is { }:
-                    if (_scrollBar.OtherScrollBar.Size == _scrollColsSize)
+                case true when _scrollBar.OtherScrollBarView is { }:
+                    if (_scrollBar.OtherScrollBarView.Size == _scrollColsSize)
                     {
                         return;
                     }
 
-                    _scrollBar.OtherScrollBar.Size = _scrollColsSize;
+                    _scrollBar.OtherScrollBarView.Size = _scrollColsSize;
 
                     break;
                 case false:
@@ -164,19 +164,19 @@ public partial class View
                 {
                     _scrollBar.Position = _scrollLeftOffset;
                 }
-                else if (_scrollBar is { OtherScrollBar.IsVertical: false } && _scrollBar?.OtherScrollBar.Position != _scrollLeftOffset)
+                else if (_scrollBar is { OtherScrollBarView.IsVertical: false } && _scrollBar?.OtherScrollBarView.Position != _scrollLeftOffset)
                 {
-                    _scrollBar!.OtherScrollBar.Position = _scrollLeftOffset;
+                    _scrollBar!.OtherScrollBarView.Position = _scrollLeftOffset;
                 }
             }
         }
     }
 
-    /// <summary>Represent a vertical or horizontal ScrollBar other than this.</summary>
-    public ScrollBarView ScrollOtherScrollBar
+    /// <summary>Represent a vertical or horizontal ScrollBarView other than this.</summary>
+    public ScrollBarView ScrollOtherScrollBarView
     {
-        get => _scrollBar.OtherScrollBar;
-        set => _scrollBar.OtherScrollBar = value;
+        get => _scrollBar.OtherScrollBarView;
+        set => _scrollBar.OtherScrollBarView = value;
     }
 
     /// <summary>The position, relative to <see cref="Size"/>, to set the scrollbar at.</summary>
@@ -213,13 +213,13 @@ public partial class View
                     _scrollBar.Size = _scrollRowsSize;
 
                     break;
-                case false when _scrollBar.OtherScrollBar is { }:
-                    if (_scrollBar.OtherScrollBar.Size == _scrollRowsSize)
+                case false when _scrollBar.OtherScrollBarView is { }:
+                    if (_scrollBar.OtherScrollBarView.Size == _scrollRowsSize)
                     {
                         return;
                     }
 
-                    _scrollBar.OtherScrollBar.Size = _scrollRowsSize;
+                    _scrollBar.OtherScrollBarView.Size = _scrollRowsSize;
 
                     break;
             }
@@ -257,9 +257,9 @@ public partial class View
                 {
                     _scrollBar.Position = _scrollTopOffset;
                 }
-                else if (_scrollBar is { OtherScrollBar.IsVertical: true } && _scrollBar?.OtherScrollBar.Position != _scrollTopOffset)
+                else if (_scrollBar is { OtherScrollBarView.IsVertical: true } && _scrollBar?.OtherScrollBarView.Position != _scrollTopOffset)
                 {
-                    _scrollBar!.OtherScrollBar.Position = _scrollTopOffset;
+                    _scrollBar!.OtherScrollBarView.Position = _scrollTopOffset;
                 }
             }
         }
@@ -279,9 +279,9 @@ public partial class View
 
         scrollBar.ChangedPosition += ScrollBar_ChangedPosition;
 
-        if (scrollBar.OtherScrollBar != null)
+        if (_scrollBar.OtherScrollBarView != null)
         {
-            scrollBar.OtherScrollBar.ChangedPosition += OtherScrollBar_ChangedPosition;
+            _scrollBar.OtherScrollBarView.ChangedPosition += OtherScrollBarView_ChangedPosition;
         }
     }
 
@@ -301,9 +301,9 @@ public partial class View
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBar is { IsVertical: true })
+                                      if (scrollBar.OtherScrollBarView is { IsVertical: true })
                                       {
-                                          scrollBar.OtherScrollBar.Position++;
+                                          scrollBar.OtherScrollBarView.Position++;
 
                                           return true;
                                       }
@@ -322,9 +322,9 @@ public partial class View
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBar is { IsVertical: true })
+                                      if (scrollBar.OtherScrollBarView is { IsVertical: true })
                                       {
-                                          scrollBar.OtherScrollBar.Position--;
+                                          scrollBar.OtherScrollBarView.Position--;
 
                                           return true;
                                       }
@@ -343,9 +343,9 @@ public partial class View
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBar is { IsVertical: true })
+                                      if (scrollBar.OtherScrollBarView is { IsVertical: true })
                                       {
-                                          scrollBar.OtherScrollBar.Position = 0;
+                                          scrollBar.OtherScrollBarView.Position = 0;
 
                                           return true;
                                       }
@@ -364,9 +364,9 @@ public partial class View
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBar is { IsVertical: true })
+                                      if (scrollBar.OtherScrollBarView is { IsVertical: true })
                                       {
-                                          scrollBar.OtherScrollBar.Position = ScrollRowsSize;
+                                          scrollBar.OtherScrollBarView.Position = ScrollRowsSize;
 
                                           return true;
                                       }
@@ -385,9 +385,9 @@ public partial class View
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBar is { IsVertical: true })
+                                      if (scrollBar.OtherScrollBarView is { IsVertical: true })
                                       {
-                                          scrollBar.OtherScrollBar.Position += ContentArea.Height;
+                                          scrollBar.OtherScrollBarView.Position += ContentArea.Height;
 
                                           return true;
                                       }
@@ -406,9 +406,9 @@ public partial class View
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBar is { IsVertical: true })
+                                      if (scrollBar.OtherScrollBarView is { IsVertical: true })
                                       {
-                                          scrollBar.OtherScrollBar.Position -= ContentArea.Height;
+                                          scrollBar.OtherScrollBarView.Position -= ContentArea.Height;
 
                                           return true;
                                       }
@@ -438,9 +438,9 @@ public partial class View
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBar is { IsVertical: false })
+                                      if (scrollBar.OtherScrollBarView is { IsVertical: false })
                                       {
-                                          scrollBar.OtherScrollBar.Position--;
+                                          scrollBar.OtherScrollBarView.Position--;
 
                                           return true;
                                       }
@@ -459,9 +459,9 @@ public partial class View
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBar is { IsVertical: false })
+                                      if (scrollBar.OtherScrollBarView is { IsVertical: false })
                                       {
-                                          scrollBar.OtherScrollBar.Position++;
+                                          scrollBar.OtherScrollBarView.Position++;
 
                                           return true;
                                       }
@@ -480,9 +480,9 @@ public partial class View
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBar is { IsVertical: false })
+                                      if (scrollBar.OtherScrollBarView is { IsVertical: false })
                                       {
-                                          scrollBar.OtherScrollBar.Position = 0;
+                                          scrollBar.OtherScrollBarView.Position = 0;
 
                                           return true;
                                       }
@@ -501,9 +501,9 @@ public partial class View
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBar is { IsVertical: false })
+                                      if (scrollBar.OtherScrollBarView is { IsVertical: false })
                                       {
-                                          scrollBar.OtherScrollBar.Position = ScrollColsSize;
+                                          scrollBar.OtherScrollBarView.Position = ScrollColsSize;
 
                                           return true;
                                       }
@@ -522,9 +522,9 @@ public partial class View
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBar is { IsVertical: false })
+                                      if (scrollBar.OtherScrollBarView is { IsVertical: false })
                                       {
-                                          scrollBar.OtherScrollBar.Position += ContentArea.Width;
+                                          scrollBar.OtherScrollBarView.Position += ContentArea.Width;
 
                                           return true;
                                       }
@@ -543,9 +543,9 @@ public partial class View
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBar is { IsVertical: false })
+                                      if (scrollBar.OtherScrollBarView is { IsVertical: false })
                                       {
-                                          scrollBar.OtherScrollBar.Position -= ContentArea.Width;
+                                          scrollBar.OtherScrollBarView.Position -= ContentArea.Width;
 
                                           return true;
                                       }
@@ -572,16 +572,16 @@ public partial class View
 
         _scrollBar.ChangedPosition -= ScrollBar_ChangedPosition;
 
-        if (_scrollBar.OtherScrollBar != null)
+        if (_scrollBar.OtherScrollBarView != null)
         {
-            _scrollBar.OtherScrollBar.ChangedPosition -= OtherScrollBar_ChangedPosition;
+            _scrollBar.OtherScrollBarView.ChangedPosition -= OtherScrollBarView_ChangedPosition;
         }
 
         _scrollBar.RemoveAll ();
         _scrollBar = null;
     }
 
-    private void OtherScrollBar_ChangedPosition (object sender, EventArgs e) { SetBoundsByPosition (_scrollBar.OtherScrollBar); }
+    private void OtherScrollBarView_ChangedPosition (object sender, EventArgs e) { SetBoundsByPosition (_scrollBar.OtherScrollBarView); }
 
     private void ScrollBar_ChangedPosition (object sender, EventArgs e) { SetBoundsByPosition (_scrollBar); }
 

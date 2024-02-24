@@ -193,7 +193,7 @@ public class Editor : Scenario
                                          )
                                  }
                                 ),
-                new MenuBarItem ("_ScrollBar", CreateKeepChecked ()),
+                new MenuBarItem ("_ScrollBarView", CreateKeepChecked ()),
                 new MenuBarItem ("_Cursor", CreateCursorRadio ()),
                 new MenuBarItem (
                                  "Forma_t",

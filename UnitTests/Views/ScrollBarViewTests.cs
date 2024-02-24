@@ -15,7 +15,7 @@ public class ScrollBarViewTests
     [ScrollBarAutoInitShutdown]
     public void AutoHideScrollBars_Check ()
     {
-        Hosting_A_View_To_A_ScrollBar ();
+        Hosting_A_View_To_A_ScrollBarView ();
 
         AddHandlers ();
 
@@ -30,16 +30,16 @@ public class ScrollBarViewTests
                       _scrollBar.Height.ToString ()
                      );
         Assert.Equal (24, _scrollBar.Bounds.Height);
-        Assert.True (_scrollBar.OtherScrollBar.ShowScrollIndicator);
-        Assert.True (_scrollBar.OtherScrollBar.Visible);
+        Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+        Assert.True (_scrollBar.OtherScrollBarView.Visible);
 
         Assert.Equal (
                       "Fill(1)",
-                      _scrollBar.OtherScrollBar.Width.ToString ()
+                      _scrollBar.OtherScrollBarView.Width.ToString ()
                      );
-        Assert.Equal (79, _scrollBar.OtherScrollBar.Bounds.Width);
-        Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBar.Height.ToString ());
-        Assert.Equal (1, _scrollBar.OtherScrollBar.Bounds.Height);
+        Assert.Equal (79, _scrollBar.OtherScrollBarView.Bounds.Width);
+        Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
+        Assert.Equal (1, _scrollBar.OtherScrollBarView.Bounds.Height);
 
         _hostView.Lines = 10;
         _hostView.Draw ();
@@ -53,16 +53,16 @@ public class ScrollBarViewTests
                       _scrollBar.Height.ToString ()
                      );
         Assert.Equal (24, _scrollBar.Bounds.Height);
-        Assert.True (_scrollBar.OtherScrollBar.ShowScrollIndicator);
-        Assert.True (_scrollBar.OtherScrollBar.Visible);
+        Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+        Assert.True (_scrollBar.OtherScrollBarView.Visible);
 
         Assert.Equal (
                       "Fill(0)",
-                      _scrollBar.OtherScrollBar.Width.ToString ()
+                      _scrollBar.OtherScrollBarView.Width.ToString ()
                      );
-        Assert.Equal (80, _scrollBar.OtherScrollBar.Bounds.Width);
-        Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBar.Height.ToString ());
-        Assert.Equal (1, _scrollBar.OtherScrollBar.Bounds.Height);
+        Assert.Equal (80, _scrollBar.OtherScrollBarView.Bounds.Width);
+        Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
+        Assert.Equal (1, _scrollBar.OtherScrollBarView.Bounds.Height);
 
         _hostView.Cols = 60;
         _hostView.Draw ();
@@ -76,16 +76,16 @@ public class ScrollBarViewTests
                       _scrollBar.Height.ToString ()
                      );
         Assert.Equal (24, _scrollBar.Bounds.Height);
-        Assert.False (_scrollBar.OtherScrollBar.ShowScrollIndicator);
-        Assert.False (_scrollBar.OtherScrollBar.Visible);
+        Assert.False (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+        Assert.False (_scrollBar.OtherScrollBarView.Visible);
 
         Assert.Equal (
                       "Fill(0)",
-                      _scrollBar.OtherScrollBar.Width.ToString ()
+                      _scrollBar.OtherScrollBarView.Width.ToString ()
                      );
-        Assert.Equal (80, _scrollBar.OtherScrollBar.Bounds.Width);
-        Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBar.Height.ToString ());
-        Assert.Equal (1, _scrollBar.OtherScrollBar.Bounds.Height);
+        Assert.Equal (80, _scrollBar.OtherScrollBarView.Bounds.Width);
+        Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
+        Assert.Equal (1, _scrollBar.OtherScrollBarView.Bounds.Height);
 
         _hostView.Lines = 40;
         _hostView.Draw ();
@@ -99,16 +99,16 @@ public class ScrollBarViewTests
                       _scrollBar.Height.ToString ()
                      );
         Assert.Equal (25, _scrollBar.Bounds.Height);
-        Assert.False (_scrollBar.OtherScrollBar.ShowScrollIndicator);
-        Assert.False (_scrollBar.OtherScrollBar.Visible);
+        Assert.False (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+        Assert.False (_scrollBar.OtherScrollBarView.Visible);
 
         Assert.Equal (
                       "Fill(0)",
-                      _scrollBar.OtherScrollBar.Width.ToString ()
+                      _scrollBar.OtherScrollBarView.Width.ToString ()
                      );
-        Assert.Equal (80, _scrollBar.OtherScrollBar.Bounds.Width);
-        Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBar.Height.ToString ());
-        Assert.Equal (1, _scrollBar.OtherScrollBar.Bounds.Height);
+        Assert.Equal (80, _scrollBar.OtherScrollBarView.Bounds.Width);
+        Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
+        Assert.Equal (1, _scrollBar.OtherScrollBarView.Bounds.Height);
 
         _hostView.Cols = 120;
         _hostView.Draw ();
@@ -122,16 +122,16 @@ public class ScrollBarViewTests
                       _scrollBar.Height.ToString ()
                      );
         Assert.Equal (24, _scrollBar.Bounds.Height);
-        Assert.True (_scrollBar.OtherScrollBar.ShowScrollIndicator);
-        Assert.True (_scrollBar.OtherScrollBar.Visible);
+        Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+        Assert.True (_scrollBar.OtherScrollBarView.Visible);
 
         Assert.Equal (
                       "Fill(1)",
-                      _scrollBar.OtherScrollBar.Width.ToString ()
+                      _scrollBar.OtherScrollBarView.Width.ToString ()
                      );
-        Assert.Equal (79, _scrollBar.OtherScrollBar.Bounds.Width);
-        Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBar.Height.ToString ());
-        Assert.Equal (1, _scrollBar.OtherScrollBar.Bounds.Height);
+        Assert.Equal (79, _scrollBar.OtherScrollBarView.Bounds.Width);
+        Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
+        Assert.Equal (1, _scrollBar.OtherScrollBarView.Bounds.Height);
     }
 
     [Fact]
@@ -161,7 +161,7 @@ public class ScrollBarViewTests
 
             ShowScrollIndicator = true,
             IsVertical = true,
-            OtherScrollBar = horiz
+            OtherScrollBarView = horiz
         };
         super.Add (vert);
 
@@ -216,7 +216,7 @@ public class ScrollBarViewTests
     [ScrollBarAutoInitShutdown]
     public void ChangedPosition_Negative_Value ()
     {
-        Hosting_A_View_To_A_ScrollBar ();
+        Hosting_A_View_To_A_ScrollBarView ();
 
         AddHandlers ();
 
@@ -224,16 +224,16 @@ public class ScrollBarViewTests
         Assert.Equal (0, _scrollBar.Position);
         Assert.Equal (_scrollBar.Position, _hostView.Top);
 
-        _scrollBar.OtherScrollBar.Position = -50;
-        Assert.Equal (0, _scrollBar.OtherScrollBar.Position);
-        Assert.Equal (_scrollBar.OtherScrollBar.Position, _hostView.Left);
+        _scrollBar.OtherScrollBarView.Position = -50;
+        Assert.Equal (0, _scrollBar.OtherScrollBarView.Position);
+        Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
     }
 
     [Fact]
     [ScrollBarAutoInitShutdown]
     public void ChangedPosition_Scrolling ()
     {
-        Hosting_A_View_To_A_ScrollBar ();
+        Hosting_A_View_To_A_ScrollBarView ();
 
         AddHandlers ();
 
@@ -249,16 +249,16 @@ public class ScrollBarViewTests
             Assert.Equal (_scrollBar.Position, _hostView.Top);
         }
 
-        for (var i = 0; i < _scrollBar.OtherScrollBar.Size; i++)
+        for (var i = 0; i < _scrollBar.OtherScrollBarView.Size; i++)
         {
-            _scrollBar.OtherScrollBar.Position += i;
-            Assert.Equal (_scrollBar.OtherScrollBar.Position, _hostView.Left);
+            _scrollBar.OtherScrollBarView.Position += i;
+            Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
         }
 
-        for (int i = _scrollBar.OtherScrollBar.Size - 1; i >= 0; i--)
+        for (int i = _scrollBar.OtherScrollBarView.Size - 1; i >= 0; i--)
         {
-            _scrollBar.OtherScrollBar.Position -= 1;
-            Assert.Equal (_scrollBar.OtherScrollBar.Position, _hostView.Left);
+            _scrollBar.OtherScrollBarView.Position -= 1;
+            Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
         }
     }
 
@@ -266,15 +266,15 @@ public class ScrollBarViewTests
     [ScrollBarAutoInitShutdown]
     public void ChangedPosition_Update_The_Hosted_View ()
     {
-        Hosting_A_View_To_A_ScrollBar ();
+        Hosting_A_View_To_A_ScrollBarView ();
 
         AddHandlers ();
 
         _scrollBar.Position = 2;
         Assert.Equal (_scrollBar.Position, _hostView.Top);
 
-        _scrollBar.OtherScrollBar.Position = 5;
-        Assert.Equal (_scrollBar.OtherScrollBar.Position, _hostView.Left);
+        _scrollBar.OtherScrollBarView.Position = 5;
+        Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
     }
 
     [Fact]
@@ -411,42 +411,42 @@ This is a tes
 
                                                     Assert.True (listView.ScrollKeepContentAlwaysInViewPort);
 
-                                                    var newScrollBar = listView.Padding.Subviews [0] as ScrollBarView;
+                                                    var newScrollBarView = listView.Padding.Subviews [0] as ScrollBarView;
 
-                                                    newScrollBar!.ChangedPosition += (s, e) =>
-                                                                                     {
-                                                                                         listView.LeftItem = newScrollBar.Position;
-
-                                                                                         if (listView.LeftItem != newScrollBar.Position)
+                                                    newScrollBarView!.ChangedPosition += (s, e) =>
                                                                                          {
-                                                                                             newScrollBar.Position = listView.LeftItem;
-                                                                                         }
+                                                                                             listView.LeftItem = newScrollBarView.Position;
 
-                                                                                         Assert.Equal (newScrollBar.Position, listView.LeftItem);
-                                                                                         listView.SetNeedsDisplay ();
-                                                                                     };
+                                                                                             if (listView.LeftItem != newScrollBarView.Position)
+                                                                                             {
+                                                                                                 newScrollBarView.Position = listView.LeftItem;
+                                                                                             }
+
+                                                                                             Assert.Equal (newScrollBarView.Position, listView.LeftItem);
+                                                                                             listView.SetNeedsDisplay ();
+                                                                                         };
 
                                                     listView.DrawContent += (s, e) =>
                                                                             {
-                                                                                newScrollBar.Size = listView.MaxLength;
-                                                                                Assert.Equal (newScrollBar.Size, listView.MaxLength);
-                                                                                newScrollBar.Position = listView.LeftItem;
-                                                                                Assert.Equal (newScrollBar.Position, listView.LeftItem);
-                                                                                newScrollBar.Refresh ();
+                                                                                newScrollBarView.Size = listView.MaxLength;
+                                                                                Assert.Equal (newScrollBarView.Size, listView.MaxLength);
+                                                                                newScrollBarView.Position = listView.LeftItem;
+                                                                                Assert.Equal (newScrollBarView.Position, listView.LeftItem);
+                                                                                newScrollBarView.Refresh ();
                                                                             };
 
                                                     top.Ready += (s, e) =>
                                                                  {
-                                                                     newScrollBar.Position = 100;
+                                                                     newScrollBarView.Position = 100;
 
                                                                      Assert.Equal (
-                                                                                   newScrollBar.Position,
-                                                                                   newScrollBar.Size
+                                                                                   newScrollBarView.Position,
+                                                                                   newScrollBarView.Size
                                                                                    - listView.LeftItem
                                                                                    + (listView.LeftItem - listView.Bounds.Width));
-                                                                     Assert.Equal (newScrollBar.Position, listView.LeftItem);
+                                                                     Assert.Equal (newScrollBarView.Position, listView.LeftItem);
 
-                                                                     Assert.Equal (92, newScrollBar.Position);
+                                                                     Assert.Equal (92, newScrollBarView.Position);
                                                                      Assert.Equal (92, listView.LeftItem);
                                                                      Application.RequestStop ();
                                                                  };
@@ -487,43 +487,43 @@ This is a tes
                                                         Source = new ListWrapper (source)
                                                     };
                                                     win.Add (listView);
-                                                    var newScrollBar = new ScrollBarView { IsVertical = true, KeepContentAlwaysInViewPort = true };
-                                                    listView.Add (newScrollBar);
+                                                    var newScrollBarView = new ScrollBarView { IsVertical = true, KeepContentAlwaysInViewPort = true };
+                                                    listView.Add (newScrollBarView);
 
-                                                    newScrollBar.ChangedPosition += (s, e) =>
-                                                                                    {
-                                                                                        listView.TopItem = newScrollBar.Position;
-
-                                                                                        if (listView.TopItem != newScrollBar.Position)
+                                                    newScrollBarView.ChangedPosition += (s, e) =>
                                                                                         {
-                                                                                            newScrollBar.Position = listView.TopItem;
-                                                                                        }
+                                                                                            listView.TopItem = newScrollBarView.Position;
 
-                                                                                        Assert.Equal (newScrollBar.Position, listView.TopItem);
-                                                                                        listView.SetNeedsDisplay ();
-                                                                                    };
+                                                                                            if (listView.TopItem != newScrollBarView.Position)
+                                                                                            {
+                                                                                                newScrollBarView.Position = listView.TopItem;
+                                                                                            }
+
+                                                                                            Assert.Equal (newScrollBarView.Position, listView.TopItem);
+                                                                                            listView.SetNeedsDisplay ();
+                                                                                        };
 
                                                     listView.DrawContent += (s, e) =>
                                                                             {
-                                                                                newScrollBar.Size = listView.Source.Count;
-                                                                                Assert.Equal (newScrollBar.Size, listView.Source.Count);
-                                                                                newScrollBar.Position = listView.TopItem;
-                                                                                Assert.Equal (newScrollBar.Position, listView.TopItem);
-                                                                                newScrollBar.Refresh ();
+                                                                                newScrollBarView.Size = listView.Source.Count;
+                                                                                Assert.Equal (newScrollBarView.Size, listView.Source.Count);
+                                                                                newScrollBarView.Position = listView.TopItem;
+                                                                                Assert.Equal (newScrollBarView.Position, listView.TopItem);
+                                                                                newScrollBarView.Refresh ();
                                                                             };
 
                                                     top.Ready += (s, e) =>
                                                                  {
-                                                                     newScrollBar.Position = 45;
+                                                                     newScrollBarView.Position = 45;
 
                                                                      Assert.Equal (
-                                                                                   newScrollBar.Position,
-                                                                                   newScrollBar.Size
+                                                                                   newScrollBarView.Position,
+                                                                                   newScrollBarView.Size
                                                                                    - listView.TopItem
                                                                                    + (listView.TopItem - listView.Bounds.Height)
                                                                                   );
-                                                                     Assert.Equal (newScrollBar.Position, listView.TopItem);
-                                                                     Assert.Equal (27, newScrollBar.Position);
+                                                                     Assert.Equal (newScrollBarView.Position, listView.TopItem);
+                                                                     Assert.Equal (27, newScrollBarView.Position);
                                                                      Assert.Equal (27, listView.TopItem);
                                                                      Application.RequestStop ();
                                                                  };
@@ -544,17 +544,17 @@ This is a tes
             "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
         var label = new Label { Text = text };
         var sbv = new ScrollBarView { X = Pos.AnchorEnd (1), IsVertical = true, Size = 100 };
-        sbv.OtherScrollBar = new ScrollBarView { Y = Pos.AnchorEnd (1), IsVertical = false, Size = 100, OtherScrollBar = sbv };
-        label.Add (sbv, sbv.OtherScrollBar);
+        sbv.OtherScrollBarView = new ScrollBarView { Y = Pos.AnchorEnd (1), IsVertical = false, Size = 100, OtherScrollBarView = sbv };
+        label.Add (sbv, sbv.OtherScrollBarView);
         Application.Top.Add (label);
         Application.Begin (Application.Top);
 
         Assert.Equal (100, sbv.Size);
-        Assert.Equal (100, sbv.OtherScrollBar.Size);
+        Assert.Equal (100, sbv.OtherScrollBarView.Size);
         Assert.True (sbv.ShowScrollIndicator);
-        Assert.True (sbv.OtherScrollBar.ShowScrollIndicator);
+        Assert.True (sbv.OtherScrollBarView.ShowScrollIndicator);
         Assert.True (sbv.Visible);
-        Assert.True (sbv.OtherScrollBar.Visible);
+        Assert.True (sbv.OtherScrollBarView.Visible);
 
         View contentBottomRightCorner =
             label.Subviews.First (v => v is ScrollBarView.ContentBottomRightCorner);
@@ -574,13 +574,13 @@ This is a tes▼
                                                      );
 
         sbv.Size = 0;
-        sbv.OtherScrollBar.Size = 0;
+        sbv.OtherScrollBarView.Size = 0;
         Assert.Equal (0, sbv.Size);
-        Assert.Equal (0, sbv.OtherScrollBar.Size);
+        Assert.Equal (0, sbv.OtherScrollBarView.Size);
         Assert.False (sbv.ShowScrollIndicator);
-        Assert.False (sbv.OtherScrollBar.ShowScrollIndicator);
+        Assert.False (sbv.OtherScrollBarView.ShowScrollIndicator);
         Assert.False (sbv.Visible);
-        Assert.False (sbv.OtherScrollBar.Visible);
+        Assert.False (sbv.OtherScrollBarView.Visible);
         Application.Top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -596,13 +596,13 @@ This is a test
                                                      );
 
         sbv.Size = 50;
-        sbv.OtherScrollBar.Size = 50;
+        sbv.OtherScrollBarView.Size = 50;
         Assert.Equal (50, sbv.Size);
-        Assert.Equal (50, sbv.OtherScrollBar.Size);
+        Assert.Equal (50, sbv.OtherScrollBarView.Size);
         Assert.True (sbv.ShowScrollIndicator);
-        Assert.True (sbv.OtherScrollBar.ShowScrollIndicator);
+        Assert.True (sbv.OtherScrollBarView.ShowScrollIndicator);
         Assert.True (sbv.Visible);
-        Assert.True (sbv.OtherScrollBar.Visible);
+        Assert.True (sbv.OtherScrollBarView.Visible);
         Application.Top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -632,7 +632,7 @@ This is a tes▼
         Application.Begin (Application.Top);
 
         Assert.Equal (100, sbv.Size);
-        Assert.Null (sbv.OtherScrollBar);
+        Assert.Null (sbv.OtherScrollBarView);
         Assert.True (sbv.ShowScrollIndicator);
         Assert.True (sbv.Visible);
 
@@ -669,9 +669,9 @@ This is a test
 
     [Fact]
     [ScrollBarAutoInitShutdown]
-    public void DrawContent_Update_The_ScrollBar_Position ()
+    public void DrawContent_Update_The_ScrollBarView_Position ()
     {
-        Hosting_A_View_To_A_ScrollBar ();
+        Hosting_A_View_To_A_ScrollBarView ();
 
         AddHandlers ();
 
@@ -681,7 +681,7 @@ This is a test
 
         _hostView.Left = 6;
         _hostView.Draw ();
-        Assert.Equal (_scrollBar.OtherScrollBar.Position, _hostView.Left);
+        Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
     }
 
     [Fact]
@@ -708,22 +708,22 @@ This is a test
 
     [Fact]
     [ScrollBarAutoInitShutdown]
-    public void Hosting_A_View_To_A_ScrollBar ()
+    public void Hosting_A_View_To_A_ScrollBarView ()
     {
         RemoveHandlers ();
 
-        _scrollBar = new ScrollBarView { IsVertical = true, OtherScrollBar = new ScrollBarView { IsVertical = false } };
+        _scrollBar = new ScrollBarView { IsVertical = true, OtherScrollBarView = new ScrollBarView { IsVertical = false } };
         _hostView.Add (_scrollBar);
 
         Application.Begin (Application.Top);
 
         Assert.True (_scrollBar.IsVertical);
-        Assert.False (_scrollBar.OtherScrollBar.IsVertical);
+        Assert.False (_scrollBar.OtherScrollBarView.IsVertical);
 
         Assert.Equal (_scrollBar.Position, _hostView.Top);
         Assert.NotEqual (_scrollBar.Size, _hostView.Lines);
-        Assert.Equal (_scrollBar.OtherScrollBar.Position, _hostView.Left);
-        Assert.NotEqual (_scrollBar.OtherScrollBar.Size, _hostView.Cols);
+        Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
+        Assert.NotEqual (_scrollBar.OtherScrollBarView.Size, _hostView.Cols);
 
         AddHandlers ();
         _hostView.SuperView.LayoutSubviews ();
@@ -731,8 +731,8 @@ This is a test
 
         Assert.Equal (_scrollBar.Position, _hostView.Top);
         Assert.Equal (_scrollBar.Size, _hostView.Lines);
-        Assert.Equal (_scrollBar.OtherScrollBar.Position, _hostView.Left);
-        Assert.Equal (_scrollBar.OtherScrollBar.Size, _hostView.Cols);
+        Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
+        Assert.Equal (_scrollBar.OtherScrollBarView.Size, _hostView.Cols);
     }
 
     [Fact]
@@ -758,14 +758,14 @@ This is a test
         var scrollBar = textView.Padding.Subviews [0] as ScrollBarView;
         Assert.True (scrollBar.AutoHideScrollBars);
         Assert.False (scrollBar.ShowScrollIndicator);
-        Assert.False (scrollBar.OtherScrollBar.ShowScrollIndicator);
+        Assert.False (scrollBar.OtherScrollBarView.ShowScrollIndicator);
         Assert.Equal (5, textView.Lines);
 
         // The length is one more for the cursor on the last column of the line
         Assert.Equal (43, textView.Maxlength);
         Assert.Equal (0, textView.LeftColumn);
         Assert.Equal (0, scrollBar.Position);
-        Assert.Equal (0, scrollBar.OtherScrollBar.Position);
+        Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
 
         var expected = @"
 ┌───────────────────────────────────────────┐
@@ -805,7 +805,7 @@ This is a test
         Assert.Equal (23, textView.Maxlength);
         Assert.Equal (0, textView.LeftColumn);
         Assert.Equal (0, scrollBar.Position);
-        Assert.Equal (0, scrollBar.OtherScrollBar.Position);
+        Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
 
         expected = @"
 ┌────────────────────────┐
@@ -844,7 +844,7 @@ This is a test
         Assert.Equal (7, textView.Maxlength);
         Assert.Equal (0, textView.LeftColumn);
         Assert.Equal (0, scrollBar.Position);
-        Assert.Equal (0, scrollBar.OtherScrollBar.Position);
+        Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
         Assert.True (scrollBar.ShowScrollIndicator);
 
         expected = @"
@@ -875,7 +875,7 @@ This is a test
         Assert.Equal (7, textView.Maxlength);
         Assert.Equal (0, textView.LeftColumn);
         Assert.Equal (0, scrollBar.Position);
-        Assert.Equal (0, scrollBar.OtherScrollBar.Position);
+        Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
         Assert.True (scrollBar.ShowScrollIndicator);
 
         expected = @"
@@ -898,7 +898,7 @@ This is a test
 
     [Fact]
     [ScrollBarAutoInitShutdown]
-    public void Hosting_Two_Horizontal_ScrollBar_Throws_ArgumentException ()
+    public void Hosting_Two_Horizontal_ScrollBarView_Throws_ArgumentException ()
     {
         var top = new Toplevel ();
         var host = new View ();
@@ -906,13 +906,13 @@ This is a test
         var v = new ScrollBarView { IsVertical = false };
         var h = new ScrollBarView { IsVertical = false };
 
-        Assert.Throws<ArgumentException> (() => v.OtherScrollBar = h);
-        Assert.Throws<ArgumentException> (() => h.OtherScrollBar = v);
+        Assert.Throws<ArgumentException> (() => v.OtherScrollBarView = h);
+        Assert.Throws<ArgumentException> (() => h.OtherScrollBarView = v);
     }
 
     [Fact]
     [ScrollBarAutoInitShutdown]
-    public void Hosting_Two_Vertical_ScrollBar_Throws_ArgumentException ()
+    public void Hosting_Two_Vertical_ScrollBarView_Throws_ArgumentException ()
     {
         var top = new Toplevel ();
         var host = new View ();
@@ -920,8 +920,8 @@ This is a test
         var v = new ScrollBarView { IsVertical = true };
         var h = new ScrollBarView { IsVertical = true };
 
-        Assert.Throws<ArgumentException> (() => v.OtherScrollBar = h);
-        Assert.Throws<ArgumentException> (() => h.OtherScrollBar = v);
+        Assert.Throws<ArgumentException> (() => v.OtherScrollBarView = h);
+        Assert.Throws<ArgumentException> (() => h.OtherScrollBarView = v);
     }
 
     [Fact]
@@ -931,56 +931,56 @@ This is a test
         Toplevel top = Application.Top;
         Assert.Equal (new Rectangle (0, 0, 80, 25), top.Bounds);
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
-        var sbv = new ScrollBarView { IsVertical = true, OtherScrollBar = new ScrollBarView { IsVertical = false } };
+        var sbv = new ScrollBarView { IsVertical = true, OtherScrollBarView = new ScrollBarView { IsVertical = false } };
         view.Add (sbv);
         top.Add (view);
         Assert.Equal (view, sbv.SuperView);
         sbv.Size = 40;
         sbv.Position = 0;
-        sbv.OtherScrollBar.Size = 100;
-        sbv.OtherScrollBar.Position = 0;
+        sbv.OtherScrollBarView.Size = 100;
+        sbv.OtherScrollBarView.Position = 0;
 
         // Host bounds is not empty.
         Assert.True (sbv.CanScroll (10, out int max, sbv.IsVertical));
         Assert.Equal (10, max);
-        Assert.True (sbv.OtherScrollBar.CanScroll (10, out max, sbv.OtherScrollBar.IsVertical));
+        Assert.True (sbv.OtherScrollBarView.CanScroll (10, out max, sbv.OtherScrollBarView.IsVertical));
         Assert.Equal (10, max);
 
         Application.Begin (top);
 
         // They are visible so they are drawn.
         Assert.True (sbv.Visible);
-        Assert.True (sbv.OtherScrollBar.Visible);
+        Assert.True (sbv.OtherScrollBarView.Visible);
         top.LayoutSubviews ();
 
         // Now the host bounds is not empty.
         Assert.True (sbv.CanScroll (10, out max, sbv.IsVertical));
         Assert.Equal (10, max);
-        Assert.True (sbv.OtherScrollBar.CanScroll (10, out max, sbv.OtherScrollBar.IsVertical));
+        Assert.True (sbv.OtherScrollBarView.CanScroll (10, out max, sbv.OtherScrollBarView.IsVertical));
         Assert.Equal (10, max);
         Assert.True (sbv.CanScroll (50, out max, sbv.IsVertical));
         Assert.Equal (40, sbv.Size);
         Assert.Equal (16, max); // 16+25=41
-        Assert.True (sbv.OtherScrollBar.CanScroll (150, out max, sbv.OtherScrollBar.IsVertical));
-        Assert.Equal (100, sbv.OtherScrollBar.Size);
+        Assert.True (sbv.OtherScrollBarView.CanScroll (150, out max, sbv.OtherScrollBarView.IsVertical));
+        Assert.Equal (100, sbv.OtherScrollBarView.Size);
         Assert.Equal (21, max); // 21+80=101
         Assert.True (sbv.Visible);
-        Assert.True (sbv.OtherScrollBar.Visible);
+        Assert.True (sbv.OtherScrollBarView.Visible);
         sbv.KeepContentAlwaysInViewPort = false;
-        sbv.OtherScrollBar.KeepContentAlwaysInViewPort = false;
+        sbv.OtherScrollBarView.KeepContentAlwaysInViewPort = false;
         Assert.True (sbv.CanScroll (50, out max, sbv.IsVertical));
         Assert.Equal (39, max); // Keep 1 row visible
-        Assert.True (sbv.OtherScrollBar.CanScroll (150, out max, sbv.OtherScrollBar.IsVertical));
+        Assert.True (sbv.OtherScrollBarView.CanScroll (150, out max, sbv.OtherScrollBarView.IsVertical));
         Assert.Equal (99, max); // Keep 1 column visible
         Assert.True (sbv.Visible);
-        Assert.True (sbv.OtherScrollBar.Visible);
+        Assert.True (sbv.OtherScrollBarView.Visible);
     }
 
     [Fact]
     [ScrollBarAutoInitShutdown]
     public void KeepContentAlwaysInViewport_False ()
     {
-        Hosting_A_View_To_A_ScrollBar ();
+        Hosting_A_View_To_A_ScrollBarView ();
 
         AddHandlers ();
 
@@ -991,10 +991,10 @@ This is a test
         Assert.Equal (29, _scrollBar.Position);
         Assert.Equal (29, _hostView.Top);
 
-        _scrollBar.OtherScrollBar.Position = 150;
-        Assert.Equal (_scrollBar.OtherScrollBar.Position, _scrollBar.OtherScrollBar.Size - 1);
-        Assert.Equal (_scrollBar.OtherScrollBar.Position, _hostView.Left);
-        Assert.Equal (99, _scrollBar.OtherScrollBar.Position);
+        _scrollBar.OtherScrollBarView.Position = 150;
+        Assert.Equal (_scrollBar.OtherScrollBarView.Position, _scrollBar.OtherScrollBarView.Size - 1);
+        Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
+        Assert.Equal (99, _scrollBar.OtherScrollBarView.Position);
         Assert.Equal (99, _hostView.Left);
     }
 
@@ -1002,20 +1002,20 @@ This is a test
     [ScrollBarAutoInitShutdown]
     public void KeepContentAlwaysInViewport_True ()
     {
-        Hosting_A_View_To_A_ScrollBar ();
+        Hosting_A_View_To_A_ScrollBarView ();
 
         AddHandlers ();
 
         Assert.Equal (80, _hostView.Bounds.Width);
         Assert.Equal (25, _hostView.Bounds.Height);
-        Assert.Equal (79, _scrollBar.OtherScrollBar.Bounds.Width);
+        Assert.Equal (79, _scrollBar.OtherScrollBarView.Bounds.Width);
         Assert.Equal (24, _scrollBar.Bounds.Height);
         Assert.Equal (30, _scrollBar.Size);
-        Assert.Equal (100, _scrollBar.OtherScrollBar.Size);
+        Assert.Equal (100, _scrollBar.OtherScrollBarView.Size);
         Assert.True (_scrollBar.ShowScrollIndicator);
-        Assert.True (_scrollBar.OtherScrollBar.ShowScrollIndicator);
+        Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
         Assert.True (_scrollBar.Visible);
-        Assert.True (_scrollBar.OtherScrollBar.Visible);
+        Assert.True (_scrollBar.OtherScrollBarView.Visible);
 
         _scrollBar.Position = 50;
         Assert.Equal (_scrollBar.Position, _scrollBar.Size - _scrollBar.Bounds.Height);
@@ -1023,36 +1023,36 @@ This is a test
         Assert.Equal (6, _scrollBar.Position);
         Assert.Equal (6, _hostView.Top);
         Assert.True (_scrollBar.ShowScrollIndicator);
-        Assert.True (_scrollBar.OtherScrollBar.ShowScrollIndicator);
+        Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
         Assert.True (_scrollBar.Visible);
-        Assert.True (_scrollBar.OtherScrollBar.Visible);
+        Assert.True (_scrollBar.OtherScrollBarView.Visible);
 
-        _scrollBar.OtherScrollBar.Position = 150;
+        _scrollBar.OtherScrollBarView.Position = 150;
 
         Assert.Equal (
-                      _scrollBar.OtherScrollBar.Position,
-                      _scrollBar.OtherScrollBar.Size - _scrollBar.OtherScrollBar.Bounds.Width
+                      _scrollBar.OtherScrollBarView.Position,
+                      _scrollBar.OtherScrollBarView.Size - _scrollBar.OtherScrollBarView.Bounds.Width
                      );
-        Assert.Equal (_scrollBar.OtherScrollBar.Position, _hostView.Left);
-        Assert.Equal (21, _scrollBar.OtherScrollBar.Position);
+        Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
+        Assert.Equal (21, _scrollBar.OtherScrollBarView.Position);
         Assert.Equal (21, _hostView.Left);
         Assert.True (_scrollBar.ShowScrollIndicator);
-        Assert.True (_scrollBar.OtherScrollBar.ShowScrollIndicator);
+        Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
         Assert.True (_scrollBar.Visible);
-        Assert.True (_scrollBar.OtherScrollBar.Visible);
+        Assert.True (_scrollBar.OtherScrollBarView.Visible);
     }
 
     [Fact]
     [ScrollBarAutoInitShutdown]
-    public void OtherScrollBar_Not_Null ()
+    public void OtherScrollBarView_Not_Null ()
     {
-        Hosting_A_View_To_A_ScrollBar ();
+        Hosting_A_View_To_A_ScrollBarView ();
 
         AddHandlers ();
 
-        Assert.NotNull (_scrollBar.OtherScrollBar);
-        Assert.NotEqual (_scrollBar, _scrollBar.OtherScrollBar);
-        Assert.Equal (_scrollBar.OtherScrollBar.OtherScrollBar, _scrollBar);
+        Assert.NotNull (_scrollBar.OtherScrollBarView);
+        Assert.NotEqual (_scrollBar, _scrollBar.OtherScrollBarView);
+        Assert.Equal (_scrollBar.OtherScrollBarView.OtherScrollBarView, _scrollBar);
     }
 
     [Fact]
@@ -1486,12 +1486,12 @@ This is a test
     [ScrollBarAutoInitShutdown]
     public void ShowScrollIndicator_Check ()
     {
-        Hosting_A_View_To_A_ScrollBar ();
+        Hosting_A_View_To_A_ScrollBarView ();
 
         AddHandlers ();
 
         Assert.True (_scrollBar.ShowScrollIndicator);
-        Assert.True (_scrollBar.OtherScrollBar.ShowScrollIndicator);
+        Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
     }
 
     [Fact]
@@ -1510,7 +1510,7 @@ This is a test
         Application.Begin (Application.Top);
 
         Assert.Equal (5, sbv.Size);
-        Assert.Null (sbv.OtherScrollBar);
+        Assert.Null (sbv.OtherScrollBarView);
         Assert.False (sbv.ShowScrollIndicator);
         Assert.False (sbv.Visible);
 
@@ -1679,8 +1679,8 @@ This is a tes▼             ",
     {
         _scrollBar.Size = _hostView.Lines;
         _scrollBar.Position = _hostView.Top;
-        _scrollBar.OtherScrollBar.Size = _hostView.Cols;
-        _scrollBar.OtherScrollBar.Position = _hostView.Left;
+        _scrollBar.OtherScrollBarView.Size = _hostView.Cols;
+        _scrollBar.OtherScrollBarView.Position = _hostView.Left;
         _scrollBar.Refresh ();
     }
 
@@ -1696,13 +1696,13 @@ This is a tes▼             ",
         _hostView.SetNeedsDisplay ();
     }
 
-    private void _scrollBar_OtherScrollBar_ChangedPosition (object sender, EventArgs e)
+    private void _scrollBar_OtherScrollBarView_ChangedPosition (object sender, EventArgs e)
     {
-        _hostView.Left = _scrollBar.OtherScrollBar.Position;
+        _hostView.Left = _scrollBar.OtherScrollBarView.Position;
 
-        if (_hostView.Left != _scrollBar.OtherScrollBar.Position)
+        if (_hostView.Left != _scrollBar.OtherScrollBarView.Position)
         {
-            _scrollBar.OtherScrollBar.Position = _hostView.Left;
+            _scrollBar.OtherScrollBarView.Position = _hostView.Left;
         }
 
         _hostView.SetNeedsDisplay ();
@@ -1714,7 +1714,7 @@ This is a tes▼             ",
         {
             _hostView.DrawContent += _hostView_DrawContent;
             _scrollBar.ChangedPosition += _scrollBar_ChangedPosition;
-            _scrollBar.OtherScrollBar.ChangedPosition += _scrollBar_OtherScrollBar_ChangedPosition;
+            _scrollBar.OtherScrollBarView.ChangedPosition += _scrollBar_OtherScrollBarView_ChangedPosition;
         }
 
         _added = true;
@@ -1726,7 +1726,7 @@ This is a tes▼             ",
         {
             _hostView.DrawContent -= _hostView_DrawContent;
             _scrollBar.ChangedPosition -= _scrollBar_ChangedPosition;
-            _scrollBar.OtherScrollBar.ChangedPosition -= _scrollBar_OtherScrollBar_ChangedPosition;
+            _scrollBar.OtherScrollBarView.ChangedPosition -= _scrollBar_OtherScrollBarView_ChangedPosition;
         }
 
         _added = false;

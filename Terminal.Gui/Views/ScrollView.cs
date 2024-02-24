@@ -60,11 +60,11 @@ public class ScrollView : View
             Size = 1,
             IsVertical = false
         };
-        _vertical.OtherScrollBar = _horizontal;
-        _horizontal.OtherScrollBar = _vertical;
+        _vertical.OtherScrollBarView = _horizontal;
+        _horizontal.OtherScrollBarView = _vertical;
 
         // The _horizontal will be automatically added
-        // through the OtherScrollBar property
+        // through the OtherScrollBarView property
         base.Add (_vertical);
 
         CanFocus = true;
@@ -220,7 +220,7 @@ public class ScrollView : View
 
                 if (value)
                 {
-                    _horizontal.OtherScrollBar = _vertical;
+                    _horizontal.OtherScrollBarView = _vertical;
 
                     if (!Subviews.Contains (_horizontal))
                     {
@@ -229,7 +229,7 @@ public class ScrollView : View
 
                     _horizontal.ShowScrollIndicator = true;
                     _horizontal.AutoHideScrollBars = AutoHideScrollBars;
-                    _horizontal.OtherScrollBar.ShowScrollIndicator = true;
+                    _horizontal.OtherScrollBarView.ShowScrollIndicator = true;
                     _horizontal.MouseEnter += View_MouseEnter;
                     _horizontal.MouseLeave += View_MouseLeave;
                 }
@@ -258,7 +258,7 @@ public class ScrollView : View
 
                 if (value)
                 {
-                    _vertical.OtherScrollBar = _horizontal;
+                    _vertical.OtherScrollBarView = _horizontal;
 
                     if (!Subviews.Contains (_vertical))
                     {
@@ -267,7 +267,7 @@ public class ScrollView : View
 
                     _vertical.ShowScrollIndicator = true;
                     _vertical.AutoHideScrollBars = AutoHideScrollBars;
-                    _vertical.OtherScrollBar.ShowScrollIndicator = true;
+                    _vertical.OtherScrollBarView.ShowScrollIndicator = true;
                     _vertical.MouseEnter += View_MouseEnter;
                     _vertical.MouseLeave += View_MouseLeave;
                 }
