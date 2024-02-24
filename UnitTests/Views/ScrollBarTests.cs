@@ -414,17 +414,17 @@ This is a tes
                                                     var newScrollBar = listView.Padding.Subviews [0] as ScrollBar;
 
                                                     newScrollBar!.ChangedPosition += (s, e) =>
+                                                                                     {
+                                                                                         listView.LeftItem = newScrollBar.Position;
+
+                                                                                         if (listView.LeftItem != newScrollBar.Position)
                                                                                          {
-                                                                                             listView.LeftItem = newScrollBar.Position;
+                                                                                             newScrollBar.Position = listView.LeftItem;
+                                                                                         }
 
-                                                                                             if (listView.LeftItem != newScrollBar.Position)
-                                                                                             {
-                                                                                                 newScrollBar.Position = listView.LeftItem;
-                                                                                             }
-
-                                                                                             Assert.Equal (newScrollBar.Position, listView.LeftItem);
-                                                                                             listView.SetNeedsDisplay ();
-                                                                                         };
+                                                                                         Assert.Equal (newScrollBar.Position, listView.LeftItem);
+                                                                                         listView.SetNeedsDisplay ();
+                                                                                     };
 
                                                     listView.DrawContent += (s, e) =>
                                                                             {
@@ -491,17 +491,17 @@ This is a tes
                                                     listView.Add (newScrollBar);
 
                                                     newScrollBar.ChangedPosition += (s, e) =>
+                                                                                    {
+                                                                                        listView.TopItem = newScrollBar.Position;
+
+                                                                                        if (listView.TopItem != newScrollBar.Position)
                                                                                         {
-                                                                                            listView.TopItem = newScrollBar.Position;
+                                                                                            newScrollBar.Position = listView.TopItem;
+                                                                                        }
 
-                                                                                            if (listView.TopItem != newScrollBar.Position)
-                                                                                            {
-                                                                                                newScrollBar.Position = listView.TopItem;
-                                                                                            }
-
-                                                                                            Assert.Equal (newScrollBar.Position, listView.TopItem);
-                                                                                            listView.SetNeedsDisplay ();
-                                                                                        };
+                                                                                        Assert.Equal (newScrollBar.Position, listView.TopItem);
+                                                                                        listView.SetNeedsDisplay ();
+                                                                                    };
 
                                                     listView.DrawContent += (s, e) =>
                                                                             {
@@ -1097,7 +1097,7 @@ This is a test
 
     [Fact]
     [SetupFakeDriver]
-    public void ScrollBarType_IsBuiltIn_In_Padding_Thickness ()
+    public void ScrollBarType_IsBuiltIn_UseNegativeBoundsLocation_In_Padding_Thickness ()
     {
         ((FakeDriver)Application.Driver).SetBufferSize (15, 11);
 
@@ -1106,7 +1106,8 @@ This is a test
         var view = new View
         {
             X = Pos.Center (), Y = Pos.Center (), Width = 9, Height = 6,
-            Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line", CanFocus = true
+            Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line", CanFocus = true,
+            UseNegativeBoundsLocation = true
         };
         view.Padding.ScrollBarType = ScrollBarType.Both;
         view.TextFormatter.WordWrap = false;
@@ -1189,11 +1190,27 @@ This is a test
 000000000000000",
                                                null,
                                                attrs);
+
+        Assert.True (view.Padding.OnInvokingKeyBindings (new Key (KeyCode.End)));
+        Assert.True (view.Padding.OnInvokingKeyBindings (new Key (KeyCode.End | KeyCode.ShiftMask)));
+        top.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+   d Line  ▲
+   th Line ┬
+   h Line  │
+   h Line  ┴
+   nth Line▼
+   ◄░░├──┤► 
+            
+     Test   ",
+                                                      _output);
     }
 
     [Fact]
     [SetupFakeDriver]
-    public void ScrollBarType_IsBuiltIn_In_Padding_Thickness_Inside_Another_Container ()
+    public void ScrollBarType_IsBuiltIn_UseNegativeBoundsLocation_In_Padding_Thickness_Inside_Another_Container ()
     {
         ((FakeDriver)Application.Driver).SetBufferSize (15, 11);
 
@@ -1202,7 +1219,8 @@ This is a test
         var view = new View
         {
             X = Pos.Center (), Y = Pos.Center (), Width = 9, Height = 6,
-            Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line", CanFocus = true
+            Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line", CanFocus = true,
+            UseNegativeBoundsLocation = true
         };
         view.Padding.ScrollBarType = ScrollBarType.Both;
         view.TextFormatter.WordWrap = false;
@@ -1292,11 +1310,30 @@ This is a test
 000000000000000",
                                                null,
                                                attrs);
+
+        Assert.True (view.Padding.OnInvokingKeyBindings (new Key (KeyCode.End)));
+        Assert.True (view.Padding.OnInvokingKeyBindings (new Key (KeyCode.End | KeyCode.ShiftMask)));
+        top.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌─────────────┐
+│             │
+│  d Line  ▲  │
+│  th Line ┬  │
+│  h Line  │  │
+│  h Line  ┴  │
+│  nth Line▼  │
+│  ◄░░├──┤►   │
+│             │
+│    Test     │
+└─────────────┘",
+                                                      _output);
     }
 
-        [Fact]
+    [Fact]
     [SetupFakeDriver]
-    public void ScrollBarType_IsBuiltIn_In_Parent_Inside_Another_Container ()
+    public void ScrollBarType_IsBuiltIn_UseNegativeBoundsLocation_In_Parent_Inside_Another_Container ()
     {
         ((FakeDriver)Application.Driver).SetBufferSize (15, 11);
 
@@ -1306,7 +1343,8 @@ This is a test
         {
             X = Pos.Center (), Y = Pos.Center (), Width = 9, Height = 6,
             Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line", CanFocus = true,
-            ScrollBarType = ScrollBarType.Both
+            ScrollBarType = ScrollBarType.Both,
+            UseNegativeBoundsLocation = true
         };
         view.TextFormatter.WordWrap = false;
         view.TextFormatter.MultiLine = true;
@@ -1388,6 +1426,25 @@ This is a test
 000000000000000",
                                                null,
                                                attrs);
+
+        Assert.True (view.OnInvokingKeyBindings (Key.End));
+        Assert.True (view.OnInvokingKeyBindings (Key.End.WithShift));
+        top.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌─────────────┐
+│             │
+│  d Line  ▲  │
+│  th Line ┬  │
+│  h Line  │  │
+│  h Line  ┴  │
+│  nth Line▼  │
+│  ◄░░├──┤►   │
+│             │
+│    Test     │
+└─────────────┘",
+                                                      _output);
     }
 
     [Fact]

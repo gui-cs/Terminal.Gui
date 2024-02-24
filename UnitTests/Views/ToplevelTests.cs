@@ -1504,7 +1504,7 @@ public class ToplevelTests
                                                            new MouseEvent { X = 5, Y = 5, Flags = MouseFlags.Button1Released }
                                                           )
                                  );
-        Assert.Null (Application.MouseGrabView);
+        Assert.Equal (scrollView, Application.MouseGrabView);
 
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (
@@ -1807,40 +1807,40 @@ public class ToplevelTests
         testWindow.Add (btnPopup);
 
         btnPopup.Accept += (s, e) =>
-                            {
-                                Rectangle viewToScreen = btnPopup.BoundsToScreen (top.Frame);
+                           {
+                               Rectangle viewToScreen = btnPopup.BoundsToScreen (top.Frame);
 
-                                var viewAddedToTop = new View
-                                {
-                                    Text = "viewAddedToTop",
-                                    X = 1,
-                                    Y = viewToScreen.Y + 1,
-                                    Width = 18,
-                                    Height = 16,
-                                    BorderStyle = LineStyle.Single
-                                };
-                                Assert.Equal (testWindow, Application.Current);
-                                Application.Current.DrawContentComplete += testWindow_DrawContentComplete;
-                                top.Add (viewAddedToTop);
+                               var viewAddedToTop = new View
+                               {
+                                   Text = "viewAddedToTop",
+                                   X = 1,
+                                   Y = viewToScreen.Y + 1,
+                                   Width = 18,
+                                   Height = 16,
+                                   BorderStyle = LineStyle.Single
+                               };
+                               Assert.Equal (testWindow, Application.Current);
+                               Application.Current.DrawContentComplete += testWindow_DrawContentComplete;
+                               top.Add (viewAddedToTop);
 
-                                void testWindow_DrawContentComplete (object sender, DrawEventArgs e)
-                                {
-                                    Assert.Equal (new Rectangle (1, 3, 18, 16), viewAddedToTop.Frame);
+                               void testWindow_DrawContentComplete (object sender, DrawEventArgs e)
+                               {
+                                   Assert.Equal (new Rectangle (1, 3, 18, 16), viewAddedToTop.Frame);
 
-                                    Rectangle savedClip = Application.Driver.Clip;
-                                    Application.Driver.Clip = top.Frame;
-                                    viewAddedToTop.Draw ();
-                                    top.Move (2, 15);
-                                    View.Driver.AddStr ("One");
-                                    top.Move (2, 16);
-                                    View.Driver.AddStr ("Two");
-                                    top.Move (2, 17);
-                                    View.Driver.AddStr ("Three");
-                                    Application.Driver.Clip = savedClip;
+                                   Rectangle savedClip = Application.Driver.Clip;
+                                   Application.Driver.Clip = top.Frame;
+                                   viewAddedToTop.Draw ();
+                                   top.Move (2, 15);
+                                   View.Driver.AddStr ("One");
+                                   top.Move (2, 16);
+                                   View.Driver.AddStr ("Two");
+                                   top.Move (2, 17);
+                                   View.Driver.AddStr ("Three");
+                                   Application.Driver.Clip = savedClip;
 
-                                    Application.Current.DrawContentComplete -= testWindow_DrawContentComplete;
-                                }
-                            };
+                                   Application.Current.DrawContentComplete -= testWindow_DrawContentComplete;
+                               }
+                           };
         RunState rs = Application.Begin (testWindow);
 
         Assert.Equal (new Rectangle (2, 1, 15, 10), testWindow.Frame);
