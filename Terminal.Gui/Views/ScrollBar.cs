@@ -958,6 +958,8 @@ public class ScrollBar : View
         parent.EnabledChanged += Parent_EnabledChanged;
         parent.VisibleChanged += Parent_VisibleChanged;
         parent.DrawAdornments += Parent_DrawAdornments;
+        parent.MouseEnter += (s, e) => OnMouseEnter (e.MouseEvent);
+        parent.MouseLeave += (s, e) => OnMouseLeave (e.MouseEvent);
 
         ManageScrollBarThickness ();
     }

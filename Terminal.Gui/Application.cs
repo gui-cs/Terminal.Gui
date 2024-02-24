@@ -1512,14 +1512,28 @@ public static partial class Application
                 };
             }
 
-            if (OutsideRect (new Point (nme.X, nme.Y), MouseGrabView.Bounds))
+            if (OutsideRect (new Point (nme.X, nme.Y), MouseGrabView.Bounds) || (view is { } && view != MouseGrabView))
             {
                 // The mouse has moved outside the bounds of the view that
                 // grabbed the mouse, so we tell the view that last got 
                 // OnMouseEnter the mouse is leaving
                 // BUGBUG: That sentence makes no sense. Either I'm missing something
                 // or this logic is flawed.
-                _mouseEnteredView?.OnMouseLeave (a.MouseEvent);
+                // We cannot trust the bounds because they may be the same as the bounds of
+                // other views, and therefore it is more accurate to trust the view itself
+                if (view is { })
+                {
+                    View parent = view is Adornment adornment ? adornment.Parent : view;
+
+                    if (parent.OnMouseEnter (a.MouseEvent))
+                    {
+                        MouseGrabView?.OnMouseLeave (a.MouseEvent);
+                    }
+                }
+                else
+                {
+                    _mouseEnteredView?.OnMouseLeave (a.MouseEvent);
+                }
             }
 
             //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{MouseGrabView}");

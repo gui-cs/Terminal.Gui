@@ -1056,6 +1056,32 @@ This is a test
     }
 
     [Fact]
+    [SetupFakeDriver]
+    public void ScrollBar_Ungrab_Mouse_If_The_Mouse_Is_On_Another_View ()
+    {
+        var top = new Toplevel { Id = "top", Width = 10, Height = 10 };
+        var viewLeft = new View { Id = "left", Width = 5, Height = 5, ScrollBarType = ScrollBarType.Vertical, ScrollRowsSize = 20, CanFocus = true };
+
+        var viewRight = new View
+            { Id = "right", X = Pos.Right (viewLeft), Width = 5, Height = 6, ScrollBarType = ScrollBarType.Vertical, ScrollRowsSize = 20, CanFocus = true };
+        top.Add (viewLeft, viewRight);
+        Application.Begin (top);
+
+        Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.WheeledDown }));
+
+        View firstGrabbed = Application.MouseGrabView;
+        Assert.IsType<ScrollBar> (firstGrabbed);
+        Assert.Equal (new Rectangle (4, 0, 1, 5), firstGrabbed.Frame);
+
+        Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent { X = 7, Y = 0, Flags = MouseFlags.WheeledDown }));
+
+        View secondGrabbed = Application.MouseGrabView;
+        Assert.IsType<ScrollBar> (firstGrabbed);
+        Assert.Equal (new Rectangle (4, 0, 1, 6), secondGrabbed.Frame);
+        Assert.NotEqual (firstGrabbed, secondGrabbed);
+    }
+
+    [Fact]
     public void ScrollBarType_IsBuiltIn_In_Padding ()
     {
         var view = new View { ScrollBarType = ScrollBarType.None };
