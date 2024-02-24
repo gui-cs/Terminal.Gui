@@ -23,7 +23,7 @@ public class ScrollBars : Scenario
         {
             X = 0, Y = Pos.Center (), Width = 12, Height = 6,
             Text = text,
-            UseNegativeBoundsLocation = true
+            UseContentOffset = true
         };
         viewOnMargin.Margin.ScrollBarType = ScrollBarType.Both;
         SetViewProperties (viewOnMargin);
@@ -35,7 +35,7 @@ public class ScrollBars : Scenario
         {
             X = Pos.AnchorEnd () - 15, Y = Pos.Center (), Width = 15, Height = 8,
             Text = text,
-            UseNegativeBoundsLocation = true,
+            UseContentOffset = true,
             ScrollBarType = ScrollBarType.Both
         };
         viewOnContentArea.Margin.Thickness = new Thickness (1);
@@ -50,7 +50,7 @@ public class ScrollBars : Scenario
         {
             X = Pos.Left (viewOnContentArea) - 30, Y = Pos.Center (), Width = 15, Height = 8,
             Text = text,
-            UseNegativeBoundsLocation = true
+            UseContentOffset = true
         };
         viewOnPadding.Padding.ScrollBarType = ScrollBarType.Both;
         viewOnPadding.Margin.Thickness = new Thickness (1);
@@ -66,7 +66,7 @@ public class ScrollBars : Scenario
         {
             X = Pos.Left (viewOnPadding) - 30, Y = Pos.Center (), Width = 13, Height = 8,
             Text = text,
-            UseNegativeBoundsLocation = true,
+            UseContentOffset = true,
             BorderStyle = LineStyle.None
         };
         viewOnBorder.Border.ScrollBarType = ScrollBarType.Both;

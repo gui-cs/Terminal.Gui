@@ -1016,7 +1016,7 @@ public class ScrollBarView : View
 
         if (_showBothScrollIndicator)
         {
-            if (SuperView is { UseNegativeBoundsLocation: true })
+            if (SuperView is { UseContentOffset: true })
             {
                 Rectangle bounds = GetSuperViewBounds ();
 
@@ -1050,7 +1050,7 @@ public class ScrollBarView : View
         }
         else if (_showScrollIndicator)
         {
-            if (SuperView is { UseNegativeBoundsLocation: true })
+            if (SuperView is { UseContentOffset: true })
             {
                 Rectangle bounds = GetSuperViewBounds ();
 
@@ -1067,7 +1067,7 @@ public class ScrollBarView : View
         }
         else if (_otherScrollBarView?._showScrollIndicator == true)
         {
-            if (SuperView is { UseNegativeBoundsLocation: true })
+            if (SuperView is { UseContentOffset: true })
             {
                 Rectangle bounds = GetSuperViewBounds ();
 

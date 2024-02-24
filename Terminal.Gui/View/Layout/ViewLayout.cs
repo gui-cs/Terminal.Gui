@@ -257,7 +257,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     Represent the content offset if <see cref="UseNegativeBoundsLocation"/> is true.
+    ///     Represent the content offset if <see cref="UseContentOffset"/> is true.
     /// </summary>
     public Point ContentOffset { get; set; }
 

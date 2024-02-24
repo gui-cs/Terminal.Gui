@@ -151,7 +151,7 @@ public partial class View
         get => _scrollLeftOffset;
         set
         {
-            if (!UseNegativeBoundsLocation)
+            if (!UseContentOffset)
             {
                 _scrollLeftOffset = value;
 
@@ -244,7 +244,7 @@ public partial class View
         get => _scrollTopOffset;
         set
         {
-            if (!UseNegativeBoundsLocation)
+            if (!UseContentOffset)
             {
                 _scrollTopOffset = value;
 
@@ -268,7 +268,7 @@ public partial class View
     /// <summary>
     ///     Determines if negative bounds location is allowed for scrolling the <see cref="ContentArea"/>.
     /// </summary>
-    public bool UseNegativeBoundsLocation { get; set; }
+    public bool UseContentOffset { get; set; }
 
     private void AddEventHandlersForScrollBars (ScrollBarView scrollBar)
     {
@@ -589,7 +589,7 @@ public partial class View
     {
         if (scrollBar.IsVertical)
         {
-            if (UseNegativeBoundsLocation)
+            if (UseContentOffset)
             {
                 ContentOffset = new Point (Bounds.X, -scrollBar.Position);
 
@@ -608,7 +608,7 @@ public partial class View
         }
         else
         {
-            if (UseNegativeBoundsLocation)
+            if (UseContentOffset)
             {
                 ContentOffset = new Point (-scrollBar.Position, Bounds.Y);
 

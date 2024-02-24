@@ -1133,7 +1133,7 @@ This is a test
         {
             X = Pos.Center (), Y = Pos.Center (), Width = 9, Height = 6,
             Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line", CanFocus = true,
-            UseNegativeBoundsLocation = true
+            UseContentOffset = true
         };
         view.Padding.ScrollBarType = ScrollBarType.Both;
         view.TextFormatter.WordWrap = false;
@@ -1246,7 +1246,7 @@ This is a test
         {
             X = Pos.Center (), Y = Pos.Center (), Width = 9, Height = 6,
             Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line", CanFocus = true,
-            UseNegativeBoundsLocation = true
+            UseContentOffset = true
         };
         view.Padding.ScrollBarType = ScrollBarType.Both;
         view.TextFormatter.WordWrap = false;
@@ -1370,7 +1370,7 @@ This is a test
             X = Pos.Center (), Y = Pos.Center (), Width = 9, Height = 6,
             Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line", CanFocus = true,
             ScrollBarType = ScrollBarType.Both,
-            UseNegativeBoundsLocation = true
+            UseContentOffset = true
         };
         view.TextFormatter.WordWrap = false;
         view.TextFormatter.MultiLine = true;
