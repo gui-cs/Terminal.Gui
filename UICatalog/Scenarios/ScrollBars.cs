@@ -3,7 +3,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("ScrollBar BuiltIn", "Demonstrates the scroll bar built-in the Padding Adornment.")]
+[ScenarioMetadata ("ScrollBars", "Demonstrates the scroll bar built-in the Padding Adornment.")]
 [ScenarioCategory ("Controls")]
 public class ScrollBars : Scenario
 {
@@ -15,34 +15,86 @@ public class ScrollBars : Scenario
 
     public override void Setup ()
     {
-        var view = new View
+        var text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line";
+
+        var win = new Window ();
+
+        var viewOnMargin = new View
         {
-            X = Pos.Center (), Y = Pos.Center (), Width = 15, Height = 8, ScrollBarType = ScrollBarType.Both,
-            Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line",
+            X = 0, Y = Pos.Center (), Width = 12, Height = 6,
+            Text = text,
             UseNegativeBoundsLocation = true
         };
+        viewOnMargin.Margin.ScrollBarType = ScrollBarType.Both;
+        SetViewProperties (viewOnMargin);
+        win.Add (viewOnMargin);
 
-        //var view = new View
-        //{
-        //    X = 5, Y = 5, Width = 9, Height = 6, ScrollBarType = ScrollBarType.Both,
-        //    Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line", UseNegativeBoundsLocation = true
-        //};
+        win.Add (new Label { X = 0, Y = Pos.Top (viewOnMargin) - 2, Text = "On Margin:" });
+
+        var viewOnContentArea = new View
+        {
+            X = Pos.AnchorEnd () - 15, Y = Pos.Center (), Width = 15, Height = 8,
+            Text = text,
+            UseNegativeBoundsLocation = true,
+            ScrollBarType = ScrollBarType.Both
+        };
+        viewOnContentArea.Margin.Thickness = new Thickness (1);
+        viewOnContentArea.Margin.ColorScheme = Colors.ColorSchemes ["Dialog"];
+        viewOnContentArea.BorderStyle = LineStyle.Single;
+        SetViewProperties (viewOnContentArea);
+        win.Add (viewOnContentArea);
+
+        win.Add (new Label { X = Pos.Left (viewOnContentArea), Y = Pos.Top (viewOnContentArea) - 2, Text = "On ContentArea:" });
+
+        var viewOnPadding = new View
+        {
+            X = Pos.Left (viewOnContentArea) - 30, Y = Pos.Center (), Width = 15, Height = 8,
+            Text = text,
+            UseNegativeBoundsLocation = true
+        };
+        viewOnPadding.Padding.ScrollBarType = ScrollBarType.Both;
+        viewOnPadding.Margin.Thickness = new Thickness (1);
+        viewOnPadding.Margin.ColorScheme = Colors.ColorSchemes ["Dialog"];
+        viewOnPadding.BorderStyle = LineStyle.Single;
+        viewOnPadding.Padding.ColorScheme = Colors.ColorSchemes ["Menu"];
+        SetViewProperties (viewOnPadding);
+        win.Add (viewOnPadding);
+
+        win.Add (new Label { X = Pos.Left (viewOnPadding), Y = Pos.Top (viewOnPadding) - 2, Text = "On Padding:" });
+
+        var viewOnBorder = new View
+        {
+            X = Pos.Left (viewOnPadding) - 30, Y = Pos.Center (), Width = 13, Height = 8,
+            Text = text,
+            UseNegativeBoundsLocation = true,
+            BorderStyle = LineStyle.None
+        };
+        viewOnBorder.Border.ScrollBarType = ScrollBarType.Both;
+        viewOnBorder.Margin.Thickness = new Thickness (1);
+        viewOnBorder.Margin.ColorScheme = Colors.ColorSchemes ["Dialog"];
+        SetViewProperties (viewOnBorder);
+        win.Add (viewOnBorder);
+
+        win.Add (new Label { X = Pos.Left (viewOnBorder), Y = Pos.Top (viewOnBorder) - 2, Text = "On Border:" });
+
+        var btn = new Button { X = Pos.Center (), Y = Pos.Bottom (viewOnContentArea) + 1, Text = "Test" };
+        win.Add (btn);
+
+        viewOnBorder.TabIndex = 1;
+        viewOnPadding.TabIndex = 2;
+        viewOnContentArea.TabIndex = 3;
+
+        Application.Top.Add (win);
+    }
+
+    private void SetViewProperties (View view)
+    {
         view.TextFormatter.WordWrap = false;
         view.TextFormatter.MultiLine = true;
         view.TextFormatter.FillRemaining = true;
         view.CanFocus = true;
-        view.Padding.ColorScheme = Colors.ColorSchemes ["Menu"];
         string [] strings = view.Text.Split ("\n").ToArray ();
         view.ScrollColsSize = strings.OrderByDescending (s => s.Length).First ().GetColumns ();
         view.ScrollRowsSize = strings.Length;
-        view.Margin.Thickness = new Thickness (1);
-        view.Margin.ColorScheme = Colors.ColorSchemes ["Dialog"];
-        view.BorderStyle = LineStyle.Single;
-        var win = new Window ();
-        win.Add (view);
-
-        var btn = new Button { X = Pos.Center (), Y = Pos.Bottom (view), Text = "Test" };
-        win.Add (btn);
-        Application.Top.Add (win);
     }
 }
