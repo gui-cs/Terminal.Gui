@@ -192,7 +192,7 @@ public class Border : Adornment
 
         Driver.Clip = savedClip;
     }
-    
+
     /// <inheritdoc/>
     public override Rectangle FrameToScreen ()
     {
@@ -202,6 +202,17 @@ public class Border : Adornment
         ret.Y += Parent?.Margin.Thickness.Top ?? 0;
 
         return ret;
+    }
+
+    /// <inheritdoc/>
+    public override Thickness GetAdornmentsThickness ()
+    {
+        int left = Parent.Margin.Thickness.Left;
+        int top = Parent.Margin.Thickness.Top;
+        int right = Parent.Margin.Thickness.Right;
+        int bottom = Parent.Margin.Thickness.Bottom;
+
+        return new Thickness (left, top, right, bottom);
     }
 
     /// <inheritdoc/>
@@ -225,38 +236,39 @@ public class Border : Adornment
         // For Border
         // ...thickness extends outward (border/title is always as far in as possible)
         var borderBounds = new Rectangle (
-                                     screenBounds.X + Math.Max (0, Thickness.Left - 1),
-                                     screenBounds.Y + Math.Max (0, Thickness.Top - 1),
-                                     Math.Max (
-                                               0,
-                                               screenBounds.Width
-                                               - Math.Max (
-                                                           0,
-                                                           Math.Max (0, Thickness.Left - 1)
-                                                           + Math.Max (0, Thickness.Right - 1)
-                                                          )
-                                              ),
-                                     Math.Max (
-                                               0,
-                                               screenBounds.Height
-                                               - Math.Max (
-                                                           0,
-                                                           Math.Max (0, Thickness.Top - 1)
-                                                           + Math.Max (0, Thickness.Bottom - 1)
-                                                          )
-                                              )
-                                    );
+                                          screenBounds.X + Math.Max (0, Thickness.Left - 1),
+                                          screenBounds.Y + Math.Max (0, Thickness.Top - 1),
+                                          Math.Max (
+                                                    0,
+                                                    screenBounds.Width
+                                                    - Math.Max (
+                                                                0,
+                                                                Math.Max (0, Thickness.Left - 1)
+                                                                + Math.Max (0, Thickness.Right - 1)
+                                                               )
+                                                   ),
+                                          Math.Max (
+                                                    0,
+                                                    screenBounds.Height
+                                                    - Math.Max (
+                                                                0,
+                                                                Math.Max (0, Thickness.Top - 1)
+                                                                + Math.Max (0, Thickness.Bottom - 1)
+                                                               )
+                                                   )
+                                         );
 
         int topTitleLineY = borderBounds.Y;
         int titleY = borderBounds.Y;
         var titleBarsLength = 0; // the little vertical thingies
 
-        int maxTitleWidth = Math.Max (0,
+        int maxTitleWidth = Math.Max (
+                                      0,
                                       Math.Min (
-                                          Parent.TitleTextFormatter.FormatAndGetSize ().Width,
-                                          Math.Min (screenBounds.Width - 4, borderBounds.Width - 4)
-                                          )
-                                      );
+                                                Parent.TitleTextFormatter.FormatAndGetSize ().Width,
+                                                Math.Min (screenBounds.Width - 4, borderBounds.Width - 4)
+                                               )
+                                     );
         Parent.TitleTextFormatter.Size = new Size (maxTitleWidth, 1);
 
         int sideLineLength = borderBounds.Height;
@@ -296,7 +308,8 @@ public class Border : Adornment
 
         if (canDrawBorder && Thickness.Top > 0 && maxTitleWidth > 0 && !string.IsNullOrEmpty (Parent?.Title))
         {
-            Parent.TitleTextFormatter.Draw (new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
+            Parent.TitleTextFormatter.Draw (
+                                            new Rectangle (borderBounds.X + 2, titleY, maxTitleWidth, 1),
                                             Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor (),
                                             Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetHotNormalColor ());
         }
@@ -475,7 +488,8 @@ public class Border : Adornment
                 // Redraw title 
                 if (drawTop && maxTitleWidth > 0 && !string.IsNullOrEmpty (Parent?.Title))
                 {
-                    Parent.TitleTextFormatter.Draw (new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
+                    Parent.TitleTextFormatter.Draw (
+                                                    new Rectangle (borderBounds.X + 2, titleY, maxTitleWidth, 1),
                                                     Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor (),
                                                     Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor ());
                 }

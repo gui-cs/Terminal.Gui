@@ -570,23 +570,10 @@ public partial class View
             if (super is Adornment adornment)
             {
                 boundsOffset = super.FrameToScreen ().Location;
-                View parent = adornment.Parent;
+                Thickness thickness = adornment.GetAdornmentsThickness ();
 
-                switch (super)
-                {
-                    case Gui.Margin:
-                        break;
-                    case Gui.Border:
-                        boundsOffset.X -= parent.Margin.Thickness.Left;
-                        boundsOffset.Y -= parent.Margin.Thickness.Top;
-
-                        break;
-                    case Gui.Padding:
-                        boundsOffset.X -= parent.Margin.Thickness.Left + parent.Border.Thickness.Left;
-                        boundsOffset.Y -= parent.Margin.Thickness.Top + parent.Border.Thickness.Top;
-
-                        break;
-                }
+                boundsOffset.X -= thickness.Left;
+                boundsOffset.Y -= thickness.Top;
             }
             else
             {
@@ -684,7 +671,7 @@ public partial class View
     ///     <para>Gets the thickness describing the sum of the Adornments' thicknesses.</para>
     /// </summary>
     /// <returns>A thickness that describes the sum of the Adornments' thicknesses.</returns>
-    public Thickness GetAdornmentsThickness ()
+    public virtual Thickness GetAdornmentsThickness ()
     {
         int left = Margin.Thickness.Left + Border.Thickness.Left + Padding.Thickness.Left;
         int top = Margin.Thickness.Top + Border.Thickness.Top + Padding.Thickness.Top;

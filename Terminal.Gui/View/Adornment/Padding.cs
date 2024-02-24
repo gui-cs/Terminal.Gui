@@ -49,4 +49,15 @@ public class Padding : Adornment
 
         return ret;
     }
+
+    /// <inheritdoc/>
+    public override Thickness GetAdornmentsThickness ()
+    {
+        int left = Parent.Margin.Thickness.Left + Parent.Border.Thickness.Left;
+        int top = Parent.Margin.Thickness.Top + Parent.Border.Thickness.Top;
+        int right = Parent.Margin.Thickness.Right + Parent.Border.Thickness.Right;
+        int bottom = Parent.Margin.Thickness.Bottom + Parent.Border.Thickness.Bottom;
+
+        return new Thickness (left, top, right, bottom);
+    }
 }

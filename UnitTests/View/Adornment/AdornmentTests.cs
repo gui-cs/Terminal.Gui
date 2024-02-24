@@ -388,6 +388,21 @@ public class AdornmentTests
     }
 
     [Fact]
+    public void GetAdornmentsThickness_On_Adornments ()
+    {
+        var view = new View { Width = 10, Height = 10 };
+        view.Margin.Thickness = new Thickness (1);
+        view.Border.Thickness = new Thickness (1);
+        view.Padding.Thickness = new Thickness (1);
+
+        Assert.Equal (new Thickness (3, 3, 3, 3), view.GetAdornmentsThickness ());
+        Assert.Equal (Thickness.Empty, view.Margin.GetAdornmentsThickness ());
+        Assert.Equal (new Thickness (1), view.Border.GetAdornmentsThickness ());
+        Assert.Equal (new Thickness (2), view.Padding.GetAdornmentsThickness ());
+        view.Dispose ();
+    }
+
+    [Fact]
     public void Setting_Bounds_Throws ()
     {
         var adornment = new Adornment (null);
