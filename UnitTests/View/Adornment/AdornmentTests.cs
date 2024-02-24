@@ -114,10 +114,10 @@ public class AdornmentTests
         Assert.Equal ("{X=1,Y=1,Width=6,Height=5}", parent.Border.Bounds.ToString ());
         Assert.Equal ("{X=1,Y=1,Width=4,Height=3}", parent.Padding.Bounds.ToString ());
         Assert.Equal ("{X=0,Y=0,Width=4,Height=3}", parent.Bounds.ToString ());
-        Assert.Equal ("{X=1,Y=1,Width=8,Height=7}", parent.Margin.ContentArea.ToString ());
-        Assert.Equal ("{X=1,Y=1,Width=6,Height=5}", parent.Border.ContentArea.ToString ());
-        Assert.Equal ("{X=1,Y=1,Width=4,Height=3}", parent.Padding.ContentArea.ToString ());
-        Assert.Equal ("{X=0,Y=0,Width=4,Height=3}", parent.ContentArea.ToString ());
+        Assert.Equal ("{X=1,Y=1,Width=8,Height=7}", parent.Margin.GetVisibleContentArea ().ToString ());
+        Assert.Equal ("{X=1,Y=1,Width=6,Height=5}", parent.Border.GetVisibleContentArea ().ToString ());
+        Assert.Equal ("{X=1,Y=1,Width=4,Height=3}", parent.Padding.GetVisibleContentArea ().ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=4,Height=3}", parent.GetVisibleContentArea ().ToString ());
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -201,10 +201,10 @@ public class AdornmentTests
         Assert.Equal ("{X=1,Y=1,Width=6,Height=5}", parent.Border.Bounds.ToString ());
         Assert.Equal ("{X=1,Y=1,Width=4,Height=3}", parent.Padding.Bounds.ToString ());
         Assert.Equal ("{X=0,Y=0,Width=4,Height=3}", parent.Bounds.ToString ());
-        Assert.Equal ("{X=1,Y=1,Width=8,Height=7}", parent.Margin.ContentArea.ToString ());
-        Assert.Equal ("{X=1,Y=1,Width=6,Height=5}", parent.Border.ContentArea.ToString ());
-        Assert.Equal ("{X=1,Y=1,Width=4,Height=3}", parent.Padding.ContentArea.ToString ());
-        Assert.Equal ("{X=0,Y=0,Width=4,Height=3}", parent.ContentArea.ToString ());
+        Assert.Equal ("{X=1,Y=1,Width=8,Height=7}", parent.Margin.GetVisibleContentArea ().ToString ());
+        Assert.Equal ("{X=1,Y=1,Width=6,Height=5}", parent.Border.GetVisibleContentArea ().ToString ());
+        Assert.Equal ("{X=1,Y=1,Width=4,Height=3}", parent.Padding.GetVisibleContentArea ().ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=4,Height=3}", parent.GetVisibleContentArea ().ToString ());
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"

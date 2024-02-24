@@ -232,31 +232,6 @@ public partial class View
     }
 
     /// <summary>
-    ///     The content area represent the View-relative rectangle used for this view. The area inside the view where subviews
-    ///     and content are presented. The Location is always (0,0). It will be mainly used for clipping a region.
-    /// </summary>
-    public virtual Rectangle ContentArea
-    {
-        get
-        {
-            if (Margin == null || Border == null || Padding == null)
-            {
-                return new Rectangle (default (Point), Frame.Size);
-            }
-
-            int width = Math.Max (
-                                  0,
-                                  Frame.Size.Width - Margin.Thickness.Horizontal - Border.Thickness.Horizontal - Padding.Thickness.Horizontal);
-
-            int height = Math.Max (
-                                   0,
-                                   Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical);
-
-            return new Rectangle (Point.Empty, new Size (width, height));
-        }
-    }
-
-    /// <summary>
     ///     Represent the content offset if <see cref="UseContentOffset"/> is true.
     /// </summary>
     public Point ContentOffset { get; set; }
@@ -691,6 +666,31 @@ public partial class View
                           Padding?.Thickness.GetInside (Padding.Frame).X ?? 0,
                           Padding?.Thickness.GetInside (Padding.Frame).Y ?? 0
                          );
+    }
+
+    /// <summary>
+    ///     Get the visible content area represent the View-relative rectangle used for this view. The area inside the view
+    ///     where subviews
+    ///     and content are presented. The Location is always (0,0). It will be mainly used for clipping a region.
+    /// </summary>
+    public virtual Rectangle GetVisibleContentArea ()
+    {
+        {
+            if (Margin == null || Border == null || Padding == null)
+            {
+                return new Rectangle (default (Point), Frame.Size);
+            }
+
+            int width = Math.Max (
+                                  0,
+                                  Frame.Size.Width - Margin.Thickness.Horizontal - Border.Thickness.Horizontal - Padding.Thickness.Horizontal);
+
+            int height = Math.Max (
+                                   0,
+                                   Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical);
+
+            return new Rectangle (Point.Empty, new Size (width, height));
+        }
     }
 
     /// <summary>Fired after the View's <see cref="LayoutSubviews"/> method has completed.</summary>

@@ -37,11 +37,6 @@ public class Adornment : View
         set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
     }
 
-    /// <summary>
-    ///     Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).
-    /// </summary>
-    public override Rectangle ContentArea => Thickness?.GetInside (new Rectangle (Point.Empty, Frame.Size)) ?? new Rectangle (Point.Empty, Frame.Size);
-
     /// <summary>The Parent of this Adornment (the View this Adornment surrounds).</summary>
     /// <remarks>
     ///     Adornments are distinguished from typical View classes in that they are not sub-views, but have a parent/child
@@ -115,6 +110,14 @@ public class Adornment : View
         // We now have coordinates relative to our View. If our View's SuperView has
         // a SuperView, keep going...
         return ret;
+    }
+
+    /// <summary>
+    ///     Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).
+    /// </summary>
+    public override Rectangle GetVisibleContentArea ()
+    {
+        return Thickness?.GetInside (new Rectangle (Point.Empty, Frame.Size)) ?? new Rectangle (Point.Empty, Frame.Size);
     }
 
     /// <summary>Does nothing for Adornment</summary>

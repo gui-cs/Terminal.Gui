@@ -266,7 +266,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     Determines if negative bounds location is allowed for scrolling the <see cref="ContentArea"/>.
+    ///     Determines if negative bounds location is allowed for scrolling the <see cref="GetVisibleContentArea"/>.
     /// </summary>
     public bool UseContentOffset { get; set; }
 
@@ -380,14 +380,14 @@ public partial class View
                                   {
                                       if (scrollBar.IsVertical)
                                       {
-                                          scrollBar.Position += ContentArea.Height;
+                                          scrollBar.Position += GetVisibleContentArea().Height;
 
                                           return true;
                                       }
 
                                       if (scrollBar.OtherScrollBarView is { IsVertical: true })
                                       {
-                                          scrollBar.OtherScrollBarView.Position += ContentArea.Height;
+                                          scrollBar.OtherScrollBarView.Position += GetVisibleContentArea().Height;
 
                                           return true;
                                       }
@@ -401,14 +401,14 @@ public partial class View
                                   {
                                       if (scrollBar.IsVertical)
                                       {
-                                          scrollBar.Position -= ContentArea.Height;
+                                          scrollBar.Position -= GetVisibleContentArea().Height;
 
                                           return true;
                                       }
 
                                       if (scrollBar.OtherScrollBarView is { IsVertical: true })
                                       {
-                                          scrollBar.OtherScrollBarView.Position -= ContentArea.Height;
+                                          scrollBar.OtherScrollBarView.Position -= GetVisibleContentArea().Height;
 
                                           return true;
                                       }
@@ -517,14 +517,14 @@ public partial class View
                                   {
                                       if (!scrollBar.IsVertical)
                                       {
-                                          scrollBar.Position += ContentArea.Width;
+                                          scrollBar.Position += GetVisibleContentArea().Width;
 
                                           return true;
                                       }
 
                                       if (scrollBar.OtherScrollBarView is { IsVertical: false })
                                       {
-                                          scrollBar.OtherScrollBarView.Position += ContentArea.Width;
+                                          scrollBar.OtherScrollBarView.Position += GetVisibleContentArea().Width;
 
                                           return true;
                                       }
@@ -538,14 +538,14 @@ public partial class View
                                   {
                                       if (!scrollBar.IsVertical)
                                       {
-                                          scrollBar.Position -= ContentArea.Width;
+                                          scrollBar.Position -= GetVisibleContentArea().Width;
 
                                           return true;
                                       }
 
                                       if (scrollBar.OtherScrollBarView is { IsVertical: false })
                                       {
-                                          scrollBar.OtherScrollBarView.Position -= ContentArea.Width;
+                                          scrollBar.OtherScrollBarView.Position -= GetVisibleContentArea ().Width;
 
                                           return true;
                                       }
