@@ -1573,9 +1573,9 @@ public static partial class Application
             // TODO: Debate whether inside-out or outside-in is the right strategy
             if (AdornmentHandledMouseEvent (view?.Padding))
             {
-                view = View.FindDeepestView (view?.Padding, screenX, screenY, out _, out _);
+                view = View.FindDeepestView (view?.Padding, screenX, screenY, out int newX, out int newY);
 
-                if (view is { } && AdornmentSubViewHandledMouseEvent ())
+                if (view is { } && AdornmentSubViewHandledMouseEvent (newX, newY))
                 {
                     return;
                 }
@@ -1585,12 +1585,23 @@ public static partial class Application
 
             if (AdornmentHandledMouseEvent (view?.Border))
             {
-                if (view is Toplevel)
+                View previousView = view;
+
+                view = View.FindDeepestView (view?.Border, screenX, screenY, out int newX, out int newY);
+
+                if (view is { } && AdornmentSubViewHandledMouseEvent (newX, newY))
+                {
+                    return;
+                }
+
+                view = previousView;
+
+                if (previousView is Toplevel)
                 {
                     // TODO: This is a temporary hack to work around the fact that 
                     // drag handling is handled in Toplevel (See Issue #2537)
 
-                    if (AdornmentSubViewHandledMouseEvent ())
+                    if (AdornmentSubViewHandledMouseEvent (screenX, screenY))
                     {
                         return;
                     }
@@ -1601,6 +1612,13 @@ public static partial class Application
 
             if (AdornmentHandledMouseEvent (view?.Margin))
             {
+                view = View.FindDeepestView (view?.Margin, screenX, screenY, out int newX, out int newY);
+
+                if (view is { } && AdornmentSubViewHandledMouseEvent (newX, newY))
+                {
+                    return;
+                }
+
                 return;
             }
 
@@ -1649,15 +1667,15 @@ public static partial class Application
             }
         }
 
-        bool AdornmentSubViewHandledMouseEvent ()
+        bool AdornmentSubViewHandledMouseEvent (int x, int y)
         {
             var me = new MouseEvent
             {
-                X = screenX,
-                Y = screenY,
+                X = x,
+                Y = y,
                 Flags = a.MouseEvent.Flags,
-                OfX = screenX,
-                OfY = screenY,
+                OfX = screenX - x,
+                OfY = screenY - y,
                 View = view
             };
 
