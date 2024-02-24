@@ -3,13 +3,13 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class ScrollBarTests
+public class ScrollBarViewTests
 {
     private static HostView _hostView;
     private readonly ITestOutputHelper _output;
     private bool _added;
-    private ScrollBar _scrollBar;
-    public ScrollBarTests (ITestOutputHelper output) { _output = output; }
+    private ScrollBarView _scrollBar;
+    public ScrollBarViewTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [ScrollBarAutoInitShutdown]
@@ -144,7 +144,7 @@ public class ScrollBarTests
         var super = new Window { Id = "super", Width = Dim.Fill (), Height = Dim.Fill () };
         Application.Top.Add (super);
 
-        var horiz = new ScrollBar
+        var horiz = new ScrollBarView
         {
             Id = "horiz",
             Size = width * 2,
@@ -154,7 +154,7 @@ public class ScrollBarTests
         };
         super.Add (horiz);
 
-        var vert = new ScrollBar
+        var vert = new ScrollBarView
         {
             Id = "vert",
             Size = height * 2,
@@ -286,7 +286,7 @@ public class ScrollBarTests
         var label = new Label { Text = text };
         Application.Top.Add (label);
 
-        var sbv = new ScrollBar { IsVertical = true, Size = 100, ClearOnVisibleFalse = false };
+        var sbv = new ScrollBarView { IsVertical = true, Size = 100, ClearOnVisibleFalse = false };
         label.Add (sbv);
         Application.Begin (Application.Top);
 
@@ -411,7 +411,7 @@ This is a tes
 
                                                     Assert.True (listView.ScrollKeepContentAlwaysInViewPort);
 
-                                                    var newScrollBar = listView.Padding.Subviews [0] as ScrollBar;
+                                                    var newScrollBar = listView.Padding.Subviews [0] as ScrollBarView;
 
                                                     newScrollBar!.ChangedPosition += (s, e) =>
                                                                                      {
@@ -487,7 +487,7 @@ This is a tes
                                                         Source = new ListWrapper (source)
                                                     };
                                                     win.Add (listView);
-                                                    var newScrollBar = new ScrollBar { IsVertical = true, KeepContentAlwaysInViewPort = true };
+                                                    var newScrollBar = new ScrollBarView { IsVertical = true, KeepContentAlwaysInViewPort = true };
                                                     listView.Add (newScrollBar);
 
                                                     newScrollBar.ChangedPosition += (s, e) =>
@@ -543,8 +543,8 @@ This is a tes
         var text =
             "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
         var label = new Label { Text = text };
-        var sbv = new ScrollBar { X = Pos.AnchorEnd (1), IsVertical = true, Size = 100 };
-        sbv.OtherScrollBar = new ScrollBar { Y = Pos.AnchorEnd (1), IsVertical = false, Size = 100, OtherScrollBar = sbv };
+        var sbv = new ScrollBarView { X = Pos.AnchorEnd (1), IsVertical = true, Size = 100 };
+        sbv.OtherScrollBar = new ScrollBarView { Y = Pos.AnchorEnd (1), IsVertical = false, Size = 100, OtherScrollBar = sbv };
         label.Add (sbv, sbv.OtherScrollBar);
         Application.Top.Add (label);
         Application.Begin (Application.Top);
@@ -557,8 +557,8 @@ This is a tes
         Assert.True (sbv.OtherScrollBar.Visible);
 
         View contentBottomRightCorner =
-            label.Subviews.First (v => v is ScrollBar.ContentBottomRightCorner);
-        Assert.True (contentBottomRightCorner is ScrollBar.ContentBottomRightCorner);
+            label.Subviews.First (v => v is ScrollBarView.ContentBottomRightCorner);
+        Assert.True (contentBottomRightCorner is ScrollBarView.ContentBottomRightCorner);
         Assert.True (contentBottomRightCorner.Visible);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -626,7 +626,7 @@ This is a tes▼
             "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
         var label = new Label { Text = text };
 
-        var sbv = new ScrollBar { X = Pos.AnchorEnd (1), IsVertical = true, Size = 100 };
+        var sbv = new ScrollBarView { X = Pos.AnchorEnd (1), IsVertical = true, Size = 100 };
         label.Add (sbv);
         Application.Top.Add (label);
         Application.Begin (Application.Top);
@@ -694,7 +694,7 @@ This is a test
         var super = new Window { Id = "super", Width = Dim.Fill (), Height = Dim.Fill () };
         Application.Top.Add (super);
 
-        var sbv = new ScrollBar { Id = "sbv", Size = width * 2, ShowScrollIndicator = true };
+        var sbv = new ScrollBarView { Id = "sbv", Size = width * 2, ShowScrollIndicator = true };
         super.Add (sbv);
         Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (width, height);
@@ -712,7 +712,7 @@ This is a test
     {
         RemoveHandlers ();
 
-        _scrollBar = new ScrollBar { IsVertical = true, OtherScrollBar = new ScrollBar { IsVertical = false } };
+        _scrollBar = new ScrollBarView { IsVertical = true, OtherScrollBar = new ScrollBarView { IsVertical = false } };
         _hostView.Add (_scrollBar);
 
         Application.Begin (Application.Top);
@@ -755,7 +755,7 @@ This is a test
         Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (45, 20);
 
-        var scrollBar = textView.Padding.Subviews [0] as ScrollBar;
+        var scrollBar = textView.Padding.Subviews [0] as ScrollBarView;
         Assert.True (scrollBar.AutoHideScrollBars);
         Assert.False (scrollBar.ShowScrollIndicator);
         Assert.False (scrollBar.OtherScrollBar.ShowScrollIndicator);
@@ -903,8 +903,8 @@ This is a test
         var top = new Toplevel ();
         var host = new View ();
         top.Add (host);
-        var v = new ScrollBar { IsVertical = false };
-        var h = new ScrollBar { IsVertical = false };
+        var v = new ScrollBarView { IsVertical = false };
+        var h = new ScrollBarView { IsVertical = false };
 
         Assert.Throws<ArgumentException> (() => v.OtherScrollBar = h);
         Assert.Throws<ArgumentException> (() => h.OtherScrollBar = v);
@@ -917,8 +917,8 @@ This is a test
         var top = new Toplevel ();
         var host = new View ();
         top.Add (host);
-        var v = new ScrollBar { IsVertical = true };
-        var h = new ScrollBar { IsVertical = true };
+        var v = new ScrollBarView { IsVertical = true };
+        var h = new ScrollBarView { IsVertical = true };
 
         Assert.Throws<ArgumentException> (() => v.OtherScrollBar = h);
         Assert.Throws<ArgumentException> (() => h.OtherScrollBar = v);
@@ -931,7 +931,7 @@ This is a test
         Toplevel top = Application.Top;
         Assert.Equal (new Rectangle (0, 0, 80, 25), top.Bounds);
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
-        var sbv = new ScrollBar { IsVertical = true, OtherScrollBar = new ScrollBar { IsVertical = false } };
+        var sbv = new ScrollBarView { IsVertical = true, OtherScrollBar = new ScrollBarView { IsVertical = false } };
         view.Add (sbv);
         top.Add (view);
         Assert.Equal (view, sbv.SuperView);
@@ -1070,13 +1070,13 @@ This is a test
         Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.WheeledDown }));
 
         View firstGrabbed = Application.MouseGrabView;
-        Assert.IsType<ScrollBar> (firstGrabbed);
+        Assert.IsType<ScrollBarView> (firstGrabbed);
         Assert.Equal (new Rectangle (4, 0, 1, 5), firstGrabbed.Frame);
 
         Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent { X = 7, Y = 0, Flags = MouseFlags.WheeledDown }));
 
         View secondGrabbed = Application.MouseGrabView;
-        Assert.IsType<ScrollBar> (firstGrabbed);
+        Assert.IsType<ScrollBarView> (firstGrabbed);
         Assert.Equal (new Rectangle (4, 0, 1, 6), secondGrabbed.Frame);
         Assert.NotEqual (firstGrabbed, secondGrabbed);
     }
@@ -1093,25 +1093,25 @@ This is a test
 
         foreach (View sbv in view.Padding.Subviews)
         {
-            if (sbv is not ScrollBar)
+            if (sbv is not ScrollBarView)
             {
-                Assert.True (sbv is ScrollBar.ContentBottomRightCorner);
+                Assert.True (sbv is ScrollBarView.ContentBottomRightCorner);
             }
             else
             {
-                Assert.True (sbv is ScrollBar);
+                Assert.True (sbv is ScrollBarView);
             }
         }
 
         view = new View ();
         view.Padding.ScrollBarType = ScrollBarType.Vertical;
         Assert.Single (view.Padding.Subviews);
-        Assert.True (view.Padding.Subviews [0] is ScrollBar);
+        Assert.True (view.Padding.Subviews [0] is ScrollBarView);
 
         view = new View ();
         view.Padding.ScrollBarType = ScrollBarType.Horizontal;
         Assert.Single (view.Padding.Subviews);
-        Assert.True (view.Padding.Subviews [0] is ScrollBar);
+        Assert.True (view.Padding.Subviews [0] is ScrollBarView);
     }
 
     [Fact]
@@ -1477,7 +1477,7 @@ This is a test
     [ScrollBarAutoInitShutdown]
     public void Scrolling_With_Default_Constructor_Do_Not_Scroll ()
     {
-        var sbv = new ScrollBar { Position = 1 };
+        var sbv = new ScrollBarView { Position = 1 };
         Assert.Equal (1, sbv.Position);
         Assert.NotEqual (0, sbv.Position);
     }
@@ -1504,7 +1504,7 @@ This is a test
         var btn = new Button { X = 14, Text = "Click Me!" };
         btn.Accept += (s, e) => clicked = true;
 
-        var sbv = new ScrollBar { IsVertical = true, Size = 5 };
+        var sbv = new ScrollBarView { IsVertical = true, Size = 5 };
         label.Add (sbv);
         Application.Top.Add (label, btn);
         Application.Begin (Application.Top);
@@ -1618,7 +1618,7 @@ This is a tes▼             ",
         var super = new Window { Id = "super", Width = Dim.Fill (), Height = Dim.Fill () };
         Application.Top.Add (super);
 
-        var sbv = new ScrollBar
+        var sbv = new ScrollBarView
         {
             Id = "sbv",
             Size = height * 2,

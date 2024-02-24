@@ -28,8 +28,8 @@ namespace Terminal.Gui;
 public class ScrollView : View
 {
     private readonly ContentView _contentView;
-    private readonly ScrollBar _horizontal;
-    private readonly ScrollBar _vertical;
+    private readonly ScrollBarView _horizontal;
+    private readonly ScrollBarView _vertical;
     private View _contentBottomRightCorner;
     private Point _contentOffset;
     private Size _contentSize;
@@ -43,7 +43,7 @@ public class ScrollView : View
         _contentView = new ContentView ();
         base.Add (_contentView);
 
-        _vertical = new ScrollBar
+        _vertical = new ScrollBarView
         {
             X = Pos.AnchorEnd (1),
             Y = 0,
@@ -52,7 +52,7 @@ public class ScrollView : View
             IsVertical = true
         };
 
-        _horizontal = new ScrollBar
+        _horizontal = new ScrollBarView
         {
             X = 0,
             Y = Pos.AnchorEnd (1),
@@ -286,12 +286,12 @@ public class ScrollView : View
     /// <param name="view">The view to add to the scrollview.</param>
     public override void Add (View view)
     {
-        if (view is ScrollBar.ContentBottomRightCorner)
+        if (view is ScrollBarView.ContentBottomRightCorner)
         {
             _contentBottomRightCorner = view;
             base.Add (view);
         }
-        else if (view is ScrollBar)
+        else if (view is ScrollBarView)
         {
             base.Add (view);
         }

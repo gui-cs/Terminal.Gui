@@ -1,7 +1,7 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     The scroll bar types used by this <see cref="ScrollBar"/>.
+///     The scroll bar types used by this <see cref="ScrollBarView"/>.
 /// </summary>
 public enum ScrollBarType
 {
@@ -28,7 +28,7 @@ public enum ScrollBarType
 
 public partial class View
 {
-    private ScrollBar _scrollBar;
+    private ScrollBarView _scrollBar;
     private ScrollBarType _scrollBarType;
     private int _scrollColsSize;
     private int _scrollLeftOffset;
@@ -64,16 +64,16 @@ public partial class View
             switch (view._scrollBarType)
             {
                 case ScrollBarType.Vertical:
-                    view._scrollBar = new ScrollBar { IsVertical = true };
+                    view._scrollBar = new ScrollBarView { IsVertical = true };
 
                     break;
                 case ScrollBarType.Horizontal:
-                    view._scrollBar = new ScrollBar { IsVertical = false };
+                    view._scrollBar = new ScrollBarView { IsVertical = false };
 
                     break;
                 case ScrollBarType.Both:
-                    view._scrollBar = new ScrollBar { IsVertical = true };
-                    view._scrollBar.OtherScrollBar = new ScrollBar { IsVertical = false, OtherScrollBar = view._scrollBar };
+                    view._scrollBar = new ScrollBarView { IsVertical = true };
+                    view._scrollBar.OtherScrollBar = new ScrollBarView { IsVertical = false, OtherScrollBar = view._scrollBar };
 
                     break;
                 case ScrollBarType.None:
@@ -136,7 +136,7 @@ public partial class View
         }
     }
 
-    /// <summary>Get or sets if the view-port is kept always visible in the area of this <see cref="ScrollBar"/></summary>
+    /// <summary>Get or sets if the view-port is kept always visible in the area of this <see cref="ScrollBarView"/></summary>
     public bool ScrollKeepContentAlwaysInViewPort
     {
         get => _scrollBar.KeepContentAlwaysInViewPort;
@@ -173,7 +173,7 @@ public partial class View
     }
 
     /// <summary>Represent a vertical or horizontal ScrollBar other than this.</summary>
-    public ScrollBar ScrollOtherScrollBar
+    public ScrollBarView ScrollOtherScrollBar
     {
         get => _scrollBar.OtherScrollBar;
         set => _scrollBar.OtherScrollBar = value;
@@ -270,7 +270,7 @@ public partial class View
     /// </summary>
     public bool UseNegativeBoundsLocation { get; set; }
 
-    private void AddEventHandlersForScrollBars (ScrollBar scrollBar)
+    private void AddEventHandlersForScrollBars (ScrollBarView scrollBar)
     {
         if (scrollBar is null)
         {
@@ -285,7 +285,7 @@ public partial class View
         }
     }
 
-    private void AddKeyBindingsForScrolling (ScrollBar scrollBar)
+    private void AddKeyBindingsForScrolling (ScrollBarView scrollBar)
     {
         if (scrollBar.IsVertical)
         {
@@ -585,7 +585,7 @@ public partial class View
 
     private void ScrollBar_ChangedPosition (object sender, EventArgs e) { SetBoundsByPosition (_scrollBar); }
 
-    private void SetBoundsByPosition (ScrollBar scrollBar)
+    private void SetBoundsByPosition (ScrollBarView scrollBar)
     {
         if (scrollBar.IsVertical)
         {

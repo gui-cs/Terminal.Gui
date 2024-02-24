@@ -76,10 +76,10 @@ public class GlyphDefinitions
     /// <summary>Continuous block meter segment (e.g. for <see cref="ProgressBar"/>).</summary>
     public Rune ContinuousMeterSegment { get; set; } = (Rune)'█';
 
-    /// <summary>Stipple pattern (e.g. for <see cref="ScrollBar"/>). Default is Light Shade (U+2591) - ░.</summary>
+    /// <summary>Stipple pattern (e.g. for <see cref="ScrollBarView"/>). Default is Light Shade (U+2591) - ░.</summary>
     public Rune Stipple { get; set; } = (Rune)'░';
 
-    /// <summary>Diamond (e.g. for <see cref="ScrollBar"/>. Default is Lozenge (U+25CA) - ◊.</summary>
+    /// <summary>Diamond (e.g. for <see cref="ScrollBarView"/>. Default is Lozenge (U+25CA) - ◊.</summary>
     public Rune Diamond { get; set; } = (Rune)'◊';
 
     /// <summary>Close. Default is Heavy Ballot X (U+2718) - ✘.</summary>

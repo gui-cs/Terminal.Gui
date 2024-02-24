@@ -405,8 +405,8 @@ public class ScrollViewTests
 
         top.Draw ();
 
-        View contentBottomRightCorner = sv.Subviews.First (v => v is ScrollBar.ContentBottomRightCorner);
-        Assert.True (contentBottomRightCorner is ScrollBar.ContentBottomRightCorner);
+        View contentBottomRightCorner = sv.Subviews.First (v => v is ScrollBarView.ContentBottomRightCorner);
+        Assert.True (contentBottomRightCorner is ScrollBarView.ContentBottomRightCorner);
         Assert.True (contentBottomRightCorner.Visible);
 
         TestHelpers.AssertDriverContentsWithFrameAre (

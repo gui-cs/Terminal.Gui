@@ -15,14 +15,14 @@ namespace Terminal.Gui;
 ///     </para>
 ///     <para>If the region to display the scrollbar is larger than three characters, arrow indicators are drawn.</para>
 /// </remarks>
-public class ScrollBar : View
+public class ScrollBarView : View
 {
     private static Point _superViewContentOffset;
     private bool _autoHideScrollBars = true;
     private View _contentBottomRightCorner;
     private bool _keepContentAlwaysInViewport = true;
     private int _lastLocation = -1;
-    private ScrollBar _otherScrollBar;
+    private ScrollBarView _otherScrollBar;
     private int _posBarOffset;
     private int _posBottomTee;
     private int _posLeftTee;
@@ -33,10 +33,10 @@ public class ScrollBar : View
     private bool _vertical;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ScrollBar"/> class using
+    ///     Initializes a new instance of the <see cref="ScrollBarView"/> class using
     ///     <see cref="LayoutStyle.Computed"/> layout.
     /// </summary>
-    public ScrollBar ()
+    public ScrollBarView ()
     {
         ShowScrollIndicator = true;
         WantContinuousButtonPressed = true;
@@ -76,7 +76,7 @@ public class ScrollBar : View
         }
     }
 
-    /// <summary>Get or sets if the view-port is kept always visible in the area of this <see cref="ScrollBar"/></summary>
+    /// <summary>Get or sets if the view-port is kept always visible in the area of this <see cref="ScrollBarView"/></summary>
     public bool KeepContentAlwaysInViewPort
     {
         get => _keepContentAlwaysInViewport;
@@ -92,7 +92,7 @@ public class ScrollBar : View
     }
 
     /// <summary>Represent a vertical or horizontal ScrollBar other than this.</summary>
-    public ScrollBar OtherScrollBar
+    public ScrollBarView OtherScrollBar
     {
         get => _otherScrollBar;
         set
@@ -685,7 +685,7 @@ public class ScrollBar : View
         }
     }
 
-    private bool CheckBothScrollBars (ScrollBar scrollBarView, bool pending = false)
+    private bool CheckBothScrollBars (ScrollBarView scrollBarView, bool pending = false)
     {
         int barsize = scrollBarView._vertical ? scrollBarView.Bounds.Height : scrollBarView.Bounds.Width;
 
