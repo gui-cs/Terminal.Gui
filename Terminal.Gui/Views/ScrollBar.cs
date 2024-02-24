@@ -17,6 +17,7 @@ namespace Terminal.Gui;
 /// </remarks>
 public class ScrollBar : View
 {
+    private static Point _superViewContentOffset;
     private bool _autoHideScrollBars = true;
     private View _contentBottomRightCorner;
     private bool _keepContentAlwaysInViewport = true;
@@ -164,7 +165,7 @@ public class ScrollBar : View
     /// </remarks>
     public int Size
     {
-        get => _size;
+        get => _size - (IsVertical ? _superViewContentOffset.Y : _superViewContentOffset.X);
         set
         {
             _size = value;
@@ -631,7 +632,7 @@ public class ScrollBar : View
     // param n is the new position and the max is the positive/negative value that can be scrolled for the new position
     internal bool CanScroll (int n, out int maxToScroll, bool isVertical = false)
     {
-        if (SuperView is null || SuperView?.Bounds.IsEmpty == true)
+        if (GetSuperViewBounds ().IsEmpty)
         {
             maxToScroll = 0;
 
@@ -639,13 +640,13 @@ public class ScrollBar : View
         }
 
         int barSize = GetBarSize (isVertical);
-        int newPosition = Math.Max (Math.Min (_size - barSize, n), 0);
+        int newPosition = Math.Max (Math.Min (Size - barSize, n), 0);
 
-        maxToScroll = _size > barSize + newPosition
+        maxToScroll = Size > barSize + newPosition
                           ? newPosition - _position
-                          : _size - (barSize + _position) - (barSize == 0 && _showBothScrollIndicator ? 1 : 0);
+                          : Size - (barSize + _position) - (barSize == 0 && _showBothScrollIndicator ? 1 : 0);
 
-        return _size >= barSize + newPosition && maxToScroll != 0;
+        return Size >= barSize + newPosition && maxToScroll != 0;
     }
 
     private void AdjustContentInViewport (bool refresh = true)
@@ -656,15 +657,16 @@ public class ScrollBar : View
         }
 
         var pos = 0;
+        Rectangle bounds = GetSuperViewBounds ();
 
-        if (KeepContentAlwaysInViewPort && !_vertical && _position + SuperView.Bounds.Width > _size + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0))
+        if (KeepContentAlwaysInViewPort && !_vertical && _position + bounds.Width > Size + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0))
         {
-            pos = Math.Max (_size - SuperView.Bounds.Width + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0), 0);
+            pos = Math.Max (Size - bounds.Width + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0), 0);
         }
 
-        if (KeepContentAlwaysInViewPort && _vertical && _position + SuperView.Bounds.Height > _size + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0))
+        if (KeepContentAlwaysInViewPort && _vertical && _position + bounds.Height > Size + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0))
         {
-            pos = Math.Max (_size - SuperView.Bounds.Height + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0), 0);
+            pos = Math.Max (Size - bounds.Height + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0), 0);
         }
 
         if (pos != 0)
@@ -687,7 +689,7 @@ public class ScrollBar : View
     {
         int barsize = scrollBarView._vertical ? scrollBarView.Bounds.Height : scrollBarView.Bounds.Width;
 
-        if (barsize == 0 || barsize >= scrollBarView._size)
+        if (barsize == 0 || barsize >= scrollBarView.Size)
         {
             if (scrollBarView._showScrollIndicator)
             {
@@ -699,7 +701,7 @@ public class ScrollBar : View
                 scrollBarView.Visible = false;
             }
         }
-        else if (barsize > 0 && barsize == scrollBarView._size && scrollBarView.OtherScrollBar is { } && pending)
+        else if (barsize > 0 && barsize == scrollBarView.Size && scrollBarView.OtherScrollBar is { } && pending)
         {
             if (scrollBarView._showScrollIndicator)
             {
@@ -721,7 +723,7 @@ public class ScrollBar : View
                 scrollBarView.OtherScrollBar.Visible = false;
             }
         }
-        else if (barsize > 0 && barsize == _size && scrollBarView.OtherScrollBar is { } && !pending)
+        else if (barsize > 0 && barsize == Size && scrollBarView.OtherScrollBar is { } && !pending)
         {
             pending = true;
         }
@@ -837,7 +839,9 @@ public class ScrollBar : View
 
     private int GetBarSize (bool isVertical)
     {
-        if (SuperView is null || SuperView?.Bounds.IsEmpty == true)
+        Rectangle bounds = GetSuperViewBounds ();
+
+        if (bounds.IsEmpty)
         {
             return 0;
         }
@@ -845,15 +849,25 @@ public class ScrollBar : View
         if (IsBuiltIn)
         {
             return isVertical ? KeepContentAlwaysInViewPort
-                                    ? SuperView.Bounds.Height
+                                    ? bounds.Height
                                     : 0 :
-                   KeepContentAlwaysInViewPort ? SuperView.Bounds.Width : 0;
+                   KeepContentAlwaysInViewPort ? bounds.Width : 0;
         }
 
         return isVertical ? KeepContentAlwaysInViewPort
-                                ? SuperView.Bounds.Height - (_showBothScrollIndicator ? 1 : 0)
+                                ? bounds.Height - (_showBothScrollIndicator ? 1 : 0)
                                 : 0 :
-               KeepContentAlwaysInViewPort ? SuperView.Bounds.Width - (_showBothScrollIndicator ? 1 : 0) : 0;
+               KeepContentAlwaysInViewPort ? bounds.Width - (_showBothScrollIndicator ? 1 : 0) : 0;
+    }
+
+    private Rectangle GetSuperViewBounds ()
+    {
+        if (SuperView is null)
+        {
+            return Rectangle.Empty;
+        }
+
+        return new Rectangle (Point.Empty, new Size (SuperView.Bounds.Width + SuperView.ContentOffset.X, SuperView.Bounds.Height + SuperView.ContentOffset.Y));
     }
 
     private void ManageScrollBarThickness ()
@@ -991,7 +1005,6 @@ public class ScrollBar : View
         OtherScrollBar?._contentBottomRightCorner?.SetNeedsDisplay ();
     }
 
-    // BUGBUG: v2 - rationalize this with View.SetMinWidthHeight
     private void SetWidthHeight ()
     {
         if (!IsInitialized)
@@ -1001,26 +1014,71 @@ public class ScrollBar : View
 
         if (_showBothScrollIndicator)
         {
-            Width = _vertical ? 1 : SuperView is Adornment ? Dim.Fill () : Dim.Fill (1);
-            Height = _vertical ? SuperView is Adornment ? Dim.Fill () : Dim.Fill (1) : 1;
+            if (SuperView is { UseNegativeBoundsLocation: true })
+            {
+                Rectangle bounds = GetSuperViewBounds ();
 
-            _otherScrollBar.Width = _otherScrollBar._vertical ? 1 :
-                                    SuperView is Adornment ? Dim.Fill () : Dim.Fill (1);
+                X = _vertical ? bounds.Right - 1 : bounds.Left;
+                Y = _vertical ? bounds.Top : bounds.Bottom - 1;
+                Width = _vertical ? 1 : SuperView is Adornment ? Dim.Fill () : bounds.Width - 1;
+                Height = _vertical ? SuperView is Adornment ? Dim.Fill () : bounds.Height - 1 : 1;
 
-            _otherScrollBar.Height = _otherScrollBar._vertical
-                                         ? SuperView is Adornment ? Dim.Fill () : Dim.Fill (1)
-                                         : 1;
+                _otherScrollBar.X = _otherScrollBar._vertical ? bounds.Right - 1 : bounds.Left;
+                _otherScrollBar.Y = _otherScrollBar._vertical ? bounds.Top : bounds.Bottom - 1;
+
+                _otherScrollBar.Width = _otherScrollBar._vertical ? 1 :
+                                        SuperView is Adornment ? Dim.Fill () : bounds.Width - 1;
+
+                _otherScrollBar.Height = _otherScrollBar._vertical
+                                             ? SuperView is Adornment ? Dim.Fill () : bounds.Height - 1
+                                             : 1;
+            }
+            else
+            {
+                Width = _vertical ? 1 : SuperView is Adornment ? Dim.Fill () : Dim.Fill (1);
+                Height = _vertical ? SuperView is Adornment ? Dim.Fill () : Dim.Fill (1) : 1;
+
+                _otherScrollBar.Width = _otherScrollBar._vertical ? 1 :
+                                        SuperView is Adornment ? Dim.Fill () : Dim.Fill (1);
+
+                _otherScrollBar.Height = _otherScrollBar._vertical
+                                             ? SuperView is Adornment ? Dim.Fill () : Dim.Fill (1)
+                                             : 1;
+            }
         }
         else if (_showScrollIndicator)
         {
-            Width = _vertical ? 1 : Dim.Fill ();
-            Height = _vertical ? Dim.Fill () : 1;
+            if (SuperView is { UseNegativeBoundsLocation: true })
+            {
+                Rectangle bounds = GetSuperViewBounds ();
+
+                X = _vertical ? bounds.Right - 1 : bounds.Left;
+                Y = _vertical ? bounds.Top : bounds.Bottom - 1;
+                Width = _vertical ? 1 : bounds.Width;
+                Height = _vertical ? bounds.Height : 1;
+            }
+            else
+            {
+                Width = _vertical ? 1 : Dim.Fill ();
+                Height = _vertical ? Dim.Fill () : 1;
+            }
         }
         else if (_otherScrollBar?._showScrollIndicator == true)
         {
-            _otherScrollBar.Width = _otherScrollBar._vertical ? 1 : Dim.Fill ();
+            if (SuperView is { UseNegativeBoundsLocation: true })
+            {
+                Rectangle bounds = GetSuperViewBounds ();
 
-            _otherScrollBar.Height = _otherScrollBar._vertical ? Dim.Fill () : 1;
+                _otherScrollBar.X = _otherScrollBar._vertical ? bounds.Right - 1 : bounds.Left;
+                _otherScrollBar.Y = _otherScrollBar._vertical ? bounds.Top : bounds.Bottom - 1;
+                _otherScrollBar.Width = _otherScrollBar._vertical ? 1 : bounds.Width;
+                _otherScrollBar.Height = _otherScrollBar._vertical ? bounds.Height : 1;
+            }
+            else
+            {
+                _otherScrollBar.Width = _otherScrollBar._vertical ? 1 : Dim.Fill ();
+                _otherScrollBar.Height = _otherScrollBar._vertical ? Dim.Fill () : 1;
+            }
         }
 
         if (IsBuiltIn)
@@ -1037,7 +1095,7 @@ public class ScrollBar : View
             return;
         }
 
-        SetRelativeLayout (SuperView?.Bounds ?? Bounds);
+        SetRelativeLayout (GetSuperViewBounds ());
 
         if (AutoHideScrollBars)
         {
@@ -1045,18 +1103,18 @@ public class ScrollBar : View
 
             if (_otherScrollBar is { })
             {
-                _otherScrollBar.SetRelativeLayout (SuperView?.Bounds ?? Bounds);
+                _otherScrollBar.SetRelativeLayout (GetSuperViewBounds ());
                 CheckBothScrollBars (_otherScrollBar, pending);
             }
         }
 
         SetWidthHeight ();
-        SetRelativeLayout (SuperView?.Bounds ?? Bounds);
+        SetRelativeLayout (GetSuperViewBounds ());
 
         if (_otherScrollBar is { })
         {
             OtherScrollBar.SetWidthHeight ();
-            OtherScrollBar.SetRelativeLayout (SuperView?.Bounds ?? Bounds);
+            OtherScrollBar.SetRelativeLayout (GetSuperViewBounds ());
         }
 
         if (_showBothScrollIndicator)

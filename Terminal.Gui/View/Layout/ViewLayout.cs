@@ -190,13 +190,17 @@ public partial class View
                                   - Margin.Thickness.Horizontal
                                   - Border.Thickness.Horizontal
                                   - Padding.Thickness.Horizontal
-                                  - _bounds.Location.X);
+                                  - ContentOffset.X);
 
             int height = Math.Max (
                                    0,
-                                   Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical - _bounds.Location.Y);
+                                   Frame.Size.Height
+                                   - Margin.Thickness.Vertical
+                                   - Border.Thickness.Vertical
+                                   - Padding.Thickness.Vertical
+                                   - ContentOffset.Y);
 
-            return new Rectangle (_bounds.Location, new Size (width, height));
+            return new Rectangle (ContentOffset, new Size (width, height));
         }
         set
         {
@@ -210,12 +214,6 @@ public partial class View
                                 );
             }
 #endif // DEBUG
-            if (ScrollBarType != ScrollBarType.None && UseNegativeBoundsLocation)
-            {
-                _bounds = value;
-
-                return;
-            }
 
             Frame = new Rectangle (
                                    Frame.Location,
@@ -258,6 +256,11 @@ public partial class View
         }
     }
 
+    /// <summary>
+    ///     Represent the content offset if <see cref="UseNegativeBoundsLocation"/> is true.
+    /// </summary>
+    public Point ContentOffset { get; set; }
+
     /// <summary>Gets or sets the absolute location and dimension of the view.</summary>
     /// <value>
     ///     The rectangle describing absolute location and dimension of the view, in coordinates relative to the
@@ -272,7 +275,8 @@ public partial class View
     ///     <para>This causes <see cref="LayoutStyle"/> to be <see cref="LayoutStyle.Absolute"/>.</para>
     ///     <para>
     ///         Altering the Frame will eventually (when the view hierarchy is next laid out via  see
-    ///         cref="LayoutSubviews"/>) cause <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/>
+    ///         cref="LayoutSubviews"/>) cause <see cref="LayoutSubview(View, Rectangle)"/> and
+    ///         <see cref="OnDrawContent(Rectangle)"/>
     ///         methods to be called.
     ///     </para>
     /// </remarks>
@@ -472,7 +476,8 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
-    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been called.
+    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been
+    ///         called.
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
@@ -499,7 +504,8 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
-    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been called.
+    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been
+    ///         called.
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
@@ -986,8 +992,8 @@ public partial class View
         // First try SuperView.Bounds, then Application.Top, then Driver.Bounds.
         // Finally, if none of those are valid, use int.MaxValue (for Unit tests).
         Rectangle relativeBounds = SuperView is { IsInitialized: true } ? SuperView.Bounds :
-                              Application.Top is { } && Application.Top.IsInitialized ? Application.Top.Bounds :
-                              Application.Driver?.Bounds ?? new Rectangle (0, 0, int.MaxValue, int.MaxValue);
+                                   Application.Top is { } && Application.Top.IsInitialized ? Application.Top.Bounds :
+                                   Application.Driver?.Bounds ?? new Rectangle (0, 0, int.MaxValue, int.MaxValue);
         SetRelativeLayout (relativeBounds);
 
         // TODO: Determine what, if any of the below is actually needed here.

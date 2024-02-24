@@ -61,7 +61,6 @@ public partial class View
             view._scrollBarType = value;
             view.DisposeScrollBar ();
 
-
             switch (view._scrollBarType)
             {
                 case ScrollBarType.Vertical:
@@ -592,8 +591,7 @@ public partial class View
         {
             if (UseNegativeBoundsLocation)
             {
-                Bounds = Bounds with { Y = -scrollBar.Position };
-                Bounds = Bounds with { Height = Math.Min (Bounds.Height + scrollBar.Position, ScrollRowsSize) };
+                ContentOffset = new Point (Bounds.X, -scrollBar.Position);
 
                 if (Bounds.Y != -scrollBar.Position)
                 {
@@ -612,8 +610,7 @@ public partial class View
         {
             if (UseNegativeBoundsLocation)
             {
-                Bounds = Bounds with { X = -scrollBar.Position };
-                Bounds = Bounds with { Width = Math.Min (Bounds.Width + scrollBar.Position, ScrollColsSize) };
+                ContentOffset = new Point (-scrollBar.Position, Bounds.Y);
 
                 if (Bounds.X != -scrollBar.Position)
                 {
