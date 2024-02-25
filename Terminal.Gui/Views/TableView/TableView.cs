@@ -2007,16 +2007,11 @@ public class TableView : View
 
     private void SetScrollRowsColsSize ()
     {
-        int scrollColsSize = Table?.Columns + ContentArea.Width - 1 ?? 0;
+        int scrollColsSize = Math.Max (Table?.Columns + ContentArea.Width - 1 ?? 0, 0);
 
-        if (ScrollColsSize != scrollColsSize)
+        if (ContentSize.Width != scrollColsSize || ContentSize.Height != Table?.Rows)
         {
-            ScrollColsSize = scrollColsSize;
-        }
-
-        if (ScrollRowsSize != Table?.Rows)
-        {
-            ScrollRowsSize = Table?.Rows ?? 0;
+            ContentSize = new Size (scrollColsSize, Table?.Rows ?? 0);
         }
     }
 

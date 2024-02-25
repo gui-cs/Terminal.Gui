@@ -94,7 +94,6 @@ public class ScrollBars : Scenario
         view.TextFormatter.FillRemaining = true;
         view.CanFocus = true;
         string [] strings = view.Text.Split ("\n").ToArray ();
-        view.ScrollColsSize = strings.OrderByDescending (s => s.Length).First ().GetColumns ();
-        view.ScrollRowsSize = strings.Length;
+        view.ContentSize = new Size (strings.OrderByDescending (s => s.Length).First ().GetColumns (), strings.Length);
     }
 }

@@ -30,8 +30,6 @@ public partial class View
 {
     private ScrollBarView _scrollBar;
     private ScrollBarType _scrollBarType;
-    private int _scrollColsSize;
-    private int _scrollRowsSize;
 
     /// <summary>If true the vertical/horizontal scroll bars won't be showed if it's not needed.</summary>
     public bool ScrollAutoHideScrollBars
@@ -93,47 +91,6 @@ public partial class View
         }
     }
 
-    /// <summary>
-    ///     Determines the number of columns to scrolling.
-    /// </summary>
-    public int ScrollColsSize
-    {
-        get => _scrollColsSize;
-        set
-        {
-            _scrollColsSize = value;
-
-            if (ScrollBarType == ScrollBarType.None)
-            {
-                return;
-            }
-
-            switch (_scrollBar.IsVertical)
-            {
-                case true when _scrollBar.OtherScrollBarView is { }:
-                    if (_scrollBar.OtherScrollBarView.Size == _scrollColsSize)
-                    {
-                        return;
-                    }
-
-                    _scrollBar.OtherScrollBarView.Size = _scrollColsSize;
-
-                    break;
-                case false:
-                    if (_scrollBar.Size == _scrollColsSize)
-                    {
-                        return;
-                    }
-
-                    _scrollBar.Size = _scrollColsSize;
-
-                    break;
-            }
-
-            SetNeedsDisplay ();
-        }
-    }
-
     /// <summary>Get or sets if the view-port is kept always visible in the area of this <see cref="ScrollBarView"/></summary>
     public bool ScrollKeepContentAlwaysInViewPort
     {
@@ -154,47 +111,6 @@ public partial class View
     {
         get => _scrollBar.Position;
         set => _scrollBar.Position = value;
-    }
-
-    /// <summary>
-    ///     Determines the number of rows to scrolling.
-    /// </summary>
-    public int ScrollRowsSize
-    {
-        get => _scrollRowsSize;
-        set
-        {
-            _scrollRowsSize = value;
-
-            if (ScrollBarType == ScrollBarType.None)
-            {
-                return;
-            }
-
-            switch (_scrollBar.IsVertical)
-            {
-                case true:
-                    if (_scrollBar.Size == _scrollRowsSize)
-                    {
-                        return;
-                    }
-
-                    _scrollBar.Size = _scrollRowsSize;
-
-                    break;
-                case false when _scrollBar.OtherScrollBarView is { }:
-                    if (_scrollBar.OtherScrollBarView.Size == _scrollRowsSize)
-                    {
-                        return;
-                    }
-
-                    _scrollBar.OtherScrollBarView.Size = _scrollRowsSize;
-
-                    break;
-            }
-
-            SetNeedsDisplay ();
-        }
     }
 
     /// <summary>Gets or sets the visibility for the vertical or horizontal scroll indicator.</summary>
@@ -294,14 +210,14 @@ public partial class View
                                   {
                                       if (scrollBar.IsVertical)
                                       {
-                                          scrollBar.Position = ScrollRowsSize;
+                                          scrollBar.Position = ContentSize.Height;
 
                                           return true;
                                       }
 
                                       if (scrollBar.OtherScrollBarView is { IsVertical: true })
                                       {
-                                          scrollBar.OtherScrollBarView.Position = ScrollRowsSize;
+                                          scrollBar.OtherScrollBarView.Position = ContentSize.Height;
 
                                           return true;
                                       }
@@ -431,14 +347,14 @@ public partial class View
                                   {
                                       if (!scrollBar.IsVertical)
                                       {
-                                          scrollBar.Position = ScrollColsSize;
+                                          scrollBar.Position = ContentSize.Width;
 
                                           return true;
                                       }
 
                                       if (scrollBar.OtherScrollBarView is { IsVertical: false })
                                       {
-                                          scrollBar.OtherScrollBarView.Position = ScrollColsSize;
+                                          scrollBar.OtherScrollBarView.Position = ContentSize.Width;
 
                                           return true;
                                       }

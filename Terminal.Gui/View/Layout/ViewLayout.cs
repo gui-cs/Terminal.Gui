@@ -38,6 +38,7 @@ public partial class View
 {
     private bool _autoSize;
     private Point _contentOffset;
+    private Size _contentSize;
     private Rectangle _frame;
     private Dim _height = Dim.Sized (0);
     private Dim _width = Dim.Sized (0);
@@ -266,6 +267,58 @@ public partial class View
             else if (_scrollBar is { OtherScrollBarView.IsVertical: true } && _scrollBar?.OtherScrollBarView.Position != -_contentOffset.Y)
             {
                 _scrollBar!.OtherScrollBarView.Position = -_contentOffset.Y;
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Represents the contents size of the data shown inside the <see cref="ContentArea"/>.
+    /// </summary>
+    public Size ContentSize
+    {
+        get => _contentSize;
+        set
+        {
+            if (_contentSize != value)
+            {
+                _contentSize = value;
+                SetNeedsDisplay ();
+            }
+
+            if (_scrollBar is null)
+            {
+                return;
+            }
+
+            if (_scrollBar.IsVertical)
+            {
+                if (_scrollBar.Size != ContentSize.Height)
+                {
+                    _scrollBar.Size = ContentSize.Height;
+                }
+
+                if (_scrollBar.OtherScrollBarView is { })
+                {
+                    if (_scrollBar.OtherScrollBarView.Size != ContentSize.Width)
+                    {
+                        _scrollBar.OtherScrollBarView.Size = ContentSize.Width;
+                    }
+                }
+            }
+            else
+            {
+                if (_scrollBar.Size != ContentSize.Width)
+                {
+                    _scrollBar.Size = ContentSize.Width;
+                }
+
+                if (_scrollBar.OtherScrollBarView is { })
+                {
+                    if (_scrollBar.OtherScrollBarView.Size != ContentSize.Height)
+                    {
+                        _scrollBar.OtherScrollBarView.Size = ContentSize.Height;
+                    }
+                }
             }
         }
     }

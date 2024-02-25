@@ -1060,10 +1060,13 @@ This is a test
     public void ScrollBar_Ungrab_Mouse_If_The_Mouse_Is_On_Another_View ()
     {
         var top = new Toplevel { Id = "top", Width = 10, Height = 10 };
-        var viewLeft = new View { Id = "left", Width = 5, Height = 5, ScrollBarType = ScrollBarType.Vertical, ScrollRowsSize = 20, CanFocus = true };
+        var viewLeft = new View { Id = "left", Width = 5, Height = 5, ScrollBarType = ScrollBarType.Vertical, ContentSize = new Size (0, 20), CanFocus = true };
 
         var viewRight = new View
-            { Id = "right", X = Pos.Right (viewLeft), Width = 5, Height = 6, ScrollBarType = ScrollBarType.Vertical, ScrollRowsSize = 20, CanFocus = true };
+        {
+            Id = "right", X = Pos.Right (viewLeft), Width = 5, Height = 6, ScrollBarType = ScrollBarType.Vertical, ContentSize = new Size (0, 20),
+            CanFocus = true
+        };
         top.Add (viewLeft, viewRight);
         Application.Begin (top);
 
@@ -1139,8 +1142,7 @@ This is a test
         view.TextFormatter.WordWrap = false;
         view.TextFormatter.MultiLine = true;
         string [] strings = view.Text.Split ("\n").ToArray ();
-        view.ScrollColsSize = strings.OrderByDescending (s => s.Length).First ().GetColumns ();
-        view.ScrollRowsSize = strings.Length;
+        view.ContentSize = new Size (strings.OrderByDescending (s => s.Length).First ().GetColumns (), strings.Length);
 
         view.ColorScheme = new ColorScheme
         {
@@ -1163,8 +1165,8 @@ This is a test
         top.Draw ();
         Assert.True (view.HasFocus);
         Assert.False (view2.HasFocus);
-        Assert.Equal (12, view.ScrollColsSize);
-        Assert.Equal (7, view.ScrollRowsSize);
+        Assert.Equal (12, view.ContentSize.Width);
+        Assert.Equal (7, view.ContentSize.Height);
         Assert.Equal ("{X=0,Y=0,Width=8,Height=5}", view.ContentArea.ToString ());
         Assert.Equal ("{X=0,Y=0,Width=8,Height=5}", view.GetVisibleContentArea ().ToString ());
         Assert.Equal ("{X=3,Y=2,Width=9,Height=6}", view.Frame.ToString ());
@@ -1252,8 +1254,7 @@ This is a test
         view.TextFormatter.WordWrap = false;
         view.TextFormatter.MultiLine = true;
         string [] strings = view.Text.Split ("\n").ToArray ();
-        view.ScrollColsSize = strings.OrderByDescending (s => s.Length).First ().GetColumns ();
-        view.ScrollRowsSize = strings.Length;
+        view.ContentSize = new Size (strings.OrderByDescending (s => s.Length).First ().GetColumns (), strings.Length);
 
         view.ColorScheme = new ColorScheme
         {
@@ -1280,8 +1281,8 @@ This is a test
         superTop.Draw ();
         Assert.True (view.HasFocus);
         Assert.False (view2.HasFocus);
-        Assert.Equal (12, view.ScrollColsSize);
-        Assert.Equal (7, view.ScrollRowsSize);
+        Assert.Equal (12, view.ContentSize.Width);
+        Assert.Equal (7, view.ContentSize.Height);
         Assert.Equal ("{X=0,Y=0,Width=8,Height=5}", view.ContentArea.ToString ());
         Assert.Equal ("{X=0,Y=0,Width=8,Height=5}", view.GetVisibleContentArea ().ToString ());
         Assert.Equal ("{X=2,Y=1,Width=9,Height=6}", view.Frame.ToString ());
@@ -1375,8 +1376,7 @@ This is a test
         view.TextFormatter.WordWrap = false;
         view.TextFormatter.MultiLine = true;
         string [] strings = view.Text.Split ("\n").ToArray ();
-        view.ScrollColsSize = strings.OrderByDescending (s => s.Length).First ().GetColumns ();
-        view.ScrollRowsSize = strings.Length;
+        view.ContentSize = new Size (strings.OrderByDescending (s => s.Length).First ().GetColumns (), strings.Length);
 
         view.ColorScheme = new ColorScheme
         {
@@ -1398,8 +1398,8 @@ This is a test
         superTop.Draw ();
         Assert.True (view.HasFocus);
         Assert.False (view2.HasFocus);
-        Assert.Equal (12, view.ScrollColsSize);
-        Assert.Equal (7, view.ScrollRowsSize);
+        Assert.Equal (12, view.ContentSize.Width);
+        Assert.Equal (7, view.ContentSize.Height);
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.ContentArea.ToString ());
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.GetVisibleContentArea ().ToString ());
         Assert.Equal ("{X=2,Y=1,Width=9,Height=6}", view.Frame.ToString ());

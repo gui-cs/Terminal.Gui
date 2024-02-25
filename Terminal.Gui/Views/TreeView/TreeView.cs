@@ -1626,11 +1626,7 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <returns>The branch for <paramref name="toFind"/> or null if it is not currently exposed in the tree.</returns>
     private Branch<T> ObjectToBranch (T toFind) { return BuildLineMap ().FirstOrDefault (o => o.Model.Equals (toFind)); }
 
-    private void TreeView_DrawAdornments (object sender, DrawEventArgs e)
-    {
-        ScrollRowsSize = ContentHeight;
-        ScrollColsSize = GetContentWidth (true);
-    }
+    private void TreeView_DrawAdornments (object sender, DrawEventArgs e) { ContentSize = new Size (GetContentWidth (true), ContentHeight); }
 }
 
 internal class TreeSelection<T> where T : class

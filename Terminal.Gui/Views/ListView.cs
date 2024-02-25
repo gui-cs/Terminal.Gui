@@ -914,8 +914,7 @@ public class ListView : View
     {
         try
         {
-            ScrollRowsSize = Source?.Count ?? 0;
-            ScrollColsSize = MaxLength;
+            ContentSize = new Size (MaxLength, Source?.Count ?? 0);
         }
         catch (NotImplementedException)
         { }

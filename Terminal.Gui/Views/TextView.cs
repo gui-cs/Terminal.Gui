@@ -6343,8 +6343,7 @@ public class TextView : View
     {
         if (ScrollBarType != ScrollBarType.None)
         {
-            ScrollColsSize = Maxlength;
-            ScrollRowsSize = Lines;
+            ContentSize = new Size (Maxlength, Lines);
             ContentOffset = new Point (-LeftColumn, -TopRow);
         }
     }
