@@ -150,7 +150,7 @@ public class ScrollBarViewTests
             Size = width * 2,
 
             ShowScrollIndicator = true,
-            IsVertical = false
+            Orientation = Orientation.Horizontal
         };
         super.Add (horiz);
 
@@ -160,7 +160,7 @@ public class ScrollBarViewTests
             Size = height * 2,
 
             ShowScrollIndicator = true,
-            IsVertical = true,
+            Orientation = Orientation.Vertical,
             OtherScrollBarView = horiz
         };
         super.Add (vert);
@@ -286,7 +286,7 @@ public class ScrollBarViewTests
         var label = new Label { Text = text };
         Application.Top.Add (label);
 
-        var sbv = new ScrollBarView { IsVertical = true, Size = 100, ClearOnVisibleFalse = false };
+        var sbv = new ScrollBarView { Orientation = Orientation.Vertical, Size = 100, ClearOnVisibleFalse = false };
         label.Add (sbv);
         Application.Begin (Application.Top);
 
@@ -487,7 +487,9 @@ This is a tes
                                                         Source = new ListWrapper (source)
                                                     };
                                                     win.Add (listView);
-                                                    var newScrollBarView = new ScrollBarView { IsVertical = true, KeepContentAlwaysInViewPort = true };
+
+                                                    var newScrollBarView = new ScrollBarView
+                                                        { Orientation = Orientation.Vertical, KeepContentAlwaysInViewPort = true };
                                                     listView.Add (newScrollBarView);
 
                                                     newScrollBarView.ChangedPosition += (s, e) =>
@@ -543,8 +545,8 @@ This is a tes
         var text =
             "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
         var label = new Label { Text = text };
-        var sbv = new ScrollBarView { X = Pos.AnchorEnd (1), IsVertical = true, Size = 100 };
-        sbv.OtherScrollBarView = new ScrollBarView { Y = Pos.AnchorEnd (1), IsVertical = false, Size = 100, OtherScrollBarView = sbv };
+        var sbv = new ScrollBarView { X = Pos.AnchorEnd (1), Orientation = Orientation.Vertical, Size = 100 };
+        sbv.OtherScrollBarView = new ScrollBarView { Y = Pos.AnchorEnd (1), Orientation = Orientation.Horizontal, Size = 100, OtherScrollBarView = sbv };
         label.Add (sbv, sbv.OtherScrollBarView);
         Application.Top.Add (label);
         Application.Begin (Application.Top);
@@ -626,7 +628,7 @@ This is a tes▼
             "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
         var label = new Label { Text = text };
 
-        var sbv = new ScrollBarView { X = Pos.AnchorEnd (1), IsVertical = true, Size = 100 };
+        var sbv = new ScrollBarView { X = Pos.AnchorEnd (1), Orientation = Orientation.Vertical, Size = 100 };
         label.Add (sbv);
         Application.Top.Add (label);
         Application.Begin (Application.Top);
@@ -712,13 +714,13 @@ This is a test
     {
         RemoveHandlers ();
 
-        _scrollBar = new ScrollBarView { IsVertical = true, OtherScrollBarView = new ScrollBarView { IsVertical = false } };
+        _scrollBar = new ScrollBarView { Orientation = Orientation.Vertical, OtherScrollBarView = new ScrollBarView { Orientation = Orientation.Horizontal } };
         _hostView.Add (_scrollBar);
 
         Application.Begin (Application.Top);
 
-        Assert.True (_scrollBar.IsVertical);
-        Assert.False (_scrollBar.OtherScrollBarView.IsVertical);
+        Assert.True (_scrollBar.Orientation == Orientation.Vertical);
+        Assert.True (_scrollBar.OtherScrollBarView.Orientation == Orientation.Horizontal);
 
         Assert.Equal (_scrollBar.Position, _hostView.Top);
         Assert.NotEqual (_scrollBar.Size, _hostView.Lines);
@@ -903,8 +905,8 @@ This is a test
         var top = new Toplevel ();
         var host = new View ();
         top.Add (host);
-        var v = new ScrollBarView { IsVertical = false };
-        var h = new ScrollBarView { IsVertical = false };
+        var v = new ScrollBarView { Orientation = Orientation.Horizontal };
+        var h = new ScrollBarView { Orientation = Orientation.Horizontal };
 
         Assert.Throws<ArgumentException> (() => v.OtherScrollBarView = h);
         Assert.Throws<ArgumentException> (() => h.OtherScrollBarView = v);
@@ -917,8 +919,8 @@ This is a test
         var top = new Toplevel ();
         var host = new View ();
         top.Add (host);
-        var v = new ScrollBarView { IsVertical = true };
-        var h = new ScrollBarView { IsVertical = true };
+        var v = new ScrollBarView { Orientation = Orientation.Vertical };
+        var h = new ScrollBarView { Orientation = Orientation.Vertical };
 
         Assert.Throws<ArgumentException> (() => v.OtherScrollBarView = h);
         Assert.Throws<ArgumentException> (() => h.OtherScrollBarView = v);
@@ -931,7 +933,7 @@ This is a test
         Toplevel top = Application.Top;
         Assert.Equal (new Rectangle (0, 0, 80, 25), top.ContentArea);
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
-        var sbv = new ScrollBarView { IsVertical = true, OtherScrollBarView = new ScrollBarView { IsVertical = false } };
+        var sbv = new ScrollBarView { Orientation = Orientation.Vertical, OtherScrollBarView = new ScrollBarView { Orientation = Orientation.Horizontal } };
         view.Add (sbv);
         top.Add (view);
         Assert.Equal (view, sbv.SuperView);
@@ -941,9 +943,9 @@ This is a test
         sbv.OtherScrollBarView.Position = 0;
 
         // Host bounds is not empty.
-        Assert.True (sbv.CanScroll (10, out int max, sbv.IsVertical));
+        Assert.True (sbv.CanScroll (10, out int max, sbv.Orientation));
         Assert.Equal (10, max);
-        Assert.True (sbv.OtherScrollBarView.CanScroll (10, out max, sbv.OtherScrollBarView.IsVertical));
+        Assert.True (sbv.OtherScrollBarView.CanScroll (10, out max, sbv.OtherScrollBarView.Orientation));
         Assert.Equal (10, max);
 
         Application.Begin (top);
@@ -954,23 +956,23 @@ This is a test
         top.LayoutSubviews ();
 
         // Now the host bounds is not empty.
-        Assert.True (sbv.CanScroll (10, out max, sbv.IsVertical));
+        Assert.True (sbv.CanScroll (10, out max, sbv.Orientation));
         Assert.Equal (10, max);
-        Assert.True (sbv.OtherScrollBarView.CanScroll (10, out max, sbv.OtherScrollBarView.IsVertical));
+        Assert.True (sbv.OtherScrollBarView.CanScroll (10, out max, sbv.OtherScrollBarView.Orientation));
         Assert.Equal (10, max);
-        Assert.True (sbv.CanScroll (50, out max, sbv.IsVertical));
+        Assert.True (sbv.CanScroll (50, out max, sbv.Orientation));
         Assert.Equal (40, sbv.Size);
         Assert.Equal (16, max); // 16+25=41
-        Assert.True (sbv.OtherScrollBarView.CanScroll (150, out max, sbv.OtherScrollBarView.IsVertical));
+        Assert.True (sbv.OtherScrollBarView.CanScroll (150, out max, sbv.OtherScrollBarView.Orientation));
         Assert.Equal (100, sbv.OtherScrollBarView.Size);
         Assert.Equal (21, max); // 21+80=101
         Assert.True (sbv.Visible);
         Assert.True (sbv.OtherScrollBarView.Visible);
         sbv.KeepContentAlwaysInViewPort = false;
         sbv.OtherScrollBarView.KeepContentAlwaysInViewPort = false;
-        Assert.True (sbv.CanScroll (50, out max, sbv.IsVertical));
+        Assert.True (sbv.CanScroll (50, out max, sbv.Orientation));
         Assert.Equal (39, max); // Keep 1 row visible
-        Assert.True (sbv.OtherScrollBarView.CanScroll (150, out max, sbv.OtherScrollBarView.IsVertical));
+        Assert.True (sbv.OtherScrollBarView.CanScroll (150, out max, sbv.OtherScrollBarView.Orientation));
         Assert.Equal (99, max); // Keep 1 column visible
         Assert.True (sbv.Visible);
         Assert.True (sbv.OtherScrollBarView.Visible);
@@ -1504,7 +1506,7 @@ This is a test
         var btn = new Button { X = 14, Text = "Click Me!" };
         btn.Accept += (s, e) => clicked = true;
 
-        var sbv = new ScrollBarView { IsVertical = true, Size = 5 };
+        var sbv = new ScrollBarView { Orientation = Orientation.Vertical, Size = 5 };
         label.Add (sbv);
         Application.Top.Add (label, btn);
         Application.Begin (Application.Top);
@@ -1624,7 +1626,7 @@ This is a tes▼             ",
             Size = height * 2,
 
             ShowScrollIndicator = true,
-            IsVertical = true
+            Orientation = Orientation.Vertical
         };
 
         super.Add (sbv);

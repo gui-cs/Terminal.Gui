@@ -60,16 +60,16 @@ public partial class View
             switch (view._scrollBarType)
             {
                 case ScrollBarType.Vertical:
-                    view._scrollBar = new ScrollBarView { IsVertical = true };
+                    view._scrollBar = new ScrollBarView { Orientation = Orientation.Vertical };
 
                     break;
                 case ScrollBarType.Horizontal:
-                    view._scrollBar = new ScrollBarView { IsVertical = false };
+                    view._scrollBar = new ScrollBarView { Orientation = Orientation.Horizontal };
 
                     break;
                 case ScrollBarType.Both:
-                    view._scrollBar = new ScrollBarView { IsVertical = true };
-                    view._scrollBar.OtherScrollBarView = new ScrollBarView { IsVertical = false, OtherScrollBarView = view._scrollBar };
+                    view._scrollBar = new ScrollBarView { Orientation = Orientation.Vertical };
+                    view._scrollBar.OtherScrollBarView = new ScrollBarView { Orientation = Orientation.Horizontal, OtherScrollBarView = view._scrollBar };
 
                     break;
                 case ScrollBarType.None:
@@ -130,21 +130,21 @@ public partial class View
 
     private void AddKeyBindingsForScrolling (ScrollBarView scrollBar)
     {
-        if (scrollBar.IsVertical)
+        if (scrollBar.Orientation == Orientation.Vertical)
         {
             // Things this view knows how to do
             scrollBar.AddCommand (
                                   Command.ScrollDown,
                                   () =>
                                   {
-                                      if (scrollBar.IsVertical)
+                                      if (scrollBar.Orientation == Orientation.Vertical)
                                       {
                                           scrollBar.Position++;
 
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBarView is { IsVertical: true })
+                                      if (scrollBar.OtherScrollBarView is { Orientation: Orientation.Vertical })
                                       {
                                           scrollBar.OtherScrollBarView.Position++;
 
@@ -158,14 +158,14 @@ public partial class View
                                   Command.ScrollUp,
                                   () =>
                                   {
-                                      if (scrollBar.IsVertical)
+                                      if (scrollBar.Orientation == Orientation.Vertical)
                                       {
                                           scrollBar.Position--;
 
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBarView is { IsVertical: true })
+                                      if (scrollBar.OtherScrollBarView is { Orientation: Orientation.Vertical })
                                       {
                                           scrollBar.OtherScrollBarView.Position--;
 
@@ -179,14 +179,14 @@ public partial class View
                                   Command.TopHome,
                                   () =>
                                   {
-                                      if (scrollBar.IsVertical)
+                                      if (scrollBar.Orientation == Orientation.Vertical)
                                       {
                                           scrollBar.Position = 0;
 
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBarView is { IsVertical: true })
+                                      if (scrollBar.OtherScrollBarView is { Orientation: Orientation.Vertical })
                                       {
                                           scrollBar.OtherScrollBarView.Position = 0;
 
@@ -200,14 +200,14 @@ public partial class View
                                   Command.BottomEnd,
                                   () =>
                                   {
-                                      if (scrollBar.IsVertical)
+                                      if (scrollBar.Orientation == Orientation.Vertical)
                                       {
                                           scrollBar.Position = ContentSize.Height;
 
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBarView is { IsVertical: true })
+                                      if (scrollBar.OtherScrollBarView is { Orientation: Orientation.Vertical })
                                       {
                                           scrollBar.OtherScrollBarView.Position = ContentSize.Height;
 
@@ -221,14 +221,14 @@ public partial class View
                                   Command.PageDown,
                                   () =>
                                   {
-                                      if (scrollBar.IsVertical)
+                                      if (scrollBar.Orientation == Orientation.Vertical)
                                       {
                                           scrollBar.Position += GetVisibleContentArea ().Height;
 
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBarView is { IsVertical: true })
+                                      if (scrollBar.OtherScrollBarView is { Orientation: Orientation.Vertical })
                                       {
                                           scrollBar.OtherScrollBarView.Position += GetVisibleContentArea ().Height;
 
@@ -242,14 +242,14 @@ public partial class View
                                   Command.PageUp,
                                   () =>
                                   {
-                                      if (scrollBar.IsVertical)
+                                      if (scrollBar.Orientation == Orientation.Vertical)
                                       {
                                           scrollBar.Position -= GetVisibleContentArea ().Height;
 
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBarView is { IsVertical: true })
+                                      if (scrollBar.OtherScrollBarView is { Orientation: Orientation.Vertical })
                                       {
                                           scrollBar.OtherScrollBarView.Position -= GetVisibleContentArea ().Height;
 
@@ -274,14 +274,14 @@ public partial class View
                                   Command.Left,
                                   () =>
                                   {
-                                      if (!scrollBar.IsVertical)
+                                      if (scrollBar.Orientation == Orientation.Horizontal)
                                       {
                                           scrollBar.Position--;
 
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBarView is { IsVertical: false })
+                                      if (scrollBar.OtherScrollBarView is { Orientation: Orientation.Horizontal })
                                       {
                                           scrollBar.OtherScrollBarView.Position--;
 
@@ -295,14 +295,14 @@ public partial class View
                                   Command.Right,
                                   () =>
                                   {
-                                      if (!scrollBar.IsVertical)
+                                      if (scrollBar.Orientation == Orientation.Horizontal)
                                       {
                                           scrollBar.Position++;
 
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBarView is { IsVertical: false })
+                                      if (scrollBar.OtherScrollBarView is { Orientation: Orientation.Horizontal })
                                       {
                                           scrollBar.OtherScrollBarView.Position++;
 
@@ -316,14 +316,14 @@ public partial class View
                                   Command.LeftHome,
                                   () =>
                                   {
-                                      if (!scrollBar.IsVertical)
+                                      if (scrollBar.Orientation == Orientation.Horizontal)
                                       {
                                           scrollBar.Position = 0;
 
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBarView is { IsVertical: false })
+                                      if (scrollBar.OtherScrollBarView is { Orientation: Orientation.Horizontal })
                                       {
                                           scrollBar.OtherScrollBarView.Position = 0;
 
@@ -337,14 +337,14 @@ public partial class View
                                   Command.RightEnd,
                                   () =>
                                   {
-                                      if (!scrollBar.IsVertical)
+                                      if (scrollBar.Orientation == Orientation.Horizontal)
                                       {
                                           scrollBar.Position = ContentSize.Width;
 
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBarView is { IsVertical: false })
+                                      if (scrollBar.OtherScrollBarView is { Orientation: Orientation.Horizontal })
                                       {
                                           scrollBar.OtherScrollBarView.Position = ContentSize.Width;
 
@@ -358,14 +358,14 @@ public partial class View
                                   Command.PageRight,
                                   () =>
                                   {
-                                      if (!scrollBar.IsVertical)
+                                      if (scrollBar.Orientation == Orientation.Horizontal)
                                       {
                                           scrollBar.Position += GetVisibleContentArea ().Width;
 
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBarView is { IsVertical: false })
+                                      if (scrollBar.OtherScrollBarView is { Orientation: Orientation.Horizontal })
                                       {
                                           scrollBar.OtherScrollBarView.Position += GetVisibleContentArea ().Width;
 
@@ -379,14 +379,14 @@ public partial class View
                                   Command.PageLeft,
                                   () =>
                                   {
-                                      if (!scrollBar.IsVertical)
+                                      if (scrollBar.Orientation == Orientation.Horizontal)
                                       {
                                           scrollBar.Position -= GetVisibleContentArea ().Width;
 
                                           return true;
                                       }
 
-                                      if (scrollBar.OtherScrollBarView is { IsVertical: false })
+                                      if (scrollBar.OtherScrollBarView is { Orientation: Orientation.Horizontal })
                                       {
                                           scrollBar.OtherScrollBarView.Position -= GetVisibleContentArea ().Width;
 
@@ -430,7 +430,7 @@ public partial class View
 
     private void SetBoundsByPosition (ScrollBarView scrollBar)
     {
-        if (scrollBar.IsVertical)
+        if (scrollBar.Orientation == Orientation.Vertical)
         {
             ContentOffset = new Point (ContentArea.X, -scrollBar.Position);
         }

@@ -22,6 +22,7 @@ public class ScrollBarView : View
     private View _contentBottomRightCorner;
     private bool _keepContentAlwaysInViewport = true;
     private int _lastLocation = -1;
+    private Orientation _orientation;
     private ScrollBarView _otherScrollBarView;
     private int _posBarOffset;
     private int _posBottomTee;
@@ -30,7 +31,6 @@ public class ScrollBarView : View
     private int _posTopTee;
     private bool _showScrollIndicator;
     private int _size, _position;
-    private bool _vertical;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using
@@ -61,21 +61,6 @@ public class ScrollBarView : View
         }
     }
 
-    /// <summary>If set to <c>true</c> this is a vertical scrollbar, otherwise, the scrollbar is horizontal.</summary>
-    public bool IsVertical
-    {
-        get => _vertical;
-        set
-        {
-            _vertical = value;
-
-            if (IsInitialized)
-            {
-                SetWidthHeight ();
-            }
-        }
-    }
-
     /// <summary>Get or sets if the view-port is kept always visible in the area of this <see cref="ScrollBarView"/></summary>
     public bool KeepContentAlwaysInViewPort
     {
@@ -91,16 +76,33 @@ public class ScrollBarView : View
         }
     }
 
+    /// <summary>Defines if a scrollbar is vertical or horizontal.</summary>
+    public Orientation Orientation
+    {
+        get => _orientation;
+        set
+        {
+            _orientation = value;
+
+            if (IsInitialized)
+            {
+                SetWidthHeight ();
+            }
+        }
+    }
+
     /// <summary>Represent a vertical or horizontal ScrollBarView other than this.</summary>
     public ScrollBarView OtherScrollBarView
     {
         get => _otherScrollBarView;
         set
         {
-            if (value is { } && ((value.IsVertical && _vertical) || (!value.IsVertical && !_vertical)))
+            if (value is { }
+                && ((value.Orientation == Orientation.Vertical && _orientation == Orientation.Vertical)
+                    || (value.Orientation == Orientation.Horizontal && _orientation == Orientation.Horizontal)))
             {
                 throw new ArgumentException (
-                                             $"There is already a {(_vertical ? "vertical" : "horizontal")} ScrollBarView."
+                                             $"There is already a {(_orientation == Orientation.Vertical ? "vertical" : "horizontal")} ScrollBarView."
                                             );
             }
 
@@ -165,7 +167,7 @@ public class ScrollBarView : View
     /// </remarks>
     public int Size
     {
-        get => _size - (IsVertical ? _superViewContentOffset.Y : _superViewContentOffset.X);
+        get => _size - (Orientation == Orientation.Vertical ? _superViewContentOffset.Y : _superViewContentOffset.X);
         set
         {
             _size = value;
@@ -212,10 +214,10 @@ public class ScrollBarView : View
             host.SetFocus ();
         }
 
-        int location = _vertical ? mouseEvent.Y : mouseEvent.X;
-        int barsize = _vertical ? ContentArea.Height : ContentArea.Width;
-        int posTopLeftTee = _vertical ? _posTopTee + 1 : _posLeftTee + 1;
-        int posBottomRightTee = _vertical ? _posBottomTee + 1 : _posRightTee + 1;
+        int location = _orientation == Orientation.Vertical ? mouseEvent.Y : mouseEvent.X;
+        int barsize = _orientation == Orientation.Vertical ? ContentArea.Height : ContentArea.Width;
+        int posTopLeftTee = _orientation == Orientation.Vertical ? _posTopTee + 1 : _posLeftTee + 1;
+        int posBottomRightTee = _orientation == Orientation.Vertical ? _posBottomTee + 1 : _posRightTee + 1;
         barsize -= 2;
         int pos = Position;
 
@@ -249,7 +251,7 @@ public class ScrollBarView : View
         }
         else if (_lastLocation == -1 && mouseEvent.Flags == MouseFlags.Button1Pressed && location == barsize + 1)
         {
-            if (CanScroll (pos + 1, out _, _vertical))
+            if (CanScroll (pos + 1, out _, _orientation))
             {
                 Position = pos + 1;
             }
@@ -292,12 +294,12 @@ public class ScrollBarView : View
                     {
                         int np = (location - _posBarOffset) * Size / barsize + Size / barsize;
 
-                        if (CanScroll (np, out int nv, _vertical))
+                        if (CanScroll (np, out int nv, _orientation))
                         {
                             Position = pos + nv;
                         }
                     }
-                    else if (CanScroll (Size, out int nv, _vertical))
+                    else if (CanScroll (Size, out int nv, _orientation))
                     {
                         Position = Math.Min (pos + nv, Size);
                     }
@@ -308,7 +310,7 @@ public class ScrollBarView : View
                     {
                         int np = (location - _posBarOffset) * Size / barsize - Size / barsize;
 
-                        if (CanScroll (np, out int nv, _vertical))
+                        if (CanScroll (np, out int nv, _orientation))
                         {
                             Position = pos + nv;
                         }
@@ -322,11 +324,11 @@ public class ScrollBarView : View
                 {
                     Position = Size;
                 }
-                else if (location - _posBarOffset >= barsize && posBottomRightTee - posTopLeftTee >= 3 && CanScroll (Size - pos, out int nv, _vertical))
+                else if (location - _posBarOffset >= barsize && posBottomRightTee - posTopLeftTee >= 3 && CanScroll (Size - pos, out int nv, _orientation))
                 {
                     Position = Math.Min (pos + nv, Size);
                 }
-                else if (location - _posBarOffset >= barsize - 1 && posBottomRightTee - posTopLeftTee <= 3 && CanScroll (Size - pos, out nv, _vertical))
+                else if (location - _posBarOffset >= barsize - 1 && posBottomRightTee - posTopLeftTee <= 3 && CanScroll (Size - pos, out nv, _orientation))
                 {
                     Position = Math.Min (pos + nv, Size);
                 }
@@ -337,14 +339,14 @@ public class ScrollBarView : View
             }
             else if (location > posBottomRightTee)
             {
-                if (CanScroll (pos + barsize, out int nv, _vertical))
+                if (CanScroll (pos + barsize, out int nv, _orientation))
                 {
                     Position = pos + nv;
                 }
             }
             else if (location < posTopLeftTee)
             {
-                if (CanScroll (pos - barsize, out int nv, _vertical))
+                if (CanScroll (pos - barsize, out int nv, _orientation))
                 {
                     Position = pos + nv;
                 }
@@ -355,7 +357,7 @@ public class ScrollBarView : View
             }
             else if (location == barsize)
             {
-                if (CanScroll (Size, out int nv, _vertical))
+                if (CanScroll (Size, out int nv, _orientation))
                 {
                     Position = Math.Min (pos + nv, Size);
                 }
@@ -381,7 +383,9 @@ public class ScrollBarView : View
             return;
         }
 
-        if (Size == 0 || (_vertical && ContentArea.Height == 0) || (!_vertical && ContentArea.Width == 0))
+        if (Size == 0
+            || (_orientation == Orientation.Vertical && ContentArea.Height == 0)
+            || (_orientation == Orientation.Horizontal && ContentArea.Width == 0))
         {
             return;
         }
@@ -395,7 +399,7 @@ public class ScrollBarView : View
             Driver.SetAttribute (SuperView.HasFocus ? ColorScheme.Focus : GetNormalColor ());
         }
 
-        if (_vertical)
+        if (_orientation == Orientation.Vertical)
         {
             if (ContentArea.Right < ContentArea.Width - 1)
             {
@@ -630,7 +634,7 @@ public class ScrollBarView : View
     public virtual void Refresh () { ShowHideScrollBars (); }
 
     // param n is the new position and the max is the positive/negative value that can be scrolled for the new position
-    internal bool CanScroll (int n, out int maxToScroll, bool isVertical = false)
+    internal bool CanScroll (int n, out int maxToScroll, Orientation orientation = Orientation.Horizontal)
     {
         Rectangle bounds = SuperView?.GetVisibleContentArea () ?? Rectangle.Empty;
 
@@ -641,7 +645,7 @@ public class ScrollBarView : View
             return false;
         }
 
-        int barSize = GetBarSize (isVertical);
+        int barSize = GetBarSize (orientation);
         int newPosition = Math.Max (Math.Min (Size - barSize, n), 0);
 
         maxToScroll = Size > barSize + newPosition
@@ -661,12 +665,16 @@ public class ScrollBarView : View
         var pos = 0;
         Rectangle bounds = SuperView?.GetVisibleContentArea () ?? Rectangle.Empty;
 
-        if (KeepContentAlwaysInViewPort && !_vertical && _position + bounds.Width > Size + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0))
+        if (KeepContentAlwaysInViewPort
+            && _orientation == Orientation.Horizontal
+            && _position + bounds.Width > Size + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0))
         {
             pos = Math.Max (Size - bounds.Width + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0), 0);
         }
 
-        if (KeepContentAlwaysInViewPort && _vertical && _position + bounds.Height > Size + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0))
+        if (KeepContentAlwaysInViewPort
+            && _orientation == Orientation.Vertical
+            && _position + bounds.Height > Size + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0))
         {
             pos = Math.Max (Size - bounds.Height + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0), 0);
         }
@@ -689,7 +697,7 @@ public class ScrollBarView : View
 
     private bool CheckBothScrollBars (ScrollBarView scrollBarView, bool pending = false)
     {
-        int barsize = scrollBarView._vertical ? scrollBarView.ContentArea.Height : scrollBarView.ContentArea.Width;
+        int barsize = scrollBarView._orientation == Orientation.Vertical ? scrollBarView.ContentArea.Height : scrollBarView.ContentArea.Width;
 
         if (barsize == 0 || barsize >= scrollBarView.Size)
         {
@@ -839,7 +847,7 @@ public class ScrollBarView : View
         }
     }
 
-    private int GetBarSize (bool isVertical)
+    private int GetBarSize (Orientation orientation)
     {
         Rectangle bounds = SuperView?.GetVisibleContentArea () ?? Rectangle.Empty;
 
@@ -850,15 +858,15 @@ public class ScrollBarView : View
 
         if (IsBuiltIn)
         {
-            return isVertical ? KeepContentAlwaysInViewPort
-                                    ? bounds.Height
-                                    : 0 :
+            return orientation == Orientation.Vertical ? KeepContentAlwaysInViewPort
+                                                             ? bounds.Height
+                                                             : 0 :
                    KeepContentAlwaysInViewPort ? bounds.Width : 0;
         }
 
-        return isVertical ? KeepContentAlwaysInViewPort
-                                ? bounds.Height - (_showBothScrollIndicator ? 1 : 0)
-                                : 0 :
+        return orientation == Orientation.Vertical ? KeepContentAlwaysInViewPort
+                                                         ? bounds.Height - (_showBothScrollIndicator ? 1 : 0)
+                                                         : 0 :
                KeepContentAlwaysInViewPort ? bounds.Width - (_showBothScrollIndicator ? 1 : 0) : 0;
     }
 
@@ -877,14 +885,14 @@ public class ScrollBarView : View
                                                ScrollBarType.Both => new Thickness (
                                                                                     0,
                                                                                     0,
-                                                                                    IsVertical
+                                                                                    Orientation == Orientation.Vertical
                                                                                         ? ShowScrollIndicator ? 1 : 0
-                                                                                        : OtherScrollBarView?.IsVertical == true
+                                                                                        : OtherScrollBarView?.Orientation == Orientation.Vertical
                                                                                             ? OtherScrollBarView?.ShowScrollIndicator == true ? 1 : 0
                                                                                             : 0,
-                                                                                    !IsVertical
+                                                                                    Orientation == Orientation.Horizontal
                                                                                         ? ShowScrollIndicator ? 1 : 0
-                                                                                        : OtherScrollBarView?.IsVertical == false
+                                                                                        : OtherScrollBarView?.Orientation == Orientation.Horizontal
                                                                                             ? OtherScrollBarView?.ShowScrollIndicator == true ? 1 : 0
                                                                                             : 0),
                                                _ => throw new ArgumentOutOfRangeException ()
@@ -928,13 +936,13 @@ public class ScrollBarView : View
     {
         if (IsBuiltIn)
         {
-            X = IsVertical ? Pos.AnchorEnd () : 0;
-            Y = IsVertical ? 0 : Pos.AnchorEnd ();
+            X = Orientation == Orientation.Vertical ? Pos.AnchorEnd () : 0;
+            Y = Orientation == Orientation.Vertical ? 0 : Pos.AnchorEnd ();
         }
         else
         {
-            X = IsVertical ? Pos.AnchorEnd (1) : 0;
-            Y = IsVertical ? 0 : Pos.AnchorEnd (1);
+            X = Orientation == Orientation.Vertical ? Pos.AnchorEnd (1) : 0;
+            Y = Orientation == Orientation.Vertical ? 0 : Pos.AnchorEnd (1);
         }
 
         if (OtherScrollBarView is { SuperView: null } && !e.Parent.Subviews.Contains (OtherScrollBarView))
@@ -967,7 +975,7 @@ public class ScrollBarView : View
     // Helper to assist Initialized event handler
     private void SetPosition (int newPosition)
     {
-        if (CanScroll (newPosition, out int max, _vertical))
+        if (CanScroll (newPosition, out int max, _orientation))
         {
             if (max == newPosition)
             {
@@ -1012,30 +1020,30 @@ public class ScrollBarView : View
             {
                 Rectangle bounds = SuperView?.GetVisibleContentArea () ?? Rectangle.Empty;
 
-                X = _vertical ? bounds.Right - 1 : bounds.Left;
-                Y = _vertical ? bounds.Top : bounds.Bottom - 1;
-                Width = _vertical ? 1 : SuperView is Adornment ? Dim.Fill () : bounds.Width - 1;
-                Height = _vertical ? SuperView is Adornment ? Dim.Fill () : bounds.Height - 1 : 1;
+                X = _orientation == Orientation.Vertical ? bounds.Right - 1 : bounds.Left;
+                Y = _orientation == Orientation.Vertical ? bounds.Top : bounds.Bottom - 1;
+                Width = _orientation == Orientation.Vertical ? 1 : SuperView is Adornment ? Dim.Fill () : bounds.Width - 1;
+                Height = _orientation == Orientation.Vertical ? SuperView is Adornment ? Dim.Fill () : bounds.Height - 1 : 1;
 
-                _otherScrollBarView.X = _otherScrollBarView._vertical ? bounds.Right - 1 : bounds.Left;
-                _otherScrollBarView.Y = _otherScrollBarView._vertical ? bounds.Top : bounds.Bottom - 1;
+                _otherScrollBarView.X = _otherScrollBarView._orientation == Orientation.Vertical ? bounds.Right - 1 : bounds.Left;
+                _otherScrollBarView.Y = _otherScrollBarView._orientation == Orientation.Vertical ? bounds.Top : bounds.Bottom - 1;
 
-                _otherScrollBarView.Width = _otherScrollBarView._vertical ? 1 :
+                _otherScrollBarView.Width = _otherScrollBarView._orientation == Orientation.Vertical ? 1 :
                                             SuperView is Adornment ? Dim.Fill () : bounds.Width - 1;
 
-                _otherScrollBarView.Height = _otherScrollBarView._vertical
+                _otherScrollBarView.Height = _otherScrollBarView._orientation == Orientation.Vertical
                                                  ? SuperView is Adornment ? Dim.Fill () : bounds.Height - 1
                                                  : 1;
             }
             else
             {
-                Width = _vertical ? 1 : SuperView is Adornment ? Dim.Fill () : Dim.Fill (1);
-                Height = _vertical ? SuperView is Adornment ? Dim.Fill () : Dim.Fill (1) : 1;
+                Width = _orientation == Orientation.Vertical ? 1 : SuperView is Adornment ? Dim.Fill () : Dim.Fill (1);
+                Height = _orientation == Orientation.Vertical ? SuperView is Adornment ? Dim.Fill () : Dim.Fill (1) : 1;
 
-                _otherScrollBarView.Width = _otherScrollBarView._vertical ? 1 :
+                _otherScrollBarView.Width = _otherScrollBarView._orientation == Orientation.Vertical ? 1 :
                                             SuperView is Adornment ? Dim.Fill () : Dim.Fill (1);
 
-                _otherScrollBarView.Height = _otherScrollBarView._vertical
+                _otherScrollBarView.Height = _otherScrollBarView._orientation == Orientation.Vertical
                                                  ? SuperView is Adornment ? Dim.Fill () : Dim.Fill (1)
                                                  : 1;
             }
@@ -1046,15 +1054,15 @@ public class ScrollBarView : View
             {
                 Rectangle bounds = SuperView?.GetVisibleContentArea () ?? Rectangle.Empty;
 
-                X = _vertical ? bounds.Right - 1 : bounds.Left;
-                Y = _vertical ? bounds.Top : bounds.Bottom - 1;
-                Width = _vertical ? 1 : bounds.Width;
-                Height = _vertical ? bounds.Height : 1;
+                X = _orientation == Orientation.Vertical ? bounds.Right - 1 : bounds.Left;
+                Y = _orientation == Orientation.Vertical ? bounds.Top : bounds.Bottom - 1;
+                Width = _orientation == Orientation.Vertical ? 1 : bounds.Width;
+                Height = _orientation == Orientation.Vertical ? bounds.Height : 1;
             }
             else
             {
-                Width = _vertical ? 1 : Dim.Fill ();
-                Height = _vertical ? Dim.Fill () : 1;
+                Width = _orientation == Orientation.Vertical ? 1 : Dim.Fill ();
+                Height = _orientation == Orientation.Vertical ? Dim.Fill () : 1;
             }
         }
         else if (_otherScrollBarView?._showScrollIndicator == true)
@@ -1063,15 +1071,15 @@ public class ScrollBarView : View
             {
                 Rectangle bounds = SuperView?.GetVisibleContentArea () ?? Rectangle.Empty;
 
-                _otherScrollBarView.X = _otherScrollBarView._vertical ? bounds.Right - 1 : bounds.Left;
-                _otherScrollBarView.Y = _otherScrollBarView._vertical ? bounds.Top : bounds.Bottom - 1;
-                _otherScrollBarView.Width = _otherScrollBarView._vertical ? 1 : bounds.Width;
-                _otherScrollBarView.Height = _otherScrollBarView._vertical ? bounds.Height : 1;
+                _otherScrollBarView.X = _otherScrollBarView._orientation == Orientation.Vertical ? bounds.Right - 1 : bounds.Left;
+                _otherScrollBarView.Y = _otherScrollBarView._orientation == Orientation.Vertical ? bounds.Top : bounds.Bottom - 1;
+                _otherScrollBarView.Width = _otherScrollBarView._orientation == Orientation.Vertical ? 1 : bounds.Width;
+                _otherScrollBarView.Height = _otherScrollBarView._orientation == Orientation.Vertical ? bounds.Height : 1;
             }
             else
             {
-                _otherScrollBarView.Width = _otherScrollBarView._vertical ? 1 : Dim.Fill ();
-                _otherScrollBarView.Height = _otherScrollBarView._vertical ? Dim.Fill () : 1;
+                _otherScrollBarView.Width = _otherScrollBarView._orientation == Orientation.Vertical ? 1 : Dim.Fill ();
+                _otherScrollBarView.Height = _otherScrollBarView._orientation == Orientation.Vertical ? Dim.Fill () : 1;
             }
         }
 

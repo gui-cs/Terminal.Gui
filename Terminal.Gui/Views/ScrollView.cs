@@ -49,7 +49,7 @@ public class ScrollView : View
             Y = 0,
             Width = 1,
             Size = 1,
-            IsVertical = true
+            Orientation = Orientation.Vertical
         };
 
         _horizontal = new ScrollBarView
@@ -58,7 +58,7 @@ public class ScrollView : View
             Y = Pos.AnchorEnd (1),
             Height = 1,
             Size = 1,
-            IsVertical = false
+            Orientation = Orientation.Horizontal
         };
         _vertical.OtherScrollBarView = _horizontal;
         _horizontal.OtherScrollBarView = _vertical;
@@ -453,7 +453,7 @@ public class ScrollView : View
     /// <param name="lines">Number of lines to scroll.</param>
     public bool ScrollDown (int lines)
     {
-        if (_vertical.CanScroll (_vertical.Position + lines, out _, true))
+        if (_vertical.CanScroll (_vertical.Position + lines, out _, Orientation.Vertical))
         {
             ContentOffset = new Point (_contentOffset.X, _contentOffset.Y - lines);
 

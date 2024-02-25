@@ -251,20 +251,20 @@ public partial class View
                 return;
             }
 
-            if (!_scrollBar.IsVertical && _scrollBar.Position != -_contentOffset.X)
+            if (_scrollBar.Orientation == Orientation.Horizontal && _scrollBar.Position != -_contentOffset.X)
             {
                 _scrollBar.Position = -_contentOffset.X;
             }
-            else if (_scrollBar is { OtherScrollBarView.IsVertical: false } && _scrollBar?.OtherScrollBarView.Position != -_contentOffset.X)
+            else if (_scrollBar is { OtherScrollBarView.Orientation: Orientation.Horizontal } && _scrollBar?.OtherScrollBarView.Position != -_contentOffset.X)
             {
                 _scrollBar!.OtherScrollBarView.Position = -_contentOffset.X;
             }
 
-            if (_scrollBar.IsVertical && _scrollBar.Position != -_contentOffset.Y)
+            if (_scrollBar.Orientation == Orientation.Vertical && _scrollBar.Position != -_contentOffset.Y)
             {
                 _scrollBar.Position = -_contentOffset.Y;
             }
-            else if (_scrollBar is { OtherScrollBarView.IsVertical: true } && _scrollBar?.OtherScrollBarView.Position != -_contentOffset.Y)
+            else if (_scrollBar is { OtherScrollBarView.Orientation: Orientation.Vertical } && _scrollBar?.OtherScrollBarView.Position != -_contentOffset.Y)
             {
                 _scrollBar!.OtherScrollBarView.Position = -_contentOffset.Y;
             }
@@ -290,7 +290,7 @@ public partial class View
                 return;
             }
 
-            if (_scrollBar.IsVertical)
+            if (_scrollBar.Orientation == Orientation.Vertical)
             {
                 if (_scrollBar.Size != ContentSize.Height)
                 {
