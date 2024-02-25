@@ -51,8 +51,9 @@ namespace Terminal.Gui;
 ///     <para>
 ///         To create a View using Absolute layout, call a constructor that takes a Rectangle parameter to specify the
 ///         absolute position and size or simply set <see cref="View.Frame "/>). To create a View using Computed layout use
-///         a constructor that does not take a Rectangle parameter and set the X, Y, Width and Height properties on the view to
-///         non-absolute values. Both approaches use coordinates that are relative to the <see cref="Bounds"/> of the
+///         a constructor that does not take a Rectangle parameter and set the X, Y, Width and Height properties on the
+///         view to
+///         non-absolute values. Both approaches use coordinates that are relative to the <see cref="ContentArea"/> of the
 ///         <see cref="SuperView"/> the View is added to.
 ///     </para>
 ///     <para>
@@ -73,7 +74,8 @@ namespace Terminal.Gui;
 ///         a View can be accessed with the <see cref="SuperView"/> property.
 ///     </para>
 ///     <para>
-///         To flag a region of the View's <see cref="Bounds"/> to be redrawn call <see cref="SetNeedsDisplay(Rectangle)"/>.
+///         To flag a region of the View's <see cref="ContentArea"/> to be redrawn call
+///         <see cref="SetNeedsDisplay(Rectangle)"/>.
 ///         To flag the entire view for redraw call <see cref="SetNeedsDisplay()"/>.
 ///     </para>
 ///     <para>
@@ -309,6 +311,7 @@ public partial class View : Responder, ISupportInitializeNotification
                 string old = _title;
                 _title = value;
                 TitleTextFormatter.Text = _title;
+
                 TitleTextFormatter.Size = new Size (
                                                     TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
                                                     - (TitleTextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true

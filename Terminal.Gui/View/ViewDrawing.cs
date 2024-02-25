@@ -80,7 +80,7 @@ public partial class View
         Driver.AddRune (ch);
     }
 
-    /// <summary>Clears the <see cref="Bounds"/> with the normal background color.</summary>
+    /// <summary>Clears the <see cref="ContentArea"/> with the normal background color.</summary>
     /// <remarks>
     ///     <para>This clears the Bounds used by this view.</para>
     /// </remarks>
@@ -88,7 +88,7 @@ public partial class View
     {
         if (IsInitialized)
         {
-            Clear (BoundsToScreen (Bounds));
+            Clear (BoundsToScreen (ContentArea));
         }
     }
 
@@ -110,14 +110,15 @@ public partial class View
         Driver.SetAttribute (prev);
     }
 
-    /// <summary>Expands the <see cref="ConsoleDriver"/>'s clip region to include <see cref="Bounds"/>.</summary>
+    /// <summary>Expands the <see cref="ConsoleDriver"/>'s clip region to include <see cref="ContentArea"/>.</summary>
     /// <returns>
     ///     The current screen-relative clip region, which can be then re-applied by setting
     ///     <see cref="ConsoleDriver.Clip"/>.
     /// </returns>
     /// <remarks>
     ///     <para>
-    ///         If <see cref="ConsoleDriver.Clip"/> and <see cref="Bounds"/> do not intersect, the clip region will be set to
+    ///         If <see cref="ConsoleDriver.Clip"/> and <see cref="ContentArea"/> do not intersect, the clip region will be set
+    ///         to
     ///         <see cref="Rectangle.Empty"/>.
     ///     </para>
     /// </remarks>
@@ -140,7 +141,7 @@ public partial class View
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Always use <see cref="Bounds"/> (view-relative) when calling <see cref="OnDrawContent(Rectangle)"/>, NOT
+    ///         Always use <see cref="ContentArea"/> (view-relative) when calling <see cref="OnDrawContent(Rectangle)"/>, NOT
     ///         <see cref="Frame"/> (superview-relative).
     ///     </para>
     ///     <para>
@@ -170,12 +171,12 @@ public partial class View
         }
 
         // Invoke DrawContentEvent
-        var dev = new DrawEventArgs (Bounds);
+        var dev = new DrawEventArgs (ContentArea);
         DrawContent?.Invoke (this, dev);
 
         if (!dev.Cancel)
         {
-            OnDrawContent (Bounds);
+            OnDrawContent (ContentArea);
         }
 
         if (Driver is { })
@@ -190,12 +191,12 @@ public partial class View
         ClearNeedsDisplay ();
 
         // Invoke DrawContentCompleteEvent
-        dev = new DrawEventArgs (Bounds);
+        dev = new DrawEventArgs (ContentArea);
         DrawContentComplete?.Invoke (this, dev);
 
         if (!dev.Cancel)
         {
-            OnDrawContentComplete (Bounds);
+            OnDrawContentComplete (ContentArea);
         }
     }
 
@@ -368,13 +369,13 @@ public partial class View
             return false;
         }
 
-        DrawAdornments?.Invoke (this, new DrawEventArgs (Bounds));
+        DrawAdornments?.Invoke (this, new DrawEventArgs (ContentArea));
 
         // Each of these renders lines to either this View's LineCanvas 
         // Those lines will be finally rendered in OnRenderLineCanvas
-        Margin?.OnDrawContent (Margin.Bounds);
-        Border?.OnDrawContent (Border.Bounds);
-        Padding?.OnDrawContent (Padding.Bounds);
+        Margin?.OnDrawContent (Margin.ContentArea);
+        Border?.OnDrawContent (Border.ContentArea);
+        Padding?.OnDrawContent (Padding.ContentArea);
 
         return true;
     }
@@ -509,7 +510,7 @@ public partial class View
         return true;
     }
 
-    /// <summary>Sets the area of this view needing to be redrawn to <see cref="Bounds"/>.</summary>
+    /// <summary>Sets the area of this view needing to be redrawn to <see cref="ContentArea"/>.</summary>
     /// <remarks>
     ///     If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), this method
     ///     does nothing.
@@ -518,7 +519,7 @@ public partial class View
     {
         if (IsInitialized)
         {
-            SetNeedsDisplay (Bounds);
+            SetNeedsDisplay (ContentArea);
         }
     }
 
@@ -552,14 +553,14 @@ public partial class View
 
         _superView?.SetSubViewNeedsDisplay ();
 
-        if (_needsDisplayRect.X < Bounds.X
-            || _needsDisplayRect.Y < Bounds.Y
-            || _needsDisplayRect.Width > Bounds.Width
-            || _needsDisplayRect.Height > Bounds.Height)
+        if (_needsDisplayRect.X < ContentArea.X
+            || _needsDisplayRect.Y < ContentArea.Y
+            || _needsDisplayRect.Width > ContentArea.Width
+            || _needsDisplayRect.Height > ContentArea.Height)
         {
-            Margin?.SetNeedsDisplay (Margin.Bounds);
-            Border?.SetNeedsDisplay (Border.Bounds);
-            Padding?.SetNeedsDisplay (Padding.Bounds);
+            Margin?.SetNeedsDisplay (Margin.ContentArea);
+            Border?.SetNeedsDisplay (Border.ContentArea);
+            Padding?.SetNeedsDisplay (Padding.ContentArea);
 
             if (Margin != null)
             {

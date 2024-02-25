@@ -73,6 +73,7 @@ public class CharacterMap : Scenario
         void JumpEditOnAccept (object sender, CancelEventArgs e)
         {
             JumpEdit_TextChanged (sender, new StateEventArgs<string> (jumpEdit.Text, jumpEdit.Text));
+
             // Cancel the event to prevent ENTER from being handled elsewhere
             e.Cancel = true;
         }
@@ -372,7 +373,7 @@ internal class CharMap : ScrollView
                     Command.PageUp,
                     () =>
                     {
-                        int page = (Bounds.Height / _rowHeight - 1) * 16;
+                        int page = (ContentArea.Height / _rowHeight - 1) * 16;
                         SelectedCodePoint -= Math.Min (page, SelectedCodePoint);
 
                         return true;
@@ -383,7 +384,7 @@ internal class CharMap : ScrollView
                     Command.PageDown,
                     () =>
                     {
-                        int page = (Bounds.Height / _rowHeight - 1) * 16;
+                        int page = (ContentArea.Height / _rowHeight - 1) * 16;
                         SelectedCodePoint += Math.Min (page, MaxCodePoint - SelectedCodePoint);
 
                         return true;
@@ -456,7 +457,7 @@ internal class CharMap : ScrollView
                 int row = SelectedCodePoint / 16 * _rowHeight;
                 int col = SelectedCodePoint % 16 * COLUMN_WIDTH;
 
-                int height = Bounds.Height - (ShowHorizontalScrollIndicator ? 2 : 1);
+                int height = ContentArea.Height - (ShowHorizontalScrollIndicator ? 2 : 1);
 
                 if (row + ContentOffset.Y < 0)
                 {
@@ -472,7 +473,7 @@ internal class CharMap : ScrollView
                                               );
                 }
 
-                int width = Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
+                int width = ContentArea.Width / COLUMN_WIDTH * COLUMN_WIDTH - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
 
                 if (col + ContentOffset.X < 0)
                 {
@@ -556,12 +557,12 @@ internal class CharMap : ScrollView
         }
 
         var viewport = new Rectangle (
-                                 ContentOffset,
-                                 new Size (
-                                           Math.Max (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
-                                           Math.Max (Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0)
-                                          )
-                                );
+                                      ContentOffset,
+                                      new Size (
+                                                Math.Max (ContentArea.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
+                                                Math.Max (ContentArea.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0)
+                                               )
+                                     );
 
         Rectangle oldClip = ClipToBounds ();
 
@@ -569,18 +570,18 @@ internal class CharMap : ScrollView
         {
             // ClipToBounds doesn't know about the scroll indicators, so if off, subtract one from height
             Driver.Clip = new Rectangle (
-                                    Driver.Clip.Location,
-                                    new Size (Driver.Clip.Width, Driver.Clip.Height - 1)
-                                   );
+                                         Driver.Clip.Location,
+                                         new Size (Driver.Clip.Width, Driver.Clip.Height - 1)
+                                        );
         }
 
         if (ShowVerticalScrollIndicator)
         {
             // ClipToBounds doesn't know about the scroll indicators, so if off, subtract one from width
             Driver.Clip = new Rectangle (
-                                    Driver.Clip.Location,
-                                    new Size (Driver.Clip.Width - 1, Driver.Clip.Height)
-                                   );
+                                         Driver.Clip.Location,
+                                         new Size (Driver.Clip.Width - 1, Driver.Clip.Height)
+                                        );
         }
 
         int cursorCol = Cursor.X - ContentOffset.X - RowLabelWidth - 1;
@@ -613,7 +614,7 @@ internal class CharMap : ScrollView
 
         int firstColumnX = viewport.X + RowLabelWidth;
 
-        for (var y = 1; y < Bounds.Height; y++)
+        for (var y = 1; y < ContentArea.Height; y++)
         {
             // What row is this?
             int row = (y - ContentOffset.Y - 1) / _rowHeight;
@@ -738,9 +739,9 @@ internal class CharMap : ScrollView
     {
         if (HasFocus
             && Cursor.X >= RowLabelWidth
-            && Cursor.X < Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0)
+            && Cursor.X < ContentArea.Width - (ShowVerticalScrollIndicator ? 1 : 0)
             && Cursor.Y > 0
-            && Cursor.Y < Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0))
+            && Cursor.Y < ContentArea.Height - (ShowHorizontalScrollIndicator ? 1 : 0))
         {
             Driver.SetCursorVisibility (_cursor);
             Move (Cursor.X, Cursor.Y);
@@ -952,16 +953,16 @@ internal class CharMap : ScrollView
             var dlg = new Dialog { Title = title, Buttons = [copyGlyph, copyCP, cancel] };
 
             copyGlyph.Accept += (s, a) =>
-                                 {
-                                     CopyGlyph ();
-                                     dlg.RequestStop ();
-                                 };
+                                {
+                                    CopyGlyph ();
+                                    dlg.RequestStop ();
+                                };
 
             copyCP.Accept += (s, a) =>
-                              {
-                                  CopyCodePoint ();
-                                  dlg.RequestStop ();
-                              };
+                             {
+                                 CopyCodePoint ();
+                                 dlg.RequestStop ();
+                             };
             cancel.Accept += (s, a) => dlg.RequestStop ();
 
             var rune = (Rune)SelectedCodePoint;

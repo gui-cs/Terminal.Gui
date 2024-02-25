@@ -213,7 +213,7 @@ public class ScrollBarView : View
         }
 
         int location = _vertical ? mouseEvent.Y : mouseEvent.X;
-        int barsize = _vertical ? Bounds.Height : Bounds.Width;
+        int barsize = _vertical ? ContentArea.Height : ContentArea.Width;
         int posTopLeftTee = _vertical ? _posTopTee + 1 : _posLeftTee + 1;
         int posBottomRightTee = _vertical ? _posBottomTee + 1 : _posRightTee + 1;
         barsize -= 2;
@@ -381,7 +381,7 @@ public class ScrollBarView : View
             return;
         }
 
-        if (Size == 0 || (_vertical && Bounds.Height == 0) || (!_vertical && Bounds.Width == 0))
+        if (Size == 0 || (_vertical && ContentArea.Height == 0) || (!_vertical && ContentArea.Width == 0))
         {
             return;
         }
@@ -397,13 +397,13 @@ public class ScrollBarView : View
 
         if (_vertical)
         {
-            if (Bounds.Right < Bounds.Width - 1)
+            if (ContentArea.Right < ContentArea.Width - 1)
             {
                 return;
             }
 
-            int col = Bounds.Width - 1;
-            int bh = Bounds.Height;
+            int col = ContentArea.Width - 1;
+            int bh = ContentArea.Height;
             Rune special;
 
             if (bh < 4)
@@ -413,7 +413,7 @@ public class ScrollBarView : View
 
                 Move (col, 0);
 
-                if (Bounds.Height == 1)
+                if (ContentArea.Height == 1)
                 {
                     Driver.AddRune (Glyphs.Diamond);
                 }
@@ -422,15 +422,15 @@ public class ScrollBarView : View
                     Driver.AddRune (Glyphs.UpArrow);
                 }
 
-                if (Bounds.Height == 3)
+                if (ContentArea.Height == 3)
                 {
                     Move (col, 1);
                     Driver.AddRune (Glyphs.Diamond);
                 }
 
-                if (Bounds.Height > 1)
+                if (ContentArea.Height > 1)
                 {
-                    Move (col, Bounds.Height - 1);
+                    Move (col, ContentArea.Height - 1);
                     Driver.AddRune (Glyphs.DownArrow);
                 }
             }
@@ -499,23 +499,23 @@ public class ScrollBarView : View
 
                 if (!hasTopTee)
                 {
-                    Move (col, Bounds.Height - 2);
+                    Move (col, ContentArea.Height - 2);
                     Driver.AddRune (Glyphs.TopTee);
                 }
 
-                Move (col, Bounds.Height - 1);
+                Move (col, ContentArea.Height - 1);
                 Driver.AddRune (Glyphs.DownArrow);
             }
         }
         else
         {
-            if (Bounds.Bottom < Bounds.Height - 1)
+            if (ContentArea.Bottom < ContentArea.Height - 1)
             {
                 return;
             }
 
-            int row = Bounds.Height - 1;
-            int bw = Bounds.Width;
+            int row = ContentArea.Height - 1;
+            int bw = ContentArea.Width;
             Rune special;
 
             if (bw < 4)
@@ -590,7 +590,7 @@ public class ScrollBarView : View
 
                 if (!hasLeftTee)
                 {
-                    Move (Bounds.Width - 2, row);
+                    Move (ContentArea.Width - 2, row);
                     Driver.AddRune (Glyphs.LeftTee);
                 }
 
@@ -687,7 +687,7 @@ public class ScrollBarView : View
 
     private bool CheckBothScrollBars (ScrollBarView scrollBarView, bool pending = false)
     {
-        int barsize = scrollBarView._vertical ? scrollBarView.Bounds.Height : scrollBarView.Bounds.Width;
+        int barsize = scrollBarView._vertical ? scrollBarView.ContentArea.Height : scrollBarView.ContentArea.Width;
 
         if (barsize == 0 || barsize >= scrollBarView.Size)
         {
@@ -867,7 +867,9 @@ public class ScrollBarView : View
             return Rectangle.Empty;
         }
 
-        return new Rectangle (Point.Empty, new Size (SuperView.Bounds.Width + SuperView.ContentOffset.X, SuperView.Bounds.Height + SuperView.ContentOffset.Y));
+        return new Rectangle (
+                              Point.Empty,
+                              new Size (SuperView.ContentArea.Width + SuperView.ContentOffset.X, SuperView.ContentArea.Height + SuperView.ContentOffset.Y));
     }
 
     private void ManageScrollBarThickness ()
@@ -1040,12 +1042,12 @@ public class ScrollBarView : View
                 Width = _vertical ? 1 : SuperView is Adornment ? Dim.Fill () : Dim.Fill (1);
                 Height = _vertical ? SuperView is Adornment ? Dim.Fill () : Dim.Fill (1) : 1;
 
-            _otherScrollBarView.Width = _otherScrollBarView._vertical ? 1 :
-                                        SuperView is Adornment ? Dim.Fill () : Dim.Fill (1);
+                _otherScrollBarView.Width = _otherScrollBarView._vertical ? 1 :
+                                            SuperView is Adornment ? Dim.Fill () : Dim.Fill (1);
 
-            _otherScrollBarView.Height = _otherScrollBarView._vertical
-                                             ? SuperView is Adornment ? Dim.Fill () : Dim.Fill (1)
-                                             : 1;
+                _otherScrollBarView.Height = _otherScrollBarView._vertical
+                                                 ? SuperView is Adornment ? Dim.Fill () : Dim.Fill (1)
+                                                 : 1;
             }
         }
         else if (_showScrollIndicator)
@@ -1078,7 +1080,7 @@ public class ScrollBarView : View
             }
             else
             {
-                _otherScrollBarView.Width = _otherScrollBarView._vertical ? 1 : Dim.Fill();
+                _otherScrollBarView.Width = _otherScrollBarView._vertical ? 1 : Dim.Fill ();
                 _otherScrollBarView.Height = _otherScrollBarView._vertical ? Dim.Fill () : 1;
             }
         }

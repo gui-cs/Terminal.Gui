@@ -8,64 +8,6 @@ public class LabelTests
     private readonly ITestOutputHelper _output;
     public LabelTests (ITestOutputHelper output) { _output = output; }
 
-    // Test that Title and Text are the same
-    [Fact]
-    public void Text_Mirrors_Title ()
-    {
-        var label = new Label ();
-        label.Title = "Hello";
-        Assert.Equal ("Hello", label.Title);
-        Assert.Equal ("Hello", label.TitleTextFormatter.Text);
-
-        Assert.Equal ("Hello", label.Text);
-        Assert.Equal ("Hello", label.TextFormatter.Text);
-    }
-
-    [Fact]
-    public void Title_Mirrors_Text ()
-    {
-        var label = new Label ();
-        label.Text = "Hello";
-        Assert.Equal ("Hello", label.Text);
-        Assert.Equal ("Hello", label.TextFormatter.Text);
-
-        Assert.Equal ("Hello", label.Title);
-        Assert.Equal ("Hello", label.TitleTextFormatter.Text);
-    }
-
-    [Fact]
-    public void HotKey_Command_SetsFocus_OnNextSubview ()
-    {
-        var superView = new View () { CanFocus = true };
-        var label = new Label ();
-        var nextSubview = new View () { CanFocus = true };
-        superView.Add (label, nextSubview);
-        superView.BeginInit ();
-        superView.EndInit ();
-
-        Assert.False (label.HasFocus);
-        Assert.False (nextSubview.HasFocus);
-
-        label.InvokeCommand (Command.HotKey);
-        Assert.False (label.HasFocus);
-        Assert.True (nextSubview.HasFocus);
-    }
-
-    [Fact]
-    public void HotKey_Command_Does_Not_Accept ()
-    {
-        var label = new Label ();
-        var accepted = false;
-
-        label.Accept += LabelOnAccept;
-        label.InvokeCommand (Command.HotKey);
-
-        Assert.False (accepted);
-
-        return;
-        void LabelOnAccept (object sender, CancelEventArgs e) { accepted = true; }
-    }
-
     [Fact]
     [AutoInitShutdown]
     public void AutoSize_Stays_True_AnchorEnd ()
@@ -226,6 +168,60 @@ Test
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
         Application.End (rs);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Full_Border ()
+    {
+        var label = new Label { Text = "Test", /*Width = 6, Height = 3, */BorderStyle = LineStyle.Single };
+        Application.Top.Add (label);
+        Application.Begin (Application.Top);
+
+        Assert.Equal (new Rectangle (0, 0, 6, 3), label.Frame);
+        Assert.Equal (new Rectangle (0, 0, 4, 1), label.ContentArea);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌┤Te├┐
+│Test│
+└────┘",
+                                                      _output
+                                                     );
+    }
+
+    [Fact]
+    public void HotKey_Command_Does_Not_Accept ()
+    {
+        var label = new Label ();
+        var accepted = false;
+
+        label.Accept += LabelOnAccept;
+        label.InvokeCommand (Command.HotKey);
+
+        Assert.False (accepted);
+
+        return;
+
+        void LabelOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void HotKey_Command_SetsFocus_OnNextSubview ()
+    {
+        var superView = new View { CanFocus = true };
+        var label = new Label ();
+        var nextSubview = new View { CanFocus = true };
+        superView.Add (label, nextSubview);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        Assert.False (label.HasFocus);
+        Assert.False (nextSubview.HasFocus);
+
+        label.InvokeCommand (Command.HotKey);
+        Assert.False (label.HasFocus);
+        Assert.True (nextSubview.HasFocus);
     }
 
     [Fact]
@@ -420,6 +416,31 @@ e
         Assert.Equal ("heyb", ((Label)b).Text);
     }
 
+    // Test that Title and Text are the same
+    [Fact]
+    public void Text_Mirrors_Title ()
+    {
+        var label = new Label ();
+        label.Title = "Hello";
+        Assert.Equal ("Hello", label.Title);
+        Assert.Equal ("Hello", label.TitleTextFormatter.Text);
+
+        Assert.Equal ("Hello", label.Text);
+        Assert.Equal ("Hello", label.TextFormatter.Text);
+    }
+
+    [Fact]
+    public void Title_Mirrors_Text ()
+    {
+        var label = new Label ();
+        label.Text = "Hello";
+        Assert.Equal ("Hello", label.Text);
+        Assert.Equal ("Hello", label.TextFormatter.Text);
+
+        Assert.Equal ("Hello", label.Title);
+        Assert.Equal ("Hello", label.TitleTextFormatter.Text);
+    }
+
     [Fact]
     [AutoInitShutdown]
     public void Update_Only_On_Or_After_Initialize ()
@@ -437,7 +458,7 @@ e
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
         Assert.Equal ("Say Hello 你", label.TextFormatter.Text);
-        Assert.Equal (new Rectangle (0, 0, 12, 1), label.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 12, 1), label.ContentArea);
 
         var expected = @"
 ┌────────────────────────────┐
@@ -467,7 +488,7 @@ e
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
         Assert.Equal ("Say Hello 你", label.TextFormatter.Text);
-        Assert.Equal (new Rectangle (0, 0, 12, 1), label.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 12, 1), label.ContentArea);
 
         var expected = @"
 ┌────────────────────────────┐
@@ -481,27 +502,6 @@ e
         Assert.Equal (new Rectangle (0, 0, 30, 5), pos);
     }
 
-
-    [Fact]
-    [AutoInitShutdown]
-    public void Full_Border ()
-    {
-        var label = new Label { Text = "Test", /*Width = 6, Height = 3, */BorderStyle = LineStyle.Single };
-        Application.Top.Add (label);
-        Application.Begin (Application.Top);
-
-        Assert.Equal (new (0, 0, 6, 3), label.Frame);
-        Assert.Equal (new (0, 0, 4, 1), label.Bounds);
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌┤Te├┐
-│Test│
-└────┘",
-                                                      _output
-                                                     );
-    }
-
     [Fact]
     [AutoInitShutdown]
     public void With_Top_Margin_Without_Top_Border ()
@@ -512,8 +512,8 @@ e
         Application.Top.Add (label);
         Application.Begin (Application.Top);
 
-        Assert.Equal (new (0, 0, 6, 3), label.Frame);
-        Assert.Equal (new (0, 0, 4, 1), label.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 6, 3), label.Frame);
+        Assert.Equal (new Rectangle (0, 0, 4, 1), label.ContentArea);
         Application.Begin (Application.Top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -533,8 +533,8 @@ e
         Application.Top.Add (label);
         Application.Begin (Application.Top);
 
-        Assert.Equal (new (0, 0, 6, 2), label.Frame);
-        Assert.Equal (new (0, 0, 4, 1), label.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 6, 2), label.Frame);
+        Assert.Equal (new Rectangle (0, 0, 4, 1), label.ContentArea);
         Application.Begin (Application.Top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -544,5 +544,4 @@ e
                                                       _output
                                                      );
     }
-
 }

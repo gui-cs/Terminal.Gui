@@ -18,7 +18,7 @@ public interface IAnnotation
 
     /// <summary>
     ///     Called once after series have been rendered (or before if <see cref="BeforeSeries"/> is true). Use
-    ///     <see cref="View.Driver"/> to draw and <see cref="View.Bounds"/> to avoid drawing outside of graph
+    ///     <see cref="View.Driver"/> to draw and <see cref="View.ContentArea"/> to avoid drawing outside of graph
     /// </summary>
     /// <param name="graph"></param>
     void Render (GraphView graph);
@@ -70,7 +70,7 @@ public class TextAnnotation : IAnnotation
     protected void DrawText (GraphView graph, int x, int y)
     {
         // the draw point is out of control bounds
-        if (!graph.Bounds.Contains (new Point (x, y)))
+        if (!graph.ContentArea.Contains (new Point (x, y)))
         {
             return;
         }
@@ -83,7 +83,7 @@ public class TextAnnotation : IAnnotation
 
         graph.Move (x, y);
 
-        int availableWidth = graph.Bounds.Width - x;
+        int availableWidth = graph.ContentArea.Width - x;
 
         if (availableWidth <= 0)
         {
@@ -127,7 +127,7 @@ public class LegendAnnotation : View, IAnnotation
     /// <summary>Returns false i.e. Legends render after series</summary>
     public bool BeforeSeries => false;
 
-    /// <summary>Draws the Legend and all entries into the area within <see cref="View.Bounds"/></summary>
+    /// <summary>Draws the Legend and all entries into the area within <see cref="View.ContentArea"/></summary>
     /// <param name="graph"></param>
     public void Render (GraphView graph)
     {
@@ -165,13 +165,13 @@ public class LegendAnnotation : View, IAnnotation
             // add the text
             Move (1, linesDrawn);
 
-            string str = TextFormatter.ClipOrPad (entry.Item2, Bounds.Width - 1);
+            string str = TextFormatter.ClipOrPad (entry.Item2, ContentArea.Width - 1);
             Application.Driver.AddStr (str);
 
             linesDrawn++;
 
             // Legend has run out of space
-            if (linesDrawn >= Bounds.Height)
+            if (linesDrawn >= ContentArea.Height)
             {
                 break;
             }
@@ -182,7 +182,7 @@ public class LegendAnnotation : View, IAnnotation
     /// <param name="graphCellToRender">The symbol appearing on the graph that should appear in the legend</param>
     /// <param name="text">
     ///     Text to render on this line of the legend.  Will be truncated if outside of Legend
-    ///     <see cref="View.Bounds"/>
+    ///     <see cref="View.ContentArea"/>
     /// </param>
     public void AddEntry (GraphCellToRender graphCellToRender, string text) { _entries.Add (Tuple.Create (graphCellToRender, text)); }
 }

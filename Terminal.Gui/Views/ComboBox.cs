@@ -194,7 +194,7 @@ public class ComboBox : View
             {
                 SelectedItem = -1;
                 _search.Text = string.Empty;
-                Search_Changed (this, new StateEventArgs<string> (string.Empty, _search.Text)); 
+                Search_Changed (this, new StateEventArgs<string> (string.Empty, _search.Text));
                 SetNeedsDisplay ();
             }
         }
@@ -252,8 +252,8 @@ public class ComboBox : View
     /// <inheritdoc/>
     public override bool MouseEvent (MouseEvent me)
     {
-        if (me.X == Bounds.Right - 1
-            && me.Y == Bounds.Top
+        if (me.X == ContentArea.Right - 1
+            && me.Y == ContentArea.Top
             && me.Flags == MouseFlags.Button1Pressed
             && _autoHide)
         {
@@ -301,7 +301,7 @@ public class ComboBox : View
         }
 
         Driver.SetAttribute (ColorScheme.Focus);
-        Move (Bounds.Right - 1, 0);
+        Move (ContentArea.Right - 1, 0);
         Driver.AddRune (Glyphs.DownArrow);
     }
 
@@ -408,15 +408,15 @@ public class ComboBox : View
     /// <returns></returns>
     private int CalculatetHeight ()
     {
-        if (!IsInitialized || Bounds.Height == 0)
+        if (!IsInitialized || ContentArea.Height == 0)
         {
             return 0;
         }
 
         return Math.Min (
-                         Math.Max (Bounds.Height - 1, _minimumHeight - 1),
+                         Math.Max (ContentArea.Height - 1, _minimumHeight - 1),
                          _searchset?.Count > 0 ? _searchset.Count :
-                         IsShow ? Math.Max (Bounds.Height - 1, _minimumHeight - 1) : 0
+                         IsShow ? Math.Max (ContentArea.Height - 1, _minimumHeight - 1) : 0
                         );
     }
 
@@ -497,7 +497,7 @@ public class ComboBox : View
             OnOpenSelectedItem ();
         }
 
-        Rectangle rect = _listview.BoundsToScreen (_listview.IsInitialized ? _listview.Bounds : Rectangle.Empty);
+        Rectangle rect = _listview.BoundsToScreen (_listview.IsInitialized ? _listview.ContentArea : Rectangle.Empty);
         Reset (true);
         _listview.Clear (rect);
         _listview.TabStop = false;
@@ -614,18 +614,18 @@ public class ComboBox : View
 
     private void ProcessLayout ()
     {
-        if (Bounds.Height < _minimumHeight && (Height is null || Height is Dim.DimAbsolute))
+        if (ContentArea.Height < _minimumHeight && (Height is null || Height is Dim.DimAbsolute))
         {
             Height = _minimumHeight;
         }
 
-        if ((!_autoHide && Bounds.Width > 0 && _search.Frame.Width != Bounds.Width)
-            || (_autoHide && Bounds.Width > 0 && _search.Frame.Width != Bounds.Width - 1))
+        if ((!_autoHide && ContentArea.Width > 0 && _search.Frame.Width != ContentArea.Width)
+            || (_autoHide && ContentArea.Width > 0 && _search.Frame.Width != ContentArea.Width - 1))
         {
-            _search.Width = _listview.Width = _autoHide ? Bounds.Width - 1 : Bounds.Width;
+            _search.Width = _listview.Width = _autoHide ? ContentArea.Width - 1 : ContentArea.Width;
             _listview.Height = CalculatetHeight ();
-            _search.SetRelativeLayout (Bounds);
-            _listview.SetRelativeLayout (Bounds);
+            _search.SetRelativeLayout (ContentArea);
+            _listview.SetRelativeLayout (ContentArea);
         }
     }
 
@@ -661,7 +661,7 @@ public class ComboBox : View
     }
 
     // Tell TextField to handle Accept Command (Enter)
-    void Search_Accept (object sender, CancelEventArgs e) { e.Cancel = true; }
+    private void Search_Accept (object sender, CancelEventArgs e) { e.Cancel = true; }
 
     private void Search_Changed (object sender, StateEventArgs<string> e)
     {

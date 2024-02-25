@@ -63,7 +63,7 @@ public class TextViewTests
 
         Application.Iteration += (s, a) =>
                                  {
-                                     int width = _textView.Bounds.Width - 1;
+                                     int width = _textView.ContentArea.Width - 1;
                                      Assert.Equal (30, width + 1);
                                      Assert.Equal (10, _textView.Height);
                                      _textView.Text = "";
@@ -6912,28 +6912,28 @@ This is the second line.
 
         Assert.Equal (4, tv.LeftColumn);
         Assert.Equal (14, tv.Maxlength);
-        Assert.Equal (tv.LeftColumn, tv.Maxlength - tv.Bounds.Width);
+        Assert.Equal (tv.LeftColumn, tv.Maxlength - tv.ContentArea.Width);
 
         tv.NewKeyDownEvent (new Key (KeyCode.Backspace));
         tv.NewKeyDownEvent (new Key (KeyCode.End));
 
         Assert.Equal (3, tv.LeftColumn);
         Assert.Equal (13, tv.Maxlength);
-        Assert.Equal (tv.LeftColumn, tv.Maxlength - tv.Bounds.Width);
+        Assert.Equal (tv.LeftColumn, tv.Maxlength - tv.ContentArea.Width);
 
         tv.NewKeyDownEvent (new Key (KeyCode.Space));
         tv.NewKeyDownEvent (new Key (KeyCode.Space));
 
         Assert.Equal (5, tv.LeftColumn);
         Assert.Equal (15, tv.Maxlength);
-        Assert.Equal (tv.LeftColumn, tv.Maxlength - tv.Bounds.Width);
+        Assert.Equal (tv.LeftColumn, tv.Maxlength - tv.ContentArea.Width);
 
         tv.NewKeyDownEvent (new Key (KeyCode.Backspace));
         tv.NewKeyDownEvent (new Key (KeyCode.Backspace));
 
         Assert.Equal (3, tv.LeftColumn);
         Assert.Equal (13, tv.Maxlength);
-        Assert.Equal (tv.LeftColumn, tv.Maxlength - tv.Bounds.Width);
+        Assert.Equal (tv.LeftColumn, tv.Maxlength - tv.ContentArea.Width);
     }
 
     [Fact]
@@ -6958,27 +6958,27 @@ This is the second line.
 
         Assert.Equal (4, tv.TopRow);
         Assert.Equal (13, tv.Lines);
-        Assert.Equal (tv.TopRow, tv.Lines - tv.Bounds.Height);
+        Assert.Equal (tv.TopRow, tv.Lines - tv.ContentArea.Height);
 
         tv.NewKeyDownEvent (new Key (KeyCode.Backspace));
 
         Assert.Equal (3, tv.TopRow);
         Assert.Equal (12, tv.Lines);
-        Assert.Equal (tv.TopRow, tv.Lines - tv.Bounds.Height);
+        Assert.Equal (tv.TopRow, tv.Lines - tv.ContentArea.Height);
 
         tv.NewKeyDownEvent (new Key (KeyCode.Enter));
         tv.NewKeyDownEvent (new Key (KeyCode.Enter));
 
         Assert.Equal (5, tv.TopRow);
         Assert.Equal (14, tv.Lines);
-        Assert.Equal (tv.TopRow, tv.Lines - tv.Bounds.Height);
+        Assert.Equal (tv.TopRow, tv.Lines - tv.ContentArea.Height);
 
         tv.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.AltMask));
         tv.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.AltMask));
 
         Assert.Equal (3, tv.TopRow);
         Assert.Equal (12, tv.Lines);
-        Assert.Equal (tv.TopRow, tv.Lines - tv.Bounds.Height);
+        Assert.Equal (tv.TopRow, tv.Lines - tv.ContentArea.Height);
     }
 
     [Fact]
@@ -7139,7 +7139,7 @@ This is the second line.
 
         Application.Iteration += (s, a) =>
                                  {
-                                     int width = _textView.Bounds.Width - 1;
+                                     int width = _textView.ContentArea.Width - 1;
                                      Assert.Equal (30, width + 1);
                                      Assert.Equal (10, _textView.Height);
                                      _textView.Text = "";
@@ -7180,7 +7180,7 @@ This is the second line.
 
         Application.Iteration += (s, a) =>
                                  {
-                                     int width = _textView.Bounds.Width - 1;
+                                     int width = _textView.ContentArea.Width - 1;
                                      Assert.Equal (30, width + 1);
                                      Assert.Equal (10, _textView.Height);
                                      var col = 0;
@@ -7221,7 +7221,7 @@ This is the second line.
 
         Application.Iteration += (s, a) =>
                                  {
-                                     int width = _textView.Bounds.Width - 1;
+                                     int width = _textView.ContentArea.Width - 1;
                                      Assert.Equal (30, width + 1);
                                      Assert.Equal (10, _textView.Height);
                                      _textView.Text = "";
@@ -7271,7 +7271,7 @@ This is the second line.
 
         Application.Iteration += (s, a) =>
                                  {
-                                     int width = _textView.Bounds.Width - 1;
+                                     int width = _textView.ContentArea.Width - 1;
                                      Assert.Equal (30, width + 1);
                                      Assert.Equal (10, _textView.Height);
                                      Assert.Equal ("TAB to jump between text fields.", _textView.Text);
@@ -7323,7 +7323,7 @@ This is the second line.
 
         Application.Iteration += (s, a) =>
                                  {
-                                     int width = _textView.Bounds.Width - 1;
+                                     int width = _textView.ContentArea.Width - 1;
                                      Assert.Equal (30, width + 1);
                                      Assert.Equal (10, _textView.Height);
                                      var col = 0;
@@ -7489,7 +7489,7 @@ TAB to jump between text field",
 
         //this passes
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (
-                                                                 @"
+                                                                      @"
 ┌─────────────┐
 │             │
 │aaa          │
@@ -7505,8 +7505,8 @@ TAB to jump between text field",
 │             │
 │             │
 └─────────────┘",
-                                                                 _output
-                                                                );
+                                                                      _output
+                                                                     );
 
         Assert.Equal (new Rectangle (0, 0, 15, 15), pos);
 
@@ -7565,7 +7565,7 @@ TAB to jump between text field",
 
         //this passes
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (
-                                                                 @"
+                                                                      @"
 ┌─────────────┐
 │             │
 │aaa          │
@@ -7581,8 +7581,8 @@ TAB to jump between text field",
 │             │
 │             │
 └─────────────┘",
-                                                                 _output
-                                                                );
+                                                                      _output
+                                                                     );
 
         Assert.Equal (new Rectangle (0, 0, 15, 15), pos);
 

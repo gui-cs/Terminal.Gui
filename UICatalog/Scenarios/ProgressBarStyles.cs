@@ -70,7 +70,7 @@ public class ProgressBarStyles : Scenario
                                          dialog.X = pbList.Frame.X;
                                          dialog.Y = pbList.Frame.Height;
 
-                                         dialog.Bounds = new Rectangle (0, 0, colorPicker.Frame.Width, colorPicker.Frame.Height);
+                                         dialog.ContentArea = new Rectangle (0, 0, colorPicker.Frame.Width, colorPicker.Frame.Height);
 
                                          Application.Top.LayoutSubviews ();
                                      };
@@ -92,23 +92,23 @@ public class ProgressBarStyles : Scenario
         editor.Add (fgColorPickerBtn);
 
         fgColorPickerBtn.Accept += (s, e) =>
-                                    {
-                                        ColorName newColor = ChooseColor (
-                                                                          fgColorPickerBtn.Text,
-                                                                          editor.ViewToEdit.ColorScheme.HotNormal.Foreground
-                                                                                .GetClosestNamedColor ()
-                                                                         );
+                                   {
+                                       ColorName newColor = ChooseColor (
+                                                                         fgColorPickerBtn.Text,
+                                                                         editor.ViewToEdit.ColorScheme.HotNormal.Foreground
+                                                                               .GetClosestNamedColor ()
+                                                                        );
 
-                                        var cs = new ColorScheme (editor.ViewToEdit.ColorScheme)
-                                        {
-                                            HotNormal = new Attribute (
-                                                                       newColor,
-                                                                       editor.ViewToEdit.ColorScheme.HotNormal
-                                                                             .Background
-                                                                      )
-                                        };
-                                        editor.ViewToEdit.ColorScheme = cs;
-                                    };
+                                       var cs = new ColorScheme (editor.ViewToEdit.ColorScheme)
+                                       {
+                                           HotNormal = new Attribute (
+                                                                      newColor,
+                                                                      editor.ViewToEdit.ColorScheme.HotNormal
+                                                                            .Background
+                                                                     )
+                                       };
+                                       editor.ViewToEdit.ColorScheme = cs;
+                                   };
 
         var bgColorPickerBtn = new Button
         {
@@ -117,23 +117,23 @@ public class ProgressBarStyles : Scenario
         editor.Add (bgColorPickerBtn);
 
         bgColorPickerBtn.Accept += (s, e) =>
-                                    {
-                                        ColorName newColor = ChooseColor (
-                                                                          fgColorPickerBtn.Text,
-                                                                          editor.ViewToEdit.ColorScheme.HotNormal.Background
-                                                                                .GetClosestNamedColor ()
-                                                                         );
+                                   {
+                                       ColorName newColor = ChooseColor (
+                                                                         fgColorPickerBtn.Text,
+                                                                         editor.ViewToEdit.ColorScheme.HotNormal.Background
+                                                                               .GetClosestNamedColor ()
+                                                                        );
 
-                                        var cs = new ColorScheme (editor.ViewToEdit.ColorScheme)
-                                        {
-                                            HotNormal = new Attribute (
-                                                                       editor.ViewToEdit.ColorScheme.HotNormal
-                                                                             .Foreground,
-                                                                       newColor
-                                                                      )
-                                        };
-                                        editor.ViewToEdit.ColorScheme = cs;
-                                    };
+                                       var cs = new ColorScheme (editor.ViewToEdit.ColorScheme)
+                                       {
+                                           HotNormal = new Attribute (
+                                                                      editor.ViewToEdit.ColorScheme.HotNormal
+                                                                            .Foreground,
+                                                                      newColor
+                                                                     )
+                                       };
+                                       editor.ViewToEdit.ColorScheme = cs;
+                                   };
 
         #endregion
 
@@ -178,36 +178,36 @@ public class ProgressBarStyles : Scenario
         editor.Add (continuousPB);
 
         button.Accept += (s, e) =>
-                          {
-                              if (_fractionTimer == null)
-                              {
-                                  //blocksPB.Enabled = false;
-                                  blocksPB.Fraction = 0;
-                                  continuousPB.Fraction = 0;
-                                  float fractionSum = 0;
+                         {
+                             if (_fractionTimer == null)
+                             {
+                                 //blocksPB.Enabled = false;
+                                 blocksPB.Fraction = 0;
+                                 continuousPB.Fraction = 0;
+                                 float fractionSum = 0;
 
-                                  _fractionTimer = new Timer (
-                                                              _ =>
-                                                              {
-                                                                  fractionSum += fractionStep;
-                                                                  blocksPB.Fraction = fractionSum;
-                                                                  continuousPB.Fraction = fractionSum;
+                                 _fractionTimer = new Timer (
+                                                             _ =>
+                                                             {
+                                                                 fractionSum += fractionStep;
+                                                                 blocksPB.Fraction = fractionSum;
+                                                                 continuousPB.Fraction = fractionSum;
 
-                                                                  if (fractionSum > 1)
-                                                                  {
-                                                                      _fractionTimer.Dispose ();
-                                                                      _fractionTimer = null;
-                                                                      button.Enabled = true;
-                                                                  }
+                                                                 if (fractionSum > 1)
+                                                                 {
+                                                                     _fractionTimer.Dispose ();
+                                                                     _fractionTimer = null;
+                                                                     button.Enabled = true;
+                                                                 }
 
-                                                                  Application.Wakeup ();
-                                                              },
-                                                              null,
-                                                              0,
-                                                              _timerTick
-                                                             );
-                              }
-                          };
+                                                                 Application.Wakeup ();
+                                                             },
+                                                             null,
+                                                             0,
+                                                             _timerTick
+                                                            );
+                             }
+                         };
 
         var ckbBidirectional = new CheckBox
         {

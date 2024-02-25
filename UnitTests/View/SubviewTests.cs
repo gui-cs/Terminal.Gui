@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
@@ -75,7 +74,7 @@ public class SubviewTests
         w2.Dispose ();
         top2.Dispose ();
     }
-    
+
     [Fact]
     [TestRespondersDisposed]
     public void Initialized_Event_Comparing_With_Added_Event ()
@@ -151,8 +150,8 @@ public class SubviewTests
         winAddedToTop.Initialized += (s, e) =>
                                      {
                                          wc++;
-                                         Assert.Equal (top.Bounds.Width, winAddedToTop.Frame.Width);
-                                         Assert.Equal (top.Bounds.Height, winAddedToTop.Frame.Height);
+                                         Assert.Equal (top.ContentArea.Width, winAddedToTop.Frame.Width);
+                                         Assert.Equal (top.ContentArea.Height, winAddedToTop.Frame.Height);
                                      };
 
         v1AddedToWin.Initialized += (s, e) =>
@@ -258,8 +257,8 @@ public class SubviewTests
         w.Initialized += (s, e) =>
                          {
                              wc++;
-                             Assert.Equal (t.Bounds.Width, w.Frame.Width);
-                             Assert.Equal (t.Bounds.Height, w.Frame.Height);
+                             Assert.Equal (t.ContentArea.Width, w.Frame.Width);
+                             Assert.Equal (t.ContentArea.Height, w.Frame.Height);
                          };
 
         v1.Initialized += (s, e) =>

@@ -380,14 +380,14 @@ public partial class View
                                   {
                                       if (scrollBar.IsVertical)
                                       {
-                                          scrollBar.Position += GetVisibleContentArea().Height;
+                                          scrollBar.Position += GetVisibleContentArea ().Height;
 
                                           return true;
                                       }
 
                                       if (scrollBar.OtherScrollBarView is { IsVertical: true })
                                       {
-                                          scrollBar.OtherScrollBarView.Position += GetVisibleContentArea().Height;
+                                          scrollBar.OtherScrollBarView.Position += GetVisibleContentArea ().Height;
 
                                           return true;
                                       }
@@ -401,14 +401,14 @@ public partial class View
                                   {
                                       if (scrollBar.IsVertical)
                                       {
-                                          scrollBar.Position -= GetVisibleContentArea().Height;
+                                          scrollBar.Position -= GetVisibleContentArea ().Height;
 
                                           return true;
                                       }
 
                                       if (scrollBar.OtherScrollBarView is { IsVertical: true })
                                       {
-                                          scrollBar.OtherScrollBarView.Position -= GetVisibleContentArea().Height;
+                                          scrollBar.OtherScrollBarView.Position -= GetVisibleContentArea ().Height;
 
                                           return true;
                                       }
@@ -517,14 +517,14 @@ public partial class View
                                   {
                                       if (!scrollBar.IsVertical)
                                       {
-                                          scrollBar.Position += GetVisibleContentArea().Width;
+                                          scrollBar.Position += GetVisibleContentArea ().Width;
 
                                           return true;
                                       }
 
                                       if (scrollBar.OtherScrollBarView is { IsVertical: false })
                                       {
-                                          scrollBar.OtherScrollBarView.Position += GetVisibleContentArea().Width;
+                                          scrollBar.OtherScrollBarView.Position += GetVisibleContentArea ().Width;
 
                                           return true;
                                       }
@@ -538,7 +538,7 @@ public partial class View
                                   {
                                       if (!scrollBar.IsVertical)
                                       {
-                                          scrollBar.Position -= GetVisibleContentArea().Width;
+                                          scrollBar.Position -= GetVisibleContentArea ().Width;
 
                                           return true;
                                       }
@@ -591,11 +591,11 @@ public partial class View
         {
             if (UseContentOffset)
             {
-                ContentOffset = new Point (Bounds.X, -scrollBar.Position);
+                ContentOffset = new Point (ContentArea.X, -scrollBar.Position);
 
-                if (Bounds.Y != -scrollBar.Position)
+                if (ContentArea.Y != -scrollBar.Position)
                 {
-                    scrollBar.Position = Bounds.Y;
+                    scrollBar.Position = ContentArea.Y;
                 }
             }
             else
@@ -610,11 +610,11 @@ public partial class View
         {
             if (UseContentOffset)
             {
-                ContentOffset = new Point (-scrollBar.Position, Bounds.Y);
+                ContentOffset = new Point (-scrollBar.Position, ContentArea.Y);
 
-                if (Bounds.X != -scrollBar.Position)
+                if (ContentArea.X != -scrollBar.Position)
                 {
-                    scrollBar.Position = Bounds.X;
+                    scrollBar.Position = ContentArea.X;
                 }
             }
             else

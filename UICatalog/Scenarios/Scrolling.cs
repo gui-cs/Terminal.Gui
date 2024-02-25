@@ -67,17 +67,17 @@ public class Scrolling : Scenario
         void Top_Loaded (object sender, EventArgs args)
         {
             horizontalRuler.Text =
-                rule.Repeat ((int)Math.Ceiling (horizontalRuler.Bounds.Width / (double)rule.Length)) [
-                                                                                                      ..horizontalRuler.Bounds.Width]
+                rule.Repeat ((int)Math.Ceiling (horizontalRuler.ContentArea.Width / (double)rule.Length)) [
+                     ..horizontalRuler.ContentArea.Width]
                 + "\n"
                 + "|         ".Repeat (
-                                       (int)Math.Ceiling (horizontalRuler.Bounds.Width / (double)rule.Length)
+                                       (int)Math.Ceiling (horizontalRuler.ContentArea.Width / (double)rule.Length)
                                       ) [
-                                         ..horizontalRuler.Bounds.Width];
+                                         ..horizontalRuler.ContentArea.Width];
 
             verticalRuler.Text =
-                vrule.Repeat ((int)Math.Ceiling (verticalRuler.Bounds.Height * 2 / (double)rule.Length))
-                    [..(verticalRuler.Bounds.Height * 2)];
+                vrule.Repeat ((int)Math.Ceiling (verticalRuler.ContentArea.Height * 2 / (double)rule.Length))
+                    [..(verticalRuler.ContentArea.Height * 2)];
             Application.Top.Loaded -= Top_Loaded;
         }
 
@@ -138,14 +138,14 @@ public class Scrolling : Scenario
         anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
 
         anchorButton.Accept += (s, e) =>
-                                {
-                                    // This demonstrates how to have a dynamically sized button
-                                    // Each time the button is clicked the button's text gets longer
-                                    // The call to Win.LayoutSubviews causes the Computed layout to
-                                    // get updated. 
-                                    anchorButton.Text += "!";
-                                    Win.LayoutSubviews ();
-                                };
+                               {
+                                   // This demonstrates how to have a dynamically sized button
+                                   // Each time the button is clicked the button's text gets longer
+                                   // The call to Win.LayoutSubviews causes the Computed layout to
+                                   // get updated. 
+                                   anchorButton.Text += "!";
+                                   Win.LayoutSubviews ();
+                               };
         scrollView.Add (anchorButton);
 
         Win.Add (scrollView);

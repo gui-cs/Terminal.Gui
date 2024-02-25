@@ -5,7 +5,7 @@
 // QUESTION: How does a user navigate out of an Adornment to another Adornment, or back into the Parent's SubViews?
 
 /// <summary>
-///     Adornments are a special form of <see cref="View"/> that appear outside of the <see cref="View.Bounds"/>:
+///     Adornments are a special form of <see cref="View"/> that appear outside of the <see cref="View.ContentArea"/>:
 ///     <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>. They are defined using the
 ///     <see cref="Thickness"/> class, which specifies the thickness of the sides of a rectangle.
 /// </summary>
@@ -31,7 +31,7 @@ public class Adornment : View
     public Adornment (View parent) { Parent = parent; }
 
     /// <summary>Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).</summary>
-    public override Rectangle Bounds
+    public override Rectangle ContentArea
     {
         get => Thickness?.GetInside (new Rectangle (Point.Empty, Frame.Size)) ?? new Rectangle (Point.Empty, Frame.Size);
         set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");

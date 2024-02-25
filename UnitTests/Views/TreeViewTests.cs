@@ -9,6 +9,70 @@ public class TreeViewTests
     private readonly ITestOutputHelper _output;
     public TreeViewTests (ITestOutputHelper output) { _output = output; }
 
+    [Fact]
+    public void Accept_Cancel_Event_Prevents_ObjectActivated ()
+    {
+        TreeView<object> treeView = CreateTree (out Factory f, out Car car1, out _);
+        treeView.SelectedObject = car1;
+        var accepted = false;
+        var activated = false;
+        object selectedObject = null;
+
+        treeView.Accept += Accept;
+        treeView.ObjectActivated += ObjectActivated;
+
+        treeView.InvokeCommand (Command.Accept);
+
+        Assert.True (accepted);
+        Assert.False (activated);
+        Assert.Equal (null, selectedObject);
+
+        return;
+
+        void ObjectActivated (object sender, ObjectActivatedEventArgs<object> e)
+        {
+            activated = true;
+            selectedObject = e.ActivatedObject;
+        }
+
+        void Accept (object sender, CancelEventArgs e)
+        {
+            accepted = true;
+            e.Cancel = true;
+        }
+    }
+
+    [Fact]
+    public void Accept_Command_Accepts_and_ActivatesObject ()
+    {
+        TreeView<object> treeView = CreateTree (out Factory f, out Car car1, out _);
+        Assert.NotNull (car1);
+        treeView.SelectedObject = car1;
+
+        var accepted = false;
+        var activated = false;
+        object selectedObject = null;
+
+        treeView.Accept += Accept;
+        treeView.ObjectActivated += ObjectActivated;
+
+        treeView.InvokeCommand (Command.Accept);
+
+        Assert.True (accepted);
+        Assert.True (activated);
+        Assert.Equal (car1, selectedObject);
+
+        return;
+
+        void ObjectActivated (object sender, ObjectActivatedEventArgs<object> e)
+        {
+            activated = true;
+            selectedObject = e.ActivatedObject;
+        }
+
+        void Accept (object sender, CancelEventArgs e) { accepted = true; }
+    }
+
     /// <summary>Tests that <see cref="TreeView.Expand(object)"/> results in a correct content height</summary>
     [Fact]
     public void ContentHeight_BiggerAfterExpand ()
@@ -30,7 +94,7 @@ public class TreeViewTests
         tree.BeginInit ();
         tree.EndInit ();
 
-        tree.Bounds = new Rectangle (0, 0, 10, 10);
+        tree.ContentArea = new Rectangle (0, 0, 10, 10);
 
         InitFakeDriver ();
 
@@ -60,7 +124,7 @@ public class TreeViewTests
         tree.EndInit ();
 
         // control only allows 1 row to be viewed at once
-        tree.Bounds = new Rectangle (0, 0, 20, 1);
+        tree.ContentArea = new Rectangle (0, 0, 20, 1);
 
         InitFakeDriver ();
 
@@ -234,7 +298,7 @@ public class TreeViewTests
         tree.EndInit ();
 
         // Make tree bounds 1 in height so that EnsureVisible always requires updating scroll offset
-        tree.Bounds = new Rectangle (0, 0, 50, 1);
+        tree.ContentArea = new Rectangle (0, 0, 50, 1);
 
         Assert.Null (tree.SelectedObject);
         Assert.Equal (0, tree.ScrollOffsetVertical);
@@ -262,6 +326,33 @@ public class TreeViewTests
         Exception exception = Record.Exception (() => tree.GoToEnd ());
 
         Assert.Null (exception);
+    }
+
+    [Fact]
+    public void HotKey_Command_Does_Not_Accept ()
+    {
+        var treeView = new TreeView ();
+        var accepted = false;
+
+        treeView.Accept += OnAccept;
+        treeView.InvokeCommand (Command.HotKey);
+
+        Assert.False (accepted);
+
+        return;
+
+        void OnAccept (object sender, CancelEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void HotKey_Command_SetsFocus ()
+    {
+        var view = new TreeView ();
+
+        view.CanFocus = true;
+        Assert.False (view.HasFocus);
+        view.InvokeCommand (Command.HotKey);
+        Assert.True (view.HasFocus);
     }
 
     /// <summary>
@@ -1348,95 +1439,4 @@ oot two
     }
 
     #endregion
-
-
-    [Fact]
-    public void HotKey_Command_SetsFocus ()
-    {
-        var view = new TreeView ();
-
-        view.CanFocus = true;
-        Assert.False (view.HasFocus);
-        view.InvokeCommand (Command.HotKey);
-        Assert.True (view.HasFocus);
-    }
-
-    [Fact]
-    public void HotKey_Command_Does_Not_Accept ()
-    {
-        var treeView = new TreeView ();
-        var accepted = false;
-
-        treeView.Accept += OnAccept;
-        treeView.InvokeCommand (Command.HotKey);
-
-        Assert.False (accepted);
-
-        return;
-        void OnAccept (object sender, CancelEventArgs e) { accepted = true; }
-    }
-
-
-    [Fact]
-    public void Accept_Command_Accepts_and_ActivatesObject ()
-    {
-        var treeView = CreateTree (out Factory f, out Car car1, out _);
-        Assert.NotNull (car1);
-        treeView.SelectedObject = car1;
-
-        var accepted = false;
-        var activated = false;
-        object selectedObject = null;
-
-        treeView.Accept += Accept;
-        treeView.ObjectActivated += ObjectActivated;
-
-        treeView.InvokeCommand (Command.Accept);
-
-        Assert.True (accepted);
-        Assert.True (activated);
-        Assert.Equal (car1, selectedObject);
-
-        return;
-
-        void ObjectActivated (object sender, ObjectActivatedEventArgs<object> e)
-        {
-            activated = true;
-            selectedObject = e.ActivatedObject;
-        }
-        void Accept (object sender, CancelEventArgs e) { accepted = true; }
-    }
-
-    [Fact]
-    public void Accept_Cancel_Event_Prevents_ObjectActivated ()
-    {
-        var treeView = CreateTree (out Factory f, out Car car1, out _);
-        treeView.SelectedObject = car1;
-        var accepted = false;
-        var activated = false;
-        object selectedObject = null;
-
-        treeView.Accept += Accept;
-        treeView.ObjectActivated += ObjectActivated;
-
-        treeView.InvokeCommand (Command.Accept);
-
-        Assert.True (accepted);
-        Assert.False (activated);
-        Assert.Equal (null, selectedObject);
-
-        return;
-
-        void ObjectActivated (object sender, ObjectActivatedEventArgs<object> e)
-        {
-            activated = true;
-            selectedObject = e.ActivatedObject;
-        }
-
-        void Accept (object sender, CancelEventArgs e)
-        {
-            accepted = true;
-            e.Cancel = true;
-        }
-    }
 }

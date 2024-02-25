@@ -1364,7 +1364,7 @@ public class ToplevelTests
         Assert.Equal (new Rectangle (1, 3, 10, 5), view.Frame);
         Assert.Equal (new Rectangle (0, 0, 10, 5), view._needsDisplayRect);
 
-        view.OnDrawContent (view.Bounds);
+        view.OnDrawContent (view.ContentArea);
         view.Frame = new Rectangle (1, 3, 10, 5);
         Assert.Equal (new Rectangle (1, 3, 10, 5), view.Frame);
         Assert.Equal (new Rectangle (0, 0, 10, 5), view._needsDisplayRect);

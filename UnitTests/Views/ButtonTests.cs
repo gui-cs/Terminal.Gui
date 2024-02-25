@@ -8,29 +8,25 @@ public class ButtonTests
     private readonly ITestOutputHelper _output;
     public ButtonTests (ITestOutputHelper output) { _output = output; }
 
-    // Test that Title and Text are the same
     [Fact]
-    public void Text_Mirrors_Title ()
+    public void Accept_Cancel_Event_OnAccept_Returns_True ()
     {
-        var view = new Button ();
-        view.Title = "Hello";
-        Assert.Equal ("Hello", view.Title);
-        Assert.Equal ($"Hello", view.TitleTextFormatter.Text);
+        var button = new Button ();
+        var acceptInvoked = false;
 
-        Assert.Equal ("Hello", view.Text);
-        Assert.Equal ($"{CM.Glyphs.LeftBracket} Hello {CM.Glyphs.RightBracket}", view.TextFormatter.Text);
-    }
+        button.Accept += ButtonAccept;
 
-    [Fact]
-    public void Title_Mirrors_Text ()
-    {
-        var view = new Button ();
-        view.Text = "Hello";
-        Assert.Equal ("Hello", view.Text);
-        Assert.Equal ($"{CM.Glyphs.LeftBracket} Hello {CM.Glyphs.RightBracket}", view.TextFormatter.Text);
+        bool? ret = button.OnAccept ();
+        Assert.True (ret);
+        Assert.True (acceptInvoked);
 
-        Assert.Equal ("Hello", view.Title);
-        Assert.Equal ($"Hello", view.TitleTextFormatter.Text);
+        return;
+
+        void ButtonAccept (object sender, CancelEventArgs e)
+        {
+            acceptInvoked = true;
+            e.Cancel = true;
+        }
     }
 
     // BUGBUG: This test is NOT a unit test and needs to be broken apart into 
@@ -127,9 +123,10 @@ public class ButtonTests
         Assert.Equal (0, txtToFind.ScrollOffset);
         Assert.Equal (16, txtToFind.CursorPosition);
 
-        Assert.Equal (new (30, 1, 20, 1), btnFindNext.Frame);
-        Assert.Equal (new (30, 2, 20, 1), btnFindPrevious.Frame);
-        Assert.Equal (new (30, 4, 20, 1), btnCancel.Frame);
+        Assert.Equal (new Rectangle (30, 1, 20, 1), btnFindNext.Frame);
+        Assert.Equal (new Rectangle (30, 2, 20, 1), btnFindPrevious.Frame);
+        Assert.Equal (new Rectangle (30, 4, 20, 1), btnCancel.Frame);
+
 //        Assert.Equal (new (0, 3, 12, 1), ckbMatchCase.Frame);
 //        Assert.Equal (new (0, 4, 18, 1), ckbMatchWholeWord.Frame);
 
@@ -432,14 +429,14 @@ public class ButtonTests
         Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.True (btn.CanFocus);
-        Assert.Equal (new Rectangle (0, 0, 4, 1), btn.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 4, 1), btn.ContentArea);
         Assert.Equal (new Rectangle (0, 0, 4, 1), btn.Frame);
         Assert.Equal ($"{CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
         Assert.False (btn.IsDefault);
         Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.True (btn.CanFocus);
-        Assert.Equal (new Rectangle (0, 0, 4, 1), btn.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 4, 1), btn.ContentArea);
         Assert.Equal (new Rectangle (0, 0, 4, 1), btn.Frame);
 
         Assert.Equal (string.Empty, btn.Title);
@@ -478,7 +475,7 @@ public class ButtonTests
         Assert.True (btn.IsDefault);
         Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
         Assert.True (btn.CanFocus);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), btn.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), btn.ContentArea);
         Assert.Equal (new Rectangle (0, 0, 10, 1), btn.Frame);
         Assert.Equal (KeyCode.T, btn.HotKey);
 
@@ -521,8 +518,24 @@ public class ButtonTests
 ";
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-        Assert.Equal (new Rectangle (0, 0, 9, 1), btn.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 9, 1), btn.ContentArea);
         Assert.Equal (new Rectangle (1, 2, 9, 1), btn.Frame);
+    }
+
+    [Fact]
+    public void HotKey_Command_Accepts ()
+    {
+        var button = new Button ();
+        var accepted = false;
+
+        button.Accept += ButtonOnAccept;
+        button.InvokeCommand (Command.HotKey);
+
+        Assert.True (accepted);
+
+        return;
+
+        void ButtonOnAccept (object sender, CancelEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -671,40 +684,6 @@ public class ButtonTests
     }
 
     [Fact]
-    public void HotKey_Command_Accepts ()
-    {
-        var button = new Button ();
-        var accepted = false;
-
-        button.Accept += ButtonOnAccept;
-        button.InvokeCommand (Command.HotKey);
-
-        Assert.True (accepted);
-
-        return;
-        void ButtonOnAccept (object sender, CancelEventArgs e) { accepted = true; }
-    }
-
-    [Fact]
-    public void Accept_Cancel_Event_OnAccept_Returns_True ()
-    {
-        var button = new Button ();
-        var acceptInvoked = false;
-
-        button.Accept += ButtonAccept;
-
-        var ret = button.OnAccept ();
-        Assert.True (ret);
-        Assert.True (acceptInvoked);
-
-        return;
-        void ButtonAccept (object sender, CancelEventArgs e)
-        {
-            acceptInvoked = true;
-            e.Cancel = true;
-        }
-    }
-    [Fact]
     public void Setting_Empty_Text_Sets_HoKey_To_KeyNull ()
     {
         var super = new View ();
@@ -742,6 +721,31 @@ public class ButtonTests
         Assert.Equal ("heyb", ((Button)b).Text);
     }
 
+    // Test that Title and Text are the same
+    [Fact]
+    public void Text_Mirrors_Title ()
+    {
+        var view = new Button ();
+        view.Title = "Hello";
+        Assert.Equal ("Hello", view.Title);
+        Assert.Equal ("Hello", view.TitleTextFormatter.Text);
+
+        Assert.Equal ("Hello", view.Text);
+        Assert.Equal ($"{CM.Glyphs.LeftBracket} Hello {CM.Glyphs.RightBracket}", view.TextFormatter.Text);
+    }
+
+    [Fact]
+    public void Title_Mirrors_Text ()
+    {
+        var view = new Button ();
+        view.Text = "Hello";
+        Assert.Equal ("Hello", view.Text);
+        Assert.Equal ($"{CM.Glyphs.LeftBracket} Hello {CM.Glyphs.RightBracket}", view.TextFormatter.Text);
+
+        Assert.Equal ("Hello", view.Title);
+        Assert.Equal ("Hello", view.TitleTextFormatter.Text);
+    }
+
     [Fact]
     [AutoInitShutdown]
     public void Update_Only_On_Or_After_Initialize ()
@@ -762,7 +766,7 @@ public class ButtonTests
         Assert.True (btn.IsInitialized);
         Assert.Equal ("Say Hello 你", btn.Text);
         Assert.Equal ($"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
-        Assert.Equal (new Rectangle (0, 0, 16, 1), btn.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 16, 1), btn.ContentArea);
         var btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
 
         var expected = @$"
@@ -799,7 +803,7 @@ public class ButtonTests
         Assert.True (btn.IsInitialized);
         Assert.Equal ("Say Hello 你", btn.Text);
         Assert.Equal ($"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
-        Assert.Equal (new Rectangle (0, 0, 16, 1), btn.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 16, 1), btn.ContentArea);
         var btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
 
         var expected = @$"

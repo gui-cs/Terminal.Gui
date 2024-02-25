@@ -366,7 +366,7 @@ public class HexView : View
         {
             var lineRect = new Rectangle (0, line, frame.Width, 1);
 
-            if (!Bounds.Contains (lineRect))
+            if (!ContentArea.Contains (lineRect))
             {
                 continue;
             }
@@ -604,9 +604,9 @@ public class HexView : View
         // Small buffers will just show the position, with the bsize field value (4 bytes)
         bytesPerLine = bsize;
 
-        if (Bounds.Width - displayWidth > 17)
+        if (ContentArea.Width - displayWidth > 17)
         {
-            bytesPerLine = bsize * ((Bounds.Width - displayWidth) / 18);
+            bytesPerLine = bsize * ((ContentArea.Width - displayWidth) / 18);
         }
     }
 

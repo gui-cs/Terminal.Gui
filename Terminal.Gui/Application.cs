@@ -1512,7 +1512,7 @@ public static partial class Application
                 };
             }
 
-            if (OutsideRect (new Point (nme.X, nme.Y), MouseGrabView.Bounds) || (view is { } && view != MouseGrabView))
+            if (OutsideRect (new Point (nme.X, nme.Y), MouseGrabView.ContentArea) || (view is { } && view != MouseGrabView))
             {
                 // The mouse has moved outside the bounds of the view that
                 // grabbed the mouse, so we tell the view that last got 
@@ -1636,7 +1636,7 @@ public static partial class Application
                 return;
             }
 
-            Rectangle bounds = view.BoundsToScreen (view.Bounds);
+            Rectangle bounds = view.BoundsToScreen (view.ContentArea);
 
             if (bounds.Contains (a.MouseEvent.X, a.MouseEvent.Y))
             {

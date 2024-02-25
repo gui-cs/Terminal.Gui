@@ -526,7 +526,7 @@ public class TableView : View
             return null;
         }
 
-        IEnumerable<ColumnToRender> viewPort = CalculateViewport (Bounds);
+        IEnumerable<ColumnToRender> viewPort = CalculateViewport (ContentArea);
 
         int headerHeight = GetHeaderHeightIfAny ();
 
@@ -545,7 +545,7 @@ public class TableView : View
         }
 
         // the cell is way down below the scroll area and off the screen
-        if (tableRow > RowOffset + (Bounds.Height - headerHeight))
+        if (tableRow > RowOffset + (ContentArea.Height - headerHeight))
         {
             return null;
         }
@@ -620,7 +620,7 @@ public class TableView : View
             return;
         }
 
-        ColumnToRender [] columnsToRender = CalculateViewport (Bounds).ToArray ();
+        ColumnToRender [] columnsToRender = CalculateViewport (ContentArea).ToArray ();
         int headerHeight = GetHeaderHeightIfAny ();
 
         //if we have scrolled too far to the left 
@@ -638,7 +638,7 @@ public class TableView : View
                 while (SelectedColumn > columnsToRender.Max (r => r.Column))
                 {
                     ColumnOffset++;
-                    columnsToRender = CalculateViewport (Bounds).ToArray ();
+                    columnsToRender = CalculateViewport (ContentArea).ToArray ();
 
                     // if we are already scrolled to the last column then break
                     // this will prevent any theoretical infinite loop
@@ -655,9 +655,9 @@ public class TableView : View
         }
 
         //if we have scrolled too far down
-        if (SelectedRow >= RowOffset + (Bounds.Height - headerHeight))
+        if (SelectedRow >= RowOffset + (ContentArea.Height - headerHeight))
         {
-            RowOffset = SelectedRow - (Bounds.Height - headerHeight) + 1;
+            RowOffset = SelectedRow - (ContentArea.Height - headerHeight) + 1;
         }
 
         //if we have scrolled too far up
@@ -736,11 +736,11 @@ public class TableView : View
 
             // ensure regions do not go over edge of table bounds
             region.Rectangle = Rectangle.FromLTRB (
-                                         region.Rectangle.Left,
-                                         region.Rectangle.Top,
-                                         Math.Max (Math.Min (region.Rectangle.Right, Table.Columns), 0),
-                                         Math.Max (Math.Min (region.Rectangle.Bottom, Table.Rows), 0)
-                                        );
+                                                   region.Rectangle.Left,
+                                                   region.Rectangle.Top,
+                                                   Math.Max (Math.Min (region.Rectangle.Right, Table.Columns), 0),
+                                                   Math.Max (Math.Min (region.Rectangle.Bottom, Table.Rows), 0)
+                                                  );
 
             MultiSelectedRegions.Push (region);
         }
@@ -949,12 +949,12 @@ public class TableView : View
         _scrollLeftPoint = null;
 
         // What columns to render at what X offset in viewport
-        ColumnToRender [] columnsToRender = CalculateViewport (Bounds).ToArray ();
+        ColumnToRender [] columnsToRender = CalculateViewport (ContentArea).ToArray ();
 
         Driver.SetAttribute (GetNormalColor ());
 
         //invalidate current row (prevents scrolling around leaving old characters in the frame
-        Driver.AddStr (new string (' ', Bounds.Width));
+        Driver.AddStr (new string (' ', ContentArea.Width));
 
         var line = 0;
 
@@ -968,7 +968,7 @@ public class TableView : View
             */
             if (Style.ShowHorizontalHeaderOverline)
             {
-                RenderHeaderOverline (line, Bounds.Width, columnsToRender);
+                RenderHeaderOverline (line, ContentArea.Width, columnsToRender);
                 line++;
             }
 
@@ -980,7 +980,7 @@ public class TableView : View
 
             if (Style.ShowHorizontalHeaderUnderline)
             {
-                RenderHeaderUnderline (line, Bounds.Width, columnsToRender);
+                RenderHeaderUnderline (line, ContentArea.Width, columnsToRender);
                 line++;
             }
         }
@@ -988,9 +988,9 @@ public class TableView : View
         int headerLinesConsumed = line;
 
         //render the cells
-        for (; line < Bounds.Height; line++)
+        for (; line < ContentArea.Height; line++)
         {
-            ClearLine (line, Bounds.Width);
+            ClearLine (line, ContentArea.Width);
 
             //work out what Row to render
             int rowToRender = RowOffset + (line - headerLinesConsumed);
@@ -1006,7 +1006,7 @@ public class TableView : View
             {
                 if (rowToRender == Table.Rows && Style.ShowHorizontalBottomline)
                 {
-                    RenderBottomLine (line, Bounds.Width, columnsToRender);
+                    RenderBottomLine (line, ContentArea.Width, columnsToRender);
                 }
 
                 continue;
@@ -1044,7 +1044,7 @@ public class TableView : View
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
     public void PageDown (bool extend)
     {
-        ChangeSelectionByOffset (0, Bounds.Height - GetHeaderHeightIfAny (), extend);
+        ChangeSelectionByOffset (0, ContentArea.Height - GetHeaderHeightIfAny (), extend);
         Update ();
     }
 
@@ -1052,7 +1052,7 @@ public class TableView : View
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
     public void PageUp (bool extend)
     {
-        ChangeSelectionByOffset (0, -(Bounds.Height - GetHeaderHeightIfAny ()), extend);
+        ChangeSelectionByOffset (0, -(ContentArea.Height - GetHeaderHeightIfAny ()), extend);
         Update ();
     }
 
@@ -1116,7 +1116,7 @@ public class TableView : View
             return null;
         }
 
-        IEnumerable<ColumnToRender> viewPort = CalculateViewport (Bounds);
+        IEnumerable<ColumnToRender> viewPort = CalculateViewport (ContentArea);
 
         int headerHeight = GetHeaderHeightIfAny ();
 
@@ -1704,7 +1704,7 @@ public class TableView : View
         // Renders something like:
         // │ArithmeticComparator│chi       │Healthboard│Interpretation│Labnumber│
 
-        ClearLine (row, Bounds.Width);
+        ClearLine (row, ContentArea.Width);
 
         //render start of line
         if (_style.ShowVerticalHeaderLines)
@@ -1734,7 +1734,7 @@ public class TableView : View
         //render end of line
         if (_style.ShowVerticalHeaderLines)
         {
-            AddRune (Bounds.Width - 1, row, Glyphs.VLine);
+            AddRune (ContentArea.Width - 1, row, Glyphs.VLine);
         }
     }
 
@@ -1892,7 +1892,7 @@ public class TableView : View
         }
 
         Driver.SetAttribute (color);
-        Driver.AddStr (new string (' ', Bounds.Width));
+        Driver.AddStr (new string (' ', ContentArea.Width));
 
         // Render cells for each visible header for the current row
         for (var i = 0; i < columnsToRender.Length; i++)
@@ -2001,7 +2001,7 @@ public class TableView : View
 
             //render start and end of line
             AddRune (0, row, Glyphs.VLine);
-            AddRune (Bounds.Width - 1, row, Glyphs.VLine);
+            AddRune (ContentArea.Width - 1, row, Glyphs.VLine);
         }
     }
 
@@ -2020,7 +2020,7 @@ public class TableView : View
 
     private void SetScrollRowsColsSize ()
     {
-        int scrollColsSize = Table?.Columns + Bounds.Width - 1 ?? 0;
+        int scrollColsSize = Table?.Columns + ContentArea.Width - 1 ?? 0;
 
         if (ScrollColsSize != scrollColsSize)
         {

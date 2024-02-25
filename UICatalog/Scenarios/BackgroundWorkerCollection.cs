@@ -264,10 +264,10 @@ public class BackgroundWorkerCollection : Scenario
             _start = new Button { Text = "Start", IsDefault = true, ClearOnVisibleFalse = false };
 
             _start.Accept += (s, e) =>
-                              {
-                                  Staging = new Staging (DateTime.Now);
-                                  RequestStop ();
-                              };
+                             {
+                                 Staging = new Staging (DateTime.Now);
+                                 RequestStop ();
+                             };
             Add (_start);
 
             _close = new Button { Text = "Close" };
@@ -285,7 +285,7 @@ public class BackgroundWorkerCollection : Scenario
             LayoutStarted += (s, e) =>
                              {
                                  int btnsWidth = _start.Frame.Width + _close.Frame.Width + 2 - 1;
-                                 int shiftLeft = Math.Max ((Bounds.Width - btnsWidth) / 2 - 2, 0);
+                                 int shiftLeft = Math.Max ((ContentArea.Width - btnsWidth) / 2 - 2, 0);
 
                                  shiftLeft += _close.Frame.Width + 1;
                                  _close.X = Pos.AnchorEnd (shiftLeft);

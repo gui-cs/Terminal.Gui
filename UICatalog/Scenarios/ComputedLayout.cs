@@ -56,12 +56,12 @@ public class ComputedLayout : Scenario
         Application.Top.LayoutComplete += (s, a) =>
                                           {
                                               horizontalRuler.Text =
-                                                  rule.Repeat ((int)Math.Ceiling (horizontalRuler.Bounds.Width / (double)rule.Length)) [
-                                                   ..horizontalRuler.Bounds.Width];
+                                                  rule.Repeat ((int)Math.Ceiling (horizontalRuler.ContentArea.Width / (double)rule.Length)) [
+                                                   ..horizontalRuler.ContentArea.Width];
 
                                               verticalRuler.Text =
-                                                  vrule.Repeat ((int)Math.Ceiling (verticalRuler.Bounds.Height * 2 / (double)rule.Length))
-                                                      [..(verticalRuler.Bounds.Height * 2)];
+                                                  vrule.Repeat ((int)Math.Ceiling (verticalRuler.ContentArea.Height * 2 / (double)rule.Length))
+                                                      [..(verticalRuler.ContentArea.Height * 2)];
                                           };
 
         Application.Top.Add (verticalRuler);
@@ -319,14 +319,14 @@ public class ComputedLayout : Scenario
         anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
 
         anchorButton.Accept += (s, e) =>
-                                {
-                                    // This demonstrates how to have a dynamically sized button
-                                    // Each time the button is clicked the button's text gets longer
-                                    // The call to Application.Top.LayoutSubviews causes the Computed layout to
-                                    // get updated. 
-                                    anchorButton.Text += "!";
-                                    Application.Top.LayoutSubviews ();
-                                };
+                               {
+                                   // This demonstrates how to have a dynamically sized button
+                                   // Each time the button is clicked the button's text gets longer
+                                   // The call to Application.Top.LayoutSubviews causes the Computed layout to
+                                   // get updated. 
+                                   anchorButton.Text += "!";
+                                   Application.Top.LayoutSubviews ();
+                               };
         Application.Top.Add (anchorButton);
 
         // Demonstrate AnchorEnd(n) 
@@ -365,14 +365,14 @@ public class ComputedLayout : Scenario
         };
 
         leftButton.Accept += (s, e) =>
-                              {
-                                  // This demonstrates how to have a dynamically sized button
-                                  // Each time the button is clicked the button's text gets longer
-                                  // The call to Application.Top.LayoutSubviews causes the Computed layout to
-                                  // get updated. 
-                                  leftButton.Text += "!";
-                                  Application.Top.LayoutSubviews ();
-                              };
+                             {
+                                 // This demonstrates how to have a dynamically sized button
+                                 // Each time the button is clicked the button's text gets longer
+                                 // The call to Application.Top.LayoutSubviews causes the Computed layout to
+                                 // get updated. 
+                                 leftButton.Text += "!";
+                                 Application.Top.LayoutSubviews ();
+                             };
 
         // show positioning vertically using Pos.AnchorEnd
         var centerButton = new Button
@@ -381,27 +381,27 @@ public class ComputedLayout : Scenario
         };
 
         centerButton.Accept += (s, e) =>
-                                {
-                                    // This demonstrates how to have a dynamically sized button
-                                    // Each time the button is clicked the button's text gets longer
-                                    // The call to Application.Top.LayoutSubviews causes the Computed layout to
-                                    // get updated. 
-                                    centerButton.Text += "!";
-                                    Application.Top.LayoutSubviews ();
-                                };
-
-        // show positioning vertically using another window and Pos.Bottom
-        var rightButton = new Button { Text = "Right", Y = Pos.Y (centerButton) };
-
-        rightButton.Accept += (s, e) =>
                                {
                                    // This demonstrates how to have a dynamically sized button
                                    // Each time the button is clicked the button's text gets longer
                                    // The call to Application.Top.LayoutSubviews causes the Computed layout to
                                    // get updated. 
-                                   rightButton.Text += "!";
+                                   centerButton.Text += "!";
                                    Application.Top.LayoutSubviews ();
                                };
+
+        // show positioning vertically using another window and Pos.Bottom
+        var rightButton = new Button { Text = "Right", Y = Pos.Y (centerButton) };
+
+        rightButton.Accept += (s, e) =>
+                              {
+                                  // This demonstrates how to have a dynamically sized button
+                                  // Each time the button is clicked the button's text gets longer
+                                  // The call to Application.Top.LayoutSubviews causes the Computed layout to
+                                  // get updated. 
+                                  rightButton.Text += "!";
+                                  Application.Top.LayoutSubviews ();
+                              };
 
         // Center three buttons with 5 spaces between them
         leftButton.X = Pos.Left (centerButton) - (Pos.Right (leftButton) - Pos.Left (leftButton)) - 5;

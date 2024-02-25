@@ -63,7 +63,7 @@ public class LineView : View
 
         int hLineWidth = Math.Max (1, Glyphs.HLine.GetColumns ());
 
-        int dEnd = Orientation == Orientation.Horizontal ? Bounds.Width : Bounds.Height;
+        int dEnd = Orientation == Orientation.Horizontal ? ContentArea.Width : ContentArea.Height;
 
         for (var d = 0; d < dEnd; d += hLineWidth)
         {

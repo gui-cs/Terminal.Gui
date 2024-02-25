@@ -293,7 +293,7 @@ public class LineCanvasTests
         View v = GetCanvas (out LineCanvas lc);
         v.Width = 10;
         v.Height = 10;
-        v.Bounds = new Rectangle (0, 0, 10, 10);
+        v.ContentArea = new Rectangle (0, 0, 10, 10);
 
         lc.AddLine (new Point (x1, y1), len1, o1, s1);
         lc.AddLine (new Point (x2, y2), len2, o2, s2);
@@ -990,7 +990,7 @@ public class LineCanvasTests
         View v = GetCanvas (out LineCanvas lc);
         v.Width = 10;
         v.Height = 10;
-        v.Bounds = new Rectangle (0, 0, 10, 10);
+        v.ContentArea = new Rectangle (0, 0, 10, 10);
 
         lc.AddLine (new Point (x1, y1), length, o1, s1);
 
@@ -1304,7 +1304,7 @@ public class LineCanvasTests
     /// <returns></returns>
     private View GetCanvas (out LineCanvas canvas, int offsetX = 0, int offsetY = 0)
     {
-        var v = new View { Width = 10, Height = 5, Bounds = new Rectangle (0, 0, 10, 5) };
+        var v = new View { Width = 10, Height = 5, ContentArea = new Rectangle (0, 0, 10, 5) };
         Application.Top.Add (v);
         Application.Begin (Application.Top);
 

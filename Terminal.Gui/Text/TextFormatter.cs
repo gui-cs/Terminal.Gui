@@ -128,7 +128,10 @@ public class TextFormatter
 
     /// <summary>Gets or sets whether the <see cref="Size"/> should be automatically changed to fit the <see cref="Text"/>.</summary>
     /// <remarks>
-    ///     <para>Used by <see cref="View.AutoSize"/> to resize the view's <see cref="View.Bounds"/> to fit <see cref="Size"/>.</para>
+    ///     <para>
+    ///         Used by <see cref="View.AutoSize"/> to resize the view's <see cref="View.ContentArea"/> to fit
+    ///         <see cref="Size"/>.
+    ///     </para>
     ///     <para>
     ///         AutoSize is ignored if <see cref="TextAlignment.Justified"/> and
     ///         <see cref="VerticalTextAlignment.Justified"/> are used.
@@ -345,20 +348,20 @@ public class TextFormatter
             maxBounds = containerBounds == default (Rectangle)
                             ? bounds
                             : new Rectangle (
-                                        Math.Max (containerBounds.X, bounds.X),
-                                        Math.Max (containerBounds.Y, bounds.Y),
-                                        Math.Max (
-                                                  Math.Min (containerBounds.Width, containerBounds.Right - bounds.Left),
-                                                  0
-                                                 ),
-                                        Math.Max (
-                                                  Math.Min (
-                                                            containerBounds.Height,
-                                                            containerBounds.Bottom - bounds.Top
-                                                           ),
-                                                  0
-                                                 )
-                                       );
+                                             Math.Max (containerBounds.X, bounds.X),
+                                             Math.Max (containerBounds.Y, bounds.Y),
+                                             Math.Max (
+                                                       Math.Min (containerBounds.Width, containerBounds.Right - bounds.Left),
+                                                       0
+                                                      ),
+                                             Math.Max (
+                                                       Math.Min (
+                                                                 containerBounds.Height,
+                                                                 containerBounds.Bottom - bounds.Top
+                                                                ),
+                                                       0
+                                                      )
+                                            );
         }
 
         if (maxBounds.Width == 0 || maxBounds.Height == 0)

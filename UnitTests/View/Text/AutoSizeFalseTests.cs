@@ -145,7 +145,7 @@ public class AutoSizeFalseTests
         Rectangle expectedViewBounds = new (0, 0, 0, 0);
 
         Assert.False (view.AutoSize);
-        Assert.Equal (expectedViewBounds, view.Bounds);
+        Assert.Equal (expectedViewBounds, view.ContentArea);
         super.Dispose ();
     }
 
@@ -162,7 +162,7 @@ public class AutoSizeFalseTests
         Rectangle expectedViewBounds = new (0, 0, 30, 80);
 
         Assert.False (view.AutoSize);
-        Assert.Equal (expectedViewBounds, view.Bounds);
+        Assert.Equal (expectedViewBounds, view.ContentArea);
         Assert.False (view.IsInitialized);
 
         super.BeginInit ();
@@ -170,7 +170,7 @@ public class AutoSizeFalseTests
 
         Assert.True (view.IsInitialized);
         Assert.False (view.AutoSize);
-        Assert.Equal (expectedViewBounds, view.Bounds);
+        Assert.Equal (expectedViewBounds, view.ContentArea);
     }
 
     [Fact]

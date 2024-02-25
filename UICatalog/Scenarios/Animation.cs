@@ -168,12 +168,12 @@ public class Animation : Scenario
         {
             base.OnDrawContent (contentArea);
 
-            if (oldSize != Bounds)
+            if (oldSize != ContentArea)
             {
                 // Invalidate cached images now size has changed
                 matchSizes = new Image<Rgba32> [frameCount];
                 brailleCache = new string [frameCount];
-                oldSize = Bounds;
+                oldSize = ContentArea;
             }
 
             Image<Rgba32> imgScaled = matchSizes [currentFrame];
@@ -184,7 +184,7 @@ public class Animation : Scenario
                 Image<Rgba32> imgFull = fullResImages [currentFrame];
 
                 // keep aspect ratio
-                int newSize = Math.Min (Bounds.Width, Bounds.Height);
+                int newSize = Math.Min (ContentArea.Width, ContentArea.Height);
 
                 // generate one
                 matchSizes [currentFrame] = imgScaled = imgFull.Clone (

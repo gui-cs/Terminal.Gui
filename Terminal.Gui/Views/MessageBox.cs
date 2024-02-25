@@ -394,7 +394,7 @@ public static class MessageBox
                         }
 
                         // TODO: replace with Dim.Fit when implemented
-                        Rectangle maxBounds = d.SuperView?.Bounds ?? Application.Top.Bounds;
+                        Rectangle maxBounds = d.SuperView?.ContentArea ?? Application.Top.ContentArea;
 
                         if (wrapMessage)
                         {
@@ -452,10 +452,10 @@ public static class MessageBox
             Button b = buttonList [n];
 
             b.Accept += (s, e) =>
-                         {
-                             Clicked = buttonId;
-                             Application.RequestStop ();
-                         };
+                        {
+                            Clicked = buttonId;
+                            Application.RequestStop ();
+                        };
 
             if (b.IsDefault)
             {
