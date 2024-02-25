@@ -17,7 +17,6 @@ namespace Terminal.Gui;
 /// </remarks>
 public class ScrollBarView : View
 {
-    private static Point _superViewContentOffset;
     private bool _autoHideScrollBars = true;
     private View _contentBottomRightCorner;
     private bool _keepContentAlwaysInViewport = true;
@@ -167,7 +166,7 @@ public class ScrollBarView : View
     /// </remarks>
     public int Size
     {
-        get => _size - (Orientation == Orientation.Vertical ? _superViewContentOffset.Y : _superViewContentOffset.X);
+        get => _size;
         set
         {
             _size = value;
