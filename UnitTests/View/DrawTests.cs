@@ -155,18 +155,15 @@ public class DrawTests
         ((FakeDriver)Application.Driver).SetBufferSize (7, 7);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      """
-                                                      
-                                                        Test
-                                                            
-                                                            
-                                                      T
-                                                      e
-                                                      s
-                                                      t
-                                                      """,
-                                                      _output
-                                                     );
+                                                      @"
+  Test
+      
+      
+T     
+e     
+s     
+t     ",
+                                                      _output);
 
         TestHelpers.AssertDriverAttributesAre (
                                                """
@@ -417,14 +414,12 @@ public class DrawTests
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      """
-                                                      
-                                                       6w
-                                                       7
-                                                       8
-                                                       9
-                                                       0
-                                                      """,
+                                                      @"
+ 6w
+ 7 
+ 8 
+ 9 
+ 0 ",
                                                       _output
                                                      );
 
@@ -619,14 +614,12 @@ public class DrawTests
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      """
-                                                      
-                                                       6w
-                                                       7
-                                                       8
-                                                       9
-                                                       0
-                                                      """,
+                                                      @"
+ 6w
+ 7 
+ 8 
+ 9 
+ 0 ",
                                                       _output
                                                      );
 
