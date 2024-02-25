@@ -632,7 +632,9 @@ public class ScrollBarView : View
     // param n is the new position and the max is the positive/negative value that can be scrolled for the new position
     internal bool CanScroll (int n, out int maxToScroll, bool isVertical = false)
     {
-        if (GetSuperViewBounds ().IsEmpty)
+        Rectangle bounds = SuperView?.GetVisibleContentArea () ?? Rectangle.Empty;
+
+        if (bounds.IsEmpty)
         {
             maxToScroll = 0;
 
@@ -657,7 +659,7 @@ public class ScrollBarView : View
         }
 
         var pos = 0;
-        Rectangle bounds = GetSuperViewBounds ();
+        Rectangle bounds = SuperView?.GetVisibleContentArea () ?? Rectangle.Empty;
 
         if (KeepContentAlwaysInViewPort && !_vertical && _position + bounds.Width > Size + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0))
         {
@@ -839,7 +841,7 @@ public class ScrollBarView : View
 
     private int GetBarSize (bool isVertical)
     {
-        Rectangle bounds = GetSuperViewBounds ();
+        Rectangle bounds = SuperView?.GetVisibleContentArea () ?? Rectangle.Empty;
 
         if (bounds.IsEmpty)
         {
@@ -858,18 +860,6 @@ public class ScrollBarView : View
                                 ? bounds.Height - (_showBothScrollIndicator ? 1 : 0)
                                 : 0 :
                KeepContentAlwaysInViewPort ? bounds.Width - (_showBothScrollIndicator ? 1 : 0) : 0;
-    }
-
-    private Rectangle GetSuperViewBounds ()
-    {
-        if (SuperView is null)
-        {
-            return Rectangle.Empty;
-        }
-
-        return new Rectangle (
-                              Point.Empty,
-                              new Size (SuperView.ContentArea.Width + SuperView.ContentOffset.X, SuperView.ContentArea.Height + SuperView.ContentOffset.Y));
     }
 
     private void ManageScrollBarThickness ()
@@ -1020,7 +1010,7 @@ public class ScrollBarView : View
         {
             if (SuperView is { UseContentOffset: true })
             {
-                Rectangle bounds = GetSuperViewBounds ();
+                Rectangle bounds = SuperView?.GetVisibleContentArea () ?? Rectangle.Empty;
 
                 X = _vertical ? bounds.Right - 1 : bounds.Left;
                 Y = _vertical ? bounds.Top : bounds.Bottom - 1;
@@ -1054,7 +1044,7 @@ public class ScrollBarView : View
         {
             if (SuperView is { UseContentOffset: true })
             {
-                Rectangle bounds = GetSuperViewBounds ();
+                Rectangle bounds = SuperView?.GetVisibleContentArea () ?? Rectangle.Empty;
 
                 X = _vertical ? bounds.Right - 1 : bounds.Left;
                 Y = _vertical ? bounds.Top : bounds.Bottom - 1;
@@ -1071,7 +1061,7 @@ public class ScrollBarView : View
         {
             if (SuperView is { UseContentOffset: true })
             {
-                Rectangle bounds = GetSuperViewBounds ();
+                Rectangle bounds = SuperView?.GetVisibleContentArea () ?? Rectangle.Empty;
 
                 _otherScrollBarView.X = _otherScrollBarView._vertical ? bounds.Right - 1 : bounds.Left;
                 _otherScrollBarView.Y = _otherScrollBarView._vertical ? bounds.Top : bounds.Bottom - 1;
@@ -1099,7 +1089,7 @@ public class ScrollBarView : View
             return;
         }
 
-        SetRelativeLayout (GetSuperViewBounds ());
+        SetRelativeLayout (SuperView?.GetVisibleContentArea () ?? Rectangle.Empty);
 
         if (AutoHideScrollBars)
         {
@@ -1107,18 +1097,18 @@ public class ScrollBarView : View
 
             if (_otherScrollBarView is { })
             {
-                _otherScrollBarView.SetRelativeLayout (GetSuperViewBounds ());
+                _otherScrollBarView.SetRelativeLayout (SuperView?.GetVisibleContentArea () ?? Rectangle.Empty);
                 CheckBothScrollBars (_otherScrollBarView, pending);
             }
         }
 
         SetWidthHeight ();
-        SetRelativeLayout (GetSuperViewBounds ());
+        SetRelativeLayout (SuperView?.GetVisibleContentArea () ?? Rectangle.Empty);
 
         if (_otherScrollBarView is { })
         {
             OtherScrollBarView.SetWidthHeight ();
-            OtherScrollBarView.SetRelativeLayout (GetSuperViewBounds ());
+            OtherScrollBarView.SetRelativeLayout (SuperView?.GetVisibleContentArea () ?? Rectangle.Empty);
         }
 
         if (_showBothScrollIndicator)

@@ -2589,6 +2589,29 @@ public class TextView : View
         set => base.CanFocus = value;
     }
 
+    /// <inheritdoc/>
+    public override Point ContentOffset
+    {
+        get => base.ContentOffset;
+        set
+        {
+            if (base.ContentOffset != value)
+            {
+                base.ContentOffset = value;
+            }
+
+            if (LeftColumn != -ContentOffset.X)
+            {
+                LeftColumn = -ContentOffset.X;
+            }
+
+            if (TopRow != -ContentOffset.Y)
+            {
+                TopRow = -ContentOffset.Y;
+            }
+        }
+    }
+
     /// <summary>Get the <see cref="ContextMenu"/> for this view.</summary>
     public ContextMenu? ContextMenu { get; }
 
@@ -2667,7 +2690,7 @@ public class TextView : View
                 return;
             }
 
-            ScrollLeftOffset = _leftColumn = Math.Max (Math.Min (value, Maxlength - 1), 0);
+            ContentOffset = ContentOffset with { X = -(_leftColumn = Math.Max (Math.Min (value, Maxlength - 1), 0)) };
         }
     }
 
@@ -2746,42 +2769,6 @@ public class TextView : View
                 SetNeedsDisplay ();
                 WrapTextModel ();
                 Adjust ();
-            }
-        }
-    }
-
-    /// <inheritdoc/>
-    public override int ScrollLeftOffset
-    {
-        get => base.ScrollLeftOffset;
-        set
-        {
-            if (base.ScrollLeftOffset != value)
-            {
-                base.ScrollLeftOffset = value;
-            }
-
-            if (LeftColumn != ScrollLeftOffset)
-            {
-                LeftColumn = ScrollLeftOffset;
-            }
-        }
-    }
-
-    /// <inheritdoc/>
-    public override int ScrollTopOffset
-    {
-        get => base.ScrollTopOffset;
-        set
-        {
-            if (base.ScrollTopOffset != value)
-            {
-                base.ScrollTopOffset = value;
-            }
-
-            if (TopRow != ScrollTopOffset)
-            {
-                TopRow = ScrollTopOffset;
             }
         }
     }
@@ -2892,7 +2879,7 @@ public class TextView : View
     public int TopRow
     {
         get => _topRow;
-        set => ScrollTopOffset = _topRow = Math.Max (Math.Min (value, Lines - 1), 0);
+        set => ContentOffset = ContentOffset with { Y = -(_topRow = Math.Max (Math.Min (value, Lines - 1), 0)) };
     }
 
     /// <summary>
@@ -3956,13 +3943,13 @@ public class TextView : View
 
         if (isRow)
         {
-            ScrollTopOffset = _topRow = Math.Max (idx > _model.Count - 1 ? _model.Count - 1 : idx, 0);
+            ContentOffset = ContentOffset with { Y = -(_topRow = Math.Max (idx > _model.Count - 1 ? _model.Count - 1 : idx, 0)) };
         }
         else if (!_wordWrap)
         {
             int maxlength =
                 _model.GetMaxVisibleLine (_topRow, _topRow + ContentArea.Height, TabWidth);
-            ScrollLeftOffset = _leftColumn = Math.Max (!_wordWrap && idx > maxlength - 1 ? maxlength - 1 : idx, 0);
+            ContentOffset = ContentOffset with { X = -(_leftColumn = Math.Max (!_wordWrap && idx > maxlength - 1 ? maxlength - 1 : idx, 0)) };
         }
 
         SetNeedsDisplay ();
@@ -6358,8 +6345,7 @@ public class TextView : View
         {
             ScrollColsSize = Maxlength;
             ScrollRowsSize = Lines;
-            ScrollLeftOffset = LeftColumn;
-            ScrollTopOffset = TopRow;
+            ContentOffset = new Point (-LeftColumn, -TopRow);
         }
     }
 

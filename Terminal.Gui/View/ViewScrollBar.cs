@@ -31,9 +31,7 @@ public partial class View
     private ScrollBarView _scrollBar;
     private ScrollBarType _scrollBarType;
     private int _scrollColsSize;
-    private int _scrollLeftOffset;
     private int _scrollRowsSize;
-    private int _scrollTopOffset;
 
     /// <summary>If true the vertical/horizontal scroll bars won't be showed if it's not needed.</summary>
     public bool ScrollAutoHideScrollBars
@@ -143,35 +141,6 @@ public partial class View
         set => _scrollBar.KeepContentAlwaysInViewPort = value;
     }
 
-    /// <summary>
-    ///     Determines the left offset on scrolling.
-    /// </summary>
-    public virtual int ScrollLeftOffset
-    {
-        get => _scrollLeftOffset;
-        set
-        {
-            if (!UseContentOffset)
-            {
-                _scrollLeftOffset = value;
-
-                if (_scrollBar is null)
-                {
-                    return;
-                }
-
-                if (!_scrollBar.IsVertical && _scrollBar.Position != _scrollLeftOffset)
-                {
-                    _scrollBar.Position = _scrollLeftOffset;
-                }
-                else if (_scrollBar is { OtherScrollBarView.IsVertical: false } && _scrollBar?.OtherScrollBarView.Position != _scrollLeftOffset)
-                {
-                    _scrollBar!.OtherScrollBarView.Position = _scrollLeftOffset;
-                }
-            }
-        }
-    }
-
     /// <summary>Represent a vertical or horizontal ScrollBarView other than this.</summary>
     public ScrollBarView ScrollOtherScrollBarView
     {
@@ -235,40 +204,6 @@ public partial class View
         get => _scrollBar.ShowScrollIndicator;
         set => _scrollBar.ShowScrollIndicator = value;
     }
-
-    /// <summary>
-    ///     Determines the top offset on scrolling.
-    /// </summary>
-    public virtual int ScrollTopOffset
-    {
-        get => _scrollTopOffset;
-        set
-        {
-            if (!UseContentOffset)
-            {
-                _scrollTopOffset = value;
-
-                if (_scrollBar is null)
-                {
-                    return;
-                }
-
-                if (_scrollBar.IsVertical && _scrollBar.Position != _scrollTopOffset)
-                {
-                    _scrollBar.Position = _scrollTopOffset;
-                }
-                else if (_scrollBar is { OtherScrollBarView.IsVertical: true } && _scrollBar?.OtherScrollBarView.Position != _scrollTopOffset)
-                {
-                    _scrollBar!.OtherScrollBarView.Position = _scrollTopOffset;
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    ///     Determines if negative bounds location is allowed for scrolling the <see cref="GetVisibleContentArea"/>.
-    /// </summary>
-    public bool UseContentOffset { get; set; }
 
     private void AddEventHandlersForScrollBars (ScrollBarView scrollBar)
     {
@@ -589,41 +524,11 @@ public partial class View
     {
         if (scrollBar.IsVertical)
         {
-            if (UseContentOffset)
-            {
-                ContentOffset = new Point (ContentArea.X, -scrollBar.Position);
-
-                if (ContentArea.Y != -scrollBar.Position)
-                {
-                    scrollBar.Position = ContentArea.Y;
-                }
-            }
-            else
-            {
-                if (ScrollTopOffset != scrollBar.Position)
-                {
-                    ScrollTopOffset = scrollBar.Position;
-                }
-            }
+            ContentOffset = new Point (ContentArea.X, -scrollBar.Position);
         }
         else
         {
-            if (UseContentOffset)
-            {
-                ContentOffset = new Point (-scrollBar.Position, ContentArea.Y);
-
-                if (ContentArea.X != -scrollBar.Position)
-                {
-                    scrollBar.Position = ContentArea.X;
-                }
-            }
-            else
-            {
-                if (ScrollLeftOffset != scrollBar.Position)
-                {
-                    ScrollLeftOffset = scrollBar.Position;
-                }
-            }
+            ContentOffset = new Point (-scrollBar.Position, ContentArea.Y);
         }
 
         SetTextFormatterSize ();

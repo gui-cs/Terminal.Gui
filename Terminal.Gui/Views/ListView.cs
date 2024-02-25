@@ -191,6 +191,29 @@ public class ListView : View
         }
     }
 
+    /// <inheritdoc/>
+    public override Point ContentOffset
+    {
+        get => base.ContentOffset;
+        set
+        {
+            if (base.ContentOffset != value)
+            {
+                base.ContentOffset = value;
+            }
+
+            if (LeftItem != -ContentOffset.X)
+            {
+                _left = -ContentOffset.X;
+            }
+
+            if (TopItem != -ContentOffset.Y)
+            {
+                _top = -ContentOffset.Y;
+            }
+        }
+    }
+
     /// <summary>
     ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="ListView.Source"/> collection as the
     ///     user types.
@@ -214,49 +237,13 @@ public class ListView : View
                 throw new ArgumentException ("value");
             }
 
-            ScrollLeftOffset = _leftItem = value;
+            ContentOffset = ContentOffset with { X = -(_leftItem = value) };
             SetNeedsDisplay ();
         }
     }
 
     /// <summary>Gets the widest item in the list.</summary>
     public int MaxLength => _source?.Length ?? 0;
-
-    /// <inheritdoc/>
-    public override int ScrollLeftOffset
-    {
-        get => base.ScrollLeftOffset;
-        set
-        {
-            if (base.ScrollLeftOffset != value)
-            {
-                base.ScrollLeftOffset = value;
-            }
-
-            if (LeftItem != ScrollLeftOffset)
-            {
-                _left = ScrollLeftOffset;
-            }
-        }
-    }
-
-    /// <inheritdoc/>
-    public override int ScrollTopOffset
-    {
-        get => base.ScrollTopOffset;
-        set
-        {
-            if (base.ScrollTopOffset != value)
-            {
-                base.ScrollTopOffset = value;
-            }
-
-            if (TopItem != ScrollTopOffset)
-            {
-                _top = ScrollTopOffset;
-            }
-        }
-    }
 
     /// <summary>Gets or sets the index of the currently selected item.</summary>
     /// <value>The selected item.</value>
@@ -315,7 +302,7 @@ public class ListView : View
                 throw new ArgumentException ("value");
             }
 
-            ScrollTopOffset = _topItem = Math.Max (value, 0);
+            ContentOffset = ContentOffset with { Y = -(_topItem = Math.Max (value, 0)) };
             SetNeedsDisplay ();
         }
     }
@@ -323,13 +310,13 @@ public class ListView : View
     private int _left
     {
         get => _leftItem;
-        set => ScrollLeftOffset = _leftItem = value;
+        set => ContentOffset = ContentOffset with { X = -(_leftItem = value) };
     }
 
     private int _top
     {
         get => _topItem;
-        set => ScrollTopOffset = _topItem = value;
+        set => ContentOffset = ContentOffset with { Y = -(_topItem = value) };
     }
 
     /// <summary>

@@ -345,7 +345,31 @@ public class TableView : View
         get => _columnOffset;
 
         //try to prevent this being set to an out of bounds column
-        set => ScrollLeftOffset = _columnOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Columns - 1, value));
+        set => ContentOffset = ContentOffset with { X = -(_columnOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Columns - 1, value))) };
+    }
+
+    /// <inheritdoc/>
+    public override Point ContentOffset
+    {
+        get => base.ContentOffset;
+        set
+        {
+            if (base.ContentOffset != value)
+            {
+                base.ContentOffset = value;
+            }
+
+            if (ColumnOffset != -ContentOffset.X)
+            {
+                _ignoreEnsureSelectedCellIsVisible = true;
+                ColumnOffset = -ContentOffset.X;
+            }
+
+            if (RowOffset != -ContentOffset.Y)
+            {
+                RowOffset = -ContentOffset.Y;
+            }
+        }
     }
 
     /// <summary>True to select the entire row at once.  False to select individual cells.  Defaults to false</summary>
@@ -381,44 +405,7 @@ public class TableView : View
     public int RowOffset
     {
         get => _rowOffset;
-        set => ScrollTopOffset = _rowOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Rows - 1, value));
-    }
-
-    /// <inheritdoc/>
-    public override int ScrollLeftOffset
-    {
-        get => base.ScrollLeftOffset;
-        set
-        {
-            if (base.ScrollLeftOffset != value)
-            {
-                base.ScrollLeftOffset = value;
-            }
-
-            if (ColumnOffset != ScrollLeftOffset)
-            {
-                _ignoreEnsureSelectedCellIsVisible = true;
-                ColumnOffset = ScrollLeftOffset;
-            }
-        }
-    }
-
-    /// <inheritdoc/>
-    public override int ScrollTopOffset
-    {
-        get => base.ScrollTopOffset;
-        set
-        {
-            if (base.ScrollTopOffset != value)
-            {
-                base.ScrollTopOffset = value;
-            }
-
-            if (RowOffset != ScrollTopOffset)
-            {
-                RowOffset = ScrollTopOffset;
-            }
-        }
+        set => ContentOffset = ContentOffset with { Y = -(_rowOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Rows - 1, value))) };
     }
 
     /// <summary>The index of <see cref="DataTable.Columns"/> in <see cref="Table"/> that the user has currently selected</summary>

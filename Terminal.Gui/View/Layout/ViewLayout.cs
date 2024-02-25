@@ -37,8 +37,7 @@ public enum LayoutStyle
 public partial class View
 {
     private bool _autoSize;
-
-    private Rectangle _bounds;
+    private Point _contentOffset;
     private Rectangle _frame;
     private Dim _height = Dim.Sized (0);
     private Dim _width = Dim.Sized (0);
@@ -195,7 +194,7 @@ public partial class View
                                   - Margin.Thickness.Horizontal
                                   - Border.Thickness.Horizontal
                                   - Padding.Thickness.Horizontal
-                                  - ContentOffset.X);
+                                  - (UseContentOffset ? ContentOffset.X : 0));
 
             int height = Math.Max (
                                    0,
@@ -203,9 +202,9 @@ public partial class View
                                    - Margin.Thickness.Vertical
                                    - Border.Thickness.Vertical
                                    - Padding.Thickness.Vertical
-                                   - ContentOffset.Y);
+                                   - (UseContentOffset ? ContentOffset.Y : 0));
 
-            return new Rectangle (ContentOffset, new Size (width, height));
+            return new Rectangle (UseContentOffset ? ContentOffset : Point.Empty, new Size (width, height));
         }
         set
         {
@@ -239,7 +238,37 @@ public partial class View
     /// <summary>
     ///     Represent the content offset if <see cref="UseContentOffset"/> is true.
     /// </summary>
-    public Point ContentOffset { get; set; }
+    public virtual Point ContentOffset
+    {
+        get => _contentOffset;
+        set
+        {
+            _contentOffset = value;
+
+            if (_scrollBar is null)
+            {
+                return;
+            }
+
+            if (!_scrollBar.IsVertical && _scrollBar.Position != -_contentOffset.X)
+            {
+                _scrollBar.Position = -_contentOffset.X;
+            }
+            else if (_scrollBar is { OtherScrollBarView.IsVertical: false } && _scrollBar?.OtherScrollBarView.Position != -_contentOffset.X)
+            {
+                _scrollBar!.OtherScrollBarView.Position = -_contentOffset.X;
+            }
+
+            if (_scrollBar.IsVertical && _scrollBar.Position != -_contentOffset.Y)
+            {
+                _scrollBar.Position = -_contentOffset.Y;
+            }
+            else if (_scrollBar is { OtherScrollBarView.IsVertical: true } && _scrollBar?.OtherScrollBarView.Position != -_contentOffset.Y)
+            {
+                _scrollBar!.OtherScrollBarView.Position = -_contentOffset.Y;
+            }
+        }
+    }
 
     /// <summary>Gets or sets the absolute location and dimension of the view.</summary>
     /// <value>
@@ -400,6 +429,11 @@ public partial class View
     ///     </para>
     /// </remarks>
     public Padding Padding { get; private set; }
+
+    /// <summary>
+    ///     Determines if negative bounds location is allowed for scrolling the <see cref="GetVisibleContentArea"/>.
+    /// </summary>
+    public bool UseContentOffset { get; set; }
 
     /// <summary>Gets or sets whether validation of <see cref="Pos"/> and <see cref="Dim"/> occurs.</summary>
     /// <remarks>

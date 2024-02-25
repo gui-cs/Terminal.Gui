@@ -327,6 +327,29 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <summary>The current number of rows in the tree (ignoring the controls bounds).</summary>
     public int ContentHeight => BuildLineMap ().Count ();
 
+    /// <inheritdoc/>
+    public override Point ContentOffset
+    {
+        get => base.ContentOffset;
+        set
+        {
+            if (base.ContentOffset != value)
+            {
+                base.ContentOffset = value;
+            }
+
+            if (ScrollOffsetHorizontal != -ContentOffset.X)
+            {
+                ScrollOffsetHorizontal = -ContentOffset.X;
+            }
+
+            if (ScrollOffsetVertical != -ContentOffset.Y)
+            {
+                ScrollOffsetVertical = -ContentOffset.Y;
+            }
+        }
+    }
+
     /// <summary>
     ///     Get / Set the wished cursor when the tree is focused. Only applies when <see cref="MultiSelect"/> is true.
     ///     Defaults to <see cref="CursorVisibility.Invisible"/>.
@@ -386,24 +409,6 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <summary>The root objects in the tree, note that this collection is of root objects only.</summary>
     public IEnumerable<T> Objects => roots.Keys;
 
-    /// <inheritdoc/>
-    public override int ScrollLeftOffset
-    {
-        get => base.ScrollLeftOffset;
-        set
-        {
-            if (base.ScrollLeftOffset != value)
-            {
-                base.ScrollLeftOffset = value;
-            }
-
-            if (ScrollOffsetHorizontal != ScrollLeftOffset)
-            {
-                ScrollOffsetHorizontal = ScrollLeftOffset;
-            }
-        }
-    }
-
     /// <summary>The amount of tree view that has been scrolled to the right (horizontally).</summary>
     /// <remarks>
     ///     Setting a value of less than 0 will result in a offset of 0. To see changes in the UI call
@@ -412,7 +417,7 @@ public class TreeView<T> : View, ITreeView where T : class
     public int ScrollOffsetHorizontal
     {
         get => _scrollOffsetHorizontal;
-        set => ScrollLeftOffset = _scrollOffsetHorizontal = Math.Max (0, value);
+        set => ContentOffset = ContentOffset with { X = -(_scrollOffsetHorizontal = Math.Max (0, value)) };
     }
 
     /// <summary>The amount of tree view that has been scrolled off the top of the screen (by the user scrolling down).</summary>
@@ -423,25 +428,7 @@ public class TreeView<T> : View, ITreeView where T : class
     public int ScrollOffsetVertical
     {
         get => _scrollOffsetVertical;
-        set => ScrollTopOffset = _scrollOffsetVertical = Math.Max (0, value);
-    }
-
-    /// <inheritdoc/>
-    public override int ScrollTopOffset
-    {
-        get => base.ScrollTopOffset;
-        set
-        {
-            if (base.ScrollTopOffset != value)
-            {
-                base.ScrollTopOffset = value;
-            }
-
-            if (ScrollOffsetVertical != ScrollTopOffset)
-            {
-                ScrollOffsetVertical = ScrollTopOffset;
-            }
-        }
+        set => ContentOffset = ContentOffset with { Y = -(_scrollOffsetVertical = Math.Max (0, value)) };
     }
 
     /// <summary>

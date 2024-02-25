@@ -763,7 +763,7 @@ public class TableViewTests
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
         tableView.LayoutSubviews ();
 
-        // 3 columns are visibile
+        // 3 columns are visible
         tableView.ContentArea = new Rectangle (0, 0, 7, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = false;
         tableView.Style.ShowHorizontalHeaderOverline = false;
