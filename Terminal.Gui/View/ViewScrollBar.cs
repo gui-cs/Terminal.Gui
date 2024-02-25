@@ -105,14 +105,6 @@ public partial class View
         set => _scrollBar.OtherScrollBarView = value;
     }
 
-    /// <summary>The position, relative to <see cref="Size"/>, to set the scrollbar at.</summary>
-    /// <value>The position.</value>
-    public int ScrollPosition
-    {
-        get => _scrollBar.Position;
-        set => _scrollBar.Position = value;
-    }
-
     /// <summary>Gets or sets the visibility for the vertical or horizontal scroll indicator.</summary>
     /// <value><c>true</c> if show vertical or horizontal scroll indicator; otherwise, <c>false</c>.</value>
     public bool ScrollShowScrollIndicator
