@@ -435,7 +435,7 @@ public static class EscSeqUtils
         int nSep = kChar.Count (static x => x == ';') + 1;
         var values = new string [nSep];
         var valueIdx = 0;
-        var terminating = "";
+        var terminating = string.Empty;
 
         for (var i = 2; i < kChar.Length; i++)
         {
