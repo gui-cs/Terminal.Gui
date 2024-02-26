@@ -3852,7 +3852,7 @@ public class TextView : View
             // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
             //var minRow = Math.Min (Math.Max (Math.Min (selectionStartRow, currentRow) - topRow, 0), Frame.Height);
             //var maxRow = Math.Min (Math.Max (Math.Max (selectionStartRow, currentRow) - topRow, 0), Frame.Height);
-            //SetNeedsDisplay (new Rect (0, minRow, Frame.Width, maxRow));
+            //SetNeedsDisplay (new (0, minRow, Frame.Width, maxRow));
             SetNeedsDisplay ();
         }
 
@@ -4306,8 +4306,9 @@ public class TextView : View
             }
             else
             {
+                //QUESTION: Is the below comment still relevant?
                 // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-                //SetNeedsDisplay (new Rect (0, startRow - topRow, Frame.Width, startRow - topRow + 1));
+                //SetNeedsDisplay (new (0, startRow - topRow, Frame.Width, startRow - topRow + 1));
                 SetNeedsDisplay ();
             }
 
@@ -4403,7 +4404,7 @@ public class TextView : View
             else
             {
                 // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-                //SetNeedsDisplay (new Rect (0, currentRow - topRow, 1, Frame.Width));
+                //SetNeedsDisplay (new (0, currentRow - topRow, 1, Frame.Width));
                 SetNeedsDisplay ();
             }
         }
@@ -4495,16 +4496,16 @@ public class TextView : View
                 _wrapNeeded = true;
             }
 
-            DoSetNeedsDisplay (new Rectangle (0, CurrentRow - _topRow, Frame.Width, CurrentRow - _topRow + 1));
+            DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Frame.Width, CurrentRow - _topRow + 1));
         }
         else
         {
-            _historyText.Add (new List<List<RuneCell>> { new (currentLine) }, CursorPosition);
+            _historyText.Add ([[..currentLine]], CursorPosition);
 
             currentLine.RemoveAt (CurrentColumn);
 
             _historyText.Add (
-                              new List<List<RuneCell>> { new (currentLine) },
+                              [[..currentLine]],
                               CursorPosition,
                               HistoryText.LineStatus.Replaced
                              );
@@ -4515,12 +4516,12 @@ public class TextView : View
             }
 
             DoSetNeedsDisplay (
-                               new Rectangle (
-                                         CurrentColumn - _leftColumn,
-                                         CurrentRow - _topRow,
-                                         Frame.Width,
-                                         CurrentRow - _topRow + 1
-                                        )
+                               new (
+                                    CurrentColumn - _leftColumn,
+                                    CurrentRow - _topRow,
+                                    Frame.Width,
+                                    CurrentRow - _topRow + 1
+                                   )
                               );
         }
 
@@ -4813,7 +4814,7 @@ public class TextView : View
         if (!_wrapNeeded)
         {
             // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-            //SetNeedsDisplay (new Rect (0, prow, Math.Max (Frame.Width, 0), Math.Max (prow + 1, 0)));
+            //SetNeedsDisplay (new (0, prow, Math.Max (Frame.Width, 0), Math.Max (prow + 1, 0)));
             SetNeedsDisplay ();
         }
     }
@@ -4862,7 +4863,7 @@ public class TextView : View
             else
             {
                 // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-                //SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Math.Max (currentRow - topRow + 1, 0)));
+                //SetNeedsDisplay (new (0, currentRow - topRow, Frame.Width, Math.Max (currentRow - topRow + 1, 0)));
                 SetNeedsDisplay ();
             }
 
@@ -5069,14 +5070,14 @@ public class TextView : View
         }
 
         _historyText.Add (
-                          new List<List<RuneCell>> { new (GetCurrentLine ()) },
+                          [[..GetCurrentLine ()]],
                           CursorPosition,
                           HistoryText.LineStatus.Replaced
                          );
 
         UpdateWrapModel ();
 
-        DoSetNeedsDisplay (new Rectangle (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
+        DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
 
         _lastWasKill = setLastWasKill;
         DoNeededAction ();
@@ -5109,7 +5110,7 @@ public class TextView : View
             return;
         }
 
-        _historyText.Add (new List<List<RuneCell>> { new (currentLine) }, CursorPosition);
+        _historyText.Add ([[..currentLine]], CursorPosition);
 
         if (currentLine.Count == 0)
         {
@@ -5140,12 +5141,14 @@ public class TextView : View
                 CurrentRow--;
                 currentLine = _model.GetLine (CurrentRow);
 
-                List<List<RuneCell>> removedLine = new () { new List<RuneCell> (currentLine) };
-
-                removedLine.Add (new List<RuneCell> ());
+                List<List<RuneCell>> removedLine =
+                [
+                    [..currentLine],
+                    []
+                ];
 
                 _historyText.Add (
-                                  new List<List<RuneCell>> (removedLine),
+                                  [..removedLine],
                                   CursorPosition,
                                   HistoryText.LineStatus.Removed
                                  );
@@ -5174,14 +5177,14 @@ public class TextView : View
         }
 
         _historyText.Add (
-                          new List<List<RuneCell>> { new (GetCurrentLine ()) },
+                          [[..GetCurrentLine ()]],
                           CursorPosition,
                           HistoryText.LineStatus.Replaced
                          );
 
         UpdateWrapModel ();
 
-        DoSetNeedsDisplay (new Rectangle (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
+        DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
 
         _lastWasKill = setLastWasKill;
         DoNeededAction ();
@@ -5198,14 +5201,14 @@ public class TextView : View
 
         List<RuneCell> currentLine = GetCurrentLine ();
 
-        _historyText.Add (new List<List<RuneCell>> { new (GetCurrentLine ()) }, CursorPosition);
+        _historyText.Add ([[..GetCurrentLine ()]], CursorPosition);
 
         if (CurrentColumn == 0)
         {
             DeleteTextBackwards ();
 
             _historyText.ReplaceLast (
-                                      new List<List<RuneCell>> { new (GetCurrentLine ()) },
+                                      [[..GetCurrentLine ()]],
                                       CursorPosition,
                                       HistoryText.LineStatus.Replaced
                                      );
@@ -5244,14 +5247,14 @@ public class TextView : View
         }
 
         _historyText.Add (
-                          new List<List<RuneCell>> { new (GetCurrentLine ()) },
+                          [[..GetCurrentLine ()]],
                           CursorPosition,
                           HistoryText.LineStatus.Replaced
                          );
 
         UpdateWrapModel ();
 
-        DoSetNeedsDisplay (new Rectangle (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
+        DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
         DoNeededAction ();
     }
 
@@ -5266,14 +5269,14 @@ public class TextView : View
 
         List<RuneCell> currentLine = GetCurrentLine ();
 
-        _historyText.Add (new List<List<RuneCell>> { new (GetCurrentLine ()) }, CursorPosition);
+        _historyText.Add ([[..GetCurrentLine ()]], CursorPosition);
 
         if (currentLine.Count == 0 || CurrentColumn == currentLine.Count)
         {
             DeleteTextForwards ();
 
             _historyText.ReplaceLast (
-                                      new List<List<RuneCell>> { new (GetCurrentLine ()) },
+                                      [[..GetCurrentLine ()]],
                                       CursorPosition,
                                       HistoryText.LineStatus.Replaced
                                      );
@@ -5303,14 +5306,14 @@ public class TextView : View
         }
 
         _historyText.Add (
-                          new List<List<RuneCell>> { new (GetCurrentLine ()) },
+                          [[..GetCurrentLine ()]],
                           CursorPosition,
                           HistoryText.LineStatus.Replaced
                          );
 
         UpdateWrapModel ();
 
-        DoSetNeedsDisplay (new Rectangle (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
+        DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
         DoNeededAction ();
     }
 
@@ -6173,7 +6176,7 @@ public class TextView : View
         else
         {
             // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-            //SetNeedsDisplay (new Rect (0, currentRow - topRow, 2, Frame.Height));
+            //SetNeedsDisplay (new (0, currentRow - topRow, 2, Frame.Height));
             SetNeedsDisplay ();
         }
 

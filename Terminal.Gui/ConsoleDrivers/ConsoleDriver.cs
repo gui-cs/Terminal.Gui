@@ -320,7 +320,8 @@ public abstract class ConsoleDriver
     {
         // TODO: This method is really "Clear Contents" now and should not be abstract (or virtual)
         Contents = new Cell [Rows, Cols];
-        Clip = new Rectangle (0, 0, Cols, Rows);
+        //CONCURRENCY: Unsynchronized access to Clip isn't safe.
+        Clip = new (0, 0, Cols, Rows);
         _dirtyLines = new bool [Rows];
 
         lock (Contents)

@@ -615,7 +615,7 @@ internal class CursesDriver : ConsoleDriver
         if (!RunningUnitTests && Curses.CheckWinChange ())
         {
             ClearContents ();
-            OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
+            OnSizeChanged (new SizeChangedEventArgs (new (Cols, Rows)));
         }
     }
 

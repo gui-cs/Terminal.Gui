@@ -179,7 +179,7 @@ public partial class View
             // BUGBUG: I think there's a bug here. This should be && not ||
             if (Margin is null || Border is null || Padding is null)
             {
-                return new Rectangle (default (Point), Frame.Size);
+                return Rectangle.Empty with { Size = Frame.Size };
             }
 
             int width = Math.Max (
@@ -195,7 +195,7 @@ public partial class View
                                    Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical
                                   );
 
-            return new Rectangle (Point.Empty, new Size (width, height));
+            return Rectangle.Empty with { Size = new (width, height) };
         }
         set
         {
@@ -209,19 +209,20 @@ public partial class View
                                 );
             }
 #endif // DEBUG
-            Frame = new Rectangle (
-                              Frame.Location,
-                              new Size (
-                                        value.Size.Width
-                                        + Margin.Thickness.Horizontal
-                                        + Border.Thickness.Horizontal
-                                        + Padding.Thickness.Horizontal,
-                                        value.Size.Height
-                                        + Margin.Thickness.Vertical
-                                        + Border.Thickness.Vertical
-                                        + Padding.Thickness.Vertical
-                                       )
-                             );
+            Frame = Frame with
+            {
+                Size =
+                new (
+                     value.Size.Width
+                     + Margin.Thickness.Horizontal
+                     + Border.Thickness.Horizontal
+                     + Padding.Thickness.Horizontal,
+                     value.Size.Height
+                     + Margin.Thickness.Vertical
+                     + Border.Thickness.Vertical
+                     + Padding.Thickness.Vertical
+                    )
+            };
         }
     }
 
@@ -248,7 +249,7 @@ public partial class View
         get => _frame;
         set
         {
-            _frame = new Rectangle (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
+            _frame = value with { Width = Math.Max (value.Width, 0), Height = Math.Max (value.Height, 0) };
 
             // If Frame gets set, by definition, the View is now LayoutStyle.Absolute, so
             // set all Pos/Dim to Absolute values.
@@ -500,9 +501,9 @@ public partial class View
     /// <summary>Converts a <see cref="Bounds"/>-relative region to a screen-relative region.</summary>
     public Rectangle BoundsToScreen (Rectangle region)
     {
-        BoundsToScreen (region.X, region.Y, out int x, out int y, false);
+        BoundsToScreen (region.X, region.Y, out int screenX, out int screenY, false);
 
-        return new Rectangle (x, y, region.Width, region.Height);
+        return region with { X = screenX, Y = screenY };
     }
 
     /// <summary>
@@ -520,6 +521,8 @@ public partial class View
     /// </param>
     public virtual void BoundsToScreen (int x, int y, out int rx, out int ry, bool clamped = true)
     {
+        // PERF: Use Point.Offset
+        // Already dealing with Point here.
         Point boundsOffset = GetBoundsOffset ();
         rx = x + Frame.X + boundsOffset.X;
         ry = y + Frame.Y + boundsOffset.Y;
@@ -688,7 +691,7 @@ public partial class View
 
         foreach (View v in ordered)
         {
-            LayoutSubview (v, new Rectangle (GetBoundsOffset (), Bounds.Size));
+            LayoutSubview (v, new (GetBoundsOffset (), Bounds.Size));
         }
 
         // If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.
@@ -845,7 +848,7 @@ public partial class View
 
         if (Margin.Frame.Size != Frame.Size)
         {
-            Margin._frame = new Rectangle (Point.Empty, Frame.Size);
+            Margin._frame = Rectangle.Empty with { Size = Frame.Size };
             Margin.X = 0;
             Margin.Y = 0;
             Margin.Width = Frame.Size.Width;
@@ -858,7 +861,7 @@ public partial class View
 
         if (border != Border.Frame)
         {
-            Border._frame = new Rectangle (new Point (border.Location.X, border.Location.Y), border.Size);
+            Border._frame = border;
             Border.X = border.Location.X;
             Border.Y = border.Location.Y;
             Border.Width = border.Size.Width;
@@ -871,7 +874,7 @@ public partial class View
 
         if (padding != Padding.Frame)
         {
-            Padding._frame = new Rectangle (new Point (padding.Location.X, padding.Location.Y), padding.Size);
+            Padding._frame = padding;
             Padding.X = padding.Location.X;
             Padding.Y = padding.Location.Y;
             Padding.Width = padding.Size.Width;
@@ -1129,7 +1132,7 @@ public partial class View
         // vertical/height
         (newY, newH) = GetNewLocationAndDimension (false, superviewBounds, _y, _height, autosize.Height);
 
-        var r = new Rectangle (newX, newY, newW, newH);
+        Rectangle r = new (newX, newY, newW, newH);
 
         if (Frame != r)
         {
@@ -1167,7 +1170,7 @@ public partial class View
             {
                 // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height, making
                 // the view LayoutStyle.Absolute.
-                _frame = new Rectangle (Frame.Location, autosize);
+                _frame = _frame with { Size = autosize };
 
                 if (autosize.Width == 0)
                 {
@@ -1422,7 +1425,7 @@ public partial class View
 
         if (boundsChanged)
         {
-            Bounds = new Rectangle (Bounds.X, Bounds.Y, canSizeW ? rW : Bounds.Width, canSizeH ? rH : Bounds.Height);
+            Bounds = new (Bounds.X, Bounds.Y, canSizeW ? rW : Bounds.Width, canSizeH ? rH : Bounds.Height);
         }
 
         return boundsChanged;

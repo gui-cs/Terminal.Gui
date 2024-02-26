@@ -529,7 +529,7 @@ public partial class View
             int y = Math.Min (_needsDisplayRect.Y, region.Y);
             int w = Math.Max (_needsDisplayRect.Width, region.Width);
             int h = Math.Max (_needsDisplayRect.Height, region.Height);
-            _needsDisplayRect = new Rectangle (x, y, w, h);
+            _needsDisplayRect = new (x, y, w, h);
         }
 
         _superView?.SetSubViewNeedsDisplay ();
@@ -579,6 +579,7 @@ public partial class View
         SubViewNeedsDisplay = false;
     }
 
+    // INTENT: Isn't this just intersection? It isn't used anyway.
     // Clips a rectangle in screen coordinates to the dimensions currently available on the screen
     internal Rectangle ScreenClip (Rectangle regionScreen)
     {
@@ -593,6 +594,6 @@ public partial class View
                     ? Driver.Rows - regionScreen.Y
                     : regionScreen.Height;
 
-        return new Rectangle (x, y, w, h);
+        return new (x, y, w, h);
     }
 }

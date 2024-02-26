@@ -312,10 +312,10 @@ internal class CharMap : ScrollView
         ColorScheme = Colors.ColorSchemes ["Dialog"];
         CanFocus = true;
 
-        ContentSize = new Size (
-                                RowWidth,
-                                (MaxCodePoint / 16 + (ShowHorizontalScrollIndicator ? 2 : 1)) * _rowHeight
-                               );
+        ContentSize = new (
+                           RowWidth,
+                           (MaxCodePoint / 16 + (ShowHorizontalScrollIndicator ? 2 : 1)) * _rowHeight
+                          );
 
         AddCommand (
                     Command.ScrollUp,
@@ -527,23 +527,23 @@ internal class CharMap : ScrollView
     public override void OnDrawContent (Rectangle contentArea)
     {
         //if (ShowHorizontalScrollIndicator && ContentSize.Height < (int)(MaxCodePoint / 16 + 2)) {
-        //	//ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePoint / 16 + 2));
-        //	//ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePoint / 16) * _rowHeight + 2);
+        //	//ContentSize = new (CharMap.RowWidth, (int)(MaxCodePoint / 16 + 2));
+        //	//ContentSize = new (CharMap.RowWidth, (int)(MaxCodePoint / 16) * _rowHeight + 2);
         //	var width = (Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH) - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
         //	if (Cursor.X + ContentOffset.X >= width) {
         //		// Snap to the selected glyph.
-        //		ContentOffset = new Point (
+        //		ContentOffset = new (
         //			Math.Min (Cursor.X, Cursor.X - width + COLUMN_WIDTH),
         //			ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
         //	} else {
-        //		ContentOffset = new Point (
+        //		ContentOffset = new (
         //			ContentOffset.X - Cursor.X,
         //			ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
         //	}
         //} else if (!ShowHorizontalScrollIndicator && ContentSize.Height > (int)(MaxCodePoint / 16 + 1)) {
-        //	//ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePoint / 16 + 1));
+        //	//ContentSize = new (CharMap.RowWidth, (int)(MaxCodePoint / 16 + 1));
         //	// Snap 1st column into view if it's been scrolled horizontally
-        //	ContentOffset = new Point (0, ContentOffset.Y < -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
+        //	ContentOffset = new (0, ContentOffset.Y < -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
         //}
         base.OnDrawContent (contentArea);
     }
@@ -556,32 +556,26 @@ internal class CharMap : ScrollView
             return;
         }
 
-        var viewport = new Rectangle (
-                                 ContentOffset,
-                                 new Size (
-                                           Math.Max (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
-                                           Math.Max (Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0)
-                                          )
-                                );
+        Rectangle viewport = new (
+                                  ContentOffset,
+                                  new (
+                                       Math.Max (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
+                                       Math.Max (Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0)
+                                      )
+                                 );
 
         Rectangle oldClip = ClipToBounds ();
 
         if (ShowHorizontalScrollIndicator)
         {
             // ClipToBounds doesn't know about the scroll indicators, so if off, subtract one from height
-            Driver.Clip = new Rectangle (
-                                    Driver.Clip.Location,
-                                    new Size (Driver.Clip.Width, Driver.Clip.Height - 1)
-                                   );
+            Driver.Clip.Inflate (0, -1);
         }
 
         if (ShowVerticalScrollIndicator)
         {
             // ClipToBounds doesn't know about the scroll indicators, so if off, subtract one from width
-            Driver.Clip = new Rectangle (
-                                    Driver.Clip.Location,
-                                    new Size (Driver.Clip.Width - 1, Driver.Clip.Height)
-                                   );
+            Driver.Clip.Inflate (-1, 0);
         }
 
         int cursorCol = Cursor.X - ContentOffset.X - RowLabelWidth - 1;

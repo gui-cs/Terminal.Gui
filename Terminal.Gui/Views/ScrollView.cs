@@ -126,9 +126,10 @@ public class ScrollView : View
                            }
 
                            SetContentOffset (_contentOffset);
-                           _contentView.Frame = new Rectangle (ContentOffset, ContentSize);
-                           _vertical.ChangedPosition += delegate { ContentOffset = new Point (ContentOffset.X, _vertical.Position); };
-                           _horizontal.ChangedPosition += delegate { ContentOffset = new Point (_horizontal.Position, ContentOffset.Y); };
+                           _contentView.Frame = new (ContentOffset, ContentSize);
+                           // PERF: How about calls to Point.Offset instead?
+                           _vertical.ChangedPosition += delegate { ContentOffset = new (ContentOffset.X, _vertical.Position); };
+                           _horizontal.ChangedPosition += delegate { ContentOffset = new (_horizontal.Position, ContentOffset.Y); };
                        };
     }
 
@@ -187,7 +188,7 @@ public class ScrollView : View
             if (_contentSize != value)
             {
                 _contentSize = value;
-                _contentView.Frame = new Rectangle (_contentOffset, value);
+                _contentView.Frame = new (_contentOffset, value);
                 _vertical.Size = _contentSize.Height;
                 _horizontal.Size = _contentSize.Width;
                 SetNeedsDisplay ();
@@ -589,8 +590,9 @@ public class ScrollView : View
 
     private void SetContentOffset (Point offset)
     {
-        _contentOffset = new Point (-Math.Abs (offset.X), -Math.Abs (offset.Y));
-        _contentView.Frame = new Rectangle (_contentOffset, _contentSize);
+        // INTENT: Unclear intent. How about a call to Offset?
+        _contentOffset = new (-Math.Abs (offset.X), -Math.Abs (offset.Y));
+        _contentView.Frame = new (_contentOffset, _contentSize);
         int p = Math.Max (0, -_contentOffset.Y);
 
         if (_vertical.Position != p)

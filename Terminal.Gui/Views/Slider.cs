@@ -773,37 +773,39 @@ public class Slider<T> : View
             return;
         }
 
+        Thickness adornmentsThickness = GetAdornmentsThickness ();
+
         if (_config._sliderOrientation == Orientation.Horizontal)
         {
-            Bounds = new Rectangle (
-                               Bounds.Location,
-                               new Size (
-                                         int.Min (
-                                                  SuperView.Bounds.Width - GetAdornmentsThickness ().Horizontal,
-                                                  CalcBestLength ()
-                                                 ),
-                                         int.Min (
-                                                  SuperView.Bounds.Height - GetAdornmentsThickness ().Vertical,
-                                                  CalcThickness ()
-                                                 )
-                                        )
-                              );
+            Bounds = new (
+                          Bounds.Location,
+                          new (
+                               int.Min (
+                                        SuperView.Bounds.Width - adornmentsThickness.Horizontal,
+                                        CalcBestLength ()
+                                       ),
+                               int.Min (
+                                        SuperView.Bounds.Height - adornmentsThickness.Vertical,
+                                        CalcThickness ()
+                                       )
+                              )
+                         );
         }
         else
         {
-            Bounds = new Rectangle (
-                               Bounds.Location,
-                               new Size (
-                                         int.Min (
-                                                  SuperView.Bounds.Width - GetAdornmentsThickness ().Horizontal,
-                                                  CalcThickness ()
-                                                 ),
-                                         int.Min (
-                                                  SuperView.Bounds.Height - GetAdornmentsThickness ().Vertical,
-                                                  CalcBestLength ()
-                                                 )
-                                        )
-                              );
+            Bounds = new (
+                          Bounds.Location,
+                          new (
+                               int.Min (
+                                        SuperView.Bounds.Width - adornmentsThickness.Horizontal,
+                                        CalcThickness ()
+                                       ),
+                               int.Min (
+                                        SuperView.Bounds.Height - adornmentsThickness.Vertical,
+                                        CalcBestLength ()
+                                       )
+                              )
+                         );
         }
     }
 

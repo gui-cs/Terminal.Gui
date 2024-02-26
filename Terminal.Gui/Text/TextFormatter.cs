@@ -342,23 +342,24 @@ public class TextFormatter
 
         if (driver is { })
         {
+            // INTENT: What, exactly, is the intent of this?
             maxBounds = containerBounds == default (Rectangle)
                             ? bounds
-                            : new Rectangle (
-                                        Math.Max (containerBounds.X, bounds.X),
-                                        Math.Max (containerBounds.Y, bounds.Y),
-                                        Math.Max (
-                                                  Math.Min (containerBounds.Width, containerBounds.Right - bounds.Left),
-                                                  0
-                                                 ),
-                                        Math.Max (
-                                                  Math.Min (
-                                                            containerBounds.Height,
-                                                            containerBounds.Bottom - bounds.Top
-                                                           ),
-                                                  0
-                                                 )
-                                       );
+                            : new (
+                                   Math.Max (containerBounds.X, bounds.X),
+                                   Math.Max (containerBounds.Y, bounds.Y),
+                                   Math.Max (
+                                             Math.Min (containerBounds.Width, containerBounds.Right - bounds.Left),
+                                             0
+                                            ),
+                                   Math.Max (
+                                             Math.Min (
+                                                       containerBounds.Height,
+                                                       containerBounds.Bottom - bounds.Top
+                                                      ),
+                                             0
+                                            )
+                                  );
         }
 
         if (maxBounds.Width == 0 || maxBounds.Height == 0)
@@ -687,11 +688,10 @@ public class TextFormatter
             return Size.Empty;
         }
 
-        List<string> lines = GetLines ();
-        int width = GetLines ().Max (line => line.GetColumns ());
+        int width = GetLines ().Max (static line => line.GetColumns ());
         int height = GetLines ().Count;
 
-        return new Size (width, height);
+        return new (width, height);
     }
 
     /// <summary>Gets a list of formatted lines, constrained to <see cref="Size"/>.</summary>
@@ -1861,7 +1861,7 @@ public class TextFormatter
     {
         if (string.IsNullOrEmpty (text))
         {
-            return new Rectangle (new Point (x, y), Size.Empty);
+            return new (new (x, y), Size.Empty);
         }
 
         int w, h;
@@ -1978,7 +1978,7 @@ public class TextFormatter
             h = vh;
         }
 
-        return new Rectangle (x, y, w, h);
+        return new (x, y, w, h);
     }
 
     /// <summary>Finds the HotKey and its location in text.</summary>

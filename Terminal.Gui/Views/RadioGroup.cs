@@ -400,7 +400,7 @@ public class RadioGroup : View
     {
         if (radioLabels is null)
         {
-            return new Rectangle (x, y, 0, 0);
+            return new (x, y, 0, 0);
         }
 
         var width = 0;
@@ -410,7 +410,7 @@ public class RadioGroup : View
             width = Math.Max (s.GetColumns () + 2, width);
         }
 
-        return new Rectangle (x, y, width, radioLabels.Count);
+        return new (x, y, width, radioLabels.Count);
     }
 
     private void MoveDown ()

@@ -28,9 +28,9 @@ public class Scrolling : Scenario
             Width = 50,
             Height = 20,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
-            ContentSize = new Size (200, 100),
+            ContentSize = new (200, 100),
 
-            //ContentOffset = new Point (0, 0),
+            //ContentOffset = Point.Empty,
             ShowVerticalScrollIndicator = true,
             ShowHorizontalScrollIndicator = true
         };
@@ -218,13 +218,13 @@ public class Scrolling : Scenario
         keepCheckBox.Toggled += (s, e) => scrollView.KeepContentAlwaysInViewport = (bool)keepCheckBox.Checked;
         Win.Add (keepCheckBox);
 
-        //var scrollView2 = new ScrollView (new Rect (55, 2, 20, 8)) {
-        //	ContentSize = new Size (20, 50),
-        //	//ContentOffset = new Point (0, 0),
+        //var scrollView2 = new ScrollView (new (55, 2, 20, 8)) {
+        //	ContentSize = new (20, 50),
+        //	//ContentOffset = Point.Empty,
         //	ShowVerticalScrollIndicator = true,
         //	ShowHorizontalScrollIndicator = true
         //};
-        //var filler = new Filler (new Rect (0, 0, 60, 40));
+        //var filler = new Filler (new (0, 0, 60, 40));
         //scrollView2.Add (filler);
         //scrollView2.DrawContent += (s,e) => {
         //	scrollView2.ContentSize = filler.GetContentSize ();
@@ -232,8 +232,8 @@ public class Scrolling : Scenario
         //Win.Add (scrollView2);
 
         //// This is just to debug the visuals of the scrollview when small
-        //var scrollView3 = new ScrollView (new Rect (55, 15, 3, 3)) {
-        //	ContentSize = new Size (100, 100),
+        //var scrollView3 = new ScrollView (new (55, 15, 3, 3)) {
+        //	ContentSize = new (100, 100),
         //	ShowVerticalScrollIndicator = true,
         //	ShowHorizontalScrollIndicator = true
         //};
@@ -274,110 +274,5 @@ public class Scrolling : Scenario
         }
 
         Application.Top.Unloaded += Top_Unloaded;
-    }
-
-    private class Box10x : View
-    {
-        private readonly int _h = 50;
-        private readonly int _w = 40;
-        public Box10x (int x, int y) { Frame = new Rectangle (x, y, 20, 10); }
-        public bool WantCursorPosition { get; set; } = false;
-        public Size GetContentSize () { return new Size (_w, _h); }
-
-        public override void OnDrawContent (Rectangle contentArea)
-        {
-            //Point pos = new Point (region.X, region.Y);
-            Driver.SetAttribute (ColorScheme.Focus);
-
-            for (var y = 0; y < _h; y++)
-            {
-                Move (0, y);
-                Driver.AddStr (y.ToString ());
-
-                for (var x = 0; x < _w - y.ToString ().Length; x++)
-                {
-                    //Driver.AddRune ((Rune)('0' + (x + y) % 10));
-                    if (y.ToString ().Length < _w)
-                    {
-                        Driver.AddStr (" ");
-                    }
-                }
-            }
-
-            //Move (pos.X, pos.Y);
-        }
-
-        public void SetCursorPosition (Point pos) { throw new NotImplementedException (); }
-    }
-
-    private class Filler : View
-    {
-        private int _h = 50;
-        private int _w = 40;
-
-        public Filler (Rectangle rect)
-        {
-            _w = rect.Width;
-            _h = rect.Height;
-            Frame = rect;
-        }
-
-        public Size GetContentSize () { return new Size (_w, _h); }
-
-        public override void OnDrawContent (Rectangle contentArea)
-        {
-            Driver.SetAttribute (ColorScheme.Focus);
-            Rectangle f = Frame;
-            _w = 0;
-            _h = 0;
-
-            for (var y = 0; y < f.Width; y++)
-            {
-                Move (0, y);
-                var nw = 0;
-
-                for (var x = 0; x < f.Height; x++)
-                {
-                    Rune r;
-
-                    switch (x % 3)
-                    {
-                        case 0:
-                            char er = y.ToString ().ToCharArray (0, 1) [0];
-                            nw += er.ToString ().Length;
-                            Driver.AddRune ((Rune)er);
-
-                            if (y > 9)
-                            {
-                                er = y.ToString ().ToCharArray (1, 1) [0];
-                                nw += er.ToString ().Length;
-                                Driver.AddRune ((Rune)er);
-                            }
-
-                            r = (Rune)'.';
-
-                            break;
-                        case 1:
-                            r = (Rune)'o';
-
-                            break;
-                        default:
-                            r = (Rune)'O';
-
-                            break;
-                    }
-
-                    Driver.AddRune (r);
-                    nw += r.Utf8SequenceLength;
-                }
-
-                if (nw > _w)
-                {
-                    _w = nw;
-                }
-
-                _h = y + 1;
-            }
-        }
     }
 }

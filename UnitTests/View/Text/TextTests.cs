@@ -21,7 +21,7 @@ public class TextTests
         Assert.Equal ("Hello World ", view.TextFormatter.Text);
 
         view.TextFormatter.WordWrap = true;
-        view.TextFormatter.Size = new Size (5, 3);
+        view.TextFormatter.Size = new (5, 3);
 
         view.PreserveTrailingSpaces = false;
         Assert.Equal ($"Hello{Environment.NewLine}World", view.TextFormatter.Format ());
