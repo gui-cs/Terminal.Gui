@@ -167,8 +167,8 @@ public class WindowTests
     #endif
         Assert.True (windowWithFrameRectEmpty.CanFocus);
         Assert.False (windowWithFrameRectEmpty.HasFocus);
-        Assert.Equal (new Rectangle (0, 0, 0, 0), windowWithFrameRectEmpty.Bounds);
-        Assert.Equal (new Rectangle (0, 0, 0, 0), windowWithFrameRectEmpty.Frame);
+        Assert.Equal (Rectangle.Empty, windowWithFrameRectEmpty.Bounds);
+        Assert.Equal (Rectangle.Empty, windowWithFrameRectEmpty.Frame);
         Assert.Null (windowWithFrameRectEmpty.Focused);
         Assert.NotNull (windowWithFrameRectEmpty.ColorScheme);
         Assert.Equal (0, windowWithFrameRectEmpty.X);
