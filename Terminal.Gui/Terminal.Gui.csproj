@@ -90,9 +90,9 @@
   <ItemGroup>
     <Using Include="JetBrains.Annotations" />
     <Using Include="System.Diagnostics.Contracts.PureAttribute" Alias="PureAttribute" />
+    <Using Include="System.Drawing.Rectangle" Alias="Rectangle" />
     <Using Include="System.Text" />
     <Using Include="JetBrains.Annotations" />
-    <Using Include="System.Diagnostics.Contracts.PureAttribute" Alias="PureAttribute" />
   </ItemGroup>
   <!-- =================================================================== -->
   <!-- Nuget  -->

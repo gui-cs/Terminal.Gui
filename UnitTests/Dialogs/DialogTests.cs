@@ -246,7 +246,7 @@ public class DialogTests
                                                       new Button { Text = btn3Text },
                                                       new Button { Text = btn4Text }
                                                      );
-        Assert.Equal (new Size (width, 1), dlg.Frame.Size);
+        Assert.Equal (new Size (width, 1), (Size)dlg.Frame.Size);
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
 
@@ -1114,7 +1114,7 @@ public class DialogTests
 
         // Default location is centered, so 100 / 2 - 85 / 2 = 7
         var expected = 7;
-        Assert.Equal (new Point (expected, expected), d.Frame.Location);
+        Assert.Equal (new Point (expected, expected), (Point)d.Frame.Location);
     }
 
     [Fact]
@@ -1127,7 +1127,7 @@ public class DialogTests
 
         // Default location is centered, so 100 / 2 - 85 / 2 = 7
         var expected = 1;
-        Assert.Equal (new Point (expected, expected), d.Frame.Location);
+        Assert.Equal (new Point (expected, expected), (Point)d.Frame.Location);
     }
 
     [Fact]
@@ -1140,7 +1140,7 @@ public class DialogTests
         ((FakeDriver)Driver).SetBufferSize (20, 10);
 
         // Default location is centered, so 100 / 2 - 85 / 2 = 7
-        Assert.Equal (new Point (expected, expected), d.Frame.Location);
+        Assert.Equal (new Point (expected, expected), (Point)d.Frame.Location);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1170,7 +1170,7 @@ public class DialogTests
                              var d = new Dialog { X = 5, Y = 5, Height = 3, Width = 5 };
                              Begin (d);
 
-                             Assert.Equal (new Point (5, 5), d.Frame.Location);
+                             Assert.Equal (new Point (5, 5), (Point)d.Frame.Location);
 
                              TestHelpers.AssertDriverContentsWithFrameAre (
                                                                            @"
@@ -1191,7 +1191,7 @@ public class DialogTests
                              Begin (d);
 
                              // This is because of PostionTopLevels and EnsureVisibleBounds
-                             Assert.Equal (new Point (3, 2), d.Frame.Location);
+                             Assert.Equal (new Point (3, 2), (Point)d.Frame.Location);
 
                              // #3127: Before					
                              //					Assert.Equal (new Size (17, 8), d.Frame.Size);
@@ -1208,7 +1208,7 @@ public class DialogTests
                              //╚══└───────────────┘", _output);
 
                              // #3127: After: Because Toplevel is now Width/Height = Dim.Filll
-                             Assert.Equal (new Size (15, 6), d.Frame.Size);
+                             Assert.Equal (new Size (15, 6), (Size)d.Frame.Size);
 
                              TestHelpers.AssertDriverContentsWithFrameAre (
                                                                            @"
@@ -1272,7 +1272,7 @@ public class DialogTests
         ((FakeDriver)Driver).SetBufferSize (100, 100);
 
         // Default size is Percent(85) 
-        Assert.Equal (new Size ((int)(100 * .85), (int)(100 * .85)), d.Frame.Size);
+        Assert.Equal (new Size ((int)(100 * .85), (int)(100 * .85)), (Size)d.Frame.Size);
     }
 
     [Fact]
@@ -1285,7 +1285,7 @@ public class DialogTests
         ((FakeDriver)Driver).SetBufferSize (100, 100);
 
         // Default size is Percent(85) 
-        Assert.Equal (new Size (50, 50), d.Frame.Size);
+        Assert.Equal (new Size (50, 50), (Size)d.Frame.Size);
     }
 
     [Fact]

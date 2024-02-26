@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Diagnostics;
 
 namespace Terminal.Gui;
@@ -542,61 +542,53 @@ public partial class View
         }
     }
 
+    #nullable enable
     /// <summary>Finds which view that belong to the <paramref name="start"/> superview at the provided location.</summary>
     /// <param name="start">The superview where to look for.</param>
     /// <param name="x">The column location in the superview.</param>
     /// <param name="y">The row location in the superview.</param>
-    /// <param name="resx">The found view screen relative column location.</param>
-    /// <param name="resy">The found view screen relative row location.</param>
+    /// <param name="resultX">The found view screen relative column location.</param>
+    /// <param name="resultY">The found view screen relative row location.</param>
     /// <returns>
-    ///     The view that was found at the <praramref name="x"/> and <praramref name="y"/> coordinates.
+    ///     The view that was found at the <paramref name="x"/> and <paramref name="y"/> coordinates.
     ///     <see langword="null"/> if no view was found.
     /// </returns>
-    public static View FindDeepestView (View start, int x, int y, out int resx, out int resy)
+    // CONCURRENCY: This method is not thread-safe.
+    // Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
+    public static View? FindDeepestView (View? start, int x, int y, out int resultX, out int resultY)
     {
-        resy = resx = 0;
+        resultY = resultX = 0;
 
         if (start is null || !start.Frame.Contains (x, y))
         {
             return null;
         }
 
-        Rectangle startFrame = start.Frame;
-
-        if (start.InternalSubviews is { })
+        if (start.InternalSubviews is { Count: > 0 })
         {
-            int count = start.InternalSubviews.Count;
+            Point boundsOffset = start.GetBoundsOffset ();
+            int rx = x - (start.Frame.X + boundsOffset.X);
+            int ry = y - (start.Frame.Y + boundsOffset.Y);
 
-            if (count > 0)
+            for (int i = start.InternalSubviews.Count - 1; i >= 0; i--)
             {
-                Point boundsOffset = start.GetBoundsOffset ();
-                int rx = x - (startFrame.X + boundsOffset.X);
-                int ry = y - (startFrame.Y + boundsOffset.Y);
+                View v = start.InternalSubviews [i];
 
-                for (int i = count - 1; i >= 0; i--)
+                if (v.Visible && v.Frame.Contains (rx, ry))
                 {
-                    View v = start.InternalSubviews [i];
+                    View? deep = FindDeepestView (v, rx, ry, out resultX, out resultY);
 
-                    if (v.Visible && v.Frame.Contains (rx, ry))
-                    {
-                        View deep = FindDeepestView (v, rx, ry, out resx, out resy);
-
-                        if (deep is null)
-                        {
-                            return v;
-                        }
-
-                        return deep;
-                    }
+                    return deep ?? v;
                 }
             }
         }
 
-        resx = x - startFrame.X;
-        resy = y - startFrame.Y;
+        resultX = x - start.Frame.X;
+        resultY = y - start.Frame.Y;
 
         return start;
     }
+    #nullable restore
 
     /// <summary>Gets the <see cref="Frame"/> with a screen-relative location.</summary>
     /// <returns>The location and size of the view in screen-relative coordinates.</returns>

@@ -14,7 +14,7 @@ using System.Text.Json.Serialization;
 namespace Terminal.Gui;
 
 /// <summary>Represents an ordered pair of integer x- and y-coordinates that defines a point in a two-dimensional plane.</summary>
-public struct Point
+public partial struct Point
 {
     /// <summary>Gets or sets the x-coordinate of this Point.</summary>
     [JsonInclude]

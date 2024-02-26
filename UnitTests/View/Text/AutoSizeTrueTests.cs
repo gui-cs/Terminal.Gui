@@ -2692,12 +2692,12 @@ Y
         Assert.True (horizontalView.AutoSize);
         Assert.Equal (new Rectangle (0, 0, 12, 1), horizontalView.Frame);
         Assert.Equal (new Size (12, 1), horizontalView.GetSizeNeededForTextWithoutHotKey ());
-        Assert.Equal (horizontalView.Frame.Size, horizontalView.GetSizeNeededForTextWithoutHotKey ());
+        Assert.Equal ((Size)horizontalView.Frame.Size, horizontalView.GetSizeNeededForTextWithoutHotKey ());
 
         Assert.True (verticalView.AutoSize);
         Assert.Equal (new Rectangle (0, 0, 2, 11), verticalView.Frame);
         Assert.Equal (new Size (2, 11), verticalView.GetSizeNeededForTextWithoutHotKey ());
-        Assert.Equal (verticalView.Frame.Size, verticalView.GetSizeNeededForTextWithoutHotKey ());
+        Assert.Equal ((Size)verticalView.Frame.Size, verticalView.GetSizeNeededForTextWithoutHotKey ());
 
         text = "Say He_llo 你";
         horizontalView.Text = text;
@@ -2706,12 +2706,12 @@ Y
         Assert.True (horizontalView.AutoSize);
         Assert.Equal (new Rectangle (0, 0, 12, 1), horizontalView.Frame);
         Assert.Equal (new Size (12, 1), horizontalView.GetSizeNeededForTextWithoutHotKey ());
-        Assert.Equal (horizontalView.Frame.Size, horizontalView.GetSizeNeededForTextWithoutHotKey ());
+        Assert.Equal ((Size)horizontalView.Frame.Size, horizontalView.GetSizeNeededForTextWithoutHotKey ());
 
         Assert.True (verticalView.AutoSize);
         Assert.Equal (new Rectangle (0, 0, 2, 11), verticalView.Frame);
         Assert.Equal (new Size (2, 11), verticalView.GetSizeNeededForTextWithoutHotKey ());
-        Assert.Equal (verticalView.Frame.Size, verticalView.GetSizeNeededForTextWithoutHotKey ());
+        Assert.Equal ((Size)verticalView.Frame.Size, verticalView.GetSizeNeededForTextWithoutHotKey ());
     }
 
     [Fact]

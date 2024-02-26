@@ -11,7 +11,7 @@
 namespace Terminal.Gui;
 
 /// <summary>Stores an ordered pair of integers, which specify a Height and Width.</summary>
-public struct Size
+public partial struct Size
 {
     private int width, height;
 
