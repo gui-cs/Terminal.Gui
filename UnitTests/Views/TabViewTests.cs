@@ -413,7 +413,7 @@ public class TabViewTests
         Assert.Equal (tv.SelectedTab.View, top.Focused.MostFocused);
 
         // Press the cursor up key to focus the selected tab
-        var args = new Key (Key.CursorUp);
+        var args = Key.CursorUp;
         Application.OnKeyDown (args);
         Application.Refresh ();
 
@@ -432,7 +432,7 @@ public class TabViewTests
                                  };
 
         // Press the cursor right key to select the next tab
-        args = new Key (Key.CursorRight);
+        args = Key.CursorRight;
         Application.OnKeyDown (args);
         Application.Refresh ();
         Assert.Equal (tab1, oldChanged);
@@ -442,7 +442,7 @@ public class TabViewTests
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the cursor down key to focus the selected tab view hosting
-        args = new Key (Key.CursorDown);
+        args = Key.CursorDown;
         Application.OnKeyDown (args);
         Application.Refresh ();
         Assert.Equal (tab2, tv.SelectedTab);
@@ -462,7 +462,7 @@ public class TabViewTests
         Assert.Null (top.Focused.MostFocused);
 
         // Press the cursor up key to focus the selected tab view hosting again
-        args = new Key (Key.CursorUp);
+        args = Key.CursorUp;
         Application.OnKeyDown (args);
         Application.Refresh ();
         Assert.Equal (tab2, tv.SelectedTab);
@@ -470,7 +470,7 @@ public class TabViewTests
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the cursor up key to focus the selected tab
-        args = new Key (Key.CursorUp);
+        args = Key.CursorUp;
         Application.OnKeyDown (args);
         Application.Refresh ();
 
@@ -480,7 +480,7 @@ public class TabViewTests
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the cursor left key to select the previous tab
-        args = new Key (Key.CursorLeft);
+        args = Key.CursorLeft;
         Application.OnKeyDown (args);
         Application.Refresh ();
         Assert.Equal (tab2, oldChanged);
@@ -490,7 +490,7 @@ public class TabViewTests
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the end key to select the last tab
-        args = new Key (Key.End);
+        args = Key.End;
         Application.OnKeyDown (args);
         Application.Refresh ();
         Assert.Equal (tab1, oldChanged);
@@ -500,7 +500,7 @@ public class TabViewTests
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the home key to select the first tab
-        args = new Key (Key.Home);
+        args = Key.Home;
         Application.OnKeyDown (args);
         Application.Refresh ();
         Assert.Equal (tab2, oldChanged);
@@ -510,7 +510,7 @@ public class TabViewTests
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the page down key to select the next set of tabs
-        args = new Key (Key.PageDown);
+        args = Key.PageDown;
         Application.OnKeyDown (args);
         Application.Refresh ();
         Assert.Equal (tab1, oldChanged);
@@ -520,7 +520,7 @@ public class TabViewTests
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the page up key to select the previous set of tabs
-        args = new Key (Key.PageUp);
+        args = Key.PageUp;
         Application.OnKeyDown (args);
         Application.Refresh ();
         Assert.Equal (tab2, oldChanged);

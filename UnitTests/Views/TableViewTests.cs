@@ -2523,11 +2523,7 @@ A B C
             Assert.Equal (0, tableView.SelectedRow);
         }
 
-        tableView.NewKeyDownEvent (
-                                   new Key (
-                                            KeyCode.End | KeyCode.CtrlMask
-                                           )
-                                  );
+        tableView.NewKeyDownEvent (Key.End.WithCtrl);
 
         if (withFullRowSelect)
         {

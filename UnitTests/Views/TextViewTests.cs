@@ -5521,7 +5521,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.PageUp));
         Assert.Equal (24, tv.GetCurrentLine ().Count);
         Assert.Equal (new Point (24, 1), tv.CursorPosition);
-        Assert.True (tv.NewKeyDownEvent (new Key (Key.V.WithAlt)));
+        Assert.True (tv.NewKeyDownEvent (Key.V.WithAlt));
         Assert.Equal (23, tv.GetCurrentLine ().Count);
         Assert.Equal (new Point (23, 0), tv.CursorPosition);
         Assert.True (tv.NewKeyDownEvent (Key.PageDown));
@@ -5816,7 +5816,7 @@ This is the second line.
         Assert.Equal (19, tv.SelectionStartColumn);
         Assert.Equal (0, tv.SelectionStartRow);
         tv.SelectionStartColumn = 0;
-        Assert.True (tv.NewKeyDownEvent (new Key (Key.C.WithAlt)));
+        Assert.True (tv.NewKeyDownEvent (Key.C.WithAlt));
 
         Assert.Equal (
                       $"is is the first lin{
@@ -5848,7 +5848,7 @@ This is the second line.
         Assert.True (tv.Selecting);
         Assert.Equal (0, tv.SelectionStartColumn);
         Assert.Equal (0, tv.SelectionStartRow);
-        Assert.True (tv.NewKeyDownEvent (new Key (Key.W.WithAlt)));
+        Assert.True (tv.NewKeyDownEvent (Key.W.WithAlt));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
@@ -5917,7 +5917,7 @@ This is the second line.
         Assert.Equal (6, tv.SelectedLength);
         Assert.Equal ("third ", tv.SelectedText);
         Assert.True (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (Key.B.WithAlt)));
+        Assert.True (tv.NewKeyDownEvent (Key.B.WithAlt));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
@@ -5947,7 +5947,7 @@ This is the second line.
         Assert.Equal (6, tv.SelectedLength);
         Assert.Equal ("third ", tv.SelectedText);
         Assert.True (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (Key.F.WithAlt)));
+        Assert.True (tv.NewKeyDownEvent (Key.F.WithAlt));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
@@ -5957,7 +5957,7 @@ This is the second line.
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (Key.F.WithAlt)));
+        Assert.True (tv.NewKeyDownEvent (Key.F.WithAlt));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
@@ -5967,7 +5967,7 @@ This is the second line.
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (Key.F.WithAlt)));
+        Assert.True (tv.NewKeyDownEvent (Key.F.WithAlt));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
@@ -6504,11 +6504,7 @@ This is the second line.
 
                     break;
                 case 1:
-                    _textView.NewKeyDownEvent (
-                                               new Key (
-                                                        KeyCode.Delete | KeyCode.CtrlMask | KeyCode.ShiftMask
-                                                       )
-                                              );
+                    _textView.NewKeyDownEvent (Key.Delete.WithCtrl.WithShift);
                     Assert.Equal (0, _textView.CursorPosition.X);
                     Assert.Equal (0, _textView.CursorPosition.Y);
                     Assert.Equal ("This is the second line.", _textView.Text);
@@ -6567,11 +6563,7 @@ This is the second line.
 
                     break;
                 case 1:
-                    _textView.NewKeyDownEvent (
-                                               new Key (
-                                                        KeyCode.Backspace | KeyCode.CtrlMask | KeyCode.ShiftMask
-                                                       )
-                                              );
+                    _textView.NewKeyDownEvent (Key.Backspace.WithCtrl.WithShift);
                     Assert.Equal (23, _textView.CursorPosition.X);
                     Assert.Equal (0, _textView.CursorPosition.Y);
                     Assert.Equal ("This is the first line.", _textView.Text);
@@ -6914,22 +6906,22 @@ This is the second line.
         Assert.Equal (14, tv.Maxlength);
         Assert.Equal (tv.LeftColumn, tv.Maxlength - tv.ContentArea.Width);
 
-        tv.NewKeyDownEvent (new Key (KeyCode.Backspace));
-        tv.NewKeyDownEvent (new Key (KeyCode.End));
+        tv.NewKeyDownEvent (Key.Backspace);
+        tv.NewKeyDownEvent (Key.End);
 
         Assert.Equal (3, tv.LeftColumn);
         Assert.Equal (13, tv.Maxlength);
         Assert.Equal (tv.LeftColumn, tv.Maxlength - tv.ContentArea.Width);
 
-        tv.NewKeyDownEvent (new Key (KeyCode.Space));
-        tv.NewKeyDownEvent (new Key (KeyCode.Space));
+        tv.NewKeyDownEvent (Key.Space);
+        tv.NewKeyDownEvent (Key.Space);
 
         Assert.Equal (5, tv.LeftColumn);
         Assert.Equal (15, tv.Maxlength);
         Assert.Equal (tv.LeftColumn, tv.Maxlength - tv.ContentArea.Width);
 
-        tv.NewKeyDownEvent (new Key (KeyCode.Backspace));
-        tv.NewKeyDownEvent (new Key (KeyCode.Backspace));
+        tv.NewKeyDownEvent (Key.Backspace);
+        tv.NewKeyDownEvent (Key.Backspace);
 
         Assert.Equal (3, tv.LeftColumn);
         Assert.Equal (13, tv.Maxlength);
@@ -6954,27 +6946,27 @@ This is the second line.
         tv.BeginInit ();
         tv.EndInit ();
 
-        tv.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.End));
+        tv.NewKeyDownEvent (Key.End.WithCtrl);
 
         Assert.Equal (4, tv.TopRow);
         Assert.Equal (13, tv.Lines);
         Assert.Equal (tv.TopRow, tv.Lines - tv.ContentArea.Height);
 
-        tv.NewKeyDownEvent (new Key (KeyCode.Backspace));
+        tv.NewKeyDownEvent (Key.Backspace);
 
         Assert.Equal (3, tv.TopRow);
         Assert.Equal (12, tv.Lines);
         Assert.Equal (tv.TopRow, tv.Lines - tv.ContentArea.Height);
 
-        tv.NewKeyDownEvent (new Key (KeyCode.Enter));
-        tv.NewKeyDownEvent (new Key (KeyCode.Enter));
+        tv.NewKeyDownEvent (Key.Enter);
+        tv.NewKeyDownEvent (Key.Enter);
 
         Assert.Equal (5, tv.TopRow);
         Assert.Equal (14, tv.Lines);
         Assert.Equal (tv.TopRow, tv.Lines - tv.ContentArea.Height);
 
-        tv.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.AltMask));
-        tv.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.AltMask));
+        tv.NewKeyDownEvent (Key.K.WithAlt);
+        tv.NewKeyDownEvent (Key.K.WithAlt);
 
         Assert.Equal (3, tv.TopRow);
         Assert.Equal (12, tv.Lines);
@@ -8348,11 +8340,7 @@ line.
 
         while (!iterationsFinished)
         {
-            _textView.NewKeyDownEvent (
-                                       new Key (
-                                                KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask
-                                               )
-                                      );
+            _textView.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
             switch (iteration)
             {
@@ -8690,11 +8678,7 @@ line.
 
         while (_textView.CursorPosition.X < _textView.Text.Length)
         {
-            _textView.NewKeyDownEvent (
-                                       new Key (
-                                                KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask
-                                               )
-                                      );
+            _textView.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
             switch (iteration)
             {
@@ -8770,11 +8754,7 @@ line.
 
         while (_textView.CursorPosition.X < _textView.Text.Length)
         {
-            _textView.NewKeyDownEvent (
-                                       new Key (
-                                                KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask
-                                               )
-                                      );
+            _textView.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
             switch (iteration)
             {
