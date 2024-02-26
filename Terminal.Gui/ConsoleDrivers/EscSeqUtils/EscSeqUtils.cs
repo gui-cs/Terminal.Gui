@@ -333,7 +333,6 @@ public static class EscSeqUtils
                    _ => string.Empty
                };
     }
-    #nullable restore
 
     /// <summary>
     ///     Gets the <see cref="ConsoleKey"/> depending on terminating and value.
@@ -345,7 +344,7 @@ public static class EscSeqUtils
     /// <param name="value">The value.</param>
     /// <param name="mod">The <see cref="ConsoleModifiers"/> which may changes.</param>
     /// <returns>The <see cref="ConsoleKey"/> and probably the <see cref="ConsoleModifiers"/>.</returns>
-    public static ConsoleKey GetConsoleKey (char terminator, string value, ref ConsoleModifiers mod)
+    public static ConsoleKey GetConsoleKey (char terminator, string? value, ref ConsoleModifiers mod)
     {
         if (terminator == 'Z')
         {
@@ -386,28 +385,21 @@ public static class EscSeqUtils
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>The <see cref="ConsoleModifiers"/> or zero.</returns>
-    public static ConsoleModifiers GetConsoleModifiers (string value)
+    public static ConsoleModifiers GetConsoleModifiers (string? value)
     {
-        switch (value)
-        {
-            case "2":
-                return ConsoleModifiers.Shift;
-            case "3":
-                return ConsoleModifiers.Alt;
-            case "4":
-                return ConsoleModifiers.Shift | ConsoleModifiers.Alt;
-            case "5":
-                return ConsoleModifiers.Control;
-            case "6":
-                return ConsoleModifiers.Shift | ConsoleModifiers.Control;
-            case "7":
-                return ConsoleModifiers.Alt | ConsoleModifiers.Control;
-            case "8":
-                return ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control;
-            default:
-                return 0;
-        }
+        return value switch
+               {
+                   "2" => ConsoleModifiers.Shift,
+                   "3" => ConsoleModifiers.Alt,
+                   "4" => ConsoleModifiers.Shift | ConsoleModifiers.Alt,
+                   "5" => ConsoleModifiers.Control,
+                   "6" => ConsoleModifiers.Shift | ConsoleModifiers.Control,
+                   "7" => ConsoleModifiers.Alt | ConsoleModifiers.Control,
+                   "8" => ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control,
+                   _ => 0
+               };
     }
+    #nullable restore
 
     /// <summary>
     ///     Gets all the needed information about a escape sequence.
