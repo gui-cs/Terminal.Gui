@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <!-- =================================================================== -->
   <!-- Version numbers -->
   <!-- Automatically updated by gitversion (run `dotnet-gitversion /updateprojectfiles`)  -->
@@ -91,6 +91,9 @@
     <Using Include="JetBrains.Annotations" />
     <Using Include="System.Diagnostics.Contracts.PureAttribute" Alias="PureAttribute" />
     <Using Include="System.Drawing.Rectangle" Alias="Rectangle" />
+    <Using Include="System.Drawing.RectangleF" Alias="RectangleF" />
+    <Using Include="System.Drawing.Point" Alias="Point" />
+    <Using Include="System.Drawing.PointF" Alias="PointF" />
     <Using Include="System.Text" />
     <Using Include="JetBrains.Annotations" />
   </ItemGroup>

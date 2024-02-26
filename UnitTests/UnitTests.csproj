@@ -47,6 +47,9 @@
   </ItemGroup>
   <ItemGroup>
     <Using Include="System.Drawing.Rectangle" Alias="Rectangle" />
+    <Using Include="System.Drawing.RectangleF" Alias="RectangleF" />
+    <Using Include="System.Drawing.Point" Alias="Point" />
+    <Using Include="System.Drawing.PointF" Alias="PointF" />
     <Using Include="Terminal.Gui" />
     <Using Include="Xunit" />
   </ItemGroup>
