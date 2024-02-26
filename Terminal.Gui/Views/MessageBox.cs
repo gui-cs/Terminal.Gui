@@ -396,13 +396,15 @@ public static class MessageBox
                         // TODO: replace with Dim.Fit when implemented
                         Rectangle maxBounds = d.SuperView?.Bounds ?? Application.Top.Bounds;
 
+                        Thickness adornmentsThickness = d.GetAdornmentsThickness ();
+
                         if (wrapMessage)
                         {
                             messageLabel.TextFormatter.Size = new (
                                                                    maxBounds.Size.Width
-                                                                   - d.GetAdornmentsThickness ().Horizontal,
+                                                                   - adornmentsThickness.Horizontal,
                                                                    maxBounds.Size.Height
-                                                                   - d.GetAdornmentsThickness ().Vertical
+                                                                   - adornmentsThickness.Vertical
                                                                   );
                         }
 
@@ -413,8 +415,8 @@ public static class MessageBox
                         int newWidth = Math.Max (
                                                  width,
                                                  Math.Max (
-                                                           messageSize.Width + d.GetAdornmentsThickness ().Horizontal,
-                                                           d.GetButtonsWidth () + d.Buttons.Length + d.GetAdornmentsThickness ().Horizontal
+                                                           messageSize.Width + adornmentsThickness.Horizontal,
+                                                           d.GetButtonsWidth () + d.Buttons.Length + adornmentsThickness.Horizontal
                                                           )
                                                 );
 
@@ -426,17 +428,18 @@ public static class MessageBox
                         // Ensure height fits the text + vspace + buttons
                         if (messageSize.Height == 0)
                         {
-                            d.Height = Math.Max (height, 3 + d.GetAdornmentsThickness ().Vertical);
+                            d.Height = Math.Max (height, 3 + adornmentsThickness.Vertical);
                         }
                         else
                         {
                             string lastLine = messageLabel.TextFormatter.GetLines () [^1];
 
+                            // INTENT: Instead of the check against \n or \r\n, how about just Environment.NewLine?
                             d.Height = Math.Max (
                                                  height,
                                                  messageSize.Height
                                                  + (lastLine.EndsWith ("\r\n") || lastLine.EndsWith ('\n') ? 1 : 2)
-                                                 + d.GetAdornmentsThickness ().Vertical
+                                                 + adornmentsThickness.Vertical
                                                 );
                         }
 
