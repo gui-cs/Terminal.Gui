@@ -1,4 +1,4 @@
-//
+﻿//
 // HexView.cs: A hexadecimal viewer
 //
 // TODO:
@@ -380,7 +380,7 @@ public class HexView : View
 
             Move (0, line);
             Driver.SetAttribute (ColorScheme.HotNormal);
-            Driver.AddStr (string.Format ("{0:x8} ", displayStart + line * nblocks * bsize));
+            Driver.AddStr ($"{displayStart + line * nblocks * bsize:x8} ");
 
             currentAttribute = ColorScheme.HotNormal;
             SetAttribute (GetNormalColor ());
@@ -401,7 +401,7 @@ public class HexView : View
                         SetAttribute (GetNormalColor ());
                     }
 
-                    Driver.AddStr (offset >= n && !edited ? "  " : string.Format ("{0:x2}", value));
+                    Driver.AddStr (offset >= n && !edited ? "  " : $"{value:x2}");
                     SetAttribute (GetNormalColor ());
                     Driver.AddRune (SpaceCharRune);
                 }
