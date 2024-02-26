@@ -432,7 +432,7 @@ public static class EscSeqUtils
 
         string c1Control = GetC1ControlChar (kChar [1]);
         string code = null;
-        int nSep = kChar.Count (x => x == ';') + 1;
+        int nSep = kChar.Count (static x => x == ';') + 1;
         var values = new string [nSep];
         var valueIdx = 0;
         var terminating = "";
