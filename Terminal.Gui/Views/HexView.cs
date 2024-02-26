@@ -36,6 +36,8 @@ public class HexView : View
     private SortedDictionary<long, byte> edits = new ();
     private bool firstNibble, leftSide;
     private Stream source;
+    private static readonly Rune SpaceCharRune = new (' ');
+    private static readonly Rune PeriodCharRune = new ('.');
 
     /// <summary>Initializes a <see cref="HexView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
     /// <param name="source">
@@ -401,7 +403,7 @@ public class HexView : View
 
                     Driver.AddStr (offset >= n && !edited ? "  " : string.Format ("{0:x2}", value));
                     SetAttribute (GetNormalColor ());
-                    Driver.AddRune ((Rune)' ');
+                    Driver.AddRune (SpaceCharRune);
                 }
 
                 Driver.AddStr (block + 1 == nblocks ? " " : "| ");
@@ -415,17 +417,17 @@ public class HexView : View
 
                 if (offset >= n && !edited)
                 {
-                    c = (Rune)' ';
+                    c = SpaceCharRune;
                 }
                 else
                 {
                     if (b < 32)
                     {
-                        c = (Rune)'.';
+                        c = PeriodCharRune;
                     }
                     else if (b > 127)
                     {
-                        c = (Rune)'.';
+                        c = PeriodCharRune;
                     }
                     else
                     {
