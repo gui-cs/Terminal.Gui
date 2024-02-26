@@ -127,6 +127,9 @@ public static class EscSeqUtils
     private static bool isButtonDoubleClicked;
 
     //private static MouseFlags? lastMouseButtonReleased;
+    // QUESTION: What's the difference between isButtonClicked and isButtonPressed?
+    // Some clarity or comments would be handy, here.
+    // It also seems like some enforcement of valid states might be a good idea.
     private static bool isButtonPressed;
     private static bool isButtonTripleClicked;
 
@@ -584,16 +587,18 @@ public static class EscSeqUtils
     )
     {
         MouseFlags buttonState = 0;
-        pos = new Point ();
+        pos = Point.Empty;
         var buttonCode = 0;
         var foundButtonCode = false;
         var foundPoint = 0;
-        var value = "";
+        string value = string.Empty;
         char [] kChar = GetKeyCharArray (cki);
 
+        // PERF: This loop could benefit from use of Spans and other strategies to avoid copies.
         //System.Diagnostics.Debug.WriteLine ($"kChar: {new string (kChar)}");
         for (var i = 0; i < kChar.Length; i++)
         {
+            // PERF: Copy
             char c = kChar [i];
 
             if (c == '<')
@@ -602,6 +607,7 @@ public static class EscSeqUtils
             }
             else if (foundButtonCode && c != ';')
             {
+                // PERF: Ouch
                 value += c.ToString ();
             }
             else if (c == ';')
@@ -617,7 +623,7 @@ public static class EscSeqUtils
                     pos.X = int.Parse (value) - 1;
                 }
 
-                value = "";
+                value = string.Empty;
                 foundPoint++;
             }
             else if (foundPoint > 0 && c != 'm' && c != 'M')
