@@ -261,7 +261,7 @@ public partial class Toplevel : View
             if (mouseEvent.Y == 0 && mouseEvent.Flags == MouseFlags.Button1Pressed)
             {
                 _startGrabPoint = new Point (mouseEvent.X, mouseEvent.Y);
-                _dragPosition = new Point ();
+                _dragPosition = Point.Empty;
                 nx = mouseEvent.X - mouseEvent.OfX;
                 ny = mouseEvent.Y - mouseEvent.OfY;
                 _dragPosition = new Point (nx, ny);

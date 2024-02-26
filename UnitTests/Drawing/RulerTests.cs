@@ -36,7 +36,7 @@ public class RulerTests
         ((FakeDriver)Application.Driver).SetBufferSize (25, 25);
 
         var r = new Ruler ();
-        r.Draw (new Point (0, 0));
+        r.Draw (Point.Empty);
         TestHelpers.AssertDriverContentsWithFrameAre (@"", _output);
     }
 
@@ -57,7 +57,7 @@ public class RulerTests
         Assert.Equal (Orientation.Horizontal, r.Orientation);
 
         r.Length = len;
-        r.Draw (new Point (0, 0));
+        r.Draw (Point.Empty);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -129,7 +129,7 @@ public class RulerTests
         Assert.Equal (Orientation.Horizontal, r.Orientation);
 
         r.Length = len;
-        r.Draw (new Point (0, 0), 1);
+        r.Draw (Point.Empty, 1);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -173,7 +173,7 @@ public class RulerTests
         var r = new Ruler ();
         r.Orientation = Orientation.Vertical;
         r.Length = len;
-        r.Draw (new Point (0, 0));
+        r.Draw (Point.Empty);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -305,7 +305,7 @@ public class RulerTests
         var r = new Ruler ();
         r.Orientation = Orientation.Vertical;
         r.Length = len;
-        r.Draw (new Point (0, 0), 1);
+        r.Draw (Point.Empty, 1);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"

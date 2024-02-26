@@ -1705,7 +1705,7 @@ public class TableViewTests
         Assert.Null (tableView.ScreenToCell (1, 1));
 
         // click in cell 0,0
-        Assert.Equal (new Point (0, 0), tableView.ScreenToCell (1, 2));
+        Assert.Equal (Point.Empty, tableView.ScreenToCell (1, 2));
 
         // click in cell 0,1
         Assert.Equal (new Point (0, 1), tableView.ScreenToCell (1, 3));
@@ -1722,7 +1722,7 @@ public class TableViewTests
         Assert.Null (tableView.ScreenToCell (2, 1));
 
         // click in cell 0,0
-        Assert.Equal (new Point (0, 0), tableView.ScreenToCell (2, 2));
+        Assert.Equal (Point.Empty, tableView.ScreenToCell (2, 2));
 
         // click in cell 0,1
         Assert.Equal (new Point (0, 1), tableView.ScreenToCell (2, 3));
@@ -1791,7 +1791,7 @@ public class TableViewTests
         Assert.Equal ("A", tableView.Table.ColumnNames [col.Value]);
 
         // click in cell 0,0
-        Assert.Equal (new Point (0, 0), tableView.ScreenToCell (1, 2, out col));
+        Assert.Equal (Point.Empty, tableView.ScreenToCell (1, 2, out col));
         Assert.Null (col);
 
         // click in cell 0,1
@@ -1812,7 +1812,7 @@ public class TableViewTests
         Assert.Equal ("A", tableView.Table.ColumnNames [col.Value]);
 
         // click in cell 0,0
-        Assert.Equal (new Point (0, 0), tableView.ScreenToCell (2, 2, out col));
+        Assert.Equal (Point.Empty, tableView.ScreenToCell (2, 2, out col));
         Assert.Null (col);
 
         // click in cell 0,1
@@ -2133,7 +2133,7 @@ public class TableViewTests
         // user has rectangular selection 
         tableView.MultiSelectedRegions.Push (
                                              new TableSelection (
-                                                                 new Point (0, 0),
+                                                                 Point.Empty,
                                                                  new Rectangle (0, 0, 3, 1)
                                                                 )
                                             );
@@ -2208,7 +2208,7 @@ public class TableViewTests
 
         Point [] selected = tv.GetAllSelectedCells ().ToArray ();
 
-        Assert.Contains (new Point (0, 0), selected);
+        Assert.Contains (Point.Empty, selected);
         Assert.DoesNotContain (new Point (0, 1), selected);
         Assert.Contains (new Point (0, 2), selected);
     }
@@ -2568,7 +2568,7 @@ A B C
 
         Point [] selected = tv.GetAllSelectedCells ().ToArray ();
 
-        Assert.Contains (new Point (0, 0), selected);
+        Assert.Contains (Point.Empty, selected);
         Assert.Contains (new Point (0, 1), selected);
     }
 

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Diagnostics;
 
 namespace Terminal.Gui;
@@ -186,7 +186,7 @@ public partial class View
             // BUGBUG: I think there's a bug here. This should be && not ||
             if (Margin is null || Border is null || Padding is null)
             {
-                return new Rectangle (default (Point), Frame.Size);
+                return Rectangle.Empty with { Size = Frame.Size };
             }
 
             int width = Math.Max (
@@ -205,7 +205,7 @@ public partial class View
                                    - Padding.Thickness.Vertical
                                    - (UseContentOffset ? ContentOffset.Y : 0));
 
-            return new Rectangle (UseContentOffset ? ContentOffset : Point.Empty, new Size (width, height));
+            return new (UseContentOffset ? ContentOffset : Point.Empty, new Size (width, height));
         }
         set
         {
@@ -219,20 +219,20 @@ public partial class View
                                 );
             }
 #endif // DEBUG
-
-            Frame = new Rectangle (
-                                   Frame.Location,
-                                   new Size (
-                                             value.Size.Width
-                                             + Margin.Thickness.Horizontal
-                                             + Border.Thickness.Horizontal
-                                             + Padding.Thickness.Horizontal,
-                                             value.Size.Height
-                                             + Margin.Thickness.Vertical
-                                             + Border.Thickness.Vertical
-                                             + Padding.Thickness.Vertical
-                                            )
-                                  );
+            Frame = Frame with
+            {
+                Size =
+                new (
+                     value.Size.Width
+                     + Margin.Thickness.Horizontal
+                     + Border.Thickness.Horizontal
+                     + Padding.Thickness.Horizontal,
+                     value.Size.Height
+                     + Margin.Thickness.Vertical
+                     + Border.Thickness.Vertical
+                     + Padding.Thickness.Vertical
+                    )
+            };
         }
     }
 
@@ -347,7 +347,7 @@ public partial class View
         get => _frame;
         set
         {
-            _frame = new Rectangle (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
+            _frame = value with { Width = Math.Max (value.Width, 0), Height = Math.Max (value.Height, 0) };
 
             // If Frame gets set, by definition, the View is now LayoutStyle.Absolute, so
             // set all Pos/Dim to Absolute values.
@@ -606,9 +606,9 @@ public partial class View
     /// <summary>Converts a <see cref="ContentArea"/>-relative region to a screen-relative region.</summary>
     public Rectangle BoundsToScreen (Rectangle region)
     {
-        BoundsToScreen (region.X, region.Y, out int x, out int y, false);
+        BoundsToScreen (region.X, region.Y, out int screenX, out int screenY, false);
 
-        return new Rectangle (x, y, region.Width, region.Height);
+        return region with { X = screenX, Y = screenY };
     }
 
     /// <summary>
@@ -626,6 +626,8 @@ public partial class View
     /// </param>
     public virtual void BoundsToScreen (int x, int y, out int rx, out int ry, bool clamped = true)
     {
+        // PERF: Use Point.Offset
+        // Already dealing with Point here.
         Point boundsOffset = GetBoundsOffset ();
         rx = x + Frame.X + boundsOffset.X;
         ry = y + Frame.Y + boundsOffset.Y;
@@ -660,61 +662,53 @@ public partial class View
         }
     }
 
+    #nullable enable
     /// <summary>Finds which view that belong to the <paramref name="start"/> superview at the provided location.</summary>
     /// <param name="start">The superview where to look for.</param>
     /// <param name="x">The column location in the superview.</param>
     /// <param name="y">The row location in the superview.</param>
-    /// <param name="resx">The found view screen relative column location.</param>
-    /// <param name="resy">The found view screen relative row location.</param>
+    /// <param name="resultX">The found view screen relative column location.</param>
+    /// <param name="resultY">The found view screen relative row location.</param>
     /// <returns>
-    ///     The view that was found at the <praramref name="x"/> and <praramref name="y"/> coordinates.
+    ///     The view that was found at the <paramref name="x"/> and <paramref name="y"/> coordinates.
     ///     <see langword="null"/> if no view was found.
     /// </returns>
-    public static View FindDeepestView (View start, int x, int y, out int resx, out int resy)
+    // CONCURRENCY: This method is not thread-safe.
+    // Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
+    public static View? FindDeepestView (View? start, int x, int y, out int resultX, out int resultY)
     {
-        resy = resx = 0;
+        resultY = resultX = 0;
 
         if (start is null || !start.Frame.Contains (x, y))
         {
             return null;
         }
 
-        Rectangle startFrame = start.Frame;
-
-        if (start.InternalSubviews is { })
+        if (start.InternalSubviews is { Count: > 0 })
         {
-            int count = start.InternalSubviews.Count;
+            Point boundsOffset = start.GetBoundsOffset ();
+            int rx = x - (start.Frame.X + boundsOffset.X);
+            int ry = y - (start.Frame.Y + boundsOffset.Y);
 
-            if (count > 0)
+            for (int i = start.InternalSubviews.Count - 1; i >= 0; i--)
             {
-                Point boundsOffset = start.GetBoundsOffset ();
-                int rx = x - (startFrame.X + boundsOffset.X);
-                int ry = y - (startFrame.Y + boundsOffset.Y);
+                View v = start.InternalSubviews [i];
 
-                for (int i = count - 1; i >= 0; i--)
+                if (v.Visible && v.Frame.Contains (rx, ry))
                 {
-                    View v = start.InternalSubviews [i];
+                    View? deep = FindDeepestView (v, rx, ry, out resultX, out resultY);
 
-                    if (v.Visible && v.Frame.Contains (rx, ry))
-                    {
-                        View deep = FindDeepestView (v, rx, ry, out resx, out resy);
-
-                        if (deep is null)
-                        {
-                            return v;
-                        }
-
-                        return deep;
-                    }
+                    return deep ?? v;
                 }
             }
         }
 
-        resx = x - startFrame.X;
-        resy = y - startFrame.Y;
+        resultX = x - start.Frame.X;
+        resultY = y - start.Frame.Y;
 
         return start;
     }
+    #nullable restore
 
     /// <summary>Gets the <see cref="Frame"/> with a screen-relative location.</summary>
     /// <returns>The location and size of the view in screen-relative coordinates.</returns>
@@ -839,7 +833,7 @@ public partial class View
 
         foreach (View v in ordered)
         {
-            LayoutSubview (v, new Rectangle (GetBoundsOffset (), ContentArea.Size));
+            LayoutSubview (v, new (GetBoundsOffset (), ContentArea.Size));
         }
 
         // If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.
@@ -1006,7 +1000,7 @@ public partial class View
 
         if (Margin.Frame.Size != Frame.Size)
         {
-            Margin._frame = new Rectangle (Point.Empty, Frame.Size);
+            Margin._frame = Rectangle.Empty with { Size = Frame.Size };
             Margin.X = 0;
             Margin.Y = 0;
             Margin.Width = Frame.Size.Width;
@@ -1019,7 +1013,7 @@ public partial class View
 
         if (border != Border.Frame)
         {
-            Border._frame = new Rectangle (new Point (border.Location.X, border.Location.Y), border.Size);
+            Border._frame = border;
             Border.X = border.Location.X;
             Border.Y = border.Location.Y;
             Border.Width = border.Size.Width;
@@ -1032,7 +1026,7 @@ public partial class View
 
         if (padding != Padding.Frame)
         {
-            Padding._frame = new Rectangle (new Point (padding.Location.X, padding.Location.Y), padding.Size);
+            Padding._frame = padding;
             Padding.X = padding.Location.X;
             Padding.Y = padding.Location.Y;
             Padding.Width = padding.Size.Width;
@@ -1314,7 +1308,7 @@ public partial class View
         // vertical/height
         (newY, newH) = GetNewLocationAndDimension (false, superviewBounds, _y, _height, autosize.Height);
 
-        var r = new Rectangle (newX, newY, newW, newH);
+        Rectangle r = new (newX, newY, newW, newH);
 
         if (Frame != r)
         {
@@ -1352,7 +1346,7 @@ public partial class View
             {
                 // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height, making
                 // the view LayoutStyle.Absolute.
-                _frame = new Rectangle (Frame.Location, autosize);
+                _frame = _frame with { Size = autosize };
 
                 if (autosize.Width == 0)
                 {
@@ -1607,7 +1601,7 @@ public partial class View
 
         if (boundsChanged)
         {
-            ContentArea = new Rectangle (ContentArea.X, ContentArea.Y, canSizeW ? rW : ContentArea.Width, canSizeH ? rH : ContentArea.Height);
+            ContentArea = new (ContentArea.X, ContentArea.Y, canSizeW ? rW : ContentArea.Width, canSizeH ? rH : ContentArea.Height);
         }
 
         return boundsChanged;

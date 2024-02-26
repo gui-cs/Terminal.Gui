@@ -538,7 +538,7 @@ public class ToplevelTests
         Assert.True (Application.OnKeyDown (Key.CursorDown));
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tvW1, top.MostFocused);
-        Assert.Equal (new Point (0, 0), tvW1.CursorPosition);
+        Assert.Equal (Point.Empty, tvW1.CursorPosition);
         Assert.True (Application.OnKeyDown (Key.End.WithCtrl));
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tvW1, top.MostFocused);
@@ -722,7 +722,7 @@ public class ToplevelTests
         Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (Key.CursorDown));
         Assert.Equal (win1, Application.OverlappedChildren [0]);
         Assert.Equal (tvW1, win1.MostFocused);
-        Assert.Equal (new Point (0, 0), tvW1.CursorPosition);
+        Assert.Equal (Point.Empty, tvW1.CursorPosition);
 
         Assert.True (
                      Application.OverlappedChildren [0]
@@ -1360,14 +1360,14 @@ public class ToplevelTests
         Assert.True (subTop.IsLoaded);
         Assert.Equal (new Rectangle (0, 0, 20, 10), view.Frame);
 
-        view.Frame = new Rectangle (1, 3, 10, 5);
-        Assert.Equal (new Rectangle (1, 3, 10, 5), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 5), view._needsDisplayRect);
+        view.Frame = new (1, 3, 10, 5);
+        Assert.Equal (new (1, 3, 10, 5), view.Frame);
+        Assert.Equal (new (0, 0, 10, 5), view._needsDisplayRect);
 
         view.OnDrawContent (view.ContentArea);
-        view.Frame = new Rectangle (1, 3, 10, 5);
-        Assert.Equal (new Rectangle (1, 3, 10, 5), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 5), view._needsDisplayRect);
+        view.Frame = new (1, 3, 10, 5);
+        Assert.Equal (new (1, 3, 10, 5), view.Frame);
+        Assert.Equal (new (0, 0, 10, 5), view._needsDisplayRect);
     }
 
     // BUGBUG: Broke this test with #2483 - @bdisp I need your help figuring out why
@@ -1381,7 +1381,7 @@ public class ToplevelTests
             Y = 3,
             Width = 40,
             Height = 16,
-            ContentSize = new Size (200, 100)
+            ContentSize = new (200, 100)
         };
         var win = new Window { X = 3, Y = 3, Width = Dim.Fill (3), Height = Dim.Fill (3) };
         scrollView.Add (win);
@@ -1389,10 +1389,10 @@ public class ToplevelTests
         top.Add (scrollView);
         Application.Begin (top);
 
-        Assert.Equal (new Rectangle (0, 0, 80, 25), top.Frame);
-        Assert.Equal (new Rectangle (3, 3, 40, 16), scrollView.Frame);
-        Assert.Equal (new Rectangle (0, 0, 200, 100), scrollView.Subviews [0].Frame);
-        Assert.Equal (new Rectangle (3, 3, 194, 94), win.Frame);
+        Assert.Equal (new (0, 0, 80, 25), top.Frame);
+        Assert.Equal (new (3, 3, 40, 16), scrollView.Frame);
+        Assert.Equal (new (0, 0, 200, 100), scrollView.Subviews [0].Frame);
+        Assert.Equal (new (3, 3, 194, 94), win.Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1421,7 +1421,7 @@ public class ToplevelTests
                                                           )
                                  );
         Assert.Equal (win, Application.MouseGrabView);
-        Assert.Equal (new Rectangle (3, 3, 194, 94), win.Frame);
+        Assert.Equal (new (3, 3, 194, 94), win.Frame);
 
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (

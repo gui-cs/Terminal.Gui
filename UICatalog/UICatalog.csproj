@@ -37,4 +37,12 @@
   <ItemGroup>
     <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Using Include="System.Drawing.Rectangle" Alias="Rectangle" />
+    <Using Include="System.Drawing.RectangleF" Alias="RectangleF" />
+    <Using Include="System.Drawing.Point" Alias="Point" />
+    <Using Include="System.Drawing.PointF" Alias="PointF" />
+    <Using Include="System.Drawing.Size" Alias="Size" />
+    <Using Include="System.Drawing.SizeF" Alias="SizeF" />
+  </ItemGroup>
 </Project>

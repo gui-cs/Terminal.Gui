@@ -6,6 +6,7 @@ namespace Terminal.Gui.ViewsTests;
 public class CheckBoxTests
 {
     private readonly ITestOutputHelper _output;
+    private static readonly Size _size25x1 = new (25, 1);
     public CheckBoxTests (ITestOutputHelper output) { _output = output; }
 
 
@@ -360,8 +361,8 @@ public class CheckBoxTests
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         Assert.Equal (TextAlignment.Centered, checkBox.TextAlignment);
-        Assert.Equal (new Rectangle (1, 1, 25, 1), checkBox.Frame);
-        Assert.Equal (new Size (25, 1), checkBox.TextFormatter.Size);
+        Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
+        Assert.Equal (_size25x1, checkBox.TextFormatter.Size);
         Assert.False (checkBox.AutoSize);
 
         var expected = @$"
@@ -373,7 +374,7 @@ public class CheckBoxTests
 ";
 
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rectangle (0, 0, 30, 5), pos);
+        Assert.Equal (new (0, 0, 30, 5), pos);
 
         checkBox.Checked = true;
         Application.Refresh ();
@@ -387,7 +388,7 @@ public class CheckBoxTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rectangle (0, 0, 30, 5), pos);
+        Assert.Equal (new (0, 0, 30, 5), pos);
     }
 
     [Fact]
@@ -421,11 +422,11 @@ public class CheckBoxTests
         ((FakeDriver)Application.Driver).SetBufferSize (30, 6);
 
         Assert.Equal (TextAlignment.Justified, checkBox1.TextAlignment);
-        Assert.Equal (new Rectangle (1, 1, 25, 1), checkBox1.Frame);
-        Assert.Equal (new Size (25, 1), checkBox1.TextFormatter.Size);
+        Assert.Equal (new (1, 1, 25, 1), checkBox1.Frame);
+        Assert.Equal (_size25x1, checkBox1.TextFormatter.Size);
         Assert.Equal (TextAlignment.Justified, checkBox2.TextAlignment);
-        Assert.Equal (new Rectangle (1, 2, 25, 1), checkBox2.Frame);
-        Assert.Equal (new Size (25, 1), checkBox2.TextFormatter.Size);
+        Assert.Equal (new (1, 2, 25, 1), checkBox2.Frame);
+        Assert.Equal (_size25x1, checkBox2.TextFormatter.Size);
 
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
@@ -437,14 +438,14 @@ public class CheckBoxTests
 ";
 
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rectangle (0, 0, 30, 6), pos);
+        Assert.Equal (new (0, 0, 30, 6), pos);
 
         checkBox1.Checked = true;
-        Assert.Equal (new Rectangle (1, 1, 25, 1), checkBox1.Frame);
-        Assert.Equal (new Size (25, 1), checkBox1.TextFormatter.Size);
+        Assert.Equal (new (1, 1, 25, 1), checkBox1.Frame);
+        Assert.Equal (_size25x1, checkBox1.TextFormatter.Size);
         checkBox2.Checked = true;
-        Assert.Equal (new Rectangle (1, 2, 25, 1), checkBox2.Frame);
-        Assert.Equal (new Size (25, 1), checkBox2.TextFormatter.Size);
+        Assert.Equal (new (1, 2, 25, 1), checkBox2.Frame);
+        Assert.Equal (_size25x1, checkBox2.TextFormatter.Size);
         Application.Refresh ();
 
         expected = @$"
@@ -457,7 +458,7 @@ public class CheckBoxTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rectangle (0, 0, 30, 6), pos);
+        Assert.Equal (new (0, 0, 30, 6), pos);
     }
 
     [Fact]
@@ -480,8 +481,8 @@ public class CheckBoxTests
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         Assert.Equal (TextAlignment.Left, checkBox.TextAlignment);
-        Assert.Equal (new Rectangle (1, 1, 25, 1), checkBox.Frame);
-        Assert.Equal (new Size (25, 1), checkBox.TextFormatter.Size);
+        Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
+        Assert.Equal (_size25x1, checkBox.TextFormatter.Size);
 
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
@@ -492,7 +493,7 @@ public class CheckBoxTests
 ";
 
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rectangle (0, 0, 30, 5), pos);
+        Assert.Equal (new (0, 0, 30, 5), pos);
 
         checkBox.Checked = true;
         Application.Refresh ();
@@ -506,7 +507,7 @@ public class CheckBoxTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rectangle (0, 0, 30, 5), pos);
+        Assert.Equal (new (0, 0, 30, 5), pos);
     }
 
     [Fact]
@@ -530,8 +531,8 @@ public class CheckBoxTests
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         Assert.Equal (TextAlignment.Right, checkBox.TextAlignment);
-        Assert.Equal (new Rectangle (1, 1, 25, 1), checkBox.Frame);
-        Assert.Equal (new Size (25, 1), checkBox.TextFormatter.Size);
+        Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
+        Assert.Equal (_size25x1, checkBox.TextFormatter.Size);
         Assert.False (checkBox.AutoSize);
 
         var expected = @$"
@@ -543,7 +544,7 @@ public class CheckBoxTests
 ";
 
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rectangle (0, 0, 30, 5), pos);
+        Assert.Equal (new (0, 0, 30, 5), pos);
 
         checkBox.Checked = true;
         Application.Refresh ();
@@ -557,7 +558,7 @@ public class CheckBoxTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rectangle (0, 0, 30, 5), pos);
+        Assert.Equal (new (0, 0, 30, 5), pos);
     }
 
     [Fact]

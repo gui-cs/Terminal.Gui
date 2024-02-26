@@ -300,10 +300,10 @@ public class CsvEditor : Scenario
         var ok = new Button { Text = "Ok", IsDefault = true };
 
         ok.Accept += (s, e) =>
-                      {
-                          okPressed = true;
-                          Application.RequestStop ();
-                      };
+                     {
+                         okPressed = true;
+                         Application.RequestStop ();
+                     };
         var cancel = new Button { Text = "Cancel" };
         cancel.Accept += (s, e) => { Application.RequestStop (); };
         var d = new Dialog { Title = title, Buttons = [ok, cancel] };

@@ -161,15 +161,16 @@ public class WindowTests
 
         // TODO: Fix things so that this works in release and debug
         // BUG: This also looks like it might be unintended behavior.
-#if DEBUG
+        // Can actually also be removed, since the tests below make it redundant.
+    #if DEBUG
         Assert.Equal ($"Window(title){windowWithFrameRectEmpty.Frame}", windowWithFrameRectEmpty.ToString ());
-#else
-        Assert.Equal ("Window()(0,0,0,0)", windowWithFrameRectEmpty.ToString ());
-#endif
+    #else
+        Assert.Equal ($"Window(){windowWithFrameRectEmpty.Frame}", windowWithFrameRectEmpty.ToString ());
+    #endif
         Assert.True (windowWithFrameRectEmpty.CanFocus);
         Assert.False (windowWithFrameRectEmpty.HasFocus);
-        Assert.Equal (new Rectangle (0, 0, 0, 0), windowWithFrameRectEmpty.ContentArea);
-        Assert.Equal (new Rectangle (0, 0, 0, 0), windowWithFrameRectEmpty.Frame);
+        Assert.Equal (Rectangle.Empty, windowWithFrameRectEmpty.ContentArea);
+        Assert.Equal (Rectangle.Empty, windowWithFrameRectEmpty.Frame);
         Assert.Null (windowWithFrameRectEmpty.Focused);
         Assert.NotNull (windowWithFrameRectEmpty.ColorScheme);
         Assert.Equal (0, windowWithFrameRectEmpty.X);
@@ -196,13 +197,13 @@ public class WindowTests
         Assert.Equal (LayoutStyle.Absolute, windowWithFrame1234.LayoutStyle);
 #if DEBUG
         Assert.Equal ($"Window(title){windowWithFrame1234.Frame}", windowWithFrame1234.ToString ());
-#else
-        Assert.Equal ("Window()(1,2,3,4)", windowWithFrame1234.ToString ());
-#endif
+    #else
+        Assert.Equal ($"Window(){windowWithFrame1234.Frame}", windowWithFrame1234.ToString ());
+    #endif
         Assert.True (windowWithFrame1234.CanFocus);
         Assert.False (windowWithFrame1234.HasFocus);
-        Assert.Equal (new Rectangle (0, 0, 1, 2), windowWithFrame1234.ContentArea);
-        Assert.Equal (new Rectangle (1, 2, 3, 4), windowWithFrame1234.Frame);
+        Assert.Equal (new (0, 0, 1, 2), windowWithFrame1234.ContentArea);
+        Assert.Equal (new (1, 2, 3, 4), windowWithFrame1234.Frame);
         Assert.Null (windowWithFrame1234.Focused);
         Assert.NotNull (windowWithFrame1234.ColorScheme);
         Assert.Equal (1, windowWithFrame1234.X);

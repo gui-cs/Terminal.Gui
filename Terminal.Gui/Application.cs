@@ -716,53 +716,6 @@ public static partial class Application
     /// </summary>
     public static bool EndAfterFirstIteration { get; set; }
 
-    //
-    // provides the sync context set while executing code in Terminal.Gui, to let
-    // users use async/await on their code
-    //
-    private class MainLoopSyncContext : SynchronizationContext
-    {
-        public override SynchronizationContext CreateCopy () { return new MainLoopSyncContext (); }
-
-        public override void Post (SendOrPostCallback d, object state)
-        {
-            MainLoop.AddIdle (
-                              () =>
-                              {
-                                  d (state);
-
-                                  return false;
-                              }
-                             );
-        }
-
-        //_mainLoop.Driver.Wakeup ();
-        public override void Send (SendOrPostCallback d, object state)
-        {
-            if (Thread.CurrentThread.ManagedThreadId == _mainThreadId)
-            {
-                d (state);
-            }
-            else
-            {
-                var wasExecuted = false;
-
-                Invoke (
-                        () =>
-                        {
-                            d (state);
-                            wasExecuted = true;
-                        }
-                       );
-
-                while (!wasExecuted)
-                {
-                    Thread.Sleep (15);
-                }
-            }
-        }
-    }
-
     /// <summary>Building block API: Runs the main loop for the created <see cref="Toplevel"/>.</summary>
     /// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
     public static void RunLoop (RunState state)
@@ -1125,47 +1078,36 @@ public static partial class Application
         }
     }
 
-    private static View FindDeepestTop (Toplevel start, int x, int y, out int resx, out int resy)
+    #nullable enable
+    private static Toplevel? FindDeepestTop (Toplevel start, int x, int y)
     {
-        Rectangle startFrame = start.Frame;
-
-        if (!startFrame.Contains (x, y))
+        if (!start.Frame.Contains (x, y))
         {
-            resx = 0;
-            resy = 0;
-
             return null;
         }
 
-        if (_topLevels is { })
+        if (_topLevels is { Count: > 0 })
         {
-            int count = _topLevels.Count;
+            int rx = x - start.Frame.X;
+            int ry = y - start.Frame.Y;
 
-            if (count > 0)
+            foreach (Toplevel t in _topLevels)
             {
-                int rx = x - startFrame.X;
-                int ry = y - startFrame.Y;
-
-                foreach (Toplevel t in _topLevels)
+                if (t != Current)
                 {
-                    if (t != Current)
+                    if (t != start && t.Visible && t.Frame.Contains (rx, ry))
                     {
-                        if (t != start && t.Visible && t.Frame.Contains (rx, ry))
-                        {
-                            start = t;
+                        start = t;
 
-                            break;
-                        }
+                        break;
                     }
                 }
             }
         }
 
-        resx = x - startFrame.X;
-        resy = y - startFrame.Y;
-
         return start;
     }
+    #nullable restore
 
     private static View FindTopFromView (View view)
     {
@@ -1181,12 +1123,13 @@ public static partial class Application
         return top;
     }
 
+    #nullable enable
     // Only return true if the Current has changed.
-    private static bool MoveCurrent (Toplevel top)
+    private static bool MoveCurrent (Toplevel? top)
     {
         // The Current is modal and the top is not modal Toplevel then
         // the Current must be moved above the first not modal Toplevel.
-        if (OverlappedTop != null
+        if (OverlappedTop is { }
             && top != OverlappedTop
             && top != Current
             && Current?.Modal == true
@@ -1218,7 +1161,7 @@ public static partial class Application
 
         // The Current and the top are both not running Toplevel then
         // the top must be moved above the first not running Toplevel.
-        if (OverlappedTop != null
+        if (OverlappedTop is { }
             && top != OverlappedTop
             && top != Current
             && Current?.Running == false
@@ -1261,6 +1204,7 @@ public static partial class Application
 
         return true;
     }
+    #nullable restore
 
     /// <summary>Invoked when the terminal's size changed. The new size of the terminal is provided.</summary>
     /// <remarks>
@@ -1286,7 +1230,7 @@ public static partial class Application
 
         foreach (Toplevel t in _topLevels)
         {
-            t.SetRelativeLayout (new Rectangle (0, 0, args.Size.Width, args.Size.Height));
+            t.SetRelativeLayout (Rectangle.Empty with { Size = args.Size });
             t.LayoutSubviews ();
             t.PositionToplevels ();
             t.OnSizeChanging (new SizeChangedEventArgs (args.Size));
@@ -1406,8 +1350,9 @@ public static partial class Application
         UnGrabbedMouse?.Invoke (view, new ViewEventArgs (view));
     }
 
+    #nullable enable
     // Used by OnMouseEvent to track the last view that was clicked on.
-    internal static View _mouseEnteredView;
+    internal static View? _mouseEnteredView;
 
     /// <summary>Event fired when a mouse move or click occurs. Coordinates are screen relative.</summary>
     /// <remarks>
@@ -1419,13 +1364,11 @@ public static partial class Application
     /// </remarks>
     public static event EventHandler<MouseEventEventArgs> MouseEvent;
 
-    /// <summary>Called when a mouse event occurs. Fires the <see cref="MouseEvent"/> event.</summary>
+    /// <summary>Called when a mouse event occurs. Raises the <see cref="MouseEvent"/> event.</summary>
     /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
     /// <param name="a">The mouse event with coordinates relative to the screen.</param>
-    public static void OnMouseEvent (MouseEventEventArgs a)
+    internal static void OnMouseEvent (MouseEventEventArgs a)
     {
-        static bool OutsideRect (Point p, Rectangle r) { return p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom; }
-
         if (IsMouseDisabled)
         {
             return;
@@ -1433,7 +1376,7 @@ public static partial class Application
 
         var view = View.FindDeepestView (Current, a.MouseEvent.X, a.MouseEvent.Y, out int screenX, out int screenY);
 
-        if (view is { } && view.WantContinuousButtonPressed)
+        if (view is { WantContinuousButtonPressed: true })
         {
             WantContinuousButtonPressedView = view;
         }
@@ -1512,7 +1455,7 @@ public static partial class Application
                 };
             }
 
-            if (OutsideRect (new Point (nme.X, nme.Y), MouseGrabView.ContentArea) || (view is { } && view != MouseGrabView))
+            if (MouseGrabView.ContentArea.Contains (nme.X, nme.Y) is false || (view is { } && view != MouseGrabView))
             {
                 // The mouse has moved outside the bounds of the view that
                 // grabbed the mouse, so we tell the view that last got 
@@ -1549,7 +1492,7 @@ public static partial class Application
             && a.MouseEvent.Flags != MouseFlags.ReportMousePosition
             && a.MouseEvent.Flags != 0)
         {
-            View top = FindDeepestTop (Top, a.MouseEvent.X, a.MouseEvent.Y, out _, out _);
+            View? top = FindDeepestTop (Top, a.MouseEvent.X, a.MouseEvent.Y);
             view = View.FindDeepestView (top, a.MouseEvent.X, a.MouseEvent.Y, out screenX, out screenY);
 
             if (view is { } && view != OverlappedTop && top != Current)
@@ -1723,6 +1666,7 @@ public static partial class Application
             return false;
         }
     }
+    #nullable restore
 
     #endregion Mouse handling
 
@@ -1938,7 +1882,3 @@ public static partial class Application
 
     #endregion Keyboard handling
 }
-
-/// <summary>Event arguments for the <see cref="Application.Iteration"/> event.</summary>
-public class IterationEventArgs
-{ }

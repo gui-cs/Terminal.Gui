@@ -153,7 +153,7 @@ public class MessageBoxTests
                                          // Default location is centered, so
                                          // X = (100 / 2) - (60 / 2) = 20
                                          // Y = (100 / 2) - (5 / 2) = 47
-                                         Assert.Equal (new Point (20, 47), Application.Current.Frame.Location);
+                                         Assert.Equal (new Point (20, 47), (Point)Application.Current.Frame.Location);
 
                                          Application.RequestStop ();
                                      }
@@ -295,7 +295,7 @@ public class MessageBoxTests
 ╚══════════════════╝",
                                                                                        _output
                                                                                       );
-                                         Assert.Equal (new Size (20 - 2, 10 - 2), Application.Current.Frame.Size);
+                                         Assert.Equal (new (20 - 2, 10 - 2), Application.Current.Frame.Size);
                                          Application.RequestStop ();
 
                                          // Really long text
@@ -606,8 +606,8 @@ ffffffffffffffffffff
 
                                          Assert.IsType<Dialog> (Application.Current);
 
-                                         // Default size is Percent(60) 
-                                         Assert.Equal (new Size ((int)(100 * .60), 5), Application.Current.Frame.Size);
+                                         // Default size is Percent(60)
+                                         Assert.Equal (new ((int)(100 * .60), 5), Application.Current.Frame.Size);
 
                                          Application.RequestStop ();
                                      }
@@ -801,7 +801,7 @@ ffffffffffffffffffff
                                          Application.Refresh ();
 
                                          Assert.IsType<Dialog> (Application.Current);
-                                         Assert.Equal (new Size (height, width), Application.Current.Frame.Size);
+                                         Assert.Equal (new (height, width), Application.Current.Frame.Size);
 
                                          Application.RequestStop ();
                                      }
@@ -839,7 +839,7 @@ ffffffffffffffffffff
                                          Application.Refresh ();
 
                                          Assert.IsType<Dialog> (Application.Current);
-                                         Assert.Equal (new Size (height, width), Application.Current.Frame.Size);
+                                         Assert.Equal (new (height, width), Application.Current.Frame.Size);
 
                                          Application.RequestStop ();
                                      }
@@ -873,7 +873,7 @@ ffffffffffffffffffff
                                          Application.Refresh ();
 
                                          Assert.IsType<Dialog> (Application.Current);
-                                         Assert.Equal (new Size (height, width), Application.Current.Frame.Size);
+                                         Assert.Equal (new (height, width), Application.Current.Frame.Size);
 
                                          Application.RequestStop ();
                                      }
@@ -901,7 +901,7 @@ ffffffffffffffffffff
                                      {
                                          Application.Refresh ();
 
-                                         Assert.Equal (new Size (7, 5), Application.Current.Frame.Size);
+                                         Assert.Equal (new (7, 5), Application.Current.Frame.Size);
 
                                          TestHelpers.AssertDriverContentsWithFrameAre (
                                                                                        @$"

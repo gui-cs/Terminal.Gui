@@ -430,7 +430,7 @@ public class FakeDriver : ConsoleDriver
     {
         ResizeScreen ();
         ClearContents ();
-        OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
+        OnSizeChanged (new SizeChangedEventArgs (new (Cols, Rows)));
     }
 
     public virtual void ResizeScreen ()
@@ -455,7 +455,8 @@ public class FakeDriver : ConsoleDriver
             }
         }
 
-        Clip = new Rectangle (0, 0, Cols, Rows);
+        // CONCURRENCY: Unsynchronized access to Clip is not safe.
+        Clip = new (0, 0, Cols, Rows);
     }
 
     public override void UpdateCursor ()

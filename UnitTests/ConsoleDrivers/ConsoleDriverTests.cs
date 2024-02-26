@@ -219,7 +219,7 @@ public class ConsoleDriverTests
 
         driver.Cols = 120;
         driver.Rows = 40;
-        driver.OnSizeChanged (new SizeChangedEventArgs (new Size (driver.Cols, driver.Rows)));
+        driver.OnSizeChanged (new SizeChangedEventArgs (new (driver.Cols, driver.Rows)));
         Assert.Equal (120, driver.Cols);
         Assert.Equal (40, driver.Rows);
         Assert.True (wasTerminalResized);
@@ -254,7 +254,7 @@ public class ConsoleDriverTests
     //";
 
     //					var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-    //					Assert.Equal (new Rectangle (0, 0, 20, 8), pos);
+    //					Assert.Equal (new (0, 0, 20, 8), pos);
 
     //					Assert.True (dlg.ProcessKey (new (Key.Tab)));
     //					dlg.Draw ();
@@ -271,7 +271,7 @@ public class ConsoleDriverTests
     //";
 
     //					pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-    //					Assert.Equal (new Rectangle (0, 0, 20, 8), pos);
+    //					Assert.Equal (new (0, 0, 20, 8), pos);
 
     //					win.RequestStop ();
     //				});

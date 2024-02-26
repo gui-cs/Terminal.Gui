@@ -7,7 +7,7 @@ public class ColorPickerTests
     {
         var colorPicker = new ColorPicker ();
         Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
-        Assert.Equal (new Point (0, 0), colorPicker.Cursor);
+        Assert.Equal (Point.Empty, colorPicker.Cursor);
         Assert.True (colorPicker.CanFocus);
 
         colorPicker.BeginInit ();
@@ -73,7 +73,7 @@ public class ColorPickerTests
         colorPicker.Cursor = new Point (7, 1);
         Assert.Equal (ColorName.White, colorPicker.SelectedColor);
 
-        colorPicker.Cursor = new Point (0, 0);
+        colorPicker.Cursor = Point.Empty;
         Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
     }
 }

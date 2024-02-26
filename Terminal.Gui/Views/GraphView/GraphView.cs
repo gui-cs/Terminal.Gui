@@ -314,7 +314,7 @@ public class GraphView : View
     /// <returns></returns>
     public RectangleF ScreenToGraphSpace (int col, int row)
     {
-        return new RectangleF (
+        return new (
                                ScrollOffset.X + (col - MarginLeft) * CellSize.X,
                                ScrollOffset.Y + (ContentArea.Height - (row + MarginBottom + 1)) * CellSize.Y,
                                CellSize.X,
@@ -330,7 +330,7 @@ public class GraphView : View
         // get position of the bottom left
         RectangleF pos = ScreenToGraphSpace (screenArea.Left, screenArea.Bottom - 1);
 
-        return new RectangleF (pos.X, pos.Y, screenArea.Width * CellSize.X, screenArea.Height * CellSize.Y);
+        return pos with { Width = screenArea.Width * CellSize.X, Height = screenArea.Height * CellSize.Y };
     }
 
     /// <summary>
@@ -341,10 +341,10 @@ public class GraphView : View
     /// <param name="offsetY"></param>
     public void Scroll (float offsetX, float offsetY)
     {
-        ScrollOffset = new PointF (
-                                   ScrollOffset.X + offsetX,
-                                   ScrollOffset.Y + offsetY
-                                  );
+        ScrollOffset = new (
+                            ScrollOffset.X + offsetX,
+                            ScrollOffset.Y + offsetY
+                           );
 
         SetNeedsDisplay ();
     }

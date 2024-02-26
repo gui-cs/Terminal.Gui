@@ -1153,8 +1153,8 @@ public class TableView : View
         // Create a single region over entire table, set the origin of the selection to the active cell so that a followup spread selection e.g. shift-right behaves properly
         MultiSelectedRegions.Push (
                                    new TableSelection (
-                                                       new Point (SelectedColumn, SelectedRow),
-                                                       new Rectangle (0, 0, Table.Columns, _table.Rows)
+                                                       new (SelectedColumn, SelectedRow),
+                                                       new (0, 0, Table.Columns, _table.Rows)
                                                       )
                                   );
         Update ();
@@ -1532,7 +1532,7 @@ public class TableView : View
         int right = Math.Max (Math.Max (pt1X, pt2X), 0);
 
         // Rectangle class is inclusive of Top Left but exclusive of Bottom Right so extend by 1
-        return new TableSelection (new Point (pt1X, pt1Y), new Rectangle (left, top, right - left + 1, bot - top + 1))
+        return new TableSelection (new (pt1X, pt1Y), new (left, top, right - left + 1, bot - top + 1))
         {
             IsToggled = toggle
         };

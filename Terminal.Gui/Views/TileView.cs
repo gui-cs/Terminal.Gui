@@ -160,19 +160,21 @@ public class TileView : View
 
         if (HasBorder ())
         {
-            contentArea = new Rectangle (
-                                         contentArea.X + 1,
-                                         contentArea.Y + 1,
-                                         Math.Max (0, contentArea.Width - 2),
-                                         Math.Max (0, contentArea.Height - 2)
-                                        );
+            contentArea = new (
+                               contentArea.X + 1,
+                               contentArea.Y + 1,
+                               Math.Max (0, contentArea.Width - 2),
+                               Math.Max (0, contentArea.Height - 2)
+                              );
         }
 
         Setup (contentArea);
         base.LayoutSubviews ();
     }
 
-    /// <summary>Overridden so no Frames get drawn (BUGBUG: v2 fix this hack)</summary>
+    // BUG: v2 fix this hack
+    // QUESTION: Does this need to be fixed before events are refactored?
+    /// <summary>Overridden so no Frames get drawn</summary>
     /// <returns></returns>
     public override bool OnDrawAdornments () { return false; }
 
@@ -193,8 +195,8 @@ public class TileView : View
         {
             if (HasBorder ())
             {
-                lc.AddLine (new Point (0, 0), ContentArea.Width, Orientation.Horizontal, LineStyle);
-                lc.AddLine (new Point (0, 0), ContentArea.Height, Orientation.Vertical, LineStyle);
+                lc.AddLine (Point.Empty, ContentArea.Width, Orientation.Horizontal, LineStyle);
+                lc.AddLine (Point.Empty, ContentArea.Height, Orientation.Vertical, LineStyle);
 
                 lc.AddLine (
                             new Point (ContentArea.Width - 1, ContentArea.Height - 1),

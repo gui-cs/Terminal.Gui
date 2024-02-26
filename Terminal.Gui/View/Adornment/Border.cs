@@ -232,31 +232,32 @@ public class Border : Adornment
 
         // TODO: v2 - this will eventually be two controls: "BorderView" and "Label" (for the title)
 
-        // The border adornment (and title) are drawn at the outermost edge of border; 
+        // The border adornment (and title) are drawn at the outermost edge of border;
         // For Border
         // ...thickness extends outward (border/title is always as far in as possible)
-        var borderBounds = new Rectangle (
-                                          screenBounds.X + Math.Max (0, Thickness.Left - 1),
-                                          screenBounds.Y + Math.Max (0, Thickness.Top - 1),
-                                          Math.Max (
-                                                    0,
-                                                    screenBounds.Width
-                                                    - Math.Max (
-                                                                0,
-                                                                Math.Max (0, Thickness.Left - 1)
-                                                                + Math.Max (0, Thickness.Right - 1)
-                                                               )
-                                                   ),
-                                          Math.Max (
-                                                    0,
-                                                    screenBounds.Height
-                                                    - Math.Max (
-                                                                0,
-                                                                Math.Max (0, Thickness.Top - 1)
-                                                                + Math.Max (0, Thickness.Bottom - 1)
-                                                               )
-                                                   )
-                                         );
+        // PERF: How about a call to Rectangle.Offset?
+        Rectangle borderBounds = new (
+                                      screenBounds.X + Math.Max (0, Thickness.Left - 1),
+                                      screenBounds.Y + Math.Max (0, Thickness.Top - 1),
+                                      Math.Max (
+                                                0,
+                                                screenBounds.Width
+                                                - Math.Max (
+                                                            0,
+                                                            Math.Max (0, Thickness.Left - 1)
+                                                            + Math.Max (0, Thickness.Right - 1)
+                                                           )
+                                               ),
+                                      Math.Max (
+                                                0,
+                                                screenBounds.Height
+                                                - Math.Max (
+                                                            0,
+                                                            Math.Max (0, Thickness.Top - 1)
+                                                            + Math.Max (0, Thickness.Bottom - 1)
+                                                           )
+                                               )
+                                     );
 
         int topTitleLineY = borderBounds.Y;
         int titleY = borderBounds.Y;
@@ -265,14 +266,14 @@ public class Border : Adornment
         int maxTitleWidth = Math.Max (
                                       0,
                                       Math.Min (
-                                                Parent.TitleTextFormatter.FormatAndGetSize ().Width,
-                                                Math.Min (screenBounds.Width - 4, borderBounds.Width - 4)
-                                               )
-                                     );
-        Parent.TitleTextFormatter.Size = new Size (maxTitleWidth, 1);
+                                          Parent.TitleTextFormatter.FormatAndGetSize ().Width,
+                                          Math.Min (screenBounds.Width - 4, borderBounds.Width - 4)
+                                          )
+                                      );
+        Parent.TitleTextFormatter.Size = new (maxTitleWidth, 1);
 
         int sideLineLength = borderBounds.Height;
-        bool canDrawBorder = borderBounds.Width > 0 && borderBounds.Height > 0;
+        bool canDrawBorder = borderBounds is { Width: > 0, Height: > 0 };
 
         if (!string.IsNullOrEmpty (Parent?.Title))
         {

@@ -46,6 +46,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Using Include="System.Drawing" />
     <Using Include="Terminal.Gui" />
     <Using Include="Xunit" />
   </ItemGroup>

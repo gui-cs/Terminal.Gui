@@ -310,10 +310,10 @@ internal class WindowsConsole
             return Size.Empty;
         }
 
-        var sz = new Size (
-                           csbi.srWindow.Right - csbi.srWindow.Left + 1,
-                           csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
-        position = new Point (csbi.srWindow.Left, csbi.srWindow.Top);
+        Size sz = new (
+                       csbi.srWindow.Right - csbi.srWindow.Left + 1,
+                       csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
+        position = new (csbi.srWindow.Left, csbi.srWindow.Top);
 
         return sz;
     }
@@ -328,10 +328,10 @@ internal class WindowsConsole
             throw new Win32Exception (Marshal.GetLastWin32Error ());
         }
 
-        var sz = new Size (
-                           csbi.srWindow.Right - csbi.srWindow.Left + 1,
-                           csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
-        position = new Point (csbi.srWindow.Left, csbi.srWindow.Top);
+        Size sz = new (
+                       csbi.srWindow.Right - csbi.srWindow.Left + 1,
+                       csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
+        position = new (csbi.srWindow.Left, csbi.srWindow.Top);
 
         return sz;
     }
@@ -363,12 +363,12 @@ internal class WindowsConsole
         if (!SetConsoleWindowInfo (_outputHandle, true, ref winRect))
         {
             //throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
-            return new Size (cols, rows);
+            return new (cols, rows);
         }
 
         SetConsoleOutputWindow (csbi);
 
-        return new Size (winRect.Right + 1, newRows - 1 < 0 ? 0 : winRect.Bottom + 1);
+        return new (winRect.Right + 1, newRows - 1 < 0 ? 0 : winRect.Bottom + 1);
     }
 
     private void SetConsoleOutputWindow (CONSOLE_SCREEN_BUFFER_INFOEX csbi)
@@ -396,10 +396,10 @@ internal class WindowsConsole
             throw new Win32Exception (Marshal.GetLastWin32Error ());
         }
 
-        var sz = new Size (
+        Size sz = new (
                            csbi.srWindow.Right - csbi.srWindow.Left + 1,
                            Math.Max (csbi.srWindow.Bottom - csbi.srWindow.Top + 1, 0));
-        position = new Point (csbi.srWindow.Left, csbi.srWindow.Top);
+        position = new (csbi.srWindow.Left, csbi.srWindow.Top);
         SetConsoleOutputWindow (csbi);
         var winRect = new SmallRect (0, 0, (short)(sz.Width - 1), (short)Math.Max (sz.Height - 1, 0));
 
@@ -1259,7 +1259,7 @@ internal class WindowsDriver : ConsoleDriver
 
         if (!RunningUnitTests
             && WinConsole != null
-            && !WinConsole.WriteToConsole (new Size (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion, Force16Colors))
+            && !WinConsole.WriteToConsole (new (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion, Force16Colors))
         {
             int err = Marshal.GetLastWin32Error ();
 
@@ -1330,7 +1330,8 @@ internal class WindowsDriver : ConsoleDriver
         CurrentAttribute = new Attribute (Color.White, Color.Black);
 
         _outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
-        Clip = new Rectangle (0, 0, Cols, Rows);
+        // CONCURRENCY: Unsynchronized access to Clip is not safe.
+        Clip = new (0, 0, Cols, Rows);
 
         _damageRegion = new WindowsConsole.SmallRect
         {
@@ -1446,7 +1447,7 @@ internal class WindowsDriver : ConsoleDriver
 
         ResizeScreen ();
         ClearContents ();
-        OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
+        OnSizeChanged (new SizeChangedEventArgs (new (Cols, Rows)));
     }
 #endif
 
@@ -1725,7 +1726,8 @@ internal class WindowsDriver : ConsoleDriver
     private void ResizeScreen ()
     {
         _outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
-        Clip = new Rectangle (0, 0, Cols, Rows);
+        // CONCURRENCY: Unsynchronized access to Clip is not safe.
+        Clip = new (0, 0, Cols, Rows);
 
         _damageRegion = new WindowsConsole.SmallRect
         {

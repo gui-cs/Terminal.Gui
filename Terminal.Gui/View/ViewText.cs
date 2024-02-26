@@ -152,7 +152,7 @@ public partial class View
                                ? 0
                                : Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical);
 
-        return new Size (newWidth, newHeight);
+        return new (newWidth, newHeight);
     }
 
     /// <summary>
@@ -216,10 +216,10 @@ public partial class View
     /// <returns></returns>
     internal Size GetSizeNeededForTextWithoutHotKey ()
     {
-        return new Size (
-                         TextFormatter.Size.Width - GetHotKeySpecifierLength (),
-                         TextFormatter.Size.Height - GetHotKeySpecifierLength (false)
-                        );
+        return new (
+                    TextFormatter.Size.Width - GetHotKeySpecifierLength (),
+                    TextFormatter.Size.Height - GetHotKeySpecifierLength (false)
+                   );
     }
 
     /// <summary>
@@ -247,7 +247,7 @@ public partial class View
             return;
         }
 
-        TextFormatter.Size = new Size (
+        TextFormatter.Size = new (
                                        ContentArea.Size.Width + GetHotKeySpecifierLength (),
                                        ContentArea.Size.Height + GetHotKeySpecifierLength (false)
                                       );
@@ -257,10 +257,10 @@ public partial class View
     {
         Rectangle rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
 
-        autoSize = new Size (
-                             rect.Size.Width - GetHotKeySpecifierLength (),
-                             rect.Size.Height - GetHotKeySpecifierLength (false)
-                            );
+        autoSize = new (
+                        rect.Size.Width - GetHotKeySpecifierLength (),
+                        rect.Size.Height - GetHotKeySpecifierLength (false)
+                       );
 
         return !((ValidatePosDim && (!(Width is Dim.DimAbsolute) || !(Height is Dim.DimAbsolute)))
                  || _frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength ()
@@ -317,7 +317,7 @@ public partial class View
         {
             if (!IsInitialized)
             {
-                sizeRequired = new Size (0, 0);
+                sizeRequired = Size.Empty;
 
                 return false;
             }
@@ -338,7 +338,7 @@ public partial class View
                     if (_frame.Width < colWidth
                         && (Width is null || (ContentArea.Width >= 0 && Width is Dim.DimAbsolute && Width.Anchor (0) >= 0 && Width.Anchor (0) < colWidth)))
                     {
-                        sizeRequired = new Size (colWidth, ContentArea.Height);
+                        sizeRequired = new (colWidth, ContentArea.Height);
 
                         return true;
                     }
@@ -347,7 +347,7 @@ public partial class View
                 default:
                     if (_frame.Height < 1 && (Height is null || (Height is Dim.DimAbsolute && Height.Anchor (0) == 0)))
                     {
-                        sizeRequired = new Size (ContentArea.Width, 1);
+                        sizeRequired = new (ContentArea.Width, 1);
 
                         return true;
                     }
@@ -363,7 +363,7 @@ public partial class View
             // TODO: This is a hack.
             //_width  = size.Width;
             //_height = size.Height;
-            _frame = new Rectangle (_frame.Location, size);
+            _frame = new (_frame.Location, size);
 
             //throw new InvalidOperationException ("This is a hack.");
             return true;

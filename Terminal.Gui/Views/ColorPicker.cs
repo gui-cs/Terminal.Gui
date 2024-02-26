@@ -223,7 +223,7 @@ public class ColorPicker : View
 
         if (selected)
         {
-            DrawFocusRect (new Rectangle (x * BoxWidth, y * BoxHeight, BoxWidth, BoxHeight));
+            DrawFocusRect (new (x * BoxWidth, y * BoxHeight, BoxWidth, BoxHeight));
         }
     }
 
@@ -244,7 +244,7 @@ public class ColorPicker : View
             lc.AddLine (rect.Location, rect.Width, Orientation.Horizontal, LineStyle.Dotted);
 
             lc.AddLine (
-                        new Point (rect.Location.X, rect.Location.Y + rect.Height - 1),
+                        rect.Location with { Y = rect.Location.Y + rect.Height - 1 },
                         rect.Width,
                         Orientation.Horizontal,
                         LineStyle.Dotted
@@ -253,7 +253,7 @@ public class ColorPicker : View
             lc.AddLine (rect.Location, rect.Height, Orientation.Vertical, LineStyle.Dotted);
 
             lc.AddLine (
-                        new Point (rect.Location.X + rect.Width - 1, rect.Location.Y),
+                        rect.Location with { X = rect.Location.X + rect.Width - 1 },
                         rect.Height,
                         Orientation.Vertical,
                         LineStyle.Dotted

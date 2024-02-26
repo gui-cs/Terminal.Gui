@@ -103,8 +103,8 @@ public class MouseTests
         bool expectedClicked
     )
     {
-        var size = new Size (10, 10);
-        var pos = new Point (offset, offset);
+        Size size = new (10, 10);
+        Point pos = new (offset, offset);
 
         var clicked = false;
         Application.Top.X = pos.X;
@@ -189,8 +189,8 @@ public class MouseTests
         bool expectedClicked
     )
     {
-        var size = new Size (10, 10);
-        var pos = new Point (offset, offset);
+        Size size = new (10, 10);
+        Point pos = new (offset, offset);
 
         var clicked = false;
 
@@ -231,7 +231,7 @@ public class MouseTests
     public void MouseGrabView_WithNullMouseEventView ()
     {
         var tf = new TextField { Width = 10 };
-        var sv = new ScrollView { Width = Dim.Fill (), Height = Dim.Fill (), ContentSize = new Size (100, 100) };
+        var sv = new ScrollView { Width = Dim.Fill (), Height = Dim.Fill (), ContentSize = new (100, 100) };
 
         sv.Add (tf);
         Application.Top.Add (sv);

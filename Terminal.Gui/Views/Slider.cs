@@ -773,11 +773,13 @@ public class Slider<T> : View
             return;
         }
 
+        Thickness adornmentsThickness = GetAdornmentsThickness ();
+
         if (_config._sliderOrientation == Orientation.Horizontal)
         {
-            ContentArea = new Rectangle (
+            ContentArea = new (
                                          ContentArea.Location,
-                                         new Size (
+                                         new (
                                                    int.Min (
                                                             SuperView.ContentArea.Width - GetAdornmentsThickness ().Horizontal,
                                                             CalcBestLength ()
@@ -791,9 +793,9 @@ public class Slider<T> : View
         }
         else
         {
-            ContentArea = new Rectangle (
+            ContentArea = new (
                                          ContentArea.Location,
-                                         new Size (
+                                         new (
                                                    int.Min (
                                                             SuperView.ContentArea.Width - GetAdornmentsThickness ().Horizontal,
                                                             CalcThickness ()

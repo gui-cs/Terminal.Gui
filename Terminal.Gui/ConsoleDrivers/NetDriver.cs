@@ -408,7 +408,7 @@ internal class NetEvents : IDisposable
         _inputQueue.Enqueue (
                              new InputResult
                              {
-                                 EventType = EventType.WindowSize, WindowSizeEvent = new WindowSizeEvent { Size = new Size (w, h) }
+                                 EventType = EventType.WindowSize, WindowSizeEvent = new WindowSizeEvent { Size = new (w, h) }
                              }
                             );
 
@@ -1148,7 +1148,7 @@ internal class NetDriver : ConsoleDriver
                 ResizeScreen ();
                 ClearContents ();
                 _winSizeChanging = false;
-                OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
+                OnSizeChanged (new SizeChangedEventArgs (new (Cols, Rows)));
 
                 break;
             case EventType.RequestResponse:
@@ -1203,13 +1203,17 @@ internal class NetDriver : ConsoleDriver
                 }
 #pragma warning restore CA1416
             }
+            // INTENT: Why are these eating the exceptions?
+            // Comments would be good here.
             catch (IOException)
             {
-                Clip = new Rectangle (0, 0, Cols, Rows);
+                // CONCURRENCY: Unsynchronized access to Clip is not safe.
+                Clip = new (0, 0, Cols, Rows);
             }
             catch (ArgumentOutOfRangeException)
             {
-                Clip = new Rectangle (0, 0, Cols, Rows);
+                // CONCURRENCY: Unsynchronized access to Clip is not safe.
+                Clip = new (0, 0, Cols, Rows);
             }
         }
         else
@@ -1217,7 +1221,8 @@ internal class NetDriver : ConsoleDriver
             Console.Out.Write (EscSeqUtils.CSI_SetTerminalWindowSize (Rows, Cols));
         }
 
-        Clip = new Rectangle (0, 0, Cols, Rows);
+        // CONCURRENCY: Unsynchronized access to Clip is not safe.
+        Clip = new (0, 0, Cols, Rows);
     }
 
     #endregion
