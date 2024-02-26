@@ -744,7 +744,7 @@ public static class EscSeqUtils
             }
         }
 
-        mouseFlags = new List<MouseFlags> { MouseFlags.AllEvents };
+        mouseFlags = [MouseFlags.AllEvents];
 
         if (lastMouseButtonPressed != null
             && !isButtonPressed
@@ -771,10 +771,7 @@ public static class EscSeqUtils
             lastMouseButtonPressed = buttonState;
             isButtonPressed = true;
 
-            if (point is null)
-            {
-                point = pos;
-            }
+            point ??= pos;
 
             if ((mouseFlags [0] & MouseFlags.ReportMousePosition) == 0)
             {
