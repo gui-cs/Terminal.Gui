@@ -299,52 +299,38 @@ public static class EscSeqUtils
         }
     }
 
+    #nullable enable
     /// <summary>
     ///     Gets the c1Control used in the called escape sequence.
     /// </summary>
     /// <param name="c">The char used.</param>
     /// <returns>The c1Control.</returns>
-    public static string GetC1ControlChar (char c)
+    [Pure]
+    public static string GetC1ControlChar (in char c)
     {
         // These control characters are used in the vtXXX emulation.
-        switch (c)
-        {
-            case 'D':
-                return "IND"; // Index
-            case 'E':
-                return "NEL"; // Next Line
-            case 'H':
-                return "HTS"; // Tab Set
-            case 'M':
-                return "RI"; // Reverse Index
-            case 'N':
-                return "SS2"; // Single Shift Select of G2 Character Set: affects next character only
-            case 'O':
-                return "SS3"; // Single Shift Select of G3 Character Set: affects next character only
-            case 'P':
-                return "DCS"; // Device Control String
-            case 'V':
-                return "SPA"; // Start of Guarded Area
-            case 'W':
-                return "EPA"; // End of Guarded Area
-            case 'X':
-                return "SOS"; // Start of String
-            case 'Z':
-                return "DECID"; // Return Terminal ID Obsolete form of CSI c (DA)
-            case '[':
-                return "CSI"; // Control Sequence Introducer
-            case '\\':
-                return "ST"; // String Terminator
-            case ']':
-                return "OSC"; // Operating System Command
-            case '^':
-                return "PM"; // Privacy Message
-            case '_':
-                return "APC"; // Application Program Command
-            default:
-                return ""; // Not supported
-        }
+        return c switch
+               {
+                   'D' => "IND", // Index
+                   'E' => "NEL", // Next Line
+                   'H' => "HTS", // Tab Set
+                   'M' => "RI", // Reverse Index
+                   'N' => "SS2", // Single Shift Select of G2 Character Set: affects next character only
+                   'O' => "SS3", // Single Shift Select of G3 Character Set: affects next character only
+                   'P' => "DCS", // Device Control String
+                   'V' => "SPA", // Start of Guarded Area
+                   'W' => "EPA", // End of Guarded Area
+                   'X' => "SOS", // Start of String
+                   'Z' => "DECID", // Return Terminal ID Obsolete form of CSI c (DA)
+                   '[' => "CSI", // Control Sequence Introducer
+                   '\\' => "ST", // String Terminator
+                   ']' => "OSC", // Operating System Command
+                   '^' => "PM", // Privacy Message
+                   '_' => "APC", // Application Program Command
+                   _ => string.Empty
+               };
     }
+    #nullable restore
 
     /// <summary>
     ///     Gets the <see cref="ConsoleKey"/> depending on terminating and value.
