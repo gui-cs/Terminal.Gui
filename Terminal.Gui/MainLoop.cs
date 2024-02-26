@@ -105,6 +105,11 @@ internal class MainLoop : IDisposable
     ///     </para>
     /// </remarks>
     /// <param name="idleHandler">Token that can be used to remove the idle handler with <see cref="RemoveIdle(Func{bool})"/> .</param>
+    // QUESTION: Why are we re-inventing the event wheel here?
+    // PERF: This is heavy.
+    // CONCURRENCY: Race conditions exist here.
+    // CONCURRENCY: null delegates will hose this.
+    // 
     internal Func<bool> AddIdle (Func<bool> idleHandler)
     {
         lock (_idleHandlersLock)
@@ -325,6 +330,10 @@ internal class MainLoop : IDisposable
         return k;
     }
 
+    // PERF: This is heavier than it looks.
+    // CONCURRENCY: Potential deadlock city here.
+    // CONCURRENCY: Multiple concurrency pitfalls on the delegates themselves.
+    // INTENT: It looks like the general architecture here is trying to be a form of publisher/consumer pattern.
     private void RunIdle ()
     {
         List<Func<bool>> iterate;
