@@ -888,13 +888,6 @@ public partial class View
     protected void ClearLayoutNeeded ()
     {
         LayoutNeeded = false;
-
-        if (Margin is { })
-        {
-            Margin.LayoutNeeded = false;
-            Border.LayoutNeeded = false;
-            Margin.LayoutNeeded = false;
-        }
     }
 
     internal void CollectAll (View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
