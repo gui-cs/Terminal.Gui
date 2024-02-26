@@ -443,6 +443,7 @@ public static class EscSeqUtils
 
             if (char.IsDigit (c))
             {
+                // PERF: Ouch
                 values [valueIdx] += c.ToString ();
             }
             else if (c == ';')
@@ -451,10 +452,12 @@ public static class EscSeqUtils
             }
             else if (valueIdx == nSep - 1 || i == kChar.Length - 1)
             {
+                // PERF: Ouch
                 terminating += c.ToString ();
             }
             else
             {
+                // PERF: Ouch
                 code += c.ToString ();
             }
         }
@@ -467,6 +470,7 @@ public static class EscSeqUtils
     /// </summary>
     /// <param name="cki"></param>
     /// <returns>The char array of the escape sequence.</returns>
+    // PERF: This is expensive
     public static char [] GetKeyCharArray (ConsoleKeyInfo [] cki)
     {
         char [] kChar = { };
@@ -778,6 +782,8 @@ public static class EscSeqUtils
                 Application.MainLoop.AddIdle (
                                               () =>
                                               {
+                                                  // INTENT: What's this trying to do?
+                                                  // The task itself is not awaited.
                                                   Task.Run (
                                                             async () => await ProcessContinuousButtonPressedAsync (
                                                                          buttonState,
@@ -1085,6 +1091,9 @@ public static class EscSeqUtils
 
     private static async Task ProcessContinuousButtonPressedAsync (MouseFlags mouseFlag, Action<MouseFlags, Point> continuousButtonPressedHandler)
     {
+        // PERF: Pause and poll in a hot loop.
+        // This should be replaced with event dispatch and a synchronization primitive such as AutoResetEvent.
+        // Will make a massive difference in responsiveness.
         while (isButtonPressed)
         {
             await Task.Delay (100);
