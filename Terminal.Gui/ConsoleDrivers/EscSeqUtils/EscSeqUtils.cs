@@ -347,120 +347,38 @@ public static class EscSeqUtils
     /// <returns>The <see cref="ConsoleKey"/> and probably the <see cref="ConsoleModifiers"/>.</returns>
     public static ConsoleKey GetConsoleKey (char terminator, string value, ref ConsoleModifiers mod)
     {
-        ConsoleKey key;
-
-        switch (terminator)
+        if (terminator == 'Z')
         {
-            case 'A':
-                key = ConsoleKey.UpArrow;
-
-                break;
-            case 'B':
-                key = ConsoleKey.DownArrow;
-
-                break;
-            case 'C':
-                key = ConsoleKey.RightArrow;
-
-                break;
-            case 'D':
-                key = ConsoleKey.LeftArrow;
-
-                break;
-            case 'F':
-                key = ConsoleKey.End;
-
-                break;
-            case 'H':
-                key = ConsoleKey.Home;
-
-                break;
-            case 'P':
-                key = ConsoleKey.F1;
-
-                break;
-            case 'Q':
-                key = ConsoleKey.F2;
-
-                break;
-            case 'R':
-                key = ConsoleKey.F3;
-
-                break;
-            case 'S':
-                key = ConsoleKey.F4;
-
-                break;
-            case 'Z':
-                key = ConsoleKey.Tab;
-                mod |= ConsoleModifiers.Shift;
-
-                break;
-            case '~':
-                switch (value)
-                {
-                    case "2":
-                        key = ConsoleKey.Insert;
-
-                        break;
-                    case "3":
-                        key = ConsoleKey.Delete;
-
-                        break;
-                    case "5":
-                        key = ConsoleKey.PageUp;
-
-                        break;
-                    case "6":
-                        key = ConsoleKey.PageDown;
-
-                        break;
-                    case "15":
-                        key = ConsoleKey.F5;
-
-                        break;
-                    case "17":
-                        key = ConsoleKey.F6;
-
-                        break;
-                    case "18":
-                        key = ConsoleKey.F7;
-
-                        break;
-                    case "19":
-                        key = ConsoleKey.F8;
-
-                        break;
-                    case "20":
-                        key = ConsoleKey.F9;
-
-                        break;
-                    case "21":
-                        key = ConsoleKey.F10;
-
-                        break;
-                    case "23":
-                        key = ConsoleKey.F11;
-
-                        break;
-                    case "24":
-                        key = ConsoleKey.F12;
-
-                        break;
-                    default:
-                        key = 0;
-
-                        break;
-                }
-
-                break;
-            default:
-                key = 0;
-
-                break;
+            mod |= ConsoleModifiers.Shift;
         }
 
-        return key;
+        return (terminator, value) switch
+               {
+                   ('A', _) => ConsoleKey.UpArrow,
+                   ('B', _) => ConsoleKey.DownArrow,
+                   ('C', _) => ConsoleKey.RightArrow,
+                   ('D', _) => ConsoleKey.LeftArrow,
+                   ('F', _) => ConsoleKey.End,
+                   ('H', _) => ConsoleKey.Home,
+                   ('P', _) => ConsoleKey.F1,
+                   ('Q', _) => ConsoleKey.F2,
+                   ('R', _) => ConsoleKey.F3,
+                   ('S', _) => ConsoleKey.F4,
+                   ('Z', _) => ConsoleKey.Tab,
+                   ('~', "2") => ConsoleKey.Insert,
+                   ('~', "3") => ConsoleKey.Delete,
+                   ('~', "5") => ConsoleKey.PageUp,
+                   ('~', "6") => ConsoleKey.PageDown,
+                   ('~', "15") => ConsoleKey.F5,
+                   ('~', "17") => ConsoleKey.F6,
+                   ('~', "18") => ConsoleKey.F7,
+                   ('~', "19") => ConsoleKey.F8,
+                   ('~', "20") => ConsoleKey.F9,
+                   ('~', "21") => ConsoleKey.F10,
+                   ('~', "23") => ConsoleKey.F11,
+                   ('~', "24") => ConsoleKey.F12,
+                   (_, _) => 0
+               };
     }
 
     /// <summary>
