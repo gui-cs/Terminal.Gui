@@ -15,7 +15,7 @@ public class ContextMenuTests
     public void ContextMenu_Constructors ()
     {
         var cm = new ContextMenu ();
-        Assert.Equal (new Point (0, 0), cm.Position);
+        Assert.Equal (Point.Empty, cm.Position);
         Assert.Empty (cm.MenuItems.Children);
         Assert.Null (cm.Host);
         cm.Position = new Point (20, 10);
@@ -1014,7 +1014,7 @@ public class ContextMenuTests
 
         var cm = new ContextMenu
         {
-            Position = new Point (0, 0),
+            Position = Point.Empty,
             MenuItems = new MenuBarItem (
                                          [
                                              new MenuItem ("One", "", null),
@@ -1023,10 +1023,10 @@ public class ContextMenuTests
                                         )
         };
 
-        Assert.Equal (new Point (0, 0), cm.Position);
+        Assert.Equal (Point.Empty, cm.Position);
 
         cm.Show ();
-        Assert.Equal (new Point (0, 0), cm.Position);
+        Assert.Equal (Point.Empty, cm.Position);
         Application.Begin (Application.Top);
 
         var expected = @"
@@ -1038,7 +1038,7 @@ public class ContextMenuTests
         Assert.Equal (new Rectangle (0, 0, 8, 3), pos);
 
         cm.Hide ();
-        Assert.Equal (new Point (0, 0), cm.Position);
+        Assert.Equal (Point.Empty, cm.Position);
     }
 
     [Fact]
@@ -1049,7 +1049,7 @@ public class ContextMenuTests
 
         var cm = new ContextMenu
         {
-            Position = new Point (0, 0),
+            Position = Point.Empty,
             MenuItems = new MenuBarItem (
                                          [
                                              new MenuItem ("One", "", null),
@@ -1058,10 +1058,10 @@ public class ContextMenuTests
                                         )
         };
 
-        Assert.Equal (new Point (0, 0), cm.Position);
+        Assert.Equal (Point.Empty, cm.Position);
 
         cm.Show ();
-        Assert.Equal (new Point (0, 0), cm.Position);
+        Assert.Equal (Point.Empty, cm.Position);
         Application.Begin (Application.Top);
 
         var expected = @"
@@ -1074,7 +1074,7 @@ public class ContextMenuTests
         Assert.Equal (new Rectangle (0, 1, 5, 4), pos);
 
         cm.Hide ();
-        Assert.Equal (new Point (0, 0), cm.Position);
+        Assert.Equal (Point.Empty, cm.Position);
     }
 
     [Fact]

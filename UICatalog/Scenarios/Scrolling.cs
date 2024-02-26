@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using Terminal.Gui;
 
@@ -28,9 +28,9 @@ public class Scrolling : Scenario
             Width = 50,
             Height = 20,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
-            ContentSize = new Size (200, 100),
+            ContentSize = new (200, 100),
 
-            //ContentOffset = new Point (0, 0),
+            //ContentOffset = Point.Empty,
             ShowVerticalScrollIndicator = true,
             ShowHorizontalScrollIndicator = true
         };
@@ -218,13 +218,13 @@ public class Scrolling : Scenario
         keepCheckBox.Toggled += (s, e) => scrollView.KeepContentAlwaysInViewport = (bool)keepCheckBox.Checked;
         Win.Add (keepCheckBox);
 
-        //var scrollView2 = new ScrollView (new Rect (55, 2, 20, 8)) {
-        //	ContentSize = new Size (20, 50),
-        //	//ContentOffset = new Point (0, 0),
+        //var scrollView2 = new ScrollView (new (55, 2, 20, 8)) {
+        //	ContentSize = new (20, 50),
+        //	//ContentOffset = Point.Empty,
         //	ShowVerticalScrollIndicator = true,
         //	ShowHorizontalScrollIndicator = true
         //};
-        //var filler = new Filler (new Rect (0, 0, 60, 40));
+        //var filler = new Filler (new (0, 0, 60, 40));
         //scrollView2.Add (filler);
         //scrollView2.DrawContent += (s,e) => {
         //	scrollView2.ContentSize = filler.GetContentSize ();
@@ -232,8 +232,8 @@ public class Scrolling : Scenario
         //Win.Add (scrollView2);
 
         //// This is just to debug the visuals of the scrollview when small
-        //var scrollView3 = new ScrollView (new Rect (55, 15, 3, 3)) {
-        //	ContentSize = new Size (100, 100),
+        //var scrollView3 = new ScrollView (new (55, 15, 3, 3)) {
+        //	ContentSize = new (100, 100),
         //	ShowVerticalScrollIndicator = true,
         //	ShowHorizontalScrollIndicator = true
         //};

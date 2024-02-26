@@ -398,12 +398,12 @@ public static class MessageBox
 
                         if (wrapMessage)
                         {
-                            messageLabel.TextFormatter.Size = new Size (
-                                                                        maxBounds.Size.Width
-                                                                        - d.GetAdornmentsThickness ().Horizontal,
-                                                                        maxBounds.Size.Height
-                                                                        - d.GetAdornmentsThickness ().Vertical
-                                                                       );
+                            messageLabel.TextFormatter.Size = new (
+                                                                   maxBounds.Size.Width
+                                                                   - d.GetAdornmentsThickness ().Horizontal,
+                                                                   maxBounds.Size.Height
+                                                                   - d.GetAdornmentsThickness ().Vertical
+                                                                  );
                         }
 
                         string msg = messageLabel.TextFormatter.Format ();

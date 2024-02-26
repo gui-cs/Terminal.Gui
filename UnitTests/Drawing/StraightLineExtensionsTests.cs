@@ -12,7 +12,7 @@ public class StraightLineExtensionsTests
     public void LineCanvasIntegrationTest ()
     {
         var lc = new LineCanvas ();
-        lc.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Single);
+        lc.AddLine (Point.Empty, 10, Orientation.Horizontal, LineStyle.Single);
         lc.AddLine (new Point (9, 0), 5, Orientation.Vertical, LineStyle.Single);
         lc.AddLine (new Point (9, 4), -10, Orientation.Horizontal, LineStyle.Single);
         lc.AddLine (new Point (0, 4), -5, Orientation.Vertical, LineStyle.Single);
@@ -29,7 +29,7 @@ public class StraightLineExtensionsTests
                                 );
         IReadOnlyCollection<StraightLine> origLines = lc.Lines;
 
-        lc = new LineCanvas (origLines.Exclude (new Point (0, 0), 10, Orientation.Horizontal));
+        lc = new LineCanvas (origLines.Exclude (Point.Empty, 10, Orientation.Horizontal));
 
         TestHelpers.AssertEqual (
                                  _output,
@@ -92,7 +92,7 @@ public class StraightLineExtensionsTests
                                  $"{Environment.NewLine}{lc}"
                                 );
 
-        lc = new LineCanvas (origLines.Exclude (new Point (0, 0), 10, Orientation.Vertical));
+        lc = new LineCanvas (origLines.Exclude (Point.Empty, 10, Orientation.Vertical));
 
         TestHelpers.AssertEqual (
                                  _output,
@@ -395,7 +395,7 @@ public class StraightLineExtensionsTests
         StraightLine [] after = new [] { l1 }
 
                                 // exclude x=0 y=0-10
-                                .Exclude (new Point (0, 0), 10, Orientation.Vertical)
+                                .Exclude (Point.Empty, 10, Orientation.Vertical)
                                 .ToArray ();
 
         // Exclusion line is too far to the left so hits nothing
@@ -471,7 +471,7 @@ public class StraightLineExtensionsTests
         StraightLine [] after = new [] { l1 }
 
                                 // exclude y=0 x=0-10
-                                .Exclude (new Point (0, 0), 10, Orientation.Horizontal)
+                                .Exclude (Point.Empty, 10, Orientation.Horizontal)
                                 .ToArray ();
 
         // Exclusion line is too far above so hits nothing

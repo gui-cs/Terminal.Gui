@@ -43,12 +43,11 @@ public class TextFormatterTests
     public void Basic_Usage ()
     {
         var testText = "test";
-        var expectedSize = new Size ();
         var testBounds = new Rectangle (0, 0, 100, 1);
         var tf = new TextFormatter ();
 
         tf.Text = testText;
-        expectedSize = new Size (testText.Length, 1);
+        Size expectedSize = new (testText.Length, 1);
         Assert.Equal (testText, tf.Text);
         Assert.Equal (TextAlignment.Left, tf.Alignment);
         Assert.Equal (expectedSize, tf.Size);
@@ -57,7 +56,7 @@ public class TextFormatterTests
         Assert.NotEmpty (tf.GetLines ());
 
         tf.Alignment = TextAlignment.Right;
-        expectedSize = new Size (testText.Length, 1);
+        expectedSize = new (testText.Length, 1);
         Assert.Equal (testText, tf.Text);
         Assert.Equal (TextAlignment.Right, tf.Alignment);
         Assert.Equal (expectedSize, tf.Size);
@@ -66,7 +65,7 @@ public class TextFormatterTests
         Assert.NotEmpty (tf.GetLines ());
 
         tf.Alignment = TextAlignment.Right;
-        expectedSize = new Size (testText.Length * 2, 1);
+        expectedSize = new (testText.Length * 2, 1);
         tf.Size = expectedSize;
         Assert.Equal (testText, tf.Text);
         Assert.Equal (TextAlignment.Right, tf.Alignment);
@@ -76,7 +75,7 @@ public class TextFormatterTests
         Assert.NotEmpty (tf.GetLines ());
 
         tf.Alignment = TextAlignment.Centered;
-        expectedSize = new Size (testText.Length * 2, 1);
+        expectedSize = new (testText.Length * 2, 1);
         tf.Size = expectedSize;
         Assert.Equal (testText, tf.Text);
         Assert.Equal (TextAlignment.Centered, tf.Alignment);
@@ -92,8 +91,8 @@ public class TextFormatterTests
     public void CalcRect_Invalid_Returns_Empty (string text)
     {
         Assert.Equal (Rectangle.Empty, TextFormatter.CalcRect (0, 0, text));
-        Assert.Equal (new Rectangle (new Point (1, 2), Size.Empty), TextFormatter.CalcRect (1, 2, text));
-        Assert.Equal (new Rectangle (new Point (-1, -2), Size.Empty), TextFormatter.CalcRect (-1, -2, text));
+        Assert.Equal (new (new (1, 2), Size.Empty), TextFormatter.CalcRect (1, 2, text));
+        Assert.Equal (new (new (-1, -2), Size.Empty), TextFormatter.CalcRect (-1, -2, text));
     }
 
     [Theory]
@@ -109,7 +108,7 @@ public class TextFormatterTests
     [InlineData (" ~  s  gui.cs   master\n↑10", 27, 2)]
     public void CalcRect_MultiLine_Returns_nHigh (string text, int expectedWidth, int expectedLines)
     {
-        Assert.Equal (new Rectangle (0, 0, expectedWidth, expectedLines), TextFormatter.CalcRect (0, 0, text));
+        Assert.Equal (new (0, 0, expectedWidth, expectedLines), TextFormatter.CalcRect (0, 0, text));
         string [] lines = text.Split (text.Contains (Environment.NewLine) ? Environment.NewLine : "\n");
         int maxWidth = lines.Max (s => s.GetColumns ());
         var lineWider = 0;
@@ -124,15 +123,15 @@ public class TextFormatterTests
             }
         }
 
-        Assert.Equal (new Rectangle (0, 0, maxWidth, expectedLines), TextFormatter.CalcRect (0, 0, text));
+        Assert.Equal (new (0, 0, maxWidth, expectedLines), TextFormatter.CalcRect (0, 0, text));
 
         Assert.Equal (
-                      new Rectangle (
-                                0,
-                                0,
-                                lines [lineWider].ToRuneList ().Sum (r => Math.Max (r.GetColumns (), 0)),
-                                expectedLines
-                               ),
+                      new (
+                           0,
+                           0,
+                           lines [lineWider].ToRuneList ().Sum (r => Math.Max (r.GetColumns (), 0)),
+                           expectedLines
+                          ),
                       TextFormatter.CalcRect (0, 0, text)
                      );
     }
@@ -142,8 +141,8 @@ public class TextFormatterTests
     [InlineData (" ~  s  gui.cs   master ↑10")]
     public void CalcRect_SingleLine_Returns_1High (string text)
     {
-        Assert.Equal (new Rectangle (0, 0, text.GetRuneCount (), 1), TextFormatter.CalcRect (0, 0, text));
-        Assert.Equal (new Rectangle (0, 0, text.GetColumns (), 1), TextFormatter.CalcRect (0, 0, text));
+        Assert.Equal (new (0, 0, text.GetRuneCount (), 1), TextFormatter.CalcRect (0, 0, text));
+        Assert.Equal (new (0, 0, text.GetColumns (), 1), TextFormatter.CalcRect (0, 0, text));
     }
 
     [Theory]
@@ -152,7 +151,7 @@ public class TextFormatterTests
     public void CalcRect_With_Combining_Runes (int width, int height, TextDirection textDirection)
     {
         var text = "Les Mise\u0328\u0301rables";
-        Assert.Equal (new Rectangle (0, 0, width, height), TextFormatter.CalcRect (0, 0, text, textDirection));
+        Assert.Equal (new (0, 0, width, height), TextFormatter.CalcRect (0, 0, text, textDirection));
     }
 
     [Theory]
@@ -406,16 +405,16 @@ ssb
 
         if (textDirection == TextDirection.LeftRight_TopBottom)
         {
-            Assert.Equal (new Size (width, height), tf.Size);
+            Assert.Equal (new (width, height), tf.Size);
         }
         else
         {
-            Assert.Equal (new Size (1, text.GetColumns ()), tf.Size);
-            tf.Size = new Size (width, height);
+            Assert.Equal (new (1, text.GetColumns ()), tf.Size);
+            tf.Size = new (width, height);
         }
 
         tf.Draw (
-                 new Rectangle (0, 0, width, height),
+                 new (0, 0, width, height),
                  new Attribute (ColorName.White, ColorName.Black),
                  new Attribute (ColorName.Blue, ColorName.Black),
                  default (Rectangle),
@@ -437,10 +436,10 @@ ssb
             Attribute.Default, new Attribute (ColorName.Green, ColorName.BrightMagenta),
             new Attribute (ColorName.Blue, ColorName.Cyan)
         };
-        var tf = new TextFormatter { Size = new Size (14, 3), Text = "Test\nTest long\nTest long long\n", MultiLine = true };
+        var tf = new TextFormatter { Size = new (14, 3), Text = "Test\nTest long\nTest long long\n", MultiLine = true };
 
         tf.Draw (
-                 new Rectangle (1, 1, 19, 3),
+                 new (1, 1, 19, 3),
                  attrs [1],
                  attrs [2]);
 
@@ -466,7 +465,7 @@ ssb
         tf.FillRemaining = true;
 
         tf.Draw (
-                 new Rectangle (1, 1, 19, 3),
+                 new (1, 1, 19, 3),
                  attrs [1],
                  attrs [2]);
 
@@ -1182,7 +1181,7 @@ ssb
     {
         var tf = new TextFormatter
         {
-            Text = text, Size = new Size (maxWidth, maxHeight), WordWrap = false, MultiLine = multiLine
+            Text = text, Size = new (maxWidth, maxHeight), WordWrap = false, MultiLine = multiLine
         };
 
         Assert.False (tf.AutoSize);
@@ -1266,7 +1265,7 @@ ssb
         var tf = new TextFormatter
         {
             Text = text,
-            Size = new Size (maxWidth, maxHeight),
+            Size = new (maxWidth, maxHeight),
             WordWrap = false,
             MultiLine = multiLine,
             Direction = TextDirection.TopBottom_LeftRight
@@ -1297,7 +1296,7 @@ ssb
         tf.Draw (testBounds, new Attribute (), new Attribute ());
         Assert.False (tf.NeedsFormat);
 
-        tf.Size = new Size (1, 1);
+        tf.Size = new (1, 1);
         Assert.True (tf.NeedsFormat);
         Assert.NotEmpty (tf.GetLines ());
         Assert.False (tf.NeedsFormat); // get_Lines causes a Format
@@ -2057,10 +2056,10 @@ ssb
 
         Assert.True (tf.WordWrap);
         Assert.False (tf.PreserveTrailingSpaces);
-        Assert.Equal (new Size (width, height), tf.Size);
+        Assert.Equal (new (width, height), tf.Size);
 
         tf.Draw (
-                 new Rectangle (0, 0, width, height),
+                 new (0, 0, width, height),
                  new Attribute (ColorName.White, ColorName.Black),
                  new Attribute (ColorName.Blue, ColorName.Black),
                  default (Rectangle),
@@ -2095,10 +2094,10 @@ ssb
         tf.Text = text;
 
         Assert.True (tf.WordWrap);
-        Assert.Equal (new Size (width, height), tf.Size);
+        Assert.Equal (new (width, height), tf.Size);
 
         tf.Draw (
-                 new Rectangle (0, 0, width, height),
+                 new (0, 0, width, height),
                  new Attribute (ColorName.White, ColorName.Black),
                  new Attribute (ColorName.Blue, ColorName.Black),
                  default (Rectangle),
@@ -2133,10 +2132,10 @@ ssb
         tf.Text = text;
 
         Assert.False (tf.PreserveTrailingSpaces);
-        Assert.Equal (new Size (width, height), tf.Size);
+        Assert.Equal (new (width, height), tf.Size);
 
         tf.Draw (
-                 new Rectangle (0, 0, width, height),
+                 new (0, 0, width, height),
                  new Attribute (ColorName.White, ColorName.Black),
                  new Attribute (ColorName.Blue, ColorName.Black),
                  default (Rectangle),
@@ -2185,7 +2184,7 @@ ssb
 
         Assert.False (tf.AutoSize);
 
-        tf.Size = new Size (1, 1);
+        tf.Size = new (1, 1);
         Assert.Equal (1, tf.Size.Width);
         Assert.Equal (1, tf.Size.Height);
         tf.AutoSize = true;
@@ -2287,7 +2286,7 @@ ssb
             Assert.Equal (2, tf.Size.Height);
         }
 
-        tf.Size = new Size (1, 1);
+        tf.Size = new (1, 1);
 
         if (autoSize)
         {
@@ -2323,7 +2322,7 @@ ssb
         Assert.Equal (4, tf.Size.Width);
         Assert.Equal (1, tf.Size.Height);
 
-        tf.Size = new Size (1, 1);
+        tf.Size = new (1, 1);
 
         if (autoSize && textAlignment != TextAlignment.Justified)
         {
@@ -2357,7 +2356,7 @@ ssb
         Assert.Equal (2, tf.Size.Width);
         Assert.Equal (2, tf.Size.Height);
 
-        tf.Size = new Size (1, 1);
+        tf.Size = new (1, 1);
 
         if (autoSize && textAlignment != VerticalTextAlignment.Justified)
         {

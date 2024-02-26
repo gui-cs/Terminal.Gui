@@ -1230,7 +1230,7 @@ public static partial class Application
 
         foreach (Toplevel t in _topLevels)
         {
-            t.SetRelativeLayout (new Rectangle (0, 0, args.Size.Width, args.Size.Height));
+            t.SetRelativeLayout (Rectangle.Empty with { Size = args.Size });
             t.LayoutSubviews ();
             t.PositionToplevels ();
             t.OnSizeChanging (new SizeChangedEventArgs (args.Size));

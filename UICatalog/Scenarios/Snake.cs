@@ -318,8 +318,8 @@ public class Snake : Scenario
 
             var canvas = new LineCanvas ();
 
-            canvas.AddLine (new Point (0, 0), State.Width, Orientation.Horizontal, LineStyle.Double);
-            canvas.AddLine (new Point (0, 0), State.Height, Orientation.Vertical, LineStyle.Double);
+            canvas.AddLine (Point.Empty, State.Width, Orientation.Horizontal, LineStyle.Double);
+            canvas.AddLine (Point.Empty, State.Height, Orientation.Vertical, LineStyle.Double);
             canvas.AddLine (new Point (0, State.Height - 1), State.Width, Orientation.Horizontal, LineStyle.Double);
             canvas.AddLine (new Point (State.Width - 1, 0), State.Height, Orientation.Vertical, LineStyle.Double);
 

@@ -309,12 +309,13 @@ public partial class View : Responder, ISupportInitializeNotification
                 string old = _title;
                 _title = value;
                 TitleTextFormatter.Text = _title;
-                TitleTextFormatter.Size = new Size (
-                                                    TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
-                                                    - (TitleTextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
-                                                           ? Math.Max (HotKeySpecifier.GetColumns (), 0)
-                                                           : 0),
-                                                    1);
+
+                TitleTextFormatter.Size = new (
+                                               TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
+                                               - (TitleTextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
+                                                      ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+                                                      : 0),
+                                               1);
                 SetHotKeyFromTitle ();
                 SetNeedsDisplay ();
 #if DEBUG

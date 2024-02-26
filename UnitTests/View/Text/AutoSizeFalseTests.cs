@@ -216,9 +216,9 @@ public class AutoSizeFalseTests
     {
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
 
-        view.SetRelativeLayout (new Rectangle (0, 0, 10, 4));
-        Assert.Equal (new Rectangle (0, 0, 10, 4), view.Frame);
-        Assert.Equal (new Size (0, 0), view.TextFormatter.Size);
+        view.SetRelativeLayout (new (0, 0, 10, 4));
+        Assert.Equal (new (0, 0, 10, 4), view.Frame);
+        Assert.Equal (new (0, 0), view.TextFormatter.Size);
         Assert.False (view.AutoSize);
         Assert.True (view.TextFormatter.NeedsFormat);
         Assert.Equal (string.Empty, view.TextFormatter.Format ()); // There's no size, so it returns an empty string
@@ -228,7 +228,7 @@ public class AutoSizeFalseTests
 
         view.Text = "Views";
         Assert.True (view.TextFormatter.NeedsFormat);
-        Assert.Equal (new Size (0, 0), view.TextFormatter.Size);
+        Assert.Equal (new (0, 0), view.TextFormatter.Size);
         Assert.Equal (string.Empty, view.TextFormatter.Format ()); // There's no size, so it returns an empty string
         Assert.False (view.TextFormatter.NeedsFormat);
         Assert.Single (view.TextFormatter.GetLines ());
@@ -251,10 +251,10 @@ public class AutoSizeFalseTests
 
         Assert.Equal (5, text.Length);
         Assert.False (view.AutoSize);
-        Assert.Equal (new Rectangle (0, 0, 3, 1), view.Frame);
-        Assert.Equal (new Size (3, 1), view.TextFormatter.Size);
+        Assert.Equal (new (0, 0, 3, 1), view.Frame);
+        Assert.Equal (new (3, 1), view.TextFormatter.Size);
         Assert.Equal (new List<string> { "Vie" }, view.TextFormatter.GetLines ());
-        Assert.Equal (new Rectangle (0, 0, 10, 4), frame.Frame);
+        Assert.Equal (new (0, 0, 10, 4), frame.Frame);
 
         frame.LayoutSubviews ();
         frame.Clear ();
@@ -268,7 +268,7 @@ public class AutoSizeFalseTests
 ";
 
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rectangle (0, 0, 10, 4), pos);
+        Assert.Equal (new (0, 0, 10, 4), pos);
 
         text = "0123456789";
         Assert.Equal (10, text.Length);
@@ -278,8 +278,8 @@ public class AutoSizeFalseTests
         frame.Clear ();
         frame.Draw ();
 
-        Assert.Equal (new Rectangle (0, 0, 0, 1), view.Frame);
-        Assert.Equal (new Size (0, 1), view.TextFormatter.Size);
+        Assert.Equal (new (0, 0, 0, 1), view.Frame);
+        Assert.Equal (new (0, 1), view.TextFormatter.Size);
         Assert.Equal (new List<string> { string.Empty }, view.TextFormatter.GetLines ());
 
         expected = @"
@@ -290,7 +290,7 @@ public class AutoSizeFalseTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rectangle (0, 0, 10, 4), pos);
+        Assert.Equal (new (0, 0, 10, 4), pos);
     }
 
     [Fact]
@@ -304,7 +304,7 @@ public class AutoSizeFalseTests
         var horizontalView = new View { Width = 20, Height = 1, Text = text };
 
         // Autosize is off, so we have to explicitly set TextFormatter.Size
-        horizontalView.TextFormatter.Size = new Size (20, 1);
+        horizontalView.TextFormatter.Size = new (20, 1);
 
         var verticalView = new View
         {
@@ -316,7 +316,7 @@ public class AutoSizeFalseTests
         };
 
         // Autosize is off, so we have to explicitly set TextFormatter.Size
-        verticalView.TextFormatter.Size = new Size (1, 20);
+        verticalView.TextFormatter.Size = new (1, 20);
 
         var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), Text = "Window" };
         frame.Add (horizontalView, verticalView);
@@ -326,8 +326,8 @@ public class AutoSizeFalseTests
 
         Assert.False (horizontalView.AutoSize);
         Assert.False (verticalView.AutoSize);
-        Assert.Equal (new Rectangle (0, 0, 20, 1), horizontalView.Frame);
-        Assert.Equal (new Rectangle (0, 3, 1, 20), verticalView.Frame);
+        Assert.Equal (new (0, 0, 20, 1), horizontalView.Frame);
+        Assert.Equal (new (0, 3, 1, 20), verticalView.Frame);
 
         top.Draw ();
 
@@ -374,11 +374,11 @@ public class AutoSizeFalseTests
         // Autosize is off, so we have to explicitly set TextFormatter.Size
         // We know these glpyhs are 2 cols wide, so we need to widen the view
         verticalView.Width = 2;
-        verticalView.TextFormatter.Size = new Size (2, 20);
+        verticalView.TextFormatter.Size = new (2, 20);
         Assert.True (verticalView.TextFormatter.NeedsFormat);
 
         top.Draw ();
-        Assert.Equal (new Rectangle (0, 3, 2, 20), verticalView.Frame);
+        Assert.Equal (new (0, 3, 2, 20), verticalView.Frame);
 
         expected = @"
 ┌──────────────────────────────┐

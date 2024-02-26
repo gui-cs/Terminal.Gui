@@ -1,4 +1,4 @@
-﻿//
+//
 // HexView.cs: A hexadecimal viewer
 //
 // TODO:
@@ -45,10 +45,15 @@ public class HexView : View
     public HexView (Stream source)
     {
         Source = source;
+        // BUG: This will always call the most-derived definition of CanFocus.
+        // Either seal it or don't set it here.
         CanFocus = true;
         leftSide = true;
         firstNibble = true;
 
+        // PERF: Closure capture of 'this' creates a lot of overhead.
+        // BUG: Closure capture of 'this' may have unexpected results depending on how this is called.
+        // The above two comments apply to all of the lambdas passed to all calls to AddCommand below.
         // Things this view knows how to do
         AddCommand (Command.Left, () => MoveLeft ());
         AddCommand (Command.Right, () => MoveRight ());
@@ -111,7 +116,7 @@ public class HexView : View
         {
             if (!IsInitialized)
             {
-                return new Point (0, 0);
+                return Point.Empty;
             }
 
             var delta = (int)position;
@@ -364,7 +369,7 @@ public class HexView : View
 
         for (var line = 0; line < frame.Height; line++)
         {
-            var lineRect = new Rectangle (0, line, frame.Width, 1);
+            Rectangle lineRect = new (0, line, frame.Width, 1);
 
             if (!Bounds.Contains (lineRect))
             {
@@ -787,7 +792,7 @@ public class HexView : View
         int line = delta / bytesPerLine;
 
         // BUGBUG: Bounds!
-        SetNeedsDisplay (new Rectangle (0, line, Frame.Width, 1));
+        SetNeedsDisplay (new (0, line, Frame.Width, 1));
     }
 
     private bool ToggleSide ()

@@ -246,7 +246,7 @@ public class DialogTests
                                                       new Button { Text = btn3Text },
                                                       new Button { Text = btn4Text }
                                                      );
-        Assert.Equal (new Size (width, 1), (Size)dlg.Frame.Size);
+        Assert.Equal (new (width, 1), dlg.Frame.Size);
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
 
@@ -1191,10 +1191,10 @@ public class DialogTests
                              Begin (d);
 
                              // This is because of PostionTopLevels and EnsureVisibleBounds
-                             Assert.Equal (new Point (3, 2), (Point)d.Frame.Location);
+                             Assert.Equal (new (3, 2), d.Frame.Location);
 
                              // #3127: Before					
-                             //					Assert.Equal (new Size (17, 8), d.Frame.Size);
+                             //					Assert.Equal (new (17, 8), d.Frame.Size);
                              //					TestHelpers.AssertDriverContentsWithFrameAre (@"
                              //╔══════════════════╗
                              //║                  ║
@@ -1208,7 +1208,7 @@ public class DialogTests
                              //╚══└───────────────┘", _output);
 
                              // #3127: After: Because Toplevel is now Width/Height = Dim.Filll
-                             Assert.Equal (new Size (15, 6), (Size)d.Frame.Size);
+                             Assert.Equal (new (15, 6), d.Frame.Size);
 
                              TestHelpers.AssertDriverContentsWithFrameAre (
                                                                            @"
@@ -1272,7 +1272,7 @@ public class DialogTests
         ((FakeDriver)Driver).SetBufferSize (100, 100);
 
         // Default size is Percent(85) 
-        Assert.Equal (new Size ((int)(100 * .85), (int)(100 * .85)), (Size)d.Frame.Size);
+        Assert.Equal (new ((int)(100 * .85), (int)(100 * .85)), d.Frame.Size);
     }
 
     [Fact]
@@ -1285,7 +1285,7 @@ public class DialogTests
         ((FakeDriver)Driver).SetBufferSize (100, 100);
 
         // Default size is Percent(85) 
-        Assert.Equal (new Size (50, 50), (Size)d.Frame.Size);
+        Assert.Equal (new (50, 50), d.Frame.Size);
     }
 
     [Fact]

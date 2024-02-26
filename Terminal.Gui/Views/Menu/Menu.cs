@@ -302,7 +302,7 @@ internal sealed class Menu : View
     {
         if (items is null || items.Length == 0)
         {
-            return new Rectangle ();
+            return Rectangle.Empty;
         }
 
         int minX = x;
@@ -321,7 +321,7 @@ internal sealed class Menu : View
             minY = Math.Max (Driver.Rows - maxH, 0);
         }
 
-        return new Rectangle (minX, minY, maxW, maxH);
+        return new (minX, minY, maxW, maxH);
     }
 
     internal required MenuBar Host
@@ -774,7 +774,7 @@ internal sealed class Menu : View
         }
 
         Rectangle savedClip = Driver.Clip;
-        Driver.Clip = new Rectangle (0, 0, Driver.Cols, Driver.Rows);
+        Driver.Clip = new (0, 0, Driver.Cols, Driver.Rows);
         Driver.SetAttribute (GetNormalColor ());
 
         OnDrawAdornments ();
@@ -903,10 +903,10 @@ internal sealed class Menu : View
 
                     // The -3 is left/right border + one space (not sure what for)
                     tf.Draw (
-                             BoundsToScreen (new Rectangle (1, i, Frame.Width - 3, 1)),
+                             BoundsToScreen (new (1, i, Frame.Width - 3, 1)),
                              i == _currentChild ? ColorScheme.Focus : GetNormalColor (),
                              i == _currentChild ? ColorScheme.HotFocus : ColorScheme.HotNormal,
-                             SuperView?.BoundsToScreen (SuperView.Bounds) ?? default (Rectangle)
+                             SuperView?.BoundsToScreen (SuperView.Bounds) ?? Rectangle.Empty
                             );
                 }
                 else

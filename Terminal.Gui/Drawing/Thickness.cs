@@ -141,25 +141,24 @@ public class Thickness : IEquatable<Thickness>
         // Draw the Top side
         if (Top > 0)
         {
-            Application.Driver.FillRect (new Rectangle (rect.X, rect.Y, rect.Width, Math.Min (rect.Height, Top)), topChar);
+            Application.Driver.FillRect (rect with { Height = Math.Min (rect.Height, Top) }, topChar);
         }
 
         // Draw the Left side
         if (Left > 0)
         {
-            Application.Driver.FillRect (new Rectangle (rect.X, rect.Y, Math.Min (rect.Width, Left), rect.Height), leftChar);
+            Application.Driver.FillRect (rect with { Width = Math.Min (rect.Width, Left) }, leftChar);
         }
 
-        // Draw the Right side			
+        // Draw the Right side
         if (Right > 0)
         {
             Application.Driver.FillRect (
-                                         new Rectangle (
-                                                   Math.Max (0, rect.X + rect.Width - Right),
-                                                   rect.Y,
-                                                   Math.Min (rect.Width, Right),
-                                                   rect.Height
-                                                  ),
+                                         rect with
+                                         {
+                                             X = Math.Max (0, rect.X + rect.Width - Right),
+                                             Width = Math.Min (rect.Width, Right)
+                                         },
                                          rightChar
                                         );
         }
@@ -168,12 +167,11 @@ public class Thickness : IEquatable<Thickness>
         if (Bottom > 0)
         {
             Application.Driver.FillRect (
-                                         new Rectangle (
-                                                   rect.X,
-                                                   rect.Y + Math.Max (0, rect.Height - Bottom),
-                                                   rect.Width,
-                                                   Bottom
-                                                  ),
+                                         rect with
+                                         {
+                                             Y = rect.Y + Math.Max (0, rect.Height - Bottom),
+                                             Height = Bottom
+                                         },
                                          bottomChar
                                         );
         }
@@ -182,12 +180,13 @@ public class Thickness : IEquatable<Thickness>
         if ((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler)
             == ConsoleDriver.DiagnosticFlags.FrameRuler)
         {
+            // PERF: This can almost certainly be simplified down to a single point offset and fewer calls to Draw
             // Top
             var hruler = new Ruler { Length = rect.Width, Orientation = Orientation.Horizontal };
 
             if (Top > 0)
             {
-                hruler.Draw (new Point (rect.X, rect.Y));
+                hruler.Draw (rect.Location);
             }
 
             //Left
@@ -195,19 +194,19 @@ public class Thickness : IEquatable<Thickness>
 
             if (Left > 0)
             {
-                vruler.Draw (new Point (rect.X, rect.Y + 1), 1);
+                vruler.Draw (rect.Location with { Y = rect.Y + 1 }, 1);
             }
 
             // Bottom
             if (Bottom > 0)
             {
-                hruler.Draw (new Point (rect.X, rect.Y + rect.Height - 1));
+                hruler.Draw (rect.Location with { Y = rect.Y + rect.Height - 1 });
             }
 
             // Right
             if (Right > 0)
             {
-                vruler.Draw (new Point (rect.X + rect.Width - 1, rect.Y + 1), 1);
+                vruler.Draw (new (rect.X + rect.Width - 1, rect.Y + 1), 1);
             }
         }
 

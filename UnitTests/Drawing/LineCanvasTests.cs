@@ -572,7 +572,7 @@ public class LineCanvasTests
 
         Assert.Equal (Rectangle.Empty, lc.Bounds);
 
-        lc.AddLine (new Point (0, 0), 2, Orientation.Horizontal, LineStyle.Double);
+        lc.AddLine (Point.Empty, 2, Orientation.Horizontal, LineStyle.Double);
         Assert.NotEqual (Rectangle.Empty, lc.Bounds);
 
         lc.Clear ();
@@ -682,7 +682,7 @@ public class LineCanvasTests
         var lc = new LineCanvas ();
 
         // Add a line at 0, 0 that's has length of 0
-        lc.AddLine (new Point (0, 0), 0, orientation, LineStyle.Single);
+        lc.AddLine (Point.Empty, 0, orientation, LineStyle.Single);
         TestHelpers.AssertEqual (output, expected, $"{lc}");
     }
 
@@ -696,14 +696,14 @@ public class LineCanvasTests
 
         // Add point at opposite orientation
         lc.AddLine (
-                    new Point (0, 0),
+                    Point.Empty,
                     0,
                     orientation == Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal,
                     LineStyle.Single
                    );
 
         // Add a line at 0, 0 that's has length of 0
-        lc.AddLine (new Point (0, 0), 0, orientation, LineStyle.Single);
+        lc.AddLine (Point.Empty, 0, orientation, LineStyle.Single);
         TestHelpers.AssertEqual (output, expected, $"{lc}");
     }
 
@@ -718,15 +718,15 @@ public class LineCanvasTests
         // Add line with length of 1 in opposite orientation starting at same location
         if (orientation == Orientation.Horizontal)
         {
-            lc.AddLine (new Point (0, 0), 1, Orientation.Vertical, LineStyle.Double);
+            lc.AddLine (Point.Empty, 1, Orientation.Vertical, LineStyle.Double);
         }
         else
         {
-            lc.AddLine (new Point (0, 0), 1, Orientation.Horizontal, LineStyle.Double);
+            lc.AddLine (Point.Empty, 1, Orientation.Horizontal, LineStyle.Double);
         }
 
         // Add a line at 0, 0 that's has length of 0
-        lc.AddLine (new Point (0, 0), 0, orientation, LineStyle.Single);
+        lc.AddLine (Point.Empty, 0, orientation, LineStyle.Single);
         TestHelpers.AssertEqual (output, expected, $"{lc}");
     }
 
@@ -737,8 +737,8 @@ public class LineCanvasTests
         var canvas = new LineCanvas ();
 
         // Upper box
-        canvas.AddLine (new Point (0, 0), 2, Orientation.Horizontal, LineStyle.Single);
-        canvas.AddLine (new Point (0, 0), 2, Orientation.Vertical, LineStyle.Single);
+        canvas.AddLine (Point.Empty, 2, Orientation.Horizontal, LineStyle.Single);
+        canvas.AddLine (Point.Empty, 2, Orientation.Vertical, LineStyle.Single);
 
         var looksLike =
             @"
@@ -754,7 +754,7 @@ public class LineCanvasTests
         View v = GetCanvas (out LineCanvas canvas);
 
         // outer box
-        canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Heavy);
+        canvas.AddLine (Point.Empty, 10, Orientation.Horizontal, LineStyle.Heavy);
         canvas.AddLine (new Point (9, 0), 5, Orientation.Vertical, LineStyle.Heavy);
         canvas.AddLine (new Point (9, 4), -10, Orientation.Horizontal, LineStyle.Heavy);
         canvas.AddLine (new Point (0, 4), -5, Orientation.Vertical, LineStyle.Heavy);
@@ -783,7 +783,7 @@ public class LineCanvasTests
         View v = GetCanvas (out LineCanvas canvas);
 
         // outer box
-        canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Heavy);
+        canvas.AddLine (Point.Empty, 10, Orientation.Horizontal, LineStyle.Heavy);
         canvas.AddLine (new Point (9, 0), 5, Orientation.Vertical, thinStyle);
         canvas.AddLine (new Point (9, 4), -10, Orientation.Horizontal, LineStyle.Heavy);
         canvas.AddLine (new Point (0, 4), -5, Orientation.Vertical, thinStyle);
@@ -813,7 +813,7 @@ public class LineCanvasTests
         View v = GetCanvas (out LineCanvas canvas);
 
         // outer box
-        canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, thinStyle);
+        canvas.AddLine (Point.Empty, 10, Orientation.Horizontal, thinStyle);
         canvas.AddLine (new Point (9, 0), 5, Orientation.Vertical, LineStyle.Heavy);
         canvas.AddLine (new Point (9, 4), -10, Orientation.Horizontal, thinStyle);
         canvas.AddLine (new Point (0, 4), -5, Orientation.Vertical, LineStyle.Heavy);
@@ -842,7 +842,7 @@ public class LineCanvasTests
         var canvas = new LineCanvas ();
 
         // Upper box
-        canvas.AddLine (new Point (0, 0), 2, Orientation.Horizontal, LineStyle.Single);
+        canvas.AddLine (Point.Empty, 2, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new Point (0, 1), -2, Orientation.Vertical, LineStyle.Single);
 
         var looksLike =
@@ -859,7 +859,7 @@ public class LineCanvasTests
         var canvas = new LineCanvas ();
 
         // Top      ─  
-        canvas.AddLine (new Point (0, 0), 1, Orientation.Horizontal, LineStyle.Single);
+        canvas.AddLine (Point.Empty, 1, Orientation.Horizontal, LineStyle.Single);
 
         // Bottom   ─
         canvas.AddLine (new Point (1, 1), -1, Orientation.Horizontal, LineStyle.Single);
@@ -945,7 +945,7 @@ public class LineCanvasTests
     //			var canvas = new LineCanvas ();
 
     //			// Upper box
-    //			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, LineStyle.Single);
+    //			canvas.AddLine (Point.Empty, 9, Orientation.Horizontal, LineStyle.Single);
     //			canvas.AddLine (new Point (8, 0), 3, Orientation.Vertical, LineStyle.Single);
     //			canvas.AddLine (new Point (8, 3), -9, Orientation.Horizontal, LineStyle.Single);
     //			canvas.AddLine (new Point (0, 2), -3, Orientation.Vertical, LineStyle.Single);
@@ -1005,8 +1005,8 @@ public class LineCanvasTests
     public void View_Draws_Corner_Correct ()
     {
         View v = GetCanvas (out LineCanvas canvas);
-        canvas.AddLine (new Point (0, 0), 2, Orientation.Horizontal, LineStyle.Single);
-        canvas.AddLine (new Point (0, 0), 2, Orientation.Vertical, LineStyle.Single);
+        canvas.AddLine (Point.Empty, 2, Orientation.Horizontal, LineStyle.Single);
+        canvas.AddLine (Point.Empty, 2, Orientation.Vertical, LineStyle.Single);
 
         v.Draw ();
 
@@ -1026,7 +1026,7 @@ public class LineCanvasTests
     public void View_Draws_Corner_NoOverlap ()
     {
         View v = GetCanvas (out LineCanvas canvas);
-        canvas.AddLine (new Point (0, 0), 2, Orientation.Horizontal, LineStyle.Single);
+        canvas.AddLine (Point.Empty, 2, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new Point (0, 1), 2, Orientation.Vertical, LineStyle.Single);
 
         v.Draw ();
@@ -1046,7 +1046,7 @@ public class LineCanvasTests
     public void View_Draws_Horizontal (LineStyle style)
     {
         View v = GetCanvas (out LineCanvas canvas);
-        canvas.AddLine (new Point (0, 0), 2, Orientation.Horizontal, style);
+        canvas.AddLine (Point.Empty, 2, Orientation.Horizontal, style);
 
         v.Draw ();
 
@@ -1061,7 +1061,7 @@ public class LineCanvasTests
     public void View_Draws_Horizontal_Double ()
     {
         View v = GetCanvas (out LineCanvas canvas);
-        canvas.AddLine (new Point (0, 0), 2, Orientation.Horizontal, LineStyle.Double);
+        canvas.AddLine (Point.Empty, 2, Orientation.Horizontal, LineStyle.Double);
 
         v.Draw ();
 
@@ -1078,7 +1078,7 @@ public class LineCanvasTests
     public void View_Draws_Vertical (LineStyle style)
     {
         View v = GetCanvas (out LineCanvas canvas);
-        canvas.AddLine (new Point (0, 0), 2, Orientation.Vertical, style);
+        canvas.AddLine (Point.Empty, 2, Orientation.Vertical, style);
 
         v.Draw ();
 
@@ -1094,7 +1094,7 @@ public class LineCanvasTests
     public void View_Draws_Vertical_Double ()
     {
         View v = GetCanvas (out LineCanvas canvas);
-        canvas.AddLine (new Point (0, 0), 2, Orientation.Vertical, LineStyle.Double);
+        canvas.AddLine (Point.Empty, 2, Orientation.Vertical, LineStyle.Double);
 
         v.Draw ();
 
@@ -1112,7 +1112,7 @@ public class LineCanvasTests
         View v = GetCanvas (out LineCanvas canvas);
 
         // outer box
-        canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Double);
+        canvas.AddLine (Point.Empty, 10, Orientation.Horizontal, LineStyle.Double);
         canvas.AddLine (new Point (9, 0), 5, Orientation.Vertical, LineStyle.Double);
         canvas.AddLine (new Point (9, 4), -10, Orientation.Horizontal, LineStyle.Double);
         canvas.AddLine (new Point (0, 4), -5, Orientation.Vertical, LineStyle.Double);
@@ -1141,7 +1141,7 @@ public class LineCanvasTests
         View v = GetCanvas (out LineCanvas canvas);
 
         // outer box
-        canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Double);
+        canvas.AddLine (Point.Empty, 10, Orientation.Horizontal, LineStyle.Double);
         canvas.AddLine (new Point (9, 0), 5, Orientation.Vertical, thinStyle);
         canvas.AddLine (new Point (9, 4), -10, Orientation.Horizontal, LineStyle.Double);
         canvas.AddLine (new Point (0, 4), -5, Orientation.Vertical, thinStyle);
@@ -1174,7 +1174,7 @@ public class LineCanvasTests
         View v = GetCanvas (out LineCanvas canvas);
 
         // outer box
-        canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Rounded);
+        canvas.AddLine (Point.Empty, 10, Orientation.Horizontal, LineStyle.Rounded);
 
         // LineStyle.Single is ignored because corner overlaps with the above line which is Rounded
         // this results in a rounded corner being used.
@@ -1207,7 +1207,7 @@ public class LineCanvasTests
         View v = GetCanvas (out LineCanvas canvas);
 
         // outer box
-        canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, thinStyle);
+        canvas.AddLine (Point.Empty, 10, Orientation.Horizontal, thinStyle);
         canvas.AddLine (new Point (9, 0), 5, Orientation.Vertical, LineStyle.Double);
         canvas.AddLine (new Point (9, 4), -10, Orientation.Horizontal, thinStyle);
         canvas.AddLine (new Point (0, 4), -5, Orientation.Vertical, LineStyle.Double);
@@ -1236,7 +1236,7 @@ public class LineCanvasTests
         var canvas = new LineCanvas ();
 
         // Frame
-        canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Single);
+        canvas.AddLine (Point.Empty, 10, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new Point (9, 0), 5, Orientation.Vertical, LineStyle.Single);
         canvas.AddLine (new Point (9, 4), -10, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new Point (0, 4), -5, Orientation.Vertical, LineStyle.Single);
