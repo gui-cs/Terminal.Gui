@@ -33,7 +33,7 @@ public class HexView : View
     private int bpl;
     private CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
     private long displayStart, pos;
-    private SortedDictionary<long, byte> edits = new ();
+    private SortedDictionary<long, byte> edits = [];
     private bool firstNibble, leftSide;
     private Stream source;
     private static readonly Rune SpaceCharRune = new (' ');
