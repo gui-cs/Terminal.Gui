@@ -570,6 +570,23 @@ public partial class View
             return null;
         }
 
+        if (findAdornments)
+        {
+            if (start.Margin.Thickness.Contains (start.Frame, x, y))
+            {
+                return start.Margin;
+            }
+            if (start.Border.Thickness.Contains (start.Frame, x, y))
+            {
+                return start.Border;
+            }
+            if (start.Padding.Thickness.Contains (start.Frame, x, y))
+            {
+                return start.Padding;
+            }
+
+        }
+
         if (start.InternalSubviews is { Count: > 0 })
         {
             Point boundsOffset = start.GetBoundsOffset ();
@@ -582,7 +599,7 @@ public partial class View
 
                 if (v.Visible && v.Frame.Contains (rx, ry))
                 {
-                    View? deep = FindDeepestView (v, rx, ry);
+                    View? deep = FindDeepestView (v, rx, ry, findAdornments);
                     return deep ?? v;
                 }
             }
