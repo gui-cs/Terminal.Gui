@@ -179,11 +179,11 @@ public class ScrollBarView : View
         }
     }
 
-    private bool _showBothScrollIndicator => OtherScrollBarView?._showScrollIndicator == true && _showScrollIndicator;
-
     private int GetOtherScrollBarViewOffset => OtherScrollBarView?.Visible == true ? 1 : 0;
 
     private bool IsBuiltIn => SuperView is Adornment;
+
+    private bool ShowBothScrollIndicator => Visible && OtherScrollBarView?.Visible == true;
 
     /// <summary>This event is raised when the position on the scrollbar has changed.</summary>
     public event EventHandler ChangedPosition;
@@ -652,7 +652,7 @@ public class ScrollBarView : View
 
         maxToScroll = Size > barSize + newPosition
                           ? newPosition - _position
-                          : Size - (barSize + _position) - (barSize == 0 && _showBothScrollIndicator ? 1 : 0);
+                          : Size - (barSize + _position) - (barSize == 0 && ShowBothScrollIndicator ? 1 : 0);
 
         return Size >= barSize + newPosition && maxToScroll != 0;
     }
@@ -669,16 +669,16 @@ public class ScrollBarView : View
 
         if (KeepContentAlwaysInViewPort
             && _orientation == Orientation.Horizontal
-            && _position > Math.Max (Size - bounds.Width + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0), GetOtherScrollBarViewOffset))
+            && _position > Math.Max (Size - bounds.Width + (!IsBuiltIn && ShowBothScrollIndicator ? 1 : 0), GetOtherScrollBarViewOffset))
         {
-            pos = Math.Max (Size - bounds.Width + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0), GetOtherScrollBarViewOffset);
+            pos = Math.Max (Size - bounds.Width + (!IsBuiltIn && ShowBothScrollIndicator ? 1 : 0), GetOtherScrollBarViewOffset);
         }
 
         if (KeepContentAlwaysInViewPort
             && _orientation == Orientation.Vertical
-            && _position > Math.Max (Size - bounds.Height + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0), GetOtherScrollBarViewOffset))
+            && _position > Math.Max (Size - bounds.Height + (!IsBuiltIn && ShowBothScrollIndicator ? 1 : 0), GetOtherScrollBarViewOffset))
         {
-            pos = Math.Max (Size - bounds.Height + (!IsBuiltIn && _showBothScrollIndicator ? 1 : 0), GetOtherScrollBarViewOffset);
+            pos = Math.Max (Size - bounds.Height + (!IsBuiltIn && ShowBothScrollIndicator ? 1 : 0), GetOtherScrollBarViewOffset);
         }
 
         if (pos != 0)
@@ -715,7 +715,7 @@ public class ScrollBarView : View
                 scrollBarView.Visible = false;
             }
 
-            if (scrollBarView.OtherScrollBarView is { } && scrollBarView._showBothScrollIndicator)
+            if (scrollBarView.OtherScrollBarView is { } && scrollBarView.ShowBothScrollIndicator)
             {
                 scrollBarView.OtherScrollBarView.Visible = false;
             }
@@ -728,7 +728,7 @@ public class ScrollBarView : View
         {
             if (scrollBarView.OtherScrollBarView is { } && pending)
             {
-                if (!scrollBarView._showBothScrollIndicator && scrollBarView.OtherScrollBarView._showScrollIndicator)
+                if (!scrollBarView.ShowBothScrollIndicator && scrollBarView.OtherScrollBarView._showScrollIndicator)
                 {
                     scrollBarView.OtherScrollBarView.Visible = true;
                 }
@@ -842,9 +842,9 @@ public class ScrollBarView : View
         }
 
         return orientation == Orientation.Vertical ? KeepContentAlwaysInViewPort
-                                                         ? bounds.Height - (_showBothScrollIndicator ? 1 : 0)
+                                                         ? bounds.Height - (ShowBothScrollIndicator ? 1 : 0)
                                                          : 0 :
-               KeepContentAlwaysInViewPort ? bounds.Width - (_showBothScrollIndicator ? 1 : 0) : 0;
+               KeepContentAlwaysInViewPort ? bounds.Width - (ShowBothScrollIndicator ? 1 : 0) : 0;
     }
 
     private void ManageScrollBarThickness ()
@@ -991,7 +991,7 @@ public class ScrollBarView : View
             return;
         }
 
-        if (_showBothScrollIndicator)
+        if (ShowBothScrollIndicator)
         {
             if (SuperView is { UseContentOffset: true })
             {
@@ -1096,7 +1096,7 @@ public class ScrollBarView : View
             OtherScrollBarView.SetRelativeLayout (SuperView?.GetVisibleContentArea () ?? Rectangle.Empty);
         }
 
-        if (_showBothScrollIndicator)
+        if (ShowBothScrollIndicator)
         {
             if (_contentBottomRightCorner is { })
             {
