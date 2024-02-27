@@ -207,7 +207,6 @@ public class FindDeepestViewTests (ITestOutputHelper output)
 
         var found = View.FindDeepestView (start, testX, testY, true);
         Assert.Equal(expectedAdornmentType, found.GetType());
-
     }
 
     // Test that FindDeepestView works if the subview has positive Adornments

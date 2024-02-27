@@ -33,7 +33,7 @@ public class Adornment : View
     /// <summary>Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).</summary>
     public override Rectangle Bounds
     {
-        get => Thickness?.GetInside (new (Point.Empty, Frame.Size)) ?? new Rectangle (Point.Empty, Frame.Size);
+        get => new Rectangle (Point.Empty, Thickness?.GetInside (new (Point.Empty, Frame.Size)).Size ?? Frame.Size);
         // QUESTION: So why even have a setter then?
         set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
     }

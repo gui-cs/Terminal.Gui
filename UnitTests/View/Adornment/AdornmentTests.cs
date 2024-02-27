@@ -121,4 +121,87 @@ public class AdornmentTests
         adornment.Thickness = new Thickness (1, 2, 3, 4);
         Assert.True (raised);
     }
+
+    [Fact]
+    public void Frames_are_Parent_SuperView_Relative ()
+    {
+        var view = new View
+        {
+            X = 1,
+            Y = 2,
+            Width = 20,
+            Height = 31
+        };
+
+        var marginThickness = 1;
+        view.Margin.Thickness = new Thickness (marginThickness);
+
+        var borderThickness = 2;
+        view.Border.Thickness = new Thickness (borderThickness);
+
+        var paddingThickness = 3;
+        view.Padding.Thickness = new Thickness (paddingThickness);
+
+        view.BeginInit ();
+        view.EndInit ();
+
+        Assert.Equal (new Rectangle (1, 2, 20, 31), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 8, 19), view.Bounds);
+
+        // Margin.Frame is always the same as the view frame
+        Assert.Equal (new Rectangle (0, 0, 20, 31), view.Margin.Frame);
+
+        // Border.Frame is View.Frame minus the Margin thickness 
+        Assert.Equal (
+                      new Rectangle (marginThickness, marginThickness, view.Frame.Width - marginThickness * 2, view.Frame.Height - marginThickness * 2),
+                      view.Border.Frame);
+
+        // Padding.Frame is View.Frame minus the Border thickness plus Margin thickness
+        Assert.Equal (
+                      new Rectangle (
+                                     marginThickness + borderThickness,
+                                     marginThickness + borderThickness,
+                                     view.Frame.Width - (marginThickness + borderThickness) * 2,
+                                     view.Frame.Height - (marginThickness + borderThickness) * 2),
+                      view.Padding.Frame);
+    }
+
+    [Fact]
+    public void Bounds_Location_Always_Empty_Size_Correct ()
+    {
+        var view = new View
+        {
+            X = 1,
+            Y = 2,
+            Width = 20,
+            Height = 31
+        };
+
+        var marginThickness = 1;
+        view.Margin.Thickness = new Thickness (marginThickness);
+
+        var borderThickness = 2;
+        view.Border.Thickness = new Thickness (borderThickness);
+
+        var paddingThickness = 3;
+        view.Padding.Thickness = new Thickness (paddingThickness);
+
+        view.BeginInit ();
+        view.EndInit ();
+
+        Assert.Equal (new Rectangle (1, 2, 20, 31), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 8, 19), view.Bounds);
+
+        Assert.Equal (new Rectangle (0, 0, view.Margin.Frame.Width - marginThickness * 2, view.Margin.Frame.Height - marginThickness * 2), view.Margin.Bounds);
+
+        Assert.Equal (new Rectangle (0, 0, view.Border.Frame.Width - borderThickness * 2, view.Border.Frame.Height - borderThickness * 2), view.Border.Bounds);
+
+        Assert.Equal (
+                      new Rectangle (
+                                     0,
+                                     0,
+                                     view.Padding.Frame.Width - (marginThickness + borderThickness) * 2,
+                                     view.Padding.Frame.Height - (marginThickness + borderThickness) * 2),
+                      view.Padding.Bounds);
+    }
 }
