@@ -20,6 +20,7 @@ public class ScrollBarViewTests
         AddHandlers ();
 
         _hostView.Draw ();
+        Assert.True (_scrollBar.AutoHideScrollBars);
         Assert.True (_scrollBar.ShowScrollIndicator);
         Assert.True (_scrollBar.Visible);
         Assert.Equal ("Absolute(1)", _scrollBar.Width.ToString ());
@@ -43,7 +44,7 @@ public class ScrollBarViewTests
 
         _hostView.Lines = 10;
         _hostView.Draw ();
-        Assert.False (_scrollBar.ShowScrollIndicator);
+        Assert.True (_scrollBar.ShowScrollIndicator);
         Assert.False (_scrollBar.Visible);
         Assert.Equal ("Absolute(1)", _scrollBar.Width.ToString ());
         Assert.Equal (1, _scrollBar.ContentArea.Width);
@@ -66,7 +67,7 @@ public class ScrollBarViewTests
 
         _hostView.Cols = 60;
         _hostView.Draw ();
-        Assert.False (_scrollBar.ShowScrollIndicator);
+        Assert.True (_scrollBar.ShowScrollIndicator);
         Assert.False (_scrollBar.Visible);
         Assert.Equal ("Absolute(1)", _scrollBar.Width.ToString ());
         Assert.Equal (1, _scrollBar.ContentArea.Width);
@@ -76,7 +77,7 @@ public class ScrollBarViewTests
                       _scrollBar.Height.ToString ()
                      );
         Assert.Equal (24, _scrollBar.ContentArea.Height);
-        Assert.False (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+        Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
         Assert.False (_scrollBar.OtherScrollBarView.Visible);
 
         Assert.Equal (
@@ -99,7 +100,7 @@ public class ScrollBarViewTests
                       _scrollBar.Height.ToString ()
                      );
         Assert.Equal (25, _scrollBar.ContentArea.Height);
-        Assert.False (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+        Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
         Assert.False (_scrollBar.OtherScrollBarView.Visible);
 
         Assert.Equal (
@@ -579,8 +580,8 @@ This is a tes▼
         sbv.OtherScrollBarView.Size = 0;
         Assert.Equal (0, sbv.Size);
         Assert.Equal (0, sbv.OtherScrollBarView.Size);
-        Assert.False (sbv.ShowScrollIndicator);
-        Assert.False (sbv.OtherScrollBarView.ShowScrollIndicator);
+        Assert.True (sbv.ShowScrollIndicator);
+        Assert.True (sbv.OtherScrollBarView.ShowScrollIndicator);
         Assert.False (sbv.Visible);
         Assert.False (sbv.OtherScrollBarView.Visible);
         Application.Top.Draw ();
@@ -652,7 +653,7 @@ This is a tes▼
 
         sbv.Size = 0;
         Assert.Equal (0, sbv.Size);
-        Assert.False (sbv.ShowScrollIndicator);
+        Assert.True (sbv.ShowScrollIndicator);
         Assert.False (sbv.Visible);
         Application.Top.Draw ();
 
@@ -759,8 +760,8 @@ This is a test
 
         var scrollBar = textView.Padding.Subviews [0] as ScrollBarView;
         Assert.True (scrollBar.AutoHideScrollBars);
-        Assert.False (scrollBar.ShowScrollIndicator);
-        Assert.False (scrollBar.OtherScrollBarView.ShowScrollIndicator);
+        Assert.True (scrollBar.ShowScrollIndicator);
+        Assert.True (scrollBar.OtherScrollBarView.ShowScrollIndicator);
         Assert.Equal (5, textView.Lines);
 
         // The length is one more for the cursor on the last column of the line
@@ -998,6 +999,43 @@ This is a test
         Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
         Assert.Equal (99, _scrollBar.OtherScrollBarView.Position);
         Assert.Equal (99, _hostView.Left);
+    }
+
+    [Fact]
+    [ScrollBarAutoInitShutdown]
+    public void KeepContentAlwaysInViewport_False_True_With_Both_ShowScrollBars_False ()
+    {
+        KeepContentAlwaysInViewport_False ();
+
+        Assert.True (_scrollBar.ShowScrollIndicator);
+        Assert.True (_scrollBar.Visible);
+        Assert.True(_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+        Assert.True (_scrollBar.OtherScrollBarView.Visible);
+        Assert.False(_scrollBar.KeepContentAlwaysInViewPort);
+        _scrollBar.ShowScrollIndicator = false;
+        _scrollBar.OtherScrollBarView.ShowScrollIndicator = false;
+        _scrollBar.KeepContentAlwaysInViewPort = true;
+
+        Assert.Equal (_scrollBar.Position, _scrollBar.Size - _scrollBar.ContentArea.Height - 1);
+        Assert.Equal (_scrollBar.Position, _hostView.Top);
+        Assert.Equal (5, _scrollBar.Position);
+        Assert.Equal (5, _hostView.Top);
+        Assert.False (_scrollBar.ShowScrollIndicator);
+        Assert.False (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+        Assert.False (_scrollBar.Visible);
+        Assert.False (_scrollBar.OtherScrollBarView.Visible);
+
+        Assert.Equal (
+                      _scrollBar.OtherScrollBarView.Position,
+                      _scrollBar.OtherScrollBarView.Size - _scrollBar.OtherScrollBarView.ContentArea.Width - 1
+                     );
+        Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
+        Assert.Equal (20, _scrollBar.OtherScrollBarView.Position);
+        Assert.Equal (20, _hostView.Left);
+        Assert.False (_scrollBar.ShowScrollIndicator);
+        Assert.False (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+        Assert.False (_scrollBar.Visible);
+        Assert.False (_scrollBar.OtherScrollBarView.Visible);
     }
 
     [Fact]
@@ -1513,7 +1551,7 @@ This is a test
 
         Assert.Equal (5, sbv.Size);
         Assert.Null (sbv.OtherScrollBarView);
-        Assert.False (sbv.ShowScrollIndicator);
+        Assert.True (sbv.ShowScrollIndicator);
         Assert.False (sbv.Visible);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1543,7 +1581,7 @@ This is a test             ",
 
         sbv.Visible = true;
         Assert.Equal (5, sbv.Size);
-        Assert.False (sbv.ShowScrollIndicator);
+        Assert.True (sbv.ShowScrollIndicator);
         Assert.True (sbv.Visible);
         Application.Top.Draw ();
 
@@ -1573,13 +1611,13 @@ This is a test             ",
         Assert.Null (Application.MouseGrabView);
         Assert.True (clicked);
         Assert.Equal (5, sbv.Size);
-        Assert.False (sbv.ShowScrollIndicator);
+        Assert.True (sbv.ShowScrollIndicator);
         Assert.False (sbv.Visible);
 
         // It's needed to set ShowScrollIndicator to true and AutoHideScrollBars to false forcing
         // showing the scroll bar, otherwise AutoHideScrollBars will automatically control it
         Assert.True (sbv.AutoHideScrollBars);
-        sbv.ShowScrollIndicator = true;
+        Assert.True (sbv.ShowScrollIndicator);
         sbv.AutoHideScrollBars = false;
         Application.Top.Draw ();
 

@@ -142,8 +142,10 @@ public class ScrollViewTests
         Application.Begin (Application.Top);
 
         Assert.True (sv.AutoHideScrollBars);
-        Assert.False (sv.ShowHorizontalScrollIndicator);
-        Assert.False (sv.ShowVerticalScrollIndicator);
+        Assert.True (sv.ShowHorizontalScrollIndicator);
+        Assert.False (sv.Subviews.First(sv => sv is ScrollBarView { Orientation: Orientation.Horizontal }).Visible);
+        Assert.True (sv.ShowVerticalScrollIndicator);
+        Assert.False (sv.Subviews.First(sv => sv is ScrollBarView { Orientation: Orientation.Vertical }).Visible);
         TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
 
         sv.AutoHideScrollBars = false;

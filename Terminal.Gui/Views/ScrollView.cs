@@ -122,10 +122,11 @@ public class ScrollView : View
                            }
 
                            SetContentOffset (_contentOffset);
-                           _contentView.Frame = new (ContentOffset, ContentSize);
+                           _contentView.Frame = new Rectangle (ContentOffset, ContentSize);
+
                            // PERF: How about calls to Point.Offset instead?
-                           _vertical.ChangedPosition += delegate { ContentOffset = new (ContentOffset.X, _vertical.Position); };
-                           _horizontal.ChangedPosition += delegate { ContentOffset = new (_horizontal.Position, ContentOffset.Y); };
+                           _vertical.ChangedPosition += delegate { ContentOffset = new Point (ContentOffset.X, _vertical.Position); };
+                           _horizontal.ChangedPosition += delegate { ContentOffset = new Point (_horizontal.Position, ContentOffset.Y); };
                        };
     }
 
@@ -138,17 +139,10 @@ public class ScrollView : View
             if (_horizontal.AutoHideScrollBars || _vertical.AutoHideScrollBars != value)
             {
                 _vertical.AutoHideScrollBars = value;
+                _vertical.Visible = _vertical.ShowScrollIndicator;
+
                 _horizontal.AutoHideScrollBars = value;
-
-                if (Subviews.Contains (_vertical))
-                {
-                    _vertical.AutoHideScrollBars = value;
-                }
-
-                if (Subviews.Contains (_horizontal))
-                {
-                    _horizontal.AutoHideScrollBars = value;
-                }
+                _horizontal.Visible = _horizontal.ShowScrollIndicator;
 
                 SetNeedsDisplay ();
             }
@@ -185,7 +179,7 @@ public class ScrollView : View
             if (_contentSize != value)
             {
                 _contentSize = value;
-                _contentView.Frame = new (_contentOffset, value);
+                _contentView.Frame = new Rectangle (_contentOffset, value);
                 _vertical.Size = _contentSize.Height;
                 _horizontal.Size = _contentSize.Width;
                 SetNeedsDisplay ();
@@ -223,21 +217,22 @@ public class ScrollView : View
                 {
                     _horizontal.OtherScrollBarView = _vertical;
 
-                    if (!Subviews.Contains (_horizontal))
-                    {
-                        base.Add (_horizontal);
-                    }
+                    //if (!Subviews.Contains (_horizontal))
+                    //{
+                    //    base.Add (_horizontal);
+                    //}
 
                     _horizontal.ShowScrollIndicator = true;
+                    _horizontal.Visible = true;
                     _horizontal.AutoHideScrollBars = AutoHideScrollBars;
-                    _horizontal.OtherScrollBarView.ShowScrollIndicator = true;
                     _horizontal.MouseEnter += View_MouseEnter;
                     _horizontal.MouseLeave += View_MouseLeave;
                 }
                 else
                 {
-                    base.Remove (_horizontal);
+                    //base.Remove (_horizontal);
                     _horizontal.ShowScrollIndicator = false;
+                    _horizontal.Visible = false;
                     _horizontal.MouseEnter -= View_MouseEnter;
                     _horizontal.MouseLeave -= View_MouseLeave;
                 }
@@ -261,21 +256,22 @@ public class ScrollView : View
                 {
                     _vertical.OtherScrollBarView = _horizontal;
 
-                    if (!Subviews.Contains (_vertical))
-                    {
-                        base.Add (_vertical);
-                    }
+                    //if (!Subviews.Contains (_vertical))
+                    //{
+                    //    base.Add (_vertical);
+                    //}
 
                     _vertical.ShowScrollIndicator = true;
+                    _vertical.Visible = true;
                     _vertical.AutoHideScrollBars = AutoHideScrollBars;
-                    _vertical.OtherScrollBarView.ShowScrollIndicator = true;
                     _vertical.MouseEnter += View_MouseEnter;
                     _vertical.MouseLeave += View_MouseLeave;
                 }
                 else
                 {
-                    Remove (_vertical);
+                    //Remove (_vertical);
                     _vertical.ShowScrollIndicator = false;
+                    _vertical.Visible = false;
                     _vertical.MouseEnter -= View_MouseEnter;
                     _vertical.MouseLeave -= View_MouseLeave;
                 }
@@ -560,11 +556,11 @@ public class ScrollView : View
             return;
         }
 
-        if (_horizontal.ShowScrollIndicator && _vertical.ShowScrollIndicator)
+        if (_horizontal.Visible && _vertical.Visible)
         {
             _contentBottomRightCorner.Visible = true;
         }
-        else if (_horizontal.IsAdded || _vertical.IsAdded)
+        else if (!_horizontal.Visible || !_vertical.Visible)
         {
             _contentBottomRightCorner.Visible = false;
         }
@@ -573,8 +569,8 @@ public class ScrollView : View
     private void SetContentOffset (Point offset)
     {
         // INTENT: Unclear intent. How about a call to Offset?
-        _contentOffset = new (-Math.Abs (offset.X), -Math.Abs (offset.Y));
-        _contentView.Frame = new (_contentOffset, _contentSize);
+        _contentOffset = new Point (-Math.Abs (offset.X), -Math.Abs (offset.Y));
+        _contentView.Frame = new Rectangle (_contentOffset, _contentSize);
         int p = Math.Max (0, -_contentOffset.Y);
 
         if (_vertical.Position != p)
@@ -609,7 +605,7 @@ public class ScrollView : View
         {
             if (ShowVerticalScrollIndicator)
             {
-                ShowVerticalScrollIndicator = false;
+                _vertical.Visible = false;
             }
 
             v = false;
@@ -620,19 +616,18 @@ public class ScrollView : View
         }
         else
         {
-            if (!ShowVerticalScrollIndicator)
+            if (ShowVerticalScrollIndicator)
             {
-                ShowVerticalScrollIndicator = true;
+                _vertical.Visible = true;
+                v = true;
             }
-
-            v = true;
         }
 
         if (ContentArea.Width == 0 || ContentArea.Width > _contentSize.Width)
         {
             if (ShowHorizontalScrollIndicator)
             {
-                ShowHorizontalScrollIndicator = false;
+                _horizontal.Visible = false;
             }
 
             h = false;
@@ -641,14 +636,14 @@ public class ScrollView : View
         {
             if (ShowHorizontalScrollIndicator)
             {
-                ShowHorizontalScrollIndicator = false;
+                _horizontal.Visible = false;
             }
 
             h = false;
 
             if (ShowVerticalScrollIndicator)
             {
-                ShowVerticalScrollIndicator = false;
+                _vertical.Visible = false;
             }
 
             v = false;
@@ -657,32 +652,30 @@ public class ScrollView : View
         {
             if (p)
             {
-                if (!ShowVerticalScrollIndicator)
+                if (ShowVerticalScrollIndicator)
                 {
-                    ShowVerticalScrollIndicator = true;
+                    _vertical.Visible = true;
+                    v = true;
                 }
-
-                v = true;
             }
 
-            if (!ShowHorizontalScrollIndicator)
+            if (ShowHorizontalScrollIndicator)
             {
-                ShowHorizontalScrollIndicator = true;
+                _horizontal.Visible = true;
+                h = true;
             }
-
-            h = true;
         }
 
         Dim dim = Dim.Fill (h ? 1 : 0);
 
-        if (!_vertical.Height.Equals (dim))
+        if (_vertical.Visible && !_vertical.Height.Equals (dim))
         {
             _vertical.Height = dim;
         }
 
         dim = Dim.Fill (v ? 1 : 0);
 
-        if (!_horizontal.Width.Equals (dim))
+        if (_horizontal.Visible && !_horizontal.Width.Equals (dim))
         {
             _horizontal.Width = dim;
         }
