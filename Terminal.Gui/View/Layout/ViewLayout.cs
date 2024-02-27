@@ -572,15 +572,15 @@ public partial class View
 
         if (findAdornments)
         {
-            if (start.Margin.Thickness.Contains (start.Frame, x, y))
+            if (start.Margin.Thickness.Contains (start.Margin.Frame, x, y))
             {
                 return start.Margin;
             }
-            if (start.Border.Thickness.Contains (start.Frame, x, y))
+            if (start.Border.Thickness.Contains (start.Border.Frame, x, y))
             {
                 return start.Border;
             }
-            if (start.Padding.Thickness.Contains (start.Frame, x, y))
+            if (start.Padding.Thickness.Contains (start.Padding.Frame, x, y))
             {
                 return start.Padding;
             }

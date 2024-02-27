@@ -184,7 +184,7 @@ public class FindDeepestViewTests (ITestOutputHelper output)
     [InlineData (1, 1, typeof (Border))]
     [InlineData (8, 8, typeof (Border))]
 
-    [InlineData (1, 1, typeof (Padding))]
+    [InlineData (2, 2, typeof (Padding))]
     [InlineData (7, 7, typeof (Padding))]
 
     [InlineData (5, 5, typeof (View))]
