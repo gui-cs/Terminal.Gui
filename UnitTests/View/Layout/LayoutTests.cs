@@ -1,4 +1,5 @@
 ﻿using Xunit.Abstractions;
+using static Unix.Terminal.Curses;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
@@ -549,7 +550,7 @@ public class LayoutTests
         Assert.Equal (new Rectangle (0, 2, 10, 3), win2.Frame);
         Assert.Equal (new Rectangle (0, 0, 8, 1), view2.Frame);
         Assert.Equal (new Rectangle (0, 0, 7, 1), view3.Frame);
-        var foundView = View.FindDeepestView (top, 9, 4, out int rx, out int ry);
+        var foundView = View.FindDeepestView (top, 9, 4);
         Assert.Equal (foundView, view2);
 
         Application.OnMouseEvent (

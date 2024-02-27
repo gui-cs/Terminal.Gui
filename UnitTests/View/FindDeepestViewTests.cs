@@ -21,7 +21,7 @@ public class FindDeepestViewTests (ITestOutputHelper output)
             Width = 10, Height = 10,
         };
 
-        Assert.Same (view, View.FindDeepestView (view, testX, testY, out _, out _));
+        Assert.Same (view, View.FindDeepestView (view, testX, testY));
     }
 
     // Test that FindDeepestView returns null if the start view has no subviews and coords are outside the view
@@ -37,7 +37,7 @@ public class FindDeepestViewTests (ITestOutputHelper output)
             Width = 10, Height = 10,
         };
 
-        Assert.Null(View.FindDeepestView (view, testX, testY, out _, out _));
+        Assert.Null(View.FindDeepestView (view, testX, testY));
     }
 
     // Test that FindDeepestView returns the correct view if the start view has subviews
@@ -64,7 +64,7 @@ public class FindDeepestViewTests (ITestOutputHelper output)
         };
         view.Add (subview);
 
-        var found = View.FindDeepestView (view, testX, testY, out _, out _);
+        var found = View.FindDeepestView (view, testX, testY);
 
         Assert.Equal (expectedSubViewFound, found == subview);
     }
@@ -97,7 +97,7 @@ public class FindDeepestViewTests (ITestOutputHelper output)
         };
         view.Add (subview);
 
-        var found = View.FindDeepestView (view, testX, testY, out _, out _);
+        var found = View.FindDeepestView (view, testX, testY);
 
         Assert.Equal (expectedSubViewFound, found == subview);
     }
@@ -130,7 +130,7 @@ public class FindDeepestViewTests (ITestOutputHelper output)
         subview.Margin.Thickness = new Thickness (1);
         view.Add (subview);
 
-        var found = View.FindDeepestView (view, testX, testY, out _, out _);
+        var found = View.FindDeepestView (view, testX, testY);
 
         Assert.Equal (expectedSubViewFound, found == subview);
     }
@@ -172,7 +172,7 @@ public class FindDeepestViewTests (ITestOutputHelper output)
 
         start.Add (subviews [0]);
 
-        var found = View.FindDeepestView (start, testX, testY, out _, out _);
+        var found = View.FindDeepestView (start, testX, testY);
         Assert.Equal (expectedSubViewFound, subviews.IndexOf(found));
     }
 }

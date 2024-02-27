@@ -550,18 +550,14 @@ public partial class View
     /// <param name="start">The superview where to look for.</param>
     /// <param name="x">The column location in the superview.</param>
     /// <param name="y">The row location in the superview.</param>
-    /// <param name="resultX">The found view screen relative column location.</param>
-    /// <param name="resultY">The found view screen relative row location.</param>
     /// <returns>
     ///     The view that was found at the <paramref name="x"/> and <paramref name="y"/> coordinates.
     ///     <see langword="null"/> if no view was found.
     /// </returns>
     // CONCURRENCY: This method is not thread-safe.
     // Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
-    public static View? FindDeepestView (View? start, int x, int y, out int resultX, out int resultY)
+    public static View? FindDeepestView (View? start, int x, int y)
     {
-        resultY = resultX = 0;
-
         if (start is null || !start.Frame.Contains (x, y))
         {
             return null;
@@ -579,16 +575,11 @@ public partial class View
 
                 if (v.Visible && v.Frame.Contains (rx, ry))
                 {
-                    View? deep = FindDeepestView (v, rx, ry, out resultX, out resultY);
-
+                    View? deep = FindDeepestView (v, rx, ry);
                     return deep ?? v;
                 }
             }
         }
-
-        resultX = x - start.Frame.X;
-        resultY = y - start.Frame.Y;
-
         return start;
     }
     #nullable restore
