@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <!-- =================================================================== -->
   <!-- Version numbers -->
   <!-- Automatically updated by gitversion (run `dotnet-gitversion /updateprojectfiles`)  -->
@@ -26,6 +26,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DefineDebug>True</DefineDebug>
+    <DefineConstants>$(DefineConstants);DEBUG_IDISPOSABLE</DefineConstants>
     <DebugType>portable</DebugType>
   </PropertyGroup>
   <!-- =================================================================== -->
