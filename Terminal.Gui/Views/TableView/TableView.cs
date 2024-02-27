@@ -440,8 +440,6 @@ public class TableView : View
         get => _selectedRow;
         set
         {
-            _ignoreEnsureSelectedCellIsVisible = false;
-
             int oldValue = _selectedRow;
 
             _selectedRow = TableIsNullOrInvisible () ? 0 : Math.Min (Table.Rows - 1, Math.Max (0, value));
@@ -458,6 +456,8 @@ public class TableView : View
                                                                         )
                                       );
             }
+
+            _ignoreEnsureSelectedCellIsVisible = false;
         }
     }
 
