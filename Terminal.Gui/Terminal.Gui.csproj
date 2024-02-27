@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <!-- =================================================================== -->
   <!-- Version numbers -->
   <!-- Automatically updated by gitversion (run `dotnet-gitversion /updateprojectfiles`)  -->
@@ -16,6 +16,7 @@
     <RootNamespace>Terminal.Gui</RootNamespace>
     <AssemblyName>Terminal.Gui</AssemblyName>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+    <DefineTrace>True</DefineTrace>
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
