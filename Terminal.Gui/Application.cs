@@ -1376,6 +1376,13 @@ public static partial class Application
 
         var view = View.FindDeepestView (Current, a.MouseEvent.X, a.MouseEvent.Y);
 
+        // TODO: Remove this temporary filter:
+        if (view is Adornment adornment)
+        {
+            view = adornment.Parent;
+        }
+
+
         if (view is { WantContinuousButtonPressed: true })
         {
             WantContinuousButtonPressedView = view;

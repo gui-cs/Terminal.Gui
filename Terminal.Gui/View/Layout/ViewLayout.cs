@@ -545,20 +545,27 @@ public partial class View
         }
     }
 
-    #nullable enable
+#nullable enable
     /// <summary>Finds which view that belong to the <paramref name="start"/> superview at the provided location.</summary>
     /// <param name="start">The superview where to look for.</param>
     /// <param name="x">The column location in the superview.</param>
     /// <param name="y">The row location in the superview.</param>
+    /// <param name="findAdornments">TODO: Remove this after unit tests are fixed</param>
     /// <returns>
     ///     The view that was found at the <paramref name="x"/> and <paramref name="y"/> coordinates.
     ///     <see langword="null"/> if no view was found.
     /// </returns>
+
     // CONCURRENCY: This method is not thread-safe.
     // Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
-    public static View? FindDeepestView (View? start, int x, int y)
+    public static View? FindDeepestView (View? start, int x, int y, bool findAdornments = false)
     {
-        if (start is null || !start.Frame.Contains (x, y))
+        if (start is null || !start.Visible)
+        {
+            return null;
+        }
+
+        if (!start.Frame.Contains (x, y))
         {
             return null;
         }
@@ -582,7 +589,7 @@ public partial class View
         }
         return start;
     }
-    #nullable restore
+#nullable restore
 
     /// <summary>Gets the <see cref="Frame"/> with a screen-relative location.</summary>
     /// <returns>The location and size of the view in screen-relative coordinates.</returns>
