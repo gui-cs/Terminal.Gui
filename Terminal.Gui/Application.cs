@@ -1374,14 +1374,8 @@ public static partial class Application
             return;
         }
 
+        // TODO: In PR #3273, FindDeepestView will return adornments. Update logic below to fix adornment mouse handling
         var view = View.FindDeepestView (Current, a.MouseEvent.X, a.MouseEvent.Y);
-
-        // TODO: Remove this temporary filter:
-        if (view is Adornment adornment)
-        {
-            view = adornment.Parent;
-        }
-
 
         if (view is { WantContinuousButtonPressed: true })
         {

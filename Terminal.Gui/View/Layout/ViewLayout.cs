@@ -550,7 +550,7 @@ public partial class View
     /// <param name="start">The superview where to look for.</param>
     /// <param name="x">The column location in the superview.</param>
     /// <param name="y">The row location in the superview.</param>
-    /// <param name="findAdornments">TODO: Remove this after unit tests are fixed</param>
+    /// <param name="findAdornments">TODO: Remove this in PR #3273</param>
     /// <returns>
     ///     The view that was found at the <paramref name="x"/> and <paramref name="y"/> coordinates.
     ///     <see langword="null"/> if no view was found.
@@ -572,6 +572,7 @@ public partial class View
 
         if (findAdornments)
         {
+            // TODO: This is a temporary hack for PR #3273; it is not actually used anywhere but unit tests at this point.
             if (start.Margin.Thickness.Contains (start.Margin.Frame, x, y))
             {
                 return start.Margin;
