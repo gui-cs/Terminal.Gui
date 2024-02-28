@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -25,7 +24,7 @@ public class Scrolling : Scenario
             Id = "scrollView",
             X = 2,
             Y = Pos.Bottom (label) + 1,
-            Width = Dim.Percent(60),
+            Width = Dim.Percent (60),
             Height = Dim.Percent (80),
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             ContentSize = new (80, 28),
@@ -68,7 +67,7 @@ public class Scrolling : Scenario
         {
             horizontalRuler.Text =
                 rule.Repeat ((int)Math.Ceiling (horizontalRuler.ContentArea.Width / (double)rule.Length)) [
-                     ..horizontalRuler.ContentArea.Width]
+                 ..horizontalRuler.ContentArea.Width]
                 + "\n"
                 + "|         ".Repeat (
                                        (int)Math.Ceiling (horizontalRuler.ContentArea.Width / (double)rule.Length)
@@ -181,20 +180,11 @@ public class Scrolling : Scenario
             X = Pos.Left (scrollView), Y = Pos.Bottom (ahCheckBox), Text = k, Checked = scrollView.AutoHideScrollBars
         };
 
-        hCheckBox.Toggled += (s, e) =>
-                             {
-                                 scrollView.ShowHorizontalScrollIndicator = !(bool)hCheckBox.Checked;
-                             };
+        hCheckBox.Toggled += (s, e) => { scrollView.ShowHorizontalScrollIndicator = !(bool)hCheckBox.Checked; };
 
-        vCheckBox.Toggled += (s, e) =>
-                             {
-                                 scrollView.ShowVerticalScrollIndicator = !(bool)vCheckBox.Checked;
-                             };
+        vCheckBox.Toggled += (s, e) => { scrollView.ShowVerticalScrollIndicator = !(bool)vCheckBox.Checked; };
 
-        ahCheckBox.Toggled += (s, e) =>
-                              {
-                                  scrollView.AutoHideScrollBars = !(bool)ahCheckBox.Checked;
-                              };
+        ahCheckBox.Toggled += (s, e) => { scrollView.AutoHideScrollBars = !(bool)ahCheckBox.Checked; };
         Win.Add (ahCheckBox);
 
         keepCheckBox.Toggled += (s, e) => scrollView.KeepContentAlwaysInViewPort = !(bool)keepCheckBox.Checked;
@@ -229,12 +219,16 @@ public class Scrolling : Scenario
             X = Pos.Right (scrollView) + 1,
             Y = Pos.AnchorEnd (1),
             AutoSize = false,
-            Width = Dim.Fill(),
+            Width = Dim.Fill (),
             Height = 1,
             Text = "Mouse: "
         };
         Win.Add (mousePos);
-        Application.MouseEvent += (sender, a) => { mousePos.Text = $"Mouse: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} - {a.MouseEvent.View} {count++}"; };
+
+        Application.MouseEvent += (sender, a) =>
+                                  {
+                                      mousePos.Text = $"Mouse: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} - {a.MouseEvent.View} {count++}";
+                                  };
 
         var progress = new ProgressBar { X = Pos.Right (scrollView) + 1, Y = Pos.AnchorEnd (2), Width = 50 };
         Win.Add (progress);
