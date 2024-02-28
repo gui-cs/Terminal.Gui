@@ -727,13 +727,7 @@ internal sealed class Menu : View
             locationOffset.Y += SuperView.Border.Thickness.Top;
         }
 
-        View view = FindDeepestView (
-                                     this,
-                                     a.MouseEvent.X + locationOffset.X,
-                                     a.MouseEvent.Y + locationOffset.Y,
-                                     out int rx,
-                                     out int ry
-                                    );
+        View view = FindDeepestView (this, a.MouseEvent.X + locationOffset.X, a.MouseEvent.Y + locationOffset.Y);
 
         if (view == this)
         {
@@ -742,7 +736,13 @@ internal sealed class Menu : View
                 throw new InvalidOperationException ("This shouldn't running on a invisible menu!");
             }
 
-            var nme = new MouseEvent { X = rx, Y = ry, Flags = a.MouseEvent.Flags, View = view };
+            var screen = view.FrameToScreen ();
+            var nme = new MouseEvent {
+                X = a.MouseEvent.X - screen.X,
+                Y = a.MouseEvent.Y - screen.Y,
+                Flags = a.MouseEvent.Flags,
+                View = view
+            };
 
             if (MouseEvent (nme) || a.MouseEvent.Flags == MouseFlags.Button1Pressed || a.MouseEvent.Flags == MouseFlags.Button1Released)
             {

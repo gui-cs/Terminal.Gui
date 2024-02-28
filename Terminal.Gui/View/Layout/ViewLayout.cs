@@ -545,26 +545,47 @@ public partial class View
         }
     }
 
-    #nullable enable
+#nullable enable
     /// <summary>Finds which view that belong to the <paramref name="start"/> superview at the provided location.</summary>
     /// <param name="start">The superview where to look for.</param>
     /// <param name="x">The column location in the superview.</param>
     /// <param name="y">The row location in the superview.</param>
-    /// <param name="resultX">The found view screen relative column location.</param>
-    /// <param name="resultY">The found view screen relative row location.</param>
+    /// <param name="findAdornments">TODO: Remove this in PR #3273</param>
     /// <returns>
     ///     The view that was found at the <paramref name="x"/> and <paramref name="y"/> coordinates.
     ///     <see langword="null"/> if no view was found.
     /// </returns>
+
     // CONCURRENCY: This method is not thread-safe.
     // Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
-    public static View? FindDeepestView (View? start, int x, int y, out int resultX, out int resultY)
+    public static View? FindDeepestView (View? start, int x, int y, bool findAdornments = false)
     {
-        resultY = resultX = 0;
-
-        if (start is null || !start.Frame.Contains (x, y))
+        if (start is null || !start.Visible)
         {
             return null;
+        }
+
+        if (!start.Frame.Contains (x, y))
+        {
+            return null;
+        }
+
+        if (findAdornments)
+        {
+            // TODO: This is a temporary hack for PR #3273; it is not actually used anywhere but unit tests at this point.
+            if (start.Margin.Thickness.Contains (start.Margin.Frame, x, y))
+            {
+                return start.Margin;
+            }
+            if (start.Border.Thickness.Contains (start.Border.Frame, x, y))
+            {
+                return start.Border;
+            }
+            if (start.Padding.Thickness.Contains (start.Padding.Frame, x, y))
+            {
+                return start.Padding;
+            }
+
         }
 
         if (start.InternalSubviews is { Count: > 0 })
@@ -579,19 +600,14 @@ public partial class View
 
                 if (v.Visible && v.Frame.Contains (rx, ry))
                 {
-                    View? deep = FindDeepestView (v, rx, ry, out resultX, out resultY);
-
+                    View? deep = FindDeepestView (v, rx, ry, findAdornments);
                     return deep ?? v;
                 }
             }
         }
-
-        resultX = x - start.Frame.X;
-        resultY = y - start.Frame.Y;
-
         return start;
     }
-    #nullable restore
+#nullable restore
 
     /// <summary>Gets the <see cref="Frame"/> with a screen-relative location.</summary>
     /// <returns>The location and size of the view in screen-relative coordinates.</returns>

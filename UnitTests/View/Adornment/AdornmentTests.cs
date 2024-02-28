@@ -8,6 +8,46 @@ public class AdornmentTests
     public AdornmentTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
+    public void Bounds_Location_Always_Empty_Size_Correct ()
+    {
+        var view = new View
+        {
+            X = 1,
+            Y = 2,
+            Width = 20,
+            Height = 31
+        };
+
+        var marginThickness = 1;
+        view.Margin.Thickness = new Thickness (marginThickness);
+
+        var borderThickness = 2;
+        view.Border.Thickness = new Thickness (borderThickness);
+
+        var paddingThickness = 3;
+        view.Padding.Thickness = new Thickness (paddingThickness);
+
+        view.BeginInit ();
+        view.EndInit ();
+
+        Assert.Equal (new Rectangle (1, 2, 20, 31), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 8, 19), view.Bounds);
+
+        Assert.Equal (new Rectangle (0, 0, view.Margin.Frame.Width - marginThickness * 2, view.Margin.Frame.Height - marginThickness * 2), view.Margin.Bounds);
+
+        Assert.Equal (new Rectangle (0, 0, view.Border.Frame.Width - borderThickness * 2, view.Border.Frame.Height - borderThickness * 2), view.Border.Bounds);
+
+        Assert.Equal (
+                      new Rectangle (
+                                     0,
+                                     0,
+                                     view.Padding.Frame.Width - (marginThickness + borderThickness) * 2,
+                                     view.Padding.Frame.Height - (marginThickness + borderThickness) * 2),
+                      view.Padding.Bounds);
+    }
+
+    // Test that Adornment.Bounds_get override uses Parent not SuperView
+    [Fact]
     public void BoundsToScreen_Uses_Parent_Not_SuperView ()
     {
         var parent = new View { X = 1, Y = 2, Width = 10, Height = 10 };
@@ -25,6 +65,134 @@ public class AdornmentTests
         Assert.Equal (new Rectangle (2, 4, 5, 5), boundsAsScreen);
     }
 
+    [Fact]
+    public void Frames_are_Parent_SuperView_Relative ()
+    {
+        var view = new View
+        {
+            X = 1,
+            Y = 2,
+            Width = 20,
+            Height = 31
+        };
+
+        var marginThickness = 1;
+        view.Margin.Thickness = new Thickness (marginThickness);
+
+        var borderThickness = 2;
+        view.Border.Thickness = new Thickness (borderThickness);
+
+        var paddingThickness = 3;
+        view.Padding.Thickness = new Thickness (paddingThickness);
+
+        view.BeginInit ();
+        view.EndInit ();
+
+        Assert.Equal (new Rectangle (1, 2, 20, 31), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 8, 19), view.Bounds);
+
+        // Margin.Frame is always the same as the view frame
+        Assert.Equal (new Rectangle (0, 0, 20, 31), view.Margin.Frame);
+
+        // Border.Frame is View.Frame minus the Margin thickness 
+        Assert.Equal (
+                      new Rectangle (marginThickness, marginThickness, view.Frame.Width - marginThickness * 2, view.Frame.Height - marginThickness * 2),
+                      view.Border.Frame);
+
+        // Padding.Frame is View.Frame minus the Border thickness plus Margin thickness
+        Assert.Equal (
+                      new Rectangle (
+                                     marginThickness + borderThickness,
+                                     marginThickness + borderThickness,
+                                     view.Frame.Width - (marginThickness + borderThickness) * 2,
+                                     view.Frame.Height - (marginThickness + borderThickness) * 2),
+                      view.Padding.Frame);
+    }
+
+    // Test that Adornment.FrameToScreen override retains Frame.Size
+    [Theory]
+    [InlineData (0, 0, 0)]
+    [InlineData (0, 1, 1)]
+    [InlineData (0, 10, 10)]
+    [InlineData (1, 0, 0)]
+    [InlineData (1, 1, 1)]
+    [InlineData (1, 10, 10)]
+    public void FrameToScreen_Retains_Frame_Size (int marginThickness, int w, int h)
+    {
+        var parent = new View { X = 1, Y = 2, Width = w, Height = h };
+        parent.Margin.Thickness = new Thickness (marginThickness);
+
+        parent.BeginInit ();
+        parent.EndInit ();
+
+        Assert.Equal (new Rectangle (1, 2, w, h), parent.Frame);
+        Assert.Equal (new Rectangle (0, 0, w, h), parent.Margin.Frame);
+
+        Assert.Equal (parent.Frame, parent.Margin.FrameToScreen ());
+    }
+
+    // Test that Adornment.FrameToScreen override returns Frame if Parent is null
+    [Fact]
+    public void FrameToScreen_Returns_Frame_If_Parent_Is_Null ()
+    {
+        var a = new Adornment
+        {
+            X = 1,
+            Y = 2,
+            Width = 3,
+            Height = 4
+        };
+
+        Assert.Null (a.Parent);
+        Assert.Equal (a.Frame, a.FrameToScreen ());
+    }
+
+    // Test that Adornment.FrameToScreen override returns correct location
+    [Theory]
+    [InlineData (0, 0, 0, 0)]
+    [InlineData (0, 0, 1, 1)]
+    [InlineData (0, 0, 10, 10)]
+    [InlineData (1, 0, 0, 0)]
+    [InlineData (1, 0, 1, 1)]
+    [InlineData (1, 0, 10, 10)]
+    [InlineData (0, 1, 0, 0)]
+    [InlineData (0, 1, 1, 1)]
+    [InlineData (0, 1, 10, 10)]
+    [InlineData (1, 1, 0, 0)]
+    [InlineData (1, 1, 1, 1)]
+    [InlineData (1, 1, 10, 10)]
+    public void FrameToScreen_Returns_Screen_Location (int marginThickness, int borderThickness, int x, int y)
+    {
+        var superView = new View
+        {
+            X = 1,
+            Y = 1,
+            Width = 20,
+            Height = 20
+        };
+        superView.Margin.Thickness = new Thickness (marginThickness);
+        superView.Border.Thickness = new Thickness (borderThickness);
+
+        var view = new View { X = x, Y = y, Width = 1, Height = 1 };
+        superView.Add (view);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        Assert.Equal (new Rectangle (x, y, 1, 1), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 20, 20), superView.Margin.Frame);
+
+        Assert.Equal (
+                      new Rectangle (marginThickness, marginThickness, 20 - marginThickness * 2, 20 - marginThickness * 2),
+                      superView.Border.Frame
+                     );
+
+        Assert.Equal (
+                      new Rectangle (superView.Frame.X + marginThickness, superView.Frame.Y + marginThickness, 20 - marginThickness * 2, 20 - marginThickness * 2),
+                      superView.Border.FrameToScreen ()
+                     );
+    }
+
+    // Test that Adornment.FrameToScreen override uses Parent not SuperView
     [Fact]
     public void FrameToScreen_Uses_Parent_Not_SuperView ()
     {

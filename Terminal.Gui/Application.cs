@@ -1374,7 +1374,8 @@ public static partial class Application
             return;
         }
 
-        var view = View.FindDeepestView (Current, a.MouseEvent.X, a.MouseEvent.Y, out int screenX, out int screenY);
+        // TODO: In PR #3273, FindDeepestView will return adornments. Update logic below to fix adornment mouse handling
+        var view = View.FindDeepestView (Current, a.MouseEvent.X, a.MouseEvent.Y);
 
         if (view is { WantContinuousButtonPressed: true })
         {
@@ -1437,7 +1438,7 @@ public static partial class Application
             && a.MouseEvent.Flags != 0)
         {
             View? top = FindDeepestTop (Top, a.MouseEvent.X, a.MouseEvent.Y);
-            view = View.FindDeepestView (top, a.MouseEvent.X, a.MouseEvent.Y, out screenX, out screenY);
+            view = View.FindDeepestView (top, a.MouseEvent.X, a.MouseEvent.Y);
 
             if (view is { } && view != OverlappedTop && top != Current)
             {
@@ -1449,6 +1450,8 @@ public static partial class Application
         {
             return;
         }
+
+        var screen = view.FrameToScreen ();
 
         // Work inside-out (Padding, Border, Margin)
         // TODO: Debate whether inside-out or outside-in is the right strategy
@@ -1469,11 +1472,11 @@ public static partial class Application
 
             var me = new MouseEvent
             {
-                X = screenX,
-                Y = screenY,
+                X = a.MouseEvent.X - screen.X,
+                Y = a.MouseEvent.Y - screen.Y,
                 Flags = a.MouseEvent.Flags,
-                OfX = screenX,
-                OfY = screenY,
+                OfX = a.MouseEvent.X - screen.X,
+                OfY = a.MouseEvent.Y - screen.Y,
                 View = view
             };
 

@@ -518,7 +518,7 @@ public class MenuBarTests
 
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (
-                                                           new MouseEvent { X = 20, Y = 4, Flags = MouseFlags.Button1Clicked }
+                                                           new MouseEvent { X = 20, Y = 5, Flags = MouseFlags.Button1Clicked }
                                                           )
                                  );
 
@@ -555,7 +555,7 @@ public class MenuBarTests
 
             Application.OnMouseEvent (
                                       new MouseEventEventArgs (
-                                                               new MouseEvent { X = 20, Y = 4 + i, Flags = MouseFlags.Button1Clicked }
+                                                               new MouseEvent { X = 20, Y = 5 + i, Flags = MouseFlags.Button1Clicked }
                                                               )
                                      );
 
