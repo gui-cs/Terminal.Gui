@@ -1,250 +1,316 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using Xunit;
+﻿using System.Reflection;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
-public class AllViewsTests {
-	readonly ITestOutputHelper _output;
 
-	public AllViewsTests (ITestOutputHelper output)
-	{
-		_output = output;
-	}
+public class AllViewsTests
+{
+    private readonly ITestOutputHelper _output;
+    public AllViewsTests (ITestOutputHelper output) { _output = output; }
 
-	[Fact]
-	public void AllViews_Center_Properly ()
-	{
-		// See https://github.com/gui-cs/Terminal.Gui/issues/3156
+    [Fact]
+    public void AllViews_Center_Properly ()
+    {
+        // See https://github.com/gui-cs/Terminal.Gui/issues/3156
 
-		foreach (var type in GetAllViewClasses ()) {
-			Application.Init (new FakeDriver ());
-			var view = CreateViewFromType (type, type.GetConstructor (Array.Empty<Type> ()));
-			if (view == null) {
-				_output.WriteLine ($"Ignoring {type} - It's a Generic");
-				Application.Shutdown ();
-				continue;
-			}
-			view.X = Pos.Center ();
-			view.Y = Pos.Center ();
+        foreach (Type type in GetAllViewClasses ())
+        {
+            Application.Init (new FakeDriver ());
+            View view = CreateViewFromType (type, type.GetConstructor (Array.Empty<Type> ()));
 
-			// Ensure the view has positive dimensions
-			view.Width = 10;
-			view.Height = 10;
+            if (view == null)
+            {
+                _output.WriteLine ($"Ignoring {type} - It's a Generic");
+                Application.Shutdown ();
 
-			var frame = new View () {
-				X = 0,
-				Y = 0,
-				Width = 50,
-				Height = 50,
-			};
-			frame.Add (view);
-			frame.BeginInit ();
-			frame.EndInit ();
-			frame.LayoutSubviews ();
+                continue;
+            }
 
-			// What's the natural width/height?
-			var expectedX = (frame.Frame.Width - view.Frame.Width) / 2;
-			var expectedY = (frame.Frame.Height - view.Frame.Height) / 2;
+            view.X = Pos.Center ();
+            view.Y = Pos.Center ();
 
-			Assert.True (view.Frame.Left == expectedX, $"{view} did not center horizontally. Expected: {expectedX}. Actual: {view.Frame.Left}");
-			Assert.True (view.Frame.Top == expectedY, $"{view} did not center vertically. Expected: {expectedY}. Actual: {view.Frame.Top}");
-			Application.Shutdown ();
-		}
-	}
+            // Turn off AutoSize
+            view.AutoSize = false;
 
-	[Fact]
-	public void AllViews_Tests_All_Constructors ()
-	{
-		Application.Init (new FakeDriver ());
+            // Ensure the view has positive dimensions
+            view.Width = 10;
+            view.Height = 10;
 
-		foreach (var type in GetAllViewClasses ()) {
-			Assert.True (Test_All_Constructors_Of_Type (type));
-		}
+            var frame = new View { X = 0, Y = 0, Width = 50, Height = 50 };
+            frame.Add (view);
+            frame.BeginInit ();
+            frame.EndInit ();
+            frame.LayoutSubviews ();
 
-		Application.Shutdown ();
-	}
+            // What's the natural width/height?
+            int expectedX = (frame.Frame.Width - view.Frame.Width) / 2;
+            int expectedY = (frame.Frame.Height - view.Frame.Height) / 2;
 
-	[Fact]
-	public void AllViews_Enter_Leave_Events ()
-	{
-		foreach (var type in GetAllViewClasses ()) {
-			_output.WriteLine ($"Testing {type.Name}");
+            Assert.True (
+                         view.Frame.Left == expectedX,
+                         $"{view} did not center horizontally. Expected: {expectedX}. Actual: {view.Frame.Left}"
+                        );
 
-			Application.Init (new FakeDriver ());
+            Assert.True (
+                         view.Frame.Top == expectedY,
+                         $"{view} did not center vertically. Expected: {expectedY}. Actual: {view.Frame.Top}"
+                        );
+            Application.Shutdown ();
+        }
+    }
 
-			var top = Application.Top;
-			var vType = CreateViewFromType (type, type.GetConstructor (Array.Empty<Type> ()));
-			if (vType == null) {
-				_output.WriteLine ($"Ignoring {type} - It's a Generic");
-				Application.Shutdown ();
-				continue;
-			}
-			vType.X = 0;
-			vType.Y = 0;
-			vType.Width = 10;
-			vType.Height = 1;
+    [Fact]
+    public void AllViews_Enter_Leave_Events ()
+    {
+        foreach (Type type in GetAllViewClasses ())
+        {
+            _output.WriteLine ($"Testing {type.Name}");
 
-			var view = new View () {
-				X = 0,
-				Y = 1,
-				Width = 10,
-				Height = 1,
-				CanFocus = true
-			};
-			var vTypeEnter = 0;
-			var vTypeLeave = 0;
-			var viewEnter = 0;
-			var viewLeave = 0;
+            Application.Init (new FakeDriver ());
 
-			vType.Enter += (s, e) => vTypeEnter++;
-			vType.Leave += (s, e) => vTypeLeave++;
-			view.Enter += (s, e) => viewEnter++;
-			view.Leave += (s, e) => viewLeave++;
+            Toplevel top = Application.Top;
+            View vType = CreateViewFromType (type, type.GetConstructor (Array.Empty<Type> ()));
 
-			top.Add (vType, view);
-			Application.Begin (top);
+            if (vType == null)
+            {
+                _output.WriteLine ($"Ignoring {type} - It's a Generic");
+                Application.Shutdown ();
 
-			if (!vType.CanFocus || (vType is Toplevel && ((Toplevel)vType).Modal)) {
-				Application.Shutdown ();
-				continue;
-			}
+                continue;
+            }
 
-			if (vType is TextView) {
-				top.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask));
-			} else if (vType is DatePicker) {
-				for (int i = 0; i < 4; i++) {
-					top.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask));
-				}
-			} else {
-				top.NewKeyDownEvent (new (KeyCode.Tab));
-			}
-			top.NewKeyDownEvent (new (KeyCode.Tab));
+            vType.AutoSize = false;
+            vType.X = 0;
+            vType.Y = 0;
+            vType.Width = 10;
+            vType.Height = 1;
 
-			Assert.Equal (2, vTypeEnter);
-			Assert.Equal (1, vTypeLeave);
-			Assert.Equal (1, viewEnter);
-			Assert.Equal (1, viewLeave);
+            var view = new View
+            {
+                X = 0,
+                Y = 1,
+                Width = 10,
+                Height = 1,
+                CanFocus = true
+            };
+            var vTypeEnter = 0;
+            var vTypeLeave = 0;
+            var viewEnter = 0;
+            var viewLeave = 0;
 
-			Application.Shutdown ();
-		}
-	}
+            vType.Enter += (s, e) => vTypeEnter++;
+            vType.Leave += (s, e) => vTypeLeave++;
+            view.Enter += (s, e) => viewEnter++;
+            view.Leave += (s, e) => viewLeave++;
 
-	//[Fact]
-	//public void AllViews_HotKey_Works ()
-	//{
-	//	foreach (var type in GetAllViewClasses ()) {
-	//		_output.WriteLine ($"Testing {type.Name}");
-	//		var view = GetTypeInitializer (type, type.GetConstructor (Array.Empty<Type> ()));
-	//		view.HotKeySpecifier = (Rune)'^';
-	//		view.Text = "^text";
-	//		Assert.Equal(Key.T, view.HotKey);
-	//	}
-	//}
+            top.Add (vType, view);
+            Application.Begin (top);
 
-	public bool Test_All_Constructors_Of_Type (Type type)
-	{
-		foreach (var ctor in type.GetConstructors ()) {
-			var view = CreateViewFromType (type, ctor);
-			if (view != null) {
-				Assert.True (type.FullName == view.GetType ().FullName);
-			}
-		}
+            if (!vType.CanFocus || (vType is Toplevel && ((Toplevel)vType).Modal))
+            {
+                Application.Shutdown ();
 
-		return true;
-	}
+                continue;
+            }
 
-	private static View CreateViewFromType (Type type, ConstructorInfo ctor)
-	{
-		View viewType = null;
+            if (vType is TextView)
+            {
+                top.NewKeyDownEvent (Key.Tab.WithCtrl);
+            }
+            else if (vType is DatePicker)
+            {
+                for (var i = 0; i < 4; i++)
+                {
+                    top.NewKeyDownEvent (Key.Tab.WithCtrl);
+                }
+            }
+            else
+            {
+                top.NewKeyDownEvent (Key.Tab);
+            }
 
-		if (type.IsGenericType && type.IsTypeDefinition) {
-			List<Type> gTypes = new List<Type> ();
+            top.NewKeyDownEvent (Key.Tab);
 
-			foreach (var args in type.GetGenericArguments ()) {
-				gTypes.Add (typeof (object));
-			}
-			type = type.MakeGenericType (gTypes.ToArray ());
+            Assert.Equal (2, vTypeEnter);
+            Assert.Equal (1, vTypeLeave);
+            Assert.Equal (1, viewEnter);
+            Assert.Equal (1, viewLeave);
 
-			Assert.IsType (type, (View)Activator.CreateInstance (type));
+            Application.Shutdown ();
+        }
+    }
 
-		} else {
-			ParameterInfo [] paramsInfo = ctor.GetParameters ();
-			Type paramType;
-			List<object> pTypes = new List<object> ();
+    [Fact]
+    public void AllViews_Tests_All_Constructors ()
+    {
+        Application.Init (new FakeDriver ());
 
-			if (type.IsGenericType) {
-				foreach (var args in type.GetGenericArguments ()) {
-					paramType = args.GetType ();
-					if (args.Name == "T") {
-						pTypes.Add (typeof (object));
-					} else {
-						AddArguments (paramType, pTypes);
-					}
-				}
-			}
+        foreach (Type type in GetAllViewClasses ())
+        {
+            Assert.True (Test_All_Constructors_Of_Type (type));
+        }
 
-			foreach (var p in paramsInfo) {
-				paramType = p.ParameterType;
-				if (p.HasDefaultValue) {
-					pTypes.Add (p.DefaultValue);
-				} else {
-					AddArguments (paramType, pTypes);
-				}
+        Application.Shutdown ();
+    }
 
-			}
+    public static List<Type> GetAllViewClasses ()
+    {
+        return typeof (View).Assembly.GetTypes ()
+                            .Where (
+                                    myType => myType.IsClass
+                                              && !myType.IsAbstract
+                                              && myType.IsPublic
+                                              && myType.IsSubclassOf (typeof (View))
+                                   )
+                            .ToList ();
+    }
 
-			if (type.IsGenericType && !type.IsTypeDefinition) {
-				viewType = (View)Activator.CreateInstance (type);
-				Assert.IsType (type, viewType);
-			} else {
-				viewType = (View)ctor.Invoke (pTypes.ToArray ());
-				Assert.IsType (type, viewType);
-			}
-		}
+    //[Fact]
+    //public void AllViews_HotKey_Works ()
+    //{
+    //	foreach (var type in GetAllViewClasses ()) {
+    //		_output.WriteLine ($"Testing {type.Name}");
+    //		var view = GetTypeInitializer (type, type.GetConstructor (Array.Empty<Type> ()));
+    //		view.HotKeySpecifier = (Rune)'^';
+    //		view.Text = "^text";
+    //		Assert.Equal(Key.T, view.HotKey);
+    //	}
+    //}
 
-		return viewType;
-	}
+    public bool Test_All_Constructors_Of_Type (Type type)
+    {
+        foreach (ConstructorInfo ctor in type.GetConstructors ())
+        {
+            View view = CreateViewFromType (type, ctor);
 
-	// BUGBUG: This is a hack. We should figure out how to dynamically
-	// create the right type of argument for the constructor.
-	private static void AddArguments (Type paramType, List<object> pTypes)
-	{
-		if (paramType == typeof (Rect)) {
-			pTypes.Add (Rect.Empty);
-		} else if (paramType == typeof (string)) {
-			pTypes.Add (string.Empty);
-		} else if (paramType == typeof (int)) {
-			pTypes.Add (0);
-		} else if (paramType == typeof (bool)) {
-			pTypes.Add (true);
-		} else if (paramType.Name == "IList") {
-			pTypes.Add (new List<object> ());
-		} else if (paramType.Name == "View") {
-			var top = new Toplevel ();
-			var view = new View ();
-			top.Add (view);
-			pTypes.Add (view);
-		} else if (paramType.Name == "View[]") {
-			pTypes.Add (new View [] { });
-		} else if (paramType.Name == "Stream") {
-			pTypes.Add (new MemoryStream ());
-		} else if (paramType.Name == "String") {
-			pTypes.Add (string.Empty);
-		} else if (paramType.Name == "TreeView`1[T]") {
-			pTypes.Add (string.Empty);
-		} else {
-			pTypes.Add (null);
-		}
-	}
+            if (view != null)
+            {
+                Assert.True (type.FullName == view.GetType ().FullName);
+            }
+        }
 
-	public static List<Type> GetAllViewClasses ()
-	{
-		return typeof (View).Assembly.GetTypes ()
-			.Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsPublic && myType.IsSubclassOf (typeof (View)))
-			.ToList ();
-	}
+        return true;
+    }
+
+    // BUGBUG: This is a hack. We should figure out how to dynamically
+    // create the right type of argument for the constructor.
+    private static void AddArguments (Type paramType, List<object> pTypes)
+    {
+        if (paramType == typeof (Rectangle))
+        {
+            pTypes.Add (Rectangle.Empty);
+        }
+        else if (paramType == typeof (string))
+        {
+            pTypes.Add (string.Empty);
+        }
+        else if (paramType == typeof (int))
+        {
+            pTypes.Add (0);
+        }
+        else if (paramType == typeof (bool))
+        {
+            pTypes.Add (true);
+        }
+        else if (paramType.Name == "IList")
+        {
+            pTypes.Add (new List<object> ());
+        }
+        else if (paramType.Name == "View")
+        {
+            var top = new Toplevel ();
+            var view = new View ();
+            top.Add (view);
+            pTypes.Add (view);
+        }
+        else if (paramType.Name == "View[]")
+        {
+            pTypes.Add (new View [] { });
+        }
+        else if (paramType.Name == "Stream")
+        {
+            pTypes.Add (new MemoryStream ());
+        }
+        else if (paramType.Name == "String")
+        {
+            pTypes.Add (string.Empty);
+        }
+        else if (paramType.Name == "TreeView`1[T]")
+        {
+            pTypes.Add (string.Empty);
+        }
+        else
+        {
+            pTypes.Add (null);
+        }
+    }
+
+    private static View CreateViewFromType (Type type, ConstructorInfo ctor)
+    {
+        View viewType = null;
+
+        if (type.IsGenericType && type.IsTypeDefinition)
+        {
+            List<Type> gTypes = new ();
+
+            foreach (Type args in type.GetGenericArguments ())
+            {
+                gTypes.Add (typeof (object));
+            }
+
+            type = type.MakeGenericType (gTypes.ToArray ());
+
+            Assert.IsType (type, (View)Activator.CreateInstance (type));
+        }
+        else
+        {
+            ParameterInfo [] paramsInfo = ctor.GetParameters ();
+            Type paramType;
+            List<object> pTypes = new ();
+
+            if (type.IsGenericType)
+            {
+                foreach (Type args in type.GetGenericArguments ())
+                {
+                    paramType = args.GetType ();
+
+                    if (args.Name == "T")
+                    {
+                        pTypes.Add (typeof (object));
+                    }
+                    else
+                    {
+                        AddArguments (paramType, pTypes);
+                    }
+                }
+            }
+
+            foreach (ParameterInfo p in paramsInfo)
+            {
+                paramType = p.ParameterType;
+
+                if (p.HasDefaultValue)
+                {
+                    pTypes.Add (p.DefaultValue);
+                }
+                else
+                {
+                    AddArguments (paramType, pTypes);
+                }
+            }
+
+            if (type.IsGenericType && !type.IsTypeDefinition)
+            {
+                viewType = (View)Activator.CreateInstance (type);
+                Assert.IsType (type, viewType);
+            }
+            else
+            {
+                viewType = (View)ctor.Invoke (pTypes.ToArray ());
+                Assert.IsType (type, viewType);
+            }
+        }
+
+        return viewType;
+    }
 }

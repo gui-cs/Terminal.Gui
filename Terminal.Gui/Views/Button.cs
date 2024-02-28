@@ -5,216 +5,171 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 
-using System;
-using System.Text;
-
 namespace Terminal.Gui;
-/// <summary>
-/// Button is a <see cref="View"/> that provides an item that invokes raises the <see cref="Clicked"/> event.
-/// </summary>
+
+/// <summary>Button is a <see cref="View"/> that provides an item that invokes raises the <see cref="View.Accept"/> event.</summary>
 /// <remarks>
-///         <para>
-///         Provides a button showing text that raises the <see cref="Clicked"/> event when clicked on with a mouse
-///         or when the user presses SPACE, ENTER, or the <see cref="View.HotKey"/>. The hot key is the first letter or
-///         digit following the first underscore ('_')
-///         in the button text.
-///         </para>
-///         <para>
-///         Use <see cref="View.HotKeySpecifier"/> to change the hot key specifier from the default of ('_').
-///         </para>
-///         <para>
-///         When the button is configured as the default (<see cref="IsDefault"/>) and the user presses
-///         the ENTER key, if no other <see cref="View"/> processes the key, the <see cref="Button"/>'s
-///         <see cref="Clicked"/> event will will be fired.
-///         </para>
+///     <para>
+///         Provides a button showing text that raises the <see cref="View.Accept"/> event when clicked on with a mouse or
+///         when the user presses SPACE, ENTER, or the <see cref="View.HotKey"/>. The hot key is the first letter or digit
+///         following the first underscore ('_') in the button text.
+///     </para>
+///     <para>Use <see cref="View.HotKeySpecifier"/> to change the hot key specifier from the default of ('_').</para>
+///     <para>
+///         When the button is configured as the default (<see cref="IsDefault"/>) and the user presses the ENTER key, if
+///         no other <see cref="View"/> processes the key, the <see cref="Button"/>'s <see cref="View.Accept"/> event will
+///         be fired.
+///     </para>
 /// </remarks>
-public class Button : View {
-	bool _isDefault;
-	Rune _leftBracket;
-	Rune _leftDefault;
-	Rune _rightBracket;
-	Rune _rightDefault;
+public class Button : View
+{
+    private readonly Rune _leftBracket;
+    private readonly Rune _leftDefault;
+    private readonly Rune _rightBracket;
+    private readonly Rune _rightDefault;
+    private bool _isDefault;
 
-	/// <summary>
-	/// Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.
-	/// </summary>
-	/// <remarks>
-	/// The width of the <see cref="Button"/> is computed based on the
-	/// text length. The height will always be 1.
-	/// </remarks>
-	public Button () : this (string.Empty, false) { }
+    /// <summary>Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.</summary>
+    /// <remarks>The width of the <see cref="Button"/> is computed based on the text length. The height will always be 1.</remarks>
+    public Button ()
+    {
+        TextAlignment = TextAlignment.Centered;
+        VerticalTextAlignment = VerticalTextAlignment.Middle;
 
-	/// <summary>
-	/// Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.
-	/// </summary>
-	/// <remarks>
-	/// The width of the <see cref="Button"/> is computed based on the
-	/// text length. The height will always be 1.
-	/// </remarks>
-	/// <param name="text">The button's text</param>
-	/// <param name="is_default">
-	/// If <c>true</c>, a special decoration is used, and the user pressing the enter key
-	/// in a <see cref="Dialog"/> will implicitly activate this button.
-	/// </param>
-	public Button (string text, bool is_default = false) : base (text) => SetInitialProperties (text, is_default);
+        _leftBracket = Glyphs.LeftBracket;
+        _rightBracket = Glyphs.RightBracket;
+        _leftDefault = Glyphs.LeftDefaultIndicator;
+        _rightDefault = Glyphs.RightDefaultIndicator;
 
-	/// <summary>
-	/// Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Absolute"/> layout, based on the given
-	/// text
-	/// </summary>
-	/// <remarks>
-	/// The width of the <see cref="Button"/> is computed based on the
-	/// text length. The height will always be 1.
-	/// </remarks>
-	/// <param name="x">X position where the button will be shown.</param>
-	/// <param name="y">Y position where the button will be shown.</param>
-	/// <param name="text">The button's text</param>
-	public Button (int x, int y, string text) : this (x, y, text, false) { }
+        // Ensures a height of 1 if AutoSize is set to false
+        Height = 1;
 
-	/// <summary>
-	/// Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Absolute"/> layout, based on the given
-	/// text.
-	/// </summary>
-	/// <remarks>
-	/// The width of the <see cref="Button"/> is computed based on the
-	/// text length. The height will always be 1.
-	/// </remarks>
-	/// <param name="x">X position where the button will be shown.</param>
-	/// <param name="y">Y position where the button will be shown.</param>
-	/// <param name="text">The button's text</param>
-	/// <param name="is_default">
-	/// If <c>true</c>, a special decoration is used, and the user pressing the enter key
-	/// in a <see cref="Dialog"/> will implicitly activate this button.
-	/// </param>
-	public Button (int x, int y, string text, bool is_default)
-		: base (new Rect (x, y, text.GetRuneCount () + 4 + (is_default ? 2 : 0), 1), text) => SetInitialProperties (text, is_default);
+        CanFocus = true;
+        AutoSize = true;
 
-	/// <summary>
-	/// Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.
-	/// </summary>
-	/// <value><c>true</c> if is default; otherwise, <c>false</c>.</value>
-	public bool IsDefault {
-		get => _isDefault;
-		set {
-			_isDefault = value;
-			UpdateTextFormatterText ();
-			OnResizeNeeded ();
-		}
-	}
+        // Override default behavior of View
+        AddCommand (Command.HotKey, () =>
+                                     {
+                                         SetFocus ();
+                                         return !OnAccept ();
+                                     });
 
-	/// <summary>
-	/// 
-	/// </summary>
-	public bool NoDecorations { get; set; }
+        KeyBindings.Add (Key.Space, Command.HotKey);
+        KeyBindings.Add (Key.Enter, Command.HotKey);
 
-	/// <summary>
-	/// 
-	/// </summary>
-	public bool NoPadding { get; set; }
+        TitleChanged += Button_TitleChanged;
+    }
 
-	// TODO: v2 - Remove constructors with parameters
-	/// <summary>
-	/// Private helper to set the initial properties of the View that were provided via constructors.
-	/// </summary>
-	/// <param name="text"></param>
-	/// <param name="is_default"></param>
-	void SetInitialProperties (string text, bool is_default)
-	{
-		TextAlignment = TextAlignment.Centered;
-		VerticalTextAlignment = VerticalTextAlignment.Middle;
+    private void Button_TitleChanged (object sender, StateEventArgs<string> e)
+    {
+        base.Text = e.NewValue;
+        TextFormatter.HotKeySpecifier = HotKeySpecifier;
+    }
 
-		HotKeySpecifier = new Rune ('_');
+    /// <inheritdoc />
+    public override string Text
+    {
+        get => base.Title;
+        set => base.Text = base.Title = value;
+    }
 
-		_leftBracket = Glyphs.LeftBracket;
-		_rightBracket = Glyphs.RightBracket;
-		_leftDefault = Glyphs.LeftDefaultIndicator;
-		_rightDefault = Glyphs.RightDefaultIndicator;
+    /// <inheritdoc />
+    public override Rune HotKeySpecifier
+    {
+        get => base.HotKeySpecifier;
+        set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
+    }
 
-		CanFocus = true;
-		AutoSize = true;
-		_isDefault = is_default;
-		Text = text ?? string.Empty;
+    /// <summary>Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.</summary>
+    /// <value><c>true</c> if is default; otherwise, <c>false</c>.</value>
+    public bool IsDefault
+    {
+        get => _isDefault;
+        set
+        {
+            _isDefault = value;
+            UpdateTextFormatterText ();
+            OnResizeNeeded ();
+        }
+    }
 
-		// Override default behavior of View
-		// Command.Default sets focus
-		AddCommand (Command.Accept, () => {
-			OnClicked ();
-			return true;
-		});
-		KeyBindings.Add (Key.Space, Command.Default, Command.Accept);
-		KeyBindings.Add (Key.Enter, Command.Default, Command.Accept);
-	}
+    /// <summary></summary>
+    public bool NoDecorations { get; set; }
 
-	/// <inheritdoc/>
-	protected override void UpdateTextFormatterText ()
-	{
-		if (NoDecorations) {
-			TextFormatter.Text = Text;
-		} else if (IsDefault) {
-			TextFormatter.Text = $"{_leftBracket}{_leftDefault} {Text} {_rightDefault}{_rightBracket}";
-		} else {
-			if (NoPadding) {
-				TextFormatter.Text = $"{_leftBracket}{Text}{_rightBracket}";
-			} else {
-				TextFormatter.Text = $"{_leftBracket} {Text} {_rightBracket}";
-			}
-		}
-	}
+    /// <summary></summary>
+    public bool NoPadding { get; set; }
 
+    /// <inheritdoc/>
+    public override bool MouseEvent (MouseEvent me)
+    {
+        if (me.Flags == MouseFlags.Button1Clicked)
+        {
+            if (CanFocus && Enabled)
+            {
+                if (!HasFocus)
+                {
+                    SetFocus ();
+                    SetNeedsDisplay ();
+                    Draw ();
+                }
 
-	/// <summary>
-	/// Virtual method to invoke the <see cref="Clicked"/> event.
-	/// </summary>
-	public virtual void OnClicked () => Clicked?.Invoke (this, EventArgs.Empty);
+                OnAccept ();
+            }
 
-	/// <summary>
-	/// The event fired when the user clicks the primary mouse button within the Bounds of this <see cref="View"/>
-	/// or if the user presses the action key while this view is focused. (TODO: IsDefault)
-	/// </summary>
-	/// <remarks>
-	/// Client code can hook up to this event, it is
-	/// raised when the button is activated either with
-	/// the mouse or the keyboard.
-	/// </remarks>
-	public event EventHandler Clicked;
+            return true;
+        }
 
-	///<inheritdoc/>
-	public override bool MouseEvent (MouseEvent me)
-	{
-		if (me.Flags == MouseFlags.Button1Clicked) {
-			if (CanFocus && Enabled) {
-				if (!HasFocus) {
-					SetFocus ();
-					SetNeedsDisplay ();
-					Draw ();
-				}
-				OnClicked ();
-			}
+        return false;
+    }
 
-			return true;
-		}
-		return false;
-	}
+    /// <inheritdoc/>
+    public override bool OnEnter (View view)
+    {
+        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
 
-	///<inheritdoc/>
-	public override void PositionCursor ()
-	{
-		if (HotKey.IsValid && Text != "") {
-			for (var i = 0; i < TextFormatter.Text.GetRuneCount (); i++) {
-				if (TextFormatter.Text [i] == Text [0]) {
-					Move (i, 0);
-					return;
-				}
-			}
-		}
-		base.PositionCursor ();
-	}
+        return base.OnEnter (view);
+    }
 
-	///<inheritdoc/>
-	public override bool OnEnter (View view)
-	{
-		Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+    /// <inheritdoc/>
+    public override void PositionCursor ()
+    {
+        if (HotKey.IsValid && Text != "")
+        {
+            for (var i = 0; i < TextFormatter.Text.GetRuneCount (); i++)
+            {
+                if (TextFormatter.Text [i] == Text [0])
+                {
+                    Move (i, 0);
 
-		return base.OnEnter (view);
-	}
+                    return;
+                }
+            }
+        }
+
+        base.PositionCursor ();
+    }
+
+    /// <inheritdoc/>
+    protected override void UpdateTextFormatterText ()
+    {
+        if (NoDecorations)
+        {
+            TextFormatter.Text = Text;
+        }
+        else if (IsDefault)
+        {
+            TextFormatter.Text = $"{_leftBracket}{_leftDefault} {Text} {_rightDefault}{_rightBracket}";
+        }
+        else
+        {
+            if (NoPadding)
+            {
+                TextFormatter.Text = $"{_leftBracket}{Text}{_rightBracket}";
+            }
+            else
+            {
+                TextFormatter.Text = $"{_leftBracket} {Text} {_rightBracket}";
+            }
+        }
+    }
 }

@@ -1,127 +1,112 @@
 ﻿using System;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "SendKeys", Description: "SendKeys sample - Send key combinations.")]
-	[ScenarioCategory ("Mouse and Keyboard")]
-	public class SendKeys : Scenario {
-		public override void Setup ()
-		{
-			var label = new Label ("Insert the text to send:") {
-				X = Pos.Center (),
-				Y = Pos.Center () - 6
-			};
-			Win.Add (label);
+namespace UICatalog.Scenarios;
 
-			var txtInput = new TextField ("MockKeyPresses") {
-				X = Pos.Center (),
-				Y = Pos.Center () - 5,
-				Width = 20
-			};
-			Win.Add (txtInput);
+[ScenarioMetadata ("SendKeys", "SendKeys sample - Send key combinations.")]
+[ScenarioCategory ("Mouse and Keyboard")]
+public class SendKeys : Scenario
+{
+    public override void Setup ()
+    {
+        var label = new Label { X = Pos.Center (), Y = Pos.Center () - 6, Text = "Insert the text to send:" };
+        Win.Add (label);
 
-			var ckbShift = new CheckBox ("Shift") {
-				X = Pos.Center (),
-				Y = Pos.Center () - 4
-			};
-			Win.Add (ckbShift);
+        var txtInput = new TextField { X = Pos.Center (), Y = Pos.Center () - 5, Width = 20, Text = "MockKeyPresses" };
+        Win.Add (txtInput);
 
-			var ckbAlt = new CheckBox ("Alt") {
-				X = Pos.Center (),
-				Y = Pos.Center () - 3
-			};
-			Win.Add (ckbAlt);
+        var ckbShift = new CheckBox { X = Pos.Center (), Y = Pos.Center () - 4, Text = "Shift" };
+        Win.Add (ckbShift);
 
-			var ckbControl = new CheckBox ("Control") {
-				X = Pos.Center (),
-				Y = Pos.Center () - 2
-			};
-			Win.Add (ckbControl);
+        var ckbAlt = new CheckBox { X = Pos.Center (), Y = Pos.Center () - 3, Text = "Alt" };
+        Win.Add (ckbAlt);
 
-			label = new Label ("Result keys:") {
-				X = Pos.Center (),
-				Y = Pos.Center () + 1
-			};
-			Win.Add (label);
+        var ckbControl = new CheckBox { X = Pos.Center (), Y = Pos.Center () - 2, Text = "Control" };
+        Win.Add (ckbControl);
 
-			var txtResult = new TextField () {
-				X = Pos.Center (),
-				Y = Pos.Center () + 2,
-				Width = 20,
-			};
-			Win.Add (txtResult);
+        label = new Label { X = Pos.Center (), Y = Pos.Center () + 1, Text = "Result keys:" };
+        Win.Add (label);
 
-			var rKeys = "";
-			var rControlKeys = "";
-			var IsShift = false;
-			var IsAlt = false;
-			var IsCtrl = false;
+        var txtResult = new TextField { X = Pos.Center (), Y = Pos.Center () + 2, Width = 20 };
+        Win.Add (txtResult);
 
-			txtResult.KeyDown += (s, e) => {
-				rKeys += (char)e.KeyCode;
-				if (!IsShift && e.IsShift) {
-					rControlKeys += " Shift ";
-					IsShift = true;
-				}
-				if (!IsAlt && e.IsAlt) {
-					rControlKeys += " Alt ";
-					IsAlt = true;
-				}
-				if (!IsCtrl && e.IsCtrl) {
-					rControlKeys += " Ctrl ";
-					IsCtrl = true;
-				}
-			};
+        var rKeys = "";
+        var rControlKeys = "";
+        var IsShift = false;
+        var IsAlt = false;
+        var IsCtrl = false;
 
-			var lblShippedKeys = new Label () {
-				X = Pos.Center (),
-				Y = Pos.Center () + 3,
-				AutoSize = true
-			};
-			Win.Add (lblShippedKeys);
+        txtResult.KeyDown += (s, e) =>
+                             {
+                                 rKeys += (char)e.KeyCode;
 
-			var lblShippedControlKeys = new Label () {
-				X = Pos.Center (),
-				Y = Pos.Center () + 5,
-				AutoSize = true
-			};
-			Win.Add (lblShippedControlKeys);
+                                 if (!IsShift && e.IsShift)
+                                 {
+                                     rControlKeys += " Shift ";
+                                     IsShift = true;
+                                 }
 
-			var button = new Button ("Process keys") {
-				X = Pos.Center (),
-				Y = Pos.Center () + 7,
-				IsDefault = true
-			};
-			Win.Add (button);
+                                 if (!IsAlt && e.IsAlt)
+                                 {
+                                     rControlKeys += " Alt ";
+                                     IsAlt = true;
+                                 }
 
-			void ProcessInput ()
-			{
-				rKeys = "";
-				rControlKeys = "";
-				txtResult.Text = "";
-				IsShift = false;
-				IsAlt = false;
-				IsCtrl = false;
-				txtResult.SetFocus ();
-				foreach (var r in txtInput.Text) {
-					var ck = char.IsLetter (r)
-						? (ConsoleKey)char.ToUpper (r) : (ConsoleKey)r;
-					Application.Driver.SendKeys (r, ck, (bool)ckbShift.Checked,
-						(bool)ckbAlt.Checked, (bool)ckbControl.Checked);
-				}
-				lblShippedKeys.Text = rKeys;
-				lblShippedControlKeys.Text = rControlKeys;
-				txtInput.SetFocus ();
-			}
+                                 if (!IsCtrl && e.IsCtrl)
+                                 {
+                                     rControlKeys += " Ctrl ";
+                                     IsCtrl = true;
+                                 }
+                             };
 
-			button.Clicked += (s,e) => ProcessInput ();
+        var lblShippedKeys = new Label { X = Pos.Center (), Y = Pos.Center () + 3, AutoSize = true };
+        Win.Add (lblShippedKeys);
 
-			Win.KeyDown += (s, e) => {
-				if (e.KeyCode == KeyCode.Enter) {
-					ProcessInput ();
-					e.Handled = true;
-				}
-			};
-		}
-	}
+        var lblShippedControlKeys = new Label { X = Pos.Center (), Y = Pos.Center () + 5, AutoSize = true };
+        Win.Add (lblShippedControlKeys);
+
+        var button = new Button { X = Pos.Center (), Y = Pos.Center () + 7, IsDefault = true, Text = "Process keys" };
+        Win.Add (button);
+
+        void ProcessInput ()
+        {
+            rKeys = "";
+            rControlKeys = "";
+            txtResult.Text = "";
+            IsShift = false;
+            IsAlt = false;
+            IsCtrl = false;
+            txtResult.SetFocus ();
+
+            foreach (char r in txtInput.Text)
+            {
+                ConsoleKey ck = char.IsLetter (r)
+                                    ? (ConsoleKey)char.ToUpper (r)
+                                    : (ConsoleKey)r;
+
+                Application.Driver.SendKeys (
+                                             r,
+                                             ck,
+                                             (bool)ckbShift.Checked,
+                                             (bool)ckbAlt.Checked,
+                                             (bool)ckbControl.Checked
+                                            );
+            }
+
+            lblShippedKeys.Text = rKeys;
+            lblShippedControlKeys.Text = rControlKeys;
+            txtInput.SetFocus ();
+        }
+
+        button.Accept += (s, e) => ProcessInput ();
+
+        Win.KeyDown += (s, e) =>
+                       {
+                           if (e.KeyCode == KeyCode.Enter)
+                           {
+                               ProcessInput ();
+                               e.Handled = true;
+                           }
+                       };
+    }
 }

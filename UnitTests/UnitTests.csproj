@@ -21,16 +21,17 @@
     <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageReference Include="ReportGenerator" Version="5.2.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="ReportGenerator" Version="5.2.1" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
-    <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="20.0.4" />
-    <PackageReference Include="xunit" Version="2.6.6" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.6">
+    <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="20.0.15" />
+    <PackageReference Include="xunit" Version="2.7.0" />
+    <PackageReference Include="Xunit.Combinatorial" Version="1.6.24" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="6.0.0">
+    <PackageReference Include="coverlet.collector" Version="6.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -43,6 +44,11 @@
     <None Update="xunit.runner.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="System.Drawing" />
+    <Using Include="Terminal.Gui" />
+    <Using Include="Xunit" />
   </ItemGroup>
   <PropertyGroup Label="FineCodeCoverage">
     <Enabled>
@@ -62,5 +68,7 @@
     <IncludeTestAssembly>
       False
     </IncludeTestAssembly>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 </Project>

@@ -1,200 +1,48 @@
-﻿using Microsoft.VisualStudio.TestPlatform.Utilities;
-using System.Text;
-using Xunit;
+﻿using System.Text;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests {
-	public class ScrollViewTests {
-		readonly ITestOutputHelper output;
+namespace Terminal.Gui.ViewsTests;
 
-		public ScrollViewTests (ITestOutputHelper output)
-		{
-			this.output = output;
-		}
+public class ScrollViewTests
+{
+    private readonly ITestOutputHelper _output;
+    public ScrollViewTests (ITestOutputHelper output) { _output = output; }
 
-		[Fact]
-		public void Constructors_Defaults ()
-		{
-			var sv = new ScrollView ();
-			Assert.Equal (LayoutStyle.Absolute, sv.LayoutStyle);
-			Assert.True (sv.CanFocus);
-			Assert.Equal (new Rect (0, 0, 0, 0), sv.Frame);
-			Assert.Equal (Rect.Empty, sv.Frame);
-			Assert.Equal (Point.Empty, sv.ContentOffset);
-			Assert.Equal (Size.Empty, sv.ContentSize);
-			Assert.True (sv.AutoHideScrollBars);
-			Assert.True (sv.KeepContentAlwaysInViewport);
+    [Fact]
+    public void Adding_Views ()
+    {
+        var sv = new ScrollView { Width = 20, Height = 10, ContentSize = new (30, 20) };
 
-			sv = new ScrollView (new Rect (1, 2, 20, 10));
-			Assert.Equal (LayoutStyle.Absolute, sv.LayoutStyle);
-			Assert.True (sv.CanFocus);
-			Assert.Equal (new Rect (1, 2, 20, 10), sv.Frame);
-			Assert.Equal (Point.Empty, sv.ContentOffset);
-			Assert.Equal (Size.Empty, sv.ContentSize);
-			Assert.True (sv.AutoHideScrollBars);
-			Assert.True (sv.KeepContentAlwaysInViewport);
-		}
+        sv.Add (
+                new View { Width = 10, Height = 5 },
+                new View { X = 12, Y = 7, Width = 10, Height = 5 }
+               );
 
-		[Fact]
-		public void Adding_Views ()
-		{
-			var sv = new ScrollView (new Rect (0, 0, 20, 10)) {
-				ContentSize = new Size (30, 20)
-			};
-			sv.Add (new View () { Width = 10, Height = 5 },
-				new View () { X = 12, Y = 7, Width = 10, Height = 5 });
+        Assert.Equal (new (30, 20), sv.ContentSize);
+        Assert.Equal (2, sv.Subviews [0].Subviews.Count);
+    }
 
-			Assert.Equal (new Size (30, 20), sv.ContentSize);
-			Assert.Equal (2, sv.Subviews [0].Subviews.Count);
-		}
+    [Fact]
+    [AutoInitShutdown]
+    public void AutoHideScrollBars_False_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
+    {
+        var sv = new ScrollView { Width = 10, Height = 10, AutoHideScrollBars = false };
 
-		[Fact]
-		public void KeyBindings_Command ()
-		{
-			var sv = new ScrollView (new Rect (0, 0, 20, 10)) {
-				ContentSize = new Size (40, 20)
-			};
-			sv.Add (new View () { Width = 20, Height = 5 },
-				new View () { X = 22, Y = 7, Width = 10, Height = 5 });
+        sv.ShowHorizontalScrollIndicator = true;
+        sv.ShowVerticalScrollIndicator = true;
 
-			sv.BeginInit (); sv.EndInit ();
+        Application.Top.Add (sv);
+        Application.Begin (Application.Top);
 
-			Assert.True (sv.KeepContentAlwaysInViewport);
-			Assert.True (sv.AutoHideScrollBars);
-			Assert.Equal (new Point (0, 0), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.CursorUp)));
-			Assert.Equal (new Point (0, 0), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.CursorDown)));
-			Assert.Equal (new Point (0, -1), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.CursorUp)));
-			Assert.Equal (new Point (0, 0), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.PageUp)));
-			Assert.Equal (new Point (0, 0), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.PageDown)));
-			Assert.Equal (new Point (0, -10), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.PageDown)));
-			Assert.Equal (new Point (0, -10), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.CursorDown)));
-			Assert.Equal (new Point (0, -10), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new ((KeyCode)'v' | KeyCode.AltMask)));
-			Assert.Equal (new Point (0, 0), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.V | KeyCode.CtrlMask)));
-			Assert.Equal (new Point (0, -10), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.CursorLeft)));
-			Assert.Equal (new Point (0, -10), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.CursorRight)));
-			Assert.Equal (new Point (-1, -10), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.CursorLeft)));
-			Assert.Equal (new Point (0, -10), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.PageUp | KeyCode.CtrlMask)));
-			Assert.Equal (new Point (0, -10), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.PageDown | KeyCode.CtrlMask)));
-			Assert.Equal (new Point (-20, -10), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.CursorRight)));
-			Assert.Equal (new Point (-20, -10), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.Home)));
-			Assert.Equal (new Point (-20, 0), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.Home)));
-			Assert.Equal (new Point (-20, 0), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.End)));
-			Assert.Equal (new Point (-20, -10), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.End)));
-			Assert.Equal (new Point (-20, -10), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.Home | KeyCode.CtrlMask)));
-			Assert.Equal (new Point (0, -10), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.Home | KeyCode.CtrlMask)));
-			Assert.Equal (new Point (0, -10), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.End | KeyCode.CtrlMask)));
-			Assert.Equal (new Point (-20, -10), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.End | KeyCode.CtrlMask)));
-			Assert.Equal (new Point (-20, -10), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.Home)));
-			Assert.Equal (new Point (-20, 0), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.Home | KeyCode.CtrlMask)));
-			Assert.Equal (new Point (0, 0), sv.ContentOffset);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), sv.Bounds);
 
-			sv.KeepContentAlwaysInViewport = false;
-			Assert.False (sv.KeepContentAlwaysInViewport);
-			Assert.True (sv.AutoHideScrollBars);
-			Assert.Equal (new Point (0, 0), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.CursorUp)));
-			Assert.Equal (new Point (0, 0), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.CursorDown)));
-			Assert.Equal (new Point (0, -1), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.CursorUp)));
-			Assert.Equal (new Point (0, 0), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.PageUp)));
-			Assert.Equal (new Point (0, 0), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.PageDown)));
-			Assert.Equal (new Point (0, -10), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.PageDown)));
-			Assert.Equal (new Point (0, -19), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.PageDown)));
-			Assert.Equal (new Point (0, -19), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.CursorDown)));
-			Assert.Equal (new Point (0, -19), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new ((KeyCode)'v' | KeyCode.AltMask)));
-			Assert.Equal (new Point (0, -9), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.V | KeyCode.CtrlMask)));
-			Assert.Equal (new Point (0, -19), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.CursorLeft)));
-			Assert.Equal (new Point (0, -19), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.CursorRight)));
-			Assert.Equal (new Point (-1, -19), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.CursorLeft)));
-			Assert.Equal (new Point (0, -19), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.PageUp | KeyCode.CtrlMask)));
-			Assert.Equal (new Point (0, -19), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.PageDown | KeyCode.CtrlMask)));
-			Assert.Equal (new Point (-20, -19), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.PageDown | KeyCode.CtrlMask)));
-			Assert.Equal (new Point (-39, -19), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.PageDown | KeyCode.CtrlMask)));
-			Assert.Equal (new Point (-39, -19), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.CursorRight)));
-			Assert.Equal (new Point (-39, -19), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.PageUp | KeyCode.CtrlMask)));
-			Assert.Equal (new Point (-19, -19), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.Home)));
-			Assert.Equal (new Point (-19, 0), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.Home)));
-			Assert.Equal (new Point (-19, 0), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.End)));
-			Assert.Equal (new Point (-19, -19), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.End)));
-			Assert.Equal (new Point (-19, -19), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.Home | KeyCode.CtrlMask)));
-			Assert.Equal (new Point (0, -19), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.Home | KeyCode.CtrlMask)));
-			Assert.Equal (new Point (0, -19), sv.ContentOffset);
-			Assert.True (sv.OnKeyDown (new (KeyCode.End | KeyCode.CtrlMask)));
-			Assert.Equal (new Point (-39, -19), sv.ContentOffset);
-			Assert.False (sv.OnKeyDown (new (KeyCode.End | KeyCode.CtrlMask)));
-			Assert.Equal (new Point (-39, -19), sv.ContentOffset);
-		}
+        Assert.False (sv.AutoHideScrollBars);
+        Assert.True (sv.ShowHorizontalScrollIndicator);
+        Assert.True (sv.ShowVerticalScrollIndicator);
+        sv.Draw ();
 
-		[Fact, AutoInitShutdown]
-		public void AutoHideScrollBars_False_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
-		{
-			var sv = new ScrollView {
-				Width = 10,
-				Height = 10,
-				AutoHideScrollBars = false
-			};
-
-			sv.ShowHorizontalScrollIndicator = true;
-			sv.ShowVerticalScrollIndicator = true;
-
-			Application.Top.Add (sv);
-			Application.Begin (Application.Top);
-
-			Assert.Equal (new Rect (0, 0, 10, 10), sv.Bounds);
-
-			Assert.False (sv.AutoHideScrollBars);
-			Assert.True (sv.ShowHorizontalScrollIndicator);
-			Assert.True (sv.ShowVerticalScrollIndicator);
-			sv.Draw ();
-			TestHelpers.AssertDriverContentsAre (@"
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
          ▲
          ┬
          │
@@ -205,18 +53,22 @@ namespace Terminal.Gui.ViewsTests {
          ┴
          ▼
 ◄├─────┤► 
-", output);
+",
+                                             _output
+                                            );
 
-			sv.ShowHorizontalScrollIndicator = false;
-			Assert.Equal (new Rect (0, 0, 10, 10), sv.Bounds);
-			sv.ShowVerticalScrollIndicator = true;
-			Assert.Equal (new Rect (0, 0, 10, 10), sv.Bounds);
+        sv.ShowHorizontalScrollIndicator = false;
+        Assert.Equal (new Rectangle (0, 0, 10, 10), sv.Bounds);
+        sv.ShowVerticalScrollIndicator = true;
+        Assert.Equal (new Rectangle (0, 0, 10, 10), sv.Bounds);
 
-			Assert.False (sv.AutoHideScrollBars);
-			Assert.False (sv.ShowHorizontalScrollIndicator);
-			Assert.True (sv.ShowVerticalScrollIndicator);
-			sv.Draw ();
-			TestHelpers.AssertDriverContentsAre (@"
+        Assert.False (sv.AutoHideScrollBars);
+        Assert.False (sv.ShowHorizontalScrollIndicator);
+        Assert.True (sv.ShowVerticalScrollIndicator);
+        sv.Draw ();
+
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
          ▲
          ┬
          │
@@ -227,16 +79,20 @@ namespace Terminal.Gui.ViewsTests {
          │
          ┴
          ▼
-", output);
+",
+                                             _output
+                                            );
 
-			sv.ShowHorizontalScrollIndicator = true;
-			sv.ShowVerticalScrollIndicator = false;
+        sv.ShowHorizontalScrollIndicator = true;
+        sv.ShowVerticalScrollIndicator = false;
 
-			Assert.False (sv.AutoHideScrollBars);
-			Assert.True (sv.ShowHorizontalScrollIndicator);
-			Assert.False (sv.ShowVerticalScrollIndicator);
-			sv.Draw ();
-			TestHelpers.AssertDriverContentsAre (@"
+        Assert.False (sv.AutoHideScrollBars);
+        Assert.True (sv.ShowHorizontalScrollIndicator);
+        Assert.False (sv.ShowVerticalScrollIndicator);
+        sv.Draw ();
+
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
          
          
          
@@ -247,51 +103,57 @@ namespace Terminal.Gui.ViewsTests {
          
          
 ◄├──────┤► 
-", output);
+",
+                                             _output
+                                            );
 
-			sv.ShowHorizontalScrollIndicator = false;
-			sv.ShowVerticalScrollIndicator = false;
+        sv.ShowHorizontalScrollIndicator = false;
+        sv.ShowVerticalScrollIndicator = false;
 
-			Assert.False (sv.AutoHideScrollBars);
-			Assert.False (sv.ShowHorizontalScrollIndicator);
-			Assert.False (sv.ShowVerticalScrollIndicator);
-			sv.Draw ();
-			TestHelpers.AssertDriverContentsAre (@"
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-", output);
-		}
+        Assert.False (sv.AutoHideScrollBars);
+        Assert.False (sv.ShowHorizontalScrollIndicator);
+        Assert.False (sv.ShowVerticalScrollIndicator);
+        sv.Draw ();
 
-		[Fact, AutoInitShutdown]
-		public void AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
-		{
-			var sv = new ScrollView {
-				Width = 10,
-				Height = 10
-			};
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+",
+                                             _output
+                                            );
+    }
 
-			Application.Top.Add (sv);
-			Application.Begin (Application.Top);
+    [Fact]
+    [AutoInitShutdown]
+    public void AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
+    {
+        var sv = new ScrollView { Width = 10, Height = 10 };
 
-			Assert.True (sv.AutoHideScrollBars);
-			Assert.False (sv.ShowHorizontalScrollIndicator);
-			Assert.False (sv.ShowVerticalScrollIndicator);
-			TestHelpers.AssertDriverContentsWithFrameAre ("", output);
+        Application.Top.Add (sv);
+        Application.Begin (Application.Top);
 
-			sv.AutoHideScrollBars = false;
-			sv.ShowHorizontalScrollIndicator = true;
-			sv.ShowVerticalScrollIndicator = true;
-			sv.LayoutSubviews ();
-			sv.Draw ();
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+        Assert.True (sv.AutoHideScrollBars);
+        Assert.False (sv.ShowHorizontalScrollIndicator);
+        Assert.False (sv.ShowVerticalScrollIndicator);
+        TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
+
+        sv.AutoHideScrollBars = false;
+        sv.ShowHorizontalScrollIndicator = true;
+        sv.ShowVerticalScrollIndicator = true;
+        sv.LayoutSubviews ();
+        sv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
          ▲
          ┬
          │
@@ -302,184 +164,33 @@ namespace Terminal.Gui.ViewsTests {
          ┴
          ▼
 ◄├─────┤► 
-", output);
-		}
+",
+                                                      _output
+                                                     );
+    }
 
-		[Fact, AutoInitShutdown]
-		public void ContentSize_AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
-		{
-			var sv = new ScrollView {
-				Width = 10,
-				Height = 10,
-				ContentSize = new Size (50, 50)
-			};
+    // There are still issue with the lower right corner of the scroll view
+    [Fact]
+    [AutoInitShutdown]
+    public void Clear_Window_Inside_ScrollView ()
+    {
+        var topLabel = new Label { X = 15, Text = "At 15,0" };
 
-			Application.Top.Add (sv);
-			Application.Begin (Application.Top);
+        var sv = new ScrollView
+        {
+            X = 3,
+            Y = 3,
+            Width = 10,
+            Height = 10,
+            ContentSize = new (23, 23),
+            KeepContentAlwaysInViewport = false
+        };
+        var bottomLabel = new Label { X = 15, Y = 15, Text = "At 15,15" };
+        Application.Top.Add (topLabel, sv, bottomLabel);
+        Application.Begin (Application.Top);
 
-			Assert.Equal (50, sv.ContentSize.Width);
-			Assert.Equal (50, sv.ContentSize.Height);
-			Assert.True (sv.AutoHideScrollBars);
-			Assert.True (sv.ShowHorizontalScrollIndicator);
-			Assert.True (sv.ShowVerticalScrollIndicator);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
-         ▲
-         ┬
-         ┴
-         ░
-         ░
-         ░
-         ░
-         ░
-         ▼
-◄├┤░░░░░► 
-", output);
-		}
-
-		[Fact, AutoInitShutdown]
-		public void ContentOffset_ContentSize_AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
-		{
-			var sv = new ScrollView {
-				Width = 10,
-				Height = 10,
-				ContentSize = new Size (50, 50),
-				ContentOffset = new Point (25, 25)
-			};
-
-			Application.Top.Add (sv);
-			Application.Begin (Application.Top);
-
-			Assert.Equal (-25, sv.ContentOffset.X);
-			Assert.Equal (-25, sv.ContentOffset.Y);
-			Assert.Equal (50, sv.ContentSize.Width);
-			Assert.Equal (50, sv.ContentSize.Height);
-			Assert.True (sv.AutoHideScrollBars);
-			Assert.True (sv.ShowHorizontalScrollIndicator);
-			Assert.True (sv.ShowVerticalScrollIndicator);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
-         ▲
-         ░
-         ░
-         ░
-         ┬
-         │
-         ┴
-         ░
-         ▼
-◄░░░├─┤░► 
-", output);
-		}
-
-		// There still have an issue with lower right corner of the scroll view
-		[Fact, AutoInitShutdown]
-		public void Frame_And_Labels_Does_Not_Overspill_ScrollView ()
-		{
-			var sv = new ScrollView {
-				X = 3,
-				Y = 3,
-				Width = 10,
-				Height = 10,
-				ContentSize = new Size (50, 50)
-			};
-			for (int i = 0; i < 8; i++) {
-				sv.Add (new CustomButton ("█", $"Button {i}", 20, 3) { Y = i * 3 });
-			}
-			Application.Top.Add (sv);
-			Application.Begin (Application.Top);
-
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
-   █████████▲
-   ██████But┬
-   █████████┴
-   ┌────────░
-   │     But░
-   └────────░
-   ┌────────░
-   │     But░
-   └────────▼
-   ◄├┤░░░░░►─", output);
-
-			sv.ContentOffset = new Point (5, 5);
-			sv.LayoutSubviews ();
-			Application.Refresh ();
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
-   ─────────▲
-   ─────────┬
-    Button 2│
-   ─────────┴
-   ─────────░
-    Button 3░
-   ─────────░
-   ─────────░
-    Button 4▼
-   ◄├─┤░░░░►─", output);
-		}
-
-		private class CustomButton : FrameView {
-			private Label labelFill;
-			private Label labelText;
-
-			public CustomButton (string fill, string text, int width, int height) : base ()
-			{
-				Width = width;
-				Height = height;
-				//labelFill = new Label () { AutoSize = false, X = Pos.Center (), Y = Pos.Center (), Width = Dim.Fill (), Height = Dim.Fill (), Visible = false };
-				labelFill = new Label () { AutoSize = false, Width = Dim.Fill (), Height = Dim.Fill (), Visible = false };
-				labelFill.LayoutComplete += (s, e) => {
-					var fillText = new System.Text.StringBuilder ();
-					for (int i = 0; i < labelFill.Bounds.Height; i++) {
-						if (i > 0) {
-							fillText.AppendLine ("");
-						}
-						for (int j = 0; j < labelFill.Bounds.Width; j++) {
-							fillText.Append (fill);
-						}
-					}
-					labelFill.Text = fillText.ToString ();
-				};
-
-				labelText = new Label (text) { X = Pos.Center (), Y = Pos.Center () };
-				Add (labelFill, labelText);
-				CanFocus = true;
-			}
-
-			public override bool OnEnter (View view)
-			{
-				Border.LineStyle = LineStyle.None;
-				Border.Thickness = new Thickness (0);
-				labelFill.Visible = true;
-				view = this;
-				return base.OnEnter (view);
-			}
-
-			public override bool OnLeave (View view)
-			{
-				Border.LineStyle = LineStyle.Single;
-				Border.Thickness = new Thickness (1);
-				labelFill.Visible = false;
-				if (view == null)
-					view = this;
-				return base.OnLeave (view);
-			}
-		}
-		// There are still issue with the lower right corner of the scroll view
-		[Fact, AutoInitShutdown]
-		public void Clear_Window_Inside_ScrollView ()
-		{
-			var topLabel = new Label ("At 15,0") { X = 15 };
-			var sv = new ScrollView {
-				X = 3,
-				Y = 3,
-				Width = 10,
-				Height = 10,
-				ContentSize = new Size (23, 23),
-				KeepContentAlwaysInViewport = false
-			};
-			var bottomLabel = new Label ("At 15,15") { X = 15, Y = 15 };
-			Application.Top.Add (topLabel, sv, bottomLabel);
-			Application.Begin (Application.Top);
-
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
                At 15,0 
                        
                        
@@ -495,15 +206,19 @@ namespace Terminal.Gui.ViewsTests {
    ◄├┤░░░░░►           
                        
                        
-               At 15,15", output);
+               At 15,15",
+                                                      _output
+                                                     );
 
-			var attributes = new Attribute [] {
-						Colors.ColorSchemes ["TopLevel"].Normal,
-						Colors.ColorSchemes ["TopLevel"].Focus,
-						Colors.ColorSchemes ["Base"].Normal
-					};
+        Attribute [] attributes =
+        {
+            Colors.ColorSchemes ["TopLevel"].Normal,
+            Colors.ColorSchemes ["TopLevel"].Focus,
+            Colors.ColorSchemes ["Base"].Normal
+        };
 
-			TestHelpers.AssertDriverAttributesAre (@"
+        TestHelpers.AssertDriverAttributesAre (
+                                               @"
 00000000000000000000000
 00000000000000000000000
 00000000000000000000000
@@ -516,15 +231,20 @@ namespace Terminal.Gui.ViewsTests {
 00000000000010000000000
 00000000000010000000000
 00000000000010000000000
-00011111111100000000000
+00011111111110000000000
 00000000000000000000000
 00000000000000000000000
-00000000000000000000000", null, attributes);
+00000000000000000000000",
+                                               null,
+                                               attributes
+                                              );
 
-			sv.Add (new Window { X = 3, Y = 3, Width = 20, Height = 20 });
+        sv.Add (new Window { X = 3, Y = 3, Width = 20, Height = 20 });
 
-			Application.Refresh ();
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+        Application.Refresh ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
                At 15,0 
                        
                        
@@ -540,9 +260,12 @@ namespace Terminal.Gui.ViewsTests {
    ◄├┤░░░░░►           
                        
                        
-               At 15,15", output);
+               At 15,15",
+                                                      _output
+                                                     );
 
-			TestHelpers.AssertDriverAttributesAre (@"
+        TestHelpers.AssertDriverAttributesAre (
+                                               @"
 00000000000000000000000
 00000000000000000000000
 00000000000000000000000
@@ -555,14 +278,19 @@ namespace Terminal.Gui.ViewsTests {
 00000022222210000000000
 00000022222210000000000
 00000022222210000000000
-00011111111120000000000
+00011111111110000000000
 00000000000000000000000
 00000000000000000000000
-00000000000000000000000", null, attributes);
+00000000000000000000000",
+                                               null,
+                                               attributes
+                                              );
 
-			sv.ContentOffset = new Point (20, 20);
-			Application.Refresh ();
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+        sv.ContentOffset = new Point (20, 20);
+        Application.Refresh ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
                At 15,0 
                        
                        
@@ -578,9 +306,12 @@ namespace Terminal.Gui.ViewsTests {
    ◄░░░░├─┤►           
                        
                        
-               At 15,15", output);
+               At 15,15",
+                                                      _output
+                                                     );
 
-			TestHelpers.AssertDriverAttributesAre (@"
+        TestHelpers.AssertDriverAttributesAre (
+                                               @"
 00000000000000000000000
 00000000000000000000000
 00000000000000000000000
@@ -593,33 +324,229 @@ namespace Terminal.Gui.ViewsTests {
 00000000000010000000000
 00000000000010000000000
 00000000000010000000000
-00011111111100000000000
+00011111111110000000000
 00000000000000000000000
 00000000000000000000000
-00000000000000000000000", null, attributes);
-		}
+00000000000000000000000",
+                                               null,
+                                               attributes
+                                              );
+    }
 
-		[Fact, AutoInitShutdown]
-		public void DrawTextFormatter_Respects_The_Clip_Bounds ()
-		{
-			var rule = "0123456789";
-			var size = new Size (40, 40);
-			var view = new View (new Rect (Point.Empty, size));
-			view.Add (new Label (rule.Repeat (size.Width / rule.Length)) { AutoSize = false, Width = Dim.Fill () });
-			view.Add (new Label (rule.Repeat (size.Height / rule.Length), TextDirection.TopBottom_LeftRight) { Height = Dim.Fill (), AutoSize = false });
-			view.Add (new Label (1, 1, "[ Press me! ]"));
-			var scrollView = new ScrollView (new Rect (1, 1, 15, 10)) {
-				ContentSize = size,
-				ShowHorizontalScrollIndicator = true,
-				ShowVerticalScrollIndicator = true
-			};
-			scrollView.Add (view);
-			var win = new Window (new Rect (1, 1, 20, 14));
-			win.Add (scrollView);
-			Application.Top.Add (win);
-			Application.Begin (Application.Top);
+    [Fact]
+    public void Constructors_Defaults ()
+    {
+        var sv = new ScrollView ();
+        Assert.Equal (LayoutStyle.Absolute, sv.LayoutStyle);
+        Assert.True (sv.CanFocus);
+        Assert.Equal (new Rectangle (0, 0, 0, 0), sv.Frame);
+        Assert.Equal (Rectangle.Empty, sv.Frame);
+        Assert.Equal (Point.Empty, sv.ContentOffset);
+        Assert.Equal (Size.Empty, sv.ContentSize);
+        Assert.True (sv.AutoHideScrollBars);
+        Assert.True (sv.KeepContentAlwaysInViewport);
 
-			var expected = @"
+        sv = new ScrollView { X = 1, Y = 2, Width = 20, Height = 10 };
+        Assert.Equal (LayoutStyle.Absolute, sv.LayoutStyle);
+        Assert.True (sv.CanFocus);
+        Assert.Equal (new Rectangle (1, 2, 20, 10), sv.Frame);
+        Assert.Equal (Point.Empty, sv.ContentOffset);
+        Assert.Equal (Size.Empty, sv.ContentSize);
+        Assert.True (sv.AutoHideScrollBars);
+        Assert.True (sv.KeepContentAlwaysInViewport);
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ContentBottomRightCorner_Draw ()
+    {
+        ((FakeDriver)Application.Driver).SetBufferSize (30, 30);
+
+        var top = new View { Width = 30, Height = 30, ColorScheme = new ColorScheme { Normal = Attribute.Default } };
+
+        Size size = new (20, 10);
+
+        var sv = new ScrollView
+        {
+            X = 1,
+            Y = 1,
+            Width = 10,
+            Height = 5,
+            ContentSize = size,
+            ColorScheme = new ColorScheme { Normal = new Attribute (Color.Red, Color.Green) }
+        };
+        string text = null;
+
+        for (var i = 0; i < size.Height; i++)
+        {
+            text += "*".Repeat (size.Width);
+
+            if (i < size.Height)
+            {
+                text += '\n';
+            }
+        }
+
+        var view = new View
+        {
+            Width = size.Width,
+            Height = size.Height,
+            ColorScheme = new ColorScheme { Normal = new Attribute (Color.Blue, Color.Yellow) },
+            AutoSize = true,
+            Text = text
+        };
+        sv.Add (view);
+
+        top.Add (sv);
+        top.BeginInit ();
+        top.EndInit ();
+
+        top.LayoutSubviews ();
+
+        top.Draw ();
+
+        View contentBottomRightCorner = sv.Subviews.First (v => v is ScrollBarView.ContentBottomRightCorner);
+        Assert.True (contentBottomRightCorner is ScrollBarView.ContentBottomRightCorner);
+        Assert.True (contentBottomRightCorner.Visible);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+ *********▲
+ *********┬
+ *********┴
+ *********▼
+ ◄├──┤░░░► ",
+                                                      _output
+                                                     );
+
+        Attribute [] attrs = { Attribute.Default, new (Color.Red, Color.Green), new (Color.Blue, Color.Yellow) };
+
+        TestHelpers.AssertDriverAttributesAre (
+                                               @"
+000000000000
+022222222210
+022222222210
+022222222210
+022222222210
+011111111110
+000000000000",
+                                               null,
+                                               attrs
+                                              );
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void
+        ContentOffset_ContentSize_AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
+    {
+        var sv = new ScrollView
+        {
+            Width = 10, Height = 10, ContentSize = new (50, 50), ContentOffset = new (25, 25)
+        };
+
+        Application.Top.Add (sv);
+        Application.Begin (Application.Top);
+
+        Assert.Equal(new(-25,-25),sv.ContentOffset);
+        Assert.Equal(new(50,50),sv.ContentSize);
+        Assert.True (sv.AutoHideScrollBars);
+        Assert.True (sv.ShowHorizontalScrollIndicator);
+        Assert.True (sv.ShowVerticalScrollIndicator);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+         ▲
+         ░
+         ░
+         ░
+         ┬
+         │
+         ┴
+         ░
+         ▼
+◄░░░├─┤░► 
+",
+                                                      _output
+                                                     );
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void ContentSize_AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
+    {
+        var sv = new ScrollView { Width = 10, Height = 10, ContentSize = new (50, 50) };
+
+        Application.Top.Add (sv);
+        Application.Begin (Application.Top);
+
+        Assert.Equal (50, sv.ContentSize.Width);
+        Assert.Equal (50, sv.ContentSize.Height);
+        Assert.True (sv.AutoHideScrollBars);
+        Assert.True (sv.ShowHorizontalScrollIndicator);
+        Assert.True (sv.ShowVerticalScrollIndicator);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+         ▲
+         ┬
+         ┴
+         ░
+         ░
+         ░
+         ░
+         ░
+         ▼
+◄├┤░░░░░► 
+",
+                                                      _output
+                                                     );
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void DrawTextFormatter_Respects_The_Clip_Bounds ()
+    {
+        var rule = "0123456789";
+        Size size = new (40, 40);
+        var view = new View { Frame = new (Point.Empty, size) };
+
+        view.Add (
+                  new Label
+                  {
+                      AutoSize = false, Width = Dim.Fill (), Height = 1, Text = rule.Repeat (size.Width / rule.Length)
+                  }
+                 );
+
+        view.Add (
+                  new Label
+                  {
+                      AutoSize = false,
+                      Height = Dim.Fill (),
+                      Width = 1,
+                      Text = rule.Repeat (size.Height / rule.Length),
+                      TextDirection = TextDirection.TopBottom_LeftRight
+                  }
+                 );
+        view.Add (new Label { X = 1, Y = 1, Text = "[ Press me! ]" });
+
+        var scrollView = new ScrollView
+        {
+            X = 1,
+            Y = 1,
+            Width = 15,
+            Height = 10,
+            ContentSize = size,
+            ShowHorizontalScrollIndicator = true,
+            ShowVerticalScrollIndicator = true
+        };
+        scrollView.Add (view);
+        var win = new Window { X = 1, Y = 1, Width = 20, Height = 14 };
+        win.Add (scrollView);
+        Application.Top.Add (win);
+        Application.Begin (Application.Top);
+
+        var expected = @"
  ┌──────────────────┐
  │                  │
  │ 01234567890123▲  │
@@ -635,15 +562,15 @@ namespace Terminal.Gui.ViewsTests {
  │                  │
  └──────────────────┘
 "
-			;
+            ;
 
-			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyDown (new (KeyCode.CursorRight)));
-			Application.Top.Draw ();
+        Assert.True (scrollView.OnKeyDown (Key.CursorRight));
+        Application.Top.Draw ();
 
-			expected = @"
+        expected = @"
  ┌──────────────────┐
  │                  │
  │ 12345678901234▲  │
@@ -659,15 +586,15 @@ namespace Terminal.Gui.ViewsTests {
  │                  │
  └──────────────────┘
 "
-			;
+            ;
 
-			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyDown (new (KeyCode.CursorRight)));
-			Application.Top.Draw ();
+        Assert.True (scrollView.OnKeyDown (Key.CursorRight));
+        Application.Top.Draw ();
 
-			expected = @"
+        expected = @"
  ┌──────────────────┐
  │                  │
  │ 23456789012345▲  │
@@ -683,15 +610,15 @@ namespace Terminal.Gui.ViewsTests {
  │                  │
  └──────────────────┘
 "
-			;
+            ;
 
-			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyDown (new (KeyCode.CursorRight)));
-			Application.Top.Draw ();
+        Assert.True (scrollView.OnKeyDown (Key.CursorRight));
+        Application.Top.Draw ();
 
-			expected = @"
+        expected = @"
  ┌──────────────────┐
  │                  │
  │ 34567890123456▲  │
@@ -707,15 +634,15 @@ namespace Terminal.Gui.ViewsTests {
  │                  │
  └──────────────────┘
 "
-			;
+            ;
 
-			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyDown (new (KeyCode.CursorRight)));
-			Application.Top.Draw ();
+        Assert.True (scrollView.OnKeyDown (Key.CursorRight));
+        Application.Top.Draw ();
 
-			expected = @"
+        expected = @"
  ┌──────────────────┐
  │                  │
  │ 45678901234567▲  │
@@ -731,15 +658,15 @@ namespace Terminal.Gui.ViewsTests {
  │                  │
  └──────────────────┘
 "
-			;
+            ;
 
-			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyDown (new (KeyCode.CursorRight)));
-			Application.Top.Draw ();
+        Assert.True (scrollView.OnKeyDown (Key.CursorRight));
+        Application.Top.Draw ();
 
-			expected = @"
+        expected = @"
  ┌──────────────────┐
  │                  │
  │ 56789012345678▲  │
@@ -755,15 +682,15 @@ namespace Terminal.Gui.ViewsTests {
  │                  │
  └──────────────────┘
 "
-			;
+            ;
 
-			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyDown (new (KeyCode.CursorRight)));
-			Application.Top.Draw ();
+        Assert.True (scrollView.OnKeyDown (Key.CursorRight));
+        Application.Top.Draw ();
 
-			expected = @"
+        expected = @"
  ┌──────────────────┐
  │                  │
  │ 67890123456789▲  │
@@ -779,15 +706,15 @@ namespace Terminal.Gui.ViewsTests {
  │                  │
  └──────────────────┘
 "
-			;
+            ;
 
-			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyDown (new (KeyCode.CursorRight)));
-			Application.Top.Draw ();
+        Assert.True (scrollView.OnKeyDown (Key.CursorRight));
+        Application.Top.Draw ();
 
-			expected = @"
+        expected = @"
  ┌──────────────────┐
  │                  │
  │ 78901234567890▲  │
@@ -804,13 +731,13 @@ namespace Terminal.Gui.ViewsTests {
  └──────────────────┘
 ";
 
-			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyDown (new (KeyCode.CtrlMask | KeyCode.End)));
-			Application.Top.Draw ();
+        Assert.True (scrollView.OnKeyDown (Key.End.WithCtrl));
+        Application.Top.Draw ();
 
-			expected = @"
+        expected = @"
  ┌──────────────────┐
  │                  │
  │ 67890123456789▲  │
@@ -827,14 +754,14 @@ namespace Terminal.Gui.ViewsTests {
  └──────────────────┘
 ";
 
-			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyDown (new (KeyCode.CtrlMask | KeyCode.Home)));
-			Assert.True (scrollView.OnKeyDown (new (KeyCode.CursorDown)));
-			Application.Top.Draw ();
+        Assert.True (scrollView.OnKeyDown (Key.Home.WithCtrl));
+        Assert.True (scrollView.OnKeyDown (Key.CursorDown));
+        Application.Top.Draw ();
 
-			expected = @"
+        expected = @"
  ┌──────────────────┐
  │                  │
  │ 1[ Press me! ]▲  │
@@ -851,13 +778,13 @@ namespace Terminal.Gui.ViewsTests {
  └──────────────────┘
 ";
 
-			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyDown (new (KeyCode.CursorDown)));
-			Application.Top.Draw ();
+        Assert.True (scrollView.OnKeyDown (Key.CursorDown));
+        Application.Top.Draw ();
 
-			expected = @"
+        expected = @"
  ┌──────────────────┐
  │                  │
  │ 2             ▲  │
@@ -874,13 +801,13 @@ namespace Terminal.Gui.ViewsTests {
  └──────────────────┘
 ";
 
-			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyDown (new (KeyCode.CursorDown)));
-			Application.Top.Draw ();
+        Assert.True (scrollView.OnKeyDown (Key.CursorDown));
+        Application.Top.Draw ();
 
-			expected = @"
+        expected = @"
  ┌──────────────────┐
  │                  │
  │ 3             ▲  │
@@ -897,13 +824,13 @@ namespace Terminal.Gui.ViewsTests {
  └──────────────────┘
 ";
 
-			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (1, 1, 21, 14), pos);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyDown (new (KeyCode.End)));
-			Application.Top.Draw ();
+        Assert.True (scrollView.OnKeyDown (Key.End));
+        Application.Top.Draw ();
 
-			expected = @"
+        expected = @"
  ┌──────────────────┐
  │                  │
  │ 1             ▲  │
@@ -920,31 +847,283 @@ namespace Terminal.Gui.ViewsTests {
  └──────────────────┘
 ";
 
-			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (1, 1, 21, 14), pos);
-		}
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
+    }
 
-		[Fact, AutoInitShutdown]
-		public void Remove_Added_View_Is_Allowed ()
-		{
-			var sv = new ScrollView () {
-				Width = 20,
-				Height = 20,
-				ContentSize = new Size (100, 100)
-			};
-			sv.Add (new View () { Width = Dim.Fill (), Height = Dim.Fill (50), Id = "View1" },
-				new View () { Y = 51, Width = Dim.Fill (), Height = Dim.Fill (), Id = "View2" });
+    // There still have an issue with lower right corner of the scroll view
+    [Fact]
+    [AutoInitShutdown]
+    public void Frame_And_Labels_Does_Not_Overspill_ScrollView ()
+    {
+        var sv = new ScrollView
+        {
+            X = 3,
+            Y = 3,
+            Width = 10,
+            Height = 10,
+            ContentSize = new (50, 50)
+        };
 
-			Application.Top.Add (sv);
-			Application.Begin (Application.Top);
+        for (var i = 0; i < 8; i++)
+        {
+            sv.Add (new CustomButton ("█", $"Button {i}", 20, 3) { Y = i * 3 });
+        }
 
-			Assert.Equal (4, sv.Subviews.Count);
-			Assert.Equal (2, sv.Subviews [0].Subviews.Count);
+        Application.Top.Add (sv);
+        Application.Begin (Application.Top);
 
-			sv.Remove (sv.Subviews [0].Subviews [1]);
-			Assert.Equal (4, sv.Subviews.Count);
-			Assert.Single (sv.Subviews [0].Subviews);
-			Assert.Equal ("View1", sv.Subviews [0].Subviews [0].Id);
-		}
-	}
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+   █████████▲
+   ██████But┬
+   █████████┴
+   ┌────────░
+   │     But░
+   └────────░
+   ┌────────░
+   │     But░
+   └────────▼
+   ◄├┤░░░░░► ",
+                                                      _output
+                                                     );
+
+        sv.ContentOffset = new Point (5, 5);
+        sv.LayoutSubviews ();
+        Application.Refresh ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+   ─────────▲
+   ─────────┬
+    Button 2│
+   ─────────┴
+   ─────────░
+    Button 3░
+   ─────────░
+   ─────────░
+    Button 4▼
+   ◄├─┤░░░░► ",
+                                                      _output
+                                                     );
+    }
+
+    [Fact]
+    public void KeyBindings_Command ()
+    {
+        var sv = new ScrollView { Width = 20, Height = 10, ContentSize = new (40, 20) };
+
+        sv.Add (
+                new View { Width = 20, Height = 5 },
+                new View { X = 22, Y = 7, Width = 10, Height = 5 }
+               );
+
+        sv.BeginInit ();
+        sv.EndInit ();
+
+        Assert.True (sv.KeepContentAlwaysInViewport);
+        Assert.True (sv.AutoHideScrollBars);
+        Assert.Equal (Point.Empty, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.CursorUp));
+        Assert.Equal (Point.Empty, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.CursorDown));
+        Assert.Equal (new (0, -1), sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.CursorUp));
+        Assert.Equal (Point.Empty, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.PageUp));
+        Assert.Equal (Point.Empty, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.PageDown));
+        Point point0xMinus10 = new (0, -10);
+        Assert.Equal (point0xMinus10, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.PageDown));
+        Assert.Equal (point0xMinus10, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.CursorDown));
+        Assert.Equal (point0xMinus10, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.V.WithAlt));
+        Assert.Equal (Point.Empty, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.V.WithCtrl));
+        Assert.Equal (point0xMinus10, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.CursorLeft));
+        Assert.Equal (point0xMinus10, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.CursorRight));
+        Assert.Equal (new (-1, -10), sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.CursorLeft));
+        Assert.Equal (point0xMinus10, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.PageUp.WithCtrl));
+        Assert.Equal (point0xMinus10, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.PageDown.WithCtrl));
+        Point pointMinus20xMinus10 = new (-20, -10);
+        Assert.Equal (pointMinus20xMinus10, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.CursorRight));
+        Assert.Equal (pointMinus20xMinus10, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.Home));
+        Point pointMinus20x0 = new (-20, 0);
+        Assert.Equal (pointMinus20x0, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.Home));
+        Assert.Equal (pointMinus20x0, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.End));
+        Assert.Equal (pointMinus20xMinus10, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.End));
+        Assert.Equal (pointMinus20xMinus10, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.Home.WithCtrl));
+        Assert.Equal (point0xMinus10, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.Home.WithCtrl));
+        Assert.Equal (point0xMinus10, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.End.WithCtrl));
+        Assert.Equal (pointMinus20xMinus10, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.End.WithCtrl));
+        Assert.Equal (pointMinus20xMinus10, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.Home));
+        Assert.Equal (pointMinus20x0, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.Home.WithCtrl));
+        Assert.Equal (Point.Empty, sv.ContentOffset);
+
+        sv.KeepContentAlwaysInViewport = false;
+        Assert.False (sv.KeepContentAlwaysInViewport);
+        Assert.True (sv.AutoHideScrollBars);
+        Assert.Equal (Point.Empty, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.CursorUp));
+        Assert.Equal (Point.Empty, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.CursorDown));
+        Assert.Equal (new (0, -1), sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.CursorUp));
+        Assert.Equal (Point.Empty, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.PageUp));
+        Assert.Equal (Point.Empty, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.PageDown));
+        Assert.Equal (point0xMinus10, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.PageDown));
+        Point point0xMinus19 = new (0, -19);
+        Assert.Equal (point0xMinus19, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.PageDown));
+        Assert.Equal (point0xMinus19, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.CursorDown));
+        Assert.Equal (point0xMinus19, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.V.WithAlt));
+        Assert.Equal (new (0, -9), sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.V.WithCtrl));
+        Assert.Equal (point0xMinus19, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.CursorLeft));
+        Assert.Equal (point0xMinus19, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.CursorRight));
+        Assert.Equal (new (-1, -19), sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.CursorLeft));
+        Assert.Equal (point0xMinus19, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.PageUp.WithCtrl));
+        Assert.Equal (point0xMinus19, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.PageDown.WithCtrl));
+        Assert.Equal (new (-20, -19), sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.PageDown.WithCtrl));
+        Point pointMinus39xMinus19 = new (-39, -19);
+        Assert.Equal (pointMinus39xMinus19, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.PageDown.WithCtrl));
+        Assert.Equal (pointMinus39xMinus19, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.CursorRight));
+        Assert.Equal (pointMinus39xMinus19, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.PageUp.WithCtrl));
+        Point pointMinus19xMinus19 = new Point (-19, -19);
+        Assert.Equal (pointMinus19xMinus19, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.Home));
+        Assert.Equal (new (-19, 0), sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.Home));
+        Assert.Equal (new (-19, 0), sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.End));
+        Assert.Equal (pointMinus19xMinus19, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.End));
+        Assert.Equal (pointMinus19xMinus19, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.Home.WithCtrl));
+        Assert.Equal (point0xMinus19, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.Home.WithCtrl));
+        Assert.Equal (point0xMinus19, sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.End.WithCtrl));
+        Assert.Equal (pointMinus39xMinus19, sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.End.WithCtrl));
+        Assert.Equal (pointMinus39xMinus19, sv.ContentOffset);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Remove_Added_View_Is_Allowed ()
+    {
+        var sv = new ScrollView { Width = 20, Height = 20, ContentSize = new (100, 100) };
+
+        sv.Add (
+                new View { Width = Dim.Fill (), Height = Dim.Fill (50), Id = "View1" },
+                new View { Y = 51, Width = Dim.Fill (), Height = Dim.Fill (), Id = "View2" }
+               );
+
+        Application.Top.Add (sv);
+        Application.Begin (Application.Top);
+
+        Assert.Equal (4, sv.Subviews.Count);
+        Assert.Equal (2, sv.Subviews [0].Subviews.Count);
+
+        sv.Remove (sv.Subviews [0].Subviews [1]);
+        Assert.Equal (4, sv.Subviews.Count);
+        Assert.Single (sv.Subviews [0].Subviews);
+        Assert.Equal ("View1", sv.Subviews [0].Subviews [0].Id);
+    }
+
+    private class CustomButton : FrameView
+    {
+        private readonly Label labelFill;
+        private readonly Label labelText;
+
+        public CustomButton (string fill, string text, int width, int height)
+        {
+            Width = width;
+            Height = height;
+
+            //labelFill = new Label { AutoSize = false, X = Pos.Center (), Y = Pos.Center (), Width = Dim.Fill (), Height = Dim.Fill (), Visible = false };
+            labelFill = new Label { AutoSize = false, Width = Dim.Fill (), Height = Dim.Fill (), Visible = false };
+
+            labelFill.LayoutComplete += (s, e) =>
+                                        {
+                                            var fillText = new StringBuilder ();
+
+                                            for (var i = 0; i < labelFill.Bounds.Height; i++)
+                                            {
+                                                if (i > 0)
+                                                {
+                                                    fillText.AppendLine ("");
+                                                }
+
+                                                for (var j = 0; j < labelFill.Bounds.Width; j++)
+                                                {
+                                                    fillText.Append (fill);
+                                                }
+                                            }
+
+                                            labelFill.Text = fillText.ToString ();
+                                        };
+
+            labelText = new Label { X = Pos.Center (), Y = Pos.Center (), Text = text };
+            Add (labelFill, labelText);
+            CanFocus = true;
+        }
+
+        public override bool OnEnter (View view)
+        {
+            Border.LineStyle = LineStyle.None;
+            Border.Thickness = new Thickness (0);
+            labelFill.Visible = true;
+            view = this;
+
+            return base.OnEnter (view);
+        }
+
+        public override bool OnLeave (View view)
+        {
+            Border.LineStyle = LineStyle.Single;
+            Border.Thickness = new Thickness (1);
+            labelFill.Visible = false;
+
+            if (view == null)
+            {
+                view = this;
+            }
+
+            return base.OnLeave (view);
+        }
+    }
 }
