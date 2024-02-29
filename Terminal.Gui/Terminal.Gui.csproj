@@ -115,7 +115,7 @@
     <PackageReleaseNotes>
       See: https://github.com/gui-cs/Terminal.Gui/releases
     </PackageReleaseNotes>
-    <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\Terminal.Gui.xml</DocumentationFile>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Debug' ">true</GeneratePackageOnBuild>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <RepositoryUrl>https://github.com/gui-cs/Terminal.Gui.git</RepositoryUrl>
