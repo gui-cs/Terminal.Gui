@@ -17,19 +17,18 @@
     <AssemblyName>Terminal.Gui</AssemblyName>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
     <DefineTrace>True</DefineTrace>
+    <DebugType>portable</DebugType>
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>portable</DebugType>
     <Optimize>True</Optimize>
     <VersionSuffix></VersionSuffix>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DefineDebug>True</DefineDebug>
     <DefineConstants>$(DefineConstants);DEBUG_IDISPOSABLE</DefineConstants>
-    <DebugType>portable</DebugType>
   </PropertyGroup>
   <!-- =================================================================== -->
   <!-- Configuration Manager -->
