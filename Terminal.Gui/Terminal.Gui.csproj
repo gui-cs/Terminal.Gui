@@ -52,6 +52,15 @@
     <PackageReference Include="Wcwidth" Version="2.0.0" />
   </ItemGroup>
   <!-- =================================================================== -->
+  <!-- Global Usings and Type Aliases -->
+  <!-- =================================================================== -->
+  <ItemGroup>
+    <Using Include="JetBrains.Annotations" />
+    <Using Include="System.Diagnostics.Contracts.PureAttribute" Alias="PureAttribute" />
+    <Using Include="System.Drawing" />
+    <Using Include="System.Text" />
+  </ItemGroup>
+  <!-- =================================================================== -->
   <!-- Namespaces for which internal items are visible -->
   <!-- =================================================================== -->
   <ItemGroup>
@@ -85,13 +94,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Using Include="JetBrains.Annotations" />
-    <Using Include="System.Diagnostics.Contracts.PureAttribute" Alias="PureAttribute" />
-    <Using Include="System.Drawing" />
-    <Using Include="System.Text" />
-    <Using Include="JetBrains.Annotations" />
   </ItemGroup>
   <!-- =================================================================== -->
   <!-- Nuget  -->
