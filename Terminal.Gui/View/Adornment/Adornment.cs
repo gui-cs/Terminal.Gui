@@ -175,4 +175,61 @@ public class Adornment : View
     {
         /* Do nothing - Adornments do not have Adornments */
     }
+
+    /// <inheritdoc/>
+    public override bool OnMouseEvent (MouseEvent mouseEvent)
+    {
+        var args = new MouseEventEventArgs (mouseEvent);
+
+        if (MouseEvent (mouseEvent))
+        {
+            return true;
+        }
+
+        if (mouseEvent.Flags == MouseFlags.Button1Clicked)
+        {
+            if (Parent.CanFocus && !Parent.HasFocus)
+            {
+                Parent.SetFocus ();
+                Parent.SetNeedsDisplay ();
+            }
+
+            return OnMouseClick (args);
+        }
+
+        if (mouseEvent.Flags == MouseFlags.Button2Clicked)
+        {
+            return OnMouseClick (args);
+        }
+
+        if (mouseEvent.Flags == MouseFlags.Button3Clicked)
+        {
+            return OnMouseClick (args);
+        }
+
+        if (mouseEvent.Flags == MouseFlags.Button4Clicked)
+        {
+            return OnMouseClick (args);
+        }
+
+        return false;
+    }
+    
+    /// <inheritdoc/>
+    public override bool OnMouseEnter (MouseEvent mouseEvent)
+    {
+        var args = new MouseEventEventArgs (mouseEvent);
+
+        
+        return args.Handled || base.OnMouseEnter (mouseEvent);
+    }
+
+
+    /// <inheritdoc/>
+    public override bool OnMouseLeave (MouseEvent mouseEvent)
+    {
+        var args = new MouseEventEventArgs (mouseEvent);
+
+        return args.Handled || base.OnMouseLeave (mouseEvent);
+    }
 }

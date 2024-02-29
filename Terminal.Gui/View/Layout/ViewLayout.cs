@@ -577,7 +577,7 @@ public partial class View
             {
                 return start.Margin;
             }
-            if (start.Border.Thickness.Contains (start.Border.Frame, x, y))
+            if (start.Border.Thickness.Contains (start.Border.FrameToScreen (), x, y))
             {
                 return start.Border;
             }
