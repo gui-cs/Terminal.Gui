@@ -10,9 +10,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <!-- https://stackoverflow.com/questions/294216/why-does-c-sharp-forbid-generic-attribute-types -->
-    <!-- for AutoInitShutdown attribute -->
-    <LangVersion>Preview</LangVersion>
+    <LangVersion>12</LangVersion>
     <IsPackable>false</IsPackable>
     <UseDataCollector />
   </PropertyGroup>
