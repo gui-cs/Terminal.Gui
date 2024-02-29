@@ -1437,6 +1437,8 @@ public static partial class Application
             && a.MouseEvent.Flags != MouseFlags.ReportMousePosition
             && a.MouseEvent.Flags != 0)
         {
+            // This occurs when there are multiple overlapped "tops"
+            // E.g. "Mdi" - in the Background Worker Scenario
             View? top = FindDeepestTop (Top, a.MouseEvent.X, a.MouseEvent.Y);
             view = View.FindDeepestView (top, a.MouseEvent.X, a.MouseEvent.Y);
 
@@ -1561,14 +1563,14 @@ public static partial class Application
 
         return;
 
-        static bool AdornmentHandledMouseEvent (Adornment? frame, MouseEventEventArgs args)
+        static bool AdornmentHandledMouseEvent (Adornment? adornment, MouseEventEventArgs args)
         {
-            if (frame?.Thickness.Contains (frame.FrameToScreen (), args.MouseEvent.X, args.MouseEvent.Y) is not true)
+            if (adornment?.Thickness.Contains (adornment.FrameToScreen (), args.MouseEvent.X, args.MouseEvent.Y) is not true)
             {
                 return false;
             }
 
-            Point boundsPoint = frame.ScreenToBounds (args.MouseEvent.X, args.MouseEvent.Y);
+            Point boundsPoint = adornment.ScreenToBounds (args.MouseEvent.X, args.MouseEvent.Y);
 
             var me = new MouseEvent
             {
@@ -1577,9 +1579,9 @@ public static partial class Application
                 Flags = args.MouseEvent.Flags,
                 OfX = boundsPoint.X,
                 OfY = boundsPoint.Y,
-                View = frame
+                View = adornment
             };
-            frame.OnMouseEvent (me);
+            adornment.OnMouseEvent (me);
 
             return true;
         }
