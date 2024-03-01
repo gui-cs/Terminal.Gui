@@ -533,7 +533,7 @@ namespace Terminal.Gui
         }
 
         /// <inheritdoc/>
-        public override bool OnMouseEvent (MouseEvent mouseEvent)
+        protected internal override bool OnMouseEvent  (MouseEvent mouseEvent)
         {
             if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
             {

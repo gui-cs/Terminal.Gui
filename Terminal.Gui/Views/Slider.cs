@@ -1522,7 +1522,7 @@ public class Slider<T> : View
     private Point? _moveRenderPosition;
 
     /// <inheritdoc/>
-    public override bool OnMouseEvent (MouseEvent mouseEvent)
+    protected internal override bool OnMouseEvent  (MouseEvent mouseEvent)
     {
         // Note(jmperricone): Maybe we click to focus the cursor, and on next click we set the option.
         //                    That will makes OptionFocused Event more relevant.

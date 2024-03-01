@@ -590,7 +590,7 @@ public class TabView : View
             Add (_rightScrollIndicator, _leftScrollIndicator);
         }
 
-        public override bool OnMouseEvent (MouseEvent me)
+        protected internal override bool OnMouseEvent  (MouseEvent me)
         {
             Tab hit = me.View is Tab ? (Tab)me.View : null;
 

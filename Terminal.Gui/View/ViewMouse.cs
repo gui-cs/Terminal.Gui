@@ -37,7 +37,7 @@ public partial class View
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    public virtual bool OnMouseEnter (MouseEvent mouseEvent)
+    protected internal virtual bool OnMouseEnter (MouseEvent mouseEvent)
     {
         if (!Enabled)
         {
@@ -65,7 +65,7 @@ public partial class View
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    public virtual bool OnMouseLeave (MouseEvent mouseEvent)
+    protected internal virtual bool OnMouseLeave (MouseEvent mouseEvent)
     {
         if (!Enabled)
         {
@@ -92,7 +92,7 @@ public partial class View
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    public virtual bool OnMouseEvent (MouseEvent mouseEvent)
+    protected internal virtual bool OnMouseEvent (MouseEvent mouseEvent)
     {
         if (!Enabled)
         {

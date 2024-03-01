@@ -275,7 +275,7 @@ public class ScrollBarView : View
     public event EventHandler ChangedPosition;
 
     /// <inheritdoc/>
-    public override bool OnMouseEvent (MouseEvent mouseEvent)
+    protected internal override bool OnMouseEvent  (MouseEvent mouseEvent)
     {
         if (mouseEvent.Flags != MouseFlags.Button1Pressed
             && mouseEvent.Flags != MouseFlags.Button1DoubleClicked

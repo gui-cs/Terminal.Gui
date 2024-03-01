@@ -3319,7 +3319,7 @@ public class TextView : View
     }
 
     /// <inheritdoc/>
-    public override bool OnMouseEvent (MouseEvent ev)
+    protected internal override bool OnMouseEvent  (MouseEvent ev)
     {
         if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked)
             && !ev.Flags.HasFlag (MouseFlags.Button1Pressed)

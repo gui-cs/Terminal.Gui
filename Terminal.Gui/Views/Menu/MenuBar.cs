@@ -1647,7 +1647,7 @@ public class MenuBar : View
     }
 
     /// <inheritdoc/>
-    public override bool OnMouseEvent (MouseEvent me)
+    protected internal override bool OnMouseEvent  (MouseEvent me)
     {
         if (!_handled && !HandleGrabView (me, this))
         {
