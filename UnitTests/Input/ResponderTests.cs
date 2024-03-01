@@ -191,13 +191,6 @@ public class ResponderTests
                                              "OnDrawContent"
                                             )
                     );
-
-        Assert.True (
-                     Responder.IsOverridden (
-                                             new Button { Text = "Button overrides OnMouseEvent" },
-                                             "OnMouseEvent"
-                                            )
-                    );
 #if DEBUG_IDISPOSABLE
 
         // HACK: Force clean up of Responders to avoid having to Dispose all the Views created above.

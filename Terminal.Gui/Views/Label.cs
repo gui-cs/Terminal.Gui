@@ -25,6 +25,12 @@ public class Label : View
         KeyBindings.Add (Key.Space, Command.Accept);
 
         TitleChanged += Label_TitleChanged;
+        MouseClick += Label_MouseClick;
+    }
+
+    private void Label_MouseClick (object sender, MouseEventEventArgs e)
+    {
+        e.Handled = InvokeCommand (Command.Accept) == true;
     }
 
     private void Label_TitleChanged (object sender, StateEventArgs<string> e)
@@ -62,50 +68,6 @@ public class Label : View
     public override bool OnEnter (View view)
     {
         Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
         return base.OnEnter (view);
-    }
-
-    /// <summary>Method invoked when a mouse event is generated</summary>
-    /// <param name="mouseEvent"></param>
-    /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
-    public override bool OnMouseEvent (MouseEvent mouseEvent)
-    {
-        var args = new MouseEventEventArgs (mouseEvent);
-
-        if (OnMouseClick (args))
-        {
-            return true;
-        }
-
-        //if (MouseEvent (mouseEvent))
-        //{
-        //    return true;
-        //}
-
-        if (mouseEvent.Flags == MouseFlags.Button1Clicked)
-        {
-            if (!CanFocus)
-            {
-                FocusNext ();
-            }
-
-            if (!HasFocus && SuperView is { })
-            {
-                if (!SuperView.HasFocus)
-                {
-                    SuperView.SetFocus ();
-                }
-
-                SetFocus ();
-                SetNeedsDisplay ();
-            }
-
-            OnAccept ();
-
-            return true;
-        }
-
-        return false;
     }
 }

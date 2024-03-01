@@ -227,6 +227,24 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <summary>Event fired when the <see cref="Visible"/> value is being changed.</summary>
     public event EventHandler VisibleChanged;
 
+    /// <summary>
+    /// Cancelable event fired when the <see cref="Command.Accept"/> command is invoked. Set <see cref="CancelEventArgs.Cancel"/>
+    /// to cancel the event.
+    /// </summary>
+    public event EventHandler<CancelEventArgs> Accept;
+
+    /// <summary>
+    /// Called when the <see cref="Command.Accept"/> command is invoked. Fires the <see cref="Accept"/>
+    /// event.
+    /// </summary>
+    /// <returns>If <see langword="true"/> the event was canceled.</returns>
+    protected bool? OnAccept ()
+    {
+        var args = new CancelEventArgs ();
+        Accept?.Invoke (this, args);
+        return args.Cancel;
+    }
+
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {

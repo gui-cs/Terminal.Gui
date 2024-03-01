@@ -328,7 +328,7 @@ public class CheckBoxTests
 
         ckb.Accept += ViewOnAccept;
 
-        var ret = ckb.OnAccept ();
+        var ret = ckb.InvokeCommand (Command.Accept);
         Assert.True (ret);
         Assert.True (acceptInvoked);
 
@@ -567,13 +567,13 @@ public class CheckBoxTests
         var cb = new CheckBox ();
         var accepted = false;
 
-        cb.Accept += ButtonOnAccept;
+        cb.Accept += CheckBoxOnAccept;
         cb.InvokeCommand (Command.HotKey);
 
         Assert.True (accepted);
 
         return;
-        void ButtonOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+        void CheckBoxOnAccept (object sender, CancelEventArgs e) { accepted = true; }
     }
 
     [Theory]

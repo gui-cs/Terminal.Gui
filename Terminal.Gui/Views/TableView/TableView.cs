@@ -796,7 +796,7 @@ public class TableView : View
             && me.Flags != MouseFlags.WheeledLeft
             && me.Flags != MouseFlags.WheeledRight)
         {
-            return base.OnMouseEvent (me);
+            return false;
         }
 
         if (!HasFocus && CanFocus)

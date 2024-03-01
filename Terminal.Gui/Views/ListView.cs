@@ -704,9 +704,10 @@ public class ListView : View
 
         object value = _source.ToList () [_selected];
 
+        // By default, Command.Accept calls OnAccept, so we need to call it here to ensure that the event is fired.
         if (OnAccept () == true)
         {
-            return false;
+            return true;
         }
 
         OpenSelectedItem?.Invoke (this, new ListViewItemEventArgs (_selected, value));

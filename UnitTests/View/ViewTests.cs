@@ -1161,7 +1161,7 @@ At 0,0
 
         view.Accept += ViewOnAccept;
 
-        view.OnAccept ();
+        view.InvokeCommand (Command.Accept);
         Assert.True (accepted);
 
         return;
@@ -1176,7 +1176,7 @@ At 0,0
 
         view.Accept += ViewOnAccept;
 
-        var ret = view.OnAccept ();
+        var ret = view.InvokeCommand (Command.Accept);
         Assert.True (ret);
         Assert.True (acceptInvoked);
 
