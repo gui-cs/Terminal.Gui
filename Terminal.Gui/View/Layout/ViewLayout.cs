@@ -1504,4 +1504,153 @@ public partial class View
 #endif // DEBUG
         return pos;
     }
+
+
+    /// <summary>
+    ///     Gets a new location of the <see cref="View"/> that is within the Bounds of the <paramref name="top"/>'s
+    ///     <see cref="View.SuperView"/> (e.g. for dragging a Window). The `out` parameters are the new X and Y coordinates.
+    /// </summary>
+    /// <remarks>
+    ///     If <paramref name="top"/> does not have a <see cref="View.SuperView"/> or it's SuperView is not
+    ///     <see cref="Application.Top"/> the position will be bound by the <see cref="ConsoleDriver.Cols"/> and
+    ///     <see cref="ConsoleDriver.Rows"/>.
+    /// </remarks>
+    /// <param name="top">The View that is to be moved.</param>
+    /// <param name="targetX">The target x location.</param>
+    /// <param name="targetY">The target y location.</param>
+    /// <param name="nx">The x location that will ensure <paramref name="top"/> will be visible.</param>
+    /// <param name="ny">The y location that will ensure <paramref name="top"/> will be visible.</param>
+    /// <param name="menuBar">The new top most menuBar</param>
+    /// <param name="statusBar">The new top most statusBar</param>
+    /// <returns>
+    ///     Either <see cref="Application.Top"/> (if <paramref name="top"/> does not have a Super View) or
+    ///     <paramref name="top"/>'s SuperView. This can be used to ensure LayoutSubviews is called on the correct View.
+    /// </returns>
+    internal static View GetLocationThatFits (
+        View top,
+        int targetX,
+        int targetY,
+        out int nx,
+        out int ny,
+        out MenuBar menuBar,
+        out StatusBar statusBar
+    )
+    {
+        int maxWidth;
+        View superView;
+
+        if (top?.SuperView is null || top == Application.Top || top?.SuperView == Application.Top)
+        {
+            maxWidth = Driver.Cols;
+            superView = Application.Top;
+        }
+        else
+        {
+            // Use the SuperView's Bounds, not Frame
+            maxWidth = top.SuperView.Bounds.Width;
+            superView = top.SuperView;
+        }
+
+        if (superView.Margin is { } && superView == top.SuperView)
+        {
+            maxWidth -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
+        }
+
+        if (top.Frame.Width <= maxWidth)
+        {
+            nx = Math.Max (targetX, 0);
+            nx = nx + top.Frame.Width > maxWidth ? Math.Max (maxWidth - top.Frame.Width, 0) : nx;
+
+            if (nx > top.Frame.X + top.Frame.Width)
+            {
+                nx = Math.Max (top.Frame.Right, 0);
+            }
+        }
+        else
+        {
+            nx = targetX;
+        }
+
+        //System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
+        bool menuVisible, statusVisible;
+
+        if (top?.SuperView is null || top == Application.Top || top?.SuperView == Application.Top)
+        {
+            menuVisible = Application.Top.MenuBar?.Visible == true;
+            menuBar = Application.Top.MenuBar;
+        }
+        else
+        {
+            View t = top.SuperView;
+
+            while (t is not Toplevel)
+            {
+                t = t.SuperView;
+            }
+
+            menuVisible = ((Toplevel)t).MenuBar?.Visible == true;
+            menuBar = ((Toplevel)t).MenuBar;
+        }
+
+        if (top?.SuperView is null || top == Application.Top || top?.SuperView == Application.Top)
+        {
+            maxWidth = menuVisible ? 1 : 0;
+        }
+        else
+        {
+            maxWidth = 0;
+        }
+
+        ny = Math.Max (targetY, maxWidth);
+
+        if (top?.SuperView is null || top == Application.Top || top?.SuperView == Application.Top)
+        {
+            statusVisible = Application.Top.StatusBar?.Visible == true;
+            statusBar = Application.Top.StatusBar;
+        }
+        else
+        {
+            View t = top.SuperView;
+
+            while (t is not Toplevel)
+            {
+                t = t.SuperView;
+            }
+
+            statusVisible = ((Toplevel)t).StatusBar?.Visible == true;
+            statusBar = ((Toplevel)t).StatusBar;
+        }
+
+        if (top?.SuperView is null || top == Application.Top || top?.SuperView == Application.Top)
+        {
+            maxWidth = statusVisible ? Driver.Rows - 1 : Driver.Rows;
+        }
+        else
+        {
+            maxWidth = statusVisible ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
+        }
+
+        if (superView.Margin is { } && superView == top.SuperView)
+        {
+            maxWidth -= superView.GetAdornmentsThickness ().Top + superView.GetAdornmentsThickness ().Bottom;
+        }
+
+        ny = Math.Min (ny, maxWidth);
+
+        if (top.Frame.Height <= maxWidth)
+        {
+            ny = ny + top.Frame.Height > maxWidth
+                     ? Math.Max (maxWidth - top.Frame.Height, menuVisible ? 1 : 0)
+                     : ny;
+
+            if (ny > top.Frame.Y + top.Frame.Height)
+            {
+                ny = Math.Max (top.Frame.Bottom, 0);
+            }
+        }
+
+        //System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
+
+        return superView;
+    }
 }

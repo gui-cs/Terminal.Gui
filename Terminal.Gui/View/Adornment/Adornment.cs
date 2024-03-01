@@ -28,7 +28,14 @@ public class Adornment : View
 
     /// <summary>Constructs a new adornment for the view specified by <paramref name="parent"/>.</summary>
     /// <param name="parent"></param>
-    public Adornment (View parent) { Parent = parent; }
+    public Adornment (View parent)
+    {
+
+        Application.GrabbingMouse += Application_GrabbingMouse;
+        Application.UnGrabbingMouse += Application_UnGrabbingMouse;
+
+        Parent = parent;
+    }
 
     /// <summary>Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).</summary>
     public override Rectangle Bounds
@@ -166,13 +173,9 @@ public class Adornment : View
     /// <summary>Fired whenever the <see cref="Thickness"/> property changes.</summary>
     public event EventHandler<ThicknessEventArgs> ThicknessChanged;
 
-    /// <inheritdoc/>
-    protected internal override bool OnMouseEnter (MouseEvent mouseEvent)
-    {
-        var args = new MouseEventEventArgs (mouseEvent);
+    internal static Point? _dragPosition;
 
-        return args.Handled || base.OnMouseEnter (mouseEvent);
-    }
+    private Point _startGrabPoint;
 
     /// <inheritdoc/>
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
@@ -190,15 +193,102 @@ public class Adornment : View
             return OnMouseClick (args);
         }
 
+        // TODO: Checking for Toplevel is a hack until #2537 is fixed
+        if (!Parent.CanFocus || Parent is not Toplevel)
+        {
+            return true;
+        }
+
+        //System.Diagnostics.Debug.WriteLine ($"dragPosition before: {dragPosition.HasValue}");
+
+        int nx, ny;
+
+        if (!_dragPosition.HasValue
+            && (mouseEvent.Flags.HasFlag(MouseFlags.Button1Pressed)
+                || mouseEvent.Flags.HasFlag(MouseFlags.Button2Pressed)
+                || mouseEvent.Flags.HasFlag(MouseFlags.Button3Pressed)))
+        {
+            Parent.SetFocus ();
+            Application.BringOverlappedTopToFront ();
+
+            // Only start grabbing if the user clicks on the title bar.
+            if (mouseEvent.Y == 0 && mouseEvent.Flags.HasFlag(MouseFlags.Button1Pressed))
+            {
+                _startGrabPoint = new Point (mouseEvent.X, mouseEvent.Y);
+                nx = mouseEvent.X - mouseEvent.OfX;
+                ny = mouseEvent.Y - mouseEvent.OfY;
+                _dragPosition = new Point (nx, ny);
+                Application.GrabMouse (this);
+            }
+
+            //System.Diagnostics.Debug.WriteLine ($"Starting at {dragPosition}");
+            return true;
+        }
+
+        if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) || mouseEvent.Flags == MouseFlags.Button3Pressed)
+        {
+            if (_dragPosition.HasValue)
+            {
+                if (Parent.SuperView is null)
+                {
+                    // Redraw the entire app window.
+                    Application.Top.SetNeedsDisplay ();
+                }
+                else
+                {
+                    Parent.SuperView.SetNeedsDisplay ();
+                }
+
+                View.GetLocationThatFits (
+                                     Parent,
+                                     mouseEvent.X + mouseEvent.OfX - _startGrabPoint.X,
+                                     mouseEvent.Y + mouseEvent.OfY - _startGrabPoint.Y,
+                                     out nx,
+                                     out ny,
+                                     out _,
+                                     out _
+                                    );
+
+                _dragPosition = new Point (nx, ny);
+                Parent.X = nx;
+                Parent.Y = ny;
+                Parent.SetNeedsDisplay ();
+                return true;
+            }
+        }
+
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && _dragPosition.HasValue)
+        {
+            _dragPosition = null;
+            Application.UngrabMouse ();
+        }
         return false;
     }
 
-    /// <inheritdoc/>
-    protected internal override bool OnMouseLeave (MouseEvent mouseEvent)
+    private void Application_GrabbingMouse (object sender, GrabMouseEventArgs e)
     {
-        var args = new MouseEventEventArgs (mouseEvent);
+        if (Application.MouseGrabView == this && _dragPosition.HasValue)
+        {
+            e.Cancel = true;
+        }
+    }
 
-        return args.Handled || base.OnMouseLeave (mouseEvent);
+    private void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)
+    {
+        if (Application.MouseGrabView == this && _dragPosition.HasValue)
+        {
+            e.Cancel = true;
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        Application.GrabbingMouse -= Application_GrabbingMouse;
+        Application.UnGrabbingMouse -= Application_UnGrabbingMouse;
+
+        _dragPosition = null;
+        base.Dispose (disposing);
     }
 
     internal override Adornment CreateAdornment (Type adornmentType)

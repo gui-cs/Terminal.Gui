@@ -532,7 +532,7 @@ public static partial class Application
     ///     <see langword="null"/> if <see cref="Init"/> has already been called.
     /// </param>
     public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
-        where T : Toplevel, new ()
+        where T : Toplevel, new()
     {
         if (_initialized)
         {
@@ -1400,46 +1400,45 @@ public static partial class Application
             return;
         }
 
-        if (view is not Adornment)
+        if (MouseGrabView is { })
         {
-            if (MouseGrabView is { })
+            // If the mouse is grabbed, send the event to the view that grabbed it.
+            // The coordinates are relative to the Bounds of the view that grabbed the mouse.
+            Point newxy = MouseGrabView.ScreenToFrame (a.MouseEvent.X, a.MouseEvent.Y);
+
+            var nme = new MouseEvent
             {
-                // If the mouse is grabbed, send the event to the view that grabbed it.
-                // The coordinates are relative to the Bounds of the view that grabbed the mouse.
-                Point newxy = MouseGrabView.ScreenToFrame (a.MouseEvent.X, a.MouseEvent.Y);
+                X = newxy.X,
+                Y = newxy.Y,
+                Flags = a.MouseEvent.Flags,
+                OfX = a.MouseEvent.X - newxy.X,
+                OfY = a.MouseEvent.Y - newxy.Y,
+                View = view
+            };
 
-                var nme = new MouseEvent
-                {
-                    X = newxy.X,
-                    Y = newxy.Y,
-                    Flags = a.MouseEvent.Flags,
-                    OfX = a.MouseEvent.X - newxy.X,
-                    OfY = a.MouseEvent.Y - newxy.Y,
-                    View = view
-                };
-
-                if (MouseGrabView.Bounds.Contains (nme.X, nme.Y) is false)
-                {
-                    // The mouse has moved outside the bounds of the view that
-                    // grabbed the mouse, so we tell the view that last got 
-                    // OnMouseEnter the mouse is leaving
-                    // BUGBUG: That sentence makes no sense. Either I'm missing something
-                    // or this logic is flawed.
-                    _mouseEnteredView?.OnMouseLeave (a.MouseEvent);
-                }
-
-                //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-                if (MouseGrabView?.OnMouseEvent (nme) == true)
-                {
-                    return;
-                }
+            if (MouseGrabView.Bounds.Contains (nme.X, nme.Y) is false)
+            {
+                // The mouse has moved outside the bounds of the view that
+                // grabbed the mouse, so we tell the view that last got 
+                // OnMouseEnter the mouse is leaving
+                // BUGBUG: That sentence makes no sense. Either I'm missing something or this logic is flawed.
+                _mouseEnteredView?.OnMouseLeave (a.MouseEvent);
             }
 
+            //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
+            if (MouseGrabView?.OnMouseEvent (nme) == true)
+            {
+                return;
+            }
+        }
+
+        if (view is not Adornment)
+        {
             if ((view is null || view == OverlappedTop)
-                && Current is { Modal: false }
-                && OverlappedTop != null
-                && a.MouseEvent.Flags != MouseFlags.ReportMousePosition
-                && a.MouseEvent.Flags != 0)
+                    && Current is { Modal: false }
+                    && OverlappedTop != null
+                    && a.MouseEvent.Flags != MouseFlags.ReportMousePosition
+                    && a.MouseEvent.Flags != 0)
             {
                 // This occurs when there are multiple overlapped "tops"
                 // E.g. "Mdi" - in the Background Worker Scenario

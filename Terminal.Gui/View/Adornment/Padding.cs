@@ -38,4 +38,11 @@ public class Padding : Adornment
             Parent?.SetNeedsDisplay ();
         }
     }
+
+    /// <inheritdoc/>
+    protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
+    {
+        return false;
+    }
+
 }

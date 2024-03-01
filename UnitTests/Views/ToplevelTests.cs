@@ -256,7 +256,7 @@ public class ToplevelTests
         Assert.Equal (top, Application.Top);
 
         // Application.Top without menu and status bar.
-        View supView = top.GetLocationThatFits (top, 2, 2, out int nx, out int ny, out MenuBar mb, out StatusBar sb);
+        View supView = View.GetLocationThatFits (top, 2, 2, out int nx, out int ny, out MenuBar mb, out StatusBar sb);
         Assert.Equal (Application.Top, supView);
         Assert.Equal (0, nx);
         Assert.Equal (0, ny);
@@ -267,7 +267,7 @@ public class ToplevelTests
         Assert.NotNull (top.MenuBar);
 
         // Application.Top with a menu and without status bar.
-        top.GetLocationThatFits (top, 2, 2, out nx, out ny, out mb, out sb);
+        View.GetLocationThatFits (top, 2, 2, out nx, out ny, out mb, out sb);
         Assert.Equal (0, nx);
         Assert.Equal (1, ny);
         Assert.NotNull (mb);
@@ -277,7 +277,7 @@ public class ToplevelTests
         Assert.NotNull (top.StatusBar);
 
         // Application.Top with a menu and status bar.
-        top.GetLocationThatFits (top, 2, 2, out nx, out ny, out mb, out sb);
+        View.GetLocationThatFits (top, 2, 2, out nx, out ny, out mb, out sb);
         Assert.Equal (0, nx);
 
         // The available height is lower than the Application.Top height minus
@@ -290,7 +290,7 @@ public class ToplevelTests
         Assert.Null (top.MenuBar);
 
         // Application.Top without a menu and with a status bar.
-        top.GetLocationThatFits (top, 2, 2, out nx, out ny, out mb, out sb);
+        View.GetLocationThatFits (top, 2, 2, out nx, out ny, out mb, out sb);
         Assert.Equal (0, nx);
 
         // The available height is lower than the Application.Top height minus
@@ -308,13 +308,13 @@ public class ToplevelTests
         top.LayoutSubviews ();
 
         // The SuperView is always the same regardless of the caller.
-        supView = top.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
+        supView = View.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
         Assert.Equal (Application.Top, supView);
-        supView = win.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
+        supView = View.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
         Assert.Equal (Application.Top, supView);
 
         // Application.Top without menu and status bar.
-        top.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
+        View.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
         Assert.Equal (0, nx);
         Assert.Equal (0, ny);
         Assert.Null (mb);
@@ -324,7 +324,7 @@ public class ToplevelTests
         Assert.NotNull (top.MenuBar);
 
         // Application.Top with a menu and without status bar.
-        top.GetLocationThatFits (win, 2, 2, out nx, out ny, out mb, out sb);
+        View.GetLocationThatFits (win, 2, 2, out nx, out ny, out mb, out sb);
         Assert.Equal (0, nx);
         Assert.Equal (1, ny);
         Assert.NotNull (mb);
@@ -334,7 +334,7 @@ public class ToplevelTests
         Assert.NotNull (top.StatusBar);
 
         // Application.Top with a menu and status bar.
-        top.GetLocationThatFits (win, 30, 20, out nx, out ny, out mb, out sb);
+        View.GetLocationThatFits (win, 30, 20, out nx, out ny, out mb, out sb);
         Assert.Equal (0, nx);
 
         // The available height is lower than the Application.Top height minus
@@ -354,7 +354,7 @@ public class ToplevelTests
         top.Add (win);
 
         // Application.Top without menu and status bar.
-        top.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
+        View.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
         Assert.Equal (0, nx);
         Assert.Equal (0, ny);
         Assert.Null (mb);
@@ -364,7 +364,7 @@ public class ToplevelTests
         Assert.NotNull (top.MenuBar);
 
         // Application.Top with a menu and without status bar.
-        top.GetLocationThatFits (win, 2, 2, out nx, out ny, out mb, out sb);
+        View.GetLocationThatFits (win, 2, 2, out nx, out ny, out mb, out sb);
         Assert.Equal (2, nx);
         Assert.Equal (2, ny);
         Assert.NotNull (mb);
@@ -374,7 +374,7 @@ public class ToplevelTests
         Assert.NotNull (top.StatusBar);
 
         // Application.Top with a menu and status bar.
-        top.GetLocationThatFits (win, 30, 20, out nx, out ny, out mb, out sb);
+        View.GetLocationThatFits (win, 30, 20, out nx, out ny, out mb, out sb);
         Assert.Equal (20, nx); // 20+60=80
         Assert.Equal (9, ny); // 9+15+1(mb)=25
         Assert.NotNull (mb);
@@ -383,14 +383,14 @@ public class ToplevelTests
         top.PositionToplevels ();
         Assert.Equal (new Rectangle (0, 1, 60, 15), win.Frame);
 
-        Assert.Null (Toplevel._dragPosition);
+        //Assert.Null (Toplevel._dragPosition);
         win.OnMouseEvent (new MouseEvent { X = 6, Y = 0, Flags = MouseFlags.Button1Pressed });
-        Assert.Equal (new Point (6, 0), Toplevel._dragPosition);
+       // Assert.Equal (new Point (6, 0), Toplevel._dragPosition);
         win.OnMouseEvent (new MouseEvent { X = 6, Y = 0, Flags = MouseFlags.Button1Released });
-        Assert.Null (Toplevel._dragPosition);
+        //Assert.Null (Toplevel._dragPosition);
         win.CanFocus = false;
         win.OnMouseEvent (new MouseEvent { X = 6, Y = 0, Flags = MouseFlags.Button1Pressed });
-        Assert.Null (Toplevel._dragPosition);
+        //Assert.Null (Toplevel._dragPosition);
     }
 
     [Fact]

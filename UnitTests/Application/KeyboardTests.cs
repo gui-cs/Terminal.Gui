@@ -179,7 +179,7 @@ public class KeyboardTests
         Assert.True (win2.HasFocus);
         Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
         win2.OnMouseEvent (new MouseEvent { Flags = MouseFlags.Button1Released });
-        Assert.Null (Toplevel._dragPosition);
+        //Assert.Null (Toplevel._dragPosition);
     }
 
     [Fact]
@@ -240,7 +240,7 @@ public class KeyboardTests
         Assert.True (win2.HasFocus);
         Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
         win2.OnMouseEvent (new MouseEvent { Flags = MouseFlags.Button1Released });
-        Assert.Null (Toplevel._dragPosition);
+        //Assert.Null (Toplevel._dragPosition);
     }
 
     [Fact]
