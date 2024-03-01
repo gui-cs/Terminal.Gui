@@ -37,6 +37,16 @@ public partial class View
         return args.Handled || base.OnMouseEnter (mouseEvent);
     }
 
+
+    /// <summary>Method invoked when a mouse event is generated</summary>
+    /// <remarks>
+    /// The coordinates are relative to <see cref="View.Bounds"/>.
+    /// </remarks>
+    /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
+    /// <param name="mouseEvent">Contains the details about the mouse event.</param>
+    //public virtual bool MouseEvent (MouseEvent mouseEvent) { return false; }
+
+
     /// <summary>Method invoked when a mouse event is generated</summary>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
@@ -54,10 +64,10 @@ public partial class View
 
         var args = new MouseEventEventArgs (mouseEvent);
 
-        if (MouseEvent (mouseEvent))
-        {
-            return true;
-        }
+        //if (MouseEvent (mouseEvent))
+        //{
+        //    return true;
+        //}
 
         if (mouseEvent.Flags == MouseFlags.Button1Clicked)
         {

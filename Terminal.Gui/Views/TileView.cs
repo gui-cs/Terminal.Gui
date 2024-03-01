@@ -901,7 +901,7 @@ public class TileView : View
             }
         }
 
-        public override bool MouseEvent (MouseEvent mouseEvent)
+        public override bool OnMouseEvent (MouseEvent mouseEvent)
         {
             if (!dragPosition.HasValue && mouseEvent.Flags == MouseFlags.Button1Pressed)
             {

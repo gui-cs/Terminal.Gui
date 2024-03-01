@@ -262,7 +262,7 @@ public class HexView : View
     public event EventHandler<HexViewEditEventArgs> Edited;
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent me)
+    public override bool OnMouseEvent (MouseEvent me)
     {
         // BUGBUG: Test this with a border! Assumes Frame == Bounds!
 

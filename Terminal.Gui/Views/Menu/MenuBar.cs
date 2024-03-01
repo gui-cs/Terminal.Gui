@@ -1647,7 +1647,7 @@ public class MenuBar : View
     }
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent me)
+    public override bool OnMouseEvent (MouseEvent me)
     {
         if (!_handled && !HandleGrabView (me, this))
         {
@@ -1805,7 +1805,7 @@ public class MenuBar : View
                         nme = new MouseEvent { X = me.X + current.Frame.X, Y = 0, Flags = me.Flags, View = v };
                     }
 
-                    v.MouseEvent (nme);
+                    v.OnMouseEvent (nme);
 
                     return false;
                 }

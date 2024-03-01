@@ -163,9 +163,9 @@ public class TimeField : TextField
     }
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent ev)
+    public override bool OnMouseEvent (MouseEvent ev)
     {
-        bool result = base.MouseEvent (ev);
+        bool result = base.OnMouseEvent (ev);
 
         if (result && SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed))
         {

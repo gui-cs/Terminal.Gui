@@ -334,7 +334,7 @@ public class ScrollView : View
     }
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent me)
+    public override bool OnMouseEvent (MouseEvent me)
     {
         if (me.Flags != MouseFlags.WheeledDown
             && me.Flags != MouseFlags.WheeledUp
@@ -366,11 +366,11 @@ public class ScrollView : View
         }
         else if (me.X == _vertical.Frame.X && ShowVerticalScrollIndicator)
         {
-            _vertical.MouseEvent (me);
+            _vertical.OnMouseEvent (me);
         }
         else if (me.Y == _horizontal.Frame.Y && ShowHorizontalScrollIndicator)
         {
-            _horizontal.MouseEvent (me);
+            _horizontal.OnMouseEvent (me);
         }
         else if (IsOverridden (me.View, "MouseEvent"))
         {

@@ -172,13 +172,13 @@ public class KeyboardTests
         Assert.True (win2.HasFocus);
         Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-        win.MouseEvent (new MouseEvent { Flags = MouseFlags.Button1Pressed });
+        win.OnMouseEvent (new MouseEvent { Flags = MouseFlags.Button1Pressed });
         Assert.False (win.CanFocus);
         Assert.False (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.True (win2.HasFocus);
         Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
-        win2.MouseEvent (new MouseEvent { Flags = MouseFlags.Button1Released });
+        win2.OnMouseEvent (new MouseEvent { Flags = MouseFlags.Button1Released });
         Assert.Null (Toplevel._dragPosition);
     }
 
@@ -233,13 +233,13 @@ public class KeyboardTests
         Assert.False (win2.HasFocus);
         Assert.Equal ("win", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-        win2.MouseEvent (new MouseEvent { Flags = MouseFlags.Button1Pressed });
+        win2.OnMouseEvent (new MouseEvent { Flags = MouseFlags.Button1Pressed });
         Assert.True (win.CanFocus);
         Assert.False (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.True (win2.HasFocus);
         Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
-        win2.MouseEvent (new MouseEvent { Flags = MouseFlags.Button1Released });
+        win2.OnMouseEvent (new MouseEvent { Flags = MouseFlags.Button1Released });
         Assert.Null (Toplevel._dragPosition);
     }
 

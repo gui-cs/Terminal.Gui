@@ -445,7 +445,7 @@ public class NavigationTests
 
         view.NewKeyDownEvent (Key.Space);
         Assert.True (wasClicked);
-        view.MouseEvent (new MouseEvent { Flags = MouseFlags.Button1Clicked });
+        view.OnMouseEvent (new MouseEvent { Flags = MouseFlags.Button1Clicked });
         Assert.False (wasClicked);
         Assert.True (view.Enabled);
         Assert.True (view.CanFocus);
@@ -454,7 +454,7 @@ public class NavigationTests
         view.Enabled = false;
         view.NewKeyDownEvent (Key.Space);
         Assert.False (wasClicked);
-        view.MouseEvent (new MouseEvent { Flags = MouseFlags.Button1Clicked });
+        view.OnMouseEvent (new MouseEvent { Flags = MouseFlags.Button1Clicked });
         Assert.False (wasClicked);
         Assert.False (view.Enabled);
         Assert.True (view.CanFocus);
@@ -483,7 +483,7 @@ public class NavigationTests
 
                                      win.NewKeyDownEvent (Key.Enter);
                                      Assert.True (wasClicked);
-                                     button.MouseEvent (new MouseEvent { Flags = MouseFlags.Button1Clicked });
+                                     button.OnMouseEvent (new MouseEvent { Flags = MouseFlags.Button1Clicked });
                                      Assert.False (wasClicked);
                                      Assert.True (button.Enabled);
                                      Assert.True (button.CanFocus);
@@ -495,7 +495,7 @@ public class NavigationTests
                                      win.Enabled = false;
                                      button.NewKeyDownEvent (Key.Enter);
                                      Assert.False (wasClicked);
-                                     button.MouseEvent (new MouseEvent { Flags = MouseFlags.Button1Clicked });
+                                     button.OnMouseEvent (new MouseEvent { Flags = MouseFlags.Button1Clicked });
                                      Assert.False (wasClicked);
                                      Assert.False (button.Enabled);
                                      Assert.True (button.CanFocus);

@@ -56,14 +56,6 @@ public class Responder : IDisposable
     /// <summary>Event raised when <see cref="Dispose()"/> has been called to signal that this object is being disposed.</summary>
     public event EventHandler Disposing;
 
-    /// <summary>Method invoked when a mouse event is generated</summary>
-    /// <remarks>
-    /// The coordinates are relative to <see cref="View.Bounds"/>.
-    /// </remarks>
-    /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
-    /// <param name="mouseEvent">Contains the details about the mouse event.</param>
-    public virtual bool MouseEvent (MouseEvent mouseEvent) { return false; }
-
     /// <summary>Method invoked when the <see cref="CanFocus"/> property from a view is changed.</summary>
     public virtual void OnCanFocusChanged () { }
 

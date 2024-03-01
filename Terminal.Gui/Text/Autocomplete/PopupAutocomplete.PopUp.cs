@@ -14,7 +14,7 @@ public abstract partial class PopupAutocomplete
             WantMousePositionReports = true;
         }
 
-        public override bool MouseEvent (MouseEvent mouseEvent) { return _autoComplete.MouseEvent (mouseEvent); }
+        public override bool OnMouseEvent (MouseEvent mouseEvent) { return _autoComplete.OnMouseEvent (mouseEvent); }
 
         public override void OnDrawContent (Rectangle contentArea)
         {

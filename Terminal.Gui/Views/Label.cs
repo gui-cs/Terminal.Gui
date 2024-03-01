@@ -78,10 +78,10 @@ public class Label : View
             return true;
         }
 
-        if (MouseEvent (mouseEvent))
-        {
-            return true;
-        }
+        //if (MouseEvent (mouseEvent))
+        //{
+        //    return true;
+        //}
 
         if (mouseEvent.Flags == MouseFlags.Button1Clicked)
         {
