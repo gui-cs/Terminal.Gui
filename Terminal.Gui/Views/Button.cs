@@ -100,7 +100,7 @@ public class Button : View
     public bool NoPadding { get; set; }
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent me)
+    public override bool OnMouseEvent (MouseEvent me)
     {
         if (me.Flags == MouseFlags.Button1Clicked)
         {

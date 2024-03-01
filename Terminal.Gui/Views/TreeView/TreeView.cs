@@ -1001,7 +1001,7 @@ public class TreeView<T> : View, ITreeView where T : class
     public bool IsSelected (T model) { return Equals (SelectedObject, model) || (MultiSelect && multiSelectedRegions.Any (s => s.Contains (model))); }
 
     ///<inheritdoc/>
-    public override bool MouseEvent (MouseEvent me)
+    public override bool OnMouseEvent (MouseEvent me)
     {
         // If it is not an event we care about
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
@@ -1012,7 +1012,7 @@ public class TreeView<T> : View, ITreeView where T : class
             && !me.Flags.HasFlag (MouseFlags.WheeledLeft))
         {
             // do nothing
-            return false;
+            return base.OnMouseEvent (me);
         }
 
         if (!HasFocus && CanFocus)

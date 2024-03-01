@@ -343,7 +343,7 @@ public class TextField : View
 
         // OnAccept returns true if the event is canceled.
         // By Default pressing ENTER should be ignored (Invoke(Command.Accept) should return false).
-        AddCommand (Command.Accept, () => OnAccept() != true);
+        AddCommand (Command.Accept, () => OnAccept () != true);
 
         // Default keybindings for this view
         // We follow this as closely as possible: https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
@@ -846,7 +846,7 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent ev)
+    public override bool OnMouseEvent (MouseEvent ev)
     {
         if (!ev.Flags.HasFlag (MouseFlags.Button1Pressed)
             && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition)
@@ -855,7 +855,7 @@ public class TextField : View
             && !ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)
             && !ev.Flags.HasFlag (ContextMenu.MouseFlags))
         {
-            return false;
+            return base.OnMouseEvent (ev);
         }
 
         if (!CanFocus)
@@ -869,7 +869,7 @@ public class TextField : View
         }
 
         // Give autocomplete first opportunity to respond to mouse clicks
-        if (SelectedLength == 0 && Autocomplete.MouseEvent (ev, true))
+        if (SelectedLength == 0 && Autocomplete.OnMouseEvent (ev, true))
         {
             return true;
         }

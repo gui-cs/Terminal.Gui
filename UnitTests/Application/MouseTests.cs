@@ -60,11 +60,11 @@ public class MouseTests
     }
 
     /// <summary>
-    ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. No frames;
+    ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. No adornments;
     ///     Frame == Bounds
     /// </summary>
-    [AutoInitShutdown]
     [Theory]
+    [AutoInitShutdown]
 
     // click inside view tests
     [InlineData (0, 0, 0, 0, 0, true)]
@@ -94,7 +94,7 @@ public class MouseTests
     [InlineData (1, 0, 1, 0, 0, false)]
     [InlineData (1, 9, 0, 0, 0, false)]
     [InlineData (1, 0, 9, 0, 0, false)]
-    public void MouseCoordinatesTest_NoFrames (
+    public void MouseCoordinatesTest_NoAdornments (
         int offset,
         int clickX,
         int clickY,
@@ -107,23 +107,27 @@ public class MouseTests
         Point pos = new (offset, offset);
 
         var clicked = false;
-        Application.Top.X = pos.X;
-        Application.Top.Y = pos.Y;
-        Application.Top.Width = size.Width;
-        Application.Top.Height = size.Height;
-
-        Application.Begin (Application.Top);
+        var view = new View ()
+        {
+            X = pos.X,
+            Y = pos.Y,
+            Width = size.Width,
+            Height = size.Height
+        };
+        view.BeginInit();
+        view.EndInit();
 
         var mouseEvent = new MouseEvent { X = clickX, Y = clickY, Flags = MouseFlags.Button1Clicked };
         var mouseEventArgs = new MouseEventEventArgs (mouseEvent);
 
-        Application.Top.MouseClick += (s, e) =>
+        view.MouseClick += (s, e) =>
                                       {
                                           Assert.Equal (expectedX, e.MouseEvent.X);
                                           Assert.Equal (expectedY, e.MouseEvent.Y);
                                           clicked = true;
                                       };
 
+        Application.Top.Add (view);
         Application.OnMouseEvent (mouseEventArgs);
         Assert.Equal (expectedClicked, clicked);
     }

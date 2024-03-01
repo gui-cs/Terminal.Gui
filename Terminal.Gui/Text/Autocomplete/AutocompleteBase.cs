@@ -52,7 +52,7 @@ public abstract class AutocompleteBase : IAutocomplete
     public virtual AutocompleteContext Context { get; set; }
 
     /// <inheritdoc/>
-    public abstract bool MouseEvent (MouseEvent me, bool fromHost = false);
+    public abstract bool OnMouseEvent (MouseEvent me, bool fromHost = false);
 
     /// <inheritdoc/>
     public abstract bool ProcessKey (Key a);

@@ -44,7 +44,7 @@ public partial class View
     /// </remarks>
     /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
     /// <param name="mouseEvent">Contains the details about the mouse event.</param>
-    public virtual bool MouseEvent (MouseEvent mouseEvent) { return false; }
+    //public virtual bool MouseEvent (MouseEvent mouseEvent) { return false; }
 
 
     /// <summary>Method invoked when a mouse event is generated</summary>
@@ -64,10 +64,10 @@ public partial class View
 
         var args = new MouseEventEventArgs (mouseEvent);
 
-        if (MouseEvent (mouseEvent))
-        {
-            return true;
-        }
+        //if (MouseEvent (mouseEvent))
+        //{
+        //    return true;
+        //}
 
         if (mouseEvent.Flags == MouseFlags.Button1Clicked)
         {
