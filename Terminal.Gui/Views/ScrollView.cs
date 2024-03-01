@@ -322,7 +322,7 @@ public class ScrollView : View
         }
         else
         {
-            if (!IsOverridden (view, "MouseEvent"))
+            if (!IsOverridden (view, "OnMouseEvent"))
             {
                 view.MouseEnter += View_MouseEnter;
                 view.MouseLeave += View_MouseLeave;

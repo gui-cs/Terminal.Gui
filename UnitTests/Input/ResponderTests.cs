@@ -113,28 +113,28 @@ public class ResponderTests
     public void IsOverridden_False_IfNotOverridden ()
     {
         // MouseEvent IS defined on Responder but NOT overridden
-        Assert.False (Responder.IsOverridden (new Responder (), "MouseEvent"));
+        Assert.False (Responder.IsOverridden (new Responder (), "OnMouseEvent"));
 
         // MouseEvent is defined on Responder and NOT overrident on View
         Assert.False (
                       Responder.IsOverridden (
-                                              new View { Text = "View does not override MouseEvent" },
-                                              "MouseEvent"
+                                              new View { Text = "View does not override OnMouseEvent" },
+                                              "OnMouseEvent"
                                              )
                      );
 
         Assert.False (
                       Responder.IsOverridden (
-                                              new DerivedView { Text = "DerivedView does not override MouseEvent" },
-                                              "MouseEvent"
+                                              new DerivedView { Text = "DerivedView does not override OnMouseEvent" },
+                                              "OnMouseEvent"
                                              )
                      );
 
         // MouseEvent is NOT defined on DerivedView 
         Assert.False (
                       Responder.IsOverridden (
-                                              new DerivedView { Text = "DerivedView does not override MouseEvent" },
-                                              "MouseEvent"
+                                              new DerivedView { Text = "DerivedView does not override OnMouseEvent" },
+                                              "OnMouseEvent"
                                              )
                      );
 
