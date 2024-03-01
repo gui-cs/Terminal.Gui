@@ -486,7 +486,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     Invoked when the users presses a key, allowing subscribers to do things during key down events. Set
+    ///     Invoked when the user presses a key, allowing subscribers to do things during key down events. Set
     ///     <see cref="Key.Handled"/> to true to stop the key from being processed by other views. Invoked after
     ///     <see cref="KeyDown"/> and before <see cref="InvokingKeyBindings"/>.
     /// </summary>
