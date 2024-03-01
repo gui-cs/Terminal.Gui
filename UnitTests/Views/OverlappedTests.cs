@@ -903,7 +903,7 @@ public class OverlappedTests
                                                            new MouseEvent { X = 1, Y = 1, Flags = MouseFlags.Button1Pressed }
                                                           )
                                  );
-        Assert.Equal (win2, Application.MouseGrabView);
+        Assert.Equal (win2.Border, Application.MouseGrabView);
 
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (

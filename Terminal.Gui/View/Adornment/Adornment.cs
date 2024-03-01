@@ -33,7 +33,8 @@ public class Adornment : View
     /// <summary>Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).</summary>
     public override Rectangle Bounds
     {
-        get => new Rectangle (Point.Empty, Thickness?.GetInside (new (Point.Empty, Frame.Size)).Size ?? Frame.Size);
+        get => new (Point.Empty, Thickness?.GetInside (new (Point.Empty, Frame.Size)).Size ?? Frame.Size);
+
         // QUESTION: So why even have a setter then?
         set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
     }
@@ -158,35 +159,27 @@ public class Adornment : View
     {
         ThicknessChanged?.Invoke (
                                   this,
-                                  new ThicknessEventArgs { Thickness = Thickness, PreviousThickness = previousThickness }
+                                  new() { Thickness = Thickness, PreviousThickness = previousThickness }
                                  );
     }
 
     /// <summary>Fired whenever the <see cref="Thickness"/> property changes.</summary>
     public event EventHandler<ThicknessEventArgs> ThicknessChanged;
 
-    internal override Adornment CreateAdornment (Type adornmentType)
-    {
-        /* Do nothing - Adornments do not have Adornments */
-        return null;
-    }
-
-    internal override void LayoutAdornments ()
-    {
-        /* Do nothing - Adornments do not have Adornments */
-    }
-
     /// <inheritdoc/>
-    public override bool OnMouseEvent (MouseEvent mouseEvent)
+    protected internal override bool OnMouseEnter (MouseEvent mouseEvent)
     {
         var args = new MouseEventEventArgs (mouseEvent);
 
-        if (MouseEvent (mouseEvent))
-        {
-            return true;
-        }
+        return args.Handled || base.OnMouseEnter (mouseEvent);
+    }
 
-        if (mouseEvent.Flags == MouseFlags.Button1Clicked)
+    /// <inheritdoc/>
+    protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
+    {
+        var args = new MouseEventEventArgs (mouseEvent);
+
+        if (mouseEvent.Flags.HasFlag(MouseFlags.Button1Clicked))
         {
             if (Parent.CanFocus && !Parent.HasFocus)
             {
@@ -197,39 +190,25 @@ public class Adornment : View
             return OnMouseClick (args);
         }
 
-        if (mouseEvent.Flags == MouseFlags.Button2Clicked)
-        {
-            return OnMouseClick (args);
-        }
-
-        if (mouseEvent.Flags == MouseFlags.Button3Clicked)
-        {
-            return OnMouseClick (args);
-        }
-
-        if (mouseEvent.Flags == MouseFlags.Button4Clicked)
-        {
-            return OnMouseClick (args);
-        }
-
         return false;
     }
-    
-    /// <inheritdoc/>
-    public override bool OnMouseEnter (MouseEvent mouseEvent)
-    {
-        var args = new MouseEventEventArgs (mouseEvent);
-
-        
-        return args.Handled || base.OnMouseEnter (mouseEvent);
-    }
-
 
     /// <inheritdoc/>
-    public override bool OnMouseLeave (MouseEvent mouseEvent)
+    protected internal override bool OnMouseLeave (MouseEvent mouseEvent)
     {
         var args = new MouseEventEventArgs (mouseEvent);
 
         return args.Handled || base.OnMouseLeave (mouseEvent);
+    }
+
+    internal override Adornment CreateAdornment (Type adornmentType)
+    {
+        /* Do nothing - Adornments do not have Adornments */
+        return null;
+    }
+
+    internal override void LayoutAdornments ()
+    {
+        /* Do nothing - Adornments do not have Adornments */
     }
 }
