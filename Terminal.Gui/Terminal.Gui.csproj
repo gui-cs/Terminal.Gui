@@ -15,16 +15,21 @@
     <LangVersion>12</LangVersion>
     <RootNamespace>Terminal.Gui</RootNamespace>
     <AssemblyName>Terminal.Gui</AssemblyName>
-    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
-    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineTrace>True</DefineTrace>
     <DebugType>portable</DebugType>
-    <VersionSuffix></VersionSuffix>
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL</DefineConstants>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <NoLogo>True</NoLogo>
+    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
-    <DebugType>portable</DebugType>
+    <DefineDebug>True</DefineDebug>
+    <DefineConstants>$(DefineConstants);DEBUG_IDISPOSABLE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>True</Optimize>
+    <VersionSuffix></VersionSuffix>
   </PropertyGroup>
   <!-- =================================================================== -->
   <!-- Configuration Manager -->
@@ -40,7 +45,6 @@
   <!-- =================================================================== -->
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
     <!-- Enable Nuget Source Link for github -->
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     <PackageReference Include="System.IO.Abstractions" Version="20.0.15" />
@@ -48,16 +52,20 @@
     <PackageReference Include="Wcwidth" Version="2.0.0" />
   </ItemGroup>
   <!-- =================================================================== -->
+  <!-- Global Usings and Type Aliases -->
+  <!-- =================================================================== -->
+  <ItemGroup>
+    <Using Include="JetBrains.Annotations" />
+    <Using Include="System.Diagnostics.Contracts.PureAttribute" Alias="PureAttribute" />
+    <Using Include="System.Drawing" />
+    <Using Include="System.Text" />
+  </ItemGroup>
+  <!-- =================================================================== -->
   <!-- Namespaces for which internal items are visible -->
   <!-- =================================================================== -->
   <ItemGroup>
     <InternalsVisibleTo Include="UnitTests" />
   </ItemGroup>
-  <PropertyGroup>
-    <!-- Uncomment the RestoreSources element to have dotnet restore pull NStack from a local dir for testing -->
-    <!-- See https://stackoverflow.com/a/44463578/297526 -->
-    <!--<RestoreSources>$(RestoreSources);..\..\NStack\NStack\bin\Debug;https://api.nuget.org/v3/index.json</RestoreSources>-->
-  </PropertyGroup>
   <!-- =================================================================== -->
   <!-- API Documentation -->
   <!-- =================================================================== -->
@@ -87,13 +95,6 @@
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Using Include="JetBrains.Annotations" />
-    <Using Include="System.Diagnostics.Contracts.PureAttribute" Alias="PureAttribute" />
-    <Using Include="System.Drawing" />
-    <Using Include="System.Text" />
-    <Using Include="JetBrains.Annotations" />
-  </ItemGroup>
   <!-- =================================================================== -->
   <!-- Nuget  -->
   <!-- =================================================================== -->
@@ -111,7 +112,7 @@
     <PackageReleaseNotes>
       See: https://github.com/gui-cs/Terminal.Gui/releases
     </PackageReleaseNotes>
-    <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\Terminal.Gui.xml</DocumentationFile>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Debug' ">true</GeneratePackageOnBuild>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <RepositoryUrl>https://github.com/gui-cs/Terminal.Gui.git</RepositoryUrl>
@@ -124,9 +125,6 @@
     <GitRepositoryRemoteName>upstream</GitRepositoryRemoteName>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <EnableSourceLink>true</EnableSourceLink>
-    <!--<DebugType>Embedded</DebugType>-->
     <Authors>Miguel de Icaza, Tig Kindel (@tig), @BDisp</Authors>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 </Project>
