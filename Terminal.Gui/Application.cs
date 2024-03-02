@@ -1435,10 +1435,10 @@ public static partial class Application
         if (view is not Adornment)
         {
             if ((view is null || view == OverlappedTop)
-                    && Current is { Modal: false }
-                    && OverlappedTop != null
-                    && a.MouseEvent.Flags != MouseFlags.ReportMousePosition
-                    && a.MouseEvent.Flags != 0)
+                && Current is { Modal: false }
+                && OverlappedTop != null
+                && a.MouseEvent.Flags != MouseFlags.ReportMousePosition
+                && a.MouseEvent.Flags != 0)
             {
                 // This occurs when there are multiple overlapped "tops"
                 // E.g. "Mdi" - in the Background Worker Scenario
