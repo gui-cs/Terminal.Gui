@@ -175,7 +175,20 @@ public class Adornment : View
     /// <summary>Fired whenever the <see cref="Thickness"/> property changes.</summary>
     public event EventHandler<ThicknessEventArgs> ThicknessChanged;
 
-    /// <inheritdoc/>
+    /// <summary>Called when a mouse event occurs within the Adornment.</summary>
+    /// <remarks>
+    /// <para>
+    /// The coordinates are relative to <see cref="View.Bounds"/>.
+    /// </para>
+    /// <para>
+    /// A mouse click on the Adornment will cause the Parent to focus.
+    /// </para>
+    /// <para>
+    /// A mouse drag on the Adornment will cause the Parent to move.
+    /// </para>
+    /// </remarks>
+    /// <param name="mouseEvent"></param>
+    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
         var args = new MouseEventEventArgs (mouseEvent);
