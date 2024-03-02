@@ -2,7 +2,6 @@
 
 // TODO: Missing 3D effect - 3D effects will be drawn by a mechanism separate from Adornments
 // TODO: If a Adornment has focus, navigation keys (e.g Command.NextView) should cycle through SubViews of the Adornments
-// TODO: Why don't we let Frame.X/Y be the location of the Adornment> Why always 0?
 // QUESTION: How does a user navigate out of an Adornment to another Adornment, or back into the Parent's SubViews?
 
 /// <summary>
@@ -144,7 +143,7 @@ public class Adornment : View
 
         // This just draws/clears the thickness, not the insides.
         Driver.SetAttribute (normalAttr);
-        Thickness.Draw (screenBounds, (string)(Data ?? string.Empty));
+        Thickness.Draw (screenBounds, ToString ());
 
         if (!string.IsNullOrEmpty (TextFormatter.Text))
         {

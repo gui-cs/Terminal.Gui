@@ -580,13 +580,10 @@ public partial class View
                 return start.Margin;
             }
 
-            // TODO: Move this logic into Adornment? Why can't Adornment.Frame be used?
             if (start.Border.Thickness.Contains (
-                                                 new (
-                                                      start.Frame.X + start.Margin.Thickness.Left,
-                                                      start.Frame.Y + start.Margin.Thickness.Top,
-                                                      start.Frame.Width - start.Margin.Thickness.Horizontal,
-                                                      start.Frame.Height - start.Margin.Thickness.Vertical),
+                                                 start.Border.Frame with { 
+                                                     X = start.Frame.X + start.Border.Frame.X,
+                                                     Y = start.Frame.Y + start.Border.Frame.Y },
                                                  x,
                                                  y))
             {
@@ -594,14 +591,13 @@ public partial class View
             }
 
             if (start.Padding.Thickness.Contains (
-                                                  new (
-                                                       start.Frame.X + start.Margin.Thickness.Left + start.Border.Thickness.Left,
-                                                       start.Frame.Y + start.Margin.Thickness.Top + start.Border.Thickness.Top,
-                                                       start.Frame.Width - start.Margin.Thickness.Horizontal - start.Border.Thickness.Horizontal,
-                                                       start.Frame.Height - start.Margin.Thickness.Vertical - start.Border.Thickness.Vertical),
+                                                  start.Padding.Frame with
+                                                  {
+                                                      X = start.Frame.X + start.Padding.Frame.X,
+                                                      Y = start.Frame.Y + start.Padding.Frame.Y
+                                                  },
                                                   x,
                                                   y))
-
             {
                 return start.Padding;
             }
@@ -716,7 +712,7 @@ public partial class View
         LayoutAdornments ();
 
         Rectangle oldBounds = Bounds;
-        OnLayoutStarted (new() { OldBounds = oldBounds });
+        OnLayoutStarted (new () { OldBounds = oldBounds });
 
         SetTextFormatterSize ();
 
@@ -743,7 +739,7 @@ public partial class View
 
         LayoutNeeded = false;
 
-        OnLayoutComplete (new() { OldBounds = oldBounds });
+        OnLayoutComplete (new () { OldBounds = oldBounds });
     }
 
     /// <summary>Converts a screen-relative coordinate to a bounds-relative coordinate.</summary>
