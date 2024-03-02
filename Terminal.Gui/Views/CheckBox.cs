@@ -34,6 +34,13 @@ public class CheckBox : View
         KeyBindings.Add (Key.Space, Command.Accept);
 
         TitleChanged += Checkbox_TitleChanged;
+
+        MouseClick += CheckBox_MouseClick;
+    }
+
+    private void CheckBox_MouseClick (object? sender, MouseEventEventArgs e)
+    {
+        e.Handled = OnToggled () == true;
     }
 
     private void Checkbox_TitleChanged (object? sender, StateEventArgs<string> e)
@@ -88,17 +95,6 @@ public class CheckBox : View
     }
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent me)
-    {
-        if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) || !CanFocus)
-        {
-            return false;
-        }
-
-        return OnToggled () == true;
-    }
-
-    /// <inheritdoc/>
     public override bool OnEnter (View view)
     {
         Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
@@ -143,11 +139,13 @@ public class CheckBox : View
             return e.Cancel;
         }
 
-        Checked = e.NewValue;
+        // By default, Command.Accept calls OnAccept, so we need to call it here to ensure that the event is fired.
+        if (OnAccept () == true)
+        {
+            return true;
+        }
 
-        SetNeedsDisplay ();
-        SetFocus ();
-        OnAccept ();
+        Checked = e.NewValue;
 
         return true;
     }

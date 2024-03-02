@@ -840,7 +840,7 @@ At 0,0
 
         //Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
         Assert.False (r.OnKeyUp (new Key { KeyCode = KeyCode.Null }));
-        Assert.False (r.MouseEvent (new MouseEvent { Flags = MouseFlags.AllEvents }));
+        Assert.False (r.OnMouseEvent (new MouseEvent { Flags = MouseFlags.AllEvents }));
         Assert.False (r.OnMouseEnter (new MouseEvent { Flags = MouseFlags.AllEvents }));
         Assert.False (r.OnMouseLeave (new MouseEvent { Flags = MouseFlags.AllEvents }));
 
@@ -1161,7 +1161,7 @@ At 0,0
 
         view.Accept += ViewOnAccept;
 
-        view.OnAccept ();
+        view.InvokeCommand (Command.Accept);
         Assert.True (accepted);
 
         return;
@@ -1176,7 +1176,7 @@ At 0,0
 
         view.Accept += ViewOnAccept;
 
-        var ret = view.OnAccept ();
+        var ret = view.InvokeCommand (Command.Accept);
         Assert.True (ret);
         Assert.True (acceptInvoked);
 

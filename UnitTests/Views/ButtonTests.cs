@@ -693,7 +693,7 @@ public class ButtonTests
 
         button.Accept += ButtonAccept;
 
-        var ret = button.OnAccept ();
+        var ret = button.InvokeCommand (Command.Accept);
         Assert.True (ret);
         Assert.True (acceptInvoked);
 

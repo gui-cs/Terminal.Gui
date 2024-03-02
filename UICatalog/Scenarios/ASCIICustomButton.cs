@@ -126,31 +126,6 @@ public class ASCIICustomButtonTest : Scenario
             return base.OnLeave (view);
         }
 
-        public override bool OnMouseEvent (MouseEvent mouseEvent)
-        {
-            Debug.WriteLine ($"{mouseEvent.Flags}");
-
-            if (mouseEvent.Flags == MouseFlags.Button1Clicked)
-            {
-                if (!HasFocus && SuperView != null)
-                {
-                    if (!SuperView.HasFocus)
-                    {
-                        SuperView.SetFocus ();
-                    }
-
-                    SetFocus ();
-                    SetNeedsDisplay ();
-                }
-
-                OnAccept ();
-
-                return true;
-            }
-
-            return base.OnMouseEvent (mouseEvent);
-        }
-
         public event Action<ASCIICustomButton> PointerEnter;
         private void This_MouseClick (object sender, MouseEventEventArgs obj) { OnMouseEvent (obj.MouseEvent); }
     }

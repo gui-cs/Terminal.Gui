@@ -142,7 +142,7 @@ public class StatusBar : View
     }
 
     ///<inheritdoc/>
-    public override bool MouseEvent (MouseEvent me)
+    protected internal override bool OnMouseEvent  (MouseEvent me)
     {
         if (me.Flags != MouseFlags.Button1Clicked)
         {

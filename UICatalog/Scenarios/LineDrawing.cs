@@ -84,7 +84,7 @@ public class LineDrawing : Scenario
             return false;
         }
 
-        public override bool OnMouseEvent (MouseEvent mouseEvent)
+        protected override bool OnMouseEvent (MouseEvent mouseEvent)
         {
             if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
             {

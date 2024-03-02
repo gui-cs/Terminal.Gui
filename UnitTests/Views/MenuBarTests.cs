@@ -37,13 +37,13 @@ public class MenuBarTests
         Assert.True (mi.Checked);
 
         Assert.True (
-                     menu.MouseEvent (
+                     menu.OnMouseEvent (
                                       new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }
                                      )
                     );
 
         Assert.True (
-                     menu._openMenu.MouseEvent (
+                     menu._openMenu.OnMouseEvent (
                                                 new MouseEvent { X = 0, Y = 1, Flags = MouseFlags.Button1Clicked, View = menu._openMenu }
                                                )
                     );
@@ -57,7 +57,7 @@ public class MenuBarTests
         Assert.Null (mi.Checked);
 
         Assert.True (
-                     menu.MouseEvent (
+                     menu.OnMouseEvent (
                                       new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }
                                      )
                     );
@@ -75,7 +75,7 @@ public class MenuBarTests
                                                      );
 
         Assert.True (
-                     menu._openMenu.MouseEvent (
+                     menu._openMenu.OnMouseEvent (
                                                 new MouseEvent { X = 0, Y = 1, Flags = MouseFlags.Button1Clicked, View = menu._openMenu }
                                                )
                     );
@@ -87,13 +87,13 @@ public class MenuBarTests
         Assert.False (mi.Checked);
 
         Assert.True (
-                     menu.MouseEvent (
+                     menu.OnMouseEvent (
                                       new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }
                                      )
                     );
 
         Assert.True (
-                     menu._openMenu.MouseEvent (
+                     menu._openMenu.OnMouseEvent (
                                                 new MouseEvent { X = 0, Y = 1, Flags = MouseFlags.Button1Clicked, View = menu._openMenu }
                                                )
                     );
@@ -296,7 +296,7 @@ public class MenuBarTests
                                               );
 
         Assert.True (
-                     menu.MouseEvent (
+                     menu.OnMouseEvent (
                                       new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }
                                      )
                     );
@@ -317,7 +317,7 @@ public class MenuBarTests
 
         Assert.True (
                      top.Subviews [1]
-                        .MouseEvent (
+                        .OnMouseEvent (
                                      new MouseEvent { X = 0, Y = 2, Flags = MouseFlags.Button1Clicked, View = top.Subviews [1] }
                                     )
                     );
@@ -338,7 +338,7 @@ public class MenuBarTests
 
         Assert.True (
                      top.Subviews [1]
-                        .MouseEvent (
+                        .OnMouseEvent (
                                      new MouseEvent { X = 0, Y = 2, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [1] }
                                     )
                     );
@@ -1460,13 +1460,13 @@ wo
         Application.Top.Add (menu);
         Application.Begin (Application.Top);
 
-        Assert.True (menu.MouseEvent (new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }));
+        Assert.True (menu.OnMouseEvent (new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }));
         Assert.True (menu.IsMenuOpen);
         Application.Top.Draw ();
 
         TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), _output);
 
-        Assert.True (menu.MouseEvent (new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }));
+        Assert.True (menu.OnMouseEvent (new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }));
         Assert.False (menu.IsMenuOpen);
         Application.Top.Draw ();
         TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, _output);
@@ -2171,7 +2171,7 @@ wo
 
         // open the menu
         Assert.True (
-                     menu.MouseEvent (
+                     menu.OnMouseEvent (
                                       new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }
                                      )
                     );
@@ -2180,7 +2180,7 @@ wo
         Assert.Equal ("_New", miCurrent.Title);
 
         Assert.True (
-                     mCurrent.MouseEvent (
+                     mCurrent.OnMouseEvent (
                                           new MouseEvent { X = 1, Y = 1, Flags = MouseFlags.ReportMousePosition, View = mCurrent }
                                          )
                     );
@@ -2189,7 +2189,7 @@ wo
         Assert.Equal ("_New", miCurrent.Title);
 
         Assert.True (
-                     mCurrent.MouseEvent (
+                     mCurrent.OnMouseEvent (
                                           new MouseEvent { X = 1, Y = 2, Flags = MouseFlags.ReportMousePosition, View = mCurrent }
                                          )
                     );
@@ -2198,7 +2198,7 @@ wo
         Assert.Equal ("_New", miCurrent.Title);
 
         Assert.True (
-                     mCurrent.MouseEvent (
+                     mCurrent.OnMouseEvent (
                                           new MouseEvent { X = 1, Y = 3, Flags = MouseFlags.ReportMousePosition, View = mCurrent }
                                          )
                     );
@@ -2208,7 +2208,7 @@ wo
 
         // close the menu
         Assert.True (
-                     menu.MouseEvent (
+                     menu.OnMouseEvent (
                                       new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }
                                      )
                     );
@@ -2373,7 +2373,7 @@ Edit
         Application.Begin (Application.Top);
 
         Assert.True (
-                     menu.MouseEvent (
+                     menu.OnMouseEvent (
                                       new MouseEvent { X = 10, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }
                                      )
                     );
@@ -2382,7 +2382,7 @@ Edit
         Assert.Equal ("_Copy", miCurrent.Title);
 
         Assert.True (
-                     mCurrent.MouseEvent (
+                     mCurrent.OnMouseEvent (
                                           new MouseEvent { X = 10, Y = 3, Flags = MouseFlags.ReportMousePosition, View = mCurrent }
                                          )
                     );
@@ -2395,7 +2395,7 @@ Edit
             if (i == -1)
             {
                 Assert.False (
-                              mCurrent.MouseEvent (
+                              mCurrent.OnMouseEvent (
                                                    new MouseEvent { X = 10, Y = i, Flags = MouseFlags.ReportMousePosition, View = menu }
                                                   )
                              );
@@ -2403,7 +2403,7 @@ Edit
             else
             {
                 Assert.True (
-                             mCurrent.MouseEvent (
+                             mCurrent.OnMouseEvent (
                                                   new MouseEvent { X = 10, Y = i, Flags = MouseFlags.ReportMousePosition, View = mCurrent }
                                                  )
                             );
@@ -2564,14 +2564,14 @@ Edit
         Application.Begin (Application.Top);
 
         Assert.True (tf.HasFocus);
-        Assert.True (menu.MouseEvent (new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }));
+        Assert.True (menu.OnMouseEvent (new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }));
         Assert.True (menu.IsMenuOpen);
         Assert.False (tf.HasFocus);
         Application.Top.Draw ();
         TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), _output);
 
         Assert.True (
-                     menu.MouseEvent (
+                     menu.OnMouseEvent (
                                       new MouseEvent { X = 8, Y = 0, Flags = MouseFlags.ReportMousePosition, View = menu }
                                      )
                     );
@@ -2581,7 +2581,7 @@ Edit
         TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), _output);
 
         Assert.True (
-                     menu.MouseEvent (
+                     menu.OnMouseEvent (
                                       new MouseEvent { X = 15, Y = 0, Flags = MouseFlags.ReportMousePosition, View = menu }
                                      )
                     );
@@ -2591,7 +2591,7 @@ Edit
         TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (2), _output);
 
         Assert.True (
-                     menu.MouseEvent (
+                     menu.OnMouseEvent (
                                       new MouseEvent { X = 8, Y = 0, Flags = MouseFlags.ReportMousePosition, View = menu }
                                      )
                     );
@@ -2601,7 +2601,7 @@ Edit
         TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, _output);
 
         Assert.True (
-                     menu.MouseEvent (
+                     menu.OnMouseEvent (
                                       new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.ReportMousePosition, View = menu }
                                      )
                     );
@@ -2610,7 +2610,7 @@ Edit
         Application.Top.Draw ();
         TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), _output);
 
-        Assert.True (menu.MouseEvent (new MouseEvent { X = 8, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }));
+        Assert.True (menu.OnMouseEvent (new MouseEvent { X = 8, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }));
         Assert.False (menu.IsMenuOpen);
         Assert.True (tf.HasFocus);
         Application.Top.Draw ();
@@ -2939,7 +2939,7 @@ Edit
         Assert.Equal (new Rectangle (1, 0, 8, 1), pos);
 
         Assert.True (
-                     menu.MouseEvent (
+                     menu.OnMouseEvent (
                                       new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }
                                      )
                     );
@@ -2958,7 +2958,7 @@ Edit
         Assert.Equal (new Rectangle (1, 0, 10, 6), pos);
 
         Assert.False (
-                      menu.MouseEvent (
+                      menu.OnMouseEvent (
                                        new MouseEvent
                                        {
                                            X = 1, Y = 3, Flags = MouseFlags.ReportMousePosition, View = Application.Top.Subviews [1]
@@ -2981,7 +2981,7 @@ Edit
         Assert.Equal (new Rectangle (1, 0, 25, 7), pos);
 
         Assert.False (
-                      menu.MouseEvent (
+                      menu.OnMouseEvent (
                                        new MouseEvent
                                        {
                                            X = 1, Y = 2, Flags = MouseFlags.ReportMousePosition, View = Application.Top.Subviews [1]
@@ -3003,7 +3003,7 @@ Edit
         Assert.Equal (new Rectangle (1, 0, 10, 6), pos);
 
         Assert.False (
-                      menu.MouseEvent (
+                      menu.OnMouseEvent (
                                        new MouseEvent { X = 70, Y = 2, Flags = MouseFlags.Button1Clicked, View = Application.Top }
                                       )
                      );
@@ -3246,7 +3246,7 @@ Edit
         Assert.Equal (new Rectangle (1, 0, 8, 1), pos);
 
         Assert.True (
-                     menu.MouseEvent (
+                     menu.OnMouseEvent (
                                       new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }
                                      )
                     );
@@ -3265,7 +3265,7 @@ Edit
         Assert.Equal (new Rectangle (1, 0, 10, 6), pos);
 
         Assert.False (
-                      menu.MouseEvent (
+                      menu.OnMouseEvent (
                                        new MouseEvent { X = 1, Y = 3, Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [1] }
                                       )
                      );
@@ -3285,7 +3285,7 @@ Edit
         Assert.Equal (new Rectangle (1, 0, 15, 7), pos);
 
         Assert.False (
-                      menu.MouseEvent (
+                      menu.OnMouseEvent (
                                        new MouseEvent { X = 1, Y = 2, Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [2] }
                                       )
                      );
@@ -3304,7 +3304,7 @@ Edit
         Assert.Equal (new Rectangle (1, 0, 10, 6), pos);
 
         Assert.False (
-                      menu.MouseEvent (
+                      menu.OnMouseEvent (
                                        new MouseEvent { X = 70, Y = 2, Flags = MouseFlags.Button1Clicked, View = Application.Top }
                                       )
                      );
@@ -3440,7 +3440,7 @@ Edit
         Assert.Equal (new Rectangle (1, 0, 8, 1), pos);
 
         Assert.True (
-                     menu.MouseEvent (
+                     menu.OnMouseEvent (
                                       new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }
                                      )
                     );
@@ -3457,7 +3457,7 @@ Edit
         Assert.Equal (new Rectangle (1, 0, 8, 4), pos);
 
         Assert.False (
-                      menu.MouseEvent (
+                      menu.OnMouseEvent (
                                        new MouseEvent { X = 1, Y = 2, Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [1] }
                                       )
                      );
@@ -3475,7 +3475,7 @@ Edit
         Assert.Equal (new Rectangle (1, 0, 13, 5), pos);
 
         Assert.False (
-                      menu.MouseEvent (
+                      menu.OnMouseEvent (
                                        new MouseEvent { X = 1, Y = 1, Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [2] }
                                       )
                      );
@@ -3492,7 +3492,7 @@ Edit
         Assert.Equal (new Rectangle (1, 0, 8, 4), pos);
 
         Assert.False (
-                      menu.MouseEvent (
+                      menu.OnMouseEvent (
                                        new MouseEvent { X = 70, Y = 2, Flags = MouseFlags.Button1Clicked, View = Application.Top }
                                       )
                      );

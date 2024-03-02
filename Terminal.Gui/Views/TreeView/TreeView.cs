@@ -455,9 +455,10 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <returns><see langword="true"/> if <see cref="ObjectActivated"/> was fired.</returns>
     public bool? ActivateSelectedObjectIfAny ()
     {
+        // By default, Command.Accept calls OnAccept, so we need to call it here to ensure that the event is fired.
         if (OnAccept () == true)
         {
-            return false;
+            return true;
         }
 
         T o = SelectedObject;
@@ -1001,7 +1002,7 @@ public class TreeView<T> : View, ITreeView where T : class
     public bool IsSelected (T model) { return Equals (SelectedObject, model) || (MultiSelect && multiSelectedRegions.Any (s => s.Contains (model))); }
 
     ///<inheritdoc/>
-    public override bool MouseEvent (MouseEvent me)
+    protected internal override bool OnMouseEvent  (MouseEvent me)
     {
         // If it is not an event we care about
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
@@ -1012,7 +1013,7 @@ public class TreeView<T> : View, ITreeView where T : class
             && !me.Flags.HasFlag (MouseFlags.WheeledLeft))
         {
             // do nothing
-            return false;
+            return base.OnMouseEvent (me);
         }
 
         if (!HasFocus && CanFocus)

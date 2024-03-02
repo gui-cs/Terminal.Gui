@@ -126,10 +126,11 @@ public class ScrollView : View
                            }
 
                            SetContentOffset (_contentOffset);
-                           _contentView.Frame = new (ContentOffset, ContentSize);
+                           _contentView.Frame = new Rectangle (ContentOffset, ContentSize);
+
                            // PERF: How about calls to Point.Offset instead?
-                           _vertical.ChangedPosition += delegate { ContentOffset = new (ContentOffset.X, _vertical.Position); };
-                           _horizontal.ChangedPosition += delegate { ContentOffset = new (_horizontal.Position, ContentOffset.Y); };
+                           _vertical.ChangedPosition += delegate { ContentOffset = new Point (ContentOffset.X, _vertical.Position); };
+                           _horizontal.ChangedPosition += delegate { ContentOffset = new Point (_horizontal.Position, ContentOffset.Y); };
                        };
     }
 
@@ -188,7 +189,7 @@ public class ScrollView : View
             if (_contentSize != value)
             {
                 _contentSize = value;
-                _contentView.Frame = new (_contentOffset, value);
+                _contentView.Frame = new Rectangle (_contentOffset, value);
                 _vertical.Size = _contentSize.Height;
                 _horizontal.Size = _contentSize.Width;
                 SetNeedsDisplay ();
@@ -321,7 +322,7 @@ public class ScrollView : View
         }
         else
         {
-            if (!IsOverridden (view, "MouseEvent"))
+            if (!IsOverridden (view, "OnMouseEvent"))
             {
                 view.MouseEnter += View_MouseEnter;
                 view.MouseLeave += View_MouseLeave;
@@ -331,53 +332,6 @@ public class ScrollView : View
         }
 
         SetNeedsLayout ();
-    }
-
-    /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent me)
-    {
-        if (me.Flags != MouseFlags.WheeledDown
-            && me.Flags != MouseFlags.WheeledUp
-            && me.Flags != MouseFlags.WheeledRight
-            && me.Flags != MouseFlags.WheeledLeft
-            &&
-
-            //				me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1Clicked &&
-            !me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
-        {
-            return false;
-        }
-
-        if (me.Flags == MouseFlags.WheeledDown && ShowVerticalScrollIndicator)
-        {
-            ScrollDown (1);
-        }
-        else if (me.Flags == MouseFlags.WheeledUp && ShowVerticalScrollIndicator)
-        {
-            ScrollUp (1);
-        }
-        else if (me.Flags == MouseFlags.WheeledRight && _showHorizontalScrollIndicator)
-        {
-            ScrollRight (1);
-        }
-        else if (me.Flags == MouseFlags.WheeledLeft && ShowVerticalScrollIndicator)
-        {
-            ScrollLeft (1);
-        }
-        else if (me.X == _vertical.Frame.X && ShowVerticalScrollIndicator)
-        {
-            _vertical.MouseEvent (me);
-        }
-        else if (me.Y == _horizontal.Frame.Y && ShowHorizontalScrollIndicator)
-        {
-            _horizontal.MouseEvent (me);
-        }
-        else if (IsOverridden (me.View, "MouseEvent"))
-        {
-            Application.UngrabMouse ();
-        }
-
-        return true;
     }
 
     /// <inheritdoc/>
@@ -427,6 +381,41 @@ public class ScrollView : View
         }
 
         return false;
+    }
+
+    /// <inheritdoc/>
+    protected internal override bool OnMouseEvent  (MouseEvent me)
+    {
+        if (me.Flags == MouseFlags.WheeledDown && ShowVerticalScrollIndicator)
+        {
+            ScrollDown (1);
+        }
+        else if (me.Flags == MouseFlags.WheeledUp && ShowVerticalScrollIndicator)
+        {
+            ScrollUp (1);
+        }
+        else if (me.Flags == MouseFlags.WheeledRight && _showHorizontalScrollIndicator)
+        {
+            ScrollRight (1);
+        }
+        else if (me.Flags == MouseFlags.WheeledLeft && ShowVerticalScrollIndicator)
+        {
+            ScrollLeft (1);
+        }
+        else if (me.X == _vertical.Frame.X && ShowVerticalScrollIndicator)
+        {
+            _vertical.OnMouseEvent (me);
+        }
+        else if (me.Y == _horizontal.Frame.Y && ShowHorizontalScrollIndicator)
+        {
+            _horizontal.OnMouseEvent (me);
+        }
+        else if (IsOverridden (me.View, "OnMouseEvent"))
+        {
+            Application.UngrabMouse ();
+        }
+
+        return base.OnMouseEvent(me);
     }
 
     /// <inheritdoc/>
@@ -591,8 +580,8 @@ public class ScrollView : View
     private void SetContentOffset (Point offset)
     {
         // INTENT: Unclear intent. How about a call to Offset?
-        _contentOffset = new (-Math.Abs (offset.X), -Math.Abs (offset.Y));
-        _contentView.Frame = new (_contentOffset, _contentSize);
+        _contentOffset = new Point (-Math.Abs (offset.X), -Math.Abs (offset.Y));
+        _contentView.Frame = new Rectangle (_contentOffset, _contentSize);
         int p = Math.Max (0, -_contentOffset.Y);
 
         if (_vertical.Position != p)

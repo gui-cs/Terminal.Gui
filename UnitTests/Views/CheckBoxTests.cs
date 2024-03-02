@@ -47,7 +47,7 @@ public class CheckBoxTests
         Assert.False (checkBox.Checked);
         Assert.True (checkBox.NewKeyDownEvent (Key.Space));
         Assert.True (checkBox.Checked);
-        Assert.True (checkBox.MouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
+        Assert.True (checkBox.OnMouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
         Assert.False (checkBox.Checked);
 
         checkBox.AllowNullChecked = true;
@@ -60,11 +60,11 @@ public class CheckBoxTests
 {CM.Glyphs.NullChecked} Check this out 你",
                                                       _output
                                                      );
-        Assert.True (checkBox.MouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
+        Assert.True (checkBox.OnMouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
         Assert.True (checkBox.Checked);
         Assert.True (checkBox.NewKeyDownEvent (Key.Space));
         Assert.False (checkBox.Checked);
-        Assert.True (checkBox.MouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
+        Assert.True (checkBox.OnMouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
         Assert.Null (checkBox.Checked);
 
         checkBox.AllowNullChecked = false;
@@ -328,7 +328,7 @@ public class CheckBoxTests
 
         ckb.Accept += ViewOnAccept;
 
-        var ret = ckb.OnAccept ();
+        var ret = ckb.InvokeCommand (Command.Accept);
         Assert.True (ret);
         Assert.True (acceptInvoked);
 
@@ -567,13 +567,13 @@ public class CheckBoxTests
         var cb = new CheckBox ();
         var accepted = false;
 
-        cb.Accept += ButtonOnAccept;
+        cb.Accept += CheckBoxOnAccept;
         cb.InvokeCommand (Command.HotKey);
 
         Assert.True (accepted);
 
         return;
-        void ButtonOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+        void CheckBoxOnAccept (object sender, CancelEventArgs e) { accepted = true; }
     }
 
     [Theory]

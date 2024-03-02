@@ -713,7 +713,7 @@ Item 6",
     //│Three│
     //└─────┘", output);
 
-    //			Assert.True (lv.MouseEvent (new MouseEvent {
+    //			Assert.True (lv.OnMouseEvent (new MouseEvent {
     //				X = 0,
     //				Y = 0,
     //				Flags = MouseFlags.Button1Clicked
@@ -721,7 +721,7 @@ Item 6",
     //			Assert.Equal ("", selected);
     //			Assert.Equal (-1, lv.SelectedItem);
 
-    //			Assert.True (lv.MouseEvent (new MouseEvent {
+    //			Assert.True (lv.OnMouseEvent (new MouseEvent {
     //				X = 0,
     //				Y = 1,
     //				Flags = MouseFlags.Button1Clicked
@@ -729,7 +729,7 @@ Item 6",
     //			Assert.Equal ("One", selected);
     //			Assert.Equal (0, lv.SelectedItem);
 
-    //			Assert.True (lv.MouseEvent (new MouseEvent {
+    //			Assert.True (lv.OnMouseEvent (new MouseEvent {
     //				X = 0,
     //				Y = 2,
     //				Flags = MouseFlags.Button1Clicked
@@ -737,7 +737,7 @@ Item 6",
     //			Assert.Equal ("Two", selected);
     //			Assert.Equal (1, lv.SelectedItem);
 
-    //			Assert.True (lv.MouseEvent (new MouseEvent {
+    //			Assert.True (lv.OnMouseEvent (new MouseEvent {
     //				X = 0,
     //				Y = 3,
     //				Flags = MouseFlags.Button1Clicked
@@ -745,7 +745,7 @@ Item 6",
     //			Assert.Equal ("Three", selected);
     //			Assert.Equal (2, lv.SelectedItem);
 
-    //			Assert.True (lv.MouseEvent (new MouseEvent {
+    //			Assert.True (lv.OnMouseEvent (new MouseEvent {
     //				X = 0,
     //				Y = 4,
     //				Flags = MouseFlags.Button1Clicked

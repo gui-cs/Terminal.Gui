@@ -106,11 +106,11 @@ public class ContextMenuTests
         Assert.True (ContextMenu.IsShow);
         Assert.Equal (cm.MenuBar, Application.MouseGrabView);
         Assert.False (menu.IsMenuOpen);
-        Assert.False (menu.MouseEvent (new MouseEvent { X = 1, Flags = MouseFlags.ReportMousePosition, View = menu }));
+        Assert.False (menu.OnMouseEvent (new MouseEvent { X = 1, Flags = MouseFlags.ReportMousePosition, View = menu }));
         Assert.True (ContextMenu.IsShow);
         Assert.Equal (cm.MenuBar, Application.MouseGrabView);
         Assert.False (menu.IsMenuOpen);
-        Assert.True (menu.MouseEvent (new MouseEvent { X = 1, Flags = MouseFlags.Button1Clicked, View = menu }));
+        Assert.True (menu.OnMouseEvent (new MouseEvent { X = 1, Flags = MouseFlags.Button1Clicked, View = menu }));
         Assert.False (ContextMenu.IsShow);
         Assert.Equal (menu, Application.MouseGrabView);
         Assert.True (menu.IsMenuOpen);
@@ -642,7 +642,7 @@ public class ContextMenuTests
 
         Assert.True (
                      top.Subviews [0]
-                        .MouseEvent (
+                        .OnMouseEvent (
                                      new MouseEvent { X = 0, Y = 4, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                     )
                     );
@@ -690,7 +690,7 @@ public class ContextMenuTests
 
         Assert.True (
                      top.Subviews [0]
-                        .MouseEvent (
+                        .OnMouseEvent (
                                      new MouseEvent { X = 30, Y = 4, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                     )
                     );
@@ -737,7 +737,7 @@ public class ContextMenuTests
 
         Assert.True (
                      top.Subviews [0]
-                        .MouseEvent (
+                        .OnMouseEvent (
                                      new MouseEvent { X = 30, Y = 4, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                     )
                     );
@@ -781,7 +781,7 @@ public class ContextMenuTests
 
         Assert.True (
                      top.Subviews [0]
-                        .MouseEvent (
+                        .OnMouseEvent (
                                      new MouseEvent { X = 30, Y = 4, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                     )
                     );
@@ -825,7 +825,7 @@ public class ContextMenuTests
 
         Assert.True (
                      top.Subviews [0]
-                        .MouseEvent (
+                        .OnMouseEvent (
                                      new MouseEvent { X = 30, Y = 4, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                     )
                     );
