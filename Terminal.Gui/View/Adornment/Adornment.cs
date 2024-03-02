@@ -1,7 +1,8 @@
 ﻿namespace Terminal.Gui;
 
-// TODO: v2 - Missing 3D effect - 3D effects will be drawn by a mechanism separate from Adornments
-// TODO: v2 - If a Adornment has focus, navigation keys (e.g Command.NextView) should cycle through SubViews of the Adornments
+// TODO: Missing 3D effect - 3D effects will be drawn by a mechanism separate from Adornments
+// TODO: If a Adornment has focus, navigation keys (e.g Command.NextView) should cycle through SubViews of the Adornments
+// TODO: Why don't we let Frame.X/Y be the location of the Adornment> Why always 0?
 // QUESTION: How does a user navigate out of an Adornment to another Adornment, or back into the Parent's SubViews?
 
 /// <summary>
@@ -18,6 +19,9 @@
 /// </remarsk>
 public class Adornment : View
 {
+    internal static Point? _dragPosition;
+
+    private Point _startGrabPoint;
     private Thickness _thickness = Thickness.Empty;
 
     /// <inheritdoc/>
@@ -30,7 +34,6 @@ public class Adornment : View
     /// <param name="parent"></param>
     public Adornment (View parent)
     {
-
         Application.GrabbingMouse += Application_GrabbingMouse;
         Application.UnGrabbingMouse += Application_UnGrabbingMouse;
 
@@ -166,23 +169,19 @@ public class Adornment : View
     {
         ThicknessChanged?.Invoke (
                                   this,
-                                  new() { Thickness = Thickness, PreviousThickness = previousThickness }
+                                  new () { Thickness = Thickness, PreviousThickness = previousThickness }
                                  );
     }
 
     /// <summary>Fired whenever the <see cref="Thickness"/> property changes.</summary>
     public event EventHandler<ThicknessEventArgs> ThicknessChanged;
 
-    internal static Point? _dragPosition;
-
-    private Point _startGrabPoint;
-
     /// <inheritdoc/>
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
         var args = new MouseEventEventArgs (mouseEvent);
 
-        if (mouseEvent.Flags.HasFlag(MouseFlags.Button1Clicked))
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
             if (Parent.CanFocus && !Parent.HasFocus)
             {
@@ -204,17 +203,17 @@ public class Adornment : View
         int nx, ny;
 
         if (!_dragPosition.HasValue
-            && (mouseEvent.Flags.HasFlag(MouseFlags.Button1Pressed)
-                || mouseEvent.Flags.HasFlag(MouseFlags.Button2Pressed)
-                || mouseEvent.Flags.HasFlag(MouseFlags.Button3Pressed)))
+            && (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
+                || mouseEvent.Flags.HasFlag (MouseFlags.Button2Pressed)
+                || mouseEvent.Flags.HasFlag (MouseFlags.Button3Pressed)))
         {
             Parent.SetFocus ();
             Application.BringOverlappedTopToFront ();
 
             // Only start grabbing if the user clicks on the title bar.
-            if (mouseEvent.Y == 0 && mouseEvent.Flags.HasFlag(MouseFlags.Button1Pressed))
+            if (mouseEvent.Y == 0 && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
             {
-                _startGrabPoint = new Point (mouseEvent.X, mouseEvent.Y);
+                _startGrabPoint = new (mouseEvent.X, mouseEvent.Y);
                 nx = mouseEvent.X - mouseEvent.OfX;
                 ny = mouseEvent.Y - mouseEvent.OfY;
                 _dragPosition = new Point (nx, ny);
@@ -239,7 +238,7 @@ public class Adornment : View
                     Parent.SuperView.SetNeedsDisplay ();
                 }
 
-                View.GetLocationThatFits (
+                GetLocationThatFits (
                                      Parent,
                                      mouseEvent.X + mouseEvent.OfX - _startGrabPoint.X,
                                      mouseEvent.Y + mouseEvent.OfY - _startGrabPoint.Y,
@@ -253,6 +252,7 @@ public class Adornment : View
                 Parent.X = nx;
                 Parent.Y = ny;
                 Parent.SetNeedsDisplay ();
+
                 return true;
             }
         }
@@ -262,23 +262,8 @@ public class Adornment : View
             _dragPosition = null;
             Application.UngrabMouse ();
         }
+
         return false;
-    }
-
-    private void Application_GrabbingMouse (object sender, GrabMouseEventArgs e)
-    {
-        if (Application.MouseGrabView == this && _dragPosition.HasValue)
-        {
-            e.Cancel = true;
-        }
-    }
-
-    private void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)
-    {
-        if (Application.MouseGrabView == this && _dragPosition.HasValue)
-        {
-            e.Cancel = true;
-        }
     }
 
     /// <inheritdoc/>
@@ -300,5 +285,21 @@ public class Adornment : View
     internal override void LayoutAdornments ()
     {
         /* Do nothing - Adornments do not have Adornments */
+    }
+
+    private void Application_GrabbingMouse (object sender, GrabMouseEventArgs e)
+    {
+        if (Application.MouseGrabView == this && _dragPosition.HasValue)
+        {
+            e.Cancel = true;
+        }
+    }
+
+    private void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)
+    {
+        if (Application.MouseGrabView == this && _dragPosition.HasValue)
+        {
+            e.Cancel = true;
+        }
     }
 }

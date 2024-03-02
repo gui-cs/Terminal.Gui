@@ -128,6 +128,12 @@ public partial class Toplevel : View
         KeyBindings.Add (Key.I.WithCtrl, Command.NextView); // Unix
         KeyBindings.Add (Key.B.WithCtrl, Command.PreviousView); // Unix
 #endif
+        MouseClick += Toplevel_MouseClick;
+    }
+
+    private void Toplevel_MouseClick (object sender, MouseEventEventArgs e)
+    {
+        e.Handled = InvokeCommand (Command.HotKey) == true;
     }
 
     /// <summary>Gets or sets a value indicating whether this <see cref="Toplevel"/> can focus.</summary>
