@@ -198,8 +198,6 @@ public class Adornment : View
             return true;
         }
 
-        //System.Diagnostics.Debug.WriteLine ($"dragPosition before: {dragPosition.HasValue}");
-
         int nx, ny;
 
         if (!_dragPosition.HasValue
@@ -220,7 +218,6 @@ public class Adornment : View
                 Application.GrabMouse (this);
             }
 
-            //System.Diagnostics.Debug.WriteLine ($"Starting at {dragPosition}");
             return true;
         }
 
