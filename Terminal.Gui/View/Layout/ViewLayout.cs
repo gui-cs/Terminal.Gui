@@ -561,7 +561,7 @@ public partial class View
 
     // CONCURRENCY: This method is not thread-safe.
     // Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
-    public static View? FindDeepestView (View? start, int x, int y, bool findAdornments = false)
+    public static View? FindDeepestView (View? start, int x, int y, bool findAdornments = true)
     {
         if (start is null || !start.Visible)
         {
