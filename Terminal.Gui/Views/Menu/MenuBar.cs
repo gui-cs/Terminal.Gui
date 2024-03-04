@@ -1647,7 +1647,7 @@ public class MenuBar : View
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent me)
+    protected internal override bool OnMouseEvent (MouseEvent me)
     {
         if (!_handled && !HandleGrabView (me, this))
         {
@@ -1779,35 +1779,35 @@ public class MenuBar : View
                     }
                 }
 
-                if (me.View != current)
-                {
-                    Application.UngrabMouse ();
-                    View v = me.View;
-                    Application.GrabMouse (v);
-                    MouseEvent nme;
+                // TODO: This is dead code. It is not clear what it is trying to do, and it never gets hit.
+                //if (me.View != current)
+                //{
+                //    Application.UngrabMouse ();
+                //    View v = me.View;
+                //    Application.GrabMouse (v);
+                //    MouseEvent nme;
 
-                    if (me.Y > -1)
-                    {
-                        Point newxy = v.ScreenToFrame (me.X, me.Y);
+                //    if (me.Y > -1)
+                //    {
+                //        Point newxy = v.ScreenToFrame (me.X, me.Y);
 
-                        nme = new MouseEvent
-                        {
-                            X = newxy.X,
-                            Y = newxy.Y,
-                            Flags = me.Flags,
-                            ScreenX = me.X - newxy.X,
-                            ScreenY = me.Y - newxy.Y,
-                            View = v
-                        };
-                    }
-                    else
-                    {
-                        nme = new MouseEvent { X = me.X + current.Frame.X, Y = 0, Flags = me.Flags, View = v };
-                    }
-                    v.OnMouseEvent (nme);
-
-                    return false;
-                }
+                //        nme = new MouseEvent
+                //        {
+                //            X = newxy.X,
+                //            Y = newxy.Y,
+                //            Flags = me.Flags,
+                //            ScreenX = me.X - newxy.X,
+                //            ScreenY = me.Y - newxy.Y,
+                //            View = v
+                //        };
+                //    }
+                //    else
+                //    {
+                //        nme = new MouseEvent { X = me.X + current.Frame.X, Y = 0, Flags = me.Flags, View = v };
+                //    }
+                //    v.OnMouseEvent (nme);
+                //    return false;
+                //}
             }
             else if (!_isContextMenuLoading
                      && !(me.View is MenuBar || me.View is Menu)
@@ -1841,11 +1841,11 @@ public class MenuBar : View
                                           MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                          )))
         {
-           Application.GrabMouse (current);
+            Application.GrabMouse (current);
         }
         else if (IsMenuOpen && (me.View is MenuBar || me.View is Menu))
         {
-           Application.GrabMouse (me.View);
+            Application.GrabMouse (me.View);
         }
         else
         {
