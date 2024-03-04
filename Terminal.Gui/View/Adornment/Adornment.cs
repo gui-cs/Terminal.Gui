@@ -5,7 +5,7 @@
 // QUESTION: How does a user navigate out of an Adornment to another Adornment, or back into the Parent's SubViews?
 
 /// <summary>
-///     Adornments are a special form of <see cref="View"/> that appear outside of the <see cref="View.Bounds"/>:
+///     Adornments are a special form of <see cref="View"/> that appear outside the <see cref="View.Bounds"/>:
 ///     <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>. They are defined using the
 ///     <see cref="Thickness"/> class, which specifies the thickness of the sides of a rectangle.
 /// </summary>
@@ -18,7 +18,8 @@
 /// </remarsk>
 public class Adornment : View
 {
-    internal static Point? _dragPosition;
+    // BUGBUG: This should not be static! It should be a property of the Application class.
+    private Point? _dragPosition;
 
     private Point _startGrabPoint;
     private Thickness _thickness = Thickness.Empty;
@@ -177,15 +178,15 @@ public class Adornment : View
 
     /// <summary>Called when a mouse event occurs within the Adornment.</summary>
     /// <remarks>
-    /// <para>
-    /// The coordinates are relative to <see cref="View.Bounds"/>.
-    /// </para>
-    /// <para>
-    /// A mouse click on the Adornment will cause the Parent to focus.
-    /// </para>
-    /// <para>
-    /// A mouse drag on the Adornment will cause the Parent to move.
-    /// </para>
+    ///     <para>
+    ///         The coordinates are relative to <see cref="View.Bounds"/>.
+    ///     </para>
+    ///     <para>
+    ///         A mouse click on the Adornment will cause the Parent to focus.
+    ///     </para>
+    ///     <para>
+    ///         A mouse drag on the Adornment will cause the Parent to move.
+    ///     </para>
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
@@ -212,7 +213,8 @@ public class Adornment : View
 
         int nx, ny;
 
-        if (!_dragPosition.HasValue && (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)))
+        // BUGBUG: This is true even when the mouse started dragging outside of the Adornment, which is not correct.
+        if (!_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
             Parent.SetFocus ();
             Application.BringOverlappedTopToFront ();
@@ -244,7 +246,8 @@ public class Adornment : View
 
                 _dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
 
-                var parentLoc = Parent.SuperView?.ScreenToBounds (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y) ?? mouseEvent.ScreenPosition;
+                Point parentLoc = Parent.SuperView?.ScreenToBounds (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y) ?? mouseEvent.ScreenPosition;
+
                 GetLocationThatFits (
                                      Parent,
                                      parentLoc.X - _startGrabPoint.X,
@@ -255,10 +258,8 @@ public class Adornment : View
                                      out _
                                     );
 
-
                 Parent.X = nx;
                 Parent.Y = ny;
-                //Parent.SetNeedsDisplay ();
 
                 return true;
             }
