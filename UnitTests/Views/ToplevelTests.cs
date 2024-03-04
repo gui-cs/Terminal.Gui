@@ -25,6 +25,13 @@ public class ToplevelTests
         Assert.False (top.IsOverlapped);
     }
 
+    [Fact]
+    public void Arrangement_Is_Movable ()
+    {
+        var top = new Toplevel ();
+        Assert.Equal (ViewArrangement.Movable, top.Arrangement);
+    }
+
 #if BROKE_IN_2927
     // BUGBUG: The name of this test does not match what it does. 
     [Fact]
