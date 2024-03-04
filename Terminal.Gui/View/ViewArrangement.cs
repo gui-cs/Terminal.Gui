@@ -2,7 +2,14 @@
 
 /// <summary>
 ///     Describes what user actions are enabled for arranging a <see cref="View"/> within it's <see cref="View.SuperView"/>.
+///     See <see cref="View.Arrangement"/>.
 /// </summary>
+/// <remarks>
+/// <para>
+///     Sizing or moving a view is only possible if the <see cref="View"/> is part of a <see cref="View.SuperView"/> and
+///     the relevant position and dimensions of the <see cref="View"/> are independent of other SubViews
+/// </para>
+/// </remarks>
 [Flags]
 public enum ViewArrangement
 {
@@ -12,7 +19,7 @@ public enum ViewArrangement
     Fixed = 0,
 
     /// <summary>
-    ///     The view can be moved within it's <see cref="SuperView"/>.
+    ///     The view can be moved.
     /// </summary>
     Movable = 1,
 
