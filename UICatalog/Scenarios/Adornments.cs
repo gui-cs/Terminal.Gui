@@ -50,7 +50,7 @@ public class Adornments : Scenario
         };
         label.Border.Thickness = new Thickness (1, 3, 1, 1);
 
-        var tf2 = new Button { X = Pos.AnchorEnd (10), Y = Pos.AnchorEnd (1), Text = "Button" };
+        var btnButtonInWindow = new Button { X = Pos.AnchorEnd (10), Y = Pos.AnchorEnd (1), Text = "Button" };
 
         var tv = new Label
         {
@@ -70,7 +70,7 @@ public class Adornments : Scenario
         view.Padding.Data = "Padding";
         view.Padding.Thickness = new Thickness (3);
 
-        view.Add (tf1, color, button, label, tf2, tv);
+        view.Add (tf1, color, button, label, btnButtonInWindow, tv);
 
         var editor = new AdornmentsEditor
         {
@@ -85,9 +85,8 @@ public class Adornments : Scenario
 
         editor.Initialized += (s, e) => { editor.ViewToEdit = view; };
 
-        //view.Margin.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Dialog"]);
-        //view.Border.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Error"]);
-        //view.Padding.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Menu"]);
+        var btnButtonInPadding = new Button { X = Pos.Center(), Y = 0, Text = "Button in Padding" };
+        view.Padding.Add (btnButtonInPadding);
 
         Application.Run (editor);
         Application.Shutdown ();
