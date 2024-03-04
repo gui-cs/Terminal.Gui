@@ -18,7 +18,6 @@
 /// </remarsk>
 public class Adornment : View
 {
-    // BUGBUG: This should not be static! It should be a property of the Application class.
     private Point? _dragPosition;
 
     private Point _startGrabPoint;
@@ -206,7 +205,7 @@ public class Adornment : View
         }
 
         // TODO: Checking for Toplevel is a hack until #2537 is fixed
-        if (!Parent.CanFocus || Parent is not Toplevel)
+        if (!Parent.CanFocus || !Parent.Arrangement.HasFlag(ViewArrangement.Movable))
         {
             return true;
         }

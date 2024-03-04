@@ -73,7 +73,8 @@ namespace Terminal.Gui;
 ///         a View can be accessed with the <see cref="SuperView"/> property.
 ///     </para>
 ///     <para>
-///         To flag a region of the View's <see cref="Bounds"/> to be redrawn call <see cref="SetNeedsDisplay(Rectangle)"/>.
+///         To flag a region of the View's <see cref="Bounds"/> to be redrawn call <see cref="SetNeedsDisplay(Rectangle)"/>
+///         .
 ///         To flag the entire view for redraw call <see cref="SetNeedsDisplay()"/>.
 ///     </para>
 ///     <para>
@@ -211,6 +212,13 @@ public partial class View : Responder, ISupportInitializeNotification
         }
     }
 
+    /// <summary>
+    ///     Cancelable event fired when the <see cref="Command.Accept"/> command is invoked. Set
+    ///     <see cref="CancelEventArgs.Cancel"/>
+    ///     to cancel the event.
+    /// </summary>
+    public event EventHandler<CancelEventArgs> Accept;
+
     /// <summary>Event fired when the <see cref="Enabled"/> value is being changed.</summary>
     public event EventHandler EnabledChanged;
 
@@ -226,24 +234,6 @@ public partial class View : Responder, ISupportInitializeNotification
 
     /// <summary>Event fired when the <see cref="Visible"/> value is being changed.</summary>
     public event EventHandler VisibleChanged;
-
-    /// <summary>
-    /// Cancelable event fired when the <see cref="Command.Accept"/> command is invoked. Set <see cref="CancelEventArgs.Cancel"/>
-    /// to cancel the event.
-    /// </summary>
-    public event EventHandler<CancelEventArgs> Accept;
-
-    /// <summary>
-    /// Called when the <see cref="Command.Accept"/> command is invoked. Fires the <see cref="Accept"/>
-    /// event.
-    /// </summary>
-    /// <returns>If <see langword="true"/> the event was canceled.</returns>
-    protected bool? OnAccept ()
-    {
-        var args = new CancelEventArgs ();
-        Accept?.Invoke (this, args);
-        return args.Cancel;
-    }
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
@@ -266,6 +256,19 @@ public partial class View : Responder, ISupportInitializeNotification
 
         base.Dispose (disposing);
         Debug.Assert (InternalSubviews.Count == 0);
+    }
+
+    /// <summary>
+    ///     Called when the <see cref="Command.Accept"/> command is invoked. Fires the <see cref="Accept"/>
+    ///     event.
+    /// </summary>
+    /// <returns>If <see langword="true"/> the event was canceled.</returns>
+    protected bool? OnAccept ()
+    {
+        var args = new CancelEventArgs ();
+        Accept?.Invoke (this, args);
+
+        return args.Cancel;
     }
 
     private bool CanBeVisible (View view)
@@ -508,3 +511,4 @@ public partial class View : Responder, ISupportInitializeNotification
 
     #endregion Constructors and Initialization
 }
+
