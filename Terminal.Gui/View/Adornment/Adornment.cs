@@ -125,6 +125,32 @@ public class Adornment : View
         return new (new (parent.X + Frame.X, parent.Y + Frame.Y), Frame.Size);
     }
 
+    /// <inheritdoc/>
+    public override Point ScreenToFrame (int x, int y)
+    {
+            return Parent.ScreenToFrame (x - Frame.X, y - Frame.Y);
+    }
+
+    ///// <inheritdoc/>
+    //public override void SetNeedsDisplay (Rectangle region)
+    //{
+    //    SetSubViewNeedsDisplay ();
+    //    foreach (View subView in Subviews)
+    //    {
+    //        subView.SetNeedsDisplay ();
+    //    }
+    //}
+
+    /// <inheritdoc/>
+    //protected override void ClearNeedsDisplay ()
+    //{
+    //    base.ClearNeedsDisplay ();
+    //    foreach (View subView in Subviews)
+    //    {
+    //        subView.NeedsDisplay = false;
+    //    }
+    //}
+
     /// <summary>Does nothing for Adornment</summary>
     /// <returns></returns>
     public override bool OnDrawAdornments () { return false; }
@@ -156,7 +182,13 @@ public class Adornment : View
 
         TextFormatter?.Draw (screenBounds, normalAttr, normalAttr, Rectangle.Empty);
 
-        //base.OnDrawContent (contentArea);
+        if (Subviews.Count > 0)
+        {
+            base.OnDrawContent (contentArea);
+        }
+
+        ClearLayoutNeeded ();
+        ClearNeedsDisplay ();
     }
 
     /// <summary>Does nothing for Adornment</summary>

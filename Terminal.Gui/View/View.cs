@@ -459,6 +459,9 @@ public partial class View : Responder, ISupportInitializeNotification
 
         _oldCanFocus = CanFocus;
         _oldTabIndex = _tabIndex;
+        Margin?.BeginInit ();
+        Border?.BeginInit ();
+        Padding?.BeginInit ();
 
         if (_subviews?.Count > 0)
         {
@@ -487,6 +490,9 @@ public partial class View : Responder, ISupportInitializeNotification
         }
 
         IsInitialized = true;
+        Margin?.EndInit ();
+        Border?.EndInit ();
+        Padding?.EndInit ();
 
         // TODO: Move these into ViewText.cs as EndInit_Text() to consolodate.
         // TODO: Verify UpdateTextDirection really needs to be called here.

@@ -86,6 +86,7 @@ public class Adornments : Scenario
         editor.Initialized += (s, e) => { editor.ViewToEdit = view; };
 
         var btnButtonInPadding = new Button { X = Pos.Center(), Y = 0, Text = "Button in Padding" };
+        btnButtonInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "I'm in the padding", "Ok");
         view.Padding.Add (btnButtonInPadding);
 
         Application.Run (editor);

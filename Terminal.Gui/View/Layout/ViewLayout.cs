@@ -534,9 +534,16 @@ public partial class View
 
         while (super is { })
         {
+            if (super is Adornment ador)
+            {
+                // TODO: Move this into Adornment somehow to remove coupling.
+                ador.BoundsToScreen (rx, ry, out rx, out ry);
+            }
+
             boundsOffset = super.GetBoundsOffset ();
             rx += super.Frame.X + boundsOffset.X;
             ry += super.Frame.Y + boundsOffset.Y;
+
             super = super.SuperView;
         }
 
@@ -596,14 +603,16 @@ public partial class View
             found = start.Padding;
         }
 
+        Point boundsOffset = start.GetBoundsOffset ();
+
         if (found is { })
         {
             start = found;
+            boundsOffset = found.Parent.Frame.Location;
         }
 
         if (start.InternalSubviews is { Count: > 0 })
         {
-            Point boundsOffset = start.GetBoundsOffset ();
             int rx = x - (start.Frame.X + boundsOffset.X);
             int ry = y - (start.Frame.Y + boundsOffset.Y);
 
@@ -759,18 +768,11 @@ public partial class View
     /// <returns>The coordinate relative to the <see cref="SuperView"/>'s <see cref="Bounds"/>.</returns>
     /// <param name="x">Screen-relative column.</param>
     /// <param name="y">Screen-relative row.</param>
-    public Point ScreenToFrame (int x, int y)
+    public virtual Point ScreenToFrame (int x, int y)
     {
         Point superViewBoundsOffset = SuperView?.GetBoundsOffset () ?? Point.Empty;
-        // BUGBUG: Hack. Move into Adornment somehow.
-        if (this is Adornment adornment)
-        {
-            superViewBoundsOffset = adornment.Parent.SuperView?.GetBoundsOffset () ?? Point.Empty;
-            return adornment.Parent.ScreenToFrame (x, y);
-        }
 
         var ret = new Point (x - Frame.X - superViewBoundsOffset.X, y - Frame.Y - superViewBoundsOffset.Y);
-
         if (SuperView is { })
         {
             Point superFrame = SuperView.ScreenToFrame (x - superViewBoundsOffset.X, y - superViewBoundsOffset.Y);
@@ -1040,7 +1042,10 @@ public partial class View
             Margin.Width = Frame.Size.Width;
             Margin.Height = Frame.Size.Height;
             Margin.SetNeedsLayout ();
-            Margin.SetNeedsDisplay ();
+            if (Margin.Subviews.Count > 0)
+            {
+                Margin.LayoutSubviews ();
+            }
         }
 
         Rectangle border = Margin.Thickness.GetInside (Margin.Frame);
@@ -1053,7 +1058,10 @@ public partial class View
             Border.Width = border.Size.Width;
             Border.Height = border.Size.Height;
             Border.SetNeedsLayout ();
-            Border.SetNeedsDisplay ();
+            if (Border.Subviews.Count > 0)
+            {
+                Border.LayoutSubviews ();
+            }
         }
 
         Rectangle padding = Border.Thickness.GetInside (Border.Frame);
@@ -1066,7 +1074,10 @@ public partial class View
             Padding.Width = padding.Size.Width;
             Padding.Height = padding.Size.Height;
             Padding.SetNeedsLayout ();
-            Padding.SetNeedsDisplay ();
+            if (Padding.Subviews.Count > 0)
+            {
+                Padding.LayoutSubviews ();
+            }
         }
     }
 
