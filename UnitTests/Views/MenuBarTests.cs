@@ -2371,7 +2371,8 @@ Edit
                            };
         Application.Top.Add (menu);
         Application.Begin (Application.Top);
-
+        
+        // Click on Edit
         Assert.True (
                      menu.OnMouseEvent (
                                       new MouseEvent { X = 10, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }
@@ -2381,6 +2382,7 @@ Edit
         Assert.Equal ("_Edit", miCurrent.Parent.Title);
         Assert.Equal ("_Copy", miCurrent.Title);
 
+        // Click on Paste
         Assert.True (
                      mCurrent.OnMouseEvent (
                                           new MouseEvent { X = 10, Y = 3, Flags = MouseFlags.ReportMousePosition, View = mCurrent }
@@ -2394,14 +2396,16 @@ Edit
         {
             if (i == -1)
             {
+                // Edit menu is open. Click on the menu at Y = -1, which is outside the menu.
                 Assert.False (
                               mCurrent.OnMouseEvent (
-                                                   new MouseEvent { X = 10, Y = i, Flags = MouseFlags.ReportMousePosition, View = menu }
-                                                  )
+                                                     new MouseEvent { X = 10, Y = i, Flags = MouseFlags.ReportMousePosition, View = menu }
+                                                    )
                              );
             }
             else
             {
+                // Edit menu is open. Click on the menu at Y = i.
                 Assert.True (
                              mCurrent.OnMouseEvent (
                                                   new MouseEvent { X = 10, Y = i, Flags = MouseFlags.ReportMousePosition, View = mCurrent }

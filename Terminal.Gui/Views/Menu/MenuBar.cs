@@ -556,7 +556,7 @@ public class MenuBar : View
             mi = parent.Children?.Length > 0 ? parent.Children [_openMenu._currentChild] : null;
         }
 
-        MenuOpened?.Invoke (this, new MenuOpenedEventArgs (parent, mi));
+        MenuOpened?.Invoke (this, new (parent, mi));
     }
 
     /// <summary>Virtual method that will invoke the <see cref="MenuOpening"/> event if it's defined.</summary>
@@ -829,10 +829,10 @@ public class MenuBar : View
         View sv = SuperView is null ? Application.Current : SuperView;
         Point boundsOffset = sv.GetBoundsOffset ();
 
-        return new Point (
-                          superViewFrame.X - sv.Frame.X - boundsOffset.X,
-                          superViewFrame.Y - sv.Frame.Y - boundsOffset.Y
-                         );
+        return new (
+                    superViewFrame.X - sv.Frame.X - boundsOffset.X,
+                    superViewFrame.Y - sv.Frame.Y - boundsOffset.Y
+                   );
     }
 
     /// <summary>
@@ -846,7 +846,7 @@ public class MenuBar : View
         Rectangle currentFrame = Application.Current.Frame;
         Point boundsOffset = Application.Top.GetBoundsOffset ();
 
-        return new Point (screen.X - currentFrame.X - boundsOffset.X, screen.Y - currentFrame.Y - boundsOffset.Y);
+        return new (screen.X - currentFrame.X - boundsOffset.X, screen.Y - currentFrame.Y - boundsOffset.Y);
     }
 
     internal void NextMenu (bool isSubMenu = false, bool ignoreUseSubMenusSingleFrame = false)
@@ -995,7 +995,7 @@ public class MenuBar : View
                     locationOffset.Y += SuperView.Border.Thickness.Top;
                 }
 
-                _openMenu = new Menu
+                _openMenu = new()
                 {
                     Host = this,
                     X = Frame.X + pos + locationOffset.X,
@@ -1014,7 +1014,7 @@ public class MenuBar : View
                 // Opens a submenu next to another submenu (openSubMenu)
                 if (_openSubMenu is null)
                 {
-                    _openSubMenu = new List<Menu> ();
+                    _openSubMenu = new ();
                 }
 
                 if (sIndex > -1)
@@ -1029,7 +1029,7 @@ public class MenuBar : View
                     {
                         locationOffset = GetLocationOffset ();
 
-                        openCurrentMenu = new Menu
+                        openCurrentMenu = new()
                         {
                             Host = this,
                             X = last.Frame.Left + last.Frame.Width + locationOffset.X,
@@ -1044,7 +1044,7 @@ public class MenuBar : View
 
                         // 2 is for the parent and the separator
                         MenuItem [] mbi = new MenuItem [2 + subMenu.Children.Length];
-                        mbi [0] = new MenuItem { Title = subMenu.Title, Parent = subMenu };
+                        mbi [0] = new() { Title = subMenu.Title, Parent = subMenu };
                         mbi [1] = null;
 
                         for (var j = 0; j < subMenu.Children.Length; j++)
@@ -1054,7 +1054,7 @@ public class MenuBar : View
 
                         var newSubMenu = new MenuBarItem (mbi) { Parent = subMenu };
 
-                        openCurrentMenu = new Menu
+                        openCurrentMenu = new()
                         {
                             Host = this, X = first.Frame.Left, Y = first.Frame.Top, BarItems = newSubMenu
                         };
@@ -1279,10 +1279,10 @@ public class MenuBar : View
     {
         if (MenusBorderStyle != LineStyle.None)
         {
-            return new Point (0, 1);
+            return new (0, 1);
         }
 
-        return new Point (-2, 0);
+        return new (-2, 0);
     }
 
     private void MenuBar_Added (object sender, SuperViewChangedEventArgs e)
@@ -1460,7 +1460,7 @@ public class MenuBar : View
         {
             if (_shortcutDelimiter != value)
             {
-                _shortcutDelimiter = value == default (Rune) ? new Rune ('+') : value;
+                _shortcutDelimiter = value == default (Rune) ? new ('+') : value;
             }
         }
     }
@@ -1533,6 +1533,7 @@ public class MenuBar : View
                 if (FindShortcutInChildMenu (key.KeyCode, Menus [i], out _menuItemToSelect))
                 {
                     _menuBarItemToActivate = i;
+
                     //keyEvent.Scope = KeyBindingScope.HotKey;
 
                     return base.OnInvokingKeyBindings (key);
@@ -1576,6 +1577,7 @@ public class MenuBar : View
                     if (matches)
                     {
                         _menuBarItemToActivate = i;
+
                         //keyEvent.Scope = KeyBindingScope.HotKey;
 
                         break;
@@ -1779,35 +1781,34 @@ public class MenuBar : View
                     }
                 }
 
-                // TODO: This is dead code. It is not clear what it is trying to do, and it never gets hit.
-                //if (me.View != current)
-                //{
-                //    Application.UngrabMouse ();
-                //    View v = me.View;
-                //    Application.GrabMouse (v);
-                //    MouseEvent nme;
+                if (me.View != current)
+                {
+                    Application.UngrabMouse ();
+                    View v = me.View;
+                    Application.GrabMouse (v);
+                    MouseEvent nme;
 
-                //    if (me.Y > -1)
-                //    {
-                //        Point newxy = v.ScreenToFrame (me.X, me.Y);
+                    if (me.Y > -1)
+                    {
+                        Point frameLoc = v.ScreenToFrame (me.X, me.Y);
 
-                //        nme = new MouseEvent
-                //        {
-                //            X = newxy.X,
-                //            Y = newxy.Y,
-                //            Flags = me.Flags,
-                //            ScreenX = me.X - newxy.X,
-                //            ScreenY = me.Y - newxy.Y,
-                //            View = v
-                //        };
-                //    }
-                //    else
-                //    {
-                //        nme = new MouseEvent { X = me.X + current.Frame.X, Y = 0, Flags = me.Flags, View = v };
-                //    }
-                //    v.OnMouseEvent (nme);
-                //    return false;
-                //}
+                        nme = new ()
+                        {
+                            X = frameLoc.X,
+                            Y = frameLoc.Y,
+                            Flags = me.Flags,
+                            View = v
+                        };
+                    }
+                    else
+                    {
+                        nme = new () { X = me.X + current.Frame.X, Y = 0, Flags = me.Flags, View = v };
+                    }
+
+                    v.OnMouseEvent (nme);
+
+                    return false;
+                }
             }
             else if (!_isContextMenuLoading
                      && !(me.View is MenuBar || me.View is Menu)
