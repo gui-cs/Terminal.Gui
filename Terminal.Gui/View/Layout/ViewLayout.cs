@@ -553,7 +553,6 @@ public partial class View
     /// <param name="start">The superview where to look for.</param>
     /// <param name="x">The column location in the superview.</param>
     /// <param name="y">The row location in the superview.</param>
-    /// <param name="findAdornments">TODO: Remove this in PR #3273</param>
     /// <returns>
     ///     The view that was found at the <paramref name="x"/> and <paramref name="y"/> coordinates.
     ///     <see langword="null"/> if no view was found.
@@ -561,7 +560,7 @@ public partial class View
 
     // CONCURRENCY: This method is not thread-safe.
     // Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
-    public static View? FindDeepestView (View? start, int x, int y, bool findAdornments = true)
+    public static View? FindDeepestView (View? start, int x, int y)
     {
         if (start is null || !start.Visible)
         {
@@ -573,34 +572,33 @@ public partial class View
             return null;
         }
 
-        if (findAdornments)
+        if (start.Margin.Thickness.Contains (start.Frame, x, y))
         {
-            if (start.Margin.Thickness.Contains (start.Frame, x, y))
-            {
-                return start.Margin;
-            }
+            return start.Margin;
+        }
 
-            if (start.Border.Thickness.Contains (
-                                                 start.Border.Frame with { 
-                                                     X = start.Frame.X + start.Border.Frame.X,
-                                                     Y = start.Frame.Y + start.Border.Frame.Y },
-                                                 x,
-                                                 y))
-            {
-                return start.Border;
-            }
+        if (start.Border.Thickness.Contains (
+                                             start.Border.Frame with
+                                             {
+                                                 X = start.Frame.X + start.Border.Frame.X,
+                                                 Y = start.Frame.Y + start.Border.Frame.Y
+                                             },
+                                             x,
+                                             y))
+        {
+            return start.Border;
+        }
 
-            if (start.Padding.Thickness.Contains (
-                                                  start.Padding.Frame with
-                                                  {
-                                                      X = start.Frame.X + start.Padding.Frame.X,
-                                                      Y = start.Frame.Y + start.Padding.Frame.Y
-                                                  },
-                                                  x,
-                                                  y))
-            {
-                return start.Padding;
-            }
+        if (start.Padding.Thickness.Contains (
+                                              start.Padding.Frame with
+                                              {
+                                                  X = start.Frame.X + start.Padding.Frame.X,
+                                                  Y = start.Frame.Y + start.Padding.Frame.Y
+                                              },
+                                              x,
+                                              y))
+        {
+            return start.Padding;
         }
 
         if (start.InternalSubviews is { Count: > 0 })
@@ -615,7 +613,7 @@ public partial class View
 
                 if (v.Visible && v.Frame.Contains (rx, ry))
                 {
-                    View? deep = FindDeepestView (v, rx, ry, findAdornments);
+                    View? deep = FindDeepestView (v, rx, ry);
 
                     return deep ?? v;
                 }

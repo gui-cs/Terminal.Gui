@@ -172,7 +172,7 @@ public class FindDeepestViewTests (ITestOutputHelper output)
         };
         start.Add (subview);
 
-        var found = View.FindDeepestView (start, testX, testY, true);
+        var found = View.FindDeepestView (start, testX, testY);
 
         Assert.Equal (expectedSubViewFound, found == subview);
     }
@@ -205,7 +205,7 @@ public class FindDeepestViewTests (ITestOutputHelper output)
         };
         start.Add (subview);
 
-        var found = View.FindDeepestView (start, testX, testY, true);
+        var found = View.FindDeepestView (start, testX, testY);
         Assert.Equal(expectedAdornmentType, found.GetType());
     }
 
