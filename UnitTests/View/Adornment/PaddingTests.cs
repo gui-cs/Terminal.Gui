@@ -31,9 +31,9 @@ public class PaddingTests
 
         TestHelpers.AssertDriverContentsAre (
                                              @"
-LTR
-L R
-BBB",
+PPP
+P P
+PPP",
                                              _output
                                             );
         TestHelpers.AssertDriverAttributesAre ("0", null, view.GetNormalColor ());
