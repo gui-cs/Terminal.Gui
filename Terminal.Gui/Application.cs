@@ -1411,8 +1411,7 @@ public static partial class Application
                 X = frameLoc.X,
                 Y = frameLoc.Y,
                 Flags = a.MouseEvent.Flags,
-                ScreenX = a.MouseEvent.X,
-                ScreenY = a.MouseEvent.Y,
+                ScreenPosition = new (a.MouseEvent.X, a.MouseEvent.Y),
                 View = view
             };
 
@@ -1468,8 +1467,7 @@ public static partial class Application
                 X = frameLoc.X,
                 Y = frameLoc.Y,
                 Flags = a.MouseEvent.Flags,
-                ScreenX = a.MouseEvent.X,
-                ScreenY = a.MouseEvent.Y,
+                ScreenPosition = new (a.MouseEvent.X, a.MouseEvent.Y),
                 View = view
             };
         }
@@ -1482,8 +1480,7 @@ public static partial class Application
                 X = boundsPoint.X,
                 Y = boundsPoint.Y,
                 Flags = a.MouseEvent.Flags,
-                ScreenX = a.MouseEvent.X,
-                ScreenY = a.MouseEvent.X,
+                ScreenPosition = new (a.MouseEvent.X, a.MouseEvent.Y),
                 View = view
             };
         }

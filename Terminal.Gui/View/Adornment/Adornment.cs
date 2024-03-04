@@ -221,9 +221,7 @@ public class Adornment : View
             if (Thickness.Contains (Frame, mouseEvent.X, mouseEvent.Y) && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
             {
                 _startGrabPoint = new (mouseEvent.X, mouseEvent.Y);
-                nx = mouseEvent.ScreenX;
-                ny = mouseEvent.ScreenY;
-                _dragPosition = new Point (nx, ny);
+                _dragPosition = new (mouseEvent.X, mouseEvent.Y);
                 Application.GrabMouse (this);
             }
 
@@ -246,7 +244,7 @@ public class Adornment : View
 
                 _dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
 
-                var parentLoc = Parent.SuperView?.ScreenToBounds (mouseEvent.ScreenX, mouseEvent.ScreenY) ?? new (mouseEvent.ScreenX, mouseEvent.ScreenY);
+                var parentLoc = Parent.SuperView?.ScreenToBounds (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y) ?? mouseEvent.ScreenPosition;
                 GetLocationThatFits (
                                      Parent,
                                      parentLoc.X - _startGrabPoint.X,

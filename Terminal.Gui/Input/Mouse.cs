@@ -111,10 +111,10 @@ public class MouseEvent
     /// <summary>The View at the location for the mouse event.</summary>
     public View View { get; set; }
 
-    /// <summary>The X (column) location of the mouse in <see cref="View.Bounds"/>-relative coordinates.</summary>
+    /// <summary>The X position of the mouse in <see cref="View.Bounds"/>-relative coordinates.</summary>
     public int X { get; set; }
 
-    /// <summary>The Y (column) location of the mouse in <see cref="View.Bounds"/>-relative coordinates.</summary>
+    /// <summary>The Y position of the mouse in <see cref="View.Bounds"/>-relative coordinates.</summary>
     public int Y { get; set; }
 
     /// <summary>
@@ -124,36 +124,19 @@ public class MouseEvent
     public bool Handled { get; set; }
 
     /// <summary>
-    ///     The screen-relative mouse coordinate.
+    ///     The screen-relative mouse position.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Calculated and processed in <see cref="Application.OnMouseEvent(MouseEventEventArgs)"/>.
-    ///     </para>
-    ///     <para>
-    ///         The View that has called <see cref="Application.GrabMouse"/> will receive all mouse events
-    ///         with <see cref="View.Bounds"/>-relative coordinates. <see cref="ScreenX"/> and <see cref="ScreenY"/> provide
-    ///         the screen-relative offset of these coordinates, enabling the grabbed view to know how much the
+    ///         The <see cref="X"/> and <see cref="Y"/> properties are always <see cref="View.Bounds"/>-relative. When the mouse is grabbed by a view,
+    ///         <see cref="ScreenPosition"/> provides the mouse position screen-relative coordinates, enabling the grabbed view to know how much the
     ///         mouse has moved.
     ///     </para>
-    /// </remarks>
-    public int ScreenX { get; set; }
-
-    /// <summary>
-    ///     The screen-relative mouse coordinate.
-    /// </summary>
-    /// <remarks>
     ///     <para>
     ///         Calculated and processed in <see cref="Application.OnMouseEvent(MouseEventEventArgs)"/>.
     ///     </para>
-    ///     <para>
-    ///         The View that has called <see cref="Application.GrabMouse"/> will receive all mouse events
-    ///         with <see cref="View.Bounds"/>-relative coordinates. <see cref="ScreenX"/> and <see cref="ScreenY"/> provide
-    ///         the screen-relative offset of these coordinates, enabling the grabbed view to know how much the
-    ///         mouse has moved.
-    ///     </para>
     /// </remarks>
-    public int ScreenY { get; set; }
+    public Point ScreenPosition { get; set; }
 
     /// <summary>Returns a <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</summary>
     /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</returns>
