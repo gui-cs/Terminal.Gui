@@ -1773,7 +1773,7 @@ public class TextField : View
 
         if (_text.Count == 0)
         {
-            x = pX - ev.OfX;
+            x = pX - ev.ScreenX;
         }
         else
         {

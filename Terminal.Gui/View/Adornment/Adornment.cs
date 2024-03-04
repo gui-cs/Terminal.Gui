@@ -212,20 +212,17 @@ public class Adornment : View
 
         int nx, ny;
 
-        if (!_dragPosition.HasValue
-            && (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
-                || mouseEvent.Flags.HasFlag (MouseFlags.Button2Pressed)
-                || mouseEvent.Flags.HasFlag (MouseFlags.Button3Pressed)))
+        if (!_dragPosition.HasValue && (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)))
         {
             Parent.SetFocus ();
             Application.BringOverlappedTopToFront ();
 
-            // Only start grabbing if the user clicks on the title bar.
-            if (mouseEvent.Y == 0 && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+            // Only start grabbing if the user clicks in the Thickness area
+            if (Thickness.Contains (Frame, mouseEvent.X, mouseEvent.Y) && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
             {
                 _startGrabPoint = new (mouseEvent.X, mouseEvent.Y);
-                nx = mouseEvent.X - mouseEvent.OfX;
-                ny = mouseEvent.Y - mouseEvent.OfY;
+                nx = mouseEvent.ScreenX;
+                ny = mouseEvent.ScreenY;
                 _dragPosition = new Point (nx, ny);
                 Application.GrabMouse (this);
             }
@@ -233,9 +230,9 @@ public class Adornment : View
             return true;
         }
 
-        if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) || mouseEvent.Flags == MouseFlags.Button3Pressed)
+        if (mouseEvent.Flags is (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
         {
-            if (_dragPosition.HasValue)
+            if (Application.MouseGrabView == this && _dragPosition.HasValue)
             {
                 if (Parent.SuperView is null)
                 {
@@ -247,20 +244,23 @@ public class Adornment : View
                     Parent.SuperView.SetNeedsDisplay ();
                 }
 
+                _dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
+
+                var parentLoc = Parent.SuperView?.ScreenToBounds (mouseEvent.ScreenX, mouseEvent.ScreenY) ?? new (mouseEvent.ScreenX, mouseEvent.ScreenY);
                 GetLocationThatFits (
                                      Parent,
-                                     mouseEvent.X + mouseEvent.OfX - _startGrabPoint.X,
-                                     mouseEvent.Y + mouseEvent.OfY - _startGrabPoint.Y,
+                                     parentLoc.X - _startGrabPoint.X,
+                                     parentLoc.Y - _startGrabPoint.Y,
                                      out nx,
                                      out ny,
                                      out _,
                                      out _
                                     );
 
-                _dragPosition = new Point (nx, ny);
+
                 Parent.X = nx;
                 Parent.Y = ny;
-                Parent.SetNeedsDisplay ();
+                //Parent.SetNeedsDisplay ();
 
                 return true;
             }

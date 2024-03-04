@@ -764,6 +764,13 @@ public partial class View
     public Point ScreenToFrame (int x, int y)
     {
         Point superViewBoundsOffset = SuperView?.GetBoundsOffset () ?? Point.Empty;
+        // BUGBUG: Hack. Move into Adornment somehow.
+        if (this is Adornment adornment)
+        {
+            superViewBoundsOffset = adornment.Parent.SuperView?.GetBoundsOffset () ?? Point.Empty;
+            return adornment.Parent.ScreenToFrame (x, y);
+        }
+
         var ret = new Point (x - Frame.X - superViewBoundsOffset.X, y - Frame.Y - superViewBoundsOffset.Y);
 
         if (SuperView is { })
@@ -901,30 +908,30 @@ public partial class View
         out StatusBar statusBar
     )
     {
-        int maxWidth;
+        int maxDimension;
         View superView;
 
         if (top?.SuperView is null || top == Application.Top || top?.SuperView == Application.Top)
         {
-            maxWidth = Driver.Cols;
+            maxDimension = Driver.Cols;
             superView = Application.Top;
         }
         else
         {
             // Use the SuperView's Bounds, not Frame
-            maxWidth = top.SuperView.Bounds.Width;
+            maxDimension = top.SuperView.Bounds.Width;
             superView = top.SuperView;
         }
 
         if (superView.Margin is { } && superView == top.SuperView)
         {
-            maxWidth -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
+            maxDimension -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
         }
 
-        if (top.Frame.Width <= maxWidth)
+        if (top.Frame.Width <= maxDimension)
         {
             nx = Math.Max (targetX, 0);
-            nx = nx + top.Frame.Width > maxWidth ? Math.Max (maxWidth - top.Frame.Width, 0) : nx;
+            nx = nx + top.Frame.Width > maxDimension ? Math.Max (maxDimension - top.Frame.Width, 0) : nx;
 
             if (nx > top.Frame.X + top.Frame.Width)
             {
@@ -959,14 +966,14 @@ public partial class View
 
         if (top?.SuperView is null || top == Application.Top || top?.SuperView == Application.Top)
         {
-            maxWidth = menuVisible ? 1 : 0;
+            maxDimension = menuVisible ? 1 : 0;
         }
         else
         {
-            maxWidth = 0;
+            maxDimension = 0;
         }
 
-        ny = Math.Max (targetY, maxWidth);
+        ny = Math.Max (targetY, maxDimension);
 
         if (top?.SuperView is null || top == Application.Top || top?.SuperView == Application.Top)
         {
@@ -988,24 +995,24 @@ public partial class View
 
         if (top?.SuperView is null || top == Application.Top || top?.SuperView == Application.Top)
         {
-            maxWidth = statusVisible ? Driver.Rows - 1 : Driver.Rows;
+            maxDimension = statusVisible ? Driver.Rows - 1 : Driver.Rows;
         }
         else
         {
-            maxWidth = statusVisible ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
+            maxDimension = statusVisible ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
         }
 
         if (superView.Margin is { } && superView == top.SuperView)
         {
-            maxWidth -= superView.GetAdornmentsThickness ().Top + superView.GetAdornmentsThickness ().Bottom;
+            maxDimension -= superView.GetAdornmentsThickness ().Top + superView.GetAdornmentsThickness ().Bottom;
         }
 
-        ny = Math.Min (ny, maxWidth);
+        ny = Math.Min (ny, maxDimension);
 
-        if (top.Frame.Height <= maxWidth)
+        if (top.Frame.Height <= maxDimension)
         {
-            ny = ny + top.Frame.Height > maxWidth
-                     ? Math.Max (maxWidth - top.Frame.Height, menuVisible ? 1 : 0)
+            ny = ny + top.Frame.Height > maxDimension
+                     ? Math.Max (maxDimension - top.Frame.Height, menuVisible ? 1 : 0)
                      : ny;
 
             if (ny > top.Frame.Y + top.Frame.Height)

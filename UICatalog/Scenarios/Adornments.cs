@@ -17,7 +17,7 @@ public class Adornments : Scenario
         ConfigurationManager.Themes.Theme = Theme;
         ConfigurationManager.Apply ();
         Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
-
+        
         var view = new Window { Title = "The _Window" };
         var tf1 = new TextField { Width = 10, Text = "TextField" };
         var color = new ColorPicker { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd (11) };
@@ -75,7 +75,8 @@ public class Adornments : Scenario
         var editor = new AdornmentsEditor
         {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
-            ColorScheme = Colors.ColorSchemes [TopLevelColorScheme]
+            ColorScheme = Colors.ColorSchemes [TopLevelColorScheme],
+            //BorderStyle = LineStyle.None,
         };
         view.X = 36;
         view.Y = 0;

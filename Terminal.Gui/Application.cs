@@ -1404,19 +1404,19 @@ public static partial class Application
         {
             // If the mouse is grabbed, send the event to the view that grabbed it.
             // The coordinates are relative to the Bounds of the view that grabbed the mouse.
-            Point newxy = MouseGrabView.ScreenToFrame (a.MouseEvent.X, a.MouseEvent.Y);
+            Point frameLoc = MouseGrabView.ScreenToFrame (a.MouseEvent.X, a.MouseEvent.Y);
 
-            var nme = new MouseEvent
+            var viewRelativeMouseEvent = new MouseEvent
             {
-                X = newxy.X,
-                Y = newxy.Y,
+                X = frameLoc.X,
+                Y = frameLoc.Y,
                 Flags = a.MouseEvent.Flags,
-                OfX = a.MouseEvent.X - newxy.X,
-                OfY = a.MouseEvent.Y - newxy.Y,
+                ScreenX = a.MouseEvent.X,
+                ScreenY = a.MouseEvent.Y,
                 View = view
             };
 
-            if (MouseGrabView.Bounds.Contains (nme.X, nme.Y) is false)
+            if (MouseGrabView.Bounds.Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
             {
                 // The mouse has moved outside the bounds of the view that
                 // grabbed the mouse, so we tell the view that last got 
@@ -1426,7 +1426,7 @@ public static partial class Application
             }
 
             //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-            if (MouseGrabView?.OnMouseEvent (nme) == true)
+            if (MouseGrabView?.OnMouseEvent (viewRelativeMouseEvent) == true)
             {
                 return;
             }
@@ -1461,15 +1461,15 @@ public static partial class Application
 
         if (view is Adornment adornment)
         {
-            Rectangle screen = adornment.FrameToScreen ();
+            var frameLoc = adornment.ScreenToFrame (a.MouseEvent.X, a.MouseEvent.Y);
 
             me = new MouseEvent
             {
-                X = a.MouseEvent.X - screen.X,
-                Y = a.MouseEvent.Y - screen.Y,
+                X = frameLoc.X,
+                Y = frameLoc.Y,
                 Flags = a.MouseEvent.Flags,
-                OfX = a.MouseEvent.X - screen.X,
-                OfY = a.MouseEvent.Y - screen.Y,
+                ScreenX = a.MouseEvent.X,
+                ScreenY = a.MouseEvent.Y,
                 View = view
             };
         }
@@ -1482,8 +1482,8 @@ public static partial class Application
                 X = boundsPoint.X,
                 Y = boundsPoint.Y,
                 Flags = a.MouseEvent.Flags,
-                OfX = boundsPoint.X,
-                OfY = boundsPoint.Y,
+                ScreenX = a.MouseEvent.X,
+                ScreenY = a.MouseEvent.X,
                 View = view
             };
         }

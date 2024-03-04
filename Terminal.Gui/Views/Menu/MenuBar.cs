@@ -1795,8 +1795,8 @@ public class MenuBar : View
                             X = newxy.X,
                             Y = newxy.Y,
                             Flags = me.Flags,
-                            OfX = me.X - newxy.X,
-                            OfY = me.Y - newxy.Y,
+                            ScreenX = me.X - newxy.X,
+                            ScreenY = me.Y - newxy.Y,
                             View = v
                         };
                     }
@@ -1804,7 +1804,6 @@ public class MenuBar : View
                     {
                         nme = new MouseEvent { X = me.X + current.Frame.X, Y = 0, Flags = me.Flags, View = v };
                     }
-
                     v.OnMouseEvent (nme);
 
                     return false;
@@ -1842,11 +1841,11 @@ public class MenuBar : View
                                           MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                          )))
         {
-            Application.GrabMouse (current);
+           Application.GrabMouse (current);
         }
         else if (IsMenuOpen && (me.View is MenuBar || me.View is Menu))
         {
-            Application.GrabMouse (me.View);
+           Application.GrabMouse (me.View);
         }
         else
         {
