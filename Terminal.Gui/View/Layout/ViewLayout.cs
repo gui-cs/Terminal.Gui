@@ -557,10 +557,8 @@ public partial class View
     ///     The view that was found at the <paramref name="x"/> and <paramref name="y"/> coordinates.
     ///     <see langword="null"/> if no view was found.
     /// </returns>
-
-    // CONCURRENCY: This method is not thread-safe.
-    // Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
-    public static View? FindDeepestView (View? start, int x, int y)
+    // CONCURRENCY: This method is not thread-safe. Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
+    internal static View? FindDeepestView (View? start, int x, int y)
     {
         if (start is null || !start.Visible)
         {
@@ -572,33 +570,35 @@ public partial class View
             return null;
         }
 
+        Adornment found = null;
         if (start.Margin.Thickness.Contains (start.Frame, x, y))
         {
-            return start.Margin;
+            found = start.Margin;
+        } else if (start.Border.Thickness.Contains (
+                                                    start.Border.Frame with
+                                                    {
+                                                        X = start.Frame.X + start.Border.Frame.X,
+                                                        Y = start.Frame.Y + start.Border.Frame.Y
+                                                    },
+                                                    x,
+                                                    y))
+        {
+            found = start.Border;
+        } else if (start.Padding.Thickness.Contains (
+                                                        start.Padding.Frame with
+                                                        {
+                                                            X = start.Frame.X + start.Padding.Frame.X,
+                                                            Y = start.Frame.Y + start.Padding.Frame.Y
+                                                        },
+                                                        x,
+                                                        y))
+        {
+            found = start.Padding;
         }
 
-        if (start.Border.Thickness.Contains (
-                                             start.Border.Frame with
-                                             {
-                                                 X = start.Frame.X + start.Border.Frame.X,
-                                                 Y = start.Frame.Y + start.Border.Frame.Y
-                                             },
-                                             x,
-                                             y))
+        if (found is { })
         {
-            return start.Border;
-        }
-
-        if (start.Padding.Thickness.Contains (
-                                              start.Padding.Frame with
-                                              {
-                                                  X = start.Frame.X + start.Padding.Frame.X,
-                                                  Y = start.Frame.Y + start.Padding.Frame.Y
-                                              },
-                                              x,
-                                              y))
-        {
-            return start.Padding;
+            start = found;
         }
 
         if (start.InternalSubviews is { Count: > 0 })
