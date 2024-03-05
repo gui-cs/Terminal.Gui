@@ -49,6 +49,9 @@ public class Border : Adornment
     { /* Do nothing; A parameter-less constructor is required to support all views unit tests. */
     }
 
+    /// <summary>
+    ///    The close button for the border. Set to <see cref="Button.Visible"/>, to <see langword="true"/> to enable.
+    /// </summary>
     public Button CloseButton { get; internal set; }
 
     /// <inheritdoc/>
@@ -56,6 +59,31 @@ public class Border : Adornment
     {
         /* Do nothing; View.CreateAdornment requires a constructor that takes a parent */
         Parent = parent;
+    }
+
+    /// <inheritdoc/>
+    public override void BeginInit ()
+    {
+        base.BeginInit ();
+
+        if (Parent is { })
+        {
+            CloseButton = new Button ()
+            {
+                Text = "X", // So it's not visible to not break unit tests
+                Y = 0,
+                CanFocus = true,
+                NoDecorations = false,
+                Visible = false,
+            };
+            //CloseButton.BorderStyle = LineStyle.Single;
+            //CloseButton.Border.Thickness = new (1, 0, 1, 0);
+            CloseButton.X = Pos.AnchorEnd () - (Pos.Right (CloseButton) - Pos.Left (CloseButton)) + Thickness.Left + 1; // +1 for the border
+            Add (CloseButton);
+            CloseButton.Accept += (s, e) => {
+                                      e.Cancel = Parent.InvokeCommand (Command.QuitToplevel) == true;
+                                  };
+        }
     }
 
     /// <summary>

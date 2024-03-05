@@ -120,9 +120,13 @@ public partial class View
     /// </remarks>
     public LineStyle BorderStyle
     {
-        get => Border.LineStyle;
+        get => Border?.LineStyle ?? LineStyle.None;
         set
         {
+            if (Border is null)
+            {
+                return;
+            }
             if (value != LineStyle.None)
             {
                 Border.Thickness = new (1);

@@ -86,18 +86,29 @@ public class Adornments : Scenario
 
         editor.Initialized += (s, e) => { editor.ViewToEdit = view; };
 
-        var labelInPadding = new Label () { X = 1, Y = 0, Title = "_Text:" };
-        view.Padding.Add (labelInPadding);
+        view.Initialized += (s, e) =>
+                            {
+                                var labelInPadding = new Label () { X = 1, Y = 0, Title = "_Text:" };
+                                view.Padding.Add (labelInPadding);
 
-        var textFieldInPadding = new TextField () { X = Pos.Right (labelInPadding) + 1, Y = Pos.Top (labelInPadding), Width = 15, Text = "some text" };
-        textFieldInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "TextField", textFieldInPadding.Text, "Ok");
-        view.Padding.Add (textFieldInPadding);
+                                var textFieldInPadding = new TextField () { X = Pos.Right (labelInPadding) + 1, Y = Pos.Top (labelInPadding), Width = 15, Text = "some text" };
+                                textFieldInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "TextField", textFieldInPadding.Text, "Ok");
+                                view.Padding.Add (textFieldInPadding);
 
-        var btnButtonInPadding = new Button { X = Pos.Center (), Y = 1, Text = "_Button in Padding" };
-        btnButtonInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Button in Padding Pressed!", "Ok");
-        view.Padding.Add (btnButtonInPadding);
+                                var btnButtonInPadding = new Button { X = Pos.Center (), Y = 1, Text = "_Button in Padding" };
+                                btnButtonInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Button in Padding Pressed!", "Ok");
+                                view.Padding.Add (btnButtonInPadding);
 
-        view.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Window Close Button Pressed!", "Ok");
+                                view.Border.CloseButton.Visible = true;
+                                view.Border.CloseButton.Accept += (s, e) =>
+                                                                  {
+                                                                      MessageBox.Query (20, 7, "Hi", "Window Close Button Pressed!", "Ok");
+                                                                      e.Cancel = true;
+                                                                  };
+
+                                view.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Window Close Button Pressed!", "Ok");
+                            };
+
 
         Application.Run (editor);
         Application.Shutdown ();
