@@ -538,10 +538,10 @@ public partial class View
 
         while (super is { })
         {
-            if (super is Adornment ador)
+            if (super is Adornment)
             {
                 // TODO: Move this into Adornment somehow to remove coupling.
-                ador.BoundsToScreen (rx, ry, out rx, out ry);
+                super.BoundsToScreen (rx, ry, out rx, out ry);
             }
 
             boundsOffset = super.GetBoundsOffset ();
