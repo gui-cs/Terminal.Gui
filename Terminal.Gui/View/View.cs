@@ -467,20 +467,21 @@ public partial class View : Responder, ISupportInitializeNotification
         Margin?.BeginInit ();
 
         Border?.BeginInit ();
-        if (Border is { })
-        {
-            Border.CloseButton = new Button ()
-            {
-                Text = "X",
-                X = Pos.AnchorEnd (1),
-                Y = 0,
-                CanFocus = true,
-                //NoDecorations = true,
-                Visible = true,
-            };
-            Border.Add (Border.CloseButton);
-            Border.CloseButton.Accept += (s, e) => { Border.Parent.InvokeCommand (Command.Accept); };
-        }
+        //if (Border is { })
+        //{
+        //    Border.CloseButton = new Button ()
+        //    {
+        //        Text = " ", // So it's not visible to not break unit tests
+        //        X = Pos.AnchorEnd (1),
+        //        Y = 0,
+        //        CanFocus = true,
+        //        NoDecorations = true,
+        //        NoPadding = true,
+        //        Visible = true,
+        //    };
+        //    Border.Add (Border.CloseButton);
+        //    Border.CloseButton.Accept += (s, e) => { Border.Parent.InvokeCommand (Command.Accept); };
+        //}
 
         Padding?.BeginInit ();
 
