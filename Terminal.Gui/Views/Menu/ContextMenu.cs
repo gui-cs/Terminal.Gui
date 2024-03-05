@@ -147,8 +147,7 @@ public sealed class ContextMenu : IDisposable
 
         if (Host is { })
         {
-            Host.BoundsToScreen (frame.X, frame.Y, out int x, out int y);
-            var pos = new Point (x, y);
+            Point pos = Host.BoundsToScreen (frame).Location;
             pos.Y += Host.Frame.Height - 1;
 
             if (position != pos)
@@ -185,8 +184,7 @@ public sealed class ContextMenu : IDisposable
                 }
                 else
                 {
-                    Host.BoundsToScreen (frame.X, frame.Y, out int x, out int y);
-                    var pos = new Point (x, y);
+                    Point pos = Host.BoundsToScreen (frame).Location;
                     position.Y = pos.Y - rect.Height - 1;
                 }
             }

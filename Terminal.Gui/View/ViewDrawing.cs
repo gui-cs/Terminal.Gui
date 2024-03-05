@@ -334,8 +334,8 @@ public partial class View
             return;
         }
 
-        BoundsToScreen (col, row, out int rCol, out int rRow);
-        Driver?.Move (rCol, rRow);
+        Rectangle screen = BoundsToScreen (new (col, row, 0, 0));
+        Driver?.Move (screen.X, screen.Y);
     }
 
     // TODO: Make this cancelable
