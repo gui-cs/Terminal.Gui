@@ -130,6 +130,8 @@ public partial class Toplevel : View
         KeyBindings.Add (Key.B.WithCtrl, Command.PreviousView); // Unix
 #endif
         MouseClick += Toplevel_MouseClick;
+
+        CanFocus = true;
     }
 
     private void Toplevel_MouseClick (object sender, MouseEventEventArgs e)
