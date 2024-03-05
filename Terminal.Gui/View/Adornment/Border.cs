@@ -49,10 +49,13 @@ public class Border : Adornment
     { /* Do nothing; A parameter-less constructor is required to support all views unit tests. */
     }
 
+    public Button CloseButton { get; internal set; }
+
     /// <inheritdoc/>
     public Border (View parent) : base (parent)
     {
         /* Do nothing; View.CreateAdornment requires a constructor that takes a parent */
+        Parent = parent;
     }
 
     /// <summary>

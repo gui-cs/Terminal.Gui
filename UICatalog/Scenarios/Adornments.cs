@@ -97,6 +97,8 @@ public class Adornments : Scenario
         btnButtonInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Button in Padding Pressed!", "Ok");
         view.Padding.Add (btnButtonInPadding);
 
+        view.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Window Close Button Pressed!", "Ok");
+
         Application.Run (editor);
         Application.Shutdown ();
     }

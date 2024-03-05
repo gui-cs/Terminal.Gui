@@ -322,7 +322,7 @@ public partial class View
     public bool HasFocus
     {
         set => SetHasFocus (value, this, true);
-        get { return _hasFocus; }
+        get => _hasFocus;
     }
 
     private void SetHasFocus (bool value, View view, bool force = false)
