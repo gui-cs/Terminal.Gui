@@ -108,11 +108,7 @@ public static partial class ColorTestsTheoryDataGenerators
 {
     public static TheoryData<string?> TryParse_string_Returns_False_For_Invalid_Inputs ()
     {
-        TheoryData<string?> values =
-            [
-                null
-            ]
-            ;
+        TheoryData<string?> values = [];
 
         for (var i = char.MinValue; i < 255; i++)
         {
