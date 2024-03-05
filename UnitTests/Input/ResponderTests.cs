@@ -222,7 +222,6 @@ public class ResponderTests
         var r = new Responder ();
         Assert.NotNull (r);
         Assert.Equal ("Terminal.Gui.Responder", r.ToString ());
-        Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
         Assert.True (r.Enabled);
         Assert.True (r.Visible);

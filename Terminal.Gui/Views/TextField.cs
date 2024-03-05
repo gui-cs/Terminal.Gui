@@ -434,13 +434,6 @@ public class TextField : View
     /// </summary>
     public IAutocomplete Autocomplete { get; set; }
 
-    /// <inheritdoc/>
-    public sealed override bool CanFocus
-    {
-        get => base.CanFocus;
-        set => base.CanFocus = value;
-    }
-
     /// <summary>
     ///     Gets or sets the text to render in control when no value has been entered yet and the <see cref="View"/> does
     ///     not yet have input focus.

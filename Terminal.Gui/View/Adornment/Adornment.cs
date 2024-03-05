@@ -35,7 +35,7 @@ public class Adornment : View
     {
         Application.GrabbingMouse += Application_GrabbingMouse;
         Application.UnGrabbingMouse += Application_UnGrabbingMouse;
-
+        CanFocus = true;
         Parent = parent;
     }
 

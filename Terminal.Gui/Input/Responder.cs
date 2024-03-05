@@ -22,9 +22,6 @@ public class Responder : IDisposable
 {
     private bool disposedValue;
 
-    /// <summary>Gets or sets a value indicating whether this <see cref="Responder"/> can focus.</summary>
-    /// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>
-    public virtual bool CanFocus { get; set; }
 
     /// <summary>Gets or sets a value indicating whether this <see cref="Responder"/> can respond to user interaction.</summary>
     public virtual bool Enabled { get; set; } = true;
