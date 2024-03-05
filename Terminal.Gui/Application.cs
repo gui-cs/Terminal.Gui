@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -1508,6 +1509,8 @@ public static partial class Application
         }
 
         WantContinuousButtonPressedView = view.WantContinuousButtonPressed ? view : null;
+
+        Debug.WriteLine ($"OnMouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags}");
 
         if (view.OnMouseEvent (me))
         {

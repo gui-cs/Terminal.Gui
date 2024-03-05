@@ -52,16 +52,15 @@ public class Padding : Adornment
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
-        //if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
-        //{
-        //    if (Parent.CanFocus && !Parent.HasFocus)
-        //    {
-        //        Parent.SetFocus ();
-        //        Parent.SetNeedsDisplay ();
-        //    }
-
-        //    return OnMouseEvent(mouseEvent);
-        //}
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+        {
+            if (Parent.CanFocus && !Parent.HasFocus)
+            {
+                Parent.SetFocus ();
+                Parent.SetNeedsDisplay ();
+                return true;
+            }
+        }
 
         return false;
     }
