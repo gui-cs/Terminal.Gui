@@ -501,7 +501,7 @@ public partial class View
     /// <summary>Converts a <see cref="Bounds"/>-relative region to a screen-relative region.</summary>
     public Rectangle BoundsToScreen (Rectangle region)
     {
-        BoundsToScreen (region.X, region.Y, out int screenX, out int screenY, false);
+        BoundsToScreen (region.X, region.Y, out int screenX, out int screenY);
 
         return region with { X = screenX, Y = screenY };
     }
@@ -514,12 +514,7 @@ public partial class View
     /// <param name="y"><see cref="Bounds"/>-relative row.</param>
     /// <param name="rx">Absolute column; screen-relative.</param>
     /// <param name="ry">Absolute row; screen-relative.</param>
-    /// <param name="clamped">
-    ///     If <see langword="true"/>, <paramref name="rx"/> and <paramref name="ry"/> will be clamped to the
-    ///     screen dimensions (will never be negative and will always be less than <see cref="ConsoleDriver.Cols"/> and
-    ///     <see cref="ConsoleDriver.Rows"/>, respectively.
-    /// </param>
-    public virtual void BoundsToScreen (int x, int y, out int rx, out int ry, bool clamped = true)
+    public virtual void BoundsToScreen (int x, int y, out int rx, out int ry)
     {
         // PERF: Use Point.Offset
         // Already dealing with Point here.
@@ -535,13 +530,6 @@ public partial class View
             rx += super.Frame.X + boundsOffset.X;
             ry += super.Frame.Y + boundsOffset.Y;
             super = super.SuperView;
-        }
-
-        // The following ensures that the cursor is always in the screen boundaries.
-        if (clamped)
-        {
-            ry = Math.Min (ry, Driver.Rows - 1);
-            rx = Math.Min (rx, Driver.Cols - 1);
         }
     }
 

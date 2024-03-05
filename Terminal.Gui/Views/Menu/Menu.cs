@@ -884,7 +884,7 @@ internal sealed class Menu : View
                 textToDraw = item.Title;
             }
 
-            BoundsToScreen (0, i, out int vtsCol, out int vtsRow, false);
+            BoundsToScreen (0, i, out int vtsCol, out int vtsRow);
 
             if (vtsCol < Driver.Cols)
             {
@@ -923,7 +923,7 @@ internal sealed class Menu : View
                             ? item.Help.GetColumns ()
                             : item.Help.GetColumns () + item.ShortcutTag.GetColumns () + 2;
                 int col = Frame.Width - l - 3;
-                BoundsToScreen (col, i, out vtsCol, out vtsRow, false);
+                BoundsToScreen (col, i, out vtsCol, out vtsRow);
 
                 if (vtsCol < Driver.Cols)
                 {

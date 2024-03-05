@@ -334,7 +334,7 @@ public partial class View
             return;
         }
 
-        BoundsToScreen (col, row, out int rCol, out int rRow, false);
+        BoundsToScreen (col, row, out int rCol, out int rRow);
         Driver?.Move (rCol, rRow);
     }
 
