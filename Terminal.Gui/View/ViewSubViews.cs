@@ -316,15 +316,18 @@ public partial class View
         }
     }
 
-    // BUGBUG: v2 - Seems weird that this is in View and not Responder.
     private bool _hasFocus;
 
     /// <inheritdoc/>
-    public override bool HasFocus => _hasFocus;
+    public bool HasFocus
+    {
+        set => SetHasFocus (value, this, true);
+        get { return _hasFocus; }
+    }
 
     private void SetHasFocus (bool value, View view, bool force = false)
     {
-        if (_hasFocus != value || force)
+        if (HasFocus != value || force)
         {
             _hasFocus = value;
 

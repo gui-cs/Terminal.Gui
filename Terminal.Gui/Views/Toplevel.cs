@@ -139,10 +139,6 @@ public partial class Toplevel : View
         e.Handled = InvokeCommand (Command.HotKey) == true;
     }
 
-    /// <summary>Gets or sets a value indicating whether this <see cref="Toplevel"/> can focus.</summary>
-    /// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>
-    //public override bool CanFocus => SuperView is null ? true : base.CanFocus;
-
     /// <summary>
     ///     <see langword="true"/> if was already loaded by the <see cref="Application.Begin(Toplevel)"/>
     ///     <see langword="false"/>, otherwise.
