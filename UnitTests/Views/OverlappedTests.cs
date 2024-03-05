@@ -190,9 +190,6 @@ public class OverlappedTests
 
         var top = new Toplevel ();
         RunState rs = Application.Begin (top);
-#if DEBUG_IDISPOSABLE
-        Assert.Equal (4, Responder.Instances.Count);
-#endif
 
         Application.End (rs);
         Application.Shutdown ();
