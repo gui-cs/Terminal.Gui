@@ -1320,8 +1320,8 @@ public class MenuBar : View
 
         if (mi.IsTopLevel)
         {
-            BoundsToScreen (i, 0, out int rx, out int ry);
-            var menu = new Menu { Host = this, X = rx, Y = ry, BarItems = mi };
+            Rectangle screen = BoundsToScreen (new (new (0, i), Size.Empty));
+            var menu = new Menu { Host = this, X = screen.X, Y = screen.Y, BarItems = mi };
             menu.Run (mi.Action);
             menu.Dispose ();
         }
@@ -1684,8 +1684,8 @@ public class MenuBar : View
                     {
                         if (Menus [i].IsTopLevel)
                         {
-                            BoundsToScreen (i, 0, out int rx, out int ry);
-                            var menu = new Menu { Host = this, X = rx, Y = ry, BarItems = Menus [i] };
+                            Rectangle screen = BoundsToScreen (new (new (0, i), Size.Empty));
+                            var menu = new Menu { Host = this, X = screen.X, Y = screen.Y, BarItems = Menus [i] };
                             menu.Run (Menus [i].Action);
                             menu.Dispose ();
                         }

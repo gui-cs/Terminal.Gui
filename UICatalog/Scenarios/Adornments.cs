@@ -97,8 +97,8 @@ public class Adornments : Scenario
 
                                 var btnButtonInPadding = new Button { X = Pos.Center (), Y = 1, Text = "_Button in Padding" };
                                 btnButtonInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Button in Padding Pressed!", "Ok");
-                                btnButtonInPadding.BorderStyle = LineStyle.Dashed;
-                                btnButtonInPadding.Border.Thickness = new (3,3,3,3);
+                                //btnButtonInPadding.BorderStyle = LineStyle.Dashed;
+                                //btnButtonInPadding.Border.Thickness = new (3,3,3,3);
                                 view.Padding.Add (btnButtonInPadding);
                                 btnButtonInPadding.Border.CloseButton.Visible = true;
 

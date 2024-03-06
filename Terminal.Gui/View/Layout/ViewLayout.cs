@@ -505,58 +505,36 @@ public partial class View
     /// </summary>
     public event EventHandler Initialized;
 
-    /// <summary>Converts a <see cref="Bounds"/>-relative region to a screen-relative region.</summary>
-    public Rectangle BoundsToScreen (Rectangle region)
+    /// <summary>Converts a <see cref="Bounds"/>-relative rectangle to a screen-relative rectangle.</summary>
+    public virtual Rectangle BoundsToScreen (Rectangle bounds)
     {
-        BoundsToScreen (region.X, region.Y, out int screenX, out int screenY, false);
-
-        return region with { X = screenX, Y = screenY };
-    }
-
-    /// <summary>
-    ///     Converts a <see cref="Bounds"/>-relative coordinate to a screen-relative coordinate. The output is optionally
-    ///     clamped to the screen dimensions.
-    /// </summary>
-    /// <param name="x"><see cref="Bounds"/>-relative column.</param>
-    /// <param name="y"><see cref="Bounds"/>-relative row.</param>
-    /// <param name="rx">Absolute column; screen-relative.</param>
-    /// <param name="ry">Absolute row; screen-relative.</param>
-    /// <param name="clamped">
-    ///     If <see langword="true"/>, <paramref name="rx"/> and <paramref name="ry"/> will be clamped to the
-    ///     screen dimensions (will never be negative and will always be less than <see cref="ConsoleDriver.Cols"/> and
-    ///     <see cref="ConsoleDriver.Rows"/>, respectively.
-    /// </param>
-    public virtual void BoundsToScreen (int x, int y, out int rx, out int ry, bool clamped = true)
-    {
-        // PERF: Use Point.Offset
-        // Already dealing with Point here.
         Point boundsOffset = GetBoundsOffset ();
-        rx = x + Frame.X + boundsOffset.X;
-        ry = y + Frame.Y + boundsOffset.Y;
 
+        // bounds is relative to our Frame. We need to offset them by our Frame and any boundsOffset.
+        bounds.Offset (Frame.X + boundsOffset.X, Frame.Y + boundsOffset.Y);
+
+        // If we have a SuperView, keep going...
         View super = SuperView;
-
         while (super is { })
         {
-            if (super is Adornment)
+            if (super is Adornment adornment)
             {
-                // TODO: Move this into Adornment somehow to remove coupling.
-                super.BoundsToScreen (rx, ry, out rx, out ry);
+                // Adornments are *Children* of a View, not SubViews, so we need to access the Parent instead of the SuperView.
+                Rectangle parentFrame = adornment.Frame;// ?? adornment.Frame;
+
+                // bounds is relative to Parent View. We need to offset them by the Parent View's Frame.
+                bounds.Offset (parentFrame.X, parentFrame.Y);
+                super = adornment.Parent;
             }
-
-            boundsOffset = super.GetBoundsOffset ();
-            rx += super.Frame.X + boundsOffset.X;
-            ry += super.Frame.Y + boundsOffset.Y;
-
-            super = super.SuperView;
+            else
+            {
+                boundsOffset = super.GetBoundsOffset ();
+                bounds.Offset (super.Frame.X + boundsOffset.X, super.Frame.Y + boundsOffset.Y);
+                super = super.SuperView;
+            }
         }
 
-        // The following ensures that the cursor is always in the screen boundaries.
-        if (clamped)
-        {
-            ry = Math.Min (ry, Driver.Rows - 1);
-            rx = Math.Min (rx, Driver.Cols - 1);
-        }
+        return bounds;
     }
 
 #nullable enable
@@ -676,9 +654,9 @@ public partial class View
     public Point GetBoundsOffset ()
     {
         return new (
-                    Padding?.Thickness.GetInside (Padding.Frame).X ?? 0,
-                    Padding?.Thickness.GetInside (Padding.Frame).Y ?? 0
-                   );
+                          Padding?.Thickness.GetInside (Padding.Frame).X ?? 0,
+                          Padding?.Thickness.GetInside (Padding.Frame).Y ?? 0
+                         );
     }
 
     /// <summary>Fired after the View's <see cref="LayoutSubviews"/> method has completed.</summary>
