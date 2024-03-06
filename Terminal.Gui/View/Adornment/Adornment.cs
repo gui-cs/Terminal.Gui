@@ -83,20 +83,6 @@ public class Adornment : View
     }
 
     /// <inheritdoc/>
-    public override Rectangle BoundsToScreen (Rectangle bounds)
-    {
-        // Adornments are *Children* of a View, not SubViews. Thus View.BoundsToScreen will not work.
-        // To get the screen-relative coordinates of a Adornment, we need to know who
-        // the Parent is
-        Rectangle parentFrame = Parent?.Frame ?? Frame;
-        bounds.Offset (parentFrame.X, parentFrame.Y);
-
-        // We now have rcol/rrow in coordinates relative to our View's SuperView. If our View's SuperView has
-        // a SuperView, keep going...
-        return Parent?.SuperView?.BoundsToScreen (bounds) ?? bounds;
-    }
-
-    /// <inheritdoc/>
     public override Rectangle FrameToScreen ()
     {
         if (Parent is null)

@@ -499,21 +499,16 @@ public partial class View
     public event EventHandler Initialized;
 
     /// <summary>Converts a <see cref="Bounds"/>-relative rectangle to a screen-relative rectangle.</summary>
-    public virtual Rectangle BoundsToScreen (Rectangle bounds)
+    public Rectangle BoundsToScreen (Rectangle bounds)
     {
+        // Translate bounds to Frame (our SuperView's Bounds-relative coordinates)
         Point boundsOffset = GetBoundsOffset ();
         bounds.Offset(Frame.X + boundsOffset.X, Frame.Y + boundsOffset.Y);
 
-        View super = SuperView;
+        Rectangle screen = FrameToScreen ();
+        screen.Offset (boundsOffset.X + bounds.X, boundsOffset.Y + bounds.Y);
 
-        while (super is { })
-        {
-            boundsOffset = super.GetBoundsOffset ();
-            bounds.Offset(super.Frame.X + boundsOffset.X, super.Frame.Y + boundsOffset.Y);
-            super = super.SuperView;
-        }
-
-        return bounds;
+        return screen;
     }
 
 #nullable enable
