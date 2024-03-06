@@ -873,7 +873,7 @@ At 0,0
 
         //Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
         Assert.False (r.OnKeyUp (new Key { KeyCode = KeyCode.Null }));
-        Assert.False (r.MouseEvent (new MouseEvent { Flags = MouseFlags.AllEvents }));
+        Assert.False (r.OnMouseEvent (new MouseEvent { Flags = MouseFlags.AllEvents }));
         Assert.False (r.OnMouseEnter (new MouseEvent { Flags = MouseFlags.AllEvents }));
         Assert.False (r.OnMouseLeave (new MouseEvent { Flags = MouseFlags.AllEvents }));
 
@@ -1214,6 +1214,41 @@ At 0,0
             IsKeyPress = true;
 
             return true;
+        }
+    }
+
+    // OnAccept/Accept tests
+    [Fact]
+    public void OnAccept_Fires_Accept ()
+    {
+        var view = new View ();
+        var accepted = false;
+
+        view.Accept += ViewOnAccept;
+
+        view.InvokeCommand (Command.Accept);
+        Assert.True (accepted);
+
+        return;
+        void ViewOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void Accept_Cancel_Event_OnAccept_Returns_True ()
+    {
+        var view = new View ();
+        var acceptInvoked = false;
+
+        view.Accept += ViewOnAccept;
+
+        var ret = view.InvokeCommand (Command.Accept);
+        Assert.True (ret);
+        Assert.True (acceptInvoked);
+
+        return;
+        void ViewOnAccept (object sender, CancelEventArgs e) { 
+            acceptInvoked = true;
+            e.Cancel = true;
         }
     }
 }

@@ -114,9 +114,9 @@ public class DateField : TextField
     }
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent ev)
+    protected internal override bool OnMouseEvent  (MouseEvent ev)
     {
-        bool result = base.MouseEvent (ev);
+        bool result = base.OnMouseEvent (ev);
 
         if (result && SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed))
         {

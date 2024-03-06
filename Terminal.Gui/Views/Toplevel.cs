@@ -237,7 +237,7 @@ public partial class Toplevel : View
     public event EventHandler Loaded;
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent mouseEvent)
+    protected internal override bool OnMouseEvent  (MouseEvent mouseEvent)
     {
         if (!CanFocus)
         {

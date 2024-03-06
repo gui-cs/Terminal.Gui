@@ -3307,7 +3307,7 @@ public class TextView : View
     }
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent ev)
+    protected internal override bool OnMouseEvent  (MouseEvent ev)
     {
         if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked)
             && !ev.Flags.HasFlag (MouseFlags.Button1Pressed)
@@ -3337,7 +3337,7 @@ public class TextView : View
         _continuousFind = false;
 
         // Give autocomplete first opportunity to respond to mouse clicks
-        if (SelectedLength == 0 && Autocomplete.MouseEvent (ev, true))
+        if (SelectedLength == 0 && Autocomplete.OnMouseEvent (ev, true))
         {
             return true;
         }

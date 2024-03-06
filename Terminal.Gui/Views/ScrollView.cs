@@ -294,7 +294,7 @@ public class ScrollView : View
         }
         else
         {
-            if (!IsOverridden (view, "MouseEvent"))
+            if (!IsOverridden (view, "OnMouseEvent"))
             {
                 view.MouseEnter += View_MouseEnter;
                 view.MouseLeave += View_MouseLeave;
@@ -304,53 +304,6 @@ public class ScrollView : View
         }
 
         SetNeedsLayout ();
-    }
-
-    /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent me)
-    {
-        if (me.Flags != MouseFlags.WheeledDown
-            && me.Flags != MouseFlags.WheeledUp
-            && me.Flags != MouseFlags.WheeledRight
-            && me.Flags != MouseFlags.WheeledLeft
-            &&
-
-            //				me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1Clicked &&
-            !me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
-        {
-            return false;
-        }
-
-        if (me.Flags == MouseFlags.WheeledDown && ShowVerticalScrollIndicator)
-        {
-            ScrollDown (1);
-        }
-        else if (me.Flags == MouseFlags.WheeledUp && ShowVerticalScrollIndicator)
-        {
-            ScrollUp (1);
-        }
-        else if (me.Flags == MouseFlags.WheeledRight && _horizontal.ShowScrollIndicator)
-        {
-            ScrollRight (1);
-        }
-        else if (me.Flags == MouseFlags.WheeledLeft && ShowVerticalScrollIndicator)
-        {
-            ScrollLeft (1);
-        }
-        else if (me.X == _vertical.Frame.X && ShowVerticalScrollIndicator)
-        {
-            _vertical.MouseEvent (me);
-        }
-        else if (me.Y == _horizontal.Frame.Y && ShowHorizontalScrollIndicator)
-        {
-            _horizontal.MouseEvent (me);
-        }
-        else if (IsOverridden (me.View, "MouseEvent"))
-        {
-            Application.UngrabMouse ();
-        }
-
-        return true;
     }
 
     /// <inheritdoc/>
@@ -400,6 +353,41 @@ public class ScrollView : View
         }
 
         return false;
+    }
+
+    /// <inheritdoc/>
+    protected internal override bool OnMouseEvent  (MouseEvent me)
+    {
+        if (me.Flags == MouseFlags.WheeledDown && ShowVerticalScrollIndicator)
+        {
+            ScrollDown (1);
+        }
+        else if (me.Flags == MouseFlags.WheeledUp && ShowVerticalScrollIndicator)
+        {
+            ScrollUp (1);
+        }
+        else if (me.Flags == MouseFlags.WheeledRight && _showHorizontalScrollIndicator)
+        {
+            ScrollRight (1);
+        }
+        else if (me.Flags == MouseFlags.WheeledLeft && ShowVerticalScrollIndicator)
+        {
+            ScrollLeft (1);
+        }
+        else if (me.X == _vertical.Frame.X && ShowVerticalScrollIndicator)
+        {
+            _vertical.OnMouseEvent (me);
+        }
+        else if (me.Y == _horizontal.Frame.Y && ShowHorizontalScrollIndicator)
+        {
+            _horizontal.OnMouseEvent (me);
+        }
+        else if (IsOverridden (me.View, "OnMouseEvent"))
+        {
+            Application.UngrabMouse ();
+        }
+
+        return base.OnMouseEvent(me);
     }
 
     /// <inheritdoc/>

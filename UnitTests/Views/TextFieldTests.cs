@@ -121,7 +121,7 @@ public class TextFieldTests
         Assert.False (fv.CanFocus);
         Assert.False (fv.HasFocus);
 
-        tf.MouseEvent (
+        tf.OnMouseEvent (
                        new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
                       );
 
@@ -135,7 +135,7 @@ public class TextFieldTests
         fv.CanFocus = true;
         tf.CanFocus = true;
 
-        tf.MouseEvent (
+        tf.OnMouseEvent (
                        new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
                       );
 
@@ -147,7 +147,7 @@ public class TextFieldTests
 
         fv.CanFocus = false;
 
-        tf.MouseEvent (
+        tf.OnMouseEvent (
                        new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
                       );
 
@@ -482,7 +482,7 @@ public class TextFieldTests
         tf.Text = "Les Misérables movie.";
 
         Assert.True (
-                     tf.MouseEvent (
+                     tf.OnMouseEvent (
                                     new MouseEvent { X = 7, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
                                    )
                     );
@@ -1147,12 +1147,12 @@ public class TextFieldTests
 
         var ev = new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1DoubleClicked };
 
-        tf.MouseEvent (ev);
+        tf.OnMouseEvent (ev);
         Assert.Equal (1, tf.SelectedLength);
 
         ev = new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked };
 
-        tf.MouseEvent (ev);
+        tf.OnMouseEvent (ev);
         Assert.Equal (1, tf.SelectedLength);
     }
 
@@ -1524,14 +1524,14 @@ public class TextFieldTests
         Assert.Equal ("m", runes [idx].ToString ());
 
         Assert.True (
-                     tf.MouseEvent (
+                     tf.OnMouseEvent (
                                     new MouseEvent { X = idx, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
                                    )
                     );
         Assert.Equal ("movie.", tf.SelectedText);
 
         Assert.True (
-                     tf.MouseEvent (
+                     tf.OnMouseEvent (
                                     new MouseEvent { X = idx + 1, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
                                    )
                     );

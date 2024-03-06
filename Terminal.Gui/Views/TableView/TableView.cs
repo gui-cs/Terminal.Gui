@@ -817,7 +817,7 @@ public class TableView : View
     }
 
     ///<inheritdoc/>
-    public override bool MouseEvent (MouseEvent me)
+    protected internal override bool OnMouseEvent  (MouseEvent me)
     {
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
             && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
@@ -922,7 +922,7 @@ public class TableView : View
             }
         }
 
-        return false;
+        return base.OnMouseEvent (me);
     }
 
     ///<inheritdoc/>

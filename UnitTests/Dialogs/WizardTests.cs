@@ -38,7 +38,7 @@ public class WizardTests
         var firstIteration = true;
         Application.RunIteration (ref runstate, ref firstIteration);
 
-        wizard.NextFinishButton.OnAccept ();
+        wizard.NextFinishButton.InvokeCommand (Command.Accept);
         Application.RunIteration (ref runstate, ref firstIteration);
         Application.End (runstate);
         Assert.True (finishedFired);
@@ -64,13 +64,13 @@ public class WizardTests
         Application.RunIteration (ref runstate, ref firstIteration);
 
         Assert.Equal (step1.Title, wizard.CurrentStep.Title);
-        wizard.NextFinishButton.OnAccept ();
+        wizard.NextFinishButton.InvokeCommand (Command.Accept);
         Assert.False (finishedFired);
         Assert.False (closedFired);
 
         Assert.Equal (step2.Title, wizard.CurrentStep.Title);
         Assert.Equal (wizard.GetLastStep ().Title, wizard.CurrentStep.Title);
-        wizard.NextFinishButton.OnAccept ();
+        wizard.NextFinishButton.InvokeCommand (Command.Accept);
         Application.End (runstate);
         Assert.True (finishedFired);
         Assert.True (closedFired);
@@ -99,7 +99,7 @@ public class WizardTests
 
         Assert.Equal (step2.Title, wizard.CurrentStep.Title);
         Assert.Equal (wizard.GetLastStep ().Title, wizard.CurrentStep.Title);
-        wizard.NextFinishButton.OnAccept ();
+        wizard.NextFinishButton.InvokeCommand (Command.Accept);
         Application.End (runstate);
         Assert.True (finishedFired);
         Assert.True (closedFired);

@@ -113,28 +113,28 @@ public class ResponderTests
     public void IsOverridden_False_IfNotOverridden ()
     {
         // MouseEvent IS defined on Responder but NOT overridden
-        Assert.False (Responder.IsOverridden (new Responder (), "MouseEvent"));
+        Assert.False (Responder.IsOverridden (new Responder (), "OnMouseEvent"));
 
         // MouseEvent is defined on Responder and NOT overrident on View
         Assert.False (
                       Responder.IsOverridden (
-                                              new View { Text = "View does not override MouseEvent" },
-                                              "MouseEvent"
+                                              new View { Text = "View does not override OnMouseEvent" },
+                                              "OnMouseEvent"
                                              )
                      );
 
         Assert.False (
                       Responder.IsOverridden (
-                                              new DerivedView { Text = "DerivedView does not override MouseEvent" },
-                                              "MouseEvent"
+                                              new DerivedView { Text = "DerivedView does not override OnMouseEvent" },
+                                              "OnMouseEvent"
                                              )
                      );
 
         // MouseEvent is NOT defined on DerivedView 
         Assert.False (
                       Responder.IsOverridden (
-                                              new DerivedView { Text = "DerivedView does not override MouseEvent" },
-                                              "MouseEvent"
+                                              new DerivedView { Text = "DerivedView does not override OnMouseEvent" },
+                                              "OnMouseEvent"
                                              )
                      );
 
@@ -161,8 +161,8 @@ public class ResponderTests
         // MouseEvent is defined on Responder IS overriden on ScrollBarView (but not View)
         Assert.True (
                      Responder.IsOverridden (
-                                             new ScrollBarView { Text = "ScrollBarView overrides MouseEvent" },
-                                             "MouseEvent"
+                                             new ScrollBarView { Text = "ScrollBarView overrides OnMouseEvent" },
+                                             "OnMouseEvent"
                                             )
                     );
 
@@ -180,8 +180,8 @@ public class ResponderTests
         // ScrollBarView overrides both MouseEvent (from Responder) and Redraw (from View)
         Assert.True (
                      Responder.IsOverridden (
-                                             new ScrollBarView { Text = "ScrollBarView overrides MouseEvent" },
-                                             "MouseEvent"
+                                             new ScrollBarView { Text = "ScrollBarView overrides OnMouseEvent" },
+                                             "OnMouseEvent"
                                             )
                     );
 
@@ -189,13 +189,6 @@ public class ResponderTests
                      Responder.IsOverridden (
                                              new ScrollBarView { Text = "ScrollBarView overrides OnDrawContent" },
                                              "OnDrawContent"
-                                            )
-                    );
-
-        Assert.True (
-                     Responder.IsOverridden (
-                                             new Button { Text = "Button overrides MouseEvent" },
-                                             "MouseEvent"
                                             )
                     );
 #if DEBUG_IDISPOSABLE
@@ -245,7 +238,7 @@ public class ResponderTests
         //Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
         Assert.False (r.OnKeyDown (new Key { KeyCode = KeyCode.Null }));
         Assert.False (r.OnKeyUp (new Key { KeyCode = KeyCode.Null }));
-        Assert.False (r.MouseEvent (new MouseEvent { Flags = MouseFlags.AllEvents }));
+        Assert.False (r.OnMouseEvent (new MouseEvent { Flags = MouseFlags.AllEvents }));
         Assert.False (r.OnMouseEnter (new MouseEvent { Flags = MouseFlags.AllEvents }));
         Assert.False (r.OnMouseLeave (new MouseEvent { Flags = MouseFlags.AllEvents }));
 

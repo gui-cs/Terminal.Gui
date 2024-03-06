@@ -161,7 +161,7 @@ public class RadioGroup : View
     }
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent me)
+    protected internal override bool OnMouseEvent  (MouseEvent me)
     {
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked))
         {

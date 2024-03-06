@@ -745,7 +745,7 @@ internal sealed class Menu : View
                 View = view
             };
 
-            if (MouseEvent (nme) || a.MouseEvent.Flags == MouseFlags.Button1Pressed || a.MouseEvent.Flags == MouseFlags.Button1Released)
+            if (OnMouseEvent (nme) || a.MouseEvent.Flags == MouseFlags.Button1Pressed || a.MouseEvent.Flags == MouseFlags.Button1Released)
             {
                 a.MouseEvent.Handled = true;
             }
@@ -1184,7 +1184,7 @@ internal sealed class Menu : View
         _host?.SetNeedsDisplay ();
     }
 
-    public override bool MouseEvent (MouseEvent me)
+    protected internal override bool OnMouseEvent  (MouseEvent me)
     {
         if (!_host._handled && !_host.HandleGrabView (me, this))
         {

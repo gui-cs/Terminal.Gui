@@ -250,7 +250,7 @@ public class ComboBox : View
     public event EventHandler Expanded;
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent me)
+    protected internal override bool OnMouseEvent  (MouseEvent me)
     {
         if (me.X == ContentArea.Right - 1
             && me.Y == ContentArea.Top
@@ -801,14 +801,14 @@ public class ComboBox : View
             set => _hideDropdownListOnClick = WantContinuousButtonPressed = value;
         }
 
-        public override bool MouseEvent (MouseEvent me)
+        protected internal override bool OnMouseEvent  (MouseEvent me)
         {
             var res = false;
             bool isMousePositionValid = IsMousePositionValid (me);
 
             if (isMousePositionValid)
             {
-                res = base.MouseEvent (me);
+                res = base.OnMouseEvent (me);
             }
 
             if (HideDropdownListOnClick && me.Flags == MouseFlags.Button1Clicked)

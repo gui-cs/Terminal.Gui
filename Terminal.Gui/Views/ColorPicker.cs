@@ -89,7 +89,7 @@ public class ColorPicker : View
     public event EventHandler<ColorEventArgs> ColorChanged;
 
     ///<inheritdoc/>
-    public override bool MouseEvent (MouseEvent me)
+    protected internal override bool OnMouseEvent  (MouseEvent me)
     {
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) || !CanFocus)
         {

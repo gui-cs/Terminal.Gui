@@ -58,6 +58,12 @@ public class Button : View
         KeyBindings.Add (Key.Enter, Command.HotKey);
 
         TitleChanged += Button_TitleChanged;
+        MouseClick += Button_MouseClick;
+    }
+
+    private void Button_MouseClick (object sender, MouseEventEventArgs e)
+    {
+        e.Handled = InvokeCommand (Command.Accept) == true;
     }
 
     private void Button_TitleChanged (object sender, StateEventArgs<string> e)
@@ -98,29 +104,6 @@ public class Button : View
 
     /// <summary></summary>
     public bool NoPadding { get; set; }
-
-    /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent me)
-    {
-        if (me.Flags == MouseFlags.Button1Clicked)
-        {
-            if (CanFocus && Enabled)
-            {
-                if (!HasFocus)
-                {
-                    SetFocus ();
-                    SetNeedsDisplay ();
-                    Draw ();
-                }
-
-                OnAccept ();
-            }
-
-            return true;
-        }
-
-        return false;
-    }
 
     /// <inheritdoc/>
     public override bool OnEnter (View view)

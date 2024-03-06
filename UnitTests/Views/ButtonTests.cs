@@ -684,6 +684,40 @@ public class ButtonTests
     }
 
     [Fact]
+    public void HotKey_Command_Accepts ()
+    {
+        var button = new Button ();
+        var accepted = false;
+
+        button.Accept += ButtonOnAccept;
+        button.InvokeCommand (Command.HotKey);
+
+        Assert.True (accepted);
+
+        return;
+        void ButtonOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void Accept_Cancel_Event_OnAccept_Returns_True ()
+    {
+        var button = new Button ();
+        var acceptInvoked = false;
+
+        button.Accept += ButtonAccept;
+
+        var ret = button.InvokeCommand (Command.Accept);
+        Assert.True (ret);
+        Assert.True (acceptInvoked);
+
+        return;
+        void ButtonAccept (object sender, CancelEventArgs e)
+        {
+            acceptInvoked = true;
+            e.Cancel = true;
+        }
+    }
+    [Fact]
     public void Setting_Empty_Text_Sets_HoKey_To_KeyNull ()
     {
         var super = new View ();

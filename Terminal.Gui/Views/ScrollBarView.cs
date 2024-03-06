@@ -189,7 +189,7 @@ public class ScrollBarView : View
     public event EventHandler ChangedPosition;
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent mouseEvent)
+    protected internal override bool OnMouseEvent  (MouseEvent mouseEvent)
     {
         if (mouseEvent.Flags != MouseFlags.Button1Pressed
             && mouseEvent.Flags != MouseFlags.Button1DoubleClicked
@@ -241,7 +241,7 @@ public class ScrollBarView : View
                 || mouseEvent.Flags == MouseFlags.WheeledRight
                 || mouseEvent.Flags == MouseFlags.WheeledLeft))
         {
-            return host.MouseEvent (mouseEvent);
+            return Host.OnMouseEvent (mouseEvent);
         }
 
         if (_lastLocation == -1 && mouseEvent.Flags == MouseFlags.Button1Pressed && location == 0)
@@ -767,7 +767,7 @@ public class ScrollBarView : View
             || me.MouseEvent.Flags == MouseFlags.WheeledRight
             || me.MouseEvent.Flags == MouseFlags.WheeledLeft)
         {
-            MouseEvent (me.MouseEvent);
+            OnMouseEvent (me.MouseEvent);
         }
         else if (me.MouseEvent.Flags == MouseFlags.Button1Clicked)
         {
