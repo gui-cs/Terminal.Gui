@@ -45,7 +45,7 @@ public class Clipping : Scenario
 
         var embedded2 = new Window
         {
-            Title = "1",
+            Title = "2",
             X = 3,
             Y = 3,
             Width = Dim.Fill (3),
