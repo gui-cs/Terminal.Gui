@@ -350,9 +350,9 @@ public class Notepad : Scenario
                                     );
         }
 
-        ((View)sender).BoundsToScreen (e.MouseEvent.X, e.MouseEvent.Y, out int screenX, out int screenY);
+        Rectangle screen = ((View)sender).BoundsToScreen (new (e.MouseEvent.X, e.MouseEvent.Y, 0, 0));
 
-        var contextMenu = new ContextMenu { Position = new Point (screenX, screenY), MenuItems = items };
+        var contextMenu = new ContextMenu { Position = screen.Location, MenuItems = items };
 
         contextMenu.Show ();
         e.MouseEvent.Handled = true;
