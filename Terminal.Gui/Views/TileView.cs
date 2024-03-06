@@ -217,7 +217,7 @@ public class TileView : View
             {
                 bool isRoot = _splitterLines.Contains (line);
 
-                Rectangle screen = line.BoundsToScreen (new (new (0, 0), Size.Empty));
+                Rectangle screen = line.BoundsToScreen (Rectangle.Empty);
                 Point origin = ScreenToFrame (screen.X, screen.Y);
                 int length = line.Orientation == Orientation.Horizontal ? line.Frame.Width : line.Frame.Height;
 

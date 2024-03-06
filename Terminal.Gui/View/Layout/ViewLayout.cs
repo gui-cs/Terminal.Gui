@@ -498,39 +498,22 @@ public partial class View
     /// </summary>
     public event EventHandler Initialized;
 
-    /// <summary>Converts a <see cref="Bounds"/>-relative region to a screen-relative region.</summary>
-    public Rectangle BoundsToScreen (Rectangle region)
+    /// <summary>Converts a <see cref="Bounds"/>-relative rectangle to a screen-relative rectangle.</summary>
+    public virtual Rectangle BoundsToScreen (Rectangle bounds)
     {
-        BoundsToScreen (region.X, region.Y, out int screenX, out int screenY);
-
-        return region with { X = screenX, Y = screenY };
-    }
-
-    /// <summary>
-    ///     Converts a <see cref="Bounds"/>-relative coordinate to a screen-relative coordinate. The output is optionally
-    ///     clamped to the screen dimensions.
-    /// </summary>
-    /// <param name="x"><see cref="Bounds"/>-relative column.</param>
-    /// <param name="y"><see cref="Bounds"/>-relative row.</param>
-    /// <param name="rx">Absolute column; screen-relative.</param>
-    /// <param name="ry">Absolute row; screen-relative.</param>
-    public virtual void BoundsToScreen (int x, int y, out int rx, out int ry)
-    {
-        // PERF: Use Point.Offset
-        // Already dealing with Point here.
         Point boundsOffset = GetBoundsOffset ();
-        rx = x + Frame.X + boundsOffset.X;
-        ry = y + Frame.Y + boundsOffset.Y;
+        bounds.Offset(Frame.X + boundsOffset.X, Frame.Y + boundsOffset.Y);
 
         View super = SuperView;
 
         while (super is { })
         {
             boundsOffset = super.GetBoundsOffset ();
-            rx += super.Frame.X + boundsOffset.X;
-            ry += super.Frame.Y + boundsOffset.Y;
+            bounds.Offset(super.Frame.X + boundsOffset.X, super.Frame.Y + boundsOffset.Y);
             super = super.SuperView;
         }
+
+        return bounds;
     }
 
 #nullable enable
@@ -626,7 +609,7 @@ public partial class View
         int right = Margin.Thickness.Right + Border.Thickness.Right + Padding.Thickness.Right;
         int bottom = Margin.Thickness.Bottom + Border.Thickness.Bottom + Padding.Thickness.Bottom;
 
-        return new Thickness (left, top, right, bottom);
+        return new (left, top, right, bottom);
     }
 
     /// <summary>
@@ -635,7 +618,7 @@ public partial class View
     /// </summary>
     public Point GetBoundsOffset ()
     {
-        return new Point (
+        return new (
                           Padding?.Thickness.GetInside (Padding.Frame).X ?? 0,
                           Padding?.Thickness.GetInside (Padding.Frame).Y ?? 0
                          );
