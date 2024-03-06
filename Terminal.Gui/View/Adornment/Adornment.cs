@@ -33,7 +33,7 @@ public class Adornment : View
     /// <summary>Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).</summary>
     public override Rectangle ContentArea
     {
-        get => Thickness?.GetInside (new (Point.Empty, Frame.Size)) ?? new Rectangle (Point.Empty, Frame.Size);
+        get => new Rectangle (Point.Empty, Thickness?.GetInside (new (Point.Empty, Frame.Size)).Size ?? Frame.Size);
         // QUESTION: So why even have a setter then?
         set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
     }
@@ -100,17 +100,19 @@ public class Adornment : View
     /// <inheritdoc/>
     public override Rectangle FrameToScreen ()
     {
+        if (Parent is null)
+        {
+            return Frame;
+        }
+
         // Adornments are *Children* of a View, not SubViews. Thus View.FrameToScreen will not work.
         // To get the screen-relative coordinates of a Adornment, we need to know who
         // the Parent is
-        Rectangle ret = Parent?.Frame ?? Frame;
-        ret.Size = Frame.Size;
-
-        ret.Location = Parent?.FrameToScreen ().Location ?? ret.Location;
+        Rectangle parent = Parent.FrameToScreen ();
 
         // We now have coordinates relative to our View. If our View's SuperView has
         // a SuperView, keep going...
-        return ret;
+        return new (new (parent.X + Frame.X, parent.Y + Frame.Y), Frame.Size);
     }
 
     /// <summary>

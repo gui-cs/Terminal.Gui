@@ -57,6 +57,9 @@ public class Responder : IDisposable
     public event EventHandler Disposing;
 
     /// <summary>Method invoked when a mouse event is generated</summary>
+    /// <remarks>
+    /// The coordinates are relative to <see cref="View.Bounds"/>.
+    /// </remarks>
     /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
     /// <param name="mouseEvent">Contains the details about the mouse event.</param>
     public virtual bool MouseEvent (MouseEvent mouseEvent) { return false; }
@@ -81,6 +84,9 @@ public class Responder : IDisposable
     ///     Called when the mouse first enters the view; the view will now receives mouse events until the mouse leaves
     ///     the view. At which time, <see cref="OnMouseLeave(Gui.MouseEvent)"/> will be called.
     /// </summary>
+    /// <remarks>
+    /// The coordinates are relative to <see cref="View.Bounds"/>.
+    /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
     public virtual bool OnMouseEnter (MouseEvent mouseEvent) { return false; }
@@ -89,6 +95,9 @@ public class Responder : IDisposable
     ///     Called when the mouse has moved outside of the view; the view will no longer receive mouse events (until the
     ///     mouse moves within the view again and <see cref="OnMouseEnter(Gui.MouseEvent)"/> is called).
     /// </summary>
+    /// <remarks>
+    /// The coordinates are relative to <see cref="View.Bounds"/>.
+    /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
     public virtual bool OnMouseLeave (MouseEvent mouseEvent) { return false; }
