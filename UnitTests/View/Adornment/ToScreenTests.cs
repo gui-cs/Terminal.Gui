@@ -3,11 +3,11 @@
 namespace Terminal.Gui.ViewTests;
 
 /// <summary>
-/// Test the <see cref="View.FrameToScreen"/> and <see cref="View.BoundsToScreen"/> methods.
-/// DOES NOT TEST Adornment.xxxToScreen methods. Those are in ./Adornment/ToScreenTests.cs
+/// Test the <see cref="Adornment.FrameToScreen"/> and <see cref="Adornment.BoundsToScreen"/> methods.
+/// DOES NOT TEST View.xxxToScreen methods. Those are in ./View/Layout/ToScreenTests.cs
 /// </summary>
 /// <param name="output"></param>
-public class ToScreenTests (ITestOutputHelper output)
+public class AdornmentToScreenTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
@@ -26,10 +26,14 @@ public class ToScreenTests (ITestOutputHelper output)
         view.Frame = frame;
 
         // Act
-        var screen = view.FrameToScreen();
+        var marginScreen = view.Margin.FrameToScreen();
+        var borderScreen = view.Border.FrameToScreen ();
+        var paddingScreen = view.Padding.FrameToScreen ();
 
         // Assert
-        Assert.Equal(expectedX, screen.X);
+        Assert.Equal(expectedX, marginScreen.X);
+        Assert.Equal (expectedX, borderScreen.X);
+        Assert.Equal (expectedX, paddingScreen.X);
     }
 
     [Theory]
@@ -44,14 +48,18 @@ public class ToScreenTests (ITestOutputHelper output)
         var frame = new Rectangle (x, 0, 10, 10);
 
         var view = new View ();
-        view.BorderStyle = LineStyle.Single;
+        view.Border.Thickness = new (1);
         view.Frame = frame;
 
         // Act
-        var screen = view.FrameToScreen ();
+        var marginScreen = view.Margin.FrameToScreen ();
+        var borderScreen = view.Border.FrameToScreen ();
+        var paddingScreen = view.Padding.FrameToScreen ();
 
         // Assert
-        Assert.Equal (expectedX, screen.X);
+        Assert.Equal (expectedX, marginScreen.X);
+        Assert.Equal (expectedX + view.Margin.Thickness.Left, borderScreen.X);
+        Assert.Equal (expectedX + view.Border.Thickness.Left, paddingScreen.X);
     }
 
     [Theory]
@@ -80,10 +88,14 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.FrameToScreen ();
+        var marginScreen = view.Margin.FrameToScreen ();
+        var borderScreen = view.Border.FrameToScreen ();
+        var paddingScreen = view.Padding.FrameToScreen ();
 
         // Assert
-        Assert.Equal (expectedX, screen.X);
+        Assert.Equal (expectedX, marginScreen.X);
+        Assert.Equal (expectedX + view.Margin.Thickness.Left, borderScreen.X);
+        Assert.Equal (expectedX + view.Border.Thickness.Left, paddingScreen.X);
     }
 
     [Theory]
@@ -104,7 +116,7 @@ public class ToScreenTests (ITestOutputHelper output)
             Height = Dim.Fill (),
             Width = Dim.Fill ()
         };
-        superView.BorderStyle = LineStyle.Single;
+        superView.Border.Thickness = new (1);
 
         var view = new View ();
         view.Frame = frame;
@@ -113,10 +125,14 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.FrameToScreen ();
+        var marginScreen = view.Margin.FrameToScreen ();
+        var borderScreen = view.Border.FrameToScreen ();
+        var paddingScreen = view.Padding.FrameToScreen ();
 
         // Assert
-        Assert.Equal (expectedX, screen.X);
+        Assert.Equal (expectedX, marginScreen.X);
+        Assert.Equal (expectedX + view.Margin.Thickness.Left, borderScreen.X);
+        Assert.Equal (expectedX + view.Border.Thickness.Left, paddingScreen.X);
     }
 
     [Theory]
@@ -155,10 +171,14 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.FrameToScreen ();
+        var marginScreen = view.Margin.FrameToScreen ();
+        var borderScreen = view.Border.FrameToScreen ();
+        var paddingScreen = view.Padding.FrameToScreen ();
 
         // Assert
-        Assert.Equal (expectedX, screen.X);
+        Assert.Equal (expectedX, marginScreen.X);
+        Assert.Equal (expectedX + view.Margin.Thickness.Left, borderScreen.X);
+        Assert.Equal (expectedX + view.Border.Thickness.Left, paddingScreen.X);
     }
 
     [Theory]
@@ -179,7 +199,7 @@ public class ToScreenTests (ITestOutputHelper output)
             Height = Dim.Fill (),
             Width = Dim.Fill ()
         };
-        superSuperView.BorderStyle = LineStyle.Single;
+        superSuperView.Border.Thickness = new (1);
 
         var superView = new View ()
         {
@@ -190,7 +210,7 @@ public class ToScreenTests (ITestOutputHelper output)
         };
 
         superSuperView.Add (superView);
-        superView.BorderStyle = LineStyle.Single;
+        superView.Border.Thickness = new (1);
 
         var view = new View ();
         view.Frame = frame;
@@ -199,10 +219,14 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.FrameToScreen ();
+        var marginScreen = view.Margin.FrameToScreen ();
+        var borderScreen = view.Border.FrameToScreen ();
+        var paddingScreen = view.Padding.FrameToScreen ();
 
         // Assert
-        Assert.Equal (expectedX, screen.X);
+        Assert.Equal (expectedX, marginScreen.X);
+        Assert.Equal (expectedX + view.Margin.Thickness.Left, borderScreen.X);
+        Assert.Equal (expectedX + view.Border.Thickness.Left, paddingScreen.X);
     }
 
 
@@ -222,27 +246,31 @@ public class ToScreenTests (ITestOutputHelper output)
         view.Frame = frame;
 
         // Act
-        var screen = view.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var marginScreen = view.Margin.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var borderScreen = view.Border.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var paddingScreen = view.Padding.BoundsToScreen (new (boundsX, 0, 0, 0));
 
         // Assert
-        Assert.Equal (expectedX, screen.X);
+        Assert.Equal (expectedX, marginScreen.X);
+        Assert.Equal (expectedX + view.Margin.Thickness.Left, borderScreen.X);
+        Assert.Equal (expectedX + view.Border.Thickness.Left, paddingScreen.X);
     }
 
     [Theory]
-    [InlineData (0, 0, 1)]
-    [InlineData (1, 0, 2)]
-    [InlineData (-1, 0, 0)]
-    [InlineData (11, 0, 12)]
+    [InlineData (0, 0, 0)]
+    [InlineData (1, 0, 1)]
+    [InlineData (-1, 0, -1)]
+    [InlineData (11, 0, 11)]
 
-    [InlineData (0, 1, 2)]
-    [InlineData (1, 1, 3)]
-    [InlineData (-1, 1, 1)]
-    [InlineData (11, 1, 13)]
+    [InlineData (0, 1, 1)]
+    [InlineData (1, 1, 2)]
+    [InlineData (-1, 1, 0)]
+    [InlineData (11, 1, 12)]
 
-    [InlineData (0, -1, 0)]
-    [InlineData (1, -1, 1)]
-    [InlineData (-1, -1, -1)]
-    [InlineData (11, -1, 11)]
+    [InlineData (0, -1, -1)]
+    [InlineData (1, -1, 0)]
+    [InlineData (-1, -1, -2)]
+    [InlineData (11, -1, 10)]
     public void BoundsToScreen_NoSuperView_WithAdornments (int frameX, int boundsX, int expectedX)
     {
         // We test with only X because Y is equivalent. Height/Width are irrelevant.
@@ -250,14 +278,18 @@ public class ToScreenTests (ITestOutputHelper output)
         var frame = new Rectangle (frameX, 0, 10, 10);
 
         var view = new View ();
-        view.BorderStyle = LineStyle.Single;
+        view.Border.Thickness = new (1);
         view.Frame = frame;
 
         // Act
-        var screen = view.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var marginScreen = view.Margin.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var borderScreen = view.Border.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var paddingScreen = view.Padding.BoundsToScreen (new (boundsX, 0, 0, 0));
 
         // Assert
-        Assert.Equal (expectedX, screen.X);
+        Assert.Equal (expectedX, marginScreen.X);
+        Assert.Equal (expectedX, borderScreen.X);
+        Assert.Equal (expectedX, paddingScreen.X);
     }
 
     [Theory]
@@ -296,10 +328,14 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var marginScreen = view.Margin.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var borderScreen = view.Border.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var paddingScreen = view.Padding.BoundsToScreen (new (boundsX, 0, 0, 0));
 
         // Assert
-        Assert.Equal (expectedX, screen.X);
+        Assert.Equal (expectedX, marginScreen.X);
+        Assert.Equal (expectedX + view.Margin.Thickness.Left, borderScreen.X);
+        Assert.Equal (expectedX + view.Border.Thickness.Left, paddingScreen.X);
     }
 
     [Theory]
@@ -330,7 +366,7 @@ public class ToScreenTests (ITestOutputHelper output)
             Height = Dim.Fill (),
             Width = Dim.Fill ()
         };
-        superView.BorderStyle = LineStyle.Single;
+        superView.Border.Thickness = new (1);
 
         var view = new View ();
         view.Frame = frame;
@@ -339,10 +375,14 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var marginScreen = view.Margin.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var borderScreen = view.Border.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var paddingScreen = view.Padding.BoundsToScreen (new (boundsX, 0, 0, 0));
 
         // Assert
-        Assert.Equal (expectedX, screen.X);
+        Assert.Equal (expectedX, marginScreen.X);
+        Assert.Equal (expectedX + view.Margin.Thickness.Left, borderScreen.X);
+        Assert.Equal (expectedX + view.Border.Thickness.Left, paddingScreen.X);
     }
 
     [Theory]
@@ -391,10 +431,14 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var marginScreen = view.Margin.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var borderScreen = view.Border.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var paddingScreen = view.Padding.BoundsToScreen (new (boundsX, 0, 0, 0));
 
         // Assert
-        Assert.Equal (expectedX, screen.X);
+        Assert.Equal (expectedX, marginScreen.X);
+        Assert.Equal (expectedX + view.Margin.Thickness.Left, borderScreen.X);
+        Assert.Equal (expectedX + view.Border.Thickness.Left, paddingScreen.X);
     }
 
     [Theory]
@@ -425,7 +469,7 @@ public class ToScreenTests (ITestOutputHelper output)
             Height = Dim.Fill (),
             Width = Dim.Fill ()
         };
-        superSuperView.BorderStyle = LineStyle.Single;
+        superSuperView.Border.Thickness = new (1);
 
         var superView = new View ()
         {
@@ -436,7 +480,7 @@ public class ToScreenTests (ITestOutputHelper output)
         };
 
         superSuperView.Add (superView);
-        superView.BorderStyle = LineStyle.Single;
+        superView.Border.Thickness = new (1);
 
         var view = new View ();
         view.Frame = frame;
@@ -445,10 +489,14 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var marginScreen = view.Margin.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var borderScreen = view.Border.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var paddingScreen = view.Padding.BoundsToScreen (new (boundsX, 0, 0, 0));
 
         // Assert
-        Assert.Equal (expectedX, screen.X);
+        Assert.Equal (expectedX, marginScreen.X);
+        Assert.Equal (expectedX + view.Margin.Thickness.Left, borderScreen.X);
+        Assert.Equal (expectedX + view.Border.Thickness.Left, paddingScreen.X);
     }
 
 }
