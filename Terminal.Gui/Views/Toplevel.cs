@@ -360,7 +360,7 @@ public partial class Toplevel : View
         {
             //Driver.SetAttribute (GetNormalColor ());
             // TODO: It's bad practice for views to always clear. Defeats the purpose of clipping etc...
-            ClearFrame ();
+            Clear ();
             LayoutSubviews ();
             PositionToplevels ();
 

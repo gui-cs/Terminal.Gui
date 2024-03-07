@@ -102,26 +102,6 @@ public partial class View
         Driver.SetAttribute (prev);
     }
 
-    /// <summary>Clears the entire view (<see cref="Frame"/>) with the normal background color.</summary>
-    /// <remarks>
-    ///     <para>This method will clear the area occupied by the <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>, as
-    ///     well as the <see cref="Bounds"/>. Use <see cref="Clear()"/> to clear just the <see cref="Bounds"/>.</para>
-    /// </remarks>
-    public void ClearFrame ()
-    {
-        if (IsInitialized)
-        {
-            if (Driver is null)
-            {
-                return;
-            }
-
-            Attribute prev = Driver.SetAttribute (GetNormalColor ());
-            Driver.FillRect (FrameToScreen ());
-            Driver.SetAttribute (prev);
-        }
-    }
-
     /// <summary>Expands the <see cref="ConsoleDriver"/>'s clip region to include <see cref="Bounds"/>.</summary>
     /// <returns>
     ///     The current screen-relative clip region, which can be then re-applied by setting

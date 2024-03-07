@@ -11,39 +11,6 @@ public class DrawTests
     public DrawTests (ITestOutputHelper output) { _output = output; }
 
     [Theory]
-    [InlineData (0, 0, 2, 2)]
-    [SetupFakeDriver]
-    public void ClearFrame_Clears_Frame (int x, int y, int width, int height)
-    {
-        var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
-
-        var view = new View
-        {
-            X = x, Y = y,
-            Width = width, Height = height,
-            BorderStyle = LineStyle.Single
-        };
-        superView.Add (view);
-        superView.BeginInit ();
-        superView.EndInit ();
-        superView.LayoutSubviews ();
-
-        superView.Draw ();
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌┐
-└┘",
-                                                      _output);
-
-        view.ClearFrame ();
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"",
-                                                      _output);
-
-    }
-
-    [Theory]
     [InlineData (0, 0, 1, 1)]
     [InlineData (0, 0, 2, 2)]
     [InlineData (-1, -1, 2, 2)]
