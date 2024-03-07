@@ -110,6 +110,13 @@ public class Thickness : IEquatable<Thickness>
         return new Thickness (Left + other.Left, Top + other.Top, Right + other.Right, Bottom + other.Bottom);
     }
 
+    /// <summary>
+    /// Adds the thickness widths of another <see cref="Thickness"/> to another <see cref="Thickness"/>.
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static Thickness operator + (Thickness a, Thickness b) { return a.Add (b); }
 
     /// <summary>Draws the <see cref="Thickness"/> rectangle with an optional diagnostics label.</summary>
     /// <remarks>

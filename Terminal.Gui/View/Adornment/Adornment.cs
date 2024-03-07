@@ -30,15 +30,6 @@ public class Adornment : View
     /// <param name="parent"></param>
     public Adornment (View parent) { Parent = parent; }
 
-    ///// <summary>
-    /////     Helper to get the X and Y offset of the Bounds from the Adornment Frame. This is the Left and Top properties
-    /////     of <see cref="Thickness"/>.
-    ///// </summary>
-    //public override Point GetBoundsOffset ()
-    //{
-    //    return new (Thickness.Left, Thickness.Top);
-    //}
-
     /// <summary>
     /// Gets the rectangle that describes the area of the Adornment. The Location is always (0,0).
     /// The size is the size of the Frame 
@@ -47,6 +38,7 @@ public class Adornment : View
     {
         get => new (Point.Empty, Frame.Size);
         // QUESTION: So why even have a setter then?
+        // ANSWER: Because this is an override of a base class property, and the base class has a setter.
         set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
     }
 
@@ -103,7 +95,7 @@ public class Adornment : View
         }
 
         // Adornments are *Children* of a View, not SubViews. Thus View.FrameToScreen will not work.
-        // To get the screen-relative coordinates of a Adornment, we need get the parent's Frame
+        // To get the screen-relative coordinates of an Adornment, we need get the parent's Frame
         // in screen coords, and add our Frame location to it.
         Rectangle parent = Parent.FrameToScreen ();
         return new (new (parent.X + Frame.X, parent.Y + Frame.Y), Frame.Size);

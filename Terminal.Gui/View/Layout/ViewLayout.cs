@@ -86,8 +86,8 @@ public partial class View
     }
 
     /// <summary>
-    ///     The adornment (specified as a <see cref="Thickness"/>) inside of the view that offsets the
-    ///     <see cref="Bounds"/> from the <see cref="Margin"/>. The Border provides the space for a visual border (drawn using
+    ///     The <see cref="Adornment"/> that offsets the <see cref="Bounds"/> from the <see cref="Margin"/>.
+    ///     The Border provides the space for a visual border (drawn using
     ///     line-drawing glyphs) and the Title. The Border expands inward; in other words if `Border.Thickness.Top == 2` the
     ///     border and title will take up the first row and the second row will be filled with spaces.
     /// </summary>
@@ -181,7 +181,7 @@ public partial class View
                 return Rectangle.Empty with { Size = Frame.Size };
             }
 
-            Thickness totalThickness = Margin.Thickness.Add (Border.Thickness.Add (Padding.Thickness));
+            Thickness totalThickness = GetAdornmentsThickness ();
             int width = Math.Max (0, Frame.Size.Width - totalThickness.Horizontal);
             int height = Math.Max (0, Frame.Size.Height - totalThickness.Vertical);
 
@@ -199,20 +199,10 @@ public partial class View
                                 );
             }
 #endif // DEBUG
-            Thickness totalThickness = Margin.Thickness.Add (Border.Thickness.Add (Padding.Thickness));
+            Thickness totalThickness = GetAdornmentsThickness ();
             Frame = Frame with
             {
-                Size =
-                new (
-                     value.Size.Width + totalThickness.Horizontal,
-                     //+ Margin.Thickness.Horizontal
-                     //+ Border.Thickness.Horizontal
-                     //+ Padding.Thickness.Horizontal,
-                     value.Size.Height + totalThickness.Vertical
-                     //+ Margin.Thickness.Vertical
-                     //+ Border.Thickness.Vertical
-                     //+ Padding.Thickness.Vertical
-                    )
+                Size = new (value.Size.Width + totalThickness.Horizontal, value.Size.Height + totalThickness.Vertical)
             };
         }
     }
@@ -343,7 +333,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     The frame (specified as a <see cref="Thickness"/>) that separates a View from other SubViews of the same
+    ///     The <see cref="Adornment"/> that that separates a View from other SubViews of the same
     ///     SuperView. The margin offsets the <see cref="Bounds"/> from the <see cref="Frame"/>.
     /// </summary>
     /// <remarks>
@@ -360,7 +350,7 @@ public partial class View
     public Margin Margin { get; private set; }
 
     /// <summary>
-    ///     The frame (specified as a <see cref="Thickness"/>) inside of the view that offsets the <see cref="Bounds"/>
+    ///     The <see cref="Adornment"/> inside of the view that offsets the <see cref="Bounds"/>
     ///     from the <see cref="Border"/>.
     /// </summary>
     /// <remarks>
@@ -589,12 +579,7 @@ public partial class View
     /// <returns>A thickness that describes the sum of the Adornments' thicknesses.</returns>
     public Thickness GetAdornmentsThickness ()
     {
-        int left = Margin.Thickness.Left + Border.Thickness.Left + Padding.Thickness.Left;
-        int top = Margin.Thickness.Top + Border.Thickness.Top + Padding.Thickness.Top;
-        int right = Margin.Thickness.Right + Border.Thickness.Right + Padding.Thickness.Right;
-        int bottom = Margin.Thickness.Bottom + Border.Thickness.Bottom + Padding.Thickness.Bottom;
-
-        return new (left, top, right, bottom);
+        return Margin.Thickness + Border.Thickness + Padding.Thickness;
     }
 
     /// <summary>
