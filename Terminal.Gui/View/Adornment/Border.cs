@@ -98,7 +98,7 @@ public class Border : Adornment
         }
         set => _lineStyle = value;
     }
-    
+
     /// <inheritdoc/>
     public override void OnDrawContent (Rectangle contentArea)
     {
@@ -147,12 +147,13 @@ public class Border : Adornment
         int titleY = borderBounds.Y;
         var titleBarsLength = 0; // the little vertical thingies
 
-        int maxTitleWidth = Math.Max (0,
+        int maxTitleWidth = Math.Max (
+                                      0,
                                       Math.Min (
-                                          Parent.TitleTextFormatter.FormatAndGetSize ().Width,
-                                          Math.Min (screenBounds.Width - 4, borderBounds.Width - 4)
-                                          )
-                                      );
+                                                Parent.TitleTextFormatter.FormatAndGetSize ().Width,
+                                                Math.Min (screenBounds.Width - 4, borderBounds.Width - 4)
+                                               )
+                                     );
         Parent.TitleTextFormatter.Size = new (maxTitleWidth, 1);
 
         int sideLineLength = borderBounds.Height;
@@ -192,7 +193,8 @@ public class Border : Adornment
 
         if (canDrawBorder && Thickness.Top > 0 && maxTitleWidth > 0 && !string.IsNullOrEmpty (Parent?.Title))
         {
-            Parent.TitleTextFormatter.Draw (new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
+            Parent.TitleTextFormatter.Draw (
+                                            new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
                                             Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor (),
                                             Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetHotNormalColor ());
         }
@@ -225,7 +227,7 @@ public class Border : Adornment
                 {
                     // ╔╡╞╗ should be ╔══╗
                     lc.AddLine (
-                                new Point (borderBounds.Location.X, titleY),
+                                new (borderBounds.Location.X, titleY),
                                 borderBounds.Width,
                                 Orientation.Horizontal,
                                 LineStyle,
@@ -240,7 +242,7 @@ public class Border : Adornment
                     if (Thickness.Top == 2)
                     {
                         lc.AddLine (
-                                    new Point (borderBounds.X + 1, topTitleLineY),
+                                    new (borderBounds.X + 1, topTitleLineY),
                                     Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                     Orientation.Horizontal,
                                     LineStyle,
@@ -254,7 +256,7 @@ public class Border : Adornment
                     if (borderBounds.Width >= 4 && Thickness.Top > 2)
                     {
                         lc.AddLine (
-                                    new Point (borderBounds.X + 1, topTitleLineY),
+                                    new (borderBounds.X + 1, topTitleLineY),
                                     Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                     Orientation.Horizontal,
                                     LineStyle,
@@ -262,7 +264,7 @@ public class Border : Adornment
                                    );
 
                         lc.AddLine (
-                                    new Point (borderBounds.X + 1, topTitleLineY + 2),
+                                    new (borderBounds.X + 1, topTitleLineY + 2),
                                     Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                     Orientation.Horizontal,
                                     LineStyle,
@@ -273,7 +275,7 @@ public class Border : Adornment
                     // ╔╡Title╞═════╗
                     // Add a short horiz line for ╔╡
                     lc.AddLine (
-                                new Point (borderBounds.Location.X, titleY),
+                                new (borderBounds.Location.X, titleY),
                                 2,
                                 Orientation.Horizontal,
                                 LineStyle,
@@ -282,7 +284,7 @@ public class Border : Adornment
 
                     // Add a vert line for ╔╡
                     lc.AddLine (
-                                new Point (borderBounds.X + 1, topTitleLineY),
+                                new (borderBounds.X + 1, topTitleLineY),
                                 titleBarsLength,
                                 Orientation.Vertical,
                                 LineStyle.Single,
@@ -291,13 +293,13 @@ public class Border : Adornment
 
                     // Add a vert line for ╞
                     lc.AddLine (
-                                new Point (
-                                           borderBounds.X
-                                           + 1
-                                           + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2)
-                                           - 1,
-                                           topTitleLineY
-                                          ),
+                                new (
+                                     borderBounds.X
+                                     + 1
+                                     + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2)
+                                     - 1,
+                                     topTitleLineY
+                                    ),
                                 titleBarsLength,
                                 Orientation.Vertical,
                                 LineStyle.Single,
@@ -306,13 +308,13 @@ public class Border : Adornment
 
                     // Add the right hand line for ╞═════╗
                     lc.AddLine (
-                                new Point (
-                                           borderBounds.X
-                                           + 1
-                                           + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2)
-                                           - 1,
-                                           titleY
-                                          ),
+                                new (
+                                     borderBounds.X
+                                     + 1
+                                     + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2)
+                                     - 1,
+                                     titleY
+                                    ),
                                 borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                 Orientation.Horizontal,
                                 LineStyle,
@@ -324,7 +326,7 @@ public class Border : Adornment
             if (drawLeft)
             {
                 lc.AddLine (
-                            new Point (borderBounds.Location.X, titleY),
+                            new (borderBounds.Location.X, titleY),
                             sideLineLength,
                             Orientation.Vertical,
                             LineStyle,
@@ -335,7 +337,7 @@ public class Border : Adornment
             if (drawBottom)
             {
                 lc.AddLine (
-                            new Point (borderBounds.X, borderBounds.Y + borderBounds.Height - 1),
+                            new (borderBounds.X, borderBounds.Y + borderBounds.Height - 1),
                             borderBounds.Width,
                             Orientation.Horizontal,
                             LineStyle,
@@ -346,7 +348,7 @@ public class Border : Adornment
             if (drawRight)
             {
                 lc.AddLine (
-                            new Point (borderBounds.X + borderBounds.Width - 1, titleY),
+                            new (borderBounds.X + borderBounds.Width - 1, titleY),
                             sideLineLength,
                             Orientation.Vertical,
                             LineStyle,
@@ -365,13 +367,14 @@ public class Border : Adornment
 
                 if (drawTop)
                 {
-                    hruler.Draw (new Point (screenBounds.X, screenBounds.Y));
+                    hruler.Draw (new (screenBounds.X, screenBounds.Y));
                 }
 
                 // Redraw title 
                 if (drawTop && maxTitleWidth > 0 && !string.IsNullOrEmpty (Parent?.Title))
                 {
-                    Parent.TitleTextFormatter.Draw (new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
+                    Parent.TitleTextFormatter.Draw (
+                                                    new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
                                                     Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor (),
                                                     Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor ());
                 }
@@ -381,19 +384,19 @@ public class Border : Adornment
 
                 if (drawLeft)
                 {
-                    vruler.Draw (new Point (screenBounds.X, screenBounds.Y + 1), 1);
+                    vruler.Draw (new (screenBounds.X, screenBounds.Y + 1), 1);
                 }
 
                 // Bottom
                 if (drawBottom)
                 {
-                    hruler.Draw (new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1));
+                    hruler.Draw (new (screenBounds.X, screenBounds.Y + screenBounds.Height - 1));
                 }
 
                 // Right
                 if (drawRight)
                 {
-                    vruler.Draw (new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y + 1), 1);
+                    vruler.Draw (new (screenBounds.X + screenBounds.Width - 1, screenBounds.Y + 1), 1);
                 }
             }
         }
