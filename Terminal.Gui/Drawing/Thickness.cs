@@ -100,6 +100,17 @@ public class Thickness : IEquatable<Thickness>
         return outside.Contains (x, y) && !inside.Contains (x, y);
     }
 
+    /// <summary>
+    /// Adds the thickness widths of another <see cref="Thickness"/> to the current <see cref="Thickness"/>, returning a new <see cref="Thickness"/>.
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public Thickness Add (Thickness other)
+    {
+        return new Thickness (Left + other.Left, Top + other.Top, Right + other.Right, Bottom + other.Bottom);
+    }
+
+
     /// <summary>Draws the <see cref="Thickness"/> rectangle with an optional diagnostics label.</summary>
     /// <remarks>
     ///     If <see cref="ConsoleDriver.DiagnosticFlags"/> is set to

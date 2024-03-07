@@ -785,4 +785,95 @@ public class ThicknessTests
         Assert.Equal (0, t.Bottom);
         Assert.Equal (0, t.Horizontal);
     }
+
+    // Test Thickness.Add
+    [Theory]
+    [InlineData (
+                    1,
+                    2,
+                    3,
+                    4,
+                    1,
+                    2,
+                    3,
+                    4,
+                    2,
+                    4,
+                    6,
+                    8)]
+    [InlineData (
+                    1,
+                    2,
+                    3,
+                    4,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    2,
+                    3,
+                    4)]
+    [InlineData (
+                    1,
+                    2,
+                    3,
+                    4,
+                    -1,
+                    -2,
+                    -3,
+                    -4,
+                    0,
+                    0,
+                    0,
+                    0)]
+    [InlineData (
+                    1,
+                    2,
+                    3,
+                    4,
+                    1,
+                    1,
+                    1,
+                    1,
+                    2,
+                    3,
+                    4,
+                    5)]
+    [InlineData (
+                    1,
+                    2,
+                    3,
+                    4,
+                    1,
+                    1,
+                    1,
+                    1,
+                    2,
+                    3,
+                    4,
+                    5)]
+    public void AddTest (
+        int left,
+        int top,
+        int right,
+        int bottom,
+        int left2,
+        int top2,
+        int right2,
+        int bottom2,
+        int expectedLeft,
+        int expectedTop,
+        int expectedRight,
+        int expectedBottom
+    )
+    {
+        var t = new Thickness (left, top, right, bottom);
+        var t2 = new Thickness (left2, top2, right2, bottom2);
+        var result = t.Add (t2);
+        Assert.Equal (expectedLeft, result.Left);
+        Assert.Equal (expectedTop, result.Top);
+        Assert.Equal (expectedRight, result.Right);
+        Assert.Equal (expectedBottom, result.Bottom);
+    }
 }

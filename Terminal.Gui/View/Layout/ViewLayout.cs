@@ -181,8 +181,9 @@ public partial class View
                 return Rectangle.Empty with { Size = Frame.Size };
             }
 
-            int width = Math.Max (0, Frame.Size.Width - Margin.Thickness.Horizontal - Border.Thickness.Horizontal - Padding.Thickness.Horizontal);
-            int height = Math.Max (0, Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical);
+            Thickness totalThickness = Margin.Thickness.Add (Border.Thickness.Add (Padding.Thickness));
+            int width = Math.Max (0, Frame.Size.Width - totalThickness.Horizontal);
+            int height = Math.Max (0, Frame.Size.Height - totalThickness.Vertical);
 
             return Rectangle.Empty with { Size = new (width, height) };
         }
@@ -198,18 +199,19 @@ public partial class View
                                 );
             }
 #endif // DEBUG
+            Thickness totalThickness = Margin.Thickness.Add (Border.Thickness.Add (Padding.Thickness));
             Frame = Frame with
             {
                 Size =
                 new (
-                     value.Size.Width
-                     + Margin.Thickness.Horizontal
-                     + Border.Thickness.Horizontal
-                     + Padding.Thickness.Horizontal,
-                     value.Size.Height
-                     + Margin.Thickness.Vertical
-                     + Border.Thickness.Vertical
-                     + Padding.Thickness.Vertical
+                     value.Size.Width + totalThickness.Horizontal,
+                     //+ Margin.Thickness.Horizontal
+                     //+ Border.Thickness.Horizontal
+                     //+ Padding.Thickness.Horizontal,
+                     value.Size.Height + totalThickness.Vertical
+                     //+ Margin.Thickness.Vertical
+                     //+ Border.Thickness.Vertical
+                     //+ Padding.Thickness.Vertical
                     )
             };
         }
