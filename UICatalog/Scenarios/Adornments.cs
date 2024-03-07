@@ -11,6 +11,8 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Borders")]
 public class Adornments : Scenario
 {
+    private ConsoleDriver.DiagnosticFlags _diagnosticFlags;
+
     public override void Init ()
     {
         Application.Init ();
@@ -112,6 +114,7 @@ public class Adornments : Scenario
                                 view.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Window Close Button Pressed!", "Ok");
                             };
 
+        Application.Top.Closed += (s, e) => ConsoleDriver.Diagnostics = _diagnosticFlags;
 
         Application.Run (editor);
         Application.Shutdown ();
@@ -431,7 +434,7 @@ public class Adornments : Scenario
                                              if (e.NewValue == true)
                                              {
                                                  ConsoleDriver.Diagnostics =
-                                                     ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler;
+                                                     ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.HighlightAdornmentOnMouseEnter;
                                              }
                                              else
                                              {

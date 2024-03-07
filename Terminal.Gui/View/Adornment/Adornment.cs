@@ -39,6 +39,7 @@ public class Adornment : View
         Parent = parent;
     }
 
+
     /// <summary>
     ///     Gets the rectangle that describes the area of the Adornment. The Location is always (0,0).
     ///     The size is the size of the Frame
@@ -324,5 +325,33 @@ public class Adornment : View
         {
             e.Cancel = true;
         }
+    }
+
+    protected internal override bool OnMouseEnter (MouseEvent mouseEvent)
+    {
+        // Invert Normal
+        if (ConsoleDriver.Diagnostics.HasFlag(ConsoleDriver.DiagnosticFlags.HighlightAdornmentOnMouseEnter) && ColorScheme != null)
+        {
+            var cs = new ColorScheme (ColorScheme) 
+            { 
+                Normal = new Attribute (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground) 
+            };
+            ColorScheme = cs;
+        }
+        return base.OnMouseEnter (mouseEvent);
+    }
+
+    protected internal override bool OnMouseLeave (MouseEvent mouseEvent)
+    {
+        // Invert Normal
+        if (ConsoleDriver.Diagnostics.HasFlag (ConsoleDriver.DiagnosticFlags.HighlightAdornmentOnMouseEnter) && ColorScheme != null)
+        {
+            var cs = new ColorScheme (ColorScheme)
+            {
+                Normal = new Attribute (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground)
+            };
+            ColorScheme= cs;
+        }
+        return base.OnMouseLeave (mouseEvent);
     }
 }
