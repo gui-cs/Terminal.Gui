@@ -102,9 +102,10 @@ public partial class View
         Driver.SetAttribute (prev);
     }
 
-    /// <summary>Clears the <see cref="Frame"/> with the normal background color.</summary>
+    /// <summary>Clears the entire view (<see cref="Frame"/>) with the normal background color.</summary>
     /// <remarks>
-    ///     <para>This clears the Bounds used by this view.</para>
+    ///     <para>This method will clear the area occupied by the <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>, as
+    ///     well as the <see cref="Bounds"/>. Use <see cref="Clear()"/> to clear just the <see cref="Bounds"/>.</para>
     /// </remarks>
     public void ClearFrame ()
     {
