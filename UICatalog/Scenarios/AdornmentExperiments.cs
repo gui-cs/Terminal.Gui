@@ -16,7 +16,7 @@ public class AdornmentExperiments : Scenario
         Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
 
         _diagnosticFlags = View.Diagnostics;
-        View.Diagnostics = ViewDiagnosticFlags.MouseEnter;
+        //View.Diagnostics = ViewDiagnosticFlags.MouseEnter;
     }
 
     private View _frameView;
