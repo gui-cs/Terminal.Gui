@@ -80,6 +80,28 @@ public partial class View
         Driver.AddRune (ch);
     }
 
+    /// <summary>Clears <see cref="Bounds"/> with the normal background.</summary>
+    /// <remarks></remarks>
+    public void Clear () { Clear (Bounds); }
+
+    /// <summary>Clears the specified <see cref="Bounds"/>-relative rectangle with the normal background.</summary>
+    /// <remarks></remarks>
+    /// <param name="contentArea">The Bounds-relative rectangle to clear.</param>
+    public void Clear (Rectangle contentArea)
+    {
+        if (Driver is null)
+        {
+            return;
+        }
+
+        Attribute prev = Driver.SetAttribute (GetNormalColor ());
+
+        // Clamp the region to the bounds of the view
+        contentArea = Rectangle.Intersect (contentArea, Bounds);
+        Driver.FillRect (BoundsToScreen (contentArea));
+        Driver.SetAttribute (prev);
+    }
+
     /// <summary>Clears the <see cref="Frame"/> with the normal background color.</summary>
     /// <remarks>
     ///     <para>This clears the Bounds used by this view.</para>
@@ -94,33 +116,9 @@ public partial class View
             }
 
             Attribute prev = Driver.SetAttribute (GetNormalColor ());
-            Driver.FillRect (FrameToScreen());
+            Driver.FillRect (FrameToScreen ());
             Driver.SetAttribute (prev);
         }
-    }
-
-    /// <summary>Clears <see cref="Bounds"/> with the normal background.</summary>
-    /// <remarks></remarks>
-    public void Clear ()
-    {
-        Clear (Bounds);
-    }
-
-    /// <summary>Clears the specified <see cref="Bounds"/>-relative rectangle with the normal background.</summary>
-    /// <remarks></remarks>
-    /// <param name="contentArea">The Bounds-relative rectangle to clear.</param>
-    public void Clear (Rectangle contentArea)
-    {
-        if (Driver is null)
-        {
-            return;
-        }
-
-        Attribute prev = Driver.SetAttribute (GetNormalColor ());
-        // Clamp the region to the bounds of the view
-        contentArea = Rectangle.Intersect (contentArea, Bounds);
-        Driver.FillRect (BoundsToScreen(contentArea));
-        Driver.SetAttribute (prev);
     }
 
     /// <summary>Expands the <see cref="ConsoleDriver"/>'s clip region to include <see cref="Bounds"/>.</summary>
@@ -294,7 +292,7 @@ public partial class View
 
         if (ColorScheme is null)
         {
-            cs = new ColorScheme ();
+            cs = new ();
         }
 
         return Enabled ? cs.Focus : cs.Disabled;
@@ -312,7 +310,7 @@ public partial class View
 
         if (ColorScheme is null)
         {
-            cs = new ColorScheme ();
+            cs = new ();
         }
 
         return Enabled ? cs.HotNormal : cs.Disabled;
@@ -330,7 +328,7 @@ public partial class View
 
         if (ColorScheme is null)
         {
-            cs = new ColorScheme ();
+            cs = new ();
         }
 
         return Enabled ? cs.Normal : cs.Disabled;
@@ -447,7 +445,7 @@ public partial class View
     ///     This method will be called after any subviews removed with <see cref="Remove(View)"/> have been completed
     ///     drawing.
     /// </remarks>
-    public virtual void OnDrawContentComplete (Rectangle contentArea) { DrawContentComplete?.Invoke (this, new DrawEventArgs (contentArea)); }
+    public virtual void OnDrawContentComplete (Rectangle contentArea) { DrawContentComplete?.Invoke (this, new (contentArea)); }
 
     // TODO: Make this cancelable
     /// <summary>
