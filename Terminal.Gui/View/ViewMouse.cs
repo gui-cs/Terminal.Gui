@@ -9,6 +9,14 @@ public partial class View
     /// <value><see langword="true"/> if want mouse position reports; otherwise, <see langword="false"/>.</value>
     public virtual bool WantMousePositionReports { get; set; }
 
+    /// <summary>Event fired when a mouse event occurs.</summary>
+    /// <remarks>
+    /// <para>
+    /// The coordinates are relative to <see cref="View.Bounds"/>.
+    /// </para>
+    /// </remarks>
+    public event EventHandler<MouseEventEventArgs> MouseEvent;
+
     /// <summary>Event fired when a mouse click occurs.</summary>
     /// <remarks>
     /// <para>
@@ -123,7 +131,9 @@ public partial class View
             return OnMouseClick (args);
         }
 
-        return false;
+        MouseEvent?.Invoke (this, args);
+
+        return args.Handled == true;
     }
 
     /// <summary>Invokes the MouseClick event.</summary>

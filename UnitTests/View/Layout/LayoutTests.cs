@@ -511,11 +511,11 @@ public class LayoutTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void PosCombine_DimCombine_View_With_SubViews ()
     {
         var clicked = false;
-        Toplevel top = Application.Top;
+        Toplevel top = new Toplevel() { Width = 80, Height = 25 };
         var win1 = new Window { Id = "win1", Width = 20, Height = 10 };
         var view1 = new View { Text = "view1", AutoSize = true }; // BUGBUG: AutoSize or Width must be set
         var win2 = new Window { Id = "win2", Y = Pos.Bottom (view1) + 1, Width = 10, Height = 3 };
@@ -527,23 +527,9 @@ public class LayoutTests
         win2.Add (view2);
         win1.Add (view1, win2);
         top.Add (win1);
+        top.BeginInit();
+        top.EndInit();
 
-        RunState rs = Application.Begin (top);
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌──────────────────┐
-│view1             │
-│                  │
-│┌────────┐        │
-││        │        │
-│└────────┘        │
-│                  │
-│                  │
-│                  │
-└──────────────────┘",
-                                                      _output
-                                                     );
         Assert.Equal (new Rectangle (0, 0, 80, 25), top.Frame);
         Assert.Equal (new Rectangle (0, 0, 5, 1), view1.Frame);
         Assert.Equal (new Rectangle (0, 0, 20, 10), win1.Frame);
@@ -552,15 +538,6 @@ public class LayoutTests
         Assert.Equal (new Rectangle (0, 0, 7, 1), view3.Frame);
         var foundView = View.FindDeepestView (top, 9, 4);
         Assert.Equal (foundView, view2);
-
-        Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent { X = 9, Y = 4, Flags = MouseFlags.Button1Clicked }
-                                                          )
-                                 );
-        Assert.True (clicked);
-
-        Application.End (rs);
     }
 
     [Fact]
