@@ -64,8 +64,8 @@ public class AllViewsTester : Scenario
                                                 "~F2~ Toggle Frame Ruler",
                                                 () =>
                                                 {
-                                                    ConsoleDriver.Diagnostics ^=
-                                                        ConsoleDriver.DiagnosticFlags.FrameRuler;
+                                                    View.Diagnostics ^=
+                                                        ViewDiagnosticFlags.Ruler;
                                                     Application.Top.SetNeedsDisplay ();
                                                 }
                                                ),
@@ -74,8 +74,8 @@ public class AllViewsTester : Scenario
                                                 "~F3~ Toggle Frame Padding",
                                                 () =>
                                                 {
-                                                    ConsoleDriver.Diagnostics ^=
-                                                        ConsoleDriver.DiagnosticFlags.FramePadding;
+                                                    View.Diagnostics ^=
+                                                        ViewDiagnosticFlags.Padding;
                                                     Application.Top.SetNeedsDisplay ();
                                                 }
                                                )

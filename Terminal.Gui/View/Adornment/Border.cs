@@ -359,8 +359,7 @@ public class Border : Adornment
             Driver.SetAttribute (prevAttr);
 
             // TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
-            if ((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler)
-                == ConsoleDriver.DiagnosticFlags.FrameRuler)
+            if (View.Diagnostics.HasFlag (ViewDiagnosticFlags.Ruler))
             {
                 // Top
                 var hruler = new Ruler { Length = screenBounds.Width, Orientation = Orientation.Horizontal };

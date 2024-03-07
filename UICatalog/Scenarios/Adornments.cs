@@ -400,17 +400,18 @@ public class Adornments : Scenario
                 Add (_paddingEditor);
 
                 _diagCheckBox = new CheckBox { Text = "_Diagnostics", Y = Pos.Bottom (_paddingEditor) };
+                _diagCheckBox.Checked = View.Diagnostics != ViewDiagnosticFlags.Off;
 
                 _diagCheckBox.Toggled += (s, e) =>
                                          {
                                              if (e.NewValue == true)
                                              {
-                                                 ConsoleDriver.Diagnostics =
-                                                     ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler;
+                                                 View.Diagnostics =
+                                                     ViewDiagnosticFlags.Padding | ViewDiagnosticFlags.Ruler;
                                              }
                                              else
                                              {
-                                                 ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+                                                 View.Diagnostics = ViewDiagnosticFlags.Off;
                                              }
                                          };
 
