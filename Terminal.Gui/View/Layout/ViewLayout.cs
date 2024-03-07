@@ -333,7 +333,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     The <see cref="Adornment"/> that that separates a View from other SubViews of the same
+    ///     The <see cref="Adornment"/> that enables separation of a View from other SubViews of the same
     ///     SuperView. The margin offsets the <see cref="Bounds"/> from the <see cref="Frame"/>.
     /// </summary>
     /// <remarks>
