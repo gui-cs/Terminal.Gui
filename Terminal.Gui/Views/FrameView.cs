@@ -19,7 +19,14 @@ public class FrameView : View
 
         //Border.ColorScheme = ColorScheme;
         Border.Data = "Border";
+        MouseClick += FrameView_MouseClick;
     }
+
+    private void FrameView_MouseClick (object sender, MouseEventEventArgs e)
+    {
+        e.Handled = InvokeCommand (Command.HotKey) == true;
+    }
+
 
     /// <summary>
     ///     The default <see cref="LineStyle"/> for <see cref="FrameView"/>'s border. The default is

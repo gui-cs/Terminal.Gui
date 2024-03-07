@@ -120,16 +120,20 @@ public partial class View
     /// </remarks>
     public LineStyle BorderStyle
     {
-        get => Border.LineStyle;
+        get => Border?.LineStyle ?? LineStyle.None;
         set
         {
+            if (Border is null)
+            {
+                return;
+            }
             if (value != LineStyle.None)
             {
-                Border.Thickness = new Thickness (1);
+                Border.Thickness = new (1);
             }
             else
             {
-                Border.Thickness = new Thickness (0);
+                Border.Thickness = new (0);
             }
 
             Border.LineStyle = value;
@@ -240,7 +244,8 @@ public partial class View
     ///     <para>This causes <see cref="LayoutStyle"/> to be <see cref="LayoutStyle.Absolute"/>.</para>
     ///     <para>
     ///         Altering the Frame will eventually (when the view hierarchy is next laid out via  see
-    ///         cref="LayoutSubviews"/>) cause <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/>
+    ///         cref="LayoutSubviews"/>) cause <see cref="LayoutSubview(View, Rectangle)"/> and
+    ///         <see cref="OnDrawContent(Rectangle)"/>
     ///         methods to be called.
     ///     </para>
     /// </remarks>
@@ -440,7 +445,8 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
-    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been called.
+    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been
+    ///         called.
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
@@ -467,7 +473,8 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
-    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been called.
+    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been
+    ///         called.
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
@@ -531,9 +538,16 @@ public partial class View
 
         while (super is { })
         {
+            if (super is Adornment)
+            {
+                // TODO: Move this into Adornment somehow to remove coupling.
+                super.BoundsToScreen (rx, ry, out rx, out ry);
+            }
+
             boundsOffset = super.GetBoundsOffset ();
             rx += super.Frame.X + boundsOffset.X;
             ry += super.Frame.Y + boundsOffset.Y;
+
             super = super.SuperView;
         }
 
@@ -550,15 +564,12 @@ public partial class View
     /// <param name="start">The superview where to look for.</param>
     /// <param name="x">The column location in the superview.</param>
     /// <param name="y">The row location in the superview.</param>
-    /// <param name="findAdornments">TODO: Remove this in PR #3273</param>
     /// <returns>
     ///     The view that was found at the <paramref name="x"/> and <paramref name="y"/> coordinates.
     ///     <see langword="null"/> if no view was found.
     /// </returns>
-
-    // CONCURRENCY: This method is not thread-safe.
-    // Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
-    public static View? FindDeepestView (View? start, int x, int y, bool findAdornments = false)
+    // CONCURRENCY: This method is not thread-safe. Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
+    internal static View? FindDeepestView (View? start, int x, int y)
     {
         if (start is null || !start.Visible)
         {
@@ -570,27 +581,42 @@ public partial class View
             return null;
         }
 
-        if (findAdornments)
+        Adornment found = null;
+        if (start.Margin.Thickness.Contains (start.Frame, x, y))
         {
-            // TODO: This is a temporary hack for PR #3273; it is not actually used anywhere but unit tests at this point.
-            if (start.Margin.Thickness.Contains (start.Margin.Frame, x, y))
-            {
-                return start.Margin;
-            }
-            if (start.Border.Thickness.Contains (start.Border.Frame, x, y))
-            {
-                return start.Border;
-            }
-            if (start.Padding.Thickness.Contains (start.Padding.Frame, x, y))
-            {
-                return start.Padding;
-            }
+            found = start.Margin;
+        } else if (start.Border.Thickness.Contains (
+                                                    start.Border.Frame with
+                                                    {
+                                                        X = start.Frame.X + start.Border.Frame.X,
+                                                        Y = start.Frame.Y + start.Border.Frame.Y
+                                                    },
+                                                    x,
+                                                    y))
+        {
+            found = start.Border;
+        } else if (start.Padding.Thickness.Contains (
+                                                        start.Padding.Frame with
+                                                        {
+                                                            X = start.Frame.X + start.Padding.Frame.X,
+                                                            Y = start.Frame.Y + start.Padding.Frame.Y
+                                                        },
+                                                        x,
+                                                        y))
+        {
+            found = start.Padding;
+        }
 
+        Point boundsOffset = start.GetBoundsOffset ();
+
+        if (found is { })
+        {
+            start = found;
+            boundsOffset = found.Parent.Frame.Location;
         }
 
         if (start.InternalSubviews is { Count: > 0 })
         {
-            Point boundsOffset = start.GetBoundsOffset ();
             int rx = x - (start.Frame.X + boundsOffset.X);
             int ry = y - (start.Frame.Y + boundsOffset.Y);
 
@@ -600,11 +626,13 @@ public partial class View
 
                 if (v.Visible && v.Frame.Contains (rx, ry))
                 {
-                    View? deep = FindDeepestView (v, rx, ry, findAdornments);
+                    View? deep = FindDeepestView (v, rx, ry);
+
                     return deep ?? v;
                 }
             }
         }
+
         return start;
     }
 #nullable restore
@@ -638,7 +666,7 @@ public partial class View
         int right = Margin.Thickness.Right + Border.Thickness.Right + Padding.Thickness.Right;
         int bottom = Margin.Thickness.Bottom + Border.Thickness.Bottom + Padding.Thickness.Bottom;
 
-        return new Thickness (left, top, right, bottom);
+        return new (left, top, right, bottom);
     }
 
     /// <summary>
@@ -647,10 +675,10 @@ public partial class View
     /// </summary>
     public Point GetBoundsOffset ()
     {
-        return new Point (
-                          Padding?.Thickness.GetInside (Padding.Frame).X ?? 0,
-                          Padding?.Thickness.GetInside (Padding.Frame).Y ?? 0
-                         );
+        return new (
+                    Padding?.Thickness.GetInside (Padding.Frame).X ?? 0,
+                    Padding?.Thickness.GetInside (Padding.Frame).Y ?? 0
+                   );
     }
 
     /// <summary>Fired after the View's <see cref="LayoutSubviews"/> method has completed.</summary>
@@ -695,7 +723,7 @@ public partial class View
         LayoutAdornments ();
 
         Rectangle oldBounds = Bounds;
-        OnLayoutStarted (new LayoutEventArgs { OldBounds = oldBounds });
+        OnLayoutStarted (new () { OldBounds = oldBounds });
 
         SetTextFormatterSize ();
 
@@ -722,7 +750,7 @@ public partial class View
 
         LayoutNeeded = false;
 
-        OnLayoutComplete (new LayoutEventArgs { OldBounds = oldBounds });
+        OnLayoutComplete (new () { OldBounds = oldBounds });
     }
 
     /// <summary>Converts a screen-relative coordinate to a bounds-relative coordinate.</summary>
@@ -734,7 +762,7 @@ public partial class View
         Point screen = ScreenToFrame (x, y);
         Point boundsOffset = GetBoundsOffset ();
 
-        return new Point (screen.X - boundsOffset.X, screen.Y - boundsOffset.Y);
+        return new (screen.X - boundsOffset.X, screen.Y - boundsOffset.Y);
     }
 
     /// <summary>
@@ -744,15 +772,15 @@ public partial class View
     /// <returns>The coordinate relative to the <see cref="SuperView"/>'s <see cref="Bounds"/>.</returns>
     /// <param name="x">Screen-relative column.</param>
     /// <param name="y">Screen-relative row.</param>
-    public Point ScreenToFrame (int x, int y)
+    public virtual Point ScreenToFrame (int x, int y)
     {
         Point superViewBoundsOffset = SuperView?.GetBoundsOffset () ?? Point.Empty;
-        var ret = new Point (x - Frame.X - superViewBoundsOffset.X, y - Frame.Y - superViewBoundsOffset.Y);
 
+        var ret = new Point (x - Frame.X - superViewBoundsOffset.X, y - Frame.Y - superViewBoundsOffset.Y);
         if (SuperView is { })
         {
             Point superFrame = SuperView.ScreenToFrame (x - superViewBoundsOffset.X, y - superViewBoundsOffset.Y);
-            ret = new Point (superFrame.X - Frame.X, superFrame.Y - Frame.Y);
+            ret = new (superFrame.X - Frame.X, superFrame.Y - Frame.Y);
         }
 
         return ret;
@@ -854,6 +882,154 @@ public partial class View
         return adornment;
     }
 
+    /// <summary>
+    ///     Gets a new location of the <see cref="View"/> that is within the Bounds of the <paramref name="top"/>'s
+    ///     <see cref="View.SuperView"/> (e.g. for dragging a Window). The `out` parameters are the new X and Y coordinates.
+    /// </summary>
+    /// <remarks>
+    ///     If <paramref name="top"/> does not have a <see cref="View.SuperView"/> or it's SuperView is not
+    ///     <see cref="Application.Top"/> the position will be bound by the <see cref="ConsoleDriver.Cols"/> and
+    ///     <see cref="ConsoleDriver.Rows"/>.
+    /// </remarks>
+    /// <param name="top">The View that is to be moved.</param>
+    /// <param name="targetX">The target x location.</param>
+    /// <param name="targetY">The target y location.</param>
+    /// <param name="nx">The x location that will ensure <paramref name="top"/> will be visible.</param>
+    /// <param name="ny">The y location that will ensure <paramref name="top"/> will be visible.</param>
+    /// <param name="menuBar">The new top most menuBar</param>
+    /// <param name="statusBar">The new top most statusBar</param>
+    /// <returns>
+    ///     Either <see cref="Application.Top"/> (if <paramref name="top"/> does not have a Super View) or
+    ///     <paramref name="top"/>'s SuperView. This can be used to ensure LayoutSubviews is called on the correct View.
+    /// </returns>
+    internal static View GetLocationThatFits (
+        View top,
+        int targetX,
+        int targetY,
+        out int nx,
+        out int ny,
+        out MenuBar menuBar,
+        out StatusBar statusBar
+    )
+    {
+        int maxDimension;
+        View superView;
+
+        if (top?.SuperView is null || top == Application.Top || top?.SuperView == Application.Top)
+        {
+            maxDimension = Driver.Cols;
+            superView = Application.Top;
+        }
+        else
+        {
+            // Use the SuperView's Bounds, not Frame
+            maxDimension = top.SuperView.Bounds.Width;
+            superView = top.SuperView;
+        }
+
+        if (superView.Margin is { } && superView == top.SuperView)
+        {
+            maxDimension -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
+        }
+
+        if (top.Frame.Width <= maxDimension)
+        {
+            nx = Math.Max (targetX, 0);
+            nx = nx + top.Frame.Width > maxDimension ? Math.Max (maxDimension - top.Frame.Width, 0) : nx;
+
+            if (nx > top.Frame.X + top.Frame.Width)
+            {
+                nx = Math.Max (top.Frame.Right, 0);
+            }
+        }
+        else
+        {
+            nx = targetX;
+        }
+
+        //System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
+        bool menuVisible, statusVisible;
+
+        if (top?.SuperView is null || top == Application.Top || top?.SuperView == Application.Top)
+        {
+            menuVisible = Application.Top.MenuBar?.Visible == true;
+            menuBar = Application.Top.MenuBar;
+        }
+        else
+        {
+            View t = top.SuperView;
+
+            while (t is not Toplevel)
+            {
+                t = t.SuperView;
+            }
+
+            menuVisible = ((Toplevel)t).MenuBar?.Visible == true;
+            menuBar = ((Toplevel)t).MenuBar;
+        }
+
+        if (top?.SuperView is null || top == Application.Top || top?.SuperView == Application.Top)
+        {
+            maxDimension = menuVisible ? 1 : 0;
+        }
+        else
+        {
+            maxDimension = 0;
+        }
+
+        ny = Math.Max (targetY, maxDimension);
+
+        if (top?.SuperView is null || top == Application.Top || top?.SuperView == Application.Top)
+        {
+            statusVisible = Application.Top.StatusBar?.Visible == true;
+            statusBar = Application.Top.StatusBar;
+        }
+        else
+        {
+            View t = top.SuperView;
+
+            while (t is not Toplevel)
+            {
+                t = t.SuperView;
+            }
+
+            statusVisible = ((Toplevel)t).StatusBar?.Visible == true;
+            statusBar = ((Toplevel)t).StatusBar;
+        }
+
+        if (top?.SuperView is null || top == Application.Top || top?.SuperView == Application.Top)
+        {
+            maxDimension = statusVisible ? Driver.Rows - 1 : Driver.Rows;
+        }
+        else
+        {
+            maxDimension = statusVisible ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
+        }
+
+        if (superView.Margin is { } && superView == top.SuperView)
+        {
+            maxDimension -= superView.GetAdornmentsThickness ().Top + superView.GetAdornmentsThickness ().Bottom;
+        }
+
+        ny = Math.Min (ny, maxDimension);
+
+        if (top.Frame.Height <= maxDimension)
+        {
+            ny = ny + top.Frame.Height > maxDimension
+                     ? Math.Max (maxDimension - top.Frame.Height, menuVisible ? 1 : 0)
+                     : ny;
+
+            if (ny > top.Frame.Y + top.Frame.Height)
+            {
+                ny = Math.Max (top.Frame.Bottom, 0);
+            }
+        }
+
+        //System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
+
+        return superView;
+    }
+
     /// <summary>Overriden by <see cref="Adornment"/> to do nothing, as the <see cref="Adornment"/> does not have adornments.</summary>
     internal virtual void LayoutAdornments ()
     {
@@ -870,7 +1046,10 @@ public partial class View
             Margin.Width = Frame.Size.Width;
             Margin.Height = Frame.Size.Height;
             Margin.SetNeedsLayout ();
-            Margin.SetNeedsDisplay ();
+            if (Margin.Subviews.Count > 0)
+            {
+                Margin.LayoutSubviews ();
+            }
         }
 
         Rectangle border = Margin.Thickness.GetInside (Margin.Frame);
@@ -883,7 +1062,10 @@ public partial class View
             Border.Width = border.Size.Width;
             Border.Height = border.Size.Height;
             Border.SetNeedsLayout ();
-            Border.SetNeedsDisplay ();
+            if (Border.Subviews.Count > 0)
+            {
+                Border.LayoutSubviews ();
+            }
         }
 
         Rectangle padding = Border.Thickness.GetInside (Border.Frame);
@@ -896,7 +1078,10 @@ public partial class View
             Padding.Width = padding.Size.Width;
             Padding.Height = padding.Size.Height;
             Padding.SetNeedsLayout ();
-            Padding.SetNeedsDisplay ();
+            if (Padding.Subviews.Count > 0)
+            {
+                Padding.LayoutSubviews ();
+            }
         }
     }
 
@@ -929,8 +1114,8 @@ public partial class View
         // First try SuperView.Bounds, then Application.Top, then Driver.Bounds.
         // Finally, if none of those are valid, use int.MaxValue (for Unit tests).
         Rectangle relativeBounds = SuperView is { IsInitialized: true } ? SuperView.Bounds :
-                              Application.Top is { } && Application.Top.IsInitialized ? Application.Top.Bounds :
-                              Application.Driver?.Bounds ?? new Rectangle (0, 0, int.MaxValue, int.MaxValue);
+                                   Application.Top is { } && Application.Top.IsInitialized ? Application.Top.Bounds :
+                                   Application.Driver?.Bounds ?? new Rectangle (0, 0, int.MaxValue, int.MaxValue);
         SetRelativeLayout (relativeBounds);
 
         // TODO: Determine what, if any of the below is actually needed here.

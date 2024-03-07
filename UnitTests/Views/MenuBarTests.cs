@@ -44,7 +44,7 @@ public class MenuBarTests
 
         Assert.True (
                      menu._openMenu.OnMouseEvent (
-                                                new MouseEvent { X = 0, Y = 1, Flags = MouseFlags.Button1Clicked, View = menu._openMenu }
+                                                new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked, View = menu._openMenu }
                                                )
                     );
         Application.MainLoop.RunIteration ();
@@ -76,7 +76,7 @@ public class MenuBarTests
 
         Assert.True (
                      menu._openMenu.OnMouseEvent (
-                                                new MouseEvent { X = 0, Y = 1, Flags = MouseFlags.Button1Clicked, View = menu._openMenu }
+                                                new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked, View = menu._openMenu }
                                                )
                     );
         Application.MainLoop.RunIteration ();
@@ -94,7 +94,7 @@ public class MenuBarTests
 
         Assert.True (
                      menu._openMenu.OnMouseEvent (
-                                                new MouseEvent { X = 0, Y = 1, Flags = MouseFlags.Button1Clicked, View = menu._openMenu }
+                                                new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked, View = menu._openMenu }
                                                )
                     );
         Application.MainLoop.RunIteration ();
@@ -549,7 +549,7 @@ public class MenuBarTests
                                                       _output
                                                      );
 
-        for (var i = 1; i < items.Count; i++)
+        for (var i = 0; i < items.Count; i++)
         {
             menu.OpenMenu ();
 
@@ -2190,7 +2190,7 @@ wo
 
         Assert.True (
                      mCurrent.OnMouseEvent (
-                                          new MouseEvent { X = 1, Y = 2, Flags = MouseFlags.ReportMousePosition, View = mCurrent }
+                                          new MouseEvent { X = 1, Y = 1, Flags = MouseFlags.ReportMousePosition, View = mCurrent }
                                          )
                     );
         Assert.True (menu.IsMenuOpen);
@@ -2199,7 +2199,7 @@ wo
 
         Assert.True (
                      mCurrent.OnMouseEvent (
-                                          new MouseEvent { X = 1, Y = 3, Flags = MouseFlags.ReportMousePosition, View = mCurrent }
+                                          new MouseEvent { X = 1, Y = 2, Flags = MouseFlags.ReportMousePosition, View = mCurrent }
                                          )
                     );
         Assert.True (menu.IsMenuOpen);
@@ -2371,7 +2371,8 @@ Edit
                            };
         Application.Top.Add (menu);
         Application.Begin (Application.Top);
-
+        
+        // Click on Edit
         Assert.True (
                      menu.OnMouseEvent (
                                       new MouseEvent { X = 10, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }
@@ -2381,9 +2382,10 @@ Edit
         Assert.Equal ("_Edit", miCurrent.Parent.Title);
         Assert.Equal ("_Copy", miCurrent.Title);
 
+        // Click on Paste
         Assert.True (
                      mCurrent.OnMouseEvent (
-                                          new MouseEvent { X = 10, Y = 3, Flags = MouseFlags.ReportMousePosition, View = mCurrent }
+                                          new MouseEvent { X = 10, Y = 2, Flags = MouseFlags.ReportMousePosition, View = mCurrent }
                                          )
                     );
         Assert.True (menu.IsMenuOpen);
@@ -2394,14 +2396,16 @@ Edit
         {
             if (i == -1)
             {
+                // Edit menu is open. Click on the menu at Y = -1, which is outside the menu.
                 Assert.False (
                               mCurrent.OnMouseEvent (
-                                                   new MouseEvent { X = 10, Y = i, Flags = MouseFlags.ReportMousePosition, View = menu }
-                                                  )
+                                                     new MouseEvent { X = 10, Y = i, Flags = MouseFlags.ReportMousePosition, View = menu }
+                                                    )
                              );
             }
             else
             {
+                // Edit menu is open. Click on the menu at Y = i.
                 Assert.True (
                              mCurrent.OnMouseEvent (
                                                   new MouseEvent { X = 10, Y = i, Flags = MouseFlags.ReportMousePosition, View = mCurrent }
@@ -2414,12 +2418,12 @@ Edit
             if (i == 2)
             {
                 Assert.Equal ("_Edit", miCurrent.Parent.Title);
-                Assert.Equal ("C_ut", miCurrent.Title);
+                Assert.Equal ("_Paste", miCurrent.Title);
             }
             else if (i == 1)
             {
                 Assert.Equal ("_Edit", miCurrent.Parent.Title);
-                Assert.Equal ("_Copy", miCurrent.Title);
+                Assert.Equal ("C_ut", miCurrent.Title);
             }
             else if (i == 0)
             {
@@ -2961,7 +2965,7 @@ Edit
                       menu.OnMouseEvent (
                                        new MouseEvent
                                        {
-                                           X = 1, Y = 3, Flags = MouseFlags.ReportMousePosition, View = Application.Top.Subviews [1]
+                                           X = 1, Y = 2, Flags = MouseFlags.ReportMousePosition, View = Application.Top.Subviews [1]
                                        }
                                       )
                      );
@@ -2984,7 +2988,7 @@ Edit
                       menu.OnMouseEvent (
                                        new MouseEvent
                                        {
-                                           X = 1, Y = 2, Flags = MouseFlags.ReportMousePosition, View = Application.Top.Subviews [1]
+                                           X = 1, Y = 1, Flags = MouseFlags.ReportMousePosition, View = Application.Top.Subviews [1]
                                        }
                                       )
                      );
@@ -3266,7 +3270,7 @@ Edit
 
         Assert.False (
                       menu.OnMouseEvent (
-                                       new MouseEvent { X = 1, Y = 3, Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [1] }
+                                       new MouseEvent { X = 1, Y = 2, Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [1] }
                                       )
                      );
         Application.Top.Draw ();
@@ -3286,7 +3290,7 @@ Edit
 
         Assert.False (
                       menu.OnMouseEvent (
-                                       new MouseEvent { X = 1, Y = 2, Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [2] }
+                                       new MouseEvent { X = 1, Y = 1, Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [2] }
                                       )
                      );
         Application.Top.Draw ();

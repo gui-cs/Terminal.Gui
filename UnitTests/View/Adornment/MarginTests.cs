@@ -36,9 +36,9 @@ public class MarginTests
 
         TestHelpers.AssertDriverContentsAre (
                                              @"
-LTR
-L R
-BBB",
+MMM
+M M
+MMM",
                                              _output
                                             );
         TestHelpers.AssertDriverAttributesAre ("0", null, superView.GetNormalColor ());

@@ -2598,13 +2598,6 @@ public class TextView : View
         }
     }
 
-    /// <inheritdoc/>
-    public override bool CanFocus
-    {
-        get => base.CanFocus;
-        set => base.CanFocus = value;
-    }
-
     /// <summary>Get the <see cref="ContextMenu"/> for this view.</summary>
     public ContextMenu? ContextMenu { get; }
 
