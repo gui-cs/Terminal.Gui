@@ -156,7 +156,7 @@ public class Adornment : View
         Driver.SetAttribute (normalAttr);
 
         // This just draws/clears the thickness, not the insides.
-        Thickness.Draw (screenBounds, (string)(Data ?? string.Empty));
+        Thickness.Draw (screenBounds, ToString ());
 
         if (!string.IsNullOrEmpty (TextFormatter.Text))
         {

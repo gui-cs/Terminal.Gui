@@ -1016,14 +1016,14 @@ public class NavigationTests
         screen = top.BoundsToScreen (new (0, 0, 0, 0));
         Assert.Equal (4, screen.X);
         Assert.Equal (3, screen.Y);
-        Assert.Equal (top, View.FindDeepestView (top, 3, 2));
+        Assert.Equal (top.Border, View.FindDeepestView (top, 3, 2));
         //Assert.Equal (0, found.FrameToScreen ().X);
         //Assert.Equal (0, found.FrameToScreen ().Y);
         Assert.Equal (new Point (10, 0), top.ScreenToFrame (13, 2));
         screen = top.BoundsToScreen (new (10, 0, 0, 0));
         Assert.Equal (14, screen.X);
         Assert.Equal (3, screen.Y);
-        Assert.Equal (top, View.FindDeepestView (top, 13, 2));
+        Assert.Equal (top.Border, View.FindDeepestView (top, 13, 2));
         //Assert.Equal (10, found.FrameToScreen ().X);
         //Assert.Equal (0, found.FrameToScreen ().Y);
         Assert.Equal (new Point (11, 1), top.ScreenToFrame (14, 3));
