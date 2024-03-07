@@ -31,12 +31,13 @@ public class Adornment : View
     public Adornment (View parent) { Parent = parent; }
 
     /// <summary>
-    /// Gets the rectangle that describes the area of the Adornment. The Location is always (0,0).
-    /// The size is the size of the Frame 
+    ///     Gets the rectangle that describes the area of the Adornment. The Location is always (0,0).
+    ///     The size is the size of the Frame
     /// </summary>
     public override Rectangle Bounds
     {
         get => new (Point.Empty, Frame.Size);
+
         // QUESTION: So why even have a setter then?
         // ANSWER: Because this is an override of a base class property, and the base class has a setter.
         set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
@@ -98,6 +99,7 @@ public class Adornment : View
         // To get the screen-relative coordinates of an Adornment, we need get the parent's Frame
         // in screen coords, and add our Frame location to it.
         Rectangle parent = Parent.FrameToScreen ();
+
         return new (new (parent.X + Frame.X, parent.Y + Frame.Y), Frame.Size);
     }
 
@@ -116,6 +118,7 @@ public class Adornment : View
         Rectangle screenBounds = BoundsToScreen (contentArea);
         Attribute normalAttr = GetNormalColor ();
         Driver.SetAttribute (normalAttr);
+
         // This just draws/clears the thickness, not the insides.
         Thickness.Draw (screenBounds, ToString ());
 
@@ -142,7 +145,7 @@ public class Adornment : View
     {
         ThicknessChanged?.Invoke (
                                   this,
-                                  new ThicknessEventArgs { Thickness = Thickness, PreviousThickness = previousThickness }
+                                  new() { Thickness = Thickness, PreviousThickness = previousThickness }
                                  );
     }
 
