@@ -69,6 +69,9 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     {
         Debug.WriteLine ($"After: {methodUnderTest.Name}");
 
+        // Turn off diagnostic flags in case some test left them on
+        View.Diagnostics = ViewDiagnosticFlags.Off;
+
         if (AutoInit)
         {
             Application.Shutdown ();
@@ -145,6 +148,10 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
     public override void After (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"After: {methodUnderTest.Name}");
+
+        // Turn off diagnostic flags in case some test left them on
+        View.Diagnostics = ViewDiagnosticFlags.Off;
+
         Application.Driver = null;
     }
 
