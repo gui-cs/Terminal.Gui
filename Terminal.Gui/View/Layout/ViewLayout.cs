@@ -484,7 +484,7 @@ public partial class View
     public event EventHandler Initialized;
 
     /// <summary>Converts a <see cref="Bounds"/>-relative rectangle to a screen-relative rectangle.</summary>
-    public Rectangle BoundsToScreen (Rectangle bounds)
+    public Rectangle BoundsToScreen (in Rectangle bounds)
     {
         // Translate bounds to Frame (our SuperView's Bounds-relative coordinates)
         Point boundsOffset = GetBoundsOffset ();
