@@ -125,11 +125,11 @@ public partial class View
         {
             if (value != LineStyle.None)
             {
-                Border.Thickness = new Thickness (1);
+                Border.Thickness = new (1);
             }
             else
             {
-                Border.Thickness = new Thickness (0);
+                Border.Thickness = new (0);
             }
 
             Border.LineStyle = value;
@@ -200,6 +200,7 @@ public partial class View
             }
 #endif // DEBUG
             Thickness totalThickness = GetAdornmentsThickness ();
+
             Frame = Frame with
             {
                 Size = new (value.Size.Width + totalThickness.Horizontal, value.Size.Height + totalThickness.Vertical)
@@ -221,7 +222,8 @@ public partial class View
     ///     <para>This causes <see cref="LayoutStyle"/> to be <see cref="LayoutStyle.Absolute"/>.</para>
     ///     <para>
     ///         Altering the Frame will eventually (when the view hierarchy is next laid out via  see
-    ///         cref="LayoutSubviews"/>) cause <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/>
+    ///         cref="LayoutSubviews"/>) cause <see cref="LayoutSubview(View, Rectangle)"/> and
+    ///         <see cref="OnDrawContent(Rectangle)"/>
     ///         methods to be called.
     ///     </para>
     /// </remarks>
@@ -421,7 +423,8 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
-    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been called.
+    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been
+    ///         called.
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
@@ -448,7 +451,8 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
-    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been called.
+    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been
+    ///         called.
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
@@ -488,7 +492,7 @@ public partial class View
         Rectangle screen = FrameToScreen ();
         screen.Offset (boundsOffset.X + bounds.X, boundsOffset.Y + bounds.Y);
 
-        return new Rectangle (screen.Location, bounds.Size);
+        return new (screen.Location, bounds.Size);
     }
 
 #nullable enable
@@ -523,15 +527,16 @@ public partial class View
             {
                 return start.Margin;
             }
+
             if (start.Border.Thickness.Contains (start.Border.Frame, x, y))
             {
                 return start.Border;
             }
+
             if (start.Padding.Thickness.Contains (start.Padding.Frame, x, y))
             {
                 return start.Padding;
             }
-
         }
 
         if (start.InternalSubviews is { Count: > 0 })
@@ -547,10 +552,12 @@ public partial class View
                 if (v.Visible && v.Frame.Contains (rx, ry))
                 {
                     View? deep = FindDeepestView (v, rx, ry, findAdornments);
+
                     return deep ?? v;
                 }
             }
         }
+
         return start;
     }
 #nullable restore
@@ -577,10 +584,7 @@ public partial class View
     ///     <para>Gets the thickness describing the sum of the Adornments' thicknesses.</para>
     /// </summary>
     /// <returns>A thickness that describes the sum of the Adornments' thicknesses.</returns>
-    public Thickness GetAdornmentsThickness ()
-    {
-        return Margin.Thickness + Border.Thickness + Padding.Thickness;
-    }
+    public Thickness GetAdornmentsThickness () { return Margin.Thickness + Border.Thickness + Padding.Thickness; }
 
     /// <summary>
     ///     Helper to get the X and Y offset of the Bounds from the Frame. This is the sum of the Left and Top properties
@@ -638,7 +642,7 @@ public partial class View
         LayoutAdornments ();
 
         Rectangle oldBounds = Bounds;
-        OnLayoutStarted (new LayoutEventArgs { OldBounds = oldBounds });
+        OnLayoutStarted (new() { OldBounds = oldBounds });
 
         SetTextFormatterSize ();
 
@@ -665,7 +669,7 @@ public partial class View
 
         LayoutNeeded = false;
 
-        OnLayoutComplete (new LayoutEventArgs { OldBounds = oldBounds });
+        OnLayoutComplete (new() { OldBounds = oldBounds });
     }
 
     /// <summary>Converts a screen-relative coordinate to a bounds-relative coordinate.</summary>
@@ -677,7 +681,7 @@ public partial class View
         Point screen = ScreenToFrame (x, y);
         Point boundsOffset = GetBoundsOffset ();
 
-        return new Point (screen.X - boundsOffset.X, screen.Y - boundsOffset.Y);
+        return new (screen.X - boundsOffset.X, screen.Y - boundsOffset.Y);
     }
 
     /// <summary>
@@ -695,7 +699,7 @@ public partial class View
         if (SuperView is { })
         {
             Point superFrame = SuperView.ScreenToFrame (x - superViewBoundsOffset.X, y - superViewBoundsOffset.Y);
-            ret = new Point (superFrame.X - Frame.X, superFrame.Y - Frame.Y);
+            ret = new (superFrame.X - Frame.X, superFrame.Y - Frame.Y);
         }
 
         return ret;
@@ -872,8 +876,8 @@ public partial class View
         // First try SuperView.Bounds, then Application.Top, then Driver.Bounds.
         // Finally, if none of those are valid, use int.MaxValue (for Unit tests).
         Rectangle relativeBounds = SuperView is { IsInitialized: true } ? SuperView.Bounds :
-                              Application.Top is { } && Application.Top.IsInitialized ? Application.Top.Bounds :
-                              Application.Driver?.Bounds ?? new Rectangle (0, 0, int.MaxValue, int.MaxValue);
+                                   Application.Top is { } && Application.Top.IsInitialized ? Application.Top.Bounds :
+                                   Application.Driver?.Bounds ?? new Rectangle (0, 0, int.MaxValue, int.MaxValue);
         SetRelativeLayout (relativeBounds);
 
         // TODO: Determine what, if any of the below is actually needed here.
