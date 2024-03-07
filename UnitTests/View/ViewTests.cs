@@ -53,13 +53,22 @@ public class ViewTests
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rectangle (0, 0, 20, 10), pos);
 
-        view.Clear (view.Frame);
+        view.Clear (view.Bounds);
 
         expected = @"
+┌──────────────────┐
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+└──────────────────┘
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (Rectangle.Empty, pos);
     }
 
     [Fact]
@@ -106,13 +115,22 @@ public class ViewTests
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rectangle (0, 0, 20, 10), pos);
 
-        view.Clear (view.Frame);
+        view.Clear (view.Bounds);
 
         expected = @"
+┌──────────────────┐
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+└──────────────────┘
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (Rectangle.Empty, pos);
     }
 
     [Theory]

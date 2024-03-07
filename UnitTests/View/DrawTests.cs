@@ -2,13 +2,54 @@
 using System.Text;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace Terminal.Gui.ViewTests;
 
 [Trait("Category","Output")]
 public class DrawTests
 {
     private readonly ITestOutputHelper _output;
     public DrawTests (ITestOutputHelper output) { _output = output; }
+
+    [Theory]
+    [InlineData (0, 0, 1, 1)]
+    [InlineData (0, 0, 2, 2)]
+    [InlineData (-1, -1, 2, 2)]
+    [SetupFakeDriver]
+    public void Clear_Bounds_Clears_Only_Bounds (int x, int y, int width, int height)
+    {
+        var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
+
+        var view = new View
+        {
+            Text = "X",
+            X = 1, Y = 1,
+            Width = 3, Height = 3,
+            BorderStyle = LineStyle.Single
+        };
+        superView.Add (view);
+        superView.BeginInit ();
+        superView.EndInit ();
+        superView.LayoutSubviews ();
+
+        superView.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+ ┌─┐
+ │X│
+ └─┘",
+                                                      _output);
+
+        Rectangle boundsToClear = new (x, y, width, height);
+        view.Clear (boundsToClear);
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+ ┌─┐
+ │ │
+ └─┘",
+                                                      _output);
+
+    }
 
     [Fact]
     [AutoInitShutdown]

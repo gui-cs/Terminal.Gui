@@ -182,7 +182,7 @@ public class TileView : View
     public override void OnDrawContent (Rectangle contentArea)
     {
         Driver.SetAttribute (ColorScheme.Normal);
-        Clear ();
+        Clear (contentArea);
 
         base.OnDrawContent (contentArea);
 
@@ -217,8 +217,8 @@ public class TileView : View
             {
                 bool isRoot = _splitterLines.Contains (line);
 
-                line.BoundsToScreen (0, 0, out int x1, out int y1);
-                Point origin = ScreenToFrame (x1, y1);
+                Rectangle screen = line.BoundsToScreen (Rectangle.Empty);
+                Point origin = ScreenToFrame (screen.X, screen.Y);
                 int length = line.Orientation == Orientation.Horizontal ? line.Frame.Width : line.Frame.Height;
 
                 if (!isRoot)
@@ -837,10 +837,8 @@ public class TileView : View
         /// </summary>
         public Point GetLocalCoordinateForTitle (TileView intoCoordinateSpace)
         {
-            Tile.ContentView.BoundsToScreen (0, 0, out int screenCol, out int screenRow);
-            screenRow--;
-
-            return intoCoordinateSpace.ScreenToFrame (screenCol, screenRow);
+            Rectangle screen = Tile.ContentView.BoundsToScreen (Rectangle.Empty);
+            return intoCoordinateSpace.ScreenToFrame (screen.X, screen.Y - 1);
         }
 
         internal string GetTrimmedTitle ()
