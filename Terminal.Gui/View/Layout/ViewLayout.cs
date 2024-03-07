@@ -181,26 +181,10 @@ public partial class View
                 return Rectangle.Empty with { Size = Frame.Size };
             }
 
-            //if (!IsInitialized)
-            //{
-                int width = Math.Max (
-                                      0,
-                                      Frame.Size.Width
-                                      - Margin.Thickness.Horizontal
-                                      - Border.Thickness.Horizontal
-                                      - Padding.Thickness.Horizontal
-                                     );
+            int width = Math.Max (0, Frame.Size.Width - Margin.Thickness.Horizontal - Border.Thickness.Horizontal - Padding.Thickness.Horizontal);
+            int height = Math.Max (0, Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical);
 
-                int height = Math.Max (
-                                       0,
-                                       Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical
-                                      );
-
-                return Rectangle.Empty with { Size = new (width, height) };
-            //}
-
-            //var totalThickness = Margin.Thickness + Border.Thickness + Padding.Thickness;
-            //return new (Point.Empty, totalThickness.GetInside (Frame).Size ?? Frame.Size);
+            return Rectangle.Empty with { Size = new (width, height) };
         }
         set
         {
@@ -512,7 +496,7 @@ public partial class View
         Rectangle screen = FrameToScreen ();
         screen.Offset (boundsOffset.X + bounds.X, boundsOffset.Y + bounds.Y);
 
-        return new Rectangle(screen.Location, bounds.Size);
+        return new Rectangle (screen.Location, bounds.Size);
     }
 
 #nullable enable
