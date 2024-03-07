@@ -88,9 +88,8 @@ public partial class View
     }
 
     /// <summary>
-    ///     The adornment (specified as a <see cref="Thickness"/>) inside of the view that offsets the
-    ///     <see cref="ContentArea"/> from the <see cref="Margin"/>. The Border provides the space for a visual border (drawn
-    ///     using
+    ///     The <see cref="Adornment"/> that offsets the <see cref="ContentArea"/> from the <see cref="Margin"/>.
+    ///     The Border provides the space for a visual border (drawn using
     ///     line-drawing glyphs) and the Title. The Border expands inward; in other words if `Border.Thickness.Top == 2` the
     ///     border and title will take up the first row and the second row will be filled with spaces.
     /// </summary>
@@ -128,11 +127,11 @@ public partial class View
         {
             if (value != LineStyle.None)
             {
-                Border.Thickness = new Thickness (1);
+                Border.Thickness = new (1);
             }
             else
             {
-                Border.Thickness = new Thickness (0);
+                Border.Thickness = new (0);
             }
 
             Border.LineStyle = value;
@@ -183,27 +182,14 @@ public partial class View
             }
 #endif // DEBUG
 
-            // BUGBUG: I think there's a bug here. This should be && not ||
             if (Margin is null || Border is null || Padding is null)
             {
                 return Rectangle.Empty with { Size = Frame.Size };
             }
 
-            int width = Math.Max (
-                                  0,
-                                  Frame.Size.Width
-                                  - Margin.Thickness.Horizontal
-                                  - Border.Thickness.Horizontal
-                                  - Padding.Thickness.Horizontal
-                                  - (UseContentOffset ? ContentOffset.X : 0));
-
-            int height = Math.Max (
-                                   0,
-                                   Frame.Size.Height
-                                   - Margin.Thickness.Vertical
-                                   - Border.Thickness.Vertical
-                                   - Padding.Thickness.Vertical
-                                   - (UseContentOffset ? ContentOffset.Y : 0));
+            Thickness totalThickness = GetAdornmentsThickness ();
+            int width = Math.Max (0, Frame.Size.Width - totalThickness.Horizontal- (UseContentOffset ? ContentOffset.X : 0));
+            int height = Math.Max (0, Frame.Size.Height - totalThickness.Vertical- (UseContentOffset ? ContentOffset.Y : 0));
 
             return new (UseContentOffset ? ContentOffset : Point.Empty, new Size (width, height));
         }
@@ -219,19 +205,11 @@ public partial class View
                                 );
             }
 #endif // DEBUG
+            Thickness totalThickness = GetAdornmentsThickness ();
+
             Frame = Frame with
             {
-                Size =
-                new (
-                     value.Size.Width
-                     + Margin.Thickness.Horizontal
-                     + Border.Thickness.Horizontal
-                     + Padding.Thickness.Horizontal,
-                     value.Size.Height
-                     + Margin.Thickness.Vertical
-                     + Border.Thickness.Vertical
-                     + Padding.Thickness.Vertical
-                    )
+                Size = new (value.Size.Width + totalThickness.Horizontal, value.Size.Height + totalThickness.Vertical)
             };
         }
     }
@@ -450,7 +428,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     The frame (specified as a <see cref="Thickness"/>) that separates a View from other SubViews of the same
+    ///     The <see cref="Adornment"/> that enables separation of a View from other SubViews of the same
     ///     SuperView. The margin offsets the <see cref="ContentArea"/> from the <see cref="Frame"/>.
     /// </summary>
     /// <remarks>
@@ -467,7 +445,7 @@ public partial class View
     public Margin Margin { get; private set; }
 
     /// <summary>
-    ///     The frame (specified as a <see cref="Thickness"/>) inside of the view that offsets the <see cref="ContentArea"/>
+    ///     The <see cref="Adornment"/> inside of the view that offsets the <see cref="ContentArea"/>
     ///     from the <see cref="Border"/>.
     /// </summary>
     /// <remarks>
@@ -603,63 +581,16 @@ public partial class View
     /// </summary>
     public event EventHandler Initialized;
 
-    /// <summary>Converts a <see cref="ContentArea"/>-relative region to a screen-relative region.</summary>
-    public Rectangle BoundsToScreen (Rectangle region)
+    /// <summary>Converts a <see cref="ContentArea"/>-relative rectangle to a screen-relative rectangle.</summary>
+    public Rectangle BoundsToScreen (in Rectangle bounds)
     {
-        BoundsToScreen (region.X, region.Y, out int screenX, out int screenY, false);
-
-        return region with { X = screenX, Y = screenY };
-    }
-
-    /// <summary>
-    ///     Converts a <see cref="ContentArea"/>-relative coordinate to a screen-relative coordinate. The output is optionally
-    ///     clamped to the screen dimensions.
-    /// </summary>
-    /// <param name="x"><see cref="ContentArea"/>-relative column.</param>
-    /// <param name="y"><see cref="ContentArea"/>-relative row.</param>
-    /// <param name="rx">Absolute column; screen-relative.</param>
-    /// <param name="ry">Absolute row; screen-relative.</param>
-    /// <param name="clamped">
-    ///     If <see langword="true"/>, <paramref name="rx"/> and <paramref name="ry"/> will be clamped to the
-    ///     screen dimensions (will never be negative and will always be less than <see cref="ConsoleDriver.Cols"/> and
-    ///     <see cref="ConsoleDriver.Rows"/>, respectively.
-    /// </param>
-    public virtual void BoundsToScreen (int x, int y, out int rx, out int ry, bool clamped = true)
-    {
-        // PERF: Use Point.Offset
-        // Already dealing with Point here.
+        // Translate bounds to Frame (our SuperView's Bounds-relative coordinates)
         Point boundsOffset = GetBoundsOffset ();
-        rx = x + Frame.X + boundsOffset.X;
-        ry = y + Frame.Y + boundsOffset.Y;
 
-        View super = SuperView;
+        Rectangle screen = FrameToScreen ();
+        screen.Offset (boundsOffset.X + bounds.X, boundsOffset.Y + bounds.Y);
 
-        while (super is { })
-        {
-            if (super is Adornment adornment)
-            {
-                boundsOffset = super.FrameToScreen ().Location;
-                Thickness thickness = adornment.GetAdornmentsThickness ();
-
-                boundsOffset.X -= thickness.Left;
-                boundsOffset.Y -= thickness.Top;
-            }
-            else
-            {
-                boundsOffset = super.GetBoundsOffset ();
-            }
-
-            rx += super.Frame.X + boundsOffset.X;
-            ry += super.Frame.Y + boundsOffset.Y;
-            super = super.SuperView;
-        }
-
-        // The following ensures that the cursor is always in the screen boundaries.
-        if (clamped)
-        {
-            ry = Math.Min (ry, Driver.Rows - 1);
-            rx = Math.Min (rx, Driver.Cols - 1);
-        }
+        return new (screen.Location, bounds.Size);
     }
 
 #nullable enable
@@ -694,15 +625,16 @@ public partial class View
             {
                 return start.Margin;
             }
+
             if (start.Border.Thickness.Contains (start.Border.Frame, x, y))
             {
                 return start.Border;
             }
+
             if (start.Padding.Thickness.Contains (start.Padding.Frame, x, y))
             {
                 return start.Padding;
             }
-
         }
 
         if (start.InternalSubviews is { Count: > 0 })
@@ -718,10 +650,12 @@ public partial class View
                 if (v.Visible && v.Frame.Contains (rx, ry))
                 {
                     View? deep = FindDeepestView (v, rx, ry, findAdornments);
+
                     return deep ?? v;
                 }
             }
         }
+
         return start;
     }
 #nullable restore
@@ -748,26 +682,20 @@ public partial class View
     ///     <para>Gets the thickness describing the sum of the Adornments' thicknesses.</para>
     /// </summary>
     /// <returns>A thickness that describes the sum of the Adornments' thicknesses.</returns>
-    public virtual Thickness GetAdornmentsThickness ()
-    {
-        int left = Margin.Thickness.Left + Border.Thickness.Left + Padding.Thickness.Left;
-        int top = Margin.Thickness.Top + Border.Thickness.Top + Padding.Thickness.Top;
-        int right = Margin.Thickness.Right + Border.Thickness.Right + Padding.Thickness.Right;
-        int bottom = Margin.Thickness.Bottom + Border.Thickness.Bottom + Padding.Thickness.Bottom;
-
-        return new Thickness (left, top, right, bottom);
-    }
+    public Thickness GetAdornmentsThickness () { return Margin.Thickness + Border.Thickness + Padding.Thickness; }
 
     /// <summary>
     ///     Helper to get the X and Y offset of the Bounds from the Frame. This is the sum of the Left and Top properties
     ///     of <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/>.
     /// </summary>
-    public Point GetBoundsOffset ()
+    public virtual Point GetBoundsOffset ()
     {
-        return new Point (
-                          Padding?.Thickness.GetInside (Padding.Frame).X ?? 0,
-                          Padding?.Thickness.GetInside (Padding.Frame).Y ?? 0
-                         );
+        if (Padding is null)
+        {
+            return Point.Empty;
+        }
+
+        return Padding.Thickness.GetInside (Padding.Frame).Location;
     }
 
     /// <summary>
@@ -837,7 +765,7 @@ public partial class View
         LayoutAdornments ();
 
         Rectangle oldBounds = ContentArea;
-        OnLayoutStarted (new LayoutEventArgs { OldBounds = oldBounds });
+        OnLayoutStarted (new() { OldBounds = oldBounds });
 
         SetTextFormatterSize ();
 
@@ -864,7 +792,7 @@ public partial class View
 
         LayoutNeeded = false;
 
-        OnLayoutComplete (new LayoutEventArgs { OldBounds = oldBounds });
+        OnLayoutComplete (new() { OldBounds = oldBounds });
     }
 
     /// <summary>Converts a screen-relative coordinate to a bounds-relative coordinate.</summary>
@@ -876,7 +804,7 @@ public partial class View
         Point screen = ScreenToFrame (x, y);
         Point boundsOffset = GetBoundsOffset ();
 
-        return new Point (screen.X - boundsOffset.X, screen.Y - boundsOffset.Y);
+        return new (screen.X - boundsOffset.X, screen.Y - boundsOffset.Y);
     }
 
     /// <summary>
@@ -894,7 +822,7 @@ public partial class View
         if (SuperView is { })
         {
             Point superFrame = SuperView.ScreenToFrame (x - superViewBoundsOffset.X, y - superViewBoundsOffset.Y);
-            ret = new Point (superFrame.X - Frame.X, superFrame.Y - Frame.Y);
+            ret = new (superFrame.X - Frame.X, superFrame.Y - Frame.Y);
         }
 
         return ret;

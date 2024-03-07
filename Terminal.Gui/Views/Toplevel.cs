@@ -1,3 +1,5 @@
+using System.Net.Mime;
+
 namespace Terminal.Gui;
 
 /// <summary>

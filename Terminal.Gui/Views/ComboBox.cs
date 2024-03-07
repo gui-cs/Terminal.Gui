@@ -497,11 +497,11 @@ public class ComboBox : View
             OnOpenSelectedItem ();
         }
 
-        Rectangle rect = _listview.BoundsToScreen (_listview.IsInitialized ? _listview.ContentArea : Rectangle.Empty);
         Reset (true);
-        _listview.Clear (rect);
+        _listview.Clear (_listview.IsInitialized ? _listview.ContentArea : Rectangle.Empty);
         _listview.TabStop = false;
         SuperView?.SendSubviewToBack (this);
+        Rectangle rect = _listview.BoundsToScreen (_listview.IsInitialized ? _listview.Bounds : Rectangle.Empty);
         SuperView?.SetNeedsDisplay (rect);
         OnCollapsed ();
     }
@@ -768,7 +768,7 @@ public class ComboBox : View
     private void ShowList ()
     {
         _listview.SetSource (_searchset);
-        _listview.Clear (); // Ensure list shrinks in Dialog as you type
+        _listview.Clear (Bounds); // Ensure list shrinks in Dialog as you type
         _listview.Height = CalculatetHeight ();
         SuperView?.BringSubviewToFront (this);
     }

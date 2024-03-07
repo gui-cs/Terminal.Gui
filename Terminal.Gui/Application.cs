@@ -807,7 +807,7 @@ public static partial class Application
                 || state.Toplevel.SubViewNeedsDisplay
                 || state.Toplevel.LayoutNeeded))
         {
-            state.Toplevel.Clear (Driver.Bounds);
+            Driver.ClearContents ();
         }
 
         if (state.Toplevel.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded || OverlappedChildNeedsDisplay ())

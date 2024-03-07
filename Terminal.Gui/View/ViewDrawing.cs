@@ -80,25 +80,14 @@ public partial class View
         Driver.AddRune (ch);
     }
 
-    /// <summary>Clears the <see cref="ContentArea"/> with the normal background color.</summary>
-    /// <remarks>
-    ///     <para>This clears the Bounds used by this view.</para>
-    /// </remarks>
-    public void Clear ()
-    {
-        if (IsInitialized)
-        {
-            Clear (BoundsToScreen (ContentArea));
-        }
-    }
-
-    // BUGBUG: This version of the Clear API should be removed. We should have a tenet that says 
-    // "View APIs only deal with View-relative coords". This is only used by ComboBox which can
-    // be refactored to use the View-relative version.
-    /// <summary>Clears the specified screen-relative rectangle with the normal background.</summary>
+    /// <summary>Clears <see cref="ContentArea"/> with the normal background.</summary>
     /// <remarks></remarks>
-    /// <param name="regionScreen">The screen-relative rectangle to clear.</param>
-    public void Clear (Rectangle regionScreen)
+    public void Clear () { Clear (ContentArea); }
+
+    /// <summary>Clears the specified <see cref="Bounds"/>-relative rectangle with the normal background.</summary>
+    /// <remarks></remarks>
+    /// <param name="contentArea">The Bounds-relative rectangle to clear.</param>
+    public void Clear (Rectangle contentArea)
     {
         if (Driver is null)
         {
@@ -106,7 +95,10 @@ public partial class View
         }
 
         Attribute prev = Driver.SetAttribute (GetNormalColor ());
-        Driver.FillRect (regionScreen);
+
+        // Clamp the region to the bounds of the view
+        contentArea = Rectangle.Intersect (contentArea, Bounds);
+        Driver.FillRect (BoundsToScreen (contentArea));
         Driver.SetAttribute (prev);
     }
 
@@ -298,7 +290,7 @@ public partial class View
 
         if (ColorScheme is null)
         {
-            cs = new ColorScheme ();
+            cs = new ();
         }
 
         return Enabled ? cs.Focus : cs.Disabled;
@@ -316,7 +308,7 @@ public partial class View
 
         if (ColorScheme is null)
         {
-            cs = new ColorScheme ();
+            cs = new ();
         }
 
         return Enabled ? cs.HotNormal : cs.Disabled;
@@ -334,7 +326,7 @@ public partial class View
 
         if (ColorScheme is null)
         {
-            cs = new ColorScheme ();
+            cs = new ();
         }
 
         return Enabled ? cs.Normal : cs.Disabled;
@@ -351,8 +343,8 @@ public partial class View
             return;
         }
 
-        BoundsToScreen (col, row, out int rCol, out int rRow, false);
-        Driver?.Move (rCol, rRow);
+        Rectangle screen = BoundsToScreen (new (col, row, 0, 0));
+        Driver?.Move (screen.X, screen.Y);
     }
 
     // TODO: Make this cancelable
@@ -392,7 +384,7 @@ public partial class View
         {
             if (SuperView is { })
             {
-                Clear (BoundsToScreen (contentArea));
+                Clear (contentArea);
             }
 
             if (!string.IsNullOrEmpty (TextFormatter.Text))
@@ -453,7 +445,7 @@ public partial class View
     ///     This method will be called after any subviews removed with <see cref="Remove(View)"/> have been completed
     ///     drawing.
     /// </remarks>
-    public virtual void OnDrawContentComplete (Rectangle contentArea) { }
+    public virtual void OnDrawContentComplete (Rectangle contentArea) { DrawContentComplete?.Invoke (this, new (contentArea)); }
 
     // TODO: Make this cancelable
     /// <summary>

@@ -885,11 +885,10 @@ internal sealed class Menu : View
                 textToDraw = item.Title;
             }
 
-            BoundsToScreen (0, i, out int vtsCol, out int vtsRow, false);
-
-            if (vtsCol < Driver.Cols)
+            Rectangle screen = BoundsToScreen (new (new (0 , i), Size.Empty));
+            if (screen.X < Driver.Cols)
             {
-                Driver.Move (vtsCol + 1, vtsRow);
+                Driver.Move (screen.X + 1, screen.Y);
 
                 if (!item.IsEnabled ())
                 {
@@ -924,17 +923,17 @@ internal sealed class Menu : View
                             ? item.Help.GetColumns ()
                             : item.Help.GetColumns () + item.ShortcutTag.GetColumns () + 2;
                 int col = Frame.Width - l - 3;
-                BoundsToScreen (col, i, out vtsCol, out vtsRow, false);
+                screen = BoundsToScreen (new (new (col, i), Size.Empty));
 
-                if (vtsCol < Driver.Cols)
+                if (screen.X < Driver.Cols)
                 {
-                    Driver.Move (vtsCol, vtsRow);
+                    Driver.Move (screen.X, screen.Y);
                     Driver.AddStr (item.Help);
 
                     // The shortcut tag string
                     if (!string.IsNullOrEmpty (item.ShortcutTag))
                     {
-                        Driver.Move (vtsCol + l - item.ShortcutTag.GetColumns (), vtsRow);
+                        Driver.Move (screen.X + l - item.ShortcutTag.GetColumns (), screen.Y);
                         Driver.AddStr (item.ShortcutTag);
                     }
                 }

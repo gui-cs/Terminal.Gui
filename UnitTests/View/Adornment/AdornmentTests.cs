@@ -15,35 +15,80 @@ public class AdornmentTests
             X = 1,
             Y = 2,
             Width = 20,
-            Height = 31
+            Height = 20
         };
-
-        var marginThickness = 1;
-        view.Margin.Thickness = new Thickness (marginThickness);
-
-        var borderThickness = 2;
-        view.Border.Thickness = new Thickness (borderThickness);
-
-        var paddingThickness = 3;
-        view.Padding.Thickness = new Thickness (paddingThickness);
 
         view.BeginInit ();
         view.EndInit ();
 
-        Assert.Equal (new Rectangle (1, 2, 20, 31), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 8, 19), view.Bounds);
+        Assert.Equal (new (1, 2, 20, 20), view.Frame);
+        Assert.Equal (new (0, 0, 20, 20), view.Bounds);
 
-        Assert.Equal (new Rectangle (0, 0, view.Margin.Frame.Width - marginThickness * 2, view.Margin.Frame.Height - marginThickness * 2), view.Margin.Bounds);
+        var marginThickness = 1;
+        view.Margin.Thickness = new  (marginThickness);
+        Assert.Equal (new (0, 0, 18, 18), view.Bounds);
 
-        Assert.Equal (new Rectangle (0, 0, view.Border.Frame.Width - borderThickness * 2, view.Border.Frame.Height - borderThickness * 2), view.Border.Bounds);
+        var borderThickness = 2;
+        view.Border.Thickness = new (borderThickness);
+        Assert.Equal (new (0, 0, 14, 14), view.Bounds);
 
-        Assert.Equal (
-                      new Rectangle (
-                                     0,
-                                     0,
-                                     view.Padding.Frame.Width - (marginThickness + borderThickness) * 2,
-                                     view.Padding.Frame.Height - (marginThickness + borderThickness) * 2),
-                      view.Padding.Bounds);
+        var paddingThickness = 3;
+        view.Padding.Thickness = new Thickness (paddingThickness);
+        Assert.Equal (new (0, 0, 8, 8), view.Bounds);
+
+        Assert.Equal (new (0, 0, view.Margin.Frame.Width, view.Margin.Frame.Height), view.Margin.Bounds);
+
+        Assert.Equal (new (0, 0, view.Border.Frame.Width, view.Border.Frame.Height), view.Border.Bounds);
+
+        Assert.Equal (new (0, 0, view.Padding.Frame.Width , view.Padding.Frame.Height), view.Padding.Bounds);
+    }
+
+    // Test that Adornment.Bounds_get override returns Frame.Size minus Thickness
+    [Theory]
+    [InlineData (0, 0, 0, 0, 0)]
+    [InlineData (0, 0, 0, 1, 1)]
+    [InlineData (0, 0, 0, 1, 0)]
+    [InlineData (0, 0, 0, 0, 1)]
+    [InlineData (1, 0, 0, 0, 0)]
+    [InlineData (1, 0, 0, 1, 1)]
+    [InlineData (1, 0, 0, 1, 0)]
+    [InlineData (1, 0, 0, 0, 1)]
+    [InlineData (1, 0, 0, 4, 4)]
+    [InlineData (1, 0, 0, 4, 0)]
+    [InlineData (1, 0, 0, 0, 4)]
+
+    [InlineData (0, 1, 0, 0, 0)]
+    [InlineData (0, 1, 0, 1, 1)]
+    [InlineData (0, 1, 0, 1, 0)]
+    [InlineData (0, 1, 0, 0, 1)]
+    [InlineData (1, 1, 0, 0, 0)]
+    [InlineData (1, 1, 0, 1, 1)]
+    [InlineData (1, 1, 0, 1, 0)]
+    [InlineData (1, 1, 0, 0, 1)]
+    [InlineData (1, 1, 0, 4, 4)]
+    [InlineData (1, 1, 0, 4, 0)]
+    [InlineData (1, 1, 0, 0, 4)]
+
+    [InlineData (0, 1, 1, 0, 0)]
+    [InlineData (0, 1, 1, 1, 1)]
+    [InlineData (0, 1, 1, 1, 0)]
+    [InlineData (0, 1, 1, 0, 1)]
+    [InlineData (1, 1, 1, 0, 0)]
+    [InlineData (1, 1, 1, 1, 1)]
+    [InlineData (1, 1, 1, 1, 0)]
+    [InlineData (1, 1, 1, 0, 1)]
+    [InlineData (1, 1, 1, 4, 4)]
+    [InlineData (1, 1, 1, 4, 0)]
+    [InlineData (1, 1, 1, 0, 4)]
+    public void Bounds_Width_Is_Frame_Width (int thickness, int x, int y, int w, int h)
+    {
+        var adornment = new Adornment (null);
+        adornment.Thickness = new Thickness (thickness);
+        adornment.Frame = new Rectangle (x, y, w, h);
+        Assert.Equal (new Rectangle (x, y, w, h), adornment.Frame);
+
+        var expectedBounds = new Rectangle (0, 0, w, h);
+        Assert.Equal (expectedBounds, adornment.Bounds);
     }
 
     // Test that Adornment.Bounds_get override uses Parent not SuperView

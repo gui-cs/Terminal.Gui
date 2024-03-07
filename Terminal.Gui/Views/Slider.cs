@@ -1073,7 +1073,7 @@ public class Slider<T> : View
     private void DrawSlider ()
     {
         // TODO: be more surgical on clear
-        Clear ();
+        Clear (Bounds);
 
         // Attributes
 
