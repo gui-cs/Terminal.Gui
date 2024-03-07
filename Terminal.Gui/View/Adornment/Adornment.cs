@@ -36,7 +36,7 @@ public class Adornment : View
     /// </summary>
     public override Rectangle Bounds
     {
-        get => new (Point.Empty, Frame.Size);
+        get => Frame with { Location = Point.Empty };
 
         // QUESTION: So why even have a setter then?
         // ANSWER: Because this is an override of a base class property, and the base class has a setter.
