@@ -1,3 +1,5 @@
+using System.Net.Mime;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -358,7 +360,7 @@ public partial class Toplevel : View
         {
             //Driver.SetAttribute (GetNormalColor ());
             // TODO: It's bad practice for views to always clear. Defeats the purpose of clipping etc...
-            Clear ();
+            ClearFrame ();
             LayoutSubviews ();
             PositionToplevels ();
 

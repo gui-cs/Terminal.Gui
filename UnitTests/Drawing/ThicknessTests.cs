@@ -340,6 +340,22 @@ public class ThicknessTests
         Assert.Equal (t.GetHashCode (), t.GetHashCode ());
     }
 
+    // Test Thickness.GetInside(Rectangle)
+    [Theory]
+    [InlineData (0, 0, 10, 10, 1, 1, 8, 8)]
+    [InlineData (1, 0, 10, 10, 2, 1, 8, 8)]
+    [InlineData (0, 1, 10, 10, 1, 2, 8, 8)]
+    public void GetInside_Uniform (int x, int y, int width, int height, int expectedX, int expectedY, int expectedWidth, int expectedHeight)
+    {
+        var t = new Thickness (1, 1, 1, 1); // Uniform thickness for simplicity
+        var r = new Rectangle (x, y, width, height);
+        Rectangle inside = t.GetInside (r);
+        Assert.Equal (expectedX, inside.X);
+        Assert.Equal (expectedY, inside.Y);
+        Assert.Equal (expectedWidth, inside.Width);
+        Assert.Equal (expectedHeight, inside.Height);
+    }
+
     [Fact]
     public void GetInsideTests_Mixed_Pos_Neg_Thickness_Non_Empty_Size ()
     {

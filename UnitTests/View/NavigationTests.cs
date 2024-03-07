@@ -848,8 +848,8 @@ public class NavigationTests
         Assert.Equal (0, screen.X);
         Assert.Equal (0, screen.Y);
         screen = top.Padding.BoundsToScreen (new (0, 0, 0, 0));
-        Assert.Equal (0, screen.X);
-        Assert.Equal (0, screen.Y);
+        Assert.Equal (1, screen.X);
+        Assert.Equal (1, screen.Y);
         screen = top.BoundsToScreen (new (0, 0, 0, 0));
         Assert.Equal (1, screen.X);
         Assert.Equal (1, screen.Y);
@@ -1007,8 +1007,8 @@ public class NavigationTests
         Assert.Equal (0, screen.X);
         Assert.Equal (0, screen.Y);
         screen = top.Padding.BoundsToScreen (new (-3, -2, 0, 0));
-        Assert.Equal (0, screen.X);
-        Assert.Equal (0, screen.Y);
+        Assert.Equal (1, screen.X);
+        Assert.Equal (1, screen.Y);
         screen = top.BoundsToScreen (new (-3, -2, 0, 0));
         Assert.Equal (1, screen.X);
         Assert.Equal (1, screen.Y);

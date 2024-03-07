@@ -201,7 +201,7 @@ public partial class View : Responder, ISupportInitializeNotification
 
                     if (ClearOnVisibleFalse)
                     {
-                        Clear ();
+                        ClearFrame();
                     }
                 }
 

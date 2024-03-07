@@ -182,7 +182,7 @@ public class TileView : View
     public override void OnDrawContent (Rectangle contentArea)
     {
         Driver.SetAttribute (ColorScheme.Normal);
-        Clear ();
+        Clear (contentArea);
 
         base.OnDrawContent (contentArea);
 

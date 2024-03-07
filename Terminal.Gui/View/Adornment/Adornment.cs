@@ -30,10 +30,22 @@ public class Adornment : View
     /// <param name="parent"></param>
     public Adornment (View parent) { Parent = parent; }
 
-    /// <summary>Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).</summary>
+    ///// <summary>
+    /////     Helper to get the X and Y offset of the Bounds from the Adornment Frame. This is the Left and Top properties
+    /////     of <see cref="Thickness"/>.
+    ///// </summary>
+    //public override Point GetBoundsOffset ()
+    //{
+    //    return new (Thickness.Left, Thickness.Top);
+    //}
+
+    /// <summary>
+    /// Gets the rectangle that describes the area of the Adornment. The Location is always (0,0).
+    /// The size is the size of the Frame 
+    /// </summary>
     public override Rectangle Bounds
     {
-        get => new Rectangle (Point.Empty, Thickness?.GetInside (new (Point.Empty, Frame.Size)).Size ?? Frame.Size);
+        get => new (Point.Empty, Frame.Size);
         // QUESTION: So why even have a setter then?
         set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
     }
@@ -82,6 +94,18 @@ public class Adornment : View
         }
     }
 
+    ///// <inheritdoc/>
+    //public override Rectangle BoundsToScreen (Rectangle bounds)
+    //{
+    //    // Adornments are *Children* of a View, not SubViews. Thus View.BoundsToScreen will not work.
+    //    // To get the screen-relative coordinates of a Adornment, we need to know who
+    //    // the Parent is
+    //    Rectangle parentFrame = Parent?.Frame ?? Frame;
+    //    bounds.Offset (parentFrame.X, parentFrame.Y);
+
+    //    return Parent?.SuperView?.BoundsToScreen (bounds) ?? bounds;
+    //}
+
     /// <inheritdoc/>
     public override Rectangle FrameToScreen ()
     {
@@ -91,12 +115,9 @@ public class Adornment : View
         }
 
         // Adornments are *Children* of a View, not SubViews. Thus View.FrameToScreen will not work.
-        // To get the screen-relative coordinates of a Adornment, we need to know who
-        // the Parent is
+        // To get the screen-relative coordinates of a Adornment, we need get the parent's Frame
+        // in screen coords, and add our Frame location to it.
         Rectangle parent = Parent.FrameToScreen ();
-
-        // We now have coordinates relative to our View. If our View's SuperView has
-        // a SuperView, keep going...
         return new (new (parent.X + Frame.X, parent.Y + Frame.Y), Frame.Size);
     }
 
@@ -112,13 +133,11 @@ public class Adornment : View
             return;
         }
 
-        Rectangle screenBounds = BoundsToScreen (Frame);
-
+        Rectangle screenBounds = BoundsToScreen (contentArea);
         Attribute normalAttr = GetNormalColor ();
-
-        // This just draws/clears the thickness, not the insides.
         Driver.SetAttribute (normalAttr);
-        Thickness.Draw (screenBounds, (string)(Data ?? string.Empty));
+        // This just draws/clears the thickness, not the insides.
+        Thickness.Draw (screenBounds, ToString ());
 
         if (!string.IsNullOrEmpty (TextFormatter.Text))
         {

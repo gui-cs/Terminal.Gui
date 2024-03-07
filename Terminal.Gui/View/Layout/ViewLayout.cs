@@ -176,26 +176,31 @@ public partial class View
             }
 #endif // DEBUG
 
-            // BUGBUG: I think there's a bug here. This should be && not ||
             if (Margin is null || Border is null || Padding is null)
             {
                 return Rectangle.Empty with { Size = Frame.Size };
             }
 
-            int width = Math.Max (
-                                  0,
-                                  Frame.Size.Width
-                                  - Margin.Thickness.Horizontal
-                                  - Border.Thickness.Horizontal
-                                  - Padding.Thickness.Horizontal
-                                 );
+            //if (!IsInitialized)
+            //{
+                int width = Math.Max (
+                                      0,
+                                      Frame.Size.Width
+                                      - Margin.Thickness.Horizontal
+                                      - Border.Thickness.Horizontal
+                                      - Padding.Thickness.Horizontal
+                                     );
 
-            int height = Math.Max (
-                                   0,
-                                   Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical
-                                  );
+                int height = Math.Max (
+                                       0,
+                                       Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical
+                                      );
 
-            return Rectangle.Empty with { Size = new (width, height) };
+                return Rectangle.Empty with { Size = new (width, height) };
+            //}
+
+            //var totalThickness = Margin.Thickness + Border.Thickness + Padding.Thickness;
+            //return new (Point.Empty, totalThickness.GetInside (Frame).Size ?? Frame.Size);
         }
         set
         {
@@ -503,12 +508,11 @@ public partial class View
     {
         // Translate bounds to Frame (our SuperView's Bounds-relative coordinates)
         Point boundsOffset = GetBoundsOffset ();
-        bounds.Offset(Frame.X + boundsOffset.X, Frame.Y + boundsOffset.Y);
 
         Rectangle screen = FrameToScreen ();
         screen.Offset (boundsOffset.X + bounds.X, boundsOffset.Y + bounds.Y);
 
-        return screen;
+        return new Rectangle(screen.Location, bounds.Size);
     }
 
 #nullable enable
@@ -611,12 +615,14 @@ public partial class View
     ///     Helper to get the X and Y offset of the Bounds from the Frame. This is the sum of the Left and Top properties
     ///     of <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/>.
     /// </summary>
-    public Point GetBoundsOffset ()
+    public virtual Point GetBoundsOffset ()
     {
-        return new (
-                          Padding?.Thickness.GetInside (Padding.Frame).X ?? 0,
-                          Padding?.Thickness.GetInside (Padding.Frame).Y ?? 0
-                         );
+        if (Padding is null)
+        {
+            return Point.Empty;
+        }
+
+        return Padding.Thickness.GetInside (Padding.Frame).Location;
     }
 
     /// <summary>Fired after the View's <see cref="LayoutSubviews"/> method has completed.</summary>

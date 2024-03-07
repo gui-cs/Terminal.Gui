@@ -254,7 +254,7 @@ public class ScenarioTests
                                                       _hostPane.Remove (_curView);
                                                       _curView.Dispose ();
                                                       _curView = null;
-                                                      _hostPane.Clear ();
+                                                      _hostPane.Clear (_hostPane.Bounds);
                                                   }
 
                                                   _curView = CreateClass (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);

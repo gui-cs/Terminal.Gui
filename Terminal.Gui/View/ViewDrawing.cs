@@ -80,25 +80,36 @@ public partial class View
         Driver.AddRune (ch);
     }
 
-    /// <summary>Clears the <see cref="Bounds"/> with the normal background color.</summary>
+    /// <summary>Clears the <see cref="Frame"/> with the normal background color.</summary>
     /// <remarks>
     ///     <para>This clears the Bounds used by this view.</para>
     /// </remarks>
-    public void Clear ()
+    public void ClearFrame ()
     {
         if (IsInitialized)
         {
-            Clear (BoundsToScreen (Bounds));
+            if (Driver is null)
+            {
+                return;
+            }
+
+            Attribute prev = Driver.SetAttribute (GetNormalColor ());
+            Driver.FillRect (FrameToScreen());
+            Driver.SetAttribute (prev);
         }
     }
 
-    // BUGBUG: This version of the Clear API should be removed. We should have a tenet that says 
-    // "View APIs only deal with View-relative coords". This is only used by ComboBox which can
-    // be refactored to use the View-relative version.
-    /// <summary>Clears the specified screen-relative rectangle with the normal background.</summary>
+    /// <summary>Clears <see cref="Bounds"/> with the normal background.</summary>
     /// <remarks></remarks>
-    /// <param name="regionScreen">The screen-relative rectangle to clear.</param>
-    public void Clear (Rectangle regionScreen)
+    public void Clear ()
+    {
+        Clear (Bounds);
+    }
+
+    /// <summary>Clears the specified <see cref="Bounds"/>-relative rectangle with the normal background.</summary>
+    /// <remarks></remarks>
+    /// <param name="contentArea">The Bounds-relative rectangle to clear.</param>
+    public void Clear (Rectangle contentArea)
     {
         if (Driver is null)
         {
@@ -106,7 +117,9 @@ public partial class View
         }
 
         Attribute prev = Driver.SetAttribute (GetNormalColor ());
-        Driver.FillRect (regionScreen);
+        // Clamp the region to the bounds of the view
+        contentArea = Rectangle.Intersect (contentArea, Bounds);
+        Driver.FillRect (BoundsToScreen(contentArea));
         Driver.SetAttribute (prev);
     }
 
@@ -373,7 +386,7 @@ public partial class View
         {
             if (SuperView is { })
             {
-                Clear (BoundsToScreen (contentArea));
+                Clear (contentArea);
             }
 
             if (!string.IsNullOrEmpty (TextFormatter.Text))

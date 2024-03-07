@@ -99,7 +99,7 @@ public class ColorPickers : Scenario
     /// <summary>Update a color label from his ColorPicker.</summary>
     private void UpdateColorLabel (Label label, ColorPicker colorPicker)
     {
-        label.Clear ();
+        label.ClearFrame ();
         var color = new Color (colorPicker.SelectedColor);
 
         label.Text =

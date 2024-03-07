@@ -314,7 +314,7 @@ public class Snake : Scenario
             base.OnDrawContent (contentArea);
 
             Driver.SetAttribute (white);
-            Clear ();
+            Clear (contentArea);
 
             var canvas = new LineCanvas ();
 

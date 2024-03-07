@@ -121,7 +121,7 @@ public class AllViewsTester : Scenario
                                                       _hostPane.Remove (_curView);
                                                       _curView.Dispose ();
                                                       _curView = null;
-                                                      _hostPane.Clear ();
+                                                      _hostPane.ClearFrame ();
                                                   }
 
                                                   _curView = CreateClass (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
