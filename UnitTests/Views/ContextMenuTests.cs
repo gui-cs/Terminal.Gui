@@ -643,7 +643,7 @@ public class ContextMenuTests
         Assert.True (
                      top.Subviews [0]
                         .OnMouseEvent (
-                                     new MouseEvent { X = 0, Y = 4, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                     new MouseEvent { X = 0, Y = 3, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                     )
                     );
         Application.Refresh ();
@@ -691,7 +691,7 @@ public class ContextMenuTests
         Assert.True (
                      top.Subviews [0]
                         .OnMouseEvent (
-                                     new MouseEvent { X = 30, Y = 4, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                     new MouseEvent { X = 30, Y = 3, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                     )
                     );
         Application.Refresh ();
@@ -738,7 +738,7 @@ public class ContextMenuTests
         Assert.True (
                      top.Subviews [0]
                         .OnMouseEvent (
-                                     new MouseEvent { X = 30, Y = 4, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                     new MouseEvent { X = 30, Y = 3, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                     )
                     );
         Application.Refresh ();
@@ -782,7 +782,7 @@ public class ContextMenuTests
         Assert.True (
                      top.Subviews [0]
                         .OnMouseEvent (
-                                     new MouseEvent { X = 30, Y = 4, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                     new MouseEvent { X = 30, Y = 3, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                     )
                     );
         Application.Refresh ();
@@ -826,7 +826,7 @@ public class ContextMenuTests
         Assert.True (
                      top.Subviews [0]
                         .OnMouseEvent (
-                                     new MouseEvent { X = 30, Y = 4, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                     new MouseEvent { X = 30, Y = 3, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                     )
                     );
         Application.Refresh ();

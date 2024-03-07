@@ -190,9 +190,6 @@ public class OverlappedTests
 
         var top = new Toplevel ();
         RunState rs = Application.Begin (top);
-#if DEBUG_IDISPOSABLE
-        Assert.Equal (4, Responder.Instances.Count);
-#endif
 
         Application.End (rs);
         Application.Shutdown ();
@@ -903,7 +900,7 @@ public class OverlappedTests
                                                            new MouseEvent { X = 1, Y = 1, Flags = MouseFlags.Button1Pressed }
                                                           )
                                  );
-        Assert.Equal (win2, Application.MouseGrabView);
+        Assert.Equal (win2.Border, Application.MouseGrabView);
 
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (

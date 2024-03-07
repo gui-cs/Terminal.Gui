@@ -39,7 +39,7 @@ public class Window : Toplevel
                             return true;
                         }
 
-                        return false;
+                        return OnAccept ();
                     }
                    );
 

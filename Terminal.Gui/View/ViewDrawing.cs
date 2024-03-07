@@ -521,12 +521,11 @@ public partial class View
     ///     redrawn will be the <paramref name="region"/>.
     /// </remarks>
     /// <param name="region">The Bounds-relative region that needs to be redrawn.</param>
-    public void SetNeedsDisplay (Rectangle region)
+    public virtual void SetNeedsDisplay (Rectangle region)
     {
         if (!IsInitialized)
         {
             _needsDisplayRect = region;
-
             return;
         }
 
@@ -545,22 +544,11 @@ public partial class View
 
         _superView?.SetSubViewNeedsDisplay ();
 
-        if (_needsDisplayRect.X < Bounds.X
-            || _needsDisplayRect.Y < Bounds.Y
-            || _needsDisplayRect.Width > Bounds.Width
-            || _needsDisplayRect.Height > Bounds.Height)
-        {
-            Margin?.SetNeedsDisplay (Margin.Bounds);
-            Border?.SetNeedsDisplay (Border.Bounds);
-            Padding?.SetNeedsDisplay (Padding.Bounds);
-        }
+        Margin?.SetNeedsDisplay (Margin.Bounds);
+        Border?.SetNeedsDisplay (Border.Bounds);
+        Padding?.SetNeedsDisplay (Padding.Bounds);
 
-        if (_subviews is null)
-        {
-            return;
-        }
-
-        foreach (View subview in _subviews)
+        foreach (View subview in Subviews)
         {
             if (subview.Frame.IntersectsWith (region))
             {
@@ -584,7 +572,7 @@ public partial class View
     }
 
     /// <summary>Clears <see cref="NeedsDisplay"/> and <see cref="SubViewNeedsDisplay"/>.</summary>
-    protected void ClearNeedsDisplay ()
+    protected virtual void ClearNeedsDisplay ()
     {
         _needsDisplayRect = Rectangle.Empty;
         SubViewNeedsDisplay = false;

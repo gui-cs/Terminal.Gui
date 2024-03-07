@@ -316,15 +316,18 @@ public partial class View
         }
     }
 
-    // BUGBUG: v2 - Seems weird that this is in View and not Responder.
     private bool _hasFocus;
 
     /// <inheritdoc/>
-    public override bool HasFocus => _hasFocus;
+    public bool HasFocus
+    {
+        set => SetHasFocus (value, this, true);
+        get => _hasFocus;
+    }
 
     private void SetHasFocus (bool value, View view, bool force = false)
     {
-        if (_hasFocus != value || force)
+        if (HasFocus != value || force)
         {
             _hasFocus = value;
 
@@ -357,6 +360,7 @@ public partial class View
     public override void OnCanFocusChanged () { CanFocusChanged?.Invoke (this, EventArgs.Empty); }
 
     private bool _oldCanFocus;
+    private bool _canFocus;
 
     /// <summary>Gets or sets a value indicating whether this <see cref="View"/> can focus.</summary>
     /// <remarks>
@@ -367,9 +371,9 @@ public partial class View
     ///     Set accessor validates <see langword="value"/> before setting <see cref="Responder"/>.
     ///     <see cref="Responder.CanFocus"/>.
     /// </remarks>
-    public override bool CanFocus
+    public bool CanFocus
     {
-        get => base.CanFocus;
+        get => _canFocus;
         set
         {
             if (!_addingView && IsInitialized && SuperView?.CanFocus == false && value)
@@ -377,9 +381,9 @@ public partial class View
                 throw new InvalidOperationException ("Cannot set CanFocus to true if the SuperView CanFocus is false!");
             }
 
-            if (base.CanFocus != value)
+            if (_canFocus != value)
             {
-                base.CanFocus = value;
+                _canFocus = value;
 
                 switch (value)
                 {
