@@ -63,7 +63,7 @@ public class Button : View
 
     private void Button_MouseClick (object sender, MouseEventEventArgs e)
     {
-        e.Handled = InvokeCommand (Command.Accept) == true;
+        e.Handled = InvokeCommand (Command.HotKey) == true;
     }
 
     private void Button_TitleChanged (object sender, StateEventArgs<string> e)

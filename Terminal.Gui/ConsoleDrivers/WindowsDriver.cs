@@ -1387,6 +1387,12 @@ internal class WindowsDriver : ConsoleDriver
 
             case WindowsConsole.EventType.Mouse:
                 MouseEvent me = ToDriverMouse (inputEvent.MouseEvent);
+
+                if (me is null)
+                {
+                    break;
+                }
+
                 OnMouseEvent (new MouseEventEventArgs (me));
 
                 if (_processButtonClick)
@@ -1763,6 +1769,7 @@ internal class WindowsDriver : ConsoleDriver
         return mouseFlag;
     }
 
+    [CanBeNull]
     private MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
     {
         var mouseFlag = MouseFlags.AllEvents;
@@ -1993,8 +2000,9 @@ internal class WindowsDriver : ConsoleDriver
                 _pointMove = new Point (mouseEvent.MousePosition.X, mouseEvent.MousePosition.Y);
             }
         }
-        else if (mouseEvent.ButtonState == 0 && mouseEvent.EventFlags == 0)
+        else if (mouseEvent is { ButtonState: 0, EventFlags: 0 })
         {
+            // This happens on a double or triple click event.
             mouseFlag = 0;
         }
 
