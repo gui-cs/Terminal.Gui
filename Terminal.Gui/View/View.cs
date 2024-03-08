@@ -73,7 +73,8 @@ namespace Terminal.Gui;
 ///         a View can be accessed with the <see cref="SuperView"/> property.
 ///     </para>
 ///     <para>
-///         To flag a region of the View's <see cref="Bounds"/> to be redrawn call <see cref="SetNeedsDisplay(Rectangle)"/>.
+///         To flag a region of the View's <see cref="Bounds"/> to be redrawn call <see cref="SetNeedsDisplay(Rectangle)"/>
+///         .
 ///         To flag the entire view for redraw call <see cref="SetNeedsDisplay()"/>.
 ///     </para>
 ///     <para>
@@ -113,20 +114,177 @@ namespace Terminal.Gui;
 
 public partial class View : Responder, ISupportInitializeNotification
 {
-    private bool _oldEnabled;
-
-    /// <summary>Gets or sets whether a view is cleared if the <see cref="Visible"/> property is <see langword="false"/>.</summary>
-    public bool ClearOnVisibleFalse { get; set; } = true;
-
-    /// <summary>Gets or sets arbitrary data for the view.</summary>
-    /// <remarks>This property is not used internally.</remarks>
-    public object Data { get; set; }
+    #region Constructors and Initialization
 
     /// <summary>
     ///     Points to the current driver in use by the view, it is a convenience property for simplifying the development
     ///     of new views.
     /// </summary>
     public static ConsoleDriver Driver => Application.Driver;
+
+    /// <summary>Initializes a new instance of <see cref="View"/>.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
+    ///         control the size and location of the view. The <see cref="View"/> will be created using
+    ///         <see cref="LayoutStyle.Absolute"/> coordinates. The initial size ( <see cref="View.Frame"/>) will be adjusted
+    ///         to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines.
+    ///     </para>
+    ///     <para>If <see cref="Height"/> is greater than one, word wrapping is provided.</para>
+    ///     <para>
+    ///         This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>.
+    ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
+    ///         control the size and location of the view, changing it to <see cref="LayoutStyle.Computed"/>.
+    ///     </para>
+    /// </remarks>
+    public View ()
+    {
+        HotKeySpecifier = (Rune)'_';
+        TitleTextFormatter.HotKeyChanged += TitleTextFormatter_HotKeyChanged;
+
+        TextDirection = TextDirection.LeftRight_TopBottom;
+        Text = string.Empty;
+
+        CanFocus = false;
+        TabIndex = -1;
+        TabStop = false;
+
+        AddCommands ();
+
+        Margin = CreateAdornment (typeof (Margin)) as Margin;
+        Border = CreateAdornment (typeof (Border)) as Border;
+        Padding = CreateAdornment (typeof (Padding)) as Padding;
+    }
+
+    /// <summary>
+    ///     Event called only once when the <see cref="View"/> is being initialized for the first time. Allows
+    ///     configurations and assignments to be performed before the <see cref="View"/> being shown. This derived from
+    ///     <see cref="ISupportInitializeNotification"/> to allow notify all the views that are being initialized.
+    /// </summary>
+    public event EventHandler Initialized;
+
+    /// <summary>
+    ///     Get or sets if  the <see cref="View"/> has been initialized (via <see cref="ISupportInitialize.BeginInit"/>
+    ///     and <see cref="ISupportInitialize.EndInit"/>).
+    /// </summary>
+    /// <para>
+    ///     If first-run-only initialization is preferred, overrides to
+    ///     <see cref="ISupportInitializeNotification.IsInitialized"/> can be implemented, in which case the
+    ///     <see cref="ISupportInitialize"/> methods will only be called if
+    ///     <see cref="ISupportInitializeNotification.IsInitialized"/> is <see langword="false"/>. This allows proper
+    ///     <see cref="View"/> inheritance hierarchies to override base class layout code optimally by doing so only on first
+    ///     run, instead of on every run.
+    /// </para>
+    public virtual bool IsInitialized { get; set; }
+
+    /// <summary>Signals the View that initialization is starting. See <see cref="ISupportInitialize"/>.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         Views can opt-in to more sophisticated initialization by implementing overrides to
+    ///         <see cref="ISupportInitialize.BeginInit"/> and <see cref="ISupportInitialize.EndInit"/> which will be called
+    ///         when the <see cref="SuperView"/> is initialized.
+    ///     </para>
+    ///     <para>
+    ///         If first-run-only initialization is preferred, overrides to <see cref="ISupportInitializeNotification"/> can
+    ///         be implemented too, in which case the <see cref="ISupportInitialize"/> methods will only be called if
+    ///         <see cref="ISupportInitializeNotification.IsInitialized"/> is <see langword="false"/>. This allows proper
+    ///         <see cref="View"/> inheritance hierarchies to override base class layout code optimally by doing so only on
+    ///         first run, instead of on every run.
+    ///     </para>
+    /// </remarks>
+    public virtual void BeginInit ()
+    {
+        if (IsInitialized)
+        {
+            throw new InvalidOperationException ("The view is already initialized.");
+        }
+
+        _oldCanFocus = CanFocus;
+        _oldTabIndex = _tabIndex;
+
+        if (_subviews?.Count > 0)
+        {
+            foreach (View view in _subviews)
+            {
+                if (!view.IsInitialized)
+                {
+                    view.BeginInit ();
+                }
+            }
+        }
+    }
+
+    // TODO: Implement logic that allows EndInit to throw if BeginInit has not been called
+    // TODO: See EndInit_Called_Without_BeginInit_Throws test.
+
+    /// <summary>Signals the View that initialization is ending. See <see cref="ISupportInitialize"/>.</summary>
+    /// <remarks>
+    ///     <para>Initializes all Subviews and Invokes the <see cref="Initialized"/> event.</para>
+    /// </remarks>
+    public virtual void EndInit ()
+    {
+        if (IsInitialized)
+        {
+            throw new InvalidOperationException ("The view is already initialized.");
+        }
+
+        IsInitialized = true;
+
+        // TODO: Move these into ViewText.cs as EndInit_Text() to consolodate.
+        // TODO: Verify UpdateTextDirection really needs to be called here.
+        // These calls were moved from BeginInit as they access Bounds which is indeterminate until EndInit is called.
+        UpdateTextDirection (TextDirection);
+        UpdateTextFormatterText ();
+        OnResizeNeeded ();
+
+        if (_subviews is { })
+        {
+            foreach (View view in _subviews)
+            {
+                if (!view.IsInitialized)
+                {
+                    view.EndInit ();
+                }
+            }
+        }
+
+        Initialized?.Invoke (this, EventArgs.Empty);
+    }
+
+    #endregion Constructors and Initialization
+
+    /// <summary>Gets or sets an identifier for the view;</summary>
+    /// <value>The identifier.</value>
+    /// <remarks>The id should be unique across all Views that share a SuperView.</remarks>
+    public string Id { get; set; } = "";
+
+    /// <summary>Gets or sets arbitrary data for the view.</summary>
+    /// <remarks>This property is not used internally.</remarks>
+    public object Data { get; set; }
+
+    /// <summary>
+    ///     Cancelable event fired when the <see cref="Command.Accept"/> command is invoked. Set
+    ///     <see cref="CancelEventArgs.Cancel"/>
+    ///     to cancel the event.
+    /// </summary>
+    public event EventHandler<CancelEventArgs> Accept;
+
+    /// <summary>
+    ///     Called when the <see cref="Command.Accept"/> command is invoked. Fires the <see cref="Accept"/>
+    ///     event.
+    /// </summary>
+    /// <returns>If <see langword="true"/> the event was canceled.</returns>
+    protected bool? OnAccept ()
+    {
+        var args = new CancelEventArgs ();
+        Accept?.Invoke (this, args);
+
+        return args.Cancel;
+    }
+
+    #region Visibility
+
+    private bool _oldEnabled;
 
     /// <inheritdoc/>
     public override bool Enabled
@@ -176,13 +334,13 @@ public partial class View : Responder, ISupportInitializeNotification
         }
     }
 
-    /// <summary>Gets or sets an identifier for the view;</summary>
-    /// <value>The identifier.</value>
-    /// <remarks>The id should be unique across all Views that share a SuperView.</remarks>
-    public string Id { get; set; } = "";
+    /// <summary>Event fired when the <see cref="Enabled"/> value is being changed.</summary>
+    public event EventHandler EnabledChanged;
 
     /// <inheritdoc/>
-    /// >
+    public override void OnEnabledChanged () { EnabledChanged?.Invoke (this, EventArgs.Empty); }
+
+    /// <inheritdoc/>
     public override bool Visible
     {
         get => base.Visible;
@@ -211,62 +369,14 @@ public partial class View : Responder, ISupportInitializeNotification
         }
     }
 
-    /// <summary>Event fired when the <see cref="Enabled"/> value is being changed.</summary>
-    public event EventHandler EnabledChanged;
-
-    /// <inheritdoc/>
-    public override void OnEnabledChanged () { EnabledChanged?.Invoke (this, EventArgs.Empty); }
-
     /// <inheritdoc/>
     public override void OnVisibleChanged () { VisibleChanged?.Invoke (this, EventArgs.Empty); }
 
-    /// <summary>Pretty prints the View</summary>
-    /// <returns></returns>
-    public override string ToString () { return $"{GetType ().Name}({Id}){Frame}"; }
+    /// <summary>Gets or sets whether a view is cleared if the <see cref="Visible"/> property is <see langword="false"/>.</summary>
+    public bool ClearOnVisibleFalse { get; set; } = true;
 
     /// <summary>Event fired when the <see cref="Visible"/> value is being changed.</summary>
     public event EventHandler VisibleChanged;
-
-    /// <summary>
-    /// Cancelable event fired when the <see cref="Command.Accept"/> command is invoked. Set <see cref="CancelEventArgs.Cancel"/>
-    /// to cancel the event.
-    /// </summary>
-    public event EventHandler<CancelEventArgs> Accept;
-
-    /// <summary>
-    /// Called when the <see cref="Command.Accept"/> command is invoked. Fires the <see cref="Accept"/>
-    /// event.
-    /// </summary>
-    /// <returns>If <see langword="true"/> the event was canceled.</returns>
-    protected bool? OnAccept ()
-    {
-        var args = new CancelEventArgs ();
-        Accept?.Invoke (this, args);
-        return args.Cancel;
-    }
-
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        LineCanvas.Dispose ();
-
-        Margin?.Dispose ();
-        Margin = null;
-        Border?.Dispose ();
-        Border = null;
-        Padding?.Dispose ();
-        Padding = null;
-
-        for (int i = InternalSubviews.Count - 1; i >= 0; i--)
-        {
-            View subview = InternalSubviews [i];
-            Remove (subview);
-            subview.Dispose ();
-        }
-
-        base.Dispose (disposing);
-        Debug.Assert (InternalSubviews.Count == 0);
-    }
 
     private bool CanBeVisible (View view)
     {
@@ -285,6 +395,8 @@ public partial class View : Responder, ISupportInitializeNotification
 
         return true;
     }
+
+    #endregion Visibility
 
     #region Title
 
@@ -382,129 +494,30 @@ public partial class View : Responder, ISupportInitializeNotification
 
     #endregion
 
-    #region Constructors and Initialization
+    /// <summary>Pretty prints the View</summary>
+    /// <returns></returns>
+    public override string ToString () { return $"{GetType ().Name}({Id}){Frame}"; }
 
-    /// <summary>Initializes a new instance of <see cref="View"/>.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
-    ///         control the size and location of the view. The <see cref="View"/> will be created using
-    ///         <see cref="LayoutStyle.Absolute"/> coordinates. The initial size ( <see cref="View.Frame"/>) will be adjusted
-    ///         to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines.
-    ///     </para>
-    ///     <para>If <see cref="Height"/> is greater than one, word wrapping is provided.</para>
-    ///     <para>
-    ///         This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>.
-    ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
-    ///         control the size and location of the view, changing it to <see cref="LayoutStyle.Computed"/>.
-    ///     </para>
-    /// </remarks>
-    public View ()
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
     {
-        HotKeySpecifier = (Rune)'_';
-        TitleTextFormatter.HotKeyChanged += TitleTextFormatter_HotKeyChanged;
+        LineCanvas.Dispose ();
 
-        TextDirection = TextDirection.LeftRight_TopBottom;
-        Text = string.Empty;
+        Margin?.Dispose ();
+        Margin = null;
+        Border?.Dispose ();
+        Border = null;
+        Padding?.Dispose ();
+        Padding = null;
 
-        CanFocus = false;
-        TabIndex = -1;
-        TabStop = false;
+        for (int i = InternalSubviews.Count - 1; i >= 0; i--)
+        {
+            View subview = InternalSubviews [i];
+            Remove (subview);
+            subview.Dispose ();
+        }
 
-        AddCommands ();
-
-        Margin = CreateAdornment (typeof (Margin)) as Margin;
-        Border = CreateAdornment (typeof (Border)) as Border;
-        Padding = CreateAdornment (typeof (Padding)) as Padding;
+        base.Dispose (disposing);
+        Debug.Assert (InternalSubviews.Count == 0);
     }
-
-    /// <summary>
-    ///     Get or sets if  the <see cref="View"/> has been initialized (via <see cref="ISupportInitialize.BeginInit"/>
-    ///     and <see cref="ISupportInitialize.EndInit"/>).
-    /// </summary>
-    /// <para>
-    ///     If first-run-only initialization is preferred, overrides to
-    ///     <see cref="ISupportInitializeNotification.IsInitialized"/> can be implemented, in which case the
-    ///     <see cref="ISupportInitialize"/> methods will only be called if
-    ///     <see cref="ISupportInitializeNotification.IsInitialized"/> is <see langword="false"/>. This allows proper
-    ///     <see cref="View"/> inheritance hierarchies to override base class layout code optimally by doing so only on first
-    ///     run, instead of on every run.
-    /// </para>
-    public virtual bool IsInitialized { get; set; }
-
-    /// <summary>Signals the View that initialization is starting. See <see cref="ISupportInitialize"/>.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         Views can opt-in to more sophisticated initialization by implementing overrides to
-    ///         <see cref="ISupportInitialize.BeginInit"/> and <see cref="ISupportInitialize.EndInit"/> which will be called
-    ///         when the <see cref="SuperView"/> is initialized.
-    ///     </para>
-    ///     <para>
-    ///         If first-run-only initialization is preferred, overrides to <see cref="ISupportInitializeNotification"/> can
-    ///         be implemented too, in which case the <see cref="ISupportInitialize"/> methods will only be called if
-    ///         <see cref="ISupportInitializeNotification.IsInitialized"/> is <see langword="false"/>. This allows proper
-    ///         <see cref="View"/> inheritance hierarchies to override base class layout code optimally by doing so only on
-    ///         first run, instead of on every run.
-    ///     </para>
-    /// </remarks>
-    public virtual void BeginInit ()
-    {
-        if (IsInitialized)
-        {
-            throw new InvalidOperationException ("The view is already initialized.");
-        }
-
-        _oldCanFocus = CanFocus;
-        _oldTabIndex = _tabIndex;
-
-        if (_subviews?.Count > 0)
-        {
-            foreach (View view in _subviews)
-            {
-                if (!view.IsInitialized)
-                {
-                    view.BeginInit ();
-                }
-            }
-        }
-    }
-
-    // TODO: Implement logic that allows EndInit to throw if BeginInit has not been called
-    // TODO: See EndInit_Called_Without_BeginInit_Throws test.
-
-    /// <summary>Signals the View that initialization is ending. See <see cref="ISupportInitialize"/>.</summary>
-    /// <remarks>
-    ///     <para>Initializes all Subviews and Invokes the <see cref="Initialized"/> event.</para>
-    /// </remarks>
-    public virtual void EndInit ()
-    {
-        if (IsInitialized)
-        {
-            throw new InvalidOperationException ("The view is already initialized.");
-        }
-
-        IsInitialized = true;
-
-        // TODO: Move these into ViewText.cs as EndInit_Text() to consolodate.
-        // TODO: Verify UpdateTextDirection really needs to be called here.
-        // These calls were moved from BeginInit as they access Bounds which is indeterminate until EndInit is called.
-        UpdateTextDirection (TextDirection);
-        UpdateTextFormatterText ();
-        OnResizeNeeded ();
-
-        if (_subviews is { })
-        {
-            foreach (View view in _subviews)
-            {
-                if (!view.IsInitialized)
-                {
-                    view.EndInit ();
-                }
-            }
-        }
-
-        Initialized?.Invoke (this, EventArgs.Empty);
-    }
-
-    #endregion Constructors and Initialization
 }
