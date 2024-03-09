@@ -77,7 +77,7 @@ public class ScrollBars : Scenario
 
         win.Add (new Label { X = Pos.Left (viewOnBorder), Y = Pos.Top (viewOnBorder) - 2, Text = "On Border:" });
 
-        var btn = new Button { X = Pos.Center (), Y = Pos.Bottom (viewOnContentArea) + 1, Text = "Test" };
+        var btn = new Button { X = Pos.Center (), Y = Pos.Bottom (viewOnContentArea) + 1, Text = "Tab or click to select the views" };
         win.Add (btn);
 
         viewOnBorder.TabIndex = 1;
