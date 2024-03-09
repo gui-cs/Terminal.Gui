@@ -676,7 +676,7 @@ public partial class View
     ///     <para>Gets the thickness describing the sum of the Adornments' thicknesses.</para>
     /// </summary>
     /// <returns>A thickness that describes the sum of the Adornments' thicknesses.</returns>
-    public Thickness GetAdornmentsThickness () { return Margin.Thickness + Border.Thickness + Padding.Thickness; }
+    public virtual Thickness GetAdornmentsThickness () { return Margin.Thickness + Border.Thickness + Padding.Thickness; }
 
     /// <summary>
     ///     Helper to get the X and Y offset of the Bounds from the Frame. This is the sum of the Left and Top properties
