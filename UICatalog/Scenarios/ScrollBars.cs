@@ -25,7 +25,7 @@ public class ScrollBars : Scenario
             Text = text,
             UseContentOffset = true
         };
-        viewOnMargin.Margin.ScrollBarType = ScrollBarType.Both;
+        viewOnMargin.Margin.EnableScrollBars = true;
         SetViewProperties (viewOnMargin);
         win.Add (viewOnMargin);
 
@@ -36,7 +36,7 @@ public class ScrollBars : Scenario
             X = Pos.AnchorEnd () - 15, Y = Pos.Center (), Width = 15, Height = 8,
             Text = text,
             UseContentOffset = true,
-            ScrollBarType = ScrollBarType.Both
+            EnableScrollBars = true
         };
         viewOnContentArea.Margin.Thickness = new Thickness (1);
         viewOnContentArea.Margin.ColorScheme = Colors.ColorSchemes ["Dialog"];
@@ -52,7 +52,7 @@ public class ScrollBars : Scenario
             Text = text,
             UseContentOffset = true
         };
-        viewOnPadding.Padding.ScrollBarType = ScrollBarType.Both;
+        viewOnPadding.Padding.EnableScrollBars = true;
         viewOnPadding.Margin.Thickness = new Thickness (1);
         viewOnPadding.Margin.ColorScheme = Colors.ColorSchemes ["Dialog"];
         viewOnPadding.BorderStyle = LineStyle.Single;
@@ -69,7 +69,7 @@ public class ScrollBars : Scenario
             UseContentOffset = true,
             BorderStyle = LineStyle.None
         };
-        viewOnBorder.Border.ScrollBarType = ScrollBarType.Both;
+        viewOnBorder.Border.EnableScrollBars = true;
         viewOnBorder.Margin.Thickness = new Thickness (1);
         viewOnBorder.Margin.ColorScheme = Colors.ColorSchemes ["Dialog"];
         SetViewProperties (viewOnBorder);

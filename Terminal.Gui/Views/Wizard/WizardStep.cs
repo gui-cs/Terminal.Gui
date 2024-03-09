@@ -50,7 +50,7 @@ public class WizardStep : FrameView
 
         _helpTextView.ReadOnly = true;
         _helpTextView.WordWrap = true;
-        _helpTextView.ScrollBarType = ScrollBarType.Both;
+        _helpTextView.EnableScrollBars = true;
         base.Add (_helpTextView);
 
         ShowHide ();

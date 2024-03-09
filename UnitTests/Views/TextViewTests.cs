@@ -6893,7 +6893,7 @@ This is the second line.
         }
 
         var tv = new TextView { Width = 10, Height = 10 };
-        tv.Padding.ScrollBarType = ScrollBarType.Both;
+        tv.Padding.EnableScrollBars = true;
         tv.Text = text;
 
         tv.BeginInit ();
@@ -6940,7 +6940,7 @@ This is the second line.
         }
 
         var tv = new TextView { Width = 10, Height = 10 };
-        tv.Padding.ScrollBarType = ScrollBarType.Both;
+        tv.Padding.EnableScrollBars = true;
         tv.Text = text;
 
         tv.BeginInit ();

@@ -51,7 +51,7 @@ public class ListViewWithSelection : Scenario
             AllowsMarking = false,
             AllowsMultipleSelection = false
         };
-        _listView.Padding.ScrollBarType = ScrollBarType.Both;
+        _listView.Padding.EnableScrollBars = true;
         _listView.RowRender += ListView_RowRender;
         Win.Add (_listView);
 
@@ -61,9 +61,9 @@ public class ListViewWithSelection : Scenario
 
         var keepCheckBox = new CheckBox
         {
-            X = Pos.AnchorEnd (k.Length + 3), Y = 0, Text = k, Checked = _listView.ScrollAutoHideScrollBars
+            X = Pos.AnchorEnd (k.Length + 3), Y = 0, Text = k, Checked = _listView.AutoHideScrollBars
         };
-        keepCheckBox.Toggled += (s, e) => _listView.ScrollKeepContentAlwaysInViewPort = (bool)keepCheckBox.Checked;
+        keepCheckBox.Toggled += (s, e) => _listView.KeepContentAlwaysInContentArea = (bool)keepCheckBox.Checked;
         Win.Add (keepCheckBox);
     }
 

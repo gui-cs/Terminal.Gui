@@ -605,7 +605,7 @@ public class CsvEditor : Scenario
 
     private void SetTable (DataTable dataTable) { _tableView.Table = new DataTableSource (_currentTable = dataTable); }
 
-    private void SetupScrollBar () { _tableView.Padding.ScrollBarType = ScrollBarType.Both; }
+    private void SetupScrollBar () { _tableView.Padding.EnableScrollBars = true; }
 
     private void Sort (bool asc)
     {

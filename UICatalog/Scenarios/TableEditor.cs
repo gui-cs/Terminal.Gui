@@ -434,7 +434,7 @@ public class TableEditor : Scenario
         Win.Height = Dim.Fill (1); // status bar
 
         _tableView = new TableView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (1) };
-        _tableView.Padding.ScrollBarType = ScrollBarType.Both;
+        _tableView.Padding.EnableScrollBars = true;
 
         var menu = new MenuBar
         {

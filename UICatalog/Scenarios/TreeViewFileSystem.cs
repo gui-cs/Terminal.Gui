@@ -175,7 +175,7 @@ public class TreeViewFileSystem : Scenario
         Application.Top.Add (menu);
 
         _treeViewFiles = new TreeView<IFileSystemInfo> { X = 0, Y = 0, Width = Dim.Percent (50), Height = Dim.Fill () };
-        _treeViewFiles.Padding.ScrollBarType = ScrollBarType.Both;
+        _treeViewFiles.Padding.EnableScrollBars = true;
         _treeViewFiles.DrawLine += TreeViewFiles_DrawLine;
 
         _detailsFrame = new DetailsFrame (_iconProvider)

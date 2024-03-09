@@ -122,7 +122,7 @@ public class ScrollView : View
                            }
 
                            SetContentOffset (_contentOffset);
-                           _contentView.Frame = new Rectangle (ContentOffset, ContentSize);
+                           _contentView.Frame = new (ContentOffset, ContentSize);
 
                            // PERF: How about calls to Point.Offset instead?
                            _vertical.ChangedPosition += delegate { ContentOffset = new Point (ContentOffset.X, _vertical.Position); };

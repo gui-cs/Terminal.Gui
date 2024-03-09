@@ -6344,7 +6344,7 @@ public class TextView : View
 
     private void SetScrollColsRowsSize ()
     {
-        if (ScrollBarType != ScrollBarType.None)
+        if (EnableScrollBars)
         {
             ContentSize = new Size (Maxlength, Lines);
             ContentOffset = new Point (-LeftColumn, -TopRow);

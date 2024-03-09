@@ -49,7 +49,7 @@ public class ListsAndCombos : Scenario
             Width = Dim.Percent (40),
             Source = new ListWrapper (items)
         };
-        listview.Padding.ScrollBarType = ScrollBarType.Both;
+        listview.Padding.EnableScrollBars = true;
         listview.SelectedItemChanged += (s, e) => lbListView.Text = items [listview.SelectedItem];
         Win.Add (lbListView, listview);
 
@@ -70,7 +70,7 @@ public class ListsAndCombos : Scenario
             Height = Dim.Fill (2),
             Width = Dim.Percent (40)
         };
-        comboBox.ScrollBarType = ScrollBarType.Both;
+        comboBox.EnableScrollBars = true;
         comboBox.SetSource (items);
 
         comboBox.SelectedItemChanged += (s, text) => lbComboBox.Text = text.Value.ToString ();

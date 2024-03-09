@@ -67,7 +67,7 @@ public class ListColumns : Scenario
                 ExpandLastColumn = false
             }
         };
-        _listColView.Padding.ScrollBarType = ScrollBarType.Both;
+        _listColView.Padding.EnableScrollBars = true;
         var listColStyle = new ListColumnStyle ();
 
         var menu = new MenuBar

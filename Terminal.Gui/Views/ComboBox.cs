@@ -139,10 +139,10 @@ public class ComboBox : View
     }
 
     /// <inheritdoc/>
-    public override ScrollBarType ScrollBarType
+    public override bool EnableScrollBars
     {
-        get => _listview.Padding.ScrollBarType;
-        set => _listview.Padding.ScrollBarType = value;
+        get => _listview.Padding.EnableScrollBars;
+        set => _listview.Padding.EnableScrollBars = value;
     }
 
     /// <summary>Current search text</summary>

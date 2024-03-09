@@ -261,7 +261,7 @@ public class Wizards : Scenario
                                                AllowsTab = false,
                                                ColorScheme = Colors.ColorSchemes ["Base"]
                                            };
-                                           someText.Padding.ScrollBarType = ScrollBarType.Both;
+                                           someText.Padding.EnableScrollBars = true;
                                            var help = "This is helpful.";
                                            fourthStep.Add (someText);
 

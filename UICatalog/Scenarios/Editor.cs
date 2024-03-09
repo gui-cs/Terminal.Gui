@@ -59,7 +59,7 @@ public class Editor : Scenario
             Width = Dim.Fill (),
             Height = Dim.Fill ()
         };
-        _textView.Padding.ScrollBarType = ScrollBarType.Both;
+        _textView.Padding.EnableScrollBars = true;
 
         CreateDemoFile (_fileName);
 
@@ -719,7 +719,7 @@ public class Editor : Scenario
         item.Title = "Keep Content Always In Viewport";
         item.CheckType |= MenuItemCheckStyle.Checked;
         item.Checked = true;
-        item.Action += () => _textView.ScrollKeepContentAlwaysInViewPort = (bool)(item.Checked = !item.Checked);
+        item.Action += () => _textView.KeepContentAlwaysInContentArea = (bool)(item.Checked = !item.Checked);
 
         return new [] { item };
     }

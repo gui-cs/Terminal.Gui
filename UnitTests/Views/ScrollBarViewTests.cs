@@ -407,10 +407,11 @@ This is a tes
                                                         Height = Dim.Fill (),
                                                         Source = new ListWrapper (source)
                                                     };
-                                                    listView.Padding.ScrollBarType = ScrollBarType.Horizontal;
+                                                    listView.Padding.EnableScrollBars = true;
+                                                    listView.Padding.ShowVerticalScrollBar = false;
                                                     win.Add (listView);
 
-                                                    Assert.True (listView.ScrollKeepContentAlwaysInViewPort);
+                                                    Assert.True (listView.KeepContentAlwaysInContentArea);
 
                                                     var newScrollBarView = listView.Padding.Subviews [0] as ScrollBarView;
 
@@ -749,7 +750,7 @@ This is a test
             Text =
                 "This is the help text for the Second Step.\n\nPress the button to see a message box.\n\nEnter name too."
         };
-        textView.Padding.ScrollBarType = ScrollBarType.Both;
+        textView.Padding.EnableScrollBars = true;
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (textView);
 
@@ -1100,11 +1101,11 @@ This is a test
     public void ScrollBar_Ungrab_Mouse_If_The_Mouse_Is_On_Another_View ()
     {
         var top = new Toplevel { Id = "top", Width = 10, Height = 10 };
-        var viewLeft = new View { Id = "left", Width = 5, Height = 5, ScrollBarType = ScrollBarType.Vertical, ContentSize = new Size (0, 20), CanFocus = true };
+        var viewLeft = new View { Id = "left", Width = 5, Height = 5, EnableScrollBars = true, ShowHorizontalScrollBar = false, ContentSize = new Size (0, 20), CanFocus = true };
 
         var viewRight = new View
         {
-            Id = "right", X = Pos.Right (viewLeft), Width = 5, Height = 6, ScrollBarType = ScrollBarType.Vertical, ContentSize = new Size (0, 20),
+            Id = "right", X = Pos.Right (viewLeft), Width = 5, Height = 6, EnableScrollBars = true, ShowHorizontalScrollBar = false, ContentSize = new Size (0, 20),
             CanFocus = true
         };
         top.Add (viewLeft, viewRight);
@@ -1127,11 +1128,11 @@ This is a test
     [Fact]
     public void ScrollBarType_IsBuiltIn_In_Padding ()
     {
-        var view = new View { ScrollBarType = ScrollBarType.None };
+        var view = new View ();
         Assert.Empty (view.Padding.Subviews);
 
         view = new View ();
-        view.Padding.ScrollBarType = ScrollBarType.Both;
+        view.Padding.EnableScrollBars = true;
         Assert.Equal (3, view.Padding.Subviews.Count);
 
         foreach (View sbv in view.Padding.Subviews)
@@ -1147,20 +1148,24 @@ This is a test
         }
 
         view = new View ();
-        view.Padding.ScrollBarType = ScrollBarType.Vertical;
-        Assert.Single (view.Padding.Subviews);
+        view.Padding.EnableScrollBars = true;
+        view.Padding.ShowHorizontalScrollBar = false;
+        // While EnableScrollBars is true the scroll bars aren't removed.
+        Assert.Equal (3, view.Padding.Subviews.Count);
         Assert.True (view.Padding.Subviews [0] is ScrollBarView);
 
         view = new View ();
-        view.Padding.ScrollBarType = ScrollBarType.Horizontal;
-        Assert.Single (view.Padding.Subviews);
+        view.Padding.EnableScrollBars = true;
+        view.Padding.ShowVerticalScrollBar = false;
+        // While EnableScrollBars is true the scroll bars aren't removed.
+        Assert.Equal (3, view.Padding.Subviews.Count);
         Assert.True (view.Padding.Subviews [0] is ScrollBarView);
     }
 
     [Fact]
     public void ScrollBarType_IsBuiltIn_In_Padding_Does_Not_Throws_If_ScrollBarType_None ()
     {
-        Exception exception = Record.Exception (() => () => new View { ScrollBarType = ScrollBarType.None });
+        Exception exception = Record.Exception (() => () => new View ());
         Assert.Null (exception);
     }
 
@@ -1178,7 +1183,7 @@ This is a test
             Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line", CanFocus = true,
             UseContentOffset = true
         };
-        view.Padding.ScrollBarType = ScrollBarType.Both;
+        view.Padding.EnableScrollBars = true;
         view.TextFormatter.WordWrap = false;
         view.TextFormatter.MultiLine = true;
         string [] strings = view.Text.Split ("\n").ToArray ();
@@ -1290,7 +1295,7 @@ This is a test
             Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line", CanFocus = true,
             UseContentOffset = true
         };
-        view.Padding.ScrollBarType = ScrollBarType.Both;
+        view.Padding.EnableScrollBars = true;
         view.TextFormatter.WordWrap = false;
         view.TextFormatter.MultiLine = true;
         string [] strings = view.Text.Split ("\n").ToArray ();
@@ -1410,7 +1415,7 @@ This is a test
         {
             X = Pos.Center (), Y = Pos.Center (), Width = 9, Height = 6,
             Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line", CanFocus = true,
-            ScrollBarType = ScrollBarType.Both,
+            EnableScrollBars = true,
             UseContentOffset = true
         };
         view.TextFormatter.WordWrap = false;

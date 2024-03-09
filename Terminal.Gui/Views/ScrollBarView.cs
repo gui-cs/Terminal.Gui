@@ -793,7 +793,7 @@ public class ScrollBarView : View
             && ((_contentBottomRightCorner is null && OtherScrollBarView is null)
                 || (_contentBottomRightCorner is null && OtherScrollBarView is { } && OtherScrollBarView._contentBottomRightCorner is null)))
         {
-            if (IsBuiltIn && ((Adornment)host).Parent.ScrollBarType != ScrollBarType.Both)
+            if (IsBuiltIn && !((Adornment)host).Parent.EnableScrollBars)
             {
                 return;
             }
@@ -809,11 +809,7 @@ public class ScrollBarView : View
             _contentBottomRightCorner.MouseClick += ContentBottomRightCorner_MouseClick;
             _contentBottomRightCorner.DrawContent += ContentBottomRightCorner_DrawContent;
         }
-        else if (host != null
-                 && _contentBottomRightCorner == null
-                 && OtherScrollBarView != null
-                 && OtherScrollBarView._contentBottomRightCorner != null)
-
+        else if (host != null && _contentBottomRightCorner is null && OtherScrollBarView is { _contentBottomRightCorner: { } })
         {
             _contentBottomRightCorner = OtherScrollBarView._contentBottomRightCorner;
         }
@@ -860,26 +856,24 @@ public class ScrollBarView : View
             return;
         }
 
-        ((Adornment)SuperView).Thickness = ((Adornment)SuperView).Parent.ScrollBarType switch
-                                           {
-                                               ScrollBarType.None => new (0),
-                                               ScrollBarType.Vertical => new (0, 0, Visible ? 1 : 0, 0),
-                                               ScrollBarType.Horizontal => new (0, 0, 0, Visible ? 1 : 0),
-                                               ScrollBarType.Both => new (
-                                                                          0,
-                                                                          0,
-                                                                          Orientation == Orientation.Vertical
-                                                                              ? Visible ? 1 : 0
-                                                                              : OtherScrollBarView?.Orientation == Orientation.Vertical
-                                                                                  ? OtherScrollBarView?.Visible == true ? 1 : 0
-                                                                                  : 0,
-                                                                          Orientation == Orientation.Horizontal
-                                                                              ? Visible ? 1 : 0
-                                                                              : OtherScrollBarView?.Orientation == Orientation.Horizontal
-                                                                                  ? OtherScrollBarView?.Visible == true ? 1 : 0
-                                                                                  : 0),
-                                               _ => throw new ArgumentOutOfRangeException ()
-                                           };
+        var adornment = (Adornment)SuperView;
+
+        if (Visible && OtherScrollBarView.Visible)
+        {
+            adornment.Thickness = new Thickness (0, 0, 1, 1);
+        }
+        else if ((Visible && Orientation == Orientation.Vertical) || (OtherScrollBarView.Visible && OtherScrollBarView.Orientation == Orientation.Vertical))
+        {
+            adornment.Thickness = new Thickness (0, 0, 1, 0);
+        }
+        else if ((Visible && Orientation == Orientation.Horizontal) || (OtherScrollBarView.Visible && OtherScrollBarView.Orientation == Orientation.Horizontal))
+        {
+            adornment.Thickness = new Thickness (0, 0, 0, 1);
+        }
+        else
+        {
+            adornment.Thickness = new Thickness (0);
+        }
     }
 
     private void Parent_DrawAdornments (object sender, DrawEventArgs e) { AdjustContentInViewport (); }
