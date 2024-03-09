@@ -646,20 +646,53 @@ public partial class View
             return true;
         }
 
-        // Now, process any key bindings in the subviews that are tagged to KeyBindingScope.HotKey.
-        foreach (View view in Subviews.Where (
-                                              v => v.KeyBindings.TryGet (
-                                                                         keyEvent,
-                                                                         KeyBindingScope.HotKey,
-                                                                         out KeyBinding _
-                                                                        )
-                                             ))
+        if (ProcessAdornmentBindings (Margin, keyEvent, ref handled))
         {
-            // TODO: I think this TryGet is not needed due to the one in the lambda above. Use `Get` instead?
-            if (view.KeyBindings.TryGet (keyEvent, KeyBindingScope.HotKey, out KeyBinding binding))
+            return true;
+        }
+
+        if (ProcessAdornmentBindings (Padding, keyEvent, ref handled))
+        {
+            return true;
+        }
+
+        if (ProcessAdornmentBindings (Border, keyEvent, ref handled))
+        {
+            return true;
+        }
+
+        if (ProcessSubViewKeyBindings (keyEvent, ref handled))
+        {
+            return true;
+        }
+
+        return handled;
+    }
+
+    private bool ProcessAdornmentBindings (Adornment adornment, Key keyEvent, ref bool? handled)
+    {
+        foreach (View subview in adornment?.Subviews!)
+        {
+            handled = subview.OnInvokingKeyBindings (keyEvent);
+
+            if (handled is { } && (bool)handled)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool ProcessSubViewKeyBindings (Key keyEvent, ref bool? handled)
+    {
+        // Now, process any key bindings in the subviews that are tagged to KeyBindingScope.HotKey.
+        foreach (View subview in Subviews)
+        {
+            if (subview.KeyBindings.TryGet (keyEvent, KeyBindingScope.HotKey, out KeyBinding binding))
             {
                 //keyEvent.Scope = KeyBindingScope.HotKey;
-                handled = view.OnInvokingKeyBindings (keyEvent);
+                handled = subview.OnInvokingKeyBindings (keyEvent);
 
                 if (handled is { } && (bool)handled)
                 {
@@ -668,7 +701,7 @@ public partial class View
             }
         }
 
-        return handled;
+        return false;
     }
 
     /// <summary>
