@@ -100,26 +100,7 @@ public class Border : Adornment
     }
 
     /// <inheritdoc/>
-    public override Rectangle FrameToScreen ()
-    {
-        Rectangle ret = base.FrameToScreen ();
-
-        ret.X += Parent?.Margin.Thickness.Left ?? 0;
-        ret.Y += Parent?.Margin.Thickness.Top ?? 0;
-
-        return ret;
-    }
-
-    /// <inheritdoc/>
-    public override Thickness GetAdornmentsThickness ()
-    {
-        int left = Parent.Margin.Thickness.Left;
-        int top = Parent.Margin.Thickness.Top;
-        int right = Parent.Margin.Thickness.Right;
-        int bottom = Parent.Margin.Thickness.Bottom;
-
-        return new Thickness (left, top, right, bottom);
-    }
+    public override Thickness GetAdornmentsThickness () { return Parent.Margin.Thickness; }
 
     /// <inheritdoc/>
     public override void OnDrawContent (Rectangle contentArea)

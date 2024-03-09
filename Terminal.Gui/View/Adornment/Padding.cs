@@ -40,24 +40,5 @@ public class Padding : Adornment
     }
 
     /// <inheritdoc/>
-    public override Rectangle FrameToScreen ()
-    {
-        Rectangle ret = base.FrameToScreen ();
-
-        ret.X += Parent != null ? Parent.Margin.Thickness.Left + Parent.Border.Thickness.Left : 0;
-        ret.Y += Parent != null ? Parent.Margin.Thickness.Top + Parent.Border.Thickness.Top : 0;
-
-        return ret;
-    }
-
-    /// <inheritdoc/>
-    public override Thickness GetAdornmentsThickness ()
-    {
-        int left = Parent.Margin.Thickness.Left + Parent.Border.Thickness.Left;
-        int top = Parent.Margin.Thickness.Top + Parent.Border.Thickness.Top;
-        int right = Parent.Margin.Thickness.Right + Parent.Border.Thickness.Right;
-        int bottom = Parent.Margin.Thickness.Bottom + Parent.Border.Thickness.Bottom;
-
-        return new Thickness (left, top, right, bottom);
-    }
+    public override Thickness GetAdornmentsThickness () { return Parent.Margin.Thickness + Parent.Border.Thickness; }
 }
