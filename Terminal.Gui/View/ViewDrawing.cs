@@ -97,7 +97,7 @@ public partial class View
         Attribute prev = Driver.SetAttribute (GetNormalColor ());
 
         // Clamp the region to the bounds of the view
-        contentArea = Rectangle.Intersect (contentArea, Bounds);
+        contentArea = Rectangle.Intersect (contentArea, ContentArea);
         Driver.FillRect (BoundsToScreen (contentArea));
         Driver.SetAttribute (prev);
     }
