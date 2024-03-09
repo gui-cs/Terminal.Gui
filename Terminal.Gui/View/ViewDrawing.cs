@@ -545,39 +545,9 @@ public partial class View
 
         _superView?.SetSubViewNeedsDisplay ();
 
-        if (_needsDisplayRect.X < ContentArea.X
-            || _needsDisplayRect.Y < ContentArea.Y
-            || _needsDisplayRect.Width > ContentArea.Width
-            || _needsDisplayRect.Height > ContentArea.Height)
-        {
-            Margin?.SetNeedsDisplay (Margin.ContentArea);
-            Border?.SetNeedsDisplay (Border.ContentArea);
-            Padding?.SetNeedsDisplay (Padding.ContentArea);
-
-            if (Margin != null)
-            {
-                for (var i = 0; i < 3; i++)
-                {
-                    Adornment adornment = i switch
-                                          {
-                                              0 => Margin,
-                                              1 => Border,
-                                              2 => Padding,
-                                              _ => null
-                                          };
-
-                    if (adornment != null)
-                    {
-                        adornment.SetNeedsDisplay ();
-
-                        foreach (View view in adornment.Subviews)
-                        {
-                            view.SetNeedsDisplay ();
-                        }
-                    }
-                }
-            }
-        }
+            Margin?.SetNeedsDisplay (Margin.Frame);
+            Border?.SetNeedsDisplay (Border.Frame);
+            Padding?.SetNeedsDisplay (Padding.Frame);
 
         if (_subviews is null)
         {
