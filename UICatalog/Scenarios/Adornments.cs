@@ -90,17 +90,17 @@ public class Adornments : Scenario
 
         view.Initialized += (s, e) =>
                             {
-                                var labelInPadding = new Label () { X = 1, Y = 0, Title = "_Text:" };
+                                var labelInPadding = new Label () {  X = 1, Y = 0, Title = "_Text:" };
                                 view.Padding.Add (labelInPadding);
 
                                 var textFieldInPadding = new TextField () { X = Pos.Right (labelInPadding) + 1, Y = Pos.Top (labelInPadding), Width = 15, Text = "some text" };
                                 textFieldInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "TextField", textFieldInPadding.Text, "Ok");
                                 view.Padding.Add (textFieldInPadding);
 
-                                var btnButtonInPadding = new Button { X = Pos.Center (), Y = 1, Text = "_Button in Padding" };
+                                var btnButtonInPadding = new Button { X = Pos.Center (), Y = 0, Text = "_Button in Padding" };
                                 btnButtonInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Button in Padding Pressed!", "Ok");
                                 btnButtonInPadding.BorderStyle = LineStyle.Dashed;
-                                btnButtonInPadding.Border.Thickness = new (3,3,3,3);
+                                btnButtonInPadding.Border.Thickness = new (1,1,1,1);
                                 view.Padding.Add (btnButtonInPadding);
                                 btnButtonInPadding.Border.CloseButton.Visible = true;
 

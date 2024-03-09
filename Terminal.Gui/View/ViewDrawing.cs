@@ -376,6 +376,11 @@ public partial class View
                 }
             }
 
+            if (Title == "_Text:")
+            {
+
+            }
+
             // This should NOT clear 
             TextFormatter?.Draw (
                                  BoundsToScreen (contentArea),

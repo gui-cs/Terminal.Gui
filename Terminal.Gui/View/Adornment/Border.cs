@@ -70,15 +70,19 @@ public class Border : Adornment
         {
             CloseButton = new Button ()
             {
-                Text = "X", // So it's not visible to not break unit tests
-                Y = 0,
+                Text = "X",
                 CanFocus = true,
-                NoDecorations = false,
                 Visible = false,
             };
-            //CloseButton.BorderStyle = LineStyle.Single;
-            //CloseButton.Border.Thickness = new (1, 0, 1, 0);
-            CloseButton.X = Pos.AnchorEnd () - (Pos.Right (CloseButton) - Pos.Left (CloseButton)) + Thickness.Left + 1; // +1 for the border
+
+            CloseButton.LayoutStarted += (sender, args) =>
+                                         {
+                                             CloseButton.X = Pos.AnchorEnd (Thickness.Right / 2 + 1) - 
+                                                             (Pos.Right (CloseButton) - 
+                                                              Pos.Left (CloseButton))  ;
+
+                                             CloseButton.Y = 0;;//Thickness.Top / 2;
+                                         };
             Add (CloseButton);
             CloseButton.Accept += (s, e) => {
                                       e.Cancel = Parent.InvokeCommand (Command.QuitToplevel) == true;

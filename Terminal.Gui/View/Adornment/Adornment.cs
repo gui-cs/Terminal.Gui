@@ -115,27 +115,7 @@ public class Adornment : View
     {
             return Parent.ScreenToFrame (x - Frame.X, y - Frame.Y);
     }
-
-    ///// <inheritdoc/>
-    //public override void SetNeedsDisplay (Rectangle region)
-    //{
-    //    SetSubViewNeedsDisplay ();
-    //    foreach (View subView in Subviews)
-    //    {
-    //        subView.SetNeedsDisplay ();
-    //    }
-    //}
-
-    /// <inheritdoc/>
-    //protected override void ClearNeedsDisplay ()
-    //{
-    //    base.ClearNeedsDisplay ();
-    //    foreach (View subView in Subviews)
-    //    {
-    //        subView.NeedsDisplay = false;
-    //    }
-    //}
-
+    
     /// <summary>Does nothing for Adornment</summary>
     /// <returns></returns>
     public override bool OnDrawAdornments () { return false; }
