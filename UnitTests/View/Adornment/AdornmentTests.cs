@@ -358,11 +358,7 @@ public class AdornmentTests (ITestOutputHelper output)
     [Fact]
     public void Setting_Thickness_Causes_Adornment_Layout ()
     {
-        var view = new View ()
-        {
-            Width = 5,
-            Height = 5
-        };
+        var view = new View ();
         var raised = false;
         view.BeginInit ();
         view.EndInit ();
@@ -376,7 +372,5 @@ public class AdornmentTests (ITestOutputHelper output)
         {
             raised = true;
         }
-
     }
-
 }
