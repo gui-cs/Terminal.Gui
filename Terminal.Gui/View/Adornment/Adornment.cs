@@ -32,7 +32,7 @@ public class Adornment : View
 
     /// <summary>
     ///     Gets the rectangle that describes the area of the Adornment. The Location is always (0,0).
-    ///     The size is the size of the Frame 
+    ///     The size is the size of the Frame
     /// </summary>
     public override Rectangle ContentArea
     {
@@ -105,7 +105,7 @@ public class Adornment : View
     /// </summary>
     public override Rectangle GetVisibleContentArea ()
     {
-        return Thickness?.GetInside (new Rectangle (Point.Empty, Frame.Size)) ?? new Rectangle (Point.Empty, Frame.Size);
+        return new Rectangle (Point.Empty, Frame.Size);
     }
 
     /// <summary>Does nothing for Adornment</summary>
