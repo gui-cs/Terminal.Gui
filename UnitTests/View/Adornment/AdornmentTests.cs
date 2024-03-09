@@ -2,10 +2,9 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class AdornmentTests
+public class AdornmentTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public AdornmentTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void Bounds_Location_Always_Empty_Size_Correct ()
@@ -335,48 +334,49 @@ public class AdornmentTests
         Assert.True (raised);
     }
 
+
     [Fact]
-    public void Adornment_WithSubView_FindDeepestView_Finds ()
+    public void Setting_Thickness_Causes_Parent_Layout ()
     {
-        var view = new View () {
-            Width = 10,
-            Height = 10
+        var view = new View ();
+        var raised = false;
+        view.BeginInit();
+        view.EndInit();
 
-        };
-        view.Padding.Thickness = new Thickness (1);
+        view.LayoutStarted += LayoutStarted;
+        view.Margin.Thickness = new Thickness (1, 2, 3, 4);
+        Assert.True (raised);
 
-        var subView = new View () {
-            X = 0,
-            Y =0,
-            Width = 1,
-            Height = 1
-        };
-        view.Padding.Add (subView);
+        return;
+        void LayoutStarted (object sender, LayoutEventArgs e)
+        {
+            raised = true;
+        }
 
-        Assert.Equal (subView, View.FindDeepestView (view, 0, 0));
     }
 
     [Fact]
-    public void Adornment_WithNonVisibleSubView_FindDeepestView_Finds_Adornment ()
+    public void Setting_Thickness_Causes_Adornment_Layout ()
     {
         var view = new View ()
         {
-            Width = 10,
-            Height = 10
-
+            Width = 5,
+            Height = 5
         };
-        view.Padding.Thickness = new Thickness (1);
+        var raised = false;
+        view.BeginInit ();
+        view.EndInit ();
 
-        var subView = new View ()
+        view.Margin.LayoutStarted += LayoutStarted;
+        view.Margin.Thickness = new Thickness (1, 2, 3, 4);
+        Assert.True (raised);
+
+        return;
+        void LayoutStarted (object sender, LayoutEventArgs e)
         {
-            X = 0,
-            Y = 0,
-            Width = 1,
-            Height = 1,
-            Visible = false
-        };
-        view.Padding.Add (subView);
+            raised = true;
+        }
 
-        Assert.Equal (view.Padding, View.FindDeepestView (view, 0, 0));
     }
+
 }

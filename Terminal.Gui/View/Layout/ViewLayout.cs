@@ -570,13 +570,10 @@ public partial class View
             Margin.Y = 0;
             Margin.Width = Frame.Size.Width;
             Margin.Height = Frame.Size.Height;
-            Margin.SetNeedsLayout ();
-            Margin.SetNeedsDisplay ();
-            if (Margin.Subviews.Count > 0)
-            {
-                Margin.LayoutSubviews ();
-            }
         }
+        Margin.SetNeedsLayout ();
+        Margin.SetNeedsDisplay ();
+        Margin.LayoutSubviews ();
 
         Rectangle border = Margin.Thickness.GetInside (Margin.Frame);
 
@@ -587,13 +584,10 @@ public partial class View
             Border.Y = border.Location.Y;
             Border.Width = border.Size.Width;
             Border.Height = border.Size.Height;
-            Border.SetNeedsLayout ();
-            Border.SetNeedsDisplay ();
-            if (Border.Subviews.Count > 0)
-            {
-                Border.LayoutSubviews ();
-            }
         }
+        Border.SetNeedsLayout ();
+        Border.SetNeedsDisplay ();
+        Border.LayoutSubviews ();
 
         Rectangle padding = Border.Thickness.GetInside (Border.Frame);
 
@@ -604,13 +598,10 @@ public partial class View
             Padding.Y = padding.Location.Y;
             Padding.Width = padding.Size.Width;
             Padding.Height = padding.Size.Height;
-            Padding.SetNeedsLayout ();
-            Padding.SetNeedsDisplay ();
-            if (Padding.Subviews.Count > 0)
-            {
-                Padding.LayoutSubviews ();
-            }
         }
+        Padding.SetNeedsLayout ();
+        Padding.SetNeedsDisplay ();
+        Padding.LayoutSubviews ();
     }
 
     #endregion Adornments
@@ -1216,8 +1207,8 @@ public partial class View
             }
 
             LayoutAdornments ();
-            SetNeedsLayout ();
             SetNeedsDisplay ();
+            SetNeedsLayout ();
         }
     }
 
