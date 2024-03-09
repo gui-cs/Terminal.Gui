@@ -359,7 +359,7 @@ public partial class View : Responder, ISupportInitializeNotification
                         SetHasFocus (false, this);
                     }
 
-                    if (ClearOnVisibleFalse)
+                    if (IsInitialized && ClearOnVisibleFalse)
                     {
                         Clear ();
                     }
