@@ -13,29 +13,13 @@ public class Line : View
     public Orientation Orientation { get; set; }
 
     /// <inheritdoc/>
-    public override bool OnDrawAdornments ()
+    public override void OnDrawContent (Rectangle contentArea)
     {
-        Rectangle screenBounds = BoundsToScreen (Bounds);
-        LineCanvas lc;
-
-        lc = SuperView?.LineCanvas;
-
-        lc.AddLine (
-                    screenBounds.Location,
+        LineCanvas.AddLine (
+                    BoundsToScreen (contentArea).Location,
                     Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height,
                     Orientation,
                     BorderStyle
                    );
-
-        return true;
     }
-
-    //public override void OnDrawContentComplete (Rect contentArea)
-    //{
-    //	var screenBounds = ViewToScreen (Frame);
-
-    //}
-
-    /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea) { OnDrawAdornments (); }
 }
