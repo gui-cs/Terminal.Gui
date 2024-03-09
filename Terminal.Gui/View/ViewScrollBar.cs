@@ -432,11 +432,11 @@ public partial class View
     {
         if (scrollBar.Orientation == Orientation.Vertical)
         {
-            ContentOffset = new Point (ContentArea.X, -scrollBar.Position);
+            ContentOffset = ContentOffset with { Y = -scrollBar.Position };
         }
         else
         {
-            ContentOffset = new Point (-scrollBar.Position, ContentArea.Y);
+            ContentOffset = ContentOffset with { X = -scrollBar.Position };
         }
 
         SetTextFormatterSize ();
