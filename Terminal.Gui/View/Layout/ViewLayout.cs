@@ -657,6 +657,13 @@ public partial class View
         while (super is { })
         {
             Point boundsOffset = super.GetBoundsOffset ();
+
+            if (super is Adornment adornment)
+            {
+                boundsOffset = super.FrameToScreen ().Location;
+                Thickness thickness = adornment.GetAdornmentsThickness ();
+                boundsOffset.Offset (-thickness.Left, -thickness.Top);
+            }
             ret.X += super.Frame.X + boundsOffset.X;
             ret.Y += super.Frame.Y + boundsOffset.Y;
             super = super.SuperView;
