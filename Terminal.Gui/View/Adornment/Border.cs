@@ -56,18 +56,21 @@ public class Border : Adornment
         Parent = parent;
     }
 
+#if SUBVIEW_BASED_BORDER
     private Line _left;
 
     /// <summary>
     ///    The close button for the border. Set to <see cref="View.Visible"/>, to <see langword="true"/> to enable.
     /// </summary>
     public Button CloseButton { get; internal set; }
+#endif
 
     /// <inheritdoc/>
     public override void BeginInit ()
     {
         base.BeginInit ();
 
+#if SUBVIEW_BASED_BORDER
         if (Parent is { })
         {
             // Left
@@ -90,9 +93,11 @@ public class Border : Adornment
             Add (CloseButton);
 
             LayoutStarted += OnLayoutStarted;
-        }
     }
+#endif
+}
 
+#if SUBVIEW_BASED_BORDER
     private void OnLayoutStarted (object sender, LayoutEventArgs e)
     {
         _left.Border.LineStyle = LineStyle;
@@ -106,7 +111,8 @@ public class Border : Adornment
                         (Pos.Right (CloseButton) -
                          Pos.Left (CloseButton));
         CloseButton.Y = 0;
-    }
+}
+#endif
 
     /// <summary>
     ///     The color scheme for the Border. If set to <see langword="null"/>, gets the <see cref="Adornment.Parent"/>
@@ -380,16 +386,19 @@ public class Border : Adornment
                 }
             }
 
+#if !SUBVIEW_BASED_BORDER
+
             if (drawLeft)
             {
-                //lc.AddLine (
-                //            new (borderBounds.Location.X, titleY),
-                //            sideLineLength,
-                //            Orientation.Vertical,
-                //            LineStyle,
-                //            Driver.GetAttribute ()
-                //           );
+                lc.AddLine (
+                            new (borderBounds.Location.X, titleY),
+                            sideLineLength,
+                            Orientation.Vertical,
+                            LineStyle,
+                            Driver.GetAttribute ()
+                           );
             }
+#endif
 
             if (drawBottom)
             {

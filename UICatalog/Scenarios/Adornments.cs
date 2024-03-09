@@ -102,6 +102,8 @@ public class Adornments : Scenario
                                 btnButtonInPadding.BorderStyle = LineStyle.Dashed;
                                 btnButtonInPadding.Border.Thickness = new (1,1,1,1);
                                 view.Padding.Add (btnButtonInPadding);
+
+#if SUBVIEW_BASED_BORDER
                                 btnButtonInPadding.Border.CloseButton.Visible = true;
 
                                 view.Border.CloseButton.Visible = true;
@@ -112,6 +114,7 @@ public class Adornments : Scenario
                                                                   };
 
                                 view.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Window Close Button Pressed!", "Ok");
+#endif
                             };
 
         Application.Top.Closed += (s, e) => View.Diagnostics = _diagnosticFlags;
