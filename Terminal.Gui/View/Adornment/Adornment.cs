@@ -86,7 +86,7 @@ public class Adornment : View
             Thickness prev = _thickness;
             _thickness = value;
 
-            if (prev != _thickness)
+            if (IsInitialized && prev != _thickness)
             {
                 Parent?.SetNeedsLayout ();
                 Parent?.LayoutSubviews ();

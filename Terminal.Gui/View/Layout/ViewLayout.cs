@@ -509,7 +509,7 @@ public partial class View
     /// </remarks>
     public LineStyle BorderStyle
     {
-        get => Border.LineStyle;
+        get => Border?.LineStyle ?? LineStyle.Single;
         set
         {
             if (Border is null)
@@ -558,7 +558,7 @@ public partial class View
     /// <summary>Overriden by <see cref="Adornment"/> to do nothing, as the <see cref="Adornment"/> does not have adornments.</summary>
     internal virtual void LayoutAdornments ()
     {
-        if (Margin is null)
+        if (!IsInitialized || Margin is null)
         {
             return; // CreateAdornments () has not been called yet
         }
