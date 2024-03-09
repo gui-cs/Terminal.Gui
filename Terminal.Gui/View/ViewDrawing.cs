@@ -183,7 +183,7 @@ public partial class View
         ClearNeedsDisplay ();
 
         // Invoke DrawContentCompleteEvent
-        dev = new DrawEventArgs (ContentArea);
+        dev = new (ContentArea);
         DrawContentComplete?.Invoke (this, dev);
 
         if (!dev.Cancel)
@@ -445,7 +445,7 @@ public partial class View
     ///     This method will be called after any subviews removed with <see cref="Remove(View)"/> have been completed
     ///     drawing.
     /// </remarks>
-    public virtual void OnDrawContentComplete (Rectangle contentArea) { DrawContentComplete?.Invoke (this, new (contentArea)); }
+    public virtual void OnDrawContentComplete (Rectangle contentArea) { }
 
     // TODO: Make this cancelable
     /// <summary>
