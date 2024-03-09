@@ -694,7 +694,7 @@ public partial class View
 
     /// <summary>
     ///     Get the visible content area represent the View-relative rectangle used for this view. The area inside the view
-    ///     where subviews
+    ///     where subviews and content are presented.The Location is always (0,0). It will be mainly used for clipping a region.
     ///     and content are presented. The Location is always (0,0). It will be mainly used for clipping a region.
     /// </summary>
     public virtual Rectangle GetVisibleContentArea ()
