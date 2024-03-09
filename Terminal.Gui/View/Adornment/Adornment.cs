@@ -86,10 +86,18 @@ public class Adornment : View
             Thickness prev = _thickness;
             _thickness = value;
 
-            if (IsInitialized && prev != _thickness)
+            if (prev != _thickness)
             {
-                Parent?.SetNeedsLayout ();
-                Parent?.LayoutSubviews ();
+                if (Parent?.IsInitialized == false)
+                {
+                    // When initialized Parent.LayoutSubViews will cause a LayoutAdornments
+                    Parent?.LayoutAdornments ();
+                }
+                else
+                {
+                    Parent?.SetNeedsLayout ();
+                    Parent?.LayoutSubviews ();
+                }
                 OnThicknessChanged (prev);
             }
         }
@@ -162,7 +170,7 @@ public class Adornment : View
     public override bool OnRenderLineCanvas () { return false; }
 
     /// <summary>Called whenever the <see cref="Thickness"/> property changes.</summary>
-    public virtual void OnThicknessChanged (Thickness previousThickness)
+    public void OnThicknessChanged (Thickness previousThickness)
     {
         ThicknessChanged?.Invoke (
                                   this,

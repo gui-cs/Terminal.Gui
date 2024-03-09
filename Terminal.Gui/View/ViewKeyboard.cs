@@ -646,17 +646,17 @@ public partial class View
             return true;
         }
 
-        if (ProcessAdornmentKeyBindings (Margin, keyEvent, ref handled))
+        if (Margin is {} && ProcessAdornmentKeyBindings (Margin, keyEvent, ref handled))
         {
             return true;
         }
 
-        if (ProcessAdornmentKeyBindings (Padding, keyEvent, ref handled))
+        if (Padding is {} && ProcessAdornmentKeyBindings (Padding, keyEvent, ref handled))
         {
             return true;
         }
 
-        if (ProcessAdornmentKeyBindings (Border, keyEvent, ref handled))
+        if (Border is {} && ProcessAdornmentKeyBindings (Border, keyEvent, ref handled))
         {
             return true;
         }
@@ -671,7 +671,7 @@ public partial class View
 
     private bool ProcessAdornmentKeyBindings (Adornment adornment, Key keyEvent, ref bool? handled)
     {
-        foreach (View subview in adornment?.Subviews!)
+        foreach (View subview in adornment?.Subviews)
         {
             handled = subview.OnInvokingKeyBindings (keyEvent);
 

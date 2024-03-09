@@ -558,7 +558,7 @@ public partial class View
     /// <summary>Overriden by <see cref="Adornment"/> to do nothing, as the <see cref="Adornment"/> does not have adornments.</summary>
     internal virtual void LayoutAdornments ()
     {
-        if (!IsInitialized || Margin is null)
+        if (Margin is null)
         {
             return; // CreateAdornments () has not been called yet
         }
@@ -573,7 +573,11 @@ public partial class View
         }
         Margin.SetNeedsLayout ();
         Margin.SetNeedsDisplay ();
-        Margin.LayoutSubviews ();
+
+        if (IsInitialized)
+        {
+            Margin.LayoutSubviews ();
+        }
 
         Rectangle border = Margin.Thickness.GetInside (Margin.Frame);
 
@@ -587,7 +591,10 @@ public partial class View
         }
         Border.SetNeedsLayout ();
         Border.SetNeedsDisplay ();
-        Border.LayoutSubviews ();
+        if (IsInitialized)
+        {
+            Border.LayoutSubviews ();
+        }
 
         Rectangle padding = Border.Thickness.GetInside (Border.Frame);
 
@@ -601,7 +608,10 @@ public partial class View
         }
         Padding.SetNeedsLayout ();
         Padding.SetNeedsDisplay ();
-        Padding.LayoutSubviews ();
+        if (IsInitialized)
+        {
+            Padding.LayoutSubviews ();
+        }
     }
 
     #endregion Adornments

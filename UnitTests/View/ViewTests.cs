@@ -744,6 +744,9 @@ At 0,0
         // Parameterless
         var r = new View ();
         Assert.NotNull (r);
+        Assert.True (r.Enabled);
+        Assert.True (r.Visible);
+
         Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
         Assert.Equal ($"View(){r.Bounds}", r.ToString ());
         Assert.False (r.CanFocus);

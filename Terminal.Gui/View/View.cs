@@ -286,51 +286,46 @@ public partial class View : Responder, ISupportInitializeNotification
 
     #region Visibility
 
+    private bool _enabled = true;
     private bool _oldEnabled;
 
-    /// <inheritdoc/>
-    public override bool Enabled
+    /// <summary>Gets or sets a value indicating whether this <see cref="Responder"/> can respond to user interaction.</summary>
+    public virtual bool Enabled
     {
-        get => base.Enabled;
+        get => _enabled;
         set
         {
-            if (base.Enabled != value)
+            if (_enabled == value)
             {
-                if (value)
+                return;
+            }
+
+            _enabled = value;
+
+            if (!_enabled && HasFocus)
+            {
+                SetHasFocus (false, this);
+            }
+
+            OnEnabledChanged ();
+            SetNeedsDisplay ();
+
+            if (_subviews is null)
+            {
+                return;
+            }
+
+            foreach (View view in _subviews)
+            {
+                if (!_enabled)
                 {
-                    if (SuperView is null || SuperView?.Enabled == true)
-                    {
-                        base.Enabled = value;
-                    }
+                    view._oldEnabled = view.Enabled;
+                    view.Enabled = _enabled;
                 }
                 else
                 {
-                    base.Enabled = value;
-                }
-
-                if (!value && HasFocus)
-                {
-                    SetHasFocus (false, this);
-                }
-
-                OnEnabledChanged ();
-                SetNeedsDisplay ();
-
-                if (_subviews is { })
-                {
-                    foreach (View view in _subviews)
-                    {
-                        if (!value)
-                        {
-                            view._oldEnabled = view.Enabled;
-                            view.Enabled = false;
-                        }
-                        else
-                        {
-                            view.Enabled = view._oldEnabled;
-                            view._addingView = false;
-                        }
-                    }
+                    view.Enabled = view._oldEnabled;
+                    view._addingView = _enabled;
                 }
             }
         }
@@ -339,40 +334,44 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <summary>Event fired when the <see cref="Enabled"/> value is being changed.</summary>
     public event EventHandler EnabledChanged;
 
-    /// <inheritdoc/>
-    public override void OnEnabledChanged () { EnabledChanged?.Invoke (this, EventArgs.Empty); }
+    /// <summary>Method invoked when the <see cref="Enabled"/> property from a view is changed.</summary>
+    public virtual void OnEnabledChanged () { EnabledChanged?.Invoke (this, EventArgs.Empty); }
 
-    /// <inheritdoc/>
-    public override bool Visible
+    private bool _visible = true;
+    /// <summary>Gets or sets a value indicating whether this <see cref="Responder"/> and all its child controls are displayed.</summary>
+    public virtual bool Visible
     {
-        get => base.Visible;
+        get => _visible;
         set
         {
-            if (base.Visible != value)
+            if (_visible == value)
             {
-                base.Visible = value;
+                return;
+            }
 
-                if (!value)
+            _visible = value;
+
+            if (!_visible)
+            {
+                if (HasFocus)
                 {
-                    if (HasFocus)
-                    {
-                        SetHasFocus (false, this);
-                    }
-
-                    if (IsInitialized && ClearOnVisibleFalse)
-                    {
-                        Clear ();
-                    }
+                    SetHasFocus (false, this);
                 }
 
-                OnVisibleChanged ();
-                SetNeedsDisplay ();
+                if (IsInitialized && ClearOnVisibleFalse)
+                {
+                    Clear ();
+                }
             }
+
+            OnVisibleChanged ();
+            SetNeedsDisplay ();
         }
     }
 
-    /// <inheritdoc/>
-    public override void OnVisibleChanged () { VisibleChanged?.Invoke (this, EventArgs.Empty); }
+
+    /// <summary>Method invoked when the <see cref="Visible"/> property from a view is changed.</summary>
+    public virtual void OnVisibleChanged () { VisibleChanged?.Invoke (this, EventArgs.Empty); }
 
     /// <summary>Gets or sets whether a view is cleared if the <see cref="Visible"/> property is <see langword="false"/>.</summary>
     public bool ClearOnVisibleFalse { get; set; } = true;
@@ -380,7 +379,7 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <summary>Event fired when the <see cref="Visible"/> value is being changed.</summary>
     public event EventHandler VisibleChanged;
 
-    private bool CanBeVisible (View view)
+    private static bool CanBeVisible (View view)
     {
         if (!view.Visible)
         {

@@ -222,8 +222,6 @@ public class ResponderTests
         var r = new Responder ();
         Assert.NotNull (r);
         Assert.Equal ("Terminal.Gui.Responder", r.ToString ());
-        Assert.True (r.Enabled);
-        Assert.True (r.Visible);
         r.Dispose ();
     }
 

@@ -1360,7 +1360,7 @@ public static partial class Application
     /// <summary>Event fired when a mouse move or click occurs. Coordinates are screen relative.</summary>
     /// <remarks>
     ///     <para>
-    ///         Use this event to receive mouse events in screen coordinates. Use <see cref="Responder.MouseEvent"/> to
+    ///         Use this event to receive mouse events in screen coordinates. Use <see cref="MouseEvent"/> to
     ///         receive mouse events relative to a <see cref="View"/>'s bounds.
     ///     </para>
     ///     <para>The <see cref="MouseEvent.View"/> will contain the <see cref="View"/> that contains the mouse coordinates.</para>

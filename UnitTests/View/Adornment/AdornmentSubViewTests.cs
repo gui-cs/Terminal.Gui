@@ -14,15 +14,17 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
     [InlineData (2, 1, true)]
     public void Adornment_WithSubView_FindDeepestView_Finds (int viewMargin, int subViewMargin, bool expectedFound)
     {
-        var view = new View () {
+        var view = new View ()
+        {
             Width = 10,
             Height = 10
         };
         view.Margin.Thickness = new Thickness (viewMargin);
 
-        var subView = new View () {
+        var subView = new View ()
+        {
             X = 0,
-            Y =0,
+            Y = 0,
             Width = 5,
             Height = 5
         };
@@ -65,6 +67,8 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         var view = new View ();
         var subView = new View ();
         view.Margin.Add (subView);
+        view.BeginInit ();
+        view.EndInit ();
         var raised = false;
 
         subView.LayoutStarted += LayoutStarted;
