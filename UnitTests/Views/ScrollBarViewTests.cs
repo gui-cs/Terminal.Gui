@@ -1216,8 +1216,8 @@ This is a test
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Border.ContentArea.ToString ());
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Border.GetVisibleContentArea ().ToString ());
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Border.Frame.ToString ());
-        Assert.Equal ("{X=0,Y=0,Width=8,Height=5}", view.Padding.ContentArea.ToString ());
-        Assert.Equal ("{X=0,Y=0,Width=8,Height=5}", view.Padding.GetVisibleContentArea ().ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Padding.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Padding.GetVisibleContentArea ().ToString ());
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Padding.Frame.ToString ());
         Assert.Equal ("(Left=0,Top=0,Right=1,Bottom=1)", view.Padding.Thickness.ToString ());
         Assert.Equal ("{Width=8, Height=5}", view.TextFormatter.Size.ToString ());
@@ -1259,8 +1259,8 @@ This is a test
                                                null,
                                                attrs);
 
-        Assert.True (view.Padding.OnInvokingKeyBindings (new Key (KeyCode.End)));
-        Assert.True (view.Padding.OnInvokingKeyBindings (new Key (KeyCode.End | KeyCode.ShiftMask)));
+        Assert.True (view.Padding.OnInvokingKeyBindings (Key.End));
+        Assert.True (view.Padding.OnInvokingKeyBindings (Key.End.WithShift));
         top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1332,8 +1332,8 @@ This is a test
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Border.ContentArea.ToString ());
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Border.GetVisibleContentArea ().ToString ());
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Border.Frame.ToString ());
-        Assert.Equal ("{X=0,Y=0,Width=8,Height=5}", view.Padding.ContentArea.ToString ());
-        Assert.Equal ("{X=0,Y=0,Width=8,Height=5}", view.Padding.GetVisibleContentArea ().ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Padding.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Padding.GetVisibleContentArea ().ToString ());
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Padding.Frame.ToString ());
         Assert.Equal ("(Left=0,Top=0,Right=1,Bottom=1)", view.Padding.Thickness.ToString ());
         Assert.Equal ("{Width=8, Height=5}", view.TextFormatter.Size.ToString ());

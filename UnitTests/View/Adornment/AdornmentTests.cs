@@ -106,21 +106,21 @@ public class AdornmentTests
         Assert.Equal (new Rectangle (1, 2, 10, 10), parent.Frame);
         Assert.Equal (new Rectangle (0, 0, 4, 4), parent.ContentArea);
         Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin.Frame);
-        Assert.Equal (new Rectangle (1, 1, 8, 8), parent.Margin.ContentArea);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin.ContentArea);
         Assert.Equal (new Rectangle (1, 1, 8, 8), parent.Border.Frame);
-        Assert.Equal (new Rectangle (1, 1, 6, 6), parent.Border.ContentArea);
+        Assert.Equal (new Rectangle (0, 0, 8, 8), parent.Border.ContentArea);
         Assert.Equal (new Rectangle (2, 2, 6, 6), parent.Padding.Frame);
-        Assert.Equal (new Rectangle (1, 1, 4, 4), parent.Padding.ContentArea);
+        Assert.Equal (new Rectangle (0, 0, 6, 6), parent.Padding.ContentArea);
 
         Assert.Null (parent.Margin.SuperView);
         Rectangle boundsAsScreen = parent.BoundsToScreen (parent.ContentArea);
         Assert.Equal (new Rectangle (4, 5, 4, 4), boundsAsScreen);
         boundsAsScreen = parent.Margin.BoundsToScreen (parent.Margin.ContentArea);
-        Assert.Equal (new Rectangle (2, 3, 8, 8), boundsAsScreen);
+        Assert.Equal (new Rectangle (1, 2, 10, 10), boundsAsScreen);
         boundsAsScreen = parent.Border.BoundsToScreen (parent.Border.ContentArea);
-        Assert.Equal (new Rectangle (2, 3, 6, 6), boundsAsScreen);
+        Assert.Equal (new Rectangle (2, 3, 8, 8), boundsAsScreen);
         boundsAsScreen = parent.Padding.BoundsToScreen (parent.Padding.ContentArea);
-        Assert.Equal (new Rectangle (2, 3, 4, 4), boundsAsScreen);
+        Assert.Equal (new Rectangle (3, 4, 6, 6), boundsAsScreen);
     }
 
     [Fact]
@@ -195,13 +195,13 @@ public class AdornmentTests
         Assert.Equal ("{X=1,Y=1,Width=8,Height=7}", parent.Border.Frame.ToString ());
         Assert.Equal ("{X=2,Y=2,Width=6,Height=5}", parent.Padding.Frame.ToString ());
         Assert.Equal ("{X=5,Y=1,Width=10,Height=9}", parent.Frame.ToString ());
-        Assert.Equal ("{X=1,Y=1,Width=8,Height=7}", parent.Margin.ContentArea.ToString ());
-        Assert.Equal ("{X=1,Y=1,Width=6,Height=5}", parent.Border.ContentArea.ToString ());
-        Assert.Equal ("{X=1,Y=1,Width=4,Height=3}", parent.Padding.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=10,Height=9}", parent.Margin.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=8,Height=7}", parent.Border.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=6,Height=5}", parent.Padding.ContentArea.ToString ());
         Assert.Equal ("{X=0,Y=0,Width=4,Height=3}", parent.ContentArea.ToString ());
-        Assert.Equal ("{X=1,Y=1,Width=8,Height=7}", parent.Margin.GetVisibleContentArea ().ToString ());
-        Assert.Equal ("{X=1,Y=1,Width=6,Height=5}", parent.Border.GetVisibleContentArea ().ToString ());
-        Assert.Equal ("{X=1,Y=1,Width=4,Height=3}", parent.Padding.GetVisibleContentArea ().ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=10,Height=9}", parent.Margin.GetVisibleContentArea ().ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=8,Height=7}", parent.Border.GetVisibleContentArea ().ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=6,Height=5}", parent.Padding.GetVisibleContentArea ().ToString ());
         Assert.Equal ("{X=0,Y=0,Width=4,Height=3}", parent.GetVisibleContentArea ().ToString ());
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -282,13 +282,13 @@ public class AdornmentTests
         Assert.Equal ("{X=1,Y=1,Width=8,Height=7}", parent.Border.Frame.ToString ());
         Assert.Equal ("{X=2,Y=2,Width=6,Height=5}", parent.Padding.Frame.ToString ());
         Assert.Equal ("{X=4,Y=0,Width=10,Height=9}", parent.Frame.ToString ());
-        Assert.Equal ("{X=1,Y=1,Width=8,Height=7}", parent.Margin.ContentArea.ToString ());
-        Assert.Equal ("{X=1,Y=1,Width=6,Height=5}", parent.Border.ContentArea.ToString ());
-        Assert.Equal ("{X=1,Y=1,Width=4,Height=3}", parent.Padding.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=10,Height=9}", parent.Margin.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=8,Height=7}", parent.Border.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=6,Height=5}", parent.Padding.ContentArea.ToString ());
         Assert.Equal ("{X=0,Y=0,Width=4,Height=3}", parent.ContentArea.ToString ());
-        Assert.Equal ("{X=1,Y=1,Width=8,Height=7}", parent.Margin.GetVisibleContentArea ().ToString ());
-        Assert.Equal ("{X=1,Y=1,Width=6,Height=5}", parent.Border.GetVisibleContentArea ().ToString ());
-        Assert.Equal ("{X=1,Y=1,Width=4,Height=3}", parent.Padding.GetVisibleContentArea ().ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=10,Height=9}", parent.Margin.GetVisibleContentArea ().ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=8,Height=7}", parent.Border.GetVisibleContentArea ().ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=6,Height=5}", parent.Padding.GetVisibleContentArea ().ToString ());
         Assert.Equal ("{X=0,Y=0,Width=4,Height=3}", parent.GetVisibleContentArea ().ToString ());
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -465,11 +465,11 @@ public class AdornmentTests
         Assert.Equal (new Rectangle (1, 2, 10, 10), parent.Frame);
         Assert.Equal (new Rectangle (0, 0, 4, 4), parent.ContentArea);
         Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin.Frame);
-        Assert.Equal (new Rectangle (1, 1, 8, 8), parent.Margin.ContentArea);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin.ContentArea);
         Assert.Equal (new Rectangle (1, 1, 8, 8), parent.Border.Frame);
-        Assert.Equal (new Rectangle (1, 1, 6, 6), parent.Border.ContentArea);
+        Assert.Equal (new Rectangle (0, 0, 8, 8), parent.Border.ContentArea);
         Assert.Equal (new Rectangle (2, 2, 6, 6), parent.Padding.Frame);
-        Assert.Equal (new Rectangle (1, 1, 4, 4), parent.Padding.ContentArea);
+        Assert.Equal (new Rectangle (0, 0, 6, 6), parent.Padding.ContentArea);
 
         Assert.Null (parent.Margin.SuperView);
         Assert.Equal (new Rectangle (1, 2, 10, 10), parent.FrameToScreen ());
@@ -496,11 +496,11 @@ public class AdornmentTests
         Assert.Equal (new Rectangle (1, 2, 10, 10), parent.Frame);
         Assert.Equal (new Rectangle (0, 0, 4, 4), parent.ContentArea);
         Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin.Frame);
-        Assert.Equal (new Rectangle (1, 1, 8, 8), parent.Margin.ContentArea);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin.ContentArea);
         Assert.Equal (new Rectangle (1, 1, 8, 8), parent.Border.Frame);
-        Assert.Equal (new Rectangle (1, 1, 6, 6), parent.Border.ContentArea);
+        Assert.Equal (new Rectangle (0, 0, 8, 8), parent.Border.ContentArea);
         Assert.Equal (new Rectangle (2, 2, 6, 6), parent.Padding.Frame);
-        Assert.Equal (new Rectangle (1, 1, 4, 4), parent.Padding.ContentArea);
+        Assert.Equal (new Rectangle (0, 0, 6, 6), parent.Padding.ContentArea);
 
         Assert.Null (parent.Margin.SuperView);
         Assert.Equal (new Rectangle (0, 0, 12, 12), top.FrameToScreen ());
@@ -519,10 +519,15 @@ public class AdornmentTests
     [InlineData (1, 2, "Border", false)]
     [InlineData (2, 2, "Border", false)]
     [InlineData (2, 3, "Border", true)]
+    [InlineData (2, 4, "Border", true)]
+    [InlineData (3, 4, "Border", false)]
     [InlineData (1, 2, "Padding", false)]
     [InlineData (1, 3, "Padding", false)]
     [InlineData (2, 3, "Padding", false)]
     [InlineData (3, 4, "Padding", true)]
+    [InlineData (4, 5, "Padding", false)]
+    [InlineData (5, 4, "Padding", true)]
+    [InlineData (5, 6, "Padding", false)]
     public void FrameToScreen_Find_Adornment_By_Location (int x, int y, string adornment, bool expectedBool)
     {
         var parent = new View { X = 1, Y = 2, Width = 10, Height = 10 };

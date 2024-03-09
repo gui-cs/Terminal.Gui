@@ -1504,6 +1504,7 @@ public class ToplevelTests
                                                            new MouseEvent { X = 5, Y = 5, Flags = MouseFlags.Button1Released }
                                                           )
                                  );
+        // ScrollView always grab the mouse when the container's subview OnMouseEnter don't want grab the mouse
         Assert.Equal (scrollView, Application.MouseGrabView);
 
         Application.OnMouseEvent (
