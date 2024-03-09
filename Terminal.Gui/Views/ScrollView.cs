@@ -366,7 +366,7 @@ public class ScrollView : View
         {
             ScrollUp (1);
         }
-        else if (me.Flags == MouseFlags.WheeledRight && _showHorizontalScrollIndicator)
+        else if (me.Flags == MouseFlags.WheeledRight && ShowHorizontalScrollIndicator)
         {
             ScrollRight (1);
         }
