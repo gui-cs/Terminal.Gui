@@ -10,43 +10,6 @@ public class ViewTests
     public ViewTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
-    public void Accept_Cancel_Event_OnAccept_Returns_True ()
-    {
-        var view = new View ();
-        var acceptInvoked = false;
-
-        view.Accept += ViewOnAccept;
-
-        bool? ret = view.OnAccept ();
-        Assert.True (ret);
-        Assert.True (acceptInvoked);
-
-        return;
-
-        void ViewOnAccept (object sender, CancelEventArgs e)
-        {
-            acceptInvoked = true;
-            e.Cancel = true;
-        }
-    }
-
-    [Fact]
-    public void Accept_Command_Invokes_Accept_Event ()
-    {
-        var view = new View ();
-        var accepted = false;
-
-        view.Accept += ViewOnAccept;
-
-        view.InvokeCommand (Command.Accept);
-        Assert.True (accepted);
-
-        return;
-
-        void ViewOnAccept (object sender, CancelEventArgs e) { accepted = true; }
-    }
-
-    [Fact]
     [AutoInitShutdown]
     public void Clear_Bounds_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
     {
@@ -90,7 +53,7 @@ public class ViewTests
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rectangle (0, 0, 20, 10), pos);
 
-        view.Clear (view.Bounds);
+        view.Clear (view.ContentArea);
 
         expected = @"
 ┌──────────────────┐
@@ -152,7 +115,7 @@ public class ViewTests
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rectangle (0, 0, 20, 10), pos);
 
-        view.Clear (view.Bounds);
+        view.Clear (view.ContentArea);
 
         expected = @"
 ┌──────────────────┐
@@ -563,17 +526,6 @@ At 0,0
     }
 
     [Fact]
-    public void HotKey_Command_SetsFocus ()
-    {
-        var view = new View ();
-
-        view.CanFocus = true;
-        Assert.False (view.HasFocus);
-        view.InvokeCommand (Command.HotKey);
-        Assert.True (view.HasFocus);
-    }
-
-    [Fact]
     [AutoInitShutdown]
     public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Frame ()
     {
@@ -771,6 +723,21 @@ At 0,0
     }
 
     [Fact]
+    [SetupFakeDriver]
+    public void SetText_RendersCorrectly ()
+    {
+        View view;
+        var text = "test";
+
+        view = new Label { Text = text };
+        view.BeginInit ();
+        view.EndInit ();
+        view.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre ( text, _output);
+    }
+
+    [Fact]
     [TestRespondersDisposed]
     public void New_Initializes ()
     {
@@ -906,38 +873,6 @@ At 0,0
         r.Dispose ();
 
         // TODO: Add more
-    }
-
-    // OnAccept/Accept tests
-    [Fact]
-    public void OnAccept_Fires_Accept ()
-    {
-        var view = new View ();
-        var accepted = false;
-
-        view.Accept += ViewOnAccept;
-
-        view.OnAccept ();
-        Assert.True (accepted);
-
-        return;
-
-        void ViewOnAccept (object sender, CancelEventArgs e) { accepted = true; }
-    }
-
-    [Fact]
-    [SetupFakeDriver]
-    public void SetText_RendersCorrectly ()
-    {
-        View view;
-        var text = "test";
-
-        view = new Label { Text = text };
-        view.BeginInit ();
-        view.EndInit ();
-        view.Draw ();
-
-        TestHelpers.AssertDriverContentsWithFrameAre (text, _output);
     }
 
     [Fact]
@@ -1268,5 +1203,31 @@ At 0,0
             acceptInvoked = true;
             e.Cancel = true;
         }
+    }
+
+    [Fact]
+    public void Accept_Command_Invokes_Accept_Event ()
+    {
+        var view = new View ();
+        var accepted = false;
+
+        view.Accept += ViewOnAccept;
+
+        view.InvokeCommand (Command.Accept);
+        Assert.True (accepted);
+
+        return;
+        void ViewOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void HotKey_Command_SetsFocus ()
+    {
+        var view = new View ();
+
+        view.CanFocus = true;
+        Assert.False (view.HasFocus);
+        view.InvokeCommand (Command.HotKey);
+        Assert.True (view.HasFocus);
     }
 }

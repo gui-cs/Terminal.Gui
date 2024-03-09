@@ -28,7 +28,7 @@ public class BoundsTests (ITestOutputHelper output)
         view.EndInit();
 
         // Act
-        var bounds = view.Bounds;
+        var bounds = view.ContentArea;
 
         // Assert
         Assert.Equal(expectedW, bounds.Width);
@@ -85,7 +85,7 @@ public class BoundsTests (ITestOutputHelper output)
         superSuperView.LayoutSubviews ();
 
         // Act
-        var bounds = view.Bounds;
+        var bounds = view.ContentArea;
 
         // Assert
         Assert.Equal (expectedW, bounds.Width);
@@ -144,7 +144,7 @@ public class BoundsTests (ITestOutputHelper output)
         superSuperView.LayoutSubviews ();
 
         // Act
-        var bounds = view.Bounds;
+        var bounds = view.ContentArea;
 
         // Assert
         Assert.Equal (expectedW, bounds.Width);

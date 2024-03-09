@@ -22,25 +22,25 @@ public class AdornmentTests
         view.EndInit ();
 
         Assert.Equal (new (1, 2, 20, 20), view.Frame);
-        Assert.Equal (new (0, 0, 20, 20), view.Bounds);
+        Assert.Equal (new (0, 0, 20, 20), view.ContentArea);
 
         var marginThickness = 1;
         view.Margin.Thickness = new  (marginThickness);
-        Assert.Equal (new (0, 0, 18, 18), view.Bounds);
+        Assert.Equal (new (0, 0, 18, 18), view.ContentArea);
 
         var borderThickness = 2;
         view.Border.Thickness = new (borderThickness);
-        Assert.Equal (new (0, 0, 14, 14), view.Bounds);
+        Assert.Equal (new (0, 0, 14, 14), view.ContentArea);
 
         var paddingThickness = 3;
         view.Padding.Thickness = new Thickness (paddingThickness);
-        Assert.Equal (new (0, 0, 8, 8), view.Bounds);
+        Assert.Equal (new (0, 0, 8, 8), view.ContentArea);
 
-        Assert.Equal (new (0, 0, view.Margin.Frame.Width, view.Margin.Frame.Height), view.Margin.Bounds);
+        Assert.Equal (new (0, 0, view.Margin.Frame.Width, view.Margin.Frame.Height), view.Margin.ContentArea);
 
-        Assert.Equal (new (0, 0, view.Border.Frame.Width, view.Border.Frame.Height), view.Border.Bounds);
+        Assert.Equal (new (0, 0, view.Border.Frame.Width, view.Border.Frame.Height), view.Border.ContentArea);
 
-        Assert.Equal (new (0, 0, view.Padding.Frame.Width , view.Padding.Frame.Height), view.Padding.Bounds);
+        Assert.Equal (new (0, 0, view.Padding.Frame.Width , view.Padding.Frame.Height), view.Padding.ContentArea);
     }
 
     // Test that Adornment.Bounds_get override returns Frame.Size minus Thickness
@@ -88,7 +88,7 @@ public class AdornmentTests
         Assert.Equal (new Rectangle (x, y, w, h), adornment.Frame);
 
         var expectedBounds = new Rectangle (0, 0, w, h);
-        Assert.Equal (expectedBounds, adornment.Bounds);
+        Assert.Equal (expectedBounds, adornment.ContentArea);
     }
 
     // Test that Adornment.Bounds_get override uses Parent not SuperView
@@ -347,7 +347,7 @@ public class AdornmentTests
         view.EndInit ();
 
         Assert.Equal (new Rectangle (1, 2, 20, 31), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 8, 19), view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 8, 19), view.ContentArea);
 
         // Margin.Frame is always the same as the view frame
         Assert.Equal (new Rectangle (0, 0, 20, 31), view.Margin.Frame);
