@@ -122,11 +122,11 @@ public class GraphViewExample : Scenario
                                                               () => EnableDiagnostics ()
                                                              )
                                      {
-                                         Checked = ConsoleDriver.Diagnostics
-                                                   == (ConsoleDriver.DiagnosticFlags
-                                                                    .FramePadding
-                                                       | ConsoleDriver.DiagnosticFlags
-                                                                      .FrameRuler),
+                                         Checked = View.Diagnostics
+                                                   == (ViewDiagnosticFlags
+                                                                    .Padding
+                                                       | ViewDiagnosticFlags
+                                                                      .Ruler),
                                          CheckType = MenuItemCheckStyle.Checked
                                      }
                                  }
@@ -186,10 +186,10 @@ public class GraphViewExample : Scenario
     {
         _miDiags.Checked = !_miDiags.Checked;
 
-        ConsoleDriver.Diagnostics = _miDiags.Checked == true
-                                        ? ConsoleDriver.DiagnosticFlags.FramePadding
-                                          | ConsoleDriver.DiagnosticFlags.FrameRuler
-                                        : ConsoleDriver.DiagnosticFlags.Off;
+        View.Diagnostics = _miDiags.Checked == true
+                                        ? ViewDiagnosticFlags.Padding
+                                          | ViewDiagnosticFlags.Ruler
+                                        : ViewDiagnosticFlags.Off;
         Application.Refresh ();
     }
 
