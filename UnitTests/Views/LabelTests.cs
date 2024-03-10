@@ -51,6 +51,27 @@ public class LabelTests
         Assert.True (nextSubview.HasFocus);
     }
 
+
+    [Fact]
+    public void MouseClick_SetsFocus_OnNextSubview ()
+    {
+        var superView = new View () { CanFocus = true, Height = 1, Width = 15};
+        var focusedView = new View () { CanFocus = true, Width = 1, Height = 1 };
+        var label = new Label () { X = 2, Title = "_x" };
+        var nextSubview = new View () { CanFocus = true, X = 4, Width = 4, Height = 1 };
+        superView.Add (label, nextSubview);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        Assert.False (focusedView.HasFocus);
+        Assert.False (label.HasFocus);
+        Assert.False (nextSubview.HasFocus);
+
+        label.OnMouseEvent (new MouseEvent () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked });
+        Assert.False (label.HasFocus);
+        Assert.True (nextSubview.HasFocus);
+    }
+
     [Fact]
     public void HotKey_Command_Does_Not_Accept ()
     {
