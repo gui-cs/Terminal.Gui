@@ -30,7 +30,7 @@ public class Label : View
 
     private void Label_MouseClick (object sender, MouseEventEventArgs e)
     {
-        e.Handled = InvokeCommand (Command.Accept) == true;
+        e.Handled = InvokeCommand (Command.HotKey) == true;
     }
 
     private void Label_TitleChanged (object sender, StateEventArgs<string> e)
