@@ -8,6 +8,70 @@ public class LabelTests
     private readonly ITestOutputHelper _output;
     public LabelTests (ITestOutputHelper output) { _output = output; }
 
+    // Test that Title and Text are the same
+    [Fact]
+    public void Text_Mirrors_Title ()
+    {
+        var label = new Label ();
+        label.Title = "Hello";
+        Assert.Equal ("Hello", label.Title);
+        Assert.Equal ("Hello", label.TitleTextFormatter.Text);
+
+        Assert.Equal ("Hello", label.Text);
+        Assert.Equal ("Hello", label.TextFormatter.Text);
+    }
+
+    [Fact]
+    public void Title_Mirrors_Text ()
+    {
+        var label = new Label ();
+        label.Text = "Hello";
+        Assert.Equal ("Hello", label.Text);
+        Assert.Equal ("Hello", label.TextFormatter.Text);
+
+        Assert.Equal ("Hello", label.Title);
+        Assert.Equal ("Hello", label.TitleTextFormatter.Text);
+    }
+
+    [Fact]
+    public void HotKey_Command_SetsFocus_OnNextSubview ()
+    {
+        var superView = new View () { CanFocus = true };
+        var label = new Label ();
+        var nextSubview = new View () { CanFocus = true };
+        superView.Add (label, nextSubview);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        Assert.False (label.HasFocus);
+        Assert.False (nextSubview.HasFocus);
+
+        label.InvokeCommand (Command.HotKey);
+        Assert.False (label.HasFocus);
+        Assert.True (nextSubview.HasFocus);
+    }
+
+
+    [Fact]
+    public void MouseClick_SetsFocus_OnNextSubview ()
+    {
+        var superView = new View () { CanFocus = true, Height = 1, Width = 15};
+        var focusedView = new View () { CanFocus = true, Width = 1, Height = 1 };
+        var label = new Label () { X = 2, Title = "_x" };
+        var nextSubview = new View () { CanFocus = true, X = 4, Width = 4, Height = 1 };
+        superView.Add (focusedView, label, nextSubview);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        Assert.False (focusedView.HasFocus);
+        Assert.False (label.HasFocus);
+        Assert.False (nextSubview.HasFocus);
+
+        label.OnMouseEvent (new MouseEvent () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked });
+        Assert.False (label.HasFocus);
+        Assert.True (nextSubview.HasFocus);
+    }
+
     [Fact]
     [AutoInitShutdown]
     public void AutoSize_Stays_True_AnchorEnd ()

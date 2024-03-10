@@ -148,7 +148,7 @@ public partial class View
 
         if (!HasFocus && CanFocus)
         {
-            SetFocus();
+            SetFocus ();
         }
 
         return args.Handled;
