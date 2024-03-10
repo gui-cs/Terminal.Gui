@@ -59,7 +59,7 @@ public class LabelTests
         var focusedView = new View () { CanFocus = true, Width = 1, Height = 1 };
         var label = new Label () { X = 2, Title = "_x" };
         var nextSubview = new View () { CanFocus = true, X = 4, Width = 4, Height = 1 };
-        superView.Add (label, nextSubview);
+        superView.Add (focusedView, label, nextSubview);
         superView.BeginInit ();
         superView.EndInit ();
 
