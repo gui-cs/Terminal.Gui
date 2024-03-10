@@ -156,6 +156,11 @@ public partial class View
             return true;
         }
 
+        if (!HasFocus && CanFocus)
+        {
+            SetFocus ();
+        }
+
         return args.Handled;
     }
 }
