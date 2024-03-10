@@ -3,23 +3,22 @@
 public partial class View
 {
     private bool _enableScrollBars;
-    private View _parent;
     private ScrollBarView _scrollBar;
 
     /// <summary>If true the vertical/horizontal scroll bars won't be showed if it's not needed.</summary>
     public bool AutoHideScrollBars
     {
-        get => _parent?._scrollBar?.AutoHideScrollBars is true;
+        get => ParentView?._scrollBar?.AutoHideScrollBars is true;
         set
         {
             if (HasVerticalScrollBar)
             {
-                _parent._scrollBar.AutoHideScrollBars = value;
+                ParentView._scrollBar.AutoHideScrollBars = value;
             }
 
             if (HasHorizontalScrollBar)
             {
-                _parent._scrollBar.OtherScrollBarView.AutoHideScrollBars = value;
+                ParentView._scrollBar.OtherScrollBarView.AutoHideScrollBars = value;
             }
         }
     }
@@ -33,22 +32,12 @@ public partial class View
         get => _enableScrollBars;
         set
         {
-            if (this is Adornment adornment)
-            {
-                _parent = adornment.Parent;
-                adornment.Parent._parent = _parent;
-            }
-            else
-            {
-                _parent = this;
-            }
-
-            if (_parent._scrollBar is { } && _parent._enableScrollBars == value)
+            if (ParentView._scrollBar is { } && ParentView._enableScrollBars == value)
             {
                 return;
             }
 
-            _parent._enableScrollBars = value;
+            ParentView._enableScrollBars = value;
             DisposeScrollBar ();
 
             if (!value)
@@ -56,38 +45,38 @@ public partial class View
                 return;
             }
 
-            var vertical = new ScrollBarView { Orientation = Orientation.Vertical };
-            var horizontal = new ScrollBarView { Orientation = Orientation.Horizontal };
-            _parent._scrollBar = vertical;
-            _parent._scrollBar.OtherScrollBarView = horizontal;
+            var vertical = new ScrollBarView { Orientation = Orientation.Vertical, Size = ParentView.ContentSize.Height };
+            var horizontal = new ScrollBarView { Orientation = Orientation.Horizontal, Size = ParentView.ContentSize.Width };
+            ParentView._scrollBar = vertical;
+            ParentView._scrollBar.OtherScrollBarView = horizontal;
 
-            Add (_parent._scrollBar);
-            _parent.AddEventHandlersForScrollBars (_parent._scrollBar);
-            _parent.AddKeyBindingsForScrolling (_parent._scrollBar);
+            Add (ParentView._scrollBar);
+            ParentView.AddEventHandlersForScrollBars (ParentView._scrollBar);
+            ParentView.AddKeyBindingsForScrolling (ParentView._scrollBar);
 
-            if (_parent._scrollBar.OtherScrollBarView != null)
+            if (ParentView._scrollBar.OtherScrollBarView != null)
             {
-                _parent.AddKeyBindingsForScrolling (_parent._scrollBar.OtherScrollBarView);
+                ParentView.AddKeyBindingsForScrolling (ParentView._scrollBar.OtherScrollBarView);
             }
 
-            _parent.SetNeedsDisplay ();
+            ParentView.SetNeedsDisplay ();
         }
     }
 
     /// <summary>Get or sets if the view-port is kept always visible in the area of this <see cref="ScrollBarView"/></summary>
     public bool KeepContentAlwaysInContentArea
     {
-        get => _parent?._scrollBar?.KeepContentAlwaysInViewPort is true || _parent?._scrollBar?.OtherScrollBarView.KeepContentAlwaysInViewPort is true;
+        get => ParentView?._scrollBar?.KeepContentAlwaysInViewPort is true || ParentView?._scrollBar?.OtherScrollBarView.KeepContentAlwaysInViewPort is true;
         set
         {
             if (HasVerticalScrollBar)
             {
-                _parent._scrollBar.KeepContentAlwaysInViewPort = value;
+                ParentView._scrollBar.KeepContentAlwaysInViewPort = value;
             }
 
             if (HasHorizontalScrollBar)
             {
-                _parent._scrollBar.OtherScrollBarView.KeepContentAlwaysInViewPort = value;
+                ParentView._scrollBar.OtherScrollBarView.KeepContentAlwaysInViewPort = value;
             }
         }
     }
@@ -96,12 +85,12 @@ public partial class View
     /// <value><c>true</c> if show horizontal scroll bar; otherwise, <c>false</c>.</value>
     public virtual bool ShowHorizontalScrollBar
     {
-        get => _parent?._scrollBar?.OtherScrollBarView.ShowScrollIndicator is true;
+        get => ParentView?._scrollBar?.OtherScrollBarView.ShowScrollIndicator is true;
         set
         {
-            if (_parent._scrollBar?.OtherScrollBarView is { })
+            if (ParentView._scrollBar?.OtherScrollBarView is { })
             {
-                _parent._scrollBar.OtherScrollBarView.ShowScrollIndicator = value;
+                ParentView._scrollBar.OtherScrollBarView.ShowScrollIndicator = value;
             }
         }
     }
@@ -110,19 +99,21 @@ public partial class View
     /// <value><c>true</c> if show vertical scroll bar; otherwise, <c>false</c>.</value>
     public virtual bool ShowVerticalScrollBar
     {
-        get => _parent?._scrollBar?.ShowScrollIndicator is true;
+        get => ParentView?._scrollBar?.ShowScrollIndicator is true;
         set
         {
-            if (_parent._scrollBar is { })
+            if (ParentView._scrollBar is { })
             {
-                _parent._scrollBar.ShowScrollIndicator = value;
+                ParentView._scrollBar.ShowScrollIndicator = value;
             }
         }
     }
 
-    private bool HasHorizontalScrollBar => _parent is { _scrollBar.OtherScrollBarView: { } };
+    private bool HasHorizontalScrollBar => ParentView is { _scrollBar.OtherScrollBarView: { } };
 
-    private bool HasVerticalScrollBar => _parent is { _scrollBar: { } };
+    private bool HasVerticalScrollBar => ParentView is { _scrollBar: { } };
+
+    private View ParentView => this is Adornment adornment ? adornment.Parent : this;
 
     private void AddEventHandlersForScrollBars (ScrollBarView scrollBar)
     {
@@ -148,93 +139,63 @@ public partial class View
                                   Command.ScrollDown,
                                   () =>
                                   {
-                                      if (scrollBar.Orientation == Orientation.Vertical)
-                                      {
-                                          scrollBar.Position++;
+                                      scrollBar.Position++;
 
-                                          return true;
-                                      }
-
-                                      return false;
+                                      return true;
                                   });
 
             scrollBar.AddCommand (
                                   Command.ScrollUp,
                                   () =>
                                   {
-                                      if (scrollBar.Orientation == Orientation.Vertical)
-                                      {
-                                          scrollBar.Position--;
+                                      scrollBar.Position--;
 
-                                          return true;
-                                      }
-
-                                      return false;
+                                      return true;
                                   });
 
             scrollBar.AddCommand (
                                   Command.TopHome,
                                   () =>
                                   {
-                                      if (scrollBar.Orientation == Orientation.Vertical)
-                                      {
-                                          scrollBar.Position = 0;
+                                      scrollBar.Position = 0;
 
-                                          return true;
-                                      }
-
-                                      return false;
+                                      return true;
                                   });
 
             scrollBar.AddCommand (
                                   Command.BottomEnd,
                                   () =>
                                   {
-                                      if (scrollBar.Orientation == Orientation.Vertical)
-                                      {
-                                          scrollBar.Position = ContentSize.Height;
+                                      scrollBar.Position = ContentSize.Height;
 
-                                          return true;
-                                      }
-
-                                      return false;
+                                      return true;
                                   });
 
             scrollBar.AddCommand (
                                   Command.PageDown,
                                   () =>
                                   {
-                                      if (scrollBar.Orientation == Orientation.Vertical)
-                                      {
-                                          scrollBar.Position += GetVisibleContentArea ().Height;
+                                      scrollBar.Position += scrollBar.GetVisibleContentArea ().Height;
 
-                                          return true;
-                                      }
-
-                                      return false;
+                                      return true;
                                   });
 
             scrollBar.AddCommand (
                                   Command.PageUp,
                                   () =>
                                   {
-                                      if (scrollBar.Orientation == Orientation.Vertical)
-                                      {
-                                          scrollBar.Position -= GetVisibleContentArea ().Height;
+                                      scrollBar.Position -= scrollBar.GetVisibleContentArea ().Height;
 
-                                          return true;
-                                      }
-
-                                      return false;
+                                      return true;
                                   });
 
             // Default keybindings for this view
-            scrollBar.KeyBindings.Add (KeyCode.CursorDown, KeyBindingScope.HotKey, Command.ScrollDown);
-            scrollBar.KeyBindings.Add (KeyCode.CursorUp, KeyBindingScope.HotKey, Command.ScrollUp);
-            scrollBar.KeyBindings.Add (KeyCode.Home, KeyBindingScope.HotKey, Command.TopHome);
-            scrollBar.KeyBindings.Add (KeyCode.End, KeyBindingScope.HotKey, Command.BottomEnd);
-            scrollBar.KeyBindings.Add (KeyCode.PageDown, KeyBindingScope.HotKey, Command.PageDown);
-            scrollBar.KeyBindings.Add (KeyCode.PageUp, KeyBindingScope.HotKey, Command.PageUp);
+            scrollBar.KeyBindings.Add (Key.CursorDown, KeyBindingScope.HotKey, Command.ScrollDown);
+            scrollBar.KeyBindings.Add (Key.CursorUp, KeyBindingScope.HotKey, Command.ScrollUp);
+            scrollBar.KeyBindings.Add (Key.Home, KeyBindingScope.HotKey, Command.TopHome);
+            scrollBar.KeyBindings.Add (Key.End, KeyBindingScope.HotKey, Command.BottomEnd);
+            scrollBar.KeyBindings.Add (Key.PageDown, KeyBindingScope.HotKey, Command.PageDown);
+            scrollBar.KeyBindings.Add (Key.PageUp, KeyBindingScope.HotKey, Command.PageUp);
         }
         else
         {
@@ -243,118 +204,88 @@ public partial class View
                                   Command.Left,
                                   () =>
                                   {
-                                      if (scrollBar.Orientation == Orientation.Horizontal)
-                                      {
-                                          scrollBar.Position--;
+                                      scrollBar.Position--;
 
-                                          return true;
-                                      }
-
-                                      return false;
+                                      return true;
                                   });
 
             scrollBar.AddCommand (
                                   Command.Right,
                                   () =>
                                   {
-                                      if (scrollBar.Orientation == Orientation.Horizontal)
-                                      {
-                                          scrollBar.Position++;
+                                      scrollBar.Position++;
 
-                                          return true;
-                                      }
-
-                                      return false;
+                                      return true;
                                   });
 
             scrollBar.AddCommand (
                                   Command.LeftHome,
                                   () =>
                                   {
-                                      if (scrollBar.Orientation == Orientation.Horizontal)
-                                      {
-                                          scrollBar.Position = 0;
+                                      scrollBar.Position = 0;
 
-                                          return true;
-                                      }
-
-                                      return false;
+                                      return true;
                                   });
 
             scrollBar.AddCommand (
                                   Command.RightEnd,
                                   () =>
                                   {
-                                      if (scrollBar.Orientation == Orientation.Horizontal)
-                                      {
-                                          scrollBar.Position = ContentSize.Width;
+                                      scrollBar.Position = ContentSize.Width;
 
-                                          return true;
-                                      }
-
-                                      return false;
+                                      return true;
                                   });
 
             scrollBar.AddCommand (
                                   Command.PageRight,
                                   () =>
                                   {
-                                      if (scrollBar.Orientation == Orientation.Horizontal)
-                                      {
-                                          scrollBar.Position += GetVisibleContentArea ().Width;
+                                      scrollBar.Position += scrollBar.GetVisibleContentArea ().Width;
 
-                                          return true;
-                                      }
-
-                                      return false;
+                                      return true;
                                   });
 
             scrollBar.AddCommand (
                                   Command.PageLeft,
                                   () =>
                                   {
-                                      if (scrollBar.Orientation == Orientation.Horizontal)
-                                      {
-                                          scrollBar.Position -= GetVisibleContentArea ().Width;
+                                      scrollBar.Position -= scrollBar.GetVisibleContentArea ().Width;
 
-                                          return true;
-                                      }
-
-                                      return false;
+                                      return true;
                                   });
 
             // Default keybindings for this view
-            scrollBar.KeyBindings.Add (KeyCode.CursorLeft, KeyBindingScope.HotKey, Command.Left);
-            scrollBar.KeyBindings.Add (KeyCode.CursorRight, KeyBindingScope.HotKey, Command.Right);
-            scrollBar.KeyBindings.Add (KeyCode.Home | KeyCode.ShiftMask, KeyBindingScope.HotKey, Command.LeftHome);
-            scrollBar.KeyBindings.Add (KeyCode.End | KeyCode.ShiftMask, KeyBindingScope.HotKey, Command.RightEnd);
-            scrollBar.KeyBindings.Add (KeyCode.PageDown | KeyCode.ShiftMask, KeyBindingScope.HotKey, Command.PageRight);
-            scrollBar.KeyBindings.Add (KeyCode.PageUp | KeyCode.ShiftMask, KeyBindingScope.HotKey, Command.PageLeft);
+            scrollBar.KeyBindings.Add (Key.CursorLeft, KeyBindingScope.HotKey, Command.Left);
+            scrollBar.KeyBindings.Add (Key.CursorRight, KeyBindingScope.HotKey, Command.Right);
+            scrollBar.KeyBindings.Add (Key.Home.WithShift, KeyBindingScope.HotKey, Command.LeftHome);
+            scrollBar.KeyBindings.Add (Key.End.WithShift, KeyBindingScope.HotKey, Command.RightEnd);
+            scrollBar.KeyBindings.Add (Key.PageDown.WithShift, KeyBindingScope.HotKey, Command.PageRight);
+            scrollBar.KeyBindings.Add (Key.PageUp.WithShift, KeyBindingScope.HotKey, Command.PageLeft);
         }
     }
 
     private void DisposeScrollBar ()
     {
-        if (_parent._scrollBar is null)
+        if (ParentView._scrollBar is null)
         {
             return;
         }
 
-        _parent._scrollBar.ChangedPosition -= VerticalScrollBar_ChangedPosition;
-        _parent.Remove (_parent._scrollBar);
+        ParentView._scrollBar.ChangedPosition -= VerticalScrollBar_ChangedPosition;
+        ParentView.Remove (ParentView._scrollBar);
 
-        if (_parent._scrollBar.OtherScrollBarView != null)
+        if (ParentView._scrollBar.OtherScrollBarView != null)
         {
-            _parent._scrollBar.OtherScrollBarView.ChangedPosition -= HorizontalScrollBar_ChangedPosition;
-            _parent.Remove (_parent._scrollBar.OtherScrollBarView);
+            ParentView._scrollBar.OtherScrollBarView.ChangedPosition -= HorizontalScrollBar_ChangedPosition;
+            ParentView.Remove (ParentView._scrollBar.OtherScrollBarView);
         }
 
-        if (_parent.Subviews.First (v => v is ScrollBarView.ContentBottomRightCorner) is { } contentBottomRightCorner)
+        if (ParentView.Subviews.First (v => v is ScrollBarView.ContentBottomRightCorner) is { } contentBottomRightCorner)
         {
-            _parent.Remove (contentBottomRightCorner);
+            ParentView.Remove (contentBottomRightCorner);
         }
 
-        _parent._scrollBar = null;
+        ParentView._scrollBar = null;
     }
 
     private void HorizontalScrollBar_ChangedPosition (object sender, EventArgs e) { SetBoundsByPosition (_scrollBar.OtherScrollBarView); }
