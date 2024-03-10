@@ -31,7 +31,7 @@ public class LineCanvasExperiment : Scenario
         };
         frame1.BorderStyle = LineStyle.Double;
 
-        //ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
+        //View.Diagnostics ^= DiagnosticFlags.FrameRuler;
 
         Application.Top.Add (frame1);
 

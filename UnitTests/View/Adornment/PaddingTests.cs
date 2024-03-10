@@ -25,9 +25,9 @@ public class PaddingTests
 
         view.BeginInit ();
         view.EndInit ();
-        ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.FramePadding;
+        View.Diagnostics = ViewDiagnosticFlags.Padding;
         view.Draw ();
-        ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+        View.Diagnostics = ViewDiagnosticFlags.Off;
 
         TestHelpers.AssertDriverContentsAre (
                                              @"

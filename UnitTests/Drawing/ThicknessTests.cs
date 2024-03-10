@@ -61,14 +61,14 @@ public class ThicknessTests
         ((FakeDriver)Application.Driver).SetBufferSize (60, 60);
         var t = new Thickness (0, 0, 0, 0);
         var r = new Rectangle (5, 5, 40, 15);
-        ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FramePadding;
+        View.Diagnostics |= ViewDiagnosticFlags.Padding;
 
         Application.Driver.FillRect (
                                      new Rectangle (0, 0, Application.Driver.Cols, Application.Driver.Rows),
                                      (Rune)' '
                                     );
         t.Draw (r, "Test");
-        ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+        View.Diagnostics = ViewDiagnosticFlags.Off;
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -78,14 +78,14 @@ public class ThicknessTests
 
         t = new Thickness (1, 1, 1, 1);
         r = new Rectangle (5, 5, 40, 15);
-        ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FramePadding;
+        View.Diagnostics |= ViewDiagnosticFlags.Padding;
 
         Application.Driver.FillRect (
                                      new Rectangle (0, 0, Application.Driver.Cols, Application.Driver.Rows),
                                      (Rune)' '
                                     );
         t.Draw (r, "Test");
-        ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+        View.Diagnostics = ViewDiagnosticFlags.Off;
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -109,14 +109,14 @@ public class ThicknessTests
 
         t = new Thickness (1, 2, 3, 4);
         r = new Rectangle (5, 5, 40, 15);
-        ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FramePadding;
+        View.Diagnostics |= ViewDiagnosticFlags.Padding;
 
         Application.Driver.FillRect (
                                      new Rectangle (0, 0, Application.Driver.Cols, Application.Driver.Rows),
                                      (Rune)' '
                                     );
         t.Draw (r, "Test");
-        ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+        View.Diagnostics = ViewDiagnosticFlags.Off;
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -140,14 +140,14 @@ public class ThicknessTests
 
         t = new Thickness (-1, 1, 1, 1);
         r = new Rectangle (5, 5, 40, 15);
-        ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FramePadding;
+        View.Diagnostics |= ViewDiagnosticFlags.Padding;
 
         Application.Driver.FillRect (
                                      new Rectangle (0, 0, Application.Driver.Cols, Application.Driver.Rows),
                                      (Rune)' '
                                     );
         t.Draw (r, "Test");
-        ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+        View.Diagnostics = ViewDiagnosticFlags.Off;
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -184,9 +184,9 @@ public class ThicknessTests
         var t = new Thickness (0, 0, 0, 0);
         var r = new Rectangle (2, 2, 40, 15);
         Application.Refresh ();
-        ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FrameRuler;
+        View.Diagnostics |= ViewDiagnosticFlags.Ruler;
         t.Draw (r, "Test");
-        ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+        View.Diagnostics = ViewDiagnosticFlags.Off;
 
         TestHelpers.AssertDriverContentsAre (
                                              @"
@@ -216,9 +216,9 @@ public class ThicknessTests
         t = new Thickness (1, 1, 1, 1);
         r = new Rectangle (1, 1, 40, 15);
         Application.Refresh ();
-        ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FrameRuler;
+        View.Diagnostics |= ViewDiagnosticFlags.Ruler;
         t.Draw (r, "Test");
-        ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+        View.Diagnostics = ViewDiagnosticFlags.Off;
 
         TestHelpers.AssertDriverContentsAre (
                                              @"
@@ -248,9 +248,9 @@ public class ThicknessTests
         t = new Thickness (1, 2, 3, 4);
         r = new Rectangle (2, 2, 40, 15);
         Application.Refresh ();
-        ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FrameRuler;
+        View.Diagnostics |= ViewDiagnosticFlags.Ruler;
         t.Draw (r, "Test");
-        ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+        View.Diagnostics = ViewDiagnosticFlags.Off;
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -280,9 +280,9 @@ public class ThicknessTests
         t = new Thickness (-1, 1, 1, 1);
         r = new Rectangle (5, 5, 40, 15);
         Application.Refresh ();
-        ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FrameRuler;
+        View.Diagnostics |= ViewDiagnosticFlags.Ruler;
         t.Draw (r, "Test");
-        ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+        View.Diagnostics = ViewDiagnosticFlags.Off;
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"

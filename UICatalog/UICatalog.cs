@@ -56,7 +56,7 @@ internal class UICatalogApp
     private static string? _cachedTheme = string.Empty;
     private static List<string>? _categories;
     private static readonly FileSystemWatcher _currentDirWatcher = new ();
-    private static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
+    private static ViewDiagnosticFlags _diagnosticFlags;
     private static string _forceDriver = string.Empty;
     private static readonly FileSystemWatcher _homeDirWatcher = new ();
     private static bool _isFirstRunning = true;
@@ -156,7 +156,7 @@ internal class UICatalogApp
         {
             using var process = new Process
             {
-                StartInfo = new ProcessStartInfo
+                StartInfo = new()
                 {
                     FileName = "xdg-open",
                     Arguments = url,
@@ -301,7 +301,7 @@ internal class UICatalogApp
             return;
         }
 
-        _aboutMessage = new StringBuilder ();
+        _aboutMessage = new ();
         _aboutMessage.AppendLine (@"A comprehensive sample library for");
         _aboutMessage.AppendLine (@"");
         _aboutMessage.AppendLine (@"  _______                  _             _   _____       _  ");
@@ -388,68 +388,68 @@ internal class UICatalogApp
         public UICatalogTopLevel ()
         {
             _themeMenuItems = CreateThemeMenuItems ();
-            _themeMenuBarItem = new MenuBarItem ("_Themes", _themeMenuItems);
+            _themeMenuBarItem = new ("_Themes", _themeMenuItems);
 
-            MenuBar = new MenuBar
+            MenuBar = new()
             {
                 Menus =
                 [
-                    new MenuBarItem (
-                                     "_File",
-                                     new MenuItem []
-                                     {
-                                         new (
-                                              "_Quit",
-                                              "Quit UI Catalog",
-                                              RequestStop
-                                             )
-                                     }
-                                    ),
+                    new (
+                         "_File",
+                         new MenuItem []
+                         {
+                             new (
+                                  "_Quit",
+                                  "Quit UI Catalog",
+                                  RequestStop
+                                 )
+                         }
+                        ),
                     _themeMenuBarItem,
-                    new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems ()),
-                    new MenuBarItem (
-                                     "_Help",
-                                     new MenuItem []
-                                     {
-                                         new (
-                                              "_Documentation",
-                                              "",
-                                              () => OpenUrl ("https://gui-cs.github.io/Terminal.GuiV2Docs"),
-                                              null,
-                                              null,
-                                              (KeyCode)Key.F1
-                                             ),
-                                         new (
-                                              "_README",
-                                              "",
-                                              () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"),
-                                              null,
-                                              null,
-                                              (KeyCode)Key.F2
-                                             ),
-                                         new (
-                                              "_About...",
-                                              "About UI Catalog",
-                                              () => MessageBox.Query (
-                                                                      "About UI Catalog",
-                                                                      _aboutMessage!.ToString (),
-                                                                      0,
-                                                                      false,
-                                                                      "_Ok"
-                                                                     ),
-                                              null,
-                                              null,
-                                              (KeyCode)Key.A.WithCtrl
-                                             )
-                                     }
-                                    )
+                    new ("Diag_nostics", CreateDiagnosticMenuItems ()),
+                    new (
+                         "_Help",
+                         new MenuItem []
+                         {
+                             new (
+                                  "_Documentation",
+                                  "",
+                                  () => OpenUrl ("https://gui-cs.github.io/Terminal.GuiV2Docs"),
+                                  null,
+                                  null,
+                                  (KeyCode)Key.F1
+                                 ),
+                             new (
+                                  "_README",
+                                  "",
+                                  () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"),
+                                  null,
+                                  null,
+                                  (KeyCode)Key.F2
+                                 ),
+                             new (
+                                  "_About...",
+                                  "About UI Catalog",
+                                  () => MessageBox.Query (
+                                                          "About UI Catalog",
+                                                          _aboutMessage!.ToString (),
+                                                          0,
+                                                          false,
+                                                          "_Ok"
+                                                         ),
+                                  null,
+                                  null,
+                                  (KeyCode)Key.A.WithCtrl
+                                 )
+                         }
+                        )
                 ]
             };
 
-            DriverName = new StatusItem (Key.Empty, "Driver:", null);
-            OS = new StatusItem (Key.Empty, "OS:", null);
+            DriverName = new (Key.Empty, "Driver:", null);
+            OS = new (Key.Empty, "OS:", null);
 
-            StatusBar = new StatusBar { Visible = ShowStatusBar };
+            StatusBar = new() { Visible = ShowStatusBar };
 
             StatusBar.Items = new []
             {
@@ -487,7 +487,7 @@ internal class UICatalogApp
             };
 
             // Create the Category list view. This list never changes.
-            CategoryList = new ListView
+            CategoryList = new()
             {
                 X = 0,
                 Y = 1,
@@ -506,7 +506,7 @@ internal class UICatalogApp
             // Create the scenario list. The contents of the scenario list changes whenever the
             // Category list selection changes (to show just the scenarios that belong to the selected
             // category).
-            ScenarioList = new TableView
+            ScenarioList = new()
             {
                 X = Pos.Right (CategoryList) - 1,
                 Y = 1,
@@ -547,9 +547,9 @@ internal class UICatalogApp
 
             ScenarioList.Style.ColumnStyles.Add (
                                                  0,
-                                                 new ColumnStyle { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName }
+                                                 new() { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName }
                                                 );
-            ScenarioList.Style.ColumnStyles.Add (1, new ColumnStyle { MaxWidth = 1 });
+            ScenarioList.Style.ColumnStyles.Add (1, new() { MaxWidth = 1 });
 
             // Enable user to find & select a scenario by typing text
             // TableView does not (currently) have built-in CollectionNavigator support (the ability for the 
@@ -678,8 +678,7 @@ internal class UICatalogApp
 
                                    foreach (MenuItem schemeMenuItem in schemeMenuItems)
                                    {
-                                       schemeMenuItem.Checked =
-                                           (string)schemeMenuItem.Data == _topLevelColorScheme;
+                                       schemeMenuItem.Checked = (string)schemeMenuItem.Data == _topLevelColorScheme;
                                    }
 
                                    ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
@@ -713,7 +712,7 @@ internal class UICatalogApp
 
             ScenarioList.Table = new EnumerableTableSource<Scenario> (
                                                                       newlist,
-                                                                      new Dictionary<string, Func<Scenario, object>>
+                                                                      new()
                                                                       {
                                                                           { "Name", s => s.GetName () }, { "Description", s => s.GetDescription () }
                                                                       }
@@ -735,9 +734,9 @@ internal class UICatalogApp
 
         private MenuItem [] CreateDiagnosticFlagsMenuItems ()
         {
-            const string OFF = "Diagnostics: _Off";
-            const string FRAME_RULER = "Diagnostics: Frame _Ruler";
-            const string FRAME_PADDING = "Diagnostics: _Frame Padding";
+            const string OFF = "View Diagnostics: _Off";
+            const string RULER = "View Diagnostics: _Ruler";
+            const string PADDING = "View Diagnostics: _Padding";
             var index = 0;
 
             List<MenuItem> menuItems = new ();
@@ -751,13 +750,9 @@ internal class UICatalogApp
                 index++;
                 item.CheckType |= MenuItemCheckStyle.Checked;
 
-                if (GetDiagnosticsTitle (ConsoleDriver.DiagnosticFlags.Off) == item.Title)
+                if (GetDiagnosticsTitle (ViewDiagnosticFlags.Off) == item.Title)
                 {
-                    item.Checked = (_diagnosticFlags
-                                    & (ConsoleDriver.DiagnosticFlags.FramePadding
-                                       | ConsoleDriver.DiagnosticFlags
-                                                      .FrameRuler))
-                                   == 0;
+                    item.Checked = !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Padding) && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Ruler);
                 }
                 else
                 {
@@ -766,16 +761,16 @@ internal class UICatalogApp
 
                 item.Action += () =>
                                {
-                                   string t = GetDiagnosticsTitle (ConsoleDriver.DiagnosticFlags.Off);
+                                   string t = GetDiagnosticsTitle (ViewDiagnosticFlags.Off);
 
                                    if (item.Title == t && item.Checked == false)
                                    {
-                                       _diagnosticFlags &= ~(ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler);
+                                       _diagnosticFlags &= ~(ViewDiagnosticFlags.Padding | ViewDiagnosticFlags.Ruler);
                                        item.Checked = true;
                                    }
                                    else if (item.Title == t && item.Checked == true)
                                    {
-                                       _diagnosticFlags |= ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler;
+                                       _diagnosticFlags |= ViewDiagnosticFlags.Padding | ViewDiagnosticFlags.Ruler;
                                        item.Checked = false;
                                    }
                                    else
@@ -796,23 +791,16 @@ internal class UICatalogApp
                                    {
                                        if (menuItem.Title == t)
                                        {
-                                           menuItem.Checked =
-                                               !_diagnosticFlags.HasFlag (
-                                                                          ConsoleDriver.DiagnosticFlags
-                                                                                       .FrameRuler
-                                                                         )
-                                               && !_diagnosticFlags.HasFlag (ConsoleDriver.DiagnosticFlags.FramePadding);
+                                           menuItem.Checked = !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Ruler)
+                                                              && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Padding);
                                        }
                                        else if (menuItem.Title != t)
                                        {
-                                           menuItem.Checked =
-                                               _diagnosticFlags.HasFlag (
-                                                                         GetDiagnosticsEnumValue (menuItem.Title)
-                                                                        );
+                                           menuItem.Checked = _diagnosticFlags.HasFlag (GetDiagnosticsEnumValue (menuItem.Title));
                                        }
                                    }
 
-                                   ConsoleDriver.Diagnostics = _diagnosticFlags;
+                                   Diagnostics = _diagnosticFlags;
                                    Application.Top.SetNeedsDisplay ();
                                };
                 menuItems.Add (item);
@@ -825,8 +813,8 @@ internal class UICatalogApp
                 return Enum.GetName (_diagnosticFlags.GetType (), diag) switch
                        {
                            "Off" => OFF,
-                           "FrameRuler" => FRAME_RULER,
-                           "FramePadding" => FRAME_PADDING,
+                           "Ruler" => RULER,
+                           "Padding" => PADDING,
                            _ => ""
                        };
             }
@@ -835,8 +823,8 @@ internal class UICatalogApp
             {
                 return title switch
                        {
-                           FRAME_RULER => ConsoleDriver.DiagnosticFlags.FrameRuler,
-                           FRAME_PADDING => ConsoleDriver.DiagnosticFlags.FramePadding,
+                           RULER => ViewDiagnosticFlags.Ruler,
+                           PADDING => ViewDiagnosticFlags.Padding,
                            _ => null!
                        };
             }
@@ -845,30 +833,30 @@ internal class UICatalogApp
             {
                 switch (diag)
                 {
-                    case ConsoleDriver.DiagnosticFlags.FrameRuler:
+                    case ViewDiagnosticFlags.Ruler:
                         if (add)
                         {
-                            _diagnosticFlags |= ConsoleDriver.DiagnosticFlags.FrameRuler;
+                            _diagnosticFlags |= ViewDiagnosticFlags.Ruler;
                         }
                         else
                         {
-                            _diagnosticFlags &= ~ConsoleDriver.DiagnosticFlags.FrameRuler;
+                            _diagnosticFlags &= ~ViewDiagnosticFlags.Ruler;
                         }
 
                         break;
-                    case ConsoleDriver.DiagnosticFlags.FramePadding:
+                    case ViewDiagnosticFlags.Padding:
                         if (add)
                         {
-                            _diagnosticFlags |= ConsoleDriver.DiagnosticFlags.FramePadding;
+                            _diagnosticFlags |= ViewDiagnosticFlags.Padding;
                         }
                         else
                         {
-                            _diagnosticFlags &= ~ConsoleDriver.DiagnosticFlags.FramePadding;
+                            _diagnosticFlags &= ~ViewDiagnosticFlags.Padding;
                         }
 
                         break;
                     default:
-                        _diagnosticFlags = default (ConsoleDriver.DiagnosticFlags);
+                        _diagnosticFlags = default (ViewDiagnosticFlags);
 
                         break;
                 }
@@ -894,7 +882,7 @@ internal class UICatalogApp
         private MenuItem [] CreateDisabledEnabledMenuBorder ()
         {
             List<MenuItem> menuItems = new ();
-            miIsMenuBorderDisabled = new MenuItem { Title = "Disable Menu _Border" };
+            miIsMenuBorderDisabled = new() { Title = "Disable Menu _Border" };
 
             miIsMenuBorderDisabled.Shortcut =
                 (KeyCode)new Key (miIsMenuBorderDisabled!.Title!.Substring (14, 1) [0]).WithAlt
@@ -917,7 +905,7 @@ internal class UICatalogApp
         private MenuItem [] CreateDisabledEnabledMouseItems ()
         {
             List<MenuItem> menuItems = new ();
-            miIsMouseDisabled = new MenuItem { Title = "_Disable Mouse" };
+            miIsMouseDisabled = new() { Title = "_Disable Mouse" };
 
             miIsMouseDisabled.Shortcut =
                 (KeyCode)new Key (miIsMouseDisabled!.Title!.Substring (1, 1) [0]).WithAlt.WithCtrl;
@@ -937,7 +925,7 @@ internal class UICatalogApp
         private MenuItem [] CreateDisabledEnableUseSubMenusSingleFrame ()
         {
             List<MenuItem> menuItems = new ();
-            miUseSubMenusSingleFrame = new MenuItem { Title = "Enable _Sub-Menus Single Frame" };
+            miUseSubMenusSingleFrame = new() { Title = "Enable _Sub-Menus Single Frame" };
 
             miUseSubMenusSingleFrame.Shortcut = KeyCode.CtrlMask
                                                 | KeyCode.AltMask
@@ -959,7 +947,7 @@ internal class UICatalogApp
         {
             List<MenuItem> menuItems = new ();
 
-            miForce16Colors = new MenuItem
+            miForce16Colors = new()
             {
                 Title = "Force _16 Colors",
                 Shortcut = (KeyCode)Key.F6,
