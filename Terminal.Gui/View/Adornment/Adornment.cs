@@ -1,9 +1,5 @@
 ﻿namespace Terminal.Gui;
 
-// TODO: Missing 3D effect - 3D effects will be drawn by a mechanism separate from Adornments
-// TODO: If a Adornment has focus, navigation keys (e.g Command.NextView) should cycle through SubViews of the Adornments
-// QUESTION: How does a user navigate out of an Adornment to another Adornment, or back into the Parent's SubViews?
-
 /// <summary>
 ///     Adornments are a special form of <see cref="View"/> that appear outside the <see cref="View.Bounds"/>:
 ///     <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>. They are defined using the
@@ -11,18 +7,13 @@
 /// </summary>
 /// <remarsk>
 ///     <para>
-///         There is no prevision for creating additional subclasses of Adornment. It is not abstract to enable unit
-///         testing.
+///         Each of <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/> has slightly different
+///         behavior relative to <see cref="ColorScheme"/>, <see cref="View.SetFocus"/>, keyboard input, and
+///         mouse input. Each can be customized by manipulating their Subviews.
 ///     </para>
-///     <para>Each of <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/> can be customized.</para>
 /// </remarsk>
 public class Adornment : View
 {
-    private Point? _dragPosition;
-
-    private Point _startGrabPoint;
-    private Thickness _thickness = Thickness.Empty;
-
     /// <inheritdoc/>
     public Adornment ()
     {
@@ -39,17 +30,6 @@ public class Adornment : View
         Parent = parent;
     }
 
-
-    /// <summary>
-    ///     Gets the rectangle that describes the area of the Adornment. The Location is always (0,0).
-    ///     The size is the size of the Frame
-    /// </summary>
-    public override Rectangle Bounds
-    {
-        get => Frame with { Location = Point.Empty };
-        set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
-    }
-
     /// <summary>The Parent of this Adornment (the View this Adornment surrounds).</summary>
     /// <remarks>
     ///     Adornments are distinguished from typical View classes in that they are not sub-views, but have a parent/child
@@ -57,25 +37,9 @@ public class Adornment : View
     /// </remarks>
     public View Parent { get; set; }
 
-    /// <summary>
-    ///     Adornments cannot be used as sub-views (see <see cref="Parent"/>); this method always throws an
-    ///     <see cref="InvalidOperationException"/>. TODO: Are we sure?
-    /// </summary>
-    public override View SuperView
-    {
-        get => null;
-        set => throw new NotImplementedException ();
-    }
+    #region Thickness
 
-    /// <summary>
-    ///     Adornments only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas, so setting this
-    ///     property throws an <see cref="InvalidOperationException"/>.
-    /// </summary>
-    public override bool SuperViewRendersLineCanvas
-    {
-        get => false; // throw new NotImplementedException ();
-        set => throw new NotImplementedException ();
-    }
+    private Thickness _thickness = Thickness.Empty;
 
     /// <summary>Defines the rectangle that the <see cref="Adornment"/> will use to draw its content.</summary>
     public Thickness Thickness
@@ -98,9 +62,57 @@ public class Adornment : View
                     Parent?.SetNeedsLayout ();
                     Parent?.LayoutSubviews ();
                 }
+
                 OnThicknessChanged (prev);
             }
         }
+    }
+
+    /// <summary>Fired whenever the <see cref="Thickness"/> property changes.</summary>
+    public event EventHandler<ThicknessEventArgs> ThicknessChanged;
+
+    /// <summary>Called whenever the <see cref="Thickness"/> property changes.</summary>
+    public void OnThicknessChanged (Thickness previousThickness)
+    {
+        ThicknessChanged?.Invoke (
+                                  this,
+                                  new () { Thickness = Thickness, PreviousThickness = previousThickness }
+                                 );
+    }
+
+    #endregion Thickness
+
+    #region View Overrides
+
+    /// <summary>
+    ///     Adornments cannot be used as sub-views (see <see cref="Parent"/>); setting this property will throw
+    ///     <see cref="InvalidOperationException"/>.
+    /// </summary>
+    public override View SuperView
+    {
+        get => null;
+        set => throw new NotImplementedException ();
+    }
+
+    internal override Adornment CreateAdornment (Type adornmentType)
+    {
+        /* Do nothing - Adornments do not have Adornments */
+        return null;
+    }
+
+    internal override void LayoutAdornments ()
+    {
+        /* Do nothing - Adornments do not have Adornments */
+    }
+
+    /// <summary>
+    ///     Gets the rectangle that describes the area of the Adornment. The Location is always (0,0).
+    ///     The size is the size of the <see cref="View.Frame"/>.
+    /// </summary>
+    public override Rectangle Bounds
+    {
+        get => Frame with { Location = Point.Empty };
+        set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
     }
 
     /// <inheritdoc/>
@@ -120,11 +132,8 @@ public class Adornment : View
     }
 
     /// <inheritdoc/>
-    public override Point ScreenToFrame (int x, int y)
-    {
-            return Parent.ScreenToFrame (x - Frame.X, y - Frame.Y);
-    }
-    
+    public override Point ScreenToFrame (int x, int y) { return Parent.ScreenToFrame (x - Frame.X, y - Frame.Y); }
+
     /// <summary>Does nothing for Adornment</summary>
     /// <returns></returns>
     public override bool OnDrawAdornments () { return false; }
@@ -136,7 +145,6 @@ public class Adornment : View
         {
             return;
         }
-
 
         Rectangle screenBounds = BoundsToScreen (contentArea);
         Attribute normalAttr = GetNormalColor ();
@@ -169,17 +177,38 @@ public class Adornment : View
     /// <returns></returns>
     public override bool OnRenderLineCanvas () { return false; }
 
-    /// <summary>Called whenever the <see cref="Thickness"/> property changes.</summary>
-    public void OnThicknessChanged (Thickness previousThickness)
+    /// <summary>
+    ///     Adornments only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas, so setting this
+    ///     property throws an <see cref="InvalidOperationException"/>.
+    /// </summary>
+    public override bool SuperViewRendersLineCanvas
     {
-        ThicknessChanged?.Invoke (
-                                  this,
-                                  new() { Thickness = Thickness, PreviousThickness = previousThickness }
-                                 );
+        get => false; // throw new NotImplementedException ();
+        set => throw new NotImplementedException ();
     }
 
-    /// <summary>Fired whenever the <see cref="Thickness"/> property changes.</summary>
-    public event EventHandler<ThicknessEventArgs> ThicknessChanged;
+    #endregion View Overrides
+
+    #region Mouse Support
+
+    private Point? _dragPosition;
+    private Point _startGrabPoint;
+
+    /// <inheritdoc/>
+    protected internal override bool OnMouseEnter (MouseEvent mouseEvent)
+    {
+        // Invert Normal
+        if (Diagnostics.HasFlag (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
+        {
+            var cs = new ColorScheme (ColorScheme)
+            {
+                Normal = new (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground)
+            };
+            ColorScheme = cs;
+        }
+
+        return base.OnMouseEnter (mouseEvent);
+    }
 
     /// <summary>Called when a mouse event occurs within the Adornment.</summary>
     /// <remarks>
@@ -210,15 +239,12 @@ public class Adornment : View
             return OnMouseClick (args);
         }
 
-        // TODO: Checking for Toplevel is a hack until #2537 is fixed
-        if (!Parent.CanFocus || !Parent.Arrangement.HasFlag(ViewArrangement.Movable))
+        if (!Parent.CanFocus || !Parent.Arrangement.HasFlag (ViewArrangement.Movable))
         {
             return true;
         }
 
-        int nx, ny;
-
-        // BUGBUG: This is true even when the mouse started dragging outside of the Adornment, which is not correct.
+        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3312
         if (!_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
             Parent.SetFocus ();
@@ -257,8 +283,8 @@ public class Adornment : View
                                      Parent,
                                      parentLoc.X - _startGrabPoint.X,
                                      parentLoc.Y - _startGrabPoint.Y,
-                                     out nx,
-                                     out ny,
+                                     out int nx,
+                                     out int ny,
                                      out _,
                                      out _
                                     );
@@ -280,6 +306,22 @@ public class Adornment : View
     }
 
     /// <inheritdoc/>
+    protected internal override bool OnMouseLeave (MouseEvent mouseEvent)
+    {
+        // Invert Normal
+        if (Diagnostics.HasFlag (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
+        {
+            var cs = new ColorScheme (ColorScheme)
+            {
+                Normal = new (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground)
+            };
+            ColorScheme = cs;
+        }
+
+        return base.OnMouseLeave (mouseEvent);
+    }
+
+    /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
         Application.GrabbingMouse -= Application_GrabbingMouse;
@@ -287,17 +329,6 @@ public class Adornment : View
 
         _dragPosition = null;
         base.Dispose (disposing);
-    }
-
-    internal override Adornment CreateAdornment (Type adornmentType)
-    {
-        /* Do nothing - Adornments do not have Adornments */
-        return null;
-    }
-
-    internal override void LayoutAdornments ()
-    {
-        /* Do nothing - Adornments do not have Adornments */
     }
 
     private void Application_GrabbingMouse (object sender, GrabMouseEventArgs e)
@@ -315,34 +346,5 @@ public class Adornment : View
             e.Cancel = true;
         }
     }
-
-    /// <inheritdoc />
-    protected internal override bool OnMouseEnter (MouseEvent mouseEvent)
-    {
-        // Invert Normal
-        if (View.Diagnostics.HasFlag(ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
-        {
-            var cs = new ColorScheme (ColorScheme) 
-            { 
-                Normal = new Attribute (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground) 
-            };
-            ColorScheme = cs;
-        }
-        return base.OnMouseEnter (mouseEvent);
-    }
-
-    /// <inheritdoc />
-    protected internal override bool OnMouseLeave (MouseEvent mouseEvent)
-    {
-        // Invert Normal
-        if (View.Diagnostics.HasFlag (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
-        {
-            var cs = new ColorScheme (ColorScheme)
-            {
-                Normal = new Attribute (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground)
-            };
-            ColorScheme= cs;
-        }
-        return base.OnMouseLeave (mouseEvent);
-    }
+    #endregion Mouse Support
 }
