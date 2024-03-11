@@ -94,11 +94,11 @@ public class Adornment : View
         set => throw new NotImplementedException ();
     }
 
-    internal override Adornment CreateAdornment (Type adornmentType)
-    {
-        /* Do nothing - Adornments do not have Adornments */
-        return null;
-    }
+    //internal override Adornment CreateAdornment (Type adornmentType)
+    //{
+    //    /* Do nothing - Adornments do not have Adornments */
+    //    return null;
+    //}
 
     internal override void LayoutAdornments ()
     {

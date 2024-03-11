@@ -3,38 +3,13 @@ public partial class View
 {
     private void CreateAdornments ()
     {
-        Margin = CreateAdornment (typeof (Margin)) as Margin;
-        Border = CreateAdornment (typeof (Border)) as Border;
-        Padding = CreateAdornment (typeof (Padding)) as Padding;
-    }
-
-    // TODO: Move this to Adornment as a static factory method
-    /// <summary>
-    ///     This internal method is overridden by Adornment to do nothing to prevent recursion during View construction.
-    ///     And, because Adornments don't have Adornments. It's internal to support unit tests.
-    /// </summary>
-    /// <param name="adornmentType"></param>
-    /// <exception cref="ArgumentNullException"></exception>
-    /// <exception cref="ArgumentException"></exception>
-    internal virtual Adornment CreateAdornment (Type adornmentType)
-    {
-        void ThicknessChangedHandler (object sender, EventArgs e)
+        //// TODO: Move this to Adornment as a static factory method
+        if (this is not Adornment)
         {
-            if (IsInitialized)
-            {
-                LayoutAdornments ();
-            }
-
-            SetNeedsLayout ();
-            SetNeedsDisplay ();
+            Margin = new (this);
+            Border = new (this);
+            Padding = new (this);
         }
-
-        Adornment adornment;
-
-        adornment = Activator.CreateInstance (adornmentType, this) as Adornment;
-        adornment.ThicknessChanged += ThicknessChangedHandler;
-
-        return adornment;
     }
 
     private void BeginInitAdornments ()
@@ -50,7 +25,6 @@ public partial class View
         Border?.EndInit ();
         Padding?.EndInit ();
     }
-
     private void DisposeAdornments ()
     {
         Margin?.Dispose ();
