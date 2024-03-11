@@ -294,7 +294,7 @@ public class Adornment : View
 
                 Point parentLoc = Parent.SuperView?.ScreenToBounds (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y) ?? mouseEvent.ScreenPosition;
 
-                GetLocationThatFits (
+                GetLocationEnsuringFullVisibility (
                                      Parent,
                                      parentLoc.X - _startGrabPoint.X,
                                      parentLoc.Y - _startGrabPoint.Y,
