@@ -102,8 +102,10 @@ public partial class View
             }
 
             Point boundsOffset = super.GetBoundsOffset ();
-            ret.X += super.Frame.X + boundsOffset.X;
-            ret.Y += super.Frame.Y + boundsOffset.Y;
+            boundsOffset.Offset(super.Frame.X, super.Frame.Y);
+            //ret.Location.Offset(super.Frame.X + boundsOffset.X, super.Frame.Y + boundsOffset.Y);
+            ret.X += boundsOffset.X;
+            ret.Y += boundsOffset.Y;
             super = super.SuperView;
         }
 
