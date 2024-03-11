@@ -264,47 +264,43 @@ public class ToplevelTests
         Assert.Equal (top, Application.Top);
 
         // Application.Top without menu and status bar.
-        View supView = View.GetLocationThatFits (top, 2, 2, out int nx, out int ny, out MenuBar mb, out StatusBar sb);
+        View supView = View.GetLocationThatFits (top, 2, 2, out int nx, out int ny, out StatusBar sb);
         Assert.Equal (Application.Top, supView);
         Assert.Equal (0, nx);
         Assert.Equal (0, ny);
-        Assert.Null (mb);
         Assert.Null (sb);
 
         top.AddMenuStatusBar (new MenuBar ());
         Assert.NotNull (top.MenuBar);
 
         // Application.Top with a menu and without status bar.
-        View.GetLocationThatFits (top, 2, 2, out nx, out ny, out mb, out sb);
+        View.GetLocationThatFits (top, 2, 2, out nx, out ny,  out sb);
         Assert.Equal (0, nx);
         Assert.Equal (1, ny);
-        Assert.NotNull (mb);
         Assert.Null (sb);
 
         top.AddMenuStatusBar (new StatusBar ());
         Assert.NotNull (top.StatusBar);
 
         // Application.Top with a menu and status bar.
-        View.GetLocationThatFits (top, 2, 2, out nx, out ny, out mb, out sb);
+        View.GetLocationThatFits (top, 2, 2, out nx, out ny, out sb);
         Assert.Equal (0, nx);
 
         // The available height is lower than the Application.Top height minus
         // the menu bar and status bar, then the top can go beyond the bottom
         Assert.Equal (2, ny);
-        Assert.NotNull (mb);
         Assert.NotNull (sb);
 
         top.RemoveMenuStatusBar (top.MenuBar);
         Assert.Null (top.MenuBar);
 
         // Application.Top without a menu and with a status bar.
-        View.GetLocationThatFits (top, 2, 2, out nx, out ny, out mb, out sb);
+        View.GetLocationThatFits (top, 2, 2, out nx, out ny, out sb);
         Assert.Equal (0, nx);
 
         // The available height is lower than the Application.Top height minus
         // the status bar, then the top can go beyond the bottom
         Assert.Equal (2, ny);
-        Assert.Null (mb);
         Assert.NotNull (sb);
 
         top.RemoveMenuStatusBar (top.StatusBar);
@@ -316,39 +312,36 @@ public class ToplevelTests
         top.LayoutSubviews ();
 
         // The SuperView is always the same regardless of the caller.
-        supView = View.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
+        supView = View.GetLocationThatFits (win, 0, 0, out nx, out ny, out sb);
         Assert.Equal (Application.Top, supView);
-        supView = View.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
+        supView = View.GetLocationThatFits (win, 0, 0, out nx, out ny, out sb);
         Assert.Equal (Application.Top, supView);
 
         // Application.Top without menu and status bar.
-        View.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
+        View.GetLocationThatFits (win, 0, 0, out nx, out ny, out sb);
         Assert.Equal (0, nx);
         Assert.Equal (0, ny);
-        Assert.Null (mb);
         Assert.Null (sb);
 
         top.AddMenuStatusBar (new MenuBar ());
         Assert.NotNull (top.MenuBar);
 
         // Application.Top with a menu and without status bar.
-        View.GetLocationThatFits (win, 2, 2, out nx, out ny, out mb, out sb);
+        View.GetLocationThatFits (win, 2, 2, out nx, out ny, out sb);
         Assert.Equal (0, nx);
         Assert.Equal (1, ny);
-        Assert.NotNull (mb);
         Assert.Null (sb);
 
         top.AddMenuStatusBar (new StatusBar ());
         Assert.NotNull (top.StatusBar);
 
         // Application.Top with a menu and status bar.
-        View.GetLocationThatFits (win, 30, 20, out nx, out ny, out mb, out sb);
+        View.GetLocationThatFits (win, 30, 20, out nx, out ny, out sb);
         Assert.Equal (0, nx);
 
         // The available height is lower than the Application.Top height minus
         // the menu bar and status bar, then the top can go beyond the bottom
         Assert.Equal (20, ny);
-        Assert.NotNull (mb);
         Assert.NotNull (sb);
 
         top.RemoveMenuStatusBar (top.MenuBar);
@@ -362,30 +355,27 @@ public class ToplevelTests
         top.Add (win);
 
         // Application.Top without menu and status bar.
-        View.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
+        View.GetLocationThatFits (win, 0, 0, out nx, out ny, out sb);
         Assert.Equal (0, nx);
         Assert.Equal (0, ny);
-        Assert.Null (mb);
         Assert.Null (sb);
 
         top.AddMenuStatusBar (new MenuBar ());
         Assert.NotNull (top.MenuBar);
 
         // Application.Top with a menu and without status bar.
-        View.GetLocationThatFits (win, 2, 2, out nx, out ny, out mb, out sb);
+        View.GetLocationThatFits (win, 2, 2, out nx, out ny, out sb);
         Assert.Equal (2, nx);
         Assert.Equal (2, ny);
-        Assert.NotNull (mb);
         Assert.Null (sb);
 
         top.AddMenuStatusBar (new StatusBar ());
         Assert.NotNull (top.StatusBar);
 
         // Application.Top with a menu and status bar.
-        View.GetLocationThatFits (win, 30, 20, out nx, out ny, out mb, out sb);
+        View.GetLocationThatFits (win, 30, 20, out nx, out ny, out sb);
         Assert.Equal (20, nx); // 20+60=80
         Assert.Equal (9, ny); // 9+15+1(mb)=25
-        Assert.NotNull (mb);
         Assert.NotNull (sb);
 
         top.PositionToplevels ();

@@ -386,7 +386,6 @@ public partial class Toplevel : View
                                               top.Frame.Y,
                                               out int nx,
                                               out int ny,
-                                              out _,
                                               out StatusBar sb
                                              );
         var layoutSubviews = false;

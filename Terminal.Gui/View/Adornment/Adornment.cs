@@ -300,7 +300,6 @@ public class Adornment : View
                                      parentLoc.Y - _startGrabPoint.Y,
                                      out int nx,
                                      out int ny,
-                                     out _,
                                      out _
                                     );
 

@@ -663,12 +663,12 @@ public partial class View
     /// <summary>Finds the first Subview of <paramref name="start"/> that is visible at the provided location.</summary>
     /// <remarks>
     /// <para>
-    ///     Used to determine what view the mouse is over. 
+    ///     Used to determine what view the mouse is over.
     /// </para>
     /// </remarks>
     /// <param name="start">The view to scope the search by.</param>
     /// <param name="x"><paramref name="start"/>.SuperView-relative X coordinate.</param>
-    /// <param name="y"><paramref name="start"/>.SuperView-relative Y coordinate..</param>
+    /// <param name="y"><paramref name="start"/>.SuperView-relative Y coordinate.</param>
     /// <returns>
     ///     The view that was found at the <paramref name="x"/> and <paramref name="y"/> coordinates.
     ///     <see langword="null"/> if no view was found.
@@ -727,39 +727,38 @@ public partial class View
 #nullable restore
 
     /// <summary>
-    ///     Gets a new location of the <see cref="View"/> that is within the Bounds of the <paramref name="top"/>'s
+    ///     Gets a new location of the <see cref="View"/> that is within the Bounds of the <paramref name="viewToMove"/>'s
     ///     <see cref="View.SuperView"/> (e.g. for dragging a Window). The `out` parameters are the new X and Y coordinates.
     /// </summary>
     /// <remarks>
-    ///     If <paramref name="top"/> does not have a <see cref="View.SuperView"/> or it's SuperView is not
+    ///     If <paramref name="viewToMove"/> does not have a <see cref="View.SuperView"/> or it's SuperView is not
     ///     <see cref="Application.Top"/> the position will be bound by the <see cref="ConsoleDriver.Cols"/> and
     ///     <see cref="ConsoleDriver.Rows"/>.
     /// </remarks>
-    /// <param name="top">The View that is to be moved.</param>
+    /// <param name="viewToMove">The View that is to be moved.</param>
     /// <param name="targetX">The target x location.</param>
     /// <param name="targetY">The target y location.</param>
-    /// <param name="nx">The x location that will ensure <paramref name="top"/> will be visible.</param>
-    /// <param name="ny">The y location that will ensure <paramref name="top"/> will be visible.</param>
+    /// <param name="nx">The new x location that will ensure <paramref name="viewToMove"/> will be fully visible.</param>
+    /// <param name="ny">The new y location that will ensure <paramref name="viewToMove"/> will be fully visible.</param>
     /// <param name="menuBar">The new top most menuBar</param>
     /// <param name="statusBar">The new top most statusBar</param>
     /// <returns>
-    ///     Either <see cref="Application.Top"/> (if <paramref name="top"/> does not have a Super View) or
-    ///     <paramref name="top"/>'s SuperView. This can be used to ensure LayoutSubviews is called on the correct View.
+    ///     Either <see cref="Application.Top"/> (if <paramref name="viewToMove"/> does not have a Super View) or
+    ///     <paramref name="viewToMove"/>'s SuperView. This can be used to ensure LayoutSubviews is called on the correct View.
     /// </returns>
-    internal static View GetLocationThatFits (
-        View top,
+    internal static View GetLocationEnsuringFullVisibility (
+        View viewToMove,
         int targetX,
         int targetY,
         out int nx,
         out int ny,
-        out MenuBar menuBar,
         out StatusBar statusBar
     )
     {
         int maxDimension;
         View superView;
 
-        if (top?.SuperView is null || top == Application.Top || top?.SuperView == Application.Top)
+        if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
             maxDimension = Driver.Cols;
             superView = Application.Top;
@@ -767,23 +766,23 @@ public partial class View
         else
         {
             // Use the SuperView's Bounds, not Frame
-            maxDimension = top.SuperView.Bounds.Width;
-            superView = top.SuperView;
+            maxDimension = viewToMove.SuperView.Bounds.Width;
+            superView = viewToMove.SuperView;
         }
 
-        if (superView.Margin is { } && superView == top.SuperView)
+        if (superView.Margin is { } && superView == viewToMove.SuperView)
         {
             maxDimension -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
         }
 
-        if (top.Frame.Width <= maxDimension)
+        if (viewToMove.Frame.Width <= maxDimension)
         {
             nx = Math.Max (targetX, 0);
-            nx = nx + top.Frame.Width > maxDimension ? Math.Max (maxDimension - top.Frame.Width, 0) : nx;
+            nx = nx + viewToMove.Frame.Width > maxDimension ? Math.Max (maxDimension - viewToMove.Frame.Width, 0) : nx;
 
-            if (nx > top.Frame.X + top.Frame.Width)
+            if (nx > viewToMove.Frame.X + viewToMove.Frame.Width)
             {
-                nx = Math.Max (top.Frame.Right, 0);
+                nx = Math.Max (viewToMove.Frame.Right, 0);
             }
         }
         else
@@ -794,14 +793,13 @@ public partial class View
         //System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
         bool menuVisible, statusVisible;
 
-        if (top?.SuperView is null || top == Application.Top || top?.SuperView == Application.Top)
+        if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
             menuVisible = Application.Top.MenuBar?.Visible == true;
-            menuBar = Application.Top.MenuBar;
         }
         else
         {
-            View t = top.SuperView;
+            View t = viewToMove.SuperView;
 
             while (t is not Toplevel)
             {
@@ -809,10 +807,9 @@ public partial class View
             }
 
             menuVisible = ((Toplevel)t).MenuBar?.Visible == true;
-            menuBar = ((Toplevel)t).MenuBar;
         }
 
-        if (top?.SuperView is null || top == Application.Top || top?.SuperView == Application.Top)
+        if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
             maxDimension = menuVisible ? 1 : 0;
         }
@@ -823,14 +820,14 @@ public partial class View
 
         ny = Math.Max (targetY, maxDimension);
 
-        if (top?.SuperView is null || top == Application.Top || top?.SuperView == Application.Top)
+        if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
             statusVisible = Application.Top.StatusBar?.Visible == true;
             statusBar = Application.Top.StatusBar;
         }
         else
         {
-            View t = top.SuperView;
+            View t = viewToMove.SuperView;
 
             while (t is not Toplevel)
             {
@@ -841,31 +838,31 @@ public partial class View
             statusBar = ((Toplevel)t).StatusBar;
         }
 
-        if (top?.SuperView is null || top == Application.Top || top?.SuperView == Application.Top)
+        if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
             maxDimension = statusVisible ? Driver.Rows - 1 : Driver.Rows;
         }
         else
         {
-            maxDimension = statusVisible ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
+            maxDimension = statusVisible ? viewToMove.SuperView.Frame.Height - 1 : viewToMove.SuperView.Frame.Height;
         }
 
-        if (superView.Margin is { } && superView == top.SuperView)
+        if (superView.Margin is { } && superView == viewToMove.SuperView)
         {
             maxDimension -= superView.GetAdornmentsThickness ().Top + superView.GetAdornmentsThickness ().Bottom;
         }
 
         ny = Math.Min (ny, maxDimension);
 
-        if (top.Frame.Height <= maxDimension)
+        if (viewToMove.Frame.Height <= maxDimension)
         {
-            ny = ny + top.Frame.Height > maxDimension
-                     ? Math.Max (maxDimension - top.Frame.Height, menuVisible ? 1 : 0)
+            ny = ny + viewToMove.Frame.Height > maxDimension
+                     ? Math.Max (maxDimension - viewToMove.Frame.Height, menuVisible ? 1 : 0)
                      : ny;
 
-            if (ny > top.Frame.Y + top.Frame.Height)
+            if (ny > viewToMove.Frame.Y + viewToMove.Frame.Height)
             {
-                ny = Math.Max (top.Frame.Bottom, 0);
+                ny = Math.Max (viewToMove.Frame.Bottom, 0);
             }
         }
 
