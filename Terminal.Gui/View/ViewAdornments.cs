@@ -1,4 +1,5 @@
 ﻿namespace Terminal.Gui;
+
 public partial class View
 {
     private void CreateAdornments ()
@@ -25,6 +26,7 @@ public partial class View
         Border?.EndInit ();
         Padding?.EndInit ();
     }
+
     private void DisposeAdornments ()
     {
         Margin?.Dispose ();
@@ -133,7 +135,10 @@ public partial class View
     /// <returns>A thickness that describes the sum of the Adornments' thicknesses.</returns>
     public Thickness GetAdornmentsThickness () { return Margin.Thickness + Border.Thickness + Padding.Thickness; }
 
-    /// <summary>Overriden by <see cref="Adornment"/> to do nothing, as the <see cref="Adornment"/> does not have adornments.</summary>
+    /// <summary>Lays out the Adornments of the View.</summary>
+    /// <remarks>
+    ///     Overriden by <see cref="Adornment"/> to do nothing, as <see cref="Adornment"/> does not have adornments.
+    /// </remarks>
     internal virtual void LayoutAdornments ()
     {
         if (Margin is null)

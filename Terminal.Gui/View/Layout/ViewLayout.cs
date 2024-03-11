@@ -120,15 +120,15 @@ public partial class View
     public virtual Point ScreenToFrame (int x, int y)
     {
         Point superViewBoundsOffset = SuperView?.GetBoundsOffset () ?? Point.Empty;
-        var ret = new Point (x - Frame.X - superViewBoundsOffset.X, y - Frame.Y - superViewBoundsOffset.Y);
-
-        if (SuperView is { })
+        if (SuperView is null)
         {
-            Point superFrame = SuperView.ScreenToFrame (x - superViewBoundsOffset.X, y - superViewBoundsOffset.Y);
-            ret = new (superFrame.X - Frame.X, superFrame.Y - Frame.Y);
+            superViewBoundsOffset.Offset (x - Frame.X, y - Frame.Y);
+            return superViewBoundsOffset;
         }
 
-        return ret;
+        var frame = SuperView.ScreenToFrame (x - superViewBoundsOffset.X, y - superViewBoundsOffset.Y);
+        frame.Offset (-Frame.X, -Frame.Y);
+        return frame;
     }
 
     private Pos _x = Pos.At (0);
