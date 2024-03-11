@@ -1510,7 +1510,7 @@ public static partial class Application
 
         WantContinuousButtonPressedView = view.WantContinuousButtonPressed ? view : null;
 
-        Debug.WriteLine ($"OnMouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags}");
+        //Debug.WriteLine ($"OnMouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags}");
 
         if (view.OnMouseEvent (me))
         {
