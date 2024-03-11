@@ -3,7 +3,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("ScrollBars", "Demonstrates the scroll bar built-in the Padding Adornment.")]
+[ScenarioMetadata ("ScrollBars", "Demonstrates the scroll bar built-in on Adornments and view.")]
 [ScenarioCategory ("Controls")]
 public class ScrollBars : Scenario
 {
@@ -38,7 +38,7 @@ public class ScrollBars : Scenario
             UseContentOffset = true,
             EnableScrollBars = true
         };
-        viewOnContentArea.Margin.Thickness = new Thickness (1);
+        viewOnContentArea.Margin.Thickness = new (1);
         viewOnContentArea.Margin.ColorScheme = Colors.ColorSchemes ["Dialog"];
         viewOnContentArea.BorderStyle = LineStyle.Single;
         SetViewProperties (viewOnContentArea);
@@ -53,7 +53,7 @@ public class ScrollBars : Scenario
             UseContentOffset = true
         };
         viewOnPadding.Padding.EnableScrollBars = true;
-        viewOnPadding.Margin.Thickness = new Thickness (1);
+        viewOnPadding.Margin.Thickness = new (1);
         viewOnPadding.Margin.ColorScheme = Colors.ColorSchemes ["Dialog"];
         viewOnPadding.BorderStyle = LineStyle.Single;
         viewOnPadding.Padding.ColorScheme = Colors.ColorSchemes ["Menu"];
@@ -70,7 +70,7 @@ public class ScrollBars : Scenario
             BorderStyle = LineStyle.None
         };
         viewOnBorder.Border.EnableScrollBars = true;
-        viewOnBorder.Margin.Thickness = new Thickness (1);
+        viewOnBorder.Margin.Thickness = new (1);
         viewOnBorder.Margin.ColorScheme = Colors.ColorSchemes ["Dialog"];
         SetViewProperties (viewOnBorder);
         win.Add (viewOnBorder);
@@ -94,6 +94,6 @@ public class ScrollBars : Scenario
         view.TextFormatter.FillRemaining = true;
         view.CanFocus = true;
         string [] strings = view.Text.Split ("\n").ToArray ();
-        view.ContentSize = new Size (strings.OrderByDescending (s => s.Length).First ().GetColumns (), strings.Length);
+        view.ContentSize = new (strings.OrderByDescending (s => s.Length).First ().GetColumns (), strings.Length);
     }
 }

@@ -188,8 +188,8 @@ public partial class View
             }
 
             Thickness totalThickness = GetAdornmentsThickness ();
-            int width = Math.Max (0, Frame.Size.Width - totalThickness.Horizontal- (UseContentOffset ? ContentOffset.X : 0));
-            int height = Math.Max (0, Frame.Size.Height - totalThickness.Vertical- (UseContentOffset ? ContentOffset.Y : 0));
+            int width = Math.Max (0, Frame.Size.Width - totalThickness.Horizontal - (UseContentOffset ? ContentOffset.X : 0));
+            int height = Math.Max (0, Frame.Size.Height - totalThickness.Vertical - (UseContentOffset ? ContentOffset.Y : 0));
 
             return new (UseContentOffset ? ContentOffset : Point.Empty, new Size (width, height));
         }
@@ -211,93 +211,6 @@ public partial class View
             {
                 Size = new (value.Size.Width + totalThickness.Horizontal, value.Size.Height + totalThickness.Vertical)
             };
-        }
-    }
-
-    /// <summary>
-    ///     Represent the content offset if <see cref="UseContentOffset"/> is true.
-    /// </summary>
-    public virtual Point ContentOffset
-    {
-        get => ParentView._contentOffset;
-        set
-        {
-            ParentView._contentOffset = value;
-
-            if (_scrollBar is null)
-            {
-                return;
-            }
-
-            if (_scrollBar.Orientation == Orientation.Horizontal && _scrollBar.Position != -ContentOffset.X)
-            {
-                _scrollBar.Position = -ContentOffset.X;
-            }
-            else if (_scrollBar is { OtherScrollBarView.Orientation: Orientation.Horizontal } && _scrollBar?.OtherScrollBarView.Position != -ContentOffset.X)
-            {
-                _scrollBar!.OtherScrollBarView.Position = -ContentOffset.X;
-            }
-
-            if (_scrollBar.Orientation == Orientation.Vertical && _scrollBar.Position != -ContentOffset.Y)
-            {
-                _scrollBar.Position = -ContentOffset.Y;
-            }
-            else if (_scrollBar is { OtherScrollBarView.Orientation: Orientation.Vertical } && _scrollBar?.OtherScrollBarView.Position != -ContentOffset.Y)
-            {
-                _scrollBar!.OtherScrollBarView.Position = -ContentOffset.Y;
-            }
-        }
-    }
-
-    /// <summary>
-    ///     Represents the contents size of the data shown inside the <see cref="ContentArea"/>.
-    /// </summary>
-    public Size ContentSize
-    {
-        get => ParentView._contentSize;
-        set
-        {
-            if (ParentView._contentSize != value)
-            {
-                ParentView._contentSize = value;
-                SetNeedsDisplay ();
-            }
-
-            if (_scrollBar is null)
-            {
-                return;
-            }
-
-            if (_scrollBar.Orientation == Orientation.Vertical)
-            {
-                if (_scrollBar.Size != ContentSize.Height)
-                {
-                    _scrollBar.Size = ContentSize.Height;
-                }
-
-                if (_scrollBar.OtherScrollBarView is { })
-                {
-                    if (_scrollBar.OtherScrollBarView.Size != ContentSize.Width)
-                    {
-                        _scrollBar.OtherScrollBarView.Size = ContentSize.Width;
-                    }
-                }
-            }
-            else
-            {
-                if (_scrollBar.Size != ContentSize.Width)
-                {
-                    _scrollBar.Size = ContentSize.Width;
-                }
-
-                if (_scrollBar.OtherScrollBarView is { })
-                {
-                    if (_scrollBar.OtherScrollBarView.Size != ContentSize.Height)
-                    {
-                        _scrollBar.OtherScrollBarView.Size = ContentSize.Height;
-                    }
-                }
-            }
         }
     }
 
@@ -460,11 +373,6 @@ public partial class View
     ///     </para>
     /// </remarks>
     public Padding Padding { get; private set; }
-
-    /// <summary>
-    ///     Determines if negative bounds location is allowed for scrolling the <see cref="GetVisibleContentArea"/>.
-    /// </summary>
-    public bool UseContentOffset { get; set; }
 
     /// <summary>Gets or sets whether validation of <see cref="Pos"/> and <see cref="Dim"/> occurs.</summary>
     /// <remarks>

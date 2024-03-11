@@ -462,6 +462,11 @@ public partial class View : Responder, ISupportInitializeNotification
         Border?.BeginInit ();
         Padding?.BeginInit ();
 
+        if (_scrollBar is null && UseContentOffset)
+        {
+            AddKeyBindingsForScrolling ();
+        }
+
         if (_subviews?.Count > 0)
         {
             foreach (View view in _subviews)
