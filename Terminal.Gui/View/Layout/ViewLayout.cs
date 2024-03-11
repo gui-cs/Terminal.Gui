@@ -740,7 +740,6 @@ public partial class View
     /// <param name="targetY">The target y location.</param>
     /// <param name="nx">The new x location that will ensure <paramref name="viewToMove"/> will be fully visible.</param>
     /// <param name="ny">The new y location that will ensure <paramref name="viewToMove"/> will be fully visible.</param>
-    /// <param name="menuBar">The new top most menuBar</param>
     /// <param name="statusBar">The new top most statusBar</param>
     /// <returns>
     ///     Either <see cref="Application.Top"/> (if <paramref name="viewToMove"/> does not have a Super View) or
