@@ -380,7 +380,7 @@ public partial class Toplevel : View
     /// <param name="top">The Toplevel to adjust.</param>
     public virtual void PositionToplevel (Toplevel top)
     {
-        View superView = GetLocationThatFits (
+        View superView = GetLocationEnsuringFullVisibility (
                                               top,
                                               top.Frame.X,
                                               top.Frame.Y,
