@@ -490,6 +490,8 @@ public static partial class Application
         Toplevel.SetRelativeLayout (Driver.Bounds);
 
         //}
+
+        // BUGBUG: This call is likley not needed.
         Toplevel.LayoutSubviews ();
         Toplevel.PositionToplevels ();
         Toplevel.FocusFirst ();
@@ -1029,6 +1031,8 @@ public static partial class Application
         runState.Toplevel?.Dispose ();
         runState.Toplevel = null;
         runState.Dispose ();
+
+        // BUGBUG: Application.Top is now invalid?!?!
     }
 
     #endregion Run (Begin, Run, End)

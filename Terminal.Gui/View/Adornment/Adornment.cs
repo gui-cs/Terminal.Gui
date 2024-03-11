@@ -191,6 +191,21 @@ public class Adornment : View
 
     #region Mouse Support
 
+
+    /// <summary>
+    /// Indicates whether the specified Parent's SuperView-relative coordinates are within the Adornment's Thickness.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns><see langword="true"/> if the specified Parent's SuperView-relative coordinates are within the Adornment's Thickness. </returns>
+    public override bool Contains (int x, int y)
+    {
+        Rectangle frame = Frame;
+        frame.Offset (Parent.Frame.Location);
+
+        return Thickness.Contains (frame, x, y);
+    }
+
     private Point? _dragPosition;
     private Point _startGrabPoint;
 

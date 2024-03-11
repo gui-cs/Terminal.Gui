@@ -92,16 +92,16 @@ public partial class View
 
         while (super is { })
         {
-            Point boundsOffset = super.GetBoundsOffset ();
             if (super is Adornment adornment)
             {
                 // Adornments don't have SuperViews; use Adornment.FrameToScreen override
                 ret = adornment.FrameToScreen ();
                 ret.Offset (Frame.X, Frame.Y);
-                boundsOffset = GetBoundsOffset ();
-                //ret.Offset(-boundsOffset.X, -boundsOffset.Y);
+
                 return ret;
             }
+
+            Point boundsOffset = super.GetBoundsOffset ();
             ret.X += super.Frame.X + boundsOffset.X;
             ret.Y += super.Frame.Y + boundsOffset.Y;
             super = super.SuperView;
@@ -286,7 +286,7 @@ public partial class View
     #region Bounds
 
     /// <summary>
-    ///     The bounds represent the View-relative rectangle used for this view; the area inside of the view where
+    ///     The bounds represent the View-relative rectangle used for this view; the area inside the view where
     ///     subviews and content are presented.
     /// </summary>
     /// <value>The rectangle describing the location and size of the area where the views' subviews and content are drawn.</value>
@@ -325,14 +325,18 @@ public partial class View
 
             if (Margin is null || Border is null || Padding is null)
             {
+                // CreateAdornments has not been called yet.
                 return Rectangle.Empty with { Size = Frame.Size };
             }
 
             Thickness totalThickness = GetAdornmentsThickness ();
-            int width = Math.Max (0, Frame.Size.Width - totalThickness.Horizontal);
-            int height = Math.Max (0, Frame.Size.Height - totalThickness.Vertical);
 
-            return Rectangle.Empty with { Size = new (width, height) };
+            return Rectangle.Empty with
+            {
+                Size = new (
+                            Math.Max (0, Frame.Size.Width - totalThickness.Horizontal),
+                            Math.Max (0, Frame.Size.Height - totalThickness.Vertical))
+            };
         }
         set
         {
@@ -350,7 +354,9 @@ public partial class View
 
             Frame = Frame with
             {
-                Size = new (value.Size.Width + totalThickness.Horizontal, value.Size.Height + totalThickness.Vertical)
+                Size = new (
+                            value.Size.Width + totalThickness.Horizontal,
+                            value.Size.Height + totalThickness.Vertical)
             };
         }
     }
@@ -359,9 +365,8 @@ public partial class View
     public Rectangle BoundsToScreen (in Rectangle bounds)
     {
         // Translate bounds to Frame (our SuperView's Bounds-relative coordinates)
-        Point boundsOffset = GetBoundsOffset ();
-
         Rectangle screen = FrameToScreen ();
+        Point boundsOffset = GetBoundsOffset ();
         screen.Offset (boundsOffset.X + bounds.X, boundsOffset.Y + bounds.Y);
 
         return new (screen.Location, bounds.Size);
@@ -373,248 +378,20 @@ public partial class View
     /// <param name="y">Screen-relative row.</param>
     public Point ScreenToBounds (int x, int y)
     {
-        Point screen = ScreenToFrame (x, y);
         Point boundsOffset = GetBoundsOffset ();
+        Point screen = ScreenToFrame (x, y);
+        screen.Offset (-boundsOffset.X, -boundsOffset.Y);
 
-        return new (screen.X - boundsOffset.X, screen.Y - boundsOffset.Y);
+        return screen;
     }
 
     /// <summary>
     ///     Helper to get the X and Y offset of the Bounds from the Frame. This is the sum of the Left and Top properties
     ///     of <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/>.
     /// </summary>
-    public virtual Point GetBoundsOffset ()
-    {
-        if (Padding is null)
-        {
-            return Point.Empty;
-        }
-
-        return Padding.Thickness.GetInside (Padding.Frame).Location;
-    }
+    public Point GetBoundsOffset () { return Padding is null ? Point.Empty : Padding.Thickness.GetInside (Padding.Frame).Location; }
 
     #endregion Bounds
-
-    #region Adornments
-
-    private void CreateAdornments ()
-    {
-        Margin = CreateAdornment (typeof (Margin)) as Margin;
-        Border = CreateAdornment (typeof (Border)) as Border;
-        Padding = CreateAdornment (typeof (Padding)) as Padding;
-    }
-
-    // TODO: Move this to Adornment as a static factory method
-    /// <summary>
-    ///     This internal method is overridden by Adornment to do nothing to prevent recursion during View construction.
-    ///     And, because Adornments don't have Adornments. It's internal to support unit tests.
-    /// </summary>
-    /// <param name="adornmentType"></param>
-    /// <exception cref="ArgumentNullException"></exception>
-    /// <exception cref="ArgumentException"></exception>
-    internal virtual Adornment CreateAdornment (Type adornmentType)
-    {
-        void ThicknessChangedHandler (object sender, EventArgs e)
-        {
-            if (IsInitialized)
-            {
-                LayoutAdornments ();
-            }
-
-            SetNeedsLayout ();
-            SetNeedsDisplay ();
-        }
-
-        Adornment adornment;
-
-        adornment = Activator.CreateInstance (adornmentType, this) as Adornment;
-        adornment.ThicknessChanged += ThicknessChangedHandler;
-
-        return adornment;
-    }
-
-    private void BeginInitAdornments ()
-    {
-        Margin?.BeginInit ();
-        Border?.BeginInit ();
-        Padding?.BeginInit ();
-    }
-
-    private void EndInitAdornments ()
-    {
-        Margin?.EndInit ();
-        Border?.EndInit ();
-        Padding?.EndInit ();
-    }
-
-    private void DisposeAdornments ()
-    {
-        Margin?.Dispose ();
-        Margin = null;
-        Border?.Dispose ();
-        Border = null;
-        Padding?.Dispose ();
-        Padding = null;
-    }
-
-    /// <summary>
-    ///     The <see cref="Adornment"/> that enables separation of a View from other SubViews of the same
-    ///     SuperView. The margin offsets the <see cref="Bounds"/> from the <see cref="Frame"/>.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         The adornments (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the
-    ///         View's content and are not clipped by the View's Clip Area.
-    ///     </para>
-    ///     <para>
-    ///         Changing the size of an adornment (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
-    ///         change the size of <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
-    ///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
-    ///     </para>
-    /// </remarks>
-    public Margin Margin { get; private set; }
-
-    /// <summary>
-    ///     The <see cref="Adornment"/> that offsets the <see cref="Bounds"/> from the <see cref="Margin"/>.
-    ///     The Border provides the space for a visual border (drawn using
-    ///     line-drawing glyphs) and the Title. The Border expands inward; in other words if `Border.Thickness.Top == 2` the
-    ///     border and title will take up the first row and the second row will be filled with spaces.
-    /// </summary>
-    /// <remarks>
-    ///     <para><see cref="BorderStyle"/> provides a simple helper for turning a simple border frame on or off.</para>
-    ///     <para>
-    ///         The adornments (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the
-    ///         View's content and are not clipped by the View's Clip Area.
-    ///     </para>
-    ///     <para>
-    ///         Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
-    ///         change the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
-    ///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
-    ///     </para>
-    /// </remarks>
-    public Border Border { get; private set; }
-
-    /// <summary>Gets or sets whether the view has a one row/col thick border.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         This is a helper for manipulating the view's <see cref="Border"/>. Setting this property to any value other
-    ///         than <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s
-    ///         <see cref="Adornment.Thickness"/> to `1` and <see cref="BorderStyle"/> to the value.
-    ///     </para>
-    ///     <para>
-    ///         Setting this property to <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s
-    ///         <see cref="Adornment.Thickness"/> to `0` and <see cref="BorderStyle"/> to <see cref="LineStyle.None"/>.
-    ///     </para>
-    ///     <para>For more advanced customization of the view's border, manipulate see <see cref="Border"/> directly.</para>
-    /// </remarks>
-    public LineStyle BorderStyle
-    {
-        get => Border?.LineStyle ?? LineStyle.Single;
-        set
-        {
-            if (Border is null)
-            {
-                return;
-            }
-
-            if (value != LineStyle.None)
-            {
-                Border.Thickness = new (1);
-            }
-            else
-            {
-                Border.Thickness = new (0);
-            }
-
-            Border.LineStyle = value;
-            LayoutAdornments ();
-            SetNeedsLayout ();
-        }
-    }
-
-    /// <summary>
-    ///     The <see cref="Adornment"/> inside of the view that offsets the <see cref="Bounds"/>
-    ///     from the <see cref="Border"/>.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         The adornments (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the
-    ///         View's content and are not clipped by the View's Clip Area.
-    ///     </para>
-    ///     <para>
-    ///         Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
-    ///         change the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
-    ///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
-    ///     </para>
-    /// </remarks>
-    public Padding Padding { get; private set; }
-
-    /// <summary>
-    ///     <para>Gets the thickness describing the sum of the Adornments' thicknesses.</para>
-    /// </summary>
-    /// <returns>A thickness that describes the sum of the Adornments' thicknesses.</returns>
-    public Thickness GetAdornmentsThickness () { return Margin.Thickness + Border.Thickness + Padding.Thickness; }
-
-    /// <summary>Overriden by <see cref="Adornment"/> to do nothing, as the <see cref="Adornment"/> does not have adornments.</summary>
-    internal virtual void LayoutAdornments ()
-    {
-        if (Margin is null)
-        {
-            return; // CreateAdornments () has not been called yet
-        }
-
-        if (Margin.Frame.Size != Frame.Size)
-        {
-            Margin._frame = Rectangle.Empty with { Size = Frame.Size };
-            Margin.X = 0;
-            Margin.Y = 0;
-            Margin.Width = Frame.Size.Width;
-            Margin.Height = Frame.Size.Height;
-        }
-        Margin.SetNeedsLayout ();
-        Margin.SetNeedsDisplay ();
-
-        if (IsInitialized)
-        {
-            Margin.LayoutSubviews ();
-        }
-
-        Rectangle border = Margin.Thickness.GetInside (Margin.Frame);
-
-        if (border != Border.Frame)
-        {
-            Border._frame = border;
-            Border.X = border.Location.X;
-            Border.Y = border.Location.Y;
-            Border.Width = border.Size.Width;
-            Border.Height = border.Size.Height;
-        }
-        Border.SetNeedsLayout ();
-        Border.SetNeedsDisplay ();
-        if (IsInitialized)
-        {
-            Border.LayoutSubviews ();
-        }
-
-        Rectangle padding = Border.Thickness.GetInside (Border.Frame);
-
-        if (padding != Padding.Frame)
-        {
-            Padding._frame = padding;
-            Padding.X = padding.Location.X;
-            Padding.Y = padding.Location.Y;
-            Padding.Width = padding.Size.Width;
-            Padding.Height = padding.Size.Height;
-        }
-        Padding.SetNeedsLayout ();
-        Padding.SetNeedsDisplay ();
-        if (IsInitialized)
-        {
-            Padding.LayoutSubviews ();
-        }
-    }
-
-    #endregion Adornments
 
     #region AutoSize
 
@@ -871,52 +648,51 @@ public partial class View
 
     internal bool LayoutNeeded { get; private set; } = true;
 
+    /// <summary>
+    /// Indicates whether the specified SuperView-relative coordinates are within the View's <see cref="Frame"/>.
+    /// </summary>
+    /// <param name="x">SuperView-relative X coordinate.</param>
+    /// <param name="y">SuperView-relative Y coordinate.</param>
+    /// <returns><see langword="true"/> if the specified SuperView-relative coordinates are within the View.</returns>
+    public virtual bool Contains (int x, int y)
+    {
+        return Frame.Contains (x, y);
+    }
+
 #nullable enable
-    /// <summary>Finds which view that belong to the <paramref name="start"/> superview at the provided location.</summary>
-    /// <param name="start">The superview where to look for.</param>
-    /// <param name="x">The column location in the superview.</param>
-    /// <param name="y">The row location in the superview.</param>
+    /// <summary>Finds the first Subview of <paramref name="start"/> that is visible at the provided location.</summary>
+    /// <remarks>
+    /// <para>
+    ///     Used to determine what view the mouse is over. 
+    /// </para>
+    /// </remarks>
+    /// <param name="start">The view to scope the search by.</param>
+    /// <param name="x"><paramref name="start"/>.SuperView-relative X coordinate.</param>
+    /// <param name="y"><paramref name="start"/>.SuperView-relative Y coordinate..</param>
     /// <returns>
     ///     The view that was found at the <paramref name="x"/> and <paramref name="y"/> coordinates.
     ///     <see langword="null"/> if no view was found.
     /// </returns>
+
     // CONCURRENCY: This method is not thread-safe. Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
     internal static View? FindDeepestView (View? start, int x, int y)
     {
-        if (start is null || !start.Visible)
-        {
-            return null;
-        }
-
-        if (!start.Frame.Contains (x, y))
+        if (start is null || !start.Visible || !start.Contains (x, y))
         {
             return null;
         }
 
         Adornment? found = null;
-        if (start.Margin.Thickness.Contains (start.Frame, x, y))
+
+        if (start.Margin.Contains (x, y))
         {
             found = start.Margin;
         }
-        else if (start.Border.Thickness.Contains (
-                                                  start.Border.Frame with
-                                                  {
-                                                      X = start.Frame.X + start.Border.Frame.X,
-                                                      Y = start.Frame.Y + start.Border.Frame.Y
-                                                  },
-                                                  x,
-                                                  y))
+        else if (start.Border.Contains (x, y))
         {
             found = start.Border;
         }
-        else if (start.Padding.Thickness.Contains (
-                                                   start.Padding.Frame with
-                                                   {
-                                                       X = start.Frame.X + start.Padding.Frame.X,
-                                                       Y = start.Frame.Y + start.Padding.Frame.Y
-                                                   },
-                                                   x,
-                                                   y))
+        else if (start.Padding.Contains (x, y))
         {
             found = start.Padding;
         }
@@ -931,18 +707,17 @@ public partial class View
 
         if (start.InternalSubviews is { Count: > 0 })
         {
-            int rx = x - (start.Frame.X + boundsOffset.X);
-            int ry = y - (start.Frame.Y + boundsOffset.Y);
+            int startOffsetX = x - (start.Frame.X + boundsOffset.X);
+            int startOffsetY = y - (start.Frame.Y + boundsOffset.Y);
 
             for (int i = start.InternalSubviews.Count - 1; i >= 0; i--)
             {
-                View v = start.InternalSubviews [i];
+                View nextStart = start.InternalSubviews [i];
 
-                if (v.Visible && v.Frame.Contains (rx, ry))
+                if (nextStart.Visible && nextStart.Contains (startOffsetX, startOffsetY))
                 {
-                    View? deep = FindDeepestView (v, rx, ry);
-
-                    return deep ?? v;
+                    // TODO: Remove recursion
+                    return FindDeepestView (nextStart, startOffsetX, startOffsetY) ?? nextStart;
                 }
             }
         }
