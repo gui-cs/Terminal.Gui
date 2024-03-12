@@ -195,6 +195,9 @@ public class Adornment : View
     /// <summary>
     /// Indicates whether the specified Parent's SuperView-relative coordinates are within the Adornment's Thickness.
     /// </summary>
+    /// <remarks>
+    ///     The <paramref name="x"/> and <paramref name="x"/> are relative to the PARENT's SuperView.
+    /// </remarks>
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <returns><see langword="true"/> if the specified Parent's SuperView-relative coordinates are within the Adornment's Thickness. </returns>
@@ -266,9 +269,11 @@ public class Adornment : View
             Application.BringOverlappedTopToFront ();
 
             // Only start grabbing if the user clicks in the Thickness area
-            if (Thickness.Contains (Frame, mouseEvent.X, mouseEvent.Y) && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+            // Adornment.Contains takes Parent SuperView=relative coords.
+            if (Contains (mouseEvent.X + Parent.Frame.X + Frame.X, mouseEvent.Y+ Parent.Frame.Y + Frame.Y))
             {
-                _startGrabPoint = new (mouseEvent.X, mouseEvent.Y);
+                // Set the start grab point to the Frame coords
+                _startGrabPoint = new (mouseEvent.X + Frame.X, mouseEvent.Y + Frame.Y);
                 _dragPosition = new (mouseEvent.X, mouseEvent.Y);
                 Application.GrabMouse (this);
             }
