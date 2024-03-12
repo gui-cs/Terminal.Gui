@@ -23,6 +23,7 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public class ScrollBarView : View {
 		bool vertical;
+		int scrollAmount;
 		int size, position;
 		bool showScrollIndicator;
 		bool keepContentAlwaysInViewport = true;
@@ -171,6 +172,7 @@ namespace Terminal.Gui {
 		void Init (int size, int position, bool isVertical)
 		{
 			vertical = isVertical;
+			this.scrollAmount = 1;
 			this.position = position;
 			this.size = size;
 			WantContinuousButtonPressed = true;
@@ -183,6 +185,17 @@ namespace Terminal.Gui {
 			get => vertical;
 			set {
 				vertical = value;
+				SetNeedsDisplay ();
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets how many rows or columns will be scrolled with each time scroll command (e.g. when it's executed).
+		/// </summary>
+		public int ScrollAmount {
+			get => scrollAmount;
+			set {
+				scrollAmount = value;
 				SetNeedsDisplay ();
 			}
 		}
@@ -736,6 +749,11 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		/// <summary>
+		/// Returns the size of the scroll bar.
+		/// </summary>
+		/// <param name="isVertical">Indicates whether the scroll bar is vertical.</param>
+		/// <returns>Size of the scroll bar.</returns>
 		int GetBarsize (bool isVertical)
 		{
 			if (Host?.Bounds.IsEmpty != false) {

@@ -38,6 +38,7 @@ namespace Terminal.Gui {
 
 		ContentView contentView;
 		ScrollBarView vertical, horizontal;
+		int scrollAmount;
 
 		/// <summary>
 		///  Initializes a new instance of the <see cref="Gui.ScrollView"/> class using <see cref="LayoutStyle.Absolute"/> positioning.
@@ -47,7 +48,6 @@ namespace Terminal.Gui {
 		{
 			Initialize (frame);
 		}
-
 
 		/// <summary>
 		///  Initializes a new instance of the <see cref="Gui.ScrollView"/> class using <see cref="LayoutStyle.Computed"/> positioning.
@@ -91,10 +91,10 @@ namespace Terminal.Gui {
 			contentView.MouseLeave += View_MouseLeave;
 
 			// Things this view knows how to do
-			AddCommand (Command.ScrollUp, () => ScrollUp (1));
-			AddCommand (Command.ScrollDown, () => ScrollDown (1));
-			AddCommand (Command.ScrollLeft, () => ScrollLeft (1));
-			AddCommand (Command.ScrollRight, () => ScrollRight (1));
+			AddCommand (Command.ScrollUp, () => ScrollUp (vertical.ScrollAmount));
+			AddCommand (Command.ScrollDown, () => ScrollDown (vertical.ScrollAmount));
+			AddCommand (Command.ScrollLeft, () => ScrollLeft (horizontal.ScrollAmount));
+			AddCommand (Command.ScrollRight, () => ScrollRight (horizontal.ScrollAmount));
 			AddCommand (Command.PageUp, () => ScrollUp (Bounds.Height));
 			AddCommand (Command.PageDown, () => ScrollDown (Bounds.Height));
 			AddCommand (Command.PageLeft, () => ScrollLeft (Bounds.Width));
@@ -173,6 +173,19 @@ namespace Terminal.Gui {
 					}
 					SetNeedsDisplay ();
 				}
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets how many rows or columns will be scrolled with each time scroll command (e.g. when it's executed).
+		/// </summary>
+		public int ScrollAmount {
+			get => scrollAmount;
+			set {
+				scrollAmount = value;
+				vertical.ScrollAmount = scrollAmount;
+				horizontal.ScrollAmount = scrollAmount;
+				SetNeedsDisplay ();
 			}
 		}
 
@@ -460,7 +473,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Scrolls the view up.
 		/// </summary>
-		/// <returns><c>true</c>, if left was scrolled, <c>false</c> otherwise.</returns>
+		/// <returns><c>true</c>, if up was scrolled, <c>false</c> otherwise.</returns>
 		/// <param name="lines">Number of lines to scroll.</param>
 		public bool ScrollUp (int lines)
 		{
@@ -488,7 +501,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Scrolls the view down.
 		/// </summary>
-		/// <returns><c>true</c>, if left was scrolled, <c>false</c> otherwise.</returns>
+		/// <returns><c>true</c>, if down was scrolled, <c>false</c> otherwise.</returns>
 		/// <param name="lines">Number of lines to scroll.</param>
 		public bool ScrollDown (int lines)
 		{
@@ -537,13 +550,13 @@ namespace Terminal.Gui {
 			}
 
 			if (me.Flags == MouseFlags.WheeledDown && ShowVerticalScrollIndicator) {
-				ScrollDown (1);
+				ScrollDown (vertical.ScrollAmount);
 			} else if (me.Flags == MouseFlags.WheeledUp && ShowVerticalScrollIndicator) {
-				ScrollUp (1);
+				ScrollUp (vertical.ScrollAmount);
 			} else if (me.Flags == MouseFlags.WheeledRight && showHorizontalScrollIndicator) {
-				ScrollRight (1);
+				ScrollRight (horizontal.ScrollAmount);
 			} else if (me.Flags == MouseFlags.WheeledLeft && ShowVerticalScrollIndicator) {
-				ScrollLeft (1);
+				ScrollLeft (horizontal.ScrollAmount);
 			} else if (me.X == vertical.Frame.X && ShowVerticalScrollIndicator) {
 				vertical.MouseEvent (me);
 			} else if (me.Y == horizontal.Frame.Y && ShowHorizontalScrollIndicator) {
