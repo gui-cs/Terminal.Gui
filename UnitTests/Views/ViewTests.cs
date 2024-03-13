@@ -4581,5 +4581,19 @@ Test", output);
 011110
 000000", new Attribute [] { Colors.TopLevel.Normal, Colors.TopLevel.Focus });
 		}
+
+		[Fact]
+		public void OnMouseClick_Is_Only_Fired_Once ()
+		{
+			var mouseClicks = 0;
+			var view = new View ();
+			view.MouseClick += (_) => mouseClicks++;
+
+			view.OnMouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Pressed });
+			view.OnMouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Released });
+			view.OnMouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
+
+			Assert.Equal (1, mouseClicks);
+		}
 	}
 }
