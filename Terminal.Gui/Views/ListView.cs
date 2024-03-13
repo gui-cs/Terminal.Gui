@@ -875,7 +875,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public void Render (ListView container, ConsoleDriver driver, bool marked, int item, int col, int line, int width, int start = 0)
 		{
-			var savedClip = container.ClipToBounds();
+			var savedClip = container.ClipToBounds ();
 			container.Move (col - start, line);
 			var t = src? [item];
 			if (t == null) {
