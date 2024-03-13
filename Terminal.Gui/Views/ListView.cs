@@ -802,8 +802,6 @@ namespace Terminal.Gui {
 			selected = top + me.Y;
 			if (AllowsAll ()) {
 				Source.SetMark (SelectedItem, !Source.IsMarked (SelectedItem));
-				SetNeedsDisplay ();
-				return true;
 			}
 			OnSelectedChanged ();
 			SetNeedsDisplay ();
