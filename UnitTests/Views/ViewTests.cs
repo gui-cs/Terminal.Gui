@@ -4583,7 +4583,7 @@ Test", output);
 		}
 
 		[Fact]
-		public void OnMouseClick_Is_Only_Fired_Once ()
+		public void OnMouseClick_Is_Only_Raised_Once ()
 		{
 			var mouseClicks = 0;
 			var view = new View ();
