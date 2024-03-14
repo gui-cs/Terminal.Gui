@@ -547,7 +547,7 @@ Item 6", output);
 		}
 
 		[Fact]
-		public void SelectedItemChanged_Event_Is_Also_Fired_With_AllowsMarking_True_By_Keyboard_Or_Mouse ()
+		public void SelectedItemChanged_Event_Is_Also_Raised_With_AllowsMarking_True_By_Keyboard_Or_Mouse ()
 		{
 			var itemChanged = 0;
 			var lv = new ListView (new List<string> () { "Item1", "Item2", "Item3" }) { Width = 5, Height = 3, AllowsMarking = true };
