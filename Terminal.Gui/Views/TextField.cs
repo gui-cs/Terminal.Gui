@@ -433,13 +433,6 @@ public class TextField : View
     /// </summary>
     public IAutocomplete Autocomplete { get; set; }
 
-    /// <inheritdoc/>
-    public sealed override bool CanFocus
-    {
-        get => base.CanFocus;
-        set => base.CanFocus = value;
-    }
-
     /// <summary>
     ///     Gets or sets the text to render in control when no value has been entered yet and the <see cref="View"/> does
     ///     not yet have input focus.
@@ -1752,6 +1745,7 @@ public class TextField : View
         }
     }
 
+    // BUGBUG: This assumes Frame == Bounds. It's also not clear what the intention is. For now, changed to always return 0.
     private int OffSetBackground ()
     {
         var offB = 0;
@@ -1761,25 +1755,12 @@ public class TextField : View
             offB = SuperView.Frame.Right - Frame.Right - 1;
         }
 
-        return offB;
+        return 0;//offB;
     }
 
     private int PositionCursor (MouseEvent ev)
     {
-        // We could also set the cursor position.
-        int x;
-        int pX = TextModel.GetColFromX (_text, ScrollOffset, ev.X);
-
-        if (_text.Count == 0)
-        {
-            x = pX - ev.OfX;
-        }
-        else
-        {
-            x = pX;
-        }
-
-        return PositionCursor (x, false);
+        return PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, ev.X), false);
     }
 
     private int PositionCursor (int x, bool getX = true)

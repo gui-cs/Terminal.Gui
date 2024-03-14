@@ -2,10 +2,9 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class AdornmentTests
+public class AdornmentTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public AdornmentTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void Bounds_Location_Always_Empty_Size_Correct ()
@@ -672,5 +671,45 @@ public class AdornmentTests
                                       };
         adornment.Thickness = new Thickness (1, 2, 3, 4);
         Assert.True (raised);
+    }
+
+
+    [Fact]
+    public void Setting_Thickness_Causes_Parent_Layout ()
+    {
+        var view = new View ();
+        var raised = false;
+        view.BeginInit();
+        view.EndInit();
+
+        view.LayoutStarted += LayoutStarted;
+        view.Margin.Thickness = new Thickness (1, 2, 3, 4);
+        Assert.True (raised);
+
+        return;
+        void LayoutStarted (object sender, LayoutEventArgs e)
+        {
+            raised = true;
+        }
+
+    }
+
+    [Fact]
+    public void Setting_Thickness_Causes_Adornment_Layout ()
+    {
+        var view = new View ();
+        var raised = false;
+        view.BeginInit ();
+        view.EndInit ();
+
+        view.Margin.LayoutStarted += LayoutStarted;
+        view.Margin.Thickness = new Thickness (1, 2, 3, 4);
+        Assert.True (raised);
+
+        return;
+        void LayoutStarted (object sender, LayoutEventArgs e)
+        {
+            raised = true;
+        }
     }
 }

@@ -720,35 +720,24 @@ internal sealed class Menu : View
             return;
         }
 
-        Point locationOffset = _host.GetScreenOffsetFromCurrent ();
-
-        if (SuperView is { } && SuperView != Application.Current)
+        if (!Visible)
         {
-            locationOffset.X += SuperView.Border.Thickness.Left;
-            locationOffset.Y += SuperView.Border.Thickness.Top;
+            throw new InvalidOperationException ("This shouldn't running on a invisible menu!");
         }
 
-        View view = FindDeepestView (this, a.MouseEvent.X + locationOffset.X, a.MouseEvent.Y + locationOffset.Y);
-
-        if (view == this)
+        Point boundsPoint = ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
+        var me = new MouseEvent
         {
-            if (!Visible)
-            {
-                throw new InvalidOperationException ("This shouldn't running on a invisible menu!");
-            }
+            X = boundsPoint.X,
+            Y = boundsPoint.Y,
+            Flags = a.MouseEvent.Flags,
+            ScreenPosition = new (a.MouseEvent.X, a.MouseEvent.Y),
+            View = this
+        };
 
-            var screen = view.FrameToScreen ();
-            var nme = new MouseEvent {
-                X = a.MouseEvent.X - screen.X,
-                Y = a.MouseEvent.Y - screen.Y,
-                Flags = a.MouseEvent.Flags,
-                View = view
-            };
-
-            if (OnMouseEvent (nme) || a.MouseEvent.Flags == MouseFlags.Button1Pressed || a.MouseEvent.Flags == MouseFlags.Button1Released)
-            {
-                a.MouseEvent.Handled = true;
-            }
+        if (OnMouseEvent (me) || a.MouseEvent.Flags == MouseFlags.Button1Pressed || a.MouseEvent.Flags == MouseFlags.Button1Released)
+        {
+            a.MouseEvent.Handled = true;
         }
     }
 
@@ -1192,23 +1181,22 @@ internal sealed class Menu : View
 
         _host._handled = false;
         bool disabled;
-        int meY = me.Y - (Border is null ? 0 : Border.Thickness.Top);
 
         if (me.Flags == MouseFlags.Button1Clicked)
         {
             disabled = false;
 
-            if (meY < 0)
+            if (me.Y < 0)
             {
                 return true;
             }
 
-            if (meY >= _barItems.Children.Length)
+            if (me.Y >= _barItems.Children.Length)
             {
                 return true;
             }
 
-            MenuItem item = _barItems.Children [meY];
+            MenuItem item = _barItems.Children [me.Y];
 
             if (item is null || !item.IsEnabled ())
             {
@@ -1220,7 +1208,7 @@ internal sealed class Menu : View
                 return true;
             }
 
-            _currentChild = meY;
+            _currentChild = me.Y;
             RunSelected ();
 
             return true;
@@ -1238,12 +1226,12 @@ internal sealed class Menu : View
         {
             disabled = false;
 
-            if (meY < 0 || meY >= _barItems.Children.Length)
+            if (me.Y < 0 || me.Y >= _barItems.Children.Length)
             {
                 return true;
             }
 
-            MenuItem item = _barItems.Children [meY];
+            MenuItem item = _barItems.Children [me.Y];
 
             if (item is null)
             {
@@ -1257,7 +1245,7 @@ internal sealed class Menu : View
 
             if (!disabled)
             {
-                _currentChild = meY;
+                _currentChild = me.Y;
             }
 
             if (_host.UseSubMenusSingleFrame || !CheckSubMenu ())

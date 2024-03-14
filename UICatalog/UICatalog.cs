@@ -156,7 +156,7 @@ internal class UICatalogApp
         {
             using var process = new Process
             {
-                StartInfo = new()
+                StartInfo = new ()
                 {
                     FileName = "xdg-open",
                     Arguments = url,
@@ -390,7 +390,7 @@ internal class UICatalogApp
             _themeMenuItems = CreateThemeMenuItems ();
             _themeMenuBarItem = new ("_Themes", _themeMenuItems);
 
-            MenuBar = new()
+            MenuBar = new ()
             {
                 Menus =
                 [
@@ -449,7 +449,7 @@ internal class UICatalogApp
             DriverName = new (Key.Empty, "Driver:", null);
             OS = new (Key.Empty, "OS:", null);
 
-            StatusBar = new() { Visible = ShowStatusBar };
+            StatusBar = new () { Visible = ShowStatusBar };
 
             StatusBar.Items = new []
             {
@@ -487,7 +487,7 @@ internal class UICatalogApp
             };
 
             // Create the Category list view. This list never changes.
-            CategoryList = new()
+            CategoryList = new ()
             {
                 X = 0,
                 Y = 1,
@@ -507,7 +507,7 @@ internal class UICatalogApp
             // Create the scenario list. The contents of the scenario list changes whenever the
             // Category list selection changes (to show just the scenarios that belong to the selected
             // category).
-            ScenarioList = new()
+            ScenarioList = new ()
             {
                 X = Pos.Right (CategoryList) - 1,
                 Y = 1,
@@ -549,9 +549,9 @@ internal class UICatalogApp
 
             ScenarioList.Style.ColumnStyles.Add (
                                                  0,
-                                                 new() { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName }
+                                                 new () { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName }
                                                 );
-            ScenarioList.Style.ColumnStyles.Add (1, new() { MaxWidth = 1 });
+            ScenarioList.Style.ColumnStyles.Add (1, new () { MaxWidth = 1 });
 
             // Enable user to find & select a scenario by typing text
             // TableView does not (currently) have built-in CollectionNavigator support (the ability for the 
@@ -714,7 +714,7 @@ internal class UICatalogApp
 
             ScenarioList.Table = new EnumerableTableSource<Scenario> (
                                                                       newlist,
-                                                                      new()
+                                                                      new ()
                                                                       {
                                                                           { "Name", s => s.GetName () }, { "Description", s => s.GetDescription () }
                                                                       }
@@ -739,6 +739,7 @@ internal class UICatalogApp
             const string OFF = "View Diagnostics: _Off";
             const string RULER = "View Diagnostics: _Ruler";
             const string PADDING = "View Diagnostics: _Padding";
+            const string MOUSEENTER = "View Diagnostics: _MouseEnter";
             var index = 0;
 
             List<MenuItem> menuItems = new ();
@@ -754,7 +755,9 @@ internal class UICatalogApp
 
                 if (GetDiagnosticsTitle (ViewDiagnosticFlags.Off) == item.Title)
                 {
-                    item.Checked = !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Padding) && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Ruler);
+                    item.Checked = !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Padding)
+                                   && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Ruler)
+                                   && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.MouseEnter);
                 }
                 else
                 {
@@ -767,12 +770,12 @@ internal class UICatalogApp
 
                                    if (item.Title == t && item.Checked == false)
                                    {
-                                       _diagnosticFlags &= ~(ViewDiagnosticFlags.Padding | ViewDiagnosticFlags.Ruler);
+                                       _diagnosticFlags &= ~(ViewDiagnosticFlags.Padding | ViewDiagnosticFlags.Ruler | ViewDiagnosticFlags.MouseEnter);
                                        item.Checked = true;
                                    }
                                    else if (item.Title == t && item.Checked == true)
                                    {
-                                       _diagnosticFlags |= ViewDiagnosticFlags.Padding | ViewDiagnosticFlags.Ruler;
+                                       _diagnosticFlags |= ViewDiagnosticFlags.Padding | ViewDiagnosticFlags.Ruler | ViewDiagnosticFlags.MouseEnter;
                                        item.Checked = false;
                                    }
                                    else
@@ -794,7 +797,8 @@ internal class UICatalogApp
                                        if (menuItem.Title == t)
                                        {
                                            menuItem.Checked = !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Ruler)
-                                                              && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Padding);
+                                                              && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Padding)
+                                                              && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.MouseEnter);
                                        }
                                        else if (menuItem.Title != t)
                                        {
@@ -817,6 +821,7 @@ internal class UICatalogApp
                            "Off" => OFF,
                            "Ruler" => RULER,
                            "Padding" => PADDING,
+                           "MouseEnter" => MOUSEENTER,
                            _ => ""
                        };
             }
@@ -827,6 +832,7 @@ internal class UICatalogApp
                        {
                            RULER => ViewDiagnosticFlags.Ruler,
                            PADDING => ViewDiagnosticFlags.Padding,
+                           MOUSEENTER => ViewDiagnosticFlags.MouseEnter,
                            _ => null!
                        };
             }
@@ -857,6 +863,17 @@ internal class UICatalogApp
                         }
 
                         break;
+                    case ViewDiagnosticFlags.MouseEnter:
+                        if (add)
+                        {
+                            _diagnosticFlags |= ViewDiagnosticFlags.MouseEnter;
+                        }
+                        else
+                        {
+                            _diagnosticFlags &= ~ViewDiagnosticFlags.MouseEnter;
+                        }
+
+                        break;
                     default:
                         _diagnosticFlags = default (ViewDiagnosticFlags);
 
@@ -884,7 +901,7 @@ internal class UICatalogApp
         private MenuItem [] CreateDisabledEnabledMenuBorder ()
         {
             List<MenuItem> menuItems = new ();
-            miIsMenuBorderDisabled = new() { Title = "Disable Menu _Border" };
+            miIsMenuBorderDisabled = new () { Title = "Disable Menu _Border" };
 
             miIsMenuBorderDisabled.Shortcut =
                 (KeyCode)new Key (miIsMenuBorderDisabled!.Title!.Substring (14, 1) [0]).WithAlt
@@ -907,7 +924,7 @@ internal class UICatalogApp
         private MenuItem [] CreateDisabledEnabledMouseItems ()
         {
             List<MenuItem> menuItems = new ();
-            miIsMouseDisabled = new() { Title = "_Disable Mouse" };
+            miIsMouseDisabled = new () { Title = "_Disable Mouse" };
 
             miIsMouseDisabled.Shortcut =
                 (KeyCode)new Key (miIsMouseDisabled!.Title!.Substring (1, 1) [0]).WithAlt.WithCtrl;
@@ -927,7 +944,7 @@ internal class UICatalogApp
         private MenuItem [] CreateDisabledEnableUseSubMenusSingleFrame ()
         {
             List<MenuItem> menuItems = new ();
-            miUseSubMenusSingleFrame = new() { Title = "Enable _Sub-Menus Single Frame" };
+            miUseSubMenusSingleFrame = new () { Title = "Enable _Sub-Menus Single Frame" };
 
             miUseSubMenusSingleFrame.Shortcut = KeyCode.CtrlMask
                                                 | KeyCode.AltMask
@@ -949,7 +966,7 @@ internal class UICatalogApp
         {
             List<MenuItem> menuItems = new ();
 
-            miForce16Colors = new()
+            miForce16Colors = new ()
             {
                 Title = "Force _16 Colors",
                 Shortcut = (KeyCode)Key.F6,

@@ -518,7 +518,7 @@ public static class ConfigurationManager
             classesWithConfigProps.Add (classWithConfig.Name, classWithConfig);
         }
 
-        Debug.WriteLine ($"ConfigManager.getConfigProperties found {classesWithConfigProps.Count} classes:");
+        //Debug.WriteLine ($"ConfigManager.getConfigProperties found {classesWithConfigProps.Count} classes:");
         classesWithConfigProps.ToList ().ForEach (x => Debug.WriteLine ($"  Class: {x.Key}"));
 
         foreach (PropertyInfo? p in from c in classesWithConfigProps
@@ -573,7 +573,7 @@ public static class ConfigurationManager
                                                                    StringComparer.InvariantCultureIgnoreCase
                                                                   );
 
-        Debug.WriteLine ($"ConfigManager.Initialize found {_allConfigProperties.Count} properties:");
+        //Debug.WriteLine ($"ConfigManager.Initialize found {_allConfigProperties.Count} properties:");
 
         //_allConfigProperties.ToList ().ForEach (x => Debug.WriteLine ($"  Property: {x.Key}"));
 
@@ -584,7 +584,7 @@ public static class ConfigurationManager
     /// <returns></returns>
     internal static string ToJson ()
     {
-        Debug.WriteLine ("ConfigurationManager.ToJson()");
+        //Debug.WriteLine ("ConfigurationManager.ToJson()");
 
         return JsonSerializer.Serialize (Settings!, _serializerOptions);
     }

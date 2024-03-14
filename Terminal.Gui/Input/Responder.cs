@@ -1,42 +1,14 @@
-﻿//
-// Core.cs: The core engine for gui.cs
-//
-// Authors:
-//   Miguel de Icaza (miguel@gnome.org)
-//
-// Pending:
-//   - Check for NeedDisplay on the hierarchy and repaint
-//   - Layout support
-//   - "Colors" type or "Attributes" type?
-//   - What to surface as "BackgroundCOlor" when clearing a window, an attribute or colors?
-//
-// Optimziations
-//   - Add rendering limitation to the exposed area
-
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Terminal.Gui;
 
 /// <summary>Responder base class implemented by objects that want to participate on keyboard and mouse input.</summary>
 public class Responder : IDisposable
 {
-    private bool disposedValue;
-
-    /// <summary>Gets or sets a value indicating whether this <see cref="Responder"/> can focus.</summary>
-    /// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>
-    public virtual bool CanFocus { get; set; }
-
-    /// <summary>Gets or sets a value indicating whether this <see cref="Responder"/> can respond to user interaction.</summary>
-    public virtual bool Enabled { get; set; } = true;
-
-    /// <summary>Gets or sets a value indicating whether this <see cref="Responder"/> has focus.</summary>
-    /// <value><c>true</c> if has focus; otherwise, <c>false</c>.</value>
-    public virtual bool HasFocus { get; }
-
-    /// <summary>Gets or sets a value indicating whether this <see cref="Responder"/> and all its child controls are displayed.</summary>
-    public virtual bool Visible { get; set; } = true;
+    private bool _disposedValue;
 
     /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resource.</summary>
+
     public void Dispose ()
     {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
@@ -56,26 +28,6 @@ public class Responder : IDisposable
     /// <summary>Event raised when <see cref="Dispose()"/> has been called to signal that this object is being disposed.</summary>
     public event EventHandler Disposing;
 
-    /// <summary>Method invoked when the <see cref="CanFocus"/> property from a view is changed.</summary>
-    public virtual void OnCanFocusChanged () { }
-
-    /// <summary>Method invoked when the <see cref="Enabled"/> property from a view is changed.</summary>
-    public virtual void OnEnabledChanged () { }
-
-    /// <summary>Method invoked when a view gets focus.</summary>
-    /// <param name="view">The view that is losing focus.</param>
-    /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
-    public virtual bool OnEnter (View view) { return false; }
-
-    /// <summary>Method invoked when a view loses focus.</summary>
-    /// <param name="view">The view that is getting focus.</param>
-    /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
-    public virtual bool OnLeave (View view) { return false; }
-
-
-    /// <summary>Method invoked when the <see cref="Visible"/> property from a view is changed.</summary>
-    public virtual void OnVisibleChanged () { }
-
     /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
     /// <remarks>
     ///     If disposing equals true, the method has been called directly or indirectly by a user's code. Managed and
@@ -85,14 +37,14 @@ public class Responder : IDisposable
     /// <param name="disposing"></param>
     protected virtual void Dispose (bool disposing)
     {
-        if (!disposedValue)
+        if (!_disposedValue)
         {
             if (disposing)
             {
                 // TODO: dispose managed state (managed objects)
             }
 
-            disposedValue = true;
+            _disposedValue = true;
         }
     }
 

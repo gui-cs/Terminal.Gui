@@ -316,15 +316,18 @@ public partial class View
         }
     }
 
-    // BUGBUG: v2 - Seems weird that this is in View and not Responder.
     private bool _hasFocus;
 
     /// <inheritdoc/>
-    public override bool HasFocus => _hasFocus;
+    public bool HasFocus
+    {
+        set => SetHasFocus (value, this, true);
+        get => _hasFocus;
+    }
 
     private void SetHasFocus (bool value, View view, bool force = false)
     {
-        if (_hasFocus != value || force)
+        if (HasFocus != value || force)
         {
             _hasFocus = value;
 
@@ -350,26 +353,20 @@ public partial class View
         }
     }
 
+
     /// <summary>Event fired when the <see cref="CanFocus"/> value is being changed.</summary>
     public event EventHandler CanFocusChanged;
 
-    /// <inheritdoc/>
-    public override void OnCanFocusChanged () { CanFocusChanged?.Invoke (this, EventArgs.Empty); }
+    /// <summary>Method invoked when the <see cref="CanFocus"/> property from a view is changed.</summary>
+    public virtual void OnCanFocusChanged () { CanFocusChanged?.Invoke (this, EventArgs.Empty); }
 
     private bool _oldCanFocus;
+    private bool _canFocus;
 
     /// <summary>Gets or sets a value indicating whether this <see cref="View"/> can focus.</summary>
-    /// <remarks>
-    ///     Override of <see cref="Responder"/>.<see cref="Responder.CanFocus"/>.
-    ///     <para/>
-    ///     Get accessor directly returns <see cref="Responder"/>.<see cref="Responder.CanFocus"/>.
-    ///     <para/>
-    ///     Set accessor validates <see langword="value"/> before setting <see cref="Responder"/>.
-    ///     <see cref="Responder.CanFocus"/>.
-    /// </remarks>
-    public override bool CanFocus
+    public bool CanFocus
     {
-        get => base.CanFocus;
+        get => _canFocus;
         set
         {
             if (!_addingView && IsInitialized && SuperView?.CanFocus == false && value)
@@ -377,88 +374,92 @@ public partial class View
                 throw new InvalidOperationException ("Cannot set CanFocus to true if the SuperView CanFocus is false!");
             }
 
-            if (base.CanFocus != value)
+            if (_canFocus == value)
             {
-                base.CanFocus = value;
-
-                switch (value)
-                {
-                    case false when _tabIndex > -1:
-                        TabIndex = -1;
-
-                        break;
-                    case true when SuperView?.CanFocus == false && _addingView:
-                        SuperView.CanFocus = true;
-
-                        break;
-                }
-
-                if (value && _tabIndex == -1)
-                {
-                    TabIndex = SuperView is { } ? SuperView._tabIndexes.IndexOf (this) : -1;
-                }
-
-                TabStop = value;
-
-                if (!value && SuperView?.Focused == this)
-                {
-                    SuperView.Focused = null;
-                }
-
-                if (!value && HasFocus)
-                {
-                    SetHasFocus (false, this);
-                    SuperView?.EnsureFocus ();
-
-                    if (SuperView is { } && SuperView.Focused is null)
-                    {
-                        SuperView.FocusNext ();
-
-                        if (SuperView.Focused is null && Application.Current is { })
-                        {
-                            Application.Current.FocusNext ();
-                        }
-
-                        Application.BringOverlappedTopToFront ();
-                    }
-                }
-
-                if (_subviews is { } && IsInitialized)
-                {
-                    foreach (View view in _subviews)
-                    {
-                        if (view.CanFocus != value)
-                        {
-                            if (!value)
-                            {
-                                view._oldCanFocus = view.CanFocus;
-                                view._oldTabIndex = view._tabIndex;
-                                view.CanFocus = false;
-                                view._tabIndex = -1;
-                            }
-                            else
-                            {
-                                if (_addingView)
-                                {
-                                    view._addingView = true;
-                                }
-
-                                view.CanFocus = view._oldCanFocus;
-                                view._tabIndex = view._oldTabIndex;
-                                view._addingView = false;
-                            }
-                        }
-                    }
-                }
-
-                OnCanFocusChanged ();
-                SetNeedsDisplay ();
+                return;
             }
+
+            _canFocus = value;
+
+            switch (_canFocus)
+            {
+                case false when _tabIndex > -1:
+                    TabIndex = -1;
+
+                    break;
+                case true when SuperView?.CanFocus == false && _addingView:
+                    SuperView.CanFocus = true;
+
+                    break;
+            }
+
+            if (_canFocus && _tabIndex == -1)
+            {
+                TabIndex = SuperView is { } ? SuperView._tabIndexes.IndexOf (this) : -1;
+            }
+
+            TabStop = _canFocus;
+
+            if (!_canFocus && SuperView?.Focused == this)
+            {
+                SuperView.Focused = null;
+            }
+
+            if (!_canFocus && HasFocus)
+            {
+                SetHasFocus (false, this);
+                SuperView?.EnsureFocus ();
+
+                if (SuperView is { } && SuperView.Focused is null)
+                {
+                    SuperView.FocusNext ();
+
+                    if (SuperView.Focused is null && Application.Current is { })
+                    {
+                        Application.Current.FocusNext ();
+                    }
+
+                    Application.BringOverlappedTopToFront ();
+                }
+            }
+
+            if (_subviews is { } && IsInitialized)
+            {
+                foreach (View view in _subviews)
+                {
+                    if (view.CanFocus != value)
+                    {
+                        if (!value)
+                        {
+                            view._oldCanFocus = view.CanFocus;
+                            view._oldTabIndex = view._tabIndex;
+                            view.CanFocus = false;
+                            view._tabIndex = -1;
+                        }
+                        else
+                        {
+                            if (_addingView)
+                            {
+                                view._addingView = true;
+                            }
+
+                            view.CanFocus = view._oldCanFocus;
+                            view._tabIndex = view._oldTabIndex;
+                            view._addingView = false;
+                        }
+                    }
+                }
+            }
+
+            OnCanFocusChanged ();
+            SetNeedsDisplay ();
         }
     }
 
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
+    /// <summary>Method invoked when a view gets focus.</summary>
+    /// <param name="view">The view that is losing focus.</param>
+    /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
+    public virtual bool OnEnter (View view)
     {
         var args = new FocusEventArgs (view);
         Enter?.Invoke (this, args);
@@ -468,26 +469,19 @@ public partial class View
             return true;
         }
 
-        if (base.OnEnter (view))
-        {
-            return true;
-        }
-
         return false;
     }
 
-    /// <inheritdoc/>
-    public override bool OnLeave (View view)
+
+    /// <summary>Method invoked when a view loses focus.</summary>
+    /// <param name="view">The view that is getting focus.</param>
+    /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
+    public virtual bool OnLeave (View view)
     {
         var args = new FocusEventArgs (view);
         Leave?.Invoke (this, args);
 
         if (args.Handled)
-        {
-            return true;
-        }
-
-        if (base.OnLeave (view))
         {
             return true;
         }

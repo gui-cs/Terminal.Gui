@@ -3,61 +3,56 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class AllViewsTests
+public class AllViewsTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public AllViewsTests (ITestOutputHelper output) { _output = output; }
+    // TODO: Update all these tests to use AllViews like AllViews_Center_Properly does
+    public static TheoryData<View, string> AllViews => TestHelpers.GetAllViewsTheoryData ();
 
-    [Fact]
-    public void AllViews_Center_Properly ()
+    [Theory]
+    [MemberData (nameof (AllViews))]
+    public void AllViews_Center_Properly (View view, string viewName)
     {
         // See https://github.com/gui-cs/Terminal.Gui/issues/3156
 
-        foreach (Type type in GetAllViewClasses ())
+        if (view == null)
         {
-            Application.Init (new FakeDriver ());
-            View view = CreateViewFromType (type, type.GetConstructor (Array.Empty<Type> ()));
-
-            if (view == null)
-            {
-                _output.WriteLine ($"Ignoring {type} - It's a Generic");
-                Application.Shutdown ();
-
-                continue;
-            }
-
-            var frame = new View { X = 0, Y = 0, Width = 50, Height = 50 };
-            frame.Add (view);
-            frame.BeginInit ();
-            frame.EndInit ();
-
-            view.X = Pos.Center ();
-            view.Y = Pos.Center ();
-
-            // Turn off AutoSize
-            view.AutoSize = false;
-
-            // Ensure the view has positive dimensions
-            view.Width = 10;
-            view.Height = 10;
-
-            frame.LayoutSubviews ();
-
-            // What's the natural width/height?
-            int expectedX = (frame.Frame.Width - view.Frame.Width) / 2;
-            int expectedY = (frame.Frame.Height - view.Frame.Height) / 2;
-
-            Assert.True (
-                         view.Frame.Left == expectedX,
-                         $"{view} did not center horizontally. Expected: {expectedX}. Actual: {view.Frame.Left}"
-                        );
-
-            Assert.True (
-                         view.Frame.Top == expectedY,
-                         $"{view} did not center vertically. Expected: {expectedY}. Actual: {view.Frame.Top}"
-                        );
+            output.WriteLine ($"Ignoring {viewName} - It's a Generic");
             Application.Shutdown ();
+
+            return;
         }
+
+        view.X = Pos.Center ();
+        view.Y = Pos.Center ();
+
+        // Turn off AutoSize
+        view.AutoSize = false;
+
+        // Ensure the view has positive dimensions
+        view.Width = 10;
+        view.Height = 10;
+
+        var frame = new View { X = 0, Y = 0, Width = 50, Height = 50 };
+        frame.Add (view);
+        frame.BeginInit ();
+        frame.EndInit ();
+        frame.LayoutSubviews ();
+
+        // What's the natural width/height?
+        int expectedX = (frame.Frame.Width - view.Frame.Width) / 2;
+        int expectedY = (frame.Frame.Height - view.Frame.Height) / 2;
+
+        Assert.True (
+                     view.Frame.Left == expectedX,
+                     $"{view} did not center horizontally. Expected: {expectedX}. Actual: {view.Frame.Left}"
+                    );
+
+        Assert.True (
+                     view.Frame.Top == expectedY,
+                     $"{view} did not center vertically. Expected: {expectedY}. Actual: {view.Frame.Top}"
+                    );
+        Application.Shutdown ();
+
     }
 
     [Fact]
@@ -65,7 +60,7 @@ public class AllViewsTests
     {
         foreach (Type type in GetAllViewClasses ())
         {
-            _output.WriteLine ($"Testing {type.Name}");
+            output.WriteLine ($"Testing {type.Name}");
 
             Application.Init (new FakeDriver ());
 
@@ -74,7 +69,7 @@ public class AllViewsTests
 
             if (vType == null)
             {
-                _output.WriteLine ($"Ignoring {type} - It's a Generic");
+                output.WriteLine ($"Ignoring {type} - It's a Generic");
                 Application.Shutdown ();
 
                 continue;

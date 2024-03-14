@@ -749,7 +749,7 @@ public class ApplicationTests
                                                            new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed }
                                                           )
                                  );
-        Assert.Equal (w, Application.MouseGrabView);
+        Assert.Equal (w.Border, Application.MouseGrabView);
 
         // Move down and to the right.
         Application.OnMouseEvent (

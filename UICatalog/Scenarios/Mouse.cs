@@ -14,31 +14,70 @@ public class Mouse : Scenario
         ml = new Label { X = 1, Y = 1, Text = "Mouse: " };
         List<string> rme = new ();
 
-        var test = new Label { X = 1, Y = 2, Text = "Se iniciará el análisis" };
-        Win.Add (test);
         Win.Add (ml);
 
-        var rmeList = new ListView
+        var logList = new ListView
         {
-            X = Pos.Right (test) + 25,
-            Y = Pos.Top (test) + 1,
-            Width = Dim.Fill () - 1,
+            X = Pos.AnchorEnd (41),
+            Y = 0,
+            Width = 41,
             Height = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Source = new ListWrapper (rme)
         };
-        Win.Add (rmeList);
+        Win.Add (logList);
 
         Application.MouseEvent += (sender, a) =>
                                   {
                                       ml.Text = $"Mouse: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count}";
                                       rme.Add ($"({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}");
-                                      rmeList.MoveDown ();
+                                      logList.MoveDown ();
                                   };
 
-        // I have no idea what this was intended to show off in demo.c
-        var drag = new Label { X = 1, Y = 4, Text = "Drag: " };
-        var dragText = new TextField { X = Pos.Right (drag), Y = Pos.Top (drag), Width = 40 };
-        Win.Add (drag, dragText);
+        Win.Add (new MouseDemo ()
+        {
+            X = 0,
+            Y = 3,
+            Width = 15,
+            Height = 10,
+            Text = "Mouse Demo",
+            TextAlignment = TextAlignment.Centered,
+            VerticalTextAlignment = VerticalTextAlignment.Middle,
+            ColorScheme = Colors.ColorSchemes ["Dialog"],
+        });
+
+    }
+
+    public class MouseDemo : View
+    {
+        private bool _button1PressedOnEnter = false;
+        public MouseDemo ()
+        {
+            CanFocus = true;
+            MouseEvent += (s, e) =>
+                          {
+                              if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+                              {
+                                  if (!_button1PressedOnEnter)
+                                  {
+                                      ColorScheme = Colors.ColorSchemes ["Toplevel"];
+                                  }
+                              }
+                              if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Released))
+                              {
+                                  ColorScheme = Colors.ColorSchemes ["Dialog"];
+                                  _button1PressedOnEnter = false;
+                              }
+                          };
+            MouseLeave += (s, e) =>
+                          {
+                              ColorScheme = Colors.ColorSchemes ["Dialog"];
+                              _button1PressedOnEnter = false;
+                          };
+            MouseEnter += (s, e) =>
+                          {
+                              _button1PressedOnEnter = e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed);
+                          };
+        }
     }
 }
