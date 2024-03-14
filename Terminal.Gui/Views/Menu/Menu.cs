@@ -769,14 +769,14 @@ internal sealed class Menu : View
         OnDrawAdornments ();
         OnRenderLineCanvas ();
 
-        for (int i = Bounds.Y; i < _barItems.Children.Length; i++)
+        for (int i = Viewport.Y; i < _barItems.Children.Length; i++)
         {
             if (i < 0)
             {
                 continue;
             }
 
-            if (BoundsToScreen (Bounds).Y + i >= Driver.Rows)
+            if (BoundsToScreen (Viewport).Y + i >= Driver.Rows)
             {
                 break;
             }
@@ -800,7 +800,7 @@ internal sealed class Menu : View
 
             Driver.SetAttribute (DetermineColorSchemeFor (item, i));
 
-            for (int p = Bounds.X; p < Frame.Width - 2; p++)
+            for (int p = Viewport.X; p < Frame.Width - 2; p++)
             {
                 // This - 2 is for the border
                 if (p < 0)
@@ -808,7 +808,7 @@ internal sealed class Menu : View
                     continue;
                 }
 
-                if (BoundsToScreen (Bounds).X + p >= Driver.Cols)
+                if (BoundsToScreen (Viewport).X + p >= Driver.Cols)
                 {
                     break;
                 }
@@ -894,7 +894,7 @@ internal sealed class Menu : View
                              BoundsToScreen (new (1, i, Frame.Width - 3, 1)),
                              i == _currentChild ? ColorScheme.Focus : GetNormalColor (),
                              i == _currentChild ? ColorScheme.HotFocus : ColorScheme.HotNormal,
-                             SuperView?.BoundsToScreen (SuperView.Bounds) ?? Rectangle.Empty
+                             SuperView?.BoundsToScreen (SuperView.Viewport) ?? Rectangle.Empty
                             );
                 }
                 else
@@ -937,7 +937,7 @@ internal sealed class Menu : View
     {
         if (Visible)
         {
-            OnDrawContent (Bounds);
+            OnDrawContent (Viewport);
         }
     }
 

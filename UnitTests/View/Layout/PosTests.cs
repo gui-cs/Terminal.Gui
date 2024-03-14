@@ -116,11 +116,11 @@ public class PosTests
         var b = $"{CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}";
 
         var frame = new FrameView { Width = 18, Height = 3 };
-        Assert.Equal (16, frame.Bounds.Width);
+        Assert.Equal (16, frame.Viewport.Width);
 
         Button btn = null;
 
-        int Btn_Width () { return btn?.Bounds.Width ?? 0; }
+        int Btn_Width () { return btn?.Viewport.Width ?? 0; }
 
         btn = new Button { Text = "Ok", X = Pos.AnchorEnd () - Pos.Function (Btn_Width) };
 
@@ -140,13 +140,13 @@ public class PosTests
         frame.EndInit ();
         frame.Draw ();
 
-        Assert.Equal (6, btn.Bounds.Width);
+        Assert.Equal (6, btn.Viewport.Width);
         Assert.Equal (10, btn.Frame.X); // frame.Bounds.Width (16) - btn.Frame.Width (6) = 10
         Assert.Equal (0, btn.Frame.Y);
         Assert.Equal (6, btn.Frame.Width);
         Assert.Equal (1, btn.Frame.Height);
 
-        Assert.Equal (9, view.Bounds.Width); // frame.Bounds.Width (16) - Dim.Fill (1) - Dim.Function (6) = 9
+        Assert.Equal (9, view.Viewport.Width); // frame.Bounds.Width (16) - Dim.Fill (1) - Dim.Function (6) = 9
         Assert.Equal (0, view.Frame.X);
         Assert.Equal (0, view.Frame.Y);
         Assert.Equal (9, view.Frame.Width);

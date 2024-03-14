@@ -289,7 +289,7 @@ public class AdornmentToScreenTests (ITestOutputHelper output)
         // Total thickness is 3 (view.Bounds will be Frame.Width - 6)
         view.Frame = frame;
 
-        Assert.Equal(4, view.Bounds.Width);
+        Assert.Equal(4, view.Viewport.Width);
 
         // Act
         var marginScreen = view.Margin.BoundsToScreen (new (boundsX, 0, 0, 0));

@@ -235,7 +235,7 @@ public class DrawTests
         view.SetRelativeLayout (Application.Driver.Bounds);
 
         Assert.Equal (new (0,0,2,2), view.Frame);
-        Assert.Equal (Rectangle.Empty, view.Bounds);
+        Assert.Equal (Rectangle.Empty, view.Viewport);
 
         view.Draw ();
 
@@ -260,7 +260,7 @@ public class DrawTests
         view.SetRelativeLayout (Application.Driver.Bounds);
 
         Assert.Equal (new (0,0,2,1), view.Frame);
-        Assert.Equal (Rectangle.Empty, view.Bounds);
+        Assert.Equal (Rectangle.Empty, view.Viewport);
 
         view.Draw ();
 
@@ -278,7 +278,7 @@ public class DrawTests
         view.SetRelativeLayout (Application.Driver.Bounds);
 
         Assert.Equal (new (0,0,1,2), view.Frame);
-        Assert.Equal (Rectangle.Empty, view.Bounds);
+        Assert.Equal (Rectangle.Empty, view.Viewport);
 
         view.Draw ();
 
@@ -303,7 +303,7 @@ public class DrawTests
         view.SetRelativeLayout (Application.Driver.Bounds);
 
         Assert.Equal (new (0,0,1,2), view.Frame);
-        Assert.Equal (Rectangle.Empty, view.Bounds);
+        Assert.Equal (Rectangle.Empty, view.Viewport);
 
         view.Draw ();
 
@@ -329,7 +329,7 @@ public class DrawTests
         view.SetRelativeLayout (Application.Driver.Bounds);
 
         Assert.Equal (new (0,0,2,1), view.Frame);
-        Assert.Equal (Rectangle.Empty, view.Bounds);
+        Assert.Equal (Rectangle.Empty, view.Viewport);
 
         view.Draw ();
 

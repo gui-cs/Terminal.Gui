@@ -21,25 +21,25 @@ public class AdornmentTests (ITestOutputHelper output)
         view.EndInit ();
 
         Assert.Equal (new (1, 2, 20, 20), view.Frame);
-        Assert.Equal (new (0, 0, 20, 20), view.Bounds);
+        Assert.Equal (new (0, 0, 20, 20), view.Viewport);
 
         var marginThickness = 1;
         view.Margin.Thickness = new  (marginThickness);
-        Assert.Equal (new (0, 0, 18, 18), view.Bounds);
+        Assert.Equal (new (0, 0, 18, 18), view.Viewport);
 
         var borderThickness = 2;
         view.Border.Thickness = new (borderThickness);
-        Assert.Equal (new (0, 0, 14, 14), view.Bounds);
+        Assert.Equal (new (0, 0, 14, 14), view.Viewport);
 
         var paddingThickness = 3;
         view.Padding.Thickness = new Thickness (paddingThickness);
-        Assert.Equal (new (0, 0, 8, 8), view.Bounds);
+        Assert.Equal (new (0, 0, 8, 8), view.Viewport);
 
-        Assert.Equal (new (0, 0, view.Margin.Frame.Width, view.Margin.Frame.Height), view.Margin.Bounds);
+        Assert.Equal (new (0, 0, view.Margin.Frame.Width, view.Margin.Frame.Height), view.Margin.Viewport);
 
-        Assert.Equal (new (0, 0, view.Border.Frame.Width, view.Border.Frame.Height), view.Border.Bounds);
+        Assert.Equal (new (0, 0, view.Border.Frame.Width, view.Border.Frame.Height), view.Border.Viewport);
 
-        Assert.Equal (new (0, 0, view.Padding.Frame.Width , view.Padding.Frame.Height), view.Padding.Bounds);
+        Assert.Equal (new (0, 0, view.Padding.Frame.Width , view.Padding.Frame.Height), view.Padding.Viewport);
     }
 
     // Test that Adornment.Bounds_get override returns Frame.Size minus Thickness
@@ -87,7 +87,7 @@ public class AdornmentTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (x, y, w, h), adornment.Frame);
 
         var expectedBounds = new Rectangle (0, 0, w, h);
-        Assert.Equal (expectedBounds, adornment.Bounds);
+        Assert.Equal (expectedBounds, adornment.Viewport);
     }
 
     // Test that Adornment.Bounds_get override uses Parent not SuperView
@@ -100,9 +100,9 @@ public class AdornmentTests (ITestOutputHelper output)
         parent.EndInit ();
 
         Assert.Equal (new Rectangle (1, 2, 10, 10), parent.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Viewport);
         Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin.Viewport);
 
         Assert.Null (parent.Margin.SuperView);
         Rectangle boundsAsScreen = parent.Margin.BoundsToScreen (new Rectangle (1, 2, 5, 5));
@@ -133,7 +133,7 @@ public class AdornmentTests (ITestOutputHelper output)
         view.EndInit ();
 
         Assert.Equal (new Rectangle (1, 2, 20, 31), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 8, 19), view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 8, 19), view.Viewport);
 
         // Margin.Frame is always the same as the view frame
         Assert.Equal (new Rectangle (0, 0, 20, 31), view.Margin.Frame);
@@ -246,9 +246,9 @@ public class AdornmentTests (ITestOutputHelper output)
         parent.EndInit ();
 
         Assert.Equal (new Rectangle (1, 2, 10, 10), parent.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Viewport);
         Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin.Viewport);
 
         Assert.Null (parent.Margin.SuperView);
         Assert.Equal (new Rectangle (1, 2, 10, 10), parent.Margin.FrameToScreen ());
@@ -284,7 +284,7 @@ public class AdornmentTests (ITestOutputHelper output)
     public void Setting_Bounds_Throws ()
     {
         var adornment = new Adornment (null);
-        Assert.Throws<InvalidOperationException> (() => adornment.Bounds = new Rectangle (1, 2, 3, 4));
+        Assert.Throws<InvalidOperationException> (() => adornment.Viewport = new Rectangle (1, 2, 3, 4));
     }
 
     [Fact]
@@ -309,11 +309,11 @@ public class AdornmentTests (ITestOutputHelper output)
         parent.EndInit ();
 
         Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Viewport);
 
         parent.Margin.Thickness = new Thickness (1);
         Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Frame);
-        Assert.Equal (new Rectangle (0, 0, 8, 8), parent.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 8, 8), parent.Viewport);
     }
 
     [Fact]

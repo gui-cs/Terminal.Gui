@@ -297,7 +297,7 @@ public class TabView : View
         }
 
         // if current viewport does not include the selected tab
-        if (!CalculateViewport (Bounds).Any (r => Equals (SelectedTab, r.Tab)))
+        if (!CalculateViewport (Viewport).Any (r => Equals (SelectedTab, r.Tab)))
         {
             // Set scroll offset so the first tab rendered is the
             TabScrollOffset = Math.Max (0, Tabs.IndexOf (SelectedTab));
@@ -659,7 +659,7 @@ public class TabView : View
 
         public override void OnDrawContent (Rectangle contentArea)
         {
-            _host._tabLocations = _host.CalculateViewport (Bounds).ToArray ();
+            _host._tabLocations = _host.CalculateViewport (Viewport).ToArray ();
 
             // clear any old text
             Clear (contentArea);
@@ -683,7 +683,7 @@ public class TabView : View
             for (var i = 0; i < tabLocations.Length; i++)
             {
                 View tab = tabLocations [i].Tab;
-                Rectangle vts = tab.BoundsToScreen (tab.Bounds);
+                Rectangle vts = tab.BoundsToScreen (tab.Viewport);
                 var lc = new LineCanvas ();
                 int selectedOffset = _host.Style.ShowTopLine && tabLocations [i].IsSelected ? 0 : 1;
 
@@ -1115,7 +1115,7 @@ public class TabView : View
 
                     int lastSelectedTab = !_host.Style.ShowTopLine && i == selectedTab ? 1 :
                                           _host.Style.TabsOnBottom ? 1 : 0;
-                    Rectangle tabsBarVts = BoundsToScreen (Bounds);
+                    Rectangle tabsBarVts = BoundsToScreen (Viewport);
                     int lineLength = tabsBarVts.Right - vts.Right;
 
                     // Right horizontal line
@@ -1238,7 +1238,7 @@ public class TabView : View
 
             View selected = null;
             int topLine = _host.Style.ShowTopLine ? 1 : 0;
-            int width = Bounds.Width;
+            int width = Viewport.Width;
 
             foreach (TabToRender toRender in tabLocations)
             {
@@ -1314,7 +1314,7 @@ public class TabView : View
                 }
 
                 tab.TextFormatter.Draw (
-                                        tab.BoundsToScreen (tab.Bounds),
+                                        tab.BoundsToScreen (tab.Viewport),
                                         prevAttr,
                                         ColorScheme.HotNormal
                                        );
@@ -1360,7 +1360,7 @@ public class TabView : View
             // if there are more tabs to the right not visible
             if (ShouldDrawRightScrollIndicator ())
             {
-                _rightScrollIndicator.X = Bounds.Width - 1;
+                _rightScrollIndicator.X = Viewport.Width - 1;
                 _rightScrollIndicator.Y = y;
 
                 // indicate that

@@ -83,10 +83,10 @@ public class ScrollView : View
         AddCommand (Command.ScrollDown, () => ScrollDown (1));
         AddCommand (Command.ScrollLeft, () => ScrollLeft (1));
         AddCommand (Command.ScrollRight, () => ScrollRight (1));
-        AddCommand (Command.PageUp, () => ScrollUp (Bounds.Height));
-        AddCommand (Command.PageDown, () => ScrollDown (Bounds.Height));
-        AddCommand (Command.PageLeft, () => ScrollLeft (Bounds.Width));
-        AddCommand (Command.PageRight, () => ScrollRight (Bounds.Width));
+        AddCommand (Command.PageUp, () => ScrollUp (Viewport.Height));
+        AddCommand (Command.PageDown, () => ScrollDown (Viewport.Height));
+        AddCommand (Command.PageLeft, () => ScrollLeft (Viewport.Width));
+        AddCommand (Command.PageRight, () => ScrollRight (Viewport.Width));
         AddCommand (Command.TopHome, () => ScrollUp (_contentSize.Height));
         AddCommand (Command.BottomEnd, () => ScrollDown (_contentSize.Height));
         AddCommand (Command.LeftHome, () => ScrollLeft (_contentSize.Width));
@@ -210,26 +210,26 @@ public class ScrollView : View
                 _horizontal.OtherScrollBarView.KeepContentAlwaysInViewport = value;
                 Point p = default;
 
-                if (value && -_contentOffset.X + Bounds.Width > _contentSize.Width)
+                if (value && -_contentOffset.X + Viewport.Width > _contentSize.Width)
                 {
                     p = new Point (
-                                   _contentSize.Width - Bounds.Width + (_showVerticalScrollIndicator ? 1 : 0),
+                                   _contentSize.Width - Viewport.Width + (_showVerticalScrollIndicator ? 1 : 0),
                                    -_contentOffset.Y
                                   );
                 }
 
-                if (value && -_contentOffset.Y + Bounds.Height > _contentSize.Height)
+                if (value && -_contentOffset.Y + Viewport.Height > _contentSize.Height)
                 {
                     if (p == default (Point))
                     {
                         p = new Point (
                                        -_contentOffset.X,
-                                       _contentSize.Height - Bounds.Height + (_showHorizontalScrollIndicator ? 1 : 0)
+                                       _contentSize.Height - Viewport.Height + (_showHorizontalScrollIndicator ? 1 : 0)
                                       );
                     }
                     else
                     {
-                        p.Y = _contentSize.Height - Bounds.Height + (_showHorizontalScrollIndicator ? 1 : 0);
+                        p.Y = _contentSize.Height - Viewport.Height + (_showHorizontalScrollIndicator ? 1 : 0);
                     }
                 }
 
@@ -612,7 +612,7 @@ public class ScrollView : View
         bool v = false, h = false;
         var p = false;
 
-        if (Bounds.Height == 0 || Bounds.Height > _contentSize.Height)
+        if (Viewport.Height == 0 || Viewport.Height > _contentSize.Height)
         {
             if (ShowVerticalScrollIndicator)
             {
@@ -621,7 +621,7 @@ public class ScrollView : View
 
             v = false;
         }
-        else if (Bounds.Height > 0 && Bounds.Height == _contentSize.Height)
+        else if (Viewport.Height > 0 && Viewport.Height == _contentSize.Height)
         {
             p = true;
         }
@@ -635,7 +635,7 @@ public class ScrollView : View
             v = true;
         }
 
-        if (Bounds.Width == 0 || Bounds.Width > _contentSize.Width)
+        if (Viewport.Width == 0 || Viewport.Width > _contentSize.Width)
         {
             if (ShowHorizontalScrollIndicator)
             {
@@ -644,7 +644,7 @@ public class ScrollView : View
 
             h = false;
         }
-        else if (Bounds.Width > 0 && Bounds.Width == _contentSize.Width && p)
+        else if (Viewport.Width > 0 && Viewport.Width == _contentSize.Width && p)
         {
             if (ShowHorizontalScrollIndicator)
             {
@@ -696,13 +696,13 @@ public class ScrollView : View
 
         if (v)
         {
-            _vertical.SetRelativeLayout (Bounds);
+            _vertical.SetRelativeLayout (Viewport);
             _vertical.Draw ();
         }
 
         if (h)
         {
-            _horizontal.SetRelativeLayout (Bounds);
+            _horizontal.SetRelativeLayout (Viewport);
             _horizontal.Draw ();
         }
 
@@ -710,7 +710,7 @@ public class ScrollView : View
 
         if (v && h)
         {
-            _contentBottomRightCorner.SetRelativeLayout (Bounds);
+            _contentBottomRightCorner.SetRelativeLayout (Viewport);
             _contentBottomRightCorner.Draw ();
         }
     }

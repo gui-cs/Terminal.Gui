@@ -99,7 +99,7 @@ public class StatusBarTests
                                );
         Application.Top.Add (sb);
 
-        sb.OnDrawContent (sb.Bounds);
+        sb.OnDrawContent (sb.Viewport);
 
         var expected = @$"
 ^O Open {
@@ -121,7 +121,7 @@ public class StatusBarTests
                                 }
                                );
         Application.Top.Add (sb);
-        sb.OnDrawContent (sb.Bounds);
+        sb.OnDrawContent (sb.Viewport);
 
         var expected = @$"
 CTRL-O Open {

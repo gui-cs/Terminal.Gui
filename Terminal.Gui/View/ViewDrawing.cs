@@ -80,11 +80,11 @@ public partial class View
         Driver.AddRune (ch);
     }
 
-    /// <summary>Clears <see cref="Bounds"/> with the normal background.</summary>
+    /// <summary>Clears <see cref="Viewport"/> with the normal background.</summary>
     /// <remarks></remarks>
-    public void Clear () { Clear (Bounds); }
+    public void Clear () { Clear (Viewport); }
 
-    /// <summary>Clears the specified <see cref="Bounds"/>-relative rectangle with the normal background.</summary>
+    /// <summary>Clears the specified <see cref="Viewport"/>-relative rectangle with the normal background.</summary>
     /// <remarks></remarks>
     /// <param name="contentArea">The Bounds-relative rectangle to clear.</param>
     public void Clear (Rectangle contentArea)
@@ -97,19 +97,19 @@ public partial class View
         Attribute prev = Driver.SetAttribute (GetNormalColor ());
 
         // Clamp the region to the bounds of the view
-        contentArea = Rectangle.Intersect (contentArea, Bounds);
+        contentArea = Rectangle.Intersect (contentArea, Viewport);
         Driver.FillRect (BoundsToScreen (contentArea));
         Driver.SetAttribute (prev);
     }
 
-    /// <summary>Expands the <see cref="ConsoleDriver"/>'s clip region to include <see cref="Bounds"/>.</summary>
+    /// <summary>Expands the <see cref="ConsoleDriver"/>'s clip region to include <see cref="Viewport"/>.</summary>
     /// <returns>
     ///     The current screen-relative clip region, which can be then re-applied by setting
     ///     <see cref="ConsoleDriver.Clip"/>.
     /// </returns>
     /// <remarks>
     ///     <para>
-    ///         If <see cref="ConsoleDriver.Clip"/> and <see cref="Bounds"/> do not intersect, the clip region will be set to
+    ///         If <see cref="ConsoleDriver.Clip"/> and <see cref="Viewport"/> do not intersect, the clip region will be set to
     ///         <see cref="Rectangle.Empty"/>.
     ///     </para>
     /// </remarks>
@@ -121,7 +121,7 @@ public partial class View
         }
 
         Rectangle previous = Driver.Clip;
-        Driver.Clip = Rectangle.Intersect (previous, BoundsToScreen (Bounds));
+        Driver.Clip = Rectangle.Intersect (previous, BoundsToScreen (Viewport));
 
         return previous;
     }
@@ -132,7 +132,7 @@ public partial class View
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Always use <see cref="Bounds"/> (view-relative) when calling <see cref="OnDrawContent(Rectangle)"/>, NOT
+    ///         Always use <see cref="Viewport"/> (view-relative) when calling <see cref="OnDrawContent(Rectangle)"/>, NOT
     ///         <see cref="Frame"/> (superview-relative).
     ///     </para>
     ///     <para>
@@ -162,12 +162,12 @@ public partial class View
         }
 
         // Invoke DrawContentEvent
-        var dev = new DrawEventArgs (Bounds);
+        var dev = new DrawEventArgs (Viewport);
         DrawContent?.Invoke (this, dev);
 
         if (!dev.Cancel)
         {
-            OnDrawContent (Bounds);
+            OnDrawContent (Viewport);
         }
 
         if (Driver is { })
@@ -178,7 +178,7 @@ public partial class View
         OnRenderLineCanvas ();
 
         // Invoke DrawContentCompleteEvent
-        OnDrawContentComplete (Bounds);
+        OnDrawContentComplete (Viewport);
 
         // BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
         ClearLayoutNeeded ();
@@ -346,9 +346,9 @@ public partial class View
 
         // Each of these renders lines to either this View's LineCanvas 
         // Those lines will be finally rendered in OnRenderLineCanvas
-        Margin?.OnDrawContent (Margin.Bounds);
-        Border?.OnDrawContent (Border.Bounds);
-        Padding?.OnDrawContent (Padding.Bounds);
+        Margin?.OnDrawContent (Margin.Viewport);
+        Border?.OnDrawContent (Border.Viewport);
+        Padding?.OnDrawContent (Padding.Viewport);
 
         return true;
     }
@@ -483,7 +483,7 @@ public partial class View
         return true;
     }
 
-    /// <summary>Sets the area of this view needing to be redrawn to <see cref="Bounds"/>.</summary>
+    /// <summary>Sets the area of this view needing to be redrawn to <see cref="Viewport"/>.</summary>
     /// <remarks>
     ///     If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), this method
     ///     does nothing.
@@ -492,7 +492,7 @@ public partial class View
     {
         if (IsInitialized)
         {
-            SetNeedsDisplay (Bounds);
+            SetNeedsDisplay (Viewport);
         }
     }
 
@@ -525,9 +525,9 @@ public partial class View
 
         _superView?.SetSubViewNeedsDisplay ();
 
-        Margin?.SetNeedsDisplay (Margin.Bounds);
-        Border?.SetNeedsDisplay (Border.Bounds);
-        Padding?.SetNeedsDisplay (Padding.Bounds);
+        Margin?.SetNeedsDisplay (Margin.Viewport);
+        Border?.SetNeedsDisplay (Border.Viewport);
+        Padding?.SetNeedsDisplay (Padding.Viewport);
 
         foreach (View subview in Subviews)
         {

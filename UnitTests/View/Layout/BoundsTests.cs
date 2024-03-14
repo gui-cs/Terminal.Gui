@@ -3,7 +3,7 @@
 namespace Terminal.Gui.ViewTests;
 
 /// <summary>
-/// Test the <see cref="View.Bounds"/>.
+/// Test the <see cref="View.Viewport"/>.
 /// DOES NOT TEST Adornment.Bounds methods. Those are in ./Adornment/BoundsTests.cs
 /// </summary>
 /// <param name="output"></param>
@@ -28,7 +28,7 @@ public class BoundsTests (ITestOutputHelper output)
         view.EndInit();
 
         // Act
-        var bounds = view.Bounds;
+        var bounds = view.Viewport;
 
         // Assert
         Assert.Equal(expectedW, bounds.Width);
@@ -85,7 +85,7 @@ public class BoundsTests (ITestOutputHelper output)
         superSuperView.LayoutSubviews ();
 
         // Act
-        var bounds = view.Bounds;
+        var bounds = view.Viewport;
 
         // Assert
         Assert.Equal (expectedW, bounds.Width);
@@ -144,7 +144,7 @@ public class BoundsTests (ITestOutputHelper output)
         superSuperView.LayoutSubviews ();
 
         // Act
-        var bounds = view.Bounds;
+        var bounds = view.Viewport;
 
         // Assert
         Assert.Equal (expectedW, bounds.Width);

@@ -156,7 +156,7 @@ public class TileView : View
             return;
         }
 
-        Rectangle contentArea = Bounds;
+        Rectangle contentArea = Viewport;
 
         if (HasBorder ())
         {
@@ -195,19 +195,19 @@ public class TileView : View
         {
             if (HasBorder ())
             {
-                lc.AddLine (Point.Empty, Bounds.Width, Orientation.Horizontal, LineStyle);
-                lc.AddLine (Point.Empty, Bounds.Height, Orientation.Vertical, LineStyle);
+                lc.AddLine (Point.Empty, Viewport.Width, Orientation.Horizontal, LineStyle);
+                lc.AddLine (Point.Empty, Viewport.Height, Orientation.Vertical, LineStyle);
 
                 lc.AddLine (
-                            new Point (Bounds.Width - 1, Bounds.Height - 1),
-                            -Bounds.Width,
+                            new Point (Viewport.Width - 1, Viewport.Height - 1),
+                            -Viewport.Width,
                             Orientation.Horizontal,
                             LineStyle
                            );
 
                 lc.AddLine (
-                            new Point (Bounds.Width - 1, Bounds.Height - 1),
-                            -Bounds.Height,
+                            new Point (Viewport.Width - 1, Viewport.Height - 1),
+                            -Viewport.Height,
                             Orientation.Vertical,
                             LineStyle
                            );
@@ -241,7 +241,7 @@ public class TileView : View
 
         Driver.SetAttribute (ColorScheme.Normal);
 
-        foreach (KeyValuePair<Point, Rune> p in lc.GetMap (Bounds))
+        foreach (KeyValuePair<Point, Rune> p in lc.GetMap (Viewport))
         {
             AddRune (p.Key.X, p.Key.Y, p.Value);
         }
@@ -423,7 +423,7 @@ public class TileView : View
                                         );
         }
 
-        int fullSpace = _orientation == Orientation.Vertical ? Bounds.Width : Bounds.Height;
+        int fullSpace = _orientation == Orientation.Vertical ? Viewport.Width : Viewport.Height;
 
         if (fullSpace != 0 && !IsValidNewSplitterPos (idx, value, fullSpace))
         {
@@ -806,14 +806,14 @@ public class TileView : View
                 tile.ContentView.X = i == 0 ? contentArea.X : Pos.Right (visibleSplitterLines [i - 1]);
                 tile.ContentView.Y = contentArea.Y;
                 tile.ContentView.Height = contentArea.Height;
-                tile.ContentView.Width = GetTileWidthOrHeight (i, Bounds.Width, visibleTiles, visibleSplitterLines);
+                tile.ContentView.Width = GetTileWidthOrHeight (i, Viewport.Width, visibleTiles, visibleSplitterLines);
             }
             else
             {
                 tile.ContentView.X = contentArea.X;
                 tile.ContentView.Y = i == 0 ? contentArea.Y : Pos.Bottom (visibleSplitterLines [i - 1]);
                 tile.ContentView.Width = contentArea.Width;
-                tile.ContentView.Height = GetTileWidthOrHeight (i, Bounds.Height, visibleTiles, visibleSplitterLines);
+                tile.ContentView.Height = GetTileWidthOrHeight (i, Viewport.Height, visibleTiles, visibleSplitterLines);
             }
         }
     }
@@ -845,7 +845,7 @@ public class TileView : View
         {
             Dim spaceDim = Tile.ContentView.Width;
 
-            int spaceAbs = spaceDim.Anchor (Parent.Bounds.Width);
+            int spaceAbs = spaceDim.Anchor (Parent.Viewport.Width);
 
             var title = $" {Tile.Title} ";
 
@@ -893,7 +893,7 @@ public class TileView : View
         {
             if (dragPosition is { } || CanFocus)
             {
-                Point location = moveRuneRenderLocation ?? new Point (Bounds.Width / 2, Bounds.Height / 2);
+                Point location = moveRuneRenderLocation ?? new Point (Viewport.Width / 2, Viewport.Height / 2);
 
                 AddRune (location.X, location.Y, Glyphs.Diamond);
             }
@@ -919,7 +919,7 @@ public class TileView : View
                     {
                         moveRuneRenderLocation = new Point (
                                                             0,
-                                                            Math.Max (1, Math.Min (Bounds.Height - 2, mouseEvent.Y))
+                                                            Math.Max (1, Math.Min (Viewport.Height - 2, mouseEvent.Y))
                                                            );
                     }
                 }
@@ -943,7 +943,7 @@ public class TileView : View
                 {
                     int dx = mouseEvent.X - dragPosition.Value.X;
                     Parent.SetSplitterPos (Idx, Offset (X, dx));
-                    moveRuneRenderLocation = new Point (0, Math.Max (1, Math.Min (Bounds.Height - 2, mouseEvent.Y)));
+                    moveRuneRenderLocation = new Point (0, Math.Max (1, Math.Min (Viewport.Height - 2, mouseEvent.Y)));
                 }
 
                 Parent.SetNeedsDisplay ();
@@ -988,7 +988,7 @@ public class TileView : View
         {
             base.PositionCursor ();
 
-            Point location = moveRuneRenderLocation ?? new Point (Bounds.Width / 2, Bounds.Height / 2);
+            Point location = moveRuneRenderLocation ?? new Point (Viewport.Width / 2, Viewport.Height / 2);
             Move (location.X, location.Y);
         }
 
@@ -1032,10 +1032,10 @@ public class TileView : View
             {
                 if (Orientation == Orientation.Horizontal)
                 {
-                    return Parent.SetSplitterPos (Idx, ConvertToPosFactor (newValue, Parent.Bounds.Height));
+                    return Parent.SetSplitterPos (Idx, ConvertToPosFactor (newValue, Parent.Viewport.Height));
                 }
 
-                return Parent.SetSplitterPos (Idx, ConvertToPosFactor (newValue, Parent.Bounds.Width));
+                return Parent.SetSplitterPos (Idx, ConvertToPosFactor (newValue, Parent.Viewport.Width));
             }
 
             return Parent.SetSplitterPos (Idx, newValue);
@@ -1071,8 +1071,8 @@ public class TileView : View
         {
             int posAbsolute = pos.Anchor (
                                           Orientation == Orientation.Horizontal
-                                              ? Parent.Bounds.Height
-                                              : Parent.Bounds.Width
+                                              ? Parent.Viewport.Height
+                                              : Parent.Viewport.Width
                                          );
 
             return posAbsolute + delta;

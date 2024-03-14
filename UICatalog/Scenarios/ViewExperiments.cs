@@ -218,17 +218,17 @@ public class ViewExperiments : Scenario
                                        $"Container.Frame: {
                                            Application.Top.Frame
                                        } .Bounds: {
-                                           Application.Top.Bounds
+                                           Application.Top.Viewport
                                        }\nView.Frame: {
                                            view.Frame
                                        } .Bounds: {
-                                           view.Bounds
+                                           view.Viewport
                                        } .BoundsOffset: {
                                            view.GetBoundsOffset ()
                                        }\n .Padding.Frame: {
                                            view.Padding.Frame
                                        } .Padding.Bounds: {
-                                           view.Padding.Bounds
+                                           view.Padding.Viewport
                                        }";
                                };
 

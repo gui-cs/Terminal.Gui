@@ -151,7 +151,7 @@ public class ProgressBar : View
 
         if (_isActivity)
         {
-            for (var i = 0; i < Bounds.Width; i++)
+            for (var i = 0; i < Viewport.Width; i++)
             {
                 if (Array.IndexOf (_activityPos, i) != -1)
                 {
@@ -165,15 +165,15 @@ public class ProgressBar : View
         }
         else
         {
-            var mid = (int)(_fraction * Bounds.Width);
+            var mid = (int)(_fraction * Viewport.Width);
             int i;
 
-            for (i = 0; (i < mid) & (i < Bounds.Width); i++)
+            for (i = 0; (i < mid) & (i < Viewport.Width); i++)
             {
                 Driver.AddRune (SegmentCharacter);
             }
 
-            for (; i < Bounds.Width; i++)
+            for (; i < Viewport.Width; i++)
             {
                 Driver.AddRune ((Rune)' ');
             }
@@ -190,10 +190,10 @@ public class ProgressBar : View
             }
 
             tf?.Draw (
-                      BoundsToScreen (Bounds),
+                      BoundsToScreen (Viewport),
                       attr,
                       ColorScheme.Normal,
-                      SuperView?.BoundsToScreen (SuperView.Bounds) ?? default (Rectangle)
+                      SuperView?.BoundsToScreen (SuperView.Viewport) ?? default (Rectangle)
                      );
         }
     }
@@ -244,13 +244,13 @@ public class ProgressBar : View
 
                 _delta = 1;
             }
-            else if (_activityPos [0] >= Bounds.Width)
+            else if (_activityPos [0] >= Viewport.Width)
             {
                 if (_bidirectionalMarquee)
                 {
                     for (var i = 0; i < _activityPos.Length; i++)
                     {
-                        _activityPos [i] = Bounds.Width + i - 2;
+                        _activityPos [i] = Viewport.Width + i - 2;
                     }
 
                     _delta = -1;

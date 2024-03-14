@@ -34,7 +34,7 @@ public class ScrollViewTests
         Application.Top.Add (sv);
         Application.Begin (Application.Top);
 
-        Assert.Equal (new Rectangle (0, 0, 10, 10), sv.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), sv.Viewport);
 
         Assert.False (sv.AutoHideScrollBars);
         Assert.True (sv.ShowHorizontalScrollIndicator);
@@ -58,9 +58,9 @@ public class ScrollViewTests
                                             );
 
         sv.ShowHorizontalScrollIndicator = false;
-        Assert.Equal (new Rectangle (0, 0, 10, 10), sv.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), sv.Viewport);
         sv.ShowVerticalScrollIndicator = true;
-        Assert.Equal (new Rectangle (0, 0, 10, 10), sv.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), sv.Viewport);
 
         Assert.False (sv.AutoHideScrollBars);
         Assert.False (sv.ShowHorizontalScrollIndicator);
@@ -1081,14 +1081,14 @@ public class ScrollViewTests
                                         {
                                             var fillText = new StringBuilder ();
 
-                                            for (var i = 0; i < labelFill.Bounds.Height; i++)
+                                            for (var i = 0; i < labelFill.Viewport.Height; i++)
                                             {
                                                 if (i > 0)
                                                 {
                                                     fillText.AppendLine ("");
                                                 }
 
-                                                for (var j = 0; j < labelFill.Bounds.Width; j++)
+                                                for (var j = 0; j < labelFill.Viewport.Width; j++)
                                                 {
                                                     fillText.Append (fill);
                                                 }

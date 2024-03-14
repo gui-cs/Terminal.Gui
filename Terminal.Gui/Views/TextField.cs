@@ -1196,8 +1196,8 @@ public class TextField : View
 
         int pos = _cursorPosition - ScrollOffset + Math.Min (Frame.X, 0);
         int offB = OffSetBackground ();
-        Rectangle containerFrame = SuperView?.BoundsToScreen (SuperView.Bounds) ?? default (Rectangle);
-        Rectangle thisFrame = BoundsToScreen (Bounds);
+        Rectangle containerFrame = SuperView?.BoundsToScreen (SuperView.Viewport) ?? default (Rectangle);
+        Rectangle thisFrame = BoundsToScreen (Viewport);
 
         if (pos > -1
             && col >= pos
@@ -1878,9 +1878,9 @@ public class TextField : View
         Move (0, 0);
         string render = Caption;
 
-        if (render.GetColumns () > Bounds.Width)
+        if (render.GetColumns () > Viewport.Width)
         {
-            render = render [..Bounds.Width];
+            render = render [..Viewport.Width];
         }
 
         Driver.AddStr (render);
@@ -1941,9 +1941,9 @@ public class TextField : View
     {
         _cursorPosition = Text.GetRuneCount ();
 
-        if (Bounds.Width > 0)
+        if (Viewport.Width > 0)
         {
-            ScrollOffset = _cursorPosition > Bounds.Width + 1 ? _cursorPosition - Bounds.Width + 1 : 0;
+            ScrollOffset = _cursorPosition > Viewport.Width + 1 ? _cursorPosition - Viewport.Width + 1 : 0;
         }
 
         Autocomplete.HostControl = this;

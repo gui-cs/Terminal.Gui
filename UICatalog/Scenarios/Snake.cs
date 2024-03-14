@@ -341,7 +341,7 @@ public class Snake : Scenario
                                );
             }
 
-            foreach (KeyValuePair<Point, Rune> p in canvas.GetMap (Bounds))
+            foreach (KeyValuePair<Point, Rune> p in canvas.GetMap (Viewport))
             {
                 AddRune (p.Key.X, p.Key.Y, p.Value);
             }

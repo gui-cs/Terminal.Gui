@@ -151,8 +151,8 @@ public class SubviewTests
         winAddedToTop.Initialized += (s, e) =>
                                      {
                                          wc++;
-                                         Assert.Equal (top.Bounds.Width, winAddedToTop.Frame.Width);
-                                         Assert.Equal (top.Bounds.Height, winAddedToTop.Frame.Height);
+                                         Assert.Equal (top.Viewport.Width, winAddedToTop.Frame.Width);
+                                         Assert.Equal (top.Viewport.Height, winAddedToTop.Frame.Height);
                                      };
 
         v1AddedToWin.Initialized += (s, e) =>
@@ -258,8 +258,8 @@ public class SubviewTests
         w.Initialized += (s, e) =>
                          {
                              wc++;
-                             Assert.Equal (t.Bounds.Width, w.Frame.Width);
-                             Assert.Equal (t.Bounds.Height, w.Frame.Height);
+                             Assert.Equal (t.Viewport.Width, w.Frame.Width);
+                             Assert.Equal (t.Viewport.Height, w.Frame.Height);
                          };
 
         v1.Initialized += (s, e) =>

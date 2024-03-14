@@ -268,12 +268,12 @@ public partial class Toplevel : View
             {
                 foreach (Toplevel top in Application.OverlappedChildren.AsEnumerable ().Reverse ())
                 {
-                    if (top.Frame.IntersectsWith (Bounds))
+                    if (top.Frame.IntersectsWith (Viewport))
                     {
                         if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible)
                         {
                             top.SetNeedsLayout ();
-                            top.SetNeedsDisplay (top.Bounds);
+                            top.SetNeedsDisplay (top.Viewport);
                             top.Draw ();
                             top.OnRenderLineCanvas ();
                         }
@@ -284,10 +284,10 @@ public partial class Toplevel : View
             // This should not be here, but in base
             foreach (View view in Subviews)
             {
-                if (view.Frame.IntersectsWith (Bounds) && !OutsideTopFrame (this))
+                if (view.Frame.IntersectsWith (Viewport) && !OutsideTopFrame (this))
                 {
                     //view.SetNeedsLayout ();
-                    view.SetNeedsDisplay (view.Bounds);
+                    view.SetNeedsDisplay (view.Viewport);
                     view.SetSubViewNeedsDisplay ();
                 }
             }

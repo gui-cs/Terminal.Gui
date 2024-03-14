@@ -42,10 +42,10 @@ public partial class View
     /// <summary>Gets or sets the absolute location and dimension of the view.</summary>
     /// <value>
     ///     The rectangle describing absolute location and dimension of the view, in coordinates relative to the
-    ///     <see cref="SuperView"/>'s <see cref="Bounds"/>.
+    ///     <see cref="SuperView"/>'s <see cref="Viewport"/>.
     /// </value>
     /// <remarks>
-    ///     <para>Frame is relative to the <see cref="SuperView"/>'s <see cref="Bounds"/>.</para>
+    ///     <para>Frame is relative to the <see cref="SuperView"/>'s <see cref="Viewport"/>.</para>
     ///     <para>
     ///         Setting Frame will set <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> to the
     ///         values of the corresponding properties of the <paramref name="value"/> parameter.
@@ -113,9 +113,9 @@ public partial class View
 
     /// <summary>
     ///     Converts a screen-relative coordinate to a Frame-relative coordinate. Frame-relative means relative to the
-    ///     View's <see cref="SuperView"/>'s <see cref="Bounds"/>.
+    ///     View's <see cref="SuperView"/>'s <see cref="Viewport"/>.
     /// </summary>
-    /// <returns>The coordinate relative to the <see cref="SuperView"/>'s <see cref="Bounds"/>.</returns>
+    /// <returns>The coordinate relative to the <see cref="SuperView"/>'s <see cref="Viewport"/>.</returns>
     /// <param name="x">Screen-relative column.</param>
     /// <param name="y">Screen-relative row.</param>
     public virtual Point ScreenToFrame (int x, int y)
@@ -306,12 +306,12 @@ public partial class View
     ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
-    ///         Because <see cref="Bounds"/> coordinates are relative to the upper-left corner of the <see cref="View"/>, the
+    ///         Because <see cref="Viewport"/> coordinates are relative to the upper-left corner of the <see cref="View"/>, the
     ///         coordinates of the upper-left corner of the rectangle returned by this property are (0,0). Use this property to
     ///         obtain the size of the area of the view for tasks such as drawing the view's contents.
     ///     </para>
     /// </remarks>
-    public virtual Rectangle Bounds
+    public virtual Rectangle Viewport
     {
         get
         {
@@ -362,7 +362,7 @@ public partial class View
         }
     }
 
-    /// <summary>Converts a <see cref="Bounds"/>-relative rectangle to a screen-relative rectangle.</summary>
+    /// <summary>Converts a <see cref="Viewport"/>-relative rectangle to a screen-relative rectangle.</summary>
     public Rectangle BoundsToScreen (in Rectangle bounds)
     {
         // Translate bounds to Frame (our SuperView's Bounds-relative coordinates)
@@ -374,7 +374,7 @@ public partial class View
     }
 
     /// <summary>Converts a screen-relative coordinate to a bounds-relative coordinate.</summary>
-    /// <returns>The coordinate relative to this view's <see cref="Bounds"/>.</returns>
+    /// <returns>The coordinate relative to this view's <see cref="Viewport"/>.</returns>
     /// <param name="x">Screen-relative column.</param>
     /// <param name="y">Screen-relative row.</param>
     public Point ScreenToBounds (int x, int y)
@@ -400,7 +400,7 @@ public partial class View
 
     /// <summary>
     ///     Gets or sets a flag that determines whether the View will be automatically resized to fit the <see cref="Text"/>
-    ///     within <see cref="Bounds"/>.
+    ///     within <see cref="Viewport"/>.
     ///     <para>
     ///         The default is <see langword="false"/>. Set to <see langword="true"/> to turn on AutoSize. If
     ///         <see langword="true"/> then <see cref="Width"/> and <see cref="Height"/> will be used if <see cref="Text"/> can
@@ -598,7 +598,7 @@ public partial class View
 
         if (boundsChanged)
         {
-            Bounds = new (Bounds.X, Bounds.Y, canSizeW ? rW : Bounds.Width, canSizeH ? rH : Bounds.Height);
+            Viewport = new (Viewport.X, Viewport.Y, canSizeW ? rW : Viewport.Width, canSizeH ? rH : Viewport.Height);
         }
 
         return boundsChanged;
@@ -766,7 +766,7 @@ public partial class View
         else
         {
             // Use the SuperView's Bounds, not Frame
-            maxDimension = viewToMove.SuperView.Bounds.Width;
+            maxDimension = viewToMove.SuperView.Viewport.Width;
             superView = viewToMove.SuperView;
         }
 
@@ -912,7 +912,7 @@ public partial class View
 
         LayoutAdornments ();
 
-        Rectangle oldBounds = Bounds;
+        Rectangle oldBounds = Viewport;
         OnLayoutStarted (new () { OldBounds = oldBounds });
 
         SetTextFormatterSize ();
@@ -925,7 +925,7 @@ public partial class View
 
         foreach (View v in ordered)
         {
-            LayoutSubview (v, new (GetBoundsOffset (), Bounds.Size));
+            LayoutSubview (v, new (GetBoundsOffset (), Viewport.Size));
         }
 
         // If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.
@@ -974,8 +974,8 @@ public partial class View
         // TODO: Until then leave it `internal` and non-virtual
         // First try SuperView.Bounds, then Application.Top, then Driver.Bounds.
         // Finally, if none of those are valid, use int.MaxValue (for Unit tests).
-        Rectangle relativeBounds = SuperView is { IsInitialized: true } ? SuperView.Bounds :
-                                   Application.Top is { } && Application.Top.IsInitialized ? Application.Top.Bounds :
+        Rectangle relativeBounds = SuperView is { IsInitialized: true } ? SuperView.Viewport :
+                                   Application.Top is { } && Application.Top.IsInitialized ? Application.Top.Viewport :
                                    Application.Driver?.Bounds ?? new Rectangle (0, 0, int.MaxValue, int.MaxValue);
         SetRelativeLayout (relativeBounds);
 

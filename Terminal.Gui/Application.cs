@@ -1420,7 +1420,7 @@ public static partial class Application
                 View = view
             };
 
-            if (MouseGrabView.Bounds.Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
+            if (MouseGrabView.Viewport.Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
             {
                 // The mouse has moved outside the bounds of the view that
                 // grabbed the mouse, so we tell the view that last got 
@@ -1476,7 +1476,7 @@ public static partial class Application
                 View = view
             };
         }
-        else if (view.BoundsToScreen (view.Bounds).Contains (a.MouseEvent.X, a.MouseEvent.Y))
+        else if (view.BoundsToScreen (view.Viewport).Contains (a.MouseEvent.X, a.MouseEvent.Y))
         {
             Point boundsPoint = view.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
 

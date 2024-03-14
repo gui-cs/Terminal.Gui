@@ -245,8 +245,8 @@ public class ComboBox : View
     /// <inheritdoc/>
     protected internal override bool OnMouseEvent  (MouseEvent me)
     {
-        if (me.X == Bounds.Right - 1
-            && me.Y == Bounds.Top
+        if (me.X == Viewport.Right - 1
+            && me.Y == Viewport.Top
             && me.Flags == MouseFlags.Button1Pressed
             && _autoHide)
         {
@@ -294,7 +294,7 @@ public class ComboBox : View
         }
 
         Driver.SetAttribute (ColorScheme.Focus);
-        Move (Bounds.Right - 1, 0);
+        Move (Viewport.Right - 1, 0);
         Driver.AddRune (Glyphs.DownArrow);
     }
 
@@ -401,15 +401,15 @@ public class ComboBox : View
     /// <returns></returns>
     private int CalculatetHeight ()
     {
-        if (!IsInitialized || Bounds.Height == 0)
+        if (!IsInitialized || Viewport.Height == 0)
         {
             return 0;
         }
 
         return Math.Min (
-                         Math.Max (Bounds.Height - 1, _minimumHeight - 1),
+                         Math.Max (Viewport.Height - 1, _minimumHeight - 1),
                          _searchset?.Count > 0 ? _searchset.Count :
-                         IsShow ? Math.Max (Bounds.Height - 1, _minimumHeight - 1) : 0
+                         IsShow ? Math.Max (Viewport.Height - 1, _minimumHeight - 1) : 0
                         );
     }
 
@@ -491,10 +491,10 @@ public class ComboBox : View
         }
 
         Reset (true);
-        _listview.Clear (_listview.IsInitialized ? _listview.Bounds : Rectangle.Empty);
+        _listview.Clear (_listview.IsInitialized ? _listview.Viewport : Rectangle.Empty);
         _listview.TabStop = false;
         SuperView?.SendSubviewToBack (this);
-        Rectangle rect = _listview.BoundsToScreen (_listview.IsInitialized ? _listview.Bounds : Rectangle.Empty);
+        Rectangle rect = _listview.BoundsToScreen (_listview.IsInitialized ? _listview.Viewport : Rectangle.Empty);
         SuperView?.SetNeedsDisplay (rect);
         OnCollapsed ();
     }
@@ -607,18 +607,18 @@ public class ComboBox : View
 
     private void ProcessLayout ()
     {
-        if (Bounds.Height < _minimumHeight && (Height is null || Height is Dim.DimAbsolute))
+        if (Viewport.Height < _minimumHeight && (Height is null || Height is Dim.DimAbsolute))
         {
             Height = _minimumHeight;
         }
 
-        if ((!_autoHide && Bounds.Width > 0 && _search.Frame.Width != Bounds.Width)
-            || (_autoHide && Bounds.Width > 0 && _search.Frame.Width != Bounds.Width - 1))
+        if ((!_autoHide && Viewport.Width > 0 && _search.Frame.Width != Viewport.Width)
+            || (_autoHide && Viewport.Width > 0 && _search.Frame.Width != Viewport.Width - 1))
         {
-            _search.Width = _listview.Width = _autoHide ? Bounds.Width - 1 : Bounds.Width;
+            _search.Width = _listview.Width = _autoHide ? Viewport.Width - 1 : Viewport.Width;
             _listview.Height = CalculatetHeight ();
-            _search.SetRelativeLayout (Bounds);
-            _listview.SetRelativeLayout (Bounds);
+            _search.SetRelativeLayout (Viewport);
+            _listview.SetRelativeLayout (Viewport);
         }
     }
 
@@ -761,7 +761,7 @@ public class ComboBox : View
     private void ShowList ()
     {
         _listview.SetSource (_searchset);
-        _listview.Clear (Bounds); // Ensure list shrinks in Dialog as you type
+        _listview.Clear (Viewport); // Ensure list shrinks in Dialog as you type
         _listview.Height = CalculatetHeight ();
         SuperView?.BringSubviewToFront (this);
     }

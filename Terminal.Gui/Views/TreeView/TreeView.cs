@@ -742,10 +742,10 @@ public class TreeView<T> : View, ITreeView where T : class
             //if user has scrolled up too far to see their selection
             ScrollOffsetVertical = idx;
         }
-        else if (idx >= ScrollOffsetVertical + Bounds.Height - leaveSpace)
+        else if (idx >= ScrollOffsetVertical + Viewport.Height - leaveSpace)
         {
             //if user has scrolled off bottom of visible tree
-            ScrollOffsetVertical = Math.Max (0, idx + 1 - (Bounds.Height - leaveSpace));
+            ScrollOffsetVertical = Math.Max (0, idx + 1 - (Viewport.Height - leaveSpace));
         }
     }
 
@@ -868,12 +868,12 @@ public class TreeView<T> : View, ITreeView where T : class
             }
 
             // If control has no height to it then there is no visible area for content
-            if (Bounds.Height == 0)
+            if (Viewport.Height == 0)
             {
                 return 0;
             }
 
-            return map.Skip (ScrollOffsetVertical).Take (Bounds.Height).Max (b => b.GetWidth (Driver));
+            return map.Skip (ScrollOffsetVertical).Take (Viewport.Height).Max (b => b.GetWidth (Driver));
         }
 
         return map.Max (b => b.GetWidth (Driver));
@@ -886,13 +886,13 @@ public class TreeView<T> : View, ITreeView where T : class
     ///     If you have screen coordinates then use <see cref="View.ScreenToFrame"/> to translate these into the client area of
     ///     the <see cref="TreeView{T}"/>.
     /// </summary>
-    /// <param name="row">The row of the <see cref="View.Bounds"/> of the <see cref="TreeView{T}"/>.</param>
+    /// <param name="row">The row of the <see cref="View.Viewport"/> of the <see cref="TreeView{T}"/>.</param>
     /// <returns>The object currently displayed on this row or null.</returns>
     public T GetObjectOnRow (int row) { return HitTest (row)?.Model; }
 
     /// <summary>
     ///     <para>
-    ///         Returns the Y coordinate within the <see cref="View.Bounds"/> of the tree at which <paramref name="toFind"/>
+    ///         Returns the Y coordinate within the <see cref="View.Viewport"/> of the tree at which <paramref name="toFind"/>
     ///         would be displayed or null if it is not currently exposed (e.g. its parent is collapsed).
     ///     </para>
     ///     <para>
@@ -967,7 +967,7 @@ public class TreeView<T> : View, ITreeView where T : class
     public void GoToEnd ()
     {
         IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
-        ScrollOffsetVertical = Math.Max (0, map.Count - Bounds.Height + 1);
+        ScrollOffsetVertical = Math.Max (0, map.Count - Viewport.Height + 1);
         SelectedObject = map.LastOrDefault ()?.Model;
 
         SetNeedsDisplay ();
@@ -1129,12 +1129,12 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <summary>Moves the selection down by the height of the control (1 page).</summary>
     /// <param name="expandSelection">True if the navigation should add the covered nodes to the selected current selection.</param>
     /// <exception cref="NotImplementedException"></exception>
-    public void MovePageDown (bool expandSelection = false) { AdjustSelection (Bounds.Height, expandSelection); }
+    public void MovePageDown (bool expandSelection = false) { AdjustSelection (Viewport.Height, expandSelection); }
 
     /// <summary>Moves the selection up by the height of the control (1 page).</summary>
     /// <param name="expandSelection">True if the navigation should add the covered nodes to the selected current selection.</param>
     /// <exception cref="NotImplementedException"></exception>
-    public void MovePageUp (bool expandSelection = false) { AdjustSelection (-Bounds.Height, expandSelection); }
+    public void MovePageUp (bool expandSelection = false) { AdjustSelection (-Viewport.Height, expandSelection); }
 
     /// <summary>
     ///     This event is raised when an object is activated e.g. by double clicking or pressing
@@ -1160,7 +1160,7 @@ public class TreeView<T> : View, ITreeView where T : class
 
         IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
 
-        for (var line = 0; line < Bounds.Height; line++)
+        for (var line = 0; line < Viewport.Height; line++)
         {
             int idxToRender = ScrollOffsetVertical + line;
 
@@ -1168,14 +1168,14 @@ public class TreeView<T> : View, ITreeView where T : class
             if (idxToRender < map.Count)
             {
                 // Render the line
-                map.ElementAt (idxToRender).Draw (Driver, ColorScheme, line, Bounds.Width);
+                map.ElementAt (idxToRender).Draw (Driver, ColorScheme, line, Viewport.Width);
             }
             else
             {
                 // Else clear the line to prevent stale symbols due to scrolling etc
                 Move (0, line);
                 Driver.SetAttribute (GetNormalColor ());
-                Driver.AddStr (new string (' ', Bounds.Width));
+                Driver.AddStr (new string (' ', Viewport.Width));
             }
         }
     }
@@ -1247,7 +1247,7 @@ public class TreeView<T> : View, ITreeView where T : class
             int idx = map.IndexOf (b => b.Model.Equals (SelectedObject));
 
             // if currently selected line is visible
-            if (idx - ScrollOffsetVertical >= 0 && idx - ScrollOffsetVertical < Bounds.Height)
+            if (idx - ScrollOffsetVertical >= 0 && idx - ScrollOffsetVertical < Viewport.Height)
             {
                 Move (0, idx - ScrollOffsetVertical);
             }
