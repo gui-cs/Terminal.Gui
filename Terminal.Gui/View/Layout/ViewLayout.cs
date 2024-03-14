@@ -1226,7 +1226,7 @@ public partial class View
             SetNeedsDisplay ();
         }
 
-        if (AutoSize)
+        if (IsInitialized && AutoSize)
         {
             if (autosize.Width == 0 || autosize.Height == 0)
             {

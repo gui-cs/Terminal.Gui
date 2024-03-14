@@ -567,12 +567,14 @@ e
     }
 
     [Fact]
-    public void Setting_Width_Height_Before_Set_AutoSize_To_False_Do_Not_Throws ()
+    public void Constructor_Setting_Width_Height_Before_Set_AutoSize_To_False ()
     {
-        var exception = Record.Exception (() => new Label { Width = 10, AutoSize = false });
-        Assert.Null(exception);
+        var label = new Label { Width = 10, AutoSize = false };
+        Assert.Equal("Absolute(10)", label.Width.ToString());
+        Assert.False(label.AutoSize);
 
-        exception = Record.Exception (() => new Label { Height = 10, AutoSize = false });
-        Assert.Null(exception);
+        label = new Label { Height = 10, AutoSize = false };
+        Assert.Equal("Absolute(10)", label.Height.ToString());
+        Assert.False(label.AutoSize);
     }
 }
