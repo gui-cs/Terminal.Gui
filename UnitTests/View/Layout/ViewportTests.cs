@@ -4,10 +4,10 @@ namespace Terminal.Gui.ViewTests;
 
 /// <summary>
 /// Test the <see cref="View.Viewport"/>.
-/// DOES NOT TEST Adornment.Viewport methods. Those are in ./Adornment/BoundsTests.cs
+/// DOES NOT TEST Adornment.Viewport methods. Those are in ./Adornment/ViewportTests.cs
 /// </summary>
 /// <param name="output"></param>
-public class BoundsTests (ITestOutputHelper output)
+public class ViewportTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
@@ -16,7 +16,7 @@ public class BoundsTests (ITestOutputHelper output)
     [InlineData (1, 10)]
     [InlineData (-1, 10)]
     [InlineData (11, 10)]
-    public void Get_Bounds_NoSuperView_WithoutAdornments (int x, int expectedW)
+    public void Get_Viewport_NoSuperView_WithoutAdornments (int x, int expectedW)
     {
         // We test with only X because Y is equivalent. Height/Width are irrelevant.
         // Arrange
@@ -47,7 +47,7 @@ public class BoundsTests (ITestOutputHelper output)
     [InlineData (10, 1, 0)]
     [InlineData (11, 1, 0)]
 
-    public void Get_Bounds_NestedSuperView_WithAdornments (int frameX, int borderThickness, int expectedW)
+    public void Get_Viewport_NestedSuperView_WithAdornments (int frameX, int borderThickness, int expectedW)
     {
         // We test with only X because Y is equivalent. Height/Width are irrelevant.
         // Arrange
@@ -105,7 +105,7 @@ public class BoundsTests (ITestOutputHelper output)
     [InlineData (-1, 1, 5)]
     [InlineData (10, 1, 0)]
     [InlineData (11, 1, 0)]
-    public void Get_Bounds_NestedSuperView_WithAdornments_WithBorder (int frameX, int borderThickness, int expectedW)
+    public void Get_Viewport_NestedSuperView_WithAdornments_WithBorder (int frameX, int borderThickness, int expectedW)
     {
         // We test with only X because Y is equivalent. Height/Width are irrelevant.
         // Arrange

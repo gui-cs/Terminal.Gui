@@ -15,7 +15,7 @@ public class DrawTests
     [InlineData (0, 0, 2, 2)]
     [InlineData (-1, -1, 2, 2)]
     [SetupFakeDriver]
-    public void Clear_Bounds_Clears_Only_Bounds (int x, int y, int width, int height)
+    public void Clear_Viewport_Clears_Only_Bounds (int x, int y, int width, int height)
     {
         var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
 
@@ -251,7 +251,7 @@ public class DrawTests
 
     [Fact]
     [SetupFakeDriver]
-    public void Draw_Minimum_Full_Border_With_Empty_Bounds_Without_Bottom ()
+    public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Bottom ()
     {
         var view = new View { Width = 2, Height = 1, BorderStyle = LineStyle.Single };
         view.Border.Thickness = new Thickness (1, 1, 1, 0);
@@ -269,7 +269,7 @@ public class DrawTests
 
     [Fact]
     [SetupFakeDriver]
-    public void Draw_Minimum_Full_Border_With_Empty_Bounds_Without_Left ()
+    public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Left ()
     {
         var view = new View { Width = 1, Height = 2, BorderStyle = LineStyle.Single };
         view.Border.Thickness = new Thickness (0, 1, 1, 1);
@@ -294,7 +294,7 @@ public class DrawTests
 
     [Fact]
     [SetupFakeDriver]
-    public void Draw_Minimum_Full_Border_With_Empty_Bounds_Without_Right ()
+    public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Right ()
     {
         var view = new View { Width = 1, Height = 2, BorderStyle = LineStyle.Single };
         view.Border.Thickness = new Thickness (1, 1, 0, 1);
@@ -319,7 +319,7 @@ public class DrawTests
 
     [Fact]
     [SetupFakeDriver]
-    public void Draw_Minimum_Full_Border_With_Empty_Bounds_Without_Top ()
+    public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Top ()
     {
         var view = new View { Width = 2, Height = 1, BorderStyle = LineStyle.Single };
         view.Border.Thickness = new Thickness (1, 0, 1, 1);
@@ -345,7 +345,7 @@ public class DrawTests
 
     [Fact]
     [AutoInitShutdown]
-    public void Draw_Negative_Bounds_Horizontal_With_New_Lines ()
+    public void Draw_Negative_Viewport_Horizontal_With_New_Lines ()
     {
         var subView = new View
         {
@@ -492,7 +492,7 @@ public class DrawTests
 
     [Fact]
     [AutoInitShutdown]
-    public void Draw_Negative_Bounds_Horizontal_Without_New_Lines ()
+    public void Draw_Negative_Viewport_Horizontal_Without_New_Lines ()
     {
         // BUGBUG: This previously assumed the default height of a View was 1.
         var subView = new View
@@ -571,7 +571,7 @@ public class DrawTests
 
     [Fact]
     [AutoInitShutdown]
-    public void Draw_Negative_Bounds_Vertical ()
+    public void Draw_Negative_Viewport_Vertical ()
     {
         var subView = new View
         {

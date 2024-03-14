@@ -7,7 +7,7 @@ public class AdornmentTests (ITestOutputHelper output)
     private readonly ITestOutputHelper _output = output;
 
     [Fact]
-    public void Bounds_Location_Always_Empty_Size_Correct ()
+    public void Viewport_Location_Always_Empty_Size_Correct ()
     {
         var view = new View
         {
@@ -42,7 +42,7 @@ public class AdornmentTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, view.Padding.Frame.Width , view.Padding.Frame.Height), view.Padding.Viewport);
     }
 
-    // Test that Adornment.Bounds_get override returns Frame.Size minus Thickness
+    // Test that Adornment.Viewport_get override returns Frame.Size minus Thickness
     [Theory]
     [InlineData (0, 0, 0, 0, 0)]
     [InlineData (0, 0, 0, 1, 1)]
@@ -79,7 +79,7 @@ public class AdornmentTests (ITestOutputHelper output)
     [InlineData (1, 1, 1, 4, 4)]
     [InlineData (1, 1, 1, 4, 0)]
     [InlineData (1, 1, 1, 0, 4)]
-    public void Bounds_Width_Is_Frame_Width (int thickness, int x, int y, int w, int h)
+    public void Viewport_Width_Is_Frame_Width (int thickness, int x, int y, int w, int h)
     {
         var adornment = new Adornment (null);
         adornment.Thickness = new Thickness (thickness);
@@ -90,7 +90,7 @@ public class AdornmentTests (ITestOutputHelper output)
         Assert.Equal (expectedBounds, adornment.Viewport);
     }
 
-    // Test that Adornment.Bounds_get override uses Parent not SuperView
+    // Test that Adornment.Viewport_get override uses Parent not SuperView
     [Fact]
     public void BoundsToScreen_Uses_Parent_Not_SuperView ()
     {
@@ -281,7 +281,7 @@ public class AdornmentTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Setting_Bounds_Throws ()
+    public void Setting_Viewport_Throws ()
     {
         var adornment = new Adornment (null);
         Assert.Throws<InvalidOperationException> (() => adornment.Viewport = new Rectangle (1, 2, 3, 4));

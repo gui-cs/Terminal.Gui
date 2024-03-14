@@ -21,7 +21,7 @@ public class ScreenToTests
     [InlineData (1, 1, 1, 1, -1, -1)]
     [InlineData (1, 1, 9, 9, 7, 7)]
     [InlineData (1, 1, 11, 11, 9, 9)]
-    public void ScreenToBounds_NoSuper_HasAdornments (int viewX, int viewY, int x, int y, int expectedX, int expectedY)
+    public void ScreenToViewport_NoSuper_HasAdornments (int viewX, int viewY, int x, int y, int expectedX, int expectedY)
     {
         var view = new View
         {
@@ -50,7 +50,7 @@ public class ScreenToTests
     [InlineData (1, 1, 1, 1, 0, 0)]
     [InlineData (1, 1, 9, 9, 8, 8)]
     [InlineData (1, 1, 11, 11, 10, 10)] // it's ok for the view to return coordinates outside of its bounds
-    public void ScreenToBounds_NoSuper_NoAdornments (int viewX, int viewY, int x, int y, int expectedX, int expectedY)
+    public void ScreenToViewport_NoSuper_NoAdornments (int viewX, int viewY, int x, int y, int expectedX, int expectedY)
     {
         var view = new View { X = viewX, Y = viewY, Width = 10, Height = 10 };
 
@@ -69,7 +69,7 @@ public class ScreenToTests
     [InlineData (1, 1, 1, 1, -1, -1)]
     [InlineData (1, 1, 9, 9, 7, 7)]
     [InlineData (1, 1, 11, 11, 9, 9)] // it's ok for the view to return coordinates outside of its bounds
-    public void ScreenToBounds_SuperHasAdornments (int viewX, int viewY, int x, int y, int expectedX, int expectedY)
+    public void ScreenToViewport_SuperHasAdornments (int viewX, int viewY, int x, int y, int expectedX, int expectedY)
     {
         var super = new View
         {
@@ -97,7 +97,7 @@ public class ScreenToTests
     [InlineData (1, 1, 1, 1, 0, 0)]
     [InlineData (1, 1, 9, 9, 8, 8)]
     [InlineData (1, 1, 11, 11, 10, 10)] // it's ok for the view to return coordinates outside of its bounds
-    public void ScreenToBounds_SuperHasNoAdornments (int viewX, int viewY, int x, int y, int expectedX, int expectedY)
+    public void ScreenToViewport_SuperHasNoAdornments (int viewX, int viewY, int x, int y, int expectedX, int expectedY)
     {
         var super = new View { X = 0, Y = 0, Width = 10, Height = 10 };
         var view = new View { X = viewX, Y = viewY, Width = 5, Height = 5 };

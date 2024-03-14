@@ -1513,7 +1513,7 @@ public class ToplevelTests
 
     [Fact]
     [AutoInitShutdown]
-    public void Window_Bounds_Bigger_Than_Driver_Cols_And_Rows_Allow_Drag_Beyond_Left_Right_And_Bottom ()
+    public void Window_Viewport_Bigger_Than_Driver_Cols_And_Rows_Allow_Drag_Beyond_Left_Right_And_Bottom ()
     {
         Toplevel top = Application.Top;
         var window = new Window { Width = 20, Height = 3 };

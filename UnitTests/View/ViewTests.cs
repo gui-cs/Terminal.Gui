@@ -11,7 +11,7 @@ public class ViewTests
 
     [Fact]
     [AutoInitShutdown]
-    public void Clear_Bounds_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
+    public void Clear_Viewport_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
     {
         var view = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
@@ -220,7 +220,7 @@ cccccccccccccccccccc",
 
     [Fact]
     [AutoInitShutdown]
-    public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Frame ()
+    public void Correct_Redraw_Viewport_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Frame ()
     {
         var label = new Label { Text = "At 0,0" };
 
@@ -265,7 +265,7 @@ At 0,0
 
     [Fact]
     [AutoInitShutdown]
-    public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Pos_Dim ()
+    public void Correct_Redraw_Viewport_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Pos_Dim ()
     {
         var label = new Label { Text = "At 0,0" };
 
@@ -314,7 +314,7 @@ At 0,0
 
     [Fact]
     [AutoInitShutdown]
-    public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Frame ()
+    public void Correct_Redraw_Viewport_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Frame ()
     {
         var label = new Label { Text = "At 0,0" };
 
@@ -359,7 +359,7 @@ At 0,0
 
     [Fact]
     [AutoInitShutdown]
-    public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Pos_Dim ()
+    public void Correct_Redraw_Viewport_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Pos_Dim ()
     {
         var label = new Label { Text = "At 0,0" };
 
@@ -527,7 +527,7 @@ At 0,0
 
     [Fact]
     [AutoInitShutdown]
-    public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Frame ()
+    public void Incorrect_Redraw_Viewport_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Frame ()
     {
         var label = new Label { Text = "At 0,0" };
 
@@ -572,7 +572,7 @@ At 0,0
 
     [Fact]
     [AutoInitShutdown]
-    public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Pos_Dim ()
+    public void Incorrect_Redraw_Viewport_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Pos_Dim ()
     {
         var label = new Label { Text = "At 0,0" };
 
@@ -621,7 +621,7 @@ At 0,0
 
     [Fact]
     [AutoInitShutdown]
-    public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Frame ()
+    public void Incorrect_Redraw_Viewport_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Frame ()
     {
         var label = new Label { Text = "At 0,0" };
 
@@ -668,7 +668,7 @@ At 0,0
 
     [Fact]
     [AutoInitShutdown]
-    public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Pos_Dim ()
+    public void Incorrect_Redraw_Viewport_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Pos_Dim ()
     {
         var label = new Label { Text = "At 0,0" };
 

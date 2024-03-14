@@ -441,7 +441,7 @@ public class GraphViewTests
 public class SeriesTests
 {
     [Fact]
-    public void Series_GetsPassedCorrectBounds_AllAtOnce ()
+    public void Series_GetsPassedCorrectViewport_AllAtOnce ()
     {
         GraphViewTests.InitFakeDriver ();
 
@@ -493,7 +493,7 @@ public class SeriesTests
     ///     <see cref="GraphView.CellSize"/> results in multiple units of graph space being condensed into each cell of console
     /// </summary>
     [Fact]
-    public void Series_GetsPassedCorrectBounds_AllAtOnce_LargeCellSize ()
+    public void Series_GetsPassedCorrectViewport_AllAtOnce_LargeCellSize ()
     {
         GraphViewTests.InitFakeDriver ();
 

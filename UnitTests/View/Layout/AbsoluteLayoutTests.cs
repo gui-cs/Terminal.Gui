@@ -346,7 +346,7 @@ public class AbsoluteLayoutTests
     }
 
     [Fact]
-    public void AbsoluteLayout_Setting_Bounds_Location_NotEmpty ()
+    public void AbsoluteLayout_Setting_Viewport_Location_NotEmpty ()
     {
         // TODO: Should we enforce Viewport.X/Y == 0? The code currently ignores value.X/Y which is
         // TODO: correct behavior, but is silent. Perhaps an exception?
@@ -359,7 +359,7 @@ public class AbsoluteLayoutTests
     }
 
     [Fact]
-    public void AbsoluteLayout_Setting_Bounds_Sets_Frame ()
+    public void AbsoluteLayout_Setting_Viewport_Sets_Frame ()
     {
         var frame = new Rectangle (1, 2, 3, 4);
         var newBounds = new Rectangle (0, 0, 30, 40);

@@ -366,7 +366,7 @@ public class LineCanvasTests
                 )]
     [Theory]
     [SetupFakeDriver]
-    public void Bounds_H_And_V_Lines_Both_Positive (
+    public void Viewport_H_And_V_Lines_Both_Positive (
         int x,
         int y,
         int length,
@@ -448,7 +448,7 @@ public class LineCanvasTests
                 )]
     [Theory]
     [SetupFakeDriver]
-    public void Bounds_H_Line (
+    public void Viewport_H_Line (
         int x,
         int y,
         int length,
@@ -466,7 +466,7 @@ public class LineCanvasTests
 
     [Fact]
     [SetupFakeDriver]
-    public void Bounds_Specific ()
+    public void Viewport_Specific ()
     {
         // Draw at 1,1 within client area of View (i.e. leave a top and left margin of 1)
         // This proves we aren't drawing excess above
@@ -516,7 +516,7 @@ public class LineCanvasTests
 
     [Fact]
     [SetupFakeDriver]
-    public void Bounds_Specific_With_Ustring ()
+    public void Viewport_Specific_With_Ustring ()
     {
         // Draw at 1,1 within client area of View (i.e. leave a top and left margin of 1)
         // This proves we aren't drawing excess above
