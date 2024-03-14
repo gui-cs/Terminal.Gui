@@ -219,7 +219,7 @@ public partial class View
         {
             _height = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Height)} cannot be null");
 
-            if (AutoSize)
+            if (IsInitialized && AutoSize)
             {
                 throw new InvalidOperationException (@$"Must set AutoSize to false before setting {nameof (Height)}.");
             }
@@ -266,7 +266,7 @@ public partial class View
         {
             _width = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Width)} cannot be null");
 
-            if (AutoSize)
+            if (IsInitialized && AutoSize)
             {
                 throw new InvalidOperationException (@$"Must set AutoSize to false before setting {nameof (Width)}.");
             }
