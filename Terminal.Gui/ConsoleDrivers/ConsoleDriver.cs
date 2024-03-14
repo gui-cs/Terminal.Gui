@@ -25,7 +25,7 @@ public abstract class ConsoleDriver
     ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
     ///     to.
     /// </summary>
-    /// <value>The rectangle describing the bounds of <see cref="Clip"/>.</value>
+    /// <value>The rectangle describing the of <see cref="Clip"/> region.</value>
     public Rectangle Clip { get; set; }
 
     /// <summary>Get the operating system clipboard.</summary>
@@ -372,7 +372,7 @@ public abstract class ConsoleDriver
     /// <param name="col">The column.</param>
     /// <param name="row">The row.</param>
     /// <returns>
-    ///     <see langword="false"/> if the coordinate is outside of the screen bounds or outside of <see cref="Clip"/>.
+    ///     <see langword="false"/> if the coordinate is outside the screen bounds or outside of <see cref="Clip"/>.
     ///     <see langword="true"/> otherwise.
     /// </returns>
     public bool IsValidLocation (int col, int row) { return col >= 0 && row >= 0 && col < Cols && row < Rows && Clip.Contains (col, row); }

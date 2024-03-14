@@ -351,7 +351,7 @@ public class HexView : View
     }
 
     ///<inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         Attribute currentAttribute;
         Attribute current = ColorScheme.Focus;

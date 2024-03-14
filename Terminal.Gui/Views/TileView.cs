@@ -156,19 +156,19 @@ public class TileView : View
             return;
         }
 
-        Rectangle contentArea = Viewport;
+        Rectangle viewport = Viewport;
 
         if (HasBorder ())
         {
-            contentArea = new (
-                               contentArea.X + 1,
-                               contentArea.Y + 1,
-                               Math.Max (0, contentArea.Width - 2),
-                               Math.Max (0, contentArea.Height - 2)
-                              );
+            viewport = new (
+                            viewport.X + 1,
+                            viewport.Y + 1,
+                            Math.Max (0, viewport.Width - 2),
+                            Math.Max (0, viewport.Height - 2)
+                           );
         }
 
-        Setup (contentArea);
+        Setup (viewport);
         base.LayoutSubviews ();
     }
 
@@ -179,12 +179,12 @@ public class TileView : View
     public override bool OnDrawAdornments () { return false; }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         Driver.SetAttribute (ColorScheme.Normal);
-        Clear (contentArea);
+        Clear (viewport);
 
-        base.OnDrawContent (contentArea);
+        base.OnDrawContent (viewport);
 
         var lc = new LineCanvas ();
 
@@ -758,9 +758,9 @@ public class TileView : View
         return false;
     }
 
-    private void Setup (Rectangle contentArea)
+    private void Setup (Rectangle viewport)
     {
-        if (contentArea.IsEmpty || contentArea.Height <= 0 || contentArea.Width <= 0)
+        if (viewport.IsEmpty || viewport.Height <= 0 || viewport.Width <= 0)
         {
             return;
         }
@@ -803,16 +803,16 @@ public class TileView : View
 
             if (Orientation == Orientation.Vertical)
             {
-                tile.ContentView.X = i == 0 ? contentArea.X : Pos.Right (visibleSplitterLines [i - 1]);
-                tile.ContentView.Y = contentArea.Y;
-                tile.ContentView.Height = contentArea.Height;
+                tile.ContentView.X = i == 0 ? viewport.X : Pos.Right (visibleSplitterLines [i - 1]);
+                tile.ContentView.Y = viewport.Y;
+                tile.ContentView.Height = viewport.Height;
                 tile.ContentView.Width = GetTileWidthOrHeight (i, Viewport.Width, visibleTiles, visibleSplitterLines);
             }
             else
             {
-                tile.ContentView.X = contentArea.X;
-                tile.ContentView.Y = i == 0 ? contentArea.Y : Pos.Bottom (visibleSplitterLines [i - 1]);
-                tile.ContentView.Width = contentArea.Width;
+                tile.ContentView.X = viewport.X;
+                tile.ContentView.Y = i == 0 ? viewport.Y : Pos.Bottom (visibleSplitterLines [i - 1]);
+                tile.ContentView.Width = viewport.Width;
                 tile.ContentView.Height = GetTileWidthOrHeight (i, Viewport.Height, visibleTiles, visibleSplitterLines);
             }
         }
@@ -969,9 +969,9 @@ public class TileView : View
             return false;
         }
 
-        public override void OnDrawContent (Rectangle contentArea)
+        public override void OnDrawContent (Rectangle viewport)
         {
-            base.OnDrawContent (contentArea);
+            base.OnDrawContent (viewport);
 
             DrawSplitterSymbol ();
         }

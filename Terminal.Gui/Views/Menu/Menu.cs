@@ -755,7 +755,7 @@ internal sealed class Menu : View
         return !item.IsEnabled () ? ColorScheme.Disabled : GetNormalColor ();
     }
 
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         if (_barItems.Children is null)
         {

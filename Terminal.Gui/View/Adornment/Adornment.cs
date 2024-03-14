@@ -139,19 +139,19 @@ public class Adornment : View
     public override bool OnDrawAdornments () { return false; }
 
     /// <summary>Redraws the Adornments that comprise the <see cref="Adornment"/>.</summary>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         if (Thickness == Thickness.Empty)
         {
             return;
         }
 
-        Rectangle screenBounds = ViewportToScreen (contentArea);
+        Rectangle screen = ViewportToScreen (viewport);
         Attribute normalAttr = GetNormalColor ();
         Driver.SetAttribute (normalAttr);
 
         // This just draws/clears the thickness, not the insides.
-        Thickness.Draw (screenBounds, ToString ());
+        Thickness.Draw (screen, ToString ());
 
         if (!string.IsNullOrEmpty (TextFormatter.Text))
         {
@@ -162,11 +162,11 @@ public class Adornment : View
             }
         }
 
-        TextFormatter?.Draw (screenBounds, normalAttr, normalAttr, Rectangle.Empty);
+        TextFormatter?.Draw (screen, normalAttr, normalAttr, Rectangle.Empty);
 
         if (Subviews.Count > 0)
         {
-            base.OnDrawContent (contentArea);
+            base.OnDrawContent (viewport);
         }
 
         ClearLayoutNeeded ();

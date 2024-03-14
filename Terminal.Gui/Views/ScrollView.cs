@@ -335,14 +335,14 @@ public class ScrollView : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         SetViewsNeedsDisplay ();
 
         Rectangle savedClip = ClipToViewport ();
 
         // TODO: It's bad practice for views to always clear a view. It negates clipping.
-        Clear (contentArea);
+        Clear (viewport);
 
         if (!string.IsNullOrEmpty (_contentView.Text) || _contentView.Subviews.Count > 0)
         {

@@ -555,7 +555,7 @@ namespace Terminal.Gui
         }
 
         /// <inheritdoc/>
-        public override void OnDrawContent (Rectangle contentArea)
+        public override void OnDrawContent (Rectangle viewport)
         {
             if (_provider is null)
             {

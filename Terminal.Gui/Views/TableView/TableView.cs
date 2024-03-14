@@ -896,9 +896,9 @@ public class TableView : View
     }
 
     ///<inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
-        base.OnDrawContent (contentArea);
+        base.OnDrawContent (viewport);
 
         Move (0, 0);
 

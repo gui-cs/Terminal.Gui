@@ -78,23 +78,23 @@ public class LineCanvas : IDisposable
                     return _cachedViewport;
                 }
 
-                Rectangle bounds = _lines [0].Viewport;
+                Rectangle viewport = _lines [0].Viewport;
 
                 for (var i = 1; i < _lines.Count; i++)
                 {
-                    bounds = Rectangle.Union (bounds, _lines [i].Viewport);
+                    viewport = Rectangle.Union (viewport, _lines [i].Viewport);
                 }
 
-                if (bounds is {Width: 0} or {Height: 0})
+                if (viewport is {Width: 0} or {Height: 0})
                 {
-                    bounds = bounds with
+                    viewport = viewport with
                     {
-                        Width = Math.Clamp (bounds.Width, 1, short.MaxValue),
-                        Height = Math.Clamp (bounds.Height, 1, short.MaxValue)
+                        Width = Math.Clamp (viewport.Width, 1, short.MaxValue),
+                        Height = Math.Clamp (viewport.Height, 1, short.MaxValue)
                     };
                 }
 
-                _cachedViewport = bounds;
+                _cachedViewport = viewport;
             }
 
             return _cachedViewport;

@@ -249,7 +249,7 @@ public partial class Toplevel : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         if (!Visible)
         {
@@ -292,7 +292,7 @@ public partial class Toplevel : View
                 }
             }
 
-            base.OnDrawContent (contentArea);
+            base.OnDrawContent (viewport);
 
             // This is causing the menus drawn incorrectly if UseSubMenusSingleFrame is true
             //if (this.MenuBar is { } && this.MenuBar.IsMenuOpen && this.MenuBar.openMenu is { }) {

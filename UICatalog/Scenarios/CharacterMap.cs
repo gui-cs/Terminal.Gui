@@ -524,7 +524,7 @@ internal class CharMap : ScrollView
     private static int RowWidth => RowLabelWidth + COLUMN_WIDTH * 16;
     public event EventHandler<ListViewItemEventArgs> Hover;
 
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         //if (ShowHorizontalScrollIndicator && ContentSize.Height < (int)(MaxCodePoint / 16 + 2)) {
         //	//ContentSize = new (CharMap.RowWidth, (int)(MaxCodePoint / 16 + 2));
@@ -545,18 +545,18 @@ internal class CharMap : ScrollView
         //	// Snap 1st column into view if it's been scrolled horizontally
         //	ContentOffset = new (0, ContentOffset.Y < -ContentSize.Height + Viewport.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
         //}
-        base.OnDrawContent (contentArea);
+        base.OnDrawContent (viewport);
     }
 
     //public void CharMap_DrawContent (object s, DrawEventArgs a)
-    public override void OnDrawContentComplete (Rectangle contentArea)
+    public override void OnDrawContentComplete (Rectangle viewport)
     {
-        if (contentArea.Height == 0 || contentArea.Width == 0)
+        if (viewport.Height == 0 || viewport.Width == 0)
         {
             return;
         }
 
-        Rectangle viewport = new (
+        Rectangle viewportOffset = new (
                                   ContentOffset,
                                   new (
                                        Math.Max (Viewport.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
@@ -606,7 +606,7 @@ internal class CharMap : ScrollView
             }
         }
 
-        int firstColumnX = viewport.X + RowLabelWidth;
+        int firstColumnX = viewportOffset.X + RowLabelWidth;
 
         for (var y = 1; y < Viewport.Height; y++)
         {

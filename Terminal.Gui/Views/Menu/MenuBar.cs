@@ -469,7 +469,7 @@ public class MenuBar : View
     public event EventHandler<MenuOpeningEventArgs> MenuOpening;
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         Move (0, 0);
         Driver.SetAttribute (GetNormalColor ());

@@ -311,14 +311,14 @@ public class TabView : View
     public int EnsureValidScrollOffsets (int value) { return Math.Max (Math.Min (value, Tabs.Count - 1), 0); }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         Driver.SetAttribute (GetNormalColor ());
 
         if (Tabs.Any ())
         {
             Rectangle savedClip = ClipToViewport ();
-            _tabsBar.OnDrawContent (contentArea);
+            _tabsBar.OnDrawContent (viewport);
             _contentView.SetNeedsDisplay ();
             _contentView.Draw ();
             Driver.Clip = savedClip;
@@ -326,7 +326,7 @@ public class TabView : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContentComplete (Rectangle contentArea) { _tabsBar.OnDrawContentComplete (contentArea); }
+    public override void OnDrawContentComplete (Rectangle viewport) { _tabsBar.OnDrawContentComplete (viewport); }
 
     /// <summary>
     ///     Removes the given <paramref name="tab"/> from <see cref="Tabs"/>. Caller is responsible for disposing the
@@ -657,12 +657,12 @@ public class TabView : View
             return false;
         }
 
-        public override void OnDrawContent (Rectangle contentArea)
+        public override void OnDrawContent (Rectangle viewport)
         {
             _host._tabLocations = _host.CalculateViewport (Viewport).ToArray ();
 
             // clear any old text
-            Clear (contentArea);
+            Clear (viewport);
 
             RenderTabLine ();
 
@@ -670,7 +670,7 @@ public class TabView : View
             Driver.SetAttribute (GetNormalColor ());
         }
 
-        public override void OnDrawContentComplete (Rectangle contentArea)
+        public override void OnDrawContentComplete (Rectangle viewport)
         {
             if (_host._tabLocations is null)
             {

@@ -996,7 +996,7 @@ public class Slider<T> : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         // TODO: make this more surgical to reduce repaint
 
@@ -1009,9 +1009,9 @@ public class Slider<T> : View
 #if (DEBUG)
         Driver?.SetAttribute (new Attribute (Color.White, Color.Red));
 
-        for (var y = 0; y < contentArea.Height; y++)
+        for (var y = 0; y < viewport.Height; y++)
         {
-            for (var x = 0; x < contentArea.Width; x++)
+            for (var x = 0; x < viewport.Width; x++)
             {
                 // MoveAndAdd (x, y, '·');
             }

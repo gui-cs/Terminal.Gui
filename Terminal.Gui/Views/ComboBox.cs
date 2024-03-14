@@ -284,9 +284,9 @@ public class ComboBox : View
     public virtual void OnCollapsed () { Collapsed?.Invoke (this, EventArgs.Empty); }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
-        base.OnDrawContent (contentArea);
+        base.OnDrawContent (viewport);
 
         if (!_autoHide)
         {
@@ -839,7 +839,7 @@ public class ComboBox : View
             return res;
         }
 
-        public override void OnDrawContent (Rectangle contentArea)
+        public override void OnDrawContent (Rectangle viewport)
         {
             Attribute current = ColorScheme.Focus;
             Driver.SetAttribute (current);

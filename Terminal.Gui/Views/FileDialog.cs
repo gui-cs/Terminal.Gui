@@ -407,9 +407,9 @@ public class FileDialog : Dialog
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
-        base.OnDrawContent (contentArea);
+        base.OnDrawContent (viewport);
 
         if (!string.IsNullOrWhiteSpace (_feedback))
         {

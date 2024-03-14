@@ -1410,10 +1410,10 @@ public partial class View
         return result;
     } // TopologicalSort
 
-    private void LayoutSubview (View v, Rectangle contentArea)
+    private void LayoutSubview (View v, Rectangle viewport)
     {
         //if (v.LayoutStyle == LayoutStyle.Computed) {
-        v.SetRelativeLayout (contentArea);
+        v.SetRelativeLayout (viewport);
 
         //}
 

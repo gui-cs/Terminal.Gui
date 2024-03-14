@@ -1365,7 +1365,7 @@ public static partial class Application
     /// <remarks>
     ///     <para>
     ///         Use this event to receive mouse events in screen coordinates. Use <see cref="MouseEvent"/> to
-    ///         receive mouse events relative to a <see cref="View"/>'s bounds.
+    ///         receive mouse events relative to a <see cref="View.Viewport"/>.
     ///     </para>
     ///     <para>The <see cref="MouseEvent.View"/> will contain the <see cref="View"/> that contains the mouse coordinates.</para>
     /// </remarks>

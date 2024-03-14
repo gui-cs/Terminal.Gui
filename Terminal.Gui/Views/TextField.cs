@@ -973,7 +973,7 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         _isDrawing = true;
 

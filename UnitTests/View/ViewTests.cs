@@ -1119,7 +1119,7 @@ At 0,0
         public bool IsKeyUp { get; set; }
         public override string Text { get; set; }
 
-        public override void OnDrawContent (Rectangle contentArea)
+        public override void OnDrawContent (Rectangle viewport)
         {
             var idx = 0;
 

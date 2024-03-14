@@ -87,7 +87,7 @@ public partial class View
     /// <summary>Clears the specified <see cref="Viewport"/>-relative rectangle with the normal background.</summary>
     /// <remarks></remarks>
     /// <param name="contentArea">The Viewport-relative rectangle to clear.</param>
-    public void Clear (Rectangle contentArea)
+    public void Clear (Rectangle viewport)
     {
         if (Driver is null)
         {
@@ -97,8 +97,8 @@ public partial class View
         Attribute prev = Driver.SetAttribute (GetNormalColor ());
 
         // Clamp the region to the bounds of the view
-        contentArea = Rectangle.Intersect (contentArea, Viewport);
-        Driver.FillRect (ViewportToScreen (contentArea));
+        viewport = Rectangle.Intersect (viewport, Viewport);
+        Driver.FillRect (ViewportToScreen (viewport));
         Driver.SetAttribute (prev);
     }
 

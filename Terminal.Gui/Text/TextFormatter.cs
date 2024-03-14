@@ -240,12 +240,12 @@ public class TextFormatter
         }
 
         bool isVertical = IsVerticalDirection (Direction);
-        Rectangle maxBounds = viewport;
+        Rectangle maxViewport = viewport;
 
         if (driver is { })
         {
             // INTENT: What, exactly, is the intent of this?
-            maxBounds = maximum == default (Rectangle)
+            maxViewport = maximum == default (Rectangle)
                             ? viewport
                             : new (
                                    Math.Max (maximum.X, viewport.X),
@@ -264,7 +264,7 @@ public class TextFormatter
                                   );
         }
 
-        if (maxBounds.Width == 0 || maxBounds.Height == 0)
+        if (maxViewport.Width == 0 || maxViewport.Height == 0)
         {
             return;
         }
@@ -278,8 +278,8 @@ public class TextFormatter
                 continue;
             }
 
-            if ((isVertical && line >= maxBounds.Left + maxBounds.Width)
-                || (!isVertical && line >= maxBounds.Top + maxBounds.Height + lineOffset))
+            if ((isVertical && line >= maxViewport.Left + maxViewport.Width)
+                || (!isVertical && line >= maxViewport.Top + maxViewport.Height + lineOffset))
             {
                 break;
             }
@@ -422,8 +422,8 @@ public class TextFormatter
                         break;
                     }
 
-                    if ((!isVertical && current - start > maxBounds.Left + maxBounds.Width - viewport.X + colOffset)
-                        || (isVertical && idx > maxBounds.Top + maxBounds.Height - viewport.Y))
+                    if ((!isVertical && current - start > maxViewport.Left + maxViewport.Width - viewport.X + colOffset)
+                        || (isVertical && idx > maxViewport.Top + maxViewport.Height - viewport.Y))
                     {
                         break;
                     }
