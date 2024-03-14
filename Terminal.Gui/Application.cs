@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -489,6 +490,8 @@ public static partial class Application
         Toplevel.SetRelativeLayout (Driver.Bounds);
 
         //}
+
+        // BUGBUG: This call is likley not needed.
         Toplevel.LayoutSubviews ();
         Toplevel.PositionToplevels ();
         Toplevel.FocusFirst ();
@@ -532,7 +535,7 @@ public static partial class Application
     ///     <see langword="null"/> if <see cref="Init"/> has already been called.
     /// </param>
     public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
-        where T : Toplevel, new ()
+        where T : Toplevel, new()
     {
         if (_initialized)
         {
@@ -1028,6 +1031,8 @@ public static partial class Application
         runState.Toplevel?.Dispose ();
         runState.Toplevel = null;
         runState.Dispose ();
+
+        // BUGBUG: Application.Top is now invalid?!?!
     }
 
     #endregion Run (Begin, Run, End)
@@ -1078,7 +1083,7 @@ public static partial class Application
         }
     }
 
-    #nullable enable
+#nullable enable
     private static Toplevel? FindDeepestTop (Toplevel start, int x, int y)
     {
         if (!start.Frame.Contains (x, y))
@@ -1107,7 +1112,7 @@ public static partial class Application
 
         return start;
     }
-    #nullable restore
+#nullable restore
 
     private static View FindTopFromView (View view)
     {
@@ -1123,7 +1128,8 @@ public static partial class Application
         return top;
     }
 
-    #nullable enable
+#nullable enable
+
     // Only return true if the Current has changed.
     private static bool MoveCurrent (Toplevel? top)
     {
@@ -1204,7 +1210,7 @@ public static partial class Application
 
         return true;
     }
-    #nullable restore
+#nullable restore
 
     /// <summary>Invoked when the terminal's size changed. The new size of the terminal is provided.</summary>
     /// <remarks>
@@ -1350,14 +1356,15 @@ public static partial class Application
         UnGrabbedMouse?.Invoke (view, new ViewEventArgs (view));
     }
 
-    #nullable enable
+#nullable enable
+
     // Used by OnMouseEvent to track the last view that was clicked on.
     internal static View? _mouseEnteredView;
 
     /// <summary>Event fired when a mouse move or click occurs. Coordinates are screen relative.</summary>
     /// <remarks>
     ///     <para>
-    ///         Use this event to receive mouse events in screen coordinates. Use <see cref="Responder.MouseEvent"/> to
+    ///         Use this event to receive mouse events in screen coordinates. Use <see cref="MouseEvent"/> to
     ///         receive mouse events relative to a <see cref="View"/>'s bounds.
     ///     </para>
     ///     <para>The <see cref="MouseEvent.View"/> will contain the <see cref="View"/> that contains the mouse coordinates.</para>
@@ -1402,47 +1409,50 @@ public static partial class Application
         {
             // If the mouse is grabbed, send the event to the view that grabbed it.
             // The coordinates are relative to the Bounds of the view that grabbed the mouse.
-            Point newxy = MouseGrabView.ScreenToFrame (a.MouseEvent.X, a.MouseEvent.Y);
+            Point frameLoc = MouseGrabView.ScreenToFrame (a.MouseEvent.X, a.MouseEvent.Y);
 
-            var nme = new MouseEvent
+            var viewRelativeMouseEvent = new MouseEvent
             {
-                X = newxy.X,
-                Y = newxy.Y,
+                X = frameLoc.X,
+                Y = frameLoc.Y,
                 Flags = a.MouseEvent.Flags,
-                OfX = a.MouseEvent.X - newxy.X,
-                OfY = a.MouseEvent.Y - newxy.Y,
+                ScreenPosition = new (a.MouseEvent.X, a.MouseEvent.Y),
                 View = view
             };
 
-            if (MouseGrabView.Bounds.Contains (nme.X, nme.Y) is false)
+            if (MouseGrabView.Bounds.Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
             {
                 // The mouse has moved outside the bounds of the view that
                 // grabbed the mouse, so we tell the view that last got 
                 // OnMouseEnter the mouse is leaving
-                // BUGBUG: That sentence makes no sense. Either I'm missing something
-                // or this logic is flawed.
+                // BUGBUG: That sentence makes no sense. Either I'm missing something or this logic is flawed.
                 _mouseEnteredView?.OnMouseLeave (a.MouseEvent);
             }
 
             //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-            if (MouseGrabView?.OnMouseEvent (nme) == true)
+            if (MouseGrabView?.OnMouseEvent (viewRelativeMouseEvent) == true)
             {
                 return;
             }
         }
 
-        if ((view is null || view == OverlappedTop)
-            && Current is { Modal: false }
-            && OverlappedTop != null
-            && a.MouseEvent.Flags != MouseFlags.ReportMousePosition
-            && a.MouseEvent.Flags != 0)
+        if (view is not Adornment)
         {
-            View? top = FindDeepestTop (Top, a.MouseEvent.X, a.MouseEvent.Y);
-            view = View.FindDeepestView (top, a.MouseEvent.X, a.MouseEvent.Y);
-
-            if (view is { } && view != OverlappedTop && top != Current)
+            if ((view is null || view == OverlappedTop)
+                && Current is { Modal: false }
+                && OverlappedTop != null
+                && a.MouseEvent.Flags != MouseFlags.ReportMousePosition
+                && a.MouseEvent.Flags != 0)
             {
-                MoveCurrent ((Toplevel)top);
+                // This occurs when there are multiple overlapped "tops"
+                // E.g. "Mdi" - in the Background Worker Scenario
+                View? top = FindDeepestTop (Top, a.MouseEvent.X, a.MouseEvent.Y);
+                view = View.FindDeepestView (top, a.MouseEvent.X, a.MouseEvent.Y);
+
+                if (view is { } && view != OverlappedTop && top != Current)
+                {
+                    MoveCurrent ((Toplevel)top);
+                }
             }
         }
 
@@ -1451,140 +1461,70 @@ public static partial class Application
             return;
         }
 
-        var screen = view.FrameToScreen ();
+        MouseEvent? me = null;
 
-        // Work inside-out (Padding, Border, Margin)
-        // TODO: Debate whether inside-out or outside-in is the right strategy
-        if (AdornmentHandledMouseEvent (view.Padding, a))
+        if (view is Adornment adornment)
         {
-            return;
-        }
+            var frameLoc = adornment.ScreenToFrame (a.MouseEvent.X, a.MouseEvent.Y);
 
-        if (AdornmentHandledMouseEvent (view.Border, a))
-        {
-            if (view is not Toplevel)
+            me = new MouseEvent
             {
-                return;
-            }
-
-            // TODO: This is a temporary hack to work around the fact that 
-            // drag handling is handled in Toplevel (See Issue #2537)
-
-            var me = new MouseEvent
-            {
-                X = a.MouseEvent.X - screen.X,
-                Y = a.MouseEvent.Y - screen.Y,
+                X = frameLoc.X,
+                Y = frameLoc.Y,
                 Flags = a.MouseEvent.Flags,
-                OfX = a.MouseEvent.X - screen.X,
-                OfY = a.MouseEvent.Y - screen.Y,
+                ScreenPosition = new (a.MouseEvent.X, a.MouseEvent.Y),
                 View = view
             };
-
-            if (_mouseEnteredView is null)
-            {
-                _mouseEnteredView = view;
-                view.OnMouseEnter (me);
-            }
-            else if (_mouseEnteredView != view)
-            {
-                _mouseEnteredView.OnMouseLeave (me);
-                view.OnMouseEnter (me);
-                _mouseEnteredView = view;
-            }
-
-            if (!view.WantMousePositionReports && a.MouseEvent.Flags == MouseFlags.ReportMousePosition)
-            {
-                return;
-            }
-
-            WantContinuousButtonPressedView = view.WantContinuousButtonPressed ? view : null;
-
-            if (view.OnMouseEvent (me))
-            {
-                // Should we bubble up the event, if it is not handled?
-                //return;
-            }
-
-            BringOverlappedTopToFront ();
-
-            return;
         }
-
-        if (AdornmentHandledMouseEvent (view?.Margin, a))
-        {
-            return;
-        }
-
-        Rectangle bounds = view.BoundsToScreen (view.Bounds);
-
-        if (bounds.Contains (a.MouseEvent.X, a.MouseEvent.Y))
+        else if (view.BoundsToScreen (view.Bounds).Contains (a.MouseEvent.X, a.MouseEvent.Y))
         {
             Point boundsPoint = view.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
 
-            var me = new MouseEvent
+            me = new MouseEvent
             {
                 X = boundsPoint.X,
                 Y = boundsPoint.Y,
                 Flags = a.MouseEvent.Flags,
-                OfX = boundsPoint.X,
-                OfY = boundsPoint.Y,
+                ScreenPosition = new (a.MouseEvent.X, a.MouseEvent.Y),
                 View = view
             };
-
-            if (_mouseEnteredView is null)
-            {
-                _mouseEnteredView = view;
-                view.OnMouseEnter (me);
-            }
-            else if (_mouseEnteredView != view)
-            {
-                _mouseEnteredView.OnMouseLeave (me);
-                view.OnMouseEnter (me);
-                _mouseEnteredView = view;
-            }
-
-            if (!view.WantMousePositionReports && a.MouseEvent.Flags == MouseFlags.ReportMousePosition)
-            {
-                return;
-            }
-
-            WantContinuousButtonPressedView = view.WantContinuousButtonPressed ? view : null;
-
-            if (view.OnMouseEvent (me))
-            {
-                // Should we bubble up the event, if it is not handled?
-                //return;
-            }
-
-            BringOverlappedTopToFront ();
         }
 
-        return;
-
-        static bool AdornmentHandledMouseEvent (Adornment? frame, MouseEventEventArgs args)
+        if (me is null)
         {
-            if (frame?.Thickness.Contains (frame.FrameToScreen (), args.MouseEvent.X, args.MouseEvent.Y) is not true)
-            {
-                return false;
-            }
-
-            Point boundsPoint = frame.ScreenToBounds (args.MouseEvent.X, args.MouseEvent.Y);
-
-            var me = new MouseEvent
-            {
-                X = boundsPoint.X,
-                Y = boundsPoint.Y,
-                Flags = args.MouseEvent.Flags,
-                OfX = boundsPoint.X,
-                OfY = boundsPoint.Y,
-                View = frame
-            };
-            frame.OnMouseEvent (me);
-
-            return true;
+            return;
         }
+
+        if (_mouseEnteredView is null)
+        {
+            _mouseEnteredView = view;
+            view.OnMouseEnter (me);
+        }
+        else if (_mouseEnteredView != view)
+        {
+            _mouseEnteredView.OnMouseLeave (me);
+            view.OnMouseEnter (me);
+            _mouseEnteredView = view;
+        }
+
+        if (!view.WantMousePositionReports && a.MouseEvent.Flags == MouseFlags.ReportMousePosition)
+        {
+            return;
+        }
+
+        WantContinuousButtonPressedView = view.WantContinuousButtonPressed ? view : null;
+
+        //Debug.WriteLine ($"OnMouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags}");
+
+        if (view.OnMouseEvent (me))
+        {
+            // Should we bubble up the event, if it is not handled?
+            //return;
+        }
+
+        BringOverlappedTopToFront ();
     }
-    #nullable restore
+#nullable restore
 
     #endregion Mouse handling
 

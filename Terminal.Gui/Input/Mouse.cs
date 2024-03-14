@@ -5,6 +5,11 @@ namespace Terminal.Gui;
 [Flags]
 public enum MouseFlags
 {
+    /// <summary>
+    ///    No mouse event. This is the default value for <see cref="MouseEvent.Flags"/> when no mouse event is being reported.
+    /// </summary>
+    None = 0,
+
     /// <summary>The first mouse button was pressed.</summary>
     Button1Pressed = 0x2,
 
@@ -96,11 +101,11 @@ public enum MouseFlags
 // TODO: Merge MouseEvent and MouseEventEventArgs into a single class.
 
 /// <summary>
-///     Low-level construct that conveys the details of mouse events, such as coordinates and button state, from
+///     Conveys the details of mouse events, such as coordinates and button state, from
 ///     ConsoleDrivers up to <see cref="Application"/> and Views.
 /// </summary>
 /// <remarks>
-///     The <see cref="Application"/> class includes the <see cref="Application.MouseEvent"/> Action which takes a
+///     The <see cref="Application"/> class includes the <see cref="Application.MouseEvent"/> event which takes a
 ///     MouseEvent argument.
 /// </remarks>
 public class MouseEvent
@@ -108,27 +113,35 @@ public class MouseEvent
     /// <summary>Flags indicating the kind of mouse event that is being posted.</summary>
     public MouseFlags Flags { get; set; }
 
+    /// <summary>The View at the location for the mouse event.</summary>
+    public View View { get; set; }
+
+    /// <summary>The X position of the mouse in <see cref="View.Bounds"/>-relative coordinates.</summary>
+    public int X { get; set; }
+
+    /// <summary>The Y position of the mouse in <see cref="View.Bounds"/>-relative coordinates.</summary>
+    public int Y { get; set; }
+
     /// <summary>
-    ///     Indicates if the current mouse event has already been processed and the driver should stop notifying any other
-    ///     event subscriber. Its important to set this value to true specially when updating any View's layout from inside the
-    ///     subscriber method.
+    ///     Indicates if the current mouse event has been processed. Set this value to <see langword="true"/> to indicate the mouse
+    ///     event was handled.
     /// </summary>
     public bool Handled { get; set; }
 
-    /// <summary>The offset X (column) location for the mouse event.</summary>
-    public int OfX { get; set; }
-
-    /// <summary>The offset Y (column) location for the mouse event.</summary>
-    public int OfY { get; set; }
-
-    /// <summary>The current view at the location for the mouse event.</summary>
-    public View View { get; set; }
-
-    /// <summary>The X (column) location for the mouse event.</summary>
-    public int X { get; set; }
-
-    /// <summary>The Y (column) location for the mouse event.</summary>
-    public int Y { get; set; }
+    /// <summary>
+    ///     The screen-relative mouse position.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The <see cref="X"/> and <see cref="Y"/> properties are always <see cref="View.Bounds"/>-relative. When the mouse is grabbed by a view,
+    ///         <see cref="ScreenPosition"/> provides the mouse position screen-relative coordinates, enabling the grabbed view to know how much the
+    ///         mouse has moved.
+    ///     </para>
+    ///     <para>
+    ///         Calculated and processed in <see cref="Application.OnMouseEvent(MouseEventEventArgs)"/>.
+    ///     </para>
+    /// </remarks>
+    public Point ScreenPosition { get; set; }
 
     /// <summary>Returns a <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</summary>
     /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</returns>

@@ -17,7 +17,13 @@ public enum ViewDiagnosticFlags : uint
     ///     When enabled, <see cref="View.OnDrawAdornments"/> will draw the first letter of the Adornment name ('M', 'B', or 'P')
     ///     in the Thickness.
     /// </summary>
-    Padding = 0b_0000_0010
+    Padding = 0b_0000_0010,
+
+    /// <summary>
+    ///     When enabled, <see cref="Adornment.OnMouseEnter(Gui.MouseEvent)"/> and <see cref="Adornment.OnMouseLeave(Gui.MouseEvent)"/>
+    ///     will invert the foreground and background colors.
+    /// </summary>
+    MouseEnter = 0b_0000_00100
 }
 
 public partial class View

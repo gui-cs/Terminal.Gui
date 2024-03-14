@@ -228,19 +228,7 @@ internal partial class TestHelpers
                     case 0:
                         throw new Exception (
                                              $"{DriverContentsToString (driver)}\n"
-                                             + $"Expected Attribute {
-                                                 val
-                                             } (PlatformColor = {
-                                                 val.Value.PlatformColor
-                                             }) at Contents[{
-                                                 line
-                                             },{
-                                                 c
-                                             }] {
-                                                 contents [line, c]
-                                             } ((PlatformColor = {
-                                                 contents [line, c].Attribute.Value.PlatformColor
-                                             }) was not found.\n"
+                                             + $"Expected Attribute {val} (PlatformColor = {val.Value.PlatformColor}) at Contents[{line},{c}] {contents [line, c]} ((PlatformColor = {contents [line, c].Attribute.Value.PlatformColor}) was not found.\n"
                                              + $"  Expected: {string.Join (",", expectedAttributes.Select (c => c))}\n"
                                              + $"  But Was: <not found>"
                                             );
@@ -438,7 +426,7 @@ internal partial class TestHelpers
 
         // standardize line endings for the comparison
         expectedLook = expectedLook.ReplaceLineEndings ();
-        actualLook = actualLook.ReplaceLineEndings();
+        actualLook = actualLook.ReplaceLineEndings ();
 
         // Remove the first and the last line ending from the expectedLook
         if (expectedLook.StartsWith (Environment.NewLine))
@@ -522,6 +510,7 @@ internal partial class TestHelpers
         return sb.ToString ();
     }
 
+    // TODO: Update all tests that use GetALlViews to use GetAllViewsTheoryData instead
     /// <summary>Gets a list of instances of all classes derived from View.</summary>
     /// <returns>List of View objects</returns>
     public static List<View> GetAllViews ()
@@ -533,9 +522,38 @@ internal partial class TestHelpers
                                             && type.IsPublic
                                             && type.IsSubclassOf (typeof (View))
                                    )
-                            .Select (type => GetTypeInitializer (type, type.GetConstructor (Array.Empty<Type> ())))
+                            .Select (type => CreateView (type, type.GetConstructor (Array.Empty<Type> ())))
                             .ToList ();
     }
+
+    public static TheoryData<View, string> GetAllViewsTheoryData ()
+    {
+        // TODO: Figure out how to simplify this. I couldn't figure out how to not have to iterate over ret.
+        (View view, string name)[] ret =
+            typeof (View).Assembly
+                               .GetTypes ()
+                               .Where (
+                                       type => type.IsClass
+                                               && !type.IsAbstract
+                                               && type.IsPublic
+                                               && type.IsSubclassOf (typeof (View))
+                                      )
+                               .Select (
+                                        type => (
+                                                    view: CreateView (
+                                                                   type, type.GetConstructor (Array.Empty<Type> ())),
+                                                    name: type.Name)
+                                        ).ToArray();
+
+        TheoryData<View, string> td = new ();
+        foreach ((View view, string name) in ret)
+        {
+            td.Add(view, name);
+        }
+
+        return td;
+    }
+
 
     /// <summary>
     ///     Verifies the console used all the <paramref name="expectedColors"/> when rendering. If one or more of the
@@ -638,9 +656,9 @@ internal partial class TestHelpers
         }
     }
 
-    private static View GetTypeInitializer (Type type, ConstructorInfo ctor)
+    public static View CreateView (Type type, ConstructorInfo ctor)
     {
-        View viewType = null;
+        View view = null;
 
         if (type.IsGenericType && type.IsTypeDefinition)
         {
@@ -694,17 +712,17 @@ internal partial class TestHelpers
 
             if (type.IsGenericType && !type.IsTypeDefinition)
             {
-                viewType = (View)Activator.CreateInstance (type);
-                Assert.IsType (type, viewType);
+                view = (View)Activator.CreateInstance (type);
+                Assert.IsType (type, view);
             }
             else
             {
-                viewType = (View)ctor.Invoke (pTypes.ToArray ());
-                Assert.IsType (type, viewType);
+                view = (View)ctor.Invoke (pTypes.ToArray ());
+                Assert.IsType (type, view);
             }
         }
 
-        return viewType;
+        return view;
     }
 
     [GeneratedRegex ("^\\s+", RegexOptions.Multiline)]
@@ -715,11 +733,11 @@ internal partial class TestHelpers
         string replaced = toReplace;
 
         replaced = Environment.NewLine.Length switch
-                   {
-                       2 when !replaced.Contains ("\r\n") => replaced.Replace ("\n", Environment.NewLine),
-                       1 => replaced.Replace ("\r\n", Environment.NewLine),
-                       var _ => replaced
-                   };
+        {
+            2 when !replaced.Contains ("\r\n") => replaced.Replace ("\n", Environment.NewLine),
+            1 => replaced.Replace ("\r\n", Environment.NewLine),
+            var _ => replaced
+        };
 
         return replaced;
     }

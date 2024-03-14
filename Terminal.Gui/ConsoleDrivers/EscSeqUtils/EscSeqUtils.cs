@@ -163,7 +163,7 @@ public static class EscSeqUtils
     /// <param name="key">The <see cref="ConsoleKey"/> which may changes.</param>
     /// <param name="cki">The <see cref="ConsoleKeyInfo"/> array.</param>
     /// <param name="mod">The <see cref="ConsoleModifiers"/> which may changes.</param>
-    /// <param name="c1Control">The control returned by the <see cref="GetC1ControlChar(char)"/> method.</param>
+    /// <param name="c1Control">The control returned by the <see cref="GetC1ControlChar"/> method.</param>
     /// <param name="code">The code returned by the <see cref="GetEscapeResult(char[])"/> method.</param>
     /// <param name="values">The values returned by the <see cref="GetEscapeResult(char[])"/> method.</param>
     /// <param name="terminator">The terminator returned by the <see cref="GetEscapeResult(char[])"/> method.</param>
@@ -406,7 +406,7 @@ public static class EscSeqUtils
     /// </summary>
     /// <param name="kChar">The array with all chars.</param>
     /// <returns>
-    ///     The c1Control returned by <see cref="GetC1ControlChar(char)"/>, code, values and terminating.
+    ///     The c1Control returned by <see cref="GetC1ControlChar"/>, code, values and terminating.
     /// </returns>
     public static (string c1Control, string code, string [] values, string terminating) GetEscapeResult (char [] kChar)
     {

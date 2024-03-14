@@ -4,59 +4,56 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class KeyboardEventTests
+public class KeyboardEventTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public KeyboardEventTests (ITestOutputHelper output) { _output = output; }
+    public static TheoryData<View, string> AllViews => TestHelpers.GetAllViewsTheoryData ();
 
     /// <summary>
-    ///     This tests that when a new key down event is sent to the view the view will fire the 3 key-down related
+    ///     This tests that when a new key down event is sent to the view  will fire the 3 key-down related
     ///     events: KeyDown, InvokingKeyBindings, and ProcessKeyDown. Note that KeyUp is independent.
     /// </summary>
-    [Fact]
-    public void AllViews_KeyDown_All_EventsFire ()
+    [Theory]
+    [MemberData (nameof (AllViews))]
+    public void AllViews_KeyDown_All_EventsFire (View view, string viewName)
     {
-        foreach (View view in TestHelpers.GetAllViews ())
+        if (view == null)
         {
-            if (view == null)
-            {
-                _output.WriteLine ($"ERROR: null view from {nameof (TestHelpers.GetAllViews)}");
+            output.WriteLine ($"ERROR: Skipping generic view: {viewName}");
 
-                continue;
-            }
-
-            _output.WriteLine ($"Testing {view.GetType ().Name}");
-
-            var keyDown = false;
-
-            view.KeyDown += (s, a) =>
-                            {
-                                a.Handled = false; // don't handle it so the other events are called
-                                keyDown = true;
-                            };
-
-            var invokingKeyBindings = false;
-
-            view.InvokingKeyBindings += (s, a) =>
-                                        {
-                                            a.Handled = false; // don't handle it so the other events are called
-                                            invokingKeyBindings = true;
-                                        };
-
-            var keyDownProcessed = false;
-
-            view.ProcessKeyDown += (s, a) =>
-                                   {
-                                       a.Handled = true;
-                                       keyDownProcessed = true;
-                                   };
-
-            Assert.True (view.NewKeyDownEvent (Key.A)); // this will be true because the ProcessKeyDown event handled it
-            Assert.True (keyDown);
-            Assert.True (invokingKeyBindings);
-            Assert.True (keyDownProcessed);
-            view.Dispose ();
+            return;
         }
+
+        output.WriteLine ($"Testing {viewName}");
+
+        var keyDown = false;
+
+        view.KeyDown += (s, a) =>
+                        {
+                            a.Handled = false; // don't handle it so the other events are called
+                            keyDown = true;
+                        };
+
+        var invokingKeyBindings = false;
+
+        view.InvokingKeyBindings += (s, a) =>
+                                    {
+                                        a.Handled = false; // don't handle it so the other events are called
+                                        invokingKeyBindings = true;
+                                    };
+
+        var keyDownProcessed = false;
+
+        view.ProcessKeyDown += (s, a) =>
+                               {
+                                   a.Handled = true;
+                                   keyDownProcessed = true;
+                               };
+
+        Assert.True (view.NewKeyDownEvent (Key.A)); // this will be true because the ProcessKeyDown event handled it
+        Assert.True (keyDown);
+        Assert.True (invokingKeyBindings);
+        Assert.True (keyDownProcessed);
+        view.Dispose ();
     }
 
     /// <summary>
@@ -70,12 +67,12 @@ public class KeyboardEventTests
         {
             if (view == null)
             {
-                _output.WriteLine ($"ERROR: null view from {nameof (TestHelpers.GetAllViews)}");
+                output.WriteLine ($"ERROR: null view from {nameof (TestHelpers.GetAllViews)}");
 
                 continue;
             }
 
-            _output.WriteLine ($"Testing {view.GetType ().Name}");
+            output.WriteLine ($"Testing {view.GetType ().Name}");
 
             var keyUp = false;
 
@@ -133,24 +130,24 @@ public class KeyboardEventTests
         //Assert.True (view.OnProcessKeyDownWasCalled);
 
         view.NewKeyDownEvent (
-                              new Key (
-                                       KeyCode.Null
-                                       | (shift ? KeyCode.ShiftMask : 0)
-                                       | (alt ? KeyCode.AltMask : 0)
-                                       | (control ? KeyCode.CtrlMask : 0)
-                                      )
+                              new (
+                                   KeyCode.Null
+                                   | (shift ? KeyCode.ShiftMask : 0)
+                                   | (alt ? KeyCode.AltMask : 0)
+                                   | (control ? KeyCode.CtrlMask : 0)
+                                  )
                              );
         Assert.True (keyPressed);
         Assert.True (view.OnKeyDownContinued);
         Assert.True (view.OnKeyPressedContinued);
 
         view.NewKeyUpEvent (
-                            new Key (
-                                     KeyCode.Null
-                                     | (shift ? KeyCode.ShiftMask : 0)
-                                     | (alt ? KeyCode.AltMask : 0)
-                                     | (control ? KeyCode.CtrlMask : 0)
-                                    )
+                            new (
+                                 KeyCode.Null
+                                 | (shift ? KeyCode.ShiftMask : 0)
+                                 | (alt ? KeyCode.AltMask : 0)
+                                 | (control ? KeyCode.CtrlMask : 0)
+                                )
                            );
         Assert.True (keyUp);
         Assert.True (view.OnKeyUpContinued);

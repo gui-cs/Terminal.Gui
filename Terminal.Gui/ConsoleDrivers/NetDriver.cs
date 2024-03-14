@@ -2,6 +2,7 @@
 // NetDriver.cs: The System.Console-based .NET driver, works on Windows and Unix, but is not particularly efficient.
 //
 
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 using static Terminal.Gui.NetEvents;
@@ -1135,7 +1136,9 @@ internal class NetDriver : ConsoleDriver
 
                 break;
             case EventType.Mouse:
-                OnMouseEvent (new MouseEventEventArgs (ToDriverMouse (inputEvent.MouseEvent)));
+                MouseEvent me = ToDriverMouse (inputEvent.MouseEvent);
+                //Debug.WriteLine ($"NetDriver: ({me.X},{me.Y}) - {me.Flags}");
+                OnMouseEvent (new MouseEventEventArgs (me));
 
                 break;
             case EventType.WindowSize:
@@ -1376,7 +1379,7 @@ internal class NetDriver : ConsoleDriver
 
     private MouseEvent ToDriverMouse (NetEvents.MouseEvent me)
     {
-        //System.Diagnostics.Debug.WriteLine ($"X: {me.Position.X}; Y: {me.Position.Y}; ButtonState: {me.ButtonState}");
+       // System.Diagnostics.Debug.WriteLine ($"X: {me.Position.X}; Y: {me.Position.Y}; ButtonState: {me.ButtonState}");
 
         MouseFlags mouseFlag = 0;
 

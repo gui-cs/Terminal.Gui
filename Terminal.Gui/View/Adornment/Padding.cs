@@ -38,4 +38,31 @@ public class Padding : Adornment
             Parent?.SetNeedsDisplay ();
         }
     }
+
+    /// <summary>Called when a mouse event occurs within the Padding.</summary>
+    /// <remarks>
+    /// <para>
+    /// The coordinates are relative to <see cref="View.Bounds"/>.
+    /// </para>
+    /// <para>
+    /// A mouse click on the Padding will cause the Parent to focus.
+    /// </para>
+    /// </remarks>
+    /// <param name="mouseEvent"></param>
+    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
+    protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
+    {
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+        {
+            if (Parent.CanFocus && !Parent.HasFocus)
+            {
+                Parent.SetFocus ();
+                Parent.SetNeedsDisplay ();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }

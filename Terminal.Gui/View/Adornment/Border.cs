@@ -53,7 +53,66 @@ public class Border : Adornment
     public Border (View parent) : base (parent)
     {
         /* Do nothing; View.CreateAdornment requires a constructor that takes a parent */
+        Parent = parent;
     }
+
+#if SUBVIEW_BASED_BORDER
+    private Line _left;
+
+    /// <summary>
+    ///    The close button for the border. Set to <see cref="View.Visible"/>, to <see langword="true"/> to enable.
+    /// </summary>
+    public Button CloseButton { get; internal set; }
+#endif
+
+    /// <inheritdoc/>
+    public override void BeginInit ()
+    {
+        base.BeginInit ();
+
+#if SUBVIEW_BASED_BORDER
+        if (Parent is { })
+        {
+            // Left
+            _left = new ()
+            {
+                Orientation = Orientation.Vertical,
+            };
+            Add (_left);
+
+            CloseButton = new Button ()
+            {
+                Text = "X",
+                CanFocus = true,
+                Visible = false,
+            };
+            CloseButton.Accept += (s, e) =>
+            {
+                e.Cancel = Parent.InvokeCommand (Command.QuitToplevel) == true;
+            };
+            Add (CloseButton);
+
+            LayoutStarted += OnLayoutStarted;
+    }
+#endif
+}
+
+#if SUBVIEW_BASED_BORDER
+    private void OnLayoutStarted (object sender, LayoutEventArgs e)
+    {
+        _left.Border.LineStyle = LineStyle;
+
+        _left.X = Thickness.Left - 1;
+        _left.Y = Thickness.Top - 1;
+        _left.Width = 1;
+        _left.Height = Height;
+
+        CloseButton.X = Pos.AnchorEnd (Thickness.Right / 2 + 1) -
+                        (Pos.Right (CloseButton) -
+                         Pos.Left (CloseButton));
+        CloseButton.Y = 0;
+}
+#endif
 
     /// <summary>
     ///     The color scheme for the Border. If set to <see langword="null"/>, gets the <see cref="Adornment.Parent"/>
@@ -77,6 +136,31 @@ public class Border : Adornment
         }
     }
 
+    Rectangle GetBorderBounds (Rectangle screenBounds)
+    {
+        return new (
+                                      screenBounds.X + Math.Max (0, Thickness.Left - 1),
+                                      screenBounds.Y + Math.Max (0, Thickness.Top - 1),
+                                      Math.Max (
+                                                0,
+                                                screenBounds.Width
+                                                - Math.Max (
+                                                            0,
+                                                            Math.Max (0, Thickness.Left - 1)
+                                                            + Math.Max (0, Thickness.Right - 1)
+                                                           )
+                                               ),
+                                      Math.Max (
+                                                0,
+                                                screenBounds.Height
+                                                - Math.Max (
+                                                            0,
+                                                            Math.Max (0, Thickness.Top - 1)
+                                                            + Math.Max (0, Thickness.Bottom - 1)
+                                                           )
+                                               )
+                                     );
+    }
     /// <summary>
     ///     Sets the style of the border by changing the <see cref="Thickness"/>. This is a helper API for setting the
     ///     <see cref="Thickness"/> to <c>(1,1,1,1)</c> and setting the line style of the views that comprise the border. If
@@ -120,29 +204,8 @@ public class Border : Adornment
         // For Border
         // ...thickness extends outward (border/title is always as far in as possible)
         // PERF: How about a call to Rectangle.Offset?
-        Rectangle borderBounds = new (
-                                      screenBounds.X + Math.Max (0, Thickness.Left - 1),
-                                      screenBounds.Y + Math.Max (0, Thickness.Top - 1),
-                                      Math.Max (
-                                                0,
-                                                screenBounds.Width
-                                                - Math.Max (
-                                                            0,
-                                                            Math.Max (0, Thickness.Left - 1)
-                                                            + Math.Max (0, Thickness.Right - 1)
-                                                           )
-                                               ),
-                                      Math.Max (
-                                                0,
-                                                screenBounds.Height
-                                                - Math.Max (
-                                                            0,
-                                                            Math.Max (0, Thickness.Top - 1)
-                                                            + Math.Max (0, Thickness.Bottom - 1)
-                                                           )
-                                               )
-                                     );
 
+        var borderBounds = GetBorderBounds (screenBounds);
         int topTitleLineY = borderBounds.Y;
         int titleY = borderBounds.Y;
         var titleBarsLength = 0; // the little vertical thingies
@@ -323,6 +386,8 @@ public class Border : Adornment
                 }
             }
 
+#if !SUBVIEW_BASED_BORDER
+
             if (drawLeft)
             {
                 lc.AddLine (
@@ -333,6 +398,7 @@ public class Border : Adornment
                             Driver.GetAttribute ()
                            );
             }
+#endif
 
             if (drawBottom)
             {
