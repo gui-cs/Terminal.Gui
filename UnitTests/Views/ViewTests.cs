@@ -4582,16 +4582,18 @@ Test", output);
 000000", new Attribute [] { Colors.TopLevel.Normal, Colors.TopLevel.Focus });
 		}
 
-		[Fact]
-		public void OnMouseClick_Is_Only_Raised_Once ()
+		[Theory]
+		[InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
+		[InlineData (MouseFlags.Button1Pressed | MouseFlags.ButtonCtrl, MouseFlags.Button1Released | MouseFlags.ButtonCtrl, MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl)]
+		public void OnMouseClick_Is_Only_Raised_Once (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
 		{
 			var mouseClicks = 0;
 			var view = new View ();
 			view.MouseClick += (_) => mouseClicks++;
 
-			view.OnMouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Pressed });
-			view.OnMouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Released });
-			view.OnMouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
+			view.OnMouseEvent (new MouseEvent () { Flags = pressed });
+			view.OnMouseEvent (new MouseEvent () { Flags = released });
+			view.OnMouseEvent (new MouseEvent () { Flags = clicked });
 
 			Assert.Equal (1, mouseClicks);
 		}

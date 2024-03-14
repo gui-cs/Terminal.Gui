@@ -2894,8 +2894,8 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked) || mouseEvent.Flags.HasFlag (MouseFlags.Button2Clicked)
-				|| mouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked) || mouseEvent.Flags.HasFlag (MouseFlags.Button4Clicked)) {
+			if ((mouseEvent.Flags & MouseFlags.Button1Clicked) != 0 || (mouseEvent.Flags & MouseFlags.Button2Clicked) != 0
+				|| (mouseEvent.Flags & MouseFlags.Button3Clicked) != 0 || (mouseEvent.Flags & MouseFlags.Button4Clicked) != 0) {
 
 				var args = new MouseEventArgs (mouseEvent);
 				if (OnMouseClick (args)) {
