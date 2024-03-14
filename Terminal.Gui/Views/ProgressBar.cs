@@ -190,10 +190,10 @@ public class ProgressBar : View
             }
 
             tf?.Draw (
-                      BoundsToScreen (Viewport),
+                      ViewportToScreen (Viewport),
                       attr,
                       ColorScheme.Normal,
-                      SuperView?.BoundsToScreen (SuperView.Viewport) ?? default (Rectangle)
+                      SuperView?.ViewportToScreen (SuperView.Viewport) ?? default (Rectangle)
                      );
         }
     }

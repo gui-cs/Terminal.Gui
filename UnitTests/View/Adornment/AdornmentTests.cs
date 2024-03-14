@@ -105,7 +105,7 @@ public class AdornmentTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin.Viewport);
 
         Assert.Null (parent.Margin.SuperView);
-        Rectangle boundsAsScreen = parent.Margin.BoundsToScreen (new Rectangle (1, 2, 5, 5));
+        Rectangle boundsAsScreen = parent.Margin.ViewportToScreen (new Rectangle (1, 2, 5, 5));
         Assert.Equal (new Rectangle (2, 4, 5, 5), boundsAsScreen);
     }
 

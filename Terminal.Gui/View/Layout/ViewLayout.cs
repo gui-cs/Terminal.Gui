@@ -101,10 +101,10 @@ public partial class View
                 return ret;
             }
 
-            Point boundsOffset = super.GetBoundsOffset ();
-            boundsOffset.Offset(super.Frame.X, super.Frame.Y);
-            ret.X += boundsOffset.X;
-            ret.Y += boundsOffset.Y;
+            Point viewportOffset = super.GetViewportOffset ();
+            viewportOffset.Offset(super.Frame.X, super.Frame.Y);
+            ret.X += viewportOffset.X;
+            ret.Y += viewportOffset.Y;
             super = super.SuperView;
         }
 
@@ -120,7 +120,7 @@ public partial class View
     /// <param name="y">Screen-relative row.</param>
     public virtual Point ScreenToFrame (int x, int y)
     {
-        Point superViewBoundsOffset = SuperView?.GetBoundsOffset () ?? Point.Empty;
+        Point superViewBoundsOffset = SuperView?.GetViewportOffset () ?? Point.Empty;
         if (SuperView is null)
         {
             superViewBoundsOffset.Offset (x - Frame.X, y - Frame.Y);
@@ -287,10 +287,12 @@ public partial class View
     #region Viewport
 
     /// <summary>
-    ///     The bounds represent the View-relative rectangle used for this view; the area inside the view where
-    ///     subviews and content are presented.
+    ///     The viewport represents the location and size of the View's content that can be seen by the end-user at a given time.
+    ///     The location is specified in coordinates relative to the top-left corner of the area of the View within the
+    ///     <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/> and is normally <c>0, 0</c>. Non-zero
+    ///     values for the location indicate the visible area is offset into the View's virtual <see cref="ContentSize"/>.
     /// </summary>
-    /// <value>The rectangle describing the location and size of the area where the views' subviews and content are drawn.</value>
+    /// <value>The rectangle describing the location and size of the area where the views' subviews and content are visible.</value>
     /// <remarks>
     ///     <para>
     ///         If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/> the value of Viewport is indeterminate until
@@ -298,17 +300,12 @@ public partial class View
     ///         called.
     ///     </para>
     ///     <para>
-    ///         Updates to the Viewport updates <see cref="Frame"/>, and has the same effect as updating the
+    ///         Updates to the Viewport size updates <see cref="Frame"/>, and has the same effect as updating the
     ///         <see cref="Frame"/>.
     ///     </para>
     ///     <para>
-    ///         Altering the Viewport will eventually (when the view is next laid out) cause the
+    ///         Altering the Viewport size will eventually (when the view is next laid out) cause the
     ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
-    ///     </para>
-    ///     <para>
-    ///         Because <see cref="Viewport"/> coordinates are relative to the upper-left corner of the <see cref="View"/>, the
-    ///         coordinates of the upper-left corner of the rectangle returned by this property are (0,0). Use this property to
-    ///         obtain the size of the area of the view for tasks such as drawing the view's contents.
     ///     </para>
     /// </remarks>
     public virtual Rectangle Viewport
@@ -363,25 +360,25 @@ public partial class View
     }
 
     /// <summary>Converts a <see cref="Viewport"/>-relative rectangle to a screen-relative rectangle.</summary>
-    public Rectangle BoundsToScreen (in Rectangle bounds)
+    public Rectangle ViewportToScreen (in Rectangle bounds)
     {
         // Translate bounds to Frame (our SuperView's Viewport-relative coordinates)
         Rectangle screen = FrameToScreen ();
-        Point boundsOffset = GetBoundsOffset ();
-        screen.Offset (boundsOffset.X + bounds.X, boundsOffset.Y + bounds.Y);
+        Point viewportOffset = GetViewportOffset ();
+        screen.Offset (viewportOffset.X + bounds.X, viewportOffset.Y + bounds.Y);
 
         return new (screen.Location, bounds.Size);
     }
 
-    /// <summary>Converts a screen-relative coordinate to a bounds-relative coordinate.</summary>
+    /// <summary>Converts a screen-relative coordinate to a Viewport-relative coordinate.</summary>
     /// <returns>The coordinate relative to this view's <see cref="Viewport"/>.</returns>
     /// <param name="x">Screen-relative column.</param>
     /// <param name="y">Screen-relative row.</param>
-    public Point ScreenToBounds (int x, int y)
+    public Point ScreenToViewport (int x, int y)
     {
-        Point boundsOffset = GetBoundsOffset ();
+        Point viewportOffset = GetViewportOffset ();
         Point screen = ScreenToFrame (x, y);
-        screen.Offset (-boundsOffset.X, -boundsOffset.Y);
+        screen.Offset (-viewportOffset.X, -viewportOffset.Y);
 
         return screen;
     }
@@ -390,7 +387,7 @@ public partial class View
     ///     Helper to get the X and Y offset of the Viewport from the Frame. This is the sum of the Left and Top properties
     ///     of <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/>.
     /// </summary>
-    public Point GetBoundsOffset () { return Padding is null ? Point.Empty : Padding.Thickness.GetInside (Padding.Frame).Location; }
+    public Point GetViewportOffset () { return Padding is null ? Point.Empty : Padding.Thickness.GetInside (Padding.Frame).Location; }
 
     #endregion Viewport
 
@@ -698,18 +695,18 @@ public partial class View
             found = start.Padding;
         }
 
-        Point boundsOffset = start.GetBoundsOffset ();
+        Point viewportOffset = start.GetViewportOffset ();
 
         if (found is { })
         {
             start = found;
-            boundsOffset = found.Parent.Frame.Location;
+            viewportOffset = found.Parent.Frame.Location;
         }
 
         if (start.InternalSubviews is { Count: > 0 })
         {
-            int startOffsetX = x - (start.Frame.X + boundsOffset.X);
-            int startOffsetY = y - (start.Frame.Y + boundsOffset.Y);
+            int startOffsetX = x - (start.Frame.X + viewportOffset.X);
+            int startOffsetY = y - (start.Frame.Y + viewportOffset.Y);
 
             for (int i = start.InternalSubviews.Count - 1; i >= 0; i--)
             {
@@ -925,7 +922,7 @@ public partial class View
 
         foreach (View v in ordered)
         {
-            LayoutSubview (v, new (GetBoundsOffset (), Viewport.Size));
+            LayoutSubview (v, new (GetViewportOffset (), Viewport.Size));
         }
 
         // If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.

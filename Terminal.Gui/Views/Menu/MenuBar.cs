@@ -827,11 +827,11 @@ public class MenuBar : View
 
         Rectangle superViewFrame = SuperView is null ? Driver.Viewport : SuperView.Frame;
         View sv = SuperView is null ? Application.Current : SuperView;
-        Point boundsOffset = sv.GetBoundsOffset ();
+        Point viewportOffset = sv.GetViewportOffset ();
 
         return new (
-                    superViewFrame.X - sv.Frame.X - boundsOffset.X,
-                    superViewFrame.Y - sv.Frame.Y - boundsOffset.Y
+                    superViewFrame.X - sv.Frame.X - viewportOffset.X,
+                    superViewFrame.Y - sv.Frame.Y - viewportOffset.Y
                    );
     }
 
@@ -844,9 +844,9 @@ public class MenuBar : View
     {
         Rectangle screen = Driver.Viewport;
         Rectangle currentFrame = Application.Current.Frame;
-        Point boundsOffset = Application.Top.GetBoundsOffset ();
+        Point viewportOffset = Application.Top.GetViewportOffset ();
 
-        return new (screen.X - currentFrame.X - boundsOffset.X, screen.Y - currentFrame.Y - boundsOffset.Y);
+        return new (screen.X - currentFrame.X - viewportOffset.X, screen.Y - currentFrame.Y - viewportOffset.Y);
     }
 
     internal void NextMenu (bool isSubMenu = false, bool ignoreUseSubMenusSingleFrame = false)
@@ -1320,7 +1320,7 @@ public class MenuBar : View
 
         if (mi.IsTopLevel)
         {
-            Rectangle screen = BoundsToScreen (new (new (0, i), Size.Empty));
+            Rectangle screen = ViewportToScreen (new (new (0, i), Size.Empty));
             var menu = new Menu { Host = this, X = screen.X, Y = screen.Y, BarItems = mi };
             menu.Run (mi.Action);
             menu.Dispose ();
@@ -1684,7 +1684,7 @@ public class MenuBar : View
                     {
                         if (Menus [i].IsTopLevel)
                         {
-                            Rectangle screen = BoundsToScreen (new (new (0, i), Size.Empty));
+                            Rectangle screen = ViewportToScreen (new (new (0, i), Size.Empty));
                             var menu = new Menu { Host = this, X = screen.X, Y = screen.Y, BarItems = Menus [i] };
                             menu.Run (Menus [i].Action);
                             menu.Dispose ();

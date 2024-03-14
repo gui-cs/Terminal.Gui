@@ -724,7 +724,7 @@ internal sealed class Menu : View
             throw new InvalidOperationException ("This shouldn't running on a invisible menu!");
         }
 
-        Point boundsPoint = ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
+        Point boundsPoint = ScreenToViewport (a.MouseEvent.X, a.MouseEvent.Y);
         var me = new MouseEvent
         {
             X = boundsPoint.X,
@@ -776,7 +776,7 @@ internal sealed class Menu : View
                 continue;
             }
 
-            if (BoundsToScreen (Viewport).Y + i >= Driver.Rows)
+            if (ViewportToScreen (Viewport).Y + i >= Driver.Rows)
             {
                 break;
             }
@@ -808,7 +808,7 @@ internal sealed class Menu : View
                     continue;
                 }
 
-                if (BoundsToScreen (Viewport).X + p >= Driver.Cols)
+                if (ViewportToScreen (Viewport).X + p >= Driver.Cols)
                 {
                     break;
                 }
@@ -873,7 +873,7 @@ internal sealed class Menu : View
                 textToDraw = item.Title;
             }
 
-            Rectangle screen = BoundsToScreen (new (new (0 , i), Size.Empty));
+            Rectangle screen = ViewportToScreen (new (new (0 , i), Size.Empty));
             if (screen.X < Driver.Cols)
             {
                 Driver.Move (screen.X + 1, screen.Y);
@@ -891,10 +891,10 @@ internal sealed class Menu : View
 
                     // The -3 is left/right border + one space (not sure what for)
                     tf.Draw (
-                             BoundsToScreen (new (1, i, Frame.Width - 3, 1)),
+                             ViewportToScreen (new (1, i, Frame.Width - 3, 1)),
                              i == _currentChild ? ColorScheme.Focus : GetNormalColor (),
                              i == _currentChild ? ColorScheme.HotFocus : ColorScheme.HotNormal,
-                             SuperView?.BoundsToScreen (SuperView.Viewport) ?? Rectangle.Empty
+                             SuperView?.ViewportToScreen (SuperView.Viewport) ?? Rectangle.Empty
                             );
                 }
                 else
@@ -911,7 +911,7 @@ internal sealed class Menu : View
                             ? item.Help.GetColumns ()
                             : item.Help.GetColumns () + item.ShortcutTag.GetColumns () + 2;
                 int col = Frame.Width - l - 3;
-                screen = BoundsToScreen (new (new (col, i), Size.Empty));
+                screen = ViewportToScreen (new (new (col, i), Size.Empty));
 
                 if (screen.X < Driver.Cols)
                 {

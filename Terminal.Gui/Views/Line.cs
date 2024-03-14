@@ -26,7 +26,7 @@ public class Line : View
             lc = adornment.Parent.LineCanvas;
         }
         lc.AddLine (
-                    BoundsToScreen (contentArea).Location,
+                    ViewportToScreen (contentArea).Location,
                     Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height,
                     Orientation,
                     BorderStyle

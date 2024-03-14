@@ -98,7 +98,7 @@ public partial class View
 
         // Clamp the region to the bounds of the view
         contentArea = Rectangle.Intersect (contentArea, Viewport);
-        Driver.FillRect (BoundsToScreen (contentArea));
+        Driver.FillRect (ViewportToScreen (contentArea));
         Driver.SetAttribute (prev);
     }
 
@@ -113,7 +113,7 @@ public partial class View
     ///         <see cref="Rectangle.Empty"/>.
     ///     </para>
     /// </remarks>
-    public Rectangle ClipToBounds ()
+    public Rectangle ClipToViewport ()
     {
         if (Driver is null)
         {
@@ -121,7 +121,7 @@ public partial class View
         }
 
         Rectangle previous = Driver.Clip;
-        Driver.Clip = Rectangle.Intersect (previous, BoundsToScreen (Viewport));
+        Driver.Clip = Rectangle.Intersect (previous, ViewportToScreen (Viewport));
 
         return previous;
     }
@@ -153,7 +153,7 @@ public partial class View
 
         OnDrawAdornments ();
 
-        Rectangle prevClip = ClipToBounds ();
+        Rectangle prevClip = ClipToViewport ();
 
         if (ColorScheme is { })
         {
@@ -326,7 +326,7 @@ public partial class View
             return;
         }
 
-        Rectangle screen = BoundsToScreen (new (col, row, 0, 0));
+        Rectangle screen = ViewportToScreen (new (col, row, 0, 0));
         Driver?.Move (screen.X, screen.Y);
     }
 
@@ -354,18 +354,18 @@ public partial class View
     }
 
     /// <summary>Enables overrides to draw infinitely scrolled content and/or a background behind added controls.</summary>
-    /// <param name="contentArea">
+    /// <param name="viewport">
     ///     The view-relative rectangle describing the currently visible viewport into the
     ///     <see cref="View"/>
     /// </param>
     /// <remarks>This method will be called before any subviews added with <see cref="Add(View)"/> have been drawn.</remarks>
-    public virtual void OnDrawContent (Rectangle contentArea)
+    public virtual void OnDrawContent (Rectangle viewport)
     {
         if (NeedsDisplay)
         {
             if (SuperView is { })
             {
-                Clear (contentArea);
+                Clear (viewport);
             }
 
             if (!string.IsNullOrEmpty (TextFormatter.Text))
@@ -378,7 +378,7 @@ public partial class View
 
             // This should NOT clear 
             TextFormatter?.Draw (
-                                 BoundsToScreen (contentArea),
+                                 ViewportToScreen (viewport),
                                  HasFocus ? GetFocusColor () : GetNormalColor (),
                                  HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
                                  Rectangle.Empty
@@ -418,7 +418,7 @@ public partial class View
     ///     Enables overrides after completed drawing infinitely scrolled content and/or a background behind removed
     ///     controls.
     /// </summary>
-    /// <param name="contentArea">
+    /// <param name="viewport">
     ///     The view-relative rectangle describing the currently visible viewport into the
     ///     <see cref="View"/>
     /// </param>
@@ -426,7 +426,7 @@ public partial class View
     ///     This method will be called after any subviews removed with <see cref="Remove(View)"/> have been completed
     ///     drawing.
     /// </remarks>
-    public virtual void OnDrawContentComplete (Rectangle contentArea) { DrawContentComplete?.Invoke (this, new (contentArea)); }
+    public virtual void OnDrawContentComplete (Rectangle viewport) { DrawContentComplete?.Invoke (this, new (viewport)); }
 
     // TODO: Make this cancelable
     /// <summary>
@@ -557,23 +557,5 @@ public partial class View
     {
         _needsDisplayRect = Rectangle.Empty;
         SubViewNeedsDisplay = false;
-    }
-
-    // INTENT: Isn't this just intersection? It isn't used anyway.
-    // Clips a rectangle in screen coordinates to the dimensions currently available on the screen
-    internal Rectangle ScreenClip (Rectangle regionScreen)
-    {
-        int x = regionScreen.X < 0 ? 0 : regionScreen.X;
-        int y = regionScreen.Y < 0 ? 0 : regionScreen.Y;
-
-        int w = regionScreen.X + regionScreen.Width >= Driver.Cols
-                    ? Driver.Cols - regionScreen.X
-                    : regionScreen.Width;
-
-        int h = regionScreen.Y + regionScreen.Height >= Driver.Rows
-                    ? Driver.Rows - regionScreen.Y
-                    : regionScreen.Height;
-
-        return new (x, y, w, h);
     }
 }

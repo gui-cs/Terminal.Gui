@@ -217,7 +217,7 @@ public class TileView : View
             {
                 bool isRoot = _splitterLines.Contains (line);
 
-                Rectangle screen = line.BoundsToScreen (Rectangle.Empty);
+                Rectangle screen = line.ViewportToScreen (Rectangle.Empty);
                 Point origin = ScreenToFrame (screen.X, screen.Y);
                 int length = line.Orientation == Orientation.Horizontal ? line.Frame.Width : line.Frame.Height;
 
@@ -837,7 +837,7 @@ public class TileView : View
         /// </summary>
         public Point GetLocalCoordinateForTitle (TileView intoCoordinateSpace)
         {
-            Rectangle screen = Tile.ContentView.BoundsToScreen (Rectangle.Empty);
+            Rectangle screen = Tile.ContentView.ViewportToScreen (Rectangle.Empty);
             return intoCoordinateSpace.ScreenToFrame (screen.X, screen.Y - 1);
         }
 

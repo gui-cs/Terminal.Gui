@@ -223,8 +223,8 @@ public class ViewExperiments : Scenario
                                            view.Frame
                                        } .Viewport: {
                                            view.Viewport
-                                       } .BoundsOffset: {
-                                           view.GetBoundsOffset ()
+                                       } .viewportOffset: {
+                                           view.GetViewportOffset ()
                                        }\n .Padding.Frame: {
                                            view.Padding.Frame
                                        } .Padding.Viewport: {

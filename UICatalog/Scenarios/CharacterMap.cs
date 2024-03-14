@@ -564,7 +564,7 @@ internal class CharMap : ScrollView
                                       )
                                  );
 
-        Rectangle oldClip = ClipToBounds ();
+        Rectangle oldClip = ClipToViewport ();
 
         if (ShowHorizontalScrollIndicator)
         {

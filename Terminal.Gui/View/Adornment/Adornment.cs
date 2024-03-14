@@ -146,7 +146,7 @@ public class Adornment : View
             return;
         }
 
-        Rectangle screenBounds = BoundsToScreen (contentArea);
+        Rectangle screenBounds = ViewportToScreen (contentArea);
         Attribute normalAttr = GetNormalColor ();
         Driver.SetAttribute (normalAttr);
 
@@ -297,7 +297,7 @@ public class Adornment : View
 
                 _dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
 
-                Point parentLoc = Parent.SuperView?.ScreenToBounds (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y) ?? mouseEvent.ScreenPosition;
+                Point parentLoc = Parent.SuperView?.ScreenToViewport (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y) ?? mouseEvent.ScreenPosition;
 
                 GetLocationEnsuringFullVisibility (
                                      Parent,

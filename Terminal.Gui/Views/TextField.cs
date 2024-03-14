@@ -1196,8 +1196,8 @@ public class TextField : View
 
         int pos = _cursorPosition - ScrollOffset + Math.Min (Frame.X, 0);
         int offB = OffSetBackground ();
-        Rectangle containerFrame = SuperView?.BoundsToScreen (SuperView.Viewport) ?? default (Rectangle);
-        Rectangle thisFrame = BoundsToScreen (Viewport);
+        Rectangle containerFrame = SuperView?.ViewportToScreen (SuperView.Viewport) ?? default (Rectangle);
+        Rectangle thisFrame = ViewportToScreen (Viewport);
 
         if (pos > -1
             && col >= pos

@@ -32,7 +32,7 @@ public class ScreenToTests
             BorderStyle = LineStyle.Single
         };
 
-        Point actual = view.ScreenToBounds (x, y);
+        Point actual = view.ScreenToViewport (x, y);
         Assert.Equal (expectedX, actual.X);
         Assert.Equal (expectedY, actual.Y);
     }
@@ -54,7 +54,7 @@ public class ScreenToTests
     {
         var view = new View { X = viewX, Y = viewY, Width = 10, Height = 10 };
 
-        Point actual = view.ScreenToBounds (x, y);
+        Point actual = view.ScreenToViewport (x, y);
         Assert.Equal (expectedX, actual.X);
         Assert.Equal (expectedY, actual.Y);
     }
@@ -103,7 +103,7 @@ public class ScreenToTests
         var view = new View { X = viewX, Y = viewY, Width = 5, Height = 5 };
         super.Add (view);
 
-        Point actual = view.ScreenToBounds (x, y);
+        Point actual = view.ScreenToViewport (x, y);
         Assert.Equal (expectedX, actual.X);
         Assert.Equal (expectedY, actual.Y);
     }

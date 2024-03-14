@@ -1805,7 +1805,7 @@ public class ToplevelTests
 
         btnPopup.Accept += (s, e) =>
                             {
-                                Rectangle viewToScreen = btnPopup.BoundsToScreen (top.Frame);
+                                Rectangle viewToScreen = btnPopup.ViewportToScreen (top.Frame);
 
                                 var viewAddedToTop = new View
                                 {

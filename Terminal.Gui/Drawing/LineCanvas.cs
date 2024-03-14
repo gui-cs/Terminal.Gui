@@ -48,7 +48,7 @@ public class LineCanvas : IDisposable
         // TODO: Add other resolvers
     };
 
-    private Rectangle _cachedBounds;
+    private Rectangle _cachedViewport;
 
     /// <summary>Creates a new instance.</summary>
     public LineCanvas ()
@@ -71,11 +71,11 @@ public class LineCanvas : IDisposable
     {
         get
         {
-            if (_cachedBounds.IsEmpty)
+            if (_cachedViewport.IsEmpty)
             {
                 if (_lines.Count == 0)
                 {
-                    return _cachedBounds;
+                    return _cachedViewport;
                 }
 
                 Rectangle bounds = _lines [0].Viewport;
@@ -94,10 +94,10 @@ public class LineCanvas : IDisposable
                     };
                 }
 
-                _cachedBounds = bounds;
+                _cachedViewport = bounds;
             }
 
-            return _cachedBounds;
+            return _cachedViewport;
         }
     }
 
@@ -134,7 +134,7 @@ public class LineCanvas : IDisposable
         Attribute? attribute = default
     )
     {
-        _cachedBounds = Rectangle.Empty;
+        _cachedViewport = Rectangle.Empty;
         _lines.Add (new StraightLine (start, length, orientation, style, attribute));
     }
 
@@ -142,14 +142,14 @@ public class LineCanvas : IDisposable
     /// <param name="line"></param>
     public void AddLine (StraightLine line)
     {
-        _cachedBounds = Rectangle.Empty;
+        _cachedViewport = Rectangle.Empty;
         _lines.Add (line);
     }
 
     /// <summary>Clears all lines from the LineCanvas.</summary>
     public void Clear ()
     {
-        _cachedBounds = Rectangle.Empty;
+        _cachedViewport = Rectangle.Empty;
         _lines.Clear ();
     }
 
@@ -157,7 +157,7 @@ public class LineCanvas : IDisposable
     ///     Clears any cached states from the canvas Call this method if you make changes to lines that have already been
     ///     added.
     /// </summary>
-    public void ClearCache () { _cachedBounds = Rectangle.Empty; }
+    public void ClearCache () { _cachedViewport = Rectangle.Empty; }
 
     /// <summary>
     ///     Evaluates the lines that have been added to the canvas and returns a map containing the glyphs and their

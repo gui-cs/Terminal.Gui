@@ -194,7 +194,7 @@ public class Border : Adornment
         }
 
         //Driver.SetAttribute (Colors.ColorSchemes ["Error"].Normal);
-        Rectangle screenBounds = BoundsToScreen (contentArea);
+        Rectangle screenBounds = ViewportToScreen (contentArea);
 
         //OnDrawSubviews (bounds); 
 

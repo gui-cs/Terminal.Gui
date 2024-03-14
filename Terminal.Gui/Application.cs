@@ -1422,7 +1422,7 @@ public static partial class Application
 
             if (MouseGrabView.Viewport.Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
             {
-                // The mouse has moved outside the bounds of the view that
+                // The mouse has moved outside the Viewport of the view that
                 // grabbed the mouse, so we tell the view that last got 
                 // OnMouseEnter the mouse is leaving
                 // BUGBUG: That sentence makes no sense. Either I'm missing something or this logic is flawed.
@@ -1476,14 +1476,14 @@ public static partial class Application
                 View = view
             };
         }
-        else if (view.BoundsToScreen (view.Viewport).Contains (a.MouseEvent.X, a.MouseEvent.Y))
+        else if (view.ViewportToScreen (view.Viewport).Contains (a.MouseEvent.X, a.MouseEvent.Y))
         {
-            Point boundsPoint = view.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
+            Point viewportLocation = view.ScreenToViewport (a.MouseEvent.X, a.MouseEvent.Y);
 
             me = new MouseEvent
             {
-                X = boundsPoint.X,
-                Y = boundsPoint.Y,
+                X = viewportLocation.X,
+                Y = viewportLocation.Y,
                 Flags = a.MouseEvent.Flags,
                 ScreenPosition = new (a.MouseEvent.X, a.MouseEvent.Y),
                 View = view

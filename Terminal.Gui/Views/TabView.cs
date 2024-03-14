@@ -317,7 +317,7 @@ public class TabView : View
 
         if (Tabs.Any ())
         {
-            Rectangle savedClip = ClipToBounds ();
+            Rectangle savedClip = ClipToViewport ();
             _tabsBar.OnDrawContent (contentArea);
             _contentView.SetNeedsDisplay ();
             _contentView.Draw ();
@@ -683,7 +683,7 @@ public class TabView : View
             for (var i = 0; i < tabLocations.Length; i++)
             {
                 View tab = tabLocations [i].Tab;
-                Rectangle vts = tab.BoundsToScreen (tab.Viewport);
+                Rectangle vts = tab.ViewportToScreen (tab.Viewport);
                 var lc = new LineCanvas ();
                 int selectedOffset = _host.Style.ShowTopLine && tabLocations [i].IsSelected ? 0 : 1;
 
@@ -1115,7 +1115,7 @@ public class TabView : View
 
                     int lastSelectedTab = !_host.Style.ShowTopLine && i == selectedTab ? 1 :
                                           _host.Style.TabsOnBottom ? 1 : 0;
-                    Rectangle tabsBarVts = BoundsToScreen (Viewport);
+                    Rectangle tabsBarVts = ViewportToScreen (Viewport);
                     int lineLength = tabsBarVts.Right - vts.Right;
 
                     // Right horizontal line
@@ -1314,7 +1314,7 @@ public class TabView : View
                 }
 
                 tab.TextFormatter.Draw (
-                                        tab.BoundsToScreen (tab.Viewport),
+                                        tab.ViewportToScreen (tab.Viewport),
                                         prevAttr,
                                         ColorScheme.HotNormal
                                        );

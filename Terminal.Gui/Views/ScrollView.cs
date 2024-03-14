@@ -339,7 +339,7 @@ public class ScrollView : View
     {
         SetViewsNeedsDisplay ();
 
-        Rectangle savedClip = ClipToBounds ();
+        Rectangle savedClip = ClipToViewport ();
 
         // TODO: It's bad practice for views to always clear a view. It negates clipping.
         Clear (contentArea);
