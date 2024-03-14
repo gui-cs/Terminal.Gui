@@ -1,4 +1,5 @@
-﻿using UICatalog.Scenarios;
+﻿
+#nullable enable
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
@@ -9,6 +10,99 @@ namespace Terminal.Gui.ViewTests;
 /// <param name="output"></param>
 public class FindDeepestViewTests (ITestOutputHelper output)
 {
+    [Theory]
+    [InlineData (0, 0, 0, 0, 0, -1, -1, null)]
+    [InlineData (0, 0, 0, 0, 0, 0, 0, typeof (View))]
+    [InlineData (0, 0, 0, 0, 0, 1, 1, typeof (View))]
+    [InlineData (0, 0, 0, 0, 0, 4, 4, typeof (View))]
+    [InlineData (0, 0, 0, 0, 0, 9, 9, typeof (View))]
+    [InlineData (0, 0, 0, 0, 0, 10, 10, null)]
+
+    [InlineData (1, 1, 0, 0, 0, -1, -1, null)]
+    [InlineData (1, 1, 0, 0, 0, 0, 0, null)]
+    [InlineData (1, 1, 0, 0, 0, 1, 1, typeof (View))]
+    [InlineData (1, 1, 0, 0, 0, 4, 4, typeof (View))]
+    [InlineData (1, 1, 0, 0, 0, 9, 9, typeof (View))]
+    [InlineData (1, 1, 0, 0, 0, 10, 10, typeof (View))]
+
+    [InlineData (0, 0, 1, 0, 0, -1, -1, null)]
+    [InlineData (0, 0, 1, 0, 0, 0, 0, typeof (Margin))]
+    [InlineData (0, 0, 1, 0, 0, 1, 1, typeof (View))]
+    [InlineData (0, 0, 1, 0, 0, 4, 4, typeof (View))]
+    [InlineData (0, 0, 1, 0, 0, 9, 9, typeof (Margin))]
+    [InlineData (0, 0, 1, 0, 0, 10, 10, null)]
+
+    [InlineData (0, 0, 1, 1, 0, -1, -1, null)]
+    [InlineData (0, 0, 1, 1, 0, 0, 0, typeof (Margin))]
+    [InlineData (0, 0, 1, 1, 0, 1, 1, typeof (Border))]
+    [InlineData (0, 0, 1, 1, 0, 4, 4, typeof (View))]
+    [InlineData (0, 0, 1, 1, 0, 9, 9, typeof (Margin))]
+    [InlineData (0, 0, 1, 1, 0, 10, 10, null)]
+
+    [InlineData (0, 0, 1, 1, 1, -1, -1, null)]
+    [InlineData (0, 0, 1, 1, 1, 0, 0, typeof (Margin))]
+    [InlineData (0, 0, 1, 1, 1, 1, 1, typeof (Border))]
+    [InlineData (0, 0, 1, 1, 1, 2, 2, typeof (Padding))]
+    [InlineData (0, 0, 1, 1, 1, 4, 4, typeof (View))]
+    [InlineData (0, 0, 1, 1, 1, 9, 9, typeof (Margin))]
+    [InlineData (0, 0, 1, 1, 1, 10, 10, null)]
+
+    [InlineData (1, 1, 1, 0, 0, -1, -1, null)]
+    [InlineData (1, 1, 1, 0, 0, 0, 0, null)]
+    [InlineData (1, 1, 1, 0, 0, 1, 1, typeof (Margin))]
+    [InlineData (1, 1, 1, 0, 0, 4, 4, typeof (View))]
+    [InlineData (1, 1, 1, 0, 0, 9, 9, typeof (View))]
+    [InlineData (1, 1, 1, 0, 0, 10, 10, typeof (Margin))]
+    [InlineData (1, 1, 1, 1, 0, -1, -1, null)]
+    [InlineData (1, 1, 1, 1, 0, 0, 0, null)]
+    [InlineData (1, 1, 1, 1, 0, 1, 1, typeof (Margin))]
+    [InlineData (1, 1, 1, 1, 0, 4, 4, typeof (View))]
+    [InlineData (1, 1, 1, 1, 0, 9, 9, typeof (Border))]
+    [InlineData (1, 1, 1, 1, 0, 10, 10, typeof (Margin))]
+    [InlineData (1, 1, 1, 1, 1, -1, -1, null)]
+    [InlineData (1, 1, 1, 1, 1, 0, 0, null)]
+    [InlineData (1, 1, 1, 1, 1, 1, 1, typeof (Margin))]
+    [InlineData (1, 1, 1, 1, 1, 2, 2, typeof (Border))]
+    [InlineData (1, 1, 1, 1, 1, 3, 3, typeof (Padding))]
+    [InlineData (1, 1, 1, 1, 1, 4, 4, typeof (View))]
+    [InlineData (1, 1, 1, 1, 1, 8, 8, typeof (Padding))]
+    [InlineData (1, 1, 1, 1, 1, 9, 9, typeof (Border))]
+    [InlineData (1, 1, 1, 1, 1, 10, 10, typeof (Margin))]
+    public void Contains (int frameX, int frameY, int marginThickness, int borderThickness, int paddingThinkcness, int testX, int testY, Type? expectedAdornmentType)
+    {
+        var view = new View ()
+        {
+            X = frameX, Y = frameY,
+            Width = 10, Height = 10,
+        };
+        view.Margin.Thickness = new Thickness (marginThickness);
+        view.Border.Thickness = new Thickness (borderThickness);
+        view.Padding.Thickness = new Thickness (paddingThinkcness);
+
+        Type? containedType = null;
+        if (view.Contains (testX, testY))
+        {
+            containedType = view.GetType ();
+        }
+
+        if (view.Margin.Contains (testX, testY))
+        {
+            containedType = view.Margin.GetType ();
+        }
+
+        if (view.Border.Contains (testX, testY))
+        {
+            containedType = view.Border.GetType ();
+        }
+
+        if (view.Padding.Contains (testX, testY))
+        {
+            containedType = view.Padding.GetType ();
+        }
+        Assert.Equal (expectedAdornmentType, containedType);
+
+    }
+
     // Test that FindDeepestView returns the correct view if the start view has no subviews
     [Theory]
     [InlineData (0, 0)]
@@ -23,7 +117,7 @@ public class FindDeepestViewTests (ITestOutputHelper output)
 
         Assert.Same (start, View.FindDeepestView (start, testX, testY));
     }
-    
+
     // Test that FindDeepestView returns null if the start view has no subviews and coords are outside the view
     [Theory]
     [InlineData (0, 0)]
@@ -37,7 +131,7 @@ public class FindDeepestViewTests (ITestOutputHelper output)
             Width = 10, Height = 10,
         };
 
-        Assert.Null(View.FindDeepestView (start, testX, testY));
+        Assert.Null (View.FindDeepestView (start, testX, testY));
     }
 
     [Theory]
@@ -143,7 +237,7 @@ public class FindDeepestViewTests (ITestOutputHelper output)
 
         Assert.Equal (expectedSubViewFound, found == subview);
     }
-    
+
     // Test that FindDeepestView works if the start view has positive Adornments
     [Theory]
     [InlineData (0, 0, false)]
@@ -178,7 +272,7 @@ public class FindDeepestViewTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (0, 0, typeof(Margin))]
+    [InlineData (0, 0, typeof (Margin))]
     [InlineData (9, 9, typeof (Margin))]
 
     [InlineData (1, 1, typeof (Border))]
@@ -206,7 +300,7 @@ public class FindDeepestViewTests (ITestOutputHelper output)
         start.Add (subview);
 
         var found = View.FindDeepestView (start, testX, testY);
-        Assert.Equal(expectedAdornmentType, found.GetType());
+        Assert.Equal (expectedAdornmentType, found.GetType ());
     }
 
     // Test that FindDeepestView works if the subview has positive Adornments
@@ -280,6 +374,6 @@ public class FindDeepestViewTests (ITestOutputHelper output)
         start.Add (subviews [0]);
 
         var found = View.FindDeepestView (start, testX, testY);
-        Assert.Equal (expectedSubViewFound, subviews.IndexOf(found));
+        Assert.Equal (expectedSubViewFound, subviews.IndexOf (found));
     }
 }
