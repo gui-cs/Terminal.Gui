@@ -3661,7 +3661,7 @@ Edit
 
     [Fact]
     [AutoInitShutdown]
-    public void Click_Another_View_Close_A_Open_Menu ()
+    public void Click_Another_View_Close_An_Open_Menu ()
     {
         var menu = new MenuBar
         {
