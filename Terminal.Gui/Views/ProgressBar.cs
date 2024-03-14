@@ -291,7 +291,7 @@ public class ProgressBar : View
 
     private void SetInitialProperties ()
     {
-        Height = 1; // This will be updated when Bounds is updated in ProgressBar_LayoutStarted
+        Height = 1; // This will be updated when Viewport is updated in ProgressBar_LayoutStarted
         CanFocus = false;
         _fraction = 0;
         LayoutStarted += ProgressBar_LayoutStarted;

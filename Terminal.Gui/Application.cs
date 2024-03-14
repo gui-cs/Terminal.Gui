@@ -296,7 +296,7 @@ public static partial class Application
         Current = Top;
 
         // Ensure Top's layout is up to date.
-        Current.SetRelativeLayout (Driver.Bounds);
+        Current.SetRelativeLayout (Driver.Viewport);
 
         SupportedCultures = GetSupportedCultures ();
         _mainThreadId = Thread.CurrentThread.ManagedThreadId;
@@ -487,7 +487,7 @@ public static partial class Application
         }
 
         //if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
-        Toplevel.SetRelativeLayout (Driver.Bounds);
+        Toplevel.SetRelativeLayout (Driver.Viewport);
 
         //}
 
@@ -1408,7 +1408,7 @@ public static partial class Application
         if (MouseGrabView is { })
         {
             // If the mouse is grabbed, send the event to the view that grabbed it.
-            // The coordinates are relative to the Bounds of the view that grabbed the mouse.
+            // The coordinates are relative to the Viewport of the view that grabbed the mouse.
             Point frameLoc = MouseGrabView.ScreenToFrame (a.MouseEvent.X, a.MouseEvent.Y);
 
             var viewRelativeMouseEvent = new MouseEvent

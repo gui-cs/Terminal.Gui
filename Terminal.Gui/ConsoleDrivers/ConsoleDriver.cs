@@ -19,7 +19,7 @@ public abstract class ConsoleDriver
     internal bool [] _dirtyLines;
 
     /// <summary>Gets the dimensions of the terminal.</summary>
-    public Rectangle Bounds => new (0, 0, Cols, Rows);
+    public Rectangle Viewport => new (0, 0, Cols, Rows);
 
     /// <summary>
     ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject

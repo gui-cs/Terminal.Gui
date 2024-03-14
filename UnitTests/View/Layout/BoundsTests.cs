@@ -4,7 +4,7 @@ namespace Terminal.Gui.ViewTests;
 
 /// <summary>
 /// Test the <see cref="View.Viewport"/>.
-/// DOES NOT TEST Adornment.Bounds methods. Those are in ./Adornment/BoundsTests.cs
+/// DOES NOT TEST Adornment.Viewport methods. Those are in ./Adornment/BoundsTests.cs
 /// </summary>
 /// <param name="output"></param>
 public class BoundsTests (ITestOutputHelper output)

@@ -286,7 +286,7 @@ public class AdornmentToScreenTests (ITestOutputHelper output)
         view.Margin.Thickness = new (1);
         view.Border.Thickness = new (1);
         view.Padding.Thickness = new (1);
-        // Total thickness is 3 (view.Bounds will be Frame.Width - 6)
+        // Total thickness is 3 (view.Viewport will be Frame.Width - 6)
         view.Frame = frame;
 
         Assert.Equal(4, view.Viewport.Width);

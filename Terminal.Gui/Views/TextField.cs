@@ -1746,7 +1746,7 @@ public class TextField : View
         }
     }
 
-    // BUGBUG: This assumes Frame == Bounds. It's also not clear what the intention is. For now, changed to always return 0.
+    // BUGBUG: This assumes Frame == Viewport. It's also not clear what the intention is. For now, changed to always return 0.
     private int OffSetBackground ()
     {
         var offB = 0;

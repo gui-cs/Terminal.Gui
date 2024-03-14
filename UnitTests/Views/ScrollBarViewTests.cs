@@ -421,7 +421,7 @@ This is a tes
                      {
                          newScrollBarView.Position = 100;
 
-                         //Assert.Equal (newScrollBarView.Position, newScrollBarView.Size - listView.LeftItem + (listView.LeftItem - listView.Bounds.Width));
+                         //Assert.Equal (newScrollBarView.Position, newScrollBarView.Size - listView.LeftItem + (listView.LeftItem - listView.Viewport.Width));
                          Assert.Equal (newScrollBarView.Position, listView.LeftItem);
 
                          //Assert.Equal (92, newScrollBarView.Position);

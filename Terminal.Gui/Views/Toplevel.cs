@@ -297,7 +297,7 @@ public partial class Toplevel : View
             // This is causing the menus drawn incorrectly if UseSubMenusSingleFrame is true
             //if (this.MenuBar is { } && this.MenuBar.IsMenuOpen && this.MenuBar.openMenu is { }) {
             //	// TODO: Hack until we can get compositing working right.
-            //	this.MenuBar.openMenu.Redraw (this.MenuBar.openMenu.Bounds);
+            //	this.MenuBar.openMenu.Redraw (this.MenuBar.openMenu.Viewport);
             //}
         }
     }

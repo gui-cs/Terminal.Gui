@@ -778,7 +778,7 @@ public class FileDialog : Dialog
                - _btnCancel.Viewport.Width
                - 1
 
-               // TODO: Fiddle factor, seems the Bounds are wrong for someone
+               // TODO: Fiddle factor, seems the Viewport are wrong for someone
                - 2;
     }
 

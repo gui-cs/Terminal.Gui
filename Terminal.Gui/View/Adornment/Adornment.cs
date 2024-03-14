@@ -112,7 +112,7 @@ public class Adornment : View
     public override Rectangle Viewport
     {
         get => Frame with { Location = Point.Empty };
-        set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
+        set => throw new InvalidOperationException ("It makes no sense to set Viewport of a Thickness.");
     }
 
     /// <inheritdoc/>

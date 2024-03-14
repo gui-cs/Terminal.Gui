@@ -67,7 +67,7 @@ public class LineCanvas : IDisposable
     ///     Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the line that is
     ///     furthest left/top and Size is defined by the line that extends the furthest right/bottom.
     /// </summary>
-    public Rectangle Bounds
+    public Rectangle Viewport
     {
         get
         {
@@ -78,11 +78,11 @@ public class LineCanvas : IDisposable
                     return _cachedBounds;
                 }
 
-                Rectangle bounds = _lines [0].Bounds;
+                Rectangle bounds = _lines [0].Viewport;
 
                 for (var i = 1; i < _lines.Count; i++)
                 {
-                    bounds = Rectangle.Union (bounds, _lines [i].Bounds);
+                    bounds = Rectangle.Union (bounds, _lines [i].Viewport);
                 }
 
                 if (bounds is {Width: 0} or {Height: 0})
@@ -170,9 +170,9 @@ public class LineCanvas : IDisposable
         Dictionary<Point, Cell> map = new ();
 
         // walk through each pixel of the bitmap
-        for (int y = Bounds.Y; y < Bounds.Y + Bounds.Height; y++)
+        for (int y = Viewport.Y; y < Viewport.Y + Viewport.Height; y++)
         {
-            for (int x = Bounds.X; x < Bounds.X + Bounds.Width; x++)
+            for (int x = Viewport.X; x < Viewport.X + Viewport.Width; x++)
             {
                 IntersectionDefinition? [] intersects = _lines
                                                         .Select (l => l.Intersects (x, y))
@@ -232,7 +232,7 @@ public class LineCanvas : IDisposable
     ///     intersection symbols.
     /// </summary>
     /// <returns>A map of all the points within the canvas.</returns>
-    public Dictionary<Point, Rune> GetMap () { return GetMap (Bounds); }
+    public Dictionary<Point, Rune> GetMap () { return GetMap (Viewport); }
 
     /// <summary>Merges one line canvas into this one.</summary>
     /// <param name="lineCanvas"></param>
@@ -260,13 +260,13 @@ public class LineCanvas : IDisposable
 
     /// <summary>
     ///     Returns the contents of the line canvas rendered to a string. The string will include all columns and rows,
-    ///     even if <see cref="Bounds"/> has negative coordinates. For example, if the canvas contains a single line that
+    ///     even if <see cref="Viewport"/> has negative coordinates. For example, if the canvas contains a single line that
     ///     starts at (-1,-1) with a length of 2, the rendered string will have a length of 2.
     /// </summary>
     /// <returns>The canvas rendered to a string.</returns>
     public override string ToString ()
     {
-        if (Bounds.IsEmpty)
+        if (Viewport.IsEmpty)
         {
             return string.Empty;
         }
@@ -275,13 +275,13 @@ public class LineCanvas : IDisposable
         Dictionary<Point, Rune> runeMap = GetMap ();
 
         // Create the rune canvas
-        Rune [,] canvas = new Rune [Bounds.Height, Bounds.Width];
+        Rune [,] canvas = new Rune [Viewport.Height, Viewport.Width];
 
         // Copy the rune map to the canvas, adjusting for any negative coordinates
         foreach (KeyValuePair<Point, Rune> kvp in runeMap)
         {
-            int x = kvp.Key.X - Bounds.X;
-            int y = kvp.Key.Y - Bounds.Y;
+            int x = kvp.Key.X - Viewport.X;
+            int y = kvp.Key.Y - Viewport.Y;
             canvas [y, x] = kvp.Value;
         }
 

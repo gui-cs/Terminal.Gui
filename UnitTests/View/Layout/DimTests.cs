@@ -669,7 +669,7 @@ public class DimTests
                    #if DEBUG
                        Assert.Equal ($"Combine(View(Width,Button(v1){v1.Frame})-View(Width,Button(v3){v3.Viewport}))", v5.Width.ToString ());
                     #else
-                       Assert.Equal ($"Combine(View(Height,Button(){v1.Frame})-View(Height,Button(){v3.Bounds}))", v5.Height.ToString ( ));
+                       Assert.Equal ($"Combine(View(Height,Button(){v1.Frame})-View(Height,Button(){v3.Viewport}))", v5.Height.ToString ( ));
                    #endif
                        Assert.Equal (38, v5.Frame.Width);  // 47-9=38
                        Assert.Equal (80, v5.Frame.Height); // 89-9=80

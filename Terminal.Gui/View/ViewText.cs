@@ -304,12 +304,12 @@ public partial class View
             throw new InvalidOperationException ("SetFrameToFitText can only be called when AutoSize is true");
         }
 
-        // BUGBUG: This API is broken - should not assume Frame.Height == Bounds.Height
+        // BUGBUG: This API is broken - should not assume Frame.Height == Viewport.Height
         // <summary>
         // Gets the minimum dimensions required to fit the View's <see cref="Text"/>, factoring in <see cref="TextDirection"/>.
         // </summary>
         // <param name="sizeRequired">The minimum dimensions required.</param>
-        // <returns><see langword="true"/> if the dimensions fit within the View's <see cref="Bounds"/>, <see langword="false"/> otherwise.</returns>
+        // <returns><see langword="true"/> if the dimensions fit within the View's <see cref="Viewport"/>, <see langword="false"/> otherwise.</returns>
         // <remarks>
         // Always returns <see langword="false"/> if <see cref="AutoSize"/> is <see langword="true"/> or
         // if <see cref="Height"/> (Horizontal) or <see cref="Width"/> (Vertical) are not not set or zero.
@@ -336,7 +336,7 @@ public partial class View
                 case true:
                     int colWidth = TextFormatter.GetWidestLineLength (new List<string> { TextFormatter.Text }, 0, 1);
 
-                    // TODO: v2 - This uses frame.Width; it should only use Bounds
+                    // TODO: v2 - This uses frame.Width; it should only use Viewport
                     if (_frame.Width < colWidth
                         && (Width is null || (Viewport.Width >= 0 && Width is Dim.DimAbsolute && Width.Anchor (0) >= 0 && Width.Anchor (0) < colWidth)))
                     {

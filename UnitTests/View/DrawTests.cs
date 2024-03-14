@@ -232,7 +232,7 @@ public class DrawTests
         var view = new View { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
         view.BeginInit ();
         view.EndInit ();
-        view.SetRelativeLayout (Application.Driver.Bounds);
+        view.SetRelativeLayout (Application.Driver.Viewport);
 
         Assert.Equal (new (0,0,2,2), view.Frame);
         Assert.Equal (Rectangle.Empty, view.Viewport);
@@ -257,7 +257,7 @@ public class DrawTests
         view.Border.Thickness = new Thickness (1, 1, 1, 0);
         view.BeginInit ();
         view.EndInit ();
-        view.SetRelativeLayout (Application.Driver.Bounds);
+        view.SetRelativeLayout (Application.Driver.Viewport);
 
         Assert.Equal (new (0,0,2,1), view.Frame);
         Assert.Equal (Rectangle.Empty, view.Viewport);
@@ -275,7 +275,7 @@ public class DrawTests
         view.Border.Thickness = new Thickness (0, 1, 1, 1);
         view.BeginInit ();
         view.EndInit ();
-        view.SetRelativeLayout (Application.Driver.Bounds);
+        view.SetRelativeLayout (Application.Driver.Viewport);
 
         Assert.Equal (new (0,0,1,2), view.Frame);
         Assert.Equal (Rectangle.Empty, view.Viewport);
@@ -300,7 +300,7 @@ public class DrawTests
         view.Border.Thickness = new Thickness (1, 1, 0, 1);
         view.BeginInit ();
         view.EndInit ();
-        view.SetRelativeLayout (Application.Driver.Bounds);
+        view.SetRelativeLayout (Application.Driver.Viewport);
 
         Assert.Equal (new (0,0,1,2), view.Frame);
         Assert.Equal (Rectangle.Empty, view.Viewport);
@@ -326,7 +326,7 @@ public class DrawTests
 
         view.BeginInit ();
         view.EndInit ();
-        view.SetRelativeLayout (Application.Driver.Bounds);
+        view.SetRelativeLayout (Application.Driver.Viewport);
 
         Assert.Equal (new (0,0,2,1), view.Frame);
         Assert.Equal (Rectangle.Empty, view.Viewport);

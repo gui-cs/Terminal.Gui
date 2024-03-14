@@ -62,7 +62,7 @@ public class TextAnnotation : IAnnotation
 
     /// <summary>
     ///     Draws the <see cref="Text"/> at the given coordinates with truncation to avoid spilling over
-    ///     <see name="View.Bounds"/> of the <paramref name="graph"/>
+    ///     <see name="View.Viewport"/> of the <paramref name="graph"/>
     /// </summary>
     /// <param name="graph"></param>
     /// <param name="x">Screen x position to start drawing string</param>

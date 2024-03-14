@@ -142,7 +142,7 @@ public sealed class ContextMenu : IDisposable
 
         _container = Application.Current;
         _container.Closing += Container_Closing;
-        Rectangle frame = Application.Driver.Bounds;
+        Rectangle frame = Application.Driver.Viewport;
         Point position = Position;
 
         if (Host is { })

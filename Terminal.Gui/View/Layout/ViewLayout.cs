@@ -284,7 +284,7 @@ public partial class View
 
     #endregion Frame
 
-    #region Bounds
+    #region Viewport
 
     /// <summary>
     ///     The bounds represent the View-relative rectangle used for this view; the area inside the view where
@@ -293,16 +293,16 @@ public partial class View
     /// <value>The rectangle describing the location and size of the area where the views' subviews and content are drawn.</value>
     /// <remarks>
     ///     <para>
-    ///         If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/> the value of Bounds is indeterminate until
+    ///         If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/> the value of Viewport is indeterminate until
     ///         the view has been initialized ( <see cref="IsInitialized"/> is true) and <see cref="LayoutSubviews"/> has been
     ///         called.
     ///     </para>
     ///     <para>
-    ///         Updates to the Bounds updates <see cref="Frame"/>, and has the same effect as updating the
+    ///         Updates to the Viewport updates <see cref="Frame"/>, and has the same effect as updating the
     ///         <see cref="Frame"/>.
     ///     </para>
     ///     <para>
-    ///         Altering the Bounds will eventually (when the view is next laid out) cause the
+    ///         Altering the Viewport will eventually (when the view is next laid out) cause the
     ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
@@ -319,7 +319,7 @@ public partial class View
             if (LayoutStyle == LayoutStyle.Computed && !IsInitialized)
             {
                 Debug.WriteLine (
-                                 $"WARNING: Bounds is being accessed before the View has been initialized. This is likely a bug in {this}"
+                                 $"WARNING: Viewport is being accessed before the View has been initialized. This is likely a bug in {this}"
                                 );
             }
 #endif // DEBUG
@@ -341,13 +341,13 @@ public partial class View
         }
         set
         {
-            // TODO: Should we enforce Bounds.X/Y == 0? The code currently ignores value.X/Y which is
+            // TODO: Should we enforce Viewport.X/Y == 0? The code currently ignores value.X/Y which is
             // TODO: correct behavior, but is silent. Perhaps an exception?
 #if DEBUG
             if (value.Location != Point.Empty)
             {
                 Debug.WriteLine (
-                                 $"WARNING: Bounds.Location must always be 0,0. Location ({value.Location}) is ignored. {this}"
+                                 $"WARNING: Viewport.Location must always be 0,0. Location ({value.Location}) is ignored. {this}"
                                 );
             }
 #endif // DEBUG
@@ -365,7 +365,7 @@ public partial class View
     /// <summary>Converts a <see cref="Viewport"/>-relative rectangle to a screen-relative rectangle.</summary>
     public Rectangle BoundsToScreen (in Rectangle bounds)
     {
-        // Translate bounds to Frame (our SuperView's Bounds-relative coordinates)
+        // Translate bounds to Frame (our SuperView's Viewport-relative coordinates)
         Rectangle screen = FrameToScreen ();
         Point boundsOffset = GetBoundsOffset ();
         screen.Offset (boundsOffset.X + bounds.X, boundsOffset.Y + bounds.Y);
@@ -387,12 +387,12 @@ public partial class View
     }
 
     /// <summary>
-    ///     Helper to get the X and Y offset of the Bounds from the Frame. This is the sum of the Left and Top properties
+    ///     Helper to get the X and Y offset of the Viewport from the Frame. This is the sum of the Left and Top properties
     ///     of <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/>.
     /// </summary>
     public Point GetBoundsOffset () { return Padding is null ? Point.Empty : Padding.Thickness.GetInside (Padding.Frame).Location; }
 
-    #endregion Bounds
+    #endregion Viewport
 
     #region AutoSize
 
@@ -573,7 +573,7 @@ public partial class View
     /// <summary>Resizes the View to fit the specified size. Factors in the HotKey.</summary>
     /// <remarks>ResizeBoundsToFit can only be called when AutoSize is true (or being set to true).</remarks>
     /// <param name="size"></param>
-    /// <returns>whether the Bounds was changed or not</returns>
+    /// <returns>whether the Viewport was changed or not</returns>
     private bool ResizeBoundsToFit (Size size)
     {
         //if (AutoSize == false) {
@@ -728,7 +728,7 @@ public partial class View
 #nullable restore
 
     /// <summary>
-    ///     Gets a new location of the <see cref="View"/> that is within the Bounds of the <paramref name="viewToMove"/>'s
+    ///     Gets a new location of the <see cref="View"/> that is within the Viewport of the <paramref name="viewToMove"/>'s
     ///     <see cref="View.SuperView"/> (e.g. for dragging a Window). The `out` parameters are the new X and Y coordinates.
     /// </summary>
     /// <remarks>
@@ -765,7 +765,7 @@ public partial class View
         }
         else
         {
-            // Use the SuperView's Bounds, not Frame
+            // Use the SuperView's Viewport, not Frame
             maxDimension = viewToMove.SuperView.Viewport.Width;
             superView = viewToMove.SuperView;
         }
@@ -972,11 +972,11 @@ public partial class View
     {
         // TODO: Identify a real-world use-case where this API should be virtual. 
         // TODO: Until then leave it `internal` and non-virtual
-        // First try SuperView.Bounds, then Application.Top, then Driver.Bounds.
+        // First try SuperView.Viewport, then Application.Top, then Driver.Viewport.
         // Finally, if none of those are valid, use int.MaxValue (for Unit tests).
         Rectangle relativeBounds = SuperView is { IsInitialized: true } ? SuperView.Viewport :
                                    Application.Top is { } && Application.Top.IsInitialized ? Application.Top.Viewport :
-                                   Application.Driver?.Bounds ?? new Rectangle (0, 0, int.MaxValue, int.MaxValue);
+                                   Application.Driver?.Viewport ?? new Rectangle (0, 0, int.MaxValue, int.MaxValue);
         SetRelativeLayout (relativeBounds);
 
         // TODO: Determine what, if any of the below is actually needed here.
@@ -1018,12 +1018,12 @@ public partial class View
 
     /// <summary>
     ///     Applies the view's position (<see cref="X"/>, <see cref="Y"/>) and dimension (<see cref="Width"/>, and
-    ///     <see cref="Height"/>) to <see cref="Frame"/>, given a rectangle describing the SuperView's Bounds (nominally the
-    ///     same as <c>this.SuperView.Bounds</c>).
+    ///     <see cref="Height"/>) to <see cref="Frame"/>, given a rectangle describing the SuperView's Viewport (nominally the
+    ///     same as <c>this.SuperView.Viewport</c>).
     /// </summary>
     /// <param name="superviewBounds">
-    ///     The rectangle describing the SuperView's Bounds (nominally the same as
-    ///     <c>this.SuperView.Bounds</c>).
+    ///     The rectangle describing the SuperView's Viewport (nominally the same as
+    ///     <c>this.SuperView.Viewport</c>).
     /// </param>
     internal void SetRelativeLayout (Rectangle superviewBounds)
     {
@@ -1047,7 +1047,7 @@ public partial class View
         // TODO: View.AutoSize stuff is removed.
 
         // Returns the new dimension (width or height) and location (x or y) for the View given
-        //   the superview's Bounds
+        //   the superview's Viewport
         //   the current Pos (View.X or View.Y)
         //   the current Dim (View.Width or View.Height)
         // This method is called recursively if pos is Pos.PosCombine

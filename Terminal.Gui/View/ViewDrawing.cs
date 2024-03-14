@@ -86,7 +86,7 @@ public partial class View
 
     /// <summary>Clears the specified <see cref="Viewport"/>-relative rectangle with the normal background.</summary>
     /// <remarks></remarks>
-    /// <param name="contentArea">The Bounds-relative rectangle to clear.</param>
+    /// <param name="contentArea">The Viewport-relative rectangle to clear.</param>
     public void Clear (Rectangle contentArea)
     {
         if (Driver is null)
@@ -141,7 +141,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         Overrides of <see cref="OnDrawContent(Rectangle)"/> must ensure they do not set <c>Driver.Clip</c> to a clip
-    ///         region larger than the <ref name="Bounds"/> property, as this will cause the driver to clip the entire region.
+    ///         region larger than the <ref name="Viewport"/> property, as this will cause the driver to clip the entire region.
     ///     </para>
     /// </remarks>
     public void Draw ()
@@ -443,7 +443,7 @@ public partial class View
         }
 
         // If we have a SuperView, it'll render our frames.
-        if (!SuperViewRendersLineCanvas && LineCanvas.Bounds != Rectangle.Empty)
+        if (!SuperViewRendersLineCanvas && LineCanvas.Viewport != Rectangle.Empty)
         {
             foreach (KeyValuePair<Point, Cell> p in LineCanvas.GetCellMap ())
             {
@@ -501,7 +501,7 @@ public partial class View
     ///     If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), the area to be
     ///     redrawn will be the <paramref name="region"/>.
     /// </remarks>
-    /// <param name="region">The Bounds-relative region that needs to be redrawn.</param>
+    /// <param name="region">The Viewport-relative region that needs to be redrawn.</param>
     public virtual void SetNeedsDisplay (Rectangle region)
     {
         if (!IsInitialized)

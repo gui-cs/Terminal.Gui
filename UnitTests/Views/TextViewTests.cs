@@ -7657,7 +7657,7 @@ This is the second line.
                                                      );
 
         ((FakeDriver)Application.Driver).SetBufferSize (6, 25);
-        tv.SetRelativeLayout (Application.Driver.Bounds);
+        tv.SetRelativeLayout (Application.Driver.Viewport);
         tv.Draw ();
         Assert.Equal (new Point (4, 2), tv.CursorPosition);
         Assert.Equal (new Point (12, 0), cp);

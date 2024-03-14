@@ -374,7 +374,7 @@ public class Slider<T> : View
     }
 
     /// <summary>
-    ///     If <see langword="true"/> the slider will be sized to fit the available space (the Bounds of the the
+    ///     If <see langword="true"/> the slider will be sized to fit the available space (the Viewport of the the
     ///     SuperView).
     /// </summary>
     /// <remarks>
@@ -663,10 +663,10 @@ public class Slider<T> : View
 
         if (AutoSize)
         {
-            // Max size is SuperView's Bounds. Min Size is size that will fit.
+            // Max size is SuperView's Viewport. Min Size is size that will fit.
             if (SuperView is { })
             {
-                // Calculate the size of the slider based on the size of the SuperView's Bounds.
+                // Calculate the size of the slider based on the size of the SuperView's Viewport.
                 if (_config._sliderOrientation == Orientation.Horizontal)
                 {
                     size = int.Min (SuperView.Viewport.Width, CalcBestLength ());
@@ -686,7 +686,7 @@ public class Slider<T> : View
         }
         else
         {
-            // Fit Slider to the Bounds
+            // Fit Slider to the Viewport
             if (_config._sliderOrientation == Orientation.Horizontal)
             {
                 size = Viewport.Width;

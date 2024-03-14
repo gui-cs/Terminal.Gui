@@ -141,12 +141,12 @@ public class PosTests
         frame.Draw ();
 
         Assert.Equal (6, btn.Viewport.Width);
-        Assert.Equal (10, btn.Frame.X); // frame.Bounds.Width (16) - btn.Frame.Width (6) = 10
+        Assert.Equal (10, btn.Frame.X); // frame.Viewport.Width (16) - btn.Frame.Width (6) = 10
         Assert.Equal (0, btn.Frame.Y);
         Assert.Equal (6, btn.Frame.Width);
         Assert.Equal (1, btn.Frame.Height);
 
-        Assert.Equal (9, view.Viewport.Width); // frame.Bounds.Width (16) - Dim.Fill (1) - Dim.Function (6) = 9
+        Assert.Equal (9, view.Viewport.Width); // frame.Viewport.Width (16) - Dim.Fill (1) - Dim.Function (6) = 9
         Assert.Equal (0, view.Frame.X);
         Assert.Equal (0, view.Frame.Y);
         Assert.Equal (9, view.Frame.Width);

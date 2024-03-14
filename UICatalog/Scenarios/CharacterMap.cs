@@ -529,21 +529,21 @@ internal class CharMap : ScrollView
         //if (ShowHorizontalScrollIndicator && ContentSize.Height < (int)(MaxCodePoint / 16 + 2)) {
         //	//ContentSize = new (CharMap.RowWidth, (int)(MaxCodePoint / 16 + 2));
         //	//ContentSize = new (CharMap.RowWidth, (int)(MaxCodePoint / 16) * _rowHeight + 2);
-        //	var width = (Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH) - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
+        //	var width = (Viewport.Width / COLUMN_WIDTH * COLUMN_WIDTH) - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
         //	if (Cursor.X + ContentOffset.X >= width) {
         //		// Snap to the selected glyph.
         //		ContentOffset = new (
         //			Math.Min (Cursor.X, Cursor.X - width + COLUMN_WIDTH),
-        //			ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
+        //			ContentOffset.Y == -ContentSize.Height + Viewport.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
         //	} else {
         //		ContentOffset = new (
         //			ContentOffset.X - Cursor.X,
-        //			ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
+        //			ContentOffset.Y == -ContentSize.Height + Viewport.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
         //	}
         //} else if (!ShowHorizontalScrollIndicator && ContentSize.Height > (int)(MaxCodePoint / 16 + 1)) {
         //	//ContentSize = new (CharMap.RowWidth, (int)(MaxCodePoint / 16 + 1));
         //	// Snap 1st column into view if it's been scrolled horizontally
-        //	ContentOffset = new (0, ContentOffset.Y < -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
+        //	ContentOffset = new (0, ContentOffset.Y < -ContentSize.Height + Viewport.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
         //}
         base.OnDrawContent (contentArea);
     }

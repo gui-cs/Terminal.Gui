@@ -1123,7 +1123,7 @@ At 0,0
         {
             var idx = 0;
 
-            // BUGBUG: v2 - this should use Bounds, not Frame
+            // BUGBUG: v2 - this should use Viewport, not Frame
             for (var r = 0; r < Frame.Height; r++)
             {
                 for (var c = 0; c < Frame.Width; c++)
