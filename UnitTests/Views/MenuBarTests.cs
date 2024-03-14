@@ -3658,4 +3658,26 @@ Edit
             Add (menu);
         }
     }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Click_Another_View_Close_A_Open_Menu ()
+    {
+        var menu = new MenuBar
+        {
+            Menus =
+            [
+                new MenuBarItem ("File", new MenuItem [] { new ("New", "", null) })
+            ]
+        };
+
+        var btnClicked = false;
+        var btn = new Button { Y = 4, Text = "Test" };
+        btn.Accept += (s, e) => btnClicked = true;
+        Application.Top.Add (menu, btn);
+        Application.Begin (Application.Top);
+
+        Application.OnMouseEvent (new (new () { X = 0, Y = 4, Flags = MouseFlags.Button1Clicked }));
+        Assert.True (btnClicked);
+    }
 }
