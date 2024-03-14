@@ -1481,7 +1481,7 @@ public static partial class Application
                 View = view
             };
         }
-        else if (view.BoundsToScreen (view.Bounds).Contains (a.MouseEvent.X, a.MouseEvent.Y))
+        else if (view.BoundsToScreen (view.ContentArea).Contains (a.MouseEvent.X, a.MouseEvent.Y))
         {
             Point boundsPoint = view.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
 

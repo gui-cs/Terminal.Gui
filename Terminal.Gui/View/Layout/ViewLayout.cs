@@ -599,7 +599,7 @@ public partial class View
 
         if (boundsChanged)
         {
-            Bounds = new (Bounds.X, Bounds.Y, canSizeW ? rW : Bounds.Width, canSizeH ? rH : Bounds.Height);
+            ContentArea = new (ContentArea.X, ContentArea.Y, canSizeW ? rW : ContentArea.Width, canSizeH ? rH : ContentArea.Height);
         }
 
         return boundsChanged;
@@ -767,7 +767,7 @@ public partial class View
         else
         {
             // Use the SuperView's Bounds, not Frame
-            maxDimension = viewToMove.SuperView.Bounds.Width;
+            maxDimension = viewToMove.SuperView.ContentArea.Width;
             superView = viewToMove.SuperView;
         }
 

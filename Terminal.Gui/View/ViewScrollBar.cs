@@ -5,6 +5,8 @@ public partial class View
     private bool _enableScrollBars;
     private ScrollBarView _scrollBar;
     private bool _useContentOffset;
+    private Point _contentOffset;
+    private Size _contentSize;
 
     /// <summary>If true the vertical/horizontal scroll bars won't be showed if it's not needed.</summary>
     public bool AutoHideScrollBars

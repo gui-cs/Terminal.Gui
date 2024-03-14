@@ -2583,13 +2583,6 @@ public class TextView : View
     public IAutocomplete Autocomplete { get; protected set; } = new TextViewAutocomplete ();
 
     /// <inheritdoc/>
-    public override bool CanFocus
-    {
-        get => base.CanFocus;
-        set => base.CanFocus = value;
-    }
-
-    /// <inheritdoc/>
     public override Point ContentOffset
     {
         get => base.ContentOffset;

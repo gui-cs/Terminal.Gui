@@ -39,6 +39,6 @@ public class Margin : Adornment
         }
     }
 
-    /// <inheritdoc/>
-    public override Thickness GetAdornmentsThickness () { return Thickness.Empty; }
+    ///// <inheritdoc/>
+    //public override Thickness GetAdornmentsThickness () { return Thickness.Empty; }
 }

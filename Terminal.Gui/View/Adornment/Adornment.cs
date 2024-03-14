@@ -22,7 +22,13 @@ public class Adornment : View
 
     /// <summary>Constructs a new adornment for the view specified by <paramref name="parent"/>.</summary>
     /// <param name="parent"></param>
-    public Adornment (View parent) { Parent = parent; }
+    public Adornment (View parent)
+    {
+        Application.GrabbingMouse += Application_GrabbingMouse;
+        Application.UnGrabbingMouse += Application_UnGrabbingMouse;
+        CanFocus = true;
+        Parent = parent;
+    }
 
     /// <summary>
     ///     Gets the rectangle that describes the area of the Adornment. The Location is always (0,0).
@@ -30,10 +36,8 @@ public class Adornment : View
     /// </summary>
     public override Rectangle ContentArea
     {
-        Application.GrabbingMouse += Application_GrabbingMouse;
-        Application.UnGrabbingMouse += Application_UnGrabbingMouse;
-        CanFocus = true;
-        Parent = parent;
+        get => Frame with { Location = Point.Empty };
+        set => throw new InvalidOperationException ("It makes no sense to set ContentArea of a Thickness.");
     }
 
     /// <summary>The Parent of this Adornment (the View this Adornment surrounds).</summary>
@@ -109,16 +113,6 @@ public class Adornment : View
     internal override void LayoutAdornments ()
     {
         /* Do nothing - Adornments do not have Adornments */
-    }
-
-    /// <summary>
-    ///     Gets the rectangle that describes the area of the Adornment. The Location is always (0,0).
-    ///     The size is the size of the <see cref="View.Frame"/>.
-    /// </summary>
-    public override Rectangle Bounds
-    {
-        get => Frame with { Location = Point.Empty };
-        set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
     }
 
     /// <inheritdoc/>

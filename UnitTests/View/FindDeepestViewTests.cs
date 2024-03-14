@@ -400,7 +400,7 @@ public class FindDeepestViewTests (ITestOutputHelper output)
     [InlineData (5, 5, typeof (View), "start")]
 
     [InlineData (4, 4, typeof (View), "subview")]
-    public void Returns_Adornment_If_Start_Has_Adornments (int testX, int testY, Type expectedAdornmentType, string expectedParentName)
+    public void Returns_Adornment_If_Start_Has_Adornments_New (int testX, int testY, Type expectedAdornmentType, string expectedParentName)
     {
         var start = new View ()
         {
