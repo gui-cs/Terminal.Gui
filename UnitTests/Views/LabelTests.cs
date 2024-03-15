@@ -55,7 +55,7 @@ public class LabelTests
     [Fact]
     public void MouseClick_SetsFocus_OnNextSubview ()
     {
-        var superView = new View () { CanFocus = true, Height = 1, Width = 15};
+        var superView = new View () { CanFocus = true, Height = 1, Width = 15 };
         var focusedView = new View () { CanFocus = true, Width = 1, Height = 1 };
         var label = new Label () { X = 2, Title = "_x" };
         var nextSubview = new View () { CanFocus = true, X = 4, Width = 4, Height = 1 };
@@ -567,14 +567,34 @@ e
     }
 
     [Fact]
-    public void Constructor_Setting_Width_Height_Before_Set_AutoSize_To_False ()
+    public void On_Object_Initializer_Setting_Width_Height_Before_Set_AutoSize_To_False ()
     {
-        var label = new Label { Width = 10, AutoSize = false };
-        Assert.Equal("Absolute(10)", label.Width.ToString());
-        Assert.False(label.AutoSize);
+        // Setting AutoSize to false
+        var label = new Label { Width = 10, Height = 10, AutoSize = false };
+        Assert.Equal ("Absolute(10)", label.Width.ToString ());
+        Assert.Equal ("Absolute(10)", label.Height.ToString ());
+        Assert.False (label.AutoSize);
+        label.BeginInit ();
+        label.EndInit ();
 
-        label = new Label { Height = 10, AutoSize = false };
-        Assert.Equal("Absolute(10)", label.Height.ToString());
-        Assert.False(label.AutoSize);
+        label.AutoSize = true;
+        Assert.Equal ("Absolute(0)", label.Width.ToString ());
+        Assert.Equal ("Absolute(0)", label.Height.ToString ());
+
+        Assert.Throws<InvalidOperationException> (() => label.Width = 10);
+        Assert.Throws<InvalidOperationException> (() => label.Height = 10);
+
+        // Without setting AutoSize to false
+        label = new () { Width = 10, Height = 10 };
+        Assert.Equal ("Absolute(10)", label.Width.ToString ());
+        Assert.Equal ("Absolute(10)", label.Height.ToString ());
+        Assert.True (label.AutoSize);
+        label.BeginInit ();
+        label.EndInit ();
+        Assert.Equal ("Absolute(0)", label.Width.ToString ());
+        Assert.Equal ("Absolute(0)", label.Height.ToString ());
+
+        Assert.Throws<InvalidOperationException> (() => label.Width = 10);
+        Assert.Throws<InvalidOperationException> (() => label.Height = 10);
     }
 }
