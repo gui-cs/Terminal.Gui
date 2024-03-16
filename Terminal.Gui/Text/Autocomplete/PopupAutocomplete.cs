@@ -57,9 +57,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     /// </summary>
     public virtual int ScrollOffset { get; set; }
 
-#nullable enable
     private Point? LastPopupPos { get; set; }
-#nullable restore
 
     /// <inheritdoc/>
     public override void EnsureSelectedIdxIsValid ()
