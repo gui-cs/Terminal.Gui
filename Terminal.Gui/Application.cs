@@ -1028,11 +1028,15 @@ public static partial class Application
             Refresh ();
         }
 
+        if (Top == runState.Toplevel)
+        {
+           // Top = null;
+        }
+
+        Debug.Assert(Current != runState.Toplevel);
         runState.Toplevel?.Dispose ();
         runState.Toplevel = null;
         runState.Dispose ();
-
-        // BUGBUG: Application.Top is now invalid?!?!
     }
 
     #endregion Run (Begin, Run, End)
