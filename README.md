@@ -1,6 +1,5 @@
 ![Terminal.Gui](https://socialify.git.ci/gui-cs/Terminal.Gui/image?description=1&font=Rokkitt&forks=1&language=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2Fgui-cs%2FTerminal.Gui%2Fdevelop%2Fdocfx%2Fimages%2Flogo.png&name=1&owner=1&pattern=Circuit%20Board&stargazers=1&theme=Auto)
 ![.NET Core](https://github.com/gui-cs/Terminal.Gui/workflows/.NET%20Core/badge.svg?branch=develop)
-![Code scanning - action](https://github.com/gui-cs/Terminal.Gui/workflows/Code%20scanning%20-%20action/badge.svg)
 [![Version](https://img.shields.io/nuget/v/Terminal.Gui.svg)](https://www.nuget.org/packages/Terminal.Gui)
 ![Code Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/migueldeicaza/90ef67a684cb71db1817921a970f8d27/raw/code-coverage.json)
 [![Downloads](https://img.shields.io/nuget/dt/Terminal.Gui)](https://www.nuget.org/packages/Terminal.Gui)
@@ -34,10 +33,10 @@ dotnet run
 ## Documentation 
 
 * [Documentation Home](https://gui-cs.github.io/Terminal.Gui/index.html)
-* [Terminal.Gui Overview](https://gui-cs.github.io/Terminal.Gui/articles/overview.html)
-* [List of Views/Controls](https://gui-cs.github.io/Terminal.Gui/articles/views.html)
-* [Conceptual Documentation](https://gui-cs.github.io/Terminal.Gui/articles/index.html)
-* [API Documentation](https://gui-cs.github.io/Terminal.Gui)
+* [Terminal.Gui Overview](https://gui-cs.github.io/Terminal.Gui/docs/overview.html)
+* [List of Views/Controls](https://gui-cs.github.io/Terminal.Gui/docs/views.html)
+* [Conceptual Documentation](https://gui-cs.github.io/Terminal.Gui/docs/index.html)
+* [API Documentation](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui)
 
 _The Documentation matches the most recent Nuget release from the `main` branch ([![Version](https://img.shields.io/nuget/v/Terminal.Gui.svg)](https://www.nuget.org/packages/Terminal.Gui))_
 

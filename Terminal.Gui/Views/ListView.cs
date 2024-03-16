@@ -802,8 +802,6 @@ namespace Terminal.Gui {
 			selected = top + me.Y;
 			if (AllowsAll ()) {
 				Source.SetMark (SelectedItem, !Source.IsMarked (SelectedItem));
-				SetNeedsDisplay ();
-				return true;
 			}
 			OnSelectedChanged ();
 			SetNeedsDisplay ();
@@ -877,7 +875,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public void Render (ListView container, ConsoleDriver driver, bool marked, int item, int col, int line, int width, int start = 0)
 		{
-			var savedClip = container.ClipToBounds();
+			var savedClip = container.ClipToBounds ();
 			container.Move (col - start, line);
 			var t = src? [item];
 			if (t == null) {

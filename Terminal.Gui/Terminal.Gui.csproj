@@ -80,7 +80,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>csharp, terminal, c#, f#, gui, toolkit, console, tui</PackageTags>
     <Description>Cross platform Terminal UI toolkit for .NET</Description>
-    <Owners>Miguel de Icaza, Tig Kindel</Owners>
+    <Owners>Tig Kindel</Owners>
     <Summary>A toolkit for building rich console apps for .NET that works on Windows, Mac, and Linux/Unix.</Summary>
     <Title>Terminal.Gui - Cross platform Terminal User Interface (TUI) toolkit for .NET</Title>
     <PackageReleaseNotes>
@@ -100,7 +100,6 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <EnableSourceLink>true</EnableSourceLink>
     <!--<DebugType>Embedded</DebugType>-->
-    <Authors>Miguel de Icaza, Tig Kindel (@tig), @BDisp</Authors>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>Terminal.Gui.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
