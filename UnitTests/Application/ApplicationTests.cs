@@ -47,6 +47,26 @@ public class ApplicationTests
     }
 
     [Fact]
+    public void End_Disposes_Runstate_Toplevel ()
+    {
+        Init ();
+
+        RunState rs = Application.Begin (Application.Top);
+        Application.End (rs);
+
+#if DEBUG_IDISPOSABLE
+        Assert.True (rs.WasDisposed);
+        Assert.True (Application.Top.WasDisposed);
+#endif
+
+        Assert.Null (rs.Toplevel);
+
+        Shutdown ();
+
+        Assert.Null (Application.Top);
+    }
+
+    [Fact]
     public void Init_Begin_End_Cleans_Up ()
     {
         Init ();
@@ -678,7 +698,7 @@ public class ApplicationTests
                                          Application.OnMouseEvent (
                                                                    new MouseEventEventArgs (
                                                                                             new MouseEvent
-                                                                                                { X = 0, Y = 0, Flags = MouseFlags.ReportMousePosition }
+                                                                                            { X = 0, Y = 0, Flags = MouseFlags.ReportMousePosition }
                                                                                            )
                                                                   );
                                          Assert.False (top.NeedsDisplay);

@@ -383,6 +383,10 @@ public static partial class Application
             throw new ArgumentNullException (nameof (Toplevel));
         }
 
+#if DEBUG_IDISPOSABLE
+        Debug.Assert (!Toplevel.WasDisposed);
+#endif
+
         if (Toplevel.IsOverlappedContainer && OverlappedTop != Toplevel && OverlappedTop is { })
         {
             throw new InvalidOperationException ("Only one Overlapped Container is allowed.");
@@ -1028,12 +1032,11 @@ public static partial class Application
             Refresh ();
         }
 
-        if (Top == runState.Toplevel)
-        {
-           // Top = null;
-        }
+        //if (Top == runState.Toplevel)
+        //{
+        //   Top = null;
+        //}
 
-        Debug.Assert(Current != runState.Toplevel);
         runState.Toplevel?.Dispose ();
         runState.Toplevel = null;
         runState.Dispose ();
