@@ -131,6 +131,9 @@ public class Adornment : View
         return new (new (parent.X + Frame.X, parent.Y + Frame.Y), Frame.Size);
     }
 
+    /// <inheritdoc/>
+    public override Point ScreenToFrame (int x, int y) { return Parent.ScreenToFrame (x - Frame.X, y - Frame.Y); }
+
     /// <summary>
     ///     Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).
     /// </summary>

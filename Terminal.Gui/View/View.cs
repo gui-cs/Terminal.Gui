@@ -50,9 +50,7 @@ namespace Terminal.Gui;
 ///     </para>
 ///     <para>
 ///         To create a View using Absolute layout, call a constructor that takes a Rectangle parameter to specify the
-///         absolute position and size or simply set <see cref="View.Frame "/>). To create a View using Computed layout use
-///         a constructor that does not take a Rectangle parameter and set the X, Y, Width and Height properties on the
-///         view to
+///         absolute position and size or simply set <see cref="View.Frame "/>). To create a View using Computed layout use view to
 ///         non-absolute values. Both approaches use coordinates that are relative to the <see cref="ContentArea"/> of the
 ///         <see cref="SuperView"/> the View is added to.
 ///     </para>

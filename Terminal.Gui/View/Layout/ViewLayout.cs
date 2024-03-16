@@ -969,7 +969,7 @@ public partial class View
     }
 
     /// <summary>Indicates that the view does not need to be laid out.</summary>
-    protected void ClearLayoutNeeded ()
+    protected void ClearLayoutNeeded () { LayoutNeeded = false; }
     {
         LayoutNeeded = false;
     }
