@@ -778,34 +778,34 @@ public class Slider<T> : View
         if (_config._sliderOrientation == Orientation.Horizontal)
         {
             ContentArea = new (
-                                         ContentArea.Location,
-                                         new (
-                                                   int.Min (
-                                                            SuperView.ContentArea.Width - GetAdornmentsThickness ().Horizontal,
-                                                            CalcBestLength ()
-                                                           ),
-                                                   int.Min (
-                                                            SuperView.ContentArea.Height - GetAdornmentsThickness ().Vertical,
-                                                            CalcThickness ()
-                                                           )
-                                                  )
-                                        );
+                               ContentArea.Location,
+                               new (
+                                    int.Min (
+                                             SuperView.ContentArea.Width - adornmentsThickness.Horizontal,
+                                             CalcBestLength ()
+                                            ),
+                                    int.Min (
+                                             SuperView.ContentArea.Height - adornmentsThickness.Vertical,
+                                             CalcThickness ()
+                                            )
+                                   )
+                              );
         }
         else
         {
             ContentArea = new (
-                                         ContentArea.Location,
-                                         new (
-                                                   int.Min (
-                                                            SuperView.ContentArea.Width - GetAdornmentsThickness ().Horizontal,
-                                                            CalcThickness ()
-                                                           ),
-                                                   int.Min (
-                                                            SuperView.ContentArea.Height - GetAdornmentsThickness ().Vertical,
-                                                            CalcBestLength ()
-                                                           )
-                                                  )
-                                        );
+                               ContentArea.Location,
+                               new (
+                                    int.Min (
+                                             SuperView.ContentArea.Width - adornmentsThickness.Horizontal,
+                                             CalcThickness ()
+                                            ),
+                                    int.Min (
+                                             SuperView.ContentArea.Height - adornmentsThickness.Vertical,
+                                             CalcBestLength ()
+                                            )
+                                   )
+                              );
         }
     }
 
