@@ -715,7 +715,7 @@ internal sealed class Menu : View
 
     private void Application_RootMouseEvent (object sender, MouseEventEventArgs a)
     {
-        if (a.MouseEvent.View is MenuBar)
+        if (a.MouseEvent.View is { } and (MenuBar or not Menu))
         {
             return;
         }
@@ -725,17 +725,19 @@ internal sealed class Menu : View
             throw new InvalidOperationException ("This shouldn't running on a invisible menu!");
         }
 
-        Point boundsPoint = ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
+        View view = a.MouseEvent.View ?? this;
+
+        Point boundsPoint = view.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
         var me = new MouseEvent
         {
             X = boundsPoint.X,
             Y = boundsPoint.Y,
             Flags = a.MouseEvent.Flags,
             ScreenPosition = new (a.MouseEvent.X, a.MouseEvent.Y),
-            View = this
+            View = view
         };
 
-        if (OnMouseEvent (me) || a.MouseEvent.Flags == MouseFlags.Button1Pressed || a.MouseEvent.Flags == MouseFlags.Button1Released)
+        if (view.OnMouseEvent (me) || a.MouseEvent.Flags == MouseFlags.Button1Pressed || a.MouseEvent.Flags == MouseFlags.Button1Released)
         {
             a.MouseEvent.Handled = true;
         }

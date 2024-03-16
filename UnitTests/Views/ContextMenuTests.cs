@@ -1306,9 +1306,10 @@ public class ContextMenuTests
                                                       _output
                                                      );
 
+        // X=5 is the border and so need to use at least one more
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (
-                                                           new MouseEvent { X = 5, Y = 13, Flags = MouseFlags.Button1Clicked }
+                                                           new MouseEvent { X = 6, Y = 13, Flags = MouseFlags.Button1Clicked }
                                                           )
                                  );
 
@@ -1330,7 +1331,7 @@ public class ContextMenuTests
 
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (
-                                                           new MouseEvent { X = 5, Y = 12, Flags = MouseFlags.Button1Clicked }
+                                                           new MouseEvent { X = 6, Y = 12, Flags = MouseFlags.Button1Clicked }
                                                           )
                                  );
 
@@ -1345,6 +1346,124 @@ public class ContextMenuTests
      │ Two   ►│
      │ Three  │
      └────────┘",
+                                                      _output
+                                                     );
+
+        Application.End (rs);
+    }
+
+        [Fact]
+    [AutoInitShutdown]
+    public void UseSubMenusSingleFrame_False_By_Mouse ()
+    {
+        var cm = new ContextMenu
+        {
+            Position = new Point (5, 10),
+            MenuItems = new MenuBarItem (
+                                         "Numbers",
+                                         [
+                                             new MenuItem ("One", "", null),
+                                             new MenuBarItem (
+                                                              "Two",
+                                                              [
+                                                                  new MenuItem (
+                                                                                "Two-Menu 1",
+                                                                                "",
+                                                                                null
+                                                                               ),
+                                                                  new MenuItem ("Two-Menu 2", "", null)
+                                                              ]
+                                                             ),
+                                             new MenuBarItem ("Three",
+                                                              [
+                                                                  new MenuItem (
+                                                                                "Three-Menu 1",
+                                                                                "",
+                                                                                null
+                                                                               ),
+                                                                  new MenuItem ("Three-Menu 2", "", null)
+                                                              ]
+                                                             )
+                                         ]
+                                        )
+        };
+
+        cm.Show ();
+        RunState rs = Application.Begin (Application.Top);
+
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+     ┌────────┐
+     │ One    │
+     │ Two   ►│
+     │ Three ►│
+     └────────┘",
+                                                      _output
+                                                     );
+
+        Application.OnMouseEvent (
+                                  new MouseEventEventArgs (
+                                                           new MouseEvent { X = 6, Y = 13, Flags = MouseFlags.ReportMousePosition }
+                                                          )
+                                 );
+
+        var firstIteration = false;
+        Application.RunIteration (ref rs, ref firstIteration);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+     ┌────────┐               
+     │ One    │               
+     │ Two   ►│┌─────────────┐
+     │ Three ►││ Two-Menu 1  │
+     └────────┘│ Two-Menu 2  │
+               └─────────────┘",
+                                                      _output
+                                                     );
+
+        Application.OnMouseEvent (
+                                  new MouseEventEventArgs (
+                                                           new MouseEvent { X = 6, Y = 14, Flags = MouseFlags.ReportMousePosition }
+                                                          )
+                                 );
+
+        firstIteration = false;
+        Application.RunIteration (ref rs, ref firstIteration);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+     ┌────────┐                 
+     │ One    │                 
+     │ Two   ►│                 
+     │ Three ►│┌───────────────┐
+     └────────┘│ Three-Menu 1  │
+               │ Three-Menu 2  │
+               └───────────────┘",
+                                                      _output
+                                                     );
+
+        Application.OnMouseEvent (
+                                  new MouseEventEventArgs (
+                                                           new MouseEvent { X = 6, Y = 13, Flags = MouseFlags.ReportMousePosition }
+                                                          )
+                                 );
+
+        firstIteration = false;
+        Application.RunIteration (ref rs, ref firstIteration);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+     ┌────────┐               
+     │ One    │               
+     │ Two   ►│┌─────────────┐
+     │ Three ►││ Two-Menu 1  │
+     └────────┘│ Two-Menu 2  │
+               └─────────────┘",
                                                       _output
                                                      );
 
