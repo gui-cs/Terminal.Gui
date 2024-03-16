@@ -970,9 +970,6 @@ public partial class View
 
     /// <summary>Indicates that the view does not need to be laid out.</summary>
     protected void ClearLayoutNeeded () { LayoutNeeded = false; }
-    {
-        LayoutNeeded = false;
-    }
 
     /// <summary>
     ///     Raises the <see cref="LayoutComplete"/> event. Called from  <see cref="LayoutSubviews"/> before all sub-views
