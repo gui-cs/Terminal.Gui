@@ -54,10 +54,10 @@ public class SetRelativeLayoutTests
         Assert.Equal (1, view.Frame.Y);
         Assert.Equal (79, view.Frame.Width);
         Assert.Equal (24, view.Frame.Height);
-        Assert.Equal (0, view.Bounds.X);
-        Assert.Equal (0, view.Bounds.Y);
-        Assert.Equal (79, view.Bounds.Width);
-        Assert.Equal (24, view.Bounds.Height);
+        Assert.Equal (0, view.Viewport.X);
+        Assert.Equal (0, view.Viewport.Y);
+        Assert.Equal (79, view.Viewport.Width);
+        Assert.Equal (24, view.Viewport.Height);
 
         view.X = 0;
         view.Y = 0;
@@ -68,10 +68,10 @@ public class SetRelativeLayoutTests
         Assert.Equal (0, view.Frame.Y);
         Assert.Equal (80, view.Frame.Width);
         Assert.Equal (25, view.Frame.Height);
-        Assert.Equal (0, view.Bounds.X);
-        Assert.Equal (0, view.Bounds.Y);
-        Assert.Equal (80, view.Bounds.Width);
-        Assert.Equal (25, view.Bounds.Height);
+        Assert.Equal (0, view.Viewport.X);
+        Assert.Equal (0, view.Viewport.Y);
+        Assert.Equal (80, view.Viewport.Width);
+        Assert.Equal (25, view.Viewport.Height);
     }
 
     [Fact]

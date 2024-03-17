@@ -458,7 +458,7 @@ e
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
         Assert.Equal ("Say Hello 你", label.TextFormatter.Text);
-        Assert.Equal (new Rectangle (0, 0, 12, 1), label.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 12, 1), label.Viewport);
 
         var expected = @"
 ┌────────────────────────────┐
@@ -488,7 +488,7 @@ e
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
         Assert.Equal ("Say Hello 你", label.TextFormatter.Text);
-        Assert.Equal (new Rectangle (0, 0, 12, 1), label.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 12, 1), label.Viewport);
 
         var expected = @"
 ┌────────────────────────────┐
@@ -512,7 +512,7 @@ e
         Application.Begin (Application.Top);
 
         Assert.Equal (new (0, 0, 6, 3), label.Frame);
-        Assert.Equal (new (0, 0, 4, 1), label.Bounds);
+        Assert.Equal (new (0, 0, 4, 1), label.Viewport);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -534,7 +534,7 @@ e
         Application.Begin (Application.Top);
 
         Assert.Equal (new (0, 0, 6, 3), label.Frame);
-        Assert.Equal (new (0, 0, 4, 1), label.Bounds);
+        Assert.Equal (new (0, 0, 4, 1), label.Viewport);
         Application.Begin (Application.Top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -555,7 +555,7 @@ e
         Application.Begin (Application.Top);
 
         Assert.Equal (new (0, 0, 6, 2), label.Frame);
-        Assert.Equal (new (0, 0, 4, 1), label.Bounds);
+        Assert.Equal (new (0, 0, 4, 1), label.Viewport);
         Application.Begin (Application.Top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (

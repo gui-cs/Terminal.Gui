@@ -156,19 +156,19 @@ public class TileView : View
             return;
         }
 
-        Rectangle contentArea = Bounds;
+        Rectangle viewport = Viewport;
 
         if (HasBorder ())
         {
-            contentArea = new (
-                               contentArea.X + 1,
-                               contentArea.Y + 1,
-                               Math.Max (0, contentArea.Width - 2),
-                               Math.Max (0, contentArea.Height - 2)
-                              );
+            viewport = new (
+                            viewport.X + 1,
+                            viewport.Y + 1,
+                            Math.Max (0, viewport.Width - 2),
+                            Math.Max (0, viewport.Height - 2)
+                           );
         }
 
-        Setup (contentArea);
+        Setup (viewport);
         base.LayoutSubviews ();
     }
 
@@ -179,12 +179,12 @@ public class TileView : View
     public override bool OnDrawAdornments () { return false; }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         Driver.SetAttribute (ColorScheme.Normal);
-        Clear (contentArea);
+        Clear (viewport);
 
-        base.OnDrawContent (contentArea);
+        base.OnDrawContent (viewport);
 
         var lc = new LineCanvas ();
 
@@ -195,19 +195,19 @@ public class TileView : View
         {
             if (HasBorder ())
             {
-                lc.AddLine (Point.Empty, Bounds.Width, Orientation.Horizontal, LineStyle);
-                lc.AddLine (Point.Empty, Bounds.Height, Orientation.Vertical, LineStyle);
+                lc.AddLine (Point.Empty, Viewport.Width, Orientation.Horizontal, LineStyle);
+                lc.AddLine (Point.Empty, Viewport.Height, Orientation.Vertical, LineStyle);
 
                 lc.AddLine (
-                            new Point (Bounds.Width - 1, Bounds.Height - 1),
-                            -Bounds.Width,
+                            new Point (Viewport.Width - 1, Viewport.Height - 1),
+                            -Viewport.Width,
                             Orientation.Horizontal,
                             LineStyle
                            );
 
                 lc.AddLine (
-                            new Point (Bounds.Width - 1, Bounds.Height - 1),
-                            -Bounds.Height,
+                            new Point (Viewport.Width - 1, Viewport.Height - 1),
+                            -Viewport.Height,
                             Orientation.Vertical,
                             LineStyle
                            );
@@ -217,7 +217,7 @@ public class TileView : View
             {
                 bool isRoot = _splitterLines.Contains (line);
 
-                Rectangle screen = line.BoundsToScreen (Rectangle.Empty);
+                Rectangle screen = line.ViewportToScreen (Rectangle.Empty);
                 Point origin = ScreenToFrame (screen.X, screen.Y);
                 int length = line.Orientation == Orientation.Horizontal ? line.Frame.Width : line.Frame.Height;
 
@@ -241,7 +241,7 @@ public class TileView : View
 
         Driver.SetAttribute (ColorScheme.Normal);
 
-        foreach (KeyValuePair<Point, Rune> p in lc.GetMap (Bounds))
+        foreach (KeyValuePair<Point, Rune> p in lc.GetMap (Viewport))
         {
             AddRune (p.Key.X, p.Key.Y, p.Value);
         }
@@ -423,7 +423,7 @@ public class TileView : View
                                         );
         }
 
-        int fullSpace = _orientation == Orientation.Vertical ? Bounds.Width : Bounds.Height;
+        int fullSpace = _orientation == Orientation.Vertical ? Viewport.Width : Viewport.Height;
 
         if (fullSpace != 0 && !IsValidNewSplitterPos (idx, value, fullSpace))
         {
@@ -758,9 +758,9 @@ public class TileView : View
         return false;
     }
 
-    private void Setup (Rectangle contentArea)
+    private void Setup (Rectangle viewport)
     {
-        if (contentArea.IsEmpty || contentArea.Height <= 0 || contentArea.Width <= 0)
+        if (viewport.IsEmpty || viewport.Height <= 0 || viewport.Width <= 0)
         {
             return;
         }
@@ -803,17 +803,17 @@ public class TileView : View
 
             if (Orientation == Orientation.Vertical)
             {
-                tile.ContentView.X = i == 0 ? contentArea.X : Pos.Right (visibleSplitterLines [i - 1]);
-                tile.ContentView.Y = contentArea.Y;
-                tile.ContentView.Height = contentArea.Height;
-                tile.ContentView.Width = GetTileWidthOrHeight (i, Bounds.Width, visibleTiles, visibleSplitterLines);
+                tile.ContentView.X = i == 0 ? viewport.X : Pos.Right (visibleSplitterLines [i - 1]);
+                tile.ContentView.Y = viewport.Y;
+                tile.ContentView.Height = viewport.Height;
+                tile.ContentView.Width = GetTileWidthOrHeight (i, Viewport.Width, visibleTiles, visibleSplitterLines);
             }
             else
             {
-                tile.ContentView.X = contentArea.X;
-                tile.ContentView.Y = i == 0 ? contentArea.Y : Pos.Bottom (visibleSplitterLines [i - 1]);
-                tile.ContentView.Width = contentArea.Width;
-                tile.ContentView.Height = GetTileWidthOrHeight (i, Bounds.Height, visibleTiles, visibleSplitterLines);
+                tile.ContentView.X = viewport.X;
+                tile.ContentView.Y = i == 0 ? viewport.Y : Pos.Bottom (visibleSplitterLines [i - 1]);
+                tile.ContentView.Width = viewport.Width;
+                tile.ContentView.Height = GetTileWidthOrHeight (i, Viewport.Height, visibleTiles, visibleSplitterLines);
             }
         }
     }
@@ -837,7 +837,7 @@ public class TileView : View
         /// </summary>
         public Point GetLocalCoordinateForTitle (TileView intoCoordinateSpace)
         {
-            Rectangle screen = Tile.ContentView.BoundsToScreen (Rectangle.Empty);
+            Rectangle screen = Tile.ContentView.ViewportToScreen (Rectangle.Empty);
             return intoCoordinateSpace.ScreenToFrame (screen.X, screen.Y - 1);
         }
 
@@ -845,7 +845,7 @@ public class TileView : View
         {
             Dim spaceDim = Tile.ContentView.Width;
 
-            int spaceAbs = spaceDim.Anchor (Parent.Bounds.Width);
+            int spaceAbs = spaceDim.Anchor (Parent.Viewport.Width);
 
             var title = $" {Tile.Title} ";
 
@@ -893,7 +893,7 @@ public class TileView : View
         {
             if (dragPosition is { } || CanFocus)
             {
-                Point location = moveRuneRenderLocation ?? new Point (Bounds.Width / 2, Bounds.Height / 2);
+                Point location = moveRuneRenderLocation ?? new Point (Viewport.Width / 2, Viewport.Height / 2);
 
                 AddRune (location.X, location.Y, Glyphs.Diamond);
             }
@@ -919,7 +919,7 @@ public class TileView : View
                     {
                         moveRuneRenderLocation = new Point (
                                                             0,
-                                                            Math.Max (1, Math.Min (Bounds.Height - 2, mouseEvent.Y))
+                                                            Math.Max (1, Math.Min (Viewport.Height - 2, mouseEvent.Y))
                                                            );
                     }
                 }
@@ -943,7 +943,7 @@ public class TileView : View
                 {
                     int dx = mouseEvent.X - dragPosition.Value.X;
                     Parent.SetSplitterPos (Idx, Offset (X, dx));
-                    moveRuneRenderLocation = new Point (0, Math.Max (1, Math.Min (Bounds.Height - 2, mouseEvent.Y)));
+                    moveRuneRenderLocation = new Point (0, Math.Max (1, Math.Min (Viewport.Height - 2, mouseEvent.Y)));
                 }
 
                 Parent.SetNeedsDisplay ();
@@ -969,9 +969,9 @@ public class TileView : View
             return false;
         }
 
-        public override void OnDrawContent (Rectangle contentArea)
+        public override void OnDrawContent (Rectangle viewport)
         {
-            base.OnDrawContent (contentArea);
+            base.OnDrawContent (viewport);
 
             DrawSplitterSymbol ();
         }
@@ -988,7 +988,7 @@ public class TileView : View
         {
             base.PositionCursor ();
 
-            Point location = moveRuneRenderLocation ?? new Point (Bounds.Width / 2, Bounds.Height / 2);
+            Point location = moveRuneRenderLocation ?? new Point (Viewport.Width / 2, Viewport.Height / 2);
             Move (location.X, location.Y);
         }
 
@@ -1032,10 +1032,10 @@ public class TileView : View
             {
                 if (Orientation == Orientation.Horizontal)
                 {
-                    return Parent.SetSplitterPos (Idx, ConvertToPosFactor (newValue, Parent.Bounds.Height));
+                    return Parent.SetSplitterPos (Idx, ConvertToPosFactor (newValue, Parent.Viewport.Height));
                 }
 
-                return Parent.SetSplitterPos (Idx, ConvertToPosFactor (newValue, Parent.Bounds.Width));
+                return Parent.SetSplitterPos (Idx, ConvertToPosFactor (newValue, Parent.Viewport.Width));
             }
 
             return Parent.SetSplitterPos (Idx, newValue);
@@ -1071,8 +1071,8 @@ public class TileView : View
         {
             int posAbsolute = pos.Anchor (
                                           Orientation == Orientation.Horizontal
-                                              ? Parent.Bounds.Height
-                                              : Parent.Bounds.Width
+                                              ? Parent.Viewport.Height
+                                              : Parent.Viewport.Width
                                          );
 
             return posAbsolute + delta;

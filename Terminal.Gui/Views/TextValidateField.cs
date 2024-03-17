@@ -537,7 +537,7 @@ namespace Terminal.Gui
         {
             if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
             {
-                int c = _provider.Cursor (mouseEvent.X - GetMargins (Bounds.Width).left);
+                int c = _provider.Cursor (mouseEvent.X - GetMargins (Viewport.Width).left);
 
                 if (_provider.Fixed == false && TextAlignment == TextAlignment.Right && Text.Length > 0)
                 {
@@ -555,7 +555,7 @@ namespace Terminal.Gui
         }
 
         /// <inheritdoc/>
-        public override void OnDrawContent (Rectangle contentArea)
+        public override void OnDrawContent (Rectangle viewport)
         {
             if (_provider is null)
             {
@@ -568,7 +568,7 @@ namespace Terminal.Gui
             Color bgcolor = !IsValid ? new Color (Color.BrightRed) : ColorScheme.Focus.Background;
             var textColor = new Attribute (ColorScheme.Focus.Foreground, bgcolor);
 
-            (int margin_left, int margin_right) = GetMargins (Bounds.Width);
+            (int margin_left, int margin_right) = GetMargins (Viewport.Width);
 
             Move (0, 0);
 
@@ -642,7 +642,7 @@ namespace Terminal.Gui
         /// <inheritdoc/>
         public override void PositionCursor ()
         {
-            (int left, _) = GetMargins (Bounds.Width);
+            (int left, _) = GetMargins (Viewport.Width);
 
             // Fixed = true, is for inputs that have fixed width, like masked ones.
             // Fixed = false, is for normal input.
@@ -660,7 +660,7 @@ namespace Terminal.Gui
                 Move (curPos, 0);
             }
 
-            if (curPos < 0 || curPos >= Bounds.Width)
+            if (curPos < 0 || curPos >= Viewport.Width)
             {
                 Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
             }

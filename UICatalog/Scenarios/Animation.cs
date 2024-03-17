@@ -163,16 +163,16 @@ public class Animation : Scenario
         private Rectangle oldSize = Rectangle.Empty;
         public void NextFrame () { currentFrame = (currentFrame + 1) % frameCount; }
 
-        public override void OnDrawContent (Rectangle contentArea)
+        public override void OnDrawContent (Rectangle viewport)
         {
-            base.OnDrawContent (contentArea);
+            base.OnDrawContent (viewport);
 
-            if (oldSize != Bounds)
+            if (oldSize != Viewport)
             {
                 // Invalidate cached images now size has changed
                 matchSizes = new Image<Rgba32> [frameCount];
                 brailleCache = new string [frameCount];
-                oldSize = Bounds;
+                oldSize = Viewport;
             }
 
             Image<Rgba32> imgScaled = matchSizes [currentFrame];
@@ -183,7 +183,7 @@ public class Animation : Scenario
                 Image<Rgba32> imgFull = fullResImages [currentFrame];
 
                 // keep aspect ratio
-                int newSize = Math.Min (Bounds.Width, Bounds.Height);
+                int newSize = Math.Min (Viewport.Width, Viewport.Height);
 
                 // generate one
                 matchSizes [currentFrame] = imgScaled = imgFull.Clone (

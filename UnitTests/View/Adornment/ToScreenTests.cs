@@ -3,7 +3,7 @@
 namespace Terminal.Gui.ViewTests;
 
 /// <summary>
-/// Test the <see cref="Adornment.FrameToScreen"/> and <see cref="Adornment.BoundsToScreen"/> methods.
+/// Test the <see cref="Adornment.FrameToScreen"/> and <see cref="View.ViewportToScreen"/> methods.
 /// DOES NOT TEST View.xxxToScreen methods. Those are in ./View/Layout/ToScreenTests.cs
 /// </summary>
 /// <param name="output"></param>
@@ -251,9 +251,9 @@ public class AdornmentToScreenTests (ITestOutputHelper output)
         view.Frame = frame;
 
         // Act
-        var marginScreen = view.Margin.BoundsToScreen (new (boundsX, 0, 0, 0));
-        var borderScreen = view.Border.BoundsToScreen (new (boundsX, 0, 0, 0));
-        var paddingScreen = view.Padding.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var marginScreen = view.Margin.ViewportToScreen (new (boundsX, 0, 0, 0));
+        var borderScreen = view.Border.ViewportToScreen (new (boundsX, 0, 0, 0));
+        var paddingScreen = view.Padding.ViewportToScreen (new (boundsX, 0, 0, 0));
 
         // Assert
         Assert.Equal (expectedX, marginScreen.X);
@@ -286,15 +286,15 @@ public class AdornmentToScreenTests (ITestOutputHelper output)
         view.Margin.Thickness = new (1);
         view.Border.Thickness = new (1);
         view.Padding.Thickness = new (1);
-        // Total thickness is 3 (view.Bounds will be Frame.Width - 6)
+        // Total thickness is 3 (view.Viewport will be Frame.Width - 6)
         view.Frame = frame;
 
-        Assert.Equal(4, view.Bounds.Width);
+        Assert.Equal(4, view.Viewport.Width);
 
         // Act
-        var marginScreen = view.Margin.BoundsToScreen (new (boundsX, 0, 0, 0));
-        var borderScreen = view.Border.BoundsToScreen (new (boundsX, 0, 0, 0));
-        var paddingScreen = view.Padding.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var marginScreen = view.Margin.ViewportToScreen (new (boundsX, 0, 0, 0));
+        var borderScreen = view.Border.ViewportToScreen (new (boundsX, 0, 0, 0));
+        var paddingScreen = view.Padding.ViewportToScreen (new (boundsX, 0, 0, 0));
 
         // Assert
         Assert.Equal (expectedX, marginScreen.X);
@@ -338,9 +338,9 @@ public class AdornmentToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var marginScreen = view.Margin.BoundsToScreen (new (boundsX, 0, 0, 0));
-        var borderScreen = view.Border.BoundsToScreen (new (boundsX, 0, 0, 0));
-        var paddingScreen = view.Padding.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var marginScreen = view.Margin.ViewportToScreen (new (boundsX, 0, 0, 0));
+        var borderScreen = view.Border.ViewportToScreen (new (boundsX, 0, 0, 0));
+        var paddingScreen = view.Padding.ViewportToScreen (new (boundsX, 0, 0, 0));
 
         // Assert
         Assert.Equal (expectedX, marginScreen.X);
@@ -385,9 +385,9 @@ public class AdornmentToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var marginScreen = view.Margin.BoundsToScreen (new (boundsX, 0, 0, 0));
-        var borderScreen = view.Border.BoundsToScreen (new (boundsX, 0, 0, 0));
-        var paddingScreen = view.Padding.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var marginScreen = view.Margin.ViewportToScreen (new (boundsX, 0, 0, 0));
+        var borderScreen = view.Border.ViewportToScreen (new (boundsX, 0, 0, 0));
+        var paddingScreen = view.Padding.ViewportToScreen (new (boundsX, 0, 0, 0));
 
         // Assert
         Assert.Equal (expectedX, marginScreen.X);
@@ -441,9 +441,9 @@ public class AdornmentToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var marginScreen = view.Margin.BoundsToScreen (new (boundsX, 0, 0, 0));
-        var borderScreen = view.Border.BoundsToScreen (new (boundsX, 0, 0, 0));
-        var paddingScreen = view.Padding.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var marginScreen = view.Margin.ViewportToScreen (new (boundsX, 0, 0, 0));
+        var borderScreen = view.Border.ViewportToScreen (new (boundsX, 0, 0, 0));
+        var paddingScreen = view.Padding.ViewportToScreen (new (boundsX, 0, 0, 0));
 
         // Assert
         Assert.Equal (expectedX, marginScreen.X);
@@ -502,9 +502,9 @@ public class AdornmentToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var marginScreen = view.Margin.BoundsToScreen (new (boundsX, 0, 0, 0));
-        var borderScreen = view.Border.BoundsToScreen (new (boundsX, 0, 0, 0));
-        var paddingScreen = view.Padding.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var marginScreen = view.Margin.ViewportToScreen (new (boundsX, 0, 0, 0));
+        var borderScreen = view.Border.ViewportToScreen (new (boundsX, 0, 0, 0));
+        var paddingScreen = view.Padding.ViewportToScreen (new (boundsX, 0, 0, 0));
 
         // Assert
         Assert.Equal (expectedX, marginScreen.X);

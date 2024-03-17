@@ -152,14 +152,14 @@ public class ScrollBarView : View
                 _keepContentAlwaysInViewport = value;
                 var pos = 0;
 
-                if (value && !_vertical && _position + Host.Bounds.Width > _size)
+                if (value && !_vertical && _position + Host.Viewport.Width > _size)
                 {
-                    pos = _size - Host.Bounds.Width + (_showBothScrollIndicator ? 1 : 0);
+                    pos = _size - Host.Viewport.Width + (_showBothScrollIndicator ? 1 : 0);
                 }
 
-                if (value && _vertical && _position + Host.Bounds.Height > _size)
+                if (value && _vertical && _position + Host.Viewport.Height > _size)
                 {
-                    pos = _size - Host.Bounds.Height + (_showBothScrollIndicator ? 1 : 0);
+                    pos = _size - Host.Viewport.Height + (_showBothScrollIndicator ? 1 : 0);
                 }
 
                 if (pos != 0)
@@ -301,7 +301,7 @@ public class ScrollBarView : View
         }
 
         int location = _vertical ? mouseEvent.Y : mouseEvent.X;
-        int barsize = _vertical ? Bounds.Height : Bounds.Width;
+        int barsize = _vertical ? Viewport.Height : Viewport.Width;
         int posTopLeftTee = _vertical ? _posTopTee + 1 : _posLeftTee + 1;
         int posBottomRightTee = _vertical ? _posBottomTee + 1 : _posRightTee + 1;
         barsize -= 2;
@@ -449,7 +449,7 @@ public class ScrollBarView : View
     public virtual void OnChangedPosition () { ChangedPosition?.Invoke (this, EventArgs.Empty); }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         if (ColorScheme is null || ((!_showScrollIndicator || Size == 0) && AutoHideScrollBars && Visible))
         {
@@ -461,7 +461,7 @@ public class ScrollBarView : View
             return;
         }
 
-        if (Size == 0 || (_vertical && Bounds.Height == 0) || (!_vertical && Bounds.Width == 0))
+        if (Size == 0 || (_vertical && Viewport.Height == 0) || (!_vertical && Viewport.Width == 0))
         {
             return;
         }
@@ -470,13 +470,13 @@ public class ScrollBarView : View
 
         if (_vertical)
         {
-            if (Bounds.Right < Bounds.Width - 1)
+            if (Viewport.Right < Viewport.Width - 1)
             {
                 return;
             }
 
-            int col = Bounds.Width - 1;
-            int bh = Bounds.Height;
+            int col = Viewport.Width - 1;
+            int bh = Viewport.Height;
             Rune special;
 
             if (bh < 4)
@@ -486,7 +486,7 @@ public class ScrollBarView : View
 
                 Move (col, 0);
 
-                if (Bounds.Height == 1)
+                if (Viewport.Height == 1)
                 {
                     Driver.AddRune (Glyphs.Diamond);
                 }
@@ -495,15 +495,15 @@ public class ScrollBarView : View
                     Driver.AddRune (Glyphs.UpArrow);
                 }
 
-                if (Bounds.Height == 3)
+                if (Viewport.Height == 3)
                 {
                     Move (col, 1);
                     Driver.AddRune (Glyphs.Diamond);
                 }
 
-                if (Bounds.Height > 1)
+                if (Viewport.Height > 1)
                 {
-                    Move (col, Bounds.Height - 1);
+                    Move (col, Viewport.Height - 1);
                     Driver.AddRune (Glyphs.DownArrow);
                 }
             }
@@ -572,23 +572,23 @@ public class ScrollBarView : View
 
                 if (!hasTopTee)
                 {
-                    Move (col, Bounds.Height - 2);
+                    Move (col, Viewport.Height - 2);
                     Driver.AddRune (Glyphs.TopTee);
                 }
 
-                Move (col, Bounds.Height - 1);
+                Move (col, Viewport.Height - 1);
                 Driver.AddRune (Glyphs.DownArrow);
             }
         }
         else
         {
-            if (Bounds.Bottom < Bounds.Height - 1)
+            if (Viewport.Bottom < Viewport.Height - 1)
             {
                 return;
             }
 
-            int row = Bounds.Height - 1;
-            int bw = Bounds.Width;
+            int row = Viewport.Height - 1;
+            int bw = Viewport.Width;
             Rune special;
 
             if (bw < 4)
@@ -663,7 +663,7 @@ public class ScrollBarView : View
 
                 if (!hasLeftTee)
                 {
-                    Move (Bounds.Width - 2, row);
+                    Move (Viewport.Width - 2, row);
                     Driver.AddRune (Glyphs.LeftTee);
                 }
 
@@ -685,7 +685,7 @@ public class ScrollBarView : View
 
     internal bool CanScroll (int n, out int max, bool isVertical = false)
     {
-        if (Host?.Bounds.IsEmpty != false)
+        if (Host?.Viewport.IsEmpty != false)
         {
             max = 0;
 
@@ -706,7 +706,7 @@ public class ScrollBarView : View
 
     private bool CheckBothScrollBars (ScrollBarView scrollBarView, bool pending = false)
     {
-        int barsize = scrollBarView._vertical ? scrollBarView.Bounds.Height : scrollBarView.Bounds.Width;
+        int barsize = scrollBarView._vertical ? scrollBarView.Viewport.Height : scrollBarView.Viewport.Width;
 
         if (barsize == 0 || barsize >= scrollBarView._size)
         {
@@ -845,15 +845,15 @@ public class ScrollBarView : View
 
     private int GetBarsize (bool isVertical)
     {
-        if (Host?.Bounds.IsEmpty != false)
+        if (Host?.Viewport.IsEmpty != false)
         {
             return 0;
         }
 
         return isVertical ? KeepContentAlwaysInViewport
-                                ? Host.Bounds.Height + (_showBothScrollIndicator ? -2 : -1)
+                                ? Host.Viewport.Height + (_showBothScrollIndicator ? -2 : -1)
                                 : 0 :
-               KeepContentAlwaysInViewport ? Host.Bounds.Width + (_showBothScrollIndicator ? -2 : -1) : 0;
+               KeepContentAlwaysInViewport ? Host.Viewport.Width + (_showBothScrollIndicator ? -2 : -1) : 0;
     }
 
     private void Host_EnabledChanged (object sender, EventArgs e)

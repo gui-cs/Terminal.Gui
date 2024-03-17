@@ -1,7 +1,7 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     Adornments are a special form of <see cref="View"/> that appear outside the <see cref="View.Bounds"/>:
+///     Adornments are a special form of <see cref="View"/> that appear outside the <see cref="View.Viewport"/>:
 ///     <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>. They are defined using the
 ///     <see cref="Thickness"/> class, which specifies the thickness of the sides of a rectangle.
 /// </summary>
@@ -109,10 +109,10 @@ public class Adornment : View
     ///     Gets the rectangle that describes the area of the Adornment. The Location is always (0,0).
     ///     The size is the size of the <see cref="View.Frame"/>.
     /// </summary>
-    public override Rectangle Bounds
+    public override Rectangle Viewport
     {
         get => Frame with { Location = Point.Empty };
-        set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
+        set => throw new InvalidOperationException ("It makes no sense to set Viewport of a Thickness.");
     }
 
     /// <inheritdoc/>
@@ -139,19 +139,19 @@ public class Adornment : View
     public override bool OnDrawAdornments () { return false; }
 
     /// <summary>Redraws the Adornments that comprise the <see cref="Adornment"/>.</summary>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         if (Thickness == Thickness.Empty)
         {
             return;
         }
 
-        Rectangle screenBounds = BoundsToScreen (contentArea);
+        Rectangle screen = ViewportToScreen (viewport);
         Attribute normalAttr = GetNormalColor ();
         Driver.SetAttribute (normalAttr);
 
         // This just draws/clears the thickness, not the insides.
-        Thickness.Draw (screenBounds, ToString ());
+        Thickness.Draw (screen, ToString ());
 
         if (!string.IsNullOrEmpty (TextFormatter.Text))
         {
@@ -162,11 +162,11 @@ public class Adornment : View
             }
         }
 
-        TextFormatter?.Draw (screenBounds, normalAttr, normalAttr, Rectangle.Empty);
+        TextFormatter?.Draw (screen, normalAttr, normalAttr, Rectangle.Empty);
 
         if (Subviews.Count > 0)
         {
-            base.OnDrawContent (contentArea);
+            base.OnDrawContent (viewport);
         }
 
         ClearLayoutNeeded ();
@@ -231,7 +231,7 @@ public class Adornment : View
     /// <summary>Called when a mouse event occurs within the Adornment.</summary>
     /// <remarks>
     ///     <para>
-    ///         The coordinates are relative to <see cref="View.Bounds"/>.
+    ///         The coordinates are relative to <see cref="View.Viewport"/>.
     ///     </para>
     ///     <para>
     ///         A mouse click on the Adornment will cause the Parent to focus.
@@ -297,7 +297,7 @@ public class Adornment : View
 
                 _dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
 
-                Point parentLoc = Parent.SuperView?.ScreenToBounds (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y) ?? mouseEvent.ScreenPosition;
+                Point parentLoc = Parent.SuperView?.ScreenToViewport (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y) ?? mouseEvent.ScreenPosition;
 
                 GetLocationEnsuringFullVisibility (
                                      Parent,

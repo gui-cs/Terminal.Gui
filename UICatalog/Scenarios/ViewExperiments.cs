@@ -217,18 +217,18 @@ public class ViewExperiments : Scenario
                                    containerLabel.Text =
                                        $"Container.Frame: {
                                            Application.Top.Frame
-                                       } .Bounds: {
-                                           Application.Top.Bounds
+                                       } .Viewport: {
+                                           Application.Top.Viewport
                                        }\nView.Frame: {
                                            view.Frame
-                                       } .Bounds: {
-                                           view.Bounds
-                                       } .BoundsOffset: {
-                                           view.GetBoundsOffset ()
+                                       } .Viewport: {
+                                           view.Viewport
+                                       } .viewportOffset: {
+                                           view.GetViewportOffset ()
                                        }\n .Padding.Frame: {
                                            view.Padding.Frame
-                                       } .Padding.Bounds: {
-                                           view.Padding.Bounds
+                                       } .Padding.Viewport: {
+                                           view.Padding.Viewport
                                        }";
                                };
 
