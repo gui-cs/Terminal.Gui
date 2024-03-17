@@ -42,17 +42,29 @@ public class AllViewsTests (ITestOutputHelper output)
         int expectedX = (frame.Frame.Width - view.Frame.Width) / 2;
         int expectedY = (frame.Frame.Height - view.Frame.Height) / 2;
 
-        Assert.True (
-                     view.Frame.Left == expectedX,
-                     $"{view} did not center horizontally. Expected: {expectedX}. Actual: {view.Frame.Left}"
-                    );
+        if (view is ScrollBarView)
+        {
+            output.WriteLine ($"It's a {viewName} - It has its own Pos/Dim calculation");
+            expectedX = frame.Frame.Width - view.Frame.Width;
+            expectedY = frame.Frame.Bottom - view.Frame.Height;
 
-        Assert.True (
-                     view.Frame.Top == expectedY,
-                     $"{view} did not center vertically. Expected: {expectedY}. Actual: {view.Frame.Top}"
-                    );
+            Assert.True (view.Frame.Left == expectedX);
+            Assert.True (view.Frame.Top == expectedY);
+        }
+        else
+        {
+            Assert.True (
+                         view.Frame.Left == expectedX,
+                         $"{view} did not center horizontally. Expected: {expectedX}. Actual: {view.Frame.Left}"
+                        );
+
+            Assert.True (
+                         view.Frame.Top == expectedY,
+                         $"{view} did not center vertically. Expected: {expectedY}. Actual: {view.Frame.Top}"
+                        );
+
+        }
         Application.Shutdown ();
-
     }
 
     [Fact]
