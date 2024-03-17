@@ -471,13 +471,9 @@ public class MenuBar : View
     /// <inheritdoc/>
     public override void OnDrawContent (Rectangle viewport)
     {
-        Move (0, 0);
         Driver.SetAttribute (GetNormalColor ());
 
-        for (var i = 0; i < Frame.Width; i++)
-        {
-            Driver.AddRune ((Rune)' ');
-        }
+        Clear ();
 
         Move (1, 0);
         var pos = 0;

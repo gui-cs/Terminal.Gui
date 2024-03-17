@@ -790,7 +790,8 @@ internal sealed class Menu : View
 
             if (item is null && BorderStyle != LineStyle.None)
             {
-                Move (-1, i);
+                var s = ViewportToScreen (new (-1, i, 0, 0));
+                Driver.Move (s.X, s.Y);
                 Driver.AddRune (Glyphs.LeftTee);
             }
             else if (Frame.X < Driver.Cols)
@@ -837,7 +838,8 @@ internal sealed class Menu : View
             {
                 if (BorderStyle != LineStyle.None && SuperView?.Frame.Right - Frame.X > Frame.Width)
                 {
-                    Move (Frame.Width - 2, i);
+                    var s = ViewportToScreen (new (Frame.Width - 2, i, 0, 0));
+                    Driver.Move (s.X, s.Y);
                     Driver.AddRune (Glyphs.RightTee);
                 }
 
