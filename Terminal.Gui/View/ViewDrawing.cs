@@ -61,27 +61,25 @@ public partial class View
     public virtual bool SuperViewRendersLineCanvas { get; set; } = false;
 
     /// <summary>Draws the specified character in the specified viewport-relative column and row of the View.</summary>
+    /// <para>
+    ///     If the provided coordinates are outside the visible content area, this method does nothing.
+    /// </para>
     /// <remarks>
     ///     The top-left corner of the visible content area is <c>ViewPort.Location</c>.
     /// </remarks>
     /// <param name="col">Column (viewport-relative).</param>
     /// <param name="row">Row (viewport-relative).</param>
-    /// <param name="ch">Ch.</param>
-    public void AddRune (int col, int row, Rune ch)
+    /// <param name="rune">The Rune.</param>
+    public void AddRune (int col, int row, Rune rune)
     {
-        if (row < 0 || col < 0)
+        if (row < 0 || col < 0 || row >= Viewport.Height || col >= Viewport.Width)
         {
-            return;
-        }
-
-        // BUGBUG: This should be Viewport.Size
-        if (row > _frame.Height - 1 || col > _frame.Width - 1)
-        {
+            // TODO: Change return type to bool so callers can determine success?
             return;
         }
 
         Move (col, row);
-        Driver.AddRune (ch);
+        Driver.AddRune (rune);
     }
 
     /// <summary>Clears <see cref="Viewport"/> with the normal background.</summary>
@@ -320,9 +318,14 @@ public partial class View
         return Enabled ? cs.Normal : cs.Disabled;
     }
 
-    /// <summary>This moves the cursor to the specified view-relative column and row in the view.</summary>
+    /// <summary>Moves the drawing cursor to the specified view-relative column and row in the view.</summary>
     /// <remarks>
+    /// <para>
+    ///     If the provided coordinates are outside the visible content area, this method does nothing.
+    /// </para>
+    /// <para>
     ///     The top-left corner of the visible content area is <c>ViewPort.Location</c>.
+    /// </para>
     /// </remarks>
     /// <param name="col">Column (viewport-relative).</param>
     /// <param name="row">Row (viewport-relative).</param>
@@ -333,9 +336,13 @@ public partial class View
             return;
         }
 
-        Rectangle screen = ViewportToScreen (new (col, row, 0, 0));
+        if (col < 0 || row < 0 || col >= Viewport.Size.Width || row >= Viewport.Size.Height)
+        {
+            // TODO: Change return type to bool so callers can determine success?
+            return;
+        }
 
-        // TODO: Clamp this to stay within the View's Viewport
+        Rectangle screen = ViewportToScreen (new (col, row, 0, 0));
         Driver?.Move (screen.X, screen.Y);
     }
 
