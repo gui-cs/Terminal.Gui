@@ -58,6 +58,7 @@ public class ClassExplorer : Scenario
         Application.Top.Add (menu);
 
         _treeView = new TreeView<object> { X = 0, Y = 1, Width = Dim.Percent (50), Height = Dim.Fill () };
+        _treeView.Padding.EnableScrollBars = true;
 
         var lblSearch = new Label { Text = "Search" };
         var tfSearch = new TextField { Width = 20, X = Pos.Right (lblSearch) };
@@ -85,7 +86,7 @@ public class ClassExplorer : Scenario
 
         Win.Add (_treeView);
 
-        _textView = new TextView { X = Pos.Right (_treeView), Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
+        _textView = new TextView { X = Pos.Right (_treeView) + 1, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
         Win.Add (_textView);
     }
