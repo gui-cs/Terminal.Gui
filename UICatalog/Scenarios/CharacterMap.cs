@@ -608,7 +608,7 @@ internal class CharMap : ScrollView
 
         int firstColumnX = viewportOffset.X + RowLabelWidth;
 
-        for (var y = 1; y < Viewport.Height; y++)
+        for (var y = 1; y < Viewport.Height - (ShowHorizontalScrollIndicator ? 1 : 0); y++)
         {
             // What row is this?
             int row = (y - ContentOffset.Y - 1) / _rowHeight;

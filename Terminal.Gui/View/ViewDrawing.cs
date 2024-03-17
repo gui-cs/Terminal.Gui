@@ -54,15 +54,18 @@ public partial class View
 
     /// <summary>
     ///     Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for rendering any border
-    ///     lines. If <see langword="true"/> the rendering of any borders drawn by this Frame will be done by it's parent's
+    ///     lines. If <see langword="true"/> the rendering of any borders drawn by this Frame will be done by its parent's
     ///     SuperView. If <see langword="false"/> (the default) this View's <see cref="OnDrawAdornments"/> method will be
     ///     called to render the borders.
     /// </summary>
     public virtual bool SuperViewRendersLineCanvas { get; set; } = false;
 
-    /// <summary>Displays the specified character in the specified column and row of the View.</summary>
-    /// <param name="col">Column (view-relative).</param>
-    /// <param name="row">Row (view-relative).</param>
+    /// <summary>Draws the specified character in the specified viewport-relative column and row of the View.</summary>
+    /// <remarks>
+    ///     The top-left corner of the visible content area is <c>ViewPort.Location</c>.
+    /// </remarks>
+    /// <param name="col">Column (viewport-relative).</param>
+    /// <param name="row">Row (viewport-relative).</param>
     /// <param name="ch">Ch.</param>
     public void AddRune (int col, int row, Rune ch)
     {
@@ -71,6 +74,7 @@ public partial class View
             return;
         }
 
+        // BUGBUG: This should be Viewport.Size
         if (row > _frame.Height - 1 || col > _frame.Width - 1)
         {
             return;
@@ -86,7 +90,7 @@ public partial class View
 
     /// <summary>Clears the specified <see cref="Viewport"/>-relative rectangle with the normal background.</summary>
     /// <remarks></remarks>
-    /// <param name="contentArea">The Viewport-relative rectangle to clear.</param>
+    /// <param name="viewport">The Viewport-relative rectangle to clear.</param>
     public void Clear (Rectangle viewport)
     {
         if (Driver is null)
@@ -141,7 +145,8 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         Overrides of <see cref="OnDrawContent(Rectangle)"/> must ensure they do not set <c>Driver.Clip</c> to a clip
-    ///         region larger than the <ref name="Viewport"/> property, as this will cause the driver to clip the entire region.
+    ///         region larger than the <ref name="Viewport"/> property, as this will cause the driver to clip the entire
+    ///         region.
     ///     </para>
     /// </remarks>
     public void Draw ()
@@ -263,8 +268,8 @@ public partial class View
 
     /// <summary>Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.</summary>
     /// <returns>
-    ///     <see cref="Terminal.Gui.ColorScheme.Focus"/> if <see cref="Enabled"/> is <see langword="true"/> or
-    ///     <see cref="Terminal.Gui.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
+    ///     <see cref="ColorScheme.Focus"/> if <see cref="Enabled"/> is <see langword="true"/> or
+    ///     <see cref="ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
     ///     overridden can return other values.
     /// </returns>
     public virtual Attribute GetFocusColor ()
@@ -315,10 +320,12 @@ public partial class View
         return Enabled ? cs.Normal : cs.Disabled;
     }
 
-    /// <summary>This moves the cursor to the specified column and row in the view.</summary>
-    /// <returns>The move.</returns>
-    /// <param name="col">The column to move to, in view-relative coordinates.</param>
-    /// <param name="row">the row to move to, in view-relative coordinates.</param>
+    /// <summary>This moves the cursor to the specified view-relative column and row in the view.</summary>
+    /// <remarks>
+    ///     The top-left corner of the visible content area is <c>ViewPort.Location</c>.
+    /// </remarks>
+    /// <param name="col">Column (viewport-relative).</param>
+    /// <param name="row">Row (viewport-relative).</param>
     public void Move (int col, int row)
     {
         if (Driver is null || Driver?.Rows == 0)
@@ -327,6 +334,8 @@ public partial class View
         }
 
         Rectangle screen = ViewportToScreen (new (col, row, 0, 0));
+
+        // TODO: Clamp this to stay within the View's Viewport
         Driver?.Move (screen.X, screen.Y);
     }
 
@@ -353,12 +362,36 @@ public partial class View
         return true;
     }
 
-    /// <summary>Enables overrides to draw infinitely scrolled content and/or a background behind added controls.</summary>
+    /// <summary>
+    ///     Draws the view's content, including Subviews.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The <paramref name="viewport"/> parameter is provided as a convenience; it has the same values as the
+    ///         <see cref="Viewport"/> property.
+    ///     </para>
+    ///     <para>
+    ///         The <see cref="Viewport"/> Location and Size indicate what part of the View's virtual content area, defined
+    ///         by <see cref="ContentSize"/>, is visible and should be drawn. The coordinates taken by <see cref="Move"/> and
+    ///         <see cref="AddRune"/> are relative to <see cref="Viewport"/>, thus if <c>ViewPort.Location.Y</c> is <c>5</c>
+    ///         the 5th row of the content should be drawn using <c>MoveTo (x, 5)</c>.
+    ///     </para>
+    ///     <para>
+    ///         If <see cref="ContentSize"/> is larger than <c>ViewPort.Size</c> drawing code should use <see cref="Viewport"/>
+    ///         to constrain drawing for better performance.
+    ///     </para>
+    ///     <para>
+    ///         The <see cref="Clip"/> may define smaller area than <see cref="Viewport"/>; complex drawing code can be more
+    ///         efficient by using <see cref="Clip"/> to constrain drawing for better performance.
+    ///     </para>
+    ///     <para>
+    ///         Overrides should loop through the subviews and call <see cref="Draw"/>.
+    ///     </para>
+    /// </remarks>
     /// <param name="viewport">
-    ///     The view-relative rectangle describing the currently visible viewport into the
-    ///     <see cref="View"/>
+    ///     The rectangle describing the currently visible viewport into the <see cref="View"/>; has the same value as
+    ///     <see cref="Viewport"/>.
     /// </param>
-    /// <remarks>This method will be called before any subviews added with <see cref="Add(View)"/> have been drawn.</remarks>
     public virtual void OnDrawContent (Rectangle viewport)
     {
         if (NeedsDisplay)
@@ -386,6 +419,7 @@ public partial class View
             SetSubViewNeedsDisplay ();
         }
 
+        // TODO: Move drawing of subviews to a separate OnDrawSubviews virtual method
         // Draw subviews
         // TODO: Implement OnDrawSubviews (cancelable);
         if (_subviews is { } && SubViewNeedsDisplay)
@@ -415,17 +449,12 @@ public partial class View
     }
 
     /// <summary>
-    ///     Enables overrides after completed drawing infinitely scrolled content and/or a background behind removed
-    ///     controls.
+    ///     Called after <see cref="OnDrawContent"/> to enable overrides.
     /// </summary>
     /// <param name="viewport">
-    ///     The view-relative rectangle describing the currently visible viewport into the
+    ///     The viewport-relative rectangle describing the currently visible viewport into the
     ///     <see cref="View"/>
     /// </param>
-    /// <remarks>
-    ///     This method will be called after any subviews removed with <see cref="Remove(View)"/> have been completed
-    ///     drawing.
-    /// </remarks>
     public virtual void OnDrawContentComplete (Rectangle viewport) { DrawContentComplete?.Invoke (this, new (viewport)); }
 
     // TODO: Make this cancelable
@@ -498,15 +527,22 @@ public partial class View
 
     /// <summary>Expands the area of this view needing to be redrawn to include <paramref name="region"/>.</summary>
     /// <remarks>
-    ///     If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), the area to be
-    ///     redrawn will be the <paramref name="region"/>.
+    ///     <para>
+    ///         The location of <see cref="region"/> are relative to the View's content, bound by <c>Size.Empty</c> and
+    ///         <see cref="ContentSize"/>.
+    ///     </para>
+    ///     <para>
+    ///         If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), the area to be
+    ///         redrawn will be the <paramref name="region"/>.
+    ///     </para>
     /// </remarks>
-    /// <param name="region">The Viewport-relative region that needs to be redrawn.</param>
+    /// <param name="region">The content-relative region that needs to be redrawn.</param>
     public virtual void SetNeedsDisplay (Rectangle region)
     {
         if (!IsInitialized)
         {
             _needsDisplayRect = region;
+
             return;
         }
 

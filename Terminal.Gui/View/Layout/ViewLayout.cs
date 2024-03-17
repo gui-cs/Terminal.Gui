@@ -287,12 +287,12 @@ public partial class View
     #region Viewport
 
     /// <summary>
-    ///     The viewport represents the location and size of the View's content that can be seen by the end-user at a given time.
-    ///     The location is specified in coordinates relative to the top-left corner of the area of the View within the
-    ///     <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/> and is normally <c>0, 0</c>. Non-zero
-    ///     values for the location indicate the visible area is offset into the View's virtual <see cref="ContentSize"/>.
+    ///     Gets or sets the rectangle describing the portion of the View's content that is visible to the user.
+    ///     The viewport Location is relative to the top-left corner of the inner rectangle of the <see cref="Adornment"/>s.
+    ///     If the viewport Size is the sames as the <see cref="ContentSize"/> the Location will be <c>0, 0</c>.
+    ///     Non-zero values for the location indicate the visible area is offset into the View's virtual <see cref="ContentSize"/>.
     /// </summary>
-    /// <value>The rectangle describing the location and size of the area where the views' subviews and content are visible.</value>
+    /// <value>The rectangle describing the location and size of the viewport into the View's virtual content, described by <see cref="ContentSize"/>.</value>
     /// <remarks>
     ///     <para>
     ///         If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/> the value of Viewport is indeterminate until
@@ -300,11 +300,11 @@ public partial class View
     ///         called.
     ///     </para>
     ///     <para>
-    ///         Updates to the Viewport size updates <see cref="Frame"/>, and has the same effect as updating the
+    ///         Updates to the Viewport Size updates <see cref="Frame"/>, and has the same impact as updating the
     ///         <see cref="Frame"/>.
     ///     </para>
     ///     <para>
-    ///         Altering the Viewport size will eventually (when the view is next laid out) cause the
+    ///         Altering the Viewport Size will eventually (when the view is next laid out) cause the
     ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     /// </remarks>
@@ -360,14 +360,14 @@ public partial class View
     }
 
     /// <summary>Converts a <see cref="Viewport"/>-relative rectangle to a screen-relative rectangle.</summary>
-    public Rectangle ViewportToScreen (in Rectangle bounds)
+    public Rectangle ViewportToScreen (in Rectangle viewport)
     {
         // Translate bounds to Frame (our SuperView's Viewport-relative coordinates)
         Rectangle screen = FrameToScreen ();
         Point viewportOffset = GetViewportOffset ();
-        screen.Offset (viewportOffset.X + bounds.X, viewportOffset.Y + bounds.Y);
+        screen.Offset (viewportOffset.X + viewport.X, viewportOffset.Y + viewport.Y);
 
-        return new (screen.Location, bounds.Size);
+        return new (screen.Location, viewport.Size);
     }
 
     /// <summary>Converts a screen-relative coordinate to a Viewport-relative coordinate.</summary>
