@@ -38,7 +38,4 @@ public class Margin : Adornment
             Parent?.SetNeedsDisplay ();
         }
     }
-
-    ///// <inheritdoc/>
-    //public override Thickness GetAdornmentsThickness () { return Thickness.Empty; }
 }

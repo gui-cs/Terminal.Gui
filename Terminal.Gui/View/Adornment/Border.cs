@@ -183,9 +183,6 @@ public class Border : Adornment
         set => _lineStyle = value;
     }
 
-    ///// <inheritdoc/>
-    //public override Thickness GetAdornmentsThickness () { return Parent.Margin.Thickness; }
-
     /// <inheritdoc/>
     public override void OnDrawContent (Rectangle contentArea)
     {

@@ -45,12 +45,13 @@ namespace Terminal.Gui;
 ///         View supports two layout styles: <see cref="LayoutStyle.Absolute"/> or <see cref="LayoutStyle.Computed"/>.
 ///         The style is determined by the values of <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and
 ///         <see cref="Height"/>. If any of these is set to non-absolute <see cref="Pos"/> or <see cref="Dim"/> object,
-///         then the layout style is <see cref="LayoutStyle.Computed"/>. Otherwise it is <see cref="LayoutStyle.Absolute"/>
+///         then the layout style is <see cref="LayoutStyle.Computed"/>. Otherwise, it is <see cref="LayoutStyle.Absolute"/>
 ///         .
 ///     </para>
 ///     <para>
-///         To create a View using Absolute layout, call a constructor that takes a Rectangle parameter to specify the
-///         absolute position and size or simply set <see cref="View.Frame "/>). To create a View using Computed layout use view to
+///         To create a View using Absolute layout, call a constructor that takes a Rect parameter to specify the
+///         absolute position and size or simply set <see cref="View.Frame "/>. To create a View using Computed layout use
+///         a constructor that does not take a Rect parameter and set the X, Y, Width and Height properties on the view to
 ///         non-absolute values. Both approaches use coordinates that are relative to the <see cref="ContentArea"/> of the
 ///         <see cref="SuperView"/> the View is added to.
 ///     </para>

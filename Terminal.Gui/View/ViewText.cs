@@ -30,8 +30,7 @@ public partial class View
     ///         <see cref="TextAlignment"/> and <see cref="TextDirection"/>.
     ///     </para>
     ///     <para>
-    ///         The text will word-wrap to additional lines if it does not fit horizontally. If <see cref="ContentArea"/>'s
-    ///         height
+    ///         The text will word-wrap to additional lines if it does not fit horizontally. If <see cref="ContentArea"/>'s height
     ///         is 1, the text will be clipped.
     ///     </para>
     ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="ContentArea"/> will be adjusted to fit the text.</para>
@@ -60,6 +59,18 @@ public partial class View
             OnTextChanged (old, Text);
         }
     }
+
+    /// <summary>
+    ///     Called when the <see cref="Text"/> has changed. Fires the <see cref="TextChanged"/> event.
+    /// </summary>
+    /// <param name="oldValue"></param>
+    /// <param name="newValue"></param>
+    public void OnTextChanged (string oldValue, string newValue) { TextChanged?.Invoke (this, new StateEventArgs<string> (oldValue, newValue)); }
+
+    /// <summary>
+    ///     Text changed event, raised when the text has changed.
+    /// </summary>
+    public event EventHandler<StateEventArgs<string>> TextChanged;
 
     /// <summary>
     ///     Gets or sets how the View's <see cref="Text"/> is aligned horizontally when drawn. Changing this property will
@@ -190,18 +201,6 @@ public partial class View
                    ? Math.Max (TextFormatter.HotKeySpecifier.GetColumns (), 0)
                    : 0;
     }
-
-    /// <summary>
-    ///     Called when the <see cref="Text"/> has changed. Fires the <see cref="TextChanged"/> event.
-    /// </summary>
-    /// <param name="oldValue"></param>
-    /// <param name="newValue"></param>
-    public void OnTextChanged (string oldValue, string newValue) { TextChanged?.Invoke (this, new StateEventArgs<string> (oldValue, newValue)); }
-
-    /// <summary>
-    ///     Text changed event, raised when the text has changed.
-    /// </summary>
-    public event EventHandler<StateEventArgs<string>> TextChanged;
 
     /// <summary>Can be overridden if the <see cref="Terminal.Gui.TextFormatter.Text"/> has different format than the default.</summary>
     protected virtual void UpdateTextFormatterText ()
