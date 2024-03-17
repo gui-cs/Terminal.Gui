@@ -1366,7 +1366,6 @@ public class ToplevelTests
         Assert.Equal (new (0, 0, 10, 5), view._needsDisplayRect);
     }
 
-    // BUGBUG: Broke this test with #2483 - @bdisp I need your help figuring out why
     [Fact]
     [AutoInitShutdown]
     public void Toplevel_Inside_ScrollView_MouseGrabView ()
@@ -1471,30 +1470,29 @@ public class ToplevelTests
         Assert.Equal (win.Border, Application.MouseGrabView);
         top.SetNeedsLayout ();
         top.LayoutSubviews ();
-        // BUGBUG: tig broke this in #3273
-   //     Assert.Equal (new Rectangle (2, 2, 195, 95), win.Frame);
-   //     Application.Refresh ();
+        Assert.Equal (new Rectangle (2, 2, 195, 95), win.Frame);
+        Application.Refresh ();
 
-   //     TestHelpers.AssertDriverContentsWithFrameAre (
-   //                                                   @"
-   //                                       ▲
-   //                                       ┬
-   //  ┌────────────────────────────────────│
-   //  │                                    ┴
-   //  │                                    ░
-   //  │                                    ░
-   //  │                                    ░
-   //  │                                    ░
-   //  │                                    ░
-   //  │                                    ░
-   //  │                                    ░
-   //  │                                    ░
-   //  │                                    ░
-   //  │                                    ░
-   //  │                                    ▼
-   //◄├──────┤░░░░░░░░░░░░░░░░░░░░░░░░░░░░░► ",
-   //                                                   _output
-   //                                                  );
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+                                          ▲
+                                          ┬
+     ┌────────────────────────────────────│
+     │                                    ┴
+     │                                    ░
+     │                                    ░
+     │                                    ░
+     │                                    ░
+     │                                    ░
+     │                                    ░
+     │                                    ░
+     │                                    ░
+     │                                    ░
+     │                                    ░
+     │                                    ▼
+   ◄├──────┤░░░░░░░░░░░░░░░░░░░░░░░░░░░░░► ",
+                                                      _output
+                                                     );
 
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (
@@ -1504,12 +1502,12 @@ public class ToplevelTests
         // ScrollView always grab the mouse when the container's subview OnMouseEnter don't want grab the mouse
         Assert.Equal (scrollView, Application.MouseGrabView);
 
-   //     Application.OnMouseEvent (
-   //                               new MouseEventEventArgs (
-   //                                                        new MouseEvent { X = 4, Y = 4, Flags = MouseFlags.ReportMousePosition }
-   //                                                       )
-   //                              );
-   //     Assert.Equal (scrollView, Application.MouseGrabView);
+        Application.OnMouseEvent (
+                                  new MouseEventEventArgs (
+                                                           new MouseEvent { X = 4, Y = 4, Flags = MouseFlags.ReportMousePosition }
+                                                          )
+                                 );
+        Assert.Equal (scrollView, Application.MouseGrabView);
     }
 
     [Fact]
