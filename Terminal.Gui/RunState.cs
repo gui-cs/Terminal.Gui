@@ -32,8 +32,11 @@ public class RunState : IDisposable
     {
         if (Toplevel is { } && disposing)
         {
+            // Previously we were requiring Toplevel be disposed here.
+            // But that is not correct becaue `Begin` didn't create the TopLevel, `Init` did; thus
+            // disposing should be done by `Shutdown`, not `End`.
             throw new InvalidOperationException (
-                                                 "You must clean up (Dispose) the Toplevel before calling Application.RunState.Dispose"
+                                                 "Toplevel must be null before calling Application.RunState.Dispose"
                                                 );
         }
     }

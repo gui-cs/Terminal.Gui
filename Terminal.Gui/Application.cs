@@ -383,6 +383,10 @@ public static partial class Application
             throw new ArgumentNullException (nameof (Toplevel));
         }
 
+#if DEBUG_IDISPOSABLE
+        Debug.Assert (!Toplevel.WasDisposed);
+#endif
+
         if (Toplevel.IsOverlappedContainer && OverlappedTop != Toplevel && OverlappedTop is { })
         {
             throw new InvalidOperationException ("Only one Overlapped Container is allowed.");
@@ -539,9 +543,17 @@ public static partial class Application
     {
         if (_initialized)
         {
+            // Init created Application.Top. If it hasn't been disposed...
+            if (Top is { })
+            {
+                Top.Dispose ();
+                Top = null;
+            }
+
             if (Driver is { })
             {
                 // Init() has been called and we have a driver, so just run the app.
+                // This Toplevel will get disposed in `Shutdown`
                 var top = new T ();
                 Type type = top.GetType ().BaseType;
 
@@ -1028,11 +1040,10 @@ public static partial class Application
             Refresh ();
         }
 
-        runState.Toplevel?.Dispose ();
+        // Do NOT dispose .Toplevel here. It was not created by
+        // Run, but Init or someone else.
         runState.Toplevel = null;
         runState.Dispose ();
-
-        // BUGBUG: Application.Top is now invalid?!?!
     }
 
     #endregion Run (Begin, Run, End)

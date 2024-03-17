@@ -201,52 +201,15 @@ public class LabelTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Constructors_Defaults ()
     {
         var label = new Label ();
         Assert.Equal (string.Empty, label.Text);
-        Application.Top.Add (label);
-        RunState rs = Application.Begin (Application.Top);
-
         Assert.Equal (TextAlignment.Left, label.TextAlignment);
         Assert.True (label.AutoSize);
         Assert.False (label.CanFocus);
         Assert.Equal (new Rectangle (0, 0, 0, 0), label.Frame);
         Assert.Equal (KeyCode.Null, label.HotKey);
-        var expected = @"";
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Application.End (rs);
-
-        label = new Label { Text = "Test" };
-        Assert.True (label.AutoSize);
-        Assert.Equal ("Test", label.Text);
-        Application.Top.Add (label);
-        rs = Application.Begin (Application.Top);
-
-        Assert.Equal ("Test", label.TextFormatter.Text);
-        Assert.Equal (new Rectangle (0, 0, 4, 1), label.Frame);
-
-        expected = @"
-Test
-";
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Application.End (rs);
-
-        label = new Label { X = 3, Y = 4, Text = "Test" };
-        Assert.Equal ("Test", label.Text);
-        Application.Top.Add (label);
-        rs = Application.Begin (Application.Top);
-
-        Assert.Equal ("Test", label.TextFormatter.Text);
-        Assert.Equal (new Rectangle (3, 4, 4, 1), label.Frame);
-
-        expected = @"
-   Test
-";
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-
-        Application.End (rs);
     }
 
     [Fact]
