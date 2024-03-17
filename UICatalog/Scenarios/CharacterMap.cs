@@ -373,7 +373,7 @@ internal class CharMap : ScrollView
                     Command.PageUp,
                     () =>
                     {
-                        int page = (Bounds.Height / _rowHeight - 1) * 16;
+                        int page = (Viewport.Height / _rowHeight - 1) * 16;
                         SelectedCodePoint -= Math.Min (page, SelectedCodePoint);
 
                         return true;
@@ -384,7 +384,7 @@ internal class CharMap : ScrollView
                     Command.PageDown,
                     () =>
                     {
-                        int page = (Bounds.Height / _rowHeight - 1) * 16;
+                        int page = (Viewport.Height / _rowHeight - 1) * 16;
                         SelectedCodePoint += Math.Min (page, MaxCodePoint - SelectedCodePoint);
 
                         return true;
@@ -457,7 +457,7 @@ internal class CharMap : ScrollView
                 int row = SelectedCodePoint / 16 * _rowHeight;
                 int col = SelectedCodePoint % 16 * COLUMN_WIDTH;
 
-                int height = Bounds.Height - (ShowHorizontalScrollIndicator ? 2 : 1);
+                int height = Viewport.Height - (ShowHorizontalScrollIndicator ? 2 : 1);
 
                 if (row + ContentOffset.Y < 0)
                 {
@@ -473,7 +473,7 @@ internal class CharMap : ScrollView
                                               );
                 }
 
-                int width = Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
+                int width = Viewport.Width / COLUMN_WIDTH * COLUMN_WIDTH - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
 
                 if (col + ContentOffset.X < 0)
                 {
@@ -524,47 +524,47 @@ internal class CharMap : ScrollView
     private static int RowWidth => RowLabelWidth + COLUMN_WIDTH * 16;
     public event EventHandler<ListViewItemEventArgs> Hover;
 
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         //if (ShowHorizontalScrollIndicator && ContentSize.Height < (int)(MaxCodePoint / 16 + 2)) {
         //	//ContentSize = new (CharMap.RowWidth, (int)(MaxCodePoint / 16 + 2));
         //	//ContentSize = new (CharMap.RowWidth, (int)(MaxCodePoint / 16) * _rowHeight + 2);
-        //	var width = (Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH) - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
+        //	var width = (Viewport.Width / COLUMN_WIDTH * COLUMN_WIDTH) - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
         //	if (Cursor.X + ContentOffset.X >= width) {
         //		// Snap to the selected glyph.
         //		ContentOffset = new (
         //			Math.Min (Cursor.X, Cursor.X - width + COLUMN_WIDTH),
-        //			ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
+        //			ContentOffset.Y == -ContentSize.Height + Viewport.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
         //	} else {
         //		ContentOffset = new (
         //			ContentOffset.X - Cursor.X,
-        //			ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
+        //			ContentOffset.Y == -ContentSize.Height + Viewport.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
         //	}
         //} else if (!ShowHorizontalScrollIndicator && ContentSize.Height > (int)(MaxCodePoint / 16 + 1)) {
         //	//ContentSize = new (CharMap.RowWidth, (int)(MaxCodePoint / 16 + 1));
         //	// Snap 1st column into view if it's been scrolled horizontally
-        //	ContentOffset = new (0, ContentOffset.Y < -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
+        //	ContentOffset = new (0, ContentOffset.Y < -ContentSize.Height + Viewport.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
         //}
-        base.OnDrawContent (contentArea);
+        base.OnDrawContent (viewport);
     }
 
     //public void CharMap_DrawContent (object s, DrawEventArgs a)
-    public override void OnDrawContentComplete (Rectangle contentArea)
+    public override void OnDrawContentComplete (Rectangle viewport)
     {
-        if (contentArea.Height == 0 || contentArea.Width == 0)
+        if (viewport.Height == 0 || viewport.Width == 0)
         {
             return;
         }
 
-        Rectangle viewport = new (
+        Rectangle viewportOffset = new (
                                   ContentOffset,
                                   new (
-                                       Math.Max (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
-                                       Math.Max (Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0)
+                                       Math.Max (Viewport.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
+                                       Math.Max (Viewport.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0)
                                       )
                                  );
 
-        Rectangle oldClip = ClipToBounds ();
+        Rectangle oldClip = ClipToViewport ();
 
         if (ShowHorizontalScrollIndicator)
         {
@@ -606,9 +606,9 @@ internal class CharMap : ScrollView
             }
         }
 
-        int firstColumnX = viewport.X + RowLabelWidth;
+        int firstColumnX = viewportOffset.X + RowLabelWidth;
 
-        for (var y = 1; y < Bounds.Height; y++)
+        for (var y = 1; y < Viewport.Height - (ShowHorizontalScrollIndicator ? 1 : 0); y++)
         {
             // What row is this?
             int row = (y - ContentOffset.Y - 1) / _rowHeight;
@@ -733,9 +733,9 @@ internal class CharMap : ScrollView
     {
         if (HasFocus
             && Cursor.X >= RowLabelWidth
-            && Cursor.X < Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0)
+            && Cursor.X < Viewport.Width - (ShowVerticalScrollIndicator ? 1 : 0)
             && Cursor.Y > 0
-            && Cursor.Y < Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0))
+            && Cursor.Y < Viewport.Height - (ShowHorizontalScrollIndicator ? 1 : 0))
         {
             Driver.SetCursorVisibility (_cursor);
             Move (Cursor.X, Cursor.Y);

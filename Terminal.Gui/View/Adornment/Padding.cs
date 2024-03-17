@@ -42,7 +42,7 @@ public class Padding : Adornment
     /// <summary>Called when a mouse event occurs within the Padding.</summary>
     /// <remarks>
     /// <para>
-    /// The coordinates are relative to <see cref="View.Bounds"/>.
+    /// The coordinates are relative to <see cref="View.Viewport"/>.
     /// </para>
     /// <para>
     /// A mouse click on the Padding will cause the Parent to focus.

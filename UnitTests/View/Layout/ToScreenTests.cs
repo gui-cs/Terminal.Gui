@@ -3,7 +3,7 @@
 namespace Terminal.Gui.ViewTests;
 
 /// <summary>
-/// Test the <see cref="View.FrameToScreen"/> and <see cref="View.BoundsToScreen"/> methods.
+/// Test the <see cref="View.FrameToScreen"/> and <see cref="View.ViewportToScreen"/> methods.
 /// DOES NOT TEST Adornment.xxxToScreen methods. Those are in ./Adornment/ToScreenTests.cs
 /// </summary>
 /// <param name="output"></param>
@@ -222,7 +222,7 @@ public class ToScreenTests (ITestOutputHelper output)
         view.Frame = frame;
 
         // Act
-        var screen = view.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var screen = view.ViewportToScreen (new (boundsX, 0, 0, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -254,7 +254,7 @@ public class ToScreenTests (ITestOutputHelper output)
         view.Frame = frame;
 
         // Act
-        var screen = view.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var screen = view.ViewportToScreen (new (boundsX, 0, 0, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -296,7 +296,7 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var screen = view.ViewportToScreen (new (boundsX, 0, 0, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -339,7 +339,7 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var screen = view.ViewportToScreen (new (boundsX, 0, 0, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -391,7 +391,7 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var screen = view.ViewportToScreen (new (boundsX, 0, 0, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -445,7 +445,7 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.BoundsToScreen (new (boundsX, 0, 0, 0));
+        var screen = view.ViewportToScreen (new (boundsX, 0, 0, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);

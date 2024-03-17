@@ -296,7 +296,7 @@ public static partial class Application
         Current = Top;
 
         // Ensure Top's layout is up to date.
-        Current.SetRelativeLayout (Driver.Bounds);
+        Current.SetRelativeLayout (Driver.Viewport);
 
         SupportedCultures = GetSupportedCultures ();
         _mainThreadId = Thread.CurrentThread.ManagedThreadId;
@@ -491,7 +491,7 @@ public static partial class Application
         }
 
         //if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
-        Toplevel.SetRelativeLayout (Driver.Bounds);
+        Toplevel.SetRelativeLayout (Driver.Viewport);
 
         //}
 
@@ -1376,7 +1376,7 @@ public static partial class Application
     /// <remarks>
     ///     <para>
     ///         Use this event to receive mouse events in screen coordinates. Use <see cref="MouseEvent"/> to
-    ///         receive mouse events relative to a <see cref="View"/>'s bounds.
+    ///         receive mouse events relative to a <see cref="View.Viewport"/>.
     ///     </para>
     ///     <para>The <see cref="MouseEvent.View"/> will contain the <see cref="View"/> that contains the mouse coordinates.</para>
     /// </remarks>
@@ -1419,7 +1419,7 @@ public static partial class Application
         if (MouseGrabView is { })
         {
             // If the mouse is grabbed, send the event to the view that grabbed it.
-            // The coordinates are relative to the Bounds of the view that grabbed the mouse.
+            // The coordinates are relative to the Viewport of the view that grabbed the mouse.
             Point frameLoc = MouseGrabView.ScreenToFrame (a.MouseEvent.X, a.MouseEvent.Y);
 
             var viewRelativeMouseEvent = new MouseEvent
@@ -1431,9 +1431,9 @@ public static partial class Application
                 View = view
             };
 
-            if (MouseGrabView.Bounds.Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
+            if (MouseGrabView.Viewport.Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
             {
-                // The mouse has moved outside the bounds of the view that
+                // The mouse has moved outside the Viewport of the view that
                 // grabbed the mouse, so we tell the view that last got 
                 // OnMouseEnter the mouse is leaving
                 // BUGBUG: That sentence makes no sense. Either I'm missing something or this logic is flawed.
@@ -1487,14 +1487,14 @@ public static partial class Application
                 View = view
             };
         }
-        else if (view.BoundsToScreen (view.Bounds).Contains (a.MouseEvent.X, a.MouseEvent.Y))
+        else if (view.ViewportToScreen (view.Viewport).Contains (a.MouseEvent.X, a.MouseEvent.Y))
         {
-            Point boundsPoint = view.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
+            Point viewportLocation = view.ScreenToViewport (a.MouseEvent.X, a.MouseEvent.Y);
 
             me = new MouseEvent
             {
-                X = boundsPoint.X,
-                Y = boundsPoint.Y,
+                X = viewportLocation.X,
+                Y = viewportLocation.Y,
                 Flags = a.MouseEvent.Flags,
                 ScreenPosition = new (a.MouseEvent.X, a.MouseEvent.Y),
                 View = view

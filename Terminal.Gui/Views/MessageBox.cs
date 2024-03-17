@@ -394,7 +394,7 @@ public static class MessageBox
                         }
 
                         // TODO: replace with Dim.Fit when implemented
-                        Rectangle maxBounds = d.SuperView?.Bounds ?? Application.Top.Bounds;
+                        Rectangle maxBounds = d.SuperView?.Viewport ?? Application.Top.Viewport;
 
                         Thickness adornmentsThickness = d.GetAdornmentsThickness ();
 

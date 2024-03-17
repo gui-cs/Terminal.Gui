@@ -52,7 +52,7 @@ namespace Terminal.Gui;
 ///         To create a View using Absolute layout, call a constructor that takes a Rect parameter to specify the
 ///         absolute position and size or simply set <see cref="View.Frame "/>). To create a View using Computed layout use
 ///         a constructor that does not take a Rect parameter and set the X, Y, Width and Height properties on the view to
-///         non-absolute values. Both approaches use coordinates that are relative to the <see cref="Bounds"/> of the
+///         non-absolute values. Both approaches use coordinates that are relative to the <see cref="Viewport"/> of the
 ///         <see cref="SuperView"/> the View is added to.
 ///     </para>
 ///     <para>
@@ -73,7 +73,7 @@ namespace Terminal.Gui;
 ///         a View can be accessed with the <see cref="SuperView"/> property.
 ///     </para>
 ///     <para>
-///         To flag a region of the View's <see cref="Bounds"/> to be redrawn call <see cref="SetNeedsDisplay(Rectangle)"/>
+///         To flag a region of the View's <see cref="Viewport"/> to be redrawn call <see cref="SetNeedsDisplay(Rectangle)"/>
 ///         .
 ///         To flag the entire view for redraw call <see cref="SetNeedsDisplay()"/>.
 ///     </para>
@@ -234,7 +234,7 @@ public partial class View : Responder, ISupportInitializeNotification
 
         // TODO: Move these into ViewText.cs as EndInit_Text() to consolodate.
         // TODO: Verify UpdateTextDirection really needs to be called here.
-        // These calls were moved from BeginInit as they access Bounds which is indeterminate until EndInit is called.
+        // These calls were moved from BeginInit as they access Viewport which is indeterminate until EndInit is called.
         UpdateTextDirection (TextDirection);
         UpdateTextFormatterText ();
         OnResizeNeeded ();

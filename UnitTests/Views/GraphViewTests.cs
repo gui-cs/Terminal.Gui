@@ -61,7 +61,7 @@ public class GraphViewTests
         gv.EndInit ();
 
         gv.ColorScheme = new ColorScheme ();
-        gv.Bounds = new Rectangle (0, 0, 50, 30);
+        gv.Viewport = new Rectangle (0, 0, 50, 30);
         gv.Series.Add (new ScatterSeries { Points = new List<PointF> { new (1, 1) } });
         gv.CellSize = new PointF (0, 5);
         var ex = Assert.Throws<Exception> (() => gv.Draw ());
@@ -85,7 +85,7 @@ public class GraphViewTests
         gv.ColorScheme = new ColorScheme ();
         gv.MarginBottom = 1;
         gv.MarginLeft = 1;
-        gv.Bounds = new Rectangle (0, 0, 10, 5);
+        gv.Viewport = new Rectangle (0, 0, 10, 5);
 
         return gv;
     }
@@ -128,7 +128,7 @@ public class GraphViewTests
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
-        gv.Bounds = new Rectangle (0, 0, 50, 30);
+        gv.Viewport = new Rectangle (0, 0, 50, 30);
 
         // How much graph space each cell of the console depicts
         gv.CellSize = new PointF (0.1f, 0.25f);
@@ -141,9 +141,9 @@ public class GraphViewTests
         // Start the graph at 80
         gv.ScrollOffset = new PointF (0, 80);
 
-        for (var x = 0; x < gv.Bounds.Width; x++)
+        for (var x = 0; x < gv.Viewport.Width; x++)
         {
-            for (var y = 0; y < gv.Bounds.Height; y++)
+            for (var y = 0; y < gv.Viewport.Height; y++)
             {
                 RectangleF graphSpace = gv.ScreenToGraphSpace (x, y);
 
@@ -199,7 +199,7 @@ public class GraphViewTests
         gv.BeginInit ();
         gv.EndInit ();
 
-        gv.Bounds = new Rectangle (0, 0, 20, 10);
+        gv.Viewport = new Rectangle (0, 0, 20, 10);
 
         // origin should be bottom left
         RectangleF botLeft = gv.ScreenToGraphSpace (0, 9);
@@ -221,7 +221,7 @@ public class GraphViewTests
         gv.BeginInit ();
         gv.EndInit ();
 
-        gv.Bounds = new Rectangle (0, 0, 20, 10);
+        gv.Viewport = new Rectangle (0, 0, 20, 10);
 
         // origin should be bottom left
         RectangleF botLeft = gv.ScreenToGraphSpace (0, 9);
@@ -261,7 +261,7 @@ public class GraphViewTests
         gv.BeginInit ();
         gv.EndInit ();
 
-        gv.Bounds = new Rectangle (0, 0, 20, 10);
+        gv.Viewport = new Rectangle (0, 0, 20, 10);
 
         // Each cell of screen measures 5 units in graph data model vertically and 1/4 horizontally
         gv.CellSize = new PointF (0.25f, 5);
@@ -293,7 +293,7 @@ public class GraphViewTests
         gv.BeginInit ();
         gv.EndInit ();
 
-        gv.Bounds = new Rectangle (0, 0, 20, 10);
+        gv.Viewport = new Rectangle (0, 0, 20, 10);
 
         // origin should be bottom left
         Point botLeft = gv.GraphSpaceToScreen (new PointF (0, 0));
@@ -313,7 +313,7 @@ public class GraphViewTests
         gv.BeginInit ();
         gv.EndInit ();
 
-        gv.Bounds = new Rectangle (0, 0, 20, 10);
+        gv.Viewport = new Rectangle (0, 0, 20, 10);
 
         // origin should be bottom left
         Point botLeft = gv.GraphSpaceToScreen (new PointF (0, 0));
@@ -343,7 +343,7 @@ public class GraphViewTests
         gv.BeginInit ();
         gv.EndInit ();
 
-        gv.Bounds = new Rectangle (0, 0, 20, 10);
+        gv.Viewport = new Rectangle (0, 0, 20, 10);
 
         //graph is scrolled to present chart space -5 to 5 in both axes
         gv.ScrollOffset = new PointF (-5, -5);
@@ -366,7 +366,7 @@ public class GraphViewTests
         gv.BeginInit ();
         gv.EndInit ();
 
-        gv.Bounds = new Rectangle (0, 0, 20, 10);
+        gv.Viewport = new Rectangle (0, 0, 20, 10);
 
         // Each cell of screen is responsible for rendering 5 units in graph data model
         // vertically and 1/4 horizontally
@@ -407,7 +407,7 @@ public class GraphViewTests
         gv.BeginInit ();
         gv.EndInit ();
 
-        gv.Bounds = new Rectangle (0, 0, 20, 10);
+        gv.Viewport = new Rectangle (0, 0, 20, 10);
 
         // Each cell of screen is responsible for rendering 5 units in graph data model
         // vertically and 1/4 horizontally
@@ -441,7 +441,7 @@ public class GraphViewTests
 public class SeriesTests
 {
     [Fact]
-    public void Series_GetsPassedCorrectBounds_AllAtOnce ()
+    public void Series_GetsPassedCorrectViewport_AllAtOnce ()
     {
         GraphViewTests.InitFakeDriver ();
 
@@ -449,7 +449,7 @@ public class SeriesTests
         gv.BeginInit ();
         gv.EndInit ();
         gv.ColorScheme = new ColorScheme ();
-        gv.Bounds = new Rectangle (0, 0, 50, 30);
+        gv.Viewport = new Rectangle (0, 0, 50, 30);
 
         var fullGraphBounds = RectangleF.Empty;
         var graphScreenBounds = Rectangle.Empty;
@@ -493,7 +493,7 @@ public class SeriesTests
     ///     <see cref="GraphView.CellSize"/> results in multiple units of graph space being condensed into each cell of console
     /// </summary>
     [Fact]
-    public void Series_GetsPassedCorrectBounds_AllAtOnce_LargeCellSize ()
+    public void Series_GetsPassedCorrectViewport_AllAtOnce_LargeCellSize ()
     {
         GraphViewTests.InitFakeDriver ();
 
@@ -501,7 +501,7 @@ public class SeriesTests
         gv.BeginInit ();
         gv.EndInit ();
         gv.ColorScheme = new ColorScheme ();
-        gv.Bounds = new Rectangle (0, 0, 50, 30);
+        gv.Viewport = new Rectangle (0, 0, 50, 30);
 
         // the larger the cell size the more condensed (smaller) the graph space is
         gv.CellSize = new PointF (2, 5);
@@ -641,7 +641,7 @@ public class MultiBarSeriesTests
 
         // y axis goes from 0.1 to 1 across 10 console rows
         // x axis goes from 0 to 20 across 20 console columns
-        gv.Bounds = new Rectangle (0, 0, 20, 10);
+        gv.Viewport = new Rectangle (0, 0, 20, 10);
         gv.CellSize = new PointF (1f, 0.1f);
         gv.MarginBottom = 1;
         gv.MarginLeft = 1;
@@ -873,7 +873,7 @@ public class BarSeriesTests
 
         // y axis goes from 0.1 to 1 across 10 console rows
         // x axis goes from 0 to 10 across 20 console columns
-        gv.Bounds = new Rectangle (0, 0, 20, 10);
+        gv.Viewport = new Rectangle (0, 0, 20, 10);
         gv.CellSize = new PointF (0.5f, 0.1f);
 
         gv.Series.Add (series = new FakeBarSeries ());
@@ -914,7 +914,7 @@ public class AxisTests
 
         var gv = new GraphView ();
         gv.ColorScheme = new ColorScheme ();
-        gv.Bounds = new Rectangle (0, 0, 50, 30);
+        gv.Viewport = new Rectangle (0, 0, 50, 30);
 
         // graph can't be completely empty or it won't draw
         gv.Series.Add (new ScatterSeries ());
@@ -1298,19 +1298,19 @@ public class LegendTests
     public void Constructors_Defaults ()
     {
         var legend = new LegendAnnotation ();
-        Assert.Equal (Rectangle.Empty, legend.Bounds);
+        Assert.Equal (Rectangle.Empty, legend.Viewport);
         Assert.Equal (Rectangle.Empty, legend.Frame);
         Assert.Equal (LineStyle.Single, legend.BorderStyle);
         Assert.False (legend.BeforeSeries);
 
         var bounds = new Rectangle (1, 2, 10, 3);
         legend = new LegendAnnotation (bounds);
-        Assert.Equal (new Rectangle (0, 0, 8, 1), legend.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 8, 1), legend.Viewport);
         Assert.Equal (bounds, legend.Frame);
         Assert.Equal (LineStyle.Single, legend.BorderStyle);
         Assert.False (legend.BeforeSeries);
         legend.BorderStyle = LineStyle.None;
-        Assert.Equal (new Rectangle (0, 0, 10, 3), legend.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 3), legend.Viewport);
         Assert.Equal (bounds, legend.Frame);
     }
 
@@ -1549,7 +1549,7 @@ public class PathAnnotationTests
     public void XAxisLabels_With_MarginLeft ()
     {
         GraphViewTests.InitFakeDriver ();
-        var gv = new GraphView { ColorScheme = new ColorScheme (), Bounds = new Rectangle (0, 0, 10, 7) };
+        var gv = new GraphView { ColorScheme = new ColorScheme (), Viewport = new Rectangle (0, 0, 10, 7) };
 
         gv.CellSize = new PointF (1, 0.5f);
         gv.AxisY.Increment = 1;
@@ -1591,7 +1591,7 @@ public class PathAnnotationTests
     public void YAxisLabels_With_MarginBottom ()
     {
         GraphViewTests.InitFakeDriver ();
-        var gv = new GraphView { ColorScheme = new ColorScheme (), Bounds = new Rectangle (0, 0, 10, 7) };
+        var gv = new GraphView { ColorScheme = new ColorScheme (), Viewport = new Rectangle (0, 0, 10, 7) };
 
         gv.CellSize = new PointF (1, 0.5f);
         gv.AxisY.Increment = 1;

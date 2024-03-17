@@ -309,7 +309,7 @@ public class StraightLineTests
                 )]
     [Theory]
     [SetupFakeDriver]
-    public void Bounds (
+    public void Viewport (
         Orientation orientation,
         int x,
         int y,
@@ -322,6 +322,6 @@ public class StraightLineTests
     {
         var sl = new StraightLine (new Point (x, y), length, orientation, LineStyle.Single);
 
-        Assert.Equal (new Rectangle (expectedX, expectedY, expectedWidth, expectedHeight), sl.Bounds);
+        Assert.Equal (new Rectangle (expectedX, expectedY, expectedWidth, expectedHeight), sl.Viewport);
     }
 }
