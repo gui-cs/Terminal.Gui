@@ -78,6 +78,8 @@ public class ScrollView : View
         _contentView.MouseEnter += View_MouseEnter;
         _contentView.MouseLeave += View_MouseLeave;
 
+        Application.UnGrabbedMouse += Application_UnGrabbedMouse;
+
         // Things this view knows how to do
         AddCommand (Command.ScrollUp, () => ScrollUp (1));
         AddCommand (Command.ScrollDown, () => ScrollDown (1));
@@ -132,6 +134,16 @@ public class ScrollView : View
                            _vertical.ChangedPosition += delegate { ContentOffset = new Point (ContentOffset.X, _vertical.Position); };
                            _horizontal.ChangedPosition += delegate { ContentOffset = new Point (_horizontal.Position, ContentOffset.Y); };
                        };
+    }
+
+    private void Application_UnGrabbedMouse (object sender, ViewEventArgs e)
+    {
+        var parent = e.View is Adornment adornment ? adornment.Parent : e.View;
+
+        if (parent is { } && _contentView.Subviews.Contains (parent))
+        {
+            Application.GrabMouse (this);
+        }
     }
 
     /// <summary>If true the vertical/horizontal scroll bars won't be showed if it's not needed.</summary>
@@ -535,6 +547,8 @@ public class ScrollView : View
             // It was not added to SuperView, so it won't get disposed automatically
             _horizontal?.Dispose ();
         }
+
+        Application.UnGrabbedMouse -= Application_UnGrabbedMouse;
 
         base.Dispose (disposing);
     }

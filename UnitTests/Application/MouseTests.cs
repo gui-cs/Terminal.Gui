@@ -316,8 +316,9 @@ public class MouseTests
         View grabView = null;
         var count = 0;
 
-        var view1 = new View ();
-        var view2 = new View ();
+        var view1 = new View { Id = "view1" };
+        var view2 = new View { Id = "view2" };
+        var view3 = new View { Id = "view3" };
 
         Application.GrabbedMouse += Application_GrabbedMouse;
         Application.UnGrabbedMouse += Application_UnGrabbedMouse;
@@ -343,6 +344,8 @@ public class MouseTests
         Application.UngrabMouse ();
         Assert.Equal (2, count);
         Assert.Equal (grabView, view2);
+        Assert.Equal (view3, Application.MouseGrabView);
+        Application.UngrabMouse ();
         Assert.Null (Application.MouseGrabView);
 
         void Application_GrabbedMouse (object sender, ViewEventArgs e)
@@ -375,6 +378,12 @@ public class MouseTests
             }
 
             count++;
+
+            if (count > 1)
+            {
+                // It's possible to grab another view after the previous was ungrabbed
+                Application.GrabMouse (view3);
+            }
 
             Application.UnGrabbedMouse -= Application_UnGrabbedMouse;
         }
