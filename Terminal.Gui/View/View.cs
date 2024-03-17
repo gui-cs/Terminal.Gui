@@ -369,6 +369,7 @@ public partial class View : Responder, ISupportInitializeNotification
             }
 
             OnVisibleChanged ();
+            SetNeedsLayout ();
             SetNeedsDisplay ();
         }
     }
