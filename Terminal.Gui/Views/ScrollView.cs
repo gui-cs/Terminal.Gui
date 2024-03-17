@@ -140,9 +140,19 @@ public class ScrollView : View
     {
         var parent = e.View is Adornment adornment ? adornment.Parent : e.View;
 
-        if (parent is { } && _contentView.Subviews.Contains (parent))
+        if (parent is { })
         {
-            Application.GrabMouse (this);
+            var supView = parent.SuperView;
+
+            while (supView is { })
+            {
+                if (supView == _contentView)
+                {
+                    Application.GrabMouse (this);
+                }
+
+                supView = supView.SuperView;
+            }
         }
     }
 
@@ -733,7 +743,7 @@ public class ScrollView : View
 
     private void View_MouseLeave (object sender, MouseEventEventArgs e)
     {
-        if (Application.MouseGrabView is { } && Application.MouseGrabView != _vertical && Application.MouseGrabView != _horizontal)
+        if (Application.MouseGrabView is { } && Application.MouseGrabView != this && Application.MouseGrabView != _vertical && Application.MouseGrabView != _horizontal)
         {
             Application.UngrabMouse ();
         }
