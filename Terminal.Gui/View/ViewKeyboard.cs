@@ -403,28 +403,6 @@ public partial class View
             return true;
         }
 
-        // Check if adornments needs to handle the key
-        handled = Margin?.OnInvokingKeyBindings (keyEvent);
-
-        if (handled != null && (bool)handled)
-        {
-            return true;
-        }
-
-        handled = Border?.OnInvokingKeyBindings (keyEvent);
-
-        if (handled != null && (bool)handled)
-        {
-            return true;
-        }
-
-        handled = Padding?.OnInvokingKeyBindings (keyEvent);
-
-        if (handled != null && (bool)handled)
-        {
-            return true;
-        }
-
         // TODO: The below is not right. OnXXX handlers are supposed to fire the events.
         // TODO: But I've moved it outside of the v-function to test something.
         // After (fire the cancellable event)

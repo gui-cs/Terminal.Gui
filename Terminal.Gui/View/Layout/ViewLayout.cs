@@ -1037,30 +1037,6 @@ public partial class View
             view.SetNeedsLayout ();
         }
 
-        if (Margin != null)
-        {
-            for (var i = 0; i < 3; i++)
-            {
-                Adornment adornment = i switch
-                                      {
-                                          0 => Margin,
-                                          1 => Border,
-                                          2 => Padding,
-                                          _ => null
-                                      };
-
-                if (adornment != null)
-                {
-                    adornment.SetNeedsLayout ();
-
-                    foreach (View view in adornment.Subviews)
-                    {
-                        view.SetNeedsLayout ();
-                    }
-                }
-            }
-        }
-
         TextFormatter.NeedsFormat = true;
         SuperView?.SetNeedsLayout ();
     }

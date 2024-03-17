@@ -576,16 +576,6 @@ public partial class View
     {
         _needsDisplayRect = Rectangle.Empty;
         SubViewNeedsDisplay = false;
-
-        if (Margin is { })
-        {
-            Margin._needsDisplayRect = Rectangle.Empty;
-            Margin.SubViewNeedsDisplay = false;
-            Border._needsDisplayRect = Rectangle.Empty;
-            Border.SubViewNeedsDisplay = false;
-            Padding._needsDisplayRect = Rectangle.Empty;
-            Padding.SubViewNeedsDisplay = false;
-        }
     }
 
     // INTENT: Isn't this just intersection? It isn't used anyway.
