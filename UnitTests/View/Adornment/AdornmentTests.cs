@@ -613,9 +613,9 @@ public class AdornmentTests (ITestOutputHelper output)
         view.Padding.Thickness = new Thickness (1);
 
         Assert.Equal (new Thickness (3, 3, 3, 3), view.GetAdornmentsThickness ());
-        Assert.Equal (Thickness.Empty, view.Margin.GetAdornmentsThickness ());
-        Assert.Equal (new Thickness (1), view.Border.GetAdornmentsThickness ());
-        Assert.Equal (new Thickness (2), view.Padding.GetAdornmentsThickness ());
+        Assert.Equal (new Thickness (1), view.Margin.Thickness);
+        Assert.Equal (new Thickness (1), view.Border.Thickness);
+        Assert.Equal (new Thickness (1), view.Padding.Thickness);
         view.Dispose ();
     }
 
