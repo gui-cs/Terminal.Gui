@@ -239,7 +239,7 @@ public class Adornment : View
     /// <summary>Called when a mouse event occurs within the Adornment.</summary>
     /// <remarks>
     ///     <para>
-    ///         The coordinates are relative to <see cref="View.Bounds"/>.
+    ///         The coordinates are relative to <see cref="View.ContentArea"/>.
     ///     </para>
     ///     <para>
     ///         A mouse click on the Adornment will cause the Parent to focus.

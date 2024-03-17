@@ -116,10 +116,10 @@ public class MouseEvent
     /// <summary>The View at the location for the mouse event.</summary>
     public View View { get; set; }
 
-    /// <summary>The X position of the mouse in <see cref="View.Bounds"/>-relative coordinates.</summary>
+    /// <summary>The X position of the mouse in <see cref="Gui.View.ContentArea"/>-relative coordinates.</summary>
     public int X { get; set; }
 
-    /// <summary>The Y position of the mouse in <see cref="View.Bounds"/>-relative coordinates.</summary>
+    /// <summary>The Y position of the mouse in <see cref="Gui.View.ContentArea"/>-relative coordinates.</summary>
     public int Y { get; set; }
 
     /// <summary>
@@ -133,7 +133,7 @@ public class MouseEvent
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         The <see cref="X"/> and <see cref="Y"/> properties are always <see cref="View.Bounds"/>-relative. When the mouse is grabbed by a view,
+    ///         The <see cref="X"/> and <see cref="Y"/> properties are always <see cref="Gui.View.ContentArea"/>-relative. When the mouse is grabbed by a view,
     ///         <see cref="ScreenPosition"/> provides the mouse position screen-relative coordinates, enabling the grabbed view to know how much the
     ///         mouse has moved.
     ///     </para>
