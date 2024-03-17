@@ -149,6 +149,8 @@ public class ScrollView : View
                 if (supView == _contentView)
                 {
                     Application.GrabMouse (this);
+
+                    break;
                 }
 
                 supView = supView.SuperView;
