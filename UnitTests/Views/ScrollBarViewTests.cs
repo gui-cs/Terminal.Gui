@@ -1017,6 +1017,7 @@ This is a test
         _scrollBar.OtherScrollBarView.ShowScrollIndicator = false;
         _scrollBar.KeepContentAlwaysInViewPort = true;
 
+        Assert.Equal(new (79, 0, 1, 24), _scrollBar.Frame);
         Assert.Equal (_scrollBar.Position, _scrollBar.Size - _scrollBar.ContentArea.Height - 1);
         Assert.Equal (_scrollBar.Position, _hostView.Top);
         Assert.Equal (5, _scrollBar.Position);
@@ -1026,9 +1027,10 @@ This is a test
         Assert.False (_scrollBar.Visible);
         Assert.False (_scrollBar.OtherScrollBarView.Visible);
 
+        Assert.Equal(new (0, 24, 80, 1), _scrollBar.OtherScrollBarView.Frame);
         Assert.Equal (
                       _scrollBar.OtherScrollBarView.Position,
-                      _scrollBar.OtherScrollBarView.Size - _scrollBar.OtherScrollBarView.ContentArea.Width - 1
+                      _scrollBar.OtherScrollBarView.Size - _scrollBar.OtherScrollBarView.ContentArea.Width
                      );
         Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
         Assert.Equal (20, _scrollBar.OtherScrollBarView.Position);
