@@ -2029,6 +2029,7 @@ public class ToplevelTests
                                    );
 
             Application.Run (firstWindow);
+            firstWindow.Dispose ();
         }
 
         void SecondWindow (object sender, EventArgs args)
@@ -2059,6 +2060,7 @@ public class ToplevelTests
                                    );
 
             Application.Run (testWindow);
+            testWindow.Dispose ();
         }
 
         Application.Run ();
