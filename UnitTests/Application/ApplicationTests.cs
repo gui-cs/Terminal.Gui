@@ -47,7 +47,7 @@ public class ApplicationTests
     }
 
     [Fact]
-    public void End_Disposes_Runstate_Toplevel ()
+    public void End_Should_Not_Dispose_ApplicationTop_Shutdown_Should ()
     {
         Init ();
 
@@ -56,12 +56,18 @@ public class ApplicationTests
 
 #if DEBUG_IDISPOSABLE
         Assert.True (rs.WasDisposed);
-        Assert.True (Application.Top.WasDisposed);
+        Assert.False (Application.Top.WasDisposed);
 #endif
 
         Assert.Null (rs.Toplevel);
 
+        var top = Application.Top;
+
         Shutdown ();
+
+#if DEBUG_IDISPOSABLE
+        Assert.True (top.WasDisposed);
+#endif
 
         Assert.Null (Application.Top);
     }
@@ -490,12 +496,13 @@ public class ApplicationTests
     #region RunTests
 
     [Fact]
+
     public void Run_T_After_InitWithDriver_with_TopLevel_Throws ()
     {
         // Setup Mock driver
         Init ();
 
-        // Run<Toplevel> when already initialized with a Driver will throw (because Toplevel is not dervied from TopLevel)
+        // Run<Toplevel> when already initialized with a Driver will throw (because Toplevel is not derived from TopLevel)
         Assert.Throws<ArgumentException> (() => Application.Run<Toplevel> ());
 
         Shutdown ();
@@ -506,12 +513,13 @@ public class ApplicationTests
     }
 
     [Fact]
+
     public void Run_T_After_InitWithDriver_with_TopLevel_and_Driver_Throws ()
     {
         // Setup Mock driver
         Init ();
 
-        // Run<Toplevel> when already initialized with a Driver will throw (because Toplevel is not dervied from TopLevel)
+        // Run<Toplevel> when already initialized with a Driver will throw (because Toplevel is not derivied from TopLevel)
         Assert.Throws<ArgumentException> (() => Application.Run<Toplevel> (null, new FakeDriver ()));
 
         Shutdown ();
@@ -522,6 +530,40 @@ public class ApplicationTests
     }
 
     [Fact]
+    [TestRespondersDisposed]
+
+    public void Run_T_After_Init_Disposes_Application_Top ()
+    {
+        Init ();
+
+        // Init created a Toplevel and assigned it to Application.Top
+        var initTop = Application.Top;
+
+        Application.Iteration += (s, a) =>
+                                 {
+                                     Assert.NotEqual(initTop, Application.Top);
+#if DEBUG_IDISPOSABLE
+                                     Assert.True (initTop.WasDisposed);
+#endif
+                                     Application.RequestStop ();
+                                 };
+
+        Application.Run<TestToplevel> ();
+
+#if DEBUG_IDISPOSABLE
+        Assert.True (initTop.WasDisposed);
+#endif
+
+        Shutdown ();
+
+        Assert.Null (Application.Top);
+        Assert.Null (Application.MainLoop);
+        Assert.Null (Application.Driver);
+    }
+
+    [Fact]
+    [TestRespondersDisposed]
+
     public void Run_T_After_InitWithDriver_with_TestTopLevel_DoesNotThrow ()
     {
         // Setup Mock driver
@@ -540,7 +582,9 @@ public class ApplicationTests
     }
 
     [Fact]
-    public void Run_T_After_InitNullDriver_with_TestTopLevel_Throws ()
+    [TestRespondersDisposed]
+
+    public void Run_T_After_InitNullDriver_with_TestTopLevel_DoesNotThrow ()
     {
         Application.ForceDriver = "FakeDriver";
 
@@ -549,7 +593,7 @@ public class ApplicationTests
 
         Application.Iteration += (s, a) => { Application.RequestStop (); };
 
-        // Init has been called without selecting a driver and we're passing no driver to Run<TestTopLevel>. Bad
+        // Init has been called, selecting FakeDriver; we're passing no driver to Run<TestTopLevel>. Should be fine.
         Application.Run<TestToplevel> ();
 
         Shutdown ();
@@ -560,6 +604,8 @@ public class ApplicationTests
     }
 
     [Fact]
+    [TestRespondersDisposed]
+
     public void Run_T_Init_Driver_Cleared_with_TestTopLevel_Throws ()
     {
         Init ();
@@ -579,6 +625,7 @@ public class ApplicationTests
     }
 
     [Fact]
+    [TestRespondersDisposed]
     public void Run_T_NoInit_DoesNotThrow ()
     {
         Application.ForceDriver = "FakeDriver";
@@ -596,6 +643,8 @@ public class ApplicationTests
     }
 
     [Fact]
+    [TestRespondersDisposed]
+
     public void Run_T_NoInit_WithDriver_DoesNotThrow ()
     {
         Application.Iteration += (s, a) => { Application.RequestStop (); };
@@ -611,6 +660,8 @@ public class ApplicationTests
     }
 
     [Fact]
+    [TestRespondersDisposed]
+
     public void Run_RequestStop_Stops ()
     {
         // Setup Mock driver
@@ -633,6 +684,8 @@ public class ApplicationTests
     }
 
     [Fact]
+    [TestRespondersDisposed]
+
     public void Run_RunningFalse_Stops ()
     {
         // Setup Mock driver
@@ -655,6 +708,8 @@ public class ApplicationTests
     }
 
     [Fact]
+    [TestRespondersDisposed]
+
     public void Run_Loaded_Ready_Unlodaded_Events ()
     {
         Init ();

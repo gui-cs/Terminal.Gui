@@ -543,9 +543,17 @@ public static partial class Application
     {
         if (_initialized)
         {
+            // Init created Application.Top. If it hasn't been disposed...
+            if (Top is { })
+            {
+                Top.Dispose ();
+                Top = null;
+            }
+
             if (Driver is { })
             {
                 // Init() has been called and we have a driver, so just run the app.
+                // This Toplevel will get disposed in `Shutdown`
                 var top = new T ();
                 Type type = top.GetType ().BaseType;
 
@@ -1032,12 +1040,8 @@ public static partial class Application
             Refresh ();
         }
 
-        //if (Top == runState.Toplevel)
-        //{
-        //   Top = null;
-        //}
-
-        runState.Toplevel?.Dispose ();
+        // Do NOT dispose .Toplevel here. It was not created by
+        // Run, but Init or someone else.
         runState.Toplevel = null;
         runState.Dispose ();
     }
