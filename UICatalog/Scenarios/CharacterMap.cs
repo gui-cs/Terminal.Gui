@@ -41,7 +41,7 @@ public class CharacterMap : Scenario
 
     public override void Setup ()
     {
-        _charMap = new CharMap { X = 0, Y = 1, Height = Dim.Fill () };
+        _charMap = new() { X = 0, Y = 1, Height = Dim.Fill () };
         Application.Top.Add (_charMap);
 
         var jumpLabel = new Label
@@ -59,7 +59,7 @@ public class CharacterMap : Scenario
         };
         Application.Top.Add (jumpEdit);
 
-        _errorLabel = new Label
+        _errorLabel = new()
         {
             X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes ["error"], Text = "err"
         };
@@ -72,12 +72,13 @@ public class CharacterMap : Scenario
 
         void JumpEditOnAccept (object sender, CancelEventArgs e)
         {
-            JumpEdit_TextChanged (sender, new StateEventArgs<string> (jumpEdit.Text, jumpEdit.Text));
+            JumpEdit_TextChanged (sender, new (jumpEdit.Text, jumpEdit.Text));
+
             // Cancel the event to prevent ENTER from being handled elsewhere
             e.Cancel = true;
         }
 #endif
-        _categoryList = new TableView { X = Pos.Right (_charMap), Y = Pos.Bottom (jumpLabel), Height = Dim.Fill () };
+        _categoryList = new() { X = Pos.Right (_charMap), Y = Pos.Bottom (jumpLabel), Height = Dim.Fill () };
 
         _categoryList.FullRowSelect = true;
 
@@ -121,10 +122,10 @@ public class CharacterMap : Scenario
 
         _categoryList.Style.ColumnStyles.Add (
                                               0,
-                                              new ColumnStyle { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName }
+                                              new() { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName }
                                              );
-        _categoryList.Style.ColumnStyles.Add (1, new ColumnStyle { MaxWidth = 1, MinWidth = 6 });
-        _categoryList.Style.ColumnStyles.Add (2, new ColumnStyle { MaxWidth = 1, MinWidth = 6 });
+        _categoryList.Style.ColumnStyles.Add (1, new() { MaxWidth = 1, MinWidth = 6 });
+        _categoryList.Style.ColumnStyles.Add (2, new() { MaxWidth = 1, MinWidth = 6 });
 
         _categoryList.Width = _categoryList.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 4;
 
@@ -146,21 +147,21 @@ public class CharacterMap : Scenario
         {
             Menus =
             [
-                new MenuBarItem (
-                                 "_File",
-                                 new MenuItem []
-                                 {
-                                     new (
-                                          "_Quit",
-                                          $"{Application.QuitKey}",
-                                          () => Application.RequestStop ()
-                                         )
-                                 }
-                                ),
-                new MenuBarItem (
-                                 "_Options",
-                                 new [] { CreateMenuShowWidth () }
-                                )
+                new (
+                     "_File",
+                     new MenuItem []
+                     {
+                         new (
+                              "_Quit",
+                              $"{Application.QuitKey}",
+                              () => Application.RequestStop ()
+                             )
+                     }
+                    ),
+                new (
+                     "_Options",
+                     new [] { CreateMenuShowWidth () }
+                    )
             ]
         };
         Application.Top.Add (menu);
@@ -202,15 +203,15 @@ public class CharacterMap : Scenario
                                                             ? UnicodeRange.Ranges.OrderByDescending (orderBy)
                                                             : UnicodeRange.Ranges.OrderBy (orderBy);
 
-        return new EnumerableTableSource<UnicodeRange> (
-                                                        sortedRanges,
-                                                        new Dictionary<string, Func<UnicodeRange, object>>
-                                                        {
-                                                            { $"Category{categorySort}", s => s.Category },
-                                                            { $"Start{startSort}", s => $"{s.Start:x5}" },
-                                                            { $"End{endSort}", s => $"{s.End:x5}" }
-                                                        }
-                                                       );
+        return new (
+                    sortedRanges,
+                    new()
+                    {
+                        { $"Category{categorySort}", s => s.Category },
+                        { $"Start{startSort}", s => $"{s.Start:x5}" },
+                        { $"End{endSort}", s => $"{s.End:x5}" }
+                    }
+                   );
     }
 
     private MenuItem CreateMenuShowWidth ()
@@ -434,7 +435,7 @@ internal class CharMap : ScrollView
 
             int col = SelectedCodePoint % 16 * COLUMN_WIDTH + ContentOffset.X + RowLabelWidth + 1; // + 1 for padding
 
-            return new Point (col, row);
+            return new (col, row);
         }
         set => throw new NotImplementedException ();
     }
@@ -462,15 +463,15 @@ internal class CharMap : ScrollView
                 if (row + ContentOffset.Y < 0)
                 {
                     // Moving up.
-                    ContentOffset = new Point (ContentOffset.X, row);
+                    ContentOffset = new (ContentOffset.X, row);
                 }
                 else if (row + ContentOffset.Y >= height)
                 {
                     // Moving down.
-                    ContentOffset = new Point (
-                                               ContentOffset.X,
-                                               Math.Min (row, row - height + _rowHeight)
-                                              );
+                    ContentOffset = new (
+                                         ContentOffset.X,
+                                         Math.Min (row, row - height + _rowHeight)
+                                        );
                 }
 
                 int width = Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
@@ -478,20 +479,20 @@ internal class CharMap : ScrollView
                 if (col + ContentOffset.X < 0)
                 {
                     // Moving left.
-                    ContentOffset = new Point (col, ContentOffset.Y);
+                    ContentOffset = new (col, ContentOffset.Y);
                 }
                 else if (col + ContentOffset.X >= width)
                 {
                     // Moving right.
-                    ContentOffset = new Point (
-                                               Math.Min (col, col - width + COLUMN_WIDTH),
-                                               ContentOffset.Y
-                                              );
+                    ContentOffset = new (
+                                         Math.Min (col, col - width + COLUMN_WIDTH),
+                                         ContentOffset.Y
+                                        );
                 }
             }
 
             SetNeedsDisplay ();
-            SelectedCodePointChanged?.Invoke (this, new ListViewItemEventArgs (SelectedCodePoint, null));
+            SelectedCodePointChanged?.Invoke (this, new (SelectedCodePoint, null));
         }
     }
 
@@ -526,35 +527,15 @@ internal class CharMap : ScrollView
 
     public override void OnDrawContent (Rectangle contentArea)
     {
-        //if (ShowHorizontalScrollIndicator && ContentSize.Height < (int)(MaxCodePoint / 16 + 2)) {
-        //	//ContentSize = new (CharMap.RowWidth, (int)(MaxCodePoint / 16 + 2));
-        //	//ContentSize = new (CharMap.RowWidth, (int)(MaxCodePoint / 16) * _rowHeight + 2);
-        //	var width = (Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH) - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
-        //	if (Cursor.X + ContentOffset.X >= width) {
-        //		// Snap to the selected glyph.
-        //		ContentOffset = new (
-        //			Math.Min (Cursor.X, Cursor.X - width + COLUMN_WIDTH),
-        //			ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
-        //	} else {
-        //		ContentOffset = new (
-        //			ContentOffset.X - Cursor.X,
-        //			ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
-        //	}
-        //} else if (!ShowHorizontalScrollIndicator && ContentSize.Height > (int)(MaxCodePoint / 16 + 1)) {
-        //	//ContentSize = new (CharMap.RowWidth, (int)(MaxCodePoint / 16 + 1));
-        //	// Snap 1st column into view if it's been scrolled horizontally
-        //	ContentOffset = new (0, ContentOffset.Y < -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
-        //}
-        base.OnDrawContent (contentArea);
-    }
-
-    //public void CharMap_DrawContent (object s, DrawEventArgs a)
-    public override void OnDrawContentComplete (Rectangle contentArea)
-    {
         if (contentArea.Height == 0 || contentArea.Width == 0)
         {
             return;
         }
+
+        // Call the base (ScrollView) to draw the scrollbars. Do this ahead of our own drawing so that
+        // any wide or tall glyphs actually render over the scrollbars (on platforms like Windows Terminal) that 
+        // does this correctly.
+        base.OnDrawContent (contentArea);
 
         Rectangle viewport = new (
                                   ContentOffset,
@@ -569,13 +550,13 @@ internal class CharMap : ScrollView
         if (ShowHorizontalScrollIndicator)
         {
             // ClipToBounds doesn't know about the scroll indicators, so if off, subtract one from height
-            Driver.Clip.Inflate (0, -1);
+            Driver.Clip = new (Driver.Clip.Location, new (Driver.Clip.Size.Width, Driver.Clip.Size.Height - 1));
         }
 
         if (ShowVerticalScrollIndicator)
         {
             // ClipToBounds doesn't know about the scroll indicators, so if off, subtract one from width
-            Driver.Clip.Inflate (-1, 0);
+            Driver.Clip = new (Driver.Clip.Location, new (Driver.Clip.Size.Width - 1, Driver.Clip.Size.Height));
         }
 
         int cursorCol = Cursor.X - ContentOffset.X - RowLabelWidth - 1;
@@ -583,7 +564,7 @@ internal class CharMap : ScrollView
 
         Driver.SetAttribute (GetHotNormalColor ());
         Move (0, 0);
-        Driver.AddStr (new string (' ', RowLabelWidth + 1));
+        Driver.AddStr (new (' ', RowLabelWidth + 1));
 
         for (var hexDigit = 0; hexDigit < 16; hexDigit++)
         {
@@ -608,7 +589,9 @@ internal class CharMap : ScrollView
 
         int firstColumnX = viewport.X + RowLabelWidth;
 
-        for (var y = 1; y < Bounds.Height; y++)
+        // Even though the Clip is set to prevent us from drawing on the row potentially occupied by the horizontal
+        // scroll bar, we do the smart thing and not actually draw that row if not necessary.
+        for (var y = 1; y < Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0); y++)
         {
             // What row is this?
             int row = (y - ContentOffset.Y - 1) / _rowHeight;
@@ -623,6 +606,10 @@ internal class CharMap : ScrollView
             Move (firstColumnX + COLUMN_WIDTH, y);
             Driver.SetAttribute (GetNormalColor ());
 
+            // Note, this code naïvely draws all columns, even if the viewport is smaller than
+            // the needed width. We rely on Clip to ensure we don't draw past the viewport.
+            // If we were *really* worried about performance, we'd optimize this code to only draw the
+            // parts of the row that are actually visible in the viewport.
             for (var col = 0; col < 16; col++)
             {
                 int x = firstColumnX + COLUMN_WIDTH * col + 1;
@@ -639,7 +626,7 @@ internal class CharMap : ScrollView
 
                 if (Rune.IsValid (scalar))
                 {
-                    rune = new Rune (scalar);
+                    rune = new (scalar);
                 }
 
                 int width = rune.GetColumns ();
@@ -705,7 +692,7 @@ internal class CharMap : ScrollView
             }
             else
             {
-                Driver.AddStr (new string (' ', RowLabelWidth));
+                Driver.AddStr (new (' ', RowLabelWidth));
             }
         }
 
@@ -805,7 +792,7 @@ internal class CharMap : ScrollView
 
         if (me.Flags == MouseFlags.ReportMousePosition)
         {
-            Hover?.Invoke (this, new ListViewItemEventArgs (val, null));
+            Hover?.Invoke (this, new (val, null));
         }
 
         if (me.Flags == MouseFlags.Button1Clicked)
@@ -827,31 +814,31 @@ internal class CharMap : ScrollView
         {
             SelectedCodePoint = val;
 
-            _contextMenu = new ContextMenu
+            _contextMenu = new()
             {
-                Position = new Point (me.X + 1, me.Y + 1),
-                MenuItems = new MenuBarItem (
-                                             new MenuItem []
-                                             {
-                                                 new (
-                                                      "_Copy Glyph",
-                                                      "",
-                                                      CopyGlyph,
-                                                      null,
-                                                      null,
-                                                      (KeyCode)Key.C.WithCtrl
-                                                     ),
-                                                 new (
-                                                      "Copy Code _Point",
-                                                      "",
-                                                      CopyCodePoint,
-                                                      null,
-                                                      null,
-                                                      (KeyCode)Key.C.WithCtrl
-                                                                  .WithShift
-                                                     )
-                                             }
-                                            )
+                Position = new (me.X + 1, me.Y + 1),
+                MenuItems = new (
+                                 new MenuItem []
+                                 {
+                                     new (
+                                          "_Copy Glyph",
+                                          "",
+                                          CopyGlyph,
+                                          null,
+                                          null,
+                                          (KeyCode)Key.C.WithCtrl
+                                         ),
+                                     new (
+                                          "Copy Code _Point",
+                                          "",
+                                          CopyCodePoint,
+                                          null,
+                                          null,
+                                          (KeyCode)Key.C.WithCtrl
+                                                      .WithShift
+                                         )
+                                 }
+                                )
             };
             _contextMenu.Show ();
         }
@@ -869,7 +856,7 @@ internal class CharMap : ScrollView
             Y = Pos.Center (),
             Height = 7,
             Width = 50,
-            Buttons = [new Button { Text = "Cancel" }]
+            Buttons = [new() { Text = "Cancel" }]
         };
 
         var errorLabel = new Label
@@ -934,7 +921,8 @@ internal class CharMap : ScrollView
                 decResponse = JsonSerializer.Serialize (
                                                         document.RootElement,
                                                         new
-                                                            JsonSerializerOptions { WriteIndented = true }
+                                                            JsonSerializerOptions
+                                                            { WriteIndented = true }
                                                        );
             }
 
@@ -947,62 +935,62 @@ internal class CharMap : ScrollView
             var dlg = new Dialog { Title = title, Buttons = [copyGlyph, copyCP, cancel] };
 
             copyGlyph.Accept += (s, a) =>
-                                 {
-                                     CopyGlyph ();
-                                     dlg.RequestStop ();
-                                 };
+                                {
+                                    CopyGlyph ();
+                                    dlg.RequestStop ();
+                                };
 
             copyCP.Accept += (s, a) =>
-                              {
-                                  CopyCodePoint ();
-                                  dlg.RequestStop ();
-                              };
+                             {
+                                 CopyCodePoint ();
+                                 dlg.RequestStop ();
+                             };
             cancel.Accept += (s, a) => dlg.RequestStop ();
 
             var rune = (Rune)SelectedCodePoint;
             var label = new Label { Text = "IsAscii: ", X = 0, Y = 0 };
             dlg.Add (label);
 
-            label = new Label { Text = $"{rune.IsAscii}", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new() { Text = $"{rune.IsAscii}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label { Text = ", Bmp: ", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new() { Text = ", Bmp: ", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label { Text = $"{rune.IsBmp}", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new() { Text = $"{rune.IsBmp}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label { Text = ", CombiningMark: ", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new() { Text = ", CombiningMark: ", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label { Text = $"{rune.IsCombiningMark ()}", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new() { Text = $"{rune.IsCombiningMark ()}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label { Text = ", SurrogatePair: ", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new() { Text = ", SurrogatePair: ", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label { Text = $"{rune.IsSurrogatePair ()}", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new() { Text = $"{rune.IsSurrogatePair ()}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label { Text = ", Plane: ", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new() { Text = ", Plane: ", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label { Text = $"{rune.Plane}", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new() { Text = $"{rune.Plane}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label { Text = "Columns: ", X = 0, Y = Pos.Bottom (label) };
+            label = new() { Text = "Columns: ", X = 0, Y = Pos.Bottom (label) };
             dlg.Add (label);
 
-            label = new Label { Text = $"{rune.GetColumns ()}", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new() { Text = $"{rune.GetColumns ()}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label { Text = ", Utf16SequenceLength: ", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new() { Text = ", Utf16SequenceLength: ", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label { Text = $"{rune.Utf16SequenceLength}", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new() { Text = $"{rune.Utf16SequenceLength}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label
+            label = new()
             {
                 Text =
                     $"Code Point Information from {UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint}:",
@@ -1028,15 +1016,7 @@ internal class CharMap : ScrollView
         {
             MessageBox.ErrorQuery (
                                    "Code Point API",
-                                   $"{
-                                       UcdApiClient.BaseUrl
-                                   }codepoint/dec/{
-                                       SelectedCodePoint
-                                   } did not return a result for\r\n {
-                                       new Rune (SelectedCodePoint)
-                                   } U+{
-                                       SelectedCodePoint
-                                       :x5}.",
+                                   $"{UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint} did not return a result for\r\n {new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x5}.",
                                    "Ok"
                                   );
         }
@@ -1114,50 +1094,50 @@ internal class UnicodeRange
         // .NET 8.0 only supports BMP in UnicodeRanges: https://learn.microsoft.com/en-us/dotnet/api/system.text.unicode.unicoderanges?view=net-8.0
         List<UnicodeRange> nonBmpRanges = new ()
         {
-            new UnicodeRange (
-                              0x1F130,
-                              0x1F149,
-                              "Squared Latin Capital Letters"
-                             ),
-            new UnicodeRange (
-                              0x12400,
-                              0x1240f,
-                              "Cuneiform Numbers and Punctuation"
-                             ),
-            new UnicodeRange (0x10000, 0x1007F, "Linear B Syllabary"),
-            new UnicodeRange (0x10080, 0x100FF, "Linear B Ideograms"),
-            new UnicodeRange (0x10100, 0x1013F, "Aegean Numbers"),
-            new UnicodeRange (0x10300, 0x1032F, "Old Italic"),
-            new UnicodeRange (0x10330, 0x1034F, "Gothic"),
-            new UnicodeRange (0x10380, 0x1039F, "Ugaritic"),
-            new UnicodeRange (0x10400, 0x1044F, "Deseret"),
-            new UnicodeRange (0x10450, 0x1047F, "Shavian"),
-            new UnicodeRange (0x10480, 0x104AF, "Osmanya"),
-            new UnicodeRange (0x10800, 0x1083F, "Cypriot Syllabary"),
-            new UnicodeRange (
-                              0x1D000,
-                              0x1D0FF,
-                              "Byzantine Musical Symbols"
-                             ),
-            new UnicodeRange (0x1D100, 0x1D1FF, "Musical Symbols"),
-            new UnicodeRange (0x1D300, 0x1D35F, "Tai Xuan Jing Symbols"),
-            new UnicodeRange (
-                              0x1D400,
-                              0x1D7FF,
-                              "Mathematical Alphanumeric Symbols"
-                             ),
-            new UnicodeRange (0x1F600, 0x1F532, "Emojis Symbols"),
-            new UnicodeRange (
-                              0x20000,
-                              0x2A6DF,
-                              "CJK Unified Ideographs Extension B"
-                             ),
-            new UnicodeRange (
-                              0x2F800,
-                              0x2FA1F,
-                              "CJK Compatibility Ideographs Supplement"
-                             ),
-            new UnicodeRange (0xE0000, 0xE007F, "Tags")
+            new (
+                 0x1F130,
+                 0x1F149,
+                 "Squared Latin Capital Letters"
+                ),
+            new (
+                 0x12400,
+                 0x1240f,
+                 "Cuneiform Numbers and Punctuation"
+                ),
+            new (0x10000, 0x1007F, "Linear B Syllabary"),
+            new (0x10080, 0x100FF, "Linear B Ideograms"),
+            new (0x10100, 0x1013F, "Aegean Numbers"),
+            new (0x10300, 0x1032F, "Old Italic"),
+            new (0x10330, 0x1034F, "Gothic"),
+            new (0x10380, 0x1039F, "Ugaritic"),
+            new (0x10400, 0x1044F, "Deseret"),
+            new (0x10450, 0x1047F, "Shavian"),
+            new (0x10480, 0x104AF, "Osmanya"),
+            new (0x10800, 0x1083F, "Cypriot Syllabary"),
+            new (
+                 0x1D000,
+                 0x1D0FF,
+                 "Byzantine Musical Symbols"
+                ),
+            new (0x1D100, 0x1D1FF, "Musical Symbols"),
+            new (0x1D300, 0x1D35F, "Tai Xuan Jing Symbols"),
+            new (
+                 0x1D400,
+                 0x1D7FF,
+                 "Mathematical Alphanumeric Symbols"
+                ),
+            new (0x1F600, 0x1F532, "Emojis Symbols"),
+            new (
+                 0x20000,
+                 0x2A6DF,
+                 "CJK Unified Ideographs Extension B"
+                ),
+            new (
+                 0x2F800,
+                 0x2FA1F,
+                 "CJK Compatibility Ideographs Supplement"
+                ),
+            new (0xE0000, 0xE007F, "Tags")
         };
 
         return ranges.Concat (nonBmpRanges).OrderBy (r => r.Category).ToList ();
