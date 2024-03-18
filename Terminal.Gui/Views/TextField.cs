@@ -973,7 +973,7 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         _isDrawing = true;
 
@@ -1196,8 +1196,8 @@ public class TextField : View
 
         int pos = _cursorPosition - ScrollOffset + Math.Min (Frame.X, 0);
         int offB = OffSetBackground ();
-        Rectangle containerFrame = SuperView?.BoundsToScreen (SuperView.Bounds) ?? default (Rectangle);
-        Rectangle thisFrame = BoundsToScreen (Bounds);
+        Rectangle containerFrame = SuperView?.ViewportToScreen (SuperView.Viewport) ?? default (Rectangle);
+        Rectangle thisFrame = ViewportToScreen (Viewport);
 
         if (pos > -1
             && col >= pos
@@ -1746,7 +1746,7 @@ public class TextField : View
         }
     }
 
-    // BUGBUG: This assumes Frame == Bounds. It's also not clear what the intention is. For now, changed to always return 0.
+    // BUGBUG: This assumes Frame == Viewport. It's also not clear what the intention is. For now, changed to always return 0.
     private int OffSetBackground ()
     {
         var offB = 0;
@@ -1878,9 +1878,9 @@ public class TextField : View
         Move (0, 0);
         string render = Caption;
 
-        if (render.GetColumns () > Bounds.Width)
+        if (render.GetColumns () > Viewport.Width)
         {
-            render = render [..Bounds.Width];
+            render = render [..Viewport.Width];
         }
 
         Driver.AddStr (render);
@@ -1941,9 +1941,9 @@ public class TextField : View
     {
         _cursorPosition = Text.GetRuneCount ();
 
-        if (Bounds.Width > 0)
+        if (Viewport.Width > 0)
         {
-            ScrollOffset = _cursorPosition > Bounds.Width + 1 ? _cursorPosition - Bounds.Width + 1 : 0;
+            ScrollOffset = _cursorPosition > Viewport.Width + 1 ? _cursorPosition - Viewport.Width + 1 : 0;
         }
 
         Autocomplete.HostControl = this;

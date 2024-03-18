@@ -165,7 +165,7 @@ public class Dialog : Window
         {
             case ButtonAlignments.Center:
                 // Center Buttons
-                shiftLeft = (Bounds.Width - buttonsWidth - _buttons.Count - 1) / 2 + 1;
+                shiftLeft = (Viewport.Width - buttonsWidth - _buttons.Count - 1) / 2 + 1;
 
                 for (int i = _buttons.Count - 1; i >= 0; i--)
                 {
@@ -178,7 +178,7 @@ public class Dialog : Window
                     }
                     else
                     {
-                        button.X = Bounds.Width - shiftLeft;
+                        button.X = Viewport.Width - shiftLeft;
                     }
 
                     button.Y = Pos.AnchorEnd (1);
@@ -190,7 +190,7 @@ public class Dialog : Window
                 // Justify Buttons
                 // leftmost and rightmost buttons are hard against edges. The rest are evenly spaced.
 
-                var spacing = (int)Math.Ceiling ((double)(Bounds.Width - buttonsWidth) / (_buttons.Count - 1));
+                var spacing = (int)Math.Ceiling ((double)(Viewport.Width - buttonsWidth) / (_buttons.Count - 1));
 
                 for (int i = _buttons.Count - 1; i >= 0; i--)
                 {
@@ -206,7 +206,7 @@ public class Dialog : Window
                         if (i == 0)
                         {
                             // first (leftmost) button 
-                            int left = Bounds.Width;
+                            int left = Viewport.Width;
                             button.X = Pos.AnchorEnd (left);
                         }
                         else

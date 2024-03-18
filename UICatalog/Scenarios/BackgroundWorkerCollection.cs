@@ -285,7 +285,7 @@ public class BackgroundWorkerCollection : Scenario
             LayoutStarted += (s, e) =>
                              {
                                  int btnsWidth = _start.Frame.Width + _close.Frame.Width + 2 - 1;
-                                 int shiftLeft = Math.Max ((Bounds.Width - btnsWidth) / 2 - 2, 0);
+                                 int shiftLeft = Math.Max ((Viewport.Width - btnsWidth) / 2 - 2, 0);
 
                                  shiftLeft += _close.Frame.Width + 1;
                                  _close.X = Pos.AnchorEnd (shiftLeft);
