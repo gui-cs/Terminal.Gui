@@ -1316,8 +1316,9 @@ public static partial class Application
 
         if (!OnUnGrabbingMouse (MouseGrabView))
         {
-            OnUnGrabbedMouse (MouseGrabView);
+            var view = MouseGrabView;
             MouseGrabView = null;
+            OnUnGrabbedMouse (view);
         }
     }
 
