@@ -44,7 +44,7 @@ public class ScrollBarViewTests
 
         _hostView.Lines = 10;
         _hostView.Draw ();
-        Assert.True (_scrollBar.ShowScrollIndicator);
+        Assert.False (_scrollBar.ShowScrollIndicator);
         Assert.False (_scrollBar.Visible);
         Assert.Equal ("Absolute(1)", _scrollBar.Width.ToString ());
         Assert.Equal (1, _scrollBar.ContentArea.Width);
@@ -67,7 +67,7 @@ public class ScrollBarViewTests
 
         _hostView.Cols = 60;
         _hostView.Draw ();
-        Assert.True (_scrollBar.ShowScrollIndicator);
+        Assert.False (_scrollBar.ShowScrollIndicator);
         Assert.False (_scrollBar.Visible);
         Assert.Equal ("Absolute(1)", _scrollBar.Width.ToString ());
         Assert.Equal (1, _scrollBar.ContentArea.Width);
@@ -77,7 +77,7 @@ public class ScrollBarViewTests
                       _scrollBar.Height.ToString ()
                      );
         Assert.Equal (24, _scrollBar.ContentArea.Height);
-        Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+        Assert.False (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
         Assert.False (_scrollBar.OtherScrollBarView.Visible);
 
         Assert.Equal (
@@ -100,7 +100,7 @@ public class ScrollBarViewTests
                       _scrollBar.Height.ToString ()
                      );
         Assert.Equal (25, _scrollBar.ContentArea.Height);
-        Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+        Assert.False (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
         Assert.False (_scrollBar.OtherScrollBarView.Visible);
 
         Assert.Equal (
@@ -408,10 +408,20 @@ This is a tes
                                                         Source = new ListWrapper (source)
                                                     };
                                                     listView.Padding.EnableScrollBars = true;
+                                                    // Only this won't avoid the VerticalScrollBar from showing because
+                                                    // AutoHideScrollBars is true and control the visibility of the VerticalScrollBar
                                                     listView.Padding.ShowVerticalScrollBar = false;
                                                     win.Add (listView);
 
+                                                    Assert.True (listView.AutoHideScrollBars);
+                                                    Assert.True (listView.ShowVerticalScrollBar);
+                                                    Assert.True (listView.ShowHorizontalScrollBar);
                                                     Assert.True (listView.KeepContentAlwaysInContentArea);
+
+                                                    // To hide the VerticalScrollBar it's also needed to set AutoHideScrollBars to false
+                                                    listView.AutoHideScrollBars = false;
+                                                    Assert.False (listView.ShowVerticalScrollBar);
+                                                    Assert.True (listView.ShowHorizontalScrollBar);
 
                                                     var newScrollBarView = listView.Padding.Subviews [0] as ScrollBarView;
 
@@ -581,8 +591,8 @@ This is a tes▼
         sbv.OtherScrollBarView.Size = 0;
         Assert.Equal (0, sbv.Size);
         Assert.Equal (0, sbv.OtherScrollBarView.Size);
-        Assert.True (sbv.ShowScrollIndicator);
-        Assert.True (sbv.OtherScrollBarView.ShowScrollIndicator);
+        Assert.False (sbv.ShowScrollIndicator);
+        Assert.False (sbv.OtherScrollBarView.ShowScrollIndicator);
         Assert.False (sbv.Visible);
         Assert.False (sbv.OtherScrollBarView.Visible);
         Application.Top.Draw ();
@@ -654,7 +664,7 @@ This is a tes▼
 
         sbv.Size = 0;
         Assert.Equal (0, sbv.Size);
-        Assert.True (sbv.ShowScrollIndicator);
+        Assert.False (sbv.ShowScrollIndicator);
         Assert.False (sbv.Visible);
         Application.Top.Draw ();
 
@@ -761,8 +771,10 @@ This is a test
 
         var scrollBar = textView.Padding.Subviews [0] as ScrollBarView;
         Assert.True (scrollBar.AutoHideScrollBars);
-        Assert.True (scrollBar.ShowScrollIndicator);
-        Assert.True (scrollBar.OtherScrollBarView.ShowScrollIndicator);
+        Assert.False (scrollBar.ShowScrollIndicator);
+        Assert.False (scrollBar.Visible);
+        Assert.False (scrollBar.OtherScrollBarView.ShowScrollIndicator);
+        Assert.False (scrollBar.OtherScrollBarView.Visible);
         Assert.Equal (5, textView.Lines);
 
         // The length is one more for the cursor on the last column of the line
@@ -1008,33 +1020,49 @@ This is a test
     {
         KeepContentAlwaysInViewport_False ();
 
+        Assert.True (_scrollBar.AutoHideScrollBars);
         Assert.True (_scrollBar.ShowScrollIndicator);
         Assert.True (_scrollBar.Visible);
         Assert.True(_scrollBar.OtherScrollBarView.ShowScrollIndicator);
         Assert.True (_scrollBar.OtherScrollBarView.Visible);
         Assert.False(_scrollBar.KeepContentAlwaysInViewPort);
+        // Only this won't avoid the ShowScrollIndicator from showing because
+        // AutoHideScrollBars is true and control their visibility
         _scrollBar.ShowScrollIndicator = false;
         _scrollBar.OtherScrollBarView.ShowScrollIndicator = false;
         _scrollBar.KeepContentAlwaysInViewPort = true;
+        Assert.True (_scrollBar.ShowScrollIndicator);
+        Assert.True (_scrollBar.Visible);
+        Assert.True(_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+        Assert.True (_scrollBar.OtherScrollBarView.Visible);
 
+        // To hide the scroll bars it's also needed to set AutoHideScrollBars to false
+        _scrollBar.AutoHideScrollBars = false;
+        Assert.False (_scrollBar.ShowScrollIndicator);
+        Assert.False (_scrollBar.Visible);
+        Assert.False(_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+        Assert.False (_scrollBar.OtherScrollBarView.Visible);
+
+        // The scroll bar is not visible, so the Frame is irrelevant
         Assert.Equal(new (79, 0, 1, 24), _scrollBar.Frame);
-        Assert.Equal (_scrollBar.Position, _scrollBar.Size - _scrollBar.ContentArea.Height - 1);
+        Assert.Equal (_scrollBar.Position, _scrollBar.Size - _scrollBar.ContentArea.Height);
         Assert.Equal (_scrollBar.Position, _hostView.Top);
-        Assert.Equal (5, _scrollBar.Position);
-        Assert.Equal (5, _hostView.Top);
+        Assert.Equal (6, _scrollBar.Position);
+        Assert.Equal (6, _hostView.Top);
         Assert.False (_scrollBar.ShowScrollIndicator);
         Assert.False (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
         Assert.False (_scrollBar.Visible);
         Assert.False (_scrollBar.OtherScrollBarView.Visible);
 
-        Assert.Equal(new (0, 24, 80, 1), _scrollBar.OtherScrollBarView.Frame);
+        // The scroll bar is not visible, so the Frame is irrelevant
+        Assert.Equal(new (0, 24, 79, 1), _scrollBar.OtherScrollBarView.Frame);
         Assert.Equal (
                       _scrollBar.OtherScrollBarView.Position,
                       _scrollBar.OtherScrollBarView.Size - _scrollBar.OtherScrollBarView.ContentArea.Width
                      );
         Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
-        Assert.Equal (20, _scrollBar.OtherScrollBarView.Position);
-        Assert.Equal (20, _hostView.Left);
+        Assert.Equal (21, _scrollBar.OtherScrollBarView.Position);
+        Assert.Equal (21, _hostView.Left);
         Assert.False (_scrollBar.ShowScrollIndicator);
         Assert.False (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
         Assert.False (_scrollBar.Visible);
@@ -1558,7 +1586,7 @@ This is a test
 
         Assert.Equal (5, sbv.Size);
         Assert.Null (sbv.OtherScrollBarView);
-        Assert.True (sbv.ShowScrollIndicator);
+        Assert.False (sbv.ShowScrollIndicator);
         Assert.False (sbv.Visible);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1618,13 +1646,14 @@ This is a test             ",
         Assert.Null (Application.MouseGrabView);
         Assert.True (clicked);
         Assert.Equal (5, sbv.Size);
-        Assert.True (sbv.ShowScrollIndicator);
+        Assert.False (sbv.ShowScrollIndicator);
         Assert.False (sbv.Visible);
 
         // It's needed to set ShowScrollIndicator to true and AutoHideScrollBars to false forcing
         // showing the scroll bar, otherwise AutoHideScrollBars will automatically control it
         Assert.True (sbv.AutoHideScrollBars);
-        Assert.True (sbv.ShowScrollIndicator);
+        Assert.False (sbv.ShowScrollIndicator);
+        Assert.False (sbv.Visible);
         sbv.AutoHideScrollBars = false;
         Application.Top.Draw ();
 
@@ -1720,6 +1749,43 @@ This is a tes▼             ",
 │▼│
 └─┘";
         _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+    }
+
+    [Fact]
+    public void Set_AutoHideScrollBars_To_False_Restore_Original_ShowScrollIndicator_Visible__Values ()
+    {
+        var sbv = new ScrollBarView ();
+        var top = new View { Width = 10, Height = 10 };
+        top.Add (sbv);
+        top.BeginInit ();
+        top.EndInit ();
+
+        Assert.True (sbv.AutoHideScrollBars);
+        Assert.False (sbv.ShowScrollIndicator);
+        Assert.False (sbv.Visible);
+
+        sbv.AutoHideScrollBars = false;
+        Assert.True (sbv.ShowScrollIndicator);
+        Assert.True (sbv.Visible);
+    }
+
+    [Fact]
+    public void Set_ShowScrollIndicator_To_False_Will_Still_Be_Visible_If_Needed_When_AutoHideScrollBars_Is_True ()
+    {
+        var sbv = new ScrollBarView { Size = 20 };
+        var top = new View { Width = 10, Height = 10 };
+        top.Add (sbv);
+        top.BeginInit ();
+        top.EndInit ();
+
+        sbv.ShowScrollIndicator = false;
+        Assert.True (sbv.AutoHideScrollBars);
+        Assert.True (sbv.ShowScrollIndicator);
+        Assert.True (sbv.Visible);
+
+        sbv.AutoHideScrollBars = false;
+        Assert.False (sbv.ShowScrollIndicator);
+        Assert.False (sbv.Visible);
     }
 
     private void _hostView_DrawContent (object sender, DrawEventArgs e)

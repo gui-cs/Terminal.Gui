@@ -33,6 +33,8 @@ public class ScrollView : View
     private View _contentBottomRightCorner;
     private Point _contentOffset;
     private Size _contentSize;
+    private bool _showHorizontalScrollIndicator;
+    private bool _showVerticalScrollIndicator;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Gui.ScrollView"/> class using <see cref="LayoutStyle.Computed"/>
@@ -229,12 +231,12 @@ public class ScrollView : View
     /// <value><c>true</c> if show horizontal scroll indicator; otherwise, <c>false</c>.</value>
     public bool ShowHorizontalScrollIndicator
     {
-        get => _horizontal.ShowScrollIndicator;
+        get => _horizontal.Visible;
         set
         {
-            if (value != _horizontal.ShowScrollIndicator)
+            if (value != _showHorizontalScrollIndicator)
             {
-                _horizontal.ShowScrollIndicator = value;
+                _showHorizontalScrollIndicator = _horizontal.ShowScrollIndicator = value;
                 SetNeedsLayout ();
 
                 if (value)
@@ -268,12 +270,12 @@ public class ScrollView : View
     /// <value><c>true</c> if show vertical scroll indicator; otherwise, <c>false</c>.</value>
     public bool ShowVerticalScrollIndicator
     {
-        get => _vertical.ShowScrollIndicator;
+        get => _vertical.Visible;
         set
         {
-            if (value != _vertical.ShowScrollIndicator)
+            if (value != _showVerticalScrollIndicator)
             {
-                _vertical.ShowScrollIndicator = value;
+                _showVerticalScrollIndicator = _vertical.ShowScrollIndicator = value;
                 SetNeedsLayout ();
 
                 if (value)

@@ -146,23 +146,25 @@ public class ScrollBarView : View
     }
 
     // BUGBUG: v2 - Why can't we get rid of this and just use Visible?
-    // We need this property to distinguish from Visible which will also affect the parent
-    /// <summary>Gets or sets the visibility for the vertical or horizontal scroll indicator.</summary>
+    // We need this property to distinguish from Visible value and the original value of this property
+    /// <summary>
+    /// Gets or sets the visibility for the vertical or horizontal scroll indicator.
+    /// If <see cref="AutoHideScrollBars"/> is true the visibility will be handled as needed,
+    /// no matter ShowScrollIndicator is true or false. It's a flag that indicates the original state.
+    /// If <see cref="AutoHideScrollBars"/> is false and ShowScrollIndicator is false it'll
+    /// be not visible, otherwise it will be always visible even it isn't needed.
+    /// </summary>
     /// <value><c>true</c> if show vertical or horizontal scroll indicator; otherwise, <c>false</c>.</value>
     public bool ShowScrollIndicator
     {
-        get => _showScrollIndicator;
+        get => Visible;
         set
         {
             _showScrollIndicator = value;
 
-            if (value)
+            if (!AutoHideScrollBars)
             {
-                Visible = true;
-            }
-            else
-            {
-                Visible = false;
+                Visible = value;
             }
 
             SetWidthHeight ();
@@ -712,23 +714,28 @@ public class ScrollBarView : View
 
     private bool CheckBothScrollBars (ScrollBarView scrollBarView, bool pending = false)
     {
+        if (!AutoHideScrollBars)
+        {
+            return false;
+        }
+
         int barsize = scrollBarView._orientation == Orientation.Vertical ? scrollBarView.ContentArea.Height : scrollBarView.ContentArea.Width;
 
         if (barsize == 0 || barsize - scrollBarView.Position >= scrollBarView.Size)
         {
-            if (scrollBarView._showScrollIndicator && scrollBarView.Visible)
+            if (scrollBarView.Visible)
             {
                 scrollBarView.Visible = false;
             }
         }
         else if (barsize > 0 && barsize - scrollBarView.Position == scrollBarView.Size && scrollBarView.OtherScrollBarView is { } && pending)
         {
-            if (scrollBarView._showScrollIndicator && scrollBarView.Visible)
+            if (scrollBarView.Visible)
             {
                 scrollBarView.Visible = false;
             }
 
-            if (scrollBarView.OtherScrollBarView is { } && scrollBarView.ShowBothScrollIndicator && scrollBarView.OtherScrollBarView.Visible)
+            if (scrollBarView.OtherScrollBarView is { Visible: true })
             {
                 scrollBarView.OtherScrollBarView.Visible = false;
             }
@@ -742,14 +749,13 @@ public class ScrollBarView : View
             if (scrollBarView.OtherScrollBarView is { } && pending)
             {
                 if (!scrollBarView.ShowBothScrollIndicator
-                    && scrollBarView.OtherScrollBarView._showScrollIndicator
                     && !scrollBarView.OtherScrollBarView.Visible)
                 {
                     scrollBarView.OtherScrollBarView.Visible = true;
                 }
             }
 
-            if (scrollBarView._showScrollIndicator && !scrollBarView.Visible)
+            if (!scrollBarView.Visible)
             {
                 scrollBarView.Visible = true;
             }
@@ -1079,15 +1085,12 @@ public class ScrollBarView : View
 
         SetRelativeLayout (SuperView?.GetVisibleContentArea () ?? Rectangle.Empty);
 
-        if (AutoHideScrollBars)
-        {
-            bool pending = CheckBothScrollBars (this);
+        bool pending = CheckBothScrollBars (this);
 
-            if (_otherScrollBarView is { })
-            {
-                _otherScrollBarView.SetRelativeLayout (SuperView?.GetVisibleContentArea () ?? Rectangle.Empty);
-                CheckBothScrollBars (_otherScrollBarView, pending);
-            }
+        if (_otherScrollBarView is { })
+        {
+            _otherScrollBarView.SetRelativeLayout (SuperView?.GetVisibleContentArea () ?? Rectangle.Empty);
+            CheckBothScrollBars (_otherScrollBarView, pending);
         }
 
         SetWidthHeight ();
