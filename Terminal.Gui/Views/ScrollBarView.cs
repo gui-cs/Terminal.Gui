@@ -57,6 +57,11 @@ public class ScrollBarView : View
                 _autoHideScrollBars = value;
                 Visible = _showScrollIndicator;
                 SetNeedsDisplay ();
+
+                if (OtherScrollBarView is { } && OtherScrollBarView._autoHideScrollBars != value)
+                {
+                    OtherScrollBarView.AutoHideScrollBars = value;
+                }
             }
         }
     }
@@ -70,6 +75,11 @@ public class ScrollBarView : View
             if (_keepContentAlwaysInViewport != value)
             {
                 _keepContentAlwaysInViewport = value;
+
+                if (OtherScrollBarView is { } && OtherScrollBarView._keepContentAlwaysInViewport != value)
+                {
+                    OtherScrollBarView.KeepContentAlwaysInViewPort = value;
+                }
 
                 AdjustContentInViewport ();
             }
