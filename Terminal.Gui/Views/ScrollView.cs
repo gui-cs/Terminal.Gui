@@ -342,7 +342,7 @@ public class ScrollView : View
         Rectangle savedClip = ClipToViewport ();
 
         // TODO: It's bad practice for views to always clear a view. It negates clipping.
-        Clear (viewport);
+        //Clear (viewport);
 
         if (!string.IsNullOrEmpty (_contentView.Text) || _contentView.Subviews.Count > 0)
         {

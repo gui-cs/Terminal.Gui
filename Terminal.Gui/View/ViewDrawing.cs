@@ -381,7 +381,7 @@ public partial class View
     ///         The <see cref="Viewport"/> Location and Size indicate what part of the View's virtual content area, defined
     ///         by <see cref="ContentSize"/>, is visible and should be drawn. The coordinates taken by <see cref="Move"/> and
     ///         <see cref="AddRune"/> are relative to <see cref="Viewport"/>, thus if <c>ViewPort.Location.Y</c> is <c>5</c>
-    ///         the 5th row of the content should be drawn using <c>MoveTo (x, 5)</c>.
+    ///         the 6th row of the content should be drawn using <c>MoveTo (x, 5)</c>.
     ///     </para>
     ///     <para>
     ///         If <see cref="ContentSize"/> is larger than <c>ViewPort.Size</c> drawing code should use <see cref="Viewport"/>
