@@ -2,8 +2,6 @@
 
 public partial class View
 {
-    // The view-relative region that needs to be redrawn. Marked internal for unit tests.
-    internal Rectangle _needsDisplayRect = Rectangle.Empty;
     private ColorScheme _colorScheme;
 
     /// <summary>The color scheme for this view, if it is not defined, it returns the <see cref="SuperView"/>'s color scheme.</summary>
@@ -31,6 +29,9 @@ public partial class View
     /// <summary>The canvas that any line drawing that is to be shared by subviews of this view should add lines to.</summary>
     /// <remarks><see cref="Border"/> adds border lines to this LineCanvas.</remarks>
     public LineCanvas LineCanvas { get; } = new ();
+
+    // The view-relative region that needs to be redrawn. Marked internal for unit tests.
+    internal Rectangle _needsDisplayRect = Rectangle.Empty;
 
     /// <summary>Gets or sets whether the view needs to be redrawn.</summary>
     public bool NeedsDisplay
@@ -502,7 +503,7 @@ public partial class View
     ///     redrawn will be the <paramref name="region"/>.
     /// </remarks>
     /// <param name="region">The Bounds-relative region that needs to be redrawn.</param>
-    public virtual void SetNeedsDisplay (Rectangle region)
+    public void SetNeedsDisplay (Rectangle region)
     {
         if (!IsInitialized)
         {
@@ -523,11 +524,11 @@ public partial class View
             _needsDisplayRect = new (x, y, w, h);
         }
 
-        _superView?.SetSubViewNeedsDisplay ();
+        SuperView?.SetSubViewNeedsDisplay ();
 
-        Margin?.SetNeedsDisplay (Margin.Bounds);
-        Border?.SetNeedsDisplay (Border.Bounds);
-        Padding?.SetNeedsDisplay (Padding.Bounds);
+        Margin?.SetNeedsDisplay ();
+        Border?.SetNeedsDisplay ();
+        Padding?.SetNeedsDisplay ();
 
         foreach (View subview in Subviews)
         {
@@ -541,19 +542,31 @@ public partial class View
         }
     }
 
-    /// <summary>Indicates that any Subviews (in the <see cref="Subviews"/> list) need to be repainted.</summary>
+    /// <summary>Sets <see cref="SubViewNeedsDisplay"/> to <see langword="true"/> for this View and all Superviews.</summary>
     public void SetSubViewNeedsDisplay ()
     {
         SubViewNeedsDisplay = true;
 
-        _superView?.SetSubViewNeedsDisplay ();
+        if (SuperView is { SubViewNeedsDisplay: false })
+        {
+            SuperView.SetSubViewNeedsDisplay ();
+        }
     }
 
     /// <summary>Clears <see cref="NeedsDisplay"/> and <see cref="SubViewNeedsDisplay"/>.</summary>
-    protected virtual void ClearNeedsDisplay ()
+    protected void ClearNeedsDisplay ()
     {
         _needsDisplayRect = Rectangle.Empty;
         SubViewNeedsDisplay = false;
+
+        Margin?.ClearNeedsDisplay ();
+        Border?.ClearNeedsDisplay ();
+        Padding?.ClearNeedsDisplay ();
+
+        foreach (View subview in Subviews)
+        {
+            subview.ClearNeedsDisplay();
+        }
     }
 
     // INTENT: Isn't this just intersection? It isn't used anyway.
