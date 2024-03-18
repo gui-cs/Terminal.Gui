@@ -546,10 +546,7 @@ public partial class View
     {
         SubViewNeedsDisplay = true;
 
-        if (_superView is { } && !_superView.SubViewNeedsDisplay)
-        {
-            _superView.SetSubViewNeedsDisplay ();
-        }
+        _superView?.SetSubViewNeedsDisplay ();
     }
 
     /// <summary>Clears <see cref="NeedsDisplay"/> and <see cref="SubViewNeedsDisplay"/>.</summary>
