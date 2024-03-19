@@ -82,6 +82,7 @@ internal class KeyBindingsDialog : Dialog
                            Application.RequestStop ();
                        };
         Application.Run (dlg);
+        dlg.Dispose ();
 
         if (key.HasValue)
         {

@@ -203,6 +203,7 @@ public class HexEditor : Scenario
             _hexView.Source = LoadFile ();
             _hexView.DisplayStart = 0;
         }
+        d.Dispose ();
     }
 
     private void Paste () { MessageBox.ErrorQuery ("Not Implemented", "Functionality not yet implemented.", "Ok"); }

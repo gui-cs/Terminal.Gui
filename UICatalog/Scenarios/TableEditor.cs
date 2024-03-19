@@ -886,6 +886,7 @@ public class TableEditor : Scenario
         tf.SetFocus ();
 
         Application.Run (d);
+        d.Dispose ();
 
         if (okPressed)
         {
@@ -1085,6 +1086,7 @@ public class TableEditor : Scenario
         tf.SetFocus ();
 
         Application.Run (d);
+        d.Dispose ();
 
         if (accepted)
         {

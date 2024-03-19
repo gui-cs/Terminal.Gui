@@ -349,6 +349,7 @@ public class Wizards : Scenario
                                                                                     };
 
                                             Application.Run (wizard);
+                                            wizard.Dispose ();
                                         }
                                         catch (FormatException)
                                         {

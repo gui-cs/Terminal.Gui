@@ -992,6 +992,7 @@ internal class UICatalogApp
                            {
                                var dlg = new KeyBindingsDialog ();
                                Application.Run (dlg);
+                               dlg.Dispose ();
                            };
 
             menuItems.Add (null!);

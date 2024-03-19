@@ -117,6 +117,7 @@ public class MultiColouredTable : Scenario
         tf.SetFocus ();
 
         Application.Run (d);
+        d.Dispose ();
 
         enteredText = okPressed ? tf.Text : null;
 

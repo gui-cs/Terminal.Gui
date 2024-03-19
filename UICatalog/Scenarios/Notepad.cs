@@ -56,11 +56,13 @@ public class Notepad : Scenario
 
         if (string.IsNullOrWhiteSpace (fd.Path))
         {
+            fd.Dispose ();
             return false;
         }
 
         if (fd.Canceled)
         {
+            fd.Dispose ();
             return false;
         }
 
@@ -68,6 +70,7 @@ public class Notepad : Scenario
         tab.Text = fd.FileName;
         tab.Save ();
 
+        fd.Dispose ();
         return true;
     }
 
@@ -248,19 +251,23 @@ public class Notepad : Scenario
 
         Application.Run (open);
 
-        if (!open.Canceled)
+        bool canceled = open.Canceled;
+
+        if (!canceled)
         {
             foreach (string path in open.FilePaths)
             {
                 if (string.IsNullOrEmpty (path) || !File.Exists (path))
                 {
-                    return;
+                    break;
                 }
 
                 // TODO should open in focused TabView
                 Open (new FileInfo (path), Path.GetFileName (path));
             }
         }
+
+        open.Dispose ();
     }
 
     /// <summary>Creates a new tab with initial text</summary>

@@ -898,6 +898,7 @@ internal class CharMap : ScrollView
                                    (s as Dialog)?.RequestStop ();
                                };
         Application.Run (waitIndicator);
+        waitIndicator.Dispose ();
 
         if (!string.IsNullOrEmpty (decResponse))
         {
@@ -1011,6 +1012,7 @@ internal class CharMap : ScrollView
             dlg.Add (json);
 
             Application.Run (dlg);
+            dlg.Dispose ();
         }
         else
         {

@@ -294,6 +294,7 @@ public class ListColumns : Scenario
         tf.SetFocus ();
 
         Application.Run (d);
+        d.Dispose ();
 
         if (accepted)
         {

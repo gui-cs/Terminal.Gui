@@ -1331,4 +1331,33 @@ public class DialogTests
 
         return (Begin (dlg), dlg);
     }
+
+    [Fact]
+    [SetupFakeDriver]
+    [TestRespondersDisposed]
+    public void Run_Does_Not_Dispose_Dialog ()
+    {
+        Init ();
+        Dialog dlg = new ();
+
+        dlg.Ready += Dlg_Ready;
+
+        Run (dlg);
+
+#if DEBUG_IDISPOSABLE
+        Assert.False (dlg.WasDisposed);
+#endif
+
+        dlg.Dispose ();
+
+        Shutdown();
+
+        return;
+
+        void Dlg_Ready (object sender, EventArgs e)
+        {
+            RequestStop ();
+        }
+    }
+
 }
