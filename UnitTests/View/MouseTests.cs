@@ -79,4 +79,17 @@ public class MouseTests (ITestOutputHelper output)
 
         Assert.Equal (expectedMoved, new Point (5, 5) == testView.Frame.Location);
     }
+
+    [Theory]
+    [InlineData (MouseFlags.WheeledUp | MouseFlags.ButtonCtrl, MouseFlags.WheeledLeft)]
+    [InlineData (MouseFlags.WheeledDown | MouseFlags.ButtonCtrl, MouseFlags.WheeledRight)]
+    public void WheeledLeft_WheeledRight (MouseFlags mouseFlags, MouseFlags expectedMouseFlagsFromEvent)
+    {
+        MouseFlags mouseFlagsFromEvent = MouseFlags.None;
+        var view = new View ();
+        view.MouseEvent += (s, e) => mouseFlagsFromEvent = e.MouseEvent.Flags;
+
+        view.OnMouseEvent (new MouseEvent () { Flags = mouseFlags });
+        Assert.Equal (mouseFlagsFromEvent, expectedMouseFlagsFromEvent);
+    }
 }
