@@ -507,4 +507,60 @@ public class ToScreenTests (ITestOutputHelper output)
         Assert.Equal (expectedX, screen.X);
     }
 
+
+    [Theory]
+    [InlineData (0, 0, 3)]
+    [InlineData (1, 0, 4)]
+    [InlineData (-1, 0, 2)]
+    [InlineData (11, 0, 14)]
+
+    [InlineData (0, 1, 4)]
+    [InlineData (1, 1, 5)]
+    [InlineData (-1, 1, 3)]
+    [InlineData (11, 1, 15)]
+
+    [InlineData (0, -1, 2)]
+    [InlineData (1, -1, 3)]
+    [InlineData (-1, -1, 1)]
+    [InlineData (11, -1, 13)]
+    public void ViewportToScreen_Positive_NestedSuperView_WithAdornments (int frameX, int testX, int expectedX)
+    {
+        // We test with only X because Y is equivalent. Height/Width are irrelevant.
+        // Arrange
+        var frame = new Rectangle (frameX, 0, 10, 10);
+
+        var superSuperView = new View ()
+        {
+            X = 0,
+            Y = 0,
+            Height = Dim.Fill (),
+            Width = Dim.Fill ()
+        };
+        superSuperView.BorderStyle = LineStyle.Single;
+
+        var superView = new View ()
+        {
+            X = 0,
+            Y = 0,
+            Height = Dim.Fill (),
+            Width = Dim.Fill ()
+        };
+
+        superSuperView.Add (superView);
+        superView.BorderStyle = LineStyle.Single;
+
+        var view = new View ();
+        view.Frame = frame;
+        view.ContentSize = new (11, 11);
+        view.Viewport = view.Viewport with { Location = new (1, 1) };
+
+        superView.Add (view);
+        superView.LayoutSubviews ();
+
+        // Act
+        var screen = view.ViewportToScreen (new (testX, 0, 0, 0));
+
+        // Assert
+        Assert.Equal (expectedX, screen.X);
+    }
 }

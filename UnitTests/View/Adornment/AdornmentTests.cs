@@ -24,7 +24,7 @@ public class AdornmentTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 20, 20), view.Viewport);
 
         var marginThickness = 1;
-        view.Margin.Thickness = new  (marginThickness);
+        view.Margin.Thickness = new (marginThickness);
         Assert.Equal (new (0, 0, 18, 18), view.Viewport);
 
         var borderThickness = 2;
@@ -39,7 +39,7 @@ public class AdornmentTests (ITestOutputHelper output)
 
         Assert.Equal (new (0, 0, view.Border.Frame.Width, view.Border.Frame.Height), view.Border.Viewport);
 
-        Assert.Equal (new (0, 0, view.Padding.Frame.Width , view.Padding.Frame.Height), view.Padding.Viewport);
+        Assert.Equal (new (0, 0, view.Padding.Frame.Width, view.Padding.Frame.Height), view.Padding.Viewport);
     }
 
     // Test that Adornment.Viewport_get override returns Frame.Size minus Thickness
@@ -291,14 +291,14 @@ public class AdornmentTests (ITestOutputHelper output)
     public void Setting_SuperView_Throws ()
     {
         var adornment = new Adornment (null);
-        Assert.Throws<NotImplementedException> (() => adornment.SuperView = new View ());
+        Assert.Throws<InvalidOperationException> (() => adornment.SuperView = new View ());
     }
 
     [Fact]
     public void Setting_SuperViewRendersLineCanvas_Throws ()
     {
         var adornment = new Adornment (null);
-        Assert.Throws<NotImplementedException> (() => adornment.SuperViewRendersLineCanvas = true);
+        Assert.Throws<InvalidOperationException> (() => adornment.SuperViewRendersLineCanvas = true);
     }
 
     [Fact]
@@ -340,8 +340,8 @@ public class AdornmentTests (ITestOutputHelper output)
     {
         var view = new View ();
         var raised = false;
-        view.BeginInit();
-        view.EndInit();
+        view.BeginInit ();
+        view.EndInit ();
 
         view.LayoutStarted += LayoutStarted;
         view.Margin.Thickness = new Thickness (1, 2, 3, 4);
@@ -372,5 +372,16 @@ public class AdornmentTests (ITestOutputHelper output)
         {
             raised = true;
         }
+    }
+
+    [Fact]
+    public void Set_Viewport_Throws ()
+    {
+        View view = new ();
+
+        view.BeginInit ();
+        view.EndInit ();
+        view.Padding.Thickness = new (2, 2, 2, 2);
+        Assert.Throws<InvalidOperationException> (() => view.Padding.Viewport = view.Padding.Viewport with { Location = new (1, 1) });
     }
 }

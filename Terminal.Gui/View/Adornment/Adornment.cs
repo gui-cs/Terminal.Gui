@@ -91,7 +91,7 @@ public class Adornment : View
     public override View SuperView
     {
         get => null;
-        set => throw new NotImplementedException ();
+        set => throw new InvalidOperationException (@"Adornments can not be Subviews or have SuperViews. Use Parent instead.");
     }
 
     //internal override Adornment CreateAdornment (Type adornmentType)
@@ -109,10 +109,14 @@ public class Adornment : View
     ///     Gets the rectangle that describes the area of the Adornment. The Location is always (0,0).
     ///     The size is the size of the <see cref="View.Frame"/>.
     /// </summary>
+    /// <remarks>
+    ///     The Viewport of an Adornment cannot be modified. Attempting to set this property will throw an
+    ///     <see cref="InvalidOperationException"/>.
+    /// </remarks>
     public override Rectangle Viewport
     {
         get => Frame with { Location = Point.Empty };
-        set => throw new InvalidOperationException ("It makes no sense to set Viewport of a Thickness.");
+        set => throw new InvalidOperationException (@"The Viewport of an Adornment cannot be modified.");
     }
 
     /// <inheritdoc/>
@@ -183,8 +187,8 @@ public class Adornment : View
     /// </summary>
     public override bool SuperViewRendersLineCanvas
     {
-        get => false; // throw new NotImplementedException ();
-        set => throw new NotImplementedException ();
+        get => false; 
+        set => throw new InvalidOperationException (@"Adornment can only render to their Parent or Parent's Superview.");
     }
 
     #endregion View Overrides
