@@ -103,6 +103,7 @@ public class InteractiveTree : Scenario
         tf.SetFocus ();
 
         Application.Run (d);
+        d.Dispose ();
 
         enteredText = okPressed ? tf.Text : null;
 

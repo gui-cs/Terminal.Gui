@@ -228,6 +228,8 @@ public class FileDialogExamples : Scenario
                               "Ok"
                              );
         }
+
+        fd.Dispose ();
     }
 
     private void SetupHandler (Button btn)

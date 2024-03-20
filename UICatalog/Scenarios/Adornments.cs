@@ -120,6 +120,8 @@ public class Adornments : Scenario
         Application.Top.Closed += (s, e) => View.Diagnostics = _diagnosticFlags;
 
         Application.Run (editor);
+        editor.Dispose ();
+
         Application.Shutdown ();
     }
 

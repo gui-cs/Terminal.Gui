@@ -1061,6 +1061,7 @@ public class Editor : Scenario
             _fileName = d.FilePaths [0];
             LoadFile ();
         }
+        d.Dispose ();
     }
 
     private void Paste ()
@@ -1259,12 +1260,16 @@ public class Editor : Scenario
         };
         var sd = new SaveDialog { Title = "Save file", AllowedTypes = aTypes };
 
-        sd.Path = Path.Combine (sd.FileName, Win.Title);
+        sd.Path = Win.Title;
         Application.Run (sd);
+        bool canceled = sd.Canceled;
+        string path = sd.Path;
+        string fileName = sd.FileName;
+        sd.Dispose ();
 
-        if (!sd.Canceled)
+        if (!canceled)
         {
-            if (File.Exists (sd.Path))
+            if (File.Exists (path))
             {
                 if (MessageBox.Query (
                                       "Save File",
@@ -1274,7 +1279,7 @@ public class Editor : Scenario
                                      )
                     == 1)
                 {
-                    return SaveFile (sd.FileName, sd.Path);
+                    return SaveFile (fileName, path);
                 }
 
                 _saved = false;
@@ -1282,7 +1287,7 @@ public class Editor : Scenario
                 return _saved;
             }
 
-            return SaveFile (sd.FileName, sd.Path);
+            return SaveFile (fileName, path);
         }
 
         _saved = false;

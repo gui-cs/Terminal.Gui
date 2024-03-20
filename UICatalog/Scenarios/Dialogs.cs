@@ -192,6 +192,7 @@ public class Dialogs : Scenario
                                                                        buttonPressedLabel
                                                                       );
                                         Application.Run (dlg);
+                                        dlg.Dispose ();
                                     };
 
         Win.Add (showDialogButton);

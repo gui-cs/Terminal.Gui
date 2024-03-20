@@ -78,6 +78,7 @@ public class ProgressBarStyles : Scenario
             dialog.Add (colorPicker);
             colorPicker.ColorChanged += (s, e) => { dialog.RequestStop (); };
             Application.Run (dialog);
+            dialog.Dispose ();
 
             ColorName retColor = colorPicker.SelectedColor;
             colorPicker.Dispose ();
@@ -294,6 +295,7 @@ public class ProgressBarStyles : Scenario
         }
 
         Application.Run (editor);
+        editor.Dispose ();
         Application.Shutdown ();
     }
 

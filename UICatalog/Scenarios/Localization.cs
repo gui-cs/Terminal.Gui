@@ -200,6 +200,7 @@ public class Localization : Scenario
         }
 
         Application.Run (dialog);
+        dialog.Dispose ();
     }
 
     public void ShowWizard ()
@@ -209,6 +210,7 @@ public class Localization : Scenario
         wizard.AddStep (new WizardStep { HelpText = "Wizard step 2", NextButtonText = ">>> (_N)" });
         wizard.AddStep (new WizardStep { HelpText = "Wizard last step" });
         Application.Run (wizard);
+        wizard.Dispose ();
     }
 
     private void LanguageComboBox_SelectChanged (object sender, ListViewItemEventArgs e)
