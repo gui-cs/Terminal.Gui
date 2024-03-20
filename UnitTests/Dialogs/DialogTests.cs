@@ -1331,4 +1331,37 @@ public class DialogTests
 
         return (Begin (dlg), dlg);
     }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Run_Dispose_Dialog ()
+    {
+        var top = Top;
+
+        Dialog dlg = new ();
+
+        dlg.Ready += Dlg_Ready;
+
+        Run (dlg);
+
+#if DEBUG_IDISPOSABLE
+        Assert.True (dlg.WasDisposed);
+        Assert.True (Top.WasDisposed);
+        Assert.Equal (top, Top);
+#endif
+
+        // This is instance and the user is responsible to set to null or not
+        // because in the Application it's all working as expected.
+        // Fortunately, this instance is not null so that we can obtain the value of its properties
+        Assert.NotNull (dlg);
+
+        Shutdown();
+
+        return;
+
+        void Dlg_Ready (object sender, EventArgs e)
+        {
+            RequestStop ();
+        }
+    }
 }
