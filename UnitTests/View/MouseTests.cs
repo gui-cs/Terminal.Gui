@@ -37,20 +37,21 @@ public class MouseTests (ITestOutputHelper output)
     // Test drag to move
     [Theory]
     [InlineData (0, 0, 0, 0, false)]
-    [InlineData (0, 0, 0, 4, false)]
+    [InlineData (0, 0, 0, 4, true)]
     [InlineData (1, 0, 0, 4, true)]
     [InlineData (0, 1, 0, 4, true)]
-    [InlineData (0, 0, 1, 4, false)]
+    [InlineData (0, 0, 1, 4, true)]
 
     [InlineData (1, 1, 0, 3, false)]
     [InlineData (1, 1, 0, 4, true)]
     [InlineData (1, 1, 0, 5, true)]
     [InlineData (1, 1, 0, 6, false)]
 
-
     [InlineData (1, 1, 0, 11, false)]
     [InlineData (1, 1, 0, 12, true)]
+    [InlineData (0, 0, 0, 13, true)]
     [InlineData (1, 1, 0, 13, true)]
+    [InlineData (0, 0, 1, 13, true)]
     [InlineData (1, 1, 0, 14, false)]
     [AutoInitShutdown]
     public void ButtonPressed_In_Margin_Or_Border_Starts_Drag (int marginThickness, int borderThickness, int paddingThickness, int xy, bool expectedMoved)
@@ -73,10 +74,22 @@ public class MouseTests (ITestOutputHelper output)
         Assert.Equal (new Point (4, 4), testView.Frame.Location);
         Application.OnMouseEvent (new (new () { X = xy, Y = xy, Flags = MouseFlags.Button1Pressed }));
 
-        Assert.False (Application.MouseGrabView is { } && (Application.MouseGrabView != testView.Margin && Application.MouseGrabView != testView.Border));
+        if (expectedMoved)
+        {
+            Assert.False (Application.MouseGrabView is { } && (Application.MouseGrabView != testView.Margin && Application.MouseGrabView != testView.Border && Application.MouseGrabView != testView.Padding));
+        }
+        else
+        {
+            Assert.Null (Application.MouseGrabView);
+        }
 
         Application.OnMouseEvent (new (new () { X = xy + 1, Y = xy + 1, Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition }));
 
         Assert.Equal (expectedMoved, new Point (5, 5) == testView.Frame.Location);
+
+        if (!expectedMoved)
+        {
+            Assert.Equal (new Point (4, 4), testView.Frame.Location);
+        }
     }
 }

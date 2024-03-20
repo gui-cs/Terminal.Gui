@@ -179,7 +179,7 @@ public static partial class Application
     ///     <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are
     ///     specified the default driver for the platform will be used.
     /// </param>
-    public static void Init (ConsoleDriver driver = null, string driverName = null) { InternalInit (() => new Toplevel (), driver, driverName); }
+    public static void Init (ConsoleDriver driver = null, string driverName = null) { InternalInit (() => new Toplevel { Arrangement = ViewArrangement.Fixed }, driver, driverName); }
 
     internal static bool _initialized;
     internal static int _mainThreadId = -1;

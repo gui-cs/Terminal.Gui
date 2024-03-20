@@ -133,7 +133,12 @@ public partial class View
 
         MouseEvent?.Invoke (this, args);
 
-        return args.Handled == true;
+        if (args.Handled)
+        {
+            return true;
+        }
+
+        return Margin?.OnMouseEvent (mouseEvent) == true;
     }
 
     /// <summary>Invokes the MouseClick event.</summary>

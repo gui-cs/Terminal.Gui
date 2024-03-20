@@ -259,7 +259,7 @@ public class Adornment : View
 
         if (!Parent.CanFocus || !Parent.Arrangement.HasFlag (ViewArrangement.Movable))
         {
-            return true;
+            return false;
         }
 
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3312
@@ -270,7 +270,8 @@ public class Adornment : View
 
             // Only start grabbing if the user clicks in the Thickness area
             // Adornment.Contains takes Parent SuperView=relative coords.
-            if (Contains (mouseEvent.X + Parent.Frame.X + Frame.X, mouseEvent.Y+ Parent.Frame.Y + Frame.Y))
+            if (mouseEvent.View is Adornment && Contains (mouseEvent.X + Parent.Frame.X + Frame.X, mouseEvent.Y + Parent.Frame.Y + Frame.Y)
+                || (mouseEvent.View == Parent && IsParentLocationOnTheBoundaries(Parent.Frame,  mouseEvent.X + Parent.Frame.X + Parent.GetBoundsOffset().X, mouseEvent.Y + Parent.Frame.Y + Parent.GetBoundsOffset().Y)))
             {
                 // Set the start grab point to the Frame coords
                 _startGrabPoint = new (mouseEvent.X + Frame.X, mouseEvent.Y + Frame.Y);
@@ -319,6 +320,21 @@ public class Adornment : View
         {
             _dragPosition = null;
             Application.UngrabMouse ();
+        }
+
+        return false;
+    }
+
+    private static bool IsParentLocationOnTheBoundaries (Rectangle rect, int x, int y)
+    {
+        if (x == rect.Left || x == rect.Right - 1)
+        {
+            return y >= rect.Top && y <= rect.Bottom;
+        }
+
+        if (y == rect.Top || y == rect.Bottom - 1)
+        {
+            return x >= rect.Left && x <= rect.Right;
         }
 
         return false;
