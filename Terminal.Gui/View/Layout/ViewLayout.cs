@@ -102,7 +102,7 @@ public partial class View
             }
 
             Point viewportOffset = super.GetViewportOffset ();
-            viewportOffset.Offset(super.Frame.X, super.Frame.Y);
+            viewportOffset.Offset (super.Frame.X, super.Frame.Y);
             ret.X += viewportOffset.X;
             ret.Y += viewportOffset.Y;
             super = super.SuperView;
@@ -286,6 +286,8 @@ public partial class View
 
     #region Viewport
 
+    private Point _viewportOffset;
+
     /// <summary>
     ///     Gets or sets the rectangle describing the portion of the View's content that is visible to the user.
     ///     The viewport Location is relative to the top-left corner of the inner rectangle of the <see cref="Adornment"/>s.
@@ -324,30 +326,19 @@ public partial class View
             if (Margin is null || Border is null || Padding is null)
             {
                 // CreateAdornments has not been called yet.
-                return Rectangle.Empty with { Size = Frame.Size };
+                return new (_viewportOffset, Frame.Size);
             }
 
             Thickness totalThickness = GetAdornmentsThickness ();
 
-            return Rectangle.Empty with
-            {
-                Size = new (
-                            Math.Max (0, Frame.Size.Width - totalThickness.Horizontal),
-                            Math.Max (0, Frame.Size.Height - totalThickness.Vertical))
-            };
+            return new (_viewportOffset,
+                new (Math.Max (0, Frame.Size.Width - totalThickness.Horizontal),
+                     Math.Max (0, Frame.Size.Height - totalThickness.Vertical)));
         }
         set
         {
-            // TODO: Should we enforce Viewport.X/Y == 0? The code currently ignores value.X/Y which is
-            // TODO: correct behavior, but is silent. Perhaps an exception?
-#if DEBUG
-            if (value.Location != Point.Empty)
-            {
-                Debug.WriteLine (
-                                 $"WARNING: Viewport.Location must always be 0,0. Location ({value.Location}) is ignored. {this}"
-                                );
-            }
-#endif // DEBUG
+            _viewportOffset = value.Location;
+
             Thickness totalThickness = GetAdornmentsThickness ();
 
             Frame = Frame with
@@ -365,7 +356,7 @@ public partial class View
         // Translate bounds to Frame (our SuperView's Viewport-relative coordinates)
         Rectangle screen = FrameToScreen ();
         Point viewportOffset = GetViewportOffset ();
-        screen.Offset (viewportOffset.X + viewport.X, viewportOffset.Y + viewport.Y);
+        screen.Offset (viewportOffset.X + Viewport.X + viewport.X, viewportOffset.Y + Viewport.Y + viewport.Y);
 
         return new (screen.Location, viewport.Size);
     }
@@ -387,7 +378,10 @@ public partial class View
     ///     Helper to get the X and Y offset of the Viewport from the Frame. This is the sum of the Left and Top properties
     ///     of <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/>.
     /// </summary>
-    public Point GetViewportOffset () { return Padding is null ? Point.Empty : Padding.Thickness.GetInside (Padding.Frame).Location; }
+    public Point GetViewportOffset ()
+    {
+        return Padding is null ? Point.Empty : Padding.Thickness.GetInside (Padding.Frame).Location;
+    }
 
     /// <summary>
     /// Gets or sets the size of the View's content. If the value is <c>Size.Empty</c> the size of the content is

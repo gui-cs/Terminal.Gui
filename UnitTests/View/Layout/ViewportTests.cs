@@ -150,6 +150,112 @@ public class ViewportTests (ITestOutputHelper output)
         Assert.Equal (expectedW, bounds.Width);
     }
 
+    [Theory]
+    [InlineData (0, 0)]
+    [InlineData (1, 0)]
+    [InlineData (0, 1)]
+    [InlineData (-1, -1)]
+    public void Set_Viewport_Location_Preserves_Size_And_Frame (int xOffset, int yOffset)
+    {
+        View view = new ()
+        {
+            Width = 10,
+            Height = 10
+        };
+
+        Assert.Equal (new Rectangle (0, 0, 10, 10), view.Frame);
+
+        Rectangle testRect = new Rectangle (0, 0, 1, 1);
+        Assert.Equal (new Point (0, 0), view.ViewportToScreen (testRect).Location);
+        view.Viewport = view.Viewport with { Location = new Point (xOffset, yOffset) };
+        Assert.Equal (new Rectangle (xOffset, yOffset, 10, 10), view.Viewport);
+
+        Assert.Equal (new Rectangle (0, 0, 10, 10), view.Frame);
+    }
+
+    [Fact]
+    public void Set_Viewport_Changes_Frame ()
+    {
+        var frame = new Rectangle (1, 2, 3, 4);
+        var newViewport = new Rectangle (0, 0, 30, 40);
+
+        var v = new View { Frame = frame };
+        Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
+
+        v.Viewport = newViewport;
+        Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
+        Assert.Equal (newViewport, v.Viewport);
+        Assert.Equal (new Rectangle (1, 2, newViewport.Width, newViewport.Height), v.Frame);
+        Assert.Equal (new Rectangle (0, 0, newViewport.Width, newViewport.Height), v.Viewport);
+        Assert.Equal (Pos.At (1), v.X);
+        Assert.Equal (Pos.At (2), v.Y);
+        Assert.Equal (Dim.Sized (30), v.Width);
+        Assert.Equal (Dim.Sized (40), v.Height);
+
+        newViewport = new Rectangle (0, 0, 3, 4);
+        v.Viewport = newViewport;
+        Assert.Equal (newViewport, v.Viewport);
+        Assert.Equal (new Rectangle (1, 2, newViewport.Width, newViewport.Height), v.Frame);
+        Assert.Equal (new Rectangle (0, 0, newViewport.Width, newViewport.Height), v.Viewport);
+        Assert.Equal (Pos.At (1), v.X);
+        Assert.Equal (Pos.At (2), v.Y);
+        Assert.Equal (Dim.Sized (3), v.Width);
+        Assert.Equal (Dim.Sized (4), v.Height);
+
+        v.BorderStyle = LineStyle.Single;
+
+        // Viewport should shrink
+        Assert.Equal (new Rectangle (0, 0, 1, 2), v.Viewport);
+
+        // Frame should not change
+        Assert.Equal (new Rectangle (1, 2, 3, 4), v.Frame);
+        Assert.Equal (Pos.At (1), v.X);
+        Assert.Equal (Pos.At (2), v.Y);
+        Assert.Equal (Dim.Sized (3), v.Width);
+        Assert.Equal (Dim.Sized (4), v.Height);
+
+        // Now set bounds bigger as before
+        newViewport = new Rectangle (0, 0, 3, 4);
+        v.Viewport = newViewport;
+        Assert.Equal (newViewport, v.Viewport);
+
+        // Frame grows because there's now a border
+        Assert.Equal (new Rectangle (1, 2, 5, 6), v.Frame);
+        Assert.Equal (new Rectangle (0, 0, newViewport.Width, newViewport.Height), v.Viewport);
+        Assert.Equal (Pos.At (1), v.X);
+        Assert.Equal (Pos.At (2), v.Y);
+        Assert.Equal (Dim.Sized (5), v.Width);
+        Assert.Equal (Dim.Sized (6), v.Height);
+    }
+
+    [Theory]
+    [InlineData (0, 0, 0)]
+    [InlineData (1, 0, 0)]
+    [InlineData (-1, 0, 0)]
+    [InlineData (10, 0, 0)]
+    [InlineData (11, 0, 0)]
+
+    [InlineData (0, 1, 1)]
+    [InlineData (1, 1, 1)]
+    [InlineData (-1, 1, 1)]
+    [InlineData (10, 1, 1)]
+    [InlineData (11, 1, 1)]
+    public void GetViewportOffset_Returns_Offset_From_Frame (int frameX, int adornmentThickness, int expectedOffset)
+    {
+        View view = new ()
+        {
+            X = 1,
+            Y = 1,
+            Width = 10,
+            Height = 10
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.Margin.Thickness = new (adornmentThickness);
+
+        Assert.Equal (expectedOffset, view.GetViewportOffset ().X);
+    }
+
     [Fact]
     public void ContentSize_Empty_ByDefault ()
     {
@@ -158,6 +264,7 @@ public class ViewportTests (ITestOutputHelper output)
             Width = 1,
             Height = 1
         };
-        Assert.Equal(Size.Empty, view.ContentSize);
+        Assert.Equal (Size.Empty, view.ContentSize);
     }
+
 }
