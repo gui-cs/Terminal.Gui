@@ -389,6 +389,14 @@ public partial class View
     /// </summary>
     public Point GetViewportOffset () { return Padding is null ? Point.Empty : Padding.Thickness.GetInside (Padding.Frame).Location; }
 
+    /// <summary>
+    /// Gets or sets the size of the View's content. If the value is <c>Size.Empty</c> the size of the content is
+    /// the same as the size of the <see cref="Viewport"/>, and <c>Viewport.Location</c> will always be <c>0, 0</c>.
+    /// If a positive size is provided, <see cref="Viewport"/> describes the portion of the content currently visible
+    /// to the view. This enables virtual scrolling.
+    /// </summary>
+    public Size ContentSize { get; set; }
+
     #endregion Viewport
 
     #region AutoSize

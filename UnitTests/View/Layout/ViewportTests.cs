@@ -24,16 +24,16 @@ public class ViewportTests (ITestOutputHelper output)
 
         var view = new View ();
         view.Frame = frame;
-        view.BeginInit();
-        view.EndInit();
+        view.BeginInit ();
+        view.EndInit ();
 
         // Act
         var bounds = view.Viewport;
 
         // Assert
-        Assert.Equal(expectedW, bounds.Width);
+        Assert.Equal (expectedW, bounds.Width);
     }
-    
+
     [Theory]
     [InlineData (0, 0, 10)]
     [InlineData (1, 0, 9)]
@@ -148,5 +148,16 @@ public class ViewportTests (ITestOutputHelper output)
 
         // Assert
         Assert.Equal (expectedW, bounds.Width);
+    }
+
+    [Fact]
+    public void ContentSize_Empty_ByDefault ()
+    {
+        View view = new ()
+        {
+            Width = 1,
+            Height = 1
+        };
+        Assert.Equal(Size.Empty, view.ContentSize);
     }
 }
