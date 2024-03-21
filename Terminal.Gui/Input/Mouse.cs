@@ -88,11 +88,11 @@ public enum MouseFlags
     /// <summary>Vertical button wheeled down.</summary>
     WheeledDown = 0x20000000,
 
-    /// <summary>Vertical button wheeled up while pressing ButtonShift.</summary>
-    WheeledLeft = ButtonShift | WheeledUp,
+    /// <summary>Vertical button wheeled up while pressing ButtonCtrl.</summary>
+    WheeledLeft = ButtonCtrl | WheeledUp,
 
-    /// <summary>Vertical button wheeled down while pressing ButtonShift.</summary>
-    WheeledRight = ButtonShift | WheeledDown,
+    /// <summary>Vertical button wheeled down while pressing ButtonCtrl.</summary>
+    WheeledRight = ButtonCtrl | WheeledDown,
 
     /// <summary>Mask that captures all the events.</summary>
     AllEvents = 0x7ffffff
