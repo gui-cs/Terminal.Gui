@@ -1353,6 +1353,7 @@ public class DialogTests
         // This is instance and the user is responsible to set to null or not
         // because in the Application it's all working as expected.
         // Fortunately, this instance is not null so that we can obtain the value of its properties
+        Assert.True (dlg.Canceled);
         Assert.NotNull (dlg);
 
         Shutdown();

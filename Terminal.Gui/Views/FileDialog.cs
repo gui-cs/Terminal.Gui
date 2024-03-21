@@ -60,6 +60,9 @@ public class FileDialog : Dialog
     /// <remarks>This overload is mainly useful for testing.</remarks>
     internal FileDialog (IFileSystem fileSystem)
     {
+        // Assume canceled
+        Canceled = true;
+
         _fileSystem = fileSystem;
         Style = new FileDialogStyle (fileSystem);
 
@@ -83,7 +86,10 @@ public class FileDialog : Dialog
                                   NavigateIf (k, KeyCode.CursorUp, _tableView);
                                   NavigateIf (k, KeyCode.CursorRight, _btnOk);
                               };
-        _btnCancel.Accept += (s, e) => { Application.RequestStop (); };
+        _btnCancel.Accept += (s, e) => {
+                                 Canceled = true;
+                                 Application.RequestStop ();
+                             };
 
         _btnUp = new Button { X = 0, Y = 1, NoPadding = true };
         _btnUp.Text = GetUpButtonText ();
@@ -313,9 +319,6 @@ public class FileDialog : Dialog
         get => _tableView.MultiSelect;
         set => _tableView.MultiSelect = value;
     }
-
-    /// <summary>Gets a value indicating whether the <see cref="FileDialog"/> was closed without confirming a selection.</summary>
-    public bool Canceled { get; private set; } = true;
 
     /// <summary>The UI selected <see cref="IAllowedType"/> from combo box. May be null.</summary>
     public IAllowedType CurrentFilter { get; private set; }
