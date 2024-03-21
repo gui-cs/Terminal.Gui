@@ -52,11 +52,12 @@ public class ApplicationTests
         Init ();
 
         RunState rs = Application.Begin (Application.Top);
+        Assert.Equal (rs.Toplevel, Application.Top);
         Application.End (rs);
 
 #if DEBUG_IDISPOSABLE
         Assert.True (rs.WasDisposed);
-        Assert.False (Application.Top.WasDisposed);
+        Assert.True (Application.Top.WasDisposed); // Is true because the rs.Toplevel is the same as Application.Top
 #endif
 
         Assert.Null (rs.Toplevel);
@@ -365,6 +366,8 @@ public class ApplicationTests
     [AutoInitShutdown]
     public void SetCurrentAsTop_Run_A_Not_Modal_Toplevel_Make_It_The_Current_Application_Top ()
     {
+        var top = Application.Top;
+
         var t1 = new Toplevel ();
         var t2 = new Toplevel ();
         var t3 = new Toplevel ();
@@ -455,7 +458,11 @@ public class ApplicationTests
 
         Application.Run (t1);
 
-        Assert.Equal (t1, Application.Top);
+        Assert.NotEqual (t1, Application.Top);
+        Assert.Equal (top, Application.Top);
+#if DEBUG_IDISPOSABLE
+        Assert.True (Application.Top.WasDisposed);
+#endif
     }
 
     private void Init ()
@@ -874,6 +881,39 @@ public class ApplicationTests
 
         Application.End (rs);
         Application.Shutdown ();
+    }
+
+    [Fact]
+    public void End_Disposing_Correctly ()
+    {
+        Init ();
+
+        var top = Application.Top;
+
+        Window w = new ();
+        w.Ready += (s, e) => Application.RequestStop (); // Causes `End` to be called
+        Application.Run(w);
+
+#if DEBUG_IDISPOSABLE
+        Assert.True (w.WasDisposed);
+#endif
+
+        Assert.NotNull (w);
+        Assert.Equal (string.Empty, w.Title); // Invalid - w has been disposed -> Valid - w isn't Application.Top but the original created by Init
+        Assert.NotNull (Application.Top);
+        Assert.NotEqual(w, Application.Top);
+        Assert.Equal(top, Application.Top);
+        Assert.Null (Application.Current);
+
+        var exception = Record.Exception (()  => Application.Run(w)); // Invalid - w has been disposed. Run it in debug mode will throw, otherwise the user may want to run it again
+        Assert.NotNull (exception);
+
+        Application.Shutdown ();
+        Assert.NotNull (w);
+        Assert.Equal (string.Empty, w.Title); // Invalid - w has been disposed -> Valid - w isn't Application.Top but the original created by Init
+        Assert.Null (Application.Top);
+        Assert.Null (Application.Current);
+        Assert.NotNull (top);
     }
 
     // TODO: Add tests for Run that test errorHandler

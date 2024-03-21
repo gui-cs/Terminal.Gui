@@ -97,7 +97,9 @@ public class OverlappedTests
 
         Application.Run (overlapped);
 
-        Assert.Empty (Application.OverlappedChildren);
+        Assert.Null (Application.OverlappedChildren);
+        Assert.Null (Application.OverlappedTop);
+        Assert.NotNull (Application.Top);
     }
 
     [Fact]
@@ -332,7 +334,9 @@ public class OverlappedTests
 
         Application.Run (overlapped);
 
-        Assert.Empty (Application.OverlappedChildren);
+        Assert.Null (Application.OverlappedChildren);
+        Assert.Null (Application.OverlappedTop);
+        Assert.NotNull (Application.Top);
     }
 
     [Fact]
@@ -421,7 +425,9 @@ public class OverlappedTests
 
         Application.Run (overlapped);
 
-        Assert.Empty (Application.OverlappedChildren);
+        Assert.Null (Application.OverlappedChildren);
+        Assert.Null (Application.OverlappedTop);
+        Assert.NotNull (Application.Top);
     }
 
     [Fact]
@@ -504,7 +510,9 @@ public class OverlappedTests
 
         Application.Run (overlapped);
 
-        Assert.Empty (Application.OverlappedChildren);
+        Assert.Null (Application.OverlappedChildren);
+        Assert.Null (Application.OverlappedTop);
+        Assert.NotNull (Application.Top);
     }
 
     [Fact]
@@ -597,7 +605,9 @@ public class OverlappedTests
 
         Application.Run (overlapped);
 
-        Assert.Empty (Application.OverlappedChildren);
+        Assert.Null (Application.OverlappedChildren);
+        Assert.Null (Application.OverlappedTop);
+        Assert.NotNull (Application.Top);
     }
 
     [Fact]
@@ -689,7 +699,9 @@ public class OverlappedTests
 
         Application.Run (overlapped);
 
-        Assert.Empty (Application.OverlappedChildren);
+        Assert.Null (Application.OverlappedChildren);
+        Assert.Null (Application.OverlappedTop);
+        Assert.NotNull (Application.Top);
     }
 
     [Fact]
@@ -766,7 +778,9 @@ public class OverlappedTests
 
         Application.Run (overlapped);
 
-        Assert.Empty (Application.OverlappedChildren);
+        Assert.Null (Application.OverlappedChildren);
+        Assert.Null (Application.OverlappedTop);
+        Assert.NotNull (Application.Top);
     }
 
     [Fact]
@@ -842,7 +856,9 @@ public class OverlappedTests
 
         Application.Run (overlapped);
 
-        Assert.Empty (Application.OverlappedChildren);
+        Assert.Null (Application.OverlappedChildren);
+        Assert.Null (Application.OverlappedTop);
+        Assert.NotNull (Application.Top);
     }
 
     [Fact]

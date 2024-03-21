@@ -294,6 +294,7 @@ public static partial class Application
 
         Top = topLevelFactory ();
         Current = Top;
+        _initialTop = Top;
 
         // Ensure Top's layout is up to date.
         Current.SetRelativeLayout (Driver.Bounds);
@@ -344,6 +345,8 @@ public static partial class Application
     #endregion Initialization (Init/Shutdown)
 
     #region Run (Begin, Run, End, Stop)
+
+    private static Toplevel _initialTop;
 
     /// <summary>
     ///     Notify that a new <see cref="RunState"/> was created (<see cref="Begin(Toplevel)"/> was called). The token is
@@ -1040,10 +1043,17 @@ public static partial class Application
             Refresh ();
         }
 
-        // Do NOT dispose .Toplevel here. It was not created by
-        // Run, but Init or someone else.
+        // Always dispose runState.Toplevel here. If it is not the same as
+        // the current in the RunIteration, it will be fixed later in the
+        // next RunIteration.
+        runState.Toplevel?.Dispose ();
         runState.Toplevel = null;
         runState.Dispose ();
+
+        if (_topLevels.Count == 0)
+        {
+            Top = _initialTop;
+        }
     }
 
     #endregion Run (Begin, Run, End)
