@@ -464,11 +464,12 @@ public class ScrollBarView : View
             && mouseEvent.Flags != MouseFlags.Button1DoubleClicked
             && !mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)
             && mouseEvent.Flags != MouseFlags.Button1Released
-            && mouseEvent.Flags != MouseFlags.WheeledDown
-            && mouseEvent.Flags != MouseFlags.WheeledUp
-            && mouseEvent.Flags != MouseFlags.WheeledRight
-            && mouseEvent.Flags != MouseFlags.WheeledLeft
-            && mouseEvent.Flags != MouseFlags.Button1TripleClicked)
+            && mouseEvent.Flags != MouseFlags.Button1TripleClicked
+            && (mouseEvent.Flags & MouseFlags.WheeledDown) == 0
+            && (mouseEvent.Flags & MouseFlags.WheeledUp) == 0
+            && (mouseEvent.Flags & MouseFlags.WheeledRight) == 0
+            && (mouseEvent.Flags & MouseFlags.WheeledLeft) == 0
+            && (mouseEvent.Flags & MouseFlags.Button2Pressed) == 0)
         {
             return false;
         }
@@ -505,12 +506,13 @@ public class ScrollBarView : View
         }
 
         if (Visible
-            && (mouseEvent.Flags == MouseFlags.WheeledDown
-                || mouseEvent.Flags == MouseFlags.WheeledUp
-                || mouseEvent.Flags == MouseFlags.WheeledRight
-                || mouseEvent.Flags == MouseFlags.WheeledLeft))
+            && ((mouseEvent.Flags & MouseFlags.WheeledDown) != 0
+                || (mouseEvent.Flags & MouseFlags.WheeledUp) != 0
+                || (mouseEvent.Flags & MouseFlags.WheeledRight) != 0
+                || (mouseEvent.Flags & MouseFlags.WheeledLeft) != 0)
+                || (mouseEvent.Flags & MouseFlags.Button2Pressed) != 0)
         {
-            return SuperView.OnMouseEvent (mouseEvent);
+            return host!.OnMouseEvent (mouseEvent);
         }
 
         if (mouseEvent.Flags == MouseFlags.Button1Pressed && location == 0)

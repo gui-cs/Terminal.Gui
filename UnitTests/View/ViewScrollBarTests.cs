@@ -127,6 +127,125 @@ public class ViewScrollBarTests
             { Key.PageDown.WithShift, -10, 0, Key.PageUp.WithShift, 0, 0 }
         };
 
+    [Theory]
+    [MemberData (nameof (ScrollMouseHandling))]
+    public void Mouse_Handling_On_Border (
+        MouseFlags firstMouse,
+        int expectedFirstX,
+        int expectedFirstY,
+        MouseFlags secondMouse,
+        int expectedSecondX,
+        int expectedSecondY
+    )
+    {
+        var view = new View { Width = 10, Height = 10, ContentSize = new (20, 20), UseContentOffset = true };
+        view.Border.EnableScrollBars = true;
+        view.BeginInit ();
+        view.EndInit ();
+
+        Assert.True (view.OnMouseEvent (new () { Flags = firstMouse }));
+        Assert.Equal (new (expectedFirstX, expectedFirstY), view.ContentOffset);
+        Assert.True (view.OnMouseEvent (new () { Flags = secondMouse }));
+        Assert.Equal (new (expectedSecondX, expectedSecondY), view.ContentOffset);
+    }
+
+    [Theory]
+    [MemberData (nameof (ScrollMouseHandling))]
+    public void Mouse_Handling_On_ContentArea (
+        MouseFlags firstMouse,
+        int expectedFirstX,
+        int expectedFirstY,
+        MouseFlags secondMouse,
+        int expectedSecondX,
+        int expectedSecondY
+    )
+    {
+        var view = new View { Width = 10, Height = 10, EnableScrollBars = true, ContentSize = new (20, 20), UseContentOffset = true };
+        view.BeginInit ();
+        view.EndInit ();
+
+        Assert.True (view.OnMouseEvent (new () { Flags = firstMouse }));
+        Assert.Equal (new (expectedFirstX, expectedFirstY), view.ContentOffset);
+        Assert.True (view.OnMouseEvent (new () { Flags = secondMouse }));
+        Assert.Equal (new (expectedSecondX, expectedSecondY), view.ContentOffset);
+    }
+
+    [Theory]
+    [MemberData (nameof (ScrollMouseHandling))]
+    public void Mouse_Handling_On_Margin (
+        MouseFlags firstMouse,
+        int expectedFirstX,
+        int expectedFirstY,
+        MouseFlags secondMouse,
+        int expectedSecondX,
+        int expectedSecondY
+    )
+    {
+        var view = new View { Width = 10, Height = 10, ContentSize = new (20, 20), UseContentOffset = true };
+        view.Margin.EnableScrollBars = true;
+        view.BeginInit ();
+        view.EndInit ();
+
+        Assert.True (view.OnMouseEvent (new () { Flags = firstMouse }));
+        Assert.Equal (new (expectedFirstX, expectedFirstY), view.ContentOffset);
+        Assert.True (view.OnMouseEvent (new () { Flags = secondMouse }));
+        Assert.Equal (new (expectedSecondX, expectedSecondY), view.ContentOffset);
+    }
+
+    [Theory]
+    [MemberData (nameof (ScrollMouseHandling))]
+    public void Mouse_Handling_On_Padding (
+        MouseFlags firstMouse,
+        int expectedFirstX,
+        int expectedFirstY,
+        MouseFlags secondMouse,
+        int expectedSecondX,
+        int expectedSecondY
+    )
+    {
+        var view = new View { Width = 10, Height = 10, ContentSize = new (20, 20), UseContentOffset = true };
+        view.Padding.EnableScrollBars = true;
+        view.BeginInit ();
+        view.EndInit ();
+
+        Assert.True (view.OnMouseEvent (new () { Flags = firstMouse }));
+        Assert.Equal (new (expectedFirstX, expectedFirstY), view.ContentOffset);
+        Assert.True (view.OnMouseEvent (new () { Flags = secondMouse }));
+        Assert.Equal (new (expectedSecondX, expectedSecondY), view.ContentOffset);
+    }
+
+    [Theory]
+    [MemberData (nameof (MouseHandlingWithoutScrollBars))]
+    public void Mouse_Handling_Without_EnableScrollBars (
+        MouseFlags firstMouse,
+        int expectedFirstX,
+        int expectedFirstY,
+        MouseFlags secondMouse,
+        int expectedSecondX,
+        int expectedSecondY
+    )
+    {
+        var view = new View { Width = 10, Height = 10, ContentSize = new (20, 20), UseContentOffset = true };
+        view.BeginInit ();
+        view.EndInit ();
+
+        Assert.True (view.OnMouseEvent (new () { Flags = firstMouse }));
+        Assert.Equal (new (expectedFirstX, expectedFirstY), view.ContentOffset);
+        Assert.True (view.OnMouseEvent (new () { Flags = secondMouse }));
+        Assert.Equal (new (expectedSecondX, expectedSecondY), view.ContentOffset);
+    }
+
+    public static TheoryData<MouseFlags, int, int, MouseFlags, int, int> MouseHandlingWithoutScrollBars =>
+        new ()
+        {
+            { MouseFlags.WheeledDown, 0, -1, MouseFlags.WheeledUp, 0, 0 },
+            { MouseFlags.Button2Pressed, 0, -10, MouseFlags.Button2Pressed | MouseFlags.ButtonAlt, 0, 0 },
+            { MouseFlags.WheeledDown | MouseFlags.ButtonAlt, 0, -10, MouseFlags.WheeledUp | MouseFlags.ButtonAlt, 0, 0 },
+            { MouseFlags.WheeledRight, -1, 0, MouseFlags.WheeledLeft, 0, 0 },
+            { MouseFlags.Button2Pressed | MouseFlags.ButtonCtrl, -10, 0, MouseFlags.Button2Pressed | MouseFlags.ButtonCtrl | MouseFlags.ButtonAlt, 0, 0 },
+            { MouseFlags.WheeledRight | MouseFlags.ButtonAlt, -10, 0, MouseFlags.WheeledLeft | MouseFlags.ButtonAlt, 0, 0 }
+        };
+
     public static TheoryData<Key, int, int, Key, int, int> ScrollBarKeyBindings =>
         new ()
         {
@@ -157,7 +276,7 @@ public class ViewScrollBarTests
         string [] strings = view.Text.Split ("\n").ToArray ();
         view.ContentSize = new (strings.OrderByDescending (s => s.Length).First ().GetColumns (), strings.Length);
 
-        view.ColorScheme = new()
+        view.ColorScheme = new ()
         {
             Normal = new (Color.Green, Color.Red),
             Focus = new (Color.Red, Color.Green)
@@ -242,4 +361,15 @@ public class ViewScrollBarTests
      Test   ",
                                                       _output);
     }
+
+    public static TheoryData<MouseFlags, int, int, MouseFlags, int, int> ScrollMouseHandling =>
+        new ()
+        {
+            { MouseFlags.WheeledDown, 0, -1, MouseFlags.WheeledUp, 0, 0 },
+            { MouseFlags.Button2Pressed, 0, -11, MouseFlags.Button2Pressed | MouseFlags.ButtonAlt, 0, 0 },
+            { MouseFlags.WheeledDown | MouseFlags.ButtonAlt, 0, -9, MouseFlags.WheeledUp | MouseFlags.ButtonAlt, 0, 0 },
+            { MouseFlags.WheeledRight, -1, 0, MouseFlags.WheeledLeft, 0, 0 },
+            { MouseFlags.Button2Pressed | MouseFlags.ButtonCtrl, -11, 0, MouseFlags.Button2Pressed | MouseFlags.ButtonCtrl | MouseFlags.ButtonAlt, 0, 0 },
+            { MouseFlags.WheeledRight | MouseFlags.ButtonAlt, -9, 0, MouseFlags.WheeledLeft | MouseFlags.ButtonAlt, 0, 0 }
+        };
 }

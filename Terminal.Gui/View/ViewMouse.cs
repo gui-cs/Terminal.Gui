@@ -133,7 +133,17 @@ public partial class View
 
         MouseEvent?.Invoke (this, args);
 
-        return args.Handled == true;
+        if (args.Handled)
+        {
+            return true;
+        }
+
+        if (UseContentOffset)
+        {
+            return MouseHandlingForScrolling (mouseEvent);
+        }
+
+        return false;
     }
 
     /// <summary>Invokes the MouseClick event.</summary>
