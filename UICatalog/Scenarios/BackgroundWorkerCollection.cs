@@ -32,6 +32,8 @@ public class BackgroundWorkerCollection : Scenario
             IsOverlappedContainer = true;
 
             _workerApp = new WorkerApp { Visible = false };
+            _workerApp.Border.Thickness = new (0, 1, 0, 0);
+            _workerApp.Border.LineStyle = LineStyle.Dashed;
 
             _menu = new MenuBar
             {
@@ -332,19 +334,17 @@ public class BackgroundWorkerCollection : Scenario
         public WorkerApp ()
         {
             Data = "WorkerApp";
+            Title = "Worker collection Log";
 
             Width = Dim.Percent (80);
             Height = Dim.Percent (50);
 
             ColorScheme = Colors.ColorSchemes ["Base"];
 
-            var label = new Label { X = Pos.Center (), Y = 0, Text = "Worker collection Log" };
-            Add (label);
-
             _listLog = new ListView
             {
                 X = 0,
-                Y = Pos.Bottom (label),
+                Y = 0,
                 Width = Dim.Fill (),
                 Height = Dim.Fill (),
                 Source = new ListWrapper (_log)
