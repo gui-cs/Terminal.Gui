@@ -418,8 +418,9 @@ public partial class View
             }
 
             // This should NOT clear 
+            // TODO: If the output is not in the Viewport, do nothing
             TextFormatter?.Draw (
-                                 ViewportToScreen (viewport),
+                                 ViewportToScreen (new Rectangle(Point.Empty, ContentSize)),
                                  HasFocus ? GetFocusColor () : GetNormalColor (),
                                  HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
                                  Rectangle.Empty
@@ -447,7 +448,7 @@ public partial class View
                 }
 
                 // Draw the subview
-                // Use the view's bounds (view-relative; Location will always be (0,0)
+                // Use the view's Viewport (view-relative; Location will always be (0,0)
                 //if (view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
                 view.Draw ();
 

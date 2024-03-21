@@ -296,7 +296,7 @@ public static partial class Application
         Current = Top;
 
         // Ensure Top's layout is up to date.
-        Current.SetRelativeLayout (Driver.Viewport);
+        Current.SetRelativeLayout (Driver.Viewport.Size);
 
         SupportedCultures = GetSupportedCultures ();
         _mainThreadId = Thread.CurrentThread.ManagedThreadId;
@@ -491,7 +491,7 @@ public static partial class Application
         }
 
         //if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
-        Toplevel.SetRelativeLayout (Driver.Viewport);
+        Toplevel.SetRelativeLayout (Driver.Viewport.Size);
 
         //}
 
@@ -1247,7 +1247,7 @@ public static partial class Application
 
         foreach (Toplevel t in _topLevels)
         {
-            t.SetRelativeLayout (Rectangle.Empty with { Size = args.Size });
+            t.SetRelativeLayout (args.Size);
             t.LayoutSubviews ();
             t.PositionToplevels ();
             t.OnSizeChanging (new SizeChangedEventArgs (args.Size));

@@ -260,7 +260,7 @@ public class ToScreenTests (ITestOutputHelper output)
         Assert.Equal (new Point (0, 0), view.ViewportToScreen (testRect).Location);
         view.Viewport = view.Viewport with { Location = new Point (1, 1) };
         Assert.Equal (new Rectangle (1, 1, 10, 10), view.Viewport);
-        Assert.Equal (new Point (1, 1), view.ViewportToScreen (testRect).Location);
+        Assert.Equal (new Point (-1, -1), view.ViewportToScreen (testRect).Location);
     }
 
     [Theory]

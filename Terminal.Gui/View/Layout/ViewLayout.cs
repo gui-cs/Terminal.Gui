@@ -356,7 +356,13 @@ public partial class View
         // Translate bounds to Frame (our SuperView's Viewport-relative coordinates)
         Rectangle screen = FrameToScreen ();
         Point viewportOffset = GetViewportOffset ();
-        screen.Offset (viewportOffset.X + Viewport.X + viewport.X, viewportOffset.Y + Viewport.Y + viewport.Y);
+        screen.Offset (viewportOffset.X + viewport.X, viewportOffset.Y + viewport.Y);
+
+        if (SuperView is { })
+        {
+            screen.Offset(-SuperView.Viewport.X, -SuperView.Viewport.Y);
+        }
+
 
         return new (screen.Location, viewport.Size);
     }
@@ -369,7 +375,7 @@ public partial class View
     {
         Point viewportOffset = GetViewportOffset ();
         Point screen = ScreenToFrame (x, y);
-        screen.Offset (-viewportOffset.X, -viewportOffset.Y);
+        screen.Offset (-viewportOffset.X + Viewport.X, -viewportOffset.Y + Viewport.Y);
 
         return screen;
     }
@@ -383,13 +389,18 @@ public partial class View
         return Padding is null ? Point.Empty : Padding.Thickness.GetInside (Padding.Frame).Location;
     }
 
+    private Size _contentSize;
     /// <summary>
     /// Gets or sets the size of the View's content. If the value is <c>Size.Empty</c> the size of the content is
     /// the same as the size of the <see cref="Viewport"/>, and <c>Viewport.Location</c> will always be <c>0, 0</c>.
     /// If a positive size is provided, <see cref="Viewport"/> describes the portion of the content currently visible
     /// to the view. This enables virtual scrolling.
     /// </summary>
-    public Size ContentSize { get; set; }
+    public Size ContentSize
+    {
+        get => _contentSize == Size.Empty ? Viewport.Size : _contentSize;
+        set => _contentSize = value;
+    }
 
     #endregion Viewport
 
@@ -911,8 +922,8 @@ public partial class View
 
         LayoutAdornments ();
 
-        Rectangle oldBounds = Viewport;
-        OnLayoutStarted (new () { OldBounds = oldBounds });
+        Rectangle oldViewport = Viewport;
+        OnLayoutStarted (new () { OldViewport = oldViewport });
 
         SetTextFormatterSize ();
 
@@ -924,7 +935,7 @@ public partial class View
 
         foreach (View v in ordered)
         {
-            LayoutSubview (v, new (GetViewportOffset (), Viewport.Size));
+            LayoutSubview (v, new (GetViewportOffset (), ContentSize));
         }
 
         // If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.
@@ -939,7 +950,7 @@ public partial class View
 
         LayoutNeeded = false;
 
-        OnLayoutComplete (new () { OldBounds = oldBounds });
+        OnLayoutComplete (new () { OldViewport = oldViewport });
     }
 
     /// <summary>Indicates that the view does not need to be laid out.</summary>
@@ -973,10 +984,10 @@ public partial class View
         // TODO: Until then leave it `internal` and non-virtual
         // First try SuperView.Viewport, then Application.Top, then Driver.Viewport.
         // Finally, if none of those are valid, use int.MaxValue (for Unit tests).
-        Rectangle relativeBounds = SuperView is { IsInitialized: true } ? SuperView.Viewport :
-                                   Application.Top is { } && Application.Top.IsInitialized ? Application.Top.Viewport :
-                                   Application.Driver?.Viewport ?? new Rectangle (0, 0, int.MaxValue, int.MaxValue);
-        SetRelativeLayout (relativeBounds);
+        Size contentSize = SuperView is { IsInitialized: true } ? SuperView.ContentSize :
+                                   Application.Top is { } && Application.Top.IsInitialized ? Application.Top.ContentSize :
+                                   Application.Driver?.Viewport.Size ?? new (int.MaxValue, int.MaxValue);
+        SetRelativeLayout (contentSize);
 
         // TODO: Determine what, if any of the below is actually needed here.
         if (IsInitialized)
@@ -1017,14 +1028,14 @@ public partial class View
 
     /// <summary>
     ///     Applies the view's position (<see cref="X"/>, <see cref="Y"/>) and dimension (<see cref="Width"/>, and
-    ///     <see cref="Height"/>) to <see cref="Frame"/>, given a rectangle describing the SuperView's Viewport (nominally the
-    ///     same as <c>this.SuperView.Viewport</c>).
+    ///     <see cref="Height"/>) to <see cref="Frame"/>, given the SuperView's ContentSize (nominally the
+    ///     same as <c>this.SuperView.ContentSize</c>).
     /// </summary>
-    /// <param name="superviewBounds">
-    ///     The rectangle describing the SuperView's Viewport (nominally the same as
-    ///     <c>this.SuperView.Viewport</c>).
+    /// <param name="superviewContentSize">
+    ///     The size of the SuperView's content (nominally the same as
+    ///     <c>this.SuperView.ContentSize</c>).
     /// </param>
-    internal void SetRelativeLayout (Rectangle superviewBounds)
+    internal void SetRelativeLayout (Size superviewContentSize)
     {
         Debug.Assert (_x is { });
         Debug.Assert (_y is { });
@@ -1052,7 +1063,7 @@ public partial class View
         // This method is called recursively if pos is Pos.PosCombine
         (int newLocation, int newDimension) GetNewLocationAndDimension (
             bool width,
-            Rectangle superviewBounds,
+            Size superviewContentSize,
             Pos pos,
             Dim dim,
             int autosizeDimension
@@ -1114,7 +1125,7 @@ public partial class View
             }
 
             int newDimension, newLocation;
-            int superviewDimension = width ? superviewBounds.Width : superviewBounds.Height;
+            int superviewDimension = width ? superviewContentSize.Width : superviewContentSize.Height;
 
             // Determine new location
             switch (pos)
@@ -1138,7 +1149,7 @@ public partial class View
 
                     (left, newDimension) = GetNewLocationAndDimension (
                                                                        width,
-                                                                       superviewBounds,
+                                                                       superviewContentSize,
                                                                        combine._left,
                                                                        dim,
                                                                        autosizeDimension
@@ -1146,7 +1157,7 @@ public partial class View
 
                     (right, newDimension) = GetNewLocationAndDimension (
                                                                         width,
-                                                                        superviewBounds,
+                                                                        superviewContentSize,
                                                                         combine._right,
                                                                         dim,
                                                                         autosizeDimension
@@ -1188,10 +1199,10 @@ public partial class View
         }
 
         // horizontal/width
-        (newX, newW) = GetNewLocationAndDimension (true, superviewBounds, _x, _width, autosize.Width);
+        (newX, newW) = GetNewLocationAndDimension (true, superviewContentSize, _x, _width, autosize.Width);
 
         // vertical/height
-        (newY, newH) = GetNewLocationAndDimension (false, superviewBounds, _y, _height, autosize.Height);
+        (newY, newH) = GetNewLocationAndDimension (false, superviewContentSize, _y, _height, autosize.Height);
 
         Rectangle r = new (newX, newY, newW, newH);
 
@@ -1415,7 +1426,7 @@ public partial class View
     private void LayoutSubview (View v, Rectangle viewport)
     {
         //if (v.LayoutStyle == LayoutStyle.Computed) {
-        v.SetRelativeLayout (viewport);
+        v.SetRelativeLayout (viewport.Size);
 
         //}
 
