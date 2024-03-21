@@ -32,7 +32,7 @@ public class Clipping : Scenario
         //scrollView.ShowVerticalScrollIndicator = true;
         //scrollView.ShowHorizontalScrollIndicator = true;
 
-        var embedded1 = new Window
+        var embedded1 = new View
         {
             Title = "1",
             X = 3,
@@ -40,10 +40,12 @@ public class Clipping : Scenario
             Width = Dim.Fill (3),
             Height = Dim.Fill (3),
             ColorScheme = Colors.ColorSchemes ["Dialog"],
-            Id = "1"
+            Id = "1",
+            BorderStyle = LineStyle.Rounded,
+            Arrangement = ViewArrangement.Movable
         };
 
-        var embedded2 = new Window
+        var embedded2 = new View
         {
             Title = "2",
             X = 3,
@@ -51,11 +53,13 @@ public class Clipping : Scenario
             Width = Dim.Fill (3),
             Height = Dim.Fill (3),
             ColorScheme = Colors.ColorSchemes ["Error"],
-            Id = "2"
+            Id = "2",
+            BorderStyle = LineStyle.Rounded,
+            Arrangement = ViewArrangement.Movable
         };
         embedded1.Add (embedded2);
 
-        var embedded3 = new Window
+        var embedded3 = new View
         {
             Title = "3",
             X = 3,
@@ -63,7 +67,9 @@ public class Clipping : Scenario
             Width = Dim.Fill (3),
             Height = Dim.Fill (3),
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
-            Id = "3"
+            Id = "3",
+            BorderStyle = LineStyle.Rounded,
+            Arrangement = ViewArrangement.Movable
         };
 
         var testButton = new Button { X = 2, Y = 2, Text = "click me" };
