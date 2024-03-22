@@ -67,7 +67,7 @@ public class TabViewExample : Scenario
                                 )
             ]
         };
-        Application.Top.Add (menu);
+        Top.Add (menu);
 
         _tabView = new TabView
         {
@@ -181,7 +181,7 @@ public class TabViewExample : Scenario
                                                )
                                        }
                                       );
-        Application.Top.Add (statusBar);
+        Top.Add (statusBar);
     }
 
     private void AddBlankTab () { _tabView.AddTab (new Tab (), false); }

@@ -80,7 +80,8 @@ public class CollectionNavigatorTester : Scenario
     public override void Init ()
     {
         Application.Init ();
-        Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
+        Top = new ();
+        Top.ColorScheme = Colors.ColorSchemes ["Base"];
     }
 
     public override void Setup ()
@@ -126,13 +127,13 @@ public class CollectionNavigatorTester : Scenario
             ]
         };
 
-        Application.Top.Add (menu);
+        Top.Add (menu);
 
         _items.Sort (StringComparer.OrdinalIgnoreCase);
 
         CreateListView ();
         var vsep = new LineView (Orientation.Vertical) { X = Pos.Right (_listView), Y = 1, Height = Dim.Fill () };
-        Application.Top.Add (vsep);
+        Top.Add (vsep);
         CreateTreeView ();
     }
 
@@ -148,7 +149,7 @@ public class CollectionNavigatorTester : Scenario
             Width = Dim.Percent (50),
             Height = 1
         };
-        Application.Top.Add (label);
+        Top.Add (label);
 
         _listView = new ListView
         {
@@ -159,7 +160,7 @@ public class CollectionNavigatorTester : Scenario
             AllowsMarking = false,
             AllowsMultipleSelection = false
         };
-        Application.Top.Add (_listView);
+        Top.Add (_listView);
 
         _listView.SetSource (_items);
 
@@ -178,14 +179,14 @@ public class CollectionNavigatorTester : Scenario
             Width = Dim.Percent (50),
             Height = 1
         };
-        Application.Top.Add (label);
+        Top.Add (label);
 
         _treeView = new TreeView
         {
             X = Pos.Right (_listView) + 1, Y = Pos.Bottom (label), Width = Dim.Fill (), Height = Dim.Fill ()
         };
         _treeView.Style.HighlightModelTextOnly = true;
-        Application.Top.Add (_treeView);
+        Top.Add (_treeView);
 
         var root = new TreeNode ("IsLetterOrDigit examples");
 

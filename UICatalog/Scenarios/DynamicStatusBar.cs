@@ -17,9 +17,11 @@ public class DynamicStatusBar : Scenario
     {
         Application.Init ();
 
-        Application.Top.Add (
-                             new DynamicStatusBarSample { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" }
-                            );
+        Top = new ();
+
+        Top.Add (
+                 new DynamicStatusBarSample { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" }
+                );
     }
 
     public class Binding

@@ -13,11 +13,14 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 public class BackgroundWorkerCollection : Scenario
 {
-    public override void Run ()
+    public override void Init ()
     {
         Application.Run<OverlappedMain> ();
+
         Application.Top.Dispose ();
     }
+
+    public override void Run () { }
 
     private class OverlappedMain : Toplevel
     {

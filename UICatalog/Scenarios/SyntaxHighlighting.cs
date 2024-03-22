@@ -164,7 +164,7 @@ public class SyntaxHighlighting : Scenario
                                 )
             ]
         };
-        Application.Top.Add (menu);
+        Top.Add (menu);
 
         _textView = new TextView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
@@ -183,7 +183,7 @@ public class SyntaxHighlighting : Scenario
                                        }
                                       );
 
-        Application.Top.Add (statusBar);
+        Top.Add (statusBar);
     }
 
     /// <summary>

@@ -329,6 +329,6 @@ public class Buttons : Scenario
                                               }
                                           };
 
-        Application.Top.Ready += (s, e) => radioGroup.Refresh ();
+        Top.Ready += (s, e) => radioGroup.Refresh ();
     }
 }

@@ -18,7 +18,8 @@ public class Adornments : Scenario
         Application.Init ();
         ConfigurationManager.Themes.Theme = Theme;
         ConfigurationManager.Apply ();
-        Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
+        Top = new ();
+        Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
 
         var view = new Window { Title = "The _Window" };
         var tf1 = new TextField { Width = 10, Text = "TextField" };
@@ -117,7 +118,7 @@ public class Adornments : Scenario
 #endif
                             };
 
-        Application.Top.Closed += (s, e) => View.Diagnostics = _diagnosticFlags;
+        Top.Closed += (s, e) => View.Diagnostics = _diagnosticFlags;
 
         Application.Run (editor);
         editor.Dispose ();

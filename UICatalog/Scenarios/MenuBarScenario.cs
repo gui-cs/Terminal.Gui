@@ -199,7 +199,8 @@ public class MenuBarScenario : Scenario
     public override void Init ()
     {
         Application.Init ();
-        Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
+        Top = new ();
+        Top.ColorScheme = Colors.ColorSchemes ["Base"];
     }
 
     public override void Setup ()
@@ -208,34 +209,34 @@ public class MenuBarScenario : Scenario
         MenuItem miCurrent = null;
 
         var label = new Label { X = 0, Y = 10, Text = "Last Key: " };
-        Application.Top.Add (label);
+        Top.Add (label);
 
         _lastKey = new Label { X = Pos.Right (label), Y = Pos.Top (label), Text = "" };
 
-        Application.Top.Add (_lastKey);
+        Top.Add (_lastKey);
         label = new Label { X = 0, Y = Pos.Bottom (label), Text = "Current MenuBarItem: " };
-        Application.Top.Add (label);
+        Top.Add (label);
 
         _currentMenuBarItem = new Label { X = Pos.Right (label), Y = Pos.Top (label), Text = "" };
-        Application.Top.Add (_currentMenuBarItem);
+        Top.Add (_currentMenuBarItem);
 
         label = new Label { X = 0, Y = Pos.Bottom (label), Text = "Current MenuItem: " };
-        Application.Top.Add (label);
+        Top.Add (label);
 
         _currentMenuItem = new Label { X = Pos.Right (label), Y = Pos.Top (label), Text = "" };
-        Application.Top.Add (_currentMenuItem);
+        Top.Add (_currentMenuItem);
 
         label = new Label { X = 0, Y = Pos.Bottom (label), Text = "Last Action: " };
-        Application.Top.Add (label);
+        Top.Add (label);
 
         _lastAction = new Label { X = Pos.Right (label), Y = Pos.Top (label), Text = "" };
-        Application.Top.Add (_lastAction);
+        Top.Add (_lastAction);
 
         label = new Label { X = 0, Y = Pos.Bottom (label), Text = "Focused View: " };
-        Application.Top.Add (label);
+        Top.Add (label);
 
         _focusedView = new Label { X = Pos.Right (label), Y = Pos.Top (label), Text = "" };
-        Application.Top.Add (_focusedView);
+        Top.Add (_focusedView);
 
         MenuBar menuBar = CreateTestMenu (
                                           s =>
@@ -276,21 +277,21 @@ public class MenuBarScenario : Scenario
                                };
 
         // There's no focus change event, so this is a bit of a hack.
-        menuBar.LayoutComplete += (s, e) => { _focusedView.Text = Application.Top.MostFocused?.ToString () ?? "None"; };
+        menuBar.LayoutComplete += (s, e) => { _focusedView.Text = Top.MostFocused?.ToString () ?? "None"; };
 
         var openBtn = new Button { X = Pos.Center (), Y = 4, Text = "_Open Menu", IsDefault = true };
         openBtn.Accept += (s, e) => { menuBar.OpenMenu (); };
-        Application.Top.Add (openBtn);
+        Top.Add (openBtn);
 
         var hideBtn = new Button { X = Pos.Center (), Y = Pos.Bottom (openBtn), Text = "Toggle Menu._Visible" };
         hideBtn.Accept += (s, e) => { menuBar.Visible = !menuBar.Visible; };
-        Application.Top.Add (hideBtn);
+        Top.Add (hideBtn);
 
         var enableBtn = new Button { X = Pos.Center (), Y = Pos.Bottom (hideBtn), Text = "_Toggle Menu.Enable" };
         enableBtn.Accept += (s, e) => { menuBar.Enabled = !menuBar.Enabled; };
-        Application.Top.Add (enableBtn);
+        Top.Add (enableBtn);
 
-        Application.Top.Add (menuBar);
+        Top.Add (menuBar);
     }
 
     private void SetCurrentMenuBarItem (MenuItem mbi) { _currentMenuBarItem.Text = mbi != null ? mbi.Title : "Closed"; }

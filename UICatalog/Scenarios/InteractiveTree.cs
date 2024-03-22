@@ -23,7 +23,7 @@ public class InteractiveTree : Scenario
                 new MenuBarItem ("_File", new MenuItem [] { new ("_Quit", "", Quit) })
             ]
         };
-        Application.Top.Add (menu);
+        Top.Add (menu);
 
         _treeView = new TreeView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (1) };
         _treeView.KeyDown += TreeView_KeyPress;
@@ -55,7 +55,7 @@ public class InteractiveTree : Scenario
                                                )
                                        }
                                       );
-        Application.Top.Add (statusBar);
+        Top.Add (statusBar);
     }
 
     private void AddChildNode ()

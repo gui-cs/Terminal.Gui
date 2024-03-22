@@ -204,7 +204,14 @@ public class FileDialogExamples : Scenario
 
         Application.Run (fd);
 
-        if (fd.Canceled)
+        var canceled = fd.Canceled;
+        var multiSelected = fd.MultiSelected;
+        var path = fd.Path;
+
+        // This needs to be disposed before opening other toplevel
+        fd.Dispose ();
+
+        if (canceled)
         {
             MessageBox.Query (
                               "Canceled",
@@ -216,7 +223,7 @@ public class FileDialogExamples : Scenario
         {
             MessageBox.Query (
                               "Chosen!",
-                              "You chose:" + Environment.NewLine + string.Join (Environment.NewLine, fd.MultiSelected.Select (m => m)),
+                              "You chose:" + Environment.NewLine + string.Join (Environment.NewLine, multiSelected.Select (m => m)),
                               "Ok"
                              );
         }
@@ -224,12 +231,10 @@ public class FileDialogExamples : Scenario
         {
             MessageBox.Query (
                               "Chosen!",
-                              "You chose:" + Environment.NewLine + fd.Path,
+                              "You chose:" + Environment.NewLine + path,
                               "Ok"
                              );
         }
-
-        fd.Dispose ();
     }
 
     private void SetupHandler (Button btn)

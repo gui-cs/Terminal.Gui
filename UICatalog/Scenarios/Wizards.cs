@@ -81,10 +81,10 @@ public class Wizards : Scenario
         void Top_Loaded (object sender, EventArgs args)
         {
             frame.Height = widthEdit.Frame.Height + heightEdit.Frame.Height + titleEdit.Frame.Height + 2;
-            Application.Top.Loaded -= Top_Loaded;
+            Top.Loaded -= Top_Loaded;
         }
 
-        Application.Top.Loaded += Top_Loaded;
+        Top.Loaded += Top_Loaded;
 
         label = new Label
         {

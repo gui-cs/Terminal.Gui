@@ -29,7 +29,7 @@ public class MultiColouredTable : Scenario
                 new MenuBarItem ("_File", new MenuItem [] { new ("_Quit", "", () => Quit ()) })
             ]
         };
-        Application.Top.Add (menu);
+        Top.Add (menu);
 
         var statusBar = new StatusBar (
                                        new StatusItem []
@@ -41,7 +41,7 @@ public class MultiColouredTable : Scenario
                                                )
                                        }
                                       );
-        Application.Top.Add (statusBar);
+        Top.Add (statusBar);
 
         Win.Add (_tableView);
 

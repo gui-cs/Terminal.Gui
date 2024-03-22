@@ -42,7 +42,8 @@ public class ConfigurationEditor : Scenario
         Application.Init ();
         ConfigurationManager.Themes.Theme = Theme;
         ConfigurationManager.Apply ();
-        Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
+        Top = new ();
+        Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
     }
 
     public void Save ()
@@ -60,7 +61,7 @@ public class ConfigurationEditor : Scenario
             Width = Dim.Fill (), Height = Dim.Fill (1), Orientation = Orientation.Vertical, LineStyle = LineStyle.Single
         };
 
-        Application.Top.Add (_tileView);
+        Top.Add (_tileView);
 
         _lenStatusItem = new StatusItem (KeyCode.CharMask, "Len: ", null);
 
@@ -78,9 +79,9 @@ public class ConfigurationEditor : Scenario
                                        }
                                       );
 
-        Application.Top.Add (statusBar);
+        Top.Add (statusBar);
 
-        Application.Top.Loaded += (s, a) => Open ();
+        Top.Loaded += (s, a) => Open ();
 
         _editorColorSchemeChanged += () =>
                                      {
@@ -125,7 +126,7 @@ public class ConfigurationEditor : Scenario
             textView.Enter += (s, e) => { _lenStatusItem.Title = $"Len:{textView.Text.Length}"; };
         }
 
-        Application.Top.LayoutSubviews ();
+        Top.LayoutSubviews ();
     }
 
     private void Quit ()

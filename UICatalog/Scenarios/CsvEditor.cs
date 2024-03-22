@@ -101,7 +101,7 @@ public class CsvEditor : Scenario
                                 )
             ]
         };
-        Application.Top.Add (menu);
+        Top.Add (menu);
 
         var statusBar = new StatusBar (
                                        new StatusItem []
@@ -123,7 +123,7 @@ public class CsvEditor : Scenario
                                                )
                                        }
                                       );
-        Application.Top.Add (statusBar);
+        Top.Add (statusBar);
 
         Win.Add (_tableView);
 

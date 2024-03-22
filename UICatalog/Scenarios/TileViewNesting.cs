@@ -62,7 +62,7 @@ public class TileViewNesting : Scenario
 
         SetupTileView ();
 
-        Application.Top.Add (menu);
+        Top.Add (menu);
 
         Win.Loaded += (s, e) => _loaded = true;
     }
