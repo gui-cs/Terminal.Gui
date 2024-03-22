@@ -179,7 +179,7 @@ public static partial class Application
     ///     <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are
     ///     specified the default driver for the platform will be used.
     /// </param>
-    public static void Init (ConsoleDriver driver = null, string driverName = null) { InternalInit (() => new Toplevel (), driver, driverName); }
+    public static void Init (ConsoleDriver driver = null, string driverName = null) { InternalInit (driver, driverName); }
 
     internal static bool _initialized;
     internal static int _mainThreadId = -1;
@@ -194,7 +194,6 @@ public static partial class Application
     // 
     // calledViaRunT: If false (default) all state will be reset. If true the state will not be reset.
     internal static void InternalInit (
-        Func<Toplevel> topLevelFactory,
         ConsoleDriver driver = null,
         string driverName = null,
         bool calledViaRunT = false
@@ -292,13 +291,6 @@ public static partial class Application
 
         SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
 
-        Top = topLevelFactory ();
-        Current = Top;
-        _initialTop = Top;
-
-        // Ensure Top's layout is up to date.
-        Current.SetRelativeLayout (Driver.Bounds);
-
         SupportedCultures = GetSupportedCultures ();
         _mainThreadId = Thread.CurrentThread.ManagedThreadId;
         _initialized = true;
@@ -345,8 +337,6 @@ public static partial class Application
     #endregion Initialization (Init/Shutdown)
 
     #region Run (Begin, Run, End, Stop)
-
-    private static Toplevel _initialTop;
 
     /// <summary>
     ///     Notify that a new <see cref="RunState"/> was created (<see cref="Begin(Toplevel)"/> was called). The token is
@@ -523,7 +513,7 @@ public static partial class Application
     ///     <see cref="Top"/>.
     /// </summary>
     /// <remarks>See <see cref="Run(Toplevel, Func{Exception, bool})"/> for more details.</remarks>
-    public static void Run (Func<Exception, bool> errorHandler = null) { Run (Top, errorHandler); }
+    public static void Run (Func<Exception, bool> errorHandler = null) { Run<Toplevel> (errorHandler);}
 
     /// <summary>
     ///     Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> with a new instance of the
@@ -544,35 +534,16 @@ public static partial class Application
     public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
         where T : Toplevel, new()
     {
+        var top = new T () as Toplevel;
+
+        if (top is null)
+        {
+            throw new ArgumentException ($"{top.GetType ().Name} must be derived from TopLevel");
+        }
+
         if (_initialized)
         {
-            // Init created Application.Top. If it hasn't been disposed...
-            if (Top is { })
-            {
-                Top.Dispose ();
-                Top = null;
-            }
-
-            if (Driver is { })
-            {
-                // Init() has been called and we have a driver, so just run the app.
-                // This Toplevel will get disposed in `Shutdown`
-                var top = new T ();
-                Type type = top.GetType ().BaseType;
-
-                while (type != typeof (Toplevel) && type != typeof (object))
-                {
-                    type = type.BaseType;
-                }
-
-                if (type != typeof (Toplevel))
-                {
-                    throw new ArgumentException ($"{top.GetType ().Name} must be derived from TopLevel");
-                }
-
-                Run (top, errorHandler);
-            }
-            else
+            if (Driver is null)
             {
                 // This code path should be impossible because Init(null, null) will select the platform default driver
                 throw new InvalidOperationException (
@@ -583,9 +554,10 @@ public static partial class Application
         else
         {
             // Init() has NOT been called.
-            InternalInit (() => new T (), driver, null, true);
-            Run (Top, errorHandler);
+            InternalInit (driver, null, true);
         }
+
+        Run (top, errorHandler);
     }
 
     /// <summary>Runs the main loop on the given <see cref="Toplevel"/> container.</summary>
@@ -1049,11 +1021,6 @@ public static partial class Application
         runState.Toplevel?.Dispose ();
         runState.Toplevel = null;
         runState.Dispose ();
-
-        if (_topLevels.Count == 0)
-        {
-            Top = _initialTop;
-        }
     }
 
     #endregion Run (Begin, Run, End)

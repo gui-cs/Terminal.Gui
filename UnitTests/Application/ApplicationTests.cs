@@ -265,7 +265,6 @@ public class ApplicationTests
         Assert.Throws<InvalidOperationException> (
                                                   () =>
                                                       Application.InternalInit (
-                                                                                () => topLevel = new TestToplevel (),
                                                                                 new FakeDriver ()
                                                                                )
                                                  );
@@ -277,7 +276,7 @@ public class ApplicationTests
 
         // Now try the other way
         topLevel = null;
-        Application.InternalInit (() => topLevel = new TestToplevel (), new FakeDriver ());
+        Application.InternalInit (new FakeDriver ());
 
         Assert.Throws<InvalidOperationException> (() => Application.Init (new FakeDriver ()));
         Shutdown ();
@@ -297,7 +296,7 @@ public class ApplicationTests
         // NOTE: Run<T>, when called after Init has been called behaves differently than
         // when called if Init has not been called.
         Toplevel topLevel = null;
-        Application.InternalInit (() => topLevel = new TestToplevel (), new FakeDriver ());
+        Application.InternalInit (new FakeDriver ());
 
         RunState runstate = null;
 
@@ -911,9 +910,66 @@ public class ApplicationTests
         Application.Shutdown ();
         Assert.NotNull (w);
         Assert.Equal (string.Empty, w.Title); // Invalid - w has been disposed -> Valid - w isn't Application.Top but the original created by Init
-        Assert.Null (Application.Top);
         Assert.Null (Application.Current);
         Assert.NotNull (top);
+        Assert.Null (Application.Top);
+    }
+
+    [Fact]
+    public void Run_Creates_Top_With_Init ()
+    {
+        Application.Init (new FakeDriver ());
+
+        Assert.Null (Application.Top);
+
+        Application.Iteration += (s, e) =>
+                                 {
+                                     Assert.NotNull (Application.Top);
+                                     Application.RequestStop ();
+                                 };
+        Application.Run ();
+        Assert.NotNull (Application.Top);
+
+        Application.Shutdown ();
+        Assert.Null (Application.Top);
+    }
+
+    [Fact]
+    public void Run_T_Creates_Top_Without_Init ()
+    {
+        var driver = new FakeDriver ();
+
+        Assert.Null (Application.Top);
+
+        Application.Iteration += (s, e) =>
+                                 {
+                                     Assert.NotNull (Application.Top);
+                                     Application.RequestStop ();
+                                 };
+        Application.Run<Toplevel> (null, driver);
+        Assert.NotNull (Application.Top);
+
+        Application.Shutdown ();
+        Assert.Null (Application.Top);
+    }
+
+    [Fact]
+    public void Run_t_Creates_Top_With_Init ()
+    {
+        Application.Init (new FakeDriver ());
+
+        Assert.Null (Application.Top);
+
+        Application.Iteration += (s, e) =>
+                                 {
+                                     Assert.NotNull (Application.Top);
+                                     Application.RequestStop ();
+                                 };
+        Application.Run (new Toplevel ());
+        Assert.NotNull (Application.Top);
+
+        Application.Shutdown ();
+        Assert.Null (Application.Top);
     }
 
     // TODO: Add tests for Run that test errorHandler
