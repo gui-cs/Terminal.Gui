@@ -48,6 +48,21 @@ public record ColorScheme : IEqualityOperators<ColorScheme, ColorScheme, bool>
         _hotFocus = attribute;
     }
 
+    /// <summary>Creates a new instance, initialized with the values provided.</summary>
+    public ColorScheme (
+        Attribute normal,
+        Attribute focus,
+        Attribute hotNormal,
+        Attribute disabled,
+        Attribute hotFocus)
+    {
+        _normal = normal;
+        _focus = focus;
+        _hotNormal = hotNormal;
+        _disabled = disabled;
+        _hotFocus = hotFocus;
+    }
+
     /// <summary>The default foreground and background color for text when the view is disabled.</summary>
     public Attribute Disabled
     {
