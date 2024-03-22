@@ -435,13 +435,6 @@ public static partial class Application
             {
                 Top.OnLeave (Toplevel);
             }
-            else if (OverlappedTop is null && Top is { } && Toplevel != Top && _topLevels.Contains (Top))
-            {
-#if DEBUG_IDISPOSABLE
-                // Probably this will never hit
-                Debug.Assert (Top.WasDisposed);
-#endif
-            }
 
             // BUGBUG: We should not depend on `Id` internally. 
             // BUGBUG: It is super unclear what this code does anyway.
