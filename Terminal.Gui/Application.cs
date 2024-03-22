@@ -88,12 +88,21 @@ public static partial class Application
         foreach (Toplevel t in _topLevels)
         {
             t.Running = false;
-            t.Dispose ();
+#if DEBUG_IDISPOSABLE
+            // Don't dispose the tolevels. It's up to caller dispose them
+            Debug.Assert (t.WasDisposed);
+#endif
         }
 
         _topLevels.Clear ();
         Current = null;
-        Top?.Dispose ();
+#if DEBUG_IDISPOSABLE
+        // Don't dispose the Top. It's up to caller dispose it
+        if (Top is { })
+        {
+            Debug.Assert (Top.WasDisposed);
+        }
+#endif
         Top = null;
 
         // MainLoop stuff
@@ -378,6 +387,10 @@ public static partial class Application
 
 #if DEBUG_IDISPOSABLE
         Debug.Assert (!Toplevel.WasDisposed);
+        if (_latestClosedRunStateToplevel is { } && _latestClosedRunStateToplevel != Toplevel)
+        {
+            Debug.Assert (_latestClosedRunStateToplevel.WasDisposed);
+        }
 #endif
 
         if (Toplevel.IsOverlappedContainer && OverlappedTop != Toplevel && OverlappedTop is { })
@@ -399,17 +412,35 @@ public static partial class Application
 
         lock (_topLevels)
         {
-            // If Top was already initialized with Init, and Begin has never been called
-            // Top was not added to the Toplevels Stack. It will thus never get disposed.
-            // Clean it up here:
             if (Top is { } && Toplevel != Top && !_topLevels.Contains (Top))
             {
-                Top.Dispose ();
-                Top = null;
+#if DEBUG_IDISPOSABLE
+                // This assertion confirm if the Top was already disposed
+                Debug.Assert (Top.WasDisposed);
+                Debug.Assert (Top == _latestClosedRunStateToplevel);
+#endif
+                // If Top was already disposed and isn't on the Toplevels Stack,
+                // clean it up here if is the same as _latestClosedRunStateToplevel
+                if (Top == _latestClosedRunStateToplevel)
+                {
+                    Top = null;
+                }
+                else
+                {
+                    // Probably this will never hit
+                    throw new ObjectDisposedException (Top.GetType ().FullName);
+                }
             }
-            else if (Top is { } && Toplevel != Top && _topLevels.Contains (Top))
+            else if (OverlappedTop is { } && Toplevel != Top && _topLevels.Contains (Top))
             {
                 Top.OnLeave (Toplevel);
+            }
+            else if (OverlappedTop is null && Top is { } && Toplevel != Top && _topLevels.Contains (Top))
+            {
+#if DEBUG_IDISPOSABLE
+                // Probably this will never hit
+                Debug.Assert (Top.WasDisposed);
+#endif
             }
 
             // BUGBUG: We should not depend on `Id` internally. 
@@ -452,7 +483,7 @@ public static partial class Application
 
         var refreshDriver = true;
 
-        if (OverlappedTop == null
+        if (OverlappedTop is null
             || Toplevel.IsOverlappedContainer
             || (Current?.Modal == false && Toplevel.Modal)
             || (Current?.Modal == false && !Toplevel.Modal)
@@ -947,6 +978,8 @@ public static partial class Application
         }
     }
 
+    private static Toplevel _latestClosedRunStateToplevel;
+
     /// <summary>
     ///     Building block API: completes the execution of a <see cref="Toplevel"/> that was started with
     ///     <see cref="Begin(Toplevel)"/> .
@@ -1015,10 +1048,10 @@ public static partial class Application
             Refresh ();
         }
 
-        // Always dispose runState.Toplevel here. If it is not the same as
-        // the current in the RunIteration, it will be fixed later in the
-        // next RunIteration.
-        runState.Toplevel?.Dispose ();
+        // Don't dispose runState.Toplevel. It's up to caller dispose it
+        // If it's not the same as the current in the RunIteration,
+        // it will be fixed later in the next RunIteration.
+        _latestClosedRunStateToplevel = runState.Toplevel;
         runState.Toplevel = null;
         runState.Dispose ();
     }

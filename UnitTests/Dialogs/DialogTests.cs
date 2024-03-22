@@ -1365,4 +1365,60 @@ public class DialogTests
             RequestStop ();
         }
     }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Can_Access_Cancel_Property_After_Run ()
+    {
+        Dialog dlg = new ();
+
+        dlg.Ready += Dlg_Ready;
+
+        Run (dlg);
+
+#if DEBUG_IDISPOSABLE
+        Assert.False (dlg.WasDisposed);
+        Assert.False (Top.WasDisposed);
+        Assert.Equal (dlg, Top);
+#endif
+
+        Assert.True (dlg.Canceled);
+
+        // Run it again is possible because it isn't disposed yet
+        Run (dlg);
+
+        // Run another view without dispose the prior will throw an assertion
+#if DEBUG_IDISPOSABLE
+        Dialog dlg2 = new ();
+        dlg2.Ready += Dlg_Ready;
+        var exception = Record.Exception (() => Run (dlg2));
+        Assert.NotNull (exception);
+
+        dlg.Dispose();
+        // Now it's possible to tun dlg2 without throw
+        Run (dlg2);
+
+        Assert.True (dlg.WasDisposed);
+        Assert.False (Top.WasDisposed);
+        Assert.Equal (dlg2, Top);
+        Assert.False (dlg2.WasDisposed);
+
+        dlg2.Dispose ();
+        // Now an assertion will throw accessing the Canceled property
+        exception = Record.Exception (() => Assert.True (dlg.Canceled));
+        Assert.NotNull (exception);
+        Assert.True (Top.WasDisposed);
+        Shutdown ();
+        Assert.True (dlg2.WasDisposed);
+        Assert.Null (Top);
+#endif
+
+        return;
+
+        void Dlg_Ready (object sender, EventArgs e)
+        {
+            ((Dialog)sender).Canceled = true;
+            RequestStop ();
+        }
+    }
 }
