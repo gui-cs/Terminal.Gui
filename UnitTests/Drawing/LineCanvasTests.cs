@@ -1305,8 +1305,9 @@ public class LineCanvasTests
     private View GetCanvas (out LineCanvas canvas, int offsetX = 0, int offsetY = 0)
     {
         var v = new View { Width = 10, Height = 5, Bounds = new Rectangle (0, 0, 10, 5) };
-        Application.Top.Add (v);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (v);
+        Application.Begin (top);
 
         LineCanvas canvasCopy = canvas = new LineCanvas ();
 
