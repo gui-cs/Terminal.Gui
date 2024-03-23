@@ -48,8 +48,9 @@ public class ColorPickerTests
     {
         var colorPicker = new ColorPicker { X = 0, Y = 0, Height = 4, Width = 32 };
         Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
-        Application.Top.Add (colorPicker);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (colorPicker);
+        Application.Begin (top);
 
         Assert.False (colorPicker.OnMouseEvent (new MouseEvent ()));
 
