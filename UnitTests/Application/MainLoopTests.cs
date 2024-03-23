@@ -625,7 +625,8 @@ public class MainLoopTests
     {
         Random r = new ();
         TextField tf = new ();
-        Application.Top.Add (tf);
+        var top = new Toplevel ();
+        top.Add (tf);
 
         const int numPasses = 5;
         const int numIncrements = 500;
@@ -634,7 +635,7 @@ public class MainLoopTests
         Task task = Task.Run (() => RunTest (r, tf, numPasses, numIncrements, pollMs));
 
         // blocks here until the RequestStop is processed at the end of the test
-        Application.Run ();
+        Application.Run (top);
 
         await task; // Propagate exception if any occurred
 
@@ -672,7 +673,8 @@ public class MainLoopTests
 
         btnLaunch.Accept += (s, e) => action ();
 
-        Application.Top.Add (btnLaunch);
+        var top = new Toplevel ();
+        top.Add (btnLaunch);
 
         int iterations = -1;
 
@@ -711,7 +713,7 @@ public class MainLoopTests
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run (top);
 
         Assert.True (taskCompleted);
         Assert.Equal (clickMe, btn.Text);
