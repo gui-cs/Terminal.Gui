@@ -113,9 +113,10 @@ public class ButtonTests
         tab.Height = btnFindNext.Height + btnFindPrevious.Height + btnCancel.Height + 4;
 
         win.Add (tabView);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (54, 11);
 
         Assert.Equal (new Rectangle (0, 0, 54, 11), win.Frame);
@@ -185,12 +186,12 @@ public class ButtonTests
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (btn);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
         Assert.True (btn.AutoSize);
-        Assert.True (btn.AutoSize);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         var expected = @$"
@@ -232,12 +233,12 @@ public class ButtonTests
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (btn);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
         Assert.True (btn.AutoSize);
-        Assert.True (btn.AutoSize);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         var expected = @$"
@@ -282,18 +283,16 @@ public class ButtonTests
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (btn);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+       top.Add (win);
 
-        Assert.True (btn.AutoSize);
         Assert.True (btn.AutoSize);
 
         btn.Text = "Say Hello 你";
-        btn.Text = "Say Hello 你";
 
         Assert.True (btn.AutoSize);
-        Assert.True (btn.AutoSize);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         var expected = @$"
@@ -532,8 +531,9 @@ public class ButtonTests
         var clicked = false;
         var btn = new Button { Text = "_Test" };
         btn.Accept += (s, e) => clicked = true;
-        Application.Top.Add (btn);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (btn);
+        Application.Begin (top);
 
         Assert.Equal (KeyCode.T, btn.HotKey);
         Assert.True (btn.NewKeyDownEvent (Key.T));
@@ -566,10 +566,9 @@ public class ButtonTests
         Assert.Contains (Command.HotKey, btn.GetSupportedCommands ());
         Assert.Contains (Command.Accept, btn.GetSupportedCommands ());
 
-        Application.Top.Add (btn);
-        Application.Begin (Application.Top);
-        Application.Top.Add (btn);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (btn);
+        Application.Begin (top);
 
         // default keybinding is Space which results in keypress
         Application.OnKeyDown (new Key ((KeyCode)' '));
@@ -611,8 +610,9 @@ public class ButtonTests
         var clicked = false;
         var btn = new Button { Text = "_Test" };
         btn.Accept += (s, e) => clicked = true;
-        Application.Top.Add (btn);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (btn);
+        Application.Begin (top);
 
         // Hot key. Both alone and with alt
         Assert.Equal (KeyCode.T, btn.HotKey);
@@ -749,14 +749,12 @@ public class ButtonTests
         var btn = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (btn);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
         Assert.False (btn.IsInitialized);
-        Assert.False (btn.IsInitialized);
 
-        Application.Begin (Application.Top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         Assert.True (btn.IsInitialized);
@@ -786,14 +784,12 @@ public class ButtonTests
         var btn = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (btn);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
         Assert.False (btn.IsInitialized);
-        Assert.False (btn.IsInitialized);
 
-        Application.Begin (Application.Top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         Assert.True (btn.IsInitialized);
