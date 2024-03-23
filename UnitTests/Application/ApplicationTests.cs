@@ -916,9 +916,9 @@ public class ApplicationTests
     }
 
     [Fact]
-    public void Run_Creates_Top_With_Init ()
+    public void Run_Creates_Top_Without_Init ()
     {
-        Application.Init (new FakeDriver ());
+        var driver = new FakeDriver ();
 
         Assert.Null (Application.Top);
 
@@ -927,7 +927,16 @@ public class ApplicationTests
                                      Assert.NotNull (Application.Top);
                                      Application.RequestStop ();
                                  };
-        Application.Run ();
+        Application.Run (null, driver);
+#if DEBUG_IDISPOSABLE
+        Assert.False (Application.Top.WasDisposed);
+        var exception = Record.Exception (() => Application.Shutdown ());
+        Assert.NotNull (exception);
+        Assert.False (Application.Top.WasDisposed);
+        // It's up to caller to dispose it
+        Application.Top.Dispose ();
+        Assert.True (Application.Top.WasDisposed);
+#endif
         Assert.NotNull (Application.Top);
 
         Application.Shutdown ();
@@ -947,6 +956,15 @@ public class ApplicationTests
                                      Application.RequestStop ();
                                  };
         Application.Run<Toplevel> (null, driver);
+#if DEBUG_IDISPOSABLE
+        Assert.False (Application.Top.WasDisposed);
+        var exception = Record.Exception (() => Application.Shutdown ());
+        Assert.NotNull (exception);
+        Assert.False (Application.Top.WasDisposed);
+        // It's up to caller to dispose it
+        Application.Top.Dispose ();
+        Assert.True (Application.Top.WasDisposed);
+#endif
         Assert.NotNull (Application.Top);
 
         Application.Shutdown ();
@@ -954,9 +972,9 @@ public class ApplicationTests
     }
 
     [Fact]
-    public void Run_t_Creates_Top_With_Init ()
+    public void Run_t_Creates_Top_Without_Init ()
     {
-        Application.Init (new FakeDriver ());
+        var driver = new FakeDriver ();
 
         Assert.Null (Application.Top);
 
@@ -965,7 +983,16 @@ public class ApplicationTests
                                      Assert.NotNull (Application.Top);
                                      Application.RequestStop ();
                                  };
-        Application.Run (new Toplevel ());
+        Application.Run (new (), null, driver);
+#if DEBUG_IDISPOSABLE
+        Assert.False (Application.Top.WasDisposed);
+        var exception = Record.Exception (() => Application.Shutdown ());
+        Assert.NotNull (exception);
+        Assert.False (Application.Top.WasDisposed);
+        // It's up to caller to dispose it
+        Application.Top.Dispose ();
+        Assert.True (Application.Top.WasDisposed);
+#endif
         Assert.NotNull (Application.Top);
 
         Application.Shutdown ();
