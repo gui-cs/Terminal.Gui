@@ -879,37 +879,51 @@ public class ApplicationTests
                                               );
 
         Application.End (rs);
+        w.Dispose ();
         Application.Shutdown ();
     }
 
     [Fact]
-    public void End_Disposing_Correctly ()
+    public void End_Does_Not_Dispose ()
     {
         Init ();
 
-        var top = Application.Top;
+        var top = new Toplevel ();
 
         Window w = new ();
         w.Ready += (s, e) => Application.RequestStop (); // Causes `End` to be called
         Application.Run(w);
 
 #if DEBUG_IDISPOSABLE
-        Assert.True (w.WasDisposed);
+        Assert.False (w.WasDisposed);
 #endif
 
         Assert.NotNull (w);
-        Assert.Equal (string.Empty, w.Title); // Invalid - w has been disposed -> Valid - w isn't Application.Top but the original created by Init
+        Assert.Equal (string.Empty, w.Title); // Valid - w has not been disposed. The user may want to run it again
         Assert.NotNull (Application.Top);
-        Assert.NotEqual(w, Application.Top);
-        Assert.Equal(top, Application.Top);
+        Assert.Equal(w, Application.Top);
+        Assert.NotEqual(top, Application.Top);
         Assert.Null (Application.Current);
 
-        var exception = Record.Exception (()  => Application.Run(w)); // Invalid - w has been disposed. Run it in debug mode will throw, otherwise the user may want to run it again
+        Application.Run(w); // Valid - w has not been disposed.
+
+#if DEBUG_IDISPOSABLE
+        Assert.False (w.WasDisposed);
+        var exception = Record.Exception (() => Application.Shutdown()); // Invalid - w has not been disposed.
         Assert.NotNull (exception);
 
+        w.Dispose ();
+        Assert.True (w.WasDisposed);
+        exception = Record.Exception (() => Application.Run (w)); // Invalid - w has been disposed. Run it in debug mode will throw, otherwise the user may want to run it again
+        Assert.NotNull (exception);
+
+        exception = Record.Exception (() => Assert.Equal (string.Empty, w.Title)); // Invalid - w has been disposed and cannot be accessed
+        Assert.NotNull (exception);
+        exception = Record.Exception (() => w.Title = "NewTitle"); // Invalid - w has been disposed and cannot be accessed
+        Assert.NotNull (exception);
+#endif
         Application.Shutdown ();
         Assert.NotNull (w);
-        Assert.Equal (string.Empty, w.Title); // Invalid - w has been disposed -> Valid - w isn't Application.Top but the original created by Init
         Assert.Null (Application.Current);
         Assert.NotNull (top);
         Assert.Null (Application.Top);
