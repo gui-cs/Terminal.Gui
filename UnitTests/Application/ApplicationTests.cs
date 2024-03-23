@@ -618,8 +618,6 @@ public class ApplicationTests
 
         Application.Driver = null;
 
-        Application.Iteration += (s, a) => { Application.RequestStop (); };
-
         // Init has been called, but Driver has been set to null. Bad.
         Assert.Throws<InvalidOperationException> (() => Application.Run<TestToplevel> ());
 

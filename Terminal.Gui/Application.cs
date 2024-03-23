@@ -658,6 +658,9 @@ public static partial class Application
         {
             if (Driver is null)
             {
+                // Ensure disposing the toplevel before throwing
+                top.Dispose ();
+
                 // This code path should be impossible because Init(null, null) will select the platform default driver
                 throw new InvalidOperationException (
                                                      "Init() completed without a driver being set (this should be impossible); Run<T>() cannot be called."
