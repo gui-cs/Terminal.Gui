@@ -803,7 +803,7 @@ public partial class Toplevel : View
     {
         if (Application.OverlappedTop is { })
         {
-            Application.OverlappedTop.RequestStop ();
+            RequestStop (this);
         }
         else
         {
