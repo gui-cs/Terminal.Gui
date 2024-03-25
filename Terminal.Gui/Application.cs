@@ -548,7 +548,8 @@ public static partial class Application
     }
 
     /// <summary>
-    ///     Runs the application by creating a <see cref="Toplevel"/> object and calling <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>.
+    ///     Runs the application by creating a <see cref="Toplevel"/> object and calling
+    ///     <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>.
     /// </summary>
     /// <remarks>
     ///     <para>Calling <see cref="Init"/> first is not needed as this function will initialize the application.</para>
@@ -585,7 +586,7 @@ public static partial class Application
     /// </param>
     /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
     public static T Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
-        where T : Toplevel, new ()
+        where T : Toplevel, new()
     {
         var top = new T ();
 
@@ -636,12 +637,8 @@ public static partial class Application
     /// </param>
     public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
     {
-        // Validate that Init has been called and that the Toplevel is valid.
-        if (view is null)
-        {
-            throw new ArgumentException ($"{view.GetType ().Name} must be derived from TopLevel");
-        }
-
+        ArgumentNullException.ThrowIfNull (view);
+        
         if (_initialized)
         {
             if (Driver is null)
@@ -682,6 +679,7 @@ public static partial class Application
                 Debug.Assert (_topLevels.Count == 0);
 #endif
                 runState.Dispose ();
+
                 return;
             }
 
@@ -784,15 +782,8 @@ public static partial class Application
     /// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
     public static void RunLoop (RunState state)
     {
-        if (state is null)
-        {
-            throw new ArgumentNullException (nameof (state));
-        }
-
-        if (state.Toplevel is null)
-        {
-            throw new ObjectDisposedException ("state");
-        }
+        ArgumentNullException.ThrowIfNull (state);
+        ObjectDisposedException.ThrowIf (state.Toplevel is null, "state");
 
         var firstIteration = true;
 
@@ -1033,10 +1024,7 @@ public static partial class Application
     /// <param name="runState">The <see cref="RunState"/> returned by the <see cref="Begin(Toplevel)"/> method.</param>
     public static void End (RunState runState)
     {
-        if (runState is null)
-        {
-            throw new ArgumentNullException (nameof (runState));
-        }
+        ArgumentNullException.ThrowIfNull (runState);
 
         if (OverlappedTop is { })
         {
@@ -1125,11 +1113,12 @@ public static partial class Application
     public static Toplevel Top { get; private set; }
 
     /// <summary>
-    ///     The current <see cref="Toplevel"/> object. This is updated in <see cref="Application.Begin"/> enters and leaves to point to the current
+    ///     The current <see cref="Toplevel"/> object. This is updated in <see cref="Application.Begin"/> enters and leaves to
+    ///     point to the current
     ///     <see cref="Toplevel"/> .
     /// </summary>
     /// <remarks>
-    /// Only relevant in scenarios where <see cref="Toplevel.IsOverlappedContainer"/> is <see langword="true"/>.
+    ///     Only relevant in scenarios where <see cref="Toplevel.IsOverlappedContainer"/> is <see langword="true"/>.
     /// </remarks>
     /// <value>The current.</value>
     public static Toplevel Current { get; private set; }
@@ -1545,7 +1534,7 @@ public static partial class Application
         {
             Point frameLoc = adornment.ScreenToFrame (a.MouseEvent.X, a.MouseEvent.Y);
 
-            me = new()
+            me = new ()
             {
                 X = frameLoc.X,
                 Y = frameLoc.Y,
@@ -1558,7 +1547,7 @@ public static partial class Application
         {
             Point boundsPoint = view.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
 
-            me = new()
+            me = new ()
             {
                 X = boundsPoint.X,
                 Y = boundsPoint.Y,

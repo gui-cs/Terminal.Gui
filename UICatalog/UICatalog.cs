@@ -199,7 +199,7 @@ internal class UICatalogApp
             Apply ();
         }
 
-        Application.Run<UICatalogTopLevel> ();
+        Application.Run<UICatalogTopLevel> ().Dispose ();
         Application.Shutdown ();
 
         return _selectedScenario!;

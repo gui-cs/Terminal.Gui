@@ -117,6 +117,26 @@ public class Scenario : IDisposable
     }
 
     /// <summary>
+    ///     Called by UI Catalog to run the <see cref="Scenario"/>. This is the main entry point for the <see cref="Scenario"/>
+    ///     .
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Scenario developers are encouraged to override this method as the primary way of authoring a new
+    ///         scenario.
+    ///     </para>
+    ///     <para>
+    ///         The base implementation calls <see cref="Init"/>, <see cref="Setup"/>, and <see cref="Run"/>.
+    ///     </para>
+    /// </remarks>
+    public virtual void Main ()
+    {
+        Init ();
+        Setup ();
+        Run ();
+    }
+
+    /// <summary>
     ///     Helper that calls <see cref="Application.Init"/> and creates the default <see cref="Terminal.Gui.Window"/>
     ///     implementation with a frame and label
     ///     showing the name of the <see cref="Scenario"/> and logic to exit back to the Scenario picker UI. Override
@@ -142,7 +162,7 @@ public class Scenario : IDisposable
 
         Top = new ();
 
-        Win = new()
+        Win = new ()
         {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
             X = 0,
@@ -152,25 +172,6 @@ public class Scenario : IDisposable
             ColorScheme = Colors.ColorSchemes [TopLevelColorScheme]
         };
         Top.Add (Win);
-    }
-
-    /// <summary>
-    ///     Called by UI Catalog to run the <see cref="Scenario"/>. This is the main entry point for the <see cref="Scenario"/>
-    ///     .
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         Scenario developers are encouraged to override this method as the primary way of authoring a new
-    ///         scenario.
-    ///     </para>
-    ///     <para>
-    ///         The base implementation calls <see cref="Init"/>, <see cref="Setup"/>, and <see cref="Run"/>.
-    ///     </para>
-    public virtual void Main ()
-    {
-        Init ();
-        Setup ();
-        Run ();
     }
 
     /// <summary>
@@ -196,6 +197,7 @@ public class Scenario : IDisposable
     /// <summary>
     ///     The Toplevel for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/>.
     /// </summary>
+
     //[ObsoleteAttribute ("This property is obsolete and will be removed in v2. Use Main instead.", false)]
     public Toplevel Top { get; set; }
 
@@ -207,10 +209,12 @@ public class Scenario : IDisposable
     ///     The Window for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/> in
     ///     most cases.
     /// </summary>
+
     //[ObsoleteAttribute ("This property is obsolete and will be removed in v2. Use Main instead.", false)]
     public Window Win { get; set; }
 
-#region IDispose
+    #region IDispose
+
     public void Dispose ()
     {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
@@ -231,26 +235,25 @@ public class Scenario : IDisposable
             _disposedValue = true;
         }
     }
-#endregion IDispose
+
+    #endregion IDispose
 
     /// <summary>Returns a list of all Categories set by all of the <see cref="Scenario"/>s defined in the project.</summary>
     internal static List<string> GetAllCategories ()
     {
         List<string> categories = new ();
 
-        foreach (Type type in typeof (Scenario).Assembly.GetTypes ()
-                                               .Where (
-                                                       myType => myType.IsClass
-                                                                 && !myType.IsAbstract
-                                                                 && myType.IsSubclassOf (typeof (Scenario))
-                                                      ))
-        {
-            List<System.Attribute> attrs = System.Attribute.GetCustomAttributes (type).ToList ();
-
-            categories = categories
-                         .Union (attrs.Where (a => a is ScenarioCategory).Select (a => ((ScenarioCategory)a).Name))
-                         .ToList ();
-        }
+        categories = typeof (Scenario).Assembly.GetTypes ()
+                                      .Where (
+                                              myType => myType.IsClass
+                                                        && !myType.IsAbstract
+                                                        && myType.IsSubclassOf (typeof (Scenario)))
+                                      .Select (type => System.Attribute.GetCustomAttributes (type).ToList ())
+                                      .Aggregate (
+                                                  categories,
+                                                  (current, attrs) => current
+                                                                      .Union (attrs.Where (a => a is ScenarioCategory).Select (a => ((ScenarioCategory)a).Name))
+                                                                      .ToList ());
 
         // Sort
         categories = categories.OrderBy (c => c).ToList ();
@@ -263,10 +266,8 @@ public class Scenario : IDisposable
 
     /// <summary>Defines the category names used to catagorize a <see cref="Scenario"/></summary>
     [AttributeUsage (AttributeTargets.Class, AllowMultiple = true)]
-    public class ScenarioCategory : System.Attribute
+    public class ScenarioCategory (string Name) : System.Attribute
     {
-        public ScenarioCategory (string Name) { this.Name = Name; }
-
         /// <summary>Static helper function to get the <see cref="Scenario"/> Categories given a Type</summary>
         /// <param name="t"></param>
         /// <returns>list of category names</returns>
@@ -285,21 +286,15 @@ public class Scenario : IDisposable
         public static string GetName (Type t) { return ((ScenarioCategory)GetCustomAttributes (t) [0]).Name; }
 
         /// <summary>Category Name</summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = Name;
     }
 
     /// <summary>Defines the metadata (Name and Description) for a <see cref="Scenario"/></summary>
     [AttributeUsage (AttributeTargets.Class)]
-    public class ScenarioMetadata : System.Attribute
+    public class ScenarioMetadata (string Name, string Description) : System.Attribute
     {
-        public ScenarioMetadata (string Name, string Description)
-        {
-            this.Name = Name;
-            this.Description = Description;
-        }
-
         /// <summary><see cref="Scenario"/> Description</summary>
-        public string Description { get; set; }
+        public string Description { get; set; } = Description;
 
         /// <summary>Static helper function to get the <see cref="Scenario"/> Description given a Type</summary>
         /// <param name="t"></param>
@@ -312,6 +307,6 @@ public class Scenario : IDisposable
         public static string GetName (Type t) { return ((ScenarioMetadata)GetCustomAttributes (t) [0]).Name; }
 
         /// <summary><see cref="Scenario"/> Name</summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = Name;
     }
 }
