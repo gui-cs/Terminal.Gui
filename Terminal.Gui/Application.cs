@@ -676,6 +676,15 @@ public static partial class Application
             // by using NotifyStopRunState event.
             RunLoop (runState);
 
+            if (runState.Toplevel is null)
+            {
+#if DEBUG_IDISPOSABLE
+                Debug.Assert (_topLevels.Count == 0);
+#endif
+                runState.Dispose ();
+                return;
+            }
+
             if (!EndAfterFirstIteration)
             {
                 End (runState);
@@ -787,7 +796,7 @@ public static partial class Application
 
         var firstIteration = true;
 
-        for (state.Toplevel.Running = true; state.Toplevel.Running;)
+        for (state.Toplevel.Running = true; state.Toplevel?.Running == true;)
         {
             MainLoop.Running = true;
 
@@ -837,6 +846,11 @@ public static partial class Application
         }
 
         firstIteration = false;
+
+        if (Current == null)
+        {
+            return;
+        }
 
         if (state.Toplevel != Top && (Top.NeedsDisplay || Top.SubViewNeedsDisplay || Top.LayoutNeeded))
         {

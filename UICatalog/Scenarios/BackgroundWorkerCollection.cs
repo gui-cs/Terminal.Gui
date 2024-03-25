@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Threading;
 using Terminal.Gui;
 
@@ -19,6 +20,10 @@ public class BackgroundWorkerCollection : Scenario
 
         //main.Dispose ();
         Application.Top.Dispose ();
+
+#if DEBUG_IDISPOSABLE
+        Debug.Assert (Application.OverlappedChildren.Count == 0);
+#endif
     }
 
     public override void Run () { }
@@ -182,6 +187,7 @@ public class BackgroundWorkerCollection : Scenario
         {
             _workerApp?.WriteLog ($"{top.Toplevel.Data} deactivate.");
         }
+
         private void Quit () { RequestStop (); }
 
         private MenuBarItem View ()
@@ -356,6 +362,12 @@ public class BackgroundWorkerCollection : Scenario
             Add (_listLog);
 
             Closing += WorkerApp_Closing;
+            Closed += WorkerApp_Closed;
+        }
+
+        private void WorkerApp_Closed (object sender, ToplevelEventArgs e)
+        {
+            CancelWorker ();
         }
         private void WorkerApp_Closing (object sender, ToplevelClosingEventArgs e)
         {
@@ -474,7 +486,13 @@ public class BackgroundWorkerCollection : Scenario
 
                                                  _stagingsUi.Add (stagingUI);
                                                  _stagingWorkers.Remove (staging);
-
+#if DEBUG_IDISPOSABLE
+                                                 if (Application.OverlappedTop is null)
+                                                 {
+                                                     stagingUI.Dispose ();
+                                                     return;
+                                                 }
+#endif
                                                  Application.Run (stagingUI);
                                                  stagingUI.Dispose ();
                                              }
