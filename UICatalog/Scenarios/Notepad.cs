@@ -19,7 +19,8 @@ public class Notepad : Scenario
     public override void Init ()
     {
         Application.Init ();
-        Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
+        Top = new ();
+        Top.ColorScheme = Colors.ColorSchemes ["Base"];
     }
 
     public void Save () { Save (_focusedTabView, _focusedTabView.SelectedTab); }
@@ -108,7 +109,7 @@ public class Notepad : Scenario
                                 )
             ]
         };
-        Application.Top.Add (menu);
+        Top.Add (menu);
 
         _tabView = CreateNewTabView ();
 
@@ -120,7 +121,7 @@ public class Notepad : Scenario
         split.Tiles.ElementAt (0).ContentView.Add (_tabView);
         split.LineStyle = LineStyle.None;
 
-        Application.Top.Add (split);
+        Top.Add (split);
 
         _lenStatusItem = new StatusItem (KeyCode.CharMask, "Len: ", null);
 
@@ -146,8 +147,8 @@ public class Notepad : Scenario
         _tabView.SelectedTabChanged += TabView_SelectedTabChanged;
         _tabView.Enter += (s, e) => _focusedTabView = _tabView;
 
-        Application.Top.Add (statusBar);
-        Application.Top.Ready += (s, e) => New ();
+        Top.Add (statusBar);
+        Top.Ready += (s, e) => New ();
     }
 
     private void Close () { Close (_focusedTabView, _focusedTabView.SelectedTab); }

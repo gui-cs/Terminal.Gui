@@ -53,8 +53,9 @@ public class ListViewTests
         var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill (), Source = new ListWrapper (source) };
         var win = new Window ();
         win.Add (lv);
-        Application.Top.Add (win);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (win);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (12, 12);
         Application.Refresh ();
 
@@ -300,8 +301,9 @@ public class ListViewTests
         }
 
         var lv = new ListView { Width = 10, Height = 5, Source = new ListWrapper (source) };
-        Application.Top.Add (lv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (lv);
+        Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -335,8 +337,9 @@ Item 6",
         List<string> source = new () { "First", "Second" };
         var lv = new ListView { Width = Dim.Fill (), Height = 1, Source = new ListWrapper (source) };
         lv.SelectedItem = 1;
-        Application.Top.Add (lv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (lv);
+        Application.Begin (top);
 
         Assert.Equal ("Second ", GetContents (0));
         Assert.Equal (new string (' ', 7), GetContents (1));
@@ -618,8 +621,9 @@ Item 6",
         List<string> source = new () { "one", "two", "three" };
         var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill () };
         lv.RowRender += (s, _) => rendered = true;
-        Application.Top.Add (lv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (lv);
+        Application.Begin (top);
         Assert.False (rendered);
 
         lv.SetSource (source);
@@ -688,69 +692,76 @@ Item 6",
         public IList ToList () { return new List<string> { "One", "Two", "Three" }; }
     }
 
-    // No longer needed given PR #2920
-    //		[Fact, AutoInitShutdown]
-    //		public void Clicking_On_Border_Is_Ignored ()
-    //		{
-    //			var selected = "";
-    //			var lv = new ListView {
-    //				Height = 5,
-    //				Width = 7,
-    //				BorderStyle = LineStyle.Single
-    //			};
-    //			lv.SetSource (new List<string> { "One", "Two", "Three", "Four" });
-    //			lv.SelectedItemChanged += (s, e) => selected = e.Value.ToString ();
-    //			Application.Top.Add (lv);
-    //			Application.Begin (Application.Top);
+    [Fact]
+    [AutoInitShutdown]
+    public void Clicking_On_Border_Is_Ignored ()
+    {
+        var selected = "";
+        var lv = new ListView
+        {
+            Height = 5,
+            Width = 7,
+            BorderStyle = LineStyle.Single
+        };
+        lv.SetSource (new List<string> { "One", "Two", "Three", "Four" });
+        lv.SelectedItemChanged += (s, e) => selected = e.Value.ToString ();
+        var top = new Toplevel ();
+        top.Add (lv);
+        Application.Begin (top);
 
-    //			Assert.Equal (new Thickness (1), lv.Border.Thickness);
-    //			Assert.Equal (-1, lv.SelectedItem);
-    //			Assert.Equal ("", lv.Text);
-    //			TestHelpers.AssertDriverContentsWithFrameAre (@"
-    //┌─────┐
-    //│One  │
-    //│Two  │
-    //│Three│
-    //└─────┘", output);
+        Assert.Equal (new Thickness (1), lv.Border.Thickness);
+        Assert.Equal (-1, lv.SelectedItem);
+        Assert.Equal ("", lv.Text);
+        TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌─────┐
+│One  │
+│Two  │
+│Three│
+└─────┘", _output);
 
-    //			Assert.True (lv.OnMouseEvent (new MouseEvent {
-    //				X = 0,
-    //				Y = 0,
-    //				Flags = MouseFlags.Button1Clicked
-    //			}));
-    //			Assert.Equal ("", selected);
-    //			Assert.Equal (-1, lv.SelectedItem);
+        Application.OnMouseEvent (new (new ()
+        {
+            X = 0,
+            Y = 0,
+            Flags = MouseFlags.Button1Clicked
+        }));
+        Assert.Equal ("", selected);
+        Assert.Equal (-1, lv.SelectedItem);
 
-    //			Assert.True (lv.OnMouseEvent (new MouseEvent {
-    //				X = 0,
-    //				Y = 1,
-    //				Flags = MouseFlags.Button1Clicked
-    //			}));
-    //			Assert.Equal ("One", selected);
-    //			Assert.Equal (0, lv.SelectedItem);
+        Application.OnMouseEvent (new (new ()
+        {
+            X = 1,
+            Y = 1,
+            Flags = MouseFlags.Button1Clicked
+        }));
+        Assert.Equal ("One", selected);
+        Assert.Equal (0, lv.SelectedItem);
 
-    //			Assert.True (lv.OnMouseEvent (new MouseEvent {
-    //				X = 0,
-    //				Y = 2,
-    //				Flags = MouseFlags.Button1Clicked
-    //			}));
-    //			Assert.Equal ("Two", selected);
-    //			Assert.Equal (1, lv.SelectedItem);
+        Application.OnMouseEvent (new (new ()
+        {
+            X = 1,
+            Y = 2,
+            Flags = MouseFlags.Button1Clicked
+        }));
+        Assert.Equal ("Two", selected);
+        Assert.Equal (1, lv.SelectedItem);
 
-    //			Assert.True (lv.OnMouseEvent (new MouseEvent {
-    //				X = 0,
-    //				Y = 3,
-    //				Flags = MouseFlags.Button1Clicked
-    //			}));
-    //			Assert.Equal ("Three", selected);
-    //			Assert.Equal (2, lv.SelectedItem);
+        Application.OnMouseEvent (new (new ()
+        {
+            X = 1,
+            Y = 3,
+            Flags = MouseFlags.Button1Clicked
+        }));
+        Assert.Equal ("Three", selected);
+        Assert.Equal (2, lv.SelectedItem);
 
-    //			Assert.True (lv.OnMouseEvent (new MouseEvent {
-    //				X = 0,
-    //				Y = 4,
-    //				Flags = MouseFlags.Button1Clicked
-    //			}));
-    //			Assert.Equal ("Three", selected);
-    //			Assert.Equal (2, lv.SelectedItem);
-    //		}
+        Application.OnMouseEvent (new (new ()
+        {
+            X = 1,
+            Y = 4,
+            Flags = MouseFlags.Button1Clicked
+        }));
+        Assert.Equal ("Three", selected);
+        Assert.Equal (2, lv.SelectedItem);
+    }
 }

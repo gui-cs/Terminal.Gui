@@ -21,6 +21,8 @@ public class RuneWidthGreaterThanOne : Scenario
     {
         Application.Init ();
 
+        Top = new ();
+
         var menu = new MenuBar
         {
             Menus =
@@ -85,13 +87,13 @@ public class RuneWidthGreaterThanOne : Scenario
         };
         _win = new Window { X = 5, Y = 5, Width = Dim.Fill (22), Height = Dim.Fill (5) };
         _win.Add (_label, _text, _button, _labelR, _labelV);
-        Application.Top.Add (menu, _win);
+        Top.Add (menu, _win);
 
         WideRunes ();
 
         //NarrowRunes ();
         //MixedRunes ();
-        Application.Run ();
+        Application.Run (Top);
     }
 
     public override void Run () { }

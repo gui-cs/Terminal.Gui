@@ -74,6 +74,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
         if (AutoInit)
         {
+            Application.Top?.Dispose ();
             Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
             if (Responder.Instances.Count == 0)

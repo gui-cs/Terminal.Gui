@@ -96,11 +96,12 @@ public class LabelTests
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
         Assert.True (label.AutoSize);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         var expected = @"
@@ -137,11 +138,12 @@ public class LabelTests
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
         Assert.True (label.AutoSize);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         var expected = @"
@@ -178,7 +180,8 @@ public class LabelTests
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
         Assert.True (label.AutoSize);
 
@@ -186,7 +189,7 @@ public class LabelTests
 
         Assert.True (label.AutoSize);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         var expected = @"
@@ -226,8 +229,9 @@ public class LabelTests
         tf2.Text = "This TextFormatter (tf2) with fill will be cleared on rewritten.";
         Size tf2Size = tf2.Size;
 
-        Application.Top.Add (label);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (label);
+        Application.Begin (top);
 
         Assert.True (label.AutoSize);
 
@@ -277,8 +281,9 @@ This TextFormatter (tf2) is rewritten.
     public void Label_Draw_Horizontal_Simple_Runes ()
     {
         var label = new Label { Text = "Demo Simple Rune" };
-        Application.Top.Add (label);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (label);
+        Application.Begin (top);
 
         Assert.True (label.AutoSize);
         Assert.Equal (new Rectangle (0, 0, 16, 1), label.Frame);
@@ -296,8 +301,9 @@ Demo Simple Rune
     public void Label_Draw_Vertical_Simple_Runes ()
     {
         var label = new Label { TextDirection = TextDirection.TopBottom_LeftRight, Text = "Demo Simple Rune" };
-        Application.Top.Add (label);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (label);
+        Application.Begin (top);
 
         Assert.NotNull (label.Width);
         Assert.NotNull (label.Height);
@@ -330,8 +336,9 @@ e
     public void Label_Draw_Vertical_Wide_Runes ()
     {
         var label = new Label { TextDirection = TextDirection.TopBottom_LeftRight, Text = "デモエムポンズ" };
-        Application.Top.Add (label);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (label);
+        Application.Begin (top);
 
         var expected = @"
 デ
@@ -411,11 +418,12 @@ e
         var label = new Label { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
         Assert.False (label.IsInitialized);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         Assert.True (label.IsInitialized);
@@ -441,11 +449,12 @@ e
         var label = new Label { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你", AutoSize = true };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
         Assert.False (label.IsInitialized);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         Assert.True (label.IsInitialized);
@@ -471,8 +480,9 @@ e
     public void Full_Border ()
     {
         var label = new Label { Text = "Test", /*Width = 6, Height = 3, */BorderStyle = LineStyle.Single };
-        Application.Top.Add (label);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (label);
+        Application.Begin (top);
 
         Assert.Equal (new (0, 0, 6, 3), label.Frame);
         Assert.Equal (new (0, 0, 4, 1), label.Bounds);
@@ -493,12 +503,13 @@ e
         var label = new Label { Text = "Test", /*Width = 6, Height = 3,*/ BorderStyle = LineStyle.Single };
         label.Margin.Thickness = new Thickness (0, 1, 0, 0);
         label.Border.Thickness = new Thickness (1, 0, 1, 1);
-        Application.Top.Add (label);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (label);
+        Application.Begin (top);
 
         Assert.Equal (new (0, 0, 6, 3), label.Frame);
         Assert.Equal (new (0, 0, 4, 1), label.Bounds);
-        Application.Begin (Application.Top);
+        Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -514,12 +525,13 @@ e
     {
         var label = new Label { Text = "Test", /* Width = 6, Height = 3, */BorderStyle = LineStyle.Single };
         label.Border.Thickness = new Thickness (1, 0, 1, 1);
-        Application.Top.Add (label);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (label);
+        Application.Begin (top);
 
         Assert.Equal (new (0, 0, 6, 2), label.Frame);
         Assert.Equal (new (0, 0, 4, 1), label.Bounds);
-        Application.Begin (Application.Top);
+        Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"

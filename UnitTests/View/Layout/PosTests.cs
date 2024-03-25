@@ -43,7 +43,7 @@ public class PosTests
 
         win.Add (tv);
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (win);
         RunState rs = Application.Begin (top);
 
@@ -73,7 +73,7 @@ public class PosTests
 
         var menu = new MenuBar ();
         var status = new StatusBar ();
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (win, menu, status);
         RunState rs = Application.Begin (top);
 
@@ -317,17 +317,18 @@ public class PosTests
     public void LeftTopBottomRight_Win_ShouldNotThrow ()
     {
         // Setup Fake driver
-        (Window win, Button button) setup ()
+        (Toplevel top, Window win, Button button) setup ()
         {
             Application.Init (new FakeDriver ());
             Application.Iteration += (s, a) => { Application.RequestStop (); };
             var win = new Window { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
-            Application.Top.Add (win);
+            var top = new Toplevel ();
+            top.Add (win);
 
             var button = new Button { X = Pos.Center (), Text = "button" };
             win.Add (button);
 
-            return (win, button);
+            return (top, win, button);
         }
 
         RunState rs;
@@ -337,14 +338,15 @@ public class PosTests
             // Cleanup
             Application.End (rs);
 
+            Application.Top.Dispose ();
             // Shutdown must be called to safely clean up Application if Init has been called
             Application.Shutdown ();
         }
 
         // Test cases:
-        (Window win, Button button) app = setup ();
+        (Toplevel top, Window win, Button button) app = setup ();
         app.button.Y = Pos.Left (app.win);
-        rs = Application.Begin (Application.Top);
+        rs = Application.Begin (app.top);
 
         // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
         Application.RunLoop (rs);
@@ -352,7 +354,7 @@ public class PosTests
 
         app = setup ();
         app.button.Y = Pos.X (app.win);
-        rs = Application.Begin (Application.Top);
+        rs = Application.Begin (app.top);
 
         // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
         Application.RunLoop (rs);
@@ -360,7 +362,7 @@ public class PosTests
 
         app = setup ();
         app.button.Y = Pos.Top (app.win);
-        rs = Application.Begin (Application.Top);
+        rs = Application.Begin (app.top);
 
         // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
         Application.RunLoop (rs);
@@ -368,7 +370,7 @@ public class PosTests
 
         app = setup ();
         app.button.Y = Pos.Y (app.win);
-        rs = Application.Begin (Application.Top);
+        rs = Application.Begin (app.top);
 
         // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
         Application.RunLoop (rs);
@@ -376,7 +378,7 @@ public class PosTests
 
         app = setup ();
         app.button.Y = Pos.Bottom (app.win);
-        rs = Application.Begin (Application.Top);
+        rs = Application.Begin (app.top);
 
         // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
         Application.RunLoop (rs);
@@ -384,7 +386,7 @@ public class PosTests
 
         app = setup ();
         app.button.Y = Pos.Right (app.win);
-        rs = Application.Begin (Application.Top);
+        rs = Application.Begin (app.top);
 
         // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
         Application.RunLoop (rs);
@@ -467,7 +469,7 @@ public class PosTests
     {
         Application.Init (new FakeDriver ());
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
 
         var view = new View { X = 0, Y = 0, Width = 20, Height = 20 };
         var field = new TextField { X = 0, Y = 0, Width = 20 };
@@ -510,6 +512,7 @@ public class PosTests
 
         Assert.Equal (20, count);
 
+        top.Dispose ();
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
     }
@@ -522,7 +525,7 @@ public class PosTests
     {
         Application.Init (new FakeDriver ());
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
 
         var view = new View { X = 0, Y = 0, Width = 20, Height = 20 };
         var field = new TextField { X = 0, Y = 0, Width = 20 };
@@ -578,6 +581,7 @@ public class PosTests
 
         Assert.Equal (0, count);
 
+        top.Dispose ();
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
     }
@@ -589,7 +593,7 @@ public class PosTests
     {
         Application.Init (new FakeDriver ());
 
-        Toplevel t = Application.Top;
+        Toplevel t = new ();
 
         var w = new Window { X = 1, Y = 2, Width = 3, Height = 5 };
         t.Add (w);
@@ -602,7 +606,8 @@ public class PosTests
 
         Application.Iteration += (s, a) => Application.RequestStop ();
 
-        Application.Run ();
+        Application.Run (t);
+        t.Dispose ();
         Application.Shutdown ();
     }
 
@@ -637,7 +642,7 @@ public class PosTests
     {
         Application.Init (new FakeDriver ());
 
-        Toplevel t = Application.Top;
+        Toplevel t = new ();
 
         var w = new Window { X = Pos.Left (t) + 2, Y = Pos.Top (t) + 2 };
         var f = new FrameView ();
@@ -651,7 +656,8 @@ public class PosTests
         f.X = Pos.X (v2) - Pos.X (v1);
         f.Y = Pos.Y (v2) - Pos.Y (v1);
 
-        Assert.Throws<InvalidOperationException> (() => Application.Run ());
+        Assert.Throws<InvalidOperationException> (() => Application.Run (t));
+        t.Dispose ();
         Application.Shutdown ();
 
         v2.Dispose ();
@@ -676,8 +682,9 @@ public class PosTests
         };
 
         container.Add (view);
-        Application.Top.Add (container);
-        Application.Top.LayoutSubviews ();
+        var top = new Toplevel ();
+        top.Add (container);
+        top.LayoutSubviews ();
 
         Assert.Equal (100, container.Frame.Width);
         Assert.Equal (100, container.Frame.Height);

@@ -36,13 +36,14 @@ public class CharacterMap : Scenario
     public override void Init ()
     {
         Application.Init ();
-        Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
+        Top = new ();
+        Top.ColorScheme = Colors.ColorSchemes ["Base"];
     }
 
     public override void Setup ()
     {
         _charMap = new() { X = 0, Y = 1, Height = Dim.Fill () };
-        Application.Top.Add (_charMap);
+        Top.Add (_charMap);
 
         var jumpLabel = new Label
         {
@@ -51,19 +52,19 @@ public class CharacterMap : Scenario
             HotKeySpecifier = (Rune)'_',
             Text = "_Jump To Code Point:"
         };
-        Application.Top.Add (jumpLabel);
+        Top.Add (jumpLabel);
 
         var jumpEdit = new TextField
         {
             X = Pos.Right (jumpLabel) + 1, Y = Pos.Y (_charMap), Width = 10, Caption = "e.g. 01BE3"
         };
-        Application.Top.Add (jumpEdit);
+        Top.Add (jumpEdit);
 
         _errorLabel = new()
         {
             X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes ["error"], Text = "err"
         };
-        Application.Top.Add (_errorLabel);
+        Top.Add (_errorLabel);
 
 #if TEXT_CHANGED_TO_JUMP
         jumpEdit.TextChanged += JumpEdit_TextChanged;
@@ -135,7 +136,7 @@ public class CharacterMap : Scenario
                                                  _charMap.StartCodePoint = table.Data.ToArray () [args.NewRow].Start;
                                              };
 
-        Application.Top.Add (_categoryList);
+        Top.Add (_categoryList);
 
         _charMap.SelectedCodePoint = 0;
         _charMap.SetFocus ();
@@ -164,7 +165,7 @@ public class CharacterMap : Scenario
                     )
             ]
         };
-        Application.Top.Add (menu);
+        Top.Add (menu);
     }
 
     private void _categoryList_Initialized (object sender, EventArgs e) { _charMap.Width = Dim.Fill () - _categoryList.Width; }

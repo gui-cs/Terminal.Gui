@@ -8,7 +8,11 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Proof of Concept")]
 public class LineCanvasExperiment : Scenario
 {
-    public override void Init () { Application.Init (); }
+    public override void Init ()
+    {
+        Application.Init ();
+        Top = new ();
+    }
 
     /// <summary>Setup the scenario.</summary>
     public override void Setup ()
@@ -18,7 +22,7 @@ public class LineCanvasExperiment : Scenario
         //	new MenuItem ("_Quit", "", () => Application.RequestStop()),
         //}) });
 
-        //Application.Top.Add (menu);
+        //Top.Add (menu);
 
         var frame1 = new FrameView
         {
@@ -33,7 +37,7 @@ public class LineCanvasExperiment : Scenario
 
         //View.Diagnostics ^= DiagnosticFlags.FrameRuler;
 
-        Application.Top.Add (frame1);
+        Top.Add (frame1);
 
         var win1 = new Window
         {

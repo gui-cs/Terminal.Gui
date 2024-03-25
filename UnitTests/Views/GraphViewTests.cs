@@ -1500,6 +1500,7 @@ public class PathAnnotationTests
 
         // create a wide window
         var mount = new View { Width = 100, Height = 100 };
+        var top = new Toplevel ();
 
         try
         {
@@ -1521,8 +1522,8 @@ public class PathAnnotationTests
 
             //putting mount into Toplevel since changing size
             //also change AutoSize to false
-            Application.Top.Add (mount);
-            Application.Begin (Application.Top);
+            top.Add (mount);
+            Application.Begin (top);
 
             // render view
             view.ColorScheme = new ColorScheme ();
@@ -1541,6 +1542,7 @@ public class PathAnnotationTests
         }
         finally
         {
+            top.Dispose ();
             Application.Shutdown ();
         }
     }

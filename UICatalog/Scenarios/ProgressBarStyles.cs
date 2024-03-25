@@ -27,6 +27,8 @@ public class ProgressBarStyles : Scenario
         ConfigurationManager.Themes.Theme = Theme;
         ConfigurationManager.Apply ();
 
+        Top = new ();
+
         var editor = new AdornmentsEditor
         {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}", BorderStyle = LineStyle.Single
@@ -72,7 +74,7 @@ public class ProgressBarStyles : Scenario
 
                                          dialog.Bounds = new Rectangle (0, 0, colorPicker.Frame.Width, colorPicker.Frame.Height);
 
-                                         Application.Top.LayoutSubviews ();
+                                         Top.LayoutSubviews ();
                                      };
 
             dialog.Add (colorPicker);
@@ -275,7 +277,7 @@ public class ProgressBarStyles : Scenario
                                  300
                                 );
 
-        Application.Top.Unloaded += Top_Unloaded;
+        Top.Unloaded += Top_Unloaded;
 
         void Top_Unloaded (object sender, EventArgs args)
         {
@@ -291,7 +293,7 @@ public class ProgressBarStyles : Scenario
                 _pulseTimer = null;
             }
 
-            Application.Top.Unloaded -= Top_Unloaded;
+            Top.Unloaded -= Top_Unloaded;
         }
 
         Application.Run (editor);

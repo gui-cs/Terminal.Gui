@@ -1070,6 +1070,7 @@ internal class UICatalogApp
         {
             Applied -= ConfigAppliedHandler;
             Unloaded -= UnloadedHandler;
+            Dispose ();
         }
     }
 

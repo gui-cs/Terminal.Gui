@@ -227,7 +227,7 @@ public class AppendAutocompleteTests
         var tf = new TextField { Width = 10 };
         var tf2 = new TextField { Y = 1, Width = 10 };
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tf);
         top.Add (tf2);
 

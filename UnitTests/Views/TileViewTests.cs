@@ -1575,7 +1575,8 @@ public class TileViewTests
 
         Assert.True (tv.IsRootTileView ());
 
-        Application.Top.Add (tv);
+        var top = new Toplevel ();
+        top.Add (tv);
         tv.BeginInit ();
         tv.EndInit ();
         tv.LayoutSubviews ();
@@ -1624,7 +1625,8 @@ public class TileViewTests
         Assert.True (tv.IsRootTileView ());
         tv.Tiles.ElementAt (1).ContentView.Add (tv2);
 
-        Application.Top.Add (tv);
+        var top = new Toplevel ();
+        top.Add (tv);
         tv.BeginInit ();
         tv.EndInit ();
         tv.LayoutSubviews ();
@@ -2303,7 +2305,8 @@ public class TileViewTests
                             new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('5', 100) }
                            );
 
-        Application.Top.Add (tv);
+        var top = new Toplevel ();
+        top.Add (tv);
         tv.BeginInit ();
         tv.EndInit ();
         tv.LayoutSubviews ();
@@ -2429,7 +2432,8 @@ public class TileViewTests
         container.Tiles.ElementAt (0).MinSize = 0;
         container.Tiles.ElementAt (1).MinSize = 0;
 
-        Application.Top.Add (container);
+        var top = new Toplevel ();
+        top.Add (container);
         container.ColorScheme = new ColorScheme ();
         container.BeginInit ();
         container.EndInit ();

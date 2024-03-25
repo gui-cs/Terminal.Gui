@@ -93,7 +93,7 @@ public class Localization : Scenario
                                 )
             ]
         };
-        Application.Top.Add (menu);
+        Top.Add (menu);
 
         var selectLanguageLabel = new Label
         {

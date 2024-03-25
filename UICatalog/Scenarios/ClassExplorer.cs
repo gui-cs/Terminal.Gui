@@ -55,7 +55,7 @@ public class ClassExplorer : Scenario
                                 )
             ]
         };
-        Application.Top.Add (menu);
+        Top.Add (menu);
 
         _treeView = new TreeView<object> { X = 0, Y = 1, Width = Dim.Percent (50), Height = Dim.Fill () };
 

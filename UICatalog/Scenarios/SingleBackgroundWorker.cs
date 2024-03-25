@@ -12,14 +12,14 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Top Level Windows")]
 public class SingleBackgroundWorker : Scenario
 {
-    public override void Run ()
+    public override void Init ()
     {
-        Application.Top.Dispose ();
-
         Application.Run<MainApp> ();
 
         Application.Top.Dispose ();
     }
+
+    public override void Run () { }
 
     public class MainApp : Toplevel
     {
@@ -195,9 +195,12 @@ public class SingleBackgroundWorker : Scenario
 
                                                   var builderUI =
                                                       new StagingUIController (_startStaging, e.Result as List<string>);
+                                                  var top = Application.Top;
+                                                  top.Visible = false;
+                                                  Application.Current.Visible = false;
                                                   builderUI.Load ();
                                                   builderUI.Dispose ();
-
+                                                  top.Visible = true;
                                               }
 
                                               _worker = null;
@@ -214,11 +217,9 @@ public class SingleBackgroundWorker : Scenario
 
         public StagingUIController (DateTime? start, List<string> list)
         {
-            Rectangle frame = Application.Top.Frame;
             _top = new Toplevel
             {
-                Title = "_top", 
-                X = frame.X, Y = frame.Y, Width = frame.Width, Height = frame.Height
+                Title = "_top", Width = Dim.Fill (), Height = Dim.Fill ()
             };
 
             _top.KeyDown += (s, e) =>

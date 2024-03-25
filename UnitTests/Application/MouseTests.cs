@@ -114,8 +114,6 @@ public class MouseTests
             Width = size.Width,
             Height = size.Height
         };
-        view.BeginInit();
-        view.EndInit();
 
         var mouseEvent = new MouseEvent { X = clickX, Y = clickY, Flags = MouseFlags.Button1Clicked };
         var mouseEventArgs = new MouseEventEventArgs (mouseEvent);
@@ -127,7 +125,10 @@ public class MouseTests
                                           clicked = true;
                                       };
 
-        Application.Top.Add (view);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
+
         Application.OnMouseEvent (mouseEventArgs);
         Assert.Equal (expectedClicked, clicked);
     }
@@ -198,11 +199,12 @@ public class MouseTests
 
         var clicked = false;
 
-        Application.Top.X = 0;
-        Application.Top.Y = 0;
-        Application.Top.Width = size.Width * 2;
-        Application.Top.Height = size.Height * 2;
-        Application.Top.BorderStyle = LineStyle.None;
+        var top = new Toplevel ();
+        top.X = 0;
+        top.Y = 0;
+        top.Width = size.Width * 2;
+        top.Height = size.Height * 2;
+        top.BorderStyle = LineStyle.None;
 
         var view = new View { X = pos.X, Y = pos.Y, Width = size.Width, Height = size.Height };
 
@@ -210,8 +212,8 @@ public class MouseTests
         view.BorderStyle = LineStyle.Single;
         view.CanFocus = true;
 
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        top.Add (view);
+        Application.Begin (top);
         var mouseEvent = new MouseEvent { X = clickX, Y = clickY, Flags = MouseFlags.Button1Clicked };
         var mouseEventArgs = new MouseEventEventArgs (mouseEvent);
 
@@ -238,7 +240,8 @@ public class MouseTests
         var sv = new ScrollView { Width = Dim.Fill (), Height = Dim.Fill (), ContentSize = new (100, 100) };
 
         sv.Add (tf);
-        Application.Top.Add (sv);
+        var top = new Toplevel ();
+        top.Add (sv);
 
         int iterations = -1;
 
@@ -306,7 +309,7 @@ public class MouseTests
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run (top);
     }
 
     [Fact]

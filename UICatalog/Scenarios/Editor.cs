@@ -42,6 +42,8 @@ public class Editor : Scenario
         ConfigurationManager.Themes.Theme = Theme;
         ConfigurationManager.Apply ();
 
+        Top = new ();
+
         Win = new Window
         {
             Title = _fileName ?? "Untitled",
@@ -51,7 +53,7 @@ public class Editor : Scenario
             Height = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes [TopLevelColorScheme]
         };
-        Application.Top.Add (Win);
+        Top.Add (Win);
 
         _textView = new TextView
         {
@@ -238,7 +240,7 @@ public class Editor : Scenario
             ]
         };
 
-        Application.Top.Add (menu);
+        Top.Add (menu);
 
         var siCursorPosition = new StatusItem (KeyCode.Null, "", null);
 
@@ -268,7 +270,7 @@ public class Editor : Scenario
                                                  statusBar.SetNeedsDisplay ();
                                              };
 
-        Application.Top.Add (statusBar);
+        Top.Add (statusBar);
 
         _scrollBar = new ScrollBarView (_textView, true);
 
@@ -374,7 +376,7 @@ public class Editor : Scenario
                            }
                        };
 
-        Application.Top.Closed += (s, e) => Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
+        Top.Closed += (s, e) => Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
     }
 
     public override void Setup () { }

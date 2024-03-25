@@ -77,8 +77,9 @@ public class ContextMenuTests
             ]
         };
 
-        Application.Top.Add (menu);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (menu);
+        Application.Begin (top);
 
         Assert.Null (Application.MouseGrabView);
 
@@ -142,9 +143,10 @@ public class ContextMenuTests
                                        ]
                                       );
 
-        Application.Top.Add (menu, label, tf, statusBar);
+        var top = new Toplevel ();
+        top.Add (menu, label, tf, statusBar);
         ((FakeDriver)Application.Driver).SetBufferSize (45, 17);
-        Application.Begin (Application.Top);
+        Application.Begin (top);
 
         Assert.Equal (new Rectangle (9, 3, 20, 1), tf.Frame);
         Assert.True (tf.HasFocus);
@@ -208,8 +210,9 @@ public class ContextMenuTests
                                        }
                                       );
 
-        Application.Top.Add (menu, win, statusBar);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (menu, win, statusBar);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (44, 17);
 
         Assert.Equal (new Rectangle (9, 3, 20, 1), tf.Frame);
@@ -297,10 +300,10 @@ public class ContextMenuTests
     [AutoInitShutdown]
     public void Draw_A_ContextMenu_Over_A_Dialog ()
     {
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         var win = new Window ();
         top.Add (win);
-        Application.Begin (top);
+        RunState rsTop = Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (20, 15);
 
         Assert.Equal (new Rectangle (0, 0, 20, 15), win.Frame);
@@ -328,7 +331,7 @@ public class ContextMenuTests
         // Don't use Dialog here as it has more layout logic. Use Window instead.
         var dialog = new Window { X = 2, Y = 2, Width = 15, Height = 4 };
         dialog.Add (new TextField { X = Pos.Center (), Width = 10, Text = "Test" });
-        RunState rs = Application.Begin (dialog);
+        RunState rsDialog = Application.Begin (dialog);
 
         Assert.Equal (new Rectangle (2, 2, 15, 4), dialog.Frame);
 
@@ -359,7 +362,7 @@ public class ContextMenuTests
                                  );
 
         var firstIteration = false;
-        Application.RunIteration (ref rs, ref firstIteration);
+        Application.RunIteration (ref rsDialog, ref firstIteration);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -381,7 +384,8 @@ public class ContextMenuTests
                                                       _output
                                                      );
 
-        Application.End (rs);
+        Application.End (rsDialog);
+        Application.End (rsTop);
     }
 
     [Fact]
@@ -455,9 +459,11 @@ public class ContextMenuTests
 
         Assert.Equal (new Point (-1, -2), cm.Position);
 
+        Application.Begin (new ());
+
         cm.Show ();
         Assert.Equal (new Point (-1, -2), cm.Position);
-        Application.Begin (Application.Top);
+        Application.Refresh ();
 
         var expected = @"
 ┌──────┐
@@ -499,7 +505,7 @@ public class ContextMenuTests
                                         )
         };
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         Application.Begin (top);
         top.Running = true;
 
@@ -517,8 +523,9 @@ public class ContextMenuTests
     public void Key_Open_And_Close_The_ContextMenu ()
     {
         var tf = new TextField ();
-        Application.Top.Add (tf);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tf);
+        Application.Begin (top);
 
         Assert.True (Application.OnKeyDown (ContextMenu.DefaultKey));
         Assert.True (tf.ContextMenu.MenuBar.IsMenuOpen);
@@ -555,8 +562,9 @@ public class ContextMenuTests
                                         )
         };
 
+        Application.Begin (new ());
         cm.Show ();
-        Application.Begin (Application.Top);
+        Application.Refresh ();
 
         var expected = @"
           ┌──────┐
@@ -621,10 +629,13 @@ public class ContextMenuTests
 
         Assert.Equal (new Point (-1, -2), cm.Position);
 
-        cm.Show ();
-        Assert.Equal (new Point (-1, -2), cm.Position);
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         Application.Begin (top);
+
+        cm.Show ();
+        Application.Refresh ();
+
+        Assert.Equal (new Point (-1, -2), cm.Position);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -864,7 +875,7 @@ public class ContextMenuTests
                               }
                           };
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (lbl);
         Application.Begin (top);
 
@@ -906,8 +917,9 @@ public class ContextMenuTests
                                         )
         };
 
+        Application.Begin (new ());
         cm.Show ();
-        Application.Begin (Application.Top);
+        Application.Refresh ();
 
         var expected = @"
           ┌──────┐
@@ -938,7 +950,7 @@ public class ContextMenuTests
     public void RequestStop_While_ContextMenu_Is_Open_Does_Not_Throws ()
     {
         ContextMenu cm = Create_ContextMenu_With_Two_MenuItem (10, 5);
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         var isMenuAllClosed = false;
         MenuBarItem mi = null;
         int iterations = -1;
@@ -957,6 +969,7 @@ public class ContextMenuTests
                                                      {
                                                          var dialog1 = new Dialog ();
                                                          Application.Run (dialog1);
+                                                         dialog1.Dispose ();
                                                          Assert.False (ContextMenu.IsShow);
                                                          Assert.True (isMenuAllClosed);
                                                      };
@@ -994,12 +1007,13 @@ public class ContextMenuTests
                        {
                            var dialog2 = new Dialog ();
                            Application.Run (dialog2);
+                           dialog2.Dispose ();
                            Assert.False (ContextMenu.IsShow);
                            Assert.True (isMenuAllClosed);
                            isTopClosed = true;
                        };
 
-        Application.Run ();
+        Application.Run (top);
 
         Assert.True (isTopClosed);
         Assert.False (ContextMenu.IsShow);
@@ -1025,9 +1039,10 @@ public class ContextMenuTests
 
         Assert.Equal (Point.Empty, cm.Position);
 
+        Application.Begin (new ());
         cm.Show ();
         Assert.Equal (Point.Empty, cm.Position);
-        Application.Begin (Application.Top);
+        Application.Refresh ();
 
         var expected = @"
 ┌──────┐
@@ -1060,9 +1075,10 @@ public class ContextMenuTests
 
         Assert.Equal (Point.Empty, cm.Position);
 
+        Application.Begin (new ());
         cm.Show ();
         Assert.Equal (Point.Empty, cm.Position);
-        Application.Begin (Application.Top);
+        Application.Refresh ();
 
         var expected = @"
 ┌────
@@ -1102,13 +1118,14 @@ public class ContextMenuTests
                                         )
         };
 
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
 
         Assert.Equal (new Point (10, 5), cm.Position);
 
         cm.Show ();
-        Application.Top.Draw ();
+        top.Draw ();
         Assert.Equal (new Point (10, 5), cm.Position);
 
         var expected = @"
@@ -1166,9 +1183,10 @@ public class ContextMenuTests
 
         Assert.Equal (new Point (80, 25), cm.Position);
 
+        Application.Begin (new ());
         cm.Show ();
         Assert.Equal (new Point (80, 25), cm.Position);
-        Application.Begin (Application.Top);
+        Application.Refresh ();
 
         var expected = @"
                                                                         ┌──────┐
@@ -1208,15 +1226,16 @@ public class ContextMenuTests
                                         )
         };
 
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
 
         Assert.Equal (new Rectangle (70, 24, 10, 1), view.Frame);
         Assert.Equal (Point.Empty, cm.Position);
 
         cm.Show ();
         Assert.Equal (new Point (70, 24), cm.Position);
-        Application.Top.Draw ();
+        top.Draw ();
 
         var expected = @"
                                                                       ┌──────┐
@@ -1239,10 +1258,10 @@ public class ContextMenuTests
     {
         ContextMenu cm = Create_ContextMenu_With_Two_MenuItem (10, 5);
 
+        Application.Begin (new ());
         cm.Show ();
         Assert.True (ContextMenu.IsShow);
-
-        Application.Begin (Application.Top);
+        Application.Refresh ();
 
         var expected = @"
           ┌──────┐
@@ -1291,10 +1310,10 @@ public class ContextMenuTests
             UseSubMenusSingleFrame = true
         };
 
+        RunState rs = Application.Begin (new ());
         cm.Show ();
-        RunState rs = Application.Begin (Application.Top);
-
         Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+        Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1388,10 +1407,11 @@ public class ContextMenuTests
                                         )
         };
 
+        RunState rs = Application.Begin (new ());
         cm.Show ();
-        RunState rs = Application.Begin (Application.Top);
 
         Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+        Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
