@@ -90,8 +90,12 @@ public class Scenario : IDisposable
 
     public void Dispose ()
     {
+        // BUGBUG: Top should have already been disposed. We dispose it here until we can fix the scenarios that are doing it wrong.
         Top?.Dispose ();
+
+        // We created Win, so we Dispose it.
         Win?.Dispose ();
+
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose (true);
         GC.SuppressFinalize (this);
