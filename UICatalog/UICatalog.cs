@@ -464,10 +464,6 @@ internal class UICatalogApp
                              _selectedScenario = null;
                              RequestStop ();
                          }
-                         else
-                         {
-                             _selectedScenario.RequestStop ();
-                         }
                      }
                     ),
                 new (

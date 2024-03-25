@@ -46,7 +46,7 @@ public class ChineseUI : Scenario
 
                            if (result == 0)
                            {
-                               RequestStop ();
+                               Application.RequestStop ();
                            }
                        };
 

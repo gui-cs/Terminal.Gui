@@ -15,8 +15,9 @@ public class BackgroundWorkerCollection : Scenario
 {
     public override void Init ()
     {
-        Application.Run<OverlappedMain> ();
+        var main = Application.Run<OverlappedMain> ();
 
+        //main.Dispose ();
         Application.Top.Dispose ();
     }
 

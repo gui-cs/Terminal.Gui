@@ -587,10 +587,10 @@ public static partial class Application
     ///     <see langword="null"/> if <see cref="Init"/> has already been called.
     /// </param>
     /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
-    public static Toplevel Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
+    public static T Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
         where T : Toplevel, new()
     {
-        var top = new T () as Toplevel;
+        var top = new T ();
 
         EnsureValidInitialization (top, driver);
 
