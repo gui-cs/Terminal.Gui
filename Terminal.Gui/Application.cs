@@ -417,15 +417,19 @@ public static partial class Application
             toplevel.EndInit ();
         }
 
+#if DEBUG_IDISPOSABLE
+        if (Top is { } && toplevel != Top && !_topLevels.Contains (Top))
+        {
+            // This assertion confirm if the Top was already disposed
+            Debug.Assert (Top.WasDisposed);
+            Debug.Assert (Top == _latestClosedRunStateToplevel);
+        }
+#endif
+
         lock (_topLevels)
         {
             if (Top is { } && toplevel != Top && !_topLevels.Contains (Top))
             {
-#if DEBUG_IDISPOSABLE
-                // This assertion confirm if the Top was already disposed
-                Debug.Assert (Top.WasDisposed);
-                Debug.Assert (Top == _latestClosedRunStateToplevel);
-#endif
                 // If Top was already disposed and isn't on the Toplevels Stack,
                 // clean it up here if is the same as _latestClosedRunStateToplevel
                 if (Top == _latestClosedRunStateToplevel)
