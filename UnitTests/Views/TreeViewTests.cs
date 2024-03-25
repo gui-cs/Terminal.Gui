@@ -110,8 +110,9 @@ public class TreeViewTests
         tv.AddObject (n1);
         tv.AddObject (n2);
 
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         Assert.True (tv.MultiSelect);
         Assert.True (tv.HasFocus);

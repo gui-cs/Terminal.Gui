@@ -18,7 +18,7 @@ public class TextFieldTests
     public void Accented_Letter_With_Three_Combining_Unicode_Chars ()
     {
         var tf = new TextField { Width = 3, Text = "ắ" };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tf);
         Application.Begin (top);
 
@@ -61,8 +61,9 @@ public class TextFieldTests
     public void Adjust_First ()
     {
         var tf = new TextField { Width = Dim.Fill (), Text = "This is a test." };
-        Application.Top.Add (tf);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tf);
+        Application.Begin (top);
 
         Assert.Equal ("This is a test. ", GetContents ());
 
@@ -104,7 +105,7 @@ public class TextFieldTests
     [TextFieldTestsAutoInitShutdown]
     public void CanFocus_False_Wont_Focus_With_Mouse ()
     {
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         var tf = new TextField { Width = Dim.Fill (), CanFocus = false, ReadOnly = true, Text = "some text" };
 
         var fv = new FrameView
@@ -431,8 +432,9 @@ public class TextFieldTests
         tf.TextChanging += (s, e) => newText = e.NewValue;
         tf.TextChanged += (s, e) => oldText = e.OldValue;
 
-        Application.Top.Add (tf);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tf);
+        Application.Begin (top);
 
         Assert.Equal ("-1", tf.Text);
 
@@ -903,8 +905,9 @@ public class TextFieldTests
         Assert.Equal (0, tf.ScrollOffset);
         Assert.Equal (16, tf.CursorPosition);
 
-        Application.Top.Add (tf);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tf);
+        Application.Begin (top);
 
         Assert.Equal (0, tf.ScrollOffset);
         Assert.Equal (16, tf.CursorPosition);
@@ -917,8 +920,9 @@ public class TextFieldTests
         // Proves #3022 is fixed (TextField selected text does not show in v2)
 
         _textField.CursorPosition = 0;
-        Application.Top.Add (_textField);
-        RunState rs = Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (_textField);
+        RunState rs = Application.Begin (top);
 
         Attribute [] attributes =
         {
@@ -1029,8 +1033,9 @@ public class TextFieldTests
         var clickCounter = 0;
         tf.MouseClick += (s, m) => { clickCounter++; };
 
-        Application.Top.Add (tf);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tf);
+        Application.Begin (top);
 
         var mouseEvent = new MouseEvent { Flags = MouseFlags.Button1Clicked, View = tf };
 
@@ -1822,7 +1827,7 @@ public class TextFieldTests
     public void Words_With_Accents_Incorrect_Order_Will_Result_With_Wrong_Accent_Place ()
     {
         var tf = new TextField { Width = 30, Text = "Les Misérables" };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tf);
         Application.Begin (top);
 
@@ -1857,7 +1862,7 @@ Les Miśerables",
         var tf = new TextField { Width = 10 };
         var tf2 = new TextField { Y = 1, Width = 10 };
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tf);
         top.Add (tf2);
 

@@ -1211,7 +1211,7 @@ public class DialogTests
                          if (iterations == 0)
                          {
                              var d = new Dialog { X = 5, Y = 5, Height = 3, Width = 5 };
-                             Begin (d);
+                             var rs = Begin (d);
 
                              Assert.Equal (new Point (5, 5), (Point)d.Frame.Location);
 
@@ -1229,10 +1229,11 @@ public class DialogTests
 ╚══════════════════╝",
                                                                            _output
                                                                           );
+                             End (rs);
                              d.Dispose ();
 
                              d = new Dialog { X = 5, Y = 5 };
-                             Begin (d);
+                             rs = Begin (d);
 
                              // This is because of PostionTopLevels and EnsureVisibleBounds
                              Assert.Equal (new (3, 2), d.Frame.Location);
@@ -1268,6 +1269,7 @@ public class DialogTests
 ╚══════════════════╝",
                                                                            _output
                                                                           );
+                             End (rs);
                              d.Dispose ();
                          }
                          else if (iterations > 0)

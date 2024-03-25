@@ -62,7 +62,7 @@ public class StatusBarTests
                                                )
                                        }
                                       );
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (statusBar);
 
         bool CanExecuteNew () { return win == null; }
@@ -97,7 +97,8 @@ public class StatusBarTests
                                     new (Application.QuitKey, $"{Application.QuitKey} to Quit!", null)
                                 }
                                );
-        Application.Top.Add (sb);
+        var top = new Toplevel ();
+        top.Add (sb);
 
         sb.OnDrawContent (sb.Bounds);
 
@@ -120,7 +121,8 @@ public class StatusBarTests
                                     new (KeyCode.CtrlMask | KeyCode.Q, "~CTRL-Q~ Quit", null)
                                 }
                                );
-        Application.Top.Add (sb);
+        var top = new Toplevel ();
+        top.Add (sb);
         sb.OnDrawContent (sb.Bounds);
 
         var expected = @$"
@@ -148,8 +150,6 @@ CTRL-O Open {
                                         )
                                 }
                                );
-        Application.Top.Add (sb);
-
         var iteration = 0;
 
         Application.Iteration += (s, a) =>
@@ -217,10 +217,12 @@ CTRL-O Open {
                                      Application.RequestStop ();
                                  };
 
-        Application.Top.Add (sb);
+        var top = new Toplevel ();
+       top.Add (sb);
 
-        Application.Run ();
+        Application.Run (top);
 
+        top.Dispose ();
         Application.Shutdown ();
     }
 

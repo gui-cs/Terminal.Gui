@@ -206,6 +206,7 @@ public class SubviewTests
                                  };
 
         Application.Run (top);
+        top.Dispose ();
         Application.Shutdown ();
 
         Assert.Equal (1, tc);
@@ -301,6 +302,7 @@ public class SubviewTests
                                  };
 
         Application.Run (t);
+        t.Dispose ();
         Application.Shutdown ();
 
         Assert.Equal (1, tc);

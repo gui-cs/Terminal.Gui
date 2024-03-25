@@ -125,7 +125,6 @@ public class MessageBoxTests
     public void Location_Default ()
     {
         int iterations = -1;
-        Application.Begin (new ());
         ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
 
         Application.Iteration += (s, a) =>

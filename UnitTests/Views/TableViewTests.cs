@@ -72,8 +72,9 @@ public class TableViewTests
         tv.Table = new DataTableSource (dt);
         tv.NullSymbol = string.Empty;
 
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         tv.Draw ();
 
@@ -417,8 +418,9 @@ public class TableViewTests
     {
         var tableView = new TableView ();
 
-        Application.Top.Add (tableView);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tableView);
+        Application.Begin (top);
 
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
@@ -592,6 +594,7 @@ public class TableViewTests
 ";
         TestHelpers.AssertDriverContentsAre (expected, output);
 
+        top.Dispose ();
         Application.Shutdown ();
     }
 
@@ -610,10 +613,11 @@ public class TableViewTests
         tableView.Style.AlwaysShowHeaders = false;
 
         // ensure that TableView has the input focus
-        Application.Top.Add (tableView);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tableView);
+        Application.Begin (top);
 
-        Application.Top.FocusFirst ();
+        top.FocusFirst ();
         Assert.True (tableView.HasFocus);
 
         Assert.Equal (0, tableView.RowOffset);
@@ -1004,8 +1008,9 @@ public class TableViewTests
         var tv = new TableView (BuildTable (1, 1));
         tv.CellActivated += (s, c) => activatedValue = c.Table [c.Row, c.Col].ToString ();
 
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         // pressing enter should activate the first cell (selected cell)
         tv.NewKeyDownEvent (Key.Enter);
@@ -1625,10 +1630,11 @@ public class TableViewTests
         Assert.Equal (0, tv.SelectedRow);
 
         // ensure that TableView has the input focus
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
-        Application.Top.FocusFirst ();
+        top.FocusFirst ();
         Assert.True (tv.HasFocus);
 
         // already on fish

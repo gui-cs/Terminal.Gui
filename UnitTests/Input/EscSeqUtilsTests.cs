@@ -770,7 +770,7 @@ public class EscSeqUtilsTests
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run (top);
 
         Assert.Null (Application.WantContinuousButtonPressedView);
 

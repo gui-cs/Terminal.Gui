@@ -458,7 +458,7 @@ public class ToplevelTests
         var tf2W2 = new TextField { Id = "tf2W2", X = Pos.Left (tf1W2), Width = Dim.Fill (), Text = "Text2 on Win2" };
         win2.Add (lblTf1W2, tf1W2, lblTvW2, tvW2, lblTf2W2, tf2W2);
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (win1, win2);
         top.Loaded += (s, e) => isRunning = true;
         top.Closing += (s, e) => isRunning = false;
@@ -560,7 +560,7 @@ public class ToplevelTests
     [AutoInitShutdown]
     public void KeyBindings_Command_With_OverlappedTop ()
     {
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         Assert.Null (Application.OverlappedTop);
         top.IsOverlappedContainer = true;
         Application.Begin (top);
@@ -740,6 +740,8 @@ public class ToplevelTests
 #if UNIX_KEY_BINDINGS
         Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.L.WithCtrl)));
 #endif
+        win2.Dispose ();
+        win1.Dispose ();
     }
 
     [Fact]
@@ -780,7 +782,7 @@ public class ToplevelTests
         var win = new Window ();
         win.Add (view);
         Application.Init (new FakeDriver ());
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (win);
 
         Assert.True (wasAdded);
@@ -796,19 +798,19 @@ public class ToplevelTests
         Key alternateBackwardKey = KeyCode.Null;
         Key quitKey = KeyCode.Null;
 
+        Toplevel top = new ();
         var view = new View ();
         view.Initialized += View_Initialized;
 
         void View_Initialized (object sender, EventArgs e)
         {
-            Application.Top.AlternateForwardKeyChanged += (s, e) => alternateForwardKey = e.OldKey;
-            Application.Top.AlternateBackwardKeyChanged += (s, e) => alternateBackwardKey = e.OldKey;
-            Application.Top.QuitKeyChanged += (s, e) => quitKey = e.OldKey;
+            top.AlternateForwardKeyChanged += (s, e) => alternateForwardKey = e.OldKey;
+            top.AlternateBackwardKeyChanged += (s, e) => alternateBackwardKey = e.OldKey;
+            top.QuitKeyChanged += (s, e) => quitKey = e.OldKey;
         }
 
         var win = new Window ();
         win.Add (view);
-        Toplevel top = Application.Top;
         top.Add (win);
         Application.Begin (top);
 
@@ -847,7 +849,7 @@ public class ToplevelTests
     public void Mouse_Drag_On_Top_With_Superview_Null ()
     {
         var win = new Window ();
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (win);
         int iterations = -1;
         Window testWindow;
@@ -1003,7 +1005,7 @@ public class ToplevelTests
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run (top);
     }
 
     [Fact]
@@ -1011,7 +1013,7 @@ public class ToplevelTests
     public void Mouse_Drag_On_Top_With_Superview_Not_Null ()
     {
         var win = new Window { X = 3, Y = 2, Width = 10, Height = 5 };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (win);
 
         int iterations = -1;
@@ -1132,7 +1134,7 @@ public class ToplevelTests
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run (top);
     }
 
     [Fact]
@@ -1158,7 +1160,7 @@ public class ToplevelTests
         var v = new View ();
         v.Enter += (s, _) => isEnter = true;
         v.Leave += (s, _) => isLeave = true;
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (v);
 
         Assert.False (v.CanFocus);
@@ -1168,27 +1170,38 @@ public class ToplevelTests
         Assert.Null (exception);
 
         v.CanFocus = true;
-        Application.Begin (top);
+        RunState rsTop = Application.Begin (top);
 
+        // From the v view
         Assert.True (isEnter);
+        // The Leave event is only raised on the End method
+        // and the top is still running
         Assert.False (isLeave);
 
         isEnter = false;
         var d = new Dialog ();
-        RunState rs = Application.Begin (d);
+        var dv = new View { CanFocus = true };
+        dv.Enter += (s, _) => isEnter = true;
+        dv.Leave += (s, _) => isLeave = true;
+        d.Add (dv);
+        RunState rsDialog = Application.Begin (d);
 
-        Assert.False (isEnter);
-        Assert.True (isLeave);
-
-        isLeave = false;
-        Application.End (rs);
-
+        // From the dv view
         Assert.True (isEnter);
+        Assert.False (isLeave);
+        Assert.True (dv.HasFocus);
 
-        Assert.False (
-                      isLeave
-                     ); // Leave event cannot be trigger because it v.Enter was performed and v is focused
+        isEnter = false;
+
+        Application.End (rsDialog);
+
+        // From the v view
+        Assert.True (isEnter);
+        // From the dv view
+        Assert.True (isLeave);
         Assert.True (v.HasFocus);
+
+        Application.End (rsTop);
     }
 
     [Fact]
@@ -1196,11 +1209,11 @@ public class ToplevelTests
     public void OnEnter_OnLeave_Triggered_On_Application_Begin_End_With_More_Toplevels ()
     {
         var iterations = 0;
-        var steps = new int [5];
+        var steps = new int [4];
         var isEnterTop = false;
         var isLeaveTop = false;
         var vt = new View ();
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         var diag = new Dialog ();
 
         vt.Enter += (s, e) =>
@@ -1215,15 +1228,15 @@ public class ToplevelTests
                         }
                         else
                         {
-                            steps [4] = iterations;
+                            steps [3] = iterations;
                             Assert.Equal (diag, e.View);
                         }
                     };
 
         vt.Leave += (s, e) =>
                     {
+                        // This will never be raised
                         iterations++;
-                        steps [1] = iterations;
                         isLeaveTop = true;
                         Assert.Equal (diag, e.View);
                     };
@@ -1236,7 +1249,7 @@ public class ToplevelTests
         Assert.Null (exception);
 
         vt.CanFocus = true;
-        Application.Begin (top);
+        RunState rsTop = Application.Begin (top);
 
         Assert.True (isEnterTop);
         Assert.False (isLeaveTop);
@@ -1249,7 +1262,7 @@ public class ToplevelTests
         vd.Enter += (s, e) =>
                     {
                         iterations++;
-                        steps [2] = iterations;
+                        steps [1] = iterations;
                         isEnterDiag = true;
                         Assert.Null (e.View);
                     };
@@ -1257,7 +1270,7 @@ public class ToplevelTests
         vd.Leave += (s, e) =>
                     {
                         iterations++;
-                        steps [3] = iterations;
+                        steps [2] = iterations;
                         isLeaveDiag = true;
                         Assert.Equal (top, e.View);
                     };
@@ -1270,30 +1283,33 @@ public class ToplevelTests
         Assert.Null (exception);
 
         vd.CanFocus = true;
-        RunState rs = Application.Begin (diag);
+        RunState rsDiag = Application.Begin (diag);
 
         Assert.True (isEnterDiag);
         Assert.False (isLeaveDiag);
         Assert.False (isEnterTop);
-        Assert.True (isLeaveTop);
+        // The Leave event is only raised on the End method
+        // and the top is still running
+        Assert.False (isLeaveTop);
 
         isEnterDiag = false;
         isLeaveTop = false;
-        Application.End (rs);
+        Application.End (rsDiag);
 
         Assert.False (isEnterDiag);
         Assert.True (isLeaveDiag);
         Assert.True (isEnterTop);
-
-        Assert.False (
-                      isLeaveTop
-                     ); // Leave event cannot be trigger because it v.Enter was performed and v is focused
+        // Leave event on top cannot be raised
+        // because Current is null on the End method
+        Assert.False (isLeaveTop);
         Assert.True (vt.HasFocus);
+
+        Application.End (rsTop);
+
         Assert.Equal (1, steps [0]);
         Assert.Equal (2, steps [1]);
         Assert.Equal (3, steps [2]);
-        Assert.Equal (4, steps [3]);
-        Assert.Equal (5, steps [^1]);
+        Assert.Equal (4, steps [^1]);
     }
 
     [Fact]
@@ -1303,8 +1319,9 @@ public class ToplevelTests
         var tf = new TextField { Width = 5, Text = "test" };
         var view = new View { Width = 10, Height = 10 };
         view.Add (tf);
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
 
         Assert.True (tf.HasFocus);
         Application.Driver.GetCursorVisibility (out CursorVisibility cursor);
@@ -1321,7 +1338,7 @@ public class ToplevelTests
     [AutoInitShutdown]
     public void IsLoaded_Application_Begin ()
     {
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         Assert.False (top.IsLoaded);
 
         Application.Begin (top);
@@ -1332,7 +1349,7 @@ public class ToplevelTests
     [AutoInitShutdown]
     public void IsLoaded_With_Sub_Toplevel_Application_Begin_NeedDisplay ()
     {
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         var subTop = new Toplevel ();
         var view = new View { Frame = new Rectangle (0, 0, 20, 10) };
         subTop.Add (view);
@@ -1380,7 +1397,7 @@ public class ToplevelTests
         };
         var win = new Window { X = 3, Y = 3, Width = Dim.Fill (3), Height = Dim.Fill (3) };
         scrollView.Add (win);
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (scrollView);
         Application.Begin (top);
 
@@ -1514,11 +1531,11 @@ public class ToplevelTests
     [AutoInitShutdown]
     public void Window_Bounds_Bigger_Than_Driver_Cols_And_Rows_Allow_Drag_Beyond_Left_Right_And_Bottom ()
     {
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         var window = new Window { Width = 20, Height = 3 };
-        Application.Begin (top);
+        RunState rsTop = Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (40, 10);
-        Application.Begin (window);
+        RunState rsWindow = Application.Begin (window);
         Application.Refresh ();
         Assert.Equal (new Rectangle (0, 0, 40, 10), top.Frame);
         Assert.Equal (new Rectangle (0, 0, 20, 3), window.Frame);
@@ -1661,6 +1678,9 @@ public class ToplevelTests
         Assert.Equal (new Rectangle (0, 0, 19, 2), top.Frame);
         Assert.Equal (new Rectangle (19, 2, 20, 3), window.Frame);
         TestHelpers.AssertDriverContentsWithFrameAre (@"", _output);
+
+        Application.End (rsWindow);
+        Application.End (rsTop);
     }
 
     [Fact]
@@ -1749,15 +1769,18 @@ public class ToplevelTests
     [AutoInitShutdown]
     public void Begin_With_Window_Sets_Size_Correctly ()
     {
-        Toplevel top = Application.Top;
-        Application.Begin (top);
+        Toplevel top = new ();
+        RunState rsTop = Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (20, 20);
 
         var testWindow = new Window { X = 2, Y = 1, Width = 15, Height = 10 };
         Assert.Equal (new Rectangle (2, 1, 15, 10), testWindow.Frame);
 
-        RunState rs = Application.Begin (testWindow);
+        RunState rsTestWindow = Application.Begin (testWindow);
         Assert.Equal (new Rectangle (2, 1, 15, 10), testWindow.Frame);
+
+        Application.End (rsTestWindow);
+        Application.End (rsTop);
     }
 
     // Don't use Dialog as a Top, use a Window instead - dialog has complex layout behavior that is not needed here.
@@ -1765,10 +1788,10 @@ public class ToplevelTests
     [AutoInitShutdown]
     public void Draw_A_Top_Subview_On_A_Window ()
     {
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         var win = new Window ();
         top.Add (win);
-        Application.Begin (top);
+        RunState rsTop = Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (20, 20);
 
         Assert.Equal (new Rectangle (0, 0, 20, 20), win.Frame);
@@ -1837,7 +1860,7 @@ public class ToplevelTests
                                     Application.Current.DrawContentComplete -= testWindow_DrawContentComplete;
                                 }
                             };
-        RunState rs = Application.Begin (testWindow);
+        RunState rsTestWindow = Application.Begin (testWindow);
 
         Assert.Equal (new Rectangle (2, 1, 15, 10), testWindow.Frame);
 
@@ -1878,7 +1901,7 @@ public class ToplevelTests
         Application.Top.Draw ();
 
         var firstIteration = false;
-        Application.RunIteration (ref rs, ref firstIteration);
+        Application.RunIteration (ref rsTestWindow, ref firstIteration);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @$"
@@ -1909,7 +1932,8 @@ public class ToplevelTests
                                                       _output
                                                      );
 
-        Application.End (rs);
+        Application.End (rsTestWindow);
+        Application.End (rsTop);
     }
 
     [Fact]
@@ -1925,8 +1949,9 @@ public class ToplevelTests
         };
         var topChild = new Toplevel ();
         topChild.Add (menu);
-        Application.Top.Add (topChild);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (topChild);
+        Application.Begin (top);
 
         Exception exception = Record.Exception (() => topChild.NewKeyDownEvent (KeyCode.AltMask));
         Assert.Null (exception);
@@ -1938,7 +1963,7 @@ public class ToplevelTests
     {
         Application.Init (new FakeDriver ());
 
-        Toplevel t = Application.Top;
+        Toplevel t = new ();
         var w = new Window ();
         t.Add (w);
 
@@ -2063,7 +2088,8 @@ public class ToplevelTests
             testWindow.Dispose ();
         }
 
-        Application.Run ();
+        Application.Run (t);
+        t.Dispose ();
         Application.Shutdown ();
     }
 }
