@@ -378,29 +378,29 @@ public static partial class Application
     ///     The <see cref="RunState"/> handle that needs to be passed to the <see cref="End(RunState)"/> method upon
     ///     completion.
     /// </returns>
-    /// <param name="Toplevel">The <see cref="Toplevel"/> to prepare execution for.</param>
+    /// <param name="toplevel">The <see cref="Toplevel"/> to prepare execution for.</param>
     /// <remarks>
     ///     This method prepares the provided <see cref="Toplevel"/> for running with the focus, it adds this to the list
     ///     of <see cref="Toplevel"/>s, lays out the Subviews, focuses the first element, and draws the <see cref="Toplevel"/>
     ///     in the screen. This is usually followed by executing the <see cref="RunLoop"/> method, and then the
     ///     <see cref="End(RunState)"/> method upon termination which will undo these changes.
     /// </remarks>
-    public static RunState Begin (Toplevel Toplevel)
+    public static RunState Begin (Toplevel toplevel)
     {
-        if (Toplevel is null)
+        if (toplevel is null)
         {
-            throw new ArgumentNullException (nameof (Toplevel));
+            throw new ArgumentNullException (nameof (toplevel));
         }
 
 #if DEBUG_IDISPOSABLE
-        Debug.Assert (!Toplevel.WasDisposed);
-        if (_latestClosedRunStateToplevel is { } && _latestClosedRunStateToplevel != Toplevel)
+        Debug.Assert (!toplevel.WasDisposed);
+        if (_latestClosedRunStateToplevel is { } && _latestClosedRunStateToplevel != toplevel)
         {
             Debug.Assert (_latestClosedRunStateToplevel.WasDisposed);
         }
 #endif
 
-        if (Toplevel.IsOverlappedContainer && OverlappedTop != Toplevel && OverlappedTop is { })
+        if (toplevel.IsOverlappedContainer && OverlappedTop != toplevel && OverlappedTop is { })
         {
             throw new InvalidOperationException ("Only one Overlapped Container is allowed.");
         }
@@ -408,18 +408,18 @@ public static partial class Application
         // Ensure the mouse is ungrabed.
         MouseGrabView = null;
 
-        var rs = new RunState (Toplevel);
+        var rs = new RunState (toplevel);
 
         // View implements ISupportInitializeNotification which is derived from ISupportInitialize
-        if (!Toplevel.IsInitialized)
+        if (!toplevel.IsInitialized)
         {
-            Toplevel.BeginInit ();
-            Toplevel.EndInit ();
+            toplevel.BeginInit ();
+            toplevel.EndInit ();
         }
 
         lock (_topLevels)
         {
-            if (Top is { } && Toplevel != Top && !_topLevels.Contains (Top))
+            if (Top is { } && toplevel != Top && !_topLevels.Contains (Top))
             {
 #if DEBUG_IDISPOSABLE
                 // This assertion confirm if the Top was already disposed
@@ -438,14 +438,14 @@ public static partial class Application
                     throw new ObjectDisposedException (Top.GetType ().FullName);
                 }
             }
-            else if (OverlappedTop is { } && Toplevel != Top && _topLevels.Contains (Top))
+            else if (OverlappedTop is { } && toplevel != Top && _topLevels.Contains (Top))
             {
-                Top.OnLeave (Toplevel);
+                Top.OnLeave (toplevel);
             }
 
             // BUGBUG: We should not depend on `Id` internally. 
             // BUGBUG: It is super unclear what this code does anyway.
-            if (string.IsNullOrEmpty (Toplevel.Id))
+            if (string.IsNullOrEmpty (toplevel.Id))
             {
                 var count = 1;
                 var id = (_topLevels.Count + count).ToString ();
@@ -456,17 +456,17 @@ public static partial class Application
                     id = (_topLevels.Count + count).ToString ();
                 }
 
-                Toplevel.Id = (_topLevels.Count + count).ToString ();
+                toplevel.Id = (_topLevels.Count + count).ToString ();
 
-                _topLevels.Push (Toplevel);
+                _topLevels.Push (toplevel);
             }
             else
             {
-                Toplevel dup = _topLevels.FirstOrDefault (x => x.Id == Toplevel.Id);
+                Toplevel dup = _topLevels.FirstOrDefault (x => x.Id == toplevel.Id);
 
                 if (dup is null)
                 {
-                    _topLevels.Push (Toplevel);
+                    _topLevels.Push (toplevel);
                 }
             }
 
@@ -476,24 +476,24 @@ public static partial class Application
             }
         }
 
-        if (Top is null || Toplevel.IsOverlappedContainer)
+        if (Top is null || toplevel.IsOverlappedContainer)
         {
-            Top = Toplevel;
+            Top = toplevel;
         }
 
         var refreshDriver = true;
 
         if (OverlappedTop is null
-            || Toplevel.IsOverlappedContainer
-            || (Current?.Modal == false && Toplevel.Modal)
-            || (Current?.Modal == false && !Toplevel.Modal)
-            || (Current?.Modal == true && Toplevel.Modal))
+            || toplevel.IsOverlappedContainer
+            || (Current?.Modal == false && toplevel.Modal)
+            || (Current?.Modal == false && !toplevel.Modal)
+            || (Current?.Modal == true && toplevel.Modal))
         {
-            if (Toplevel.Visible)
+            if (toplevel.Visible)
             {
-                Current?.OnDeactivate (Toplevel);
+                Current?.OnDeactivate (toplevel);
                 var previousCurrent = Current;
-                Current = Toplevel;
+                Current = toplevel;
                 Current.OnActivate (previousCurrent);
 
                 SetCurrentOverlappedAsTop ();
@@ -504,13 +504,13 @@ public static partial class Application
             }
         }
         else if ((OverlappedTop != null
-                  && Toplevel != OverlappedTop
+                  && toplevel != OverlappedTop
                   && Current?.Modal == true
                   && !_topLevels.Peek ().Modal)
-                 || (OverlappedTop is { } && Toplevel != OverlappedTop && Current?.Running == false))
+                 || (OverlappedTop is { } && toplevel != OverlappedTop && Current?.Running == false))
         {
             refreshDriver = false;
-            MoveCurrent (Toplevel);
+            MoveCurrent (toplevel);
         }
         else
         {
@@ -519,26 +519,26 @@ public static partial class Application
         }
 
         //if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
-        Toplevel.SetRelativeLayout (Driver.Bounds);
+        toplevel.SetRelativeLayout (Driver.Bounds);
 
         //}
 
         // BUGBUG: This call is likley not needed.
-        Toplevel.LayoutSubviews ();
-        Toplevel.PositionToplevels ();
-        Toplevel.FocusFirst ();
+        toplevel.LayoutSubviews ();
+        toplevel.PositionToplevels ();
+        toplevel.FocusFirst ();
 
         if (refreshDriver)
         {
-            OverlappedTop?.OnChildLoaded (Toplevel);
-            Toplevel.OnLoaded ();
-            Toplevel.SetNeedsDisplay ();
-            Toplevel.Draw ();
-            Toplevel.PositionCursor ();
+            OverlappedTop?.OnChildLoaded (toplevel);
+            toplevel.OnLoaded ();
+            toplevel.SetNeedsDisplay ();
+            toplevel.Draw ();
+            toplevel.PositionCursor ();
             Driver.Refresh ();
         }
 
-        NotifyNewRunState?.Invoke (Toplevel, new RunStateEventArgs (rs));
+        NotifyNewRunState?.Invoke (toplevel, new RunStateEventArgs (rs));
 
         return rs;
     }
