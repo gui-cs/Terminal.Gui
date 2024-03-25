@@ -374,11 +374,11 @@ internal class NetEvents : IDisposable
                 return;
             }
 
-            _winChange.Wait (_inputReadyCancellationTokenSource.Token);
-            _winChange.Reset ();
-
             try
             {
+                _winChange.Wait (_inputReadyCancellationTokenSource.Token);
+                _winChange.Reset ();
+
                 RequestWindowSize (_inputReadyCancellationTokenSource.Token);
             }
             catch (OperationCanceledException)
