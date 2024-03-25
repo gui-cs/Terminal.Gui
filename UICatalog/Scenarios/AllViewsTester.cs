@@ -48,10 +48,7 @@ public class AllViewsTester : Scenario
         ConfigurationManager.Apply ();
         Top = new ();
         Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
-    }
 
-    public override void Setup ()
-    {
         var statusBar = new StatusBar (
                                        new StatusItem []
                                        {

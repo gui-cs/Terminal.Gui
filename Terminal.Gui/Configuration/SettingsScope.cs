@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
 
@@ -44,7 +45,10 @@ public class SettingsScope : Scope<SettingsScope>
             Update (JsonSerializer.Deserialize<SettingsScope> (stream, _serializerOptions)!);
             OnUpdated ();
             Debug.WriteLine ($"ConfigurationManager: Read configuration from \"{source}\"");
-            Sources.Add (source);
+            if (!Sources.Contains (source))
+            {
+                Sources.Add (source);
+            }
 
             return this;
         }
@@ -70,7 +74,10 @@ public class SettingsScope : Scope<SettingsScope>
         if (!File.Exists (realPath))
         {
             Debug.WriteLine ($"ConfigurationManager: Configuration file \"{realPath}\" does not exist.");
-            Sources.Add (filePath);
+            if (!Sources.Contains (filePath))
+            {
+                Sources.Add (filePath);
+            }
 
             return this;
         }
