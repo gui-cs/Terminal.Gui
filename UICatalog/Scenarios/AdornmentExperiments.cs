@@ -8,6 +8,8 @@ public class AdornmentExperiments : Scenario
 {
     private ViewDiagnosticFlags _diagnosticFlags;
 
+    private View _frameView;
+
     public override void Init ()
     {
         Application.Init ();
@@ -18,17 +20,13 @@ public class AdornmentExperiments : Scenario
 
         _diagnosticFlags = View.Diagnostics;
         //View.Diagnostics = ViewDiagnosticFlags.MouseEnter;
-    }
 
-    private View _frameView;
-    public override void Setup ()
-    {
         _frameView = new View ()
         {
             Title = "Frame View",
             X = 0,
             Y = 0,
-            Width = Dim.Percent(90),
+            Width = Dim.Percent (90),
             Height = Dim.Percent (90),
             CanFocus = true,
         };
