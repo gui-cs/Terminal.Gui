@@ -45,7 +45,7 @@ namespace UICatalog;
 ///     </para>
 ///     <para>
 ///         The UI Catalog program uses reflection to find all scenarios and adds them to the ListViews. Press ENTER to
-///         run the selected scenario. Press the default quit key to quit.	/
+///         run the selected scenario. Press the default quit key to quit.
 ///     </para>
 /// </summary>
 /// <example>
@@ -88,14 +88,6 @@ public class Scenario : IDisposable
     /// </summary>
     public Window Win { get; set; }
 
-    public void Dispose ()
-    {
-        Top?.Dispose ();
-        Win?.Dispose ();
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose (true);
-        GC.SuppressFinalize (this);
-    }
 
     /// <summary>
     ///     Helper function to get the list of categories a <see cref="Scenario"/> belongs to (defined in
@@ -136,8 +128,17 @@ public class Scenario : IDisposable
         return objects.OrderBy (s => s.GetName ()).ToList ();
     }
 
+
+    public virtual void Main ()
+    {
+        Init ();
+        Setup ();
+        Run ();
+    }
+
+
     /// <summary>
-    ///     Helper that provides the default <see cref="Terminal.Gui.Window"/> implementation with a frame and label
+    ///     Helper that calls <see cref="Application.Init"/> and creates the default <see cref="Terminal.Gui.Window"/> implementation with a frame and label
     ///     showing the name of the <see cref="Scenario"/> and logic to exit back to the Scenario picker UI. Override
     ///     <see cref="Init"/> to provide any <see cref="Terminal.Gui.Toplevel"/> behavior needed.
     /// </summary>
@@ -172,9 +173,6 @@ public class Scenario : IDisposable
         Top.Add (Win);
     }
 
-    /// <summary>Stops the scenario. Override to change shutdown behavior for the <see cref="Scenario"/>.</summary>
-    public virtual void RequestStop () { Application.RequestStop (); }
-
     /// <summary>
     ///     Runs the <see cref="Scenario"/>. Override to start the <see cref="Scenario"/> using a <see cref="Toplevel"/>
     ///     different than `Top`.
@@ -185,7 +183,7 @@ public class Scenario : IDisposable
     /// </remarks>
     public virtual void Run ()
     {
-        // Must explicit call Application.Shutdown method to shutdown.
+        // Must explicitly call Application.Shutdown method to shutdown.
         Application.Run (Top);
     }
 
@@ -196,6 +194,13 @@ public class Scenario : IDisposable
     /// <summary>Gets the Scenario Name + Description with the Description padded based on the longest known Scenario name.</summary>
     /// <returns></returns>
     public override string ToString () { return $"{GetName ().PadRight (_maxScenarioNameLen)}{GetDescription ()}"; }
+    
+    public void Dispose ()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose (true);
+        GC.SuppressFinalize (this);
+    }
 
     protected virtual void Dispose (bool disposing)
     {
@@ -203,11 +208,10 @@ public class Scenario : IDisposable
         {
             if (disposing)
             {
-                // TODO: dispose managed state (managed objects)
+                Top?.Dispose ();
+                Win?.Dispose ();
             }
 
-            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-            // TODO: set large fields to null
             _disposedValue = true;
         }
     }

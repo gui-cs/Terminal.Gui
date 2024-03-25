@@ -93,7 +93,7 @@ public static partial class Application
         {
             t.Running = false;
 #if DEBUG_IDISPOSABLE
-            // Don't dispose the tolevels. It's up to caller dispose them
+            // Don't dispose the toplevels. It's up to caller dispose them
             Debug.Assert (t.WasDisposed);
 #endif
         }
@@ -105,7 +105,7 @@ public static partial class Application
         if (Top is { })
         {
             Debug.Assert (Top.WasDisposed);
-            // If End wasn't called _latestClosedRunStateToplevel may be null
+            // If End wasn't called _cachedRunStateToplevel may be null
             if (_cachedRunStateToplevel is { })
             {
                 Debug.Assert (_cachedRunStateToplevel.WasDisposed);
@@ -246,7 +246,8 @@ public static partial class Application
         // multiple times. We need to do this because some settings are only
         // valid after a Driver is loaded. In this cases we need just 
         // `Settings` so we can determine which driver to use.
-        Load (true);
+        // Don't reset, so we can inherit the theme from the previous run.
+        Load (false);
         Apply ();
 
         // Ignore Configuration for ForceDriver if driverName is specified
@@ -350,6 +351,7 @@ public static partial class Application
     /// </remarks>
     public static void Shutdown ()
     {
+        // TODO: Throw an exception if Init hasn't been called.
         ResetState ();
         PrintJsonErrors ();
     }
@@ -531,7 +533,7 @@ public static partial class Application
 
         //}
 
-        // BUGBUG: This call is likley not needed.
+        // BUGBUG: This call is likely not needed.
         toplevel.LayoutSubviews ();
         toplevel.PositionToplevels ();
         toplevel.FocusFirst ();
@@ -555,33 +557,48 @@ public static partial class Application
     ///     Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> with the value of
     ///     <see cref="Top"/>.
     /// </summary>
-    /// <remarks>See <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> for more details.</remarks>
-    public static void Run (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null) { Run<Toplevel> (errorHandler, driver);}
+    /// <remarks>
+    ///     <para>
+    ///         <see cref="Shutdown"/> must be called when the application is closing (typically after Run> has returned) to
+    ///         ensure resources are cleaned up and terminal settings restored.
+    ///     </para>
+    /// <para>
+    /// The caller is responsible for disposing the object returned by this method.</para>
+    /// </para>
+    /// <returns>The created <see cref="Toplevel"/> object. The caller is responsible for disposing this object.</returns>
+    public static Toplevel Run (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null) { return Run<Toplevel> (errorHandler, driver); }
 
     /// <summary>
     ///     Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> with a new instance of the
     ///     specified <see cref="Toplevel"/>-derived class.
     ///     <para>Calling <see cref="Init"/> first is not needed as this function will initialize the application.</para>
+    /// </summary>
+    /// <remarks>
     ///     <para>
     ///         <see cref="Shutdown"/> must be called when the application is closing (typically after Run> has returned) to
     ///         ensure resources are cleaned up and terminal settings restored.
     ///     </para>
-    /// </summary>
-    /// <remarks>See <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> for more details.</remarks>
+    /// <para>
+    /// The caller is responsible for disposing the object returned by this method.</para>
+    /// </para>
+    /// </remarks>
     /// <param name="errorHandler"></param>
     /// <param name="driver">
     ///     The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the platform will
     ///     be used ( <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>). Must be
     ///     <see langword="null"/> if <see cref="Init"/> has already been called.
     /// </param>
-    public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
+    /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
+    public static T Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
         where T : Toplevel, new()
     {
-        var top = new T () as Toplevel;
+        var top = new T ();
 
         EnsureValidInitialization (top, driver);
 
         RunApp (top, errorHandler);
+
+        return top;
     }
 
     /// <summary>Runs the main loop on the given <see cref="Toplevel"/> container.</summary>

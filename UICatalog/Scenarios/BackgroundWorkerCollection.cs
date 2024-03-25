@@ -15,8 +15,9 @@ public class BackgroundWorkerCollection : Scenario
 {
     public override void Init ()
     {
-        Application.Run<OverlappedMain> ();
+        var main = Application.Run<OverlappedMain> ();
 
+        //main.Dispose ();
         Application.Top.Dispose ();
     }
 
@@ -357,7 +358,6 @@ public class BackgroundWorkerCollection : Scenario
 
             Closing += WorkerApp_Closing;
         }
-
         private void WorkerApp_Closing (object sender, ToplevelClosingEventArgs e)
         {
             Toplevel top = Application.OverlappedChildren.Find (x => x.Data.ToString () == "WorkerApp");

@@ -290,11 +290,10 @@ internal class UICatalogApp
             Application.Init (driverName: _forceDriver);
             _selectedScenario.Theme = _cachedTheme;
             _selectedScenario.TopLevelColorScheme = _topLevelColorScheme;
-            _selectedScenario.Init ();
-            _selectedScenario.Setup ();
-            _selectedScenario.Run ();
+            _selectedScenario.Main ();
             _selectedScenario.Dispose ();
             _selectedScenario = null;
+            // TODO: Throw if shutdown was not called already
             Application.Shutdown ();
             VerifyObjectsWereDisposed ();
 
@@ -322,13 +321,12 @@ internal class UICatalogApp
             Apply ();
             scenario.Theme = _cachedTheme;
             scenario.TopLevelColorScheme = _topLevelColorScheme;
-            scenario.Init ();
-            scenario.Setup ();
-            scenario.Run ();
+            scenario.Main ();
             scenario.Dispose ();
 
             // This call to Application.Shutdown brackets the Application.Init call
             // made by Scenario.Init() above
+            // TODO: Throw if shutdown was not called already
             Application.Shutdown ();
 
             VerifyObjectsWereDisposed ();
@@ -463,10 +461,6 @@ internal class UICatalogApp
                              // This causes GetScenarioToRun to return null
                              _selectedScenario = null;
                              RequestStop ();
-                         }
-                         else
-                         {
-                             _selectedScenario.RequestStop ();
                          }
                      }
                     ),

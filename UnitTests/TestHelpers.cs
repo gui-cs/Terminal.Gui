@@ -95,8 +95,9 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
         if (AutoInit)
         {
-#if DEBUG_IDISPOSABLE
+            ConfigurationManager.Reset ();
 
+#if DEBUG_IDISPOSABLE
             // Clear out any lingering Responder instances from previous tests
             if (Responder.Instances.Count == 0)
             {

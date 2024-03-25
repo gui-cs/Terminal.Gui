@@ -147,9 +147,8 @@ public static class ConfigurationManager
         {
             if (_settings is null)
             {
-                throw new InvalidOperationException (
-                                                     "ConfigurationManager has not been initialized. Call ConfigurationManager.Reset() before accessing the Settings property."
-                                                    );
+                // If Settings is null, we need to initialize it.
+                Reset ();
             }
 
             return _settings;
