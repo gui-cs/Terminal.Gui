@@ -175,7 +175,7 @@ CTRL-O Open {
                                      iteration++;
                                  };
 
-        Application.Run ();
+        Application.Run ().Dispose ();
     }
 
     [Fact]

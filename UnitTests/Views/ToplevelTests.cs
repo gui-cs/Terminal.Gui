@@ -1839,10 +1839,10 @@ public class ToplevelTests
                                     BorderStyle = LineStyle.Single
                                 };
                                 Assert.Equal (testWindow, Application.Current);
-                                Application.Current.DrawContentComplete += testWindow_DrawContentComplete;
+                                Application.Current.DrawContentComplete += OnDrawContentComplete;
                                 top.Add (viewAddedToTop);
 
-                                void testWindow_DrawContentComplete (object sender, DrawEventArgs e)
+                                void OnDrawContentComplete (object sender, DrawEventArgs e)
                                 {
                                     Assert.Equal (new Rectangle (1, 3, 18, 16), viewAddedToTop.Frame);
 
@@ -1857,7 +1857,7 @@ public class ToplevelTests
                                     View.Driver.AddStr ("Three");
                                     Application.Driver.Clip = savedClip;
 
-                                    Application.Current.DrawContentComplete -= testWindow_DrawContentComplete;
+                                    Application.Current.DrawContentComplete -= OnDrawContentComplete;
                                 }
                             };
         RunState rsTestWindow = Application.Begin (testWindow);
@@ -1935,6 +1935,8 @@ public class ToplevelTests
         Application.End (rsTestWindow);
         Application.End (rsTop);
     }
+
+    private void OnDrawContentComplete (object sender, DrawEventArgs e) { throw new NotImplementedException (); }
 
     [Fact]
     [AutoInitShutdown]

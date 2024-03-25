@@ -78,18 +78,6 @@ public class Scenario : IDisposable
     private bool _disposedValue;
 
     /// <summary>
-    ///     The Toplevel for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/>.
-    /// </summary>
-    public Toplevel Top { get; set; }
-
-    /// <summary>
-    ///     The Window for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/> in
-    ///     most cases.
-    /// </summary>
-    public Window Win { get; set; }
-
-
-    /// <summary>
     ///     Helper function to get the list of categories a <see cref="Scenario"/> belongs to (defined in
     ///     <see cref="ScenarioCategory"/>)
     /// </summary>
@@ -128,17 +116,9 @@ public class Scenario : IDisposable
         return objects.OrderBy (s => s.GetName ()).ToList ();
     }
 
-
-    public virtual void Main ()
-    {
-        Init ();
-        Setup ();
-        Run ();
-    }
-
-
     /// <summary>
-    ///     Helper that calls <see cref="Application.Init"/> and creates the default <see cref="Terminal.Gui.Window"/> implementation with a frame and label
+    ///     Helper that calls <see cref="Application.Init"/> and creates the default <see cref="Terminal.Gui.Window"/>
+    ///     implementation with a frame and label
     ///     showing the name of the <see cref="Scenario"/> and logic to exit back to the Scenario picker UI. Override
     ///     <see cref="Init"/> to provide any <see cref="Terminal.Gui.Toplevel"/> behavior needed.
     /// </summary>
@@ -152,6 +132,7 @@ public class Scenario : IDisposable
     ///         creating any views or calling other Terminal.Gui APIs.
     ///     </para>
     /// </remarks>
+    [ObsoleteAttribute ("This method is obsolete and will be removed in v2. Use Main instead.", false)]
     public virtual void Init ()
     {
         Application.Init ();
@@ -161,7 +142,7 @@ public class Scenario : IDisposable
 
         Top = new ();
 
-        Win = new Window
+        Win = new()
         {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
             X = 0,
@@ -174,6 +155,25 @@ public class Scenario : IDisposable
     }
 
     /// <summary>
+    ///     Called by UI Catalog to run the <see cref="Scenario"/>. This is the main entry point for the <see cref="Scenario"/>
+    ///     .
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Scenario developers are encouraged to override this method as the primary way of authoring a new
+    ///         scenario.
+    ///     </para>
+    ///     <para>
+    ///         The base implementation calls <see cref="Init"/>, <see cref="Setup"/>, and <see cref="Run"/>.
+    ///     </para>
+    public virtual void Main ()
+    {
+        Init ();
+        Setup ();
+        Run ();
+    }
+
+    /// <summary>
     ///     Runs the <see cref="Scenario"/>. Override to start the <see cref="Scenario"/> using a <see cref="Toplevel"/>
     ///     different than `Top`.
     /// </summary>
@@ -181,6 +181,7 @@ public class Scenario : IDisposable
     ///     Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Shutdown"/> before
     ///     returning.
     /// </remarks>
+    [ObsoleteAttribute ("This method is obsolete and will be removed in v2. Use Main instead.", false)]
     public virtual void Run ()
     {
         // Must explicitly call Application.Shutdown method to shutdown.
@@ -189,12 +190,27 @@ public class Scenario : IDisposable
 
     /// <summary>Override this to implement the <see cref="Scenario"/> setup logic (create controls, etc...).</summary>
     /// <remarks>This is typically the best place to put scenario logic code.</remarks>
+    [ObsoleteAttribute ("This method is obsolete and will be removed in v2. Use Main instead.", false)]
     public virtual void Setup () { }
+
+    /// <summary>
+    ///     The Toplevel for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/>.
+    /// </summary>
+    //[ObsoleteAttribute ("This property is obsolete and will be removed in v2. Use Main instead.", false)]
+    public Toplevel Top { get; set; }
 
     /// <summary>Gets the Scenario Name + Description with the Description padded based on the longest known Scenario name.</summary>
     /// <returns></returns>
     public override string ToString () { return $"{GetName ().PadRight (_maxScenarioNameLen)}{GetDescription ()}"; }
-    
+
+    /// <summary>
+    ///     The Window for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/> in
+    ///     most cases.
+    /// </summary>
+    //[ObsoleteAttribute ("This property is obsolete and will be removed in v2. Use Main instead.", false)]
+    public Window Win { get; set; }
+
+#region IDispose
     public void Dispose ()
     {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
@@ -215,6 +231,7 @@ public class Scenario : IDisposable
             _disposedValue = true;
         }
     }
+#endregion IDispose
 
     /// <summary>Returns a list of all Categories set by all of the <see cref="Scenario"/>s defined in the project.</summary>
     internal static List<string> GetAllCategories ()
@@ -250,9 +267,6 @@ public class Scenario : IDisposable
     {
         public ScenarioCategory (string Name) { this.Name = Name; }
 
-        /// <summary>Category Name</summary>
-        public string Name { get; set; }
-
         /// <summary>Static helper function to get the <see cref="Scenario"/> Categories given a Type</summary>
         /// <param name="t"></param>
         /// <returns>list of category names</returns>
@@ -269,6 +283,9 @@ public class Scenario : IDisposable
         /// <param name="t"></param>
         /// <returns>Name of the category</returns>
         public static string GetName (Type t) { return ((ScenarioCategory)GetCustomAttributes (t) [0]).Name; }
+
+        /// <summary>Category Name</summary>
+        public string Name { get; set; }
     }
 
     /// <summary>Defines the metadata (Name and Description) for a <see cref="Scenario"/></summary>
@@ -284,9 +301,6 @@ public class Scenario : IDisposable
         /// <summary><see cref="Scenario"/> Description</summary>
         public string Description { get; set; }
 
-        /// <summary><see cref="Scenario"/> Name</summary>
-        public string Name { get; set; }
-
         /// <summary>Static helper function to get the <see cref="Scenario"/> Description given a Type</summary>
         /// <param name="t"></param>
         /// <returns></returns>
@@ -296,5 +310,8 @@ public class Scenario : IDisposable
         /// <param name="t"></param>
         /// <returns></returns>
         public static string GetName (Type t) { return ((ScenarioMetadata)GetCustomAttributes (t) [0]).Name; }
+
+        /// <summary><see cref="Scenario"/> Name</summary>
+        public string Name { get; set; }
     }
 }

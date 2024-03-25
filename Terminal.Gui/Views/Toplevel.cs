@@ -9,7 +9,7 @@ namespace Terminal.Gui;
 /// <remarks>
 ///     <para>
 ///         Toplevels can run as modal (popup) views, started by calling
-///         <see cref="Application.Run(Toplevel, Func{Exception,bool})"/>. They return control to the caller when
+///         <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>. They return control to the caller when
 ///         <see cref="Application.RequestStop(Toplevel)"/> has been called (which sets the <see cref="Toplevel.Running"/>
 ///         property to <c>false</c>).
 ///     </para>
@@ -17,7 +17,7 @@ namespace Terminal.Gui;
 ///         A Toplevel is created when an application initializes Terminal.Gui by calling <see cref="Application.Init"/>.
 ///         The application Toplevel can be accessed via <see cref="Application.Top"/>. Additional Toplevels can be created
 ///         and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and call
-///         <see cref="Application.Run(Toplevel, Func{Exception,bool})"/>.
+///         <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>.
 ///     </para>
 /// </remarks>
 public partial class Toplevel : View
@@ -452,7 +452,7 @@ public partial class Toplevel : View
     /// <inheritdoc/>
     public override void Remove (View view)
     {
-        if (this is Toplevel Toplevel && Toplevel.MenuBar is { })
+        if (this is Toplevel { MenuBar: { } })
         {
             RemoveMenuStatusBar (view);
         }

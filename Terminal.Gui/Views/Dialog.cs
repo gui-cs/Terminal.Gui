@@ -9,7 +9,7 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 ///     To run the <see cref="Dialog"/> modally, create the <see cref="Dialog"/>, and pass it to
-///     <see cref="Application.Run(Func{Exception, bool})"/>. This will execute the dialog until it terminates via the
+///     <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>. This will execute the dialog until it terminates via the
 ///     [ESC] or [CTRL-Q] key, or when one of the views or buttons added to the dialog calls
 ///     <see cref="Application.RequestStop"/>.
 /// </remarks>

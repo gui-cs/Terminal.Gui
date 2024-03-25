@@ -339,7 +339,7 @@ public class FileDialog : Dialog
 
     /// <summary>
     ///     Gets all files/directories selected or an empty collection <see cref="AllowsMultipleSelection"/> is
-    ///     <see langword="false"/> or <see cref="Canceled"/>.
+    ///     <see langword="false"/> or <see cref="CancelSearch"/>.
     /// </summary>
     /// <remarks>If selecting only a single file/directory then you should use <see cref="Path"/> instead.</remarks>
     public IReadOnlyList<string> MultiSelected { get; private set; }
@@ -359,7 +359,7 @@ public class FileDialog : Dialog
 
     /// <summary>
     ///     Gets or Sets the selected path in the dialog. This is the result that should be used if
-    ///     <see cref="AllowsMultipleSelection"/> is off and <see cref="Canceled"/> is true.
+    ///     <see cref="AllowsMultipleSelection"/> is off and <see cref="CancelSearch"/> is true.
     /// </summary>
     public string Path
     {

@@ -974,15 +974,20 @@ public class ApplicationTests
                                      Assert.NotNull (Application.Top);
                                      Application.RequestStop ();
                                  };
-        Application.Run (null, driver);
+        var top = Application.Run (null, driver);
 #if DEBUG_IDISPOSABLE
-        Assert.False (Application.Top.WasDisposed);
+        Assert.Equal(top, Application.Top);
+        Assert.False (top.WasDisposed);
         var exception = Record.Exception (() => Application.Shutdown ());
         Assert.NotNull (exception);
-        Assert.False (Application.Top.WasDisposed);
+        Assert.False (top.WasDisposed);
+#endif
+
         // It's up to caller to dispose it
-        Application.Top.Dispose ();
-        Assert.True (Application.Top.WasDisposed);
+        top.Dispose ();
+
+#if DEBUG_IDISPOSABLE
+        Assert.True (top.WasDisposed);
 #endif
         Assert.NotNull (Application.Top);
 

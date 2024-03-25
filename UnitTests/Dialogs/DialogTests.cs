@@ -1126,8 +1126,7 @@ public class DialogTests
                          }
                      };
 
-        Run ();
-        Top.Dispose ();
+        Run ().Dispose ();
         Shutdown ();
 
         Assert.Equal (4, iterations);

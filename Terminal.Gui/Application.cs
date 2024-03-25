@@ -8,19 +8,12 @@ namespace Terminal.Gui;
 /// <summary>A static, singleton class representing the application. This class is the entry point for the application.</summary>
 /// <example>
 ///     <code>
-/// // A simple Terminal.Gui app that creates a window with a frame and title with 
-/// // 5 rows/columns of padding.
-/// Application.Init();
-/// var win = new Window ($"Example App ({Application.QuitKey} to quit)") {
-///   X = 5,
-///   Y = 5,
-///   Width = Dim.Fill (5),
-///   Height = Dim.Fill (5)
-/// };
-/// Application.Top.Add(win);
-/// Application.Run();
-/// Application.Shutdown();
-/// </code>
+///     Application.Init();
+///     var win = new Window ($"Example App ({Application.QuitKey} to quit)");
+///     Application.Run(win);
+///     win.Dispose();
+///     Application.Shutdown();
+///     </code>
 /// </example>
 /// <remarks>TODO: Flush this out.</remarks>
 public static partial class Application
@@ -93,6 +86,7 @@ public static partial class Application
         {
             t.Running = false;
 #if DEBUG_IDISPOSABLE
+
             // Don't dispose the toplevels. It's up to caller dispose them
             Debug.Assert (t.WasDisposed);
 #endif
@@ -101,10 +95,12 @@ public static partial class Application
         _topLevels.Clear ();
         Current = null;
 #if DEBUG_IDISPOSABLE
+
         // Don't dispose the Top. It's up to caller dispose it
         if (Top is { })
         {
             Debug.Assert (Top.WasDisposed);
+
             // If End wasn't called _cachedRunStateToplevel may be null
             if (_cachedRunStateToplevel is { })
             {
@@ -181,12 +177,14 @@ public static partial class Application
     /// </para>
     /// <para>
     ///     <see cref="Shutdown"/> must be called when the application is closing (typically after
-    ///     <see cref="Run(Func{Exception, bool}, ConsoleDriver)"/> has returned) to ensure resources are cleaned up and terminal settings
+    ///     <see cref="Run(Func{Exception, bool}, ConsoleDriver)"/> has returned) to ensure resources are cleaned up and
+    ///     terminal settings
     ///     restored.
     /// </para>
     /// <para>
     ///     The <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> function combines
-    ///     <see cref="Init(ConsoleDriver, string)"/> and <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> into a single
+    ///     <see cref="Init(ConsoleDriver, string)"/> and <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>
+    ///     into a single
     ///     call. An application cam use <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> without explicitly calling
     ///     <see cref="Init(ConsoleDriver, string)"/>.
     /// </para>
@@ -247,7 +245,7 @@ public static partial class Application
         // valid after a Driver is loaded. In this cases we need just 
         // `Settings` so we can determine which driver to use.
         // Don't reset, so we can inherit the theme from the previous run.
-        Load (false);
+        Load ();
         Apply ();
 
         // Ignore Configuration for ForceDriver if driverName is specified
@@ -346,7 +344,8 @@ public static partial class Application
     /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
     /// <remarks>
     ///     Shutdown must be called for every call to <see cref="Init"/> or
-    ///     <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> to ensure all resources are cleaned up (Disposed)
+    ///     <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> to ensure all resources are cleaned
+    ///     up (Disposed)
     ///     and terminal settings are restored.
     /// </remarks>
     public static void Shutdown ()
@@ -393,13 +392,11 @@ public static partial class Application
     /// </remarks>
     public static RunState Begin (Toplevel toplevel)
     {
-        if (toplevel is null)
-        {
-            throw new ArgumentNullException (nameof (toplevel));
-        }
+        ArgumentNullException.ThrowIfNull (toplevel);
 
 #if DEBUG_IDISPOSABLE
         Debug.Assert (!toplevel.WasDisposed);
+
         if (_cachedRunStateToplevel is { } && _cachedRunStateToplevel != toplevel)
         {
             Debug.Assert (_cachedRunStateToplevel.WasDisposed);
@@ -411,7 +408,7 @@ public static partial class Application
             throw new InvalidOperationException ("Only one Overlapped Container is allowed.");
         }
 
-        // Ensure the mouse is ungrabed.
+        // Ensure the mouse is ungrabbed.
         MouseGrabView = null;
 
         var rs = new RunState (toplevel);
@@ -437,7 +434,7 @@ public static partial class Application
             if (Top is { } && toplevel != Top && !_topLevels.Contains (Top))
             {
                 // If Top was already disposed and isn't on the Toplevels Stack,
-                // clean it up here if is the same as _latestClosedRunStateToplevel
+                // clean it up here if is the same as _cachedRunStateToplevel
                 if (Top == _cachedRunStateToplevel)
                 {
                     Top = null;
@@ -482,7 +479,7 @@ public static partial class Application
 
             if (_topLevels.FindDuplicates (new ToplevelEqualityComparer ()).Count > 0)
             {
-                throw new ArgumentException ("There are duplicates Toplevels Id's");
+                throw new ArgumentException ("There are duplicates Toplevel IDs");
             }
         }
 
@@ -502,7 +499,7 @@ public static partial class Application
             if (toplevel.Visible)
             {
                 Current?.OnDeactivate (toplevel);
-                var previousCurrent = Current;
+                Toplevel previousCurrent = Current;
                 Current = toplevel;
                 Current.OnActivate (previousCurrent);
 
@@ -528,10 +525,7 @@ public static partial class Application
             MoveCurrent (Current);
         }
 
-        //if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
         toplevel.SetRelativeLayout (Driver.Bounds);
-
-        //}
 
         // BUGBUG: This call is likely not needed.
         toplevel.LayoutSubviews ();
@@ -548,39 +542,40 @@ public static partial class Application
             Driver.Refresh ();
         }
 
-        NotifyNewRunState?.Invoke (toplevel, new RunStateEventArgs (rs));
+        NotifyNewRunState?.Invoke (toplevel, new (rs));
 
         return rs;
     }
 
     /// <summary>
-    ///     Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> with the value of
-    ///     <see cref="Top"/>.
+    ///     Runs the application by creating a <see cref="Toplevel"/> object and calling <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>.
     /// </summary>
     /// <remarks>
+    ///     <para>Calling <see cref="Init"/> first is not needed as this function will initialize the application.</para>
     ///     <para>
     ///         <see cref="Shutdown"/> must be called when the application is closing (typically after Run> has returned) to
     ///         ensure resources are cleaned up and terminal settings restored.
     ///     </para>
-    /// <para>
-    /// The caller is responsible for disposing the object returned by this method.</para>
-    /// </para>
+    ///     <para>
+    ///         The caller is responsible for disposing the object returned by this method.
+    ///     </para>
+    /// </remarks>
     /// <returns>The created <see cref="Toplevel"/> object. The caller is responsible for disposing this object.</returns>
     public static Toplevel Run (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null) { return Run<Toplevel> (errorHandler, driver); }
 
     /// <summary>
-    ///     Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> with a new instance of the
-    ///     specified <see cref="Toplevel"/>-derived class.
-    ///     <para>Calling <see cref="Init"/> first is not needed as this function will initialize the application.</para>
+    ///     Runs the application by creating a <see cref="Toplevel"/>-derived object of type <c>T</c> and calling
+    ///     <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>.
     /// </summary>
     /// <remarks>
+    ///     <para>Calling <see cref="Init"/> first is not needed as this function will initialize the application.</para>
     ///     <para>
     ///         <see cref="Shutdown"/> must be called when the application is closing (typically after Run> has returned) to
     ///         ensure resources are cleaned up and terminal settings restored.
     ///     </para>
-    /// <para>
-    /// The caller is responsible for disposing the object returned by this method.</para>
-    /// </para>
+    ///     <para>
+    ///         The caller is responsible for disposing the object returned by this method.
+    ///     </para>
     /// </remarks>
     /// <param name="errorHandler"></param>
     /// <param name="driver">
@@ -590,18 +585,16 @@ public static partial class Application
     /// </param>
     /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
     public static T Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
-        where T : Toplevel, new()
+        where T : Toplevel, new ()
     {
         var top = new T ();
 
-        EnsureValidInitialization (top, driver);
-
-        RunApp (top, errorHandler);
+        Run (top, errorHandler, driver);
 
         return top;
     }
 
-    /// <summary>Runs the main loop on the given <see cref="Toplevel"/> container.</summary>
+    /// <summary>Runs the Application using the provided <see cref="Toplevel"/> view.</summary>
     /// <remarks>
     ///     <para>
     ///         This method is used to start processing events for the main application, but it is also used to run other
@@ -623,6 +616,7 @@ public static partial class Application
     ///         <see cref="RunLoop(RunState)"/> method will only process any pending events, timers, idle handlers and then
     ///         return control immediately.
     ///     </para>
+    ///     <para>Calling <see cref="Init"/> first is not needed as this function will initialize the application.</para>
     ///     <para>
     ///         RELEASE builds only: When <paramref name="errorHandler"/> is <see langword="null"/> any exceptions will be
     ///         rethrown. Otherwise, if <paramref name="errorHandler"/> will be called. If <paramref name="errorHandler"/>
@@ -638,17 +632,35 @@ public static partial class Application
     /// <param name="driver">
     ///     The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the platform will
     ///     be used ( <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>). Must be
-    ///     <see langword="null"/> if <see cref="Init"/> has already been called.
+    ///     <see langword="null"/> if <see cref="Init"/> was called.
     /// </param>
     public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
     {
-        EnsureValidInitialization (view, driver);
+        // Validate that Init has been called and that the Toplevel is valid.
+        if (view is null)
+        {
+            throw new ArgumentException ($"{view.GetType ().Name} must be derived from TopLevel");
+        }
 
-        RunApp (view, errorHandler);
-    }
+        if (_initialized)
+        {
+            if (Driver is null)
+            {
+                // Disposing before throwing
+                view.Dispose ();
 
-    private static void RunApp (Toplevel view, Func<Exception, bool> errorHandler = null)
-    {
+                // This code path should be impossible because Init(null, null) will select the platform default driver
+                throw new InvalidOperationException (
+                                                     "Init() completed without a driver being set (this should be impossible); Run<T>() cannot be called."
+                                                    );
+            }
+        }
+        else
+        {
+            // Init() has NOT been called.
+            InternalInit (driver, null, true);
+        }
+
         var resume = true;
 
         while (resume)
@@ -680,33 +692,6 @@ public static partial class Application
                 resume = errorHandler (error);
             }
 #endif
-        }
-    }
-
-    private static void EnsureValidInitialization (Toplevel top, ConsoleDriver driver)
-    {
-        if (top is null)
-        {
-            throw new ArgumentException ($"{top.GetType ().Name} must be derived from TopLevel");
-        }
-
-        if (_initialized)
-        {
-            if (Driver is null)
-            {
-                // Ensure disposing the toplevel before throwing
-                top.Dispose ();
-
-                // This code path should be impossible because Init(null, null) will select the platform default driver
-                throw new InvalidOperationException (
-                                                     "Init() completed without a driver being set (this should be impossible); Run<T>() cannot be called."
-                                                    );
-            }
-        }
-        else
-        {
-            // Init() has NOT been called.
-            InternalInit (driver, null, true);
         }
     }
 
@@ -838,7 +823,7 @@ public static partial class Application
             }
 
             MainLoop.RunIteration ();
-            Iteration?.Invoke (null, new IterationEventArgs ());
+            Iteration?.Invoke (null, new ());
             EnsureModalOrVisibleAlwaysOnTop (state.Toplevel);
 
             if (state.Toplevel != Current)
@@ -897,10 +882,10 @@ public static partial class Application
         }
     }
 
-    /// <summary>Stops running the most recent <see cref="Toplevel"/> or the <paramref name="top"/> if provided.</summary>
+    /// <summary>Stops the provided <see cref="Toplevel"/>, causing or the <paramref name="top"/> if provided.</summary>
     /// <param name="top">The <see cref="Toplevel"/> to stop.</param>
     /// <remarks>
-    ///     <para>This will cause <see cref="Application.Run(Func{Exception, bool}, ConsoleDriver)"/> to return.</para>
+    ///     <para>This will cause <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> to return.</para>
     ///     <para>
     ///         Calling <see cref="Application.RequestStop"/> is equivalent to setting the <see cref="Toplevel.Running"/>
     ///         property on the currently running <see cref="Toplevel"/> to false.
@@ -935,7 +920,7 @@ public static partial class Application
                 return;
             }
 
-            ev = new ToplevelClosingEventArgs (top);
+            ev = new (top);
             top.OnClosing (ev);
 
             if (ev.Cancel)
@@ -1023,7 +1008,7 @@ public static partial class Application
     {
         if (EndAfterFirstIteration)
         {
-            NotifyStopRunState?.Invoke (top, new ToplevelEventArgs (top));
+            NotifyStopRunState?.Invoke (top, new (top));
         }
     }
 
@@ -1106,6 +1091,7 @@ public static partial class Application
         {
             _cachedRunStateToplevel = runState.Toplevel;
         }
+
         runState.Toplevel = null;
         runState.Dispose ();
     }
@@ -1125,10 +1111,12 @@ public static partial class Application
     public static Toplevel Top { get; private set; }
 
     /// <summary>
-    ///     The current <see cref="Toplevel"/> object. This is updated when
-    ///     <see cref="Application.Run(Func{Exception, bool}, ConsoleDriver)"/> enters and leaves to point to the current
+    ///     The current <see cref="Toplevel"/> object. This is updated in <see cref="Application.Begin"/> enters and leaves to point to the current
     ///     <see cref="Toplevel"/> .
     /// </summary>
+    /// <remarks>
+    /// Only relevant in scenarios where <see cref="Toplevel.IsOverlappedContainer"/> is <see langword="true"/>.
+    /// </remarks>
     /// <value>The current.</value>
     public static Toplevel Current { get; private set; }
 
@@ -1314,7 +1302,7 @@ public static partial class Application
             t.SetRelativeLayout (Rectangle.Empty with { Size = args.Size });
             t.LayoutSubviews ();
             t.PositionToplevels ();
-            t.OnSizeChanging (new SizeChangedEventArgs (args.Size));
+            t.OnSizeChanging (new (args.Size));
         }
 
         Refresh ();
@@ -1380,7 +1368,7 @@ public static partial class Application
 
         if (!OnUnGrabbingMouse (MouseGrabView))
         {
-            var view = MouseGrabView;
+            View view = MouseGrabView;
             MouseGrabView = null;
             OnUnGrabbedMouse (view);
         }
@@ -1419,7 +1407,7 @@ public static partial class Application
             return;
         }
 
-        GrabbedMouse?.Invoke (view, new ViewEventArgs (view));
+        GrabbedMouse?.Invoke (view, new (view));
     }
 
     private static void OnUnGrabbedMouse (View view)
@@ -1429,7 +1417,7 @@ public static partial class Application
             return;
         }
 
-        UnGrabbedMouse?.Invoke (view, new ViewEventArgs (view));
+        UnGrabbedMouse?.Invoke (view, new (view));
     }
 
 #nullable enable
@@ -1474,7 +1462,7 @@ public static partial class Application
             a.MouseEvent.View = view;
         }
 
-        MouseEvent?.Invoke (null, new MouseEventEventArgs (a.MouseEvent));
+        MouseEvent?.Invoke (null, new (a.MouseEvent));
 
         if (a.MouseEvent.Handled)
         {
@@ -1541,9 +1529,9 @@ public static partial class Application
 
         if (view is Adornment adornment)
         {
-            var frameLoc = adornment.ScreenToFrame (a.MouseEvent.X, a.MouseEvent.Y);
+            Point frameLoc = adornment.ScreenToFrame (a.MouseEvent.X, a.MouseEvent.Y);
 
-            me = new MouseEvent
+            me = new()
             {
                 X = frameLoc.X,
                 Y = frameLoc.Y,
@@ -1556,7 +1544,7 @@ public static partial class Application
         {
             Point boundsPoint = view.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
 
-            me = new MouseEvent
+            me = new()
             {
                 X = boundsPoint.X,
                 Y = boundsPoint.Y,
@@ -1620,7 +1608,7 @@ public static partial class Application
             {
                 Key oldKey = _alternateForwardKey;
                 _alternateForwardKey = value;
-                OnAlternateForwardKeyChanged (new KeyChangedEventArgs (oldKey, value));
+                OnAlternateForwardKeyChanged (new (oldKey, value));
             }
         }
     }
@@ -1647,7 +1635,7 @@ public static partial class Application
             {
                 Key oldKey = _alternateBackwardKey;
                 _alternateBackwardKey = value;
-                OnAlternateBackwardKeyChanged (new KeyChangedEventArgs (oldKey, value));
+                OnAlternateBackwardKeyChanged (new (oldKey, value));
             }
         }
     }
@@ -1674,7 +1662,7 @@ public static partial class Application
             {
                 Key oldKey = _quitKey;
                 _quitKey = value;
-                OnQuitKeyChanged (new KeyChangedEventArgs (oldKey, value));
+                OnQuitKeyChanged (new (oldKey, value));
             }
         }
     }

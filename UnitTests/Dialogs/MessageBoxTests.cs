@@ -41,7 +41,7 @@ public class MessageBoxTests
                                              break;
                                      }
                                  };
-        Application.Run ();
+        Application.Run ().Dispose ();
 
         Assert.Equal (1, result);
     }
@@ -77,7 +77,7 @@ public class MessageBoxTests
                                              break;
                                      }
                                  };
-        Application.Run ();
+        Application.Run ().Dispose ();
 
         Assert.Equal (-1, result);
     }
@@ -115,7 +115,7 @@ public class MessageBoxTests
                                              break;
                                      }
                                  };
-        Application.Run ();
+        Application.Run ().Dispose ();
 
         Assert.Equal (1, result);
     }
@@ -152,7 +152,7 @@ public class MessageBoxTests
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run ().Dispose ();
     }
 
     [Theory]
@@ -233,7 +233,7 @@ public class MessageBoxTests
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run ().Dispose ();
     }
 
     [Fact]
@@ -604,7 +604,7 @@ ffffffffffffffffffff
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run ().Dispose ();
     }
 
     [Fact]
@@ -655,7 +655,7 @@ ffffffffffffffffffff
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run ().Dispose ();
     }
 
     [Fact]
@@ -756,7 +756,7 @@ ffffffffffffffffffff
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run ().Dispose ();
     }
 
     [Theory]
@@ -905,6 +905,6 @@ ffffffffffffffffffff
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run ().Dispose ();
     }
 }
