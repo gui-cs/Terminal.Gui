@@ -331,12 +331,13 @@ public class LayoutTests
     public void DimFill_SizedCorrectly ()
     {
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
-        Application.Top.Add (view);
-        RunState rs = Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        RunState rs = Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (32, 5);
 
         //view.SetNeedsLayout ();
-        Application.Top.LayoutSubviews ();
+        top.LayoutSubviews ();
 
         //view.SetRelativeLayout (new (0, 0, 32, 5));
         Assert.Equal (32, view.Frame.Width);
@@ -349,7 +350,7 @@ public class LayoutTests
     {
         Application.Init (new FakeDriver ());
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
 
         var view = new View { X = -2, Text = "view" };
         top.Add (view);
@@ -363,7 +364,7 @@ public class LayoutTests
 
         try
         {
-            Application.Run ();
+            Application.Run (top);
         }
         catch (IndexOutOfRangeException ex)
         {
@@ -371,6 +372,7 @@ public class LayoutTests
             Assert.IsType<IndexOutOfRangeException> (ex);
         }
 
+        top.Dispose ();
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
     }
@@ -381,7 +383,7 @@ public class LayoutTests
     {
         Application.Init (new FakeDriver ());
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
 
         var view = new View { Y = -2, Height = 10, TextDirection = TextDirection.TopBottom_LeftRight, Text = "view" };
         top.Add (view);
@@ -395,7 +397,7 @@ public class LayoutTests
 
         try
         {
-            Application.Run ();
+            Application.Run (top);
         }
         catch (IndexOutOfRangeException ex)
         {
@@ -403,6 +405,7 @@ public class LayoutTests
             Assert.IsType<IndexOutOfRangeException> (ex);
         }
 
+        top.Dispose ();
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
     }
@@ -488,7 +491,7 @@ public class LayoutTests
     {
         Application.Init (new FakeDriver ());
 
-        Toplevel t = Application.Top;
+        Toplevel t = new ();
 
         var w = new Window { X = Pos.Left (t) + 2, Y = Pos.At (2) };
 
@@ -506,7 +509,8 @@ public class LayoutTests
 
         Application.Iteration += (s, a) => Application.RequestStop ();
 
-        Application.Run ();
+        Application.Run (t);
+        t.Dispose ();
         Application.Shutdown ();
     }
 
@@ -545,14 +549,16 @@ public class LayoutTests
     {
         Application.Init (new FakeDriver ());
 
-        var w = new Window { X = Pos.Left (Application.Top) + 2, Y = Pos.Top (Application.Top) + 2 };
+        var top = new Toplevel ();
+        var w = new Window { X = Pos.Left (top) + 2, Y = Pos.Top (top) + 2 };
         var f = new FrameView ();
         var v1 = new View { X = Pos.Left (w) + 2, Y = Pos.Top (w) + 2 };
         var v2 = new View { X = Pos.Left (v1) + 2, Y = Pos.Top (v1) + 2 };
 
         f.Add (v1, v2);
         w.Add (f);
-        Application.Top.Add (w);
+        top.Add (w);
+        Application.Begin (top);
 
         f.X = Pos.X (Application.Top) + Pos.X (v2) - Pos.X (v1);
         f.Y = Pos.Y (Application.Top) + Pos.Y (v2) - Pos.Y (v1);
@@ -574,6 +580,7 @@ public class LayoutTests
         Application.Iteration += (s, a) => Application.RequestStop ();
 
         Assert.Throws<InvalidOperationException> (() => Application.Run ());
+        top.Dispose ();
         Application.Shutdown ();
     }
 
@@ -634,8 +641,9 @@ public class LayoutTests
         Assert.Equal (10, rHeight);
         Assert.False (v.IsInitialized);
 
-        Application.Top.Add (top);
-        Application.Begin (Application.Top);
+        var toplevel = new Toplevel ();
+        toplevel.Add (top);
+        Application.Begin (toplevel);
 
         Assert.True (v.IsInitialized);
 
@@ -665,8 +673,9 @@ public class LayoutTests
         Assert.Equal (70, rWidth);
         Assert.False (v.IsInitialized);
 
-        Application.Top.Add (top);
-        Application.Begin (Application.Top);
+        var toplevel = new Toplevel ();
+        toplevel.Add (top);
+        Application.Begin (toplevel);
 
         Assert.True (v.IsInitialized);
         v.Width = 75;

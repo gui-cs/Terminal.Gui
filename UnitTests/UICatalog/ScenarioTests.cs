@@ -40,7 +40,7 @@ public class ScenarioTests
             FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
 
             // The only key we care about is the QuitKey
-            Application.Top.KeyDown += (sender, args) =>
+            Application.KeyDown += (sender, args) =>
                                        {
                                            _output.WriteLine ($"  Keypress: {args.KeyCode}");
 
@@ -135,7 +135,7 @@ public class ScenarioTests
 
         Application.Init (new FakeDriver ());
 
-        Toplevel Top = Application.Top;
+        Toplevel Top = new Toplevel ();
 
         _viewClasses = GetAllViewClassesCollection ()
                        .OrderBy (t => t.Name)
@@ -348,10 +348,11 @@ public class ScenarioTests
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run (Top);
 
         Assert.Equal (_viewClasses.Count, iterations);
 
+        Top.Dispose ();
         Application.Shutdown ();
 
         void DimPosChanged (View view)
@@ -624,7 +625,7 @@ public class ScenarioTests
                                      }
                                  };
 
-        Application.Top.KeyDown += (sender, args) =>
+        Application.KeyDown += (sender, args) =>
                                    {
                                        // See #2474 for why this is commented out
                                        Assert.Equal (KeyCode.CtrlMask | KeyCode.Q, args.KeyCode);

@@ -12,21 +12,22 @@ public class HotKeys : Scenario
         Application.Init ();
         ConfigurationManager.Themes.Theme = Theme;
         ConfigurationManager.Apply ();
-        Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
-        Application.Top.BorderStyle = LineStyle.RoundedDotted;
-        Application.Top.Title = $"{Application.QuitKey} to _Quit - Scenario: {GetName ()}";
+        Top = new ();
+        Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
+        Top.BorderStyle = LineStyle.RoundedDotted;
+        Top.Title = $"{Application.QuitKey} to _Quit - Scenario: {GetName ()}";
     }
 
     public override void Run ()
     {
         var textViewLabel = new Label { Text = "_TextView:", X = 0, Y = 0 };
-        Application.Top.Add (textViewLabel);
+        Top.Add (textViewLabel);
         
         var textField = new TextField (){ X = Pos.Right (textViewLabel) + 1, Y = 0, Width = 10 };
-        Application.Top.Add (textField);
+        Top.Add (textField);
 
         var viewLabel = new Label { Text = "_View:", X = 0, Y = Pos.Bottom (textField) + 1 };
-        Application.Top.Add (viewLabel);
+        Top.Add (viewLabel);
 
         var view = new View () { 
             Title = "View (_focusable)", 
@@ -35,10 +36,10 @@ public class HotKeys : Scenario
             X = Pos.Right (viewLabel) + 1, Y = Pos.Top (viewLabel), Width = 30, Height = 3,
             BorderStyle = LineStyle.Dashed,
         };
-        Application.Top.Add (view);
+        Top.Add (view);
 
         viewLabel = new Label { Text = "Vi_ew:", X = 0, Y = Pos.Bottom (view) + 1 };
-        Application.Top.Add (viewLabel);
+        Top.Add (viewLabel);
 
         view = new View ()
         {
@@ -47,10 +48,10 @@ public class HotKeys : Scenario
             X = Pos.Right (viewLabel) + 1, Y = Pos.Top (viewLabel), Width = 30, Height = 3,
             BorderStyle = LineStyle.Dashed,
         };
-        Application.Top.Add (view);
+        Top.Add (view);
 
         var labelWithFrameLabel = new Label { Text = "_Label with Frame:", X = 0, Y = Pos.Bottom (view) + 1 };
-        Application.Top.Add (labelWithFrameLabel);
+        Top.Add (labelWithFrameLabel);
 
         var labelWithFrameFocusable = new Label ()
         {
@@ -60,10 +61,10 @@ public class HotKeys : Scenario
             X = Pos.Right (labelWithFrameLabel) + 1, Y = Pos.Top (labelWithFrameLabel), Width = 40, Height = 3,
             BorderStyle = LineStyle.Dashed,
         };
-        Application.Top.Add (labelWithFrameFocusable);
+        Top.Add (labelWithFrameFocusable);
 
         labelWithFrameLabel = new Label { Text = "L_abel with Frame:", X = 0, Y = Pos.Bottom (labelWithFrameFocusable) + 1 };
-        Application.Top.Add (labelWithFrameLabel);
+        Top.Add (labelWithFrameLabel);
 
         var labelWithFrame = new Label ()
         {
@@ -72,11 +73,11 @@ public class HotKeys : Scenario
             X = Pos.Right (labelWithFrameLabel) + 1, Y = Pos.Top (labelWithFrameLabel), Width = 40, Height = 3,
             BorderStyle = LineStyle.Dashed,
         };
-        Application.Top.Add (labelWithFrame);
+        Top.Add (labelWithFrame);
 
         
         var buttonWithFrameLabel = new Label { Text = "_Button with Frame:", X = 0, Y = Pos.Bottom (labelWithFrame) + 1 };
-        Application.Top.Add (buttonWithFrameLabel);
+        Top.Add (buttonWithFrameLabel);
 
         var buttonWithFrameFocusable = new Button ()
         {
@@ -86,10 +87,10 @@ public class HotKeys : Scenario
             X = Pos.Right (buttonWithFrameLabel) + 1, Y = Pos.Top (buttonWithFrameLabel), Width = 40, Height = 3,
             BorderStyle = LineStyle.Dashed,
         };
-        Application.Top.Add (buttonWithFrameFocusable);
+        Top.Add (buttonWithFrameFocusable);
 
         buttonWithFrameLabel = new Label { Text = "Butt_on with Frame:", X = 0, Y = Pos.Bottom (buttonWithFrameFocusable) + 1 };
-        Application.Top.Add (buttonWithFrameLabel);
+        Top.Add (buttonWithFrameLabel);
 
         var buttonWithFrame = new Button ()
         {
@@ -99,12 +100,12 @@ public class HotKeys : Scenario
             CanFocus = false,
             BorderStyle = LineStyle.Dashed,
         };
-        Application.Top.Add (buttonWithFrame);
+        Top.Add (buttonWithFrame);
 
 
 
         var checkboxWithFrameLabel = new Label { Text = "_Checkbox with Frame:", X = 0, Y = Pos.Bottom (buttonWithFrame) + 1 };
-        Application.Top.Add (checkboxWithFrameLabel);
+        Top.Add (checkboxWithFrameLabel);
 
         var checkboxWithFrameFocusable = new CheckBox
         {
@@ -114,10 +115,10 @@ public class HotKeys : Scenario
             X = Pos.Right (checkboxWithFrameLabel) + 1, Y = Pos.Top (checkboxWithFrameLabel), Width = 40, Height = 3,
             BorderStyle = LineStyle.Dashed,
         };
-        Application.Top.Add (checkboxWithFrameFocusable);
+        Top.Add (checkboxWithFrameFocusable);
 
         checkboxWithFrameLabel = new Label { Text = "Checkb_ox with Frame:", X = 0, Y = Pos.Bottom (checkboxWithFrameFocusable) + 1 };
-        Application.Top.Add (checkboxWithFrameLabel);
+        Top.Add (checkboxWithFrameLabel);
 
         var checkboxWithFrame = new CheckBox
         {
@@ -127,12 +128,12 @@ public class HotKeys : Scenario
             CanFocus = false,
             BorderStyle = LineStyle.Dashed,
         };
-        Application.Top.Add (checkboxWithFrame);
+        Top.Add (checkboxWithFrame);
 
 
         var button = new Button { X = Pos.Center (), Y = Pos.AnchorEnd (1), Text = "_Press me!" };
-        Application.Top.Add (button);
+        Top.Add (button);
 
-        Application.Run (Application.Top);
+        Application.Run (Top);
     }
 }

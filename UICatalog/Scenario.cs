@@ -78,6 +78,11 @@ public class Scenario : IDisposable
     private bool _disposedValue;
 
     /// <summary>
+    ///     The Toplevel for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/>.
+    /// </summary>
+    public Toplevel Top { get; set; }
+
+    /// <summary>
     ///     The Window for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/> in
     ///     most cases.
     /// </summary>
@@ -85,6 +90,8 @@ public class Scenario : IDisposable
 
     public void Dispose ()
     {
+        Top?.Dispose ();
+        Win?.Dispose ();
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose (true);
         GC.SuppressFinalize (this);
@@ -151,6 +158,8 @@ public class Scenario : IDisposable
         ConfigurationManager.Themes.Theme = Theme;
         ConfigurationManager.Apply ();
 
+        Top = new ();
+
         Win = new Window
         {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
@@ -160,7 +169,7 @@ public class Scenario : IDisposable
             Height = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes [TopLevelColorScheme]
         };
-        Application.Top.Add (Win);
+        Top.Add (Win);
     }
 
     /// <summary>Stops the scenario. Override to change shutdown behavior for the <see cref="Scenario"/>.</summary>
@@ -177,7 +186,7 @@ public class Scenario : IDisposable
     public virtual void Run ()
     {
         // Must explicit call Application.Shutdown method to shutdown.
-        Application.Run (Application.Top);
+        Application.Run (Top);
     }
 
     /// <summary>Override this to implement the <see cref="Scenario"/> setup logic (create controls, etc...).</summary>

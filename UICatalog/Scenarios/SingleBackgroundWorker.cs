@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Threading;
 using Terminal.Gui;
 
@@ -11,14 +12,14 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Top Level Windows")]
 public class SingleBackgroundWorker : Scenario
 {
-    public override void Run ()
+    public override void Init ()
     {
-        Application.Top.Dispose ();
-
         Application.Run<MainApp> ();
 
         Application.Top.Dispose ();
     }
+
+    public override void Run () { }
 
     public class MainApp : Toplevel
     {
@@ -77,9 +78,9 @@ public class SingleBackgroundWorker : Scenario
                                           );
             Add (statusBar);
 
-            var top = new Toplevel ();
+            var workerLogTop = new Toplevel () { Title = "Worker Log Top"};
 
-            top.Add (
+            workerLogTop.Add (
                      new Label { X = Pos.Center (), Y = 0, Text = "Worker Log" }
                     );
 
@@ -91,8 +92,9 @@ public class SingleBackgroundWorker : Scenario
                 Height = Dim.Fill (),
                 Source = new ListWrapper (_log)
             };
-            top.Add (_listLog);
-            Add (top);
+            workerLogTop.Add (_listLog);
+            Add (workerLogTop);
+            Title = "MainApp";
         }
 
         private void RunWorker ()
@@ -193,24 +195,32 @@ public class SingleBackgroundWorker : Scenario
 
                                                   var builderUI =
                                                       new StagingUIController (_startStaging, e.Result as List<string>);
+                                                  var top = Application.Top;
+                                                  top.Visible = false;
+                                                  Application.Current.Visible = false;
                                                   builderUI.Load ();
+                                                  builderUI.Dispose ();
+                                                  top.Visible = true;
                                               }
 
                                               _worker = null;
                                           };
             _worker.RunWorkerAsync ();
             Application.Run (md);
+            md.Dispose ();
         }
     }
 
     public class StagingUIController : Window
     {
-        private readonly Toplevel _top;
+        private Toplevel _top;
 
         public StagingUIController (DateTime? start, List<string> list)
         {
-            Rectangle frame = Application.Top.Frame;
-            _top = new Toplevel { X = frame.X, Y = frame.Y, Width = frame.Width, Height = frame.Height };
+            _top = new Toplevel
+            {
+                Title = "_top", Width = Dim.Fill (), Height = Dim.Fill ()
+            };
 
             _top.KeyDown += (s, e) =>
                             {
@@ -299,6 +309,18 @@ public class SingleBackgroundWorker : Scenario
             _top.Add (this);
         }
 
-        public void Load () { Application.Run (_top); }
+        public void Load () {
+            Application.Run (_top);
+            _top.Dispose ();
+            _top = null;
+        }
+
+        ///// <inheritdoc />
+        //protected override void Dispose (bool disposing)
+        //{
+        //    _top?.Dispose ();
+        //    _top = null;
+        //    base.Dispose (disposing);
+        //}
     }
 }

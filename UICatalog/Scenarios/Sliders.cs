@@ -477,6 +477,6 @@ public class Sliders : Scenario
         #endregion Config Slider
 
         Win.FocusFirst ();
-        Application.Top.Initialized += (s, e) => Application.Top.LayoutSubviews ();
+        Top.Initialized += (s, e) => Top.LayoutSubviews ();
     }
 }

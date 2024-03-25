@@ -695,8 +695,9 @@ public class EscSeqUtilsTests
         Assert.False (_isReq);
 
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill (), WantContinuousButtonPressed = true };
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
 
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (
@@ -769,7 +770,7 @@ public class EscSeqUtilsTests
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run (top);
 
         Assert.Null (Application.WantContinuousButtonPressedView);
 

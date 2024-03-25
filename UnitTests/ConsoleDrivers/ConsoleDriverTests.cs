@@ -49,7 +49,7 @@ public class ConsoleDriverTests
 
         Console.MockKeyPresses = mKeys;
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         var view = new View { CanFocus = true };
         var rText = "";
         var idx = 0;
@@ -72,10 +72,11 @@ public class ConsoleDriverTests
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run (top);
 
         Assert.Equal ("MockKeyPresses", rText);
 
+        top.Dispose ();
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
     }
@@ -87,7 +88,7 @@ public class ConsoleDriverTests
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driver);
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         var view = new View { CanFocus = true };
         var count = 0;
         var wasKeyPressed = false;
@@ -105,10 +106,11 @@ public class ConsoleDriverTests
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run (top);
 
         Assert.False (wasKeyPressed);
 
+        top.Dispose ();
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
     }

@@ -78,10 +78,10 @@ public class Scrolling : Scenario
             verticalRuler.Text =
                 vrule.Repeat ((int)Math.Ceiling (verticalRuler.Bounds.Height * 2 / (double)rule.Length))
                     [..(verticalRuler.Bounds.Height * 2)];
-            Application.Top.Loaded -= Top_Loaded;
+            Top.Loaded -= Top_Loaded;
         }
 
-        Application.Top.Loaded += Top_Loaded;
+        Top.Loaded += Top_Loaded;
 
         var pressMeButton = new Button { X = 3, Y = 3, Text = "Press me!" };
         pressMeButton.Accept += (s, e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
@@ -270,9 +270,9 @@ public class Scrolling : Scenario
         void Top_Unloaded (object sender, EventArgs args)
         {
             pulsing = false;
-            Application.Top.Unloaded -= Top_Unloaded;
+            Top.Unloaded -= Top_Unloaded;
         }
 
-        Application.Top.Unloaded += Top_Unloaded;
+        Top.Unloaded += Top_Unloaded;
     }
 }

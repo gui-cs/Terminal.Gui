@@ -35,7 +35,7 @@ public class ViewDisposalTest
     {
         GetSpecialParams ();
         var Container = new View ();
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         List<Type> views = GetViews ();
 
         foreach (Type view in views)

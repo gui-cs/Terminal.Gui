@@ -20,7 +20,7 @@ public class KeyboardTests
     {
         Application.Init (new FakeDriver ());
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         var w1 = new Window ();
         var v1 = new TextField ();
         var v2 = new TextView ();
@@ -110,6 +110,7 @@ public class KeyboardTests
         Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey.KeyCode);
         Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey.KeyCode);
 
+        top.Dispose ();
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
     }
@@ -118,7 +119,7 @@ public class KeyboardTests
     [AutoInitShutdown]
     public void EnsuresTopOnFront_CanFocus_False_By_Keyboard ()
     {
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
 
         var win = new Window
         {
@@ -149,35 +150,35 @@ public class KeyboardTests
         Assert.True (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.False (win2.HasFocus);
-        Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
+        Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
 
         win.CanFocus = false;
         Assert.False (win.CanFocus);
         Assert.False (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.True (win2.HasFocus);
-        Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
+        Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
 
         top.NewKeyDownEvent (Key.Tab.WithCtrl);
         Assert.True (win2.CanFocus);
         Assert.False (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.True (win2.HasFocus);
-        Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
+        Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
 
         top.NewKeyDownEvent (Key.Tab.WithCtrl);
         Assert.False (win.CanFocus);
         Assert.False (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.True (win2.HasFocus);
-        Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
+        Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
     }
 
     [Fact]
     [AutoInitShutdown]
     public void EnsuresTopOnFront_CanFocus_True_By_Keyboard_ ()
     {
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
 
         var win = new Window
         {
@@ -208,21 +209,21 @@ public class KeyboardTests
         Assert.True (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.False (win2.HasFocus);
-        Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
+        Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
 
         top.NewKeyDownEvent (Key.Tab.WithCtrl);
         Assert.True (win.CanFocus);
         Assert.False (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.True (win2.HasFocus);
-        Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
+        Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
 
         top.NewKeyDownEvent (Key.Tab.WithCtrl);
         Assert.True (win.CanFocus);
         Assert.True (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.False (win2.HasFocus);
-        Assert.Equal ("win", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
+        Assert.Equal ("win", ((Window)top.Subviews [^1]).Title);
     }
 
     [Fact]
@@ -281,18 +282,19 @@ public class KeyboardTests
 
         var keyUps = 0;
         var output = string.Empty;
+        var top = new Toplevel ();
 
-        Application.Top.KeyUp += (sender, args) =>
-                                 {
-                                     if (args.KeyCode != (KeyCode.CtrlMask | KeyCode.Q))
-                                     {
-                                         output += args.AsRune;
-                                     }
+        top.KeyUp += (sender, args) =>
+                     {
+                         if (args.KeyCode != (KeyCode.CtrlMask | KeyCode.Q))
+                         {
+                             output += args.AsRune;
+                         }
 
-                                     keyUps++;
-                                 };
+                         keyUps++;
+                     };
 
-        Application.Run (Application.Top);
+        Application.Run (top);
 
         // Input string should match output
         Assert.Equal (input, output);
@@ -306,6 +308,7 @@ public class KeyboardTests
         // # of key up events should match # of iterations
         Assert.Equal (stackSize, iterations);
 
+        top.Dispose ();
         Application.Shutdown ();
         Assert.Null (Application.Current);
         Assert.Null (Application.Top);
@@ -321,8 +324,9 @@ public class KeyboardTests
         var invoked = false;
         view.InvokingKeyBindings += (s, e) => invoked = true;
 
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
 
         Application.OnKeyDown (Key.A);
         Assert.True (invoked);
@@ -364,8 +368,9 @@ public class KeyboardTests
         var invoked = false;
         view.InvokingKeyBindings += (s, e) => invoked = true;
 
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
 
         Application.OnKeyDown (Key.A.WithCtrl);
         Assert.False (invoked);
@@ -386,7 +391,7 @@ public class KeyboardTests
     [AutoInitShutdown]
     public void QuitKey_Getter_Setter ()
     {
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         var isQuiting = false;
 
         top.Closing += (s, e) =>

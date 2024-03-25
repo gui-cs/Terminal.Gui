@@ -13,12 +13,19 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 public class BackgroundWorkerCollection : Scenario
 {
-    public override void Run () { Application.Run<OverlappedMain> (); }
+    public override void Init ()
+    {
+        Application.Run<OverlappedMain> ();
+
+        Application.Top.Dispose ();
+    }
+
+    public override void Run () { }
 
     private class OverlappedMain : Toplevel
     {
         private readonly MenuBar _menu;
-        private readonly WorkerApp _workerApp;
+        private WorkerApp _workerApp;
         private bool _canOpenWorkerApp;
 
         public OverlappedMain ()
@@ -28,6 +35,8 @@ public class BackgroundWorkerCollection : Scenario
             IsOverlappedContainer = true;
 
             _workerApp = new WorkerApp { Visible = false };
+            _workerApp.Border.Thickness = new (0, 1, 0, 0);
+            _workerApp.Border.LineStyle = LineStyle.Dashed;
 
             _menu = new MenuBar
             {
@@ -92,8 +101,6 @@ public class BackgroundWorkerCollection : Scenario
 
             Activate += OverlappedMain_Activate;
             Deactivate += OverlappedMain_Deactivate;
-
-            Closed += OverlappedMain_Closed;
 
             Application.Iteration += (s, a) =>
                                      {
@@ -165,15 +172,15 @@ public class BackgroundWorkerCollection : Scenario
             return new MenuBarItem ("_Window", new List<MenuItem []> { menuItems.ToArray () });
         }
 
-        private void OverlappedMain_Activate (object sender, ToplevelEventArgs top) { _workerApp.WriteLog ($"{top.Toplevel.Data} activate."); }
-
-        private void OverlappedMain_Closed (object sender, ToplevelEventArgs e)
+        private void OverlappedMain_Activate (object sender, ToplevelEventArgs top)
         {
-            _workerApp.Dispose ();
-            Dispose ();
+            _workerApp?.WriteLog ($"{top.Toplevel.Data} activate.");
         }
 
-        private void OverlappedMain_Deactivate (object sender, ToplevelEventArgs top) { _workerApp.WriteLog ($"{top.Toplevel.Data} deactivate."); }
+        private void OverlappedMain_Deactivate (object sender, ToplevelEventArgs top)
+        {
+            _workerApp?.WriteLog ($"{top.Toplevel.Data} deactivate.");
+        }
         private void Quit () { RequestStop (); }
 
         private MenuBarItem View ()
@@ -207,6 +214,15 @@ public class BackgroundWorkerCollection : Scenario
                                     "_View",
                                     new List<MenuItem []> { menuItems.Count == 0 ? new MenuItem [] { } : menuItems.ToArray () }
                                    );
+        }
+
+        /// <inheritdoc />
+        protected override void Dispose (bool disposing)
+        {
+            _workerApp?.Dispose ();
+            _workerApp = null;
+
+            base.Dispose (disposing);
         }
     }
 
@@ -299,7 +315,6 @@ public class BackgroundWorkerCollection : Scenario
 
         public Staging Staging { get; private set; }
         public event Action<StagingUIController> ReportClosed;
-        public void Run () { Application.Run (this); }
 
         private void OnReportClosed (object sender, EventArgs e)
         {
@@ -322,19 +337,17 @@ public class BackgroundWorkerCollection : Scenario
         public WorkerApp ()
         {
             Data = "WorkerApp";
+            Title = "Worker collection Log";
 
             Width = Dim.Percent (80);
             Height = Dim.Percent (50);
 
             ColorScheme = Colors.ColorSchemes ["Base"];
 
-            var label = new Label { X = Pos.Center (), Y = 0, Text = "Worker collection Log" };
-            Add (label);
-
             _listLog = new ListView
             {
                 X = 0,
-                Y = Pos.Bottom (label),
+                Y = 0,
                 Width = Dim.Fill (),
                 Height = Dim.Fill (),
                 Source = new ListWrapper (_log)
@@ -447,7 +460,8 @@ public class BackgroundWorkerCollection : Scenario
                                                  _stagingsUi.Add (stagingUI);
                                                  _stagingWorkers.Remove (staging);
 
-                                                 stagingUI.Run ();
+                                                 Application.Run (stagingUI);
+                                                 stagingUI.Dispose ();
                                              }
                                          };
 
@@ -465,8 +479,8 @@ public class BackgroundWorkerCollection : Scenario
 
                 _stagingWorkers.Add (staging, worker);
                 worker.RunWorkerAsync ();
-                stagingUI.Dispose ();
             }
+            stagingUI.Dispose ();
         }
 
         public void WriteLog (string msg)

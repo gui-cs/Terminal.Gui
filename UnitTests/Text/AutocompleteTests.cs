@@ -20,7 +20,7 @@ public class AutocompleteTests
                                 .Select (s => s.Value)
                                 .Distinct ()
                                 .ToList ();
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -152,7 +152,7 @@ This an long line and against TextView.",
     public void KeyBindings_Command ()
     {
         var tv = new TextView { Width = 10, Height = 2, Text = " Fortunately super feature." };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 

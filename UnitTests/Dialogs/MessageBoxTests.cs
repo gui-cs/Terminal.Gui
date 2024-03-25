@@ -12,8 +12,6 @@ public class MessageBoxTests
     [AutoInitShutdown]
     public void KeyBindings_Enter_Causes_Focused_Button_Click ()
     {
-        Application.Begin (Application.Top);
-
         int result = -1;
 
         var iteration = 0;
@@ -52,8 +50,6 @@ public class MessageBoxTests
     [AutoInitShutdown]
     public void KeyBindings_Esc_Closes ()
     {
-        Application.Begin (Application.Top);
-
         var result = 999;
 
         var iteration = 0;
@@ -90,8 +86,6 @@ public class MessageBoxTests
     [AutoInitShutdown]
     public void KeyBindings_Space_Causes_Focused_Button_Click ()
     {
-        Application.Begin (Application.Top);
-
         int result = -1;
 
         var iteration = 0;
@@ -131,7 +125,6 @@ public class MessageBoxTests
     public void Location_Default ()
     {
         int iterations = -1;
-        Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
 
         Application.Iteration += (s, a) =>
@@ -179,7 +172,6 @@ public class MessageBoxTests
     )
     {
         int iterations = -1;
-        Application.Begin (Application.Top);
 
         Application.Iteration += (s, a) =>
                                  {
@@ -249,8 +241,8 @@ public class MessageBoxTests
     public void Message_Long_Without_Spaces_WrapMessage_True ()
     {
         int iterations = -1;
-        Application.Begin (Application.Top);
-        Application.Top.BorderStyle = LineStyle.Double;
+        var top = new Toplevel ();
+        top.BorderStyle = LineStyle.Double;
         ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 
         var btn =
@@ -325,7 +317,7 @@ public class MessageBoxTests
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run (top);
     }
 
     [Fact]
@@ -333,8 +325,8 @@ public class MessageBoxTests
     public void Message_With_Spaces_WrapMessage_False ()
     {
         int iterations = -1;
-        Application.Begin (Application.Top);
-        Application.Top.BorderStyle = LineStyle.Double;
+        var top = new Toplevel ();
+        top.BorderStyle = LineStyle.Double;
         ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 
         var btn =
@@ -410,7 +402,7 @@ ffffffffffffffffffff
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run (top);
     }
 
     [Fact]
@@ -418,8 +410,8 @@ ffffffffffffffffffff
     public void Message_With_Spaces_WrapMessage_True ()
     {
         int iterations = -1;
-        Application.Begin (Application.Top);
-        Application.Top.BorderStyle = LineStyle.Double;
+        var top = new Toplevel();
+        top.BorderStyle = LineStyle.Double;
         ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 
         var btn =
@@ -499,7 +491,7 @@ ffffffffffffffffffff
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run (top);
     }
 
     [Fact]
@@ -507,8 +499,8 @@ ffffffffffffffffffff
     public void Message_Without_Spaces_WrapMessage_False ()
     {
         int iterations = -1;
-        Application.Begin (Application.Top);
-        Application.Top.BorderStyle = LineStyle.Double;
+        var top = new Toplevel();
+        top.BorderStyle = LineStyle.Double;
         ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 
         var btn =
@@ -579,7 +571,7 @@ ffffffffffffffffffff
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run (top);
     }
 
     [Fact]
@@ -587,7 +579,6 @@ ffffffffffffffffffff
     public void Size_Default ()
     {
         int iterations = -1;
-        Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
 
         Application.Iteration += (s, a) =>
@@ -621,7 +612,6 @@ ffffffffffffffffffff
     public void Size_JustBigEnough_Fixed_Size ()
     {
         int iterations = -1;
-        Application.Begin (Application.Top);
 
         var btn =
             $"{
@@ -672,9 +662,9 @@ ffffffffffffffffffff
     [AutoInitShutdown]
     public void Size_No_With_Button ()
     {
-        Application.Top.BorderStyle = LineStyle.Double;
+        var top = new Toplevel ();
+        top.BorderStyle = LineStyle.Double;
         int iterations = -1;
-        Application.Begin (Application.Top);
 
         var aboutMessage = new StringBuilder ();
         aboutMessage.AppendLine (@"0123456789012345678901234567890123456789");
@@ -728,7 +718,7 @@ ffffffffffffffffffff
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run (top);
     }
 
     [Fact]
@@ -736,7 +726,6 @@ ffffffffffffffffffff
     public void Size_None_No_Buttons ()
     {
         int iterations = -1;
-        Application.Begin (Application.Top);
 
         Application.Iteration += (s, a) =>
                                  {
@@ -783,7 +772,6 @@ ffffffffffffffffffff
     public void Size_Not_Default_Message (int height, int width, string message)
     {
         int iterations = -1;
-        Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
 
         Application.Iteration += (s, a) =>
@@ -821,7 +809,6 @@ ffffffffffffffffffff
     public void Size_Not_Default_Message_Button (int height, int width, string message)
     {
         int iterations = -1;
-        Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
 
         Application.Iteration += (s, a) =>
@@ -855,7 +842,6 @@ ffffffffffffffffffff
     public void Size_Not_Default_No_Message (int height, int width)
     {
         int iterations = -1;
-        Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
 
         Application.Iteration += (s, a) =>
@@ -885,7 +871,6 @@ ffffffffffffffffffff
     public void Size_Tiny_Fixed_Size ()
     {
         int iterations = -1;
-        Application.Begin (Application.Top);
 
         Application.Iteration += (s, a) =>
                                  {

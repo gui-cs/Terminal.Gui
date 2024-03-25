@@ -27,7 +27,7 @@ public class WindowsAndFrameViews : Scenario
         List<View> listWin = new ();
 
         //Ignore the Win that UI Catalog created and create a new one
-        Application.Top.Remove (Win);
+        Top.Remove (Win);
         Win?.Dispose ();
 
         Win = new Window
@@ -61,7 +61,7 @@ public class WindowsAndFrameViews : Scenario
                      Text = "Press ME! (Y = Pos.AnchorEnd(1))"
                  }
                 );
-        Application.Top.Add (Win);
+        Top.Add (Win);
 
         // add it to our list
         listWin.Add (Win);
@@ -130,7 +130,7 @@ public class WindowsAndFrameViews : Scenario
                           );
             win.Add (frameView);
 
-            Application.Top.Add (win);
+            Top.Add (win);
             listWin.Add (win);
         }
 
@@ -212,9 +212,9 @@ public class WindowsAndFrameViews : Scenario
 
         frame.Add (subFrameViewofFV);
 
-        Application.Top.Add (frame);
+        Top.Add (frame);
         listWin.Add (frame);
 
-        Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
+        Top.ColorScheme = Colors.ColorSchemes ["Base"];
     }
 }

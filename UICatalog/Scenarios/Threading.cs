@@ -118,10 +118,10 @@ public class Threading : Scenario
         void Top_Loaded (object sender, EventArgs args)
         {
             _btnActionCancel.SetFocus ();
-            Application.Top.Loaded -= Top_Loaded;
+            Top.Loaded -= Top_Loaded;
         }
 
-        Application.Top.Loaded += Top_Loaded;
+        Top.Loaded += Top_Loaded;
     }
 
     private async void CallLoadItemsAsync ()

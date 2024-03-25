@@ -2119,7 +2119,7 @@ public class TableView : View
     )
     {
         // if the column index provided is out of bounds
-        if (columnIndex < 0 || columnIndex >= table.Columns)
+        if (table is null || columnIndex < 0 || columnIndex >= table.Columns)
         {
             idx = columnIndex;
 

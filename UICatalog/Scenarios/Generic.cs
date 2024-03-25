@@ -23,7 +23,8 @@ public class MyScenario : Scenario
         Application.Init ();
         ConfigurationManager.Themes.Theme = Theme;
         ConfigurationManager.Apply ();
-        Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
+        Top = new Toplevel ();
+        Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
     }
 
     public override void Setup ()
@@ -34,6 +35,6 @@ public class MyScenario : Scenario
         // `Scenario.Run` which calls `Application.Run`. Example:
 
         var button = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };
-        Application.Top.Add (button);
+        Top.Add (button);
     }
 }

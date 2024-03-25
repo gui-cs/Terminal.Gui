@@ -68,7 +68,43 @@ public class Dialog : Window
         Modal = true;
         ButtonAlignment = DefaultButtonAlignment;
 
+        AddCommand (Command.QuitToplevel, () =>
+                                          {
+                                              Canceled = true;
+                                              RequestStop ();
+                                              return true;
+                                          });
         KeyBindings.Add (Key.Esc, Command.QuitToplevel);
+    }
+
+
+    private bool _canceled;
+
+    /// <summary>Gets a value indicating whether the <see cref="Dialog"/> was canceled.</summary>
+    /// <remarks>The default value is <see langword="true"/>.</remarks>
+    public bool Canceled
+    {
+        get
+        {
+#if DEBUG_IDISPOSABLE
+            if (WasDisposed)
+            {
+                throw new ObjectDisposedException (GetType ().FullName);
+            }
+#endif
+            return _canceled;
+        }
+        set
+        {
+#if DEBUG_IDISPOSABLE
+            if (WasDisposed)
+            {
+                throw new ObjectDisposedException (GetType ().FullName);
+            }
+#endif
+            _canceled = value;
+            return;
+        }
     }
 
     /// <summary>Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the bottom of the dialog.</summary>

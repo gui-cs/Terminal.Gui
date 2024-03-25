@@ -155,7 +155,7 @@ public class Dialogs : Scenario
                 + frame.GetAdornmentsThickness ().Vertical;
         }
 
-        Application.Top.LayoutComplete += Top_LayoutComplete;
+        Top.LayoutComplete += Top_LayoutComplete;
 
         Win.Add (frame);
 
@@ -192,6 +192,7 @@ public class Dialogs : Scenario
                                                                        buttonPressedLabel
                                                                       );
                                         Application.Run (dlg);
+                                        dlg.Dispose ();
                                     };
 
         Win.Add (showDialogButton);

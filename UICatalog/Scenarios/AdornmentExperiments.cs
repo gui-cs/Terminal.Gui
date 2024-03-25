@@ -13,7 +13,8 @@ public class AdornmentExperiments : Scenario
         Application.Init ();
         ConfigurationManager.Themes.Theme = Theme;
         ConfigurationManager.Apply ();
-        Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
+        Top = new ();
+        Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
 
         _diagnosticFlags = View.Diagnostics;
         //View.Diagnostics = ViewDiagnosticFlags.MouseEnter;
@@ -31,10 +32,10 @@ public class AdornmentExperiments : Scenario
             Height = Dim.Percent (90),
             CanFocus = true,
         };
-        Application.Top.Add (_frameView);
+        Top.Add (_frameView);
         _frameView.Initialized += FrameView_Initialized;
 
-        Application.Top.Closed += (s, e) => View.Diagnostics = _diagnosticFlags;
+        Top.Closed += (s, e) => View.Diagnostics = _diagnosticFlags;
     }
 
     private void FrameView_Initialized (object sender, System.EventArgs e)
