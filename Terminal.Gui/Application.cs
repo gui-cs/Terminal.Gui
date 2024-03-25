@@ -93,7 +93,7 @@ public static partial class Application
         {
             t.Running = false;
 #if DEBUG_IDISPOSABLE
-            // Don't dispose the tolevels. It's up to caller dispose them
+            // Don't dispose the toplevels. It's up to caller dispose them
             Debug.Assert (t.WasDisposed);
 #endif
         }
@@ -105,7 +105,7 @@ public static partial class Application
         if (Top is { })
         {
             Debug.Assert (Top.WasDisposed);
-            // If End wasn't called _latestClosedRunStateToplevel may be null
+            // If End wasn't called _cachedRunStateToplevel may be null
             if (_cachedRunStateToplevel is { })
             {
                 Debug.Assert (_cachedRunStateToplevel.WasDisposed);
@@ -246,7 +246,8 @@ public static partial class Application
         // multiple times. We need to do this because some settings are only
         // valid after a Driver is loaded. In this cases we need just 
         // `Settings` so we can determine which driver to use.
-        Load (true);
+        // Don't reset, so we can inherit the theme from the previous run.
+        Load (false);
         Apply ();
 
         // Ignore Configuration for ForceDriver if driverName is specified
@@ -350,6 +351,7 @@ public static partial class Application
     /// </remarks>
     public static void Shutdown ()
     {
+        // TODO: Throw an exception if Init hasn't been called.
         ResetState ();
         PrintJsonErrors ();
     }

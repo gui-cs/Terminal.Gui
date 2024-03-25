@@ -88,18 +88,6 @@ public class Scenario : IDisposable
     /// </summary>
     public Window Win { get; set; }
 
-    public void Dispose ()
-    {
-        // BUGBUG: Top should have already been disposed. We dispose it here until we can fix the scenarios that are doing it wrong.
-        Top?.Dispose ();
-
-        // We created Win, so we Dispose it.
-        Win?.Dispose ();
-
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose (true);
-        GC.SuppressFinalize (this);
-    }
 
     /// <summary>
     ///     Helper function to get the list of categories a <see cref="Scenario"/> belongs to (defined in
@@ -139,6 +127,15 @@ public class Scenario : IDisposable
 
         return objects.OrderBy (s => s.GetName ()).ToList ();
     }
+
+
+    public virtual void Main ()
+    {
+        Init ();
+        Setup ();
+        Run ();
+    }
+
 
     /// <summary>
     ///     Helper that calls <see cref="Application.Init"/> and creates the default <see cref="Terminal.Gui.Window"/> implementation with a frame and label
@@ -186,7 +183,7 @@ public class Scenario : IDisposable
     /// </remarks>
     public virtual void Run ()
     {
-        // Must explicit call Application.Shutdown method to shutdown.
+        // Must explicitly call Application.Shutdown method to shutdown.
         Application.Run (Top);
     }
 
@@ -197,6 +194,13 @@ public class Scenario : IDisposable
     /// <summary>Gets the Scenario Name + Description with the Description padded based on the longest known Scenario name.</summary>
     /// <returns></returns>
     public override string ToString () { return $"{GetName ().PadRight (_maxScenarioNameLen)}{GetDescription ()}"; }
+    
+    public void Dispose ()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose (true);
+        GC.SuppressFinalize (this);
+    }
 
     protected virtual void Dispose (bool disposing)
     {
@@ -204,11 +208,10 @@ public class Scenario : IDisposable
         {
             if (disposing)
             {
-                // TODO: dispose managed state (managed objects)
+                Top?.Dispose ();
+                Win?.Dispose ();
             }
 
-            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-            // TODO: set large fields to null
             _disposedValue = true;
         }
     }

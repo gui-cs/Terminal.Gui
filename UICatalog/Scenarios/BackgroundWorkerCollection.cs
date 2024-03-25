@@ -354,6 +354,20 @@ public class BackgroundWorkerCollection : Scenario
                 Source = new ListWrapper (_log)
             };
             Add (_listLog);
+
+            Closing += WorkerApp_Closing;
+        }
+        private void WorkerApp_Closing (object sender, ToplevelClosingEventArgs e)
+        {
+            Toplevel top = Application.OverlappedChildren.Find (x => x.Data.ToString () == "WorkerApp");
+
+            if (Visible && top == this)
+            {
+                Visible = false;
+                e.Cancel = true;
+
+                Application.OverlappedMoveNext ();
+            }
         }
 
         public void CancelWorker ()
