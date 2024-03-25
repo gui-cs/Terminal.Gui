@@ -938,7 +938,7 @@ public class ContextMenuTests
     public void RequestStop_While_ContextMenu_Is_Open_Does_Not_Throws ()
     {
         ContextMenu cm = Create_ContextMenu_With_Two_MenuItem (10, 5);
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         var isMenuAllClosed = false;
         MenuBarItem mi = null;
         int iterations = -1;
@@ -957,6 +957,7 @@ public class ContextMenuTests
                                                      {
                                                          var dialog1 = new Dialog ();
                                                          Application.Run (dialog1);
+                                                         dialog1.Dispose ();
                                                          Assert.False (ContextMenu.IsShow);
                                                          Assert.True (isMenuAllClosed);
                                                      };
@@ -994,12 +995,13 @@ public class ContextMenuTests
                        {
                            var dialog2 = new Dialog ();
                            Application.Run (dialog2);
+                           dialog2.Dispose ();
                            Assert.False (ContextMenu.IsShow);
                            Assert.True (isMenuAllClosed);
                            isTopClosed = true;
                        };
 
-        Application.Run ();
+        Application.Run (top);
 
         Assert.True (isTopClosed);
         Assert.False (ContextMenu.IsShow);

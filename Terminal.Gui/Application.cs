@@ -491,7 +491,11 @@ public static partial class Application
         {
             if (Toplevel.Visible)
             {
+                Current?.OnDeactivate (Toplevel);
+                var previousCurrent = Current;
                 Current = Toplevel;
+                Current.OnActivate (previousCurrent);
+
                 SetCurrentOverlappedAsTop ();
             }
             else
