@@ -75,6 +75,10 @@ public static partial class Application
                       .ToList ();
     }
 
+    // When `End ()` is called, it is possible `RunState.Toplevel` is a different object than `Top`.
+    // This variable is set in `End` in this case so that `Begin` correctly sets `Top`.
+    private static Toplevel _cachedRunStateToplevel;
+
     // IMPORTANT: Ensure all property/fields are reset here. See Init_ResetState_Resets_Properties unit test.
     // Encapsulate all setting of initial state for Application; Having
     // this in a function like this ensures we don't make mistakes in
@@ -102,15 +106,15 @@ public static partial class Application
         {
             Debug.Assert (Top.WasDisposed);
             // If End wasn't called _latestClosedRunStateToplevel may be null
-            if (_latestClosedRunStateToplevel is { })
+            if (_cachedRunStateToplevel is { })
             {
-                Debug.Assert (_latestClosedRunStateToplevel.WasDisposed);
-                Debug.Assert (_latestClosedRunStateToplevel == Top);
+                Debug.Assert (_cachedRunStateToplevel.WasDisposed);
+                Debug.Assert (_cachedRunStateToplevel == Top);
             }
         }
 #endif
         Top = null;
-        _latestClosedRunStateToplevel = null;
+        _cachedRunStateToplevel = null;
 
         // MainLoop stuff
         MainLoop?.Dispose ();
@@ -394,9 +398,9 @@ public static partial class Application
 
 #if DEBUG_IDISPOSABLE
         Debug.Assert (!toplevel.WasDisposed);
-        if (_latestClosedRunStateToplevel is { } && _latestClosedRunStateToplevel != toplevel)
+        if (_cachedRunStateToplevel is { } && _cachedRunStateToplevel != toplevel)
         {
-            Debug.Assert (_latestClosedRunStateToplevel.WasDisposed);
+            Debug.Assert (_cachedRunStateToplevel.WasDisposed);
         }
 #endif
 
@@ -422,7 +426,7 @@ public static partial class Application
         {
             // This assertion confirm if the Top was already disposed
             Debug.Assert (Top.WasDisposed);
-            Debug.Assert (Top == _latestClosedRunStateToplevel);
+            Debug.Assert (Top == _cachedRunStateToplevel);
         }
 #endif
 
@@ -432,7 +436,7 @@ public static partial class Application
             {
                 // If Top was already disposed and isn't on the Toplevels Stack,
                 // clean it up here if is the same as _latestClosedRunStateToplevel
-                if (Top == _latestClosedRunStateToplevel)
+                if (Top == _cachedRunStateToplevel)
                 {
                     Top = null;
                 }
@@ -1006,8 +1010,6 @@ public static partial class Application
         }
     }
 
-    private static Toplevel _latestClosedRunStateToplevel;
-
     /// <summary>
     ///     Building block API: completes the execution of a <see cref="Toplevel"/> that was started with
     ///     <see cref="Begin(Toplevel)"/> .
@@ -1081,11 +1083,11 @@ public static partial class Application
         // it will be fixed later in the next RunIteration.
         if (OverlappedTop is { } && !_topLevels.Contains (OverlappedTop))
         {
-            _latestClosedRunStateToplevel = OverlappedTop;
+            _cachedRunStateToplevel = OverlappedTop;
         }
         else
         {
-            _latestClosedRunStateToplevel = runState.Toplevel;
+            _cachedRunStateToplevel = runState.Toplevel;
         }
         runState.Toplevel = null;
         runState.Dispose ();
