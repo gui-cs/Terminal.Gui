@@ -174,6 +174,11 @@ public class BackgroundWorkerCollection : Scenario
 
         private void OverlappedMain_Activate (object sender, ToplevelEventArgs top)
         {
+            if (top.Toplevel is null)
+            {
+                return;
+            }
+
             _workerApp?.WriteLog ($"{top.Toplevel.Data} activate.");
         }
 
