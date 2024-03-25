@@ -101,9 +101,16 @@ public static partial class Application
         if (Top is { })
         {
             Debug.Assert (Top.WasDisposed);
+            // If End wasn't called _latestClosedRunStateToplevel may be null
+            if (_latestClosedRunStateToplevel is { })
+            {
+                Debug.Assert (_latestClosedRunStateToplevel.WasDisposed);
+                Debug.Assert (_latestClosedRunStateToplevel == Top);
+            }
         }
 #endif
         Top = null;
+        _latestClosedRunStateToplevel = null;
 
         // MainLoop stuff
         MainLoop?.Dispose ();
@@ -1064,7 +1071,14 @@ public static partial class Application
         // Don't dispose runState.Toplevel. It's up to caller dispose it
         // If it's not the same as the current in the RunIteration,
         // it will be fixed later in the next RunIteration.
-        _latestClosedRunStateToplevel = runState.Toplevel;
+        if (OverlappedTop is { } && !_topLevels.Contains (OverlappedTop))
+        {
+            _latestClosedRunStateToplevel = OverlappedTop;
+        }
+        else
+        {
+            _latestClosedRunStateToplevel = runState.Toplevel;
+        }
         runState.Toplevel = null;
         runState.Dispose ();
     }
