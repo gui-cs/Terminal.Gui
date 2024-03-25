@@ -174,18 +174,14 @@ public class BackgroundWorkerCollection : Scenario
 
         private void OverlappedMain_Activate (object sender, ToplevelEventArgs top)
         {
-            if (top.Toplevel is null)
-            {
-                return;
-            }
-
-            _workerApp?.WriteLog ($"{top.Toplevel.Data} activate.");
+            _workerApp?.WriteLog ($"{(top.Toplevel is null ? ((Toplevel)sender).Data : top.Toplevel.Data)} activate.");
         }
 
         private void OverlappedMain_Deactivate (object sender, ToplevelEventArgs top)
         {
             _workerApp?.WriteLog ($"{top.Toplevel.Data} deactivate.");
         }
+
         private void Quit () { RequestStop (); }
 
         private MenuBarItem View ()
@@ -358,6 +354,21 @@ public class BackgroundWorkerCollection : Scenario
                 Source = new ListWrapper (_log)
             };
             Add (_listLog);
+
+            Closing += WorkerApp_Closing;
+        }
+
+        private void WorkerApp_Closing (object sender, ToplevelClosingEventArgs e)
+        {
+            Toplevel top = Application.OverlappedChildren.Find (x => x.Data.ToString () == "WorkerApp");
+
+            if (Visible && top == this)
+            {
+                Visible = false;
+                e.Cancel = true;
+
+                Application.OverlappedMoveNext ();
+            }
         }
 
         public void CancelWorker ()
