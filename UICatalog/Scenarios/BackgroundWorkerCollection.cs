@@ -115,10 +115,9 @@ public class BackgroundWorkerCollection : Scenario
             if (_workerApp?.Running == false)
             {
                 Application.Run (_workerApp);
-
-                return;
             }
         }
+
         private void Menu_MenuOpening (object sender, MenuOpeningEventArgs menu)
         {
             if (menu.CurrentMenu.Title == "_Window")
@@ -493,6 +492,7 @@ public class BackgroundWorkerCollection : Scenario
             if (stagingUI.Staging != null && stagingUI.Staging.StartStaging != null)
             {
                 staging = new Staging (stagingUI.Staging.StartStaging);
+                stagingUI.Dispose ();
                 WriteLog ($"Worker is started at {staging.StartStaging}.{staging.StartStaging:fff}");
 
                 if (_stagingWorkers == null)
@@ -503,7 +503,10 @@ public class BackgroundWorkerCollection : Scenario
                 _stagingWorkers.Add (staging, worker);
                 worker.RunWorkerAsync ();
             }
-            stagingUI.Dispose ();
+            else
+            {
+                stagingUI.Dispose ();
+            }
         }
 
         public void WriteLog (string msg)
