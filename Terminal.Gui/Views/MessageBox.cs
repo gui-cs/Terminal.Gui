@@ -443,7 +443,7 @@ public static class MessageBox
                                                 );
                         }
 
-                        d.SetRelativeLayout (d.SuperView?.Frame ?? Application.Top.Frame);
+                        d.SetRelativeLayout (d.SuperView?.ContentSize ?? Application.Top.ContentSize);
                     };
 
         // Setup actions

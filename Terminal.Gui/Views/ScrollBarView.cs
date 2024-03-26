@@ -262,7 +262,7 @@ public class ScrollBarView : View
 
             if (IsInitialized)
             {
-                SetRelativeLayout (SuperView?.Frame ?? Host.Frame);
+                SetRelativeLayout (SuperView?.Frame.Size ?? Host.Frame.Size);
                 ShowHideScrollBars (false);
                 SetNeedsDisplay ();
             }
@@ -890,7 +890,7 @@ public class ScrollBarView : View
     private void ScrollBarView_Initialized (object sender, EventArgs e)
     {
         SetWidthHeight ();
-        SetRelativeLayout (SuperView?.Frame ?? Host?.Frame ?? Frame);
+        SetRelativeLayout (SuperView?.Frame.Size ?? Host?.Frame.Size ?? Frame.Size);
 
         if (OtherScrollBarView is null)
         {
@@ -995,11 +995,11 @@ public class ScrollBarView : View
         }
 
         SetWidthHeight ();
-        SetRelativeLayout (SuperView?.Frame ?? Host.Frame);
+        SetRelativeLayout (SuperView?.Frame.Size ?? Host.Frame.Size);
 
         if (_otherScrollBarView is { })
         {
-            OtherScrollBarView.SetRelativeLayout (SuperView?.Frame ?? Host.Frame);
+            OtherScrollBarView.SetRelativeLayout (SuperView?.Frame.Size ?? Host.Frame.Size);
         }
 
         if (_showBothScrollIndicator)

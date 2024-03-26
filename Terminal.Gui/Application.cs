@@ -526,7 +526,7 @@ public static partial class Application
         }
 
         //if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
-        toplevel.SetRelativeLayout (Driver.Viewport);
+        toplevel.SetRelativeLayout (Driver.Viewport.Size);
 
         //}
 
@@ -1310,7 +1310,7 @@ public static partial class Application
 
         foreach (Toplevel t in _topLevels)
         {
-            t.SetRelativeLayout (Rectangle.Empty with { Size = args.Size });
+            t.SetRelativeLayout (args.Size);
             t.LayoutSubviews ();
             t.PositionToplevels ();
             t.OnSizeChanging (new (args.Size));

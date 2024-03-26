@@ -722,13 +722,13 @@ public class ScrollView : View
 
         if (v)
         {
-            _vertical.SetRelativeLayout (Viewport);
+            _vertical.SetRelativeLayout (ContentSize);
             _vertical.Draw ();
         }
 
         if (h)
         {
-            _horizontal.SetRelativeLayout (Viewport);
+            _horizontal.SetRelativeLayout (ContentSize);
             _horizontal.Draw ();
         }
 
@@ -736,7 +736,7 @@ public class ScrollView : View
 
         if (v && h)
         {
-            _contentBottomRightCorner.SetRelativeLayout (Viewport);
+            _contentBottomRightCorner.SetRelativeLayout (ContentSize);
             _contentBottomRightCorner.Draw ();
         }
     }
