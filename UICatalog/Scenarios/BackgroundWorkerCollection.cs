@@ -14,10 +14,11 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 public class BackgroundWorkerCollection : Scenario
 {
-    public override void Init ()
+    public override void Main ()
     {
         Application.Run<OverlappedMain> ().Dispose ();
         Application.Top?.Dispose ();
+        Application.Shutdown ();
 
 #if DEBUG_IDISPOSABLE
         if (Application.OverlappedChildren is { })
@@ -26,8 +27,6 @@ public class BackgroundWorkerCollection : Scenario
         }
 #endif
     }
-
-    public override void Run () { }
 
     private class OverlappedMain : Toplevel
     {
@@ -257,6 +256,7 @@ public class BackgroundWorkerCollection : Scenario
         {
             Staging = staging;
             _label.Text = "Work list:";
+            _listView.Enabled = true;
             _listView.SetSource (list);
             _start.Visible = false;
             Id = "";
@@ -282,7 +282,7 @@ public class BackgroundWorkerCollection : Scenario
             };
             Add (_label);
 
-            _listView = new ListView { X = 0, Y = 2, Width = Dim.Fill (), Height = Dim.Fill (2) };
+            _listView = new ListView { X = 0, Y = 2, Width = Dim.Fill (), Height = Dim.Fill (2), Enabled = false };
             Add (_listView);
 
             _start = new Button { Text = "Start", IsDefault = true, ClearOnVisibleFalse = false };
