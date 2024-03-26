@@ -485,7 +485,6 @@ public class BackgroundWorkerCollection : Scenario
                                                  }
 #endif
                                                  Application.Run (stagingUI);
-                                                 stagingUI.Dispose ();
                                              }
                                          };
 
