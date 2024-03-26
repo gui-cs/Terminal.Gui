@@ -295,7 +295,7 @@ public class BackgroundWorkerCollection : Scenario
 
             KeyDown += (s, e) =>
                        {
-                           if (e.KeyCode == KeyCode.Esc)
+                           if (e == Application.QuitKey)
                            {
                                OnReportClosed (this, EventArgs.Empty);
                            }
@@ -356,6 +356,9 @@ public class BackgroundWorkerCollection : Scenario
                 Source = new ListWrapper (_log)
             };
             Add (_listLog);
+
+            // We don't want WorkerApp to respond to the quitkey
+            KeyBindings.Remove (Application.QuitKey);
 
             Closing += WorkerApp_Closing;
             Closed += WorkerApp_Closed;
@@ -439,15 +442,7 @@ public class BackgroundWorkerCollection : Scenario
                                              {
                                                  // Failed
                                                  WriteLog (
-                                                           $"Exception occurred {
-                                                               e.Error.Message
-                                                           } on Worker {
-                                                               staging.StartStaging
-                                                           }.{
-                                                               staging.StartStaging
-                                                               :fff} at {
-                                                               DateTime.Now
-                                                           }"
+                                                           $"Exception occurred {e.Error.Message} on Worker {staging.StartStaging}.{staging.StartStaging:fff} at {DateTime.Now}"
                                                           );
                                              }
                                              else if (e.Cancelled)

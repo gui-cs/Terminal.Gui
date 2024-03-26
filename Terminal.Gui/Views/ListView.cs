@@ -702,7 +702,7 @@ public class ListView : View
     /// <returns><see langword="true"/> if the <see cref="OpenSelectedItem"/> event was fired.</returns>
     public bool OnOpenSelectedItem ()
     {
-        if (_source.Count <= _selected || _selected < 0 || OpenSelectedItem is null)
+        if (_source is null || _source.Count <= _selected || _selected < 0 || OpenSelectedItem is null)
         {
             return false;
         }
