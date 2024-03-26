@@ -70,7 +70,7 @@ public class DrawTests
         var view = new View { Text = r.ToString (), Height = Dim.Fill (), Width = Dim.Fill () };
         var tf = new TextField { Text = us, Y = 1, Width = 3 };
         win.Add (view, tf);
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (win);
 
         Application.Begin (top);
@@ -135,7 +135,8 @@ public class DrawTests
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (tv);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
         // Don't use Label. It sets AutoSize = true which is not what we're testing here.
         var view = new View { Text = "ワイドルーン。", Height = Dim.Fill (), Width = Dim.Fill () };
@@ -143,8 +144,8 @@ public class DrawTests
         // Don't have unit tests use things that aren't absolutely critical for the test, like Dialog
         var dg = new Window { X = 2, Y = 2, Width = 14, Height = 3 };
         dg.Add (view);
-        Application.Begin (Application.Top);
-        Application.Begin (dg);
+        RunState rsTop = Application.Begin (top);
+        RunState rsDiag = Application.Begin (dg);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 10);
 
         const string expectedOutput = """
@@ -163,6 +164,9 @@ public class DrawTests
 
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expectedOutput, _output);
         Assert.Equal (new Rectangle (0, 0, 30, 10), pos);
+
+        Application.End (rsDiag);
+        Application.End (rsTop);
     }
 
     [Fact]
@@ -189,7 +193,7 @@ public class DrawTests
             VerticalTextAlignment = VerticalTextAlignment.Bottom,
             ColorScheme = Colors.ColorSchemes ["Base"]
         };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (viewRight, viewBottom);
 
         Application.Begin (top);
@@ -402,7 +406,7 @@ public class DrawTests
             Height = 5
         };
         container.Add (content);
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (container);
         Application.Driver.Clip = container.Frame;
         Application.Begin (top);
@@ -517,7 +521,7 @@ public class DrawTests
             Height = 5
         };
         container.Add (content);
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (container);
 
         // BUGBUG: v2 - it's bogus to reference .Frame before BeginInit. And why is the clip being set anyway???
@@ -604,7 +608,7 @@ public class DrawTests
             Height = 5
         };
         container.Add (content);
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (container);
         Application.Driver.Clip = container.Frame;
         Application.Begin (top);
@@ -723,7 +727,7 @@ public class DrawTests
         var view = new Label { Text = r.ToString () };
         var tf = new TextField { Text = us, Y = 1, Width = 3 };
         win.Add (view, tf);
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (win);
 
         Application.Begin (top);

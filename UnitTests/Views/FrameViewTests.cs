@@ -44,8 +44,9 @@ public class FrameViewTests
         var fv = new FrameView ();
         Assert.Equal (string.Empty, fv.Title);
         Assert.Equal (string.Empty, fv.Text);
-        Application.Top.Add (fv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (fv);
+        Application.Begin (top);
         Assert.Equal (new Rectangle (0, 0, 0, 0), fv.Frame);
         TestHelpers.AssertDriverContentsWithFrameAre (@"", _output);
 

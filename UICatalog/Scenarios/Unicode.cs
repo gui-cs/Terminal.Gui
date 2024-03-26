@@ -60,7 +60,7 @@ public class UnicodeInMenu : Scenario
                                 )
             ]
         };
-        Application.Top.Add (menu);
+        Top.Add (menu);
 
         var statusBar = new StatusBar (
                                        new StatusItem []
@@ -74,7 +74,7 @@ public class UnicodeInMenu : Scenario
                                            new (KeyCode.Null, "~F3~ Со_хранить", null)
                                        }
                                       );
-        Application.Top.Add (statusBar);
+        Top.Add (statusBar);
 
         var label = new Label { X = 0, Y = 1, Text = "Label:" };
         Win.Add (label);

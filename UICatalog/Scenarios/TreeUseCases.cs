@@ -47,7 +47,7 @@ public class TreeUseCases : Scenario
             ]
         };
 
-        Application.Top.Add (menu);
+        Top.Add (menu);
 
         var statusBar = new StatusBar (
                                        new StatusItem []
@@ -60,7 +60,7 @@ public class TreeUseCases : Scenario
                                        }
                                       );
 
-        Application.Top.Add (statusBar);
+        Top.Add (statusBar);
 
         // Start with the most basic use case
         LoadSimpleNodes ();

@@ -98,8 +98,9 @@ public class HexViewTests
     public void CursorPosition_Encoding_Default ()
     {
         var hv = new HexView (LoadStream ()) { Width = Dim.Fill (), Height = Dim.Fill () };
-        Application.Top.Add (hv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (hv);
+        Application.Begin (top);
 
         Assert.Equal (new Point (1, 1), hv.CursorPosition);
 
@@ -126,8 +127,9 @@ public class HexViewTests
     public void CursorPosition_Encoding_Unicode ()
     {
         var hv = new HexView (LoadStream (true)) { Width = Dim.Fill (), Height = Dim.Fill () };
-        Application.Top.Add (hv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (hv);
+        Application.Begin (top);
 
         Assert.Equal (new Point (1, 1), hv.CursorPosition);
 
@@ -220,8 +222,9 @@ public class HexViewTests
     public void KeyBindings_Command ()
     {
         var hv = new HexView (LoadStream ()) { Width = 20, Height = 10 };
-        Application.Top.Add (hv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (hv);
+        Application.Begin (top);
 
         Assert.Equal (63, hv.Source.Length);
         Assert.Equal (1, hv.Position);
@@ -348,8 +351,9 @@ public class HexViewTests
         var hv = new HexView (LoadStream ()) { Width = Dim.Fill (), Height = Dim.Fill () };
         HexViewEventArgs hexViewEventArgs = null;
         hv.PositionChanged += (s, e) => hexViewEventArgs = e;
-        Application.Top.Add (hv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (hv);
+        Application.Begin (top);
 
         Assert.True (hv.NewKeyDownEvent (Key.CursorRight)); // left side must press twice
         Assert.True (hv.NewKeyDownEvent (Key.CursorRight));
@@ -365,8 +369,9 @@ public class HexViewTests
     public void Source_Sets_DisplayStart_And_Position_To_Zero_If_Greater_Than_Source_Length ()
     {
         var hv = new HexView (LoadStream ()) { Width = 10, Height = 5 };
-        Application.Top.Add (hv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (hv);
+        Application.Begin (top);
 
         Assert.True (hv.NewKeyDownEvent (Key.End));
         Assert.Equal (62, hv.DisplayStart);
@@ -379,7 +384,7 @@ public class HexViewTests
         hv.Source = LoadStream ();
         hv.Width = Dim.Fill ();
         hv.Height = Dim.Fill ();
-        Application.Top.LayoutSubviews ();
+        top.LayoutSubviews ();
         Assert.Equal (0, hv.DisplayStart);
         Assert.Equal (0, hv.Position - 1);
 

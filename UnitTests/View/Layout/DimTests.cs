@@ -28,7 +28,7 @@ public class DimTests
     [AutoInitShutdown]
     public void Dim_Add_Operator ()
     {
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
 
         var view = new View { X = 0, Y = 0, Width = 20, Height = 0 };
         var field = new TextField { X = 0, Y = Pos.Bottom (view), Width = 20 };
@@ -102,7 +102,7 @@ public class DimTests
     [AutoInitShutdown]
     public void Dim_Subtract_Operator ()
     {
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
 
         var view = new View { X = 0, Y = 0, Width = 20, Height = 0 };
         var field = new TextField { X = 0, Y = Pos.Bottom (view), Width = 20 };
@@ -386,10 +386,11 @@ public class DimTests
         };
 
         container.Add (label);
-        Application.Top.Add (container);
-        Application.Top.BeginInit ();
-        Application.Top.EndInit ();
-        Application.Top.LayoutSubviews ();
+        var top = new Toplevel ();
+        top.Add (container);
+        top.BeginInit ();
+        top.EndInit ();
+        top.LayoutSubviews ();
 
         Assert.Equal (100, container.Frame.Width);
         Assert.Equal (100, container.Frame.Height);
@@ -528,7 +529,7 @@ public class DimTests
     public void Only_DimAbsolute_And_DimFactor_As_A_Different_Procedure_For_Assigning_Value_To_Width_Or_Height ()
     {
         // Testing with the Button because it properly handles the Dim class.
-        Toplevel t = Application.Top;
+        Toplevel t = new ();
 
         var w = new Window { Width = 100, Height = 100 };
 
@@ -765,7 +766,7 @@ public class DimTests
 
         Application.Iteration += (s, a) => Application.RequestStop ();
 
-        Application.Run ();
+        Application.Run (t);
     }
 
     [Fact]

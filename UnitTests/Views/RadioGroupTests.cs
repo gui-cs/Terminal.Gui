@@ -171,9 +171,10 @@ public class RadioGroupTests
         var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test 你" } };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (rg);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         Assert.Equal (Orientation.Vertical, rg.Orientation);

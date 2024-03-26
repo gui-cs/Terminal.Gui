@@ -46,7 +46,7 @@ public class SyncrhonizationContextTests
                  );
 
         // blocks here until the RequestStop is processed at the end of the test
-        Application.Run ();
+        Application.Run ().Dispose ();
         Assert.True (success);
     }
 
@@ -79,7 +79,7 @@ public class SyncrhonizationContextTests
                  );
 
         // blocks here until the RequestStop is processed at the end of the test
-        Application.Run ();
+        Application.Run ().Dispose ();
         Assert.True (success);
     }
 }

@@ -36,31 +36,17 @@ public class ConfigurationEditor : Scenario
         }
     }
 
-    // Don't create a Window, just return the top-level view
-    public override void Init ()
+    public override void Main ()
     {
         Application.Init ();
-        ConfigurationManager.Themes.Theme = Theme;
-        ConfigurationManager.Apply ();
-        Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
-    }
 
-    public void Save ()
-    {
-        if (_tileView.MostFocused is ConfigTextView editor)
-        {
-            editor.Save ();
-        }
-    }
-
-    public override void Setup ()
-    {
+        Toplevel top = new ();
         _tileView = new TileView (0)
         {
             Width = Dim.Fill (), Height = Dim.Fill (1), Orientation = Orientation.Vertical, LineStyle = LineStyle.Single
         };
 
-        Application.Top.Add (_tileView);
+        top.Add (_tileView);
 
         _lenStatusItem = new StatusItem (KeyCode.CharMask, "Len: ", null);
 
@@ -78,9 +64,9 @@ public class ConfigurationEditor : Scenario
                                        }
                                       );
 
-        Application.Top.Add (statusBar);
+        top.Add (statusBar);
 
-        Application.Top.Loaded += (s, a) => Open ();
+        top.Loaded += (s, a) => Open ();
 
         _editorColorSchemeChanged += () =>
                                      {
@@ -94,6 +80,18 @@ public class ConfigurationEditor : Scenario
                                      };
 
         _editorColorSchemeChanged.Invoke ();
+
+        Application.Run (top);
+        top.Dispose ();
+
+        Application.Shutdown ();
+    }
+    public void Save ()
+    {
+        if (_tileView.MostFocused is ConfigTextView editor)
+        {
+            editor.Save ();
+        }
     }
 
     private void Open ()

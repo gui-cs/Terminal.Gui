@@ -142,7 +142,8 @@ public class ScrollBarViewTests
         var height = 40;
 
         var super = new Window { Id = "super", Width = Dim.Fill (), Height = Dim.Fill () };
-        Application.Top.Add (super);
+        var top = new Toplevel ();
+        top.Add (super);
 
         var horiz = new ScrollBarView
         {
@@ -168,7 +169,7 @@ public class ScrollBarViewTests
         };
         super.Add (vert);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (width, height);
 
         var expected = @"
@@ -287,10 +288,11 @@ public class ScrollBarViewTests
         var text =
             "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
         var label = new Label { Text = text };
-        Application.Top.Add (label);
+        var top = new Toplevel ();
+        top.Add (label);
 
         var sbv = new ScrollBarView (label, true, false) { Size = 100, ClearOnVisibleFalse = false };
-        Application.Begin (Application.Top);
+        Application.Begin (top);
 
         Assert.True (sbv.Visible);
 
@@ -308,7 +310,7 @@ This is a tes▼
 
         sbv.Visible = false;
         Assert.False (sbv.Visible);
-        Application.Top.Draw ();
+        top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -324,7 +326,7 @@ This is a test
 
         sbv.Visible = true;
         Assert.True (sbv.Visible);
-        Application.Top.Draw ();
+        top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -359,85 +361,91 @@ This is a tes
     public void
         Constructor_ShowBothScrollIndicator_False_And_IsVertical_False_Refresh_Does_Not_Throws_An_Object_Null_Exception ()
     {
-        // BUGBUG: v2 - Tig broke these tests; @bdisp help?
-        //var exception = Record.Exception (() => {
-        Application.Init (new FakeDriver ());
+        var exception = Record.Exception (
+                                          () =>
+                                          {
+                                              Application.Init (new FakeDriver ());
 
-        Toplevel top = Application.Top;
+                                              Toplevel top = new ();
 
-        var win = new Window { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
+                                              var win = new Window { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
-        List<string> source = new ();
+                                              List<string> source = new ();
 
-        for (var i = 0; i < 50; i++)
-        {
-            var text = $"item {i} - ";
+                                              for (var i = 0; i < 50; i++)
+                                              {
+                                                  var text = $"item {i} - ";
 
-            for (var j = 0; j < 160; j++)
-            {
-                var col = j.ToString ();
-                text += col.Length == 1 ? col [0] : col [1];
-            }
+                                                  for (var j = 0; j < 160; j++)
+                                                  {
+                                                      var col = j.ToString ();
+                                                      text += col.Length == 1 ? col [0] : col [1];
+                                                  }
 
-            source.Add (text);
-        }
+                                                  source.Add (text);
+                                              }
 
-        var listView = new ListView
-        {
-            X = 0,
-            Y = 0,
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            Source = new ListWrapper (source)
-        };
-        win.Add (listView);
+                                              var listView = new ListView
+                                              {
+                                                  X = 0,
+                                                  Y = 0,
+                                                  Width = Dim.Fill (),
+                                                  Height = Dim.Fill (),
+                                                  Source = new ListWrapper (source)
+                                              };
+                                              win.Add (listView);
 
-        var newScrollBarView = new ScrollBarView (listView, false, false) { KeepContentAlwaysInViewport = true };
-        win.Add (newScrollBarView);
+                                              var newScrollBarView = new ScrollBarView (listView, false, false) { KeepContentAlwaysInViewport = true };
+                                              win.Add (newScrollBarView);
 
-        newScrollBarView.ChangedPosition += (s, e) =>
-                                            {
-                                                listView.LeftItem = newScrollBarView.Position;
+                                              newScrollBarView.ChangedPosition += (s, e) =>
+                                                                                  {
+                                                                                      listView.LeftItem = newScrollBarView.Position;
 
-                                                if (listView.LeftItem != newScrollBarView.Position)
-                                                {
-                                                    newScrollBarView.Position = listView.LeftItem;
-                                                }
+                                                                                      if (listView.LeftItem != newScrollBarView.Position)
+                                                                                      {
+                                                                                          newScrollBarView.Position = listView.LeftItem;
+                                                                                      }
 
-                                                Assert.Equal (newScrollBarView.Position, listView.LeftItem);
-                                                listView.SetNeedsDisplay ();
-                                            };
+                                                                                      Assert.Equal (newScrollBarView.Position, listView.LeftItem);
+                                                                                      listView.SetNeedsDisplay ();
+                                                                                  };
 
-        listView.DrawContent += (s, e) =>
-                                {
-                                    newScrollBarView.Size = listView.MaxLength;
-                                    Assert.Equal (newScrollBarView.Size, listView.MaxLength);
-                                    newScrollBarView.Position = listView.LeftItem;
-                                    Assert.Equal (newScrollBarView.Position, listView.LeftItem);
-                                    newScrollBarView.Refresh ();
-                                };
+                                              listView.DrawContent += (s, e) =>
+                                                                      {
+                                                                          newScrollBarView.Size = listView.MaxLength;
+                                                                          Assert.Equal (newScrollBarView.Size, listView.MaxLength);
+                                                                          newScrollBarView.Position = listView.LeftItem;
+                                                                          Assert.Equal (newScrollBarView.Position, listView.LeftItem);
+                                                                          newScrollBarView.Refresh ();
+                                                                      };
 
-        top.Ready += (s, e) =>
-                     {
-                         newScrollBarView.Position = 100;
+                                              top.Ready += (s, e) =>
+                                                           {
+                                                               newScrollBarView.Position = 100;
 
-                         //Assert.Equal (newScrollBarView.Position, newScrollBarView.Size - listView.LeftItem + (listView.LeftItem - listView.Bounds.Width));
-                         Assert.Equal (newScrollBarView.Position, listView.LeftItem);
+                                                               Assert.Equal (
+                                                                             newScrollBarView.Position,
+                                                                             newScrollBarView.Size
+                                                                             - listView.LeftItem
+                                                                             + (listView.LeftItem - listView.Bounds.Width));
+                                                               Assert.Equal (newScrollBarView.Position, listView.LeftItem);
 
-                         //Assert.Equal (92, newScrollBarView.Position);
-                         //Assert.Equal (92, listView.LeftItem);
-                         Application.RequestStop ();
-                     };
+                                                               Assert.Equal (92, newScrollBarView.Position);
+                                                               Assert.Equal (92, listView.LeftItem);
+                                                               Application.RequestStop ();
+                                                           };
 
-        top.Add (win);
+                                              top.Add (win);
 
-        Application.Run ();
+                                              Application.Run (top);
 
-        Application.Shutdown ();
+                                              top.Dispose ();
+                                              Application.Shutdown ();
 
-        //});
+                                          });
 
-        //Assert.Null (exception);
+        Assert.Null (exception);
     }
 
     [Fact]
@@ -448,7 +456,7 @@ This is a tes
                                                 () =>
                                                 {
                                                     Application.Init (new FakeDriver ());
-                                                    Toplevel top = Application.Top;
+                                                    Toplevel top = new ();
                                                     var win = new Window { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
                                                     List<string> source = new ();
 
@@ -507,7 +515,8 @@ This is a tes
                                                                      Application.RequestStop ();
                                                                  };
                                                     top.Add (win);
-                                                    Application.Run ();
+                                                    Application.Run (top);
+                                                    top.Dispose ();
                                                     Application.Shutdown ();
                                                 }
                                                );
@@ -522,11 +531,12 @@ This is a tes
         var text =
             "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
         var label = new Label { Text = text };
-        Application.Top.Add (label);
+        var top = new Toplevel ();
+       top.Add (label);
 
         var sbv = new ScrollBarView (label, true) { Size = 100 };
         sbv.OtherScrollBarView.Size = 100;
-        Application.Begin (Application.Top);
+        Application.Begin (top);
 
         Assert.Equal (100, sbv.Size);
         Assert.Equal (100, sbv.OtherScrollBarView.Size);
@@ -560,7 +570,7 @@ This is a tes▼
         Assert.False (sbv.OtherScrollBarView.ShowScrollIndicator);
         Assert.False (sbv.Visible);
         Assert.False (sbv.OtherScrollBarView.Visible);
-        Application.Top.Draw ();
+        top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -582,7 +592,7 @@ This is a test
         Assert.True (sbv.OtherScrollBarView.ShowScrollIndicator);
         Assert.True (sbv.Visible);
         Assert.True (sbv.OtherScrollBarView.Visible);
-        Application.Top.Draw ();
+        top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -604,10 +614,11 @@ This is a tes▼
         var text =
             "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
         var label = new Label { Text = text };
-        Application.Top.Add (label);
+        var top = new Toplevel ();
+        top.Add (label);
 
         var sbv = new ScrollBarView (label, true, false) { Size = 100 };
-        Application.Begin (Application.Top);
+        Application.Begin (top);
 
         Assert.Equal (100, sbv.Size);
         Assert.Null (sbv.OtherScrollBarView);
@@ -630,7 +641,7 @@ This is a tes▼
         Assert.Equal (0, sbv.Size);
         Assert.False (sbv.ShowScrollIndicator);
         Assert.False (sbv.Visible);
-        Application.Top.Draw ();
+        top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -670,11 +681,12 @@ This is a test
         var height = 3;
 
         var super = new Window { Id = "super", Width = Dim.Fill (), Height = Dim.Fill () };
-        Application.Top.Add (super);
+        var top = new Toplevel ();
+        top.Add (super);
 
         var sbv = new ScrollBarView { Id = "sbv", Size = width * 2, ShowScrollIndicator = true };
         super.Add (sbv);
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (width, height);
 
         var expected = @"
@@ -722,7 +734,7 @@ This is a test
 
         _scrollBar = new ScrollBarView (_hostView, true);
 
-        Application.Begin (Application.Top);
+        Application.Begin (_hostView.SuperView as Toplevel);
 
         Assert.True (_scrollBar.IsVertical);
         Assert.False (_scrollBar.OtherScrollBarView.IsVertical);
@@ -820,9 +832,10 @@ This is a test
                                        scrollBar.LayoutSubviews ();
                                        scrollBar.Refresh ();
                                    };
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (45, 20);
 
         Assert.True (scrollBar.AutoHideScrollBars);
@@ -959,7 +972,7 @@ This is a test
     [AutoInitShutdown]
     public void Internal_Tests ()
     {
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         Assert.Equal (new Rectangle (0, 0, 80, 25), top.Bounds);
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
         top.Add (view);
@@ -1116,10 +1129,11 @@ This is a test
         var label = new Label { AutoSize = false, Width = 14, Height = 5, Text = text };
         var btn = new Button { X = 14, Text = "Click Me!" };
         btn.Accept += (s, e) => clicked = true;
-        Application.Top.Add (label, btn);
+        var top = new Toplevel ();
+        top.Add (label, btn);
 
         var sbv = new ScrollBarView (label, true, false) { Size = 5 };
-        Application.Begin (Application.Top);
+        Application.Begin (top);
 
         Assert.Equal (5, sbv.Size);
         Assert.Null (sbv.OtherScrollBarView);
@@ -1155,7 +1169,7 @@ This is a test             ",
         Assert.Equal (5, sbv.Size);
         Assert.False (sbv.ShowScrollIndicator);
         Assert.True (sbv.Visible);
-        Application.Top.Draw ();
+        top.Draw ();
         Assert.False (sbv.Visible);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1193,7 +1207,8 @@ This is a test             ",
         var height = 40;
 
         var super = new Window { Id = "super", Width = Dim.Fill (), Height = Dim.Fill () };
-        Application.Top.Add (super);
+        var top = new Toplevel ();
+        top.Add (super);
 
         var sbv = new ScrollBarView
         {
@@ -1207,7 +1222,7 @@ This is a test             ",
         };
 
         super.Add (sbv);
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (width, height);
 
         var expected = @"
@@ -1347,7 +1362,8 @@ This is a test             ",
                 Cols = 100
             };
 
-            Application.Top.Add (_hostView);
+            var top = new Toplevel ();
+            top.Add (_hostView);
         }
     }
 }

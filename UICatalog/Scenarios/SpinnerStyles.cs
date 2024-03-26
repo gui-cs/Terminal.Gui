@@ -159,7 +159,7 @@ public class SpinnerViewStyles : Scenario
 
         ckbBounce.Toggled += (s, e) => { spinner.SpinBounce = (bool)!e.OldValue; };
 
-        Application.Top.Unloaded += Top_Unloaded;
+        Top.Unloaded += Top_Unloaded;
 
         void SetCustom ()
         {
@@ -200,7 +200,7 @@ public class SpinnerViewStyles : Scenario
                 spinner = null;
             }
 
-            Application.Top.Unloaded -= Top_Unloaded;
+            Top.Unloaded -= Top_Unloaded;
         }
     }
 

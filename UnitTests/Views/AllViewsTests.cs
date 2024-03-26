@@ -64,12 +64,13 @@ public class AllViewsTests (ITestOutputHelper output)
 
             Application.Init (new FakeDriver ());
 
-            Toplevel top = Application.Top;
+            Toplevel top = new ();
             View vType = CreateViewFromType (type, type.GetConstructor (Array.Empty<Type> ()));
 
             if (vType == null)
             {
                 output.WriteLine ($"Ignoring {type} - It's a Generic");
+                top.Dispose ();
                 Application.Shutdown ();
 
                 continue;
@@ -104,6 +105,7 @@ public class AllViewsTests (ITestOutputHelper output)
 
             if (!vType.CanFocus || (vType is Toplevel && ((Toplevel)vType).Modal))
             {
+                top.Dispose ();
                 Application.Shutdown ();
 
                 continue;
@@ -132,6 +134,7 @@ public class AllViewsTests (ITestOutputHelper output)
             Assert.Equal (1, viewEnter);
             Assert.Equal (1, viewLeave);
 
+            top.Dispose ();
             Application.Shutdown ();
         }
     }

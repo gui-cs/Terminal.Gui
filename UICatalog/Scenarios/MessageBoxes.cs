@@ -188,10 +188,10 @@ public class MessageBoxes : Scenario
                 + styleRadioGroup.Frame.Height
                 + ckbWrapMessage.Frame.Height
                 + frame.GetAdornmentsThickness ().Vertical;
-            Application.Top.Loaded -= Top_LayoutComplete;
+            Top.Loaded -= Top_LayoutComplete;
         }
 
-        Application.Top.LayoutComplete += Top_LayoutComplete;
+        Top.LayoutComplete += Top_LayoutComplete;
 
         label = new Label
         {

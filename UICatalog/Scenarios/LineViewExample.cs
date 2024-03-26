@@ -22,7 +22,7 @@ public class LineViewExample : Scenario
                 new MenuBarItem ("_File", new MenuItem [] { new ("_Quit", "", () => Quit ()) })
             ]
         };
-        Application.Top.Add (menu);
+        Top.Add (menu);
 
         Win.Add (new Label { Y = 0, Text = "Regular Line" });
 
@@ -82,7 +82,7 @@ public class LineViewExample : Scenario
                                                )
                                        }
                                       );
-        Application.Top.Add (statusBar);
+        Top.Add (statusBar);
     }
 
     private void Quit () { Application.RequestStop (); }

@@ -12,7 +12,7 @@ public static partial class Application
 
         public override void Post (SendOrPostCallback d, object state)
         {
-            MainLoop.AddIdle (
+            MainLoop?.AddIdle (
                               () =>
                               {
                                   d (state);

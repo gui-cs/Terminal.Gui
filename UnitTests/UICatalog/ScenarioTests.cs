@@ -40,7 +40,7 @@ public class ScenarioTests
             FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
 
             // The only key we care about is the QuitKey
-            Application.Top.KeyDown += (sender, args) =>
+            Application.KeyDown += (sender, args) =>
                                        {
                                            _output.WriteLine ($"  Keypress: {args.KeyCode}");
 
@@ -53,29 +53,28 @@ public class ScenarioTests
             uint abortTime = 500;
 
             // If the scenario doesn't close within 500ms, this will force it to quit
-            Func<bool> forceCloseCallback = () =>
-                                            {
-                                                if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0)
-                                                {
-                                                    Application.RequestStop ();
+            bool ForceCloseCallback ()
+            {
+                if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0)
+                {
+                    Application.RequestStop ();
 
-                                                    // See #2474 for why this is commented out
-                                                    Assert.Fail (
-                                                                 $"'{
-                                                                     scenario.GetName ()
-                                                                 }' failed to Quit with {
-                                                                     Application.QuitKey
-                                                                 } after {
-                                                                     abortTime
-                                                                 }ms. Force quit."
-                                                                );
-                                                }
+                    // See #2474 for why this is commented out
+                    Assert.Fail (
+                                 $"'{
+                                     scenario.GetName ()
+                                 }' failed to Quit with {
+                                     Application.QuitKey
+                                 } after {
+                                     abortTime
+                                 }ms. Force quit.");
+                }
 
-                                                return false;
-                                            };
+                return false;
+            }
 
             //output.WriteLine ($"  Add timeout to force quit after {abortTime}ms");
-            _ = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
+            _ = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), ForceCloseCallback);
 
             Application.Iteration += (s, a) =>
                                      {
@@ -87,9 +86,7 @@ public class ScenarioTests
                                          }
                                      };
 
-            scenario.Init ();
-            scenario.Setup ();
-            scenario.Run ();
+            scenario.Main ();
             scenario.Dispose ();
 
             Application.Shutdown ();
@@ -135,7 +132,7 @@ public class ScenarioTests
 
         Application.Init (new FakeDriver ());
 
-        Toplevel Top = Application.Top;
+        Toplevel top = new Toplevel ();
 
         _viewClasses = GetAllViewClassesCollection ()
                        .OrderBy (t => t.Name)
@@ -321,9 +318,9 @@ public class ScenarioTests
 
         _hRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 
-        Top.Add (_leftPane, _settingsPane, _hostPane);
+        top.Add (_leftPane, _settingsPane, _hostPane);
 
-        Top.LayoutSubviews ();
+        top.LayoutSubviews ();
 
         _curView = CreateClass (_viewClasses.First ().Value);
 
@@ -348,10 +345,11 @@ public class ScenarioTests
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run (top);
 
         Assert.Equal (_viewClasses.Count, iterations);
 
+        top.Dispose ();
         Application.Shutdown ();
 
         void DimPosChanged (View view)
@@ -624,15 +622,13 @@ public class ScenarioTests
                                      }
                                  };
 
-        Application.Top.KeyDown += (sender, args) =>
+        Application.KeyDown += (sender, args) =>
                                    {
                                        // See #2474 for why this is commented out
                                        Assert.Equal (KeyCode.CtrlMask | KeyCode.Q, args.KeyCode);
                                    };
 
-        generic.Init ();
-        generic.Setup ();
-        generic.Run ();
+        generic.Main ();
 
         Assert.Equal (0, abortCount);
 

@@ -72,8 +72,9 @@ public class RuneCellTests
 
         TextView tv = CreateTextView ();
         tv.Load (runeCells);
-        Application.Top.Add (tv);
-        RunState rs = Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        RunState rs = Application.Begin (top);
         Assert.True (tv.InheritsPreviousColorScheme);
 
         var expectedText = @"
@@ -197,7 +198,8 @@ ror       ";
             new RuneCell { Rune = new Rune ('t') }
         };
         TextView tv = CreateTextView ();
-        Application.Top.Add (tv);
+        var top = new Toplevel ();
+        top.Add (tv);
         tv.Load (cells);
 
         for (var i = 0; i < tv.Lines; i++)
@@ -240,8 +242,9 @@ ror       ";
 
         tv.Text = $"{TextModel.ToString (text [0])}\n{TextModel.ToString (text [1])}\n";
         Assert.False (tv.WordWrap);
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"

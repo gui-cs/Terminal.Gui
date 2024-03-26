@@ -6,9 +6,11 @@
 using System;
 using Terminal.Gui;
 
-Application.Run<ExampleWindow> ();
+var app = Application.Run<ExampleWindow> ();
 
-Console.WriteLine ($"Username: {((ExampleWindow)Application.Top).UserNameText.Text}");
+Console.WriteLine ($"Username: {app.UserNameText.Text}");
+
+app.Dispose ();
 
 // Before the application exits, reset Terminal.Gui for clean shutdown
 Application.Shutdown ();

@@ -14,7 +14,8 @@ public class ViewExperiments : Scenario
         Application.Init ();
         ConfigurationManager.Themes.Theme = Theme;
         ConfigurationManager.Apply ();
-        Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
+        Top = new ();
+        Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
     }
 
     public override void Setup ()
@@ -27,7 +28,7 @@ public class ViewExperiments : Scenario
             Width = Dim.Fill (),
             Height = 3
         };
-        Application.Top.Add (containerLabel);
+        Top.Add (containerLabel);
 
         var view = new View
         {
@@ -40,7 +41,7 @@ public class ViewExperiments : Scenario
             Id = "DaView"
         };
 
-        //Application.Top.Add (view);
+        //Top.Add (view);
 
         view.Margin.Thickness = new Thickness (2, 2, 2, 2);
         view.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
@@ -216,9 +217,9 @@ public class ViewExperiments : Scenario
                                {
                                    containerLabel.Text =
                                        $"Container.Frame: {
-                                           Application.Top.Frame
+                                           Top.Frame
                                        } .Bounds: {
-                                           Application.Top.Bounds
+                                           Top.Bounds
                                        }\nView.Frame: {
                                            view.Frame
                                        } .Bounds: {
@@ -243,11 +244,11 @@ public class ViewExperiments : Scenario
             ViewToEdit = view
         };
 
-        Application.Top.Add (editor);
+        Top.Add (editor);
         view.X = 36;
         view.Y = 4;
         view.Width = Dim.Fill ();
         view.Height = Dim.Fill ();
-        Application.Top.Add (view);
+        Top.Add (view);
     }
 }

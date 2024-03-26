@@ -74,7 +74,7 @@ public class HexEditor : Scenario
                                 )
             ]
         };
-        Application.Top.Add (menu);
+        Top.Add (menu);
 
         _statusBar = new StatusBar (
                                     new []
@@ -101,7 +101,7 @@ public class HexEditor : Scenario
                                                                             )
                                     }
                                    );
-        Application.Top.Add (_statusBar);
+        Top.Add (_statusBar);
     }
 
     private void _hexView_Edited (object sender, HexViewEditEventArgs e) { _saved = false; }
@@ -203,6 +203,7 @@ public class HexEditor : Scenario
             _hexView.Source = LoadFile ();
             _hexView.DisplayStart = 0;
         }
+        d.Dispose ();
     }
 
     private void Paste () { MessageBox.ErrorQuery ("Not Implemented", "Functionality not yet implemented.", "Ok"); }

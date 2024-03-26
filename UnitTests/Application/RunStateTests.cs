@@ -33,6 +33,7 @@ public class RunStateTests
         Assert.NotNull (Application.MainLoop);
         Assert.NotNull (Application.Driver);
 
+        top.Dispose ();
         Shutdown ();
 
 #if DEBUG_IDISPOSABLE

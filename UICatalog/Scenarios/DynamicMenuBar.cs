@@ -18,9 +18,11 @@ public class DynamicMenuBar : Scenario
     {
         Application.Init ();
 
-        Application.Top.Add (
-                             new DynamicMenuBarSample { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" }
-                            );
+        Top = new ();
+
+        Top.Add (
+                 new DynamicMenuBarSample { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" }
+                );
     }
 
     public class Binding
@@ -417,9 +419,9 @@ public class DynamicMenuBar : Scenario
                 EditMenuBarItem (_menuItem);
             }
 
-            var _btnOk = new Button { IsDefault = true, Text = "Ok" };
+            var btnOk = new Button { IsDefault = true, Text = "Ok" };
 
-            _btnOk.Accept += (s, e) =>
+            btnOk.Accept += (s, e) =>
                               {
                                   if (string.IsNullOrEmpty (TextTitle.Text))
                                   {
@@ -431,21 +433,22 @@ public class DynamicMenuBar : Scenario
                                       Application.RequestStop ();
                                   }
                               };
-            var _btnCancel = new Button { Text = "Cancel" };
+            var btnCancel = new Button { Text = "Cancel" };
 
-            _btnCancel.Accept += (s, e) =>
+            btnCancel.Accept += (s, e) =>
                                   {
                                       TextTitle.Text = string.Empty;
                                       Application.RequestStop ();
                                   };
-            var _dialog = new Dialog { Title = "Enter the menu details.", Buttons = [_btnOk, _btnCancel] };
+            var dialog = new Dialog { Title = "Enter the menu details.", Buttons = [btnOk, btnCancel] };
 
             Width = Dim.Fill ();
             Height = Dim.Fill () - 1;
-            _dialog.Add (this);
+            dialog.Add (this);
             TextTitle.SetFocus ();
             TextTitle.CursorPosition = TextTitle.Text.Length;
-            Application.Run (_dialog);
+            Application.Run (dialog);
+            dialog.Dispose ();
 
             if (valid)
             {

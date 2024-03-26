@@ -51,7 +51,7 @@ public class TextViewAutocompletePopup : Scenario
                                 )
             ]
         };
-        Application.Top.Add (menu);
+        Top.Add (menu);
 
         _textViewTopLeft = new TextView { Width = width, Height = _height, Text = text };
         _textViewTopLeft.DrawContent += TextViewTopLeft_DrawContent;
@@ -105,7 +105,7 @@ public class TextViewAutocompletePopup : Scenario
                                            _siWrap = new StatusItem (KeyCode.Null, "", null)
                                        }
                                       );
-        Application.Top.Add (statusBar);
+        Top.Add (statusBar);
 
         Win.LayoutStarted += Win_LayoutStarted;
     }

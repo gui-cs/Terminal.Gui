@@ -66,10 +66,13 @@ public class Images : Scenario
 
                                     if (ofd.Canceled)
                                     {
+                                        ofd.Dispose ();
                                         return;
                                     }
 
                                     string path = ofd.FilePaths [0];
+
+                                    ofd.Dispose ();
 
                                     if (string.IsNullOrWhiteSpace (path))
                                     {

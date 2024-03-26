@@ -143,7 +143,7 @@ public class Wizard : Dialog
     ///             <description>Add the Wizard to a containing view with <see cref="View.Add(View)"/>.</description>
     ///         </item>
     ///     </list>
-    ///     If a non-Modal Wizard is added to the application after <see cref="Application.Run(Func{Exception, bool})"/> has
+    ///     If a non-Modal Wizard is added to the application after <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> has
     ///     been called the first step must be explicitly set by setting <see cref="CurrentStep"/> to
     ///     <see cref="GetNextStep()"/>:
     ///     <code>

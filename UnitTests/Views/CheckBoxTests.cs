@@ -40,7 +40,7 @@ public class CheckBoxTests
     public void AllowNullChecked_Get_Set ()
     {
         var checkBox = new CheckBox { Text = "Check this out 你" };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (checkBox);
         Application.Begin (top);
 
@@ -81,11 +81,12 @@ public class CheckBoxTests
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
         Assert.True (checkBox.AutoSize);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         var expected = @$"
@@ -124,11 +125,12 @@ public class CheckBoxTests
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
         Assert.True (checkBox.AutoSize);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         var expected = @$"
@@ -164,11 +166,12 @@ public class CheckBoxTests
         var checkBox = new CheckBox { X = 1, Y = Pos.Center (), Text = "Check this out 你" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
         Assert.False (checkBox.IsInitialized);
 
-        RunState runstate = Application.Begin (Application.Top);
+        RunState runstate = Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         Assert.True (checkBox.IsInitialized);
@@ -355,9 +358,10 @@ public class CheckBoxTests
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         Assert.Equal (TextAlignment.Centered, checkBox.TextAlignment);
@@ -416,9 +420,10 @@ public class CheckBoxTests
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox1, checkBox2);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 6);
 
         Assert.Equal (TextAlignment.Justified, checkBox1.TextAlignment);
@@ -475,9 +480,10 @@ public class CheckBoxTests
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         Assert.Equal (TextAlignment.Left, checkBox.TextAlignment);
@@ -525,9 +531,10 @@ public class CheckBoxTests
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         Assert.Equal (TextAlignment.Right, checkBox.TextAlignment);

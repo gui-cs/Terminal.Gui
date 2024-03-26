@@ -68,7 +68,9 @@ public class MouseTests (ITestOutputHelper output)
         testView.Border.Thickness = new (borderThickness);
         testView.Padding.Thickness = new (paddingThickness);
 
-        Application.Top.Add (testView);
+        var top = new Toplevel ();
+        top.Add (testView);
+        Application.Begin (top);
 
         Assert.Equal (new Point (4, 4), testView.Frame.Location);
         Application.OnMouseEvent (new (new () { X = xy, Y = xy, Flags = MouseFlags.Button1Pressed }));
