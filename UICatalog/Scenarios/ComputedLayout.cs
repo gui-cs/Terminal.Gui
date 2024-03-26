@@ -57,12 +57,12 @@ public class ComputedLayout : Scenario
         Top.LayoutComplete += (s, a) =>
                                           {
                                               horizontalRuler.Text =
-                                                  rule.Repeat ((int)Math.Ceiling (horizontalRuler.Bounds.Width / (double)rule.Length)) [
-                                                   ..horizontalRuler.Bounds.Width];
+                                                  rule.Repeat ((int)Math.Ceiling (horizontalRuler.Viewport.Width / (double)rule.Length)) [
+                                                   ..horizontalRuler.Viewport.Width];
 
                                               verticalRuler.Text =
-                                                  vrule.Repeat ((int)Math.Ceiling (verticalRuler.Bounds.Height * 2 / (double)rule.Length))
-                                                      [..(verticalRuler.Bounds.Height * 2)];
+                                                  vrule.Repeat ((int)Math.Ceiling (verticalRuler.Viewport.Height * 2 / (double)rule.Length))
+                                                      [..(verticalRuler.Viewport.Height * 2)];
                                           };
 
         Top.Add (verticalRuler);

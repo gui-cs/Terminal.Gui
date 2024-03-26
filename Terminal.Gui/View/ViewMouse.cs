@@ -12,7 +12,7 @@ public partial class View
     /// <summary>Event fired when a mouse event occurs.</summary>
     /// <remarks>
     /// <para>
-    /// The coordinates are relative to <see cref="View.Bounds"/>.
+    /// The coordinates are relative to <see cref="Viewport"/>.
     /// </para>
     /// </remarks>
     public event EventHandler<MouseEventEventArgs> MouseEvent;
@@ -24,24 +24,24 @@ public partial class View
     /// <see cref="MouseEvent.Flags"/> to see which button was clicked.
     /// </para>
     /// <para>
-    /// The coordinates are relative to <see cref="View.Bounds"/>.
+    /// The coordinates are relative to <see cref="Viewport"/>.
     /// </para>
     /// </remarks>
     public event EventHandler<MouseEventEventArgs> MouseClick;
 
-    /// <summary>Event fired when the mouse moves into the View's <see cref="Bounds"/>.</summary>
+    /// <summary>Event fired when the mouse moves into the View's <see cref="Viewport"/>.</summary>
     public event EventHandler<MouseEventEventArgs> MouseEnter;
 
-    /// <summary>Event fired when the mouse leaves the View's <see cref="Bounds"/>.</summary>
+    /// <summary>Event fired when the mouse leaves the View's <see cref="Viewport"/>.</summary>
     public event EventHandler<MouseEventEventArgs> MouseLeave;
 
     // TODO: OnMouseEnter should not be public virtual, but protected.
     /// <summary>
-    ///     Called when the mouse enters the View's <see cref="Bounds"/>. The view will now receive mouse events until the mouse leaves
+    ///     Called when the mouse enters the View's <see cref="Viewport"/>. The view will now receive mouse events until the mouse leaves
     ///     the view. At which time, <see cref="OnMouseLeave(Gui.MouseEvent)"/> will be called.
     /// </summary>
     /// <remarks>
-    /// The coordinates are relative to <see cref="View.Bounds"/>.
+    /// The coordinates are relative to <see cref="Viewport"/>.
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
@@ -65,11 +65,11 @@ public partial class View
 
     // TODO: OnMouseLeave should not be public virtual, but protected.
     /// <summary>
-    ///     Called when the mouse has moved out of the View's <see cref="Bounds"/>. The view will no longer receive mouse events (until the
+    ///     Called when the mouse has moved out of the View's <see cref="Viewport"/>. The view will no longer receive mouse events (until the
     ///     mouse moves within the view again and <see cref="OnMouseEnter(Gui.MouseEvent)"/> is called).
     /// </summary>
     /// <remarks>
-    /// The coordinates are relative to <see cref="View.Bounds"/>.
+    /// The coordinates are relative to <see cref="Viewport"/>.
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
@@ -92,10 +92,10 @@ public partial class View
     }
 
     // TODO: OnMouseEvent should not be public virtual, but protected.
-    /// <summary>Called when a mouse event occurs within the view's <see cref="Bounds"/>.</summary>
+    /// <summary>Called when a mouse event occurs within the view's <see cref="Viewport"/>.</summary>
     /// <remarks>
     /// <para>
-    /// The coordinates are relative to <see cref="View.Bounds"/>.
+    /// The coordinates are relative to <see cref="Viewport"/>.
     /// </para>
     /// </remarks>
     /// <param name="mouseEvent"></param>

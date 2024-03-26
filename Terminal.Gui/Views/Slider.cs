@@ -374,7 +374,7 @@ public class Slider<T> : View
     }
 
     /// <summary>
-    ///     If <see langword="true"/> the slider will be sized to fit the available space (the Bounds of the the
+    ///     If <see langword="true"/> the slider will be sized to fit the available space (the Viewport of the the
     ///     SuperView).
     /// </summary>
     /// <remarks>
@@ -663,17 +663,17 @@ public class Slider<T> : View
 
         if (AutoSize)
         {
-            // Max size is SuperView's Bounds. Min Size is size that will fit.
+            // Max size is SuperView's Viewport. Min Size is size that will fit.
             if (SuperView is { })
             {
-                // Calculate the size of the slider based on the size of the SuperView's Bounds.
+                // Calculate the size of the slider based on the size of the SuperView's Viewport.
                 if (_config._sliderOrientation == Orientation.Horizontal)
                 {
-                    size = int.Min (SuperView.Bounds.Width, CalcBestLength ());
+                    size = int.Min (SuperView.Viewport.Width, CalcBestLength ());
                 }
                 else
                 {
-                    size = int.Min (SuperView.Bounds.Height, CalcBestLength ());
+                    size = int.Min (SuperView.Viewport.Height, CalcBestLength ());
                 }
             }
             else
@@ -686,14 +686,14 @@ public class Slider<T> : View
         }
         else
         {
-            // Fit Slider to the Bounds
+            // Fit Slider to the Viewport
             if (_config._sliderOrientation == Orientation.Horizontal)
             {
-                size = Bounds.Width;
+                size = Viewport.Width;
             }
             else
             {
-                size = Bounds.Height;
+                size = Viewport.Height;
             }
         }
 
@@ -777,15 +777,15 @@ public class Slider<T> : View
 
         if (_config._sliderOrientation == Orientation.Horizontal)
         {
-            Bounds = new (
-                          Bounds.Location,
+            Viewport = new (
+                          Viewport.Location,
                           new (
                                int.Min (
-                                        SuperView.Bounds.Width - adornmentsThickness.Horizontal,
+                                        SuperView.Viewport.Width - adornmentsThickness.Horizontal,
                                         CalcBestLength ()
                                        ),
                                int.Min (
-                                        SuperView.Bounds.Height - adornmentsThickness.Vertical,
+                                        SuperView.Viewport.Height - adornmentsThickness.Vertical,
                                         CalcThickness ()
                                        )
                               )
@@ -793,15 +793,15 @@ public class Slider<T> : View
         }
         else
         {
-            Bounds = new (
-                          Bounds.Location,
+            Viewport = new (
+                          Viewport.Location,
                           new (
                                int.Min (
-                                        SuperView.Bounds.Width - adornmentsThickness.Horizontal,
+                                        SuperView.Viewport.Width - adornmentsThickness.Horizontal,
                                         CalcThickness ()
                                        ),
                                int.Min (
-                                        SuperView.Bounds.Height - adornmentsThickness.Vertical,
+                                        SuperView.Viewport.Height - adornmentsThickness.Vertical,
                                         CalcBestLength ()
                                        )
                               )
@@ -988,7 +988,7 @@ public class Slider<T> : View
 
         if (TryGetPositionByOption (FocusedOption, out (int x, int y) position))
         {
-            if (IsInitialized && Bounds.Contains (position.x, position.y))
+            if (IsInitialized && Viewport.Contains (position.x, position.y))
             {
                 Move (position.x, position.y);
             }
@@ -996,7 +996,7 @@ public class Slider<T> : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         // TODO: make this more surgical to reduce repaint
 
@@ -1009,9 +1009,9 @@ public class Slider<T> : View
 #if (DEBUG)
         Driver?.SetAttribute (new Attribute (Color.White, Color.Red));
 
-        for (var y = 0; y < contentArea.Height; y++)
+        for (var y = 0; y < viewport.Height; y++)
         {
-            for (var x = 0; x < contentArea.Width; x++)
+            for (var x = 0; x < viewport.Width; x++)
             {
                 // MoveAndAdd (x, y, '·');
             }
@@ -1073,7 +1073,7 @@ public class Slider<T> : View
     private void DrawSlider ()
     {
         // TODO: be more surgical on clear
-        Clear (Bounds);
+        Clear (Viewport);
 
         // Attributes
 
@@ -1241,7 +1241,7 @@ public class Slider<T> : View
             }
         }
 
-        int remaining = isVertical ? Bounds.Height - y : Bounds.Width - x;
+        int remaining = isVertical ? Viewport.Height - y : Viewport.Width - x;
 
         // Right Spacing
         if (_config._showEndSpacing)

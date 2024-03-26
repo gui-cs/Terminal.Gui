@@ -172,7 +172,7 @@ public class StatusBar : View
     }
 
     ///<inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         Move (0, 0);
         Driver.SetAttribute (GetNormalColor ());

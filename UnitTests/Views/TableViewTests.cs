@@ -126,7 +126,7 @@ public class TableViewTests
         // create a 4 by 4 table
         var tableView = new TableView
         {
-            Table = BuildTable (4, 4, out DataTable dt), MultiSelect = true, Bounds = new Rectangle (0, 0, 10, 5)
+            Table = BuildTable (4, 4, out DataTable dt), MultiSelect = true, Viewport = new Rectangle (0, 0, 10, 5)
         };
         tableView.BeginInit ();
         tableView.EndInit ();
@@ -153,7 +153,7 @@ public class TableViewTests
         // create a 4 by 4 table
         var tableView = new TableView
         {
-            Table = BuildTable (4, 4, out DataTable dt), MultiSelect = true, Bounds = new Rectangle (0, 0, 10, 5)
+            Table = BuildTable (4, 4, out DataTable dt), MultiSelect = true, Viewport = new Rectangle (0, 0, 10, 5)
         };
         tableView.BeginInit ();
         tableView.EndInit ();
@@ -181,7 +181,7 @@ public class TableViewTests
         var tableView = new TableView ();
         tableView.BeginInit ();
         tableView.EndInit ();
-        tableView.Bounds = new Rectangle (0, 0, 25, 10);
+        tableView.Viewport = new Rectangle (0, 0, 25, 10);
 
         Assert.Equal (0, tableView.RowOffset);
         Assert.Equal (0, tableView.ColumnOffset);
@@ -238,7 +238,7 @@ public class TableViewTests
     {
         var tableView = new TableView
         {
-            Table = BuildTable (3, 3), MultiSelect = multiSelect, Bounds = new Rectangle (0, 0, 10, 5)
+            Table = BuildTable (3, 3), MultiSelect = multiSelect, Viewport = new Rectangle (0, 0, 10, 5)
         };
         tableView.BeginInit ();
         tableView.EndInit ();
@@ -254,7 +254,7 @@ public class TableViewTests
     {
         var tableView = new TableView
         {
-            Table = BuildTable (3, 3), MultiSelect = true, FullRowSelect = true, Bounds = new Rectangle (0, 0, 10, 5)
+            Table = BuildTable (3, 3), MultiSelect = true, FullRowSelect = true, Viewport = new Rectangle (0, 0, 10, 5)
         };
         tableView.BeginInit ();
         tableView.EndInit ();
@@ -281,7 +281,7 @@ public class TableViewTests
     {
         var tableView = new TableView
         {
-            Table = BuildTable (3, 3), MultiSelect = true, Bounds = new Rectangle (0, 0, 10, 5)
+            Table = BuildTable (3, 3), MultiSelect = true, Viewport = new Rectangle (0, 0, 10, 5)
         };
         tableView.BeginInit ();
         tableView.EndInit ();
@@ -306,7 +306,7 @@ public class TableViewTests
     {
         var tableView = new TableView
         {
-            Table = BuildTable (20, 20), MultiSelect = true, Bounds = new Rectangle (0, 0, 10, 5)
+            Table = BuildTable (20, 20), MultiSelect = true, Viewport = new Rectangle (0, 0, 10, 5)
         };
         tableView.BeginInit ();
         tableView.EndInit ();
@@ -425,7 +425,7 @@ public class TableViewTests
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
         // 25 characters can be printed into table
-        tableView.Bounds = new Rectangle (0, 0, 25, 5);
+        tableView.Viewport = new Rectangle (0, 0, 25, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.Style.ShowHorizontalHeaderOverline = false;
         tableView.Style.AlwaysShowHeaders = true;
@@ -526,7 +526,7 @@ public class TableViewTests
         var driver = (FakeDriver)Application.Driver;
         driver.ClearContents ();
 
-        tableView.Bounds = new Rectangle (0, 0, 9, 5);
+        tableView.Viewport = new Rectangle (0, 0, 9, 5);
         tableView.LayoutSubviews ();
         tableView.Draw ();
 
@@ -543,7 +543,7 @@ public class TableViewTests
         // setting width to 10 leaves just enough space for the column to
         // meet MinAcceptableWidth of 5.  Column width includes terminator line
         // symbol (e.g. ┤ or │)
-        tableView.Bounds = new Rectangle (0, 0, 10, 5);
+        tableView.Viewport = new Rectangle (0, 0, 10, 5);
         tableView.LayoutSubviews ();
         tableView.Draw ();
 
@@ -556,7 +556,7 @@ public class TableViewTests
 ";
         TestHelpers.AssertDriverContentsAre (expected, output);
 
-        tableView.Bounds = new Rectangle (0, 0, 25, 5);
+        tableView.Viewport = new Rectangle (0, 0, 25, 5);
 
         // revert style change
         style.MinAcceptableWidth = TableView.DefaultMinAcceptableWidth;
@@ -604,7 +604,7 @@ public class TableViewTests
     {
         var tableView = new TableView
         {
-            Table = BuildTable (25, 50), MultiSelect = true, Bounds = new Rectangle (0, 0, 10, 5)
+            Table = BuildTable (25, 50), MultiSelect = true, Viewport = new Rectangle (0, 0, 10, 5)
         };
 
         // Header should take up 2 lines
@@ -641,7 +641,7 @@ public class TableViewTests
     {
         var tableView = new TableView ();
         tableView.ColorScheme = new ColorScheme ();
-        tableView.Bounds = new Rectangle (0, 0, 25, 10);
+        tableView.Viewport = new Rectangle (0, 0, 25, 10);
 
         // Set a table with 1 column
         tableView.Table = BuildTable (1, 50, out DataTable dt);
@@ -663,7 +663,7 @@ public class TableViewTests
         tableView.Table = BuildTable (25, 50);
 
         // 1 header + 4 rows visible
-        tableView.Bounds = new Rectangle (0, 0, 25, 5);
+        tableView.Viewport = new Rectangle (0, 0, 25, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = false;
         tableView.Style.ShowHorizontalHeaderOverline = false;
         tableView.Style.AlwaysShowHeaders = true;
@@ -690,7 +690,7 @@ public class TableViewTests
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
         // 3 columns are visibile
-        tableView.Bounds = new Rectangle (0, 0, 7, 5);
+        tableView.Viewport = new Rectangle (0, 0, 7, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.Style.ShowHorizontalHeaderOverline = false;
         tableView.Style.AlwaysShowHeaders = true;
@@ -768,7 +768,7 @@ public class TableViewTests
         tableView.LayoutSubviews ();
 
         // 3 columns are visibile
-        tableView.Bounds = new Rectangle (0, 0, 7, 5);
+        tableView.Viewport = new Rectangle (0, 0, 7, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = false;
         tableView.Style.ShowHorizontalHeaderOverline = false;
         tableView.Style.AlwaysShowHeaders = true;
@@ -831,7 +831,7 @@ public class TableViewTests
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
         // 3 columns are visibile
-        tableView.Bounds = new Rectangle (0, 0, 7, 5);
+        tableView.Viewport = new Rectangle (0, 0, 7, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = false;
         tableView.Style.ShowHorizontalHeaderOverline = false;
         tableView.Style.AlwaysShowHeaders = true;
@@ -948,7 +948,7 @@ public class TableViewTests
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
         // 3 columns are visibile
-        tableView.Bounds = new Rectangle (0, 0, 7, 5);
+        tableView.Viewport = new Rectangle (0, 0, 7, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.Style.ShowHorizontalHeaderOverline = false;
         tableView.Style.AlwaysShowHeaders = true;
@@ -979,7 +979,7 @@ public class TableViewTests
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
         // 3 columns are visibile
-        tableView.Bounds = new Rectangle (0, 0, 7, 5);
+        tableView.Viewport = new Rectangle (0, 0, 7, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.Style.ShowHorizontalHeaderOverline = false;
         tableView.Style.AlwaysShowHeaders = true;
@@ -1049,7 +1049,7 @@ public class TableViewTests
         tv.LayoutSubviews ();
 
         // width exactly matches the max col widths
-        tv.Bounds = new Rectangle (0, 0, 5, 4);
+        tv.Viewport = new Rectangle (0, 0, 5, 4);
 
         // Create a style for column B
         ColumnStyle bStyle = tv.Style.GetOrCreateColumnStyle (1);
@@ -1146,7 +1146,7 @@ public class TableViewTests
         tv.LayoutSubviews ();
 
         // width exactly matches the max col widths
-        tv.Bounds = new Rectangle (0, 0, 5, 4);
+        tv.Viewport = new Rectangle (0, 0, 5, 4);
 
         var rowHighlight = new ColorScheme
         {
@@ -1240,7 +1240,7 @@ public class TableViewTests
         tv.LayoutSubviews ();
 
         // width exactly matches the max col widths
-        tv.Bounds = new Rectangle (0, 0, 5, 4);
+        tv.Viewport = new Rectangle (0, 0, 5, 4);
 
         // private method for forcing the view to be focused/not focused
         MethodInfo setFocusMethod =
@@ -1287,7 +1287,7 @@ public class TableViewTests
         tv.LayoutSubviews ();
 
         // width exactly matches the max col widths
-        tv.Bounds = new Rectangle (0, 0, 5, 4);
+        tv.Viewport = new Rectangle (0, 0, 5, 4);
 
         // private method for forcing the view to be focused/not focused
         MethodInfo setFocusMethod =
@@ -1359,7 +1359,7 @@ public class TableViewTests
         tv.Style.ExpandLastColumn = false;
 
         // width exactly matches the max col widths
-        tv.Bounds = new Rectangle (0, 0, 5, 4);
+        tv.Viewport = new Rectangle (0, 0, 5, 4);
 
         tv.Draw ();
 
@@ -1403,7 +1403,7 @@ public class TableViewTests
     public void TableView_ShowHeadersFalse_AllLines ()
     {
         TableView tv = GetABCDEFTableView (out _);
-        tv.Bounds = new Rectangle (0, 0, 5, 5);
+        tv.Viewport = new Rectangle (0, 0, 5, 5);
 
         tv.Style.ShowHeaders = false;
         tv.Style.ShowHorizontalHeaderOverline = true;
@@ -1427,7 +1427,7 @@ public class TableViewTests
     public void TableView_ShowHeadersFalse_AndNoHeaderLines ()
     {
         TableView tv = GetABCDEFTableView (out _);
-        tv.Bounds = new Rectangle (0, 0, 5, 5);
+        tv.Viewport = new Rectangle (0, 0, 5, 5);
 
         tv.Style.ShowHeaders = false;
         tv.Style.ShowHorizontalHeaderOverline = false;
@@ -1446,7 +1446,7 @@ public class TableViewTests
     public void TableView_ShowHeadersFalse_OverlineTrue ()
     {
         TableView tv = GetABCDEFTableView (out _);
-        tv.Bounds = new Rectangle (0, 0, 5, 5);
+        tv.Viewport = new Rectangle (0, 0, 5, 5);
 
         tv.Style.ShowHeaders = false;
         tv.Style.ShowHorizontalHeaderOverline = true;
@@ -1466,7 +1466,7 @@ public class TableViewTests
     public void TableView_ShowHeadersFalse_UnderlineTrue ()
     {
         TableView tv = GetABCDEFTableView (out _);
-        tv.Bounds = new Rectangle (0, 0, 5, 5);
+        tv.Viewport = new Rectangle (0, 0, 5, 5);
 
         tv.Style.ShowHeaders = false;
         tv.Style.ShowHorizontalHeaderOverline = false;
@@ -1593,7 +1593,7 @@ public class TableViewTests
     {
         var tv = new TableView ();
         tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
-        tv.Bounds = new Rectangle (0, 0, 50, 7);
+        tv.Viewport = new Rectangle (0, 0, 50, 7);
 
         tv.Table = new EnumerableTableSource<string> (
                                                       new [] { "fish", "troll", "trap", "zoo" },
@@ -2225,7 +2225,7 @@ public class TableViewTests
     {
         var tv = new TableView ();
         tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
-        tv.Bounds = new Rectangle (0, 0, 50, 6);
+        tv.Viewport = new Rectangle (0, 0, 50, 6);
 
         tv.Table = new EnumerableTableSource<Type> (
                                                     new [] { typeof (string), typeof (int), typeof (float) },
@@ -2259,7 +2259,7 @@ public class TableViewTests
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
 
-        tv.Bounds = new Rectangle (0, 0, 7, 6);
+        tv.Viewport = new Rectangle (0, 0, 7, 6);
         tv.Frame = new Rectangle (0, 0, 7, 6);
         tv.LayoutSubviews ();
 
@@ -2275,7 +2275,7 @@ public class TableViewTests
         // should select that row
         Assert.Equal (2, tv.SelectedRow);
 
-        tv.OnDrawContent (tv.Bounds);
+        tv.OnDrawContent (tv.Viewport);
 
         var expected =
             @"
@@ -2316,7 +2316,7 @@ public class TableViewTests
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         tv.LayoutSubviews ();
 
-        tv.Bounds = new Rectangle (0, 0, 7, 6);
+        tv.Viewport = new Rectangle (0, 0, 7, 6);
 
         tv.FullRowSelect = true;
         tv.Style.ShowVerticalCellLines = false;
@@ -2368,7 +2368,7 @@ A B C
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
 
-        tv.Bounds = new Rectangle (0, 0, 7, 6);
+        tv.Viewport = new Rectangle (0, 0, 7, 6);
         tv.Frame = new Rectangle (0, 0, 7, 6);
         tv.LayoutSubviews ();
 
@@ -2383,7 +2383,7 @@ A B C
         // should select that row
         Assert.Equal (2, tv.SelectedRow);
 
-        tv.OnDrawContent (tv.Bounds);
+        tv.OnDrawContent (tv.Viewport);
 
         var expected =
             @"
@@ -2431,7 +2431,7 @@ A B C
 
         //tv.BeginInit (); tv.EndInit ();
         tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
-        tv.Bounds = new Rectangle (0, 0, 25, 4);
+        tv.Viewport = new Rectangle (0, 0, 25, 4);
 
         tv.Style = new TableStyle
         {
@@ -3200,7 +3200,7 @@ A B C
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
         // 3 columns are visible
-        tableView.Bounds = new Rectangle (0, 0, 7, 5);
+        tableView.Viewport = new Rectangle (0, 0, 7, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = false;
         tableView.Style.ShowHorizontalHeaderOverline = false;
         tableView.Style.AlwaysShowHeaders = true;
@@ -3224,7 +3224,7 @@ A B C
     {
         var tv = new TableView ();
         tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
-        tv.Bounds = new Rectangle (0, 0, 25, 6);
+        tv.Viewport = new Rectangle (0, 0, 25, 6);
 
         List<PickablePet> pets = new ()
         {
@@ -3254,7 +3254,7 @@ A B C
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
         // 3 columns are visible
-        tableView.Bounds = new Rectangle (0, 0, 7, 5);
+        tableView.Viewport = new Rectangle (0, 0, 7, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.Style.ShowHorizontalHeaderOverline = false;
         tableView.Style.AlwaysShowHeaders = true;
@@ -3283,7 +3283,7 @@ A B C
         var tv = new TableView ();
         tv.BeginInit ();
         tv.EndInit ();
-        tv.Bounds = new Rectangle (0, 0, 10, 4);
+        tv.Viewport = new Rectangle (0, 0, 10, 4);
 
         dt = new DataTable ();
         dt.Columns.Add ("A");

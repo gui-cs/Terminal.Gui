@@ -192,12 +192,12 @@ public class GraphView : View
                           (int)((location.X - ScrollOffset.X) / CellSize.X) + (int)MarginLeft,
 
                           // screen coordinates are top down while graph coordinates are bottom up
-                          Bounds.Height - 1 - (int)MarginBottom - (int)((location.Y - ScrollOffset.Y) / CellSize.Y)
+                          Viewport.Height - 1 - (int)MarginBottom - (int)((location.Y - ScrollOffset.Y) / CellSize.Y)
                          );
     }
 
     ///<inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         if (CellSize.X == 0 || CellSize.Y == 0)
         {
@@ -209,10 +209,10 @@ public class GraphView : View
         Move (0, 0);
 
         // clear all old content
-        for (var i = 0; i < Bounds.Height; i++)
+        for (var i = 0; i < Viewport.Height; i++)
         {
             Move (0, i);
-            Driver.AddStr (new string (' ', Bounds.Width));
+            Driver.AddStr (new string (' ', Viewport.Width));
         }
 
         // If there is no data do not display a graph
@@ -222,8 +222,8 @@ public class GraphView : View
         }
 
         // The drawable area of the graph (anything that isn't in the margins)
-        int graphScreenWidth = Bounds.Width - (int)MarginLeft;
-        int graphScreenHeight = Bounds.Height - (int)MarginBottom;
+        int graphScreenWidth = Viewport.Width - (int)MarginLeft;
+        int graphScreenHeight = Viewport.Height - (int)MarginBottom;
 
         // if the margins take up the full draw bounds don't render
         if (graphScreenWidth < 0 || graphScreenHeight < 0)
@@ -287,10 +287,10 @@ public class GraphView : View
     }
 
     /// <summary>Scrolls the graph down 1 page.</summary>
-    public void PageDown () { Scroll (0, -1 * CellSize.Y * Bounds.Height); }
+    public void PageDown () { Scroll (0, -1 * CellSize.Y * Viewport.Height); }
 
     /// <summary>Scrolls the graph up 1 page.</summary>
-    public void PageUp () { Scroll (0, CellSize.Y * Bounds.Height); }
+    public void PageUp () { Scroll (0, CellSize.Y * Viewport.Height); }
 
     /// <summary>
     ///     Clears all settings configured on the graph and resets all properties to default values (
@@ -316,7 +316,7 @@ public class GraphView : View
     {
         return new (
                     ScrollOffset.X + (col - MarginLeft) * CellSize.X,
-                    ScrollOffset.Y + (Bounds.Height - (row + MarginBottom + 1)) * CellSize.Y,
+                    ScrollOffset.Y + (Viewport.Height - (row + MarginBottom + 1)) * CellSize.Y,
                     CellSize.X,
                     CellSize.Y
                    );

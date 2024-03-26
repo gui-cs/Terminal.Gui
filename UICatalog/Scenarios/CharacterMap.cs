@@ -375,7 +375,7 @@ internal class CharMap : ScrollView
                     Command.PageUp,
                     () =>
                     {
-                        int page = (Bounds.Height / _rowHeight - 1) * 16;
+                        int page = (Viewport.Height / _rowHeight - 1) * 16;
                         SelectedCodePoint -= Math.Min (page, SelectedCodePoint);
 
                         return true;
@@ -386,7 +386,7 @@ internal class CharMap : ScrollView
                     Command.PageDown,
                     () =>
                     {
-                        int page = (Bounds.Height / _rowHeight - 1) * 16;
+                        int page = (Viewport.Height / _rowHeight - 1) * 16;
                         SelectedCodePoint += Math.Min (page, MaxCodePoint - SelectedCodePoint);
 
                         return true;
@@ -459,7 +459,7 @@ internal class CharMap : ScrollView
                 int row = SelectedCodePoint / 16 * _rowHeight;
                 int col = SelectedCodePoint % 16 * COLUMN_WIDTH;
 
-                int height = Bounds.Height - (ShowHorizontalScrollIndicator ? 2 : 1);
+                int height = Viewport.Height - (ShowHorizontalScrollIndicator ? 2 : 1);
 
                 if (row + ContentOffset.Y < 0)
                 {
@@ -475,7 +475,7 @@ internal class CharMap : ScrollView
                                         );
                 }
 
-                int width = Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
+                int width = Viewport.Width / COLUMN_WIDTH * COLUMN_WIDTH - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
 
                 if (col + ContentOffset.X < 0)
                 {
@@ -526,9 +526,9 @@ internal class CharMap : ScrollView
     private static int RowWidth => RowLabelWidth + COLUMN_WIDTH * 16;
     public event EventHandler<ListViewItemEventArgs> Hover;
 
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
-        if (contentArea.Height == 0 || contentArea.Width == 0)
+        if (viewport.Height == 0 || viewport.Width == 0)
         {
             return;
         }
@@ -536,17 +536,17 @@ internal class CharMap : ScrollView
         // Call the base (ScrollView) to draw the scrollbars. Do this ahead of our own drawing so that
         // any wide or tall glyphs actually render over the scrollbars (on platforms like Windows Terminal) that 
         // does this correctly.
-        base.OnDrawContent (contentArea);
+        base.OnDrawContent (viewport);
 
-        Rectangle viewport = new (
+        Rectangle viewportOffset = new (
                                   ContentOffset,
                                   new (
-                                       Math.Max (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
-                                       Math.Max (Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0)
+                                       Math.Max (Viewport.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
+                                       Math.Max (Viewport.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0)
                                       )
                                  );
 
-        Rectangle oldClip = ClipToBounds ();
+        Rectangle oldClip = ClipToViewport ();
 
         if (ShowHorizontalScrollIndicator)
         {
@@ -588,11 +588,11 @@ internal class CharMap : ScrollView
             }
         }
 
-        int firstColumnX = viewport.X + RowLabelWidth;
+        int firstColumnX = viewportOffset.X + RowLabelWidth;
 
         // Even though the Clip is set to prevent us from drawing on the row potentially occupied by the horizontal
         // scroll bar, we do the smart thing and not actually draw that row if not necessary.
-        for (var y = 1; y < Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0); y++)
+        for (var y = 1; y < Viewport.Height - (ShowHorizontalScrollIndicator ? 1 : 0); y++)
         {
             // What row is this?
             int row = (y - ContentOffset.Y - 1) / _rowHeight;
@@ -721,9 +721,9 @@ internal class CharMap : ScrollView
     {
         if (HasFocus
             && Cursor.X >= RowLabelWidth
-            && Cursor.X < Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0)
+            && Cursor.X < Viewport.Width - (ShowVerticalScrollIndicator ? 1 : 0)
             && Cursor.Y > 0
-            && Cursor.Y < Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0))
+            && Cursor.Y < Viewport.Height - (ShowHorizontalScrollIndicator ? 1 : 0))
         {
             Driver.SetCursorVisibility (_cursor);
             Move (Cursor.X, Cursor.Y);

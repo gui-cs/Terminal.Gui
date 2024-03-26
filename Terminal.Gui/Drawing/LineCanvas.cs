@@ -48,7 +48,7 @@ public class LineCanvas : IDisposable
         // TODO: Add other resolvers
     };
 
-    private Rectangle _cachedBounds;
+    private Rectangle _cachedViewport;
 
     /// <summary>Creates a new instance.</summary>
     public LineCanvas ()
@@ -67,37 +67,37 @@ public class LineCanvas : IDisposable
     ///     Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the line that is
     ///     furthest left/top and Size is defined by the line that extends the furthest right/bottom.
     /// </summary>
-    public Rectangle Bounds
+    public Rectangle Viewport
     {
         get
         {
-            if (_cachedBounds.IsEmpty)
+            if (_cachedViewport.IsEmpty)
             {
                 if (_lines.Count == 0)
                 {
-                    return _cachedBounds;
+                    return _cachedViewport;
                 }
 
-                Rectangle bounds = _lines [0].Bounds;
+                Rectangle viewport = _lines [0].Viewport;
 
                 for (var i = 1; i < _lines.Count; i++)
                 {
-                    bounds = Rectangle.Union (bounds, _lines [i].Bounds);
+                    viewport = Rectangle.Union (viewport, _lines [i].Viewport);
                 }
 
-                if (bounds is {Width: 0} or {Height: 0})
+                if (viewport is {Width: 0} or {Height: 0})
                 {
-                    bounds = bounds with
+                    viewport = viewport with
                     {
-                        Width = Math.Clamp (bounds.Width, 1, short.MaxValue),
-                        Height = Math.Clamp (bounds.Height, 1, short.MaxValue)
+                        Width = Math.Clamp (viewport.Width, 1, short.MaxValue),
+                        Height = Math.Clamp (viewport.Height, 1, short.MaxValue)
                     };
                 }
 
-                _cachedBounds = bounds;
+                _cachedViewport = viewport;
             }
 
-            return _cachedBounds;
+            return _cachedViewport;
         }
     }
 
@@ -134,7 +134,7 @@ public class LineCanvas : IDisposable
         Attribute? attribute = default
     )
     {
-        _cachedBounds = Rectangle.Empty;
+        _cachedViewport = Rectangle.Empty;
         _lines.Add (new StraightLine (start, length, orientation, style, attribute));
     }
 
@@ -142,14 +142,14 @@ public class LineCanvas : IDisposable
     /// <param name="line"></param>
     public void AddLine (StraightLine line)
     {
-        _cachedBounds = Rectangle.Empty;
+        _cachedViewport = Rectangle.Empty;
         _lines.Add (line);
     }
 
     /// <summary>Clears all lines from the LineCanvas.</summary>
     public void Clear ()
     {
-        _cachedBounds = Rectangle.Empty;
+        _cachedViewport = Rectangle.Empty;
         _lines.Clear ();
     }
 
@@ -157,7 +157,7 @@ public class LineCanvas : IDisposable
     ///     Clears any cached states from the canvas Call this method if you make changes to lines that have already been
     ///     added.
     /// </summary>
-    public void ClearCache () { _cachedBounds = Rectangle.Empty; }
+    public void ClearCache () { _cachedViewport = Rectangle.Empty; }
 
     /// <summary>
     ///     Evaluates the lines that have been added to the canvas and returns a map containing the glyphs and their
@@ -170,9 +170,9 @@ public class LineCanvas : IDisposable
         Dictionary<Point, Cell> map = new ();
 
         // walk through each pixel of the bitmap
-        for (int y = Bounds.Y; y < Bounds.Y + Bounds.Height; y++)
+        for (int y = Viewport.Y; y < Viewport.Y + Viewport.Height; y++)
         {
-            for (int x = Bounds.X; x < Bounds.X + Bounds.Width; x++)
+            for (int x = Viewport.X; x < Viewport.X + Viewport.Width; x++)
             {
                 IntersectionDefinition? [] intersects = _lines
                                                         .Select (l => l.Intersects (x, y))
@@ -232,7 +232,7 @@ public class LineCanvas : IDisposable
     ///     intersection symbols.
     /// </summary>
     /// <returns>A map of all the points within the canvas.</returns>
-    public Dictionary<Point, Rune> GetMap () { return GetMap (Bounds); }
+    public Dictionary<Point, Rune> GetMap () { return GetMap (Viewport); }
 
     /// <summary>Merges one line canvas into this one.</summary>
     /// <param name="lineCanvas"></param>
@@ -260,13 +260,13 @@ public class LineCanvas : IDisposable
 
     /// <summary>
     ///     Returns the contents of the line canvas rendered to a string. The string will include all columns and rows,
-    ///     even if <see cref="Bounds"/> has negative coordinates. For example, if the canvas contains a single line that
+    ///     even if <see cref="Viewport"/> has negative coordinates. For example, if the canvas contains a single line that
     ///     starts at (-1,-1) with a length of 2, the rendered string will have a length of 2.
     /// </summary>
     /// <returns>The canvas rendered to a string.</returns>
     public override string ToString ()
     {
-        if (Bounds.IsEmpty)
+        if (Viewport.IsEmpty)
         {
             return string.Empty;
         }
@@ -275,13 +275,13 @@ public class LineCanvas : IDisposable
         Dictionary<Point, Rune> runeMap = GetMap ();
 
         // Create the rune canvas
-        Rune [,] canvas = new Rune [Bounds.Height, Bounds.Width];
+        Rune [,] canvas = new Rune [Viewport.Height, Viewport.Width];
 
         // Copy the rune map to the canvas, adjusting for any negative coordinates
         foreach (KeyValuePair<Point, Rune> kvp in runeMap)
         {
-            int x = kvp.Key.X - Bounds.X;
-            int y = kvp.Key.Y - Bounds.Y;
+            int x = kvp.Key.X - Viewport.X;
+            int y = kvp.Key.Y - Viewport.Y;
             canvas [y, x] = kvp.Value;
         }
 

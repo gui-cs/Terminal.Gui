@@ -726,7 +726,7 @@ internal sealed class Menu : View
 
         View view = a.MouseEvent.View ?? this;
 
-        Point boundsPoint = view.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
+        Point boundsPoint = view.ScreenToViewport (a.MouseEvent.X, a.MouseEvent.Y);
         var me = new MouseEvent
         {
             X = boundsPoint.X,
@@ -757,7 +757,7 @@ internal sealed class Menu : View
         return !item.IsEnabled () ? ColorScheme.Disabled : GetNormalColor ();
     }
 
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         if (_barItems.Children is null)
         {
@@ -771,14 +771,14 @@ internal sealed class Menu : View
         OnDrawAdornments ();
         OnRenderLineCanvas ();
 
-        for (int i = Bounds.Y; i < _barItems.Children.Length; i++)
+        for (int i = Viewport.Y; i < _barItems.Children.Length; i++)
         {
             if (i < 0)
             {
                 continue;
             }
 
-            if (BoundsToScreen (Bounds).Y + i >= Driver.Rows)
+            if (ViewportToScreen (Viewport).Y + i >= Driver.Rows)
             {
                 break;
             }
@@ -792,7 +792,8 @@ internal sealed class Menu : View
 
             if (item is null && BorderStyle != LineStyle.None)
             {
-                Move (-1, i);
+                var s = ViewportToScreen (new (-1, i, 0, 0));
+                Driver.Move (s.X, s.Y);
                 Driver.AddRune (Glyphs.LeftTee);
             }
             else if (Frame.X < Driver.Cols)
@@ -802,7 +803,7 @@ internal sealed class Menu : View
 
             Driver.SetAttribute (DetermineColorSchemeFor (item, i));
 
-            for (int p = Bounds.X; p < Frame.Width - 2; p++)
+            for (int p = Viewport.X; p < Frame.Width - 2; p++)
             {
                 // This - 2 is for the border
                 if (p < 0)
@@ -810,7 +811,7 @@ internal sealed class Menu : View
                     continue;
                 }
 
-                if (BoundsToScreen (Bounds).X + p >= Driver.Cols)
+                if (ViewportToScreen (Viewport).X + p >= Driver.Cols)
                 {
                     break;
                 }
@@ -839,7 +840,8 @@ internal sealed class Menu : View
             {
                 if (BorderStyle != LineStyle.None && SuperView?.Frame.Right - Frame.X > Frame.Width)
                 {
-                    Move (Frame.Width - 2, i);
+                    var s = ViewportToScreen (new (Frame.Width - 2, i, 0, 0));
+                    Driver.Move (s.X, s.Y);
                     Driver.AddRune (Glyphs.RightTee);
                 }
 
@@ -875,7 +877,7 @@ internal sealed class Menu : View
                 textToDraw = item.Title;
             }
 
-            Rectangle screen = BoundsToScreen (new (new (0 , i), Size.Empty));
+            Rectangle screen = ViewportToScreen (new (new (0 , i), Size.Empty));
             if (screen.X < Driver.Cols)
             {
                 Driver.Move (screen.X + 1, screen.Y);
@@ -893,10 +895,10 @@ internal sealed class Menu : View
 
                     // The -3 is left/right border + one space (not sure what for)
                     tf.Draw (
-                             BoundsToScreen (new (1, i, Frame.Width - 3, 1)),
+                             ViewportToScreen (new (1, i, Frame.Width - 3, 1)),
                              i == _currentChild ? ColorScheme.Focus : GetNormalColor (),
                              i == _currentChild ? ColorScheme.HotFocus : ColorScheme.HotNormal,
-                             SuperView?.BoundsToScreen (SuperView.Bounds) ?? Rectangle.Empty
+                             SuperView?.ViewportToScreen (SuperView.Viewport) ?? Rectangle.Empty
                             );
                 }
                 else
@@ -913,7 +915,7 @@ internal sealed class Menu : View
                             ? item.Help.GetColumns ()
                             : item.Help.GetColumns () + item.ShortcutTag.GetColumns () + 2;
                 int col = Frame.Width - l - 3;
-                screen = BoundsToScreen (new (new (col, i), Size.Empty));
+                screen = ViewportToScreen (new (new (col, i), Size.Empty));
 
                 if (screen.X < Driver.Cols)
                 {
@@ -939,7 +941,7 @@ internal sealed class Menu : View
     {
         if (Visible)
         {
-            OnDrawContent (Bounds);
+            OnDrawContent (Viewport);
         }
     }
 

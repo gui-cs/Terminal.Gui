@@ -318,9 +318,9 @@ public class ListView : View
             {
                 _top = Math.Max (_selected, 0);
             }
-            else if (Bounds.Height > 0 && _selected >= _top + Bounds.Height)
+            else if (Viewport.Height > 0 && _selected >= _top + Viewport.Height)
             {
-                _top = Math.Max (_selected - Bounds.Height + 1, 0);
+                _top = Math.Max (_selected - Viewport.Height + 1, 0);
             }
 
             LayoutStarted -= ListView_LayoutStarted;
@@ -399,7 +399,7 @@ public class ListView : View
 
         if (me.Y + _top >= _source.Count
             || me.Y + _top < 0
-            || me.Y + _top > _top + Bounds.Height)
+            || me.Y + _top > _top + Viewport.Height)
         {
             return true;
         }
@@ -449,7 +449,7 @@ public class ListView : View
             //can move by down by one.
             _selected++;
 
-            if (_selected >= _top + Bounds.Height)
+            if (_selected >= _top + Viewport.Height)
             {
                 _top++;
             }
@@ -466,9 +466,9 @@ public class ListView : View
             OnSelectedChanged ();
             SetNeedsDisplay ();
         }
-        else if (_selected >= _top + Bounds.Height)
+        else if (_selected >= _top + Viewport.Height)
         {
-            _top = Math.Max (_source.Count - Bounds.Height, 0);
+            _top = Math.Max (_source.Count - Viewport.Height, 0);
             SetNeedsDisplay ();
         }
 
@@ -483,7 +483,7 @@ public class ListView : View
         {
             _selected = _source.Count - 1;
 
-            if (_top + _selected > Bounds.Height - 1)
+            if (_top + _selected > Viewport.Height - 1)
             {
                 _top = Math.Max (_selected, 0);
             }
@@ -522,7 +522,7 @@ public class ListView : View
             return true;
         }
 
-        int n = _selected + Bounds.Height;
+        int n = _selected + Viewport.Height;
 
         if (n >= _source.Count)
         {
@@ -533,7 +533,7 @@ public class ListView : View
         {
             _selected = n;
 
-            if (_source.Count >= Bounds.Height)
+            if (_source.Count >= Viewport.Height)
             {
                 _top = Math.Max (_selected, 0);
             }
@@ -553,7 +553,7 @@ public class ListView : View
     /// <returns></returns>
     public virtual bool MovePageUp ()
     {
-        int n = _selected - Bounds.Height;
+        int n = _selected - Viewport.Height;
 
         if (n < 0)
         {
@@ -603,9 +603,9 @@ public class ListView : View
             {
                 _top = Math.Max (_selected, 0);
             }
-            else if (_selected > _top + Bounds.Height)
+            else if (_selected > _top + Viewport.Height)
             {
-                _top = Math.Max (_selected - Bounds.Height + 1, 0);
+                _top = Math.Max (_selected - Viewport.Height + 1, 0);
             }
 
             OnSelectedChanged ();
@@ -621,14 +621,14 @@ public class ListView : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
-        base.OnDrawContent (contentArea);
+        base.OnDrawContent (viewport);
 
         Attribute current = ColorScheme.Focus;
         Driver.SetAttribute (current);
         Move (0, 0);
-        Rectangle f = Bounds;
+        Rectangle f = Viewport;
         int item = _top;
         bool focused = HasFocus;
         int col = _allowsMarking ? 2 : 0;
@@ -773,7 +773,7 @@ public class ListView : View
         }
         else
         {
-            Move (Bounds.Width - 1, _selected - _top);
+            Move (Viewport.Width - 1, _selected - _top);
         }
     }
 

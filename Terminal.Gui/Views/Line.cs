@@ -17,7 +17,7 @@ public class Line : View
     public Orientation Orientation { get; set; }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         LineCanvas lc = LineCanvas;
 
@@ -26,7 +26,7 @@ public class Line : View
             lc = adornment.Parent.LineCanvas;
         }
         lc.AddLine (
-                    BoundsToScreen (contentArea).Location,
+                    ViewportToScreen (viewport).Location,
                     Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height,
                     Orientation,
                     BorderStyle

@@ -80,14 +80,14 @@ public class ASCIICustomButtonTest : Scenario
 
             var fillText = new StringBuilder ();
 
-            for (var i = 0; i < Bounds.Height; i++)
+            for (var i = 0; i < Viewport.Height; i++)
             {
                 if (i > 0)
                 {
                     fillText.AppendLine ("");
                 }
 
-                for (var j = 0; j < Bounds.Width; j++)
+                for (var j = 0; j < Viewport.Width; j++)
                 {
                     fillText.Append ("█");
                 }

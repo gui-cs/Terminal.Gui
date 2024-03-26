@@ -82,12 +82,12 @@ public class SubviewTests
     {
         Application.Init (new FakeDriver ());
 
-        var top = new Toplevel { Id = "0" }; // Frame: 0, 0, 80, 25; Bounds: 0, 0, 80, 25
+        var top = new Toplevel { Id = "0" }; // Frame: 0, 0, 80, 25; Viewport: 0, 0, 80, 25
 
         var winAddedToTop = new Window
         {
             Id = "t", Width = Dim.Fill (), Height = Dim.Fill ()
-        }; // Frame: 0, 0, 80, 25; Bounds: 0, 0, 78, 23
+        }; // Frame: 0, 0, 80, 25; Viewport: 0, 0, 78, 23
 
         var v1AddedToWin = new View
         {
@@ -151,45 +151,45 @@ public class SubviewTests
         winAddedToTop.Initialized += (s, e) =>
                                      {
                                          wc++;
-                                         Assert.Equal (top.Bounds.Width, winAddedToTop.Frame.Width);
-                                         Assert.Equal (top.Bounds.Height, winAddedToTop.Frame.Height);
+                                         Assert.Equal (top.Viewport.Width, winAddedToTop.Frame.Width);
+                                         Assert.Equal (top.Viewport.Height, winAddedToTop.Frame.Height);
                                      };
 
         v1AddedToWin.Initialized += (s, e) =>
                                     {
                                         v1c++;
 
-                                        // Top.Frame: 0, 0, 80, 25; Top.Bounds: 0, 0, 80, 25
+                                        // Top.Frame: 0, 0, 80, 25; Top.Viewport: 0, 0, 80, 25
                                         // BUGBUG: This is wrong, it should be 78, 23. This test has always been broken.
-                                        // in no way should the v1AddedToWin.Frame be the same as the Top.Frame/Bounds
+                                        // in no way should the v1AddedToWin.Frame be the same as the Top.Frame/Viewport
                                         // as it is a subview of winAddedToTop, which has a border!
-                                        //Assert.Equal (top.Bounds.Width,  v1AddedToWin.Frame.Width);
-                                        //Assert.Equal (top.Bounds.Height, v1AddedToWin.Frame.Height);
+                                        //Assert.Equal (top.Viewport.Width,  v1AddedToWin.Frame.Width);
+                                        //Assert.Equal (top.Viewport.Height, v1AddedToWin.Frame.Height);
                                     };
 
         v2AddedToWin.Initialized += (s, e) =>
                                     {
                                         v2c++;
 
-                                        // Top.Frame: 0, 0, 80, 25; Top.Bounds: 0, 0, 80, 25
+                                        // Top.Frame: 0, 0, 80, 25; Top.Viewport: 0, 0, 80, 25
                                         // BUGBUG: This is wrong, it should be 78, 23. This test has always been broken.
-                                        // in no way should the v2AddedToWin.Frame be the same as the Top.Frame/Bounds
+                                        // in no way should the v2AddedToWin.Frame be the same as the Top.Frame/Viewport
                                         // as it is a subview of winAddedToTop, which has a border!
-                                        //Assert.Equal (top.Bounds.Width,  v2AddedToWin.Frame.Width);
-                                        //Assert.Equal (top.Bounds.Height, v2AddedToWin.Frame.Height);
+                                        //Assert.Equal (top.Viewport.Width,  v2AddedToWin.Frame.Width);
+                                        //Assert.Equal (top.Viewport.Height, v2AddedToWin.Frame.Height);
                                     };
 
         svAddedTov1.Initialized += (s, e) =>
                                    {
                                        sv1c++;
 
-                                       // Top.Frame: 0, 0, 80, 25; Top.Bounds: 0, 0, 80, 25
+                                       // Top.Frame: 0, 0, 80, 25; Top.Viewport: 0, 0, 80, 25
                                        // BUGBUG: This is wrong, it should be 78, 23. This test has always been broken.
-                                       // in no way should the svAddedTov1.Frame be the same as the Top.Frame/Bounds
+                                       // in no way should the svAddedTov1.Frame be the same as the Top.Frame/Viewport
                                        // because sv1AddedTov1 is a subview of v1AddedToWin, which is a subview of
                                        // winAddedToTop, which has a border!
-                                       //Assert.Equal (top.Bounds.Width,  svAddedTov1.Frame.Width);
-                                       //Assert.Equal (top.Bounds.Height, svAddedTov1.Frame.Height);
+                                       //Assert.Equal (top.Viewport.Width,  svAddedTov1.Frame.Width);
+                                       //Assert.Equal (top.Viewport.Height, svAddedTov1.Frame.Height);
                                        Assert.False (svAddedTov1.CanFocus);
                                        Assert.Throws<InvalidOperationException> (() => svAddedTov1.CanFocus = true);
                                        Assert.False (svAddedTov1.CanFocus);
@@ -259,24 +259,24 @@ public class SubviewTests
         w.Initialized += (s, e) =>
                          {
                              wc++;
-                             Assert.Equal (t.Bounds.Width, w.Frame.Width);
-                             Assert.Equal (t.Bounds.Height, w.Frame.Height);
+                             Assert.Equal (t.Viewport.Width, w.Frame.Width);
+                             Assert.Equal (t.Viewport.Height, w.Frame.Height);
                          };
 
         v1.Initialized += (s, e) =>
                           {
                               v1c++;
 
-                              //Assert.Equal (t.Bounds.Width, v1.Frame.Width);
-                              //Assert.Equal (t.Bounds.Height, v1.Frame.Height);
+                              //Assert.Equal (t.Viewport.Width, v1.Frame.Width);
+                              //Assert.Equal (t.Viewport.Height, v1.Frame.Height);
                           };
 
         v2.Initialized += (s, e) =>
                           {
                               v2c++;
 
-                              //Assert.Equal (t.Bounds.Width,  v2.Frame.Width);
-                              //Assert.Equal (t.Bounds.Height, v2.Frame.Height);
+                              //Assert.Equal (t.Viewport.Width,  v2.Frame.Width);
+                              //Assert.Equal (t.Viewport.Height, v2.Frame.Height);
                           };
         w.Add (v1, v2);
         t.Add (w);

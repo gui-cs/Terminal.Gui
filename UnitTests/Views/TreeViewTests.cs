@@ -30,7 +30,7 @@ public class TreeViewTests
         tree.BeginInit ();
         tree.EndInit ();
 
-        tree.Bounds = new Rectangle (0, 0, 10, 10);
+        tree.Viewport = new Rectangle (0, 0, 10, 10);
 
         InitFakeDriver ();
 
@@ -60,7 +60,7 @@ public class TreeViewTests
         tree.EndInit ();
 
         // control only allows 1 row to be viewed at once
-        tree.Bounds = new Rectangle (0, 0, 20, 1);
+        tree.Viewport = new Rectangle (0, 0, 20, 1);
 
         InitFakeDriver ();
 
@@ -235,7 +235,7 @@ public class TreeViewTests
         tree.EndInit ();
 
         // Make tree bounds 1 in height so that EnsureVisible always requires updating scroll offset
-        tree.Bounds = new Rectangle (0, 0, 50, 1);
+        tree.Viewport = new Rectangle (0, 0, 50, 1);
 
         Assert.Null (tree.SelectedObject);
         Assert.Equal (0, tree.ScrollOffsetVertical);

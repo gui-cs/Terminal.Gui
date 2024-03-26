@@ -18,8 +18,8 @@ public class ViewEventArgs : EventArgs
 /// <summary>Event arguments for the <see cref="View.LayoutComplete"/> event.</summary>
 public class LayoutEventArgs : EventArgs
 {
-    /// <summary>The view-relative bounds of the <see cref="View"/> before it was laid out.</summary>
-    public Rectangle OldBounds { get; set; }
+    /// <summary>The viewport of the <see cref="View"/> before it was laid out.</summary>
+    public Rectangle OldViewport { get; set; }
 }
 
 /// <summary>Event args for draw events</summary>

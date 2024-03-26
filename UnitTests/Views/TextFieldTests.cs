@@ -178,7 +178,7 @@ public class TextFieldTests
 
     [Fact]
     [AutoInitShutdown]
-    public void CaptionedTextField_DoesNotOverspillBounds_Unicode ()
+    public void CaptionedTextField_DoesNotOverspillViewport_Unicode ()
     {
         string caption = "Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables";
 
