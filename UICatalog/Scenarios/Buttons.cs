@@ -48,7 +48,7 @@ public class Buttons : Scenario
 
         View prev = colorButtonsLabel;
 
-        //With this method there is no need to call Application.TopReady += () => Application.TopRedraw (Top.Bounds);
+        //With this method there is no need to call Application.TopReady += () => Application.TopRedraw (Top.Viewport);
         Pos x = Pos.Right (colorButtonsLabel) + 2;
 
         foreach (KeyValuePair<string, ColorScheme> colorScheme in Colors.ColorSchemes)
