@@ -1066,6 +1066,11 @@ public static partial class Application
         }
         else
         {
+            if (_topLevels.Count > 1 && _topLevels.Peek () == OverlappedTop && OverlappedChildren.Any (t => t.Visible) is { })
+            {
+                OverlappedMoveNext ();
+            }
+
             Current = _topLevels.Peek ();
 
             if (_topLevels.Count == 1 && Current == OverlappedTop)

@@ -17,22 +17,22 @@ public class BackgroundWorkerCollection : Scenario
     public override void Main ()
     {
         Application.Run<OverlappedMain> ().Dispose ();
-        Application.Top?.Dispose ();
-        Application.Shutdown ();
 
 #if DEBUG_IDISPOSABLE
         if (Application.OverlappedChildren is { })
         {
             Debug.Assert (Application.OverlappedChildren?.Count == 0);
+            Debug.Assert (Application.Top == Application.OverlappedTop);
         }
 #endif
+
+        Application.Shutdown ();
     }
 
     private class OverlappedMain : Toplevel
     {
         private readonly MenuBar _menu;
         private WorkerApp _workerApp;
-        private bool _canOpenWorkerApp;
 
         public OverlappedMain ()
         {
@@ -105,27 +105,22 @@ public class BackgroundWorkerCollection : Scenario
                                           );
             Add (statusBar);
 
+            Ready += OverlappedMain_Ready;
             Activate += OverlappedMain_Activate;
             Deactivate += OverlappedMain_Deactivate;
-
-            Application.Iteration += (s, a) =>
-                                     {
-                                         if (_canOpenWorkerApp && !_workerApp.Running && Application.OverlappedTop.Running)
-                                         {
-                                             Application.Run (_workerApp);
-                                         }
-                                     };
         }
 
-        private void Menu_MenuOpening (object sender, MenuOpeningEventArgs menu)
+        private void OverlappedMain_Ready (object sender, EventArgs e)
         {
-            if (!_canOpenWorkerApp)
+            if (_workerApp?.Running == false)
             {
-                _canOpenWorkerApp = true;
+                Application.Run (_workerApp);
 
                 return;
             }
-
+        }
+        private void Menu_MenuOpening (object sender, MenuOpeningEventArgs menu)
+        {
             if (menu.CurrentMenu.Title == "_Window")
             {
                 menu.NewMenuBarItem = OpenedWindows ();
@@ -527,6 +522,7 @@ public class BackgroundWorkerCollection : Scenario
         {
             WriteLog ($"Report {obj.Staging.StartStaging}.{obj.Staging.StartStaging:fff} closed.");
             _stagingsUi.Remove (obj);
+            obj.Dispose ();
         }
     }
 }
