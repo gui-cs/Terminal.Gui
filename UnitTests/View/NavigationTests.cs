@@ -1303,13 +1303,39 @@ public class NavigationTests
         v1.TabIndex = 2;
         v2.TabIndex = 1;
         v3.TabIndex = 0;
-        Assert.True (r.TabIndexes.IndexOf (v1) == 2);
-        Assert.True (r.TabIndexes.IndexOf (v2) == 1);
-        Assert.True (r.TabIndexes.IndexOf (v3) == 0);
+        Assert.Equal (2, r.TabIndexes.IndexOf (v1));
+        Assert.Equal (1, r.TabIndexes.IndexOf (v2));
+        Assert.Equal (0, r.TabIndexes.IndexOf (v3));
 
-        Assert.True (r.Subviews.IndexOf (v1) == 0);
-        Assert.True (r.Subviews.IndexOf (v2) == 1);
-        Assert.True (r.Subviews.IndexOf (v3) == 2);
+        Assert.Equal (0, r.Subviews.IndexOf (v1));
+        Assert.Equal (1, r.Subviews.IndexOf (v2));
+        Assert.Equal (2, r.Subviews.IndexOf (v3));
+    }
+
+    [Fact]
+    public void TabIndex_Invert_Order_Added_One_By_One_Does_Not_Do_What_Is_Expected ()
+    {
+        var r = new View ();
+        var v1 = new View () { Id = "1", CanFocus = true };
+        r.Add (v1);
+        v1.TabIndex = 2;
+        var v2 = new View () { Id = "2", CanFocus = true };
+        r.Add (v2);
+        v2.TabIndex = 1;
+        var v3 = new View () { Id = "3", CanFocus = true };
+        r.Add (v3);
+        v3.TabIndex = 0;
+
+        Assert.NotEqual (2, r.TabIndexes.IndexOf (v1));
+        Assert.Equal (1, r.TabIndexes.IndexOf (v1));
+        Assert.NotEqual (1, r.TabIndexes.IndexOf (v2));
+        Assert.Equal (2, r.TabIndexes.IndexOf (v2));
+        // Only the last is in the expected index
+        Assert.Equal (0, r.TabIndexes.IndexOf (v3));
+
+        Assert.Equal (0, r.Subviews.IndexOf (v1));
+        Assert.Equal (1, r.Subviews.IndexOf (v2));
+        Assert.Equal (2, r.Subviews.IndexOf (v3));
     }
 
     [Fact]
@@ -1328,13 +1354,13 @@ public class NavigationTests
         v1.TabIndex = 2;
         v2.TabIndex = 1;
         v3.TabIndex = 0;
-        Assert.True (r.TabIndexes.IndexOf (v1) == 4);
-        Assert.True (r.TabIndexes.IndexOf (v2) == 2);
-        Assert.True (r.TabIndexes.IndexOf (v3) == 0);
+        Assert.Equal (4, r.TabIndexes.IndexOf (v1));
+        Assert.Equal (2, r.TabIndexes.IndexOf (v2));
+        Assert.Equal (0, r.TabIndexes.IndexOf (v3));
 
-        Assert.True (r.Subviews.IndexOf (v1) == 1);
-        Assert.True (r.Subviews.IndexOf (v2) == 3);
-        Assert.True (r.Subviews.IndexOf (v3) == 5);
+        Assert.Equal (1, r.Subviews.IndexOf (v1));
+        Assert.Equal (3, r.Subviews.IndexOf (v2));
+        Assert.Equal (5, r.Subviews.IndexOf (v3));
     }
 
     [Fact]
