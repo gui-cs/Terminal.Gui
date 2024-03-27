@@ -282,7 +282,7 @@ namespace Terminal.Gui {
 				} else if (SuperView?.tabIndexes == null || SuperView?.tabIndexes.Count == 1) {
 					tabIndex = 0;
 					return;
-				} else if (tabIndex == value) {
+				} else if (tabIndex == value && TabIndexes.IndexOf (this) == value) {
 					return;
 				}
 				tabIndex = value > SuperView.tabIndexes.Count - 1 ? SuperView.tabIndexes.Count - 1 : value < 0 ? 0 : value;
