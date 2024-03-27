@@ -1291,6 +1291,53 @@ public class NavigationTests
     }
 
     [Fact]
+    public void TabIndex_Invert_Order ()
+    {
+        var r = new View ();
+        var v1 = new View () { Id = "1", CanFocus = true };
+        var v2 = new View () { Id = "2", CanFocus = true };
+        var v3 = new View () { Id = "3", CanFocus = true };
+
+        r.Add (v1, v2, v3);
+
+        v1.TabIndex = 2;
+        v2.TabIndex = 1;
+        v3.TabIndex = 0;
+        Assert.True (r.TabIndexes.IndexOf (v1) == 2);
+        Assert.True (r.TabIndexes.IndexOf (v2) == 1);
+        Assert.True (r.TabIndexes.IndexOf (v3) == 0);
+
+        Assert.True (r.Subviews.IndexOf (v1) == 0);
+        Assert.True (r.Subviews.IndexOf (v2) == 1);
+        Assert.True (r.Subviews.IndexOf (v3) == 2);
+    }
+
+    [Fact]
+    public void TabIndex_Invert_Order_Mixed ()
+    {
+        var r = new View ();
+        var vl1 = new View () { Id = "vl1" };
+        var v1 = new View () { Id = "v1", CanFocus = true };
+        var vl2 = new View () { Id = "vl2" };
+        var v2 = new View () { Id = "v2", CanFocus = true };
+        var vl3 = new View () { Id = "vl3" };
+        var v3 = new View () { Id = "v3", CanFocus = true };
+
+        r.Add (vl1, v1, vl2, v2, vl3, v3);
+
+        v1.TabIndex = 2;
+        v2.TabIndex = 1;
+        v3.TabIndex = 0;
+        Assert.True (r.TabIndexes.IndexOf (v1) == 4);
+        Assert.True (r.TabIndexes.IndexOf (v2) == 2);
+        Assert.True (r.TabIndexes.IndexOf (v3) == 0);
+
+        Assert.True (r.Subviews.IndexOf (v1) == 1);
+        Assert.True (r.Subviews.IndexOf (v2) == 3);
+        Assert.True (r.Subviews.IndexOf (v3) == 5);
+    }
+
+    [Fact]
     public void TabStop_All_False_And_All_True_And_Changing_TabStop_Later ()
     {
         var r = new View ();
