@@ -267,7 +267,7 @@ public partial class View
                 return;
             }
 
-            if (_tabIndex == value)
+            if (_tabIndex == value && TabIndexes.IndexOf (this) == value)
             {
                 return;
             }
