@@ -243,20 +243,20 @@ public class VkeyPacketSimulator : Scenario
                          };
 
         btnInput.Accept += (s, e) =>
-                            {
-                                if (!tvInput.HasFocus && _keyboardStrokes.Count == 0)
-                                {
-                                    tvInput.SetFocus ();
-                                }
-                            };
+                           {
+                               if (!tvInput.HasFocus && _keyboardStrokes.Count == 0)
+                               {
+                                   tvInput.SetFocus ();
+                               }
+                           };
 
         btnOutput.Accept += (s, e) =>
-                             {
-                                 if (!tvOutput.HasFocus && _keyboardStrokes.Count == 0)
-                                 {
-                                     tvOutput.SetFocus ();
-                                 }
-                             };
+                            {
+                                if (!tvOutput.HasFocus && _keyboardStrokes.Count == 0)
+                                {
+                                    tvOutput.SetFocus ();
+                                }
+                            };
 
         tvInput.SetFocus ();
 
@@ -265,20 +265,20 @@ public class VkeyPacketSimulator : Scenario
             inputHorizontalRuler.Text = outputHorizontalRuler.Text =
                                             ruler.Repeat (
                                                           (int)Math.Ceiling (
-                                                                             inputHorizontalRuler.Bounds.Width
+                                                                             inputHorizontalRuler.ContentArea.Width
                                                                              / (double)ruler.Length
                                                                             )
                                                          ) [
-                                                            ..inputHorizontalRuler.Bounds.Width];
+                                                            ..inputHorizontalRuler.ContentArea.Width];
             inputVerticalRuler.Height = tvInput.Frame.Height + 1;
 
             inputVerticalRuler.Text =
-                ruler.Repeat ((int)Math.Ceiling (inputVerticalRuler.Bounds.Height / (double)ruler.Length)) [
-                     ..inputVerticalRuler.Bounds.Height];
+                ruler.Repeat ((int)Math.Ceiling (inputVerticalRuler.ContentArea.Height / (double)ruler.Length)) [
+                     ..inputVerticalRuler.ContentArea.Height];
 
             outputVerticalRuler.Text =
-                ruler.Repeat ((int)Math.Ceiling (outputVerticalRuler.Bounds.Height / (double)ruler.Length)) [
-                     ..outputVerticalRuler.Bounds.Height];
+                ruler.Repeat ((int)Math.Ceiling (outputVerticalRuler.ContentArea.Height / (double)ruler.Length)) [
+                     ..outputVerticalRuler.ContentArea.Height];
         }
 
         Win.LayoutComplete += Win_LayoutComplete;

@@ -1377,7 +1377,7 @@ public class ToplevelTests
         Assert.Equal (new (1, 3, 10, 5), view.Frame);
         Assert.Equal (new (0, 0, 10, 5), view._needsDisplayRect);
 
-        view.OnDrawContent (view.Bounds);
+        view.OnDrawContent (view.ContentArea);
         view.Frame = new (1, 3, 10, 5);
         Assert.Equal (new (1, 3, 10, 5), view.Frame);
         Assert.Equal (new (0, 0, 10, 5), view._needsDisplayRect);
@@ -1826,8 +1826,8 @@ public class ToplevelTests
         testWindow.Add (btnPopup);
 
         btnPopup.Accept += (s, e) =>
-                            {
-                                Rectangle viewToScreen = btnPopup.BoundsToScreen (top.Frame);
+                           {
+                               Rectangle viewToScreen = btnPopup.BoundsToScreen (top.Frame);
 
                                 var viewAddedToTop = new View
                                 {
@@ -1846,16 +1846,16 @@ public class ToplevelTests
                                 {
                                     Assert.Equal (new Rectangle (1, 3, 18, 16), viewAddedToTop.Frame);
 
-                                    Rectangle savedClip = Application.Driver.Clip;
-                                    Application.Driver.Clip = top.Frame;
-                                    viewAddedToTop.Draw ();
-                                    top.Move (2, 15);
-                                    View.Driver.AddStr ("One");
-                                    top.Move (2, 16);
-                                    View.Driver.AddStr ("Two");
-                                    top.Move (2, 17);
-                                    View.Driver.AddStr ("Three");
-                                    Application.Driver.Clip = savedClip;
+                                   Rectangle savedClip = Application.Driver.Clip;
+                                   Application.Driver.Clip = top.Frame;
+                                   viewAddedToTop.Draw ();
+                                   top.Move (2, 15);
+                                   View.Driver.AddStr ("One");
+                                   top.Move (2, 16);
+                                   View.Driver.AddStr ("Two");
+                                   top.Move (2, 17);
+                                   View.Driver.AddStr ("Three");
+                                   Application.Driver.Clip = savedClip;
 
                                     Application.Current.DrawContentComplete -= OnDrawContentComplete;
                                 }

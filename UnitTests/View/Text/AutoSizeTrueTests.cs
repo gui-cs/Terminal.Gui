@@ -587,7 +587,7 @@ public class AutoSizeTrueTests
                                      field.Text = $"Label {count}";
 
                                      // Label is AutoSize = true
-                                     var label = new Label { Text = field.Text, X = 0, Y = view.Bounds.Height /*, Width = 10*/ };
+                                     var label = new Label { Text = field.Text, X = 0, Y = view.ContentArea.Height /*, Width = 10*/ };
                                      view.Add (label);
                                      Assert.Equal ($"Label {count}", label.Text);
                                      Assert.Equal ($"Absolute({count + 1})", label.Y.ToString ());
@@ -873,16 +873,16 @@ public class AutoSizeTrueTests
         win.EndInit ();
 
         Assert.True (label.AutoSize);
-        Rectangle expectedLabelBounds = Rectangle.Empty;
-        Assert.Equal (expectedLabelBounds, label.Bounds);
+        var expectedLabelBounds = Rectangle.Empty;
+        Assert.Equal (expectedLabelBounds, label.ContentArea);
         Assert.True (label.AutoSize);
 
         label.Text = "First line\nSecond line";
         win.LayoutSubviews ();
 
-        expectedLabelBounds = new (0, 0, 11, 2);
+        expectedLabelBounds = new Rectangle (0, 0, 11, 2);
         Assert.True (label.AutoSize);
-        Assert.Equal (expectedLabelBounds, label.Bounds);
+        Assert.Equal (expectedLabelBounds, label.ContentArea);
 
         label.AutoSize = false;
         label.Width = Dim.Fill ();
@@ -892,9 +892,9 @@ public class AutoSizeTrueTests
         // Here the SetMinWidthHeight ensuring the minimum height
         // #3127: After: (0,0,28,2) because turning off AutoSize leaves
         // Height set to 2.
-        expectedLabelBounds = new (0, 0, 28, 2);
+        expectedLabelBounds = new Rectangle (0, 0, 28, 2);
         Assert.False (label.AutoSize);
-        Assert.Equal (expectedLabelBounds, label.Bounds);
+        Assert.Equal (expectedLabelBounds, label.ContentArea);
 
         label.Text = "First changed line\nSecond changed line\nNew line";
         win.LayoutSubviews ();
@@ -902,9 +902,9 @@ public class AutoSizeTrueTests
         // Here the AutoSize is false and the width 28 (Dim.Fill) and
         // #3127: Before: height 1 because it wasn't set and SetMinWidthHeight ensuring the minimum height
         // #3127: After: (0,0,28,2) because setting Text leaves Height set to 2.
-        expectedLabelBounds = new (0, 0, 28, 2);
+        expectedLabelBounds = new Rectangle (0, 0, 28, 2);
         Assert.False (label.AutoSize);
-        Assert.Equal (expectedLabelBounds, label.Bounds);
+        Assert.Equal (expectedLabelBounds, label.ContentArea);
 
         label.AutoSize = true;
 
@@ -912,9 +912,9 @@ public class AutoSizeTrueTests
 
         // Here the AutoSize ensuring the right size with width 19 (width of longest line)
         // and height 3 because the text has 3 lines
-        expectedLabelBounds = new (0, 0, 19, 3);
+        expectedLabelBounds = new Rectangle (0, 0, 19, 3);
         Assert.True (label.AutoSize);
-        Assert.Equal (expectedLabelBounds, label.Bounds);
+        Assert.Equal (expectedLabelBounds, label.ContentArea);
     }
 
     [Fact]
@@ -1505,7 +1505,7 @@ public class AutoSizeTrueTests
 
         Assert.True (label.AutoSize);
         Rectangle expectedLabelBounds = new (0, 0, 8, 1);
-        Assert.Equal (expectedLabelBounds, label.Bounds);
+        Assert.Equal (expectedLabelBounds, label.ContentArea);
         super.Dispose ();
     }
 

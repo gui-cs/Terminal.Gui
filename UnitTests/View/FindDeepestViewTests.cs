@@ -312,10 +312,13 @@ public class FindDeepestViewTests (ITestOutputHelper output)
     [InlineData (7, 8, false)]
     [InlineData (6, 7, false)]
     [InlineData (1, 2, false)]
+    [InlineData (2, 6, false)]
     [InlineData (5, 6, false)]
 
     [InlineData (2, 3, true)]
-    [InlineData (2, 3, true)]
+    [InlineData (2, 4, true)]
+    [InlineData (2, 5, true)]
+    [InlineData (4, 5, true)]
     public void Returns_Correct_If_SubView_Has_Adornments (int testX, int testY, bool expectedSubViewFound)
     {
         var start = new View ()
@@ -375,5 +378,50 @@ public class FindDeepestViewTests (ITestOutputHelper output)
 
         var found = View.FindDeepestView (start, testX, testY);
         Assert.Equal (expectedSubViewFound, subviews.IndexOf (found));
+    }
+
+    [Theory]
+    [InlineData (0, 0, typeof (Margin), "start")]
+    [InlineData (0, 1, typeof (Margin), "start")]
+    [InlineData (9, 1, typeof (Margin), "start")]
+    [InlineData (9, 9, typeof (Margin), "start")]
+
+    [InlineData (1, 1, typeof (Border), "start")]
+    [InlineData (1, 2, typeof (Border), "start")]
+    [InlineData (8, 1, typeof (Border), "start")]
+    [InlineData (8, 8, typeof (Border), "start")]
+
+    [InlineData (2, 2, typeof (Padding), "start")]
+    [InlineData (2, 3, typeof (Padding), "start")]
+    [InlineData (7, 2, typeof (Padding), "start")]
+    [InlineData (7, 7, typeof (Padding), "start")]
+
+    [InlineData (3, 3, typeof (View), "start")]
+    [InlineData (3, 4, typeof (View), "start")]
+    [InlineData (6, 3, typeof (View), "start")]
+    [InlineData (6, 6, typeof (View), "start")]
+    [InlineData (5, 5, typeof (View), "start")]
+
+    [InlineData (4, 4, typeof (View), "subview")]
+    public void Returns_Adornment_If_Start_Has_Adornments_Using_All_Adornments (int testX, int testY, Type expectedAdornmentType, string expectedParentName)
+    {
+        var start = new View ()
+        {
+            Width = 10, Height = 10,
+        };
+        start.Margin.Thickness = new Thickness (1);
+        start.Border.Thickness = new Thickness (1);
+        start.Padding.Thickness = new Thickness (1);
+
+        var subview = new View ()
+        {
+            X = 1, Y = 1,
+            Width = 1, Height = 1,
+        };
+        start.Add (subview);
+
+        var found = View.FindDeepestView (start, testX, testY);
+        Assert.Equal(expectedAdornmentType, found.GetType());
+        Assert.Equal (expectedParentName, found is Adornment ? "start" : found == start ? "start" : "subview");
     }
 }

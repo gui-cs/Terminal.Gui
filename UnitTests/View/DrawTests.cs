@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
-[Trait("Category","Output")]
+[Trait ("Category", "Output")]
 public class DrawTests
 {
     private readonly ITestOutputHelper _output;
@@ -53,7 +53,7 @@ public class DrawTests
 
     [Fact]
     [AutoInitShutdown]
-    [Trait("Category","Unicode")]
+    [Trait ("Category", "Unicode")]
     public void CJK_Compatibility_Ideographs_ConsoleWidth_ColumnWidth_Equal_Two ()
     {
         const string us = "\U0000f900";
@@ -115,7 +115,7 @@ public class DrawTests
     // TODO: Refactor this test to not depend on TextView etc... Make it as primitive as possible
     [Fact]
     [AutoInitShutdown]
-    [Trait("Category","Unicode")]
+    [Trait ("Category", "Unicode")]
     public void Clipping_AddRune_Left_Or_Right_Replace_Previous_Or_Next_Wide_Rune_With_Space ()
     {
         var tv = new TextView
@@ -171,7 +171,7 @@ public class DrawTests
 
     [Fact]
     [AutoInitShutdown]
-    [Trait("Category","Output")]
+    [Trait ("Category", "Output")]
     public void Colors_On_TextAlignment_Right_And_Bottom ()
     {
         var viewRight = new View
@@ -200,18 +200,15 @@ public class DrawTests
         ((FakeDriver)Application.Driver).SetBufferSize (7, 7);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      """
-
-                                                        Test
-                                                            
-                                                            
-                                                      T     
-                                                      e     
-                                                      s     
-                                                      t     
-                                                      """,
-                                                      _output
-                                                     );
+                                                      @"
+  Test
+      
+      
+T     
+e     
+s     
+t     ",
+                                                      _output);
 
         TestHelpers.AssertDriverAttributesAre (
                                                """
@@ -238,8 +235,8 @@ public class DrawTests
         view.EndInit ();
         view.SetRelativeLayout (Application.Driver.Bounds);
 
-        Assert.Equal (new (0,0,2,2), view.Frame);
-        Assert.Equal (Rectangle.Empty, view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 2, 2), view.Frame);
+        Assert.Equal (Rectangle.Empty, view.ContentArea);
 
         view.Draw ();
 
@@ -263,8 +260,8 @@ public class DrawTests
         view.EndInit ();
         view.SetRelativeLayout (Application.Driver.Bounds);
 
-        Assert.Equal (new (0,0,2,1), view.Frame);
-        Assert.Equal (Rectangle.Empty, view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 2, 1), view.Frame);
+        Assert.Equal (Rectangle.Empty, view.ContentArea);
 
         view.Draw ();
 
@@ -281,8 +278,8 @@ public class DrawTests
         view.EndInit ();
         view.SetRelativeLayout (Application.Driver.Bounds);
 
-        Assert.Equal (new (0,0,1,2), view.Frame);
-        Assert.Equal (Rectangle.Empty, view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 1, 2), view.Frame);
+        Assert.Equal (Rectangle.Empty, view.ContentArea);
 
         view.Draw ();
 
@@ -306,8 +303,8 @@ public class DrawTests
         view.EndInit ();
         view.SetRelativeLayout (Application.Driver.Bounds);
 
-        Assert.Equal (new (0,0,1,2), view.Frame);
-        Assert.Equal (Rectangle.Empty, view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 1, 2), view.Frame);
+        Assert.Equal (Rectangle.Empty, view.ContentArea);
 
         view.Draw ();
 
@@ -332,8 +329,8 @@ public class DrawTests
         view.EndInit ();
         view.SetRelativeLayout (Application.Driver.Bounds);
 
-        Assert.Equal (new (0,0,2,1), view.Frame);
-        Assert.Equal (Rectangle.Empty, view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 2, 1), view.Frame);
+        Assert.Equal (Rectangle.Empty, view.ContentArea);
 
         view.Draw ();
 
@@ -358,40 +355,40 @@ public class DrawTests
             Width = 1,
             Height = 7,
             Text = """
-            s
-            u
-            b
-            V
-            i
-            e
-            w
-            """
+                   s
+                   u
+                   b
+                   V
+                   i
+                   e
+                   w
+                   """
         };
 
         var view = new View
         {
             Id = "view", Width = 2, Height = 20, Text = """
-            0
-            1
-            2
-            3
-            4
-            5
-            6
-            7
-            8
-            9
-            0
-            1
-            2
-            3
-            4
-            5
-            6
-            7
-            8
-            9
-            """
+                                                        0
+                                                        1
+                                                        2
+                                                        3
+                                                        4
+                                                        5
+                                                        6
+                                                        7
+                                                        8
+                                                        9
+                                                        0
+                                                        1
+                                                        2
+                                                        3
+                                                        4
+                                                        5
+                                                        6
+                                                        7
+                                                        8
+                                                        9
+                                                        """
         };
         view.Add (subView);
         var content = new View { Id = "content", Width = 20, Height = 20 };
@@ -413,7 +410,7 @@ public class DrawTests
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-
+                                                      
                                                        0s
                                                        1u
                                                        2b
@@ -428,7 +425,7 @@ public class DrawTests
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-
+                                                      
                                                        s
                                                        u
                                                        b
@@ -448,7 +445,7 @@ public class DrawTests
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-
+                                                      
                                                        1u
                                                        2b
                                                        3V
@@ -462,14 +459,12 @@ public class DrawTests
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      """
-
-                                                       6w
-                                                       7 
-                                                       8 
-                                                       9 
-                                                       0 
-                                                      """,
+                                                      @"
+ 6w
+ 7 
+ 8 
+ 9 
+ 0 ",
                                                       _output
                                                      );
 
@@ -478,7 +473,7 @@ public class DrawTests
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-
+                                                      
                                                        9
                                                       """,
                                                       _output
@@ -533,7 +528,7 @@ public class DrawTests
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-
+                                                      
                                                        01234
                                                        subVi
                                                       """,
@@ -545,7 +540,7 @@ public class DrawTests
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-
+                                                      
                                                        12345
                                                        ubVie
                                                       """,
@@ -557,7 +552,7 @@ public class DrawTests
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-
+                                                      
                                                        ubVie
                                                       """,
                                                       _output
@@ -615,7 +610,7 @@ public class DrawTests
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-
+                                                      
                                                        0s
                                                        1u
                                                        2b
@@ -630,7 +625,7 @@ public class DrawTests
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-
+                                                      
                                                        s
                                                        u
                                                        b
@@ -650,7 +645,7 @@ public class DrawTests
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-
+                                                      
                                                        1u
                                                        2b
                                                        3V
@@ -664,14 +659,12 @@ public class DrawTests
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      """
-
-                                                       6w
-                                                       7 
-                                                       8 
-                                                       9 
-                                                       0 
-                                                      """,
+                                                      @"
+ 6w
+ 7 
+ 8 
+ 9 
+ 0 ",
                                                       _output
                                                      );
 
@@ -680,7 +673,7 @@ public class DrawTests
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-
+                                                      
                                                        9
                                                       """,
                                                       _output
@@ -735,11 +728,11 @@ public class DrawTests
 
         var expected = """
 
-            ┌┤𝔹├─────┐
-            │𝔹       │
-            │𝔹       │
-            └────────┘
-            """;
+                       ┌┤𝔹├─────┐
+                       │𝔹       │
+                       │𝔹       │
+                       └────────┘
+                       """;
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
         TestHelpers.AssertDriverContentsAre (expected, _output);

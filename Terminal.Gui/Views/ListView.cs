@@ -94,7 +94,7 @@ public class ListView : View
     private int _lastSelectedItem = -1;
     private int _selected = -1;
     private IListDataSource _source;
-    private int _top, _left;
+    private int _topItem, _leftItem;
 
     /// <summary>
     ///     Initializes a new instance of <see cref="ListView"/>. Set the <see cref="Source"/> property to display
@@ -103,6 +103,8 @@ public class ListView : View
     public ListView ()
     {
         CanFocus = true;
+
+        DrawAdornments += ListView_DrawAdornments;
 
         // Things this view knows how to do
         AddCommand (Command.LineUp, () => MoveUp ());
@@ -189,6 +191,29 @@ public class ListView : View
         }
     }
 
+    /// <inheritdoc/>
+    public override Point ContentOffset
+    {
+        get => base.ContentOffset;
+        set
+        {
+            if (base.ContentOffset != value)
+            {
+                base.ContentOffset = value;
+            }
+
+            if (LeftItem != -ContentOffset.X)
+            {
+                _left = -ContentOffset.X;
+            }
+
+            if (TopItem != -ContentOffset.Y)
+            {
+                _top = -ContentOffset.Y;
+            }
+        }
+    }
+
     /// <summary>
     ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="ListView.Source"/> collection as the
     ///     user types.
@@ -199,7 +224,7 @@ public class ListView : View
     /// <value>The left position.</value>
     public int LeftItem
     {
-        get => _left;
+        get => _leftItem;
         set
         {
             if (_source is null)
@@ -212,7 +237,7 @@ public class ListView : View
                 throw new ArgumentException ("value");
             }
 
-            _left = value;
+            ContentOffset = ContentOffset with { X = -(_leftItem = value) };
             SetNeedsDisplay ();
         }
     }
@@ -255,6 +280,7 @@ public class ListView : View
             _top = 0;
             _selected = -1;
             _lastSelectedItem = -1;
+            SetScrollRowsColsSize ();
             SetNeedsDisplay ();
         }
     }
@@ -263,7 +289,7 @@ public class ListView : View
     /// <value>The top item.</value>
     public int TopItem
     {
-        get => _top;
+        get => _topItem;
         set
         {
             if (_source is null)
@@ -276,9 +302,21 @@ public class ListView : View
                 throw new ArgumentException ("value");
             }
 
-            _top = Math.Max (value, 0);
+            ContentOffset = ContentOffset with { Y = -(_topItem = Math.Max (value, 0)) };
             SetNeedsDisplay ();
         }
+    }
+
+    private int _left
+    {
+        get => _leftItem;
+        set => ContentOffset = ContentOffset with { X = -(_leftItem = value) };
+    }
+
+    private int _top
+    {
+        get => _topItem;
+        set => ContentOffset = ContentOffset with { Y = -(_topItem = value) };
     }
 
     /// <summary>
@@ -318,9 +356,9 @@ public class ListView : View
             {
                 _top = Math.Max (_selected, 0);
             }
-            else if (Bounds.Height > 0 && _selected >= _top + Bounds.Height)
+            else if (ContentArea.Height > 0 && _selected >= _top + ContentArea.Height)
             {
-                _top = Math.Max (_selected - Bounds.Height + 1, 0);
+                _top = Math.Max (_selected - ContentArea.Height + 1, 0);
             }
 
             LayoutStarted -= ListView_LayoutStarted;
@@ -399,7 +437,7 @@ public class ListView : View
 
         if (me.Y + _top >= _source.Count
             || me.Y + _top < 0
-            || me.Y + _top > _top + Bounds.Height)
+            || me.Y + _top > _top + ContentArea.Height)
         {
             return true;
         }
@@ -449,7 +487,7 @@ public class ListView : View
             //can move by down by one.
             _selected++;
 
-            if (_selected >= _top + Bounds.Height)
+            if (_selected >= _top + ContentArea.Height)
             {
                 _top++;
             }
@@ -466,9 +504,9 @@ public class ListView : View
             OnSelectedChanged ();
             SetNeedsDisplay ();
         }
-        else if (_selected >= _top + Bounds.Height)
+        else if (_selected >= _top + ContentArea.Height)
         {
-            _top = Math.Max (_source.Count - Bounds.Height, 0);
+            _top = Math.Max (_source.Count - ContentArea.Height, 0);
             SetNeedsDisplay ();
         }
 
@@ -483,7 +521,7 @@ public class ListView : View
         {
             _selected = _source.Count - 1;
 
-            if (_top + _selected > Bounds.Height - 1)
+            if (_top + _selected > ContentArea.Height - 1)
             {
                 _top = Math.Max (_selected, 0);
             }
@@ -522,7 +560,7 @@ public class ListView : View
             return true;
         }
 
-        int n = _selected + Bounds.Height;
+        int n = _selected + ContentArea.Height;
 
         if (n >= _source.Count)
         {
@@ -533,7 +571,7 @@ public class ListView : View
         {
             _selected = n;
 
-            if (_source.Count >= Bounds.Height)
+            if (_source.Count >= ContentArea.Height)
             {
                 _top = Math.Max (_selected, 0);
             }
@@ -553,7 +591,7 @@ public class ListView : View
     /// <returns></returns>
     public virtual bool MovePageUp ()
     {
-        int n = _selected - Bounds.Height;
+        int n = _selected - ContentArea.Height;
 
         if (n < 0)
         {
@@ -603,9 +641,9 @@ public class ListView : View
             {
                 _top = Math.Max (_selected, 0);
             }
-            else if (_selected > _top + Bounds.Height)
+            else if (_selected > _top + ContentArea.Height)
             {
-                _top = Math.Max (_selected - Bounds.Height + 1, 0);
+                _top = Math.Max (_selected - ContentArea.Height + 1, 0);
             }
 
             OnSelectedChanged ();
@@ -628,7 +666,7 @@ public class ListView : View
         Attribute current = ColorScheme.Focus;
         Driver.SetAttribute (current);
         Move (0, 0);
-        Rectangle f = Bounds;
+        Rectangle f = ContentArea;
         int item = _top;
         bool focused = HasFocus;
         int col = _allowsMarking ? 2 : 0;
@@ -716,6 +754,7 @@ public class ListView : View
         }
 
         OpenSelectedItem?.Invoke (this, new ListViewItemEventArgs (_selected, value));
+
         return true;
     }
 
@@ -773,7 +812,7 @@ public class ListView : View
         }
         else
         {
-            Move (Bounds.Width - 1, _selected - _top);
+            Move (ContentArea.Width - 1, _selected - _top);
         }
     }
 
@@ -869,7 +908,23 @@ public class ListView : View
                                      );
     }
 
-    private void ListView_LayoutStarted (object sender, LayoutEventArgs e) { EnsureSelectedItemVisible (); }
+    private void ListView_DrawAdornments (object sender, DrawEventArgs e) { SetScrollRowsColsSize (); }
+
+    private void ListView_LayoutStarted (object sender, LayoutEventArgs e)
+    {
+        SetScrollRowsColsSize ();
+        EnsureSelectedItemVisible ();
+    }
+
+    private void SetScrollRowsColsSize ()
+    {
+        try
+        {
+            ContentSize = new Size (MaxLength, Source?.Count ?? 0);
+        }
+        catch (NotImplementedException)
+        { }
+    }
 }
 
 /// <summary>
@@ -1028,7 +1083,8 @@ public class ListWrapper : IListDataSource
 
     private void RenderUstr (ConsoleDriver driver, string ustr, int col, int line, int width, int start = 0)
     {
-        string u = TextFormatter.ClipAndJustify (ustr, width, TextAlignment.Left);
+        string str = start > ustr.GetColumns () ? string.Empty : ustr.Substring (start);
+        string u = TextFormatter.ClipAndJustify (str, width, TextAlignment.Left);
         driver.AddStr (u);
         width -= u.GetColumns ();
 

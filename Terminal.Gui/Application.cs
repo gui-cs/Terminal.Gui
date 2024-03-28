@@ -1492,7 +1492,7 @@ public static partial class Application
                 View = view
             };
 
-            if (MouseGrabView.Bounds.Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
+            if (MouseGrabView.ContentArea.Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
             {
                 // The mouse has moved outside the bounds of the view that
                 // grabbed the mouse, so we tell the view that last got 
@@ -1504,6 +1504,11 @@ public static partial class Application
             //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
             if (MouseGrabView?.OnMouseEvent (viewRelativeMouseEvent) == true)
             {
+                if (MouseGrabView is { WantContinuousButtonPressed: true })
+                {
+                    WantContinuousButtonPressedView = MouseGrabView;
+                }
+
                 return;
             }
         }
@@ -1548,7 +1553,7 @@ public static partial class Application
                 View = view
             };
         }
-        else if (view.BoundsToScreen (view.Bounds).Contains (a.MouseEvent.X, a.MouseEvent.Y))
+        else if (view.BoundsToScreen (view.ContentArea).Contains (a.MouseEvent.X, a.MouseEvent.Y))
         {
             Point boundsPoint = view.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
 

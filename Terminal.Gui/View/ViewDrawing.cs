@@ -81,9 +81,9 @@ public partial class View
         Driver.AddRune (ch);
     }
 
-    /// <summary>Clears <see cref="Bounds"/> with the normal background.</summary>
+    /// <summary>Clears <see cref="ContentArea"/> with the normal background.</summary>
     /// <remarks></remarks>
-    public void Clear () { Clear (Bounds); }
+    public void Clear () { Clear (ContentArea); }
 
     /// <summary>Clears the specified <see cref="Bounds"/>-relative rectangle with the normal background.</summary>
     /// <remarks></remarks>
@@ -98,19 +98,20 @@ public partial class View
         Attribute prev = Driver.SetAttribute (GetNormalColor ());
 
         // Clamp the region to the bounds of the view
-        contentArea = Rectangle.Intersect (contentArea, Bounds);
+        contentArea = Rectangle.Intersect (contentArea, ContentArea);
         Driver.FillRect (BoundsToScreen (contentArea));
         Driver.SetAttribute (prev);
     }
 
-    /// <summary>Expands the <see cref="ConsoleDriver"/>'s clip region to include <see cref="Bounds"/>.</summary>
+    /// <summary>Expands the <see cref="ConsoleDriver"/>'s clip region to include <see cref="ContentArea"/>.</summary>
     /// <returns>
     ///     The current screen-relative clip region, which can be then re-applied by setting
     ///     <see cref="ConsoleDriver.Clip"/>.
     /// </returns>
     /// <remarks>
     ///     <para>
-    ///         If <see cref="ConsoleDriver.Clip"/> and <see cref="Bounds"/> do not intersect, the clip region will be set to
+    ///         If <see cref="ConsoleDriver.Clip"/> and <see cref="ContentArea"/> do not intersect, the clip region will be set
+    ///         to
     ///         <see cref="Rectangle.Empty"/>.
     ///     </para>
     /// </remarks>
@@ -122,7 +123,7 @@ public partial class View
         }
 
         Rectangle previous = Driver.Clip;
-        Driver.Clip = Rectangle.Intersect (previous, BoundsToScreen (Bounds));
+        Driver.Clip = Rectangle.Intersect (previous, BoundsToScreen (GetVisibleContentArea ()));
 
         return previous;
     }
@@ -133,7 +134,7 @@ public partial class View
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Always use <see cref="Bounds"/> (view-relative) when calling <see cref="OnDrawContent(Rectangle)"/>, NOT
+    ///         Always use <see cref="ContentArea"/> (view-relative) when calling <see cref="OnDrawContent(Rectangle)"/>, NOT
     ///         <see cref="Frame"/> (superview-relative).
     ///     </para>
     ///     <para>
@@ -163,12 +164,12 @@ public partial class View
         }
 
         // Invoke DrawContentEvent
-        var dev = new DrawEventArgs (Bounds);
+        var dev = new DrawEventArgs (ContentArea);
         DrawContent?.Invoke (this, dev);
 
         if (!dev.Cancel)
         {
-            OnDrawContent (Bounds);
+            OnDrawContent (ContentArea);
         }
 
         if (Driver is { })
@@ -178,19 +179,35 @@ public partial class View
 
         OnRenderLineCanvas ();
 
-        // Invoke DrawContentCompleteEvent
-        OnDrawContentComplete (Bounds);
-
         // BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
         ClearLayoutNeeded ();
         ClearNeedsDisplay ();
+
+        // Invoke DrawContentCompleteEvent
+        dev = new (ContentArea);
+        DrawContentComplete?.Invoke (this, dev);
+
+        if (!dev.Cancel)
+        {
+            OnDrawContentComplete (ContentArea);
+        }
     }
+
+    /// <summary>Event invoked when the adornments area of the View is to be drawn.</summary>
+    /// <remarks>
+    ///     <para>Will be invoked before any subviews added with <see cref="Add(View)"/> have been drawn.</para>
+    ///     <para>
+    ///         Rectangle provides the view-relative rectangle describing the currently visible viewport into the
+    ///         <see cref="View"/> .
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<DrawEventArgs> DrawAdornments;
 
     /// <summary>Event invoked when the content area of the View is to be drawn.</summary>
     /// <remarks>
     ///     <para>Will be invoked before any subviews added with <see cref="Add(View)"/> have been drawn.</para>
     ///     <para>
-    ///         Rect provides the view-relative rectangle describing the currently visible viewport into the
+    ///         Rectangle provides the view-relative rectangle describing the currently visible viewport into the
     ///         <see cref="View"/> .
     ///     </para>
     /// </remarks>
@@ -200,7 +217,7 @@ public partial class View
     /// <remarks>
     ///     <para>Will be invoked after any subviews removed with <see cref="Remove(View)"/> have been completed drawing.</para>
     ///     <para>
-    ///         Rect provides the view-relative rectangle describing the currently visible viewport into the
+    ///         Rectangle provides the view-relative rectangle describing the currently visible viewport into the
     ///         <see cref="View"/> .
     ///     </para>
     /// </remarks>
@@ -345,11 +362,13 @@ public partial class View
             return false;
         }
 
+        DrawAdornments?.Invoke (this, new DrawEventArgs (ContentArea));
+
         // Each of these renders lines to either this View's LineCanvas 
         // Those lines will be finally rendered in OnRenderLineCanvas
-        Margin?.OnDrawContent (Margin.Bounds);
-        Border?.OnDrawContent (Border.Bounds);
-        Padding?.OnDrawContent (Padding.Bounds);
+        Margin?.OnDrawContent (Margin.ContentArea);
+        Border?.OnDrawContent (Border.ContentArea);
+        Padding?.OnDrawContent (Padding.ContentArea);
 
         return true;
     }
@@ -377,7 +396,7 @@ public partial class View
                 }
             }
 
-            // This should NOT clear 
+            // This should NOT clear
             TextFormatter?.Draw (
                                  BoundsToScreen (contentArea),
                                  HasFocus ? GetFocusColor () : GetNormalColor (),
@@ -427,7 +446,7 @@ public partial class View
     ///     This method will be called after any subviews removed with <see cref="Remove(View)"/> have been completed
     ///     drawing.
     /// </remarks>
-    public virtual void OnDrawContentComplete (Rectangle contentArea) { DrawContentComplete?.Invoke (this, new (contentArea)); }
+    public virtual void OnDrawContentComplete (Rectangle contentArea) { }
 
     // TODO: Make this cancelable
     /// <summary>
@@ -484,7 +503,7 @@ public partial class View
         return true;
     }
 
-    /// <summary>Sets the area of this view needing to be redrawn to <see cref="Bounds"/>.</summary>
+    /// <summary>Sets the area of this view needing to be redrawn to <see cref="ContentArea"/>.</summary>
     /// <remarks>
     ///     If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), this method
     ///     does nothing.
@@ -493,7 +512,7 @@ public partial class View
     {
         if (IsInitialized)
         {
-            SetNeedsDisplay (Bounds);
+            SetNeedsDisplay (ContentArea);
         }
     }
 

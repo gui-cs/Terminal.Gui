@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -25,10 +24,10 @@ public class Scrolling : Scenario
             Id = "scrollView",
             X = 2,
             Y = Pos.Bottom (label) + 1,
-            Width = 50,
-            Height = 20,
+            Width = Dim.Percent (60),
+            Height = Dim.Percent (80),
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
-            ContentSize = new (200, 100),
+            ContentSize = new (80, 28),
 
             //ContentOffset = Point.Empty,
             ShowVerticalScrollIndicator = true,
@@ -67,17 +66,17 @@ public class Scrolling : Scenario
         void Top_Loaded (object sender, EventArgs args)
         {
             horizontalRuler.Text =
-                rule.Repeat ((int)Math.Ceiling (horizontalRuler.Bounds.Width / (double)rule.Length)) [
-                                                                                                      ..horizontalRuler.Bounds.Width]
+                rule.Repeat ((int)Math.Ceiling (horizontalRuler.ContentArea.Width / (double)rule.Length)) [
+                 ..horizontalRuler.ContentArea.Width]
                 + "\n"
                 + "|         ".Repeat (
-                                       (int)Math.Ceiling (horizontalRuler.Bounds.Width / (double)rule.Length)
+                                       (int)Math.Ceiling (horizontalRuler.ContentArea.Width / (double)rule.Length)
                                       ) [
-                                         ..horizontalRuler.Bounds.Width];
+                                         ..horizontalRuler.ContentArea.Width];
 
             verticalRuler.Text =
-                vrule.Repeat ((int)Math.Ceiling (verticalRuler.Bounds.Height * 2 / (double)rule.Length))
-                    [..(verticalRuler.Bounds.Height * 2)];
+                vrule.Repeat ((int)Math.Ceiling (verticalRuler.ContentArea.Height * 2 / (double)rule.Length))
+                    [..(verticalRuler.ContentArea.Height * 2)];
             Top.Loaded -= Top_Loaded;
         }
 
@@ -138,14 +137,14 @@ public class Scrolling : Scenario
         anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
 
         anchorButton.Accept += (s, e) =>
-                                {
-                                    // This demonstrates how to have a dynamically sized button
-                                    // Each time the button is clicked the button's text gets longer
-                                    // The call to Win.LayoutSubviews causes the Computed layout to
-                                    // get updated. 
-                                    anchorButton.Text += "!";
-                                    Win.LayoutSubviews ();
-                                };
+                               {
+                                   // This demonstrates how to have a dynamically sized button
+                                   // Each time the button is clicked the button's text gets longer
+                                   // The call to Win.LayoutSubviews causes the Computed layout to
+                                   // get updated. 
+                                   anchorButton.Text += "!";
+                                   Win.LayoutSubviews ();
+                               };
         scrollView.Add (anchorButton);
 
         Win.Add (scrollView);
@@ -181,41 +180,14 @@ public class Scrolling : Scenario
             X = Pos.Left (scrollView), Y = Pos.Bottom (ahCheckBox), Text = k, Checked = scrollView.AutoHideScrollBars
         };
 
-        hCheckBox.Toggled += (s, e) =>
-                             {
-                                 if (ahCheckBox.Checked == false)
-                                 {
-                                     scrollView.ShowHorizontalScrollIndicator = (bool)hCheckBox.Checked;
-                                 }
-                                 else
-                                 {
-                                     hCheckBox.Checked = true;
-                                     MessageBox.Query ("Message", "Disable Auto Hide Scrollbars first.", "Ok");
-                                 }
-                             };
+        hCheckBox.Toggled += (s, e) => { scrollView.ShowHorizontalScrollIndicator = !(bool)hCheckBox.Checked; };
 
-        vCheckBox.Toggled += (s, e) =>
-                             {
-                                 if (ahCheckBox.Checked == false)
-                                 {
-                                     scrollView.ShowVerticalScrollIndicator = (bool)vCheckBox.Checked;
-                                 }
-                                 else
-                                 {
-                                     vCheckBox.Checked = true;
-                                     MessageBox.Query ("Message", "Disable Auto Hide Scrollbars first.", "Ok");
-                                 }
-                             };
+        vCheckBox.Toggled += (s, e) => { scrollView.ShowVerticalScrollIndicator = !(bool)vCheckBox.Checked; };
 
-        ahCheckBox.Toggled += (s, e) =>
-                              {
-                                  scrollView.AutoHideScrollBars = (bool)ahCheckBox.Checked;
-                                  hCheckBox.Checked = true;
-                                  vCheckBox.Checked = true;
-                              };
+        ahCheckBox.Toggled += (s, e) => { scrollView.AutoHideScrollBars = !(bool)ahCheckBox.Checked; };
         Win.Add (ahCheckBox);
 
-        keepCheckBox.Toggled += (s, e) => scrollView.KeepContentAlwaysInViewport = (bool)keepCheckBox.Checked;
+        keepCheckBox.Toggled += (s, e) => scrollView.KeepContentAlwaysInViewPort = !(bool)keepCheckBox.Checked;
         Win.Add (keepCheckBox);
 
         //var scrollView2 = new ScrollView (new (55, 2, 20, 8)) {
@@ -247,11 +219,16 @@ public class Scrolling : Scenario
             X = Pos.Right (scrollView) + 1,
             Y = Pos.AnchorEnd (1),
             AutoSize = false,
-            Width = 50,
+            Width = Dim.Fill (),
+            Height = 1,
             Text = "Mouse: "
         };
         Win.Add (mousePos);
-        Application.MouseEvent += (sender, a) => { mousePos.Text = $"Mouse: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}"; };
+
+        Application.MouseEvent += (sender, a) =>
+                                  {
+                                      mousePos.Text = $"Mouse: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} - {a.MouseEvent.View} {count++}";
+                                  };
 
         var progress = new ProgressBar { X = Pos.Right (scrollView) + 1, Y = Pos.AnchorEnd (2), Width = 50 };
         Win.Add (progress);

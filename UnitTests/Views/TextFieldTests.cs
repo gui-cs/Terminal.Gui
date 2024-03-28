@@ -1371,11 +1371,7 @@ public class TextFieldTests
 
         while (_textField.CursorPosition > 0)
         {
-            _textField.NewKeyDownEvent (
-                                        new Key (
-                                                 KeyCode.CursorLeft | KeyCode.CtrlMask | KeyCode.ShiftMask
-                                                )
-                                       );
+            _textField.NewKeyDownEvent (Key.CursorLeft.WithCtrl.WithShift);
 
             switch (iteration)
             {
@@ -1445,11 +1441,7 @@ public class TextFieldTests
 
         while (_textField.CursorPosition > 0)
         {
-            _textField.NewKeyDownEvent (
-                                        new Key (
-                                                 KeyCode.CursorLeft | KeyCode.CtrlMask | KeyCode.ShiftMask
-                                                )
-                                       );
+            _textField.NewKeyDownEvent (Key.CursorLeft.WithCtrl.WithShift);
 
             switch (iteration)
             {

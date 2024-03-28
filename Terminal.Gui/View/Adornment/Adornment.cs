@@ -1,7 +1,7 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     Adornments are a special form of <see cref="View"/> that appear outside the <see cref="View.Bounds"/>:
+///     Adornments are a special form of <see cref="View"/> that appear outside of the <see cref="View.ContentArea"/>:
 ///     <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>. They are defined using the
 ///     <see cref="Thickness"/> class, which specifies the thickness of the sides of a rectangle.
 /// </summary>
@@ -28,6 +28,16 @@ public class Adornment : View
         Application.UnGrabbingMouse += Application_UnGrabbingMouse;
         CanFocus = true;
         Parent = parent;
+    }
+
+    /// <summary>
+    ///     Gets the rectangle that describes the area of the Adornment. The Location is always (0,0).
+    ///     The size is the size of the Frame
+    /// </summary>
+    public override Rectangle ContentArea
+    {
+        get => Frame with { Location = Point.Empty };
+        set => throw new InvalidOperationException ("It makes no sense to set ContentArea of a Thickness.");
     }
 
     /// <summary>The Parent of this Adornment (the View this Adornment surrounds).</summary>
@@ -105,16 +115,6 @@ public class Adornment : View
         /* Do nothing - Adornments do not have Adornments */
     }
 
-    /// <summary>
-    ///     Gets the rectangle that describes the area of the Adornment. The Location is always (0,0).
-    ///     The size is the size of the <see cref="View.Frame"/>.
-    /// </summary>
-    public override Rectangle Bounds
-    {
-        get => Frame with { Location = Point.Empty };
-        set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
-    }
-
     /// <inheritdoc/>
     public override Rectangle FrameToScreen ()
     {
@@ -133,6 +133,14 @@ public class Adornment : View
 
     /// <inheritdoc/>
     public override Point ScreenToFrame (int x, int y) { return Parent.ScreenToFrame (x - Frame.X, y - Frame.Y); }
+
+    /// <summary>
+    ///     Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).
+    /// </summary>
+    public override Rectangle GetVisibleContentArea ()
+    {
+        return new Rectangle (Point.Empty, Frame.Size);
+    }
 
     /// <summary>Does nothing for Adornment</summary>
     /// <returns></returns>
@@ -231,7 +239,7 @@ public class Adornment : View
     /// <summary>Called when a mouse event occurs within the Adornment.</summary>
     /// <remarks>
     ///     <para>
-    ///         The coordinates are relative to <see cref="View.Bounds"/>.
+    ///         The coordinates are relative to <see cref="View.ContentArea"/>.
     ///     </para>
     ///     <para>
     ///         A mouse click on the Adornment will cause the Parent to focus.

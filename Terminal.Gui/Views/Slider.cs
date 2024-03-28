@@ -669,11 +669,11 @@ public class Slider<T> : View
                 // Calculate the size of the slider based on the size of the SuperView's Bounds.
                 if (_config._sliderOrientation == Orientation.Horizontal)
                 {
-                    size = int.Min (SuperView.Bounds.Width, CalcBestLength ());
+                    size = int.Min (SuperView.ContentArea.Width, CalcBestLength ());
                 }
                 else
                 {
-                    size = int.Min (SuperView.Bounds.Height, CalcBestLength ());
+                    size = int.Min (SuperView.ContentArea.Height, CalcBestLength ());
                 }
             }
             else
@@ -689,11 +689,11 @@ public class Slider<T> : View
             // Fit Slider to the Bounds
             if (_config._sliderOrientation == Orientation.Horizontal)
             {
-                size = Bounds.Width;
+                size = ContentArea.Width;
             }
             else
             {
-                size = Bounds.Height;
+                size = ContentArea.Height;
             }
         }
 
@@ -777,35 +777,35 @@ public class Slider<T> : View
 
         if (_config._sliderOrientation == Orientation.Horizontal)
         {
-            Bounds = new (
-                          Bounds.Location,
-                          new (
-                               int.Min (
-                                        SuperView.Bounds.Width - adornmentsThickness.Horizontal,
-                                        CalcBestLength ()
-                                       ),
-                               int.Min (
-                                        SuperView.Bounds.Height - adornmentsThickness.Vertical,
-                                        CalcThickness ()
-                                       )
-                              )
-                         );
+            ContentArea = new (
+                               ContentArea.Location,
+                               new (
+                                    int.Min (
+                                             SuperView.ContentArea.Width - adornmentsThickness.Horizontal,
+                                             CalcBestLength ()
+                                            ),
+                                    int.Min (
+                                             SuperView.ContentArea.Height - adornmentsThickness.Vertical,
+                                             CalcThickness ()
+                                            )
+                                   )
+                              );
         }
         else
         {
-            Bounds = new (
-                          Bounds.Location,
-                          new (
-                               int.Min (
-                                        SuperView.Bounds.Width - adornmentsThickness.Horizontal,
-                                        CalcThickness ()
-                                       ),
-                               int.Min (
-                                        SuperView.Bounds.Height - adornmentsThickness.Vertical,
-                                        CalcBestLength ()
-                                       )
-                              )
-                         );
+            ContentArea = new (
+                               ContentArea.Location,
+                               new (
+                                    int.Min (
+                                             SuperView.ContentArea.Width - adornmentsThickness.Horizontal,
+                                             CalcThickness ()
+                                            ),
+                                    int.Min (
+                                             SuperView.ContentArea.Height - adornmentsThickness.Vertical,
+                                             CalcBestLength ()
+                                            )
+                                   )
+                              );
         }
     }
 
@@ -988,7 +988,7 @@ public class Slider<T> : View
 
         if (TryGetPositionByOption (FocusedOption, out (int x, int y) position))
         {
-            if (IsInitialized && Bounds.Contains (position.x, position.y))
+            if (IsInitialized && ContentArea.Contains (position.x, position.y))
             {
                 Move (position.x, position.y);
             }
@@ -1073,7 +1073,7 @@ public class Slider<T> : View
     private void DrawSlider ()
     {
         // TODO: be more surgical on clear
-        Clear (Bounds);
+        Clear (ContentArea);
 
         // Attributes
 
@@ -1241,7 +1241,7 @@ public class Slider<T> : View
             }
         }
 
-        int remaining = isVertical ? Bounds.Height - y : Bounds.Width - x;
+        int remaining = isVertical ? ContentArea.Height - y : ContentArea.Width - x;
 
         // Right Spacing
         if (_config._showEndSpacing)

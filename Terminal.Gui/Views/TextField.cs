@@ -1,4 +1,3 @@
-using System.Data;
 using System.Globalization;
 using Terminal.Gui.Resources;
 
@@ -1196,8 +1195,8 @@ public class TextField : View
 
         int pos = _cursorPosition - ScrollOffset + Math.Min (Frame.X, 0);
         int offB = OffSetBackground ();
-        Rectangle containerFrame = SuperView?.BoundsToScreen (SuperView.Bounds) ?? default (Rectangle);
-        Rectangle thisFrame = BoundsToScreen (Bounds);
+        Rectangle containerFrame = SuperView?.BoundsToScreen (SuperView.ContentArea) ?? default (Rectangle);
+        Rectangle thisFrame = BoundsToScreen (ContentArea);
 
         if (pos > -1
             && col >= pos
@@ -1878,9 +1877,9 @@ public class TextField : View
         Move (0, 0);
         string render = Caption;
 
-        if (render.GetColumns () > Bounds.Width)
+        if (render.GetColumns () > ContentArea.Width)
         {
-            render = render [..Bounds.Width];
+            render = render [..ContentArea.Width];
         }
 
         Driver.AddStr (render);
@@ -1941,9 +1940,9 @@ public class TextField : View
     {
         _cursorPosition = Text.GetRuneCount ();
 
-        if (Bounds.Width > 0)
+        if (ContentArea.Width > 0)
         {
-            ScrollOffset = _cursorPosition > Bounds.Width + 1 ? _cursorPosition - Bounds.Width + 1 : 0;
+            ScrollOffset = _cursorPosition > ContentArea.Width + 1 ? _cursorPosition - ContentArea.Width + 1 : 0;
         }
 
         Autocomplete.HostControl = this;

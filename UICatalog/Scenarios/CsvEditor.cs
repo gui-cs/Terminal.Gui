@@ -300,10 +300,10 @@ public class CsvEditor : Scenario
         var ok = new Button { Text = "Ok", IsDefault = true };
 
         ok.Accept += (s, e) =>
-                      {
-                          okPressed = true;
-                          Application.RequestStop ();
-                      };
+                     {
+                         okPressed = true;
+                         Application.RequestStop ();
+                     };
         var cancel = new Button { Text = "Cancel" };
         cancel.Accept += (s, e) => { Application.RequestStop (); };
         var d = new Dialog { Title = title, Buttons = [ok, cancel] };
@@ -607,40 +607,7 @@ public class CsvEditor : Scenario
 
     private void SetTable (DataTable dataTable) { _tableView.Table = new DataTableSource (_currentTable = dataTable); }
 
-    private void SetupScrollBar ()
-    {
-        var scrollBar = new ScrollBarView (_tableView, true);
-
-        scrollBar.ChangedPosition += (s, e) =>
-                                     {
-                                         _tableView.RowOffset = scrollBar.Position;
-
-                                         if (_tableView.RowOffset != scrollBar.Position)
-                                         {
-                                             scrollBar.Position = _tableView.RowOffset;
-                                         }
-
-                                         _tableView.SetNeedsDisplay ();
-                                     };
-        /*
-        scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
-            tableView.LeftItem = scrollBar.OtherScrollBarView.Position;
-            if (tableView.LeftItem != scrollBar.OtherScrollBarView.Position) {
-                scrollBar.OtherScrollBarView.Position = tableView.LeftItem;
-            }
-            tableView.SetNeedsDisplay ();
-        };*/
-
-        _tableView.DrawContent += (s, e) =>
-                                  {
-                                      scrollBar.Size = _tableView.Table?.Rows ?? 0;
-                                      scrollBar.Position = _tableView.RowOffset;
-
-                                      //scrollBar.OtherScrollBarView.Size = tableView.Maxlength - 1;
-                                      //scrollBar.OtherScrollBarView.Position = tableView.LeftItem;
-                                      scrollBar.Refresh ();
-                                  };
-    }
+    private void SetupScrollBar () { _tableView.Padding.EnableScrollBars = true; }
 
     private void Sort (bool asc)
     {

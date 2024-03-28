@@ -35,7 +35,7 @@ public class ScrollViewTests
         top.Add (sv);
         Application.Begin (top);
 
-        Assert.Equal (new Rectangle (0, 0, 10, 10), sv.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), sv.ContentArea);
 
         Assert.False (sv.AutoHideScrollBars);
         Assert.True (sv.ShowHorizontalScrollIndicator);
@@ -59,9 +59,9 @@ public class ScrollViewTests
                                             );
 
         sv.ShowHorizontalScrollIndicator = false;
-        Assert.Equal (new Rectangle (0, 0, 10, 10), sv.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), sv.ContentArea);
         sv.ShowVerticalScrollIndicator = true;
-        Assert.Equal (new Rectangle (0, 0, 10, 10), sv.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), sv.ContentArea);
 
         Assert.False (sv.AutoHideScrollBars);
         Assert.False (sv.ShowHorizontalScrollIndicator);
@@ -145,7 +145,9 @@ public class ScrollViewTests
 
         Assert.True (sv.AutoHideScrollBars);
         Assert.False (sv.ShowHorizontalScrollIndicator);
+        Assert.False (sv.Subviews.First(sv => sv is ScrollBarView { Orientation: Orientation.Horizontal }).Visible);
         Assert.False (sv.ShowVerticalScrollIndicator);
+        Assert.False (sv.Subviews.First(sv => sv is ScrollBarView { Orientation: Orientation.Vertical }).Visible);
         TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
 
         sv.AutoHideScrollBars = false;
@@ -185,7 +187,7 @@ public class ScrollViewTests
             Width = 10,
             Height = 10,
             ContentSize = new (23, 23),
-            KeepContentAlwaysInViewport = false
+            KeepContentAlwaysInViewPort = false
         };
         var bottomLabel = new Label { X = 15, Y = 15, Text = "At 15,15" };
         var top = new Toplevel ();
@@ -347,7 +349,7 @@ public class ScrollViewTests
         Assert.Equal (Point.Empty, sv.ContentOffset);
         Assert.Equal (Size.Empty, sv.ContentSize);
         Assert.True (sv.AutoHideScrollBars);
-        Assert.True (sv.KeepContentAlwaysInViewport);
+        Assert.True (sv.KeepContentAlwaysInViewPort);
 
         sv = new ScrollView { X = 1, Y = 2, Width = 20, Height = 10 };
         Assert.Equal (LayoutStyle.Absolute, sv.LayoutStyle);
@@ -356,7 +358,7 @@ public class ScrollViewTests
         Assert.Equal (Point.Empty, sv.ContentOffset);
         Assert.Equal (Size.Empty, sv.ContentSize);
         Assert.True (sv.AutoHideScrollBars);
-        Assert.True (sv.KeepContentAlwaysInViewport);
+        Assert.True (sv.KeepContentAlwaysInViewPort);
     }
 
     [Fact]
@@ -928,8 +930,10 @@ public class ScrollViewTests
         sv.BeginInit ();
         sv.EndInit ();
 
-        Assert.True (sv.KeepContentAlwaysInViewport);
+        Assert.True (sv.KeepContentAlwaysInViewPort);
         Assert.True (sv.AutoHideScrollBars);
+        Assert.True (sv.ShowVerticalScrollIndicator);
+        Assert.True (sv.ShowHorizontalScrollIndicator);
         Assert.Equal (Point.Empty, sv.ContentOffset);
         Assert.False (sv.OnKeyDown (Key.CursorUp));
         Assert.Equal (Point.Empty, sv.ContentOffset);
@@ -940,15 +944,23 @@ public class ScrollViewTests
         Assert.False (sv.OnKeyDown (Key.PageUp));
         Assert.Equal (Point.Empty, sv.ContentOffset);
         Assert.True (sv.OnKeyDown (Key.PageDown));
-        Point point0xMinus10 = new (0, -10);
-        Assert.Equal (point0xMinus10, sv.ContentOffset);
-        Assert.False (sv.OnKeyDown (Key.PageDown));
-        Assert.Equal (point0xMinus10, sv.ContentOffset);
+        Assert.Equal (new Point (0, -10), sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.PageDown));
+
+        // The other scroll bar is visible, so it need to scroll one more row
+        Assert.Equal (new (0, -11), sv.ContentOffset);
         Assert.False (sv.OnKeyDown (Key.CursorDown));
-        Assert.Equal (point0xMinus10, sv.ContentOffset);
+        Assert.Equal (new (0, -11), sv.ContentOffset);
         Assert.True (sv.OnKeyDown (Key.V.WithAlt));
-        Assert.Equal (Point.Empty, sv.ContentOffset);
+
+        // Scrolled 10 rows and still is hiding one row
+        Assert.Equal (new (0, -1), sv.ContentOffset);
+
+        // Pressing the same key again will set to 0
+        Assert.True (sv.OnKeyDown (Key.V.WithAlt));
+        Assert.Equal (new (0, 0), sv.ContentOffset);
         Assert.True (sv.OnKeyDown (Key.V.WithCtrl));
+        Point point0xMinus10 = new (0, -10);
         Assert.Equal (point0xMinus10, sv.ContentOffset);
         Assert.False (sv.OnKeyDown (Key.CursorLeft));
         Assert.Equal (point0xMinus10, sv.ContentOffset);
@@ -959,35 +971,39 @@ public class ScrollViewTests
         Assert.False (sv.OnKeyDown (Key.PageUp.WithCtrl));
         Assert.Equal (point0xMinus10, sv.ContentOffset);
         Assert.True (sv.OnKeyDown (Key.PageDown.WithCtrl));
-        Point pointMinus20xMinus10 = new (-20, -10);
-        Assert.Equal (pointMinus20xMinus10, sv.ContentOffset);
-        Assert.False (sv.OnKeyDown (Key.CursorRight));
-        Assert.Equal (pointMinus20xMinus10, sv.ContentOffset);
-        Assert.True (sv.OnKeyDown (Key.Home));
-        Point pointMinus20x0 = new (-20, 0);
-        Assert.Equal (pointMinus20x0, sv.ContentOffset);
-        Assert.False (sv.OnKeyDown (Key.Home));
-        Assert.Equal (pointMinus20x0, sv.ContentOffset);
-        Assert.True (sv.OnKeyDown (Key.End));
-        Assert.Equal (pointMinus20xMinus10, sv.ContentOffset);
-        Assert.False (sv.OnKeyDown (Key.End));
-        Assert.Equal (pointMinus20xMinus10, sv.ContentOffset);
-        Assert.True (sv.OnKeyDown (Key.Home.WithCtrl));
-        Assert.Equal (point0xMinus10, sv.ContentOffset);
-        Assert.False (sv.OnKeyDown (Key.Home.WithCtrl));
-        Assert.Equal (point0xMinus10, sv.ContentOffset);
-        Assert.True (sv.OnKeyDown (Key.End.WithCtrl));
-        Assert.Equal (pointMinus20xMinus10, sv.ContentOffset);
-        Assert.False (sv.OnKeyDown (Key.End.WithCtrl));
-        Assert.Equal (pointMinus20xMinus10, sv.ContentOffset);
-        Assert.True (sv.OnKeyDown (Key.Home));
-        Assert.Equal (pointMinus20x0, sv.ContentOffset);
-        Assert.True (sv.OnKeyDown (Key.Home.WithCtrl));
-        Assert.Equal (Point.Empty, sv.ContentOffset);
+        Assert.Equal (new (-20, -10), sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.CursorRight));
 
-        sv.KeepContentAlwaysInViewport = false;
-        Assert.False (sv.KeepContentAlwaysInViewport);
+        // The other scroll bar is visible, so it need to scroll one more column
+        Assert.Equal (new (-21, -10), sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.Home));
+
+        // The other scroll bar is visible, so it need to scroll one more column
+        Assert.Equal (new (-21, 0), sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.Home));
+        Assert.Equal (new (-21, 0), sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.End));
+        Assert.Equal (new (-21, -11), sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.End));
+        Assert.Equal (new (-21, -11), sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.Home.WithCtrl));
+        Assert.Equal (new (0, -11), sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.Home.WithCtrl));
+        Assert.Equal (new (0, -11), sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.End.WithCtrl));
+        Assert.Equal (new (-21, -11), sv.ContentOffset);
+        Assert.False (sv.OnKeyDown (Key.End.WithCtrl));
+        Assert.Equal (new (-21, -11), sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.Home));
+        Assert.Equal (new (-21, 0), sv.ContentOffset);
+        Assert.True (sv.OnKeyDown (Key.Home.WithCtrl));
+        Assert.Equal (new (0, 0), sv.ContentOffset);
+
+        sv.KeepContentAlwaysInViewPort = false;
+        Assert.False (sv.KeepContentAlwaysInViewPort);
         Assert.True (sv.AutoHideScrollBars);
+        Assert.True (sv.ShowVerticalScrollIndicator);
+        Assert.True (sv.ShowHorizontalScrollIndicator);
         Assert.Equal (Point.Empty, sv.ContentOffset);
         Assert.False (sv.OnKeyDown (Key.CursorUp));
         Assert.Equal (Point.Empty, sv.ContentOffset);
@@ -1074,8 +1090,8 @@ public class ScrollViewTests
 
     private class CustomButton : FrameView
     {
-        private readonly Label labelFill;
-        private readonly Label labelText;
+        private readonly Label _labelFill;
+        private readonly Label _labelText;
 
         public CustomButton (string fill, string text, int width, int height)
         {
@@ -1083,30 +1099,30 @@ public class ScrollViewTests
             Height = height;
 
             //labelFill = new Label { AutoSize = false, X = Pos.Center (), Y = Pos.Center (), Width = Dim.Fill (), Height = Dim.Fill (), Visible = false };
-            labelFill = new Label { AutoSize = false, Width = Dim.Fill (), Height = Dim.Fill (), Visible = false };
+            _labelFill = new Label { AutoSize = false, Width = Dim.Fill (), Height = Dim.Fill (), Visible = false };
 
-            labelFill.LayoutComplete += (s, e) =>
-                                        {
-                                            var fillText = new StringBuilder ();
+            _labelFill.LayoutComplete += (s, e) =>
+                                         {
+                                             var fillText = new StringBuilder ();
 
-                                            for (var i = 0; i < labelFill.Bounds.Height; i++)
-                                            {
-                                                if (i > 0)
-                                                {
-                                                    fillText.AppendLine ("");
-                                                }
+                                             for (var i = 0; i < _labelFill.ContentArea.Height; i++)
+                                             {
+                                                 if (i > 0)
+                                                 {
+                                                     fillText.AppendLine ("");
+                                                 }
 
-                                                for (var j = 0; j < labelFill.Bounds.Width; j++)
-                                                {
-                                                    fillText.Append (fill);
-                                                }
-                                            }
+                                                 for (var j = 0; j < _labelFill.ContentArea.Width; j++)
+                                                 {
+                                                     fillText.Append (fill);
+                                                 }
+                                             }
 
-                                            labelFill.Text = fillText.ToString ();
-                                        };
+                                             _labelFill.Text = fillText.ToString ();
+                                         };
 
-            labelText = new Label { X = Pos.Center (), Y = Pos.Center (), Text = text };
-            Add (labelFill, labelText);
+            _labelText = new Label { X = Pos.Center (), Y = Pos.Center (), Text = text };
+            Add (_labelFill, _labelText);
             CanFocus = true;
         }
 
@@ -1114,7 +1130,7 @@ public class ScrollViewTests
         {
             Border.LineStyle = LineStyle.None;
             Border.Thickness = new Thickness (0);
-            labelFill.Visible = true;
+            _labelFill.Visible = true;
             view = this;
 
             return base.OnEnter (view);
@@ -1124,7 +1140,7 @@ public class ScrollViewTests
         {
             Border.LineStyle = LineStyle.Single;
             Border.Thickness = new Thickness (1);
-            labelFill.Visible = false;
+            _labelFill.Visible = false;
 
             if (view == null)
             {

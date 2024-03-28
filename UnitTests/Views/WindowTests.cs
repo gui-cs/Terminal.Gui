@@ -136,7 +136,7 @@ public class WindowTests
         Assert.Equal ($"Window(){defaultWindow.Frame}", defaultWindow.ToString ());
         Assert.True (defaultWindow.CanFocus);
         Assert.False (defaultWindow.HasFocus);
-        Assert.Equal (new Rectangle (0, 0, 2147483645, 2147483645), defaultWindow.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 2147483645, 2147483645), defaultWindow.ContentArea);
         Assert.Equal (new Rectangle (0, 0, 2147483647, 2147483647), defaultWindow.Frame);
         Assert.Null (defaultWindow.Focused);
         Assert.NotNull (defaultWindow.ColorScheme);
@@ -159,6 +159,7 @@ public class WindowTests
         Assert.Equal (LayoutStyle.Absolute, windowWithFrameRectEmpty.LayoutStyle);
         Assert.Equal ("title", windowWithFrameRectEmpty.Title);
         Assert.Equal (LayoutStyle.Absolute, windowWithFrameRectEmpty.LayoutStyle);
+
         // TODO: Fix things so that this works in release and debug
         // BUG: This also looks like it might be unintended behavior.
         // Can actually also be removed, since the tests below make it redundant.
@@ -169,7 +170,7 @@ public class WindowTests
     #endif
         Assert.True (windowWithFrameRectEmpty.CanFocus);
         Assert.False (windowWithFrameRectEmpty.HasFocus);
-        Assert.Equal (Rectangle.Empty, windowWithFrameRectEmpty.Bounds);
+        Assert.Equal (Rectangle.Empty, windowWithFrameRectEmpty.ContentArea);
         Assert.Equal (Rectangle.Empty, windowWithFrameRectEmpty.Frame);
         Assert.Null (windowWithFrameRectEmpty.Focused);
         Assert.NotNull (windowWithFrameRectEmpty.ColorScheme);
@@ -178,31 +179,31 @@ public class WindowTests
         Assert.Equal (0, windowWithFrameRectEmpty.Width);
         Assert.Equal (0, windowWithFrameRectEmpty.Height);
         Assert.False (windowWithFrameRectEmpty.IsCurrentTop);
-    #if DEBUG
+#if DEBUG
         Assert.Equal (windowWithFrameRectEmpty.Title, windowWithFrameRectEmpty.Id);
-    #endif
+#endif
         Assert.False (windowWithFrameRectEmpty.WantContinuousButtonPressed);
         Assert.False (windowWithFrameRectEmpty.WantMousePositionReports);
         Assert.Null (windowWithFrameRectEmpty.SuperView);
         Assert.Null (windowWithFrameRectEmpty.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, windowWithFrameRectEmpty.TextDirection);
 
-        // Rect with values
-        using var windowWithFrame1234 = new Window ( );
-        windowWithFrame1234.Frame = new  (1, 2, 3, 4);
+        // Rectangle with values
+        using var windowWithFrame1234 = new Window ();
+        windowWithFrame1234.Frame = new Rectangle (1, 2, 3, 4);
         windowWithFrame1234.Title = "title";
         Assert.Equal ("title", windowWithFrame1234.Title);
         Assert.NotNull (windowWithFrame1234);
         Assert.Equal (LayoutStyle.Absolute, windowWithFrame1234.LayoutStyle);
         Assert.Equal (LayoutStyle.Absolute, windowWithFrame1234.LayoutStyle);
-    #if DEBUG
+#if DEBUG
         Assert.Equal ($"Window(title){windowWithFrame1234.Frame}", windowWithFrame1234.ToString ());
     #else
         Assert.Equal ($"Window(){windowWithFrame1234.Frame}", windowWithFrame1234.ToString ());
     #endif
         Assert.True (windowWithFrame1234.CanFocus);
         Assert.False (windowWithFrame1234.HasFocus);
-        Assert.Equal (new (0, 0, 1, 2), windowWithFrame1234.Bounds);
+        Assert.Equal (new (0, 0, 1, 2), windowWithFrame1234.ContentArea);
         Assert.Equal (new (1, 2, 3, 4), windowWithFrame1234.Frame);
         Assert.Null (windowWithFrame1234.Focused);
         Assert.NotNull (windowWithFrame1234.ColorScheme);
@@ -211,9 +212,9 @@ public class WindowTests
         Assert.Equal (3, windowWithFrame1234.Width);
         Assert.Equal (4, windowWithFrame1234.Height);
         Assert.False (windowWithFrame1234.IsCurrentTop);
-    #if DEBUG
+#if DEBUG
         Assert.Equal (windowWithFrame1234.Title, windowWithFrame1234.Id);
-    #endif
+#endif
         Assert.False (windowWithFrame1234.WantContinuousButtonPressed);
         Assert.False (windowWithFrame1234.WantMousePositionReports);
         Assert.Null (windowWithFrame1234.SuperView);

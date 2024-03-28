@@ -98,7 +98,7 @@ public class ColorPicker : View
 
         SetFocus ();
 
-        if (me.X > Bounds.Width || me.Y > Bounds.Height)
+        if (me.X > ContentArea.Width || me.Y > ContentArea.Height)
         {
             return true;
         }
@@ -164,9 +164,9 @@ public class ColorPicker : View
         Driver.SetAttribute (HasFocus ? ColorScheme.Focus : GetNormalColor ());
         var colorIndex = 0;
 
-        for (var y = 0; y < Bounds.Height / BoxHeight; y++)
+        for (var y = 0; y < ContentArea.Height / BoxHeight; y++)
         {
-            for (var x = 0; x < Bounds.Width / BoxWidth; x++)
+            for (var x = 0; x < ContentArea.Width / BoxWidth; x++)
             {
                 int foregroundColorIndex = y == 0 ? colorIndex + _cols : colorIndex - _cols;
                 Driver.SetAttribute (new Attribute ((ColorName)foregroundColorIndex, (ColorName)colorIndex));

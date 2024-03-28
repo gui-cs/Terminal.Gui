@@ -30,10 +30,10 @@ public partial class View
     ///         <see cref="TextAlignment"/> and <see cref="TextDirection"/>.
     ///     </para>
     ///     <para>
-    ///         The text will word-wrap to additional lines if it does not fit horizontally. If <see cref="Bounds"/>'s height
+    ///         The text will word-wrap to additional lines if it does not fit horizontally. If <see cref="ContentArea"/>'s height
     ///         is 1, the text will be clipped.
     ///     </para>
-    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Bounds"/> will be adjusted to fit the text.</para>
+    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="ContentArea"/> will be adjusted to fit the text.</para>
     ///     <para>When the text changes, the <see cref="TextChanged"/> is fired.</para>
     /// </remarks>
     public virtual string Text
@@ -61,14 +61,11 @@ public partial class View
     }
 
     /// <summary>
-    /// Called when the <see cref="Text"/> has changed. Fires the <see cref="TextChanged"/> event.
+    ///     Called when the <see cref="Text"/> has changed. Fires the <see cref="TextChanged"/> event.
     /// </summary>
     /// <param name="oldValue"></param>
     /// <param name="newValue"></param>
-    public void OnTextChanged (string oldValue, string newValue)
-    {
-        TextChanged?.Invoke (this, new StateEventArgs<string> (oldValue, newValue));
-    }
+    public void OnTextChanged (string oldValue, string newValue) { TextChanged?.Invoke (this, new StateEventArgs<string> (oldValue, newValue)); }
 
     /// <summary>
     ///     Text changed event, raised when the text has changed.
@@ -80,7 +77,7 @@ public partial class View
     ///     redisplay the <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Bounds"/> will be adjusted to fit the text.</para>
+    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="ContentArea"/> will be adjusted to fit the text.</para>
     /// </remarks>
     /// <value>The text alignment.</value>
     public virtual TextAlignment TextAlignment
@@ -99,7 +96,7 @@ public partial class View
     ///     <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Bounds"/> will be adjusted to fit the text.</para>
+    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="ContentArea"/> will be adjusted to fit the text.</para>
     /// </remarks>
     /// <value>The text alignment.</value>
     public virtual TextDirection TextDirection
@@ -120,7 +117,7 @@ public partial class View
     ///     redisplay the <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Bounds"/> will be adjusted to fit the text.</para>
+    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="ContentArea"/> will be adjusted to fit the text.</para>
     /// </remarks>
     /// <value>The text alignment.</value>
     public virtual VerticalTextAlignment VerticalTextAlignment
@@ -134,7 +131,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     Gets the Frame dimensions required to fit <see cref="Text"/> within <see cref="Bounds"/> using the text
+    ///     Gets the Frame dimensions required to fit <see cref="Text"/> within <see cref="ContentArea"/> using the text
     ///     <see cref="NavigationDirection"/> specified by the <see cref="TextFormatter"/> property and accounting for any
     ///     <see cref="HotKeySpecifier"/> characters.
     /// </summary>
@@ -146,8 +143,8 @@ public partial class View
 
         if (IsInitialized)
         {
-            x = Bounds.X;
-            y = Bounds.Y;
+            x = ContentArea.X;
+            y = ContentArea.Y;
         }
 
         Rectangle rect = TextFormatter.CalcRect (x, y, TextFormatter.Text, TextFormatter.Direction);
@@ -225,7 +222,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     Internal API. Sets <see cref="TextFormatter"/>.Size to the current <see cref="Bounds"/> size, adjusted for
+    ///     Internal API. Sets <see cref="TextFormatter"/>.Size to the current <see cref="ContentArea"/> size, adjusted for
     ///     <see cref="TextFormatter.HotKeySpecifier"/>.
     /// </summary>
     /// <remarks>
@@ -244,15 +241,15 @@ public partial class View
 
         if (string.IsNullOrEmpty (TextFormatter.Text))
         {
-            TextFormatter.Size = Bounds.Size;
+            TextFormatter.Size = ContentArea.Size;
 
             return;
         }
 
         TextFormatter.Size = new (
-                                  Bounds.Size.Width + GetHotKeySpecifierLength (),
-                                  Bounds.Size.Height + GetHotKeySpecifierLength (false)
-                                 );
+                                       ContentArea.Size.Width + GetHotKeySpecifierLength (),
+                                       ContentArea.Size.Height + GetHotKeySpecifierLength (false)
+                                      );
     }
 
     private bool IsValidAutoSize (out Size autoSize)
@@ -324,7 +321,7 @@ public partial class View
                 return false;
             }
 
-            sizeRequired = Bounds.Size;
+            sizeRequired = ContentArea.Size;
 
             if (AutoSize || string.IsNullOrEmpty (TextFormatter.Text))
             {
@@ -338,9 +335,9 @@ public partial class View
 
                     // TODO: v2 - This uses frame.Width; it should only use Bounds
                     if (_frame.Width < colWidth
-                        && (Width is null || (Bounds.Width >= 0 && Width is Dim.DimAbsolute && Width.Anchor (0) >= 0 && Width.Anchor (0) < colWidth)))
+                        && (Width is null || (ContentArea.Width >= 0 && Width is Dim.DimAbsolute && Width.Anchor (0) >= 0 && Width.Anchor (0) < colWidth)))
                     {
-                        sizeRequired = new (colWidth, Bounds.Height);
+                        sizeRequired = new (colWidth, ContentArea.Height);
 
                         return true;
                     }
@@ -349,7 +346,7 @@ public partial class View
                 default:
                     if (_frame.Height < 1 && (Height is null || (Height is Dim.DimAbsolute && Height.Anchor (0) == 0)))
                     {
-                        sizeRequired = new (Bounds.Width, 1);
+                        sizeRequired = new (ContentArea.Width, 1);
 
                         return true;
                     }
@@ -392,7 +389,7 @@ public partial class View
         }
         else if (AutoSize && directionChanged && IsAdded)
         {
-            ResizeBoundsToFit (Bounds.Size);
+            ResizeBoundsToFit (ContentArea.Size);
         }
 
         SetTextFormatterSize ();
