@@ -7,17 +7,9 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 public class ScrollBars : Scenario
 {
-    public override void Init ()
-    {
-        Application.Init ();
-        Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
-    }
-
     public override void Setup ()
     {
         var text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line";
-
-        var win = new Window ();
 
         var viewOnMargin = new View
         {
@@ -27,9 +19,9 @@ public class ScrollBars : Scenario
         };
         viewOnMargin.Margin.EnableScrollBars = true;
         SetViewProperties (viewOnMargin);
-        win.Add (viewOnMargin);
+        Win.Add (viewOnMargin);
 
-        win.Add (new Label { X = 0, Y = Pos.Top (viewOnMargin) - 2, Text = "On Margin:" });
+        Win.Add (new Label { X = 0, Y = Pos.Top (viewOnMargin) - 2, Text = "On Margin:" });
 
         var viewOnContentArea = new View
         {
@@ -42,9 +34,9 @@ public class ScrollBars : Scenario
         viewOnContentArea.Margin.ColorScheme = Colors.ColorSchemes ["Dialog"];
         viewOnContentArea.BorderStyle = LineStyle.Single;
         SetViewProperties (viewOnContentArea);
-        win.Add (viewOnContentArea);
+        Win.Add (viewOnContentArea);
 
-        win.Add (new Label { X = Pos.Left (viewOnContentArea), Y = Pos.Top (viewOnContentArea) - 2, Text = "On ContentArea:" });
+        Win.Add (new Label { X = Pos.Left (viewOnContentArea), Y = Pos.Top (viewOnContentArea) - 2, Text = "On ContentArea:" });
 
         var viewOnPadding = new View
         {
@@ -58,9 +50,9 @@ public class ScrollBars : Scenario
         viewOnPadding.BorderStyle = LineStyle.Single;
         viewOnPadding.Padding.ColorScheme = Colors.ColorSchemes ["Menu"];
         SetViewProperties (viewOnPadding);
-        win.Add (viewOnPadding);
+        Win.Add (viewOnPadding);
 
-        win.Add (new Label { X = Pos.Left (viewOnPadding), Y = Pos.Top (viewOnPadding) - 2, Text = "On Padding:" });
+        Win.Add (new Label { X = Pos.Left (viewOnPadding), Y = Pos.Top (viewOnPadding) - 2, Text = "On Padding:" });
 
         var viewOnBorder = new View
         {
@@ -73,18 +65,16 @@ public class ScrollBars : Scenario
         viewOnBorder.Margin.Thickness = new (1);
         viewOnBorder.Margin.ColorScheme = Colors.ColorSchemes ["Dialog"];
         SetViewProperties (viewOnBorder);
-        win.Add (viewOnBorder);
+        Win.Add (viewOnBorder);
 
-        win.Add (new Label { X = Pos.Left (viewOnBorder), Y = Pos.Top (viewOnBorder) - 2, Text = "On Border:" });
+        Win.Add (new Label { X = Pos.Left (viewOnBorder), Y = Pos.Top (viewOnBorder) - 2, Text = "On Border:" });
 
         var btn = new Button { X = Pos.Center (), Y = Pos.Bottom (viewOnContentArea) + 1, Text = "Tab or click to select the views" };
-        win.Add (btn);
+        Win.Add (btn);
 
         viewOnBorder.TabIndex = 1;
         viewOnPadding.TabIndex = 2;
         viewOnContentArea.TabIndex = 3;
-
-        Application.Top.Add (win);
     }
 
     private void SetViewProperties (View view)

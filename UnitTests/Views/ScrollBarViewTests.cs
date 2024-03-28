@@ -324,7 +324,7 @@ This is a tes▼
         sbv.Visible = false;
         sbv.ShowScrollIndicator = false;
         sbv.AutoHideScrollBars = false;
-        Application.Top.Draw ();
+        top.Draw ();
         Assert.False (sbv.Visible);
         Assert.False (sbv.ShowScrollIndicator);
 
@@ -922,7 +922,6 @@ This is a test
     }
 
     [Fact]
-    [ScrollBarAutoInitShutdown]
     public void Hosting_Two_Horizontal_ScrollBarView_Throws_ArgumentException ()
     {
         var top = new Toplevel ();
@@ -936,7 +935,6 @@ This is a test
     }
 
     [Fact]
-    [ScrollBarAutoInitShutdown]
     public void Hosting_Two_Vertical_ScrollBarView_Throws_ArgumentException ()
     {
         var top = new Toplevel ();
@@ -1558,7 +1556,6 @@ This is a test
     }
 
     [Fact]
-    [ScrollBarAutoInitShutdown]
     public void Scrolling_With_Default_Constructor_Do_Not_Scroll ()
     {
         var sbv = new ScrollBarView { Position = 1 };
@@ -1592,8 +1589,7 @@ This is a test
 
         var sbv = new ScrollBarView { Orientation = Orientation.Vertical, Size = 5 };
         label.Add (sbv);
-        Application.Top.Add (label, btn);
-        Application.Begin (Application.Top);
+        Application.Begin (top);
 
         Assert.Equal (5, sbv.Size);
         Assert.Null (sbv.OtherScrollBarView);
@@ -1666,7 +1662,7 @@ This is a test             ",
         Assert.False (sbv.ShowScrollIndicator);
         Assert.False (sbv.Visible);
         sbv.AutoHideScrollBars = false;
-        Application.Top.Draw ();
+        top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @$"
