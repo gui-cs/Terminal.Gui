@@ -33,8 +33,9 @@ public class ViewTests
                                 Application.Driver.Clip = savedClip;
                                 e.Cancel = true;
                             };
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 
         var expected = @"
@@ -95,8 +96,9 @@ public class ViewTests
                                 Application.Driver.Clip = savedClip;
                                 e.Cancel = true;
                             };
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 
         var expected = @"
@@ -147,8 +149,9 @@ public class ViewTests
 
         root.Add (v);
 
-        Application.Top.Add (root);
-        RunState runState = Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (root);
+        RunState runState = Application.Begin (top);
 
         if (label)
         {
@@ -232,7 +235,7 @@ cccccccccccccccccccc",
             Height = 2,
             Text = "A text with some long width\n and also with two lines."
         };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (label, view);
         RunState runState = Application.Begin (top);
 
@@ -277,7 +280,7 @@ At 0,0
             Height = 2,
             Text = "A text with some long width\n and also with two lines."
         };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (label, view);
         RunState runState = Application.Begin (top);
 
@@ -326,7 +329,7 @@ At 0,0
             Height = 2,
             Text = "A text with some long width\n and also with two lines."
         };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (label, view);
         RunState runState = Application.Begin (top);
 
@@ -371,7 +374,7 @@ At 0,0
             Height = 2,
             Text = "A text with some long width\n and also with two lines."
         };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (label, view);
         RunState runState = Application.Begin (top);
 
@@ -435,8 +438,9 @@ At 0,0
         var tv = new TextView { Y = 11, Width = 10, Height = 10 };
         tv.DrawContentComplete += (s, e) => tvCalled = true;
 
-        Application.Top.Add (view, tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+       top.Add (view, tv);
+        Application.Begin (top);
 
         Assert.True (viewCalled);
         Assert.True (tvCalled);
@@ -467,7 +471,7 @@ At 0,0
         frame.Width = 40;
         frame.Height = 8;
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
 
         top.Add (frame);
 
@@ -539,7 +543,7 @@ At 0,0
             Height = 2,
             Text = "A text with some long width\n and also with two lines."
         };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (label, view);
         RunState runState = Application.Begin (top);
 
@@ -584,7 +588,7 @@ At 0,0
             Height = 2,
             Text = "A text with some long width\n and also with two lines."
         };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (label, view);
         RunState runState = Application.Begin (top);
 
@@ -633,7 +637,7 @@ At 0,0
             Height = 2,
             Text = "A text with some long width\n and also with two lines."
         };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (label, view);
         RunState runState = Application.Begin (top);
 
@@ -680,7 +684,7 @@ At 0,0
             Height = 2,
             Text = "A text with some long width\n and also with two lines."
         };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (label, view);
         RunState runState = Application.Begin (top);
 
@@ -999,7 +1003,7 @@ At 0,0
         Assert.Equal (0, view.Height);
         var win = new Window ();
         win.Add (view);
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (win);
         RunState rs = Application.Begin (top);
 
@@ -1044,7 +1048,7 @@ At 0,0
         var button = new Button { Text = "Click Me" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (button);
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (win);
 
         var iterations = 0;
@@ -1087,7 +1091,7 @@ At 0,0
                                      Application.RequestStop ();
                                  };
 
-        Application.Run ();
+        Application.Run (top);
 
         Assert.Equal (1, iterations);
 

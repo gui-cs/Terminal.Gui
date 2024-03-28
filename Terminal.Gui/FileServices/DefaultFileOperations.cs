@@ -162,6 +162,7 @@ public class DefaultFileOperations : IFileOperations
         dlg.AddButton (btnCancel);
 
         Application.Run (dlg);
+        dlg.Dispose ();
 
         result = tf.Text;
 

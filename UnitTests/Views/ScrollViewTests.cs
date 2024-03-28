@@ -31,8 +31,9 @@ public class ScrollViewTests
         sv.ShowHorizontalScrollIndicator = true;
         sv.ShowVerticalScrollIndicator = true;
 
-        Application.Top.Add (sv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (sv);
+        Application.Begin (top);
 
         Assert.Equal (new Rectangle (0, 0, 10, 10), sv.ContentArea);
 
@@ -138,8 +139,9 @@ public class ScrollViewTests
     {
         var sv = new ScrollView { Width = 10, Height = 10 };
 
-        Application.Top.Add (sv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (sv);
+        Application.Begin (top);
 
         Assert.True (sv.AutoHideScrollBars);
         Assert.False (sv.ShowHorizontalScrollIndicator);
@@ -188,8 +190,9 @@ public class ScrollViewTests
             KeepContentAlwaysInViewPort = false
         };
         var bottomLabel = new Label { X = 15, Y = 15, Text = "At 15,15" };
-        Application.Top.Add (topLabel, sv, bottomLabel);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (topLabel, sv, bottomLabel);
+        Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -447,8 +450,9 @@ public class ScrollViewTests
             Width = 10, Height = 10, ContentSize = new (50, 50), ContentOffset = new (25, 25)
         };
 
-        Application.Top.Add (sv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (sv);
+        Application.Begin (top);
 
         Assert.Equal(new(-25,-25),sv.ContentOffset);
         Assert.Equal(new(50,50),sv.ContentSize);
@@ -479,8 +483,9 @@ public class ScrollViewTests
     {
         var sv = new ScrollView { Width = 10, Height = 10, ContentSize = new (50, 50) };
 
-        Application.Top.Add (sv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (sv);
+        Application.Begin (top);
 
         Assert.Equal (50, sv.ContentSize.Width);
         Assert.Equal (50, sv.ContentSize.Height);
@@ -545,8 +550,9 @@ public class ScrollViewTests
         scrollView.Add (view);
         var win = new Window { X = 1, Y = 1, Width = 20, Height = 14 };
         win.Add (scrollView);
-        Application.Top.Add (win);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (win);
+        Application.Begin (top);
 
         var expected = @"
  ┌──────────────────┐
@@ -570,7 +576,7 @@ public class ScrollViewTests
         Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (Key.CursorRight));
-        Application.Top.Draw ();
+        top.Draw ();
 
         expected = @"
  ┌──────────────────┐
@@ -594,7 +600,7 @@ public class ScrollViewTests
         Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (Key.CursorRight));
-        Application.Top.Draw ();
+        top.Draw ();
 
         expected = @"
  ┌──────────────────┐
@@ -618,7 +624,7 @@ public class ScrollViewTests
         Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (Key.CursorRight));
-        Application.Top.Draw ();
+        top.Draw ();
 
         expected = @"
  ┌──────────────────┐
@@ -642,7 +648,7 @@ public class ScrollViewTests
         Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (Key.CursorRight));
-        Application.Top.Draw ();
+        top.Draw ();
 
         expected = @"
  ┌──────────────────┐
@@ -666,7 +672,7 @@ public class ScrollViewTests
         Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (Key.CursorRight));
-        Application.Top.Draw ();
+        top.Draw ();
 
         expected = @"
  ┌──────────────────┐
@@ -690,7 +696,7 @@ public class ScrollViewTests
         Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (Key.CursorRight));
-        Application.Top.Draw ();
+        top.Draw ();
 
         expected = @"
  ┌──────────────────┐
@@ -714,7 +720,7 @@ public class ScrollViewTests
         Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (Key.CursorRight));
-        Application.Top.Draw ();
+        top.Draw ();
 
         expected = @"
  ┌──────────────────┐
@@ -737,7 +743,7 @@ public class ScrollViewTests
         Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (Key.End.WithCtrl));
-        Application.Top.Draw ();
+        top.Draw ();
 
         expected = @"
  ┌──────────────────┐
@@ -761,7 +767,7 @@ public class ScrollViewTests
 
         Assert.True (scrollView.OnKeyDown (Key.Home.WithCtrl));
         Assert.True (scrollView.OnKeyDown (Key.CursorDown));
-        Application.Top.Draw ();
+        top.Draw ();
 
         expected = @"
  ┌──────────────────┐
@@ -784,7 +790,7 @@ public class ScrollViewTests
         Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (Key.CursorDown));
-        Application.Top.Draw ();
+        top.Draw ();
 
         expected = @"
  ┌──────────────────┐
@@ -807,7 +813,7 @@ public class ScrollViewTests
         Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (Key.CursorDown));
-        Application.Top.Draw ();
+        top.Draw ();
 
         expected = @"
  ┌──────────────────┐
@@ -830,7 +836,7 @@ public class ScrollViewTests
         Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
 
         Assert.True (scrollView.OnKeyDown (Key.End));
-        Application.Top.Draw ();
+        top.Draw ();
 
         expected = @"
  ┌──────────────────┐
@@ -872,8 +878,9 @@ public class ScrollViewTests
             sv.Add (new CustomButton ("█", $"Button {i}", 20, 3) { Y = i * 3 });
         }
 
-        Application.Top.Add (sv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (sv);
+        Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1068,8 +1075,9 @@ public class ScrollViewTests
                 new View { Y = 51, Width = Dim.Fill (), Height = Dim.Fill (), Id = "View2" }
                );
 
-        Application.Top.Add (sv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (sv);
+        Application.Begin (top);
 
         Assert.Equal (4, sv.Subviews.Count);
         Assert.Equal (2, sv.Subviews [0].Subviews.Count);

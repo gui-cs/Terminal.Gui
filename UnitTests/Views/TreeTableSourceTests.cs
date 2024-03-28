@@ -150,11 +150,14 @@ public class TreeTableSourceTests : IDisposable
     [AutoInitShutdown]
     public void TestTreeTableSource_CombinedWithCheckboxes ()
     {
+        Toplevel top = new ();
         TableView tv = GetTreeTable (out TreeView<IDescribedThing> treeSource);
 
         CheckBoxTableSourceWrapperByIndex checkSource;
         tv.Table = checkSource = new CheckBoxTableSourceWrapperByIndex (tv, tv.Table);
         tv.Style.GetOrCreateColumnStyle (2).MinAcceptableWidth = 1;
+        top.Add (tv);
+        Application.Begin (top);
 
         tv.Draw ();
 
@@ -181,7 +184,7 @@ public class TreeTableSourceTests : IDisposable
         Assert.Equal (0, tv.SelectedRow);
         Assert.Equal (1, tv.SelectedColumn);
 
-        Application.Top.NewKeyDownEvent (Key.CursorRight);
+        top.NewKeyDownEvent (Key.CursorRight);
 
         tv.Draw ();
 
@@ -280,9 +283,10 @@ public class TreeTableSourceTests : IDisposable
         tableView.EndInit ();
         tableView.LayoutSubviews ();
 
-        Application.Top.Add (tableView);
-        Application.Top.EnsureFocus ();
-        Assert.Equal (tableView, Application.Top.MostFocused);
+        var top = new Toplevel ();
+        top.Add (tableView);
+        top.EnsureFocus ();
+        Assert.Equal (tableView, top.MostFocused);
 
         return tableView;
     }

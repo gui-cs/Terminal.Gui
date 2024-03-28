@@ -101,7 +101,7 @@ public class CsvEditor : Scenario
                                 )
             ]
         };
-        Application.Top.Add (menu);
+        Top.Add (menu);
 
         var statusBar = new StatusBar (
                                        new StatusItem []
@@ -123,7 +123,7 @@ public class CsvEditor : Scenario
                                                )
                                        }
                                       );
-        Application.Top.Add (statusBar);
+        Top.Add (statusBar);
 
         Win.Add (_tableView);
 
@@ -316,6 +316,7 @@ public class CsvEditor : Scenario
         tf.SetFocus ();
 
         Application.Run (d);
+        d.Dispose ();
 
         enteredText = okPressed ? tf.Text : null;
 
@@ -455,6 +456,7 @@ public class CsvEditor : Scenario
         {
             Open (ofd.Path);
         }
+        ofd.Dispose ();
     }
 
     private void Open (string filename)

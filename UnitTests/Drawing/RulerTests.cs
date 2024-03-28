@@ -48,8 +48,9 @@ public class RulerTests
 
         // Add a frame so we can see the ruler
         var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
-        Application.Top.Add (f);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (f);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (len + 5, 5);
         Assert.Equal (new Rectangle (0, 0, len + 5, 5), f.Frame);
 
@@ -120,8 +121,9 @@ public class RulerTests
 
         // Add a frame so we can see the ruler
         var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
-        Application.Top.Add (f);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (f);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (len + 5, 5);
         Assert.Equal (new Rectangle (0, 0, len + 5, 5), f.Frame);
 
@@ -165,8 +167,9 @@ public class RulerTests
         // Add a frame so we can see the ruler
         var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
-        Application.Top.Add (f);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (f);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (5, len + 5);
         Assert.Equal (new Rectangle (0, 0, 5, len + 5), f.Frame);
 
@@ -297,8 +300,9 @@ public class RulerTests
         // Add a frame so we can see the ruler
         var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
-        Application.Top.Add (f);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (f);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (5, len + 5);
         Assert.Equal (new Rectangle (0, 0, 5, len + 5), f.Frame);
 

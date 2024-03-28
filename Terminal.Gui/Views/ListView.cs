@@ -467,7 +467,7 @@ public class ListView : View
     /// <returns></returns>
     public virtual bool MoveDown ()
     {
-        if (_source.Count == 0)
+        if (_source is null || _source.Count == 0)
         {
             // Do we set lastSelectedItem to -1 here?
             return false; //Nothing for us to move to
@@ -517,7 +517,7 @@ public class ListView : View
     /// <returns></returns>
     public virtual bool MoveEnd ()
     {
-        if (_source.Count > 0 && _selected != _source.Count - 1)
+        if (_source is { Count: > 0 } && _selected != _source.Count - 1)
         {
             _selected = _source.Count - 1;
 
@@ -555,6 +555,11 @@ public class ListView : View
     /// <returns></returns>
     public virtual bool MovePageDown ()
     {
+        if (_source is null)
+        {
+            return true;
+        }
+
         int n = _selected + ContentArea.Height;
 
         if (n >= _source.Count)
@@ -608,7 +613,7 @@ public class ListView : View
     /// <returns></returns>
     public virtual bool MoveUp ()
     {
-        if (_source.Count == 0)
+        if (_source is null || _source.Count == 0)
         {
             // Do we set lastSelectedItem to -1 here?
             return false; //Nothing for us to move to
@@ -735,7 +740,7 @@ public class ListView : View
     /// <returns><see langword="true"/> if the <see cref="OpenSelectedItem"/> event was fired.</returns>
     public bool OnOpenSelectedItem ()
     {
-        if (_source.Count <= _selected || _selected < 0 || OpenSelectedItem is null)
+        if (_source is null || _source.Count <= _selected || _selected < 0 || OpenSelectedItem is null)
         {
             return false;
         }

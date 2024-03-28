@@ -11,12 +11,13 @@ public class CombiningMarks : Scenario
         Application.Init ();
         ConfigurationManager.Themes.Theme = Theme;
         ConfigurationManager.Apply ();
-        Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
+        Top = new ();
+        Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
     }
 
     public override void Setup ()
     {
-        Application.Top.DrawContentComplete += (s, e) =>
+        Top.DrawContentComplete += (s, e) =>
                                                {
                                                    Application.Driver.Move (0, 0);
                                                    Application.Driver.AddStr ("Terminal.Gui only supports combining marks that normalize. See Issue #2616.");

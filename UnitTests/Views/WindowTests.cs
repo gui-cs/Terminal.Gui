@@ -20,8 +20,9 @@ public class WindowTests
         };
         var win = new Window ();
         win.Add (menu);
-        Application.Top.Add (win);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (win);
+        Application.Begin (top);
 
         Exception exception = Record.Exception (() => win.NewKeyDownEvent (KeyCode.AltMask));
         Assert.Null (exception);
@@ -55,7 +56,7 @@ public class WindowTests
         var fv = new FrameView { Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1), Title = "Frame View" };
         var win = new Window ();
         win.Add (menu, sb, fv);
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (win);
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (20, 10);

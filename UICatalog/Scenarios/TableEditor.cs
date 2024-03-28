@@ -670,7 +670,7 @@ public class TableEditor : Scenario
             ]
         };
 
-        Application.Top.Add (menu);
+        Top.Add (menu);
 
         var statusBar = new StatusBar (
                                        new StatusItem []
@@ -697,7 +697,7 @@ public class TableEditor : Scenario
                                                )
                                        }
                                       );
-        Application.Top.Add (statusBar);
+        Top.Add (statusBar);
 
         Win.Add (_tableView);
 
@@ -887,6 +887,7 @@ public class TableEditor : Scenario
         tf.SetFocus ();
 
         Application.Run (d);
+        d.Dispose ();
 
         if (okPressed)
         {
@@ -1086,6 +1087,7 @@ public class TableEditor : Scenario
         tf.SetFocus ();
 
         Application.Run (d);
+        d.Dispose ();
 
         if (accepted)
         {

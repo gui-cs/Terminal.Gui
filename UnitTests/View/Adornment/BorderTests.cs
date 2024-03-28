@@ -711,12 +711,13 @@ public class BorderTests
     [AutoInitShutdown]
     public void HasSuperView ()
     {
-        Application.Top.BorderStyle = LineStyle.Double;
+        var top = new Toplevel ();
+        top.BorderStyle = LineStyle.Double;
 
         var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
-        Application.Top.Add (frame);
-        RunState rs = Application.Begin (Application.Top);
+        top.Add (frame);
+        RunState rs = Application.Begin (top);
         var firstIteration = false;
 
         ((FakeDriver)Application.Driver).SetBufferSize (5, 5);
@@ -737,12 +738,13 @@ public class BorderTests
     [AutoInitShutdown]
     public void HasSuperView_Title ()
     {
-        Application.Top.BorderStyle = LineStyle.Double;
+        var top = new Toplevel ();
+        top.BorderStyle = LineStyle.Double;
 
         var frame = new FrameView { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill () };
 
-        Application.Top.Add (frame);
-        RunState rs = Application.Begin (Application.Top);
+        top.Add (frame);
+        RunState rs = Application.Begin (top);
         var firstIteration = false;
 
         ((FakeDriver)Application.Driver).SetBufferSize (10, 4);

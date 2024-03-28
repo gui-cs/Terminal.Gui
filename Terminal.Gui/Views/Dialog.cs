@@ -9,7 +9,7 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 ///     To run the <see cref="Dialog"/> modally, create the <see cref="Dialog"/>, and pass it to
-///     <see cref="Application.Run(Func{Exception, bool})"/>. This will execute the dialog until it terminates via the
+///     <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>. This will execute the dialog until it terminates via the
 ///     [ESC] or [CTRL-Q] key, or when one of the views or buttons added to the dialog calls
 ///     <see cref="Application.RequestStop"/>.
 /// </remarks>
@@ -68,7 +68,43 @@ public class Dialog : Window
         Modal = true;
         ButtonAlignment = DefaultButtonAlignment;
 
+        AddCommand (Command.QuitToplevel, () =>
+                                          {
+                                              Canceled = true;
+                                              RequestStop ();
+                                              return true;
+                                          });
         KeyBindings.Add (Key.Esc, Command.QuitToplevel);
+    }
+
+
+    private bool _canceled;
+
+    /// <summary>Gets a value indicating whether the <see cref="Dialog"/> was canceled.</summary>
+    /// <remarks>The default value is <see langword="true"/>.</remarks>
+    public bool Canceled
+    {
+        get
+        {
+#if DEBUG_IDISPOSABLE
+            if (WasDisposed)
+            {
+                throw new ObjectDisposedException (GetType ().FullName);
+            }
+#endif
+            return _canceled;
+        }
+        set
+        {
+#if DEBUG_IDISPOSABLE
+            if (WasDisposed)
+            {
+                throw new ObjectDisposedException (GetType ().FullName);
+            }
+#endif
+            _canceled = value;
+            return;
+        }
     }
 
     /// <summary>Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the bottom of the dialog.</summary>

@@ -17,22 +17,31 @@ public class Animation : Scenario
 {
     private bool _isDisposed;
 
-    public override void Setup ()
+    public override void Main ()
     {
-        base.Setup ();
+        Application.Init();
+
+        var win = new Window
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+        };
 
         var imageView = new ImageView { Width = Dim.Fill (), Height = Dim.Fill () - 2 };
 
-        Win.Add (imageView);
+        win.Add (imageView);
 
         var lbl = new Label { Y = Pos.AnchorEnd (2), Text = "Image by Wikiscient" };
-        Win.Add (lbl);
+        win.Add (lbl);
 
         var lbl2 = new Label
         {
             Y = Pos.AnchorEnd (1), Text = "https://commons.wikimedia.org/wiki/File:Spinning_globe.gif"
         };
-        Win.Add (lbl2);
+        win.Add (lbl2);
 
         DirectoryInfo dir;
 
@@ -78,6 +87,10 @@ public class Animation : Scenario
                       }
                   }
                  );
+
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 
     protected override void Dispose (bool disposing)

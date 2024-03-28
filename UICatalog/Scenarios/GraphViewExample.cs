@@ -133,7 +133,7 @@ public class GraphViewExample : Scenario
                                 )
             ]
         };
-        Application.Top.Add (menu);
+        Top.Add (menu);
 
         _graphView = new GraphView
         {
@@ -179,7 +179,7 @@ public class GraphViewExample : Scenario
                                                )
                                        }
                                       );
-        Application.Top.Add (statusBar);
+        Top.Add (statusBar);
     }
 
     private void EnableDiagnostics ()

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Threading;
 using Terminal.Gui;
 
@@ -13,13 +14,25 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 public class BackgroundWorkerCollection : Scenario
 {
-    public override void Run () { Application.Run<OverlappedMain> (); }
+    public override void Main ()
+    {
+        Application.Run<OverlappedMain> ().Dispose ();
+
+#if DEBUG_IDISPOSABLE
+        if (Application.OverlappedChildren is { })
+        {
+            Debug.Assert (Application.OverlappedChildren?.Count == 0);
+            Debug.Assert (Application.Top == Application.OverlappedTop);
+        }
+#endif
+
+        Application.Shutdown ();
+    }
 
     private class OverlappedMain : Toplevel
     {
         private readonly MenuBar _menu;
-        private readonly WorkerApp _workerApp;
-        private bool _canOpenWorkerApp;
+        private WorkerApp _workerApp;
 
         public OverlappedMain ()
         {
@@ -28,6 +41,8 @@ public class BackgroundWorkerCollection : Scenario
             IsOverlappedContainer = true;
 
             _workerApp = new WorkerApp { Visible = false };
+            _workerApp.Border.Thickness = new (0, 1, 0, 0);
+            _workerApp.Border.LineStyle = LineStyle.Dashed;
 
             _menu = new MenuBar
             {
@@ -90,29 +105,21 @@ public class BackgroundWorkerCollection : Scenario
                                           );
             Add (statusBar);
 
+            Ready += OverlappedMain_Ready;
             Activate += OverlappedMain_Activate;
             Deactivate += OverlappedMain_Deactivate;
+        }
 
-            Closed += OverlappedMain_Closed;
-
-            Application.Iteration += (s, a) =>
-                                     {
-                                         if (_canOpenWorkerApp && !_workerApp.Running && Application.OverlappedTop.Running)
-                                         {
-                                             Application.Run (_workerApp);
-                                         }
-                                     };
+        private void OverlappedMain_Ready (object sender, EventArgs e)
+        {
+            if (_workerApp?.Running == false)
+            {
+                Application.Run (_workerApp);
+            }
         }
 
         private void Menu_MenuOpening (object sender, MenuOpeningEventArgs menu)
         {
-            if (!_canOpenWorkerApp)
-            {
-                _canOpenWorkerApp = true;
-
-                return;
-            }
-
             if (menu.CurrentMenu.Title == "_Window")
             {
                 menu.NewMenuBarItem = OpenedWindows ();
@@ -165,15 +172,16 @@ public class BackgroundWorkerCollection : Scenario
             return new MenuBarItem ("_Window", new List<MenuItem []> { menuItems.ToArray () });
         }
 
-        private void OverlappedMain_Activate (object sender, ToplevelEventArgs top) { _workerApp.WriteLog ($"{top.Toplevel.Data} activate."); }
-
-        private void OverlappedMain_Closed (object sender, ToplevelEventArgs e)
+        private void OverlappedMain_Activate (object sender, ToplevelEventArgs top)
         {
-            _workerApp.Dispose ();
-            Dispose ();
+            _workerApp?.WriteLog ($"{(top.Toplevel is null ? ((Toplevel)sender).Data : top.Toplevel.Data)} activate.");
         }
 
-        private void OverlappedMain_Deactivate (object sender, ToplevelEventArgs top) { _workerApp.WriteLog ($"{top.Toplevel.Data} deactivate."); }
+        private void OverlappedMain_Deactivate (object sender, ToplevelEventArgs top)
+        {
+            _workerApp?.WriteLog ($"{top.Toplevel.Data} deactivate.");
+        }
+
         private void Quit () { RequestStop (); }
 
         private MenuBarItem View ()
@@ -208,6 +216,15 @@ public class BackgroundWorkerCollection : Scenario
                                     new List<MenuItem []> { menuItems.Count == 0 ? new MenuItem [] { } : menuItems.ToArray () }
                                    );
         }
+
+        /// <inheritdoc />
+        protected override void Dispose (bool disposing)
+        {
+            _workerApp?.Dispose ();
+            _workerApp = null;
+
+            base.Dispose (disposing);
+        }
     }
 
     private class Staging
@@ -233,6 +250,7 @@ public class BackgroundWorkerCollection : Scenario
         {
             Staging = staging;
             _label.Text = "Work list:";
+            _listView.Enabled = true;
             _listView.SetSource (list);
             _start.Visible = false;
             Id = "";
@@ -258,7 +276,7 @@ public class BackgroundWorkerCollection : Scenario
             };
             Add (_label);
 
-            _listView = new ListView { X = 0, Y = 2, Width = Dim.Fill (), Height = Dim.Fill (2) };
+            _listView = new ListView { X = 0, Y = 2, Width = Dim.Fill (), Height = Dim.Fill (2), Enabled = false };
             Add (_listView);
 
             _start = new Button { Text = "Start", IsDefault = true, ClearOnVisibleFalse = false };
@@ -276,7 +294,7 @@ public class BackgroundWorkerCollection : Scenario
 
             KeyDown += (s, e) =>
                        {
-                           if (e.KeyCode == KeyCode.Esc)
+                           if (e == Application.QuitKey)
                            {
                                OnReportClosed (this, EventArgs.Empty);
                            }
@@ -299,7 +317,6 @@ public class BackgroundWorkerCollection : Scenario
 
         public Staging Staging { get; private set; }
         public event Action<StagingUIController> ReportClosed;
-        public void Run () { Application.Run (this); }
 
         private void OnReportClosed (object sender, EventArgs e)
         {
@@ -322,24 +339,45 @@ public class BackgroundWorkerCollection : Scenario
         public WorkerApp ()
         {
             Data = "WorkerApp";
+            Title = "Worker collection Log";
 
             Width = Dim.Percent (80);
             Height = Dim.Percent (50);
 
             ColorScheme = Colors.ColorSchemes ["Base"];
 
-            var label = new Label { X = Pos.Center (), Y = 0, Text = "Worker collection Log" };
-            Add (label);
-
             _listLog = new ListView
             {
                 X = 0,
-                Y = Pos.Bottom (label),
+                Y = 0,
                 Width = Dim.Fill (),
                 Height = Dim.Fill (),
                 Source = new ListWrapper (_log)
             };
             Add (_listLog);
+
+            // We don't want WorkerApp to respond to the quitkey
+            KeyBindings.Remove (Application.QuitKey);
+
+            Closing += WorkerApp_Closing;
+            Closed += WorkerApp_Closed;
+        }
+
+        private void WorkerApp_Closed (object sender, ToplevelEventArgs e)
+        {
+            CancelWorker ();
+        }
+        private void WorkerApp_Closing (object sender, ToplevelClosingEventArgs e)
+        {
+            Toplevel top = Application.OverlappedChildren.Find (x => x.Data.ToString () == "WorkerApp");
+
+            if (Visible && top == this)
+            {
+                Visible = false;
+                e.Cancel = true;
+
+                Application.OverlappedMoveNext ();
+            }
         }
 
         public void CancelWorker ()
@@ -403,15 +441,7 @@ public class BackgroundWorkerCollection : Scenario
                                              {
                                                  // Failed
                                                  WriteLog (
-                                                           $"Exception occurred {
-                                                               e.Error.Message
-                                                           } on Worker {
-                                                               staging.StartStaging
-                                                           }.{
-                                                               staging.StartStaging
-                                                               :fff} at {
-                                                               DateTime.Now
-                                                           }"
+                                                           $"Exception occurred {e.Error.Message} on Worker {staging.StartStaging}.{staging.StartStaging:fff} at {DateTime.Now}"
                                                           );
                                              }
                                              else if (e.Cancelled)
@@ -446,8 +476,14 @@ public class BackgroundWorkerCollection : Scenario
 
                                                  _stagingsUi.Add (stagingUI);
                                                  _stagingWorkers.Remove (staging);
-
-                                                 stagingUI.Run ();
+#if DEBUG_IDISPOSABLE
+                                                 if (Application.OverlappedTop is null)
+                                                 {
+                                                     stagingUI.Dispose ();
+                                                     return;
+                                                 }
+#endif
+                                                 Application.Run (stagingUI);
                                              }
                                          };
 
@@ -456,6 +492,7 @@ public class BackgroundWorkerCollection : Scenario
             if (stagingUI.Staging != null && stagingUI.Staging.StartStaging != null)
             {
                 staging = new Staging (stagingUI.Staging.StartStaging);
+                stagingUI.Dispose ();
                 WriteLog ($"Worker is started at {staging.StartStaging}.{staging.StartStaging:fff}");
 
                 if (_stagingWorkers == null)
@@ -465,6 +502,9 @@ public class BackgroundWorkerCollection : Scenario
 
                 _stagingWorkers.Add (staging, worker);
                 worker.RunWorkerAsync ();
+            }
+            else
+            {
                 stagingUI.Dispose ();
             }
         }
@@ -479,6 +519,7 @@ public class BackgroundWorkerCollection : Scenario
         {
             WriteLog ($"Report {obj.Staging.StartStaging}.{obj.Staging.StartStaging:fff} closed.");
             _stagingsUi.Remove (obj);
+            obj.Dispose ();
         }
     }
 }

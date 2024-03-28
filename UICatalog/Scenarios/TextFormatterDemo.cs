@@ -57,7 +57,7 @@ public class TextFormatterDemo : Scenario
             X = 0,
             Y = Pos.Bottom (blockText) + 1,
             Text = "Unicode",
-            Checked = Application.Top.HotKeySpecifier == (Rune)' '
+            Checked = Top.HotKeySpecifier == (Rune)' '
         };
 
         Win.Add (unicodeCheckBox);

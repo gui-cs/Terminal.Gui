@@ -52,7 +52,8 @@ public class WizardAsView : Scenario
                                 )
             ]
         };
-        Application.Top.Add (menu);
+        Top = new ();
+        Top.Add (menu);
 
         // No need for a Title because the border is disabled
         var wizard = new Wizard { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
@@ -138,8 +139,8 @@ public class WizardAsView : Scenario
         lastStep.HelpText =
             "The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing Esc will cancel.";
 
-        Application.Top.Add (wizard);
-        Application.Run (Application.Top);
+        Top.Add (wizard);
+        Application.Run (Top);
     }
 
     public override void Run ()

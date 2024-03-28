@@ -78,7 +78,7 @@ public class ContextMenus : Scenario
 
         Win.WantMousePositionReports = true;
 
-        Application.Top.Closed += (s, e) =>
+        Top.Closed += (s, e) =>
                                   {
                                       Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
                                       Application.MouseEvent -= ApplicationMouseEvent;

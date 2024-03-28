@@ -15,8 +15,9 @@ public class ViewKeyBindingTests
         var invoked = false;
         view.InvokingKeyBindings += (s, e) => invoked = true;
 
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
 
         Application.OnKeyDown (Key.A);
         Assert.True (invoked);
@@ -51,8 +52,9 @@ public class ViewKeyBindingTests
         var invoked = false;
         view.InvokingKeyBindings += (s, e) => invoked = true;
 
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
 
         Application.OnKeyDown (Key.Z);
         Assert.False (invoked);
@@ -77,8 +79,9 @@ public class ViewKeyBindingTests
         var invoked = false;
         view.InvokingKeyBindings += (s, e) => invoked = true;
 
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
 
         invoked = false;
         Application.OnKeyDown (Key.H);
@@ -105,8 +108,9 @@ public class ViewKeyBindingTests
         var invoked = false;
         view.InvokingKeyBindings += (s, e) => invoked = true;
 
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
 
         Application.OnKeyDown (Key.Z);
         Assert.False (invoked);

@@ -60,6 +60,9 @@ public class FileDialog : Dialog
     /// <remarks>This overload is mainly useful for testing.</remarks>
     internal FileDialog (IFileSystem fileSystem)
     {
+        // Assume canceled
+        Canceled = true;
+
         _fileSystem = fileSystem;
         Style = new FileDialogStyle (fileSystem);
 
@@ -83,7 +86,10 @@ public class FileDialog : Dialog
                                   NavigateIf (k, KeyCode.CursorUp, _tableView);
                                   NavigateIf (k, KeyCode.CursorRight, _btnOk);
                               };
-        _btnCancel.Accept += (s, e) => { Application.RequestStop (); };
+        _btnCancel.Accept += (s, e) => {
+                                 Canceled = true;
+                                 Application.RequestStop ();
+                             };
 
         _btnUp = new Button { X = 0, Y = 1, NoPadding = true };
         _btnUp.Text = GetUpButtonText ();
@@ -314,9 +320,6 @@ public class FileDialog : Dialog
         set => _tableView.MultiSelect = value;
     }
 
-    /// <summary>Gets a value indicating whether the <see cref="FileDialog"/> was closed without confirming a selection.</summary>
-    public bool Canceled { get; private set; } = true;
-
     /// <summary>The UI selected <see cref="IAllowedType"/> from combo box. May be null.</summary>
     public IAllowedType CurrentFilter { get; private set; }
 
@@ -336,7 +339,7 @@ public class FileDialog : Dialog
 
     /// <summary>
     ///     Gets all files/directories selected or an empty collection <see cref="AllowsMultipleSelection"/> is
-    ///     <see langword="false"/> or <see cref="Canceled"/>.
+    ///     <see langword="false"/> or <see cref="CancelSearch"/>.
     /// </summary>
     /// <remarks>If selecting only a single file/directory then you should use <see cref="Path"/> instead.</remarks>
     public IReadOnlyList<string> MultiSelected { get; private set; }
@@ -356,7 +359,7 @@ public class FileDialog : Dialog
 
     /// <summary>
     ///     Gets or Sets the selected path in the dialog. This is the result that should be used if
-    ///     <see cref="AllowsMultipleSelection"/> is off and <see cref="Canceled"/> is true.
+    ///     <see cref="AllowsMultipleSelection"/> is off and <see cref="CancelSearch"/> is true.
     /// </summary>
     public string Path
     {

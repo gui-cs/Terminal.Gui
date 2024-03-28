@@ -137,8 +137,9 @@ public class TabViewTests
 
         tv.TabClicked += (s, e) => { clicked = e.Tab; };
 
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         MouseEventEventArgs args;
 
@@ -239,8 +240,9 @@ public class TabViewTests
                                      newChanged = e.NewTab;
                                  };
 
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         // Click the right arrow
         var args = new MouseEventEventArgs (
@@ -332,8 +334,9 @@ public class TabViewTests
                                      newChanged = e.NewTab;
                                  };
 
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         // Click the right arrow
         var args = new MouseEventEventArgs (
@@ -402,7 +405,7 @@ public class TabViewTests
             Text = "Ok"
         };
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv, btn);
         Application.Begin (top);
 

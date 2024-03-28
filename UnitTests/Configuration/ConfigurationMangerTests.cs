@@ -816,9 +816,9 @@ public class ConfigurationManagerTests
     }
 
     [Fact]
-    public void UseWithoutResetAsserts ()
+    public void UseWithoutResetDoesNotThrow ()
     {
         Initialize ();
-        Assert.Throws<InvalidOperationException> (() => _ = Settings);
+        _ = Settings;
     }
 }

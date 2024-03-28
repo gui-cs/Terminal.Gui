@@ -100,8 +100,9 @@ public class SpinnerViewTests
     {
         var view = new SpinnerView ();
 
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
 
         Assert.Equal (1, view.Width);
         Assert.Equal (1, view.Height);

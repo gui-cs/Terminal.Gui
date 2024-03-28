@@ -9,7 +9,8 @@ public class Clipping : Scenario
     public override void Init ()
     {
         Application.Init ();
-        Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
+        Top = new ();
+        Top.ColorScheme = Colors.ColorSchemes ["Base"];
     }
 
     public override void Setup ()
@@ -22,7 +23,7 @@ public class Clipping : Scenario
         {
             X = 0, Y = 0, Text = "ScrollView (new Rectangle (3, 3, 50, 20)) with a 200, 100 ContentSize..."
         };
-        Application.Top.Add (label);
+        Top.Add (label);
 
         var scrollView = new ScrollView { X = 3, Y = 3, Width = 50, Height = 20 };
         scrollView.ColorScheme = Colors.ColorSchemes ["Menu"];
@@ -79,6 +80,6 @@ public class Clipping : Scenario
 
         scrollView.Add (embedded1);
 
-        Application.Top.Add (scrollView);
+        Top.Add (scrollView);
     }
 }

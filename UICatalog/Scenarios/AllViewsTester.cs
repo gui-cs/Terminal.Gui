@@ -46,11 +46,9 @@ public class AllViewsTester : Scenario
         Application.Init ();
         ConfigurationManager.Themes.Theme = Theme;
         ConfigurationManager.Apply ();
-        Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
-    }
+        Top = new ();
+        Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
 
-    public override void Setup ()
-    {
         var statusBar = new StatusBar (
                                        new StatusItem []
                                        {
@@ -66,7 +64,7 @@ public class AllViewsTester : Scenario
                                                 {
                                                     View.Diagnostics ^=
                                                         ViewDiagnosticFlags.Ruler;
-                                                    Application.Top.SetNeedsDisplay ();
+                                                    Top.SetNeedsDisplay ();
                                                 }
                                                ),
                                            new (
@@ -76,12 +74,12 @@ public class AllViewsTester : Scenario
                                                 {
                                                     View.Diagnostics ^=
                                                         ViewDiagnosticFlags.Padding;
-                                                    Application.Top.SetNeedsDisplay ();
+                                                    Top.SetNeedsDisplay ();
                                                 }
                                                )
                                        }
                                       );
-        Application.Top.Add (statusBar);
+        Top.Add (statusBar);
 
         _viewClasses = GetAllViewClassesCollection ()
                        .OrderBy (t => t.Name)
@@ -286,7 +284,7 @@ public class AllViewsTester : Scenario
             ColorScheme = Colors.ColorSchemes ["Dialog"]
         };
 
-        Application.Top.Add (_leftPane, _settingsPane, _hostPane);
+        Top.Add (_leftPane, _settingsPane, _hostPane);
 
         _curView = CreateClass (_viewClasses.First ().Value);
     }

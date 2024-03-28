@@ -50,8 +50,9 @@ public class ASCIICustomButtonTest : Scenario
                                 )
             ]
         };
-        Application.Top.Add (menu, _scrollViewTestWindow);
-        Application.Run ();
+        Top = new ();
+        Top.Add (menu, _scrollViewTestWindow);
+        Application.Run (Top);
     }
 
     public override void Run () { }
@@ -60,9 +61,9 @@ public class ASCIICustomButtonTest : Scenario
     {
         _smallerWindow = (bool)(_miSmallerWindow.Checked = !_miSmallerWindow.Checked);
         _scrollViewTestWindow.Dispose ();
-        Application.Top.Remove (_scrollViewTestWindow);
+        Top.Remove (_scrollViewTestWindow);
         _scrollViewTestWindow = new ScrollViewTestWindow ();
-        Application.Top.Add (_scrollViewTestWindow);
+        Top.Add (_scrollViewTestWindow);
     }
 
     public class ASCIICustomButton : Button

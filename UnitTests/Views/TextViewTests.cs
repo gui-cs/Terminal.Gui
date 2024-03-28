@@ -59,7 +59,8 @@ public class TextViewTests
     [TextViewTestsAutoInitShutdown]
     public void BackTab_Test_Follow_By_Tab ()
     {
-        Application.Top.Add (_textView);
+        var top = new Toplevel ();
+        top.Add (_textView);
 
         Application.Iteration += (s, a) =>
                                  {
@@ -103,14 +104,14 @@ public class TextViewTests
                                      Application.RequestStop ();
                                  };
 
-        Application.Run ();
+        Application.Run (top);
     }
 
     [Fact]
     [TextViewTestsAutoInitShutdown]
     public void CanFocus_False_Wont_Focus_With_Mouse ()
     {
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         var tv = new TextView { Width = Dim.Fill (), CanFocus = false, ReadOnly = true, Text = "some text" };
 
         var fv = new FrameView
@@ -249,8 +250,9 @@ public class TextViewTests
                                   Assert.Equal (expectedCol, e.Col);
                               };
 
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
         Assert.Equal (1, eventcount);
     }
 
@@ -336,8 +338,9 @@ public class TextViewTests
 
         Assert.Equal ("abc", tv.Text);
 
-        Application.Top.Add (tv);
-        RunState rs = Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        RunState rs = Application.Begin (top);
         Assert.Equal (1, eventcount); // for Initialize
 
         expectedCol = 0;
@@ -364,8 +367,9 @@ public class TextViewTests
                                   Assert.Equal (expectedCol, e.Col);
                               };
 
-        Application.Top.Add (tv);
-        RunState rs = Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        RunState rs = Application.Begin (top);
         Assert.Equal (1, eventcount); // for Initialize
 
         expectedCol = 0;
@@ -739,8 +743,9 @@ public class TextViewTests
         const string text = "This is the first line.\nThis is the second line.\n";
         var tv = new TextView { Width = Dim.Fill (), Height = Dim.Fill (), Text = text };
         string envText = tv.Text;
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         Assert.False (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.CursorPosition);
@@ -809,8 +814,9 @@ This is the second line.
         const string text = "This is the first line.\nThis is the second line.\n";
         var tv = new TextView { Width = Dim.Fill (), Height = Dim.Fill (), Text = text, WordWrap = true };
         string envText = tv.Text;
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         Assert.True (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.CursorPosition);
@@ -879,8 +885,9 @@ This is the second line.
         const string text = "This is the first line.\nThis is the second line.\n";
         var tv = new TextView { Width = Dim.Fill (), Height = Dim.Fill (), Text = text };
         string envText = tv.Text;
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         Assert.False (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.CursorPosition);
@@ -949,8 +956,9 @@ This is the second line.
         const string text = "This is the first line.\nThis is the second line.\n";
         var tv = new TextView { Width = Dim.Fill (), Height = Dim.Fill (), Text = text, WordWrap = true };
         string envText = tv.Text;
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         Assert.True (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.CursorPosition);
@@ -2233,7 +2241,7 @@ This is the second line.
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -2518,7 +2526,7 @@ This is the second line.
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -2683,7 +2691,7 @@ This is the second line.
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -3248,7 +3256,7 @@ This is the second line.
         var text =
             $"This is the first line.{Environment.NewLine}This is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -3428,7 +3436,7 @@ This is the second line.
     {
         var text = "One\nTwo\nThree";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -3491,7 +3499,7 @@ This is the second line.
     {
         var text = "One\nTwo\nThree\n";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -3553,7 +3561,7 @@ This is the second line.
     public void HistoryText_Undo_Redo_Multi_Line_Selected_With_Empty_Text ()
     {
         var tv = new TextView { Width = 10, Height = 2 };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -3908,7 +3916,7 @@ This is the second line.
     public void HistoryText_Undo_Redo_Multi_Line_With_Empty_Text ()
     {
         var tv = new TextView { Width = 10, Height = 2 };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -4380,7 +4388,7 @@ This is the second line.
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -4453,7 +4461,7 @@ This is the second line.
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -4526,7 +4534,7 @@ This is the second line.
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -4595,7 +4603,7 @@ This is the second line.
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -4680,7 +4688,7 @@ This is the second line.
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -4765,7 +4773,7 @@ This is the second line.
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -5391,7 +5399,7 @@ This is the second line.
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -7017,8 +7025,9 @@ This is the second line.
     public void Selected_Text_Shows ()
     {
         // Proves #3022 is fixed (TextField selected text does not show in v2)
-        Application.Top.Add (_textView);
-        RunState rs = Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (_textView);
+        RunState rs = Application.Begin (top);
 
         _textView.CursorPosition = Point.Empty;
         _textView.SelectionStartColumn = 0;
@@ -7127,7 +7136,8 @@ This is the second line.
     [TextViewTestsAutoInitShutdown]
     public void Tab_Test_Follow_By_BackTab ()
     {
-        Application.Top.Add (_textView);
+        var top = new Toplevel ();
+        top.Add (_textView);
 
         Application.Iteration += (s, a) =>
                                  {
@@ -7157,18 +7167,19 @@ This is the second line.
                                          Assert.Equal (leftCol, _textView.LeftColumn);
                                      }
 
-                                     Application.Top.Remove (_textView);
+                                     top.Remove (_textView);
                                      Application.RequestStop ();
                                  };
 
-        Application.Run ();
+        Application.Run (top);
     }
 
     [Fact]
     [TextViewTestsAutoInitShutdown]
     public void Tab_Test_Follow_By_BackTab_With_Text ()
     {
-        Application.Top.Add (_textView);
+        var top = new Toplevel ();
+        top.Add (_textView);
 
         Application.Iteration += (s, a) =>
                                  {
@@ -7198,18 +7209,19 @@ This is the second line.
                                          Assert.Equal (leftCol, _textView.LeftColumn);
                                      }
 
-                                     Application.Top.Remove (_textView);
+                                     top.Remove (_textView);
                                      Application.RequestStop ();
                                  };
 
-        Application.Run ();
+        Application.Run (top);
     }
 
     [Fact]
     [TextViewTestsAutoInitShutdown]
     public void Tab_Test_Follow_By_CursorLeft_And_Then_Follow_By_CursorRight ()
     {
-        Application.Top.Add (_textView);
+        var top = new Toplevel ();
+        top.Add (_textView);
 
         Application.Iteration += (s, a) =>
                                  {
@@ -7248,18 +7260,19 @@ This is the second line.
                                          Assert.Equal (leftCol, _textView.LeftColumn);
                                      }
 
-                                     Application.Top.Remove (_textView);
+                                     top.Remove (_textView);
                                      Application.RequestStop ();
                                  };
 
-        Application.Run ();
+        Application.Run (top);
     }
 
     [Fact]
     [TextViewTestsAutoInitShutdown]
     public void Tab_Test_Follow_By_CursorLeft_And_Then_Follow_By_CursorRight_With_Text ()
     {
-        Application.Top.Add (_textView);
+        var top = new Toplevel ();
+        top.Add (_textView);
 
         Application.Iteration += (s, a) =>
                                  {
@@ -7300,18 +7313,19 @@ This is the second line.
                                          Assert.Equal (leftCol, _textView.LeftColumn);
                                      }
 
-                                     Application.Top.Remove (_textView);
+                                     top.Remove (_textView);
                                      Application.RequestStop ();
                                  };
 
-        Application.Run ();
+        Application.Run (top);
     }
 
     [Fact]
     [TextViewTestsAutoInitShutdown]
     public void Tab_Test_Follow_By_Home_And_Then_Follow_By_End_And_Then_Follow_By_BackTab_With_Text ()
     {
-        Application.Top.Add (_textView);
+        var top = new Toplevel ();
+        top.Add (_textView);
 
         Application.Iteration += (s, a) =>
                                  {
@@ -7368,19 +7382,20 @@ This is the second line.
                                      Assert.Equal ("TAB to jump between text fields.", _textView.Text);
                                      Assert.Equal (32, _textView.Text.Length);
 
-                                     Application.Top.Remove (_textView);
+                                     top.Remove (_textView);
                                      Application.RequestStop ();
                                  };
 
-        Application.Run ();
+        Application.Run (top);
     }
 
     [Fact]
     [TextViewTestsAutoInitShutdown]
     public void TabWidth_Setting_To_Zero_Keeps_AllowsTab ()
     {
-        Application.Top.Add (_textView);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (_textView);
+        Application.Begin (top);
 
         Assert.Equal (4, _textView.TabWidth);
         Assert.True (_textView.AllowsTab);
@@ -7474,8 +7489,9 @@ TAB to jump between text field",
 
         var win = new Window ();
         win.Add (tv);
-        Application.Top.Add (win);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (win);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (15, 15);
         Application.Refresh ();
 
@@ -7550,8 +7566,9 @@ TAB to jump between text field",
 
         var win = new Window ();
         win.Add (tv);
-        Application.Top.Add (win);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (win);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (15, 15);
         Application.Refresh ();
 
@@ -7647,8 +7664,9 @@ TAB to jump between text field",
             Width = Dim.Fill (), Height = Dim.Fill (), Text = "This is the first line.\nThis is the second line.\n"
         };
         tv.UnwrappedCursorPosition += (s, e) => { cp = e.Point; };
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         Assert.False (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.CursorPosition);
@@ -8805,8 +8823,9 @@ line.
     public void WordWrap_Deleting_Backwards ()
     {
         var tv = new TextView { Width = 5, Height = 2, WordWrap = true, Text = "aaaa" };
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.LeftColumn);
@@ -8880,10 +8899,11 @@ a
     [InlineData (KeyCode.Delete)]
     public void WordWrap_Draw_Typed_Keys_After_Text_Is_Deleted (KeyCode del)
     {
-        Application.Top.Add (_textView);
+        var top = new Toplevel ();
+        top.Add (_textView);
         _textView.Text = "Line 1.\nLine 2.";
         _textView.WordWrap = true;
-        Application.Begin (Application.Top);
+        Application.Begin (top);
 
         Assert.True (_textView.WordWrap);
 
@@ -8942,7 +8962,7 @@ Line 2.",
     }
 
     [Fact]
-    [TextViewTestsAutoInitShutdown]
+    [AutoInitShutdown]
     public void WordWrap_ReadOnly_CursorPosition_SelectedText_Copy ()
     {
         //          0123456789
@@ -8956,8 +8976,9 @@ Line 2.",
                      );
         tv.WordWrap = true;
 
-        Application.Top.Add (tv);
-        Application.Top.LayoutSubviews ();
+        var top = new Toplevel ();
+        top.Add (tv);
+        top.LayoutSubviews ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -8976,7 +8997,7 @@ line.
         tv.ReadOnly = true;
         tv.CursorPosition = new Point (6, 2);
         Assert.Equal (new Point (5, 2), tv.CursorPosition);
-        Application.Top.LayoutSubviews ();
+        top.LayoutSubviews ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -9059,7 +9080,8 @@ line.
                      );
         tv.WordWrap = true;
 
-        Application.Top.Add (tv);
+        var top = new Toplevel ();
+        top.Add (tv);
 
         tv.LayoutSubviews ();
         tv.Draw ();
