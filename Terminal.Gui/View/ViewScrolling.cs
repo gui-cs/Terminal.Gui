@@ -55,7 +55,7 @@ public partial class View
     public Point ContentToScreen (in Point location)
     {
         // Translate to Viewport
-        Point viewportOffset = GetViewportOffset ();
+        Point viewportOffset = GetViewportOffsetFromFrame ();
         Point contentRelativeToViewport = location;
         contentRelativeToViewport.Offset (-Viewport.X, -Viewport.Y);
 
@@ -74,7 +74,7 @@ public partial class View
     /// <returns>The coordinate relative to this view's Content.</returns>
     public Point ScreenToContent (int x, int y)
     {
-        Point viewportOffset = GetViewportOffset ();
+        Point viewportOffset = GetViewportOffsetFromFrame ();
         Point screen = ScreenToFrame (x, y);
         screen.Offset (Viewport.X - viewportOffset.X, Viewport.Y - viewportOffset.Y);
 
@@ -94,9 +94,9 @@ public partial class View
 
     /// <summary>
     ///     Gets or sets the rectangle describing the portion of the View's content that is visible to the user.
-    ///     The viewport Location is relative to the top-left corner of the inner rectangle of the <see cref="Adornment"/>s.
+    ///     The viewport Location is relative to the top-left corner of the inner rectangle of <see cref="Padding"/>s.
     ///     If the viewport Size is the sames as the <see cref="ContentSize"/> the Location will be <c>0, 0</c>.
-    ///     Non-zero values for the location indicate the visible area is offset into the View's virtual
+    ///     Positive values for the location indicate the visible area is offset into the View's virtual
     ///     <see cref="ContentSize"/>.
     /// </summary>
     /// <value>
@@ -175,7 +175,7 @@ public partial class View
     {
         // Translate bounds to Frame (our SuperView's Viewport-relative coordinates)
         Rectangle screen = FrameToScreen ();
-        Point viewportOffset = GetViewportOffset ();
+        Point viewportOffset = GetViewportOffsetFromFrame ();
         screen.Offset (viewportOffset.X + location.X, viewportOffset.Y + location.Y);
 
         return new (screen.Location, location.Size);
@@ -190,7 +190,7 @@ public partial class View
     /// <param name="y">Row relative to the top of the Viewport</param>
     public Point ScreenToViewport (int x, int y)
     {
-        Point viewportOffset = GetViewportOffset ();
+        Point viewportOffset = GetViewportOffsetFromFrame ();
         Point screen = ScreenToFrame (x, y);
         screen.Offset (-viewportOffset.X, -viewportOffset.Y);
 
@@ -201,7 +201,7 @@ public partial class View
     ///     Helper to get the X and Y offset of the Viewport from the Frame. This is the sum of the Left and Top properties
     ///     of <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/>.
     /// </summary>
-    public Point GetViewportOffset () { return Padding is null ? Point.Empty : Padding.Thickness.GetInside (Padding.Frame).Location; }
+    public Point GetViewportOffsetFromFrame () { return Padding is null ? Point.Empty : Padding.Thickness.GetInside (Padding.Frame).Location; }
 
     /// <summary>
     ///     Scrolls the view vertically by the specified number of rows.

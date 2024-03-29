@@ -342,7 +342,7 @@ public partial class View
         return Enabled ? cs.Normal : cs.Disabled;
     }
 
-    /// <summary>Moves the drawing cursor to the specified view-relative column and row in the view.</summary>
+    /// <summary>Moves the drawing cursor to the specified <see cref="Viewport"/>-relative location in the view.</summary>
     /// <remarks>
     ///     <para>
     ///         If the provided coordinates are outside the visible content area, this method does nothing.
@@ -402,7 +402,7 @@ public partial class View
     ///         <see cref="Viewport"/> property.
     ///     </para>
     ///     <para>
-    ///         The <see cref="Viewport"/> Location and Size indicate what part of the View's virtual content area, defined
+    ///         The <see cref="Viewport"/> Location and Size indicate what part of the View's content, defined
     ///         by <see cref="ContentSize"/>, is visible and should be drawn. The coordinates taken by <see cref="Move"/> and
     ///         <see cref="AddRune"/> are relative to <see cref="Viewport"/>, thus if <c>ViewPort.Location.Y</c> is <c>5</c>
     ///         the 6th row of the content should be drawn using <c>MoveTo (x, 5)</c>.
@@ -412,8 +412,8 @@ public partial class View
     ///         to constrain drawing for better performance.
     ///     </para>
     ///     <para>
-    ///         The <see cref="Clip"/> may define smaller area than <see cref="Viewport"/>; complex drawing code can be more
-    ///         efficient by using <see cref="Clip"/> to constrain drawing for better performance.
+    ///         The <see cref="ConsoleDriver.Clip"/> may define smaller area than <see cref="Viewport"/>; complex drawing code can be more
+    ///         efficient by using <see cref="ConsoleDriver.Clip"/> to constrain drawing for better performance.
     ///     </para>
     ///     <para>
     ///         Overrides should loop through the subviews and call <see cref="Draw"/>.

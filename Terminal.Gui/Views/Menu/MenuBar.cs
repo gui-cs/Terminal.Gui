@@ -823,7 +823,7 @@ public class MenuBar : View
 
         Rectangle superViewFrame = SuperView is null ? Driver.Viewport : SuperView.Frame;
         View sv = SuperView is null ? Application.Current : SuperView;
-        Point viewportOffset = sv.GetViewportOffset ();
+        Point viewportOffset = sv.GetViewportOffsetFromFrame ();
 
         return new (
                     superViewFrame.X - sv.Frame.X - viewportOffset.X,
@@ -840,7 +840,7 @@ public class MenuBar : View
     {
         Rectangle screen = Driver.Viewport;
         Rectangle currentFrame = Application.Current.Frame;
-        Point viewportOffset = Application.Top.GetViewportOffset ();
+        Point viewportOffset = Application.Top.GetViewportOffsetFromFrame ();
 
         return new (screen.X - currentFrame.X - viewportOffset.X, screen.Y - currentFrame.Y - viewportOffset.Y);
     }

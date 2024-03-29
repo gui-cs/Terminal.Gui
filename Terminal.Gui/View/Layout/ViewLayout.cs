@@ -43,10 +43,10 @@ public partial class View
     /// <summary>Gets or sets the absolute location and dimension of the view.</summary>
     /// <value>
     ///     The rectangle describing absolute location and dimension of the view, in coordinates relative to the
-    ///     <see cref="SuperView"/>'s <see cref="Viewport"/>.
+    ///     <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>.
     /// </value>
     /// <remarks>
-    ///     <para>Frame is relative to the <see cref="SuperView"/>'s <see cref="Viewport"/>.</para>
+    ///     <para>Frame is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>.</para>
     ///     <para>
     ///         Setting Frame will set <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> to the
     ///         values of the corresponding properties of the <paramref name="value"/> parameter.
@@ -99,7 +99,7 @@ public partial class View
                 return ret;
             }
 
-            Point viewportOffset = super.GetViewportOffset ();
+            Point viewportOffset = super.GetViewportOffsetFromFrame ();
             viewportOffset.Offset (super.Frame.X - super.Viewport.X, super.Frame.Y - super.Viewport.Y);
             ret.X += viewportOffset.X;
             ret.Y += viewportOffset.Y;
@@ -117,7 +117,7 @@ public partial class View
     /// <param name="y">Screen-relative row.</param>
     public virtual Point ScreenToFrame (int x, int y)
     {
-        Point superViewViewportOffset = SuperView?.GetViewportOffset () ?? Point.Empty;
+        Point superViewViewportOffset = SuperView?.GetViewportOffsetFromFrame () ?? Point.Empty;
 
         if (SuperView is null)
         {
@@ -138,13 +138,16 @@ public partial class View
     /// <value>The <see cref="Pos"/> object representing the X position.</value>
     /// <remarks>
     ///     <para>
+    ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>.
+    ///     </para>
+    ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
-    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been
+    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Size)"/> has been
     ///         called.
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
-    ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
+    ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
@@ -168,13 +171,16 @@ public partial class View
     /// <value>The <see cref="Pos"/> object representing the Y position.</value>
     /// <remarks>
     ///     <para>
+    ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>.
+    ///     </para>
+    ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
-    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been
+    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Size)"/> has been
     ///         called.
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
-    ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
+    ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
@@ -198,13 +204,16 @@ public partial class View
     /// <value>The <see cref="Dim"/> object representing the height of the view (the number of rows).</value>
     /// <remarks>
     ///     <para>
+    ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>.
+    ///     </para>
+    ///     <para>
     ///         If set to a relative value (e.g. <see cref="Dim.Fill(int)"/>) the value is indeterminate until the view has
-    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been
+    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Size)"/> has been
     ///         called.
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
-    ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
+    ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
@@ -245,13 +254,16 @@ public partial class View
     /// <value>The <see cref="Dim"/> object representing the width of the view (the number of columns).</value>
     /// <remarks>
     ///     <para>
+    ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>.
+    ///     </para>
+    ///     <para>
     ///         If set to a relative value (e.g. <see cref="Dim.Fill(int)"/>) the value is indeterminate until the view has
-    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been
+    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Size)"/> has been
     ///         called.
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
-    ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
+    ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
@@ -583,7 +595,7 @@ public partial class View
             found = start.Padding;
         }
 
-        Point viewportOffset = start.GetViewportOffset ();
+        Point viewportOffset = start.GetViewportOffsetFromFrame ();
 
         if (found is { })
         {
