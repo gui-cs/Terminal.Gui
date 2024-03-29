@@ -287,7 +287,7 @@ public partial class Toplevel : View
                 if (view.Frame.IntersectsWith (Viewport) && !OutsideTopFrame (this))
                 {
                     //view.SetNeedsLayout ();
-                    view.SetNeedsDisplay (view.Viewport);
+                    view.SetNeedsDisplay ();
                     view.SetSubViewNeedsDisplay ();
                 }
             }

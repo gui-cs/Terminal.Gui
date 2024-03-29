@@ -354,7 +354,7 @@ public class ScrollViewTests
         Assert.True (sv.CanFocus);
         Assert.Equal (new Rectangle (1, 2, 20, 10), sv.Frame);
         Assert.Equal (Point.Empty, sv.ContentOffset);
-        Assert.Equal (Size.Empty, sv.ContentSize);
+        Assert.Equal (sv.Viewport.Size, sv.ContentSize);
         Assert.True (sv.AutoHideScrollBars);
         Assert.True (sv.KeepContentAlwaysInViewport);
     }

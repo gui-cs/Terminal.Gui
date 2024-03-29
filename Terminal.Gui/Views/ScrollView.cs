@@ -33,7 +33,6 @@ public class ScrollView : View
     private bool _autoHideScrollBars = true;
     private View _contentBottomRightCorner;
     private Point _contentOffset;
-    private Size _contentSize;
     private bool _keepContentAlwaysInViewport = true;
     private bool _showHorizontalScrollIndicator;
     private bool _showVerticalScrollIndicator;
@@ -89,10 +88,10 @@ public class ScrollView : View
         AddCommand (Command.PageDown, () => ScrollDown (Viewport.Height));
         AddCommand (Command.PageLeft, () => ScrollLeft (Viewport.Width));
         AddCommand (Command.PageRight, () => ScrollRight (Viewport.Width));
-        AddCommand (Command.TopHome, () => ScrollUp (_contentSize.Height));
-        AddCommand (Command.BottomEnd, () => ScrollDown (_contentSize.Height));
-        AddCommand (Command.LeftHome, () => ScrollLeft (_contentSize.Width));
-        AddCommand (Command.RightEnd, () => ScrollRight (_contentSize.Width));
+        AddCommand (Command.TopHome, () => ScrollUp (ContentSize.Height));
+        AddCommand (Command.BottomEnd, () => ScrollDown (ContentSize.Height));
+        AddCommand (Command.LeftHome, () => ScrollLeft (ContentSize.Width));
+        AddCommand (Command.RightEnd, () => ScrollRight (ContentSize.Width));
 
         // Default keybindings for this view
         KeyBindings.Add (Key.CursorUp, Command.ScrollUp);
@@ -134,6 +133,14 @@ public class ScrollView : View
                            _vertical.ChangedPosition += delegate { ContentOffset = new Point (ContentOffset.X, _vertical.Position); };
                            _horizontal.ChangedPosition += delegate { ContentOffset = new Point (_horizontal.Position, ContentOffset.Y); };
                        };
+        ContentSizeChanged += ScrollViewContentSizeChanged;
+    }
+
+    private void ScrollViewContentSizeChanged (object sender, SizeChangedEventArgs e)
+    {
+        _contentView.Frame = new Rectangle (ContentOffset, e.Size with {Width = e.Size.Width-1, Height = e.Size.Height-1});
+        _vertical.Size = e.Size.Height;
+        _horizontal.Size = e.Size.Width;
     }
 
     private void Application_UnGrabbedMouse (object sender, ViewEventArgs e)
@@ -202,23 +209,23 @@ public class ScrollView : View
         }
     }
 
-    /// <summary>Represents the contents of the data shown inside the scrollview</summary>
-    /// <value>The size of the content.</value>
-    public new Size ContentSize
-    {
-        get => _contentSize;
-        set
-        {
-            if (_contentSize != value)
-            {
-                _contentSize = value;
-                _contentView.Frame = new Rectangle (_contentOffset, value);
-                _vertical.Size = _contentSize.Height;
-                _horizontal.Size = _contentSize.Width;
-                SetNeedsDisplay ();
-            }
-        }
-    }
+    ///// <summary>Represents the contents of the data shown inside the scrollview</summary>
+    ///// <value>The size of the content.</value>
+    //public new Size ContentSize
+    //{
+    //    get => ContentSize;
+    //    set
+    //    {
+    //        if (ContentSize != value)
+    //        {
+    //            ContentSize = value;
+    //            _contentView.Frame = new Rectangle (_contentOffset, value);
+    //            _vertical.Size = ContentSize.Height;
+    //            _horizontal.Size = ContentSize.Width;
+    //            SetNeedsDisplay ();
+    //        }
+    //    }
+    //}
 
     /// <summary>Get or sets if the view-port is kept always visible in the area of this <see cref="ScrollView"/></summary>
     public bool KeepContentAlwaysInViewport
@@ -233,26 +240,26 @@ public class ScrollView : View
                 _horizontal.OtherScrollBarView.KeepContentAlwaysInViewport = value;
                 Point p = default;
 
-                if (value && -_contentOffset.X + Viewport.Width > _contentSize.Width)
+                if (value && -_contentOffset.X + Viewport.Width > ContentSize.Width)
                 {
                     p = new Point (
-                                   _contentSize.Width - Viewport.Width + (_showVerticalScrollIndicator ? 1 : 0),
+                                   ContentSize.Width - Viewport.Width + (_showVerticalScrollIndicator ? 1 : 0),
                                    -_contentOffset.Y
                                   );
                 }
 
-                if (value && -_contentOffset.Y + Viewport.Height > _contentSize.Height)
+                if (value && -_contentOffset.Y + Viewport.Height > ContentSize.Height)
                 {
                     if (p == default (Point))
                     {
                         p = new Point (
                                        -_contentOffset.X,
-                                       _contentSize.Height - Viewport.Height + (_showHorizontalScrollIndicator ? 1 : 0)
+                                       ContentSize.Height - Viewport.Height + (_showHorizontalScrollIndicator ? 1 : 0)
                                       );
                     }
                     else
                     {
-                        p.Y = _contentSize.Height - Viewport.Height + (_showHorizontalScrollIndicator ? 1 : 0);
+                        p.Y = ContentSize.Height - Viewport.Height + (_showHorizontalScrollIndicator ? 1 : 0);
                     }
                 }
 
@@ -362,10 +369,8 @@ public class ScrollView : View
     {
         SetViewsNeedsDisplay ();
 
-        Rectangle savedClip = ClipToViewport ();
-
         // TODO: It's bad practice for views to always clear a view. It negates clipping.
-        Clear ();
+        ClearVisibleContent();
 
         if (!string.IsNullOrEmpty (_contentView.Text) || _contentView.Subviews.Count > 0)
         {
@@ -373,8 +378,6 @@ public class ScrollView : View
         }
 
         DrawScrollBars ();
-
-        Driver.Clip = savedClip;
     }
 
     /// <inheritdoc/>
@@ -606,7 +609,7 @@ public class ScrollView : View
     {
         // INTENT: Unclear intent. How about a call to Offset?
         _contentOffset = new Point (-Math.Abs (offset.X), -Math.Abs (offset.Y));
-        _contentView.Frame = new Rectangle (_contentOffset, _contentSize);
+        _contentView.Frame = new Rectangle (_contentOffset, ContentSize);
         int p = Math.Max (0, -_contentOffset.Y);
 
         if (_vertical.Position != p)
@@ -637,7 +640,7 @@ public class ScrollView : View
         bool v = false, h = false;
         var p = false;
 
-        if (Viewport.Height == 0 || Viewport.Height > _contentSize.Height)
+        if (Viewport.Height == 0 || Viewport.Height > ContentSize.Height)
         {
             if (ShowVerticalScrollIndicator)
             {
@@ -646,7 +649,7 @@ public class ScrollView : View
 
             v = false;
         }
-        else if (Viewport.Height > 0 && Viewport.Height == _contentSize.Height)
+        else if (Viewport.Height > 0 && Viewport.Height == ContentSize.Height)
         {
             p = true;
         }
@@ -660,7 +663,7 @@ public class ScrollView : View
             v = true;
         }
 
-        if (Viewport.Width == 0 || Viewport.Width > _contentSize.Width)
+        if (Viewport.Width == 0 || Viewport.Width > ContentSize.Width)
         {
             if (ShowHorizontalScrollIndicator)
             {
@@ -669,7 +672,7 @@ public class ScrollView : View
 
             h = false;
         }
-        else if (Viewport.Width > 0 && Viewport.Width == _contentSize.Width && p)
+        else if (Viewport.Width > 0 && Viewport.Width == ContentSize.Width && p)
         {
             if (ShowHorizontalScrollIndicator)
             {
@@ -721,13 +724,13 @@ public class ScrollView : View
 
         if (v)
         {
-            _vertical.SetRelativeLayout (ContentSize);
+            _vertical.SetRelativeLayout (Viewport.Size);
             _vertical.Draw ();
         }
 
         if (h)
         {
-            _horizontal.SetRelativeLayout (ContentSize);
+            _horizontal.SetRelativeLayout (Viewport.Size);
             _horizontal.Draw ();
         }
 
@@ -735,7 +738,7 @@ public class ScrollView : View
 
         if (v && h)
         {
-            _contentBottomRightCorner.SetRelativeLayout (ContentSize);
+            _contentBottomRightCorner.SetRelativeLayout (Viewport.Size);
             _contentBottomRightCorner.Draw ();
         }
     }

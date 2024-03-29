@@ -100,7 +100,7 @@ public class VirtualScrolling : Scenario
     {
         Application.Init ();
 
-        var view = new VirtualDemoView { Title = "Virtual Demo View" };
+        var view = new VirtualDemoView { Title = "Virtual Scrolling" };
 
         var tf1 = new TextField { X = 20, Y = 7, Width = 10, Text = "TextField" };
         var color = new ColorPicker { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd (11) };

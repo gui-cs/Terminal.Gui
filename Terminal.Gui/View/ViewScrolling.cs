@@ -44,8 +44,34 @@ public partial class View
     public Size ContentSize
     {
         get => _contentSize == Size.Empty ? Viewport.Size : _contentSize;
-        set => _contentSize = value;
+        set
+        {
+            _contentSize = value;
+            OnContentSizeChanged (new (_contentSize));
+        }
     }
+
+    /// <summary>
+    /// Called when the <see cref="ContentSize"/> changes. Invokes the <see cref="ContentSizeChanged"/> event.
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
+    protected bool? OnContentSizeChanged (SizeChangedEventArgs e)
+    {
+        ContentSizeChanged?.Invoke (this, e);
+
+        if (e.Cancel != true)
+        {
+            SetNeedsDisplay ();
+        }
+
+        return e.Cancel == true;
+    }
+
+    /// <summary>
+    ///    Event that is raised when the <see cref="ContentSize"/> changes.
+    /// </summary>
+    public event EventHandler<SizeChangedEventArgs> ContentSizeChanged;
 
     /// <summary>
     ///     Converts a content-relative location to a screen-relative location.

@@ -442,9 +442,6 @@ public partial class View
 
             // This should NOT clear 
             // TODO: If the output is not in the Viewport, do nothing
-            if (Viewport.Y != 0)
-            { }
-
             var drawRect = new Rectangle (ContentToScreen (Point.Empty), ContentSize);
 
             TextFormatter?.Draw (

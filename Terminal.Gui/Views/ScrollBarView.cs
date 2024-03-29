@@ -275,7 +275,7 @@ public class ScrollBarView : View
     public event EventHandler ChangedPosition;
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent mouseEvent)
+    protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
         if (mouseEvent.Flags != MouseFlags.Button1Pressed
             && mouseEvent.Flags != MouseFlags.Button1DoubleClicked
@@ -524,8 +524,7 @@ public class ScrollBarView : View
                     by1 = Math.Max (by1 - 1, 0);
                 }
 
-                Move (col, 0);
-                Driver.AddRune (Glyphs.UpArrow);
+                AddRune (col, 0, Glyphs.UpArrow);
 
                 var hasTopTee = false;
                 var hasDiamond = false;
@@ -533,7 +532,6 @@ public class ScrollBarView : View
 
                 for (var y = 0; y < bh; y++)
                 {
-                    Move (col, y + 1);
 
                     if ((y < by1 || y > by2) && ((_position > 0 && !hasTopTee) || (hasTopTee && hasBottomTee)))
                     {
@@ -567,17 +565,15 @@ public class ScrollBarView : View
                         }
                     }
 
-                    Driver.AddRune (special);
+                    AddRune (col, y + 1, special);
                 }
 
                 if (!hasTopTee)
                 {
-                    Move (col, Viewport.Height - 2);
-                    Driver.AddRune (Glyphs.TopTee);
+                    AddRune (col, Viewport.Height - 2, Glyphs.TopTee);
                 }
 
-                Move (col, Viewport.Height - 1);
-                Driver.AddRune (Glyphs.DownArrow);
+                AddRune (col, Viewport.Height - 1, Glyphs.DownArrow);
             }
         }
         else
