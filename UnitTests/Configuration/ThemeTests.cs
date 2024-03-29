@@ -27,6 +27,8 @@ public class ThemeTests
         Themes! [ThemeManager.SelectedTheme]!.Apply ();
 
         Assert.Equal (LineStyle.Double, FrameView.DefaultBorderStyle);
+
+        Reset ();
     }
 
     [Fact]
@@ -68,6 +70,7 @@ public class ThemeTests
         // remove test ColorScheme from Colors to avoid failures on others unit tests with ColorScheme
         Colors.ColorSchemes.Remove ("test");
         Assert.Equal (5, Colors.ColorSchemes.Count);
+        Reset ();
     }
 
     [Fact]
@@ -84,6 +87,7 @@ public class ThemeTests
                       Dialog.ButtonAlignments.Right,
                       (Dialog.ButtonAlignments)deserialized ["Dialog.DefaultButtonAlignment"].PropertyValue
                      );
+        Reset ();
     }
 
     [Fact]
@@ -132,6 +136,7 @@ public class ThemeTests
         colorSchemes = (Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue;
         Assert.Equal (colorSchemes ["Test"].Normal, colorScheme.Normal);
         Assert.Equal (colorSchemes ["Test"].Focus, colorScheme.Focus);
+        Reset ();
     }
 
     [Fact]
@@ -186,5 +191,6 @@ public class ThemeTests
         Assert.Equal (new Color (Color.BrightBlue), colorSchemes ["Test"].Normal.Background);
         Assert.Equal (new Color (Color.Cyan), colorSchemes ["Test"].Focus.Foreground);
         Assert.Equal (new Color (Color.BrightCyan), colorSchemes ["Test"].Focus.Background);
+        Reset ();
     }
 }
