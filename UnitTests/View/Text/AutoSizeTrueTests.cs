@@ -2742,7 +2742,7 @@ Y
         Assert.Equal ("Absolute(20)", view.Width.ToString ());
         Assert.Equal ("Absolute(1)", view.Height.ToString ());
 
-        view.SetRelativeLayout (new (0, 0, 25, 5));
+        view.SetRelativeLayout (new (25, 5));
 
         Assert.True (view.AutoSize);
         Assert.Equal (LayoutStyle.Absolute, view.LayoutStyle);

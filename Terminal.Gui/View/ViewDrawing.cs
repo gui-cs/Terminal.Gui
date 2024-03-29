@@ -85,7 +85,30 @@ public partial class View
 
     /// <summary>Clears <see cref="Viewport"/> with the normal background.</summary>
     /// <remarks></remarks>
-    public void Clear () { Clear (Viewport); }
+    public void Clear () { Clear (new (Point.Empty, Viewport.Size)); }
+
+    /// <summary>Clears the portion of the content that is visible with the normal background. If the content does not fill the Viewport,
+    /// the area not filled will be cleared with DarkGray.</summary>
+    /// <remarks></remarks>
+    public void ClearVisibleContent ()
+    {
+        if (Driver is null)
+        {
+            return;
+        }
+
+        Rectangle toClear = new (-Viewport.Location.X, -Viewport.Location.Y, ContentSize.Width, ContentSize.Height);
+
+        // If toClear does not fill the Viewport, we need to clear the area outside toClear with DarkGray.
+        // TODO: Need a configurable color for this
+        Attribute prev = Driver.SetAttribute (new Attribute (ColorName.DarkGray, ColorName.DarkGray));
+
+        Rectangle viewport = new (Point.Empty, Viewport.Size);
+        Driver.FillRect (ViewportToScreen (viewport));
+        Driver.SetAttribute (prev);
+
+        Clear (toClear);
+    }
 
     /// <summary>Clears the specified <see cref="Viewport"/>-relative rectangle with the normal background.</summary>
     /// <remarks></remarks>
@@ -100,7 +123,7 @@ public partial class View
         Attribute prev = Driver.SetAttribute (GetNormalColor ());
 
         // Clamp the region to the bounds of the view
-        viewport = Rectangle.Intersect (viewport, Viewport);
+        viewport = Rectangle.Intersect (viewport, new (Point.Empty, Viewport.Size));
         Driver.FillRect (ViewportToScreen (viewport));
         Driver.SetAttribute (prev);
     }
@@ -124,7 +147,7 @@ public partial class View
         }
 
         Rectangle previous = Driver.Clip;
-        Driver.Clip = Rectangle.Intersect (previous, ViewportToScreen (Viewport));
+        Driver.Clip = Rectangle.Intersect (previous, ViewportToScreen (Viewport with { Location = Point.Empty }));
 
         return previous;
     }
@@ -321,12 +344,12 @@ public partial class View
 
     /// <summary>Moves the drawing cursor to the specified view-relative column and row in the view.</summary>
     /// <remarks>
-    /// <para>
-    ///     If the provided coordinates are outside the visible content area, this method does nothing.
-    /// </para>
-    /// <para>
-    ///     The top-left corner of the visible content area is <c>ViewPort.Location</c>.
-    /// </para>
+    ///     <para>
+    ///         If the provided coordinates are outside the visible content area, this method does nothing.
+    ///     </para>
+    ///     <para>
+    ///         The top-left corner of the visible content area is <c>ViewPort.Location</c>.
+    ///     </para>
     /// </remarks>
     /// <param name="col">Column (viewport-relative).</param>
     /// <param name="row">Row (viewport-relative).</param>
@@ -406,7 +429,7 @@ public partial class View
         {
             if (SuperView is { })
             {
-                Clear (viewport);
+                ClearVisibleContent ();
             }
 
             if (!string.IsNullOrEmpty (TextFormatter.Text))
@@ -419,8 +442,13 @@ public partial class View
 
             // This should NOT clear 
             // TODO: If the output is not in the Viewport, do nothing
+            if (Viewport.Y != 0)
+            { }
+
+            var drawRect = new Rectangle (ContentToScreen (Point.Empty), ContentSize);
+
             TextFormatter?.Draw (
-                                 ViewportToScreen (new Rectangle(Point.Empty, ContentSize)),
+                                 drawRect,
                                  HasFocus ? GetFocusColor () : GetNormalColor (),
                                  HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
                                  Rectangle.Empty
@@ -609,7 +637,7 @@ public partial class View
 
         foreach (View subview in Subviews)
         {
-            subview.ClearNeedsDisplay();
+            subview.ClearNeedsDisplay ();
         }
     }
 }

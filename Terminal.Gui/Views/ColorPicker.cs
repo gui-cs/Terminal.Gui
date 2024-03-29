@@ -100,7 +100,7 @@ public class ColorPicker : View
 
         if (me.X > Viewport.Width || me.Y > Viewport.Height)
         {
-            return true;
+            return false;
         }
 
         Cursor = new Point (me.X / _boxWidth, me.Y / _boxHeight);

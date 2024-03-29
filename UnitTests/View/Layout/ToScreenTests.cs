@@ -245,6 +245,303 @@ public class ToScreenTests (ITestOutputHelper output)
         Assert.Equal (expectedX, screen.X);
     }
 
+    // ContentToScreen tests ----------------------
+
+    [Fact]
+    public void ContentToScreen_With_Positive_Content_Location ()
+    {
+        View view = new ()
+        {
+            X = 1,
+            Y = 1,
+            Width = 10,
+            Height = 10,
+            ContentSize = new (20, 20)
+        };
+
+        Point testPoint = new ( 0, 0);
+        Assert.Equal (new Point (1, 1), view.ContentToScreen (testPoint));
+    }
+
+    [Theory]
+    [InlineData (0, 0, 1)]
+    [InlineData (1, 0, 2)]
+    [InlineData (-1, 0, 0)]
+
+    [InlineData (0, 1, 2)]
+    [InlineData (1, 1, 3)]
+    [InlineData (-1, 1, 1)]
+
+    [InlineData (0, -1, 0)]
+    [InlineData (1, -1, 1)]
+    [InlineData (-1, -1, -1)]
+    public void ContentToScreen_NoSuperView_WithAdornments (int frameX, int contentX, int expectedX)
+    {
+        // We test with only X because Y is equivalent. Height/Width are irrelevant.
+        // Arrange
+        var frame = new Rectangle (frameX, 0, 10, 10);
+
+        var view = new View ();
+        view.Frame = frame;
+        view.ContentSize = new (20, 20);
+        view.BorderStyle = LineStyle.Single;
+
+        // Act
+        var screen = view.ContentToScreen (new (contentX, 0));
+
+        // Assert
+        Assert.Equal (expectedX, screen.X);
+    }
+
+    [Theory]
+    [InlineData (0, 0, 0)]
+    [InlineData (1, 0, 1)]
+    [InlineData (-1, 0, -1)]
+    [InlineData (11, 0, 11)]
+
+    [InlineData (0, 1, 1)]
+    [InlineData (1, 1, 2)]
+    [InlineData (-1, 1, 0)]
+    [InlineData (11, 1, 12)]
+
+    [InlineData (0, -1, -1)]
+    [InlineData (1, -1, 0)]
+    [InlineData (-1, -1, -2)]
+    [InlineData (11, -1, 10)]
+    public void ContentToScreen_SuperView_WithoutAdornments (int frameX, int contentX, int expectedX)
+    {
+        // We test with only X because Y is equivalent. Height/Width are irrelevant.
+        // Arrange
+        var frame = new Rectangle (frameX, 0, 10, 10);
+
+        var superView = new View ()
+        {
+            X = 0,
+            Y = 0,
+            Height = Dim.Fill (),
+            Width = Dim.Fill ()
+        };
+
+        var view = new View ();
+        view.Frame = frame;
+        view.ContentSize = new (20, 20);
+
+        superView.Add (view);
+        superView.LayoutSubviews ();
+
+        // Act
+        var screen = view.ContentToScreen (new (contentX, 0));
+
+        // Assert
+        Assert.Equal (expectedX, screen.X);
+    }
+
+    //[Theory]
+    //[InlineData (0, 0, 1)]
+    //[InlineData (1, 0, 2)]
+    //[InlineData (-1, 0, 0)]
+    //[InlineData (11, 0, 12)]
+
+    //[InlineData (0, 1, 2)]
+    //[InlineData (1, 1, 3)]
+    //[InlineData (-1, 1, 1)]
+    //[InlineData (11, 1, 13)]
+
+    //[InlineData (0, -1, 0)]
+    //[InlineData (1, -1, 1)]
+    //[InlineData (-1, -1, -1)]
+    //[InlineData (11, -1, 11)]
+    //public void ContentToScreen_SuperView_WithAdornments (int frameX, int ContentX, int expectedX)
+    //{
+    //    // We test with only X because Y is equivalent. Height/Width are irrelevant.
+    //    // Arrange
+    //    var frame = new Rectangle (frameX, 0, 10, 10);
+
+    //    var superView = new View ()
+    //    {
+    //        X = 0,
+    //        Y = 0,
+    //        Height = Dim.Fill (),
+    //        Width = Dim.Fill ()
+    //    };
+    //    superView.BorderStyle = LineStyle.Single;
+
+    //    var view = new View ();
+    //    view.Frame = frame;
+
+    //    superView.Add (view);
+    //    superView.LayoutSubviews ();
+
+    //    // Act
+    //    var screen = view.ContentToScreen (new (ContentX, 0, 0, 0));
+
+    //    // Assert
+    //    Assert.Equal (expectedX, screen.X);
+    //}
+
+    //[Theory]
+    //[InlineData (0, 0, 0)]
+    //[InlineData (1, 0, 1)]
+    //[InlineData (-1, 0, -1)]
+    //[InlineData (11, 0, 11)]
+
+    //[InlineData (0, 1, 1)]
+    //[InlineData (1, 1, 2)]
+    //[InlineData (-1, 1, 0)]
+    //[InlineData (11, 1, 12)]
+
+    //[InlineData (0, -1, -1)]
+    //[InlineData (1, -1, 0)]
+    //[InlineData (-1, -1, -2)]
+    //[InlineData (11, -1, 10)]
+    //public void ContentToScreen_NestedSuperView_WithoutAdornments (int frameX, int ContentX, int expectedX)
+    //{
+    //    // We test with only X because Y is equivalent. Height/Width are irrelevant.
+    //    // Arrange
+    //    var frame = new Rectangle (frameX, 0, 10, 10);
+
+    //    var superSuperView = new View ()
+    //    {
+    //        X = 0,
+    //        Y = 0,
+    //        Height = Dim.Fill (),
+    //        Width = Dim.Fill ()
+    //    };
+
+    //    var superView = new View ()
+    //    {
+    //        X = 0,
+    //        Y = 0,
+    //        Height = Dim.Fill (),
+    //        Width = Dim.Fill ()
+    //    };
+
+    //    superSuperView.Add (superView);
+
+    //    var view = new View ();
+    //    view.Frame = frame;
+
+    //    superView.Add (view);
+    //    superView.LayoutSubviews ();
+
+    //    // Act
+    //    var screen = view.ContentToScreen (new (ContentX, 0, 0, 0));
+
+    //    // Assert
+    //    Assert.Equal (expectedX, screen.X);
+    //}
+
+    //[Theory]
+    //[InlineData (0, 0, 2)]
+    //[InlineData (1, 0, 3)]
+    //[InlineData (-1, 0, 1)]
+    //[InlineData (11, 0, 13)]
+
+    //[InlineData (0, 1, 3)]
+    //[InlineData (1, 1, 4)]
+    //[InlineData (-1, 1, 2)]
+    //[InlineData (11, 1, 14)]
+
+    //[InlineData (0, -1, 1)]
+    //[InlineData (1, -1, 2)]
+    //[InlineData (-1, -1, 0)]
+    //[InlineData (11, -1, 12)]
+    //public void ContentToScreen_NestedSuperView_WithAdornments (int frameX, int ContentX, int expectedX)
+    //{
+    //    // We test with only X because Y is equivalent. Height/Width are irrelevant.
+    //    // Arrange
+    //    var frame = new Rectangle (frameX, 0, 10, 10);
+
+    //    var superSuperView = new View ()
+    //    {
+    //        X = 0,
+    //        Y = 0,
+    //        Height = Dim.Fill (),
+    //        Width = Dim.Fill ()
+    //    };
+    //    superSuperView.BorderStyle = LineStyle.Single;
+
+    //    var superView = new View ()
+    //    {
+    //        X = 0,
+    //        Y = 0,
+    //        Height = Dim.Fill (),
+    //        Width = Dim.Fill ()
+    //    };
+
+    //    superSuperView.Add (superView);
+    //    superView.BorderStyle = LineStyle.Single;
+
+    //    var view = new View ();
+    //    view.Frame = frame;
+
+    //    superView.Add (view);
+    //    superView.LayoutSubviews ();
+
+    //    // Act
+    //    var screen = view.ContentToScreen (new (ContentX, 0, 0, 0));
+
+    //    // Assert
+    //    Assert.Equal (expectedX, screen.X);
+    //}
+
+
+    //[Theory]
+    //[InlineData (0, 0, 3)]
+    //[InlineData (1, 0, 4)]
+    //[InlineData (-1, 0, 2)]
+    //[InlineData (11, 0, 14)]
+
+    //[InlineData (0, 1, 4)]
+    //[InlineData (1, 1, 5)]
+    //[InlineData (-1, 1, 3)]
+    //[InlineData (11, 1, 15)]
+
+    //[InlineData (0, -1, 2)]
+    //[InlineData (1, -1, 3)]
+    //[InlineData (-1, -1, 1)]
+    //[InlineData (11, -1, 13)]
+    //public void ContentToScreen_Positive_NestedSuperView_WithAdornments (int frameX, int testX, int expectedX)
+    //{
+    //    // We test with only X because Y is equivalent. Height/Width are irrelevant.
+    //    // Arrange
+    //    var frame = new Rectangle (frameX, 0, 10, 10);
+
+    //    var superSuperView = new View ()
+    //    {
+    //        X = 0,
+    //        Y = 0,
+    //        Height = Dim.Fill (),
+    //        Width = Dim.Fill ()
+    //    };
+    //    superSuperView.BorderStyle = LineStyle.Single;
+
+    //    var superView = new View ()
+    //    {
+    //        X = 0,
+    //        Y = 0,
+    //        Height = Dim.Fill (),
+    //        Width = Dim.Fill ()
+    //    };
+
+    //    superSuperView.Add (superView);
+    //    superView.BorderStyle = LineStyle.Single;
+
+    //    var view = new View ();
+    //    view.Frame = frame;
+    //    view.ContentSize = new (11, 11);
+    //    view.Content = view.Content with { Location = new (1, 1) };
+
+    //    superView.Add (view);
+    //    superView.LayoutSubviews ();
+
+    //    // Act
+    //    var screen = view.ContentToScreen (new (testX, 0, 0, 0));
+
+    //    // Assert
+    //    Assert.Equal (expectedX, screen.X);
+    //}
+
     // ViewportToScreen tests ----------------------
 
     [Fact]
@@ -260,7 +557,7 @@ public class ToScreenTests (ITestOutputHelper output)
         Assert.Equal (new Point (0, 0), view.ViewportToScreen (testRect).Location);
         view.Viewport = view.Viewport with { Location = new Point (1, 1) };
         Assert.Equal (new Rectangle (1, 1, 10, 10), view.Viewport);
-        Assert.Equal (new Point (-1, -1), view.ViewportToScreen (testRect).Location);
+        Assert.Equal (new Point (0, 0), view.ViewportToScreen (testRect).Location);
     }
 
     [Theory]
@@ -509,20 +806,20 @@ public class ToScreenTests (ITestOutputHelper output)
 
 
     [Theory]
-    [InlineData (0, 0, 3)]
-    [InlineData (1, 0, 4)]
-    [InlineData (-1, 0, 2)]
-    [InlineData (11, 0, 14)]
+    [InlineData (0, 0, 2)]
+    [InlineData (1, 0, 3)]
+    [InlineData (-1, 0, 1)]
+    [InlineData (11, 0, 13)]
 
-    [InlineData (0, 1, 4)]
-    [InlineData (1, 1, 5)]
-    [InlineData (-1, 1, 3)]
-    [InlineData (11, 1, 15)]
+    [InlineData (0, 1, 3)]
+    [InlineData (1, 1, 4)]
+    [InlineData (-1, 1, 2)]
+    [InlineData (11, 1, 14)]
 
-    [InlineData (0, -1, 2)]
-    [InlineData (1, -1, 3)]
-    [InlineData (-1, -1, 1)]
-    [InlineData (11, -1, 13)]
+    [InlineData (0, -1, 1)]
+    [InlineData (1, -1, 2)]
+    [InlineData (-1, -1, 0)]
+    [InlineData (11, -1, 12)]
     public void ViewportToScreen_Positive_NestedSuperView_WithAdornments (int frameX, int testX, int expectedX)
     {
         // We test with only X because Y is equivalent. Height/Width are irrelevant.

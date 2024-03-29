@@ -257,14 +257,14 @@ public class ViewportTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void ContentSize_Empty_ByDefault ()
+    public void ContentSize_Matches_ViewportSize_If_Not_Set ()
     {
         View view = new ()
         {
             Width = 1,
             Height = 1
         };
-        Assert.Equal (Size.Empty, view.ContentSize);
+        Assert.Equal (view.Viewport.Size, view.ContentSize);
     }
 
 }

@@ -82,8 +82,6 @@ public class Adornments : Scenario
 
             //BorderStyle = LineStyle.None,
         };
-        view.X = 36;
-        view.Y = 0;
         view.Width = Dim.Percent (60);
         view.Height = Dim.Percent (80);
 
@@ -452,15 +450,13 @@ public class Adornments : Scenario
                 Add (_diagCheckBox);
                 _viewToEdit.X = Pos.Right (rbBorderStyle);
                 _viewToEdit.Y = 0;
-                _viewToEdit.Width = Dim.Fill ();
-                _viewToEdit.Height = Dim.Fill ();
                 Add (_viewToEdit);
 
                 _viewToEdit.LayoutComplete += (s, e) =>
                                               {
                                                   if (ckbTitle.Checked == true)
                                                   {
-                                                      //_viewToEdit.Title = _origTitle;
+                                                      _viewToEdit.Title = _origTitle;
                                                   }
                                                   else
                                                   {

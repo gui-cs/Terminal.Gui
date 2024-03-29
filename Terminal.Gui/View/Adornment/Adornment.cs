@@ -267,7 +267,7 @@ public class Adornment : View
 
         if (!Parent.CanFocus || !Parent.Arrangement.HasFlag (ViewArrangement.Movable))
         {
-            return true;
+            return false;
         }
 
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3312

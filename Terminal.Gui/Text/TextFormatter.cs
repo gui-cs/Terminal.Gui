@@ -202,14 +202,14 @@ public class TextFormatter
     ///     Causes the text to be formatted (references <see cref="GetLines"/>). Sets <see cref="NeedsFormat"/> to
     ///     <c>false</c>.
     /// </remarks>
-    /// <param name="viewport">Specifies the screen-relative location and maximum size for drawing the text.</param>
+    /// <param name="screen">Specifies the screen-relative location and maximum size for drawing the text.</param>
     /// <param name="normalColor">The color to use for all text except the hotkey</param>
     /// <param name="hotColor">The color to use to draw the hotkey</param>
     /// <param name="maximum">Specifies the screen-relative location and maximum container size.</param>
     /// <param name="driver">The console driver currently used by the application.</param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public void Draw (
-        Rectangle viewport,
+        Rectangle screen,
         Attribute normalColor,
         Attribute hotColor,
         Rectangle maximum = default,
@@ -240,46 +240,46 @@ public class TextFormatter
         }
 
         bool isVertical = IsVerticalDirection (Direction);
-        Rectangle maxViewport = viewport;
+        Rectangle maxScreen = screen;
 
         if (driver is { })
         {
             // INTENT: What, exactly, is the intent of this?
-            maxViewport = maximum == default (Rectangle)
-                            ? viewport
+            maxScreen = maximum == default (Rectangle)
+                            ? screen
                             : new (
-                                   Math.Max (maximum.X, viewport.X),
-                                   Math.Max (maximum.Y, viewport.Y),
+                                   Math.Max (maximum.X, screen.X),
+                                   Math.Max (maximum.Y, screen.Y),
                                    Math.Max (
-                                             Math.Min (maximum.Width, maximum.Right - viewport.Left),
+                                             Math.Min (maximum.Width, maximum.Right - screen.Left),
                                              0
                                             ),
                                    Math.Max (
                                              Math.Min (
                                                        maximum.Height,
-                                                       maximum.Bottom - viewport.Top
+                                                       maximum.Bottom - screen.Top
                                                       ),
                                              0
                                             )
                                   );
         }
 
-        if (maxViewport.Width == 0 || maxViewport.Height == 0)
+        if (maxScreen.Width == 0 || maxScreen.Height == 0)
         {
             return;
         }
 
-        int lineOffset = !isVertical && viewport.Y < 0 ? Math.Abs (viewport.Y) : 0;
+        int lineOffset = !isVertical && screen.Y < 0 ? Math.Abs (screen.Y) : 0;
 
         for (int line = lineOffset; line < linesFormatted.Count; line++)
         {
-            if ((isVertical && line > viewport.Width) || (!isVertical && line > viewport.Height))
+            if ((isVertical && line > screen.Width) || (!isVertical && line > screen.Height))
             {
                 continue;
             }
 
-            if ((isVertical && line >= maxViewport.Left + maxViewport.Width)
-                || (!isVertical && line >= maxViewport.Top + maxViewport.Height + lineOffset))
+            if ((isVertical && line >= maxScreen.Left + maxScreen.Width)
+                || (!isVertical && line >= maxScreen.Top + maxScreen.Height + lineOffset))
             {
                 break;
             }
@@ -305,14 +305,14 @@ public class TextFormatter
                 if (isVertical)
                 {
                     int runesWidth = GetWidestLineLength (linesFormatted, line, TabWidth);
-                    x = viewport.Right - runesWidth;
-                    CursorPosition = viewport.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
+                    x = screen.Right - runesWidth;
+                    CursorPosition = screen.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
                 }
                 else
                 {
                     int runesWidth = StringExtensions.ToString (runes).GetColumns ();
-                    x = viewport.Right - runesWidth;
-                    CursorPosition = viewport.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
+                    x = screen.Right - runesWidth;
+                    CursorPosition = screen.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
                 }
             }
             else if (Alignment is TextAlignment.Left or TextAlignment.Justified)
@@ -322,11 +322,11 @@ public class TextFormatter
                     int runesWidth = line > 0
                                          ? GetWidestLineLength (linesFormatted, 0, line, TabWidth)
                                          : 0;
-                    x = viewport.Left + runesWidth;
+                    x = screen.Left + runesWidth;
                 }
                 else
                 {
-                    x = viewport.Left;
+                    x = screen.Left;
                 }
 
                 CursorPosition = _hotKeyPos > -1 ? _hotKeyPos : 0;
@@ -336,16 +336,16 @@ public class TextFormatter
                 if (isVertical)
                 {
                     int runesWidth = GetWidestLineLength (linesFormatted, line, TabWidth);
-                    x = viewport.Left + line + (viewport.Width - runesWidth) / 2;
+                    x = screen.Left + line + (screen.Width - runesWidth) / 2;
 
-                    CursorPosition = (viewport.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
+                    CursorPosition = (screen.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
                 }
                 else
                 {
                     int runesWidth = StringExtensions.ToString (runes).GetColumns ();
-                    x = viewport.Left + (viewport.Width - runesWidth) / 2;
+                    x = screen.Left + (screen.Width - runesWidth) / 2;
 
-                    CursorPosition = (viewport.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
+                    CursorPosition = (screen.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
                 }
             }
             else
@@ -358,35 +358,35 @@ public class TextFormatter
             {
                 if (isVertical)
                 {
-                    y = viewport.Bottom - runes.Length;
+                    y = screen.Bottom - runes.Length;
                 }
                 else
                 {
-                    y = viewport.Bottom - linesFormatted.Count + line;
+                    y = screen.Bottom - linesFormatted.Count + line;
                 }
             }
             else if (VerticalAlignment is VerticalTextAlignment.Top or VerticalTextAlignment.Justified)
             {
                 if (isVertical)
                 {
-                    y = viewport.Top;
+                    y = screen.Top;
                 }
                 else
                 {
-                    y = viewport.Top + line;
+                    y = screen.Top + line;
                 }
             }
             else if (VerticalAlignment == VerticalTextAlignment.Middle)
             {
                 if (isVertical)
                 {
-                    int s = (viewport.Height - runes.Length) / 2;
-                    y = viewport.Top + s;
+                    int s = (screen.Height - runes.Length) / 2;
+                    y = screen.Top + s;
                 }
                 else
                 {
-                    int s = (viewport.Height - linesFormatted.Count) / 2;
-                    y = viewport.Top + line + s;
+                    int s = (screen.Height - linesFormatted.Count) / 2;
+                    y = screen.Top + line + s;
                 }
             }
             else
@@ -394,9 +394,9 @@ public class TextFormatter
                 throw new ArgumentOutOfRangeException ($"{nameof (VerticalAlignment)}");
             }
 
-            int colOffset = viewport.X < 0 ? Math.Abs (viewport.X) : 0;
-            int start = isVertical ? viewport.Top : viewport.Left;
-            int size = isVertical ? viewport.Height : viewport.Width;
+            int colOffset = screen.X < 0 ? Math.Abs (screen.X) : 0;
+            int start = isVertical ? screen.Top : screen.Left;
+            int size = isVertical ? screen.Height : screen.Width;
             int current = start + colOffset;
             List<Point?> lastZeroWidthPos = null;
             Rune rune = default;
@@ -422,8 +422,8 @@ public class TextFormatter
                         break;
                     }
 
-                    if ((!isVertical && current - start > maxViewport.Left + maxViewport.Width - viewport.X + colOffset)
-                        || (isVertical && idx > maxViewport.Top + maxViewport.Height - viewport.Y))
+                    if ((!isVertical && current - start > maxScreen.Left + maxScreen.Width - screen.X + colOffset)
+                        || (isVertical && idx > maxScreen.Top + maxScreen.Height - screen.Y))
                     {
                         break;
                     }

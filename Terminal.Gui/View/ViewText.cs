@@ -324,7 +324,7 @@ public partial class View
                 return false;
             }
 
-            sizeRequired = Viewport.Size;
+            sizeRequired = ContentSize;
 
             if (AutoSize || string.IsNullOrEmpty (TextFormatter.Text))
             {
@@ -338,9 +338,9 @@ public partial class View
 
                     // TODO: v2 - This uses frame.Width; it should only use Viewport
                     if (_frame.Width < colWidth
-                        && (Width is null || (Viewport.Width >= 0 && Width is Dim.DimAbsolute && Width.Anchor (0) >= 0 && Width.Anchor (0) < colWidth)))
+                        && (Width is null || (ContentSize.Width >= 0 && Width is Dim.DimAbsolute && Width.Anchor (0) >= 0 && Width.Anchor (0) < colWidth)))
                     {
-                        sizeRequired = new (colWidth, Viewport.Height);
+                        sizeRequired = new (colWidth, ContentSize.Height);
 
                         return true;
                     }
@@ -349,7 +349,7 @@ public partial class View
                 default:
                     if (_frame.Height < 1 && (Height is null || (Height is Dim.DimAbsolute && Height.Anchor (0) == 0)))
                     {
-                        sizeRequired = new (Viewport.Width, 1);
+                        sizeRequired = new (ContentSize.Width, 1);
 
                         return true;
                     }

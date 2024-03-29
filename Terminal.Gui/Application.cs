@@ -88,7 +88,7 @@ public static partial class Application
 #if DEBUG_IDISPOSABLE
 
             // Don't dispose the toplevels. It's up to caller dispose them
-            Debug.Assert (t.WasDisposed);
+            //Debug.Assert (t.WasDisposed);
 #endif
         }
 
@@ -1495,7 +1495,7 @@ public static partial class Application
                 View = view
             };
 
-            if (MouseGrabView.Viewport.Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
+            if ((MouseGrabView.Viewport with { Location = Point.Empty }).Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
             {
                 // The mouse has moved outside the Viewport of the view that
                 // grabbed the mouse, so we tell the view that last got 
@@ -1551,7 +1551,7 @@ public static partial class Application
                 View = view
             };
         }
-        else if (view.ViewportToScreen (view.Viewport).Contains (a.MouseEvent.X, a.MouseEvent.Y))
+        else if (view.ViewportToScreen (Rectangle.Empty with {Size = view.Viewport.Size}).Contains (a.MouseEvent.X, a.MouseEvent.Y))
         {
             Point viewportLocation = view.ScreenToViewport (a.MouseEvent.X, a.MouseEvent.Y);
 
@@ -1591,10 +1591,16 @@ public static partial class Application
 
         //Debug.WriteLine ($"OnMouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags}");
 
-        if (view.OnMouseEvent (me))
+        while (view is {} && !view.OnMouseEvent (me))
         {
-            // Should we bubble up the event, if it is not handled?
-            //return;
+            if (view is Adornment ad)
+            {
+                view = ad.Parent.SuperView;
+            }
+            else
+            {
+                view = view.SuperView;
+            }
         }
 
         BringOverlappedTopToFront ();

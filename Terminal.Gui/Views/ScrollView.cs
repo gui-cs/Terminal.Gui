@@ -194,7 +194,6 @@ public class ScrollView : View
             {
                 // We're not initialized so we can't do anything fancy. Just cache value.
                 _contentOffset = new Point (-Math.Abs (value.X), -Math.Abs (value.Y));
-                ;
 
                 return;
             }
@@ -205,7 +204,7 @@ public class ScrollView : View
 
     /// <summary>Represents the contents of the data shown inside the scrollview</summary>
     /// <value>The size of the content.</value>
-    public Size ContentSize
+    public new Size ContentSize
     {
         get => _contentSize;
         set

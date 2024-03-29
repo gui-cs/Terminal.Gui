@@ -468,7 +468,7 @@ public partial class View
         {
             return true;
         }
-
+        
         return false;
     }
 

@@ -104,7 +104,7 @@ public partial class View
     {
         if (!Enabled)
         {
-            return true;
+            return false;
         }
 
         if (!CanBeVisible (this))

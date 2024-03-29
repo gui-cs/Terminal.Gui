@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO.Compression;
 
 namespace Terminal.Gui;
 
@@ -73,12 +74,9 @@ public partial class View
             _height = _frame.Height;
 
             // TODO: Figure out if the below can be optimized.
-            if (IsInitialized /*|| LayoutStyle == LayoutStyle.Absolute*/)
+            if (IsInitialized)
             {
-                LayoutAdornments ();
-                SetTextFormatterSize ();
-                SetNeedsLayout ();
-                SetNeedsDisplay ();
+                OnResizeNeeded ();
             }
         }
     }
@@ -102,12 +100,11 @@ public partial class View
             }
 
             Point viewportOffset = super.GetViewportOffset ();
-            viewportOffset.Offset (super.Frame.X, super.Frame.Y);
+            viewportOffset.Offset (super.Frame.X - super.Viewport.X, super.Frame.Y - super.Viewport.Y);
             ret.X += viewportOffset.X;
             ret.Y += viewportOffset.Y;
             super = super.SuperView;
         }
-
         return ret;
     }
 
@@ -120,15 +117,18 @@ public partial class View
     /// <param name="y">Screen-relative row.</param>
     public virtual Point ScreenToFrame (int x, int y)
     {
-        Point superViewBoundsOffset = SuperView?.GetViewportOffset () ?? Point.Empty;
+        Point superViewViewportOffset = SuperView?.GetViewportOffset () ?? Point.Empty;
+
         if (SuperView is null)
         {
-            superViewBoundsOffset.Offset (x - Frame.X, y - Frame.Y);
-            return superViewBoundsOffset;
-        }
+            superViewViewportOffset.Offset (x - Frame.X, y - Frame.Y);
 
-        var frame = SuperView.ScreenToFrame (x - superViewBoundsOffset.X, y - superViewBoundsOffset.Y);
+            return superViewViewportOffset;
+        }
+        superViewViewportOffset.Offset (-SuperView.Viewport.X, -SuperView.Viewport.Y);
+        Point frame = SuperView.ScreenToFrame (x - superViewViewportOffset.X, y - superViewViewportOffset.Y);
         frame.Offset (-Frame.X, -Frame.Y);
+
         return frame;
     }
 
@@ -283,126 +283,6 @@ public partial class View
     }
 
     #endregion Frame
-
-    #region Viewport
-
-    private Point _viewportOffset;
-
-    /// <summary>
-    ///     Gets or sets the rectangle describing the portion of the View's content that is visible to the user.
-    ///     The viewport Location is relative to the top-left corner of the inner rectangle of the <see cref="Adornment"/>s.
-    ///     If the viewport Size is the sames as the <see cref="ContentSize"/> the Location will be <c>0, 0</c>.
-    ///     Non-zero values for the location indicate the visible area is offset into the View's virtual <see cref="ContentSize"/>.
-    /// </summary>
-    /// <value>The rectangle describing the location and size of the viewport into the View's virtual content, described by <see cref="ContentSize"/>.</value>
-    /// <remarks>
-    ///     <para>
-    ///         If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/> the value of Viewport is indeterminate until
-    ///         the view has been initialized ( <see cref="IsInitialized"/> is true) and <see cref="LayoutSubviews"/> has been
-    ///         called.
-    ///     </para>
-    ///     <para>
-    ///         Updates to the Viewport Size updates <see cref="Frame"/>, and has the same impact as updating the
-    ///         <see cref="Frame"/>.
-    ///     </para>
-    ///     <para>
-    ///         Altering the Viewport Size will eventually (when the view is next laid out) cause the
-    ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
-    ///     </para>
-    /// </remarks>
-    public virtual Rectangle Viewport
-    {
-        get
-        {
-#if DEBUG
-            if (LayoutStyle == LayoutStyle.Computed && !IsInitialized)
-            {
-                Debug.WriteLine (
-                                 $"WARNING: Viewport is being accessed before the View has been initialized. This is likely a bug in {this}"
-                                );
-            }
-#endif // DEBUG
-
-            if (Margin is null || Border is null || Padding is null)
-            {
-                // CreateAdornments has not been called yet.
-                return new (_viewportOffset, Frame.Size);
-            }
-
-            Thickness totalThickness = GetAdornmentsThickness ();
-
-            return new (_viewportOffset,
-                new (Math.Max (0, Frame.Size.Width - totalThickness.Horizontal),
-                     Math.Max (0, Frame.Size.Height - totalThickness.Vertical)));
-        }
-        set
-        {
-            _viewportOffset = value.Location;
-
-            Thickness totalThickness = GetAdornmentsThickness ();
-
-            Frame = Frame with
-            {
-                Size = new (
-                            value.Size.Width + totalThickness.Horizontal,
-                            value.Size.Height + totalThickness.Vertical)
-            };
-        }
-    }
-
-    /// <summary>Converts a <see cref="Viewport"/>-relative rectangle to a screen-relative rectangle.</summary>
-    public Rectangle ViewportToScreen (in Rectangle viewport)
-    {
-        // Translate bounds to Frame (our SuperView's Viewport-relative coordinates)
-        Rectangle screen = FrameToScreen ();
-        Point viewportOffset = GetViewportOffset ();
-        screen.Offset (viewportOffset.X + viewport.X, viewportOffset.Y + viewport.Y);
-
-        if (SuperView is { })
-        {
-            screen.Offset(-SuperView.Viewport.X, -SuperView.Viewport.Y);
-        }
-
-
-        return new (screen.Location, viewport.Size);
-    }
-
-    /// <summary>Converts a screen-relative coordinate to a Viewport-relative coordinate.</summary>
-    /// <returns>The coordinate relative to this view's <see cref="Viewport"/>.</returns>
-    /// <param name="x">Screen-relative column.</param>
-    /// <param name="y">Screen-relative row.</param>
-    public Point ScreenToViewport (int x, int y)
-    {
-        Point viewportOffset = GetViewportOffset ();
-        Point screen = ScreenToFrame (x, y);
-        screen.Offset (-viewportOffset.X + Viewport.X, -viewportOffset.Y + Viewport.Y);
-
-        return screen;
-    }
-
-    /// <summary>
-    ///     Helper to get the X and Y offset of the Viewport from the Frame. This is the sum of the Left and Top properties
-    ///     of <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/>.
-    /// </summary>
-    public Point GetViewportOffset ()
-    {
-        return Padding is null ? Point.Empty : Padding.Thickness.GetInside (Padding.Frame).Location;
-    }
-
-    private Size _contentSize;
-    /// <summary>
-    /// Gets or sets the size of the View's content. If the value is <c>Size.Empty</c> the size of the content is
-    /// the same as the size of the <see cref="Viewport"/>, and <c>Viewport.Location</c> will always be <c>0, 0</c>.
-    /// If a positive size is provided, <see cref="Viewport"/> describes the portion of the content currently visible
-    /// to the view. This enables virtual scrolling.
-    /// </summary>
-    public Size ContentSize
-    {
-        get => _contentSize == Size.Empty ? Viewport.Size : _contentSize;
-        set => _contentSize = value;
-    }
-
-    #endregion Viewport
 
     #region AutoSize
 
@@ -657,25 +537,20 @@ public partial class View
 
     #endregion Layout Engine
 
-    internal bool LayoutNeeded { get; private set; } = true;
-
     /// <summary>
-    /// Indicates whether the specified SuperView-relative coordinates are within the View's <see cref="Frame"/>.
+    ///     Indicates whether the specified SuperView-relative coordinates are within the View's <see cref="Frame"/>.
     /// </summary>
     /// <param name="x">SuperView-relative X coordinate.</param>
     /// <param name="y">SuperView-relative Y coordinate.</param>
     /// <returns><see langword="true"/> if the specified SuperView-relative coordinates are within the View.</returns>
-    public virtual bool Contains (int x, int y)
-    {
-        return Frame.Contains (x, y);
-    }
+    public virtual bool Contains (int x, int y) { return Frame.Contains (x, y); }
 
 #nullable enable
     /// <summary>Finds the first Subview of <paramref name="start"/> that is visible at the provided location.</summary>
     /// <remarks>
-    /// <para>
-    ///     Used to determine what view the mouse is over.
-    /// </para>
+    ///     <para>
+    ///         Used to determine what view the mouse is over.
+    ///     </para>
     /// </remarks>
     /// <param name="start">The view to scope the search by.</param>
     /// <param name="x"><paramref name="start"/>.SuperView-relative X coordinate.</param>
@@ -725,10 +600,10 @@ public partial class View
             {
                 View nextStart = start.InternalSubviews [i];
 
-                if (nextStart.Visible && nextStart.Contains (startOffsetX, startOffsetY))
+                if (nextStart.Visible && nextStart.Contains (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y))
                 {
                     // TODO: Remove recursion
-                    return FindDeepestView (nextStart, startOffsetX, startOffsetY) ?? nextStart;
+                    return FindDeepestView (nextStart, startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y) ?? nextStart;
                 }
             }
         }
@@ -767,6 +642,7 @@ public partial class View
     {
         int maxDimension;
         View superView;
+        statusBar = null;
 
         if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
@@ -801,7 +677,8 @@ public partial class View
         }
 
         //System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
-        bool menuVisible, statusVisible;
+        bool menuVisible = false;
+        bool statusVisible = false;
 
         if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
@@ -811,12 +688,15 @@ public partial class View
         {
             View t = viewToMove.SuperView;
 
-            while (t is not Toplevel)
+            while (t is { } and not Toplevel)
             {
                 t = t.SuperView;
             }
 
-            menuVisible = ((Toplevel)t).MenuBar?.Visible == true;
+            if (t is Toplevel toplevel)
+            {
+                menuVisible = toplevel.MenuBar?.Visible == true;
+            }
         }
 
         if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
@@ -839,13 +719,16 @@ public partial class View
         {
             View t = viewToMove.SuperView;
 
-            while (t is not Toplevel)
+            while (t is { } and not Toplevel)
             {
                 t = t.SuperView;
             }
 
-            statusVisible = ((Toplevel)t).StatusBar?.Visible == true;
-            statusBar = ((Toplevel)t).StatusBar;
+            if (t is Toplevel toplevel)
+            {
+                statusVisible = toplevel.StatusBar?.Visible == true;
+                statusBar = toplevel.StatusBar;
+            }
         }
 
         if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
@@ -854,7 +737,7 @@ public partial class View
         }
         else
         {
-            maxDimension = statusVisible ? viewToMove.SuperView.Frame.Height - 1 : viewToMove.SuperView.Frame.Height;
+            maxDimension = statusVisible ? viewToMove.SuperView.Viewport.Height - 1 : viewToMove.SuperView.Viewport.Height;
         }
 
         if (superView.Margin is { } && superView == viewToMove.SuperView)
@@ -935,7 +818,7 @@ public partial class View
 
         foreach (View v in ordered)
         {
-            LayoutSubview (v, new (GetViewportOffset (), ContentSize));
+            LayoutSubview (v, ContentSize);
         }
 
         // If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.
@@ -944,13 +827,19 @@ public partial class View
         {
             foreach ((View from, View to) in edges)
             {
-                LayoutSubview (to, from.Frame);
+                LayoutSubview (to, from.ContentSize);
             }
         }
 
         LayoutNeeded = false;
 
         OnLayoutComplete (new () { OldViewport = oldViewport });
+    }
+    private void LayoutSubview (View v, Size contentSize)
+    {
+        v.SetRelativeLayout (contentSize);
+        v.LayoutSubviews ();
+        v.LayoutNeeded = false;
     }
 
     /// <summary>Indicates that the view does not need to be laid out.</summary>
@@ -985,8 +874,8 @@ public partial class View
         // First try SuperView.Viewport, then Application.Top, then Driver.Viewport.
         // Finally, if none of those are valid, use int.MaxValue (for Unit tests).
         Size contentSize = SuperView is { IsInitialized: true } ? SuperView.ContentSize :
-                                   Application.Top is { } && Application.Top.IsInitialized ? Application.Top.ContentSize :
-                                   Application.Driver?.Viewport.Size ?? new (int.MaxValue, int.MaxValue);
+                           Application.Top is { } && Application.Top.IsInitialized ? Application.Top.ContentSize :
+                           Application.Driver?.Viewport.Size ?? new (int.MaxValue, int.MaxValue);
         SetRelativeLayout (contentSize);
 
         // TODO: Determine what, if any of the below is actually needed here.
@@ -1003,6 +892,7 @@ public partial class View
             SetNeedsLayout ();
         }
     }
+    internal bool LayoutNeeded { get; private set; } = true;
 
     /// <summary>
     ///     Sets the internal <see cref="LayoutNeeded"/> flag for this View and all of it's subviews and it's SuperView.
@@ -1027,13 +917,20 @@ public partial class View
     }
 
     /// <summary>
-    ///     Applies the view's position (<see cref="X"/>, <see cref="Y"/>) and dimension (<see cref="Width"/>, and
-    ///     <see cref="Height"/>) to <see cref="Frame"/>, given the SuperView's ContentSize (nominally the
-    ///     same as <c>this.SuperView.ContentSize</c>).
+    ///     Adjusts <see cref="Frame"/> given the SuperView's ContentSize (nominally the same as
+    ///     <c>this.SuperView.ContentSize</c>)
+    ///     and the position (<see cref="X"/>, <see cref="Y"/>) and dimension (<see cref="Width"/>, and
+    ///     <see cref="Height"/>).
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// If <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, or <see cref="Height"/> are
+    /// absolute, they will be updated to reflect the new size and position of the view. Otherwise, they
+    /// are left unchanged.
+    /// </para>
+    /// </remarks>
     /// <param name="superviewContentSize">
-    ///     The size of the SuperView's content (nominally the same as
-    ///     <c>this.SuperView.ContentSize</c>).
+    ///     The size of the SuperView's content (nominally the same as <c>this.SuperView.ContentSize</c>).
     /// </param>
     internal void SetRelativeLayout (Size superviewContentSize)
     {
@@ -1422,17 +1319,6 @@ public partial class View
         // return L (a topologically sorted order)
         return result;
     } // TopologicalSort
-
-    private void LayoutSubview (View v, Rectangle viewport)
-    {
-        //if (v.LayoutStyle == LayoutStyle.Computed) {
-        v.SetRelativeLayout (viewport.Size);
-
-        //}
-
-        v.LayoutSubviews ();
-        v.LayoutNeeded = false;
-    }
 
     #region Diagnostics
 

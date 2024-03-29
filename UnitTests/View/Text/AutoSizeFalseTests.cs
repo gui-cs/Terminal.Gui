@@ -216,7 +216,7 @@ public class AutoSizeFalseTests
     {
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
 
-        view.SetRelativeLayout (new (0, 0, 10, 4));
+        view.SetRelativeLayout (new (10, 4));
         Assert.Equal (new (0, 0, 10, 4), view.Frame);
         Assert.Equal (new (0, 0), view.TextFormatter.Size);
         Assert.False (view.AutoSize);
