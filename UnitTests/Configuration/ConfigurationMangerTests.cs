@@ -41,6 +41,7 @@ public class ConfigurationManagerTests
         Assert.True (fired);
 
         Applied -= ConfigurationManager_Applied;
+        Reset ();
     }
 
     [Fact]
@@ -176,6 +177,7 @@ public class ConfigurationManagerTests
         Assert.True (fired);
 
         Updated -= ConfigurationManager_Updated;
+        Reset ();
     }
 
     [Fact]
@@ -264,6 +266,7 @@ public class ConfigurationManagerTests
         Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey.KeyCode);
         Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey.KeyCode);
         Assert.False (Application.IsMouseDisabled);
+        Reset ();
     }
 
     [Fact]
@@ -537,7 +540,7 @@ public class ConfigurationManagerTests
 
         Settings.Update ("{}}", "test");
 
-        Assert.NotEqual (0, jsonErrors.Length);
+        Assert.NotEqual (0, _jsonErrors.Length);
 
         Application.Shutdown ();
 
@@ -630,7 +633,7 @@ public class ConfigurationManagerTests
         jsonException = Assert.Throws<JsonException> (() => Settings.Update (json, "test"));
         Assert.StartsWith ("Unknown property", jsonException.Message);
 
-        Assert.Equal (0, jsonErrors.Length);
+        Assert.Equal (0, _jsonErrors.Length);
 
         ThrowOnJsonErrors = false;
     }
@@ -813,6 +816,7 @@ public class ConfigurationManagerTests
 
         Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"].Normal.Foreground);
         Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
+        Reset ();
     }
 
     [Fact]

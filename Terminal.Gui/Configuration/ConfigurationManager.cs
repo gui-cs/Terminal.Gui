@@ -82,8 +82,10 @@ public static class ConfigurationManager
     ///     <see cref="ConfigurationManager"/> to get and set the property's value.
     /// </summary>
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     internal static Dictionary<string, ConfigProperty>? _allConfigProperties;
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     internal static readonly JsonSerializerOptions _serializerOptions = new ()
     {
         ReadCommentHandling = JsonCommentHandling.Skip,
@@ -104,8 +106,10 @@ public static class ConfigurationManager
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
 
-    internal static StringBuilder jsonErrors = new ();
+    [System.Diagnostics.CodeAnalysis.SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+    internal static StringBuilder _jsonErrors = new ();
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     private static readonly string _configFilename = "config.json";
 
     /// <summary>The backing property for <see cref="Settings"/>.</summary>
@@ -300,12 +304,12 @@ public static class ConfigurationManager
     /// <summary>Prints any Json deserialization errors that occurred during deserialization to the console.</summary>
     public static void PrintJsonErrors ()
     {
-        if (jsonErrors.Length > 0)
+        if (_jsonErrors.Length > 0)
         {
             Console.WriteLine (
                                @"Terminal.Gui ConfigurationManager encountered the following errors while deserializing configuration files:"
                               );
-            Console.WriteLine (jsonErrors.ToString ());
+            Console.WriteLine (_jsonErrors.ToString ());
         }
     }
 
@@ -350,7 +354,7 @@ public static class ConfigurationManager
     internal static void AddJsonError (string error)
     {
         Debug.WriteLine ($"ConfigurationManager: {error}");
-        jsonErrors.AppendLine (error);
+        _jsonErrors.AppendLine (error);
     }
 
     /// <summary>
@@ -602,5 +606,5 @@ public static class ConfigurationManager
         return stream;
     }
 
-    private static void ClearJsonErrors () { jsonErrors.Clear (); }
+    private static void ClearJsonErrors () { _jsonErrors.Clear (); }
 }
