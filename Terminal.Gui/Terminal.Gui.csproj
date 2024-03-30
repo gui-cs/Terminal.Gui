@@ -65,6 +65,7 @@
   <!-- =================================================================== -->
   <ItemGroup>
     <InternalsVisibleTo Include="UnitTests" />
+    <InternalsVisibleTo Include="TerminalGuiDesigner" />
   </ItemGroup>
   <!-- =================================================================== -->
   <!-- API Documentation -->
