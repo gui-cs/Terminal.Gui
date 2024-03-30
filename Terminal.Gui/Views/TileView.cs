@@ -183,6 +183,8 @@ public class TileView : View
     {
         Driver.SetAttribute (ColorScheme.Normal);
 
+        ClearVisibleContent();
+
         base.OnDrawContent (viewport);
 
         var lc = new LineCanvas ();
