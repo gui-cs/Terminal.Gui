@@ -335,8 +335,19 @@ public partial class View
             }
 
             Thickness totalThickness = GetAdornmentsThickness ();
-            int width = Math.Max (0, Frame.Size.Width - totalThickness.Horizontal - (UseContentOffset ? ContentOffset.X : 0));
-            int height = Math.Max (0, Frame.Size.Height - totalThickness.Vertical - (UseContentOffset ? ContentOffset.Y : 0));
+            int width;
+            int height;
+
+            if (UseContentOffset)
+            {
+                width = Math.Max (GetVisibleContentArea ().Width, ContentSize.Width);
+                height = Math.Max (GetVisibleContentArea ().Height, ContentSize.Height);
+            }
+            else
+            {
+                width = Math.Max (0, Frame.Size.Width - totalThickness.Horizontal);
+                height = Math.Max (0, Frame.Size.Height - totalThickness.Vertical);
+            }
 
             return new (UseContentOffset ? ContentOffset : Point.Empty, new Size (width, height));
         }
@@ -948,9 +959,16 @@ public partial class View
         CollectAll (this, ref nodes, ref edges);
         List<View> ordered = TopologicalSort (SuperView, nodes, edges);
 
+        Point boundsOffset = Point.Empty;
+
+        if (UseContentOffset)
+        {
+            boundsOffset.Offset (ContentOffset.X, ContentOffset.Y);
+        }
+
         foreach (View v in ordered)
         {
-            LayoutSubview (v, new (Point.Empty, ContentArea.Size));
+            LayoutSubview (v, new (boundsOffset, ContentArea.Size));
         }
 
         // If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.
