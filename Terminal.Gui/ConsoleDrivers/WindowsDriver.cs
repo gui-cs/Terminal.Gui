@@ -1715,6 +1715,7 @@ internal class WindowsDriver : ConsoleDriver
                 Flags = mouseFlag
             };
 
+            // TODO: This makes ConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
             View view = Application.WantContinuousButtonPressedView;
 
             if (view is null)
@@ -1724,6 +1725,7 @@ internal class WindowsDriver : ConsoleDriver
 
             if (_isButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0)
             {
+                // TODO: This makes ConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
                 Application.Invoke (() => OnMouseEvent (new MouseEventEventArgs (me)));
             }
         }
@@ -1779,6 +1781,7 @@ internal class WindowsDriver : ConsoleDriver
 
         if (_isButtonDoubleClicked || _isOneFingerDoubleClicked)
         {
+            // TODO: This makes ConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
             Application.MainLoop.AddIdle (
                                           () =>
                                           {
@@ -1850,6 +1853,7 @@ internal class WindowsDriver : ConsoleDriver
 
             if ((mouseFlag & MouseFlags.ReportMousePosition) == 0)
             {
+                // TODO: This makes ConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
                 Application.MainLoop.AddIdle (
                                               () =>
                                               {

@@ -101,8 +101,8 @@ public partial class View
 
         // If toClear does not fill the Viewport, we need to clear the area outside toClear with DarkGray.
         // TODO: Need a configurable color for this
+        // PERF: Put an if around this if toClear is not smaller than Viewport
         Attribute prev = Driver.SetAttribute (new Attribute (ColorName.DarkGray, ColorName.DarkGray));
-
         Rectangle viewport = new (Point.Empty, Viewport.Size);
         Driver.FillRect (ViewportToScreen (viewport));
         Driver.SetAttribute (prev);
@@ -120,10 +120,10 @@ public partial class View
             return;
         }
 
-        Attribute prev = Driver.SetAttribute (GetNormalColor ());
-
         // Clamp the region to the bounds of the view
         viewport = Rectangle.Intersect (viewport, new (Point.Empty, Viewport.Size));
+
+        Attribute prev = Driver.SetAttribute (GetNormalColor ());
         Driver.FillRect (ViewportToScreen (viewport));
         Driver.SetAttribute (prev);
     }
