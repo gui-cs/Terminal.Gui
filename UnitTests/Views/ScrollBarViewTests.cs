@@ -1249,7 +1249,7 @@ This is a test
         Assert.False (view2.HasFocus);
         Assert.Equal (12, view.ContentSize.Width);
         Assert.Equal (7, view.ContentSize.Height);
-        Assert.Equal ("{X=0,Y=0,Width=8,Height=5}", view.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=12,Height=7}", view.ContentArea.ToString ());
         Assert.Equal ("{X=0,Y=0,Width=8,Height=5}", view.GetVisibleContentArea ().ToString ());
         Assert.Equal ("{X=3,Y=2,Width=9,Height=6}", view.Frame.ToString ());
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Margin.ContentArea.ToString ());
@@ -1262,7 +1262,7 @@ This is a test
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Padding.GetVisibleContentArea ().ToString ());
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Padding.Frame.ToString ());
         Assert.Equal ("(Left=0,Top=0,Right=1,Bottom=1)", view.Padding.Thickness.ToString ());
-        Assert.Equal ("{Width=8, Height=5}", view.TextFormatter.Size.ToString ());
+        Assert.Equal ("{Width=12, Height=7}", view.TextFormatter.Size.ToString ());
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1365,7 +1365,7 @@ This is a test
         Assert.False (view2.HasFocus);
         Assert.Equal (12, view.ContentSize.Width);
         Assert.Equal (7, view.ContentSize.Height);
-        Assert.Equal ("{X=0,Y=0,Width=8,Height=5}", view.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=12,Height=7}", view.ContentArea.ToString ());
         Assert.Equal ("{X=0,Y=0,Width=8,Height=5}", view.GetVisibleContentArea ().ToString ());
         Assert.Equal ("{X=2,Y=1,Width=9,Height=6}", view.Frame.ToString ());
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Margin.ContentArea.ToString ());
@@ -1378,7 +1378,7 @@ This is a test
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Padding.GetVisibleContentArea ().ToString ());
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Padding.Frame.ToString ());
         Assert.Equal ("(Left=0,Top=0,Right=1,Bottom=1)", view.Padding.Thickness.ToString ());
-        Assert.Equal ("{Width=8, Height=5}", view.TextFormatter.Size.ToString ());
+        Assert.Equal ("{Width=12, Height=7}", view.TextFormatter.Size.ToString ());
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1482,7 +1482,7 @@ This is a test
         Assert.False (view2.HasFocus);
         Assert.Equal (12, view.ContentSize.Width);
         Assert.Equal (7, view.ContentSize.Height);
-        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=12,Height=7}", view.ContentArea.ToString ());
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.GetVisibleContentArea ().ToString ());
         Assert.Equal ("{X=2,Y=1,Width=9,Height=6}", view.Frame.ToString ());
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Margin.ContentArea.ToString ());
@@ -1495,7 +1495,7 @@ This is a test
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Padding.GetVisibleContentArea ().ToString ());
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Padding.Frame.ToString ());
         Assert.Equal ("(Left=0,Top=0,Right=0,Bottom=0)", view.Padding.Thickness.ToString ());
-        Assert.Equal ("{Width=9, Height=6}", view.TextFormatter.Size.ToString ());
+        Assert.Equal ("{Width=12, Height=7}", view.TextFormatter.Size.ToString ());
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"

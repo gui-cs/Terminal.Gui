@@ -294,7 +294,7 @@ public class ViewScrollBarTests
         Assert.False (view2.HasFocus);
         Assert.Equal (12, view.ContentSize.Width);
         Assert.Equal (7, view.ContentSize.Height);
-        Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.ContentArea.ToString ());
+        Assert.Equal ("{X=0,Y=0,Width=12,Height=7}", view.ContentArea.ToString ());
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.GetVisibleContentArea ().ToString ());
         Assert.Equal ("{X=3,Y=2,Width=9,Height=6}", view.Frame.ToString ());
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Margin.ContentArea.ToString ());
@@ -306,7 +306,7 @@ public class ViewScrollBarTests
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Padding.ContentArea.ToString ());
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Padding.GetVisibleContentArea ().ToString ());
         Assert.Equal ("{X=0,Y=0,Width=9,Height=6}", view.Padding.Frame.ToString ());
-        Assert.Equal ("{Width=9, Height=6}", view.TextFormatter.Size.ToString ());
+        Assert.Equal ("{Width=12, Height=7}", view.TextFormatter.Size.ToString ());
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
