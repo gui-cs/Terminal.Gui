@@ -887,7 +887,7 @@ public partial class View
         // Finally, if none of those are valid, use int.MaxValue (for Unit tests).
         Size contentSize = SuperView is { IsInitialized: true } ? SuperView.ContentSize :
                            Application.Top is { } && Application.Top.IsInitialized ? Application.Top.ContentSize :
-                           Application.Driver?.Viewport.Size ?? new (int.MaxValue, int.MaxValue);
+                           Application.Driver?.Screen.Size ?? new (int.MaxValue, int.MaxValue);
         SetRelativeLayout (contentSize);
 
         // TODO: Determine what, if any of the below is actually needed here.

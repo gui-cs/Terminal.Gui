@@ -340,7 +340,7 @@ public class DrawTests (ITestOutputHelper output)
         var view = new View { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
         view.BeginInit ();
         view.EndInit ();
-        view.SetRelativeLayout (Application.Driver.Viewport.Size);
+        view.SetRelativeLayout (Application.Driver.Screen.Size);
 
         Assert.Equal (new (0, 0, 2, 2), view.Frame);
         Assert.Equal (Rectangle.Empty, view.Viewport);
@@ -365,7 +365,7 @@ public class DrawTests (ITestOutputHelper output)
         view.Border.Thickness = new Thickness (1, 1, 1, 0);
         view.BeginInit ();
         view.EndInit ();
-        view.SetRelativeLayout (Application.Driver.Viewport.Size);
+        view.SetRelativeLayout (Application.Driver.Screen.Size);
 
         Assert.Equal (new (0, 0, 2, 1), view.Frame);
         Assert.Equal (Rectangle.Empty, view.Viewport);
@@ -383,7 +383,7 @@ public class DrawTests (ITestOutputHelper output)
         view.Border.Thickness = new Thickness (0, 1, 1, 1);
         view.BeginInit ();
         view.EndInit ();
-        view.SetRelativeLayout (Application.Driver.Viewport.Size);
+        view.SetRelativeLayout (Application.Driver.Screen.Size);
 
         Assert.Equal (new (0, 0, 1, 2), view.Frame);
         Assert.Equal (Rectangle.Empty, view.Viewport);
@@ -408,7 +408,7 @@ public class DrawTests (ITestOutputHelper output)
         view.Border.Thickness = new Thickness (1, 1, 0, 1);
         view.BeginInit ();
         view.EndInit ();
-        view.SetRelativeLayout (Application.Driver.Viewport.Size);
+        view.SetRelativeLayout (Application.Driver.Screen.Size);
 
         Assert.Equal (new (0, 0, 1, 2), view.Frame);
         Assert.Equal (Rectangle.Empty, view.Viewport);
@@ -434,7 +434,7 @@ public class DrawTests (ITestOutputHelper output)
 
         view.BeginInit ();
         view.EndInit ();
-        view.SetRelativeLayout (Application.Driver.Viewport.Size);
+        view.SetRelativeLayout (Application.Driver.Screen.Size);
 
         Assert.Equal (new (0, 0, 2, 1), view.Frame);
         Assert.Equal (Rectangle.Empty, view.Viewport);

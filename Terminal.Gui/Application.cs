@@ -527,7 +527,7 @@ public static partial class Application
         }
 
         //if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
-        toplevel.SetRelativeLayout (Driver.Viewport.Size);
+        toplevel.SetRelativeLayout (Driver.Screen.Size);
 
         //}
 

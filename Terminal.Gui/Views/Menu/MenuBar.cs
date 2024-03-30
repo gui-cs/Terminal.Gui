@@ -821,7 +821,7 @@ public class MenuBar : View
             return Point.Empty;
         }
 
-        Rectangle superViewFrame = SuperView is null ? Driver.Viewport : SuperView.Frame;
+        Rectangle superViewFrame = SuperView is null ? Driver.Screen : SuperView.Frame;
         View sv = SuperView is null ? Application.Current : SuperView;
         Point viewportOffset = sv.GetViewportOffsetFromFrame ();
 
@@ -838,7 +838,7 @@ public class MenuBar : View
     /// <returns>The location offset.</returns>
     internal Point GetScreenOffsetFromCurrent ()
     {
-        Rectangle screen = Driver.Viewport;
+        Rectangle screen = Driver.Screen;
         Rectangle currentFrame = Application.Current.Frame;
         Point viewportOffset = Application.Top.GetViewportOffsetFromFrame ();
 

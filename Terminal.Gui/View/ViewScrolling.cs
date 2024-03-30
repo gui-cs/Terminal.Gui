@@ -176,6 +176,32 @@ public partial class View
         }
         set
         {
+            if (!ScrollSettings.HasFlag (ScrollSettings.NoRestrictVertical))
+            {
+                if (value.Y + Viewport.Height > ContentSize.Height)
+                {
+                    value.Y = ContentSize.Height - Viewport.Height;
+                }
+
+                if (value.Y < 0)
+                {
+                    value.Y = 0;
+                }
+            }
+
+            if (!ScrollSettings.HasFlag (ScrollSettings.NoRestrictHorizontal))
+            {
+                if (value.X + Viewport.Width > ContentSize.Width)
+                {
+                    value.X = ContentSize.Width - Viewport.Width;
+                }
+
+                if (value.X < 0)
+                {
+                    value.X = 0;
+                }
+            }
+            
             _viewportLocation = value.Location;
 
             Thickness thickness = GetAdornmentsThickness ();
@@ -251,12 +277,6 @@ public partial class View
             return false;
         }
 
-        if (!ScrollSettings.HasFlag (ScrollSettings.NoRestrictVertical)
-            && (Viewport.Y + rows > ContentSize.Height - Viewport.Height || Viewport.Y + rows < 0))
-        {
-            return false;
-        }
-
         Viewport = Viewport with { Y = Viewport.Y + rows };
 
         return true;
@@ -274,12 +294,6 @@ public partial class View
     public bool? ScrollHorizontal (int cols)
     {
         if (ContentSize == Size.Empty || ContentSize == Viewport.Size)
-        {
-            return false;
-        }
-
-        if (!ScrollSettings.HasFlag (ScrollSettings.NoRestrictHorizontal)
-            && (Viewport.X + cols > ContentSize.Width - Viewport.Width || Viewport.X + cols < 0))
         {
             return false;
         }
