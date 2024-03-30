@@ -430,4 +430,131 @@ public class SetRelativeLayoutTests
         Assert.Equal (26, tf.Frame.Width);
         Assert.Equal (1, tf.Frame.Height);
     }
+
+    [Theory]
+    [InlineData (0, 0, 10, 10)]
+    [InlineData (-1, -1, 9, 9)]
+    [InlineData (1, 1, 11, 11)]
+    public void AnchorEnd_X_Same_As_Y (int x, int y, int expectedX, int expectedY)
+    {
+        var screen = new Rectangle (x, y, 10, 10);
+        var view = new View { X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Width = 3, Height = 3 };
+        view.BeginInit ();
+        view.EndInit ();
+        view.SetRelativeLayout (screen);
+
+        Assert.Equal (expectedX, view.Frame.X);
+        Assert.Equal (expectedY, view.Frame.Y);
+        Assert.Equal (3, view.Frame.Width);
+        Assert.Equal (3, view.Frame.Height);
+    }
+
+    [Theory]
+    [InlineData (0, 0, 3, 3)]
+    [InlineData (-1, -1, 2, 2)]
+    [InlineData (1, 1, 4, 4)]
+    public void Center_X_Same_As_Y (int x, int y, int expectedX, int expectedY)
+    {
+        var screen = new Rectangle (x, y, 10, 10);
+        var view = new View { X = Pos.Center (), Y = Pos.Center (), Width = 3, Height = 3 };
+        view.BeginInit ();
+        view.EndInit ();
+        view.SetRelativeLayout (screen);
+
+        Assert.Equal (expectedX, view.Frame.X);
+        Assert.Equal (expectedY, view.Frame.Y);
+        Assert.Equal (3, view.Frame.Width);
+        Assert.Equal (3, view.Frame.Height);
+    }
+
+    [Theory]
+    [InlineData (0, 0, 4, 4)]
+    [InlineData (-1, -1, 2, 2)]
+    [InlineData (1, 1, 6, 6)]
+    public void Combine_X_Same_As_Y (int x, int y, int expectedX, int expectedY)
+    {
+        var screen = new Rectangle (x, y, 10, 10);
+        var view = new View { X = Pos.Center () + 1, Y = Pos.Center () + 1, Width = 3, Height = 3 };
+        view.BeginInit ();
+        view.EndInit ();
+        view.SetRelativeLayout (screen);
+
+        Assert.Equal (expectedX, view.Frame.X);
+        Assert.Equal (expectedY, view.Frame.Y);
+        Assert.Equal (3, view.Frame.Width);
+        Assert.Equal (3, view.Frame.Height);
+    }
+
+    [Theory]
+    [InlineData (0, 0, 3, 3)]
+    [InlineData (-1, -1, 2, 2)]
+    [InlineData (1, 1, 4, 4)]
+    public void Absolute_X_Same_As_Y (int x, int y, int expectedX, int expectedY)
+    {
+        var screen = new Rectangle (x, y, 10, 10);
+        var view = new View { X = 3, Y = 3, Width = 3, Height = 3 };
+        view.BeginInit ();
+        view.EndInit ();
+        view.SetRelativeLayout (screen);
+
+        Assert.Equal (expectedX, view.Frame.X);
+        Assert.Equal (expectedY, view.Frame.Y);
+        Assert.Equal (3, view.Frame.Width);
+        Assert.Equal (3, view.Frame.Height);
+    }
+
+    [Theory]
+    [InlineData (0, 0, 5, 5)]
+    [InlineData (-1, -1, 4, 4)]
+    [InlineData (1, 1, 6, 6)]
+    public void Factor_X_Same_As_Y (int x, int y, int expectedX, int expectedY)
+    {
+        var screen = new Rectangle (x, y, 10, 10);
+        var view = new View { X = Pos.Percent (50), Y = Pos.Percent (50), Width = 3, Height = 3 };
+        view.BeginInit ();
+        view.EndInit ();
+        view.SetRelativeLayout (screen);
+
+        Assert.Equal (expectedX, view.Frame.X);
+        Assert.Equal (expectedY, view.Frame.Y);
+        Assert.Equal (3, view.Frame.Width);
+        Assert.Equal (3, view.Frame.Height);
+    }
+
+    [Theory]
+    [InlineData (0, 0, 4, 4)]
+    [InlineData (-1, -1, 3, 3)]
+    [InlineData (1, 1, 5, 5)]
+    public void PosView_X_Same_As_Y (int x, int y, int expectedX, int expectedY)
+    {
+        var screen = new Rectangle (x, y, 10, 10);
+        var view1 = new View { X = 3, Y = 3, Width = 1, Height = 1 };
+        var view2 = new View { X = Pos.Right (view1), Y = Pos.Bottom (view1), Width = 3, Height = 3 };
+        view2.BeginInit ();
+        view2.EndInit ();
+        view2.SetRelativeLayout (screen);
+
+        Assert.Equal (expectedX, view2.Frame.X);
+        Assert.Equal (expectedY, view2.Frame.Y);
+        Assert.Equal (3, view2.Frame.Width);
+        Assert.Equal (3, view2.Frame.Height);
+    }
+
+    [Theory]
+    [InlineData (0, 0, 4, 4)]
+    [InlineData (-1, -1, 3, 3)]
+    [InlineData (1, 1, 5, 5)]
+    public void PosFunc_X_Same_As_Y (int x, int y, int expectedX, int expectedY)
+    {
+        var screen = new Rectangle (x, y, 10, 10);
+        var view = new View { X = Pos.Function (() => 4), Y = Pos.Function (() => 4), Width = 3, Height = 3 };
+        view.BeginInit ();
+        view.EndInit ();
+        view.SetRelativeLayout (screen);
+
+        Assert.Equal (expectedX, view.Frame.X);
+        Assert.Equal (expectedY, view.Frame.Y);
+        Assert.Equal (3, view.Frame.Width);
+        Assert.Equal (3, view.Frame.Height);
+    }
 }

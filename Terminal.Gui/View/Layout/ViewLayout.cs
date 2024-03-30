@@ -925,7 +925,7 @@ public partial class View
 
         foreach (View v in ordered)
         {
-            LayoutSubview (v, new (GetBoundsOffset (), Bounds.Size));
+            LayoutSubview (v, new (Point.Empty, Bounds.Size));
         }
 
         // If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.
@@ -1116,6 +1116,7 @@ public partial class View
 
             int newDimension, newLocation;
             int superviewDimension = width ? superviewBounds.Width : superviewBounds.Height;
+            int superviewLocation = width ? superviewBounds.X : superviewBounds.Y;
 
             // Determine new location
             switch (pos)
@@ -1124,7 +1125,7 @@ public partial class View
                     // For Center, the dimension is dependent on location, but we need to force getting the dimension first
                     // using a location of 0
                     newDimension = Math.Max (GetNewDimension (dim, 0, superviewDimension, autosizeDimension), 0);
-                    newLocation = posCenter.Anchor (superviewDimension - newDimension);
+                    newLocation = posCenter.Anchor (superviewDimension - newDimension) + superviewLocation;
 
                     newDimension = Math.Max (
                                              GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension),
@@ -1175,7 +1176,7 @@ public partial class View
                 case Pos.PosFunc:
                 case Pos.PosView:
                 default:
-                    newLocation = pos?.Anchor (superviewDimension) ?? 0;
+                    newLocation = (pos?.Anchor (superviewDimension) ?? 0) + superviewLocation;
 
                     newDimension = Math.Max (
                                              GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension),
@@ -1202,15 +1203,15 @@ public partial class View
             // the view LayoutStyle.Absolute.
             _frame = r;
 
-            if (_x is Pos.PosAbsolute)
-            {
-                _x = Frame.X;
-            }
+            //if (_x is Pos.PosAbsolute)
+            //{
+            //    _x = Frame.X;
+            //}
 
-            if (_y is Pos.PosAbsolute)
-            {
-                _y = Frame.Y;
-            }
+            //if (_y is Pos.PosAbsolute)
+            //{
+            //    _y = Frame.Y;
+            //}
 
             if (_width is Dim.DimAbsolute)
             {
