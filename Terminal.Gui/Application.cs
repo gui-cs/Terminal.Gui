@@ -99,6 +99,7 @@ public static partial class Application
         // Don't dispose the Top. It's up to caller dispose it
         if (Top is { })
         {
+            
             Debug.Assert (Top.WasDisposed);
 
             // If End wasn't called _cachedRunStateToplevel may be null

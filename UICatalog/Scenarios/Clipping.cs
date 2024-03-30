@@ -30,8 +30,9 @@ public class Clipping : Scenario
         scrollView.ContentSize = new (200, 100);
 
         //ContentOffset = Point.Empty,
-        //scrollView.ShowVerticalScrollIndicator = true;
-        //scrollView.ShowHorizontalScrollIndicator = true;
+        scrollView.AutoHideScrollBars = true;
+        scrollView.ShowVerticalScrollIndicator = true;
+        scrollView.ShowHorizontalScrollIndicator = true;
 
         var embedded1 = new View
         {

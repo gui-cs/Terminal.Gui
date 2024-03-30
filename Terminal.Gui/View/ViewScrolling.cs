@@ -116,7 +116,11 @@ public partial class View
     /// </summary>
     public ScrollSettings ScrollSettings { get; set; }
 
-    private Point _viewportOffset;
+    /// <summary>
+    /// The location of the viewport.in the view's content (0,0) is the top-left corner of the content. It's size
+    /// is <see cref="ContentSize"/>.
+    /// </summary>
+    private Point _viewportLocation;
 
     /// <summary>
     ///     Gets or sets the rectangle describing the portion of the View's content that is visible to the user.
@@ -141,7 +145,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         Altering the Viewport Size will eventually (when the view is next laid out) cause the
-    ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
+    ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     /// </remarks>
     public virtual Rectangle Viewport
@@ -160,30 +164,32 @@ public partial class View
             if (Margin is null || Border is null || Padding is null)
             {
                 // CreateAdornments has not been called yet.
-                return new (_viewportOffset, Frame.Size);
+                return new (_viewportLocation, Frame.Size);
             }
 
-            Thickness totalThickness = GetAdornmentsThickness ();
+            Thickness thickness = GetAdornmentsThickness ();
 
-            return new (
-                        _viewportOffset,
-                        new (
-                             Math.Max (0, Frame.Size.Width - totalThickness.Horizontal),
-                             Math.Max (0, Frame.Size.Height - totalThickness.Vertical)));
+            return new (_viewportLocation, new (
+                                                Math.Max (0, Frame.Size.Width - thickness.Horizontal),
+                                                Math.Max (0, Frame.Size.Height - thickness.Vertical)
+                                                ));
         }
         set
         {
-            _viewportOffset = value.Location;
+            _viewportLocation = value.Location;
 
-            Thickness totalThickness = GetAdornmentsThickness ();
-            Size newSize = new (value.Size.Width + totalThickness.Horizontal,
-                                value.Size.Height + totalThickness.Vertical);
+            Thickness thickness = GetAdornmentsThickness ();
+            Size newSize = new (value.Size.Width + thickness.Horizontal,
+                                value.Size.Height + thickness.Vertical);
             if (newSize == Frame.Size)
             {
+                // The change is not changing the Frame, so we don't need to update it. 
+                // Just call SetRelativeLayout6 to update the layout.
                 SetNeedsLayout ();
                 return;
             }
 
+            // Update the Frame because we made it bigger or smaller which impacts subviews.
             Frame = Frame with
             {
                 Size = newSize

@@ -662,7 +662,7 @@ public class TabView : View
             _host._tabLocations = _host.CalculateViewport (Viewport).ToArray ();
 
             // clear any old text
-            Clear (viewport);
+            ClearVisibleContent ();
 
             RenderTabLine ();
 
