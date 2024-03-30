@@ -18,8 +18,8 @@ public abstract class ConsoleDriver
     // This is in addition to the dirty flag on each cell.
     internal bool [] _dirtyLines;
 
-    /// <summary>Gets the dimensions of the terminal.</summary>
-    public Rectangle Viewport => new (0, 0, Cols, Rows);
+    /// <summary>Gets the location and size of the terminal screen.</summary>
+    public Rectangle Screen => new (0, 0, Cols, Rows);
 
     /// <summary>
     ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
