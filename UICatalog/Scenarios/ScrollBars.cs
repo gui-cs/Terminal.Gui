@@ -75,6 +75,70 @@ public class ScrollBars : Scenario
         viewOnBorder.TabIndex = 1;
         viewOnPadding.TabIndex = 2;
         viewOnContentArea.TabIndex = 3;
+
+        var hCheckBox = new CheckBox
+        {
+            X = 0,
+            Y = 0,
+            Text = "Horizontal Scrollbar",
+            Checked = true
+        };
+        hCheckBox.Toggled += (s, e) =>
+                             {
+                                 viewOnMargin.ShowHorizontalScrollBar = !(bool)hCheckBox.Checked;
+                                 viewOnBorder.ShowHorizontalScrollBar = !(bool)hCheckBox.Checked;
+                                 viewOnPadding.ShowHorizontalScrollBar = !(bool)hCheckBox.Checked;
+                                 viewOnContentArea.ShowHorizontalScrollBar = !(bool)hCheckBox.Checked;
+                             };
+        Win.Add (hCheckBox);
+
+        var vCheckBox = new CheckBox
+        {
+            X = Pos.Right (hCheckBox) + 3,
+            Y = 0,
+            Text = "Vertical Scrollbar",
+            Checked = true
+        };
+        vCheckBox.Toggled += (s, e) =>
+                             {
+                                 viewOnMargin.ShowVerticalScrollBar = !(bool)vCheckBox.Checked;
+                                 viewOnBorder.ShowVerticalScrollBar = !(bool)vCheckBox.Checked;
+                                 viewOnPadding.ShowVerticalScrollBar = !(bool)vCheckBox.Checked;
+                                 viewOnContentArea.ShowVerticalScrollBar = !(bool)vCheckBox.Checked;
+                             };
+        Win.Add (vCheckBox);
+
+        var ahCheckBox = new CheckBox
+        {
+            X = 0,
+            Y = Pos.Bottom (hCheckBox),
+            Text = "Auto Hide Scrollbars",
+            Checked = true
+        };
+        ahCheckBox.Toggled += (s, e) =>
+                              {
+                                  viewOnMargin.AutoHideScrollBars = !(bool)ahCheckBox.Checked;
+                                  viewOnBorder.AutoHideScrollBars = !(bool)ahCheckBox.Checked;
+                                  viewOnPadding.AutoHideScrollBars = !(bool)ahCheckBox.Checked;
+                                  viewOnContentArea.AutoHideScrollBars = !(bool)ahCheckBox.Checked;
+                              };
+        Win.Add (ahCheckBox);
+
+        var keepCheckBox = new CheckBox
+        {
+            X = 0,
+            Y = Pos.Bottom (ahCheckBox),
+            Text = "Keep Content Always In Viewport",
+            Checked = true
+        };
+        keepCheckBox.Toggled += (s, e) =>
+                                {
+                                    viewOnMargin.KeepContentAlwaysInContentArea = !(bool)keepCheckBox.Checked;
+                                    viewOnBorder.KeepContentAlwaysInContentArea = !(bool)keepCheckBox.Checked;
+                                    viewOnPadding.KeepContentAlwaysInContentArea = !(bool)keepCheckBox.Checked;
+                                    viewOnContentArea.KeepContentAlwaysInContentArea = !(bool)keepCheckBox.Checked;
+                                };
+        Win.Add (keepCheckBox);
     }
 
     private void SetViewProperties (View view)
