@@ -1555,6 +1555,248 @@ This is a test
                                                       _output);
     }
 
+    [Theory]
+    [InlineData ("Margin")]
+    [InlineData ("Border")]
+    [InlineData ("Padding")]
+    [InlineData ("ContentArea")]
+    public void KeepContentAlwaysInViewport_True_False_With_Both_ScrollBars_On_Adornments_And_ContentArea (string scrollBarsLocation)
+    {
+        var view = new View
+        {
+            X = 0, Y = 0, Width = 9, Height = 6,
+            Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line", CanFocus = true,
+            UseContentOffset = true
+        };
+        view.TextFormatter.WordWrap = false;
+        view.TextFormatter.MultiLine = true;
+
+        if (scrollBarsLocation == "Margin")
+        {
+            view.Margin.EnableScrollBars = true;
+        }
+        else if (scrollBarsLocation == "Border")
+        {
+            view.Border.EnableScrollBars = true;
+        }
+        else if (scrollBarsLocation == "Padding")
+        {
+            view.Padding.EnableScrollBars = true;
+        }
+        else
+        {
+            view.EnableScrollBars = true;
+        }
+
+        string [] strings = view.Text.Split ("\n").ToArray ();
+        view.ContentSize = new Size (strings.OrderByDescending (s => s.Length).First ().GetColumns (), strings.Length);
+        view.BeginInit ();
+        view.EndInit ();
+
+        Assert.True (view.ShowHorizontalScrollBar);
+        Assert.True (view.ShowVerticalScrollBar);
+        Assert.True (view.AutoHideScrollBars);
+        Assert.True (view.KeepContentAlwaysInContentArea);
+        Assert.True (view.OnInvokingKeyBindings (Key.End));
+        Assert.True (view.OnInvokingKeyBindings (Key.End.WithShift));
+        Assert.Equal (new Point (-4, -2), view.ContentOffset);
+
+        view.KeepContentAlwaysInContentArea = false;
+        Assert.True (view.OnInvokingKeyBindings (Key.End));
+        Assert.True (view.OnInvokingKeyBindings (Key.End.WithShift));
+        Assert.Equal (new Point (-11, -6), view.ContentOffset);
+    }
+
+    [Theory]
+    [InlineData ("Margin")]
+    [InlineData ("Border")]
+    [InlineData ("Padding")]
+    [InlineData ("ContentArea")]
+    public void KeepContentAlwaysInViewport_True_False_With_Horizontal_ScrollBar_On_Adornments_And_ContentArea (string scrollBarsLocation)
+    {
+        var view = new View
+        {
+            X = 0, Y = 0, Width = 9, Height = 6,
+            Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line", CanFocus = true,
+            UseContentOffset = true
+        };
+        view.TextFormatter.WordWrap = false;
+        view.TextFormatter.MultiLine = true;
+
+        if (scrollBarsLocation == "Margin")
+        {
+            view.Margin.EnableScrollBars = true;
+        }
+        else if (scrollBarsLocation == "Border")
+        {
+            view.Border.EnableScrollBars = true;
+        }
+        else if (scrollBarsLocation == "Padding")
+        {
+            view.Padding.EnableScrollBars = true;
+        }
+        else
+        {
+            view.EnableScrollBars = true;
+        }
+
+        string [] strings = view.Text.Split ("\n").ToArray ();
+        view.ContentSize = new Size (strings.OrderByDescending (s => s.Length).First ().GetColumns (), strings.Length);
+        view.BeginInit ();
+        view.EndInit ();
+
+        Assert.True (view.ShowHorizontalScrollBar);
+        Assert.True (view.ShowVerticalScrollBar);
+        Assert.True (view.AutoHideScrollBars);
+        Assert.True (view.KeepContentAlwaysInContentArea);
+
+        view.ShowVerticalScrollBar = false;
+        view.AutoHideScrollBars = false;
+        Assert.True (view.OnInvokingKeyBindings (Key.End));
+        Assert.True (view.OnInvokingKeyBindings (Key.End.WithShift));
+
+        if (scrollBarsLocation == "ContentArea")
+        {
+            Assert.Equal (new Point (-3, -2), view.ContentOffset);
+        }
+        else
+        {
+            Assert.Equal (new Point (-4, -2), view.ContentOffset);
+        }
+
+        view.KeepContentAlwaysInContentArea = false;
+        Assert.True (view.OnInvokingKeyBindings (Key.End));
+        Assert.True (view.OnInvokingKeyBindings (Key.End.WithShift));
+        Assert.Equal (new Point (-11, -6), view.ContentOffset);
+    }
+
+    [Theory]
+    [InlineData ("Margin")]
+    [InlineData ("Border")]
+    [InlineData ("Padding")]
+    [InlineData ("ContentArea")]
+    public void KeepContentAlwaysInViewport_True_False_With_Vertical_ScrollBar_On_Adornments_And_ContentArea (string scrollBarsLocation)
+    {
+        var view = new View
+        {
+            X = 0, Y = 0, Width = 9, Height = 6,
+            Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line", CanFocus = true,
+            UseContentOffset = true
+        };
+        view.TextFormatter.WordWrap = false;
+        view.TextFormatter.MultiLine = true;
+
+        if (scrollBarsLocation == "Margin")
+        {
+            view.Margin.EnableScrollBars = true;
+        }
+        else if (scrollBarsLocation == "Border")
+        {
+            view.Border.EnableScrollBars = true;
+        }
+        else if (scrollBarsLocation == "Padding")
+        {
+            view.Padding.EnableScrollBars = true;
+        }
+        else
+        {
+            view.EnableScrollBars = true;
+        }
+
+        string [] strings = view.Text.Split ("\n").ToArray ();
+        view.ContentSize = new Size (strings.OrderByDescending (s => s.Length).First ().GetColumns (), strings.Length);
+        view.BeginInit ();
+        view.EndInit ();
+
+        Assert.True (view.ShowHorizontalScrollBar);
+        Assert.True (view.ShowVerticalScrollBar);
+        Assert.True (view.AutoHideScrollBars);
+        Assert.True (view.KeepContentAlwaysInContentArea);
+
+        view.ShowHorizontalScrollBar = false;
+        view.AutoHideScrollBars = false;
+        Assert.True (view.OnInvokingKeyBindings (Key.End));
+        Assert.True (view.OnInvokingKeyBindings (Key.End.WithShift));
+
+        if (scrollBarsLocation == "ContentArea")
+        {
+            Assert.Equal (new Point (-4, -1), view.ContentOffset);
+        }
+        else
+        {
+            Assert.Equal (new Point (-4, -2), view.ContentOffset);
+        }
+
+        view.KeepContentAlwaysInContentArea = false;
+        Assert.True (view.OnInvokingKeyBindings (Key.End));
+        Assert.True (view.OnInvokingKeyBindings (Key.End.WithShift));
+        Assert.Equal (new Point (-11, -6), view.ContentOffset);
+    }
+
+        [Theory]
+    [InlineData ("Margin")]
+    [InlineData ("Border")]
+    [InlineData ("Padding")]
+    [InlineData ("ContentArea")]
+    public void KeepContentAlwaysInViewport_True_False_Without_ScrollBars_On_Adornments_And_ContentArea (string scrollBarsLocation)
+    {
+        var view = new View
+        {
+            X = 0, Y = 0, Width = 9, Height = 6,
+            Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line", CanFocus = true,
+            UseContentOffset = true
+        };
+        view.TextFormatter.WordWrap = false;
+        view.TextFormatter.MultiLine = true;
+
+        if (scrollBarsLocation == "Margin")
+        {
+            view.Margin.EnableScrollBars = true;
+        }
+        else if (scrollBarsLocation == "Border")
+        {
+            view.Border.EnableScrollBars = true;
+        }
+        else if (scrollBarsLocation == "Padding")
+        {
+            view.Padding.EnableScrollBars = true;
+        }
+        else
+        {
+            view.EnableScrollBars = true;
+        }
+
+        string [] strings = view.Text.Split ("\n").ToArray ();
+        view.ContentSize = new Size (strings.OrderByDescending (s => s.Length).First ().GetColumns (), strings.Length);
+        view.BeginInit ();
+        view.EndInit ();
+
+        Assert.True (view.ShowHorizontalScrollBar);
+        Assert.True (view.ShowVerticalScrollBar);
+        Assert.True (view.AutoHideScrollBars);
+        Assert.True (view.KeepContentAlwaysInContentArea);
+
+        view.ShowHorizontalScrollBar = false;
+        view.ShowVerticalScrollBar = false;
+        view.AutoHideScrollBars = false;
+        Assert.True (view.OnInvokingKeyBindings (Key.End));
+        Assert.True (view.OnInvokingKeyBindings (Key.End.WithShift));
+
+        if (scrollBarsLocation == "ContentArea")
+        {
+            Assert.Equal (new Point (-3, -1), view.ContentOffset);
+        }
+        else
+        {
+            Assert.Equal (new Point (-4, -2), view.ContentOffset);
+        }
+
+        view.KeepContentAlwaysInContentArea = false;
+        Assert.True (view.OnInvokingKeyBindings (Key.End));
+        Assert.True (view.OnInvokingKeyBindings (Key.End.WithShift));
+        Assert.Equal (new Point (-11, -6), view.ContentOffset);
+    }
+
     [Fact]
     public void Scrolling_With_Default_Constructor_Do_Not_Scroll ()
     {

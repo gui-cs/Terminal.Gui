@@ -665,12 +665,12 @@ public class ScrollBarView : View
         }
 
         int barSize = GetBarSize (orientation);
-        int isBuiltInOffset = IsBuiltIn ? 1 : 0;
+        int isBuiltInOffset = IsBuiltIn && barSize > 0 ? 1 : 0;
         int newPosition = Math.Max (Math.Min (Size - barSize, n), 0);
 
         maxToScroll = Size > barSize + newPosition - isBuiltInOffset
                           ? newPosition - _position
-                          : Size - (barSize + _position) + isBuiltInOffset - (barSize == 0 && OtherScrollBarView is { ShowScrollIndicator: true } ? 1 : 0);
+                          : Size - (barSize + _position) + isBuiltInOffset - (barSize == 0 ? 1 : 0);
 
         return Size >= barSize + newPosition - isBuiltInOffset && maxToScroll != 0;
     }
