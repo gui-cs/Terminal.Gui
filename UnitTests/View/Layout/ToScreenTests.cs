@@ -550,7 +550,8 @@ public class ToScreenTests (ITestOutputHelper output)
         View view = new ()
         {
             Width = 10,
-            Height = 10
+            Height = 10,
+            ScrollSettings = ScrollSettings.NoRestrict
         };
 
         Rectangle testRect = new Rectangle (0, 0, 1, 1);
