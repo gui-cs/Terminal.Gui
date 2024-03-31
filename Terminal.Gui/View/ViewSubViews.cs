@@ -468,7 +468,7 @@ public partial class View
         {
             return true;
         }
-
+        
         return false;
     }
 
@@ -838,16 +838,13 @@ public partial class View
             return;
         }
 
-        // BUGBUG: v2 - This needs to support children of Frames too
+        // BUGBUG: v2 - This needs to support Subviews of Adornments too
 
         if (Focused is null && SuperView is { })
         {
             SuperView.EnsureFocus ();
         }
-        else if (Focused?.Visible == true
-                 && Focused?.Enabled == true
-                 && Focused?.Frame.Width > 0
-                 && Focused.Frame.Height > 0)
+        else if (Focused is { Visible: true, Enabled: true, Frame: { Width: > 0, Height: > 0 } })
         {
             Focused.PositionCursor ();
         }

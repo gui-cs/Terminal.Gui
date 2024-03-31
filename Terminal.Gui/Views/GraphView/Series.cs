@@ -192,7 +192,7 @@ public class BarSeries : ISeries
                 screenStart.X = graph.AxisY.GetAxisXPosition (graph);
 
                 // dont draw bar off the right of the control
-                screenEnd.X = Math.Min (graph.Bounds.Width - 1, screenEnd.X);
+                screenEnd.X = Math.Min (graph.Viewport.Width - 1, screenEnd.X);
 
                 // if bar is off the screen
                 if (screenStart.Y < 0 || screenStart.Y > drawBounds.Height - graph.MarginBottom)

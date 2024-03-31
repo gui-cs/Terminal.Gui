@@ -72,7 +72,7 @@ public class ProgressBarStyles : Scenario
                                          dialog.X = pbList.Frame.X;
                                          dialog.Y = pbList.Frame.Height;
 
-                                         dialog.Bounds = new Rectangle (0, 0, colorPicker.Frame.Width, colorPicker.Frame.Height);
+                                         dialog.Viewport = new Rectangle (0, 0, colorPicker.Frame.Width, colorPicker.Frame.Height);
 
                                          Top.LayoutSubviews ();
                                      };

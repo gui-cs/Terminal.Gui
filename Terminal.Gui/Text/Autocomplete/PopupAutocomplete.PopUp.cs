@@ -16,7 +16,7 @@ public abstract partial class PopupAutocomplete
 
         protected internal override bool OnMouseEvent  (MouseEvent mouseEvent) { return _autoComplete.OnMouseEvent (mouseEvent); }
 
-        public override void OnDrawContent (Rectangle contentArea)
+        public override void OnDrawContent (Rectangle viewport)
         {
             if (!_autoComplete.LastPopupPos.HasValue)
             {

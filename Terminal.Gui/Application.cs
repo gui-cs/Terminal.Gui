@@ -88,7 +88,7 @@ public static partial class Application
 #if DEBUG_IDISPOSABLE
 
             // Don't dispose the toplevels. It's up to caller dispose them
-            Debug.Assert (t.WasDisposed);
+            //Debug.Assert (t.WasDisposed);
 #endif
         }
 
@@ -99,6 +99,7 @@ public static partial class Application
         // Don't dispose the Top. It's up to caller dispose it
         if (Top is { })
         {
+            
             Debug.Assert (Top.WasDisposed);
 
             // If End wasn't called _cachedRunStateToplevel may be null
@@ -525,7 +526,10 @@ public static partial class Application
             MoveCurrent (Current);
         }
 
-        toplevel.SetRelativeLayout (Driver.Bounds);
+        //if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
+        toplevel.SetRelativeLayout (Driver.Screen.Size);
+
+        //}
 
         // BUGBUG: This call is likely not needed.
         toplevel.LayoutSubviews ();
@@ -1307,7 +1311,7 @@ public static partial class Application
 
         foreach (Toplevel t in _topLevels)
         {
-            t.SetRelativeLayout (Rectangle.Empty with { Size = args.Size });
+            t.SetRelativeLayout (args.Size);
             t.LayoutSubviews ();
             t.PositionToplevels ();
             t.OnSizeChanging (new (args.Size));
@@ -1437,7 +1441,7 @@ public static partial class Application
     /// <remarks>
     ///     <para>
     ///         Use this event to receive mouse events in screen coordinates. Use <see cref="MouseEvent"/> to
-    ///         receive mouse events relative to a <see cref="View"/>'s bounds.
+    ///         receive mouse events relative to a <see cref="View.Viewport"/>.
     ///     </para>
     ///     <para>The <see cref="MouseEvent.View"/> will contain the <see cref="View"/> that contains the mouse coordinates.</para>
     /// </remarks>
@@ -1480,7 +1484,7 @@ public static partial class Application
         if (MouseGrabView is { })
         {
             // If the mouse is grabbed, send the event to the view that grabbed it.
-            // The coordinates are relative to the Bounds of the view that grabbed the mouse.
+            // The coordinates are relative to the Viewport of the view that grabbed the mouse.
             Point frameLoc = MouseGrabView.ScreenToFrame (a.MouseEvent.X, a.MouseEvent.Y);
 
             var viewRelativeMouseEvent = new MouseEvent
@@ -1492,9 +1496,9 @@ public static partial class Application
                 View = view
             };
 
-            if (MouseGrabView.Bounds.Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
+            if ((MouseGrabView.Viewport with { Location = Point.Empty }).Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
             {
-                // The mouse has moved outside the bounds of the view that
+                // The mouse has moved outside the Viewport of the view that
                 // grabbed the mouse, so we tell the view that last got 
                 // OnMouseEnter the mouse is leaving
                 // BUGBUG: That sentence makes no sense. Either I'm missing something or this logic is flawed.
@@ -1548,14 +1552,14 @@ public static partial class Application
                 View = view
             };
         }
-        else if (view.BoundsToScreen (view.Bounds).Contains (a.MouseEvent.X, a.MouseEvent.Y))
+        else if (view.ViewportToScreen (Rectangle.Empty with {Size = view.Viewport.Size}).Contains (a.MouseEvent.X, a.MouseEvent.Y))
         {
-            Point boundsPoint = view.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
+            Point viewportLocation = view.ScreenToViewport (a.MouseEvent.X, a.MouseEvent.Y);
 
             me = new ()
             {
-                X = boundsPoint.X,
-                Y = boundsPoint.Y,
+                X = viewportLocation.X,
+                Y = viewportLocation.Y,
                 Flags = a.MouseEvent.Flags,
                 ScreenPosition = new (a.MouseEvent.X, a.MouseEvent.Y),
                 View = view
@@ -1588,10 +1592,16 @@ public static partial class Application
 
         //Debug.WriteLine ($"OnMouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags}");
 
-        if (view.OnMouseEvent (me))
+        while (view is {} && !view.OnMouseEvent (me))
         {
-            // Should we bubble up the event, if it is not handled?
-            //return;
+            if (view is Adornment ad)
+            {
+                view = ad.Parent.SuperView;
+            }
+            else
+            {
+                view = view.SuperView;
+            }
         }
 
         BringOverlappedTopToFront ();

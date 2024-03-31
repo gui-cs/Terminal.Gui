@@ -100,7 +100,7 @@ public class StatusBarTests
         var top = new Toplevel ();
         top.Add (sb);
 
-        sb.OnDrawContent (sb.Bounds);
+        sb.OnDrawContent (sb.Viewport);
 
         var expected = @$"
 ^O Open {
@@ -123,7 +123,7 @@ public class StatusBarTests
                                );
         var top = new Toplevel ();
         top.Add (sb);
-        sb.OnDrawContent (sb.Bounds);
+        sb.OnDrawContent (sb.Viewport);
 
         var expected = @$"
 CTRL-O Open {

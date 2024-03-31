@@ -3586,7 +3586,7 @@ public class TextView : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         _isDrawing = true;
 
@@ -3649,7 +3649,7 @@ public class TextView : View
                     AddRune (col, row, rune);
                 }
 
-                if (!TextModel.SetCol (ref col, contentArea.Right, cols))
+                if (!TextModel.SetCol (ref col, viewport.Right, cols))
                 {
                     break;
                 }
@@ -3672,7 +3672,7 @@ public class TextView : View
         if (row < bottom)
         {
             SetNormalColor ();
-            ClearRegion (contentArea.Left, row, right, bottom);
+            ClearRegion (viewport.Left, row, right, bottom);
         }
 
         PositionCursor ();
