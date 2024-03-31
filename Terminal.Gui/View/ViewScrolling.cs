@@ -201,19 +201,23 @@ public partial class View
                     value.X = 0;
                 }
             }
-            
-            _viewportLocation = value.Location;
 
             Thickness thickness = GetAdornmentsThickness ();
             Size newSize = new (value.Size.Width + thickness.Horizontal,
                                 value.Size.Height + thickness.Vertical);
             if (newSize == Frame.Size)
             {
-                // The change is not changing the Frame, so we don't need to update it. 
-                // Just call SetRelativeLayout6 to update the layout.
-                SetNeedsLayout ();
+                // The change is not changing the Frame, so we don't need to update it.
+                // Just call SetNeedsLayout to update the layout.
+                if (_viewportLocation != value.Location)
+                {
+                    _viewportLocation = value.Location;
+                    SetNeedsLayout ();
+                }
                 return;
             }
+
+            _viewportLocation = value.Location;
 
             // Update the Frame because we made it bigger or smaller which impacts subviews.
             Frame = Frame with

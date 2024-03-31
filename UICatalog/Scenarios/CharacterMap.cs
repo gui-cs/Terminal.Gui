@@ -33,17 +33,24 @@ public class CharacterMap : Scenario
     private CharMap _charMap;
 
     // Don't create a Window, just return the top-level view
-    public override void Init ()
+    public override void Main ()
     {
         Application.Init ();
-        Top = new ();
-        Top.ColorScheme = Colors.ColorSchemes ["Base"];
-    }
 
-    public override void Setup ()
-    {
-        _charMap = new () { X = 0, Y = 1, Height = Dim.Fill () };
-        Top.Add (_charMap);
+        var top = new Window ()
+        {
+            BorderStyle = LineStyle.None
+        };
+
+        _charMap = new () { 
+            X = 0, 
+            Y = 0 ,
+            Width = Dim.Fill (),
+            Height = Dim.Fill () };
+        top.Add (_charMap);
+
+#if OTHER_CONTROLS
+        _charMap.Y = 1;
 
         var jumpLabel = new Label
         {
@@ -52,19 +59,19 @@ public class CharacterMap : Scenario
             HotKeySpecifier = (Rune)'_',
             Text = "_Jump To Code Point:"
         };
-        Top.Add (jumpLabel);
+        top.Add (jumpLabel);
 
         var jumpEdit = new TextField
         {
             X = Pos.Right (jumpLabel) + 1, Y = Pos.Y (_charMap), Width = 10, Caption = "e.g. 01BE3"
         };
-        Top.Add (jumpEdit);
+        top.Add (jumpEdit);
 
         _errorLabel = new ()
         {
             X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes ["error"], Text = "err"
         };
-        Top.Add (_errorLabel);
+        top.Add (_errorLabel);
 
 #if TEXT_CHANGED_TO_JUMP
         jumpEdit.TextChanged += JumpEdit_TextChanged;
@@ -80,7 +87,6 @@ public class CharacterMap : Scenario
         }
 #endif
         _categoryList = new () { X = Pos.Right (_charMap), Y = Pos.Bottom (jumpLabel), Height = Dim.Fill () };
-
         _categoryList.FullRowSelect = true;
 
         //jumpList.Style.ShowHeaders = false;
@@ -136,10 +142,8 @@ public class CharacterMap : Scenario
                                                  _charMap.StartCodePoint = table.Data.ToArray () [args.NewRow].Start;
                                              };
 
-        Top.Add (_categoryList);
+        top.Add (_categoryList);
 
-        _charMap.SelectedCodePoint = 0;
-        _charMap.SetFocus ();
 
         // TODO: Replace this with Dim.Auto when that's ready
         _categoryList.Initialized += _categoryList_Initialized;
@@ -165,7 +169,14 @@ public class CharacterMap : Scenario
                     )
             ]
         };
-        Top.Add (menu);
+        top.Add (menu);
+#endif // OTHER_CONTROLS
+
+        _charMap.SelectedCodePoint = 0;
+        _charMap.SetFocus ();
+
+        Application.Run (top);
+        top.Dispose ();
     }
 
     private void _categoryList_Initialized (object sender, EventArgs e) { _charMap.Width = Dim.Fill () - _categoryList.Width; }
@@ -380,6 +391,7 @@ internal class CharMap : View
                         {
                             ScrollHorizontal (COLUMN_WIDTH);
                         }
+
                         return true;
                     }
                    );
@@ -424,6 +436,7 @@ internal class CharMap : View
                     {
                         SelectedCodePoint = MaxCodePoint;
                         Viewport = Viewport with { Y = SelectedCodePoint / 16 * _rowHeight };
+
                         return true;
                     }
                    );
@@ -496,7 +509,7 @@ internal class CharMap : View
         set => throw new NotImplementedException ();
     }
 
-    public static int MaxCodePoint = UnicodeRange.Ranges.Max(r => r.End);// 0x10FFFF;
+    public static int MaxCodePoint = UnicodeRange.Ranges.Max (r => r.End);
 
     /// <summary>
     ///     Specifies the starting offset for the character map. The default is 0x2500 which is the Box Drawing
@@ -507,6 +520,10 @@ internal class CharMap : View
         get => _selected;
         set
         {
+            if (_selected == value)
+            {
+                return;
+            }
             _selected = value;
 
             if (IsInitialized)
@@ -538,7 +555,6 @@ internal class CharMap : View
                     Viewport = Viewport with { X = col - width };
                 }
             }
-
             SetNeedsDisplay ();
             SelectedCodePointChanged?.Invoke (this, new (SelectedCodePoint, null));
         }
@@ -582,8 +598,6 @@ internal class CharMap : View
         }
 
         ClearVisibleContent ();
-
-        Rectangle oldClip = ClipToViewport ();
 
         int cursorCol = Cursor.X + Viewport.X - RowLabelWidth - 1;
         int cursorRow = Cursor.Y + Viewport.Y - 1;
@@ -653,10 +667,6 @@ internal class CharMap : View
                     rune = new (scalar);
                 }
 
-                if (rune == (Rune)'!')
-                {
-
-                }
                 int width = rune.GetColumns ();
 
                 if (!ShowGlyphWidths || (y + Viewport.Y) % _rowHeight > 0)
@@ -711,7 +721,7 @@ internal class CharMap : View
             // Draw row label (U+XXXX_)
             Move (0, y);
 
-            Driver.SetAttribute (HasFocus && (y + Viewport.Y - 1 == cursorRow) ? ColorScheme.HotFocus : ColorScheme.HotNormal);
+            Driver.SetAttribute (HasFocus && y + Viewport.Y - 1 == cursorRow ? ColorScheme.HotFocus : ColorScheme.HotNormal);
 
             if (!ShowGlyphWidths || (y + Viewport.Y) % _rowHeight > 0)
             {
@@ -722,8 +732,6 @@ internal class CharMap : View
                 Driver.AddStr (new (' ', RowLabelWidth));
             }
         }
-
-       Driver.Clip = oldClip;
     }
 
     public override bool OnEnter (View view)
@@ -950,7 +958,7 @@ internal class CharMap : View
                                                         document.RootElement,
                                                         new
                                                             JsonSerializerOptions
-                                                            { WriteIndented = true }
+                                                        { WriteIndented = true }
                                                        );
             }
 

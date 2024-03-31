@@ -64,6 +64,11 @@ public partial class View
         get => _frame;
         set
         {
+            if (_frame == value)
+            {
+                return;
+            }
+
             _frame = value with { Width = Math.Max (value.Width, 0), Height = Math.Max (value.Height, 0) };
 
             // If Frame gets set, by definition, the View is now LayoutStyle.Absolute, so
@@ -161,6 +166,11 @@ public partial class View
         set
         {
             _x = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (X)} cannot be null");
+
+            if (Equals (_x, value))
+            {
+                return;
+            }
             OnResizeNeeded ();
         }
     }
@@ -193,6 +203,11 @@ public partial class View
         get => VerifyIsInitialized (_y, nameof (Y));
         set
         {
+            if (Equals (_y, value))
+            {
+                return;
+            }
+
             _y = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Y)} cannot be null");
             OnResizeNeeded ();
         }
@@ -226,6 +241,11 @@ public partial class View
         get => VerifyIsInitialized (_height, nameof (Height));
         set
         {
+            if (Equals (_height, value))
+            {
+                return;
+            }
+
             _height = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Height)} cannot be null");
 
             if (AutoSize)
@@ -276,6 +296,11 @@ public partial class View
         get => VerifyIsInitialized (_width, nameof (Width));
         set
         {
+            if (Equals (_width, value))
+            {
+                return;
+            }
+
             _width = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Width)} cannot be null");
 
             if (AutoSize)
