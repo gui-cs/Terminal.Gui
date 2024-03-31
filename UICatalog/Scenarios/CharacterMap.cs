@@ -1,6 +1,5 @@
-﻿#define DRAW_CONTENT
+﻿#define OTHER_CONTROLS
 
-//#define BASE_DRAW_CONTENT
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
