@@ -265,20 +265,20 @@ public class VkeyPacketSimulator : Scenario
             inputHorizontalRuler.Text = outputHorizontalRuler.Text =
                                             ruler.Repeat (
                                                           (int)Math.Ceiling (
-                                                                             inputHorizontalRuler.Bounds.Width
+                                                                             inputHorizontalRuler.Viewport.Width
                                                                              / (double)ruler.Length
                                                                             )
                                                          ) [
-                                                            ..inputHorizontalRuler.Bounds.Width];
+                                                            ..inputHorizontalRuler.Viewport.Width];
             inputVerticalRuler.Height = tvInput.Frame.Height + 1;
 
             inputVerticalRuler.Text =
-                ruler.Repeat ((int)Math.Ceiling (inputVerticalRuler.Bounds.Height / (double)ruler.Length)) [
-                     ..inputVerticalRuler.Bounds.Height];
+                ruler.Repeat ((int)Math.Ceiling (inputVerticalRuler.Viewport.Height / (double)ruler.Length)) [
+                     ..inputVerticalRuler.Viewport.Height];
 
             outputVerticalRuler.Text =
-                ruler.Repeat ((int)Math.Ceiling (outputVerticalRuler.Bounds.Height / (double)ruler.Length)) [
-                     ..outputVerticalRuler.Bounds.Height];
+                ruler.Repeat ((int)Math.Ceiling (outputVerticalRuler.Viewport.Height / (double)ruler.Length)) [
+                     ..outputVerticalRuler.Viewport.Height];
         }
 
         Win.LayoutComplete += Win_LayoutComplete;

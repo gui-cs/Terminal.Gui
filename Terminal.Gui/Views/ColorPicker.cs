@@ -98,9 +98,9 @@ public class ColorPicker : View
 
         SetFocus ();
 
-        if (me.X > Bounds.Width || me.Y > Bounds.Height)
+        if (me.X > Viewport.Width || me.Y > Viewport.Height)
         {
-            return true;
+            return false;
         }
 
         Cursor = new Point (me.X / _boxWidth, me.Y / _boxHeight);
@@ -157,16 +157,16 @@ public class ColorPicker : View
     }
 
     ///<inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
-        base.OnDrawContent (contentArea);
+        base.OnDrawContent (viewport);
 
         Driver.SetAttribute (HasFocus ? ColorScheme.Focus : GetNormalColor ());
         var colorIndex = 0;
 
-        for (var y = 0; y < Bounds.Height / BoxHeight; y++)
+        for (var y = 0; y < Viewport.Height / BoxHeight; y++)
         {
-            for (var x = 0; x < Bounds.Width / BoxWidth; x++)
+            for (var x = 0; x < Viewport.Width / BoxWidth; x++)
             {
                 int foregroundColorIndex = y == 0 ? colorIndex + _cols : colorIndex - _cols;
                 Driver.SetAttribute (new Attribute ((ColorName)foregroundColorIndex, (ColorName)colorIndex));

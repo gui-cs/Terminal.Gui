@@ -760,8 +760,8 @@ public class Editor : Scenario
         _winDialog = new Window
         {
             Title = isFind ? "Find" : "Replace",
-            X = Win.Bounds.Width / 2 - 30,
-            Y = Win.Bounds.Height / 2 - 10,
+            X = Win.Viewport.Width / 2 - 30,
+            Y = Win.Viewport.Height / 2 - 10,
             ColorScheme = Colors.ColorSchemes ["TopLevel"]
         };
 
