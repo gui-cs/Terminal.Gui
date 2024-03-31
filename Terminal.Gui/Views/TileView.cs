@@ -183,7 +183,7 @@ public class TileView : View
     {
         Driver.SetAttribute (ColorScheme.Normal);
 
-        ClearVisibleContent();
+        ClearVisibleContent ();
 
         base.OnDrawContent (viewport);
 
@@ -816,6 +816,8 @@ public class TileView : View
                 tile.ContentView.Width = viewport.Width;
                 tile.ContentView.Height = GetTileWidthOrHeight (i, Viewport.Height, visibleTiles, visibleSplitterLines);
             }
+            //  BUGBUG: This should not be needed. If any of the pos/dim setters above actually changed values, NeedsDisplay should have already been set. 
+            tile.ContentView.SetNeedsDisplay ();
         }
     }
 
@@ -900,7 +902,7 @@ public class TileView : View
             }
         }
 
-        protected internal override bool OnMouseEvent  (MouseEvent mouseEvent)
+        protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
         {
             if (!dragPosition.HasValue && mouseEvent.Flags == MouseFlags.Button1Pressed)
             {

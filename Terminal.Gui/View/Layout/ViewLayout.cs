@@ -66,7 +66,7 @@ public partial class View
         {
             if (_frame == value)
             {
-                //return;
+                return;
             }
 
             _frame = value with { Width = Math.Max (value.Width, 0), Height = Math.Max (value.Height, 0) };
@@ -165,12 +165,13 @@ public partial class View
         get => VerifyIsInitialized (_x, nameof (X));
         set
         {
-            _x = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (X)} cannot be null");
-
             if (Equals (_x, value))
             {
-                //return;
+                return;
             }
+
+            _x = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (X)} cannot be null");
+
             OnResizeNeeded ();
         }
     }
@@ -205,7 +206,7 @@ public partial class View
         {
             if (Equals (_y, value))
             {
-                //return;
+                return;
             }
 
             _y = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Y)} cannot be null");
@@ -243,7 +244,7 @@ public partial class View
         {
             if (Equals (_height, value))
             {
-                //return;
+                return;
             }
 
             _height = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Height)} cannot be null");
@@ -298,7 +299,7 @@ public partial class View
         {
             if (Equals (_width, value))
             {
-               // return;
+                return;
             }
 
             _width = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Width)} cannot be null");
