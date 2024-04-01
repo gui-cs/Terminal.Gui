@@ -185,7 +185,12 @@ public partial class View
     }
 
     /// <summary>Removes a subview added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.</summary>
-    /// <remarks></remarks>
+    /// <remarks>
+    /// <para>
+    ///     Normally Subviews will be disposed when this View is disposed. Removing a Subview causes ownership of the Subview's
+    ///     lifecycle to be transferred to the caller; the caller must call <see cref="Dispose"/>.
+    /// </para>
+    /// </remarks>
     public virtual void Remove (View view)
     {
         if (view is null || _subviews is null)
@@ -217,7 +222,15 @@ public partial class View
         }
     }
 
-    /// <summary>Removes all subviews (children) added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.</summary>
+    /// <summary>
+    /// Removes all subviews (children) added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///     Normally Subviews will be disposed when this View is disposed. Removing a Subview causes ownership of the Subview's
+    ///     lifecycle to be transferred to the caller; the caller must call <see cref="Dispose"/> on any Views that were added.
+    /// </para>
+    /// </remarks>
     public virtual void RemoveAll ()
     {
         if (_subviews is null)
