@@ -122,6 +122,8 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
     public override void After (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"After: {methodUnderTest.Name}");
+        base.After (methodUnderTest);
+
 #if DEBUG_IDISPOSABLE
         Assert.Empty (Responder.Instances);
 #endif
@@ -130,6 +132,7 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
     public override void Before (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
+        base.Before (methodUnderTest);
 #if DEBUG_IDISPOSABLE
 
         // Clear out any lingering Responder instances from previous tests
@@ -139,6 +142,7 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
     }
 }
 
+// TODO: Make this inherit from TestRespondersDisposed so that all tests that don't dispose Views correctly can be identified and fixed
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
 {
@@ -156,6 +160,7 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
         View.Diagnostics = ViewDiagnosticFlags.Off;
 
         Application.Driver = null;
+        base.After (methodUnderTest);
     }
 
     public override void Before (MethodInfo methodUnderTest)
@@ -163,6 +168,7 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
         Assert.Null (Application.Driver);
         Application.Driver = new FakeDriver { Rows = 25, Cols = 25 };
+        base.Before (methodUnderTest);
     }
 }
 
