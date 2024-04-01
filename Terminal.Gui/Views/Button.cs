@@ -58,7 +58,52 @@ public class Button : View
         KeyBindings.Add (Key.Enter, Command.HotKey);
 
         TitleChanged += Button_TitleChanged;
-        MouseClick += Button_MouseClick;
+        MouseEvent += Button_MouseEvent;
+        //MouseClick += Button_MouseClick;
+    }
+
+    private Attribute _originalNormal;
+
+    private void Button_MouseEvent (object sender, MouseEventEventArgs e)
+    {
+        if (e.MouseEvent.Flags == MouseFlags.Button1Pressed)
+        {
+            if (Application.MouseGrabView == this)
+            {
+                e.Handled = InvokeCommand (Command.HotKey) == true;
+
+                return;
+            }
+            Application.GrabMouse(this);
+
+            _originalNormal = ColorScheme.Normal;
+            var cs = new ColorScheme (ColorScheme)
+            {
+                Normal = ColorScheme.HotFocus
+            };
+            ColorScheme = cs;
+        }
+
+        if (e.MouseEvent.Flags == MouseFlags.Button1Released)
+        {
+            Application.UngrabMouse ();
+            var cs = new ColorScheme (ColorScheme)
+            {
+                Normal = _originalNormal
+            };
+            ColorScheme = cs;
+
+            e.Handled = InvokeCommand (Command.HotKey) == true;
+
+            return;
+        }
+    }
+
+    /// <inheritdoc />
+    public override bool OnLeave (View view)
+    {
+        //Application.UngrabMouse();
+        return base.OnLeave (view);
     }
 
     private void Button_MouseClick (object sender, MouseEventEventArgs e)

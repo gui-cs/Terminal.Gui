@@ -461,8 +461,88 @@ internal class CharMap : View
         KeyBindings.Add (Key.End, Command.BottomEnd);
 
         MouseClick += Handle_MouseClick;
-
         MouseEvent += Handle_MouseEvent;
+
+        // Prototype scrollbars
+        Padding.Thickness = new Thickness (0, 0, 1, 1);
+        var up = new Button ()
+        {
+            AutoSize = false,
+            X = Pos.AnchorEnd(1),
+            Y = 0,
+            Height = 1,
+            Width = 1,
+            NoPadding = true,
+            NoDecorations = true,
+            Title = CM.Glyphs.UpArrow.ToString (),
+            WantContinuousButtonPressed = true,
+            CanFocus = false,
+
+        };
+        up.Accept += (sender, args) =>
+                     {
+                         args.Cancel = ScrollVertical (-1) == true;
+                     };
+
+        var down = new Button ()
+        {
+            AutoSize = false,
+            X = Pos.AnchorEnd (1),
+            Y = Pos.AnchorEnd (2),
+            Height = 1,
+            Width = 1,
+            NoPadding = true,
+            NoDecorations = true,
+            Title = CM.Glyphs.DownArrow.ToString (),
+            WantContinuousButtonPressed = true,
+            CanFocus = false,
+
+        };
+        down.Accept += (sender, args) =>
+                     {
+                         ScrollVertical (1);
+                     };
+
+        var left = new Button ()
+        {
+            AutoSize = false,
+            X = 0,
+            Y = Pos.AnchorEnd (1),
+            Height = 1,
+            Width = 1,
+            NoPadding = true,
+            NoDecorations = true,
+            Title = CM.Glyphs.LeftArrow.ToString (),
+            WantContinuousButtonPressed = true,
+            CanFocus = false,
+
+        };
+        left.Accept += (sender, args) =>
+                     {
+                         ScrollHorizontal (-1);
+                     };
+
+        var right = new Button ()
+        {
+            AutoSize = false,
+            X = Pos.AnchorEnd (2),
+            Y = Pos.AnchorEnd (1),
+            Height = 1,
+            Width = 1,
+            NoPadding = true,
+            NoDecorations = true,
+            Title = CM.Glyphs.RightArrow.ToString (),
+            WantContinuousButtonPressed = true,
+            CanFocus = false,
+
+        };
+        right.Accept += (sender, args) =>
+                     {
+                         ScrollHorizontal (1);
+                     };
+
+
+        Padding.Add (up, down, left, right);
     }
 
     private void Handle_MouseEvent (object sender, MouseEventEventArgs e)
