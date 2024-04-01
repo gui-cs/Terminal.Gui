@@ -86,6 +86,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
                 Responder.Instances.Clear ();
             }
 #endif
+            ConfigurationManager.Reset ();
         }
     }
 

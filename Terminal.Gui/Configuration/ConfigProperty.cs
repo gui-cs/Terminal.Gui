@@ -41,7 +41,7 @@ public class ConfigProperty
             {
                 if (PropertyInfo?.GetValue (null) is { })
                 {
-                    PropertyInfo?.SetValue (null, DeepMemberwiseCopy (PropertyValue, PropertyInfo?.GetValue (null)));
+                    PropertyInfo?.SetValue (null, DeepMemberWiseCopy (PropertyValue, PropertyInfo?.GetValue (null)));
                 }
             }
             catch (TargetInvocationException tie)
@@ -82,9 +82,9 @@ public class ConfigProperty
     /// <returns></returns>
     public static string GetJsonPropertyName (PropertyInfo pi)
     {
-        var jpna = pi.GetCustomAttribute (typeof (JsonPropertyNameAttribute)) as JsonPropertyNameAttribute;
+        var attr = pi.GetCustomAttribute (typeof (JsonPropertyNameAttribute)) as JsonPropertyNameAttribute;
 
-        return jpna?.Name ?? pi.Name;
+        return attr?.Name ?? pi.Name;
     }
 
     /// <summary>
@@ -118,7 +118,7 @@ public class ConfigProperty
 
         if (PropertyValue is { })
         {
-            PropertyValue = DeepMemberwiseCopy (source, PropertyValue);
+            PropertyValue = DeepMemberWiseCopy (source, PropertyValue);
         }
         else
         {

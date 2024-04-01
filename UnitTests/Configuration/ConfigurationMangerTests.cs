@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Text.Json;
 using static Terminal.Gui.ConfigurationManager;
+#pragma warning disable IDE1006
 
 namespace Terminal.Gui.ConfigurationTests;
 
@@ -41,68 +42,69 @@ public class ConfigurationManagerTests
         Assert.True (fired);
 
         Applied -= ConfigurationManager_Applied;
+        Reset ();
     }
 
     [Fact]
-    public void DeepMemberwiseCopyTest ()
+    public void DeepMemberWiseCopyTest ()
     {
         // Value types
         var stringDest = "Destination";
         var stringSrc = "Source";
-        object stringCopy = DeepMemberwiseCopy (stringSrc, stringDest);
+        object stringCopy = DeepMemberWiseCopy (stringSrc, stringDest);
         Assert.Equal (stringSrc, stringCopy);
 
         stringDest = "Destination";
         stringSrc = "Destination";
-        stringCopy = DeepMemberwiseCopy (stringSrc, stringDest);
+        stringCopy = DeepMemberWiseCopy (stringSrc, stringDest);
         Assert.Equal (stringSrc, stringCopy);
 
         stringDest = "Destination";
         stringSrc = null;
-        stringCopy = DeepMemberwiseCopy (stringSrc, stringDest);
+        stringCopy = DeepMemberWiseCopy (stringSrc, stringDest);
         Assert.Equal (stringSrc, stringCopy);
 
         stringDest = "Destination";
         stringSrc = string.Empty;
-        stringCopy = DeepMemberwiseCopy (stringSrc, stringDest);
+        stringCopy = DeepMemberWiseCopy (stringSrc, stringDest);
         Assert.Equal (stringSrc, stringCopy);
 
         var boolDest = true;
         var boolSrc = false;
-        object boolCopy = DeepMemberwiseCopy (boolSrc, boolDest);
+        object boolCopy = DeepMemberWiseCopy (boolSrc, boolDest);
         Assert.Equal (boolSrc, boolCopy);
 
         boolDest = false;
         boolSrc = true;
-        boolCopy = DeepMemberwiseCopy (boolSrc, boolDest);
+        boolCopy = DeepMemberWiseCopy (boolSrc, boolDest);
         Assert.Equal (boolSrc, boolCopy);
 
         boolDest = true;
         boolSrc = true;
-        boolCopy = DeepMemberwiseCopy (boolSrc, boolDest);
+        boolCopy = DeepMemberWiseCopy (boolSrc, boolDest);
         Assert.Equal (boolSrc, boolCopy);
 
         boolDest = false;
         boolSrc = false;
-        boolCopy = DeepMemberwiseCopy (boolSrc, boolDest);
+        boolCopy = DeepMemberWiseCopy (boolSrc, boolDest);
         Assert.Equal (boolSrc, boolCopy);
 
         // Structs
         var attrDest = new Attribute (Color.Black);
         var attrSrc = new Attribute (Color.White);
-        object attrCopy = DeepMemberwiseCopy (attrSrc, attrDest);
+        object attrCopy = DeepMemberWiseCopy (attrSrc, attrDest);
         Assert.Equal (attrSrc, attrCopy);
 
         // Classes
         var colorschemeDest = new ColorScheme { Disabled = new Attribute (Color.Black) };
         var colorschemeSrc = new ColorScheme { Disabled = new Attribute (Color.White) };
-        object colorschemeCopy = DeepMemberwiseCopy (colorschemeSrc, colorschemeDest);
+        object colorschemeCopy = DeepMemberWiseCopy (colorschemeSrc, colorschemeDest);
         Assert.Equal (colorschemeSrc, colorschemeCopy);
 
         // Dictionaries
         Dictionary<string, Attribute> dictDest = new () { { "Disabled", new Attribute (Color.Black) } };
         Dictionary<string, Attribute> dictSrc = new () { { "Disabled", new Attribute (Color.White) } };
-        Dictionary<string, Attribute> dictCopy = (Dictionary<string, Attribute>)DeepMemberwiseCopy (dictSrc, dictDest);
+        Dictionary<string, Attribute> dictCopy = (Dictionary<string, Attribute>)DeepMemberWiseCopy (dictSrc, dictDest);
         Assert.Equal (dictSrc, dictCopy);
 
         dictDest = new Dictionary<string, Attribute> { { "Disabled", new Attribute (Color.Black) } };
@@ -111,7 +113,7 @@ public class ConfigurationManagerTests
         {
             { "Disabled", new Attribute (Color.White) }, { "Normal", new Attribute (Color.Blue) }
         };
-        dictCopy = (Dictionary<string, Attribute>)DeepMemberwiseCopy (dictSrc, dictDest);
+        dictCopy = (Dictionary<string, Attribute>)DeepMemberWiseCopy (dictSrc, dictDest);
         Assert.Equal (dictSrc, dictCopy);
 
         // src adds an item
@@ -121,7 +123,7 @@ public class ConfigurationManagerTests
         {
             { "Disabled", new Attribute (Color.White) }, { "Normal", new Attribute (Color.Blue) }
         };
-        dictCopy = (Dictionary<string, Attribute>)DeepMemberwiseCopy (dictSrc, dictDest);
+        dictCopy = (Dictionary<string, Attribute>)DeepMemberWiseCopy (dictSrc, dictDest);
         Assert.Equal (2, dictCopy.Count);
         Assert.Equal (dictSrc ["Disabled"], dictCopy ["Disabled"]);
         Assert.Equal (dictSrc ["Normal"], dictCopy ["Normal"]);
@@ -132,7 +134,7 @@ public class ConfigurationManagerTests
             { "Disabled", new Attribute (Color.Black) }, { "Normal", new Attribute (Color.White) }
         };
         dictSrc = new Dictionary<string, Attribute> { { "Disabled", new Attribute (Color.White) } };
-        dictCopy = (Dictionary<string, Attribute>)DeepMemberwiseCopy (dictSrc, dictDest);
+        dictCopy = (Dictionary<string, Attribute>)DeepMemberWiseCopy (dictSrc, dictDest);
         Assert.Equal (2, dictCopy.Count);
         Assert.Equal (dictSrc ["Disabled"], dictCopy ["Disabled"]);
         Assert.Equal (dictDest ["Normal"], dictCopy ["Normal"]);
@@ -176,6 +178,7 @@ public class ConfigurationManagerTests
         Assert.True (fired);
 
         Updated -= ConfigurationManager_Updated;
+        Reset ();
     }
 
     [Fact]
@@ -264,6 +267,7 @@ public class ConfigurationManagerTests
         Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey.KeyCode);
         Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey.KeyCode);
         Assert.False (Application.IsMouseDisabled);
+        Reset ();
     }
 
     [Fact]
@@ -376,7 +380,7 @@ public class ConfigurationManagerTests
 
         Assert.NotEmpty (Settings);
 
-        // test that all ConfigProperites have our attribute
+        // test that all ConfigProperties have our attribute
         Assert.All (
                     Settings,
                     item => Assert.NotEmpty (
@@ -408,7 +412,7 @@ public class ConfigurationManagerTests
     [Fact]
     public void TestConfigPropertyOmitClassName ()
     {
-        // Color.ColorShemes is serialzied as "ColorSchemes", not "Colors.ColorSchemes"
+        // Color.ColorSchemes is serialized as "ColorSchemes", not "Colors.ColorSchemes"
         PropertyInfo pi = typeof (Colors).GetProperty ("ColorSchemes");
         var scp = (SerializableConfigurationProperty)pi.GetCustomAttribute (typeof (SerializableConfigurationProperty));
         Assert.True (scp.Scope == typeof (ThemeScope));
@@ -537,7 +541,7 @@ public class ConfigurationManagerTests
 
         Settings.Update ("{}}", "test");
 
-        Assert.NotEqual (0, jsonErrors.Length);
+        Assert.NotEqual (0, _jsonErrors.Length);
 
         Application.Shutdown ();
 
@@ -621,7 +625,7 @@ public class ConfigurationManagerTests
         jsonException = Assert.Throws<JsonException> (() => Settings.Update (json, "test"));
         Assert.Equal ("Both Foreground and Background colors must be provided.", jsonException.Message);
 
-        // Unknown proeprty
+        // Unknown property
         json = @"
 			{
 				""Unknown"" : ""Not known""
@@ -630,7 +634,7 @@ public class ConfigurationManagerTests
         jsonException = Assert.Throws<JsonException> (() => Settings.Update (json, "test"));
         Assert.StartsWith ("Unknown property", jsonException.Message);
 
-        Assert.Equal (0, jsonErrors.Length);
+        Assert.Equal (0, _jsonErrors.Length);
 
         ThrowOnJsonErrors = false;
     }
@@ -813,6 +817,7 @@ public class ConfigurationManagerTests
 
         Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"].Normal.Foreground);
         Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
+        Reset ();
     }
 
     [Fact]
