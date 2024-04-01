@@ -244,6 +244,11 @@ public class Adornment : View
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
+        if (Parent is null)
+        {
+            return false;
+        }
+
         var args = new MouseEventEventArgs (mouseEvent);
 
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))

@@ -94,4 +94,228 @@ public class MouseTests (ITestOutputHelper output)
         view.OnMouseEvent (new MouseEvent () { Flags = mouseFlags });
         Assert.Equal (mouseFlagsFromEvent, expectedMouseFlagsFromEvent);
     }
+
+    public static TheoryData<View, string> AllViews => TestHelpers.GetAllViewsTheoryData ();
+
+
+    [Theory]
+    [MemberData (nameof (AllViews))]
+
+    public void AllViews_Enter_Leave_Events (View view, string viewName)
+    {
+        if (view == null)
+        {
+            output.WriteLine ($"Ignoring {viewName} - It's a Generic");
+            return;
+        }
+
+        if (!view.CanFocus)
+        {
+            output.WriteLine ($"Ignoring {viewName} - It can't focus.");
+
+            return;
+        }
+
+        if (view is Toplevel && ((Toplevel)view).Modal)
+        {
+            output.WriteLine ($"Ignoring {viewName} - It's a Modal Toplevel");
+
+            return;
+        }
+
+        Application.Init (new FakeDriver ());
+
+        Toplevel top = new ()
+        {
+            Height = 10,
+            Width = 10
+        };
+
+        View otherView = new ()
+        {
+            X = 0, Y = 0,
+            Height = 1,
+            Width  = 1,
+            CanFocus = true,
+        };
+
+        view.AutoSize = false;
+        view.X = Pos.Right(otherView);
+        view.Y = 0;
+        view.Width = 10;
+        view.Height = 1;
+
+        var nEnter = 0;
+        var nLeave = 0;
+
+        view.Enter += (s, e) => nEnter++;
+        view.Leave += (s, e) => nLeave++;
+
+        top.Add (view, otherView);
+        Application.Begin (top);
+
+        // Start with the focus on our test view
+        view.SetFocus ();
+
+        Assert.Equal (1, nEnter);
+        Assert.Equal (0, nLeave);
+
+        // Use keyboard to navigate to next view (otherView). 
+        if (view is TextView)
+        {
+            top.NewKeyDownEvent (Key.Tab.WithCtrl);
+        }
+        else if (view is DatePicker)
+        {
+            for (var i = 0; i < 4; i++)
+            {
+                top.NewKeyDownEvent (Key.Tab.WithCtrl);
+            }
+        }
+        else
+        {
+            top.NewKeyDownEvent (Key.Tab);
+        }
+
+        Assert.Equal (1, nEnter);
+        Assert.Equal (1, nLeave);
+
+        top.NewKeyDownEvent (Key.Tab);
+
+        Assert.Equal (2, nEnter);
+        Assert.Equal (1, nLeave);
+
+        top.Dispose ();
+        Application.Shutdown ();
+    }
+
+
+    [Theory]
+    [MemberData (nameof (AllViews))]
+
+    public void AllViews_Enter_Leave_Events_Visible_False (View view, string viewName)
+    {
+        if (view == null)
+        {
+            output.WriteLine ($"Ignoring {viewName} - It's a Generic");
+            return;
+        }
+
+        if (!view.CanFocus)
+        {
+            output.WriteLine ($"Ignoring {viewName} - It can't focus.");
+
+            return;
+        }
+
+        if (view is Toplevel && ((Toplevel)view).Modal)
+        {
+            output.WriteLine ($"Ignoring {viewName} - It's a Modal Toplevel");
+
+            return;
+        }
+
+        Application.Init (new FakeDriver ());
+
+        Toplevel top = new ()
+        {
+            Height = 10,
+            Width = 10
+        };
+
+        View otherView = new ()
+        {
+            X = 0, Y = 0,
+            Height = 1,
+            Width = 1,
+            CanFocus = true,
+        };
+
+        view.Visible = false;
+        view.AutoSize = false;
+        view.X = Pos.Right (otherView);
+        view.Y = 0;
+        view.Width = 10;
+        view.Height = 1;
+
+        var nEnter = 0;
+        var nLeave = 0;
+
+        view.Enter += (s, e) => nEnter++;
+        view.Leave += (s, e) => nLeave++;
+
+        top.Add (view, otherView);
+        Application.Begin (top);
+
+        // Start with the focus on our test view
+        view.SetFocus ();
+
+        Assert.Equal (0, nEnter);
+        Assert.Equal (0, nLeave);
+
+        // Use keyboard to navigate to next view (otherView). 
+        if (view is TextView)
+        {
+            top.NewKeyDownEvent (Key.Tab.WithCtrl);
+        }
+        else if (view is DatePicker)
+        {
+            for (var i = 0; i < 4; i++)
+            {
+                top.NewKeyDownEvent (Key.Tab.WithCtrl);
+            }
+        }
+        else
+        {
+            top.NewKeyDownEvent (Key.Tab);
+        }
+
+        Assert.Equal (0, nEnter);
+        Assert.Equal (0, nLeave);
+
+        top.NewKeyDownEvent (Key.Tab);
+
+        Assert.Equal (0, nEnter);
+        Assert.Equal (0, nLeave);
+
+        top.Dispose ();
+        Application.Shutdown ();
+    }
+
+    [Theory]
+    [MemberData (nameof (AllViews))]
+    public void AllViews_OnMouseEvent_Enabled_False_Does_Not_Set_Handled (View view, string viewName)
+    {
+        if (view == null)
+        {
+            output.WriteLine ($"Ignoring {viewName} - It's a Generic");
+            return;
+        }
+
+        view.Enabled = false;
+        var me = new MouseEvent ();
+        view.OnMouseEvent (me);
+        Assert.False (me.Handled);
+        view.Dispose ();
+    }
+
+    [Theory]
+    [MemberData (nameof (AllViews))]
+    public void AllViews_OnMouseClick_Enabled_False_Does_Not_Set_Handled (View view, string viewName)
+    {
+        if (view == null)
+        {
+            output.WriteLine ($"Ignoring {viewName} - It's a Generic");
+            return;
+        }
+
+        view.Enabled = false;
+        var me = new MouseEvent ()
+        {
+            Flags = MouseFlags.Button1Clicked
+        };
+        view.OnMouseEvent (me);
+        Assert.False (me.Handled);
+        view.Dispose ();
+    }
 }

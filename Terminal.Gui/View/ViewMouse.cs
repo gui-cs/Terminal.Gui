@@ -104,7 +104,8 @@ public partial class View
     {
         if (!Enabled)
         {
-            return true;
+            // A disabled view should not eat mouse events
+            return false;
         }
 
         if (!CanBeVisible (this))
@@ -150,6 +151,7 @@ public partial class View
     {
         if (!Enabled)
         {
+            // QUESTION: Is this right? Should a disabled view eat mouse clicks?
             args.Handled = true;
             return true;
         }

@@ -396,7 +396,7 @@ public class Buttons : Scenario
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            Title = $"Accept Count: {acceptCount}",
+            Title = $"Accept Count (press-and-hold): {acceptCount}",
             WantContinuousButtonPressed = true,
         };
         repeatButton.Accept += (s, e) =>

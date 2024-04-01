@@ -729,6 +729,87 @@ internal partial class TestHelpers
         return view;
     }
 
+    public static List<Type> GetAllViewClasses ()
+    {
+        return typeof (View).Assembly.GetTypes ()
+                            .Where (
+                                    myType => myType.IsClass
+                                              && !myType.IsAbstract
+                                              && myType.IsPublic
+                                              && myType.IsSubclassOf (typeof (View))
+                                   )
+                            .ToList ();
+    }
+
+    public static View CreateViewFromType (Type type, ConstructorInfo ctor)
+    {
+        View viewType = null;
+
+        if (type.IsGenericType && type.IsTypeDefinition)
+        {
+            List<Type> gTypes = new ();
+
+            foreach (Type args in type.GetGenericArguments ())
+            {
+                gTypes.Add (typeof (object));
+            }
+
+            type = type.MakeGenericType (gTypes.ToArray ());
+
+            Assert.IsType (type, (View)Activator.CreateInstance (type));
+        }
+        else
+        {
+            ParameterInfo [] paramsInfo = ctor.GetParameters ();
+            Type paramType;
+            List<object> pTypes = new ();
+
+            if (type.IsGenericType)
+            {
+                foreach (Type args in type.GetGenericArguments ())
+                {
+                    paramType = args.GetType ();
+
+                    if (args.Name == "T")
+                    {
+                        pTypes.Add (typeof (object));
+                    }
+                    else
+                    {
+                        AddArguments (paramType, pTypes);
+                    }
+                }
+            }
+
+            foreach (ParameterInfo p in paramsInfo)
+            {
+                paramType = p.ParameterType;
+
+                if (p.HasDefaultValue)
+                {
+                    pTypes.Add (p.DefaultValue);
+                }
+                else
+                {
+                    AddArguments (paramType, pTypes);
+                }
+            }
+
+            if (type.IsGenericType && !type.IsTypeDefinition)
+            {
+                viewType = (View)Activator.CreateInstance (type);
+                Assert.IsType (type, viewType);
+            }
+            else
+            {
+                viewType = (View)ctor.Invoke (pTypes.ToArray ());
+                Assert.IsType (type, viewType);
+            }
+        }
+
+        return viewType;
+    }
+
     [GeneratedRegex ("^\\s+", RegexOptions.Multiline)]
     private static partial Regex LeadingWhitespaceRegEx ();
 
