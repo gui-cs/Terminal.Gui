@@ -290,10 +290,11 @@ public class Buttons : Scenario
         {
             X = 0,
             Y = Pos.Bottom (moveUnicodeHotKeyBtn) + 1,
-            Title = "_1x1 Button:",
+            Title = "_Numeric Up/Down:",
         };
-        var oneByOne = new Button ()
+        var downButton = new Button ()
         {
+            CanFocus = false,
             AutoSize = false,
             X = Pos.Right(label)+1,
             Y = Pos.Top (label),
@@ -301,9 +302,41 @@ public class Buttons : Scenario
             Width = 1,
             NoPadding = true,
             NoDecorations = true,
-            Title = $"{CM.Glyphs.UpArrow}",
+            Title = $"{CM.Glyphs.DownArrow}",
+            WantContinuousButtonPressed = true,
         };
-        Win.Add (label, oneByOne);
+
+        var numericEdit = new TextField ()
+        {
+            Text = "1966",
+            X = Pos.Right (downButton),
+            Y = Pos.Top (downButton),
+            Width = 5,
+            Height = 1,
+        };
+        var upButton = new Button ()
+        {
+            CanFocus = false,
+            AutoSize = false,
+            X = Pos.Right (numericEdit),
+            Y = Pos.Top (numericEdit),
+            Height = 1,
+            Width = 1,
+            NoPadding = true,
+            NoDecorations = true,
+            Title = $"{CM.Glyphs.UpArrow}",
+            WantContinuousButtonPressed = true,
+        };
+        downButton.Accept += (s, e) =>
+                             {
+                                 numericEdit.Text = $"{int.Parse(numericEdit.Text) - 1}";
+                             };
+        upButton.Accept += (s, e) =>
+                           {
+                               numericEdit.Text = $"{int.Parse (numericEdit.Text) + 1}";
+                           };
+
+        Win.Add (label, downButton, numericEdit, upButton);
 
         radioGroup.SelectedItemChanged += (s, args) =>
                                           {
