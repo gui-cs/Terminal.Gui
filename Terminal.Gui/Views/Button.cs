@@ -67,6 +67,16 @@ public class Button : View
 
     private void Button_MouseEvent (object sender, MouseEventEventArgs e)
     {
+        if (e.MouseEvent.Flags.HasFlag(MouseFlags.Button1Clicked))
+        {
+            if (Application.MouseGrabView != this)
+            {
+                e.Handled = InvokeCommand (Command.HotKey) == true;
+
+                return;
+            }
+        }
+
         if (e.MouseEvent.Flags == MouseFlags.Button1Pressed)
         {
             if (Application.MouseGrabView == this)

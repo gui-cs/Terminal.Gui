@@ -120,7 +120,7 @@ public partial class View
             || mouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)
             || mouseEvent.Flags.HasFlag (MouseFlags.Button4Clicked))
         {
-            return OnMouseClick (args);
+            OnMouseClick (args);
         }
 
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
@@ -128,10 +128,13 @@ public partial class View
             || mouseEvent.Flags.HasFlag (MouseFlags.Button3DoubleClicked)
             || mouseEvent.Flags.HasFlag (MouseFlags.Button4DoubleClicked))
         {
-            return OnMouseClick (args);
+            OnMouseClick (args);
         }
 
-        MouseEvent?.Invoke (this, args);
+        if (args.Handled != true)
+        {
+            MouseEvent?.Invoke (this, args);
+        }
 
         return args.Handled == true;
     }
@@ -147,6 +150,7 @@ public partial class View
     {
         if (!Enabled)
         {
+            args.Handled = true;
             return true;
         }
 
@@ -158,6 +162,7 @@ public partial class View
 
         if (!HasFocus && CanFocus)
         {
+            args.Handled = true;
             SetFocus ();
         }
 
