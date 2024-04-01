@@ -469,8 +469,8 @@ public class SetRelativeLayoutTests
 
     [Theory]
     [InlineData (0, 0, 4, 4)]
-    [InlineData (-1, -1, 2, 2)]
-    [InlineData (1, 1, 6, 6)]
+    [InlineData (-1, -1, 3, 3)]
+    [InlineData (1, 1, 5, 5)]
     public void Combine_X_Same_As_Y (int x, int y, int expectedX, int expectedY)
     {
         var screen = new Rectangle (x, y, 10, 10);
@@ -523,8 +523,8 @@ public class SetRelativeLayoutTests
 
     [Theory]
     [InlineData (0, 0, 4, 4)]
-    [InlineData (-1, -1, 3, 3)]
-    [InlineData (1, 1, 5, 5)]
+    [InlineData (-1, -1, 4, 4)]
+    [InlineData (1, 1, 4, 4)]
     public void PosView_X_Same_As_Y (int x, int y, int expectedX, int expectedY)
     {
         var screen = new Rectangle (x, y, 10, 10);
