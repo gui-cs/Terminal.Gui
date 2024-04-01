@@ -1,4 +1,4 @@
-﻿#define DRAW_CONTENT
+#define DRAW_CONTENT
 
 //#define BASE_DRAW_CONTENT
 using System;

@@ -31,8 +31,14 @@ public partial class View
 
     /// <summary>Adds a subview (child) to this view.</summary>
     /// <remarks>
+    /// <para>
     ///     The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also
     ///     <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/>
+    /// </para>
+    /// <para>
+    ///     Subviews will be disposed when this View is disposed. In other-words, calling this method causes
+    ///     the lifecycle of the subviews to be transferred to this View.
+    /// </para>
     /// </remarks>
     public virtual void Add (View view)
     {
@@ -92,8 +98,14 @@ public partial class View
     /// <summary>Adds the specified views (children) to the view.</summary>
     /// <param name="views">Array of one or more views (can be optional parameter).</param>
     /// <remarks>
+    /// <para>
     ///     The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also
-    ///     <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/>
+    ///     <seealso cref="Remove(View)"/> and <seealso cref="RemoveAll"/>.
+    /// </para>
+    /// <para>
+    ///     Subviews will be disposed when this View is disposed. In other-words, calling this method causes
+    ///     the lifecycle of the subviews to be transferred to this View.
+    /// </para>
     /// </remarks>
     public void Add (params View [] views)
     {
@@ -185,7 +197,12 @@ public partial class View
     }
 
     /// <summary>Removes a subview added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.</summary>
-    /// <remarks></remarks>
+    /// <remarks>
+    /// <para>
+    ///     Normally Subviews will be disposed when this View is disposed. Removing a Subview causes ownership of the Subview's
+    ///     lifecycle to be transferred to the caller; the caller muse call <see cref="Dispose"/>.
+    /// </para>
+    /// </remarks>
     public virtual void Remove (View view)
     {
         if (view is null || _subviews is null)

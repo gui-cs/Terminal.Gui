@@ -286,6 +286,25 @@ public class Buttons : Scenario
         moveUnicodeHotKeyBtn.Accept += (s, e) => { moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text); };
         Win.Add (moveUnicodeHotKeyBtn);
 
+        label = new Label ()
+        {
+            X = 0,
+            Y = Pos.Bottom (moveUnicodeHotKeyBtn) + 1,
+            Title = "_1x1 Button:",
+        };
+        var oneByOne = new Button ()
+        {
+            AutoSize = false,
+            X = Pos.Right(label)+1,
+            Y = Pos.Top (label),
+            Height = 1,
+            Width = 1,
+            NoPadding = true,
+            NoDecorations = true,
+            Title = CM.Glyphs.UpArrow.ToString(),
+        };
+        Win.Add (label, oneByOne);
+
         radioGroup.SelectedItemChanged += (s, args) =>
                                           {
                                               switch (args.SelectedItem)
