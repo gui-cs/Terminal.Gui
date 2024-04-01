@@ -1,6 +1,3 @@
-#define DRAW_CONTENT
-
-//#define BASE_DRAW_CONTENT
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
