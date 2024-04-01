@@ -35,6 +35,7 @@ public class ThemeScopeTests
 
         ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
         Assert.Equal (Dialog.ButtonAlignments.Right, Dialog.DefaultButtonAlignment);
+        Reset ();
     }
 
     [Fact]

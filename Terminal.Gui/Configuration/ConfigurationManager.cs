@@ -2,6 +2,7 @@
 global using CM = Terminal.Gui.ConfigurationManager;
 using System.Collections;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -33,19 +34,19 @@ namespace Terminal.Gui;
 ///     Settings are applied using the following precedence (higher precedence settings overwrite lower precedence
 ///     settings):
 ///     <para>
-///         1. Application configuration found in the users's home directory (<c>~/.tui/appname.config.json</c>) --
+///         1. Application configuration found in the users' home directory (<c>~/.tui/appname.config.json</c>) --
 ///         Highest precedence
 ///     </para>
 ///     <para>
 ///         2. Application configuration found in the directory the app was launched from (
 ///         <c>./.tui/appname.config.json</c>).
 ///     </para>
-///     <para>3. Application configuration found in the applications's resources (<c>Resources/config.json</c>).</para>
+///     <para>3. Application configuration found in the applications' resources (<c>Resources/config.json</c>).</para>
 ///     <para>4. Global configuration found in the user's home directory (<c>~/.tui/config.json</c>).</para>
 ///     <para>5. Global configuration found in the directory the app was launched from (<c>./.tui/config.json</c>).</para>
 ///     <para>
 ///         6. Global configuration in <c>Terminal.Gui.dll</c>'s resources (<c>Terminal.Gui.Resources.config.json</c>) --
-///         Lowest Precidence.
+///         Lowest Precedence.
 ///     </para>
 /// </summary>
 public static class ConfigurationManager
@@ -82,8 +83,10 @@ public static class ConfigurationManager
     ///     <see cref="ConfigurationManager"/> to get and set the property's value.
     /// </summary>
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
+    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     internal static Dictionary<string, ConfigProperty>? _allConfigProperties;
 
+    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     internal static readonly JsonSerializerOptions _serializerOptions = new ()
     {
         ReadCommentHandling = JsonCommentHandling.Skip,
@@ -104,8 +107,10 @@ public static class ConfigurationManager
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
 
-    internal static StringBuilder jsonErrors = new ();
+    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+    internal static StringBuilder _jsonErrors = new ();
 
+    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     private static readonly string _configFilename = "config.json";
 
     /// <summary>The backing property for <see cref="Settings"/>.</summary>
@@ -280,7 +285,7 @@ public static class ConfigurationManager
     public static void OnApplied ()
     {
         Debug.WriteLine ("ConfigurationManager.OnApplied()");
-        Applied?.Invoke (null, new ConfigurationManagerEventArgs ());
+        Applied?.Invoke (null, new ());
 
         // TODO: Refactor ConfigurationManager to not use an event handler for this.
         // Instead, have it call a method on any class appropriately attributed
@@ -294,18 +299,18 @@ public static class ConfigurationManager
     public static void OnUpdated ()
     {
         Debug.WriteLine (@"ConfigurationManager.OnApplied()");
-        Updated?.Invoke (null, new ConfigurationManagerEventArgs ());
+        Updated?.Invoke (null, new ());
     }
 
     /// <summary>Prints any Json deserialization errors that occurred during deserialization to the console.</summary>
     public static void PrintJsonErrors ()
     {
-        if (jsonErrors.Length > 0)
+        if (_jsonErrors.Length > 0)
         {
             Console.WriteLine (
                                @"Terminal.Gui ConfigurationManager encountered the following errors while deserializing configuration files:"
                               );
-            Console.WriteLine (jsonErrors.ToString ());
+            Console.WriteLine (_jsonErrors.ToString ());
         }
     }
 
@@ -326,9 +331,9 @@ public static class ConfigurationManager
 
         ClearJsonErrors ();
 
-        Settings = new SettingsScope ();
+        Settings = new ();
         ThemeManager.Reset ();
-        AppSettings = new AppScope ();
+        AppSettings = new ();
 
         // To enable some unit tests, we only load from resources if the flag is set
         if (Locations.HasFlag (ConfigLocations.DefaultOnly))
@@ -350,23 +355,20 @@ public static class ConfigurationManager
     internal static void AddJsonError (string error)
     {
         Debug.WriteLine ($"ConfigurationManager: {error}");
-        jsonErrors.AppendLine (error);
+        _jsonErrors.AppendLine (error);
     }
 
     /// <summary>
     ///     System.Text.Json does not support copying a deserialized object to an existing instance. To work around this,
-    ///     we implement a 'deep, memberwise copy' method.
+    ///     we implement a 'deep, member-wise copy' method.
     /// </summary>
     /// <remarks>TOOD: When System.Text.Json implements `PopulateObject` revisit https://github.com/dotnet/corefx/issues/37627</remarks>
     /// <param name="source"></param>
     /// <param name="destination"></param>
     /// <returns><paramref name="destination"/> updated from <paramref name="source"/></returns>
-    internal static object? DeepMemberwiseCopy (object? source, object? destination)
+    internal static object? DeepMemberWiseCopy (object? source, object? destination)
     {
-        if (destination is null)
-        {
-            throw new ArgumentNullException (nameof (destination));
-        }
+        ArgumentNullException.ThrowIfNull (destination);
 
         if (source is null)
         {
@@ -406,7 +408,7 @@ public static class ConfigurationManager
                 if (((IDictionary)destination).Contains (srcKey))
                 {
                     ((IDictionary)destination) [srcKey] =
-                        DeepMemberwiseCopy (((IDictionary)source) [srcKey], ((IDictionary)destination) [srcKey]);
+                        DeepMemberWiseCopy (((IDictionary)source) [srcKey], ((IDictionary)destination) [srcKey]);
                 }
                 else
                 {
@@ -438,7 +440,7 @@ public static class ConfigurationManager
                     if (destVal is { })
                     {
                         // Recurse
-                        destProp.SetValue (destination, DeepMemberwiseCopy (sourceVal, destVal));
+                        destProp.SetValue (destination, DeepMemberWiseCopy (sourceVal, destVal));
                     }
                     else
                     {
@@ -478,7 +480,7 @@ public static class ConfigurationManager
             throw new InvalidOperationException ("Initialize must be called first.");
         }
 
-        Settings = new SettingsScope ();
+        Settings = new ();
         ThemeManager.GetHardCodedDefaults ();
         AppSettings?.RetrieveValues ();
 
@@ -494,7 +496,7 @@ public static class ConfigurationManager
     /// </summary>
     internal static void Initialize ()
     {
-        _allConfigProperties = new Dictionary<string, ConfigProperty> ();
+        _allConfigProperties = new ();
         _settings = null;
 
         Dictionary<string, Type> classesWithConfigProps = new (StringComparer.InvariantCultureIgnoreCase);
@@ -549,18 +551,18 @@ public static class ConfigurationManager
                                                scp.OmitClassName
                                                    ? ConfigProperty.GetJsonPropertyName (p)
                                                    : $"{p.DeclaringType?.Name}.{p.Name}",
-                                               new ConfigProperty { PropertyInfo = p, PropertyValue = null }
+                                               new() { PropertyInfo = p, PropertyValue = null }
                                               );
                 }
                 else
                 {
-                    throw new Exception (
-                                         $"Property {
-                                             p.Name
-                                         } in class {
-                                             p.DeclaringType?.Name
-                                         } is not static. All SerializableConfigurationProperty properties must be static."
-                                        );
+                    throw new (
+                               $"Property {
+                                   p.Name
+                               } in class {
+                                   p.DeclaringType?.Name
+                               } is not static. All SerializableConfigurationProperty properties must be static."
+                              );
                 }
             }
         }
@@ -576,7 +578,7 @@ public static class ConfigurationManager
 
         //_allConfigProperties.ToList ().ForEach (x => Debug.WriteLine ($"  Property: {x.Key}"));
 
-        AppSettings = new AppScope ();
+        AppSettings = new ();
     }
 
     /// <summary>Creates a JSON document with the configuration specified.</summary>
@@ -602,5 +604,5 @@ public static class ConfigurationManager
         return stream;
     }
 
-    private static void ClearJsonErrors () { jsonErrors.Clear (); }
+    private static void ClearJsonErrors () { _jsonErrors.Clear (); }
 }
