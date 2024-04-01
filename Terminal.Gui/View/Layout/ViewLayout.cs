@@ -1099,7 +1099,8 @@ public partial class View
             Rectangle superviewBounds,
             Pos pos,
             Dim dim,
-            int autosizeDimension
+            int autosizeDimension,
+            bool useSuperviewBoundsLocation = true
         )
         {
             // Gets the new dimension (width or height, dependent on `width`) of the given Dim given:
@@ -1159,7 +1160,7 @@ public partial class View
 
             int newDimension, newLocation;
             int superviewDimension = width ? superviewBounds.Width : superviewBounds.Height;
-            int superviewLocation = width ? superviewBounds.X : superviewBounds.Y;
+            int superviewLocation = useSuperviewBoundsLocation ? width ? superviewBounds.X : superviewBounds.Y : 0;
 
             // Determine new location
             switch (pos)
@@ -1194,7 +1195,8 @@ public partial class View
                                                                         superviewBounds,
                                                                         combine._right,
                                                                         dim,
-                                                                        autosizeDimension
+                                                                        autosizeDimension,
+                                                                        false
                                                                        );
 
                     if (combine._add)
@@ -1213,11 +1215,20 @@ public partial class View
 
                     break;
 
+                case Pos.PosView:
+                    newLocation = (pos?.Anchor (superviewDimension) ?? 0);
+
+                    newDimension = Math.Max (
+                                             GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension),
+                                             0
+                                            );
+
+                    break;
+
                 case Pos.PosAnchorEnd:
                 case Pos.PosAbsolute:
                 case Pos.PosFactor:
                 case Pos.PosFunc:
-                case Pos.PosView:
                 default:
                     newLocation = (pos?.Anchor (superviewDimension) ?? 0) + superviewLocation;
 
