@@ -1088,48 +1088,4 @@ public class ApplicationTests
     }
 
     #endregion
-
-    [Fact]
-    [AutoInitShutdown]
-    public void AutoInitShutdown_Dispose_Application_Top ()
-    {
-        // This unit test is for test the SetupFakeDriver_Also_Dispose_Application_Top
-        // unit test. Right-click ApplicationTests on the TestExplorer and Run or Debug
-        // Commenting Application.Top?.Dispose (); on the SetupFakeDriverAttribute some
-        // of ApplicationTests unit tests will fail
-        var view = new View ();
-        var top = new Toplevel ();
-        top.Add (view);
-        Application.Begin (top);
-
-        Assert.NotNull (Application.Top);
-#if DEBUG_IDISPOSABLE
-        Assert.False (Application.Top.WasDisposed);
-#endif
-    }
-
-    [Fact]
-    [SetupFakeDriver]
-    public void SetupFakeDriver_Also_Dispose_Application_Top ()
-    {
-        // This unit test is for test the SetupFakeDriver_Also_Dispose_Application_Top
-        // unit test. Right-click ApplicationTests on the TestExplorer and Run or Debug
-        // Commenting Application.Top?.Dispose (); on the SetupFakeDriverAttribute some
-        // of ApplicationTests unit tests will fail
-        var exception = Record.Exception (
-                                          () =>
-                                          {
-                                              var view = new View ();
-                                              var top = new Toplevel ();
-                                              top.Add (view);
-                                              Application.Begin (top);
-
-                                              Assert.NotNull (Application.Top);
-#if DEBUG_IDISPOSABLE
-                                              Assert.False (Application.Top.WasDisposed);
-#endif
-                                          });
-
-        Assert.Null (exception);
-    }
 }
