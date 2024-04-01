@@ -286,11 +286,54 @@ public class Buttons : Scenario
         moveUnicodeHotKeyBtn.Accept += (s, e) => { moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text); };
         Win.Add (moveUnicodeHotKeyBtn);
 
+        radioGroup.SelectedItemChanged += (s, args) =>
+        {
+            switch (args.SelectedItem)
+            {
+                case 0:
+                    moveBtn.TextAlignment = TextAlignment.Left;
+                    sizeBtn.TextAlignment = TextAlignment.Left;
+                    moveBtnA.TextAlignment = TextAlignment.Left;
+                    sizeBtnA.TextAlignment = TextAlignment.Left;
+                    moveHotKeyBtn.TextAlignment = TextAlignment.Left;
+                    moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Left;
+
+                    break;
+                case 1:
+                    moveBtn.TextAlignment = TextAlignment.Right;
+                    sizeBtn.TextAlignment = TextAlignment.Right;
+                    moveBtnA.TextAlignment = TextAlignment.Right;
+                    sizeBtnA.TextAlignment = TextAlignment.Right;
+                    moveHotKeyBtn.TextAlignment = TextAlignment.Right;
+                    moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Right;
+
+                    break;
+                case 2:
+                    moveBtn.TextAlignment = TextAlignment.Centered;
+                    sizeBtn.TextAlignment = TextAlignment.Centered;
+                    moveBtnA.TextAlignment = TextAlignment.Centered;
+                    sizeBtnA.TextAlignment = TextAlignment.Centered;
+                    moveHotKeyBtn.TextAlignment = TextAlignment.Centered;
+                    moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Centered;
+
+                    break;
+                case 3:
+                    moveBtn.TextAlignment = TextAlignment.Justified;
+                    sizeBtn.TextAlignment = TextAlignment.Justified;
+                    moveBtnA.TextAlignment = TextAlignment.Justified;
+                    sizeBtnA.TextAlignment = TextAlignment.Justified;
+                    moveHotKeyBtn.TextAlignment = TextAlignment.Justified;
+                    moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Justified;
+
+                    break;
+            }
+        };
+
         label = new Label ()
         {
             X = 0,
             Y = Pos.Bottom (moveUnicodeHotKeyBtn) + 1,
-            Title = "_Numeric Up/Down:",
+            Title = "_Numeric Up/Down (press-and-hold):",
         };
         var downButton = new Button ()
         {
@@ -338,48 +381,26 @@ public class Buttons : Scenario
 
         Win.Add (label, downButton, numericEdit, upButton);
 
-        radioGroup.SelectedItemChanged += (s, args) =>
-                                          {
-                                              switch (args.SelectedItem)
-                                              {
-                                                  case 0:
-                                                      moveBtn.TextAlignment = TextAlignment.Left;
-                                                      sizeBtn.TextAlignment = TextAlignment.Left;
-                                                      moveBtnA.TextAlignment = TextAlignment.Left;
-                                                      sizeBtnA.TextAlignment = TextAlignment.Left;
-                                                      moveHotKeyBtn.TextAlignment = TextAlignment.Left;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Left;
+        label = new Label ()
+        {
+            X = 0,
+            Y = Pos.Bottom (label) + 1,
+            Title = "_Repeat (CanFocus; press-and-hold):",
+        };
+        int acceptCount = 0;
+        var repeatButton = new Button ()
+        {
+            X = Pos.Right (label) + 1,
+            Y = Pos.Top (label),
+            Title = $"Accept Count: {acceptCount}",
+            WantContinuousButtonPressed = true,
+        };
+        repeatButton.Accept += (s, e) =>
+                               {
+                                   repeatButton.Title = $"Accept Count: {++acceptCount}";
+                               };
 
-                                                      break;
-                                                  case 1:
-                                                      moveBtn.TextAlignment = TextAlignment.Right;
-                                                      sizeBtn.TextAlignment = TextAlignment.Right;
-                                                      moveBtnA.TextAlignment = TextAlignment.Right;
-                                                      sizeBtnA.TextAlignment = TextAlignment.Right;
-                                                      moveHotKeyBtn.TextAlignment = TextAlignment.Right;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Right;
-
-                                                      break;
-                                                  case 2:
-                                                      moveBtn.TextAlignment = TextAlignment.Centered;
-                                                      sizeBtn.TextAlignment = TextAlignment.Centered;
-                                                      moveBtnA.TextAlignment = TextAlignment.Centered;
-                                                      sizeBtnA.TextAlignment = TextAlignment.Centered;
-                                                      moveHotKeyBtn.TextAlignment = TextAlignment.Centered;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Centered;
-
-                                                      break;
-                                                  case 3:
-                                                      moveBtn.TextAlignment = TextAlignment.Justified;
-                                                      sizeBtn.TextAlignment = TextAlignment.Justified;
-                                                      moveBtnA.TextAlignment = TextAlignment.Justified;
-                                                      sizeBtnA.TextAlignment = TextAlignment.Justified;
-                                                      moveHotKeyBtn.TextAlignment = TextAlignment.Justified;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Justified;
-
-                                                      break;
-                                              }
-                                          };
+        Win.Add(label, repeatButton);
 
         Top.Ready += (s, e) => radioGroup.Refresh ();
     }
