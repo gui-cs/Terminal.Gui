@@ -68,6 +68,7 @@ public class DimTests
         top.Add (win);
 
         Application.Run (top);
+        top.Dispose ();
 
         Assert.Equal (20, count);
     }

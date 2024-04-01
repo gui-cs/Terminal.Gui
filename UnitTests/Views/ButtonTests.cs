@@ -172,6 +172,7 @@ public class ButtonTests
 ";
 
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        top.Dispose ();
     }
 
     [Fact]
@@ -547,6 +548,7 @@ public class ButtonTests
         btn.HotKey = KeyCode.E;
         Assert.True (btn.NewKeyDownEvent (Key.E.WithAlt));
         Assert.True (clicked);
+        top.Dispose ();
     }
 
     /// <summary>

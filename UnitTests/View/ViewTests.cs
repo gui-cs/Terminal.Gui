@@ -70,6 +70,7 @@ public class ViewTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        top.Dispose ();
     }
 
     [Fact]
@@ -133,6 +134,8 @@ public class ViewTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+
+        top.Dispose ();
     }
 
     [Theory]
