@@ -1160,6 +1160,7 @@ This is a test
         Assert.IsType<ScrollBarView> (firstGrabbed);
         Assert.Equal (new Rectangle (4, 0, 1, 6), secondGrabbed.Frame);
         Assert.NotEqual (firstGrabbed, secondGrabbed);
+        top.Dispose ();
     }
 
     [Fact]
@@ -1316,6 +1317,7 @@ This is a test
             
      Test   ",
                                                       _output);
+        top.Dispose ();
     }
 
     [Fact]
@@ -1438,6 +1440,7 @@ This is a test
 │    Test     │
 └─────────────┘",
                                                       _output);
+        top.Dispose ();
     }
 
     [Fact]
@@ -1553,6 +1556,7 @@ This is a test
 │    Test     │
 └─────────────┘",
                                                       _output);
+        top.Dispose ();
     }
 
     [Theory]
