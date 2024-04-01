@@ -571,7 +571,7 @@ public partial class View
     ///     </para>
     /// </remarks>
     /// <param name="region">The content-relative region that needs to be redrawn.</param>
-    public virtual void SetNeedsDisplay (Rectangle region)
+    public void SetNeedsDisplay (Rectangle region)
     {
         if (!IsInitialized)
         {
@@ -593,11 +593,11 @@ public partial class View
             _needsDisplayRect = new (x, y, w, h);
         }
 
-        SuperView?.SetSubViewNeedsDisplay ();
-
         Margin?.SetNeedsDisplay ();
         Border?.SetNeedsDisplay ();
         Padding?.SetNeedsDisplay ();
+
+        SuperView?.SetSubViewNeedsDisplay ();
 
         foreach (View subview in Subviews)
         {
@@ -616,9 +616,16 @@ public partial class View
     {
         SubViewNeedsDisplay = true;
 
-        if (SuperView is { } && !SuperView.SubViewNeedsDisplay)
+        if (SuperView is { SubViewNeedsDisplay: false })
         {
             SuperView.SetSubViewNeedsDisplay ();
+
+            return;
+        }
+
+        if (this is Adornment adornment)
+        {
+            adornment.Parent?.SetSubViewNeedsDisplay ();
         }
     }
 
