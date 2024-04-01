@@ -301,7 +301,7 @@ public class Buttons : Scenario
             Width = 1,
             NoPadding = true,
             NoDecorations = true,
-            Title = CM.Glyphs.UpArrow.ToString(),
+            Title = $"{CM.Glyphs.UpArrow}",
         };
         Win.Add (label, oneByOne);
 

@@ -524,11 +524,11 @@ public partial class View
             _needsDisplayRect = new (x, y, w, h);
         }
 
-        SuperView?.SetSubViewNeedsDisplay ();
-
         Margin?.SetNeedsDisplay ();
         Border?.SetNeedsDisplay ();
         Padding?.SetNeedsDisplay ();
+
+        SuperView?.SetSubViewNeedsDisplay ();
 
         foreach (View subview in Subviews)
         {
@@ -550,6 +550,13 @@ public partial class View
         if (SuperView is { SubViewNeedsDisplay: false })
         {
             SuperView.SetSubViewNeedsDisplay ();
+
+            return;
+        }
+
+        if (this is Adornment adornment)
+        {
+            adornment.Parent?.SetSubViewNeedsDisplay ();
         }
     }
 

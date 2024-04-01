@@ -62,7 +62,8 @@ public class Button : View
         //MouseClick += Button_MouseClick;
     }
 
-    private Attribute _originalNormal;
+    [CanBeNull]
+    private ColorScheme _savedColorScheme;
 
     private void Button_MouseEvent (object sender, MouseEventEventArgs e)
     {
@@ -71,31 +72,29 @@ public class Button : View
             if (Application.MouseGrabView == this)
             {
                 e.Handled = InvokeCommand (Command.HotKey) == true;
-
                 return;
             }
+
+            SetFocus();
             Application.GrabMouse(this);
 
-            _originalNormal = ColorScheme.Normal;
-            var cs = new ColorScheme (ColorScheme)
-            {
-                Normal = ColorScheme.HotFocus
-            };
+            _savedColorScheme = ColorScheme;
+            var cs = new ColorScheme (new Attribute (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground));
             ColorScheme = cs;
         }
 
-        if (e.MouseEvent.Flags == MouseFlags.Button1Released)
+        if (e.MouseEvent.Flags.HasFlag(MouseFlags.Button1Released))
         {
             Application.UngrabMouse ();
-            var cs = new ColorScheme (ColorScheme)
-            {
-                Normal = _originalNormal
-            };
-            ColorScheme = cs;
 
             e.Handled = InvokeCommand (Command.HotKey) == true;
 
-            return;
+            if (_savedColorScheme is { })
+            {
+                ColorScheme = _savedColorScheme;
+            }
+
+            _savedColorScheme = null;
         }
     }
 
