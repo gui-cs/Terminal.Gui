@@ -120,7 +120,14 @@ public class VirtualScrolling : Scenario
         button.Accept += (s, e) =>
                              MessageBox.Query (20, 7, "Hi", $"Am I a {view.GetType ().Name}?", "Yes", "No");
 
-        var label = new TextView
+        var funcLabel = new Label
+        {
+            X = Pos.Function (() => 30 + -view.ContentOffset.X),
+            Y = Pos.Function (() => 8 + -view.ContentOffset.Y),
+            Text = "I'm a Pos.Function always visible"
+        };
+
+        var tv = new TextView
         {
             X = Pos.Center (),
             Y = 10,
@@ -130,11 +137,19 @@ public class VirtualScrolling : Scenario
             Width = 42,
             Height = 6 // TODO: Use Dim.Auto
         };
-        label.Border.Thickness = new (1, 3, 1, 1);
+        tv.Border.Thickness = new (1, 3, 1, 1);
+
+        var verticalLabel = new Label
+        {
+            X = Pos.Center (),
+            Y = Pos.Bottom (tv),
+            TextDirection = TextDirection.TopBottom_LeftRight,
+            Text = "12345678901234"
+        };
 
         var btnButtonInWindow = new Button { X = Pos.AnchorEnd (10), Y = Pos.AnchorEnd (1), Text = "Button" };
 
-        var tv = new Label
+        var label = new Label
         {
             AutoSize = false,
             Y = Pos.AnchorEnd (3),
@@ -154,7 +169,7 @@ public class VirtualScrolling : Scenario
         view.UseContentOffset = true;
         view.Padding.EnableScrollBars = true;
 
-        view.Add (tf1, color, button, label, btnButtonInWindow, tv);
+        view.Add (tf1, color, button, tv, btnButtonInWindow, label, funcLabel, verticalLabel);
 
         var editor = new Adornments.AdornmentsEditor
         {
