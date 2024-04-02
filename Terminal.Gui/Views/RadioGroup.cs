@@ -76,6 +76,8 @@ public class RadioGroup : View
         KeyBindings.Add (Key.Space, Command.Accept);
 
         LayoutStarted += RadioGroup_LayoutStarted;
+
+        InvertColorsOnPress = true;
     }
 
     /// <summary>
@@ -163,6 +165,7 @@ public class RadioGroup : View
     /// <inheritdoc/>
     protected internal override bool OnMouseEvent  (MouseEvent me)
     {
+        base.OnMouseEvent (me);
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
             return false;
