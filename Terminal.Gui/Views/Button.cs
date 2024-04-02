@@ -50,7 +50,7 @@ public class Button : View
 
         CanFocus = true;
         AutoSize = true;
-        InvertColorsOnPress = true;
+        HighlightOnPress = true;
 
         // Override default behavior of View
         AddCommand (Command.HotKey, () =>

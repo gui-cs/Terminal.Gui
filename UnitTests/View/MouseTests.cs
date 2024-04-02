@@ -75,8 +75,6 @@ public class MouseTests (ITestOutputHelper output)
         Assert.Equal (new Point (4, 4), testView.Frame.Location);
         Application.OnMouseEvent (new (new () { X = xy, Y = xy, Flags = MouseFlags.Button1Pressed }));
 
-        Assert.False (Application.MouseGrabView is { } && (Application.MouseGrabView != testView.Margin && Application.MouseGrabView != testView.Border));
-
         Application.OnMouseEvent (new (new () { X = xy + 1, Y = xy + 1, Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition }));
 
         Assert.Equal (expectedMoved, new Point (5, 5) == testView.Frame.Location);
@@ -135,12 +133,12 @@ public class MouseTests (ITestOutputHelper output)
         {
             X = 0, Y = 0,
             Height = 1,
-            Width  = 1,
+            Width = 1,
             CanFocus = true,
         };
 
         view.AutoSize = false;
-        view.X = Pos.Right(otherView);
+        view.X = Pos.Right (otherView);
         view.Y = 0;
         view.Width = 10;
         view.Height = 1;
@@ -316,6 +314,120 @@ public class MouseTests (ITestOutputHelper output)
         };
         view.OnMouseEvent (me);
         Assert.False (me.Handled);
+        view.Dispose ();
+    }
+
+    [Fact]
+    public void WantContinuousButtonPressed_False_Button1Press_Release_DoesNotClick ()
+    {
+        var view = new View ()
+        {
+            WantContinuousButtonPressed = false
+        };
+
+        var clicked = 0;
+
+        view.MouseClick += (s, e) => clicked++;
+
+        var me = new MouseEvent ()
+        {
+            Flags = MouseFlags.Button1Pressed
+        };
+
+        view.OnMouseEvent (me);
+        Assert.Equal (0, clicked);
+        me.Handled = false;
+
+        view.OnMouseEvent (me);
+        Assert.Equal (0, clicked);
+        me.Handled = false;
+
+        me.Flags = MouseFlags.Button1Released;
+        view.OnMouseEvent (me);
+        Assert.Equal (0, clicked);
+
+        me.Flags = MouseFlags.Button1Clicked;
+        view.OnMouseEvent (me);
+        Assert.Equal (1, clicked);
+
+        view.Dispose ();
+    }
+    [Fact]
+    public void WantContinuousButtonPressed_True_Button1Press_Release_Repeats ()
+    {
+        var view = new View ()
+        {
+            WantContinuousButtonPressed = true
+        };
+
+        var clicked = 0;
+
+        view.MouseClick += (s, e) => clicked++;
+
+        var me = new MouseEvent ()
+        {
+            Flags = MouseFlags.Button1Pressed
+        };
+
+        view.OnMouseEvent (me);
+        Assert.Equal (0, clicked);
+        me.Handled = false;
+
+        view.OnMouseEvent (me);
+        Assert.Equal (1, clicked);
+        me.Handled = false;
+
+        me.Flags = MouseFlags.Button1Released;
+        view.OnMouseEvent (me);
+        Assert.Equal (2, clicked);
+
+        me.Flags = MouseFlags.Button1Clicked;
+        view.OnMouseEvent (me);
+        Assert.Equal (2, clicked);
+
+        view.Dispose ();
+    }
+
+    [Fact]
+    public void HighlightOnPress_False_No_Highlights ()
+    {
+        var view = new View ()
+        {
+            HighlightOnPress = false
+        };
+        view.ColorScheme = new ColorScheme (new Attribute (ColorName.Red, ColorName.Blue));
+        ColorScheme originalColorScheme = view.ColorScheme;
+
+        var me = new MouseEvent ()
+        {
+            Flags = MouseFlags.Button1Pressed
+        };
+
+        view.OnMouseEvent (me);
+        Assert.Equal (originalColorScheme, view.ColorScheme);
+
+        view.Dispose ();
+    }
+
+
+    [Fact]
+    public void HighlightOnPress_False_Highlights ()
+    {
+        var view = new View ()
+        {
+            HighlightOnPress = true
+        };
+        view.ColorScheme = new ColorScheme (new Attribute (ColorName.Red, ColorName.Blue));
+        ColorScheme originalColorScheme = view.ColorScheme;
+
+        var me = new MouseEvent ()
+        {
+            Flags = MouseFlags.Button1Pressed
+        };
+
+        view.OnMouseEvent (me);
+        Assert.NotEqual (originalColorScheme, view.ColorScheme);
+
         view.Dispose ();
     }
 }

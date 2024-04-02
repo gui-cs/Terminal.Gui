@@ -3,9 +3,9 @@
 public partial class View
 {
     /// <summary>
-    /// Gets or sets whether the <see cref="View"/> will invert the colors when the mouse button is pressed/released.
+    /// Gets or sets whether the <see cref="View"/> will highlight the view visually when the mouse button is pressed/released.
     /// </summary>
-    public bool InvertColorsOnPress { get; set; }
+    public bool HighlightOnPress { get; set; }
 
     /// <summary>Gets or sets a value indicating whether this <see cref="View"/> want continuous button pressed event.</summary>
     public virtual bool WantContinuousButtonPressed { get; set; }
@@ -125,9 +125,9 @@ public partial class View
 
 
         // Default behavior is to invoke Accept (via HotKey) on clicked.
-        if (!WantContinuousButtonPressed &&
-            Application.MouseGrabView != this &&
-            mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)
+        if ((!WantContinuousButtonPressed &&
+             Application.MouseGrabView != this &&
+             mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
             || mouseEvent.Flags.HasFlag (MouseFlags.Button2Clicked)
             || mouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)
             || mouseEvent.Flags.HasFlag (MouseFlags.Button4Clicked))
@@ -135,7 +135,7 @@ public partial class View
             return OnMouseClick (args);
         }
 
-        if (InvertColorsOnPress && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
             // If WantContinuousButtonPressed is true, and this is not the first pressed event,
             // invoke Accept (via HotKey)
@@ -150,30 +150,35 @@ public partial class View
                 Application.GrabMouse (this);
                 _savedColorScheme = ColorScheme;
 
-                if (CanFocus)
+                if (HighlightOnPress && ColorScheme is { })
                 {
-                    // TODO: Make the inverted color configurable
-                    var cs = new ColorScheme (ColorScheme)
+                    if (CanFocus)
                     {
-                        Focus = new Attribute (ColorScheme.Normal.Foreground, ColorScheme.Focus.Background)
-                    };
-                    ColorScheme = cs;
-                }
-                else
-                {
-                    var cs = new ColorScheme (ColorScheme)
+                        // TODO: Make the inverted color configurable
+                        var cs = new ColorScheme (ColorScheme)
+                        {
+                            Focus = new Attribute (ColorScheme.Normal.Foreground, ColorScheme.Focus.Background)
+                        };
+                        ColorScheme = cs;
+                    }
+                    else
                     {
-                        Normal = new Attribute (ColorScheme.Focus.Background, ColorScheme.Normal.Foreground)
-                    };
-                    ColorScheme = cs;
+                        var cs = new ColorScheme (ColorScheme)
+                        {
+                            Normal = new Attribute (ColorScheme.Focus.Background, ColorScheme.Normal.Foreground)
+                        };
+                        ColorScheme = cs;
+                    }
                 }
 
+                if (CanFocus){
                 // Set the focus, but don't invoke Accept
                 SetFocus ();
+                }
             }
         }
 
-        if (InvertColorsOnPress && mouseEvent.Flags.HasFlag (MouseFlags.Button1Released))
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released))
         {
             // When the mouse is released, if WantContinuousButtonPressed is set, invoke Accept one last time.
             if (WantContinuousButtonPressed)
@@ -184,7 +189,7 @@ public partial class View
             if (Application.MouseGrabView == this)
             {
                 Application.UngrabMouse ();
-                if (_savedColorScheme is { })
+                if (HighlightOnPress && _savedColorScheme is { })
                 {
                     ColorScheme = _savedColorScheme;
                     _savedColorScheme = null;

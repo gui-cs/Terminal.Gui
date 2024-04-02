@@ -77,7 +77,7 @@ public class RadioGroup : View
 
         LayoutStarted += RadioGroup_LayoutStarted;
 
-        InvertColorsOnPress = true;
+        HighlightOnPress = true;
 
         MouseClick += RadioGroup_MouseClick;
     }

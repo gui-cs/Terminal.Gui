@@ -104,7 +104,7 @@ public class ButtonTests (ITestOutputHelper output)
         tab.Add (ckbMatchWholeWord);
 
         var tabView = new TabView { Width = Dim.Fill (), Height = Dim.Fill () };
-        tabView.AddTab (new() { DisplayText = "Find", View = tab }, true);
+        tabView.AddTab (new () { DisplayText = "Find", View = tab }, true);
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
 
@@ -412,7 +412,7 @@ public class ButtonTests (ITestOutputHelper output)
         TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         btn.Dispose ();
 
-        btn = new() { Text = "_Test", IsDefault = true };
+        btn = new () { Text = "_Test", IsDefault = true };
         btn.BeginInit ();
         btn.EndInit ();
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
@@ -432,7 +432,7 @@ public class ButtonTests (ITestOutputHelper output)
 
         btn.Dispose ();
 
-        btn = new() { X = 1, Y = 2, Text = "_abc", IsDefault = true };
+        btn = new () { X = 1, Y = 2, Text = "_abc", IsDefault = true };
         btn.BeginInit ();
         btn.EndInit ();
         Assert.Equal ("_abc", btn.Text);

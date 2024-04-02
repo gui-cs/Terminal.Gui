@@ -35,7 +35,7 @@ public class CheckBox : View
 
         TitleChanged += Checkbox_TitleChanged;
 
-        InvertColorsOnPress = true;
+        HighlightOnPress = true;
         MouseClick += CheckBox_MouseClick;
     }
 

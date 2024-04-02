@@ -31,7 +31,7 @@ public class ColorPicker : View
 
     private void SetInitialProperties ()
     {
-        InvertColorsOnPress = true;
+        HighlightOnPress = true;
 
         CanFocus = true;
         AddCommands ();
