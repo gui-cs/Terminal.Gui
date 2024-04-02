@@ -7,45 +7,101 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Mouse and Keyboard")]
 public class Mouse : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
+        Window win = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+        };
+
         Label ml;
         var count = 0;
         ml = new Label { X = 1, Y = 1, Text = "Mouse: " };
-        List<string> rme = new ();
 
-        Win.Add (ml);
+        win.Add (ml);
 
-        var logList = new ListView
-        {
-            X = Pos.AnchorEnd (41),
-            Y = 0,
-            Width = 41,
-            Height = Dim.Fill (),
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
-            Source = new ListWrapper (rme)
-        };
-        Win.Add (logList);
-
-        Application.MouseEvent += (sender, a) =>
-                                  {
-                                      ml.Text = $"Mouse: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count}";
-                                      rme.Add ($"({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}");
-                                      logList.MoveDown ();
-                                  };
-
-        Win.Add (new MouseDemo ()
+        CheckBox cbWantContinuousPresses = new CheckBox ()
         {
             X = 0,
-            Y = 3,
-            Width = 15,
-            Height = 10,
-            Text = "Mouse Demo",
+            Y = Pos.Bottom(ml) + 1,
+            Title = "_Want Continuous Button Presses",
+        };
+        cbWantContinuousPresses.Toggled += (s,e) =>
+        {
+            win.WantContinuousButtonPressed = !win.WantContinuousButtonPressed;
+        };
+
+        win.Add (cbWantContinuousPresses);
+
+        var demo = new MouseDemo ()
+        {
+            X = 0,
+            Y = Pos.Bottom (cbWantContinuousPresses) + 1,
+            Width = 20,
+            Height = 5,
+            Text = "Enter/Leave Demo",
             TextAlignment = TextAlignment.Centered,
             VerticalTextAlignment = VerticalTextAlignment.Middle,
             ColorScheme = Colors.ColorSchemes ["Dialog"],
-        });
+        };
+        win.Add (demo);
 
+        var label = new Label ()
+        {
+            Text = "_App Events:",
+            X = 0,
+            Y = Pos.Bottom (demo),
+        };
+        List<string> appLogList = new ();
+        var appLog = new ListView
+        {
+            X = Pos.Left (label),
+            Y = Pos.Bottom (label),
+            Width = Dim.Percent(49),
+            Height = Dim.Fill (),
+            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            Source = new ListWrapper (appLogList)
+        };
+        win.Add (label, appLog);
+
+        Application.MouseEvent += (sender, a) =>
+                                  {
+                                      ml.Text = $"MouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count}";
+                                      appLogList.Add ($"({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}");
+                                      appLog.MoveDown ();
+                                  };
+
+
+        label = new Label ()
+        {
+            Text = "_Window Events:",
+            X = Pos.Percent(50),
+            Y = Pos.Bottom (demo),
+        };
+        List<string> winLogList = new ();
+        var winLog = new ListView
+        {
+            X = Pos.Left(label),
+            Y = Pos.Bottom (label),
+            Width = Dim.Percent (50),
+            Height = Dim.Fill (),
+            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            Source = new ListWrapper (winLogList)
+        };
+        win.Add (label, winLog);
+        win.MouseEvent += (sender, a) =>
+                          {
+                              winLogList.Add ($"MouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}");
+                              winLog.MoveDown ();
+                          };
+        win.MouseClick += (sender, a) =>
+                          {
+                              winLogList.Add ($"MouseClick: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}");
+                              winLog.MoveDown ();
+                          };
+
+        Application.Run (win);
+        win.Dispose ();
     }
 
     public class MouseDemo : View
