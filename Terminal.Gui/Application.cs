@@ -1472,15 +1472,15 @@ public static partial class Application
         {
             // If the mouse is grabbed, send the event to the view that grabbed it.
             // The coordinates are relative to the Bounds of the view that grabbed the mouse.
-            Point frameLoc = MouseGrabView.ScreenToFrame (a.MouseEvent.X, a.MouseEvent.Y);
+            Point boundsLoc = MouseGrabView.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
 
             var viewRelativeMouseEvent = new MouseEvent
             {
-                X = frameLoc.X,
-                Y = frameLoc.Y,
+                X = boundsLoc.X,
+                Y = boundsLoc.Y,
                 Flags = a.MouseEvent.Flags,
                 ScreenPosition = new (a.MouseEvent.X, a.MouseEvent.Y),
-                View = view
+                View = MouseGrabView
             };
 
             if (MouseGrabView.Bounds.Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
