@@ -396,12 +396,12 @@ public class Buttons : Scenario
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            Title = $"Accept Count: {noRepeatAcceptCount}",
+            Title = $"Accept Cou_nt: {noRepeatAcceptCount}",
             WantContinuousButtonPressed = false,
         };
         noRepeatButton.Accept += (s, e) =>
                                  {
-                                     noRepeatButton.Title = $"Accept Count: {++noRepeatAcceptCount}";
+                                     noRepeatButton.Title = $"Accept Cou_nt: {++noRepeatAcceptCount}";
                                  };
         main.Add(label, noRepeatButton);
 
@@ -416,12 +416,12 @@ public class Buttons : Scenario
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            Title = $"Accept Count: {acceptCount}",
+            Title = $"Accept Co_unt: {acceptCount}",
             WantContinuousButtonPressed = true,
         };
         repeatButton.Accept += (s, e) =>
                                {
-                                   repeatButton.Title = $"Accept Count: {++acceptCount}";
+                                   repeatButton.Title = $"Accept Co_unt: {++acceptCount}";
                                };
 
         var enableCB = new CheckBox ()

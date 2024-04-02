@@ -149,8 +149,24 @@ public partial class View
             {
                 Application.GrabMouse (this);
                 _savedColorScheme = ColorScheme;
-                var cs = new ColorScheme (new Attribute (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground));
-                ColorScheme = cs;
+
+                if (CanFocus)
+                {
+                    // TODO: Make the inverted color configurable
+                    var cs = new ColorScheme (ColorScheme)
+                    {
+                        Focus = new Attribute (ColorScheme.Normal.Foreground, ColorScheme.Focus.Background)
+                    };
+                    ColorScheme = cs;
+                }
+                else
+                {
+                    var cs = new ColorScheme (ColorScheme)
+                    {
+                        Normal = new Attribute (ColorScheme.Focus.Background, ColorScheme.Normal.Foreground)
+                    };
+                    ColorScheme = cs;
+                }
 
                 // Set the focus, but don't invoke Accept
                 SetFocus ();
