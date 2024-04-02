@@ -67,52 +67,62 @@ public class Button : View
 
     private void Button_MouseEvent (object sender, MouseEventEventArgs e)
     {
-        if (e.MouseEvent.Flags.HasFlag(MouseFlags.Button1Clicked))
+        // Default behavior is to invoke Accept (via HotKey) on clicked.
+        if (!WantContinuousButtonPressed &&
+            Application.MouseGrabView != this &&
+            e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
+            e.Handled = InvokeCommand (Command.HotKey) == true;
+            return;
+        }
+
+        if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+        {
+            // If WantContinuousButtonPressed is true, and this is not the first pressed event,
+            // invoke Accept (via HotKey)
+            if (WantContinuousButtonPressed && Application.MouseGrabView == this)
+            {
+                e.Handled = InvokeCommand (Command.HotKey) == true;
+                return;
+            }
+
+            // The first time we get pressed event, grab the mouse and invert the colors
             if (Application.MouseGrabView != this)
             {
-                e.Handled = InvokeCommand (Command.HotKey) == true;
+                Application.GrabMouse (this);
+                _savedColorScheme = ColorScheme;
+                var cs = new ColorScheme (new Attribute (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground));
+                ColorScheme = cs;
 
-                return;
+                // Set the focus, but don't invoke Accept
+                SetFocus ();
             }
         }
 
-        if (e.MouseEvent.Flags == MouseFlags.Button1Pressed)
+        if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Released))
         {
+            // When the mouse is released, if WantContinuousButtonPressed is set, invoke Accept one last time.
+            if (WantContinuousButtonPressed)
+            {
+                e.Handled = InvokeCommand (Command.HotKey) == true;
+            }
+
             if (Application.MouseGrabView == this)
             {
-                e.Handled = InvokeCommand (Command.HotKey) == true;
-                return;
+                Application.UngrabMouse ();
+                if (_savedColorScheme is { })
+                {
+                    ColorScheme = _savedColorScheme;
+                    _savedColorScheme = null;
+                }
             }
-
-            SetFocus();
-            Application.GrabMouse(this);
-
-            _savedColorScheme = ColorScheme;
-            var cs = new ColorScheme (new Attribute (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground));
-            ColorScheme = cs;
-        }
-
-        if (e.MouseEvent.Flags.HasFlag(MouseFlags.Button1Released))
-        {
-            Application.UngrabMouse ();
-
-            e.Handled = InvokeCommand (Command.HotKey) == true;
-
-            if (_savedColorScheme is { })
-            {
-                ColorScheme = _savedColorScheme;
-            }
-
-            _savedColorScheme = null;
         }
     }
 
     /// <inheritdoc />
-    public override bool OnLeave (View view)
+    protected internal override bool OnMouseLeave (MouseEvent e)
     {
-        //Application.UngrabMouse();
-        return base.OnLeave (view);
+        return base.OnMouseLeave (e);
     }
 
     private void Button_MouseClick (object sender, MouseEventEventArgs e)

@@ -1695,7 +1695,13 @@ internal class WindowsDriver : ConsoleDriver
 
     private async Task ProcessButtonDoubleClickedAsync ()
     {
-        await Task.Delay (300);
+        // Only delay if there's not a view wanting continuous button presses
+        if (Application.WantContinuousButtonPressedView is null)
+        {
+            // QUESTION: Why 300ms?
+            await Task.Delay (300);
+        }
+
         _isButtonDoubleClicked = false;
         _isOneFingerDoubleClicked = false;
 
@@ -1704,10 +1710,16 @@ internal class WindowsDriver : ConsoleDriver
 
     private async Task ProcessContinuousButtonPressedAsync (MouseFlags mouseFlag)
     {
+        // When a user presses-and-holds, start generating pressed events every `startDelay`
+        // After `iterationsUntilFast` iterations, speed them up to `fastDelay` ms
+        const int startDelay = 500;
+        const int iterationsUntilFast = 4;
+        const int fastDelay = 50;
+
+        int iterations = 0;
+        int delay = startDelay;
         while (_isButtonPressed)
         {
-            await Task.Delay (100);
-
             var me = new MouseEvent
             {
                 X = _pointMove.X,
@@ -1715,13 +1727,18 @@ internal class WindowsDriver : ConsoleDriver
                 Flags = mouseFlag
             };
 
-            View view = Application.WantContinuousButtonPressedView;
-
-            if (view is null)
+            if (Application.WantContinuousButtonPressedView is null)
             {
                 break;
             }
 
+            if (iterations++ >= iterationsUntilFast)
+            {
+                delay = fastDelay;
+            }
+            await Task.Delay (delay);
+
+            //Debug.WriteLine($"ProcessContinuousButtonPressedAsync: {view}");
             if (_isButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0)
             {
                 Application.Invoke (() => OnMouseEvent (new MouseEventEventArgs (me)));

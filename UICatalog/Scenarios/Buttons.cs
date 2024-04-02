@@ -396,7 +396,7 @@ public class Buttons : Scenario
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            Title = $"Accept Count (press-and-hold): {acceptCount}",
+            Title = $"Accept Count: {acceptCount}",
             WantContinuousButtonPressed = true,
         };
         repeatButton.Accept += (s, e) =>
@@ -404,7 +404,18 @@ public class Buttons : Scenario
                                    repeatButton.Title = $"Accept Count: {++acceptCount}";
                                };
 
-        main.Add(label, repeatButton);
+        var enableCB = new CheckBox ()
+        {
+            X = Pos.Right (repeatButton) + 1,
+            Y = Pos.Top (repeatButton),
+            Title = "Enabled",
+            Checked = true,
+        };
+        enableCB.Toggled += (s, e) =>
+                            {
+                                repeatButton.Enabled = !repeatButton.Enabled;
+                            };
+        main.Add(label, repeatButton, enableCB);
 
         main.Ready += (s, e) => radioGroup.Refresh ();
         Application.Run (main);
