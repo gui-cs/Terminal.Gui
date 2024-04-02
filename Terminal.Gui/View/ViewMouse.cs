@@ -3,45 +3,18 @@
 public partial class View
 {
     /// <summary>
-    ///     Gets or sets whether the <see cref="View"/> will highlight the view visually when the mouse button is
-    ///     pressed/released.
+    ///     Gets or sets whether the <see cref="View"/> will be highlighted visually while the mouse button is
+    ///     pressed.
     /// </summary>
     public bool HighlightOnPress { get; set; }
 
-    /// <summary>Gets or sets a value indicating whether this <see cref="View"/> want continuous button pressed event.</summary>
+    /// <summary>Gets or sets whether the <see cref="View"/> wants continuous button pressed events.</summary>
     public virtual bool WantContinuousButtonPressed { get; set; }
 
-    /// <summary>Gets or sets a value indicating whether this <see cref="View"/> wants mouse position reports.</summary>
-    /// <value><see langword="true"/> if want mouse position reports; otherwise, <see langword="false"/>.</value>
+    /// <summary>Gets or sets whether the <see cref="View"/> wants mouse position reports.</summary>
+    /// <value><see langword="true"/> if mouse position reports are wanted; otherwise, <see langword="false"/>.</value>
     public virtual bool WantMousePositionReports { get; set; }
-
-    /// <summary>Event fired when a mouse event occurs.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         The coordinates are relative to <see cref="View.Bounds"/>.
-    ///     </para>
-    /// </remarks>
-    public event EventHandler<MouseEventEventArgs> MouseEvent;
-
-    /// <summary>Event fired when a mouse click occurs.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         Fired when the mouse is either clicked or double-clicked. Check
-    ///         <see cref="MouseEvent.Flags"/> to see which button was clicked.
-    ///     </para>
-    ///     <para>
-    ///         The coordinates are relative to <see cref="View.Bounds"/>.
-    ///     </para>
-    /// </remarks>
-    public event EventHandler<MouseEventEventArgs> MouseClick;
-
-    /// <summary>Event fired when the mouse moves into the View's <see cref="Bounds"/>.</summary>
-    public event EventHandler<MouseEventEventArgs> MouseEnter;
-
-    /// <summary>Event fired when the mouse leaves the View's <see cref="Bounds"/>.</summary>
-    public event EventHandler<MouseEventEventArgs> MouseLeave;
-
-    // TODO: OnMouseEnter should not be public virtual, but protected.
+    
     /// <summary>
     ///     Called when the mouse enters the View's <see cref="Bounds"/>. The view will now receive mouse events until the
     ///     mouse leaves
@@ -70,7 +43,9 @@ public partial class View
         return args.Handled;
     }
 
-    // TODO: OnMouseLeave should not be public virtual, but protected.
+    /// <summary>Event fired when the mouse moves into the View's <see cref="Bounds"/>.</summary>
+    public event EventHandler<MouseEventEventArgs> MouseEnter;
+
     /// <summary>
     ///     Called when the mouse has moved out of the View's <see cref="Bounds"/>. The view will no longer receive mouse
     ///     events (until the
@@ -99,10 +74,12 @@ public partial class View
         return args.Handled;
     }
 
+    /// <summary>Event fired when the mouse leaves the View's <see cref="Bounds"/>.</summary>
+    public event EventHandler<MouseEventEventArgs> MouseLeave;
+
     [CanBeNull]
     private ColorScheme _savedColorScheme;
 
-    // TODO: OnMouseEvent should not be public virtual, but protected.
     /// <summary>Called when a mouse event occurs within the view's <see cref="Bounds"/>.</summary>
     /// <remarks>
     ///     <para>
@@ -215,6 +192,14 @@ public partial class View
         return args.Handled;
     }
 
+    /// <summary>Event fired when a mouse event occurs.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         The coordinates are relative to <see cref="View.Bounds"/>.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<MouseEventEventArgs> MouseEvent;
+
     /// <summary>Invokes the MouseClick event.</summary>
     /// <remarks>
     ///     <para>
@@ -247,4 +232,16 @@ public partial class View
 
         return args.Handled;
     }
+
+    /// <summary>Event fired when a mouse click occurs.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         Fired when the mouse is either clicked or double-clicked. Check
+    ///         <see cref="MouseEvent.Flags"/> to see which button was clicked.
+    ///     </para>
+    ///     <para>
+    ///         The coordinates are relative to <see cref="View.Bounds"/>.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<MouseEventEventArgs> MouseClick;
 }
