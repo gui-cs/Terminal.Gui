@@ -317,73 +317,85 @@ public class MouseTests (ITestOutputHelper output)
         view.Dispose ();
     }
 
-    [Fact]
-    public void WantContinuousButtonPressed_False_Button1Press_Release_DoesNotClick ()
+    [Theory]
+    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
+    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
+    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
+    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
+    public void WantContinuousButtonPressed_False_Button1Press_Release_DoesNotClick (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
     {
+        var me = new MouseEvent ()
+        {
+            Flags = pressed
+        };
+
         var view = new View ()
         {
             WantContinuousButtonPressed = false
         };
 
-        var clicked = 0;
+        var clickedCount = 0;
 
-        view.MouseClick += (s, e) => clicked++;
+        view.MouseClick += (s, e) => clickedCount++;
 
-        var me = new MouseEvent ()
-        {
-            Flags = MouseFlags.Button1Pressed
-        };
 
         view.OnMouseEvent (me);
-        Assert.Equal (0, clicked);
+        Assert.Equal (0, clickedCount);
         me.Handled = false;
 
         view.OnMouseEvent (me);
-        Assert.Equal (0, clicked);
+        Assert.Equal (0, clickedCount);
         me.Handled = false;
 
-        me.Flags = MouseFlags.Button1Released;
+        me.Flags = released;
         view.OnMouseEvent (me);
-        Assert.Equal (0, clicked);
+        Assert.Equal (0, clickedCount);
+        me.Handled = false;
 
-        me.Flags = MouseFlags.Button1Clicked;
+        me.Flags =clicked;
         view.OnMouseEvent (me);
-        Assert.Equal (1, clicked);
+        Assert.Equal (1, clickedCount);
 
         view.Dispose ();
     }
-    [Fact]
-    public void WantContinuousButtonPressed_True_Button1Press_Release_Repeats ()
+
+    [Theory]
+    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
+    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
+    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
+    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
+    public void WantContinuousButtonPressed_True_Button1Press_Release_Clicks_Repeatedly (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
     {
+        var me = new MouseEvent ()
+        {
+            Flags = pressed
+        };
+
         var view = new View ()
         {
             WantContinuousButtonPressed = true
         };
 
-        var clicked = 0;
+        var clickedCount = 0;
 
-        view.MouseClick += (s, e) => clicked++;
-
-        var me = new MouseEvent ()
-        {
-            Flags = MouseFlags.Button1Pressed
-        };
+        view.MouseClick += (s, e) => clickedCount++;
 
         view.OnMouseEvent (me);
-        Assert.Equal (0, clicked);
+        Assert.Equal (0, clickedCount);
         me.Handled = false;
 
         view.OnMouseEvent (me);
-        Assert.Equal (1, clicked);
+        Assert.Equal (1, clickedCount);
         me.Handled = false;
 
-        me.Flags = MouseFlags.Button1Released;
+        me.Flags = released;
         view.OnMouseEvent (me);
-        Assert.Equal (2, clicked);
+        Assert.Equal (2, clickedCount);
+        me.Handled = false;
 
-        me.Flags = MouseFlags.Button1Clicked;
+        me.Flags = clicked;
         view.OnMouseEvent (me);
-        Assert.Equal (2, clicked);
+        Assert.Equal (2, clickedCount);
 
         view.Dispose ();
     }

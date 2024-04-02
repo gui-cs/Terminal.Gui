@@ -3,7 +3,8 @@
 public partial class View
 {
     /// <summary>
-    /// Gets or sets whether the <see cref="View"/> will highlight the view visually when the mouse button is pressed/released.
+    ///     Gets or sets whether the <see cref="View"/> will highlight the view visually when the mouse button is
+    ///     pressed/released.
     /// </summary>
     public bool HighlightOnPress { get; set; }
 
@@ -16,21 +17,21 @@ public partial class View
 
     /// <summary>Event fired when a mouse event occurs.</summary>
     /// <remarks>
-    /// <para>
-    /// The coordinates are relative to <see cref="View.Bounds"/>.
-    /// </para>
+    ///     <para>
+    ///         The coordinates are relative to <see cref="View.Bounds"/>.
+    ///     </para>
     /// </remarks>
     public event EventHandler<MouseEventEventArgs> MouseEvent;
 
     /// <summary>Event fired when a mouse click occurs.</summary>
     /// <remarks>
-    /// <para>
-    /// Fired when the mouse is either clicked or double-clicked. Check
-    /// <see cref="MouseEvent.Flags"/> to see which button was clicked.
-    /// </para>
-    /// <para>
-    /// The coordinates are relative to <see cref="View.Bounds"/>.
-    /// </para>
+    ///     <para>
+    ///         Fired when the mouse is either clicked or double-clicked. Check
+    ///         <see cref="MouseEvent.Flags"/> to see which button was clicked.
+    ///     </para>
+    ///     <para>
+    ///         The coordinates are relative to <see cref="View.Bounds"/>.
+    ///     </para>
     /// </remarks>
     public event EventHandler<MouseEventEventArgs> MouseClick;
 
@@ -42,11 +43,12 @@ public partial class View
 
     // TODO: OnMouseEnter should not be public virtual, but protected.
     /// <summary>
-    ///     Called when the mouse enters the View's <see cref="Bounds"/>. The view will now receive mouse events until the mouse leaves
+    ///     Called when the mouse enters the View's <see cref="Bounds"/>. The view will now receive mouse events until the
+    ///     mouse leaves
     ///     the view. At which time, <see cref="OnMouseLeave(Gui.MouseEvent)"/> will be called.
     /// </summary>
     /// <remarks>
-    /// The coordinates are relative to <see cref="View.Bounds"/>.
+    ///     The coordinates are relative to <see cref="View.Bounds"/>.
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
@@ -70,11 +72,12 @@ public partial class View
 
     // TODO: OnMouseLeave should not be public virtual, but protected.
     /// <summary>
-    ///     Called when the mouse has moved out of the View's <see cref="Bounds"/>. The view will no longer receive mouse events (until the
+    ///     Called when the mouse has moved out of the View's <see cref="Bounds"/>. The view will no longer receive mouse
+    ///     events (until the
     ///     mouse moves within the view again and <see cref="OnMouseEnter(Gui.MouseEvent)"/> is called).
     /// </summary>
     /// <remarks>
-    /// The coordinates are relative to <see cref="View.Bounds"/>.
+    ///     The coordinates are relative to <see cref="View.Bounds"/>.
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
@@ -102,9 +105,9 @@ public partial class View
     // TODO: OnMouseEvent should not be public virtual, but protected.
     /// <summary>Called when a mouse event occurs within the view's <see cref="Bounds"/>.</summary>
     /// <remarks>
-    /// <para>
-    /// The coordinates are relative to <see cref="View.Bounds"/>.
-    /// </para>
+    ///     <para>
+    ///         The coordinates are relative to <see cref="View.Bounds"/>.
+    ///     </para>
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
@@ -123,19 +126,21 @@ public partial class View
 
         var args = new MouseEventEventArgs (mouseEvent);
 
-
         // Default behavior is to invoke Accept (via HotKey) on clicked.
-        if ((!WantContinuousButtonPressed &&
-             Application.MouseGrabView != this &&
-             mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button2Clicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button4Clicked))
+        if (!WantContinuousButtonPressed
+            && Application.MouseGrabView != this
+            && (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)
+                || mouseEvent.Flags.HasFlag (MouseFlags.Button2Clicked)
+                || mouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)
+                || mouseEvent.Flags.HasFlag (MouseFlags.Button4Clicked)))
         {
             return OnMouseClick (args);
         }
 
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
+            || mouseEvent.Flags.HasFlag (MouseFlags.Button2Pressed)
+            || mouseEvent.Flags.HasFlag (MouseFlags.Button3Pressed)
+            || mouseEvent.Flags.HasFlag (MouseFlags.Button4Pressed))
         {
             // If WantContinuousButtonPressed is true, and this is not the first pressed event,
             // invoke Accept (via HotKey)
@@ -157,7 +162,7 @@ public partial class View
                         // TODO: Make the inverted color configurable
                         var cs = new ColorScheme (ColorScheme)
                         {
-                            Focus = new Attribute (ColorScheme.Normal.Foreground, ColorScheme.Focus.Background)
+                            Focus = new (ColorScheme.Normal.Foreground, ColorScheme.Focus.Background)
                         };
                         ColorScheme = cs;
                     }
@@ -165,20 +170,24 @@ public partial class View
                     {
                         var cs = new ColorScheme (ColorScheme)
                         {
-                            Normal = new Attribute (ColorScheme.Focus.Background, ColorScheme.Normal.Foreground)
+                            Normal = new (ColorScheme.Focus.Background, ColorScheme.Normal.Foreground)
                         };
                         ColorScheme = cs;
                     }
                 }
 
-                if (CanFocus){
-                // Set the focus, but don't invoke Accept
-                SetFocus ();
+                if (CanFocus)
+                {
+                    // Set the focus, but don't invoke Accept
+                    SetFocus ();
                 }
             }
         }
 
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released))
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released)
+            || mouseEvent.Flags.HasFlag (MouseFlags.Button2Released)
+            || mouseEvent.Flags.HasFlag (MouseFlags.Button3Released)
+            || mouseEvent.Flags.HasFlag (MouseFlags.Button4Released))
         {
             // When the mouse is released, if WantContinuousButtonPressed is set, invoke Accept one last time.
             if (WantContinuousButtonPressed)
@@ -189,6 +198,7 @@ public partial class View
             if (Application.MouseGrabView == this)
             {
                 Application.UngrabMouse ();
+
                 if (HighlightOnPress && _savedColorScheme is { })
                 {
                     ColorScheme = _savedColorScheme;
@@ -197,37 +207,20 @@ public partial class View
             }
         }
 
-        //// Clicked support for all buttons and single and double click
-        //if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)
-        //    || mouseEvent.Flags.HasFlag (MouseFlags.Button2Clicked)
-        //    || mouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)
-        //    || mouseEvent.Flags.HasFlag (MouseFlags.Button4Clicked))
-        //{
-        //    OnMouseClick (args);
-        //}
-
-        //if (mouseEvent.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
-        //    || mouseEvent.Flags.HasFlag (MouseFlags.Button2DoubleClicked)
-        //    || mouseEvent.Flags.HasFlag (MouseFlags.Button3DoubleClicked)
-        //    || mouseEvent.Flags.HasFlag (MouseFlags.Button4DoubleClicked))
-        //{
-        //    OnMouseClick (args);
-        //}
-
         if (args.Handled != true)
         {
             MouseEvent?.Invoke (this, args);
         }
 
-        return args.Handled == true;
+        return args.Handled;
     }
 
     /// <summary>Invokes the MouseClick event.</summary>
     /// <remarks>
-    /// <para>
-    /// Called when the mouse is either clicked or double-clicked. Check
-    /// <see cref="MouseEvent.Flags"/> to see which button was clicked.
-    /// </para>
+    ///     <para>
+    ///         Called when the mouse is either clicked or double-clicked. Check
+    ///         <see cref="MouseEvent.Flags"/> to see which button was clicked.
+    ///     </para>
     /// </remarks>
     protected bool OnMouseClick (MouseEventEventArgs args)
     {
@@ -235,10 +228,12 @@ public partial class View
         {
             // QUESTION: Is this right? Should a disabled view eat mouse clicks?
             args.Handled = true;
+
             return true;
         }
 
         MouseClick?.Invoke (this, args);
+
         if (args.Handled)
         {
             return true;
