@@ -1911,6 +1911,8 @@ internal class WindowsDriver : ConsoleDriver
             {
                 _point = null;
             }
+            _processButtonClick = true;
+
         }
         else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved
                  && !_isOneFingerDoubleClicked

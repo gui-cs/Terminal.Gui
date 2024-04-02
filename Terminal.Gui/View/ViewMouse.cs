@@ -2,6 +2,11 @@
 
 public partial class View
 {
+    /// <summary>
+    /// Gets or sets whether the <see cref="View"/> will invert the colors when the mouse button is pressed/released.
+    /// </summary>
+    public bool InvertColorsOnPress { get; set; }
+
     /// <summary>Gets or sets a value indicating whether this <see cref="View"/> want continuous button pressed event.</summary>
     public virtual bool WantContinuousButtonPressed { get; set; }
 
@@ -91,6 +96,9 @@ public partial class View
         return args.Handled;
     }
 
+    [CanBeNull]
+    private ColorScheme _savedColorScheme;
+
     // TODO: OnMouseEvent should not be public virtual, but protected.
     /// <summary>Called when a mouse event occurs within the view's <see cref="Bounds"/>.</summary>
     /// <remarks>
@@ -115,22 +123,75 @@ public partial class View
 
         var args = new MouseEventEventArgs (mouseEvent);
 
-        // Clicked support for all buttons and single and double click
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)
+
+        // Default behavior is to invoke Accept (via HotKey) on clicked.
+        if (!WantContinuousButtonPressed &&
+            Application.MouseGrabView != this &&
+            mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)
             || mouseEvent.Flags.HasFlag (MouseFlags.Button2Clicked)
             || mouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)
             || mouseEvent.Flags.HasFlag (MouseFlags.Button4Clicked))
         {
-            OnMouseClick (args);
+            return OnMouseClick (args);
         }
 
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button2DoubleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button3DoubleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button4DoubleClicked))
+        if (InvertColorsOnPress && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
-            OnMouseClick (args);
+            // If WantContinuousButtonPressed is true, and this is not the first pressed event,
+            // invoke Accept (via HotKey)
+            if (WantContinuousButtonPressed && Application.MouseGrabView == this)
+            {
+                return OnMouseClick (args);
+            }
+
+            // The first time we get pressed event, grab the mouse and invert the colors
+            if (Application.MouseGrabView != this)
+            {
+                Application.GrabMouse (this);
+                _savedColorScheme = ColorScheme;
+                var cs = new ColorScheme (new Attribute (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground));
+                ColorScheme = cs;
+
+                // Set the focus, but don't invoke Accept
+                SetFocus ();
+            }
         }
+
+        if (InvertColorsOnPress && mouseEvent.Flags.HasFlag (MouseFlags.Button1Released))
+        {
+            // When the mouse is released, if WantContinuousButtonPressed is set, invoke Accept one last time.
+            if (WantContinuousButtonPressed)
+            {
+                OnMouseClick (args);
+            }
+
+            if (Application.MouseGrabView == this)
+            {
+                Application.UngrabMouse ();
+                if (_savedColorScheme is { })
+                {
+                    ColorScheme = _savedColorScheme;
+                    _savedColorScheme = null;
+                }
+            }
+        }
+
+        //// Clicked support for all buttons and single and double click
+        //if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)
+        //    || mouseEvent.Flags.HasFlag (MouseFlags.Button2Clicked)
+        //    || mouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)
+        //    || mouseEvent.Flags.HasFlag (MouseFlags.Button4Clicked))
+        //{
+        //    OnMouseClick (args);
+        //}
+
+        //if (mouseEvent.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
+        //    || mouseEvent.Flags.HasFlag (MouseFlags.Button2DoubleClicked)
+        //    || mouseEvent.Flags.HasFlag (MouseFlags.Button3DoubleClicked)
+        //    || mouseEvent.Flags.HasFlag (MouseFlags.Button4DoubleClicked))
+        //{
+        //    OnMouseClick (args);
+        //}
 
         if (args.Handled != true)
         {

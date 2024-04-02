@@ -389,7 +389,27 @@ public class Buttons : Scenario
         {
             X = 0,
             Y = Pos.Bottom (label) + 1,
-            Title = "_Repeat (CanFocus; press-and-hold):",
+            Title = "_No Repeat:",
+        };
+        int noRepeatAcceptCount = 0;
+        var noRepeatButton = new Button ()
+        {
+            X = Pos.Right (label) + 1,
+            Y = Pos.Top (label),
+            Title = $"Accept Count: {noRepeatAcceptCount}",
+            WantContinuousButtonPressed = false,
+        };
+        noRepeatButton.Accept += (s, e) =>
+                                 {
+                                     noRepeatButton.Title = $"Accept Count: {++noRepeatAcceptCount}";
+                                 };
+        main.Add(label, noRepeatButton);
+
+        label = new Label ()
+        {
+            X = 0,
+            Y = Pos.Bottom (label) + 1,
+            Title = "_Repeat (press-and-hold):",
         };
         int acceptCount = 0;
         var repeatButton = new Button ()

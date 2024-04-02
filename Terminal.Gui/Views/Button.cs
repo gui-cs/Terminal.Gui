@@ -58,8 +58,8 @@ public class Button : View
         KeyBindings.Add (Key.Enter, Command.HotKey);
 
         TitleChanged += Button_TitleChanged;
-        MouseEvent += Button_MouseEvent;
-        //MouseClick += Button_MouseClick;
+        MouseClick += Button_MouseClick;
+        InvertColorsOnPress = true;
     }
 
     [CanBeNull]
