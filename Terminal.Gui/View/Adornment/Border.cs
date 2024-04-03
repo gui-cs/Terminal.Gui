@@ -198,9 +198,14 @@ public class Border : Adornment
             return true;
         }
 
-        if (!Parent.CanFocus || !Parent.Arrangement.HasFlag (ViewArrangement.Movable))
+        if (!Parent.CanFocus)
         {
-            return true;
+            return false;
+        }
+
+        if (!Parent.Arrangement.HasFlag (ViewArrangement.Movable))
+        {
+            return false;
         }
 
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3312
