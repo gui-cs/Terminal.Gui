@@ -550,13 +550,14 @@ internal class CharMap : View
         if (e.MouseEvent.Flags == MouseFlags.WheeledDown)
         {
             ScrollVertical (1);
-
+            e.Handled = true;
             return;
         }
 
         if (e.MouseEvent.Flags == MouseFlags.WheeledUp)
         {
             ScrollVertical (-1);
+            e.Handled = true;
 
             return;
         }
@@ -564,6 +565,7 @@ internal class CharMap : View
         if (e.MouseEvent.Flags == MouseFlags.WheeledRight)
         {
             ScrollHorizontal (1);
+            e.Handled = true;
 
             return;
         }
@@ -571,6 +573,8 @@ internal class CharMap : View
         if (e.MouseEvent.Flags == MouseFlags.WheeledLeft)
         {
             ScrollHorizontal (-1);
+            e.Handled = true;
+
         }
     }
 

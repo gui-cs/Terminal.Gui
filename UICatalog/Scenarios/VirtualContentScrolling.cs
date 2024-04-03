@@ -117,9 +117,15 @@ public class VirtualScrolling : Scenario
                                   };
                               };
 
-        var button = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Centered Button" };
+        var charMap = new Scenarios.CharMap ()
+        {
+            X = Pos.Center (),
+            Y = Pos.Center (),
+            Width = 30,
+            Height = 10
+        };
 
-        button.Accept += (s, e) =>
+        charMap.Accept += (s, e) =>
                              MessageBox.Query (20, 7, "Hi", $"Am I a {view.GetType ().Name}?", "Yes", "No");
 
         var label = new TextView
@@ -154,7 +160,7 @@ public class VirtualScrolling : Scenario
         view.Padding.Data = "Padding";
         view.Padding.Thickness = new (3);
 
-        view.Add (tf1, color, button, label, btnButtonInWindow, tv);
+        view.Add (tf1, color, charMap, label, btnButtonInWindow, tv);
         var label2 = new Label
         {
             X = 0,
