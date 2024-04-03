@@ -1583,6 +1583,27 @@ internal class NetDriver : ConsoleDriver
                 return MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.KeyChar);
         }
 
+        // Handle control keys whose VK codes match the related ASCII value (those below ASCII 33) like ESC
+        if (keyInfo.Key != ConsoleKey.None && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key))
+        {
+            if (keyInfo.Modifiers.HasFlag(ConsoleModifiers.Control) && keyInfo.Key == ConsoleKey.I)
+            {
+                return KeyCode.Tab;
+            }
+
+            if (keyInfo.Key == ConsoleKey.Tab)
+            {
+                return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key));
+            }
+        }
+
+        // Handle control keys (e.g. CursorUp)
+        if (keyInfo.Key != ConsoleKey.None
+            && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint))
+        {
+            return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint));
+        }
+
         if (((ConsoleKey)keyInfo.KeyChar) is >= ConsoleKey.A and <= ConsoleKey.Z)
         {
             // Shifted
@@ -1626,20 +1647,8 @@ internal class NetDriver : ConsoleDriver
             return (KeyCode)keyInfo.Key;
         }
 
-        // Handle control keys whose VK codes match the related ASCII value (those below ASCII 33) like ESC
-        if (keyInfo.Key != ConsoleKey.None && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key))
-        {
-            return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.Key);
-        }
 
-        // Handle control keys (e.g. CursorUp)
-        if (keyInfo.Key != ConsoleKey.None
-            && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint))
-        {
-            return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint));
-        }
-
-        return (KeyCode)keyInfo.KeyChar;
+        return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key));
     }
 
     #endregion Keyboard Handling
