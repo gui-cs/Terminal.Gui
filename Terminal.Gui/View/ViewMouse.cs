@@ -158,6 +158,7 @@ public partial class View
                     // Set the focus, but don't invoke Accept
                     SetFocus ();
                 }
+                args.Handled = true;
             }
         }
 
@@ -181,6 +182,7 @@ public partial class View
                     ColorScheme = _savedColorScheme;
                     _savedColorScheme = null;
                 }
+                args.Handled = true;
             }
         }
 
