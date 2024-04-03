@@ -61,8 +61,6 @@ public class Buttons : Scenario
             {
                 ColorScheme = colorScheme.Value,
                 X = Pos.Right (prev) + 2,
-
-                //X = x,
                 Y = Pos.Y (colorButtonsLabel),
                 Text = $"_{colorScheme.Key}"
             };
