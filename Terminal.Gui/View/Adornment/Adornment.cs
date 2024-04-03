@@ -291,7 +291,7 @@ public class Adornment : View
                 Application.GrabMouse (this);
             }
 
-            return true;
+            return mouseEvent.Handled = true;
         }
 
         if (mouseEvent.Flags is (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
@@ -324,7 +324,7 @@ public class Adornment : View
                 Parent.X = nx;
                 Parent.Y = ny;
 
-                return true;
+                return mouseEvent.Handled = true;
             }
         }
 

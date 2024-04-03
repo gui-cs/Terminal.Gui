@@ -156,6 +156,8 @@ public partial class View
                     // Set the focus, but don't invoke Accept
                     SetFocus ();
                 }
+
+                args.Handled = true;
             }
         }
 
@@ -210,9 +212,7 @@ public partial class View
         if (!Enabled)
         {
             // QUESTION: Is this right? Should a disabled view eat mouse clicks?
-            args.Handled = true;
-
-            return true;
+            return args.Handled = true;
         }
 
         MouseClick?.Invoke (this, args);
@@ -224,7 +224,6 @@ public partial class View
 
         if (!HasFocus && CanFocus)
         {
-            args.Handled = true;
             args.Handled = true;
             SetFocus ();
         }
