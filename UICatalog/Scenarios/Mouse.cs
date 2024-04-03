@@ -9,6 +9,7 @@ public class Mouse : Scenario
 {
     public override void Main ()
     {
+        Application.Init ();
         Window win = new ()
         {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",

@@ -2128,6 +2128,9 @@ internal class WindowsMainLoop : IMainLoopDriver
 
     void IMainLoopDriver.TearDown ()
     {
+        // Eat any outstanding events
+        //var r = _winConsole.ReadConsoleInput ();
+
         _inputHandlerTokenSource?.Cancel ();
         _inputHandlerTokenSource?.Dispose ();
 
