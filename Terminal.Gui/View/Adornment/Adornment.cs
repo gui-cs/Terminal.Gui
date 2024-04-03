@@ -203,6 +203,10 @@ public class Adornment : View
     /// <returns><see langword="true"/> if the specified Parent's SuperView-relative coordinates are within the Adornment's Thickness. </returns>
     public override bool Contains (int x, int y)
     {
+        if (Parent is null)
+        {
+            return false;
+        }
         Rectangle frame = Frame;
         frame.Offset (Parent.Frame.Location);
 
