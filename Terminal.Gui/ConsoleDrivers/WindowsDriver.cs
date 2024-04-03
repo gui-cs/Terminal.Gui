@@ -1777,8 +1777,7 @@ internal class WindowsDriver : ConsoleDriver
     {
         var mouseFlag = MouseFlags.AllEvents;
 
-        Debug.WriteLine ($"ToDriverMouse: {mouseEvent}");
-        	//$"X:{mouseEvent.MousePosition.X};Y:{mouseEvent.MousePosition.Y};ButtonState:{mouseEvent.ButtonState};EventFlags:{mouseEvent.EventFlags}");
+        //Debug.WriteLine ($"ToDriverMouse: {mouseEvent}");
 
         if (_isButtonDoubleClicked || _isOneFingerDoubleClicked)
         {
@@ -2131,17 +2130,18 @@ internal class WindowsMainLoop : IMainLoopDriver
 
     void IMainLoopDriver.TearDown ()
     {
-        // Eat any outstanding events
-        var records = _winConsole.ReadConsoleInput ();
+        // Eat any outstanding events. See #
+        //var records = 
+            _winConsole.ReadConsoleInput ();
 
-        if (records != null)
-        {
-            foreach (var rec in records)
-            {
-                Debug.WriteLine ($"Teardown: {rec.ToString ()}");
-                Debug.Assert (rec is not { EventType: WindowsConsole.EventType.Mouse, MouseEvent.ButtonState: WindowsConsole.ButtonState.Button1Pressed });
-            }
-        }
+        //if (records != null)
+        //{
+        //    foreach (var rec in records)
+        //    {
+        //        Debug.WriteLine ($"Teardown: {rec.ToString ()}");
+        //        //Debug.Assert (rec is not { EventType: WindowsConsole.EventType.Mouse, MouseEvent.ButtonState: WindowsConsole.ButtonState.Button1Pressed });
+        //    }
+        //}
 
         _inputHandlerTokenSource?.Cancel ();
         _inputHandlerTokenSource?.Dispose ();
