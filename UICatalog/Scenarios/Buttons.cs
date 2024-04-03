@@ -339,6 +339,7 @@ public class Buttons : Scenario
             Y = Pos.Bottom (moveUnicodeHotKeyBtn) + 1,
             Title = "_Numeric Up/Down (press-and-hold):",
         };
+
         var downButton = new Button ()
         {
             CanFocus = false,

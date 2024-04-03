@@ -1590,22 +1590,17 @@ public static partial class Application
 
         //Debug.WriteLine ($"OnMouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags}");
 
-        if (view.OnMouseEvent (me))
+        while (view is {} && !view.OnMouseEvent (me))
         {
-            // Should we bubble up the event, if it is not handled?
-            //return;
+            if (view is Adornment ad)
+            {
+                view = ad.Parent.SuperView;
+            }
+            else
+            {
+                view = view.SuperView;
+            }
         }
-        //while (view is {} && !view.OnMouseEvent (me))
-        //{
-        //    if (view is Adornment ad)
-        //    {
-        //        view = ad.Parent.SuperView;
-        //    }
-        //    else
-        //    {
-        //        view = view.SuperView;
-        //    }
-        //}
 
         BringOverlappedTopToFront ();
     }
