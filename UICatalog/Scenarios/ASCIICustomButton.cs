@@ -16,6 +16,8 @@ public class ASCIICustomButtonTest : Scenario
 
     public override void Main ()
     {
+        _smallerWindow = false;
+
         Application.Init ();
         Toplevel top = new ();
 
@@ -24,7 +26,7 @@ public class ASCIICustomButtonTest : Scenario
             Menus =
             [
                 new MenuBarItem (
-                                 "Window Size",
+                                 "_Window Size",
                                  new []
                                  {
                                      _miSmallerWindow =
