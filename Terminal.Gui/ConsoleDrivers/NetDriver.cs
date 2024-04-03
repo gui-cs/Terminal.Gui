@@ -874,7 +874,7 @@ internal class NetDriver : ConsoleDriver
         int rows = Rows;
         int cols = Cols;
         var output = new StringBuilder ();
-        var redrawAttr = new Attribute ();
+        Attribute? redrawAttr = null;
         int lastCol = -1;
 
         CursorVisibility? savedVisibitity = _cachedCursorVisibility;
