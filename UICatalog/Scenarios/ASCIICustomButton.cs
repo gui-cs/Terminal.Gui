@@ -18,7 +18,6 @@ public class ASCIICustomButtonTest : Scenario
     {
         Application.Init ();
         Toplevel top = new ();
-        _scrollViewTestWindow = new ScrollViewTestWindow ();
 
         var menu = new MenuBar
         {
@@ -51,7 +50,9 @@ public class ASCIICustomButtonTest : Scenario
                                 )
             ]
         };
-        top = new ();
+
+        _scrollViewTestWindow = new ScrollViewTestWindow ();
+
         top.Add (menu, _scrollViewTestWindow);
         Application.Run (top);
         top.Dispose ();
@@ -202,7 +203,7 @@ public class ASCIICustomButtonTest : Scenario
                     Width = BUTTON_WIDTH,
                     Height = BUTTON_HEIGHT
                 };
-                button.CustomInitialize ();
+                button.Initialized += Button_Initialized;
                 button.Accept += Button_Clicked;
                 button.PointerEnter += Button_PointerEnter;
                 button.MouseClick += Button_MouseClick;
@@ -221,7 +222,7 @@ public class ASCIICustomButtonTest : Scenario
                 Width = BUTTON_WIDTH,
                 Height = BUTTON_HEIGHT
             };
-            closeButton.CustomInitialize ();
+            closeButton.Initialized += Button_Initialized;
             closeButton.Accept += Button_Clicked;
             closeButton.PointerEnter += Button_PointerEnter;
             closeButton.MouseClick += Button_MouseClick;
@@ -246,6 +247,11 @@ public class ASCIICustomButtonTest : Scenario
             {
                 Add (titleLabel, _scrollView);
             }
+        }
+        private void Button_Initialized (object sender, EventArgs e)
+        {
+            var button = sender as ASCIICustomButton;
+            button?.CustomInitialize ();
         }
 
         private void Button_Clicked (object sender, EventArgs e)

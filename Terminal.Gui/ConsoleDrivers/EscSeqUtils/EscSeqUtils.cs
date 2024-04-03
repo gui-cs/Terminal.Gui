@@ -775,7 +775,7 @@ public static class EscSeqUtils
             lastMouseButtonPressed = buttonState;
             isButtonPressed = true;
 
-            point ??= pos;
+            point = pos;
 
             if ((mouseFlags [0] & MouseFlags.ReportMousePosition) == 0)
             {
