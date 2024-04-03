@@ -1,3 +1,5 @@
+#define OTHER_CONTROLS
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -30,17 +32,26 @@ public class CharacterMap : Scenario
     private CharMap _charMap;
 
     // Don't create a Window, just return the top-level view
-    public override void Init ()
+    public override void Main ()
     {
         Application.Init ();
-        Top = new ();
-        Top.ColorScheme = Colors.ColorSchemes ["Base"];
-    }
 
-    public override void Setup ()
-    {
-        _charMap = new() { X = 0, Y = 1, Height = Dim.Fill () };
-        Top.Add (_charMap);
+        var top = new Window ()
+        {
+            BorderStyle = LineStyle.None
+        };
+
+        _charMap = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+        top.Add (_charMap);
+
+#if OTHER_CONTROLS
+        _charMap.Y = 1;
 
         var jumpLabel = new Label
         {
@@ -49,19 +60,19 @@ public class CharacterMap : Scenario
             HotKeySpecifier = (Rune)'_',
             Text = "_Jump To Code Point:"
         };
-        Top.Add (jumpLabel);
+        top.Add (jumpLabel);
 
         var jumpEdit = new TextField
         {
             X = Pos.Right (jumpLabel) + 1, Y = Pos.Y (_charMap), Width = 10, Caption = "e.g. 01BE3"
         };
-        Top.Add (jumpEdit);
+        top.Add (jumpEdit);
 
-        _errorLabel = new()
+        _errorLabel = new ()
         {
             X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes ["error"], Text = "err"
         };
-        Top.Add (_errorLabel);
+        top.Add (_errorLabel);
 
 #if TEXT_CHANGED_TO_JUMP
         jumpEdit.TextChanged += JumpEdit_TextChanged;
@@ -76,8 +87,7 @@ public class CharacterMap : Scenario
             e.Cancel = true;
         }
 #endif
-        _categoryList = new() { X = Pos.Right (_charMap), Y = Pos.Bottom (jumpLabel), Height = Dim.Fill () };
-
+        _categoryList = new () { X = Pos.Right (_charMap), Y = Pos.Bottom (jumpLabel), Height = Dim.Fill () };
         _categoryList.FullRowSelect = true;
 
         //jumpList.Style.ShowHeaders = false;
@@ -95,48 +105,46 @@ public class CharacterMap : Scenario
 
         // if user clicks the mouse in TableView
         _categoryList.MouseClick += (s, e) =>
-                                    {
-                                        _categoryList.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
+        {
+            _categoryList.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
 
-                                        if (clickedCol != null && e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
-                                        {
-                                            EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
-                                            string prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;
-                                            isDescending = !isDescending;
+            if (clickedCol != null && e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+            {
+                EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+                string prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;
+                isDescending = !isDescending;
 
-                                            _categoryList.Table = CreateCategoryTable (clickedCol.Value, isDescending);
+                _categoryList.Table = CreateCategoryTable (clickedCol.Value, isDescending);
 
-                                            table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+                table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
 
-                                            _categoryList.SelectedRow = table.Data
-                                                                             .Select ((item, index) => new { item, index })
-                                                                             .FirstOrDefault (x => x.item.Category == prevSelection)
-                                                                             ?.index
-                                                                        ?? -1;
-                                        }
-                                    };
+                _categoryList.SelectedRow = table.Data
+                                                 .Select ((item, index) => new { item, index })
+                                                 .FirstOrDefault (x => x.item.Category == prevSelection)
+                                                 ?.index
+                                            ?? -1;
+            }
+        };
 
         int longestName = UnicodeRange.Ranges.Max (r => r.Category.GetColumns ());
 
         _categoryList.Style.ColumnStyles.Add (
                                               0,
-                                              new() { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName }
+                                              new () { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName }
                                              );
-        _categoryList.Style.ColumnStyles.Add (1, new() { MaxWidth = 1, MinWidth = 6 });
-        _categoryList.Style.ColumnStyles.Add (2, new() { MaxWidth = 1, MinWidth = 6 });
+        _categoryList.Style.ColumnStyles.Add (1, new () { MaxWidth = 1, MinWidth = 6 });
+        _categoryList.Style.ColumnStyles.Add (2, new () { MaxWidth = 1, MinWidth = 6 });
 
         _categoryList.Width = _categoryList.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 4;
 
         _categoryList.SelectedCellChanged += (s, args) =>
-                                             {
-                                                 EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
-                                                 _charMap.StartCodePoint = table.Data.ToArray () [args.NewRow].Start;
-                                             };
+        {
+            EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+            _charMap.StartCodePoint = table.Data.ToArray () [args.NewRow].Start;
+        };
 
-        Top.Add (_categoryList);
+        top.Add (_categoryList);
 
-        _charMap.SelectedCodePoint = 0;
-        _charMap.SetFocus ();
 
         // TODO: Replace this with Dim.Auto when that's ready
         _categoryList.Initialized += _categoryList_Initialized;
@@ -162,7 +170,14 @@ public class CharacterMap : Scenario
                     )
             ]
         };
-        Top.Add (menu);
+        top.Add (menu);
+#endif // OTHER_CONTROLS
+
+        _charMap.SelectedCodePoint = 0;
+        _charMap.SetFocus ();
+
+        Application.Run (top);
+        top.Dispose ();
     }
 
     private void _categoryList_Initialized (object sender, EventArgs e) { _charMap.Width = Dim.Fill () - _categoryList.Width; }
@@ -203,7 +218,7 @@ public class CharacterMap : Scenario
 
         return new (
                     sortedRanges,
-                    new()
+                    new ()
                     {
                         { $"Category{categorySort}", s => s.Category },
                         { $"Start{startSort}", s => $"{s.Start:x5}" },
@@ -296,7 +311,7 @@ public class CharacterMap : Scenario
     }
 }
 
-internal class CharMap : ScrollView
+internal class CharMap : View
 {
     private const CursorVisibility _cursor = CursorVisibility.Default;
     private const int COLUMN_WIDTH = 3;
@@ -311,10 +326,7 @@ internal class CharMap : ScrollView
         ColorScheme = Colors.ColorSchemes ["Dialog"];
         CanFocus = true;
 
-        ContentSize = new (
-                           RowWidth,
-                           (MaxCodePoint / 16 + (ShowHorizontalScrollIndicator ? 2 : 1)) * _rowHeight
-                          );
+        ContentSize = new (RowWidth, (MaxCodePoint / 16 + 2) * _rowHeight);
 
         AddCommand (
                     Command.ScrollUp,
@@ -325,6 +337,8 @@ internal class CharMap : ScrollView
                             SelectedCodePoint -= 16;
                         }
 
+                        ScrollVertical (-_rowHeight);
+
                         return true;
                     }
                    );
@@ -333,9 +347,14 @@ internal class CharMap : ScrollView
                     Command.ScrollDown,
                     () =>
                     {
-                        if (SelectedCodePoint < MaxCodePoint - 16)
+                        if (SelectedCodePoint <= MaxCodePoint - 16)
                         {
                             SelectedCodePoint += 16;
+                        }
+
+                        if (Cursor.Y >= Viewport.Height)
+                        {
+                            ScrollVertical (_rowHeight);
                         }
 
                         return true;
@@ -351,6 +370,11 @@ internal class CharMap : ScrollView
                             SelectedCodePoint--;
                         }
 
+                        if (Cursor.X > RowLabelWidth + 1)
+                        {
+                            ScrollHorizontal (-COLUMN_WIDTH);
+                        }
+
                         return true;
                     }
                    );
@@ -364,6 +388,11 @@ internal class CharMap : ScrollView
                             SelectedCodePoint++;
                         }
 
+                        if (Cursor.X >= Viewport.Width)
+                        {
+                            ScrollHorizontal (COLUMN_WIDTH);
+                        }
+
                         return true;
                     }
                    );
@@ -372,8 +401,9 @@ internal class CharMap : ScrollView
                     Command.PageUp,
                     () =>
                     {
-                        int page = (Viewport.Height / _rowHeight - 1) * 16;
+                        int page = (Viewport.Height - 1 / _rowHeight) * 16;
                         SelectedCodePoint -= Math.Min (page, SelectedCodePoint);
+                        Viewport = Viewport with { Y = SelectedCodePoint / 16 * _rowHeight };
 
                         return true;
                     }
@@ -383,8 +413,9 @@ internal class CharMap : ScrollView
                     Command.PageDown,
                     () =>
                     {
-                        int page = (Viewport.Height / _rowHeight - 1) * 16;
+                        int page = (Viewport.Height - 1 / _rowHeight) * 16;
                         SelectedCodePoint += Math.Min (page, MaxCodePoint - SelectedCodePoint);
+                        Viewport = Viewport with { Y = SelectedCodePoint / 16 * _rowHeight };
 
                         return true;
                     }
@@ -405,11 +436,11 @@ internal class CharMap : ScrollView
                     () =>
                     {
                         SelectedCodePoint = MaxCodePoint;
+                        Viewport = Viewport with { Y = SelectedCodePoint / 16 * _rowHeight };
 
                         return true;
                     }
                    );
-        KeyBindings.Add (Key.Enter, Command.Accept);
 
         AddCommand (
                     Command.Accept,
@@ -421,7 +452,132 @@ internal class CharMap : ScrollView
                     }
                    );
 
+        KeyBindings.Add (Key.Enter, Command.Accept);
+        KeyBindings.Add (Key.CursorUp, Command.ScrollUp);
+        KeyBindings.Add (Key.CursorDown, Command.ScrollDown);
+        KeyBindings.Add (Key.CursorLeft, Command.ScrollLeft);
+        KeyBindings.Add (Key.CursorRight, Command.ScrollRight);
+        KeyBindings.Add (Key.PageUp, Command.PageUp);
+        KeyBindings.Add (Key.PageDown, Command.PageDown);
+        KeyBindings.Add (Key.Home, Command.TopHome);
+        KeyBindings.Add (Key.End, Command.BottomEnd);
+
         MouseClick += Handle_MouseClick;
+        MouseEvent += Handle_MouseEvent;
+
+        // Prototype scrollbars
+        Padding.Thickness = new Thickness (0, 0, 1, 1);
+        var up = new Button ()
+        {
+            AutoSize = false,
+            X = Pos.AnchorEnd (1),
+            Y = 0,
+            Height = 1,
+            Width = 1,
+            NoPadding = true,
+            NoDecorations = true,
+            Title = CM.Glyphs.UpArrow.ToString (),
+            WantContinuousButtonPressed = true,
+            CanFocus = false,
+
+        };
+        up.Accept += (sender, args) =>
+        {
+            args.Cancel = ScrollVertical (-1) == true;
+        };
+
+        var down = new Button ()
+        {
+            AutoSize = false,
+            X = Pos.AnchorEnd (1),
+            Y = Pos.AnchorEnd (2),
+            Height = 1,
+            Width = 1,
+            NoPadding = true,
+            NoDecorations = true,
+            Title = CM.Glyphs.DownArrow.ToString (),
+            WantContinuousButtonPressed = true,
+            CanFocus = false,
+
+        };
+        down.Accept += (sender, args) =>
+        {
+            ScrollVertical (1);
+        };
+
+        var left = new Button ()
+        {
+            AutoSize = false,
+            X = 0,
+            Y = Pos.AnchorEnd (1),
+            Height = 1,
+            Width = 1,
+            NoPadding = true,
+            NoDecorations = true,
+            Title = CM.Glyphs.LeftArrow.ToString (),
+            WantContinuousButtonPressed = true,
+            CanFocus = false,
+
+        };
+        left.Accept += (sender, args) =>
+        {
+            ScrollHorizontal (-1);
+        };
+
+        var right = new Button ()
+        {
+            AutoSize = false,
+            X = Pos.AnchorEnd (2),
+            Y = Pos.AnchorEnd (1),
+            Height = 1,
+            Width = 1,
+            NoPadding = true,
+            NoDecorations = true,
+            Title = CM.Glyphs.RightArrow.ToString (),
+            WantContinuousButtonPressed = true,
+            CanFocus = false,
+
+        };
+        right.Accept += (sender, args) =>
+        {
+            ScrollHorizontal (1);
+        };
+
+
+        Padding.Add (up, down, left, right);
+    }
+
+    private void Handle_MouseEvent (object sender, MouseEventEventArgs e)
+    {
+        if (e.MouseEvent.Flags == MouseFlags.WheeledDown)
+        {
+            ScrollVertical (1);
+            e.Handled = true;
+            return;
+        }
+
+        if (e.MouseEvent.Flags == MouseFlags.WheeledUp)
+        {
+            ScrollVertical (-1);
+            e.Handled = true;
+
+            return;
+        }
+
+        if (e.MouseEvent.Flags == MouseFlags.WheeledRight)
+        {
+            ScrollHorizontal (1);
+            e.Handled = true;
+
+            return;
+        }
+
+        if (e.MouseEvent.Flags == MouseFlags.WheeledLeft)
+        {
+            ScrollHorizontal (-1);
+            e.Handled = true;
+
+        }
     }
 
     /// <summary>Gets the coordinates of the Cursor based on the SelectedCodePoint in screen coordinates</summary>
@@ -429,16 +585,16 @@ internal class CharMap : ScrollView
     {
         get
         {
-            int row = SelectedCodePoint / 16 * _rowHeight + ContentOffset.Y + 1;
+            int row = SelectedCodePoint / 16 * _rowHeight - Viewport.Y + 1;
 
-            int col = SelectedCodePoint % 16 * COLUMN_WIDTH + ContentOffset.X + RowLabelWidth + 1; // + 1 for padding
+            int col = SelectedCodePoint % 16 * COLUMN_WIDTH - Viewport.X + RowLabelWidth + 1; // + 1 for padding between label and first column
 
             return new (col, row);
         }
         set => throw new NotImplementedException ();
     }
 
-    public static int MaxCodePoint => 0x10FFFF;
+    public static int MaxCodePoint = UnicodeRange.Ranges.Max (r => r.End);
 
     /// <summary>
     ///     Specifies the starting offset for the character map. The default is 0x2500 which is the Box Drawing
@@ -449,6 +605,10 @@ internal class CharMap : ScrollView
         get => _selected;
         set
         {
+            if (_selected == value)
+            {
+                return;
+            }
             _selected = value;
 
             if (IsInitialized)
@@ -456,39 +616,30 @@ internal class CharMap : ScrollView
                 int row = SelectedCodePoint / 16 * _rowHeight;
                 int col = SelectedCodePoint % 16 * COLUMN_WIDTH;
 
-                int height = Viewport.Height - (ShowHorizontalScrollIndicator ? 2 : 1);
-
-                if (row + ContentOffset.Y < 0)
+                if (row - Viewport.Y < 0)
                 {
                     // Moving up.
-                    ContentOffset = new (ContentOffset.X, row);
+                    Viewport = Viewport with { Y = row };
                 }
-                else if (row + ContentOffset.Y >= height)
+                else if (row - Viewport.Y >= Viewport.Height)
                 {
                     // Moving down.
-                    ContentOffset = new (
-                                         ContentOffset.X,
-                                         Math.Min (row, row - height + _rowHeight)
-                                        );
+                    Viewport = Viewport with { Y = row - Viewport.Height };
                 }
 
-                int width = Viewport.Width / COLUMN_WIDTH * COLUMN_WIDTH - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
+                int width = Viewport.Width / COLUMN_WIDTH * COLUMN_WIDTH - RowLabelWidth;
 
-                if (col + ContentOffset.X < 0)
+                if (col - Viewport.X < 0)
                 {
                     // Moving left.
-                    ContentOffset = new (col, ContentOffset.Y);
+                    Viewport = Viewport with { X = col };
                 }
-                else if (col + ContentOffset.X >= width)
+                else if (col - Viewport.X >= width)
                 {
                     // Moving right.
-                    ContentOffset = new (
-                                         Math.Min (col, col - width + COLUMN_WIDTH),
-                                         ContentOffset.Y
-                                        );
+                    Viewport = Viewport with { X = col - width };
                 }
             }
-
             SetNeedsDisplay ();
             SelectedCodePointChanged?.Invoke (this, new (SelectedCodePoint, null));
         }
@@ -515,6 +666,7 @@ internal class CharMap : ScrollView
         {
             _start = value;
             SelectedCodePoint = value;
+            Viewport = Viewport with { Y = SelectedCodePoint / 16 * _rowHeight };
             SetNeedsDisplay ();
         }
     }
@@ -523,98 +675,71 @@ internal class CharMap : ScrollView
     private static int RowWidth => RowLabelWidth + COLUMN_WIDTH * 16;
     public event EventHandler<ListViewItemEventArgs> Hover;
 
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
-        if (contentArea.Height == 0 || contentArea.Width == 0)
+        if (viewport.Height == 0 || viewport.Width == 0)
         {
             return;
         }
 
-        // Call the base (ScrollView) to draw the scrollbars. Do this ahead of our own drawing so that
-        // any wide or tall glyphs actually render over the scrollbars (on platforms like Windows Terminal) that 
-        // does this correctly.
-        base.OnDrawContent (contentArea);
+        ClearVisibleContent ();
 
-        Rectangle viewport = new (
-                                  ContentOffset,
-                                  new (
-                                       Math.Max (Viewport.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
-                                       Math.Max (Viewport.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0)
-                                      )
-                                 );
-
-        Rectangle oldClip = ClipToViewport ();
-
-        if (ShowHorizontalScrollIndicator)
-        {
-            // ClipToBounds doesn't know about the scroll indicators, so if off, subtract one from height
-            Driver.Clip = new (Driver.Clip.Location, new (Driver.Clip.Size.Width, Driver.Clip.Size.Height - 1));
-        }
-
-        if (ShowVerticalScrollIndicator)
-        {
-            // ClipToBounds doesn't know about the scroll indicators, so if off, subtract one from width
-            Driver.Clip = new (Driver.Clip.Location, new (Driver.Clip.Size.Width - 1, Driver.Clip.Size.Height));
-        }
-
-        int cursorCol = Cursor.X - ContentOffset.X - RowLabelWidth - 1;
-        int cursorRow = Cursor.Y - ContentOffset.Y - 1;
+        int cursorCol = Cursor.X + Viewport.X - RowLabelWidth - 1;
+        int cursorRow = Cursor.Y + Viewport.Y - 1;
 
         Driver.SetAttribute (GetHotNormalColor ());
         Move (0, 0);
         Driver.AddStr (new (' ', RowLabelWidth + 1));
 
+        int firstColumnX = RowLabelWidth - Viewport.X;
+
+        // Header
         for (var hexDigit = 0; hexDigit < 16; hexDigit++)
         {
-            int x = ContentOffset.X + RowLabelWidth + hexDigit * COLUMN_WIDTH;
+            int x = firstColumnX + hexDigit * COLUMN_WIDTH;
 
             if (x > RowLabelWidth - 2)
             {
                 Move (x, 0);
                 Driver.SetAttribute (GetHotNormalColor ());
                 Driver.AddStr (" ");
-
-                Driver.SetAttribute (
-                                     HasFocus && cursorCol + ContentOffset.X + RowLabelWidth == x
-                                         ? ColorScheme.HotFocus
-                                         : GetHotNormalColor ()
-                                    );
+                Driver.SetAttribute (HasFocus && cursorCol + firstColumnX == x ? ColorScheme.HotFocus : GetHotNormalColor ());
                 Driver.AddStr ($"{hexDigit:x}");
                 Driver.SetAttribute (GetHotNormalColor ());
                 Driver.AddStr (" ");
             }
         }
 
-        int firstColumnX = viewport.X + RowLabelWidth;
-
         // Even though the Clip is set to prevent us from drawing on the row potentially occupied by the horizontal
         // scroll bar, we do the smart thing and not actually draw that row if not necessary.
-        for (var y = 1; y < Viewport.Height - (ShowHorizontalScrollIndicator ? 1 : 0); y++)
+        for (var y = 1; y < Viewport.Height; y++)
         {
             // What row is this?
-            int row = (y - ContentOffset.Y - 1) / _rowHeight;
+            int row = (y + Viewport.Y - 1) / _rowHeight;
 
             int val = row * 16;
 
             if (val > MaxCodePoint)
             {
-                continue;
+                break;
             }
 
             Move (firstColumnX + COLUMN_WIDTH, y);
             Driver.SetAttribute (GetNormalColor ());
 
-            // Note, this code naïvely draws all columns, even if the viewport is smaller than
-            // the needed width. We rely on Clip to ensure we don't draw past the viewport.
-            // If we were *really* worried about performance, we'd optimize this code to only draw the
-            // parts of the row that are actually visible in the viewport.
             for (var col = 0; col < 16; col++)
             {
                 int x = firstColumnX + COLUMN_WIDTH * col + 1;
 
+                if (x < 0 || x > Viewport.Width - 1)
+                {
+                    continue;
+                }
+
                 Move (x, y);
 
-                if (cursorRow + ContentOffset.Y + 1 == y && cursorCol + ContentOffset.X + firstColumnX + 1 == x && !HasFocus)
+                // If we're at the cursor position, and we don't have focus, invert the colors.
+                if (row == cursorRow && x == cursorCol && !HasFocus)
                 {
                     Driver.SetAttribute (GetFocusColor ());
                 }
@@ -629,9 +754,9 @@ internal class CharMap : ScrollView
 
                 int width = rune.GetColumns ();
 
-                // are we at first row of the row?
-                if (!ShowGlyphWidths || (y - ContentOffset.Y) % _rowHeight > 0)
+                if (!ShowGlyphWidths || (y + Viewport.Y) % _rowHeight > 0)
                 {
+                    // Draw the rune
                     if (width > 0)
                     {
                         Driver.AddRune (rune);
@@ -666,25 +791,24 @@ internal class CharMap : ScrollView
                 }
                 else
                 {
+                    // Draw the width of the rune
                     Driver.SetAttribute (ColorScheme.HotNormal);
                     Driver.AddStr ($"{width}");
                 }
 
-                if (cursorRow + ContentOffset.Y + 1 == y && cursorCol + ContentOffset.X + firstColumnX + 1 == x && !HasFocus)
+                // If we're at the cursor position, and we don't have focus, revert the colors to normal
+                if (row == cursorRow && x == cursorCol && !HasFocus)
                 {
                     Driver.SetAttribute (GetNormalColor ());
                 }
             }
 
+            // Draw row label (U+XXXX_)
             Move (0, y);
 
-            Driver.SetAttribute (
-                                 HasFocus && cursorRow + ContentOffset.Y + 1 == y
-                                     ? ColorScheme.HotFocus
-                                     : ColorScheme.HotNormal
-                                );
+            Driver.SetAttribute (HasFocus && y + Viewport.Y - 1 == cursorRow ? ColorScheme.HotFocus : ColorScheme.HotNormal);
 
-            if (!ShowGlyphWidths || (y - ContentOffset.Y) % _rowHeight > 0)
+            if (!ShowGlyphWidths || (y + Viewport.Y) % _rowHeight > 0)
             {
                 Driver.AddStr ($"U+{val / 16:x5}_ ");
             }
@@ -693,8 +817,6 @@ internal class CharMap : ScrollView
                 Driver.AddStr (new (' ', RowLabelWidth));
             }
         }
-
-        Driver.Clip = oldClip;
     }
 
     public override bool OnEnter (View view)
@@ -718,9 +840,9 @@ internal class CharMap : ScrollView
     {
         if (HasFocus
             && Cursor.X >= RowLabelWidth
-            && Cursor.X < Viewport.Width - (ShowVerticalScrollIndicator ? 1 : 0)
+            && Cursor.X < Viewport.Width
             && Cursor.Y > 0
-            && Cursor.Y < Viewport.Height - (ShowHorizontalScrollIndicator ? 1 : 0))
+            && Cursor.Y < Viewport.Height)
         {
             Driver.SetCursorVisibility (_cursor);
             Move (Cursor.X, Cursor.Y);
@@ -773,8 +895,8 @@ internal class CharMap : ScrollView
             me.X = Cursor.X;
         }
 
-        int row = (me.Y - 1 - ContentOffset.Y) / _rowHeight; // -1 for header
-        int col = (me.X - RowLabelWidth - ContentOffset.X) / COLUMN_WIDTH;
+        int row = (me.Y - 1 - -Viewport.Y) / _rowHeight; // -1 for header
+        int col = (me.X - RowLabelWidth - -Viewport.X) / COLUMN_WIDTH;
 
         if (col > 15)
         {
@@ -812,7 +934,7 @@ internal class CharMap : ScrollView
         {
             SelectedCodePoint = val;
 
-            _contextMenu = new()
+            _contextMenu = new ()
             {
                 Position = new (me.X + 1, me.Y + 1),
                 MenuItems = new (
@@ -854,7 +976,7 @@ internal class CharMap : ScrollView
             Y = Pos.Center (),
             Height = 7,
             Width = 50,
-            Buttons = [new() { Text = "Cancel" }]
+            Buttons = [new () { Text = "Cancel" }]
         };
 
         var errorLabel = new Label
@@ -873,28 +995,28 @@ internal class CharMap : ScrollView
         waitIndicator.Add (spinner);
 
         waitIndicator.Ready += async (s, a) =>
-                               {
-                                   try
-                                   {
-                                       decResponse = await client.GetCodepointDec (SelectedCodePoint);
-                                   }
-                                   catch (HttpRequestException e)
-                                   {
-                                       (s as Dialog).Text = e.Message;
+        {
+            try
+            {
+                decResponse = await client.GetCodepointDec (SelectedCodePoint);
+            }
+            catch (HttpRequestException e)
+            {
+                (s as Dialog).Text = e.Message;
 
-                                       Application.Invoke (
-                                                           () =>
-                                                           {
-                                                               spinner.Visible = false;
-                                                               errorLabel.Text = e.Message;
-                                                               errorLabel.ColorScheme = Colors.ColorSchemes ["Error"];
-                                                               errorLabel.Visible = true;
-                                                           }
-                                                          );
-                                   }
+                Application.Invoke (
+                                    () =>
+                                    {
+                                        spinner.Visible = false;
+                                        errorLabel.Text = e.Message;
+                                        errorLabel.ColorScheme = Colors.ColorSchemes ["Error"];
+                                        errorLabel.Visible = true;
+                                    }
+                                   );
+            }
 
                                    (s as Dialog)?.RequestStop ();
-                               };
+        };
         Application.Run (waitIndicator);
         waitIndicator.Dispose ();
 
@@ -921,7 +1043,7 @@ internal class CharMap : ScrollView
                                                         document.RootElement,
                                                         new
                                                             JsonSerializerOptions
-                                                            { WriteIndented = true }
+                                                        { WriteIndented = true }
                                                        );
             }
 
@@ -934,62 +1056,62 @@ internal class CharMap : ScrollView
             var dlg = new Dialog { Title = title, Buttons = [copyGlyph, copyCP, cancel] };
 
             copyGlyph.Accept += (s, a) =>
-                                {
-                                    CopyGlyph ();
-                                    dlg.RequestStop ();
-                                };
+            {
+                CopyGlyph ();
+                dlg.RequestStop ();
+            };
 
             copyCP.Accept += (s, a) =>
-                             {
-                                 CopyCodePoint ();
-                                 dlg.RequestStop ();
-                             };
+            {
+                CopyCodePoint ();
+                dlg.RequestStop ();
+            };
             cancel.Accept += (s, a) => dlg.RequestStop ();
 
             var rune = (Rune)SelectedCodePoint;
             var label = new Label { Text = "IsAscii: ", X = 0, Y = 0 };
             dlg.Add (label);
 
-            label = new() { Text = $"{rune.IsAscii}", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new () { Text = $"{rune.IsAscii}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new() { Text = ", Bmp: ", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new () { Text = ", Bmp: ", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new() { Text = $"{rune.IsBmp}", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new () { Text = $"{rune.IsBmp}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new() { Text = ", CombiningMark: ", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new () { Text = ", CombiningMark: ", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new() { Text = $"{rune.IsCombiningMark ()}", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new () { Text = $"{rune.IsCombiningMark ()}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new() { Text = ", SurrogatePair: ", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new () { Text = ", SurrogatePair: ", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new() { Text = $"{rune.IsSurrogatePair ()}", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new () { Text = $"{rune.IsSurrogatePair ()}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new() { Text = ", Plane: ", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new () { Text = ", Plane: ", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new() { Text = $"{rune.Plane}", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new () { Text = $"{rune.Plane}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new() { Text = "Columns: ", X = 0, Y = Pos.Bottom (label) };
+            label = new () { Text = "Columns: ", X = 0, Y = Pos.Bottom (label) };
             dlg.Add (label);
 
-            label = new() { Text = $"{rune.GetColumns ()}", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new () { Text = $"{rune.GetColumns ()}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new() { Text = ", Utf16SequenceLength: ", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new () { Text = ", Utf16SequenceLength: ", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new() { Text = $"{rune.Utf16SequenceLength}", X = Pos.Right (label), Y = Pos.Top (label) };
+            label = new () { Text = $"{rune.Utf16SequenceLength}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new()
+            label = new ()
             {
                 Text =
                     $"Code Point Information from {UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint}:",

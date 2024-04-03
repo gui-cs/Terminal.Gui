@@ -54,70 +54,16 @@ public class Button : View
 
         // Override default behavior of View
         AddCommand (Command.HotKey, () =>
-                                     {
-                                         SetFocus ();
-                                         return !OnAccept ();
-                                     });
+        {
+            SetFocus ();
+            return !OnAccept ();
+        });
 
         KeyBindings.Add (Key.Space, Command.HotKey);
         KeyBindings.Add (Key.Enter, Command.HotKey);
 
         TitleChanged += Button_TitleChanged;
-        MouseEvent += Button_MouseEvent;
-        //MouseClick += Button_MouseClick;
-    }
-
-    [CanBeNull]
-    private ColorScheme _savedColorScheme;
-
-    private void Button_MouseEvent (object sender, MouseEventEventArgs e)
-    {
-        if (e.MouseEvent.Flags.HasFlag(MouseFlags.Button1Clicked))
-        {
-            if (Application.MouseGrabView != this)
-            {
-                e.Handled = InvokeCommand (Command.HotKey) == true;
-
-                return;
-            }
-        }
-
-        if (e.MouseEvent.Flags == MouseFlags.Button1Pressed)
-        {
-            if (Application.MouseGrabView == this)
-            {
-                e.Handled = InvokeCommand (Command.HotKey) == true;
-                return;
-            }
-
-            SetFocus();
-            Application.GrabMouse(this);
-
-            _savedColorScheme = ColorScheme;
-            var cs = new ColorScheme (new Attribute (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground));
-            ColorScheme = cs;
-        }
-
-        if (e.MouseEvent.Flags.HasFlag(MouseFlags.Button1Released))
-        {
-            Application.UngrabMouse ();
-
-            e.Handled = InvokeCommand (Command.HotKey) == true;
-
-            if (_savedColorScheme is { })
-            {
-                ColorScheme = _savedColorScheme;
-            }
-
-            _savedColorScheme = null;
-        }
-    }
-
-    /// <inheritdoc />
-    public override bool OnLeave (View view)
-    {
-        //Application.UngrabMouse();
-        return base.OnLeave (view);
+        MouseClick += Button_MouseClick;
     }
     private void Button_MouseClick (object sender, MouseEventEventArgs e)
     {

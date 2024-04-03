@@ -32,19 +32,19 @@ public class Buttons : Scenario
         var swapButton = new Button { X = 50, Text = "S_wap Default (Absolute Layout)" };
 
         swapButton.Accept += (s, e) =>
-                              {
-                                  defaultButton.IsDefault = !defaultButton.IsDefault;
-                                  swapButton.IsDefault = !swapButton.IsDefault;
-                              };
+        {
+            defaultButton.IsDefault = !defaultButton.IsDefault;
+            swapButton.IsDefault = !swapButton.IsDefault;
+        };
         main.Add (swapButton);
 
         static void DoMessage (Button button, string txt)
         {
             button.Accept += (s, e) =>
-                              {
-                                  string btnText = button.Text;
-                                  MessageBox.Query ("Message", $"Did you click {txt}?", "Yes", "No");
-                              };
+            {
+                string btnText = button.Text;
+                MessageBox.Query ("Message", $"Did you click {txt}?", "Yes", "No");
+            };
         }
 
         var colorButtonsLabel = new Label { X = 0, Y = Pos.Bottom (editLabel) + 1, Text = "Color Buttons:" };
@@ -114,12 +114,12 @@ public class Buttons : Scenario
 
         // This in interesting test case because `moveBtn` and below are laid out relative to this one!
         removeButton.Accept += (s, e) =>
-                                {
-                                    // Now this throw a InvalidOperationException on the TopologicalSort method as is expected.
-                                    //main.Remove (removeButton);
+        {
+            // Now this throw a InvalidOperationException on the TopologicalSort method as is expected.
+            //main.Remove (removeButton);
 
-                                    removeButton.Visible = false;
-                                };
+            removeButton.Visible = false;
+        };
 
         var computedFrame = new FrameView
         {
@@ -144,12 +144,12 @@ public class Buttons : Scenario
         };
 
         moveBtn.Accept += (s, e) =>
-                           {
-                               moveBtn.X = moveBtn.Frame.X + 5;
+        {
+            moveBtn.X = moveBtn.Frame.X + 5;
 
-                               // This is already fixed with the call to SetNeedDisplay() in the Pos Dim.
-                               //computedFrame.LayoutSubviews (); // BUGBUG: This call should not be needed. View.X is not causing relayout correctly
-                           };
+            // This is already fixed with the call to SetNeedDisplay() in the Pos Dim.
+            //computedFrame.LayoutSubviews (); // BUGBUG: This call should not be needed. View.X is not causing relayout correctly
+        };
         computedFrame.Add (moveBtn);
 
         // Demonstrates how changing the View.Frame property can SIZE Views (#583)
@@ -165,11 +165,11 @@ public class Buttons : Scenario
         };
 
         sizeBtn.Accept += (s, e) =>
-                           {
-                               sizeBtn.Width = sizeBtn.Frame.Width + 5;
+        {
+            sizeBtn.Width = sizeBtn.Frame.Width + 5;
 
-                               //computedFrame.LayoutSubviews (); // FIXED: This call should not be needed. View.X is not causing relayout correctly
-                           };
+            //computedFrame.LayoutSubviews (); // FIXED: This call should not be needed. View.X is not causing relayout correctly
+        };
         computedFrame.Add (sizeBtn);
 
         var absoluteFrame = new FrameView
@@ -186,14 +186,14 @@ public class Buttons : Scenario
         var moveBtnA = new Button { ColorScheme = Colors.ColorSchemes ["Error"], Text = "Move This Button via Frame" };
 
         moveBtnA.Accept += (s, e) =>
-                            {
-                                moveBtnA.Frame = new Rectangle (
-                                                           moveBtnA.Frame.X + 5,
-                                                           moveBtnA.Frame.Y,
-                                                           moveBtnA.Frame.Width,
-                                                           moveBtnA.Frame.Height
-                                                          );
-                            };
+        {
+            moveBtnA.Frame = new Rectangle (
+                                       moveBtnA.Frame.X + 5,
+                                       moveBtnA.Frame.Y,
+                                       moveBtnA.Frame.Width,
+                                       moveBtnA.Frame.Height
+                                      );
+        };
         absoluteFrame.Add (moveBtnA);
 
         // Demonstrates how changing the View.Frame property can SIZE Views (#583)
@@ -203,14 +203,14 @@ public class Buttons : Scenario
         };
 
         sizeBtnA.Accept += (s, e) =>
-                            {
-                                sizeBtnA.Frame = new Rectangle (
-                                                           sizeBtnA.Frame.X,
-                                                           sizeBtnA.Frame.Y,
-                                                           sizeBtnA.Frame.Width + 5,
-                                                           sizeBtnA.Frame.Height
-                                                          );
-                            };
+        {
+            sizeBtnA.Frame = new Rectangle (
+                                       sizeBtnA.Frame.X,
+                                       sizeBtnA.Frame.Y,
+                                       sizeBtnA.Frame.Width + 5,
+                                       sizeBtnA.Frame.Height
+                                      );
+        };
         absoluteFrame.Add (sizeBtnA);
 
         var label = new Label
@@ -343,7 +343,7 @@ public class Buttons : Scenario
         {
             CanFocus = false,
             AutoSize = false,
-            X = Pos.Right(label)+1,
+            X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Height = 1,
             Width = 1,
@@ -375,13 +375,13 @@ public class Buttons : Scenario
             WantContinuousButtonPressed = true,
         };
         downButton.Accept += (s, e) =>
-                             {
-                                 numericEdit.Text = $"{int.Parse(numericEdit.Text) - 1}";
-                             };
+        {
+            numericEdit.Text = $"{int.Parse (numericEdit.Text) - 1}";
+        };
         upButton.Accept += (s, e) =>
-                           {
-                               numericEdit.Text = $"{int.Parse (numericEdit.Text) + 1}";
-                           };
+        {
+            numericEdit.Text = $"{int.Parse (numericEdit.Text) + 1}";
+        };
 
         main.Add (label, downButton, numericEdit, upButton);
 
@@ -400,10 +400,10 @@ public class Buttons : Scenario
             WantContinuousButtonPressed = false,
         };
         noRepeatButton.Accept += (s, e) =>
-                                 {
-                                     noRepeatButton.Title = $"Accept Cou_nt: {++noRepeatAcceptCount}";
-                                 };
-        main.Add(label, noRepeatButton);
+        {
+            noRepeatButton.Title = $"Accept Cou_nt: {++noRepeatAcceptCount}";
+        };
+        main.Add (label, noRepeatButton);
 
         label = new Label ()
         {
@@ -420,9 +420,9 @@ public class Buttons : Scenario
             WantContinuousButtonPressed = true,
         };
         repeatButton.Accept += (s, e) =>
-                               {
-                                   repeatButton.Title = $"Accept Co_unt: {++acceptCount}";
-                               };
+        {
+            repeatButton.Title = $"Accept Co_unt: {++acceptCount}";
+        };
 
         var enableCB = new CheckBox ()
         {
@@ -432,10 +432,10 @@ public class Buttons : Scenario
             Checked = true,
         };
         enableCB.Toggled += (s, e) =>
-                            {
-                                repeatButton.Enabled = !repeatButton.Enabled;
-                            };
-        main.Add(label, repeatButton, enableCB);
+        {
+            repeatButton.Enabled = !repeatButton.Enabled;
+        };
+        main.Add (label, repeatButton, enableCB);
 
         main.Ready += (s, e) => radioGroup.Refresh ();
         Application.Run (main);
