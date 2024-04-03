@@ -293,7 +293,7 @@ public class LineCanvasTests
         View v = GetCanvas (out LineCanvas lc);
         v.Width = 10;
         v.Height = 10;
-        v.Bounds = new Rectangle (0, 0, 10, 10);
+        v.Viewport = new Rectangle (0, 0, 10, 10);
 
         lc.AddLine (new Point (x1, y1), len1, o1, s1);
         lc.AddLine (new Point (x2, y2), len2, o2, s2);
@@ -366,7 +366,7 @@ public class LineCanvasTests
                 )]
     [Theory]
     [SetupFakeDriver]
-    public void Bounds_H_And_V_Lines_Both_Positive (
+    public void Viewport_H_And_V_Lines_Both_Positive (
         int x,
         int y,
         int length,
@@ -380,7 +380,7 @@ public class LineCanvasTests
         canvas.AddLine (new Point (x, y), length, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new Point (x, y), length, Orientation.Vertical, LineStyle.Single);
 
-        Assert.Equal (new Rectangle (expectedX, expectedY, expectedWidth, expectedHeight), canvas.Bounds);
+        Assert.Equal (new Rectangle (expectedX, expectedY, expectedWidth, expectedHeight), canvas.Viewport);
     }
 
     [InlineData (
@@ -448,7 +448,7 @@ public class LineCanvasTests
                 )]
     [Theory]
     [SetupFakeDriver]
-    public void Bounds_H_Line (
+    public void Viewport_H_Line (
         int x,
         int y,
         int length,
@@ -461,12 +461,12 @@ public class LineCanvasTests
         var canvas = new LineCanvas ();
         canvas.AddLine (new Point (x, y), length, Orientation.Horizontal, LineStyle.Single);
 
-        Assert.Equal (new Rectangle (expectedX, expectedY, expectedWidth, expectedHeight), canvas.Bounds);
+        Assert.Equal (new Rectangle (expectedX, expectedY, expectedWidth, expectedHeight), canvas.Viewport);
     }
 
     [Fact]
     [SetupFakeDriver]
-    public void Bounds_Specific ()
+    public void Viewport_Specific ()
     {
         // Draw at 1,1 within client area of View (i.e. leave a top and left margin of 1)
         // This proves we aren't drawing excess above
@@ -483,27 +483,27 @@ public class LineCanvasTests
 
         // Add a short horiz line for ╔╡
         lc.AddLine (new Point (x, y), 2, Orientation.Horizontal, LineStyle.Double);
-        Assert.Equal (new Rectangle (x, y, 2, 1), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 2, 1), lc.Viewport);
 
         //LHS line down
         lc.AddLine (new Point (x, y), height, Orientation.Vertical, LineStyle.Double);
-        Assert.Equal (new Rectangle (x, y, 2, 2), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 2, 2), lc.Viewport);
 
         //Vertical line before Title, results in a ╡
         lc.AddLine (new Point (x + 1, y), 0, Orientation.Vertical, LineStyle.Single);
-        Assert.Equal (new Rectangle (x, y, 2, 2), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 2, 2), lc.Viewport);
 
         //Vertical line after Title, results in a ╞
         lc.AddLine (new Point (x + 2, y), 0, Orientation.Vertical, LineStyle.Single);
-        Assert.Equal (new Rectangle (x, y, 3, 2), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 3, 2), lc.Viewport);
 
         // remainder of top line
         lc.AddLine (new Point (x + 2, y), width - 1, Orientation.Horizontal, LineStyle.Double);
-        Assert.Equal (new Rectangle (x, y, 4, 2), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 4, 2), lc.Viewport);
 
         //RHS line down
         lc.AddLine (new Point (x + width, y), height, Orientation.Vertical, LineStyle.Double);
-        Assert.Equal (new Rectangle (x, y, 4, 2), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 4, 2), lc.Viewport);
 
         TestHelpers.AssertEqual (
                                  output,
@@ -516,7 +516,7 @@ public class LineCanvasTests
 
     [Fact]
     [SetupFakeDriver]
-    public void Bounds_Specific_With_Ustring ()
+    public void Viewport_Specific_With_Ustring ()
     {
         // Draw at 1,1 within client area of View (i.e. leave a top and left margin of 1)
         // This proves we aren't drawing excess above
@@ -533,27 +533,27 @@ public class LineCanvasTests
 
         // Add a short horiz line for ╔╡
         lc.AddLine (new Point (x, y), 2, Orientation.Horizontal, LineStyle.Double);
-        Assert.Equal (new Rectangle (x, y, 2, 1), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 2, 1), lc.Viewport);
 
         //LHS line down
         lc.AddLine (new Point (x, y), height, Orientation.Vertical, LineStyle.Double);
-        Assert.Equal (new Rectangle (x, y, 2, 2), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 2, 2), lc.Viewport);
 
         //Vertical line before Title, results in a ╡
         lc.AddLine (new Point (x + 1, y), 0, Orientation.Vertical, LineStyle.Single);
-        Assert.Equal (new Rectangle (x, y, 2, 2), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 2, 2), lc.Viewport);
 
         //Vertical line after Title, results in a ╞
         lc.AddLine (new Point (x + 2, y), 0, Orientation.Vertical, LineStyle.Single);
-        Assert.Equal (new Rectangle (x, y, 3, 2), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 3, 2), lc.Viewport);
 
         // remainder of top line
         lc.AddLine (new Point (x + 2, y), width - 1, Orientation.Horizontal, LineStyle.Double);
-        Assert.Equal (new Rectangle (x, y, 4, 2), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 4, 2), lc.Viewport);
 
         //RHS line down
         lc.AddLine (new Point (x + width, y), height, Orientation.Vertical, LineStyle.Double);
-        Assert.Equal (new Rectangle (x, y, 4, 2), lc.Bounds);
+        Assert.Equal (new Rectangle (x, y, 4, 2), lc.Viewport);
 
         TestHelpers.AssertEqual (
                                  output,
@@ -570,13 +570,13 @@ public class LineCanvasTests
     {
         var lc = new LineCanvas ();
 
-        Assert.Equal (Rectangle.Empty, lc.Bounds);
+        Assert.Equal (Rectangle.Empty, lc.Viewport);
 
         lc.AddLine (Point.Empty, 2, Orientation.Horizontal, LineStyle.Double);
-        Assert.NotEqual (Rectangle.Empty, lc.Bounds);
+        Assert.NotEqual (Rectangle.Empty, lc.Viewport);
 
         lc.Clear ();
-        Assert.Equal (Rectangle.Empty, lc.Bounds);
+        Assert.Equal (Rectangle.Empty, lc.Viewport);
     }
 
     [InlineData (0, 0, Orientation.Horizontal, "─")]
@@ -873,7 +873,7 @@ public class LineCanvasTests
         //// Left Up
         //canvas.AddLine (new Point (0, 3), -3, Orientation.Vertical, LineStyle.Single);
 
-        Assert.Equal (new Rectangle (0, 0, 2, 2), canvas.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 2, 2), canvas.Viewport);
 
         Dictionary<Point, Rune> map = canvas.GetMap ();
         Assert.Equal (2, map.Count);
@@ -990,7 +990,7 @@ public class LineCanvasTests
         View v = GetCanvas (out LineCanvas lc);
         v.Width = 10;
         v.Height = 10;
-        v.Bounds = new Rectangle (0, 0, 10, 10);
+        v.Viewport = new Rectangle (0, 0, 10, 10);
 
         lc.AddLine (new Point (x1, y1), length, o1, s1);
 
@@ -1304,7 +1304,7 @@ public class LineCanvasTests
     /// <returns></returns>
     private View GetCanvas (out LineCanvas canvas, int offsetX = 0, int offsetY = 0)
     {
-        var v = new View { Width = 10, Height = 5, Bounds = new Rectangle (0, 0, 10, 5) };
+        var v = new View { Width = 10, Height = 5, Viewport = new Rectangle (0, 0, 10, 5) };
         var top = new Toplevel ();
         top.Add (v);
         Application.Begin (top);
@@ -1313,7 +1313,7 @@ public class LineCanvasTests
 
         v.DrawContentComplete += (s, e) =>
                                  {
-                                     v.Clear (v.Bounds);
+                                     v.Clear (v.Viewport);
 
                                      foreach (KeyValuePair<Point, Rune> p in canvasCopy.GetMap ())
                                      {

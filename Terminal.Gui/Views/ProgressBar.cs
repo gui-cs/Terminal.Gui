@@ -143,7 +143,7 @@ public class ProgressBar : View
     }
 
     ///<inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         Driver.SetAttribute (GetHotNormalColor ());
 
@@ -151,7 +151,7 @@ public class ProgressBar : View
 
         if (_isActivity)
         {
-            for (var i = 0; i < Bounds.Width; i++)
+            for (var i = 0; i < Viewport.Width; i++)
             {
                 if (Array.IndexOf (_activityPos, i) != -1)
                 {
@@ -165,15 +165,15 @@ public class ProgressBar : View
         }
         else
         {
-            var mid = (int)(_fraction * Bounds.Width);
+            var mid = (int)(_fraction * Viewport.Width);
             int i;
 
-            for (i = 0; (i < mid) & (i < Bounds.Width); i++)
+            for (i = 0; (i < mid) & (i < Viewport.Width); i++)
             {
                 Driver.AddRune (SegmentCharacter);
             }
 
-            for (; i < Bounds.Width; i++)
+            for (; i < Viewport.Width; i++)
             {
                 Driver.AddRune ((Rune)' ');
             }
@@ -190,10 +190,10 @@ public class ProgressBar : View
             }
 
             tf?.Draw (
-                      BoundsToScreen (Bounds),
+                      ViewportToScreen (Viewport),
                       attr,
                       ColorScheme.Normal,
-                      SuperView?.BoundsToScreen (SuperView.Bounds) ?? default (Rectangle)
+                      SuperView?.ViewportToScreen (SuperView.Viewport) ?? default (Rectangle)
                      );
         }
     }
@@ -244,13 +244,13 @@ public class ProgressBar : View
 
                 _delta = 1;
             }
-            else if (_activityPos [0] >= Bounds.Width)
+            else if (_activityPos [0] >= Viewport.Width)
             {
                 if (_bidirectionalMarquee)
                 {
                     for (var i = 0; i < _activityPos.Length; i++)
                     {
-                        _activityPos [i] = Bounds.Width + i - 2;
+                        _activityPos [i] = Viewport.Width + i - 2;
                     }
 
                     _delta = -1;
@@ -291,7 +291,7 @@ public class ProgressBar : View
 
     private void SetInitialProperties ()
     {
-        Height = 1; // This will be updated when Bounds is updated in ProgressBar_LayoutStarted
+        Height = 1; // This will be updated when Viewport is updated in ProgressBar_LayoutStarted
         CanFocus = false;
         _fraction = 0;
         LayoutStarted += ProgressBar_LayoutStarted;

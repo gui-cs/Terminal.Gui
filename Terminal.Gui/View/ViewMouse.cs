@@ -16,12 +16,11 @@ public partial class View
     public virtual bool WantMousePositionReports { get; set; }
     
     /// <summary>
-    ///     Called when the mouse enters the View's <see cref="Bounds"/>. The view will now receive mouse events until the
-    ///     mouse leaves
+    ///     Called when the mouse enters the View's <see cref="Viewport"/>. The view will now receive mouse events until the mouse leaves
     ///     the view. At which time, <see cref="OnMouseLeave(Gui.MouseEvent)"/> will be called.
     /// </summary>
     /// <remarks>
-    ///     The coordinates are relative to <see cref="View.Bounds"/>.
+    /// The coordinates are relative to <see cref="Viewport"/>.
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
@@ -47,12 +46,11 @@ public partial class View
     public event EventHandler<MouseEventEventArgs> MouseEnter;
 
     /// <summary>
-    ///     Called when the mouse has moved out of the View's <see cref="Bounds"/>. The view will no longer receive mouse
-    ///     events (until the
+    ///     Called when the mouse has moved out of the View's <see cref="Viewport"/>. The view will no longer receive mouse events (until the
     ///     mouse moves within the view again and <see cref="OnMouseEnter(Gui.MouseEvent)"/> is called).
     /// </summary>
     /// <remarks>
-    ///     The coordinates are relative to <see cref="View.Bounds"/>.
+    /// The coordinates are relative to <see cref="Viewport"/>.
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
@@ -82,9 +80,9 @@ public partial class View
 
     /// <summary>Called when a mouse event occurs within the view's <see cref="Bounds"/>.</summary>
     /// <remarks>
-    ///     <para>
-    ///         The coordinates are relative to <see cref="View.Bounds"/>.
-    ///     </para>
+    /// <para>
+    /// The coordinates are relative to <see cref="Viewport"/>.
+    /// </para>
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
@@ -111,7 +109,7 @@ public partial class View
                 || mouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)
                 || mouseEvent.Flags.HasFlag (MouseFlags.Button4Clicked)))
         {
-            return OnMouseClick (args);
+            OnMouseClick (args);
         }
 
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
@@ -226,6 +224,7 @@ public partial class View
 
         if (!HasFocus && CanFocus)
         {
+            args.Handled = true;
             args.Handled = true;
             SetFocus ();
         }

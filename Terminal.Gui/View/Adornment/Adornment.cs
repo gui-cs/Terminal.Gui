@@ -1,7 +1,7 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     Adornments are a special form of <see cref="View"/> that appear outside the <see cref="View.Bounds"/>:
+///     Adornments are a special form of <see cref="View"/> that appear outside the <see cref="View.Viewport"/>:
 ///     <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>. They are defined using the
 ///     <see cref="Thickness"/> class, which specifies the thickness of the sides of a rectangle.
 /// </summary>
@@ -91,7 +91,7 @@ public class Adornment : View
     public override View SuperView
     {
         get => null;
-        set => throw new NotImplementedException ();
+        set => throw new InvalidOperationException (@"Adornments can not be Subviews or have SuperViews. Use Parent instead.");
     }
 
     //internal override Adornment CreateAdornment (Type adornmentType)
@@ -109,10 +109,14 @@ public class Adornment : View
     ///     Gets the rectangle that describes the area of the Adornment. The Location is always (0,0).
     ///     The size is the size of the <see cref="View.Frame"/>.
     /// </summary>
-    public override Rectangle Bounds
+    /// <remarks>
+    ///     The Viewport of an Adornment cannot be modified. Attempting to set this property will throw an
+    ///     <see cref="InvalidOperationException"/>.
+    /// </remarks>
+    public override Rectangle Viewport
     {
         get => Frame with { Location = Point.Empty };
-        set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
+        set => throw new InvalidOperationException (@"The Viewport of an Adornment cannot be modified.");
     }
 
     /// <inheritdoc/>
@@ -139,19 +143,19 @@ public class Adornment : View
     public override bool OnDrawAdornments () { return false; }
 
     /// <summary>Redraws the Adornments that comprise the <see cref="Adornment"/>.</summary>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         if (Thickness == Thickness.Empty)
         {
             return;
         }
 
-        Rectangle screenBounds = BoundsToScreen (contentArea);
+        Rectangle screen = ViewportToScreen (viewport);
         Attribute normalAttr = GetNormalColor ();
         Driver.SetAttribute (normalAttr);
 
         // This just draws/clears the thickness, not the insides.
-        Thickness.Draw (screenBounds, ToString ());
+        Thickness.Draw (screen, ToString ());
 
         if (!string.IsNullOrEmpty (TextFormatter.Text))
         {
@@ -162,11 +166,11 @@ public class Adornment : View
             }
         }
 
-        TextFormatter?.Draw (screenBounds, normalAttr, normalAttr, Rectangle.Empty);
+        TextFormatter?.Draw (screen, normalAttr, normalAttr, Rectangle.Empty);
 
         if (Subviews.Count > 0)
         {
-            base.OnDrawContent (contentArea);
+            base.OnDrawContent (viewport);
         }
 
         ClearLayoutNeeded ();
@@ -183,8 +187,8 @@ public class Adornment : View
     /// </summary>
     public override bool SuperViewRendersLineCanvas
     {
-        get => false; // throw new NotImplementedException ();
-        set => throw new NotImplementedException ();
+        get => false; 
+        set => throw new InvalidOperationException (@"Adornment can only render to their Parent or Parent's Superview.");
     }
 
     #endregion View Overrides
@@ -203,6 +207,10 @@ public class Adornment : View
     /// <returns><see langword="true"/> if the specified Parent's SuperView-relative coordinates are within the Adornment's Thickness. </returns>
     public override bool Contains (int x, int y)
     {
+        if (Parent is null)
+        {
+            return false;
+        }
         Rectangle frame = Frame;
         frame.Offset (Parent.Frame.Location);
 
@@ -231,7 +239,7 @@ public class Adornment : View
     /// <summary>Called when a mouse event occurs within the Adornment.</summary>
     /// <remarks>
     ///     <para>
-    ///         The coordinates are relative to <see cref="View.Bounds"/>.
+    ///         The coordinates are relative to <see cref="View.Viewport"/>.
     ///     </para>
     ///     <para>
     ///         A mouse click on the Adornment will cause the Parent to focus.
@@ -264,7 +272,7 @@ public class Adornment : View
 
         if (!Parent.CanFocus || !Parent.Arrangement.HasFlag (ViewArrangement.Movable))
         {
-            return true;
+            return false;
         }
 
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3312
@@ -302,7 +310,7 @@ public class Adornment : View
 
                 _dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
 
-                Point parentLoc = Parent.SuperView?.ScreenToBounds (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y) ?? mouseEvent.ScreenPosition;
+                Point parentLoc = Parent.SuperView?.ScreenToViewport (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y) ?? mouseEvent.ScreenPosition;
 
                 GetLocationEnsuringFullVisibility (
                                      Parent,
