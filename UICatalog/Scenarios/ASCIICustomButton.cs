@@ -14,9 +14,10 @@ public class ASCIICustomButtonTest : Scenario
     private MenuItem _miSmallerWindow;
     private ScrollViewTestWindow _scrollViewTestWindow;
 
-    public override void Init ()
+    public override void Main ()
     {
         Application.Init ();
+        Toplevel top = new ();
         _scrollViewTestWindow = new ScrollViewTestWindow ();
 
         var menu = new MenuBar
@@ -50,20 +51,22 @@ public class ASCIICustomButtonTest : Scenario
                                 )
             ]
         };
-        Top = new ();
-        Top.Add (menu, _scrollViewTestWindow);
-        Application.Run (Top);
-    }
+        top = new ();
+        top.Add (menu, _scrollViewTestWindow);
+        Application.Run (top);
+        top.Dispose ();
 
-    public override void Run () { }
+        return;
 
-    private void ChangeWindowSize ()
-    {
-        _smallerWindow = (bool)(_miSmallerWindow.Checked = !_miSmallerWindow.Checked);
-        _scrollViewTestWindow.Dispose ();
-        Top.Remove (_scrollViewTestWindow);
-        _scrollViewTestWindow = new ScrollViewTestWindow ();
-        Top.Add (_scrollViewTestWindow);
+        void ChangeWindowSize ()
+        {
+            _smallerWindow = (bool)(_miSmallerWindow.Checked = !_miSmallerWindow.Checked);
+            top.Remove (_scrollViewTestWindow);
+            _scrollViewTestWindow.Dispose ();
+
+            _scrollViewTestWindow = new ScrollViewTestWindow ();
+            top.Add (_scrollViewTestWindow);
+        }
     }
 
     public class ASCIICustomButton : Button
