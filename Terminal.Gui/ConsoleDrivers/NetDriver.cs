@@ -1583,19 +1583,35 @@ internal class NetDriver : ConsoleDriver
                 return MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.KeyChar);
         }
 
-        ConsoleKey key = keyInfo.Key;
+        if (((ConsoleKey)keyInfo.KeyChar) is >= ConsoleKey.A and <= ConsoleKey.Z)
+        {
+            // Shifted
+            keyInfo = new ConsoleKeyInfo (
+                                          keyInfo.KeyChar,
+                                          (ConsoleKey)keyInfo.KeyChar,
+                                          true,
+                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt),
+                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control));
+        }
 
-        // A..Z are special cased:
-        // - Alone, they represent lowercase a...z
-        // - With ShiftMask they are A..Z
-        // - If CapsLock is on the above is reversed.
-        // - If Alt and/or Ctrl are present, treat as upper case
-        if (keyInfo.Key is >= ConsoleKey.A and <= ConsoleKey.Z)
+        if ((ConsoleKey)keyInfo.KeyChar - 32 is >= ConsoleKey.A and <= ConsoleKey.Z)
+        {
+            // Unshifted
+            keyInfo = new ConsoleKeyInfo (
+                                          keyInfo.KeyChar,
+                                          (ConsoleKey)(keyInfo.KeyChar - 32),
+                                          false,
+                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt),
+                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control));
+        }
+
+        if (keyInfo.Key is >= ConsoleKey.A and <= ConsoleKey.Z )
         {
             if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)
                 || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
             {
-                return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
+                // NetDriver doesn't support Shift-Ctrl/Shift-Alt combos
+                return MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.Key);
             }
 
             if (keyInfo.Modifiers == ConsoleModifiers.Shift)
@@ -1603,11 +1619,11 @@ internal class NetDriver : ConsoleDriver
                 // If ShiftMask is on  add the ShiftMask
                 if (char.IsUpper (keyInfo.KeyChar))
                 {
-                    return (KeyCode)(uint)keyInfo.Key | KeyCode.ShiftMask;
+                    return (KeyCode)keyInfo.Key | KeyCode.ShiftMask;
                 }
             }
 
-            return (KeyCode)keyInfo.KeyChar;
+            return (KeyCode)keyInfo.Key;
         }
 
         // Handle control keys whose VK codes match the related ASCII value (those below ASCII 33) like ESC
