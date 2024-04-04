@@ -883,20 +883,9 @@ internal class CharMap : ScrollView
                                    }
                                    catch (HttpRequestException e)
                                    {
-                                       (s as Dialog).Text = e.Message;
-
-                                       Application.Invoke (
-                                                           () =>
-                                                           {
-                                                               spinner.Visible = false;
-                                                               errorLabel.Text = e.Message;
-                                                               errorLabel.ColorScheme = Colors.ColorSchemes ["Error"];
-                                                               errorLabel.Visible = true;
-                                                           }
-                                                          );
+                                       Application.Invoke (() => waitIndicator.RequestStop ());
                                    }
 
-                                   (s as Dialog)?.RequestStop ();
                                };
         Application.Run (waitIndicator);
         waitIndicator.Dispose ();
