@@ -1396,18 +1396,20 @@ internal class WindowsDriver : ConsoleDriver
                     break;
                 }
 
+                Debug.WriteLine ($"WindowsDriver: ({me.X},{me.Y}) - {me.Flags}");
+
                 OnMouseEvent (new MouseEventEventArgs (me));
 
                 if (_processButtonClick)
                 {
-                    OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent
-                                                           {
-                                                               X = me.X,
-                                                               Y = me.Y,
-                                                               Flags = ProcessButtonClick (inputEvent.MouseEvent)
-                                                           }));
+                    me = new MouseEvent
+                    {
+                        X = me.X,
+                        Y = me.Y,
+                        Flags = ProcessButtonClick (inputEvent.MouseEvent)
+                    };
+                    Debug.WriteLine ($"WindowsDriver: 2 ({me.X},{me.Y}) - {me.Flags}");
+                    OnMouseEvent (new MouseEventEventArgs (me));
                 }
 
                 break;
@@ -2013,12 +2015,14 @@ internal class WindowsDriver : ConsoleDriver
         //System.Diagnostics.Debug.WriteLine (
         //	$"point.X:{(point is { } ? ((Point)point).X : -1)};point.Y:{(point is { } ? ((Point)point).Y : -1)}");
 
-        return new MouseEvent
+        var me = new MouseEvent
         {
             X = mouseEvent.MousePosition.X,
             Y = mouseEvent.MousePosition.Y,
             Flags = mouseFlag
         };
+
+        return me;
     }
 }
 
