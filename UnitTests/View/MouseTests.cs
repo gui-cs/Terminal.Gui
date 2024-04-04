@@ -38,22 +38,22 @@ public class MouseTests (ITestOutputHelper output)
     [Theory]
     [InlineData (0, 0, 0, 0, false)]
     [InlineData (0, 0, 0, 4, false)]
-    [InlineData (1, 0, 0, 4, true)]
+    [InlineData (1, 0, 0, 4, false)]
     [InlineData (0, 1, 0, 4, true)]
     [InlineData (0, 0, 1, 4, false)]
 
     [InlineData (1, 1, 0, 3, false)]
-    [InlineData (1, 1, 0, 4, true)]
+    [InlineData (1, 1, 0, 4, false)]
     [InlineData (1, 1, 0, 5, true)]
     [InlineData (1, 1, 0, 6, false)]
 
 
     [InlineData (1, 1, 0, 11, false)]
     [InlineData (1, 1, 0, 12, true)]
-    [InlineData (1, 1, 0, 13, true)]
+    [InlineData (1, 1, 0, 13, false)]
     [InlineData (1, 1, 0, 14, false)]
     [AutoInitShutdown]
-    public void ButtonPressed_In_Margin_Or_Border_Starts_Drag (int marginThickness, int borderThickness, int paddingThickness, int xy, bool expectedMoved)
+    public void ButtonPressed_In_Border_Starts_Drag (int marginThickness, int borderThickness, int paddingThickness, int xy, bool expectedMoved)
     {
         var testView = new View
         {

@@ -899,7 +899,7 @@ internal class UICatalogApp
 
             miIsMenuBorderDisabled.Shortcut =
                 (KeyCode)new Key (miIsMenuBorderDisabled!.Title!.Substring (14, 1) [0]).WithAlt
-                                                                                       .WithCtrl;
+                                                                                       .WithCtrl.NoShift;
             miIsMenuBorderDisabled.CheckType |= MenuItemCheckStyle.Checked;
 
             miIsMenuBorderDisabled.Action += () =>
@@ -921,7 +921,7 @@ internal class UICatalogApp
             miIsMouseDisabled = new () { Title = "_Disable Mouse" };
 
             miIsMouseDisabled.Shortcut =
-                (KeyCode)new Key (miIsMouseDisabled!.Title!.Substring (1, 1) [0]).WithAlt.WithCtrl;
+                (KeyCode)new Key (miIsMouseDisabled!.Title!.Substring (1, 1) [0]).WithAlt.WithCtrl.NoShift;
             miIsMouseDisabled.CheckType |= MenuItemCheckStyle.Checked;
 
             miIsMouseDisabled.Action += () =>

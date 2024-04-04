@@ -874,7 +874,7 @@ internal class NetDriver : ConsoleDriver
         int rows = Rows;
         int cols = Cols;
         var output = new StringBuilder ();
-        var redrawAttr = new Attribute ();
+        Attribute? redrawAttr = null;
         int lastCol = -1;
 
         CursorVisibility? savedVisibitity = _cachedCursorVisibility;
@@ -1583,37 +1583,18 @@ internal class NetDriver : ConsoleDriver
                 return MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.KeyChar);
         }
 
-        ConsoleKey key = keyInfo.Key;
-
-        // A..Z are special cased:
-        // - Alone, they represent lowercase a...z
-        // - With ShiftMask they are A..Z
-        // - If CapsLock is on the above is reversed.
-        // - If Alt and/or Ctrl are present, treat as upper case
-        if (keyInfo.Key is >= ConsoleKey.A and <= ConsoleKey.Z)
-        {
-            if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)
-                || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
-            {
-                return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
-            }
-
-            if (keyInfo.Modifiers == ConsoleModifiers.Shift)
-            {
-                // If ShiftMask is on  add the ShiftMask
-                if (char.IsUpper (keyInfo.KeyChar))
-                {
-                    return (KeyCode)(uint)keyInfo.Key | KeyCode.ShiftMask;
-                }
-            }
-
-            return (KeyCode)keyInfo.KeyChar;
-        }
-
         // Handle control keys whose VK codes match the related ASCII value (those below ASCII 33) like ESC
         if (keyInfo.Key != ConsoleKey.None && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key))
         {
-            return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.Key);
+            if (keyInfo.Modifiers.HasFlag(ConsoleModifiers.Control) && keyInfo.Key == ConsoleKey.I)
+            {
+                return KeyCode.Tab;
+            }
+
+            if (keyInfo.Key == ConsoleKey.Tab)
+            {
+                return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key));
+            }
         }
 
         // Handle control keys (e.g. CursorUp)
@@ -1623,7 +1604,51 @@ internal class NetDriver : ConsoleDriver
             return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint));
         }
 
-        return (KeyCode)keyInfo.KeyChar;
+        if (((ConsoleKey)keyInfo.KeyChar) is >= ConsoleKey.A and <= ConsoleKey.Z)
+        {
+            // Shifted
+            keyInfo = new ConsoleKeyInfo (
+                                          keyInfo.KeyChar,
+                                          (ConsoleKey)keyInfo.KeyChar,
+                                          true,
+                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt),
+                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control));
+        }
+
+        if ((ConsoleKey)keyInfo.KeyChar - 32 is >= ConsoleKey.A and <= ConsoleKey.Z)
+        {
+            // Unshifted
+            keyInfo = new ConsoleKeyInfo (
+                                          keyInfo.KeyChar,
+                                          (ConsoleKey)(keyInfo.KeyChar - 32),
+                                          false,
+                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt),
+                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control));
+        }
+
+        if (keyInfo.Key is >= ConsoleKey.A and <= ConsoleKey.Z )
+        {
+            if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)
+                || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
+            {
+                // NetDriver doesn't support Shift-Ctrl/Shift-Alt combos
+                return MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.Key);
+            }
+
+            if (keyInfo.Modifiers == ConsoleModifiers.Shift)
+            {
+                // If ShiftMask is on  add the ShiftMask
+                if (char.IsUpper (keyInfo.KeyChar))
+                {
+                    return (KeyCode)keyInfo.Key | KeyCode.ShiftMask;
+                }
+            }
+
+            return (KeyCode)keyInfo.Key;
+        }
+
+
+        return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key));
     }
 
     #endregion Keyboard Handling

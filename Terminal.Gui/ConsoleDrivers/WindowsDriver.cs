@@ -472,6 +472,7 @@ internal class WindowsConsole
     [Flags]
     public enum ButtonState
     {
+        NoButtonPressed = 0,
         Button1Pressed = 1,
         Button2Pressed = 4,
         Button3Pressed = 8,
@@ -482,6 +483,7 @@ internal class WindowsConsole
     [Flags]
     public enum ControlKeyState
     {
+        NoControlKeyPressed = 0,
         RightAltPressed = 1,
         LeftAltPressed = 2,
         RightControlPressed = 4,
@@ -496,6 +498,7 @@ internal class WindowsConsole
     [Flags]
     public enum EventFlags
     {
+        NoEvent = 0,
         MouseMoved = 1,
         DoubleClick = 2,
         MouseWheeled = 4,
@@ -517,7 +520,7 @@ internal class WindowsConsole
         [FieldOffset (12)]
         public EventFlags EventFlags;
 
-        public readonly override string ToString () { return $"[Mouse({MousePosition},{ButtonState},{ControlKeyState},{EventFlags}"; }
+        public readonly override string ToString () { return $"[Mouse{MousePosition},{ButtonState},{ControlKeyState},{EventFlags}]"; }
     }
 
     public struct WindowBufferSizeRecord
@@ -1388,7 +1391,7 @@ internal class WindowsDriver : ConsoleDriver
             case WindowsConsole.EventType.Mouse:
                 MouseEvent me = ToDriverMouse (inputEvent.MouseEvent);
 
-                if (me is null)
+               if (me is null || me.Flags == MouseFlags.None)
                 {
                     break;
                 }
@@ -1774,8 +1777,7 @@ internal class WindowsDriver : ConsoleDriver
     {
         var mouseFlag = MouseFlags.AllEvents;
 
-        //System.Diagnostics.Debug.WriteLine (
-        //	$"X:{mouseEvent.MousePosition.X};Y:{mouseEvent.MousePosition.Y};ButtonState:{mouseEvent.ButtonState};EventFlags:{mouseEvent.EventFlags}");
+        //Debug.WriteLine ($"ToDriverMouse: {mouseEvent}");
 
         if (_isButtonDoubleClicked || _isOneFingerDoubleClicked)
         {
@@ -2003,7 +2005,7 @@ internal class WindowsDriver : ConsoleDriver
         else if (mouseEvent is { ButtonState: 0, EventFlags: 0 })
         {
             // This happens on a double or triple click event.
-            mouseFlag = 0;
+            mouseFlag = MouseFlags.None;
         }
 
         mouseFlag = SetControlKeyStates (mouseEvent, mouseFlag);
@@ -2128,6 +2130,19 @@ internal class WindowsMainLoop : IMainLoopDriver
 
     void IMainLoopDriver.TearDown ()
     {
+        // Eat any outstanding events. See #
+        //var records = 
+            _winConsole.ReadConsoleInput ();
+
+        //if (records != null)
+        //{
+        //    foreach (var rec in records)
+        //    {
+        //        Debug.WriteLine ($"Teardown: {rec.ToString ()}");
+        //        //Debug.Assert (rec is not { EventType: WindowsConsole.EventType.Mouse, MouseEvent.ButtonState: WindowsConsole.ButtonState.Button1Pressed });
+        //    }
+        //}
+
         _inputHandlerTokenSource?.Cancel ();
         _inputHandlerTokenSource?.Dispose ();
 

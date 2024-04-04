@@ -14,17 +14,19 @@ public class ASCIICustomButtonTest : Scenario
     private MenuItem _miSmallerWindow;
     private ScrollViewTestWindow _scrollViewTestWindow;
 
-    public override void Init ()
+    public override void Main ()
     {
+        _smallerWindow = false;
+
         Application.Init ();
-        _scrollViewTestWindow = new ScrollViewTestWindow ();
+        Toplevel top = new ();
 
         var menu = new MenuBar
         {
             Menus =
             [
                 new MenuBarItem (
-                                 "Window Size",
+                                 "_Window Size",
                                  new []
                                  {
                                      _miSmallerWindow =
@@ -50,20 +52,24 @@ public class ASCIICustomButtonTest : Scenario
                                 )
             ]
         };
-        Top = new ();
-        Top.Add (menu, _scrollViewTestWindow);
-        Application.Run (Top);
-    }
 
-    public override void Run () { }
-
-    private void ChangeWindowSize ()
-    {
-        _smallerWindow = (bool)(_miSmallerWindow.Checked = !_miSmallerWindow.Checked);
-        _scrollViewTestWindow.Dispose ();
-        Top.Remove (_scrollViewTestWindow);
         _scrollViewTestWindow = new ScrollViewTestWindow ();
-        Top.Add (_scrollViewTestWindow);
+
+        top.Add (menu, _scrollViewTestWindow);
+        Application.Run (top);
+        top.Dispose ();
+
+        return;
+
+        void ChangeWindowSize ()
+        {
+            _smallerWindow = (bool)(_miSmallerWindow.Checked = !_miSmallerWindow.Checked);
+            top.Remove (_scrollViewTestWindow);
+            _scrollViewTestWindow.Dispose ();
+
+            _scrollViewTestWindow = new ScrollViewTestWindow ();
+            top.Add (_scrollViewTestWindow);
+        }
     }
 
     public class ASCIICustomButton : Button
@@ -199,7 +205,7 @@ public class ASCIICustomButtonTest : Scenario
                     Width = BUTTON_WIDTH,
                     Height = BUTTON_HEIGHT
                 };
-                button.CustomInitialize ();
+                button.Initialized += Button_Initialized;
                 button.Accept += Button_Clicked;
                 button.PointerEnter += Button_PointerEnter;
                 button.MouseClick += Button_MouseClick;
@@ -218,7 +224,7 @@ public class ASCIICustomButtonTest : Scenario
                 Width = BUTTON_WIDTH,
                 Height = BUTTON_HEIGHT
             };
-            closeButton.CustomInitialize ();
+            closeButton.Initialized += Button_Initialized;
             closeButton.Accept += Button_Clicked;
             closeButton.PointerEnter += Button_PointerEnter;
             closeButton.MouseClick += Button_MouseClick;
@@ -243,6 +249,11 @@ public class ASCIICustomButtonTest : Scenario
             {
                 Add (titleLabel, _scrollView);
             }
+        }
+        private void Button_Initialized (object sender, EventArgs e)
+        {
+            var button = sender as ASCIICustomButton;
+            button?.CustomInitialize ();
         }
 
         private void Button_Clicked (object sender, EventArgs e)

@@ -1018,7 +1018,7 @@ public partial class View
         // First try SuperView.Bounds, then Application.Top, then Driver.Bounds.
         // Finally, if none of those are valid, use int.MaxValue (for Unit tests).
         Rectangle relativeBounds = SuperView is { IsInitialized: true } ? SuperView.ContentArea :
-                                   Application.Top is { } && Application.Top.IsInitialized ? Application.Top.ContentArea :
+                                   Application.Top is { } && Application.Top != this && Application.Top.IsInitialized ? Application.Top.ContentArea :
                                    Application.Driver?.Bounds ?? new Rectangle (0, 0, int.MaxValue, int.MaxValue);
         SetRelativeLayout (relativeBounds);
 
