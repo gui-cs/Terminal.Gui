@@ -29,6 +29,49 @@ public class ColorPicker : View
     /// <summary>Initializes a new instance of <see cref="ColorPicker"/>.</summary>
     public ColorPicker () { SetInitialProperties (); }
 
+    private void SetInitialProperties ()
+    {
+        HighlightOnPress = true;
+
+        CanFocus = true;
+        AddCommands ();
+        AddKeyBindings ();
+
+        LayoutStarted += (o, a) =>
+                         {
+                             Thickness thickness = GetAdornmentsThickness ();
+                             Width = _cols * BoxWidth + thickness.Vertical;
+                             Height = _rows * BoxHeight + thickness.Horizontal;
+                         };
+//        MouseEvent += ColorPicker_MouseEvent;
+        MouseClick += ColorPicker_MouseClick;
+    }
+
+    // TODO: Decouple Cursor from SelectedColor so that mouse press-and-hold can show the color under the cursor.
+    //private void ColorPicker_MouseEvent (object sender, MouseEventEventArgs me)
+    //{
+    //    if (me.MouseEvent.X > Bounds.Width || me.MouseEvent.Y > Bounds.Height)
+    //    {
+    //        me.Handled = true;
+
+    //        return;
+    //    }
+
+    //    me.Handled = true;
+
+    //    return;
+    //}
+
+    private void ColorPicker_MouseClick (object sender, MouseEventEventArgs me)
+    {
+        if (CanFocus)
+        {
+            Cursor = new Point (me.MouseEvent.X / _boxWidth, me.MouseEvent.Y / _boxHeight);
+            SetFocus ();
+            me.Handled = true;
+        }
+    }
+
     /// <summary>Height of a color box</summary>
     public int BoxHeight
     {
@@ -88,37 +131,6 @@ public class ColorPicker : View
     /// <summary>Fired when a color is picked.</summary>
     public event EventHandler<ColorEventArgs> ColorChanged;
 
-    ///<inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent me)
-    {
-        if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) || !CanFocus)
-        {
-            return false;
-        }
-
-        SetFocus ();
-
-        if (me.X > Bounds.Width || me.Y > Bounds.Height)
-        {
-            return true;
-        }
-
-        Cursor = new Point (me.X / _boxWidth, me.Y / _boxHeight);
-
-        return true;
-    }
-
-    /// <summary>Moves the selected item index to the next row.</summary>
-    /// <returns></returns>
-    public virtual bool MoveDown ()
-    {
-        if (Cursor.Y < _rows - 1)
-        {
-            SelectedColor += _cols;
-        }
-
-        return true;
-    }
 
     /// <summary>Moves the selected item index to the previous column.</summary>
     /// <returns></returns>
@@ -151,6 +163,18 @@ public class ColorPicker : View
         if (Cursor.Y > 0)
         {
             SelectedColor -= _cols;
+        }
+
+        return true;
+    }
+
+    /// <summary>Moves the selected item index to the next row.</summary>
+    /// <returns></returns>
+    public virtual bool MoveDown ()
+    {
+        if (Cursor.Y < _rows - 1)
+        {
+            SelectedColor += _cols;
         }
 
         return true;
@@ -264,19 +288,5 @@ public class ColorPicker : View
         {
             AddRune (p.Key.X, p.Key.Y, p.Value);
         }
-    }
-
-    private void SetInitialProperties ()
-    {
-        CanFocus = true;
-        AddCommands ();
-        AddKeyBindings ();
-
-        LayoutStarted += (o, a) =>
-                         {
-                             Thickness thickness = GetAdornmentsThickness ();
-                             Width = _cols * BoxWidth + thickness.Vertical;
-                             Height = _rows * BoxHeight + thickness.Horizontal;
-                         };
     }
 }

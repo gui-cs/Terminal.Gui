@@ -20,6 +20,10 @@ namespace Terminal.Gui;
 ///         no other <see cref="View"/> processes the key, the <see cref="Button"/>'s <see cref="View.Accept"/> event will
 ///         be fired.
 ///     </para>
+///     <para>
+///         Set <see cref="View.WantContinuousButtonPressed"/> to <see langword="true"/> to have the <see cref="View.Accept"/> event
+///         invoked repeatedly while the button is pressed.
+///     </para>
 /// </remarks>
 public class Button : View
 {
@@ -46,6 +50,7 @@ public class Button : View
 
         CanFocus = true;
         AutoSize = true;
+        HighlightOnPress = true;
 
         // Override default behavior of View
         AddCommand (Command.HotKey, () =>
@@ -60,7 +65,6 @@ public class Button : View
         TitleChanged += Button_TitleChanged;
         MouseClick += Button_MouseClick;
     }
-
     private void Button_MouseClick (object sender, MouseEventEventArgs e)
     {
         e.Handled = InvokeCommand (Command.HotKey) == true;

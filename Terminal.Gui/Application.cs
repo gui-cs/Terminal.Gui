@@ -1456,15 +1456,6 @@ public static partial class Application
         // TODO: In PR #3273, FindDeepestView will return adornments. Update logic below to fix adornment mouse handling
         var view = View.FindDeepestView (Current, a.MouseEvent.X, a.MouseEvent.Y);
 
-        if (view is { WantContinuousButtonPressed: true })
-        {
-            WantContinuousButtonPressedView = view;
-        }
-        else
-        {
-            WantContinuousButtonPressedView = null;
-        }
-
         if (view is { })
         {
             a.MouseEvent.View = view;
@@ -1481,23 +1472,20 @@ public static partial class Application
         {
             // If the mouse is grabbed, send the event to the view that grabbed it.
             // The coordinates are relative to the Bounds of the view that grabbed the mouse.
-            Point frameLoc = MouseGrabView.ScreenToFrame (a.MouseEvent.X, a.MouseEvent.Y);
+            Point boundsLoc = MouseGrabView.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
 
             var viewRelativeMouseEvent = new MouseEvent
             {
-                X = frameLoc.X,
-                Y = frameLoc.Y,
+                X = boundsLoc.X,
+                Y = boundsLoc.Y,
                 Flags = a.MouseEvent.Flags,
                 ScreenPosition = new (a.MouseEvent.X, a.MouseEvent.Y),
-                View = view
+                View = MouseGrabView
             };
 
             if (MouseGrabView.Bounds.Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
             {
-                // The mouse has moved outside the bounds of the view that
-                // grabbed the mouse, so we tell the view that last got 
-                // OnMouseEnter the mouse is leaving
-                // BUGBUG: That sentence makes no sense. Either I'm missing something or this logic is flawed.
+                // The mouse has moved outside the bounds of the view that grabbed the mouse
                 _mouseEnteredView?.OnMouseLeave (a.MouseEvent);
             }
 
@@ -1507,6 +1495,16 @@ public static partial class Application
                 return;
             }
         }
+
+        if (view is { WantContinuousButtonPressed: true })
+        {
+            WantContinuousButtonPressedView = view;
+        }
+        else
+        {
+            WantContinuousButtonPressedView = null;
+        }
+
 
         if (view is not Adornment)
         {

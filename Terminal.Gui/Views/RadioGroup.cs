@@ -76,6 +76,41 @@ public class RadioGroup : View
         KeyBindings.Add (Key.Space, Command.Accept);
 
         LayoutStarted += RadioGroup_LayoutStarted;
+
+        HighlightOnPress = true;
+
+        MouseClick += RadioGroup_MouseClick;
+    }
+
+    // TODO: Fix InvertColorsOnPress - only highlight the selected item
+
+    private void RadioGroup_MouseClick (object sender, MouseEventEventArgs e)
+    {
+        SetFocus ();
+
+        int boundsX = e.MouseEvent.X;
+        int boundsY = e.MouseEvent.Y;
+
+        int pos = _orientation == Orientation.Horizontal ? boundsX : boundsY;
+
+        int rCount = _orientation == Orientation.Horizontal
+                         ? _horizontal.Last ().pos + _horizontal.Last ().length
+                         : _radioLabels.Count;
+
+        if (pos < rCount)
+        {
+            int c = _orientation == Orientation.Horizontal
+                        ? _horizontal.FindIndex (x => x.pos <= boundsX && x.pos + x.length - 2 >= boundsX)
+                        : boundsY;
+
+            if (c > -1)
+            {
+                _cursor = SelectedItem = c;
+                SetNeedsDisplay ();
+            }
+        }
+
+        e.Handled = true;
     }
 
     /// <summary>
@@ -158,46 +193,6 @@ public class RadioGroup : View
             _cursor = Math.Max (_selected, 0);
             SetNeedsDisplay ();
         }
-    }
-
-    /// <inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent me)
-    {
-        if (!me.Flags.HasFlag (MouseFlags.Button1Clicked))
-        {
-            return false;
-        }
-
-        if (!CanFocus)
-        {
-            return false;
-        }
-
-        SetFocus ();
-
-        int boundsX = me.X;
-        int boundsY = me.Y;
-
-        int pos = _orientation == Orientation.Horizontal ? boundsX : boundsY;
-
-        int rCount = _orientation == Orientation.Horizontal
-                         ? _horizontal.Last ().pos + _horizontal.Last ().length
-                         : _radioLabels.Count;
-
-        if (pos < rCount)
-        {
-            int c = _orientation == Orientation.Horizontal
-                        ? _horizontal.FindIndex (x => x.pos <= boundsX && x.pos + x.length - 2 >= boundsX)
-                        : boundsY;
-
-            if (c > -1)
-            {
-                _cursor = SelectedItem = c;
-                SetNeedsDisplay ();
-            }
-        }
-
-        return true;
     }
 
     /// <inheritdoc/>
