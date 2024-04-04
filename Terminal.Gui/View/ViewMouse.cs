@@ -14,7 +14,7 @@ public partial class View
     /// <summary>Gets or sets whether the <see cref="View"/> wants mouse position reports.</summary>
     /// <value><see langword="true"/> if mouse position reports are wanted; otherwise, <see langword="false"/>.</value>
     public virtual bool WantMousePositionReports { get; set; }
-    
+
     /// <summary>
     ///     Called when the mouse enters the View's <see cref="Bounds"/>. The view will now receive mouse events until the
     ///     mouse leaves
@@ -104,14 +104,20 @@ public partial class View
         var args = new MouseEventEventArgs (mouseEvent);
 
         // Default behavior is to invoke Accept (via HotKey) on clicked.
-        if (!WantContinuousButtonPressed
-            && Application.MouseGrabView != this
+        if (
+             !HighlightOnPress
+            && Application.MouseGrabView is null
             && (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)
                 || mouseEvent.Flags.HasFlag (MouseFlags.Button2Clicked)
                 || mouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)
                 || mouseEvent.Flags.HasFlag (MouseFlags.Button4Clicked)))
-        {
+        { 
             return OnMouseClick (args);
+        }
+
+        if (!HighlightOnPress)
+        {
+            return false;
         }
 
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
@@ -130,10 +136,10 @@ public partial class View
             if (Application.MouseGrabView != this)
             {
                 Application.GrabMouse (this);
-                _savedColorScheme = ColorScheme;
 
                 if (HighlightOnPress && ColorScheme is { })
                 {
+                    _savedColorScheme = ColorScheme;
                     if (CanFocus)
                     {
                         // TODO: Make the inverted color configurable
@@ -158,8 +164,8 @@ public partial class View
                     // Set the focus, but don't invoke Accept
                     SetFocus ();
                 }
-                args.Handled = true;
             }
+            args.Handled = true;
         }
 
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released)
@@ -167,14 +173,15 @@ public partial class View
             || mouseEvent.Flags.HasFlag (MouseFlags.Button3Released)
             || mouseEvent.Flags.HasFlag (MouseFlags.Button4Released))
         {
-            // When the mouse is released, if WantContinuousButtonPressed is set, invoke Accept one last time.
-            if (WantContinuousButtonPressed)
-            {
-                OnMouseClick (args);
-            }
 
             if (Application.MouseGrabView == this)
             {
+                // When the mouse is released, if WantContinuousButtonPressed is set, invoke Accept one last time.
+                //if (WantContinuousButtonPressed)
+                {
+                    OnMouseClick (args);
+                }
+
                 Application.UngrabMouse ();
 
                 if (HighlightOnPress && _savedColorScheme is { })
@@ -182,8 +189,8 @@ public partial class View
                     ColorScheme = _savedColorScheme;
                     _savedColorScheme = null;
                 }
-                args.Handled = true;
             }
+            args.Handled = true;
         }
 
         if (args.Handled != true)
@@ -209,6 +216,7 @@ public partial class View
     ///         <see cref="MouseEvent.Flags"/> to see which button was clicked.
     ///     </para>
     /// </remarks>
+    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
     protected bool OnMouseClick (MouseEventEventArgs args)
     {
         if (!Enabled)

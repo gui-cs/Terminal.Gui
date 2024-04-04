@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.CommandLine;
+using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -14,19 +17,53 @@ public class Mouse : Scenario
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
         };
 
+
+        var filterSlider = new Slider<MouseFlags> ()
+        {
+            Title = "_Filter",
+            X = 0,
+            Y = 0,
+            AutoSize = true,
+            BorderStyle = LineStyle.Single,
+            Type = SliderType.Multiple,
+            Orientation = Orientation.Vertical,
+        };
+        filterSlider.Options = Enum.GetValues (typeof (MouseFlags))
+                                   .Cast<MouseFlags> ()
+                                   .Where (value => !value.ToString ().Contains ("None") && 
+                                                    !value.ToString().Contains("All"))
+                                   .Select (value => new SliderOption<MouseFlags>
+                                   {
+                                       Legend = value.ToString (),
+                                       Data = value,
+                                   })
+                                   .ToList ();
+        for (int i = 0; i < filterSlider.Options.Count; i++)
+        {
+            filterSlider.SetOption (i);
+        }
+        win.Add (filterSlider);
+
+        var clearButton = new Button ()
+        {
+            Title = "_Clear Logs",
+            X = 1,
+            Y = Pos.Bottom (filterSlider) + 1,
+        };
+        win.Add (clearButton);
         Label ml;
         var count = 0;
-        ml = new Label { X = 1, Y = 1, Text = "Mouse: " };
+        ml = new Label { X = Pos.Right(filterSlider), Y = 0, Text = "Mouse: " };
 
         win.Add (ml);
 
         CheckBox cbWantContinuousPresses = new CheckBox ()
         {
-            X = 0,
-            Y = Pos.Bottom(ml) + 1,
+            X = Pos.Right (filterSlider),
+            Y = Pos.Bottom (ml) + 1,
             Title = "_Want Continuous Button Presses",
         };
-        cbWantContinuousPresses.Toggled += (s,e) =>
+        cbWantContinuousPresses.Toggled += (s, e) =>
         {
             win.WantContinuousButtonPressed = !win.WantContinuousButtonPressed;
         };
@@ -35,10 +72,10 @@ public class Mouse : Scenario
 
         var demo = new MouseDemo ()
         {
-            X = 0,
+            X = Pos.Right (filterSlider),
             Y = Pos.Bottom (cbWantContinuousPresses) + 1,
             Width = 20,
-            Height = 5,
+            Height = 3,
             Text = "Enter/Leave Demo",
             TextAlignment = TextAlignment.Centered,
             VerticalTextAlignment = VerticalTextAlignment.Middle,
@@ -49,15 +86,16 @@ public class Mouse : Scenario
         var label = new Label ()
         {
             Text = "_App Events:",
-            X = 0,
+            X = Pos.Right (filterSlider),
             Y = Pos.Bottom (demo),
         };
+
         List<string> appLogList = new ();
         var appLog = new ListView
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
-            Width = Dim.Percent(49),
+            Width = 50,
             Height = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Source = new ListWrapper (appLogList)
@@ -66,22 +104,26 @@ public class Mouse : Scenario
 
         Application.MouseEvent += (sender, a) =>
                                   {
-                                      ml.Text = $"MouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count}";
-                                      appLogList.Add ($"({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}");
-                                      appLog.MoveDown ();
+                                      var i = filterSlider.Options.FindIndex (o => o.Data == a.MouseEvent.Flags);
+                                      if (filterSlider.GetSetOptions().Contains(i))
+                                      {
+                                          ml.Text = $"MouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count}";
+                                          appLogList.Add ($"({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}");
+                                          appLog.MoveDown ();
+                                          }
                                   };
 
 
         label = new Label ()
         {
             Text = "_Window Events:",
-            X = Pos.Percent(50),
-            Y = Pos.Bottom (demo),
+            X = Pos.Right (appLog)+1,
+                          Y = Pos.Top (label),
         };
         List<string> winLogList = new ();
         var winLog = new ListView
         {
-            X = Pos.Left(label),
+            X = Pos.Left (label),
             Y = Pos.Bottom (label),
             Width = Dim.Percent (50),
             Height = Dim.Fill (),
@@ -89,6 +131,13 @@ public class Mouse : Scenario
             Source = new ListWrapper (winLogList)
         };
         win.Add (label, winLog);
+
+        clearButton.Accept += (s, e) =>
+                              {
+                                  appLogList.Clear ();
+                                  winLogList.Clear ();
+                              };
+
         win.MouseEvent += (sender, a) =>
                           {
                               winLogList.Add ($"MouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}");

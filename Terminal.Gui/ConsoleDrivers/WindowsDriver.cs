@@ -1712,7 +1712,7 @@ internal class WindowsDriver : ConsoleDriver
     {
         // When a user presses-and-holds, start generating pressed events every `startDelay`
         // After `iterationsUntilFast` iterations, speed them up to `fastDelay` ms
-        const int startDelay = 500;
+        const int startDelay = 50;
         const int iterationsUntilFast = 4;
         const int fastDelay = 50;
 
