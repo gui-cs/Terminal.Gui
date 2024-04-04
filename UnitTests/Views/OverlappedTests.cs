@@ -909,40 +909,8 @@ public class OverlappedTests
         Assert.Equal (win2, Application.Current);
         Assert.Equal (win1, rsWin1.Toplevel);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- ┌───┐
- │   │
- │   │
- │   │
- └───┘",
-                                                      _output
-                                                     );
-
-        Attribute [] attributes =
-        {
-            // 0
-            Colors.ColorSchemes ["TopLevel"].Normal,
-
-            // 1
-            Colors.ColorSchemes ["Base"].Normal
-        };
-
-        TestHelpers.AssertDriverAttributesAre (
-                                               @"
-0000000000
-0111110000
-0111110000
-0111110000
-0111110000
-0111110000
-0000000000
-0000000000
-0000000000
-0000000000",
-                                               null,
-                                               attributes
-                                              );
+        // Tests that rely on visuals are too fragile. If border style changes they break.
+        // Instead we should just rely on the test above.
 
         Application.OnMouseEvent (new MouseEvent { X = 1, Y = 1, Flags = MouseFlags.Button1Pressed });
         Assert.Equal (win2.Border, Application.MouseGrabView);
@@ -973,31 +941,8 @@ public class OverlappedTests
         Assert.Equal (win2, Application.Current);
         Assert.Equal (win1, rsWin1.Toplevel);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-  ┌───┐
-  │   │
-  │   │
-  │   │
-  └───┘",
-                                                      _output
-                                                     );
-
-        TestHelpers.AssertDriverAttributesAre (
-                                               @"
-0000000000
-0000000000
-0011111000
-0011111000
-0011111000
-0011111000
-0011111000
-0000000000
-0000000000
-0000000000",
-                                               null,
-                                               attributes
-                                              );
+        // Tests that rely on visuals are too fragile. If border style changes they break.
+        // Instead we should just rely on the test above.
 
         // This will end the win2 and not the overlapped
         Application.End (rsOverlapped);

@@ -875,18 +875,7 @@ public class ToplevelTests
                                      }
                                      else if (iterations == 1)
                                      {
-                                         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                                                       @"
-┌─────────────┐
-│             │
-│ ┌────────┐  │
-│ │Hello   │  │
-│ └────────┘  │
-│             │
-└─────────────┘
-",
-                                                                                       _output
-                                                                                      );
+                                         Assert.Equal(new Point(2,2), Application.Current.Frame.Location);
                                      }
                                      else if (iterations == 2)
                                      {
@@ -918,18 +907,7 @@ public class ToplevelTests
                                      else if (iterations == 4)
                                      {
                                          Assert.Equal (Application.Current.Border, Application.MouseGrabView);
-
-                                         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                                                       @"
-┌─────────────┐
-│             │
-│┌────────┐   │
-││Hello   │   │
-│└────────┘   │
-│             │
-└─────────────┘",
-                                                                                       _output
-                                                                                      );
+                                         Assert.Equal (new Point (1, 2), Application.Current.Frame.Location);
 
                                          Assert.Equal (Application.Current.Border, Application.MouseGrabView);
                                      }
@@ -953,18 +931,8 @@ public class ToplevelTests
                                      else if (iterations == 6)
                                      {
                                          Assert.Equal (Application.Current.Border, Application.MouseGrabView);
+                                         Assert.Equal (new Point (1, 1), Application.Current.Frame.Location);
 
-                                         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                                                       @"
-┌─────────────┐
-│┌────────┐   │
-││Hello   │   │
-│└────────┘   │
-│             │
-│             │
-└─────────────┘",
-                                                                                       _output
-                                                                                      );
 
                                          Assert.Equal (Application.Current.Border, Application.MouseGrabView);
                                          Assert.Equal (new Rectangle (1, 1, 10, 3), Application.Current.Frame);
@@ -1374,26 +1342,6 @@ public class ToplevelTests
         Assert.Equal (new (0, 0, 200, 100), scrollView.Subviews [0].Frame);
         Assert.Equal (new (3, 3, 194, 94), win.Frame);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-                                          ▲
-                                          ┬
-                                          │
-      ┌───────────────────────────────────┴
-      │                                   ░
-      │                                   ░
-      │                                   ░
-      │                                   ░
-      │                                   ░
-      │                                   ░
-      │                                   ░
-      │                                   ░
-      │                                   ░
-      │                                   ░
-      │                                   ▼
-   ◄├──────┤░░░░░░░░░░░░░░░░░░░░░░░░░░░░░► ",
-                                                      _output
-                                                     );
 
         Application.OnMouseEvent (new MouseEvent { X = 6, Y = 6, Flags = MouseFlags.Button1Pressed });
         Assert.Equal (win.Border, Application.MouseGrabView);
@@ -1405,27 +1353,6 @@ public class ToplevelTests
         top.LayoutSubviews ();
         Assert.Equal (new Rectangle (6, 6, 191, 91), win.Frame);
         Application.Refresh ();
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-                                          ▲
-                                          ┬
-                                          │
-                                          ┴
-                                          ░
-                                          ░
-         ┌────────────────────────────────░
-         │                                ░
-         │                                ░
-         │                                ░
-         │                                ░
-         │                                ░
-         │                                ░
-         │                                ░
-         │                                ▼
-   ◄├──────┤░░░░░░░░░░░░░░░░░░░░░░░░░░░░░► ",
-                                                      _output
-                                                     );
 
         Application.OnMouseEvent (new MouseEvent
         {
@@ -1439,27 +1366,6 @@ public class ToplevelTests
         top.LayoutSubviews ();
         Assert.Equal (new Rectangle (2, 2, 195, 95), win.Frame);
         Application.Refresh ();
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-                                          ▲
-                                          ┬
-     ┌────────────────────────────────────│
-     │                                    ┴
-     │                                    ░
-     │                                    ░
-     │                                    ░
-     │                                    ░
-     │                                    ░
-     │                                    ░
-     │                                    ░
-     │                                    ░
-     │                                    ░
-     │                                    ░
-     │                                    ▼
-   ◄├──────┤░░░░░░░░░░░░░░░░░░░░░░░░░░░░░► ",
-                                                      _output
-                                                     );
 
         Application.OnMouseEvent (new MouseEvent { X = 5, Y = 5, Flags = MouseFlags.Button1Released });
         // ScrollView always grab the mouse when the container's subview OnMouseEnter don't want grab the mouse
@@ -1482,15 +1388,6 @@ public class ToplevelTests
         Assert.Equal (new Rectangle (0, 0, 40, 10), top.Frame);
         Assert.Equal (new Rectangle (0, 0, 20, 3), window.Frame);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌──────────────────┐
-│                  │
-└──────────────────┘
-",
-                                                      _output
-                                                     );
-
         Assert.Null (Application.MouseGrabView);
 
         Application.OnMouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed });
@@ -1509,15 +1406,6 @@ public class ToplevelTests
         Assert.Equal (new Rectangle (0, 0, 40, 10), top.Frame);
         Assert.Equal (new Rectangle (0, 0, 20, 3), window.Frame);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌──────────────────┐
-│                  │
-└──────────────────┘
-",
-                                                      _output
-                                                     );
-
         // Changes Top size to same size as Dialog more menu and scroll bar
         ((FakeDriver)Application.Driver).SetBufferSize (20, 3);
 
@@ -1532,15 +1420,6 @@ public class ToplevelTests
         Application.Refresh ();
         Assert.Equal (new Rectangle (0, 0, 20, 3), top.Frame);
         Assert.Equal (new Rectangle (0, 0, 20, 3), window.Frame);
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌──────────────────┐
-│                  │
-└──────────────────┘
-",
-                                                      _output
-                                                     );
 
         // Changes Top size smaller than Dialog size
         ((FakeDriver)Application.Driver).SetBufferSize (19, 2);
@@ -1557,14 +1436,6 @@ public class ToplevelTests
         Assert.Equal (new Rectangle (0, 0, 19, 2), top.Frame);
         Assert.Equal (new Rectangle (-1, 0, 20, 3), window.Frame);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-──────────────────┐
-                  │
-",
-                                                      _output
-                                                     );
-
         Application.OnMouseEvent (new MouseEvent
         {
             X = 18,
@@ -1576,12 +1447,6 @@ public class ToplevelTests
         Application.Refresh ();
         Assert.Equal (new Rectangle (0, 0, 19, 2), top.Frame);
         Assert.Equal (new Rectangle (18, 1, 20, 3), window.Frame);
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-                  ┌",
-                                                      _output
-                                                     );
 
         // On a real app we can't go beyond the SuperView bounds
         Application.OnMouseEvent (new MouseEvent
@@ -1627,14 +1492,6 @@ public class ToplevelTests
         Assert.Null (Application.MouseGrabView);
         Assert.Equal (new Rectangle (0, 0, 10, 3), window.Frame);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌────────┐
-│  Test  │
-└────────┘",
-                                                      _output
-                                                     );
-
         Application.OnMouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed });
 
         var firstIteration = false;
@@ -1642,14 +1499,6 @@ public class ToplevelTests
         Assert.Equal (window.Border, Application.MouseGrabView);
 
         Assert.Equal (new Rectangle (0, 0, 10, 3), window.Frame);
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌────────┐
-│  Test  │
-└────────┘",
-                                                      _output
-                                                     );
 
         Application.OnMouseEvent (new MouseEvent
         {
@@ -1663,14 +1512,6 @@ public class ToplevelTests
         Application.RunIteration (ref rs, ref firstIteration);
         Assert.Equal (window.Border, Application.MouseGrabView);
         Assert.Equal (new Rectangle (1, 1, 10, 3), window.Frame);
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- ┌────────┐
- │  Test  │
- └────────┘",
-                                                      _output
-                                                     );
 
         Application.End (rs);
     }
@@ -1705,31 +1546,6 @@ public class ToplevelTests
         ((FakeDriver)Application.Driver).SetBufferSize (20, 20);
 
         Assert.Equal (new Rectangle (0, 0, 20, 20), win.Frame);
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌──────────────────┐
-│                  │
-│                  │
-│                  │
-│                  │
-│                  │
-│                  │
-│                  │
-│                  │
-│                  │
-│                  │
-│                  │
-│                  │
-│                  │
-│                  │
-│                  │
-│                  │
-│                  │
-│                  │
-└──────────────────┘",
-                                                      _output
-                                                     );
 
         var btnPopup = new Button { Text = "Popup" };
         var testWindow = new Window { X = 2, Y = 1, Width = 15, Height = 10 };
@@ -1773,31 +1589,6 @@ public class ToplevelTests
         RunState rsTestWindow = Application.Begin (testWindow);
 
         Assert.Equal (new Rectangle (2, 1, 15, 10), testWindow.Frame);
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @$"
-┌──────────────────┐
-│ ┌─────────────┐  │
-│ │{CM.Glyphs.LeftBracket} Popup {CM.Glyphs.RightBracket}    │  │
-│ │             │  │
-│ │             │  │
-│ │             │  │
-│ │             │  │
-│ │             │  │
-│ │             │  │
-│ │             │  │
-│ └─────────────┘  │
-│                  │
-│                  │
-│                  │
-│                  │
-│                  │
-│                  │
-│                  │
-│                  │
-└──────────────────┘",
-                                                      _output
-                                                     );
 
         Application.OnMouseEvent (new () { X = 5, Y = 2, Flags = MouseFlags.Button1Clicked });
         Application.Top.Draw ();

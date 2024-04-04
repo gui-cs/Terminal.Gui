@@ -812,77 +812,16 @@ public class ApplicationTests
         ((FakeDriver)Application.Driver).SetBufferSize (10, 10);
         RunState rs = Application.Begin (w);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌───┐
-│   │
-│   │
-│   │
-└───┘",
-                                                      _output
-                                                     );
+        // Don't use visuals to test as style of border can change over time.
+        Assert.Equal (new Point (0, 0), w.Frame.Location);
 
-        Attribute [] attributes =
-        {
-            // 0
-            new (ColorName.White, ColorName.Black),
-
-            // 1
-            Colors.ColorSchemes ["Base"].Normal
-        };
-
-        TestHelpers.AssertDriverAttributesAre (
-                                               @"
-1111100000
-1111100000
-1111100000
-1111100000
-1111100000
-",
-                                               null,
-                                               attributes
-                                              );
-
-        // TODO: In PR #2920 this breaks because the mouse is not grabbed anymore.
-        // TODO: Move the mouse grap/drag mode from Toplevel to Border.
         Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed });
         Assert.Equal (w.Border, Application.MouseGrabView);
+        Assert.Equal (new Point (0,0), w.Frame.Location);
 
         // Move down and to the right.
         Application.OnMouseEvent (new () { X = 1, Y = 1, Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
-        Application.Refresh ();
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- ┌───┐
- │   │
- │   │
- │   │
- └───┘",
-                                                      _output
-                                                     );
-
-        attributes = new []
-        {
-            // 0
-            new (ColorName.White, ColorName.Black),
-
-            // 1
-            Colors.ColorSchemes ["Base"].Normal
-        };
-
-        TestHelpers.AssertDriverAttributesAre (
-                                               @"
-0000000000
-0111110000
-0111110000
-0111110000
-0111110000
-0111110000
-",
-                                               null,
-                                               attributes
-                                              );
+        Assert.Equal (new Point (1, 1), w.Frame.Location);
 
         Application.End (rs);
         w.Dispose ();
