@@ -557,4 +557,47 @@ public class SetRelativeLayoutTests
         Assert.Equal (3, view.Frame.Width);
         Assert.Equal (3, view.Frame.Height);
     }
+
+    [Theory]
+    [InlineData (0, 0, 7, 7, 3, 3)]
+    [InlineData (-1, -1, 6, 6, 3, 3)]
+    [InlineData (1, 1, 8, 8, 2, 2)]
+    [InlineData (3, 3, 10, 10, 0, 0)]
+    [InlineData (-3, -3, 4, 4, 3, 3)]
+    [InlineData (-20, -20, -13, -13, 3, 3)]
+    public void AnchorEnd_X_Same_As_Y_DimFill_Width_Same_As_Height (int x, int y, int expectedX, int expectedY, int expectedWidth, int expectedHeight)
+    {
+        var screen = new Rectangle (x, y, 10, 10);
+        var view = new View { X = Pos.AnchorEnd (3), Y = Pos.AnchorEnd (3), Width = Dim.Fill (), Height = Dim.Fill () };
+        view.BeginInit ();
+        view.EndInit ();
+        view.SetRelativeLayout (screen);
+
+        Assert.Equal (expectedX, view.Frame.X);
+        Assert.Equal (expectedY, view.Frame.Y);
+        Assert.Equal (expectedWidth, view.Frame.Width);
+        Assert.Equal (expectedHeight, view.Frame.Height);
+    }
+
+    [Theory]
+    [InlineData (0, 0, 4, 4, 1, 1)]
+    [InlineData (3, 3, 4, 4, 1, 1)]
+    [InlineData (-3, -3, 4, 4, 1, 1)]
+    [InlineData (11, 11, 11, 11, 1, 1)]
+    [InlineData (5, 5, 5, 5, 1, 1)]
+    [InlineData (-5, -5, 4, 4, 1, 1)]
+    [InlineData (-6, -6, 4, 4, 0, 0)]
+    public void PosFunc_X_Same_As_Y_And_Width_Same_As_Height (int x, int y, int expectedX, int expectedY, int expectedWidth, int expectedHeight)
+    {
+        var screen = new Rectangle (x, y, 10, 10);
+        var view = new View { X = Pos.Function (() => 4 + -x), Y = Pos.Function (() => 4 + -y), Width = 1, Height = 1 };
+        view.BeginInit ();
+        view.EndInit ();
+        view.SetRelativeLayout (screen);
+
+        Assert.Equal (expectedX, view.Frame.X);
+        Assert.Equal (expectedY, view.Frame.Y);
+        Assert.Equal (expectedWidth, view.Frame.Width);
+        Assert.Equal (expectedHeight, view.Frame.Height);
+    }
 }
