@@ -1281,7 +1281,7 @@ internal class WindowsDriver : ConsoleDriver
         {
 #if HACK_CHECK_WINCHANGED
 
-            //_mainLoop.WinChanged -= ChangeWin;
+            _mainLoopDriver.WinChanged -= ChangeWin;
 #endif
         }
 
@@ -1698,7 +1698,7 @@ internal class WindowsDriver : ConsoleDriver
 
     private async Task ProcessButtonDoubleClickedAsync ()
     {
-        await Task.Delay (300);
+        await Task.Delay (200);
         _isButtonDoubleClicked = false;
         _isOneFingerDoubleClicked = false;
 
@@ -2130,33 +2130,19 @@ internal class WindowsMainLoop : IMainLoopDriver
 
     void IMainLoopDriver.TearDown ()
     {
-        // Eat any outstanding events. See #
-        //var records = 
-            _winConsole.ReadConsoleInput ();
-
-        //if (records != null)
-        //{
-        //    foreach (var rec in records)
-        //    {
-        //        Debug.WriteLine ($"Teardown: {rec.ToString ()}");
-        //        //Debug.Assert (rec is not { EventType: WindowsConsole.EventType.Mouse, MouseEvent.ButtonState: WindowsConsole.ButtonState.Button1Pressed });
-        //    }
-        //}
-
         _inputHandlerTokenSource?.Cancel ();
         _inputHandlerTokenSource?.Dispose ();
+        _waitForProbe?.Dispose ();
+
+        _resultQueue?.Clear ();
 
         _eventReadyTokenSource?.Cancel ();
         _eventReadyTokenSource?.Dispose ();
         _eventReady?.Dispose ();
 
-        _resultQueue?.Clear ();
-
 #if HACK_CHECK_WINCHANGED
         _winChange?.Dispose ();
 #endif
-
-        //_waitForProbe?.Dispose ();
 
         _mainLoop = null;
     }
@@ -2174,11 +2160,18 @@ internal class WindowsMainLoop : IMainLoopDriver
             }
             catch (OperationCanceledException)
             {
+                // Wakes the _waitForProbe if it's waiting
+                _waitForProbe.Set ();
                 return;
             }
             finally
             {
-                _waitForProbe.Reset ();
+                // If IsCancellationRequested is true the code after
+                // the `finally` block will not be executed.
+                if (!_inputHandlerTokenSource.IsCancellationRequested)
+                {
+                    _waitForProbe.Reset ();
+                }
             }
 
             if (_resultQueue?.Count == 0)
