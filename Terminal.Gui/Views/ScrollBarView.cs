@@ -45,6 +45,15 @@ public class ScrollBarView : View
 
         Added += ScrollBarView_Added;
         Initialized += ScrollBarView_Initialized;
+        Removed += ScrollBarView_Removed;
+    }
+
+    private void ScrollBarView_Removed (object sender, SuperViewChangedEventArgs e)
+    {
+        if (e.Parent is Adornment adornmentThickness)
+        {
+            adornmentThickness.Thickness = _parentThickness;
+        }
     }
 
     /// <summary>If true the vertical/horizontal scroll bars won't be showed if it's not needed.</summary>
@@ -666,13 +675,16 @@ public class ScrollBarView : View
 
         int barSize = GetBarSize (orientation);
         int isBuiltInOffset = IsBuiltIn && barSize > 0 ? 1 : 0;
-        int newPosition = Math.Max (Math.Min (Size - barSize, n), 0);
+        int boundsSizeOffset = orientation == Orientation.Vertical ? Math.Max (bounds.Height - Size, 0) : Math.Max (bounds.Width - Size, 0);
+        int newPosition = barSize > 0
+                              ? Math.Max (Math.Min (Size - barSize, n), 0)
+                              : Math.Max (Math.Min (Size + boundsSizeOffset - 1, n), 0);
 
-        maxToScroll = Size > barSize + newPosition - isBuiltInOffset
+        maxToScroll = (barSize > 0 ? Size : Size + boundsSizeOffset) > barSize + newPosition - isBuiltInOffset
                           ? newPosition - _position
-                          : Size - (barSize + _position) + isBuiltInOffset - (barSize == 0 ? 1 : 0);
+                          : Size - (barSize + _position) + isBuiltInOffset + (barSize <= 0 ? 1 : 0);
 
-        return Size >= barSize + newPosition - isBuiltInOffset && maxToScroll != 0;
+        return (barSize > 0 ? Size : Size + _position + boundsSizeOffset) >= barSize + newPosition - isBuiltInOffset && maxToScroll != 0;
     }
 
     private void AdjustContentInViewport (bool refresh = true)
@@ -684,6 +696,11 @@ public class ScrollBarView : View
 
         var pos = 0;
         Rectangle bounds = GetParentVisibleContentArea ();
+
+        if (_position < 0)
+        {
+            pos = 0;
+        }
 
         if (KeepContentAlwaysInViewPort
             && _orientation == Orientation.Horizontal
@@ -699,7 +716,7 @@ public class ScrollBarView : View
             pos = Math.Max (Size - bounds.Height + (!IsBuiltIn && OtherScrollBarView is { ShowScrollIndicator: true } ? 1 : 0), GetOtherScrollBarViewOffset);
         }
 
-        if (pos != 0)
+        if (pos != 0 || _position < 0)
         {
             Position = pos;
         }
@@ -724,7 +741,7 @@ public class ScrollBarView : View
 
         int barsize = scrollBarView._orientation == Orientation.Vertical ? scrollBarView.ContentArea.Height : scrollBarView.ContentArea.Width;
 
-        if (barsize == 0 || barsize - scrollBarView.Position >= scrollBarView.Size)
+        if (barsize == 0 || (barsize - scrollBarView.Position >= scrollBarView.Size && scrollBarView.Position == 0))
         {
             if (scrollBarView.Visible)
             {
@@ -975,7 +992,11 @@ public class ScrollBarView : View
     // Helper to assist Initialized event handler
     private void SetPosition (int newPosition)
     {
-        if (CanScroll (newPosition, out int max, _orientation))
+        if (newPosition == 0)
+        {
+            _position = newPosition;
+        }
+        else if (CanScroll (newPosition, out int max, _orientation))
         {
             if (max == newPosition)
             {
