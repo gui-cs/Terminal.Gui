@@ -2134,21 +2134,6 @@ internal class WindowsMainLoop : IMainLoopDriver
         _inputHandlerTokenSource?.Dispose ();
         _waitForProbe?.Dispose ();
 
-        // Eat any outstanding events. See #
-        // I don't recommend this because if there is no input
-        // this could being hang until some event occur
-        //var records = 
-        //_winConsole.ReadConsoleInput ();
-
-        //if (records != null)
-        //{
-        //    foreach (var rec in records)
-        //    {
-        //        Debug.WriteLine ($"Teardown: {rec.ToString ()}");
-        //        //Debug.Assert (rec is not { EventType: WindowsConsole.EventType.Mouse, MouseEvent.ButtonState: WindowsConsole.ButtonState.Button1Pressed });
-        //    }
-        //}
-
         _resultQueue?.Clear ();
 
         _eventReadyTokenSource?.Cancel ();
