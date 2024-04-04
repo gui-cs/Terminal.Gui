@@ -56,6 +56,9 @@ public class Border : Adornment
         Parent = parent;
         Application.GrabbingMouse += Application_GrabbingMouse;
         Application.UnGrabbingMouse += Application_UnGrabbingMouse;
+
+        EnablingHighlight += Border_EnablingHighlight;
+        DisablingHighlight += Border_DisablingHighlight;
     }
 
 #if SUBVIEW_BASED_BORDER
@@ -187,6 +190,23 @@ public class Border : Adornment
 
     #region Mouse Support
 
+    private LineStyle _savedHighlightLineStyle;
+
+    private void Border_EnablingHighlight (object sender, System.ComponentModel.CancelEventArgs e)
+    {
+        _savedHighlightLineStyle = Parent?.BorderStyle ?? LineStyle;
+        LineStyle = LineStyle.Heavy;
+        Parent?.SetNeedsDisplay ();
+        e.Cancel = true;
+    }
+
+    private void Border_DisablingHighlight (object sender, System.ComponentModel.CancelEventArgs e)
+    {
+        LineStyle = _savedHighlightLineStyle;
+        Parent?.SetNeedsDisplay ();
+        e.Cancel = true;
+    }
+
     private Point? _dragPosition;
     private Point _startGrabPoint;
 
@@ -222,6 +242,7 @@ public class Border : Adornment
                 _startGrabPoint = new (mouseEvent.X + Frame.X, mouseEvent.Y + Frame.Y);
                 _dragPosition = new (mouseEvent.X, mouseEvent.Y);
                 Application.GrabMouse (this);
+                EnableHighlight ();
             }
 
             return true;
@@ -265,6 +286,7 @@ public class Border : Adornment
         {
             _dragPosition = null;
             Application.UngrabMouse ();
+            DisableHighlight();
 
             return true;
         }

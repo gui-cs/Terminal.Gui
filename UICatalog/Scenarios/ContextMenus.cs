@@ -74,7 +74,7 @@ public class ContextMenus : Scenario
 
         Application.MouseEvent += ApplicationMouseEvent;
 
-        void ApplicationMouseEvent (object sender, MouseEventEventArgs a) { mousePos = new Point (a.MouseEvent.X, a.MouseEvent.Y); }
+        void ApplicationMouseEvent (object sender, MouseEvent a) { mousePos = new Point (a.X, a.Y); }
 
         Win.WantMousePositionReports = true;
 

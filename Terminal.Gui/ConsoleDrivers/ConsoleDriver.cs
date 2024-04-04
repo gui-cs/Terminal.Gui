@@ -538,11 +538,11 @@ public abstract class ConsoleDriver
     public void OnKeyUp (Key a) { KeyUp?.Invoke (this, a); }
 
     /// <summary>Event fired when a mouse event occurs.</summary>
-    public event EventHandler<MouseEventEventArgs> MouseEvent;
+    public event EventHandler<MouseEvent> MouseEvent;
 
     /// <summary>Called when a mouse event occurs. Fires the <see cref="MouseEvent"/> event.</summary>
     /// <param name="a"></param>
-    public void OnMouseEvent (MouseEventEventArgs a) { MouseEvent?.Invoke (this, a); }
+    public void OnMouseEvent (MouseEvent a) { MouseEvent?.Invoke (this, a); }
 
     /// <summary>Simulates a key press.</summary>
     /// <param name="keyChar">The key character.</param>

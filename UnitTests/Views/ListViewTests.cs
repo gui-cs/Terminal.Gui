@@ -425,7 +425,7 @@ Item 6",
     public void Accept_Command_Accepts_and_Opens_Selected_Item ()
     {
         List<string> source = ["One", "Two", "Three"];
-        var listView = new ListView {Source = new ListWrapper (source) };
+        var listView = new ListView { Source = new ListWrapper (source) };
         listView.SelectedItem = 0;
 
         var accepted = false;
@@ -719,48 +719,43 @@ Item 6",
 │Three│
 └─────┘", _output);
 
-        Application.OnMouseEvent (new (new ()
-        {
-            X = 0,
-            Y = 0,
-            Flags = MouseFlags.Button1Clicked
-        }));
+        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked });
         Assert.Equal ("", selected);
         Assert.Equal (-1, lv.SelectedItem);
 
-        Application.OnMouseEvent (new (new ()
+        Application.OnMouseEvent (new ()
         {
             X = 1,
             Y = 1,
             Flags = MouseFlags.Button1Clicked
-        }));
+        });
         Assert.Equal ("One", selected);
         Assert.Equal (0, lv.SelectedItem);
 
-        Application.OnMouseEvent (new (new ()
+        Application.OnMouseEvent (new ()
         {
             X = 1,
             Y = 2,
             Flags = MouseFlags.Button1Clicked
-        }));
+        });
         Assert.Equal ("Two", selected);
         Assert.Equal (1, lv.SelectedItem);
 
-        Application.OnMouseEvent (new (new ()
+        Application.OnMouseEvent (new ()
         {
             X = 1,
             Y = 3,
             Flags = MouseFlags.Button1Clicked
-        }));
+        });
         Assert.Equal ("Three", selected);
         Assert.Equal (2, lv.SelectedItem);
 
-        Application.OnMouseEvent (new (new ()
+        Application.OnMouseEvent (new ()
         {
             X = 1,
             Y = 4,
             Flags = MouseFlags.Button1Clicked
-        }));
+        });
         Assert.Equal ("Three", selected);
         Assert.Equal (2, lv.SelectedItem);
     }

@@ -318,7 +318,7 @@ public static partial class Application
     private static void Driver_SizeChanged (object sender, SizeChangedEventArgs e) { OnSizeChanging (e); }
     private static void Driver_KeyDown (object sender, Key e) { OnKeyDown (e); }
     private static void Driver_KeyUp (object sender, Key e) { OnKeyUp (e); }
-    private static void Driver_MouseEvent (object sender, MouseEventEventArgs e) { OnMouseEvent (e); }
+    private static void Driver_MouseEvent (object sender, MouseEvent e) { OnMouseEvent (e); }
 
     /// <summary>Gets of list of <see cref="ConsoleDriver"/> types that are available.</summary>
     /// <returns></returns>
@@ -1441,12 +1441,12 @@ public static partial class Application
     ///     </para>
     ///     <para>The <see cref="MouseEvent.View"/> will contain the <see cref="View"/> that contains the mouse coordinates.</para>
     /// </remarks>
-    public static event EventHandler<MouseEventEventArgs> MouseEvent;
+    public static event EventHandler<MouseEvent> MouseEvent;
 
     /// <summary>Called when a mouse event occurs. Raises the <see cref="MouseEvent"/> event.</summary>
     /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
     /// <param name="a">The mouse event with coordinates relative to the screen.</param>
-    internal static void OnMouseEvent (MouseEventEventArgs a)
+    internal static void OnMouseEvent (MouseEvent mouseEvent)
     {
         if (IsMouseDisabled)
         {
@@ -1454,16 +1454,16 @@ public static partial class Application
         }
 
         // TODO: In PR #3273, FindDeepestView will return adornments. Update logic below to fix adornment mouse handling
-        var view = View.FindDeepestView (Current, a.MouseEvent.X, a.MouseEvent.Y);
+        var view = View.FindDeepestView (Current, mouseEvent.X, mouseEvent.Y);
 
         if (view is { })
         {
-            a.MouseEvent.View = view;
+            mouseEvent.View = view;
         }
 
-        MouseEvent?.Invoke (null, new (a.MouseEvent));
+        MouseEvent?.Invoke (null, mouseEvent);
 
-        if (a.MouseEvent.Handled)
+        if (mouseEvent.Handled)
         {
             return;
         }
@@ -1472,25 +1472,25 @@ public static partial class Application
         {
             // If the mouse is grabbed, send the event to the view that grabbed it.
             // The coordinates are relative to the Bounds of the view that grabbed the mouse.
-            Point boundsLoc = MouseGrabView.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
+            Point boundsLoc = MouseGrabView.ScreenToBounds (mouseEvent.X, mouseEvent.Y);
 
             var viewRelativeMouseEvent = new MouseEvent
             {
                 X = boundsLoc.X,
                 Y = boundsLoc.Y,
-                Flags = a.MouseEvent.Flags,
-                ScreenPosition = new (a.MouseEvent.X, a.MouseEvent.Y),
+                Flags = mouseEvent.Flags,
+                ScreenPosition = new (mouseEvent.X, mouseEvent.Y),
                 View = MouseGrabView
             };
 
             if (MouseGrabView.Bounds.Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
             {
                 // The mouse has moved outside the bounds of the view that grabbed the mouse
-                _mouseEnteredView?.OnMouseLeave (a.MouseEvent);
+                _mouseEnteredView?.OnMouseLeave (mouseEvent);
             }
 
             //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-            if (MouseGrabView?.OnMouseEvent (viewRelativeMouseEvent) == true)
+            if (MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) == true)
             {
                 return;
             }
@@ -1511,13 +1511,13 @@ public static partial class Application
             if ((view is null || view == OverlappedTop)
                 && Current is { Modal: false }
                 && OverlappedTop != null
-                && a.MouseEvent.Flags != MouseFlags.ReportMousePosition
-                && a.MouseEvent.Flags != 0)
+                && mouseEvent.Flags != MouseFlags.ReportMousePosition
+                && mouseEvent.Flags != 0)
             {
                 // This occurs when there are multiple overlapped "tops"
                 // E.g. "Mdi" - in the Background Worker Scenario
-                View? top = FindDeepestTop (Top, a.MouseEvent.X, a.MouseEvent.Y);
-                view = View.FindDeepestView (top, a.MouseEvent.X, a.MouseEvent.Y);
+                View? top = FindDeepestTop (Top, mouseEvent.X, mouseEvent.Y);
+                view = View.FindDeepestView (top, mouseEvent.X, mouseEvent.Y);
 
                 if (view is { } && view != OverlappedTop && top != Current)
                 {
@@ -1535,27 +1535,27 @@ public static partial class Application
 
         if (view is Adornment adornment)
         {
-            Point frameLoc = adornment.ScreenToFrame (a.MouseEvent.X, a.MouseEvent.Y);
+            Point frameLoc = adornment.ScreenToFrame (mouseEvent.X, mouseEvent.Y);
 
             me = new ()
             {
                 X = frameLoc.X,
                 Y = frameLoc.Y,
-                Flags = a.MouseEvent.Flags,
-                ScreenPosition = new (a.MouseEvent.X, a.MouseEvent.Y),
+                Flags = mouseEvent.Flags,
+                ScreenPosition = new (mouseEvent.X, mouseEvent.Y),
                 View = view
             };
         }
-        else if (view.BoundsToScreen (view.Bounds).Contains (a.MouseEvent.X, a.MouseEvent.Y))
+        else if (view.BoundsToScreen (view.Bounds).Contains (mouseEvent.X, mouseEvent.Y))
         {
-            Point boundsPoint = view.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
+            Point boundsPoint = view.ScreenToBounds (mouseEvent.X, mouseEvent.Y);
 
             me = new ()
             {
                 X = boundsPoint.X,
                 Y = boundsPoint.Y,
-                Flags = a.MouseEvent.Flags,
-                ScreenPosition = new (a.MouseEvent.X, a.MouseEvent.Y),
+                Flags = mouseEvent.Flags,
+                ScreenPosition = new (mouseEvent.X, mouseEvent.Y),
                 View = view
             };
         }
@@ -1577,7 +1577,7 @@ public static partial class Application
             _mouseEnteredView = view;
         }
 
-        if (!view.WantMousePositionReports && a.MouseEvent.Flags == MouseFlags.ReportMousePosition)
+        if (!view.WantMousePositionReports && mouseEvent.Flags == MouseFlags.ReportMousePosition)
         {
             return;
         }
@@ -1586,7 +1586,7 @@ public static partial class Application
 
         //Debug.WriteLine ($"OnMouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags}");
 
-        if (view.OnMouseEvent (me))
+        if (view.NewMouseEvent (me) == false)
         {
             // Should we bubble up the event, if it is not handled?
             //return;

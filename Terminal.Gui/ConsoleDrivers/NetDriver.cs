@@ -1138,7 +1138,7 @@ internal class NetDriver : ConsoleDriver
             case EventType.Mouse:
                 MouseEvent me = ToDriverMouse (inputEvent.MouseEvent);
                 Debug.WriteLine ($"NetDriver: ({me.X},{me.Y}) - {me.Flags}");
-                OnMouseEvent (new MouseEventEventArgs (me));
+                OnMouseEvent (me);
 
                 break;
             case EventType.WindowSize:

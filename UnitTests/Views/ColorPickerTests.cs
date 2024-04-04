@@ -52,9 +52,9 @@ public class ColorPickerTests
         top.Add (colorPicker);
         Application.Begin (top);
 
-        Assert.False (colorPicker.OnMouseEvent (new MouseEvent ()));
+        Assert.False (colorPicker.NewMouseEvent (new MouseEvent ()));
 
-        Assert.True (colorPicker.OnMouseEvent (new MouseEvent { Flags = MouseFlags.Button1Clicked, X = 4, Y = 1 }));
+        Assert.True (colorPicker.NewMouseEvent (new MouseEvent { Flags = MouseFlags.Button1Clicked, X = 4, Y = 1 }));
         Assert.Equal (ColorName.Blue, colorPicker.SelectedColor);
     }
 

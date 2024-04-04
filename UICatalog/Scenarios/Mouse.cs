@@ -58,10 +58,10 @@ public class Mouse : Scenario
 
         win.Add (ml);
 
-        CheckBox cbWantContinuousPresses = new CheckBox ()
+        CheckBox cbWantContinuousPresses = new ()
         {
             X = Pos.Right (filterSlider),
-            Y = Pos.Bottom (ml) + 1,
+            Y = Pos.Bottom (ml),
             Title = "_Want Continuous Button Pressed",
         };
         cbWantContinuousPresses.Toggled += (s, e) =>
@@ -70,11 +70,23 @@ public class Mouse : Scenario
         };
 
         win.Add (cbWantContinuousPresses);
+        CheckBox cbHighlightOnPress = new ()
+        {
+            X = Pos.Right (filterSlider),
+            Y = Pos.Bottom (cbWantContinuousPresses),
+            Title = "_Highlight on Press",
+        };
+        cbHighlightOnPress.Toggled += (s, e) =>
+                                           {
+                                               win.HighlightOnPress = !win.HighlightOnPress;
+                                           };
+
+        win.Add (cbHighlightOnPress);
 
         var demo = new MouseDemo ()
         {
             X = Pos.Right (filterSlider),
-            Y = Pos.Bottom (cbWantContinuousPresses) + 1,
+            Y = Pos.Bottom (cbHighlightOnPress),
             Width = 20,
             Height = 3,
             Text = "Enter/Leave Demo",
@@ -105,16 +117,14 @@ public class Mouse : Scenario
 
         Application.MouseEvent += (sender, a) =>
                                   {
-                                      var i = filterSlider.Options.FindIndex (o => o.Data == a.MouseEvent.Flags);
+                                      var i = filterSlider.Options.FindIndex (o => o.Data == a.Flags);
                                       if (filterSlider.GetSetOptions().Contains(i))
                                       {
-                                          ml.Text = $"MouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count}";
-                                          appLogList.Add ($"({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}");
+                                          ml.Text = $"MouseEvent: ({a.X},{a.Y}) - {a.Flags} {count}";
+                                          appLogList.Add ($"({a.X},{a.Y}) - {a.Flags} {count++}");
                                           appLog.MoveDown ();
-                                          }
+                                      }
                                   };
-
-
 
         label = new Label ()
         {
@@ -137,13 +147,19 @@ public class Mouse : Scenario
         clearButton.Accept += (s, e) =>
                               {
                                   appLogList.Clear ();
+                                  appLog.SetSource (appLogList);
                                   winLogList.Clear ();
+                                  winLog.SetSource(winLogList);
                               };
 
         win.MouseEvent += (sender, a) =>
                           {
-                              winLogList.Add ($"MouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}");
-                              winLog.MoveDown ();
+                              var i = filterSlider.Options.FindIndex (o => o.Data == a.MouseEvent.Flags);
+                              if (filterSlider.GetSetOptions ().Contains (i))
+                              {
+                                  winLogList.Add ($"MouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}");
+                                  winLog.MoveDown ();
+                              }
                           };
         win.MouseClick += (sender, a) =>
                           {

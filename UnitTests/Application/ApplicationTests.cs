@@ -41,9 +41,9 @@ public class ApplicationTests
     {
         Assert.Null (Application.Top);
         Application.Begin (new ());
-        Assert.Equal (new Rectangle (0, 0, 80, 25), Application.Top.Frame);
+        Assert.Equal (new (0, 0, 80, 25), Application.Top.Frame);
         ((FakeDriver)Application.Driver).SetBufferSize (5, 5);
-        Assert.Equal (new Rectangle (0, 0, 5, 5), Application.Top.Frame);
+        Assert.Equal (new (0, 0, 5, 5), Application.Top.Frame);
     }
 
     [Fact]
@@ -62,10 +62,10 @@ public class ApplicationTests
 
         Assert.Null (rs.Toplevel);
 
-        var top = Application.Top;
+        Toplevel top = Application.Top;
 
 #if DEBUG_IDISPOSABLE
-        var exception = Record.Exception (() => Shutdown ());
+        Exception exception = Record.Exception (() => Shutdown ());
         Assert.NotNull (exception);
         Assert.False (top.WasDisposed);
         top.Dispose ();
@@ -130,7 +130,7 @@ public class ApplicationTests
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driverName: driverType.Name);
         Assert.NotNull (Application.Driver);
-        Assert.NotEqual(driver, Application.Driver);
+        Assert.NotEqual (driver, Application.Driver);
         Assert.Equal (driverType, Application.Driver.GetType ());
         Shutdown ();
     }
@@ -212,7 +212,7 @@ public class ApplicationTests
         Application._mainThreadId = 1;
 
         //Application._topLevels = new List<Toplevel> ();
-        Application._mouseEnteredView = new View ();
+        Application._mouseEnteredView = new ();
 
         //Application.SupportedCultures = new List<CultureInfo> ();
         Application.Force16Colors = true;
@@ -225,7 +225,7 @@ public class ApplicationTests
 
         //Application.OverlappedChildren = new List<View> ();
         //Application.OverlappedTop = 
-        Application._mouseEnteredView = new View ();
+        Application._mouseEnteredView = new ();
 
         //Application.WantContinuousButtonPressedView = new View ();
 
@@ -464,6 +464,7 @@ public class ApplicationTests
         Application.Run (t1);
 
         Assert.Equal (t1, Application.Top);
+
         // top wasn't run and so never was added to toplevel's stack
         Assert.NotEqual (top, Application.Top);
 #if DEBUG_IDISPOSABLE
@@ -511,7 +512,6 @@ public class ApplicationTests
     #region RunTests
 
     [Fact]
-
     public void Run_T_After_InitWithDriver_with_TopLevel_Does_Not_Throws ()
     {
         // Setup Mock driver
@@ -533,7 +533,6 @@ public class ApplicationTests
     }
 
     [Fact]
-
     public void Run_T_After_InitWithDriver_with_TopLevel_and_Driver_Does_Not_Throws ()
     {
         // Setup Mock driver
@@ -547,6 +546,7 @@ public class ApplicationTests
         Assert.True (Application.Top is Window);
 
         Application.Top.Dispose ();
+
         // Run<Toplevel> when already initialized or not with a Driver will not throw (because Dialog is derived from Toplevel)
         Application.Run<Dialog> (null, new FakeDriver ());
         Assert.True (Application.Top is Dialog);
@@ -561,7 +561,6 @@ public class ApplicationTests
 
     [Fact]
     [TestRespondersDisposed]
-
     public void Run_T_After_Init_Does_Not_Disposes_Application_Top ()
     {
         Init ();
@@ -572,7 +571,7 @@ public class ApplicationTests
 
         Application.Iteration += (s, a) =>
                                  {
-                                     Assert.NotEqual(initTop, Application.Top);
+                                     Assert.NotEqual (initTop, Application.Top);
 #if DEBUG_IDISPOSABLE
                                      Assert.False (initTop.WasDisposed);
 #endif
@@ -596,7 +595,6 @@ public class ApplicationTests
 
     [Fact]
     [TestRespondersDisposed]
-
     public void Run_T_After_InitWithDriver_with_TestTopLevel_DoesNotThrow ()
     {
         // Setup Mock driver
@@ -617,7 +615,6 @@ public class ApplicationTests
 
     [Fact]
     [TestRespondersDisposed]
-
     public void Run_T_After_InitNullDriver_with_TestTopLevel_DoesNotThrow ()
     {
         Application.ForceDriver = "FakeDriver";
@@ -640,7 +637,6 @@ public class ApplicationTests
 
     [Fact]
     [TestRespondersDisposed]
-
     public void Run_T_Init_Driver_Cleared_with_TestTopLevel_Throws ()
     {
         Init ();
@@ -678,7 +674,6 @@ public class ApplicationTests
 
     [Fact]
     [TestRespondersDisposed]
-
     public void Run_T_NoInit_WithDriver_DoesNotThrow ()
     {
         Application.Iteration += (s, a) => { Application.RequestStop (); };
@@ -696,7 +691,6 @@ public class ApplicationTests
 
     [Fact]
     [TestRespondersDisposed]
-
     public void Run_RequestStop_Stops ()
     {
         // Setup Mock driver
@@ -721,7 +715,6 @@ public class ApplicationTests
 
     [Fact]
     [TestRespondersDisposed]
-
     public void Run_RunningFalse_Stops ()
     {
         // Setup Mock driver
@@ -746,7 +739,6 @@ public class ApplicationTests
 
     [Fact]
     [TestRespondersDisposed]
-
     public void Run_Loaded_Ready_Unlodaded_Events ()
     {
         Init ();
@@ -782,18 +774,13 @@ public class ApplicationTests
                                      if (iteration == 0)
                                      {
                                          // TODO: Don't use Dialog here as it has more layout logic. Use Window instead.
-                                         d = new Dialog ();
+                                         d = new ();
                                          d.DrawContent += (s, a) => count++;
                                          Application.Run (d);
                                      }
                                      else if (iteration < 3)
                                      {
-                                         Application.OnMouseEvent (
-                                                                   new MouseEventEventArgs (
-                                                                                            new MouseEvent
-                                                                                            { X = 0, Y = 0, Flags = MouseFlags.ReportMousePosition }
-                                                                                           )
-                                                                  );
+                                         Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.ReportMousePosition });
                                          Assert.False (top.NeedsDisplay);
                                          Assert.False (top.SubViewNeedsDisplay);
                                          Assert.False (top.LayoutNeeded);
@@ -858,25 +845,11 @@ public class ApplicationTests
 
         // TODO: In PR #2920 this breaks because the mouse is not grabbed anymore.
         // TODO: Move the mouse grap/drag mode from Toplevel to Border.
-        Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed }
-                                                          )
-                                 );
+        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed });
         Assert.Equal (w.Border, Application.MouseGrabView);
 
         // Move down and to the right.
-        Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent
-                                                           {
-                                                               X = 1,
-                                                               Y = 1,
-                                                               Flags = MouseFlags.Button1Pressed
-                                                                       | MouseFlags.ReportMousePosition
-                                                           }
-                                                          )
-                                 );
+        Application.OnMouseEvent (new () { X = 1, Y = 1, Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -925,7 +898,7 @@ public class ApplicationTests
 
         Window w = new ();
         w.Ready += (s, e) => Application.RequestStop (); // Causes `End` to be called
-        Application.Run(w);
+        Application.Run (w);
 
 #if DEBUG_IDISPOSABLE
         Assert.False (w.WasDisposed);
@@ -934,20 +907,23 @@ public class ApplicationTests
         Assert.NotNull (w);
         Assert.Equal (string.Empty, w.Title); // Valid - w has not been disposed. The user may want to run it again
         Assert.NotNull (Application.Top);
-        Assert.Equal(w, Application.Top);
-        Assert.NotEqual(top, Application.Top);
+        Assert.Equal (w, Application.Top);
+        Assert.NotEqual (top, Application.Top);
         Assert.Null (Application.Current);
 
-        Application.Run(w); // Valid - w has not been disposed.
+        Application.Run (w); // Valid - w has not been disposed.
 
 #if DEBUG_IDISPOSABLE
         Assert.False (w.WasDisposed);
-        var exception = Record.Exception (() => Application.Shutdown()); // Invalid - w has not been disposed.
+        Exception exception = Record.Exception (() => Application.Shutdown ()); // Invalid - w has not been disposed.
         Assert.NotNull (exception);
 
         w.Dispose ();
         Assert.True (w.WasDisposed);
-        exception = Record.Exception (() => Application.Run (w)); // Invalid - w has been disposed. Run it in debug mode will throw, otherwise the user may want to run it again
+
+        exception = Record.Exception (
+                                      () => Application.Run (
+                                                             w)); // Invalid - w has been disposed. Run it in debug mode will throw, otherwise the user may want to run it again
         Assert.NotNull (exception);
 
         exception = Record.Exception (() => Assert.Equal (string.Empty, w.Title)); // Invalid - w has been disposed and cannot be accessed
@@ -974,11 +950,11 @@ public class ApplicationTests
                                      Assert.NotNull (Application.Top);
                                      Application.RequestStop ();
                                  };
-        var top = Application.Run (null, driver);
+        Toplevel top = Application.Run (null, driver);
 #if DEBUG_IDISPOSABLE
-        Assert.Equal(top, Application.Top);
+        Assert.Equal (top, Application.Top);
         Assert.False (top.WasDisposed);
-        var exception = Record.Exception (() => Application.Shutdown ());
+        Exception exception = Record.Exception (() => Application.Shutdown ());
         Assert.NotNull (exception);
         Assert.False (top.WasDisposed);
 #endif
@@ -1010,9 +986,10 @@ public class ApplicationTests
         Application.Run<Toplevel> (null, driver);
 #if DEBUG_IDISPOSABLE
         Assert.False (Application.Top.WasDisposed);
-        var exception = Record.Exception (() => Application.Shutdown ());
+        Exception exception = Record.Exception (() => Application.Shutdown ());
         Assert.NotNull (exception);
         Assert.False (Application.Top.WasDisposed);
+
         // It's up to caller to dispose it
         Application.Top.Dispose ();
         Assert.True (Application.Top.WasDisposed);
@@ -1038,9 +1015,10 @@ public class ApplicationTests
         Application.Run (new (), null, driver);
 #if DEBUG_IDISPOSABLE
         Assert.False (Application.Top.WasDisposed);
-        var exception = Record.Exception (() => Application.Shutdown ());
+        Exception exception = Record.Exception (() => Application.Shutdown ());
         Assert.NotNull (exception);
         Assert.False (Application.Top.WasDisposed);
+
         // It's up to caller to dispose it
         Application.Top.Dispose ();
         Assert.True (Application.Top.WasDisposed);

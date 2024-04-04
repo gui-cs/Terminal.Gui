@@ -76,9 +76,9 @@ public class TrueColors : Scenario
 
         Application.MouseEvent += (s, e) =>
                                   {
-                                      if (e.MouseEvent.View != null)
+                                      if (e.View != null)
                                       {
-                                          Attribute normal = e.MouseEvent.View.GetNormalColor ();
+                                          Attribute normal = e.View.GetNormalColor ();
                                           lblRed.Text = normal.Foreground.R.ToString ();
                                           lblGreen.Text = normal.Foreground.G.ToString ();
                                           lblBlue.Text = normal.Foreground.B.ToString ();

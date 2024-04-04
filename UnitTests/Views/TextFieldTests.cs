@@ -1039,13 +1039,13 @@ public class TextFieldTests
 
         var mouseEvent = new MouseEvent { Flags = MouseFlags.Button1Clicked, View = tf };
 
-        Application.OnMouseEvent (new MouseEventEventArgs (mouseEvent));
+        Application.OnMouseEvent (mouseEvent);
         Assert.Equal (1, clickCounter);
 
         // Get a fresh instance that represents a right click.
         // Should be ignored because of SuppressRightClick callback
         mouseEvent = new MouseEvent { Flags = MouseFlags.Button3Clicked, View = tf };
-        Application.OnMouseEvent (new MouseEventEventArgs (mouseEvent));
+        Application.OnMouseEvent (mouseEvent);
         Assert.Equal (1, clickCounter);
 
         Application.MouseEvent -= HandleRightClick;
@@ -1058,14 +1058,14 @@ public class TextFieldTests
         // This call causes the context menu to pop, and MouseEvent() returns true.
         // Thus, the clickCounter is NOT incremented.
         // Which is correct, because the user did NOT click with the left mouse button.
-        Application.OnMouseEvent (new MouseEventEventArgs (mouseEvent));
+        Application.OnMouseEvent (mouseEvent);
         Assert.Equal (1, clickCounter);
 
         return;
 
-        void HandleRightClick (object sender, MouseEventEventArgs arg)
+        void HandleRightClick (object sender, MouseEvent arg)
         {
-            if (arg.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
+            if (arg.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
                 arg.Handled = true;
             }

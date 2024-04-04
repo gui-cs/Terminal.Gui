@@ -944,11 +944,7 @@ public class OverlappedTests
                                                attributes
                                               );
 
-        Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent { X = 1, Y = 1, Flags = MouseFlags.Button1Pressed }
-                                                          )
-                                 );
+        Application.OnMouseEvent (new MouseEvent { X = 1, Y = 1, Flags = MouseFlags.Button1Pressed });
         Assert.Equal (win2.Border, Application.MouseGrabView);
 
         Application.RunIteration (ref rsOverlapped, ref firstIteration);
@@ -960,17 +956,13 @@ public class OverlappedTests
         Assert.Equal (win2, Application.Current);
         Assert.Equal (win1, rsWin1.Toplevel);
 
-        Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent
-                                                           {
-                                                               X = 2,
-                                                               Y = 2,
-                                                               Flags = MouseFlags.Button1Pressed
-                                                                       | MouseFlags.ReportMousePosition
-                                                           }
-                                                          )
-                                 );
+        Application.OnMouseEvent (new MouseEvent
+        {
+            X = 2,
+            Y = 2,
+            Flags = MouseFlags.Button1Pressed
+                    | MouseFlags.ReportMousePosition
+        });
 
         Application.RunIteration (ref rsOverlapped, ref firstIteration);
 

@@ -812,7 +812,7 @@ internal class CursesDriver : ConsoleDriver
         var me = new MouseEvent { Flags = mouseFlag, X = pos.X, Y = pos.Y };
         Debug.WriteLine ($"CursesDriver: ({me.X},{me.Y}) - {me.Flags}");
 
-        OnMouseEvent (new MouseEventEventArgs (me));
+        OnMouseEvent (me);
     }
 
     #region Color Handling

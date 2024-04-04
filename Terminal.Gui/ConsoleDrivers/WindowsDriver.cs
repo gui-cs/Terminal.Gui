@@ -1396,18 +1396,16 @@ internal class WindowsDriver : ConsoleDriver
                     break;
                 }
 
-                OnMouseEvent (new MouseEventEventArgs (me));
+                OnMouseEvent (me);
 
                 if (_processButtonClick)
                 {
-                    OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent
-                                                           {
-                                                               X = me.X,
-                                                               Y = me.Y,
-                                                               Flags = ProcessButtonClick (inputEvent.MouseEvent)
-                                                           }));
+                    OnMouseEvent (new ()
+                    {
+                        X = me.X,
+                        Y = me.Y,
+                        Flags = ProcessButtonClick (inputEvent.MouseEvent)
+                    });
                 }
 
                 break;
@@ -1715,7 +1713,7 @@ internal class WindowsDriver : ConsoleDriver
     {
         // When a user presses-and-holds, start generating pressed events every `startDelay`
         // After `iterationsUntilFast` iterations, speed them up to `fastDelay` ms
-        const int startDelay = 50;
+        const int startDelay = 500;
         const int iterationsUntilFast = 4;
         const int fastDelay = 50;
 
@@ -1744,7 +1742,7 @@ internal class WindowsDriver : ConsoleDriver
             //Debug.WriteLine($"ProcessContinuousButtonPressedAsync: {view}");
             if (_isButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0)
             {
-                Application.Invoke (() => OnMouseEvent (new MouseEventEventArgs (me)));
+                Application.Invoke (() => OnMouseEvent (me));
             }
         }
     }
