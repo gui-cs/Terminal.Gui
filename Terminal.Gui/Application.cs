@@ -1553,7 +1553,7 @@ public static partial class Application
                 View = view
             };
         }
-        else if (view.BoundsToScreen (view.ContentArea).Contains (a.MouseEvent.X, a.MouseEvent.Y))
+        else if (view.BoundsToScreen (view.GetVisibleContentArea()).Contains (a.MouseEvent.X, a.MouseEvent.Y))
         {
             Point boundsPoint = view.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
 
@@ -1593,10 +1593,37 @@ public static partial class Application
 
         //Debug.WriteLine ($"OnMouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags}");
 
-        if (view.OnMouseEvent (me))
+        while (!view.OnMouseEvent (me))
         {
-            // Should we bubble up the event, if it is not handled?
-            //return;
+            if (MouseGrabView is { })
+            {
+                break;
+            }
+
+            if (view is Adornment adornmentView)
+            {
+                view = adornmentView.Parent.SuperView;
+            }
+            else
+            {
+                view = view.SuperView;
+            }
+
+            if (view is null)
+            {
+                break;
+            }
+
+            Point boundsPoint = view.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
+
+            me = new ()
+            {
+                X = boundsPoint.X,
+                Y = boundsPoint.Y,
+                Flags = a.MouseEvent.Flags,
+                ScreenPosition = new (a.MouseEvent.X, a.MouseEvent.Y),
+                View = view
+            };
         }
 
         BringOverlappedTopToFront ();
