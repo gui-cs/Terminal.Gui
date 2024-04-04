@@ -1237,6 +1237,15 @@ public partial class View
                                              0
                                             );
 
+                    if (dim is Dim.DimFill || pos is Pos.PosFunc)
+                    {
+                        newDimension = Math.Max (Math.Min (newDimension, superviewDimension - newLocation + superviewLocation), 0);
+                    }
+
+                    if (pos is Pos.PosFunc)
+                    {
+                        newLocation = Math.Max (newLocation, superviewLocation);
+                    }
                     break;
             }
 
