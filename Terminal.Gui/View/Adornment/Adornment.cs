@@ -24,8 +24,6 @@ public class Adornment : View
     /// <param name="parent"></param>
     public Adornment (View parent)
     {
-        Application.GrabbingMouse += Application_GrabbingMouse;
-        Application.UnGrabbingMouse += Application_UnGrabbingMouse;
         CanFocus = true;
         Parent = parent;
     }
@@ -209,9 +207,6 @@ public class Adornment : View
         return Thickness.Contains (frame, x, y);
     }
 
-    private Point? _dragPosition;
-    private Point _startGrabPoint;
-
     /// <inheritdoc/>
     protected internal override bool OnMouseEnter (MouseEvent mouseEvent)
     {
@@ -257,70 +252,6 @@ public class Adornment : View
             return OnMouseClick (args);
         }
 
-        if (!Parent.CanFocus || !Parent.Arrangement.HasFlag (ViewArrangement.Movable))
-        {
-            return true;
-        }
-
-        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3312
-        if (!_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
-        {
-            Parent.SetFocus ();
-            Application.BringOverlappedTopToFront ();
-
-            // Only start grabbing if the user clicks in the Thickness area
-            // Adornment.Contains takes Parent SuperView=relative coords.
-            if (Contains (mouseEvent.X + Parent.Frame.X + Frame.X, mouseEvent.Y+ Parent.Frame.Y + Frame.Y))
-            {
-                // Set the start grab point to the Frame coords
-                _startGrabPoint = new (mouseEvent.X + Frame.X, mouseEvent.Y + Frame.Y);
-                _dragPosition = new (mouseEvent.X, mouseEvent.Y);
-                Application.GrabMouse (this);
-            }
-
-            return true;
-        }
-
-        if (mouseEvent.Flags is (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
-        {
-            if (Application.MouseGrabView == this && _dragPosition.HasValue)
-            {
-                if (Parent.SuperView is null)
-                {
-                    // Redraw the entire app window.
-                    Application.Top.SetNeedsDisplay ();
-                }
-                else
-                {
-                    Parent.SuperView.SetNeedsDisplay ();
-                }
-
-                _dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
-
-                Point parentLoc = Parent.SuperView?.ScreenToBounds (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y) ?? mouseEvent.ScreenPosition;
-
-                GetLocationEnsuringFullVisibility (
-                                     Parent,
-                                     parentLoc.X - _startGrabPoint.X,
-                                     parentLoc.Y - _startGrabPoint.Y,
-                                     out int nx,
-                                     out int ny,
-                                     out _
-                                    );
-
-                Parent.X = nx;
-                Parent.Y = ny;
-
-                return true;
-            }
-        }
-
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && _dragPosition.HasValue)
-        {
-            _dragPosition = null;
-            Application.UngrabMouse ();
-        }
-
         return false;
     }
 
@@ -340,30 +271,5 @@ public class Adornment : View
         return base.OnMouseLeave (mouseEvent);
     }
 
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        Application.GrabbingMouse -= Application_GrabbingMouse;
-        Application.UnGrabbingMouse -= Application_UnGrabbingMouse;
-
-        _dragPosition = null;
-        base.Dispose (disposing);
-    }
-
-    private void Application_GrabbingMouse (object sender, GrabMouseEventArgs e)
-    {
-        if (Application.MouseGrabView == this && _dragPosition.HasValue)
-        {
-            e.Cancel = true;
-        }
-    }
-
-    private void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)
-    {
-        if (Application.MouseGrabView == this && _dragPosition.HasValue)
-        {
-            e.Cancel = true;
-        }
-    }
     #endregion Mouse Support
 }
