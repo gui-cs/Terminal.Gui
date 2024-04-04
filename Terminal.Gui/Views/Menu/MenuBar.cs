@@ -479,7 +479,6 @@ public class MenuBar : View
             Driver.AddRune ((Rune)' ');
         }
 
-        Move (1, 0);
         var pos = 0;
 
         for (var i = 0; i < Menus.Length; i++)
