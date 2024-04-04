@@ -72,11 +72,7 @@ public class ScrollBars : Scenario
         var btn = new Button { X = Pos.Center (), Y = Pos.Bottom (viewOnContentArea) + 1, Text = "Tab or click to select the views" };
         Win.Add (btn);
 
-        viewOnBorder.TabIndex = 1;
-        viewOnPadding.TabIndex = 2;
-        viewOnContentArea.TabIndex = 3;
-
-        var hCheckBox = new CheckBox
+                var hCheckBox = new CheckBox
         {
             X = 0,
             Y = 0,
@@ -139,6 +135,10 @@ public class ScrollBars : Scenario
                                     viewOnContentArea.KeepContentAlwaysInContentArea = !(bool)keepCheckBox.Checked;
                                 };
         Win.Add (keepCheckBox);
+
+        viewOnBorder.TabIndex = 1;
+        viewOnPadding.TabIndex = 2;
+        viewOnContentArea.TabIndex = 3;
     }
 
     private void SetViewProperties (View view)

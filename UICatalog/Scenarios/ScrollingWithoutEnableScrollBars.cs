@@ -69,6 +69,22 @@ public class ScrollingWithoutEnableScrollBars : Scenario
         var btn = new Button { X = Pos.Center (), Y = Pos.Bottom (viewWithMarginBorderPadding) + 1, Text = "Tab or click to select the views" };
         Win.Add (btn);
 
+        var keepCheckBox = new CheckBox
+        {
+            X = 0,
+            Y = 0,
+            Text = "Keep Content Always In Viewport",
+            Checked = false
+        };
+        keepCheckBox.Toggled += (s, e) =>
+                                {
+                                    viewWithMargin.KeepContentAlwaysInContentArea = !(bool)keepCheckBox.Checked;
+                                    viewWithMarginBorder.KeepContentAlwaysInContentArea = !(bool)keepCheckBox.Checked;
+                                    viewWithMarginBorderPadding.KeepContentAlwaysInContentArea = !(bool)keepCheckBox.Checked;
+                                    viewWithoutAdornments.KeepContentAlwaysInContentArea = !(bool)keepCheckBox.Checked;
+                                };
+        Win.Add (keepCheckBox);
+
         viewWithMargin.TabIndex = 1;
         viewWithMarginBorder.TabIndex = 2;
         viewWithMarginBorderPadding.TabIndex = 3;

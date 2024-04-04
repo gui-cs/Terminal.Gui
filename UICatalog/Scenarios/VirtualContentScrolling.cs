@@ -82,7 +82,7 @@ public class VirtualScrolling : Scenario
 
         private void VirtualDemoView_LayoutComplete (object sender, LayoutEventArgs e)
         {
-            var status = Border.Subviews.OfType<Label> ().FirstOrDefault ();
+            var status = Border?.Subviews.OfType<Label> ().FirstOrDefault ();
 
             if (status is { })
             {
@@ -124,7 +124,7 @@ public class VirtualScrolling : Scenario
         {
             X = Pos.Function (() => 30 + -view.ContentOffset.X),
             Y = Pos.Function (() => 8 + -view.ContentOffset.Y),
-            Text = "I'm a Pos.Function always visible"
+            Text = "I'm a Pos.Function always visible within ContentSize"
         };
 
         var tv = new TextView
@@ -179,16 +179,90 @@ public class VirtualScrolling : Scenario
             //BorderStyle = LineStyle.None,
         };
 
+        var top = new Toplevel ();
+
+        MenuItem showHorizontal = null;
+        MenuItem showVertical = null;
+        MenuItem autoHide = null;
+        MenuItem keepContent = null;
+        MenuItem enableScrollBars = null;
+
+        var menu = new MenuBar
+        {
+            Menus =
+            [
+                new (
+                     "Settings",
+                     new MenuItem []
+                     {
+                         showHorizontal = new (
+                                               "Show Horizontal ScrollBar",
+                                               "",
+                                               () =>
+                                               {
+                                                   view.ShowHorizontalScrollBar = (bool)(showHorizontal.Checked = !showHorizontal.Checked);
+                                                   view.SetNeedsDisplay ();
+                                               }) { CheckType = MenuItemCheckStyle.Checked, Checked = true },
+                         showVertical = new (
+                                             "Show Vertical ScrollBar",
+                                             "",
+                                             () =>
+                                             {
+                                                 view.ShowVerticalScrollBar = (bool)(showVertical.Checked = !showVertical.Checked);
+                                                 view.SetNeedsDisplay ();
+                                             }) { CheckType = MenuItemCheckStyle.Checked, Checked = true },
+                         autoHide = new (
+                                         "AutoHide ScrollBars",
+                                         "",
+                                         () =>
+                                         {
+                                             view.AutoHideScrollBars = (bool)(autoHide.Checked = !autoHide.Checked);
+                                             view.SetNeedsDisplay ();
+                                         }) { CheckType = MenuItemCheckStyle.Checked, Checked = true },
+                         keepContent = new (
+                                            "KeepContentAlwaysInContentArea",
+                                            "",
+                                            () =>
+                                            {
+                                                view.KeepContentAlwaysInContentArea = (bool)(keepContent.Checked = !keepContent.Checked);
+                                                view.SetNeedsDisplay ();
+                                            }) { CheckType = MenuItemCheckStyle.Checked, Checked = true },
+                         enableScrollBars = new (
+                                                 "Enable ScrollBars",
+                                                 "",
+                                                 () =>
+                                                 {
+                                                     view.Padding.EnableScrollBars = (bool)(enableScrollBars.Checked = !enableScrollBars.Checked);
+
+                                                     if (view.Padding.EnableScrollBars)
+                                                     {
+                                                         showHorizontal.Checked = true;
+                                                         showVertical.Checked = true;
+                                                         autoHide.Checked = true;
+                                                         keepContent.Checked = true;
+                                                     }
+                                                     else
+                                                     {
+                                                         view.KeepContentAlwaysInContentArea = (bool)(keepContent.Checked = false);
+                                                     }
+                                                     view.SetNeedsDisplay ();
+                                                 }) { CheckType = MenuItemCheckStyle.Checked, Checked = true }
+                     })
+            ]
+        };
+
         editor.Initialized += (s, e) => { editor.ViewToEdit = view; };
 
         editor.Closed += (s, e) => View.Diagnostics = _diagnosticFlags;
+
+        top.Add(menu, editor);
 
         //button.SetFocus ();
 
         view.Width = Dim.Fill ();
         view.Height = Dim.Fill ();
-        Application.Run (editor);
-        editor.Dispose ();
+        Application.Run (top);
+        top.Dispose ();
         Application.Shutdown ();
     }
 }
