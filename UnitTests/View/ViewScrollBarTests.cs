@@ -106,7 +106,7 @@ public class ViewScrollBarTests
         int expectedSecondY
     )
     {
-        var view = new View { Width = 10, Height = 10, ContentSize = new (20, 20), UseContentOffset = true };
+        var view = new View { Width = 10, Height = 10, ContentSize = new (20, 20), UseContentOffset = true, KeepContentAlwaysInContentArea = true };
         view.BeginInit ();
         view.EndInit ();
 
@@ -225,7 +225,7 @@ public class ViewScrollBarTests
         int expectedSecondY
     )
     {
-        var view = new View { Width = 10, Height = 10, ContentSize = new (20, 20), UseContentOffset = true };
+        var view = new View { Width = 10, Height = 10, ContentSize = new (20, 20), UseContentOffset = true, KeepContentAlwaysInContentArea = true };
         view.BeginInit ();
         view.EndInit ();
 
@@ -269,7 +269,7 @@ public class ViewScrollBarTests
         {
             X = Pos.Center (), Y = Pos.Center (), Width = 9, Height = 6,
             Text = "First Line\nSecond Line\nThird Line\nFourth Line\nFifth Line\nSixth Line\nSeventh Line", CanFocus = true,
-            UseContentOffset = true
+            UseContentOffset = true, KeepContentAlwaysInContentArea = true
         };
         view.TextFormatter.WordWrap = false;
         view.TextFormatter.MultiLine = true;

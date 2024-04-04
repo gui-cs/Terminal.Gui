@@ -5,6 +5,7 @@ public partial class View
     private bool _enableScrollBars;
     private ScrollBarView _scrollBar;
     private bool _useContentOffset;
+    private bool _keepContentAlwaysInContentArea;
     private Point _contentOffset;
     private Size _contentSize;
 
@@ -127,7 +128,7 @@ public partial class View
     /// <exception cref="ArgumentOutOfRangeException">The value is out of range.</exception>
     public virtual bool EnableScrollBars
     {
-        get => _enableScrollBars;
+        get => ParentView._enableScrollBars;
         set
         {
             if (ParentView._scrollBar is { } && ParentView._enableScrollBars == value)
@@ -143,14 +144,15 @@ public partial class View
                 return;
             }
 
-            var vertical = new ScrollBarView { Orientation = Orientation.Vertical, Size = ParentView.ContentSize.Height };
-            var horizontal = new ScrollBarView { Orientation = Orientation.Horizontal, Size = ParentView.ContentSize.Width };
+            var vertical = new ScrollBarView { Orientation = Orientation.Vertical, Size = ParentView.ContentSize.Height, Position = ParentView.ContentOffset.Y };
+            var horizontal = new ScrollBarView { Orientation = Orientation.Horizontal, Size = ParentView.ContentSize.Width, Position = ParentView.ContentOffset.X };
             ParentView._scrollBar = vertical;
             ParentView._scrollBar.OtherScrollBarView = horizontal;
 
-            Add (ParentView._scrollBar);
             ParentView.AddEventHandlersForScrollBars (ParentView._scrollBar);
             ParentView.AddKeyBindingsForScrolling (ParentView._scrollBar);
+
+            Add (ParentView._scrollBar);
 
             if (ParentView._scrollBar.OtherScrollBarView != null)
             {
@@ -164,17 +166,39 @@ public partial class View
     /// <summary>Get or sets if the view-port is kept always visible in the area of this <see cref="ScrollBarView"/></summary>
     public bool KeepContentAlwaysInContentArea
     {
-        get => ParentView?._scrollBar?.KeepContentAlwaysInViewPort is true || ParentView?._scrollBar?.OtherScrollBarView.KeepContentAlwaysInViewPort is true;
-        set
+        get
         {
-            if (HasVerticalScrollBar)
+            if (ParentView._scrollBar is { })
             {
-                ParentView._scrollBar.KeepContentAlwaysInViewPort = value;
+                return ParentView?._scrollBar?.KeepContentAlwaysInViewPort is true
+                       || ParentView?._scrollBar?.OtherScrollBarView.KeepContentAlwaysInViewPort is true;
             }
 
-            if (HasHorizontalScrollBar)
+            return ParentView._keepContentAlwaysInContentArea;
+        }
+        set
+        {
+            _keepContentAlwaysInContentArea = value;
+
+            if (_scrollBar is { })
             {
-                ParentView._scrollBar.OtherScrollBarView.KeepContentAlwaysInViewPort = value;
+                if (HasVerticalScrollBar)
+                {
+                    ParentView._scrollBar.KeepContentAlwaysInViewPort = value;
+                }
+
+                if (HasHorizontalScrollBar)
+                {
+                    ParentView._scrollBar.OtherScrollBarView.KeepContentAlwaysInViewPort = value;
+                }
+            }
+            else if (_keepContentAlwaysInContentArea)
+            {
+                ParentView.ContentOffset = ParentView.ContentOffset with
+                {
+                    X = 0,
+                    Y = 0
+                };
             }
         }
     }
@@ -418,17 +442,21 @@ public partial class View
         }
 
         ParentView._scrollBar.ChangedPosition -= VerticalScrollBar_ChangedPosition;
-        ParentView.Remove (ParentView._scrollBar);
+        var sbSuperView = ParentView._scrollBar.SuperView;
+        sbSuperView.Remove (ParentView._scrollBar);
+        ParentView._scrollBar.Dispose ();
 
         if (ParentView._scrollBar.OtherScrollBarView != null)
         {
             ParentView._scrollBar.OtherScrollBarView.ChangedPosition -= HorizontalScrollBar_ChangedPosition;
-            ParentView.Remove (ParentView._scrollBar.OtherScrollBarView);
+            sbSuperView.Remove (ParentView._scrollBar.OtherScrollBarView);
+            ParentView._scrollBar.OtherScrollBarView.Dispose ();
         }
 
-        if (ParentView.Subviews.First (v => v is ScrollBarView.ContentBottomRightCorner) is { } contentBottomRightCorner)
+        if (sbSuperView.Subviews.First (v => v is ScrollBarView.ContentBottomRightCorner) is { } contentBottomRightCorner)
         {
-            ParentView.Remove (contentBottomRightCorner);
+            sbSuperView.Remove (contentBottomRightCorner);
+            contentBottomRightCorner.Dispose ();
         }
 
         ParentView._scrollBar = null;
@@ -568,12 +596,24 @@ public partial class View
         }
         else
         {
-            ParentView.ContentOffset = ParentView.ContentOffset with
+            if (KeepContentAlwaysInContentArea)
             {
-                Y = Math.Max (
-                              ParentView.ContentOffset.Y - 1,
-                              -(ParentView.ContentSize.Height - ParentView.GetVisibleContentArea ().Height))
-            };
+                ParentView.ContentOffset = ParentView.ContentOffset with
+                {
+                    Y = Math.Max (
+                                  ParentView.ContentOffset.Y - 1,
+                                  -(ParentView.ContentSize.Height - ParentView.GetVisibleContentArea ().Height))
+                };
+            }
+            else
+            {
+                ParentView.ContentOffset = ParentView.ContentOffset with
+                {
+                    Y = Math.Max (
+                                  ParentView.ContentOffset.Y - 1,
+                                  -ParentView.ContentSize.Height)
+                };
+            }
         }
 
         return true;
@@ -589,7 +629,14 @@ public partial class View
         }
         else
         {
-            ParentView.ContentOffset = ParentView.ContentOffset with { X = Math.Min (ParentView.ContentOffset.X + 1, 0) };
+            if (KeepContentAlwaysInContentArea)
+            {
+                ParentView.ContentOffset = ParentView.ContentOffset with { X = Math.Min (ParentView.ContentOffset.X + 1, 0) };
+            }
+            else
+            {
+                ParentView.ContentOffset = ParentView.ContentOffset with { X = Math.Min (ParentView.ContentOffset.X + 1, ParentView.GetVisibleContentArea().Width) };
+            }
         }
 
         return true;
@@ -701,12 +748,24 @@ public partial class View
         }
         else
         {
-            ParentView.ContentOffset = ParentView.ContentOffset with
+            if (KeepContentAlwaysInContentArea)
             {
-                X = Math.Max (
-                              ParentView.ContentOffset.X - 1,
-                              -(ParentView.ContentSize.Width - ParentView.GetVisibleContentArea ().Width))
-            };
+                ParentView.ContentOffset = ParentView.ContentOffset with
+                {
+                    X = Math.Max (
+                                      ParentView.ContentOffset.X - 1,
+                                      -(ParentView.ContentSize.Width - ParentView.GetVisibleContentArea ().Width))
+                };
+            }
+            else
+            {
+                ParentView.ContentOffset = ParentView.ContentOffset with
+                {
+                    X = Math.Max (
+                                  ParentView.ContentOffset.X - 1,
+                                  Math.Min (-ParentView.GetVisibleContentArea().Width, -ParentView.ContentSize.Width))
+                };
+            }
         }
 
         return true;
@@ -759,7 +818,14 @@ public partial class View
         }
         else
         {
-            ParentView.ContentOffset = ParentView.ContentOffset with { Y = Math.Min (ParentView.ContentOffset.Y + 1, 0) };
+            if (KeepContentAlwaysInContentArea)
+            {
+                ParentView.ContentOffset = ParentView.ContentOffset with { Y = Math.Min (ParentView.ContentOffset.Y + 1, 0) };
+            }
+            else
+            {
+                ParentView.ContentOffset = ParentView.ContentOffset with { Y = Math.Min (ParentView.ContentOffset.Y + 1, ParentView.GetVisibleContentArea().Height) };
+            }
         }
 
         return true;
