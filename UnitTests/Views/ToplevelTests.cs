@@ -1313,7 +1313,7 @@ public class ToplevelTests
         Assert.Equal (new (1, 3, 10, 5), view.Frame);
         Assert.Equal (new (0, 0, 10, 5), view._needsDisplayRect);
 
-        view.OnDrawContent (view.Bounds);
+        view.OnDrawContent (view.Viewport);
         view.Frame = new (1, 3, 10, 5);
         Assert.Equal (new (1, 3, 10, 5), view.Frame);
         Assert.Equal (new (0, 0, 10, 5), view._needsDisplayRect);
@@ -1377,7 +1377,7 @@ public class ToplevelTests
 
     [Fact]
     [AutoInitShutdown]
-    public void Window_Bounds_Bigger_Than_Driver_Cols_And_Rows_Allow_Drag_Beyond_Left_Right_And_Bottom ()
+    public void Window_Viewport_Bigger_Than_Driver_Cols_And_Rows_Allow_Drag_Beyond_Left_Right_And_Bottom ()
     {
         Toplevel top = new ();
         var window = new Window { Width = 20, Height = 3 };
@@ -1553,7 +1553,7 @@ public class ToplevelTests
 
         btnPopup.Accept += (s, e) =>
                             {
-                                Rectangle viewToScreen = btnPopup.BoundsToScreen (top.Frame);
+                                Rectangle viewToScreen = btnPopup.ViewportToScreen (top.Frame);
 
                                 var viewAddedToTop = new View
                                 {

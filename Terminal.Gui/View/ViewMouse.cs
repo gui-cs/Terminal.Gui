@@ -19,12 +19,11 @@ public partial class View
     public virtual bool WantMousePositionReports { get; set; }
 
     /// <summary>
-    ///     Called when the mouse enters the View's <see cref="Bounds"/>. The view will now receive mouse events until the
-    ///     mouse leaves
+    ///     Called when the mouse enters the View's <see cref="Viewport"/>. The view will now receive mouse events until the mouse leaves
     ///     the view. At which time, <see cref="OnMouseLeave(Gui.MouseEvent)"/> will be called.
     /// </summary>
     /// <remarks>
-    ///     The coordinates are relative to <see cref="View.Bounds"/>.
+    /// The coordinates are relative to <see cref="Viewport"/>.
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
@@ -50,12 +49,11 @@ public partial class View
     public event EventHandler<MouseEventEventArgs> MouseEnter;
 
     /// <summary>
-    ///     Called when the mouse has moved out of the View's <see cref="Bounds"/>. The view will no longer receive mouse
-    ///     events (until the
+    ///     Called when the mouse has moved out of the View's <see cref="Viewport"/>. The view will no longer receive mouse events (until the
     ///     mouse moves within the view again and <see cref="OnMouseEnter(Gui.MouseEvent)"/> is called).
     /// </summary>
     /// <remarks>
-    ///     The coordinates are relative to <see cref="View.Bounds"/>.
+    /// The coordinates are relative to <see cref="Viewport"/>.
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
@@ -172,9 +170,9 @@ public partial class View
             DisableHighlight ();
 
             // If mouse is still in bounds, click
-            if (!WantContinuousButtonPressed && Bounds.Contains (mouseEvent.X, mouseEvent.Y))
+            if (!WantContinuousButtonPressed && Viewport.Contains (mouseEvent.X, mouseEvent.Y))
             {
-                return OnMouseClick (new (mouseEvent));
+                return OnMouseClick (mouseEvent);
             }
 
             return mouseEvent.Handled = true;
@@ -195,9 +193,11 @@ public partial class View
                     // Set the focus, but don't invoke Accept
                     SetFocus ();
                 }
+
+                args.Handled = true;
             }
 
-            if (Bounds.Contains (mouseEvent.X, mouseEvent.Y))
+            if (Viewport.Contains (mouseEvent.X, mouseEvent.Y))
             {
                 EnableHighlight ();
             }
@@ -366,9 +366,7 @@ public partial class View
         if (!Enabled)
         {
             // QUESTION: Is this right? Should a disabled view eat mouse clicks?
-            args.Handled = true;
-
-            return true;
+            return args.Handled = true;
         }
 
         MouseClick?.Invoke (this, args);

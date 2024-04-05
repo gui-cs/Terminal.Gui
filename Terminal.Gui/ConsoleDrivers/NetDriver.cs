@@ -1315,7 +1315,7 @@ internal class NetDriver : ConsoleDriver
     {
         EnsureCursorVisibility ();
 
-        if (Col >= 0 && Col < Cols && Row >= 0 && Row < Rows)
+        if (Col >= 0 && Col < Cols && Row >= 0 && Row <= Rows)
         {
             SetCursorPosition (Col, Row);
             SetWindowPosition (0, Row);

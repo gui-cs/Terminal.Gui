@@ -39,7 +39,7 @@ public partial class View
 
     /// <summary>
     ///     The <see cref="Adornment"/> that enables separation of a View from other SubViews of the same
-    ///     SuperView. The margin offsets the <see cref="Bounds"/> from the <see cref="Frame"/>.
+    ///     SuperView. The margin offsets the <see cref="Viewport"/> from the <see cref="Frame"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -55,7 +55,7 @@ public partial class View
     public Margin Margin { get; private set; }
 
     /// <summary>
-    ///     The <see cref="Adornment"/> that offsets the <see cref="Bounds"/> from the <see cref="Margin"/>.
+    ///     The <see cref="Adornment"/> that offsets the <see cref="Viewport"/> from the <see cref="Margin"/>.
     ///     The Border provides the space for a visual border (drawn using
     ///     line-drawing glyphs) and the Title. The Border expands inward; in other words if `Border.Thickness.Top == 2` the
     ///     border and title will take up the first row and the second row will be filled with spaces.
@@ -116,7 +116,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     The <see cref="Adornment"/> inside of the view that offsets the <see cref="Bounds"/>
+    ///     The <see cref="Adornment"/> inside of the view that offsets the <see cref="Viewport"/>
     ///     from the <see cref="Border"/>.
     /// </summary>
     /// <remarks>
