@@ -838,6 +838,29 @@ internal class WindowsConsole
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool GetNumberOfConsoleInputEvents (nint handle, out uint lpcNumberOfEvents);
 
+    internal uint GetNumberOfConsoleInputEvents ()
+    {
+        if (!GetNumberOfConsoleInputEvents (_inputHandle, out uint numOfEvents))
+        {
+            Console.WriteLine ($"Error: {Marshal.GetLastWin32Error ()}");
+
+            return 0;
+        }
+
+        return numOfEvents;
+    }
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool FlushConsoleInputBuffer (nint handle);
+
+    internal void FlushConsoleInputBuffer ()
+    {
+        if (!FlushConsoleInputBuffer (_inputHandle))
+        {
+            Console.WriteLine ($"Error: {Marshal.GetLastWin32Error ()}");
+        }
+    }
+
     public InputRecord [] ReadConsoleInput ()
     {
         const int bufferSize = 1;
@@ -2132,6 +2155,18 @@ internal class WindowsMainLoop : IMainLoopDriver
     {
         _inputHandlerTokenSource?.Cancel ();
         _inputHandlerTokenSource?.Dispose ();
+
+        if (_winConsole is { })
+        {
+            var numOfEvents = _winConsole.GetNumberOfConsoleInputEvents ();
+
+            if (numOfEvents > 0)
+            {
+                _winConsole.FlushConsoleInputBuffer ();
+                //Debug.WriteLine ($"Flushed {numOfEvents} events.");
+            }
+        }
+
         _waitForProbe?.Dispose ();
 
         _resultQueue?.Clear ();
