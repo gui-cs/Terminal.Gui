@@ -2196,7 +2196,7 @@ public class TableViewTests
         tv.MultiSelect = true;
 
         // Clicking in bottom row
-        tv.OnMouseEvent (
+        tv.NewMouseEvent (
                        new MouseEvent { X = 1, Y = 4, Flags = MouseFlags.Button1Clicked }
                       );
 
@@ -2204,7 +2204,7 @@ public class TableViewTests
         Assert.Equal (2, tv.SelectedRow);
 
         // shift clicking top row
-        tv.OnMouseEvent (
+        tv.NewMouseEvent (
                        new MouseEvent { X = 1, Y = 2, Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl }
                       );
 
@@ -2268,7 +2268,7 @@ public class TableViewTests
         tv.Style.AlwaysUseNormalColorForVerticalCellLines = true;
 
         // Clicking in bottom row
-        tv.OnMouseEvent (
+        tv.NewMouseEvent (
                        new MouseEvent { X = 1, Y = 4, Flags = MouseFlags.Button1Clicked }
                       );
 
@@ -2323,7 +2323,7 @@ public class TableViewTests
         tv.Style.ShowVerticalHeaderLines = false;
 
         // Clicking in bottom row
-        tv.OnMouseEvent (
+        tv.NewMouseEvent (
                        new MouseEvent { X = 1, Y = 4, Flags = MouseFlags.Button1Clicked }
                       );
 
@@ -2376,7 +2376,7 @@ A B C
         tv.Style.ShowHorizontalBottomline = true;
 
         // Clicking in bottom row
-        tv.OnMouseEvent (
+        tv.NewMouseEvent (
                        new MouseEvent { X = 1, Y = 4, Flags = MouseFlags.Button1Clicked }
                       );
 
@@ -2557,7 +2557,7 @@ A B C
         tv.MultiSelect = true;
 
         // Clicking in bottom row
-        tv.OnMouseEvent (
+        tv.NewMouseEvent (
                        new MouseEvent { X = 1, Y = 3, Flags = MouseFlags.Button1Clicked }
                       );
 
@@ -2565,7 +2565,7 @@ A B C
         Assert.Equal (1, tv.SelectedRow);
 
         // shift clicking top row
-        tv.OnMouseEvent (
+        tv.NewMouseEvent (
                        new MouseEvent { X = 1, Y = 2, Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonShift }
                       );
 

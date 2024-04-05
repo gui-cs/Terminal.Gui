@@ -50,7 +50,7 @@ This a long line and against TextView.
         }
 
         Assert.True (
-                     tv.OnMouseEvent (
+                     tv.NewMouseEvent (
                                     new MouseEvent { X = 6, Y = 0, Flags = MouseFlags.Button1Pressed }
                                    )
                     );
