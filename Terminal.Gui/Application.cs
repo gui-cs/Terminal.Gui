@@ -99,7 +99,7 @@ public static partial class Application
         // Don't dispose the Top. It's up to caller dispose it
         if (Top is { })
         {
-            
+
             Debug.Assert (Top.WasDisposed);
 
             // If End wasn't called _cachedRunStateToplevel may be null
@@ -642,7 +642,7 @@ public static partial class Application
     public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
     {
         ArgumentNullException.ThrowIfNull (view);
-        
+
         if (_initialized)
         {
             if (Driver is null)
@@ -1482,7 +1482,7 @@ public static partial class Application
             {
                 X = frameLoc.X,
                 Y = frameLoc.Y,
-                Flags = a.MouseEvent.Flags,
+                Flags = mouseEvent.Flags,
                 ScreenPosition = new (mouseEvent.X, mouseEvent.Y),
                 View = MouseGrabView
             };
@@ -1550,7 +1550,7 @@ public static partial class Application
                 View = view
             };
         }
-        else if (view.ViewportToScreen (Rectangle.Empty with {Size = view.Viewport.Size}).Contains (mouseEvent.X, mouseEvent.Y))
+        else if (view.ViewportToScreen (Rectangle.Empty with { Size = view.Viewport.Size }).Contains (mouseEvent.X, mouseEvent.Y))
         {
             Point viewportLocation = view.ScreenToViewport (mouseEvent.X, mouseEvent.Y);
 
@@ -1590,16 +1590,37 @@ public static partial class Application
 
         //Debug.WriteLine ($"OnMouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags}");
 
-        while (view is {} && !view.NewMouseEvent (me) == false)
+        while (view.NewMouseEvent (me) != true)
         {
-            if (view is Adornment ad)
+            if (MouseGrabView is { })
             {
-                view = ad.Parent.SuperView;
+                break;
+            }
+
+            if (view is Adornment adornmentView)
+            {
+                view = adornmentView.Parent.SuperView;
             }
             else
             {
                 view = view.SuperView;
             }
+
+            if (view is null)
+            {
+                break;
+            }
+
+            Point boundsPoint = view.ScreenToViewport (mouseEvent.X, mouseEvent.Y);
+
+            me = new ()
+            {
+                X = boundsPoint.X,
+                Y = boundsPoint.Y,
+                Flags = mouseEvent.Flags,
+                ScreenPosition = new (mouseEvent.X, mouseEvent.Y),
+                View = view
+            };
         }
 
         BringOverlappedTopToFront ();

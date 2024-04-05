@@ -172,7 +172,7 @@ public partial class View
             // If mouse is still in bounds, click
             if (!WantContinuousButtonPressed && Viewport.Contains (mouseEvent.X, mouseEvent.Y))
             {
-                return OnMouseClick (mouseEvent);
+                return OnMouseClick (new(mouseEvent));
             }
 
             return mouseEvent.Handled = true;
@@ -194,7 +194,7 @@ public partial class View
                     SetFocus ();
                 }
 
-                args.Handled = true;
+                mouseEvent.Handled = true;
             }
 
             if (Viewport.Contains (mouseEvent.X, mouseEvent.Y))
