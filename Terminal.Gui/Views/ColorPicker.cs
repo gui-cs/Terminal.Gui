@@ -31,7 +31,7 @@ public class ColorPicker : View
 
     private void SetInitialProperties ()
     {
-        HighlightOnPress = true;
+        HighlightStyle = Gui.HighlightStyle.PressedOutside | Gui.HighlightStyle.Pressed;
 
         CanFocus = true;
         AddCommands ();

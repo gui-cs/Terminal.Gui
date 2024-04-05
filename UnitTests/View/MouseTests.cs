@@ -465,27 +465,26 @@ public class MouseTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData(false, 0, 0)]
-    [InlineData (true, 1, 1)]
-    public void HighlightOnPress_Fires_Events_And_Highlights (bool highlightOnPress, int expectedEnabling, int expectedDisabling)
+    [InlineData (HighlightStyle.None, 0, 0)]
+    [InlineData (HighlightStyle.Pressed | HighlightStyle.PressedOutside, 1, 1)]
+    public void HighlightOnPress_Fires_Events_And_Highlights (HighlightStyle highlightOnPress, int expectedEnabling, int expectedDisabling)
     {
         var view = new View ()
         {
-            HighlightOnPress = highlightOnPress,
+            HighlightStyle = highlightOnPress,
             Height = 1,
             Width = 1
         };
 
         int enablingHighlight = 0;
         int disablingHighlight = 0;
-        view.EnablingHighlight += View_EnablingHighlight;
-        view.DisablingHighlight += View_DisablingHighlight;
+        view.Highlight += View_Highlight;
         view.ColorScheme = new ColorScheme (new Attribute (ColorName.Red, ColorName.Blue));
         ColorScheme originalColorScheme = view.ColorScheme;
 
         view.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed, });
 
-        if (highlightOnPress)
+        if (highlightOnPress != HighlightStyle.None)
         {
             Assert.NotEqual (originalColorScheme, view.ColorScheme);
         }
@@ -503,15 +502,20 @@ public class MouseTests (ITestOutputHelper output)
 
         return;
 
-        void View_DisablingHighlight (object sender, System.ComponentModel.CancelEventArgs e)
+        void View_Highlight (object sender, HighlightEventArgs e)
         {
-           disablingHighlight++;
-        }
-        void View_EnablingHighlight (object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            enablingHighlight++;
+            if (e.HighlightStyle == HighlightStyle.None)
+            {
+                disablingHighlight++;
+            }
+            else
+            {
+                enablingHighlight++;
+            }
         }
     }
+
+    // TODO: Add tests for each combination of HighlightFlags
 
     [Theory]
     [InlineData (0)]
@@ -521,14 +525,13 @@ public class MouseTests (ITestOutputHelper output)
     {
         var view = new View ()
         {
-            HighlightOnPress = true,
+            HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside,
             Height = 1,
             Width = 1
         };
         int enablingHighlight = 0;
         int disablingHighlight = 0;
-        view.EnablingHighlight += View_EnablingHighlight;
-        view.DisablingHighlight += View_DisablingHighlight;
+        view.Highlight += View_Highlight;
         bool inViewport = view.Bounds.Contains (x, 0);
 
         // Start at 0,0 ; in viewport
@@ -546,8 +549,8 @@ public class MouseTests (ITestOutputHelper output)
         }
         else
         {
-            Assert.Equal (1, enablingHighlight);
-            Assert.Equal (1, disablingHighlight);
+            Assert.Equal (2, enablingHighlight);
+            Assert.Equal (0, disablingHighlight);
         }
 
         // Move backto 0,0 ; in viewport
@@ -559,21 +562,24 @@ public class MouseTests (ITestOutputHelper output)
         }
         else
         {
-            Assert.Equal (2, enablingHighlight);
-            Assert.Equal (1, disablingHighlight);
+            Assert.Equal (3, enablingHighlight);
+            Assert.Equal (0, disablingHighlight);
         }
 
         view.Dispose ();
 
         return;
 
-        void View_DisablingHighlight (object sender, System.ComponentModel.CancelEventArgs e)
+        void View_Highlight (object sender, HighlightEventArgs e)
         {
-            disablingHighlight++;
-        }
-        void View_EnablingHighlight (object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            enablingHighlight++;
+            if (e.HighlightStyle == HighlightStyle.None)
+            {
+                disablingHighlight++;
+            }
+            else
+            {
+                enablingHighlight++;
+            }
         }
     }
 

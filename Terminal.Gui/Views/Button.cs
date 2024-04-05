@@ -33,6 +33,9 @@ public class Button : View
     private readonly Rune _rightDefault;
     private bool _isDefault;
 
+    /// <inheritdoc />
+    private bool _wantContinuousButtonPressed;
+
     /// <summary>Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.</summary>
     /// <remarks>The width of the <see cref="Button"/> is computed based on the text length. The height will always be 1.</remarks>
     public Button ()
@@ -50,7 +53,7 @@ public class Button : View
 
         CanFocus = true;
         AutoSize = true;
-        HighlightOnPress = true;
+        HighlightStyle |= HighlightStyle.Pressed;
 
         // Override default behavior of View
         AddCommand (Command.HotKey, () =>
@@ -65,6 +68,31 @@ public class Button : View
         TitleChanged += Button_TitleChanged;
         MouseClick += Button_MouseClick;
     }
+
+    /// <inheritdoc />
+    public override bool WantContinuousButtonPressed
+    {
+        get => _wantContinuousButtonPressed;
+        set
+        {
+            if (value == _wantContinuousButtonPressed)
+            {
+                return;
+            }
+
+            _wantContinuousButtonPressed = value;
+
+            if (_wantContinuousButtonPressed)
+            {
+                HighlightStyle |= HighlightStyle.PressedOutside;
+            }
+            else
+            {
+                HighlightStyle &= ~HighlightStyle.PressedOutside;
+            }
+        }
+    }
+
     private void Button_MouseClick (object sender, MouseEventEventArgs e)
     {
         e.Handled = InvokeCommand (Command.HotKey) == true;

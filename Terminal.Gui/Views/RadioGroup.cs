@@ -77,7 +77,7 @@ public class RadioGroup : View
 
         LayoutStarted += RadioGroup_LayoutStarted;
 
-        HighlightOnPress = true;
+        HighlightStyle = Gui.HighlightStyle.PressedOutside | Gui.HighlightStyle.Pressed;
 
         MouseClick += RadioGroup_MouseClick;
     }
