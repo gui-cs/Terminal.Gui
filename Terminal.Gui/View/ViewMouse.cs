@@ -29,6 +29,9 @@ public enum HighlightStyle
     PressedOutside = 4
 }
 
+/// <summary>
+/// Event arguments for the <see cref="View.Highlight"/> event.
+/// </summary>
 public class HighlightEventArgs : CancelEventArgs
 {
     public HighlightEventArgs (HighlightStyle style)
@@ -36,6 +39,9 @@ public class HighlightEventArgs : CancelEventArgs
         HighlightStyle = style;
     }
 
+    /// <summary>
+    /// The highlight style.
+    /// </summary>
     public HighlightStyle HighlightStyle { get; }
 }
 
@@ -55,16 +61,24 @@ public partial class View
     public virtual bool WantMousePositionReports { get; set; }
 
     /// <summary>
-    ///     Called when the mouse enters the View's <see cref="Bounds"/>. The view will now receive mouse events until the
-    ///     mouse leaves
-    ///     the view. At which time, <see cref="OnMouseLeave(Gui.MouseEvent)"/> will be called.
+    ///     Called by <see cref="Application.OnMouseEvent"/> when the mouse enters <see cref="Bounds"/>. The view will
+    ///     then receive mouse events until <see cref="NewMouseLeaveEvent"/> is called indicating the mouse has left
+    ///     the view.
     /// </summary>
     /// <remarks>
-    ///     The coordinates are relative to <see cref="View.Bounds"/>.
+    ///     <para>
+    ///         A view must be both enabled and visible to receive mouse events.
+    ///     </para>
+    ///     <para>
+    ///         This method calls <see cref="OnMouseEnter"/> to fire the event.
+    ///     </para>
+    ///     <para>
+    ///         See <see cref="SetHighlight"/> for more information.
+    ///     </para>
     /// </remarks>
     /// <param name="mouseEvent"></param>
-    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    protected internal virtual bool OnMouseEnter (MouseEvent mouseEvent)
+    /// <returns><see langword="true"/> if the event was handled, <see langword="false"/> otherwise.</returns>
+    internal bool? NewMouseEnterEvent (MouseEvent mouseEvent)
     {
         if (!Enabled)
         {
@@ -76,6 +90,27 @@ public partial class View
             return false;
         }
 
+        return OnMouseEnter (mouseEvent);
+    }
+
+    /// <summary>
+    ///     Called by <see cref="NewMouseEvent"/> when the mouse enters <see cref="Bounds"/>. The view will
+    ///     then receive mouse events until <see cref="OnMouseLeave"/> is called indicating the mouse has left
+    ///     the view.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Override this method or subscribe to <see cref="MouseEnter"/> to change the default enter behavior.
+    /// </para>
+    /// <para>
+    ///     The coordinates are relative to <see cref="View.Bounds"/>.
+    /// </para>
+    /// </remarks>
+    /// <param name="mouseEvent"></param>
+    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
+    protected internal virtual bool OnMouseEnter (MouseEvent mouseEvent)
+    {
+
         var args = new MouseEventEventArgs (mouseEvent);
         MouseEnter?.Invoke (this, args);
 
@@ -85,13 +120,49 @@ public partial class View
     /// <summary>Event fired when the mouse moves into the View's <see cref="Bounds"/>.</summary>
     public event EventHandler<MouseEventEventArgs> MouseEnter;
 
+
     /// <summary>
-    ///     Called when the mouse has moved out of the View's <see cref="Bounds"/>. The view will no longer receive mouse
-    ///     events (until the
-    ///     mouse moves within the view again and <see cref="OnMouseEnter(Gui.MouseEvent)"/> is called).
+    ///     Called by <see cref="Application.OnMouseEvent"/> when the mouse leaves <see cref="Bounds"/>. The view will
+    ///     then no longer receive mouse events.
     /// </summary>
     /// <remarks>
+    ///     <para>
+    ///         A view must be both enabled and visible to receive mouse events.
+    ///     </para>
+    ///     <para>
+    ///         This method calls <see cref="OnMouseLeave"/> to fire the event.
+    ///     </para>
+    ///     <para>
+    ///         See <see cref="SetHighlight"/> for more information.
+    ///     </para>
+    /// </remarks>
+    /// <param name="mouseEvent"></param>
+    /// <returns><see langword="true"/> if the event was handled, <see langword="false"/> otherwise.</returns>
+    internal bool? NewMouseLeaveEvent (MouseEvent mouseEvent)
+    {
+        if (!Enabled)
+        {
+            return true;
+        }
+
+        if (!CanBeVisible (this))
+        {
+            return false;
+        }
+
+        return OnMouseLeave (mouseEvent);
+    }
+    /// <summary>
+    ///     Called by <see cref="NewMouseEvent"/> when a mouse leaves <see cref="Bounds"/>. The view will
+    ///     no longer receive mouse events.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Override this method or subscribe to <see cref="MouseEnter"/> to change the default leave behavior.
+    /// </para>
+    /// <para>
     ///     The coordinates are relative to <see cref="View.Bounds"/>.
+    /// </para>
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>

@@ -1486,7 +1486,7 @@ public static partial class Application
             if (MouseGrabView.Bounds.Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
             {
                 // The mouse has moved outside the bounds of the view that grabbed the mouse
-                _mouseEnteredView?.OnMouseLeave (mouseEvent);
+                _mouseEnteredView?.NewMouseLeaveEvent (mouseEvent);
             }
 
             //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
@@ -1568,12 +1568,12 @@ public static partial class Application
         if (_mouseEnteredView is null)
         {
             _mouseEnteredView = view;
-            view.OnMouseEnter (me);
+            view.NewMouseEnterEvent (me);
         }
         else if (_mouseEnteredView != view)
         {
-            _mouseEnteredView.OnMouseLeave (me);
-            view.OnMouseEnter (me);
+            _mouseEnteredView.NewMouseLeaveEvent (me);
+            view.NewMouseEnterEvent (me);
             _mouseEnteredView = view;
         }
 
