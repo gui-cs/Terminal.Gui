@@ -57,7 +57,7 @@ public class Border : Adornment
         Application.GrabbingMouse += Application_GrabbingMouse;
         Application.UnGrabbingMouse += Application_UnGrabbingMouse;
 
-        HighlightStyle = HighlightStyle.Pressed;
+        HighlightStyle |= HighlightStyle.Pressed;
         Highlight += Border_Highlight;
     }
 
@@ -73,6 +73,12 @@ public class Border : Adornment
     /// <inheritdoc/>
     public override void BeginInit ()
     {
+        // TOOD: Hack - make Arragnement overidable
+        if ((Parent?.Arrangement & ViewArrangement.Movable) != 0)
+        {
+            HighlightStyle |= HighlightStyle.Hover;
+        }
+
         base.BeginInit ();
 
 #if SUBVIEW_BASED_BORDER
@@ -100,7 +106,7 @@ public class Border : Adornment
             LayoutStarted += OnLayoutStarted;
     }
 #endif
-}
+    }
 
 #if SUBVIEW_BASED_BORDER
     private void OnLayoutStarted (object sender, LayoutEventArgs e)
@@ -190,18 +196,30 @@ public class Border : Adornment
 
     #region Mouse Support
 
-    private LineStyle _savedHighlightLineStyle;
+    private LineStyle? _savedHighlightLineStyle;
 
     private void Border_Highlight (object sender, HighlightEventArgs e)
     {
-        if (e.HighlightStyle == HighlightStyle)
+        if (e.HighlightStyle.HasFlag (HighlightStyle.Pressed))
         {
-            _savedHighlightLineStyle = Parent?.BorderStyle ?? LineStyle;
+            if (!_savedHighlightLineStyle.HasValue)
+            {
+                _savedHighlightLineStyle = Parent?.BorderStyle ?? LineStyle;
+            }
             LineStyle = LineStyle.Heavy;
         }
-        else
+        else if (e.HighlightStyle.HasFlag (HighlightStyle.Hover))
         {
-            LineStyle = _savedHighlightLineStyle;
+            if (!_savedHighlightLineStyle.HasValue)
+            {
+                _savedHighlightLineStyle = Parent?.BorderStyle ?? LineStyle;
+            }
+            LineStyle = LineStyle.Double;
+        }
+
+        if (e.HighlightStyle == HighlightStyle.None && _savedHighlightLineStyle.HasValue)
+        {
+            LineStyle = _savedHighlightLineStyle.Value;
         }
         Parent?.SetNeedsDisplay ();
         e.Cancel = true;
@@ -321,7 +339,7 @@ public class Border : Adornment
         }
     }
 
-#endregion Mouse Support
+    #endregion Mouse Support
 
     /// <inheritdoc/>
     public override void OnDrawContent (Rectangle contentArea)

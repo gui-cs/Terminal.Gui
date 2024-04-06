@@ -90,7 +90,17 @@ public partial class View
             return false;
         }
 
-        return OnMouseEnter (mouseEvent);
+        if (OnMouseEnter (mouseEvent) == true)
+        {
+            return true;
+        }
+
+        if (HighlightStyle.HasFlag(HighlightStyle.Hover))
+        {
+            SetHighlight (HighlightStyle.Hover);
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -108,7 +118,7 @@ public partial class View
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    protected internal virtual bool OnMouseEnter (MouseEvent mouseEvent)
+    protected internal virtual bool? OnMouseEnter (MouseEvent mouseEvent)
     {
 
         var args = new MouseEventEventArgs (mouseEvent);
@@ -150,7 +160,17 @@ public partial class View
             return false;
         }
 
-        return OnMouseLeave (mouseEvent);
+        if (OnMouseEnter (mouseEvent) == true)
+        {
+            return true;
+        }
+
+        if (HighlightStyle.HasFlag (HighlightStyle.Hover))
+        {
+            SetHighlight (HighlightStyle.None);
+        }
+
+        return false;
     }
     /// <summary>
     ///     Called by <see cref="NewMouseEvent"/> when a mouse leaves <see cref="Bounds"/>. The view will
@@ -400,10 +420,26 @@ public partial class View
     /// </remarks>
     internal void SetHighlight (HighlightStyle style)
     {
+        // TODO: Make the highlight colors configurable
+
         // Enable override via virtual method and/or event
         if (OnHighlight (style) == true)
         {
             return;
+        }
+
+        if (style.HasFlag (HighlightStyle.Hover))
+        {
+            if (_savedHighlightColorScheme is null && ColorScheme is { })
+            {
+                _savedHighlightColorScheme ??= ColorScheme;
+
+                var cs = new ColorScheme (ColorScheme)
+                {
+                    Normal = new (ColorName.BrightRed, ColorName.Black),
+                };
+                ColorScheme = cs;
+            }
         }
 
         if (style.HasFlag (HighlightStyle.Pressed) || style.HasFlag (HighlightStyle.PressedOutside))
@@ -415,14 +451,9 @@ public partial class View
 
                 if (CanFocus)
                 {
-                    // TODO: Make the inverted color configurable
                     var cs = new ColorScheme (ColorScheme)
                     {
-                        // For Buttons etc...
                         Focus = new (ColorScheme.Normal.Foreground, ColorScheme.Focus.Background),
-
-                        // For Adornments
-                        Normal = new (ColorScheme.Focus.Foreground, ColorScheme.Normal.Background)
                     };
                     ColorScheme = cs;
                 }
@@ -437,7 +468,8 @@ public partial class View
                 }
             }
         }
-        else
+
+        if (style == HighlightStyle.None)
         {
             // Unhighlight
             if (_savedHighlightColorScheme is { })

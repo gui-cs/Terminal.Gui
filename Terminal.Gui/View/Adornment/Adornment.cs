@@ -212,7 +212,7 @@ public class Adornment : View
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEnter (MouseEvent mouseEvent)
+    protected internal override bool? OnMouseEnter (MouseEvent mouseEvent)
     {
         // Invert Normal
         if (Diagnostics.HasFlag (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
