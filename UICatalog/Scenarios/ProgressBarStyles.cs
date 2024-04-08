@@ -64,18 +64,24 @@ public class ProgressBarStyles : Scenario
         {
             var colorPicker = new ColorPicker { Title = text, SelectedColor = colorName };
 
-            var dialog = new Dialog { Title = text };
+            var dialog = new Dialog { AutoSize = false, Title = text };
 
-            dialog.LayoutComplete += (sender, args) =>
+            dialog.Initialized += (sender, args) =>
                                      {
                                          // TODO: Replace with Dim.Auto
                                          dialog.X = pbList.Frame.X;
                                          dialog.Y = pbList.Frame.Height;
-
-                                         dialog.Bounds = new Rectangle (0, 0, colorPicker.Frame.Width, colorPicker.Frame.Height);
-
-                                         Top.LayoutSubviews ();
                                      };
+
+            dialog.LayoutComplete += (sender, args) =>
+                                    {
+                                        dialog.Bounds = Rectangle.Empty with
+                                        {
+                                            Width = colorPicker.Frame.Width,
+                                            Height = colorPicker.Frame.Height
+                                        };
+                                        Application.Top.LayoutSubviews();
+                                    };
 
             dialog.Add (colorPicker);
             colorPicker.ColorChanged += (s, e) => { dialog.RequestStop (); };
