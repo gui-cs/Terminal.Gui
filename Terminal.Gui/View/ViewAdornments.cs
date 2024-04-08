@@ -99,7 +99,10 @@ public partial class View
 
             if (value != LineStyle.None)
             {
-                Border.Thickness = new (1);
+                if (Border.Thickness == Thickness.Empty)
+                {
+                    Border.Thickness = new (1);
+                }
             }
             else
             {

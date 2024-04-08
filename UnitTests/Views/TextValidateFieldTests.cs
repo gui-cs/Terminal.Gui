@@ -322,7 +322,7 @@ public class TextValidateField_NET_Provider_Tests
         Assert.False (field.IsValid);
         Assert.Equal ("--(1   )--", field.Provider.Text);
 
-        field.OnMouseEvent (new MouseEvent { X = 25, Flags = MouseFlags.Button1Pressed });
+        field.NewMouseEvent (new MouseEvent { X = 25, Flags = MouseFlags.Button1Pressed });
 
         field.NewKeyDownEvent (Key.D1);
 

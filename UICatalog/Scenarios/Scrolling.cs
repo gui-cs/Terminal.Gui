@@ -251,7 +251,7 @@ public class Scrolling : Scenario
             Text = "Mouse: "
         };
         Win.Add (mousePos);
-        Application.MouseEvent += (sender, a) => { mousePos.Text = $"Mouse: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}"; };
+        Application.MouseEvent += (sender, a) => { mousePos.Text = $"Mouse: ({a.X},{a.Y}) - {a.Flags} {count++}"; };
 
         var progress = new ProgressBar { X = Pos.Right (scrollView) + 1, Y = Pos.AnchorEnd (2), Width = 50 };
         Win.Add (progress);

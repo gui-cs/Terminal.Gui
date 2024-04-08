@@ -9,21 +9,25 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Layout")]
 public class Buttons : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
+        Window main = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+        };
         // Add a label & text field so we can demo IsDefault
         var editLabel = new Label { X = 0, Y = 0, TabStop = true, Text = "TextField (to demo IsDefault):" };
-        Win.Add (editLabel);
+        main.Add (editLabel);
 
         // Add a TextField using Absolute layout. 
         var edit = new TextField { X = 31, Width = 15, HotKey = Key.Y.WithAlt };
-        Win.Add (edit);
+        main.Add (edit);
 
         // This is the default button (IsDefault = true); if user presses ENTER in the TextField
         // the scenario will quit
         var defaultButton = new Button { X = Pos.Center (), Y = Pos.AnchorEnd (1), IsDefault = true, Text = "_Quit" };
         defaultButton.Accept += (s, e) => Application.RequestStop ();
-        Win.Add (defaultButton);
+        main.Add (defaultButton);
 
         var swapButton = new Button { X = 50, Text = "S_wap Default (Absolute Layout)" };
 
@@ -32,7 +36,7 @@ public class Buttons : Scenario
                                   defaultButton.IsDefault = !defaultButton.IsDefault;
                                   swapButton.IsDefault = !swapButton.IsDefault;
                               };
-        Win.Add (swapButton);
+        main.Add (swapButton);
 
         static void DoMessage (Button button, string txt)
         {
@@ -44,7 +48,7 @@ public class Buttons : Scenario
         }
 
         var colorButtonsLabel = new Label { X = 0, Y = Pos.Bottom (editLabel) + 1, Text = "Color Buttons:" };
-        Win.Add (colorButtonsLabel);
+        main.Add (colorButtonsLabel);
 
         View prev = colorButtonsLabel;
 
@@ -57,13 +61,11 @@ public class Buttons : Scenario
             {
                 ColorScheme = colorScheme.Value,
                 X = Pos.Right (prev) + 2,
-
-                //X = x,
                 Y = Pos.Y (colorButtonsLabel),
                 Text = $"_{colorScheme.Key}"
             };
             DoMessage (colorButton, colorButton.Text);
-            Win.Add (colorButton);
+            main.Add (colorButton);
             prev = colorButton;
 
             // BUGBUG: AutoSize is true and the X doesn't change
@@ -72,7 +74,7 @@ public class Buttons : Scenario
 
         Button button;
 
-        Win.Add (
+        main.Add (
                  button = new Button
                  {
                      X = 2,
@@ -84,16 +86,16 @@ public class Buttons : Scenario
         DoMessage (button, button.Text);
 
         // Note the 'N' in 'Newline' will be the hotkey
-        Win.Add (
+        main.Add (
                  button = new Button { X = 2, Y = Pos.Bottom (button) + 1, Text = "a Newline\nin the button" }
                 );
         button.Accept += (s, e) => MessageBox.Query ("Message", "Question?", "Yes", "No");
 
         var textChanger = new Button { X = 2, Y = Pos.Bottom (button) + 1, Text = "Te_xt Changer" };
-        Win.Add (textChanger);
+        main.Add (textChanger);
         textChanger.Accept += (s, e) => textChanger.Text += "!";
 
-        Win.Add (
+        main.Add (
                  button = new Button
                  {
                      X = Pos.Right (textChanger) + 2,
@@ -106,13 +108,13 @@ public class Buttons : Scenario
         {
             X = 2, Y = Pos.Bottom (button) + 1, ColorScheme = Colors.ColorSchemes ["Error"], Text = "Remove this button"
         };
-        Win.Add (removeButton);
+        main.Add (removeButton);
 
         // This in interesting test case because `moveBtn` and below are laid out relative to this one!
         removeButton.Accept += (s, e) =>
                                 {
                                     // Now this throw a InvalidOperationException on the TopologicalSort method as is expected.
-                                    //Win.Remove (removeButton);
+                                    //main.Remove (removeButton);
 
                                     removeButton.Visible = false;
                                 };
@@ -125,7 +127,7 @@ public class Buttons : Scenario
             Height = 5,
             Title = "Computed Layout"
         };
-        Win.Add (computedFrame);
+        main.Add (computedFrame);
 
         // Demonstrates how changing the View.Frame property can move Views
         var moveBtn = new Button
@@ -176,7 +178,7 @@ public class Buttons : Scenario
             Height = 5,
             Title = "Absolute Layout"
         };
-        Win.Add (absoluteFrame);
+        main.Add (absoluteFrame);
 
         // Demonstrates how changing the View.Frame property can move Views
         var moveBtnA = new Button { ColorScheme = Colors.ColorSchemes ["Error"], Text = "Move This Button via Frame" };
@@ -213,7 +215,7 @@ public class Buttons : Scenario
         {
             X = 2, Y = Pos.Bottom (computedFrame) + 1, Text = "Text Alignment (changes the four buttons above): "
         };
-        Win.Add (label);
+        main.Add (label);
 
         var radioGroup = new RadioGroup
         {
@@ -222,7 +224,7 @@ public class Buttons : Scenario
             SelectedItem = 2,
             RadioLabels = new [] { "Left", "Right", "Centered", "Justified" }
         };
-        Win.Add (radioGroup);
+        main.Add (radioGroup);
 
         // Demo changing hotkey
         string MoveHotkey (string txt)
@@ -269,7 +271,7 @@ public class Buttons : Scenario
             Text = mhkb
         };
         moveHotKeyBtn.Accept += (s, e) => { moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text); };
-        Win.Add (moveHotKeyBtn);
+        main.Add (moveHotKeyBtn);
 
         var muhkb = " ~  s  gui.cs   master ↑10 = Сохранить";
 
@@ -284,51 +286,157 @@ public class Buttons : Scenario
             Text = muhkb
         };
         moveUnicodeHotKeyBtn.Accept += (s, e) => { moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text); };
-        Win.Add (moveUnicodeHotKeyBtn);
+        main.Add (moveUnicodeHotKeyBtn);
 
         radioGroup.SelectedItemChanged += (s, args) =>
-                                          {
-                                              switch (args.SelectedItem)
-                                              {
-                                                  case 0:
-                                                      moveBtn.TextAlignment = TextAlignment.Left;
-                                                      sizeBtn.TextAlignment = TextAlignment.Left;
-                                                      moveBtnA.TextAlignment = TextAlignment.Left;
-                                                      sizeBtnA.TextAlignment = TextAlignment.Left;
-                                                      moveHotKeyBtn.TextAlignment = TextAlignment.Left;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Left;
+        {
+            switch (args.SelectedItem)
+            {
+                case 0:
+                    moveBtn.TextAlignment = TextAlignment.Left;
+                    sizeBtn.TextAlignment = TextAlignment.Left;
+                    moveBtnA.TextAlignment = TextAlignment.Left;
+                    sizeBtnA.TextAlignment = TextAlignment.Left;
+                    moveHotKeyBtn.TextAlignment = TextAlignment.Left;
+                    moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Left;
 
-                                                      break;
-                                                  case 1:
-                                                      moveBtn.TextAlignment = TextAlignment.Right;
-                                                      sizeBtn.TextAlignment = TextAlignment.Right;
-                                                      moveBtnA.TextAlignment = TextAlignment.Right;
-                                                      sizeBtnA.TextAlignment = TextAlignment.Right;
-                                                      moveHotKeyBtn.TextAlignment = TextAlignment.Right;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Right;
+                    break;
+                case 1:
+                    moveBtn.TextAlignment = TextAlignment.Right;
+                    sizeBtn.TextAlignment = TextAlignment.Right;
+                    moveBtnA.TextAlignment = TextAlignment.Right;
+                    sizeBtnA.TextAlignment = TextAlignment.Right;
+                    moveHotKeyBtn.TextAlignment = TextAlignment.Right;
+                    moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Right;
 
-                                                      break;
-                                                  case 2:
-                                                      moveBtn.TextAlignment = TextAlignment.Centered;
-                                                      sizeBtn.TextAlignment = TextAlignment.Centered;
-                                                      moveBtnA.TextAlignment = TextAlignment.Centered;
-                                                      sizeBtnA.TextAlignment = TextAlignment.Centered;
-                                                      moveHotKeyBtn.TextAlignment = TextAlignment.Centered;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Centered;
+                    break;
+                case 2:
+                    moveBtn.TextAlignment = TextAlignment.Centered;
+                    sizeBtn.TextAlignment = TextAlignment.Centered;
+                    moveBtnA.TextAlignment = TextAlignment.Centered;
+                    sizeBtnA.TextAlignment = TextAlignment.Centered;
+                    moveHotKeyBtn.TextAlignment = TextAlignment.Centered;
+                    moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Centered;
 
-                                                      break;
-                                                  case 3:
-                                                      moveBtn.TextAlignment = TextAlignment.Justified;
-                                                      sizeBtn.TextAlignment = TextAlignment.Justified;
-                                                      moveBtnA.TextAlignment = TextAlignment.Justified;
-                                                      sizeBtnA.TextAlignment = TextAlignment.Justified;
-                                                      moveHotKeyBtn.TextAlignment = TextAlignment.Justified;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Justified;
+                    break;
+                case 3:
+                    moveBtn.TextAlignment = TextAlignment.Justified;
+                    sizeBtn.TextAlignment = TextAlignment.Justified;
+                    moveBtnA.TextAlignment = TextAlignment.Justified;
+                    sizeBtnA.TextAlignment = TextAlignment.Justified;
+                    moveHotKeyBtn.TextAlignment = TextAlignment.Justified;
+                    moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Justified;
 
-                                                      break;
-                                              }
-                                          };
+                    break;
+            }
+        };
 
-        Top.Ready += (s, e) => radioGroup.Refresh ();
+        label = new Label ()
+        {
+            X = 0,
+            Y = Pos.Bottom (moveUnicodeHotKeyBtn) + 1,
+            Title = "_Numeric Up/Down (press-and-hold):",
+        };
+        var downButton = new Button ()
+        {
+            CanFocus = false,
+            AutoSize = false,
+            X = Pos.Right(label)+1,
+            Y = Pos.Top (label),
+            Height = 1,
+            Width = 1,
+            NoPadding = true,
+            NoDecorations = true,
+            Title = $"{CM.Glyphs.DownArrow}",
+            WantContinuousButtonPressed = true,
+        };
+
+        var numericEdit = new TextField ()
+        {
+            Text = "1966",
+            X = Pos.Right (downButton),
+            Y = Pos.Top (downButton),
+            Width = 5,
+            Height = 1,
+        };
+        var upButton = new Button ()
+        {
+            CanFocus = false,
+            AutoSize = false,
+            X = Pos.Right (numericEdit),
+            Y = Pos.Top (numericEdit),
+            Height = 1,
+            Width = 1,
+            NoPadding = true,
+            NoDecorations = true,
+            Title = $"{CM.Glyphs.UpArrow}",
+            WantContinuousButtonPressed = true,
+        };
+        downButton.Accept += (s, e) =>
+                             {
+                                 numericEdit.Text = $"{int.Parse(numericEdit.Text) - 1}";
+                             };
+        upButton.Accept += (s, e) =>
+                           {
+                               numericEdit.Text = $"{int.Parse (numericEdit.Text) + 1}";
+                           };
+
+        main.Add (label, downButton, numericEdit, upButton);
+
+        label = new Label ()
+        {
+            X = 0,
+            Y = Pos.Bottom (label) + 1,
+            Title = "_No Repeat:",
+        };
+        int noRepeatAcceptCount = 0;
+        var noRepeatButton = new Button ()
+        {
+            X = Pos.Right (label) + 1,
+            Y = Pos.Top (label),
+            Title = $"Accept Cou_nt: {noRepeatAcceptCount}",
+            WantContinuousButtonPressed = false,
+        };
+        noRepeatButton.Accept += (s, e) =>
+                                 {
+                                     noRepeatButton.Title = $"Accept Cou_nt: {++noRepeatAcceptCount}";
+                                 };
+        main.Add(label, noRepeatButton);
+
+        label = new Label ()
+        {
+            X = 0,
+            Y = Pos.Bottom (label) + 1,
+            Title = "_Repeat (press-and-hold):",
+        };
+        int acceptCount = 0;
+        var repeatButton = new Button ()
+        {
+            X = Pos.Right (label) + 1,
+            Y = Pos.Top (label),
+            Title = $"Accept Co_unt: {acceptCount}",
+            WantContinuousButtonPressed = true,
+        };
+        repeatButton.Accept += (s, e) =>
+                               {
+                                   repeatButton.Title = $"Accept Co_unt: {++acceptCount}";
+                               };
+
+        var enableCB = new CheckBox ()
+        {
+            X = Pos.Right (repeatButton) + 1,
+            Y = Pos.Top (repeatButton),
+            Title = "Enabled",
+            Checked = true,
+        };
+        enableCB.Toggled += (s, e) =>
+                            {
+                                repeatButton.Enabled = !repeatButton.Enabled;
+                            };
+        main.Add(label, repeatButton, enableCB);
+
+        main.Ready += (s, e) => radioGroup.Refresh ();
+        Application.Run (main);
+        main.Dispose ();
     }
 }

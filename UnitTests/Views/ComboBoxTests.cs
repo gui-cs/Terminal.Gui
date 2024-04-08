@@ -146,7 +146,7 @@ public class ComboBoxTests
         Assert.Equal ("", cb.Text);
 
         Assert.True (
-                     cb.OnMouseEvent (
+                     cb.NewMouseEvent (
                                     new MouseEvent { X = cb.Bounds.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
                                    )
                     );
@@ -203,7 +203,7 @@ public class ComboBoxTests
         Assert.Equal ("", cb.Text);
 
         Assert.True (
-                     cb.OnMouseEvent (
+                     cb.NewMouseEvent (
                                     new MouseEvent { X = cb.Bounds.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
                                    )
                     );
@@ -240,7 +240,7 @@ public class ComboBoxTests
         Assert.Equal ("", cb.Text);
 
         Assert.True (
-                     cb.OnMouseEvent (
+                     cb.NewMouseEvent (
                                     new MouseEvent { X = cb.Bounds.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
                                    )
                     );
@@ -297,7 +297,7 @@ public class ComboBoxTests
         Assert.Equal ("", cb.Text);
 
         Assert.True (
-                     cb.OnMouseEvent (
+                     cb.NewMouseEvent (
                                     new MouseEvent { X = cb.Bounds.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
                                    )
                     );
@@ -308,7 +308,7 @@ public class ComboBoxTests
 
         Assert.True (
                      cb.Subviews [1]
-                       .OnMouseEvent (
+                       .NewMouseEvent (
                                     new MouseEvent { X = 0, Y = 1, Flags = MouseFlags.Button1Clicked }
                                    )
                     );
@@ -319,7 +319,7 @@ public class ComboBoxTests
 
         Assert.True (
                      cb.Subviews [1]
-                       .OnMouseEvent (
+                       .NewMouseEvent (
                                     new MouseEvent { X = 0, Y = 1, Flags = MouseFlags.Button1Clicked }
                                    )
                     );
@@ -332,7 +332,7 @@ public class ComboBoxTests
 
         Assert.True (
                      cb.Subviews [1]
-                       .OnMouseEvent (
+                       .NewMouseEvent (
                                     new MouseEvent { X = 0, Y = 2, Flags = MouseFlags.Button1Clicked }
                                    )
                     );
@@ -342,14 +342,14 @@ public class ComboBoxTests
         Assert.Equal ("Three", cb.Text);
 
         Assert.True (
-                     cb.OnMouseEvent (
+                     cb.NewMouseEvent (
                                     new MouseEvent { X = cb.Bounds.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
                                    )
                     );
 
         Assert.True (
                      cb.Subviews [1]
-                       .OnMouseEvent (
+                       .NewMouseEvent (
                                     new MouseEvent { X = 0, Y = 2, Flags = MouseFlags.Button1Clicked }
                                    )
                     );
@@ -359,7 +359,7 @@ public class ComboBoxTests
         Assert.Equal ("Three", cb.Text);
 
         Assert.True (
-                     cb.OnMouseEvent (
+                     cb.NewMouseEvent (
                                     new MouseEvent { X = cb.Bounds.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
                                    )
                     );
@@ -370,7 +370,7 @@ public class ComboBoxTests
 
         Assert.True (
                      cb.Subviews [1]
-                       .OnMouseEvent (
+                       .NewMouseEvent (
                                     new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }
                                    )
                     );
@@ -398,14 +398,14 @@ public class ComboBoxTests
         Assert.Equal ("", cb.Text);
 
         Assert.True (
-                     cb.OnMouseEvent (
+                     cb.NewMouseEvent (
                                     new MouseEvent { X = cb.Bounds.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
                                    )
                     );
 
         Assert.True (
                      cb.Subviews [1]
-                       .OnMouseEvent (
+                       .NewMouseEvent (
                                     new MouseEvent { X = cb.Bounds.Right - 1, Y = 0, Flags = MouseFlags.Button1Clicked }
                                    )
                     );
@@ -416,7 +416,7 @@ public class ComboBoxTests
 
         Assert.True (
                      cb.Subviews [1]
-                       .OnMouseEvent (
+                       .NewMouseEvent (
                                     new MouseEvent { X = -1, Y = 0, Flags = MouseFlags.Button1Clicked }
                                    )
                     );
@@ -429,7 +429,7 @@ public class ComboBoxTests
 
         Assert.True (
                      cb.Subviews [1]
-                       .OnMouseEvent (
+                       .NewMouseEvent (
                                     new MouseEvent { X = cb.Bounds.Right - 1, Y = 0, Flags = MouseFlags.Button1Clicked }
                                    )
                     );
@@ -440,7 +440,7 @@ public class ComboBoxTests
 
         Assert.True (
                      cb.Subviews [1]
-                       .OnMouseEvent (
+                       .NewMouseEvent (
                                     new MouseEvent { X = 0, Y = -1, Flags = MouseFlags.Button1Clicked }
                                    )
                     );
@@ -453,7 +453,7 @@ public class ComboBoxTests
 
         Assert.True (
                      cb.Subviews [1]
-                       .OnMouseEvent (
+                       .NewMouseEvent (
                                     new MouseEvent { X = cb.Bounds.Right - 1, Y = 0, Flags = MouseFlags.Button1Clicked }
                                    )
                     );
@@ -464,7 +464,7 @@ public class ComboBoxTests
 
         Assert.True (
                      cb.Subviews [1]
-                       .OnMouseEvent (
+                       .NewMouseEvent (
                                     new MouseEvent { X = cb.Frame.Width, Y = 0, Flags = MouseFlags.Button1Clicked }
                                    )
                     );
@@ -477,7 +477,7 @@ public class ComboBoxTests
 
         Assert.True (
                      cb.Subviews [1]
-                       .OnMouseEvent (
+                       .NewMouseEvent (
                                     new MouseEvent { X = cb.Bounds.Right - 1, Y = 0, Flags = MouseFlags.Button1Clicked }
                                    )
                     );
@@ -488,7 +488,7 @@ public class ComboBoxTests
 
         Assert.True (
                      cb.Subviews [1]
-                       .OnMouseEvent (
+                       .NewMouseEvent (
                                     new MouseEvent { X = 0, Y = cb.Frame.Height, Flags = MouseFlags.Button1Clicked }
                                    )
                     );
@@ -516,7 +516,7 @@ public class ComboBoxTests
         Assert.Equal ("", cb.Text);
 
         Assert.True (
-                     cb.OnMouseEvent (
+                     cb.NewMouseEvent (
                                     new MouseEvent { X = cb.Bounds.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
                                    )
                     );
@@ -673,7 +673,7 @@ Three ",
         Assert.Equal ("", cb.Text);
 
         Assert.True (
-                     cb.OnMouseEvent (
+                     cb.NewMouseEvent (
                                     new MouseEvent { X = cb.Bounds.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
                                    )
                     );
@@ -685,7 +685,7 @@ Three ",
         Assert.True (cb.Subviews [1].NewKeyDownEvent (Key.CursorDown));
 
         Assert.True (
-                     cb.OnMouseEvent (
+                     cb.NewMouseEvent (
                                     new MouseEvent { X = cb.Bounds.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
                                    )
                     );
@@ -695,7 +695,7 @@ Three ",
         Assert.Equal ("", cb.Text);
 
         Assert.True (
-                     cb.OnMouseEvent (
+                     cb.NewMouseEvent (
                                     new MouseEvent { X = cb.Bounds.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
                                    )
                     );
@@ -707,7 +707,7 @@ Three ",
         Assert.True (cb.Subviews [1].NewKeyDownEvent (Key.CursorUp));
 
         Assert.True (
-                     cb.OnMouseEvent (
+                     cb.NewMouseEvent (
                                     new MouseEvent { X = cb.Bounds.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
                                    )
                     );
@@ -735,7 +735,7 @@ Three ",
         Assert.Equal ("", cb.Text);
 
         Assert.True (
-                     cb.OnMouseEvent (
+                     cb.NewMouseEvent (
                                     new MouseEvent { X = cb.Bounds.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
                                    )
                     );
@@ -792,7 +792,7 @@ Three ",
         Assert.Equal ("", cb.Text);
 
         Assert.True (
-                     cb.OnMouseEvent (
+                     cb.NewMouseEvent (
                                     new MouseEvent { X = cb.Bounds.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
                                    )
                     );

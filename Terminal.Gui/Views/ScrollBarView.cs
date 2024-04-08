@@ -325,7 +325,7 @@ public class ScrollBarView : View
                 || mouseEvent.Flags == MouseFlags.WheeledRight
                 || mouseEvent.Flags == MouseFlags.WheeledLeft))
         {
-            return Host.OnMouseEvent (mouseEvent);
+            return Host.NewMouseEvent (mouseEvent) == true;
         }
 
         if (mouseEvent.Flags == MouseFlags.Button1Pressed && location == 0)
@@ -800,7 +800,7 @@ public class ScrollBarView : View
             || me.MouseEvent.Flags == MouseFlags.WheeledRight
             || me.MouseEvent.Flags == MouseFlags.WheeledLeft)
         {
-            OnMouseEvent (me.MouseEvent);
+            NewMouseEvent (me.MouseEvent);
         }
         else if (me.MouseEvent.Flags == MouseFlags.Button1Clicked)
         {

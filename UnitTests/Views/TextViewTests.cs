@@ -160,7 +160,7 @@ public class TextViewTests
         Assert.False (fv.CanFocus);
         Assert.False (fv.HasFocus);
 
-        tv.OnMouseEvent (new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked });
+        tv.NewMouseEvent (new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked });
 
         Assert.Empty (tv.SelectedText);
         Assert.False (tv.CanFocus);
@@ -171,7 +171,7 @@ public class TextViewTests
         Assert.Throws<InvalidOperationException> (() => tv.CanFocus = true);
         fv.CanFocus = true;
         tv.CanFocus = true;
-        tv.OnMouseEvent (new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked });
+        tv.NewMouseEvent (new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked });
 
         Assert.Equal ("some ", tv.SelectedText);
         Assert.True (tv.CanFocus);
@@ -180,7 +180,7 @@ public class TextViewTests
         Assert.True (fv.HasFocus);
 
         fv.CanFocus = false;
-        tv.OnMouseEvent (new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked });
+        tv.NewMouseEvent (new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked });
 
         Assert.Equal ("some ", tv.SelectedText); // Setting CanFocus to false don't change the SelectedText
         Assert.False (tv.CanFocus);
@@ -1072,7 +1072,7 @@ This is the second line.
 
         for (var i = 0; i < 12; i++)
         {
-            tv.OnMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledRight });
+            tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledRight });
             tv.PositionCursor ();
             Assert.Equal (Math.Min (i + 1, 11), tv.LeftColumn);
             Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
@@ -1080,7 +1080,7 @@ This is the second line.
 
         for (var i = 11; i > 0; i--)
         {
-            tv.OnMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledLeft });
+            tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledLeft });
             tv.PositionCursor ();
             Assert.Equal (i - 1, tv.LeftColumn);
 
@@ -1115,7 +1115,7 @@ This is the second line.
 
         for (var i = 0; i < 12; i++)
         {
-            tv.OnMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledDown });
+            tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledDown });
             tv.PositionCursor ();
             Assert.Equal (i + 1, tv.TopRow);
             Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
@@ -1123,7 +1123,7 @@ This is the second line.
 
         for (var i = 12; i > 0; i--)
         {
-            tv.OnMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledUp });
+            tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledUp });
             tv.PositionCursor ();
             Assert.Equal (i - 1, tv.TopRow);
 
@@ -6788,7 +6788,7 @@ This is the second line.
         Assert.Equal ("TAB to jump between text fields.", _textView.Text);
 
         Assert.True (
-                     _textView.OnMouseEvent (
+                     _textView.NewMouseEvent (
                                            new MouseEvent { X = 12, Y = 0, Flags = MouseFlags.Button1Pressed | MouseFlags.ButtonShift }
                                           )
                     );
@@ -6798,7 +6798,7 @@ This is the second line.
         Assert.True (_textView.Selecting);
         Assert.Equal ("TAB to jump ", _textView.SelectedText);
 
-        Assert.True (_textView.OnMouseEvent (new MouseEvent { X = 12, Y = 0, Flags = MouseFlags.Button1Clicked }));
+        Assert.True (_textView.NewMouseEvent (new MouseEvent { X = 12, Y = 0, Flags = MouseFlags.Button1Clicked }));
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (new Point (12, 0), _textView.CursorPosition);
@@ -6806,7 +6806,7 @@ This is the second line.
         Assert.Equal ("TAB to jump ", _textView.SelectedText);
 
         Assert.True (
-                     _textView.OnMouseEvent (
+                     _textView.NewMouseEvent (
                                            new MouseEvent { X = 19, Y = 0, Flags = MouseFlags.Button1Pressed | MouseFlags.ButtonShift }
                                           )
                     );
@@ -6816,7 +6816,7 @@ This is the second line.
         Assert.True (_textView.Selecting);
         Assert.Equal ("TAB to jump between", _textView.SelectedText);
 
-        Assert.True (_textView.OnMouseEvent (new MouseEvent { X = 19, Y = 0, Flags = MouseFlags.Button1Clicked }));
+        Assert.True (_textView.NewMouseEvent (new MouseEvent { X = 19, Y = 0, Flags = MouseFlags.Button1Clicked }));
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (new Point (19, 0), _textView.CursorPosition);
@@ -6824,7 +6824,7 @@ This is the second line.
         Assert.Equal ("TAB to jump between", _textView.SelectedText);
 
         Assert.True (
-                     _textView.OnMouseEvent (
+                     _textView.NewMouseEvent (
                                            new MouseEvent { X = 24, Y = 0, Flags = MouseFlags.Button1Pressed | MouseFlags.ButtonShift }
                                           )
                     );
@@ -6834,14 +6834,14 @@ This is the second line.
         Assert.True (_textView.Selecting);
         Assert.Equal ("TAB to jump between text", _textView.SelectedText);
 
-        Assert.True (_textView.OnMouseEvent (new MouseEvent { X = 24, Y = 0, Flags = MouseFlags.Button1Clicked }));
+        Assert.True (_textView.NewMouseEvent (new MouseEvent { X = 24, Y = 0, Flags = MouseFlags.Button1Clicked }));
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (new Point (24, 0), _textView.CursorPosition);
         Assert.True (_textView.Selecting);
         Assert.Equal ("TAB to jump between text", _textView.SelectedText);
 
-        Assert.True (_textView.OnMouseEvent (new MouseEvent { X = 24, Y = 0, Flags = MouseFlags.Button1Pressed }));
+        Assert.True (_textView.NewMouseEvent (new MouseEvent { X = 24, Y = 0, Flags = MouseFlags.Button1Pressed }));
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (new Point (24, 0), _textView.CursorPosition);
@@ -7624,12 +7624,12 @@ TAB to jump between text field",
 
         var ev = new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1DoubleClicked };
 
-        tv.OnMouseEvent (ev);
+        tv.NewMouseEvent (ev);
         Assert.Equal (1, tv.SelectedLength);
 
         ev = new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked };
 
-        tv.OnMouseEvent (ev);
+        tv.NewMouseEvent (ev);
         Assert.Equal (1, tv.SelectedLength);
     }
 
@@ -7744,7 +7744,7 @@ line.
                                                       _output
                                                      );
 
-        Assert.True (tv.OnMouseEvent (new MouseEvent { X = 0, Y = 3, Flags = MouseFlags.Button1Pressed }));
+        Assert.True (tv.NewMouseEvent (new MouseEvent { X = 0, Y = 3, Flags = MouseFlags.Button1Pressed }));
         tv.Draw ();
         Assert.Equal (new Point (0, 3), tv.CursorPosition);
         Assert.Equal (new Point (13, 0), cp);

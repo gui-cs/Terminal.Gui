@@ -108,7 +108,7 @@ public class TreeTableSourceTests : IDisposable
         Assert.Equal (0, tv.SelectedRow);
         Assert.Equal (0, tv.SelectedColumn);
 
-        Assert.True (tv.OnMouseEvent (new MouseEvent { X = 2, Y = 2, Flags = MouseFlags.Button1Clicked }));
+        Assert.True (tv.NewMouseEvent (new MouseEvent { X = 2, Y = 2, Flags = MouseFlags.Button1Clicked }));
 
         tv.Draw ();
 
@@ -125,15 +125,15 @@ public class TreeTableSourceTests : IDisposable
         TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Clicking to the right/left of the expand/collapse does nothing
-        tv.OnMouseEvent (new MouseEvent { X = 3, Y = 2, Flags = MouseFlags.Button1Clicked });
+        tv.NewMouseEvent (new MouseEvent { X = 3, Y = 2, Flags = MouseFlags.Button1Clicked });
         tv.Draw ();
         TestHelpers.AssertDriverContentsAre (expected, _output);
-        tv.OnMouseEvent (new MouseEvent { X = 1, Y = 2, Flags = MouseFlags.Button1Clicked });
+        tv.NewMouseEvent (new MouseEvent { X = 1, Y = 2, Flags = MouseFlags.Button1Clicked });
         tv.Draw ();
         TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Clicking on the + again should collapse
-        tv.OnMouseEvent (new MouseEvent { X = 2, Y = 2, Flags = MouseFlags.Button1Clicked });
+        tv.NewMouseEvent (new MouseEvent { X = 2, Y = 2, Flags = MouseFlags.Button1Clicked });
         tv.Draw ();
 
         expected =

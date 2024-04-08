@@ -163,7 +163,7 @@ CTRL-O Open {
                                      {
                                          Assert.Equal ("Quiting...", msg);
                                          msg = "";
-                                         sb.OnMouseEvent (new MouseEvent { X = 1, Y = 24, Flags = MouseFlags.Button1Clicked });
+                                         sb.NewMouseEvent (new MouseEvent { X = 1, Y = 24, Flags = MouseFlags.Button1Clicked });
                                      }
                                      else
                                      {
