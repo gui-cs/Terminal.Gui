@@ -1164,7 +1164,7 @@ This is a test
     }
 
     [Fact]
-    public void ScrollBarType_IsBuiltIn_In_Padding ()
+    public void ScrollBar_IsBuiltIn_In_Padding ()
     {
         var view = new View ();
         Assert.Empty (view.Padding.Subviews);
@@ -1201,15 +1201,8 @@ This is a test
     }
 
     [Fact]
-    public void ScrollBarType_IsBuiltIn_In_Padding_Does_Not_Throws_If_ScrollBarType_None ()
-    {
-        Exception exception = Record.Exception (() => () => new View ());
-        Assert.Null (exception);
-    }
-
-    [Fact]
     [SetupFakeDriver]
-    public void ScrollBarType_IsBuiltIn_UseNegativeBoundsLocation_In_Padding_Thickness ()
+    public void ScrollBar_IsBuiltIn_UseNegativeBoundsLocation_In_Padding_Thickness ()
     {
         ((FakeDriver)Application.Driver).SetBufferSize (15, 11);
 
@@ -1322,7 +1315,7 @@ This is a test
 
     [Fact]
     [SetupFakeDriver]
-    public void ScrollBarType_IsBuiltIn_UseNegativeBoundsLocation_In_Padding_Thickness_Inside_Another_Container ()
+    public void ScrollBar_IsBuiltIn_UseNegativeBoundsLocation_In_Padding_Thickness_Inside_Another_Container ()
     {
         ((FakeDriver)Application.Driver).SetBufferSize (15, 11);
 
@@ -1445,7 +1438,7 @@ This is a test
 
     [Fact]
     [SetupFakeDriver]
-    public void ScrollBarType_IsBuiltIn_UseNegativeBoundsLocation_In_Parent_Inside_Another_Container ()
+    public void ScrollBar_IsBuiltIn_UseNegativeBoundsLocation_In_Parent_Inside_Another_Container ()
     {
         ((FakeDriver)Application.Driver).SetBufferSize (15, 11);
 

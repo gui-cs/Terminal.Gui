@@ -6891,7 +6891,7 @@ This is the second line.
 
     [Fact]
     [TextViewTestsAutoInitShutdown]
-    public void ScrollBarType_IsBuiltIn_Always_Adjust_LeftColumn ()
+    public void ScrollBar_IsBuiltIn_Always_Adjust_LeftColumn ()
     {
         var text = "";
 
@@ -6938,7 +6938,7 @@ This is the second line.
 
     [Fact]
     [TextViewTestsAutoInitShutdown]
-    public void ScrollBarType_IsBuiltIn_Always_Adjust_TopRow ()
+    public void ScrollBar_IsBuiltIn_Always_Adjust_TopRow ()
     {
         var text = "";
 
