@@ -306,12 +306,11 @@ public partial class View
     ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
-    ///         Because <see cref="ContentArea"/> coordinates are relative to the upper-left corner of the <see cref="View"/>,
-    ///         the
+    ///         Because <see cref="ContentArea"/> coordinates are relative to the upper-left corner of the <see cref="View"/>, the
     ///         coordinates of the upper-left corner of the rectangle returned by this property are (0,0) if
     ///         <see cref="UseContentOffset"/> is false.
     ///         If <see cref="UseContentOffset"/> is true can contains negative location given by the
-    ///         <see cref="ContentOffset"/> which if it's negative will increment the respective width and height accordingly.
+    ///         <see cref="ContentOffset"/> whose width and height will be provided by the <see cref="ContentSize"/>.
     ///         Use this property to obtain the size of the area of the view for tasks such as drawing the view's contents.
     ///     </para>
     /// </remarks>
