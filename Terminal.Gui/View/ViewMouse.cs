@@ -475,6 +475,7 @@ public partial class View
                 {
                     var cs = new ColorScheme (ColorScheme)
                     {
+                        // Highlight the foreground focus color
                         Focus = new (ColorScheme.Focus.Foreground.GetHighlightColor (), ColorScheme.Focus.Background.GetHighlightColor ()),
                     };
                     ColorScheme = cs;
@@ -483,7 +484,7 @@ public partial class View
                 {
                     var cs = new ColorScheme (ColorScheme)
                     {
-                        // For Buttons etc... that can't focus (like up/down).
+                        // Invert Focus color foreground/background. We can do this because we know the view is not going to be focused.
                         Normal = new (ColorScheme.Focus.Background, ColorScheme.Normal.Foreground)
                     };
                     ColorScheme = cs;

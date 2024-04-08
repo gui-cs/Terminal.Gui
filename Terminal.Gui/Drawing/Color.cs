@@ -248,9 +248,9 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
         var hsl = ColorHelper.ColorConverter.RgbToHsl(new RGB (R, G, B));
 
         var amount = .7;
-        if (hsl.L < 50)
+        if (hsl.L <= 5)
         {
-            amount += 1;
+            return DarkGray;
         }
         hsl.L = (byte)(hsl.L * amount);
 

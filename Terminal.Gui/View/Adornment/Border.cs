@@ -198,17 +198,27 @@ public class Border : Adornment
 
     #region Mouse Support
 
-    private LineStyle? _savedHighlightLineStyle;
+    private Color? _savedForeColor;
 
     private void Border_Highlight (object sender, HighlightEventArgs e)
     {
+        if (!Parent.Arrangement.HasFlag (ViewArrangement.Movable))
+        {
+            return;
+        }
+
         if (e.HighlightStyle.HasFlag (HighlightStyle.Pressed))
         {
-            if (!_savedHighlightLineStyle.HasValue)
+            if (!_savedForeColor.HasValue)
             {
-                _savedHighlightLineStyle = Parent?.BorderStyle ?? LineStyle;
+                _savedForeColor = ColorScheme.Normal.Foreground;
             }
-            LineStyle = LineStyle.Heavy;
+
+            ColorScheme cs = new ColorScheme (ColorScheme)
+            {
+                Normal = new Attribute (ColorScheme.Normal.Foreground.GetHighlightColor (), ColorScheme.Normal.Background)
+            };
+            ColorScheme = cs;
         }
 #if HOVER
         else if (e.HighlightStyle.HasFlag (HighlightStyle.Hover))
@@ -221,9 +231,13 @@ public class Border : Adornment
         }
 #endif
 
-        if (e.HighlightStyle == HighlightStyle.None && _savedHighlightLineStyle.HasValue)
+        if (e.HighlightStyle == HighlightStyle.None && _savedForeColor.HasValue)
         {
-            LineStyle = _savedHighlightLineStyle.Value;
+            ColorScheme cs = new ColorScheme (ColorScheme)
+            {
+                Normal = new Attribute (_savedForeColor.Value, ColorScheme.Normal.Background)
+            };
+            ColorScheme = cs;
         }
         Parent?.SetNeedsDisplay ();
         e.Cancel = true;
