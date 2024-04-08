@@ -73,11 +73,13 @@ public class Border : Adornment
     /// <inheritdoc/>
     public override void BeginInit ()
     {
+#if HOVER
         // TOOD: Hack - make Arragnement overidable
         if ((Parent?.Arrangement & ViewArrangement.Movable) != 0)
         {
             HighlightStyle |= HighlightStyle.Hover;
-        }
+        }   
+#endif
 
         base.BeginInit ();
 
@@ -208,6 +210,7 @@ public class Border : Adornment
             }
             LineStyle = LineStyle.Heavy;
         }
+#if HOVER
         else if (e.HighlightStyle.HasFlag (HighlightStyle.Hover))
         {
             if (!_savedHighlightLineStyle.HasValue)
@@ -216,6 +219,7 @@ public class Border : Adornment
             }
             LineStyle = LineStyle.Double;
         }
+#endif
 
         if (e.HighlightStyle == HighlightStyle.None && _savedHighlightLineStyle.HasValue)
         {
@@ -339,7 +343,7 @@ public class Border : Adornment
         }
     }
 
-    #endregion Mouse Support
+#endregion Mouse Support
 
     /// <inheritdoc/>
     public override void OnDrawContent (Rectangle contentArea)

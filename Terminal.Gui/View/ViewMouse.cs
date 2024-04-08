@@ -13,10 +13,12 @@ public enum HighlightStyle
     /// </summary>
     None = 0,
 
+#if HOVER
     /// <summary>
     /// The mouse is hovering over the view.
     /// </summary>
     Hover = 1,
+#endif
 
     /// <summary>
     /// The mouse is pressed within the <see cref="View.Bounds"/>.
@@ -95,11 +97,15 @@ public partial class View
             return true;
         }
 
+#if HOVER
         if (HighlightStyle.HasFlag(HighlightStyle.Hover))
         {
-            SetHighlight (HighlightStyle.Hover);
+            if (SetHighlight (HighlightStyle.Hover))
+            {
+                return true;
+            }
         }
-
+#endif
         return false;
     }
 
@@ -160,15 +166,16 @@ public partial class View
             return false;
         }
 
-        if (OnMouseEnter (mouseEvent) == true)
+        if (OnMouseLeave (mouseEvent) == true)      
         {
             return true;
         }
-
+#if HOVER
         if (HighlightStyle.HasFlag (HighlightStyle.Hover))
         {
             SetHighlight (HighlightStyle.None);
         }
+#endif
 
         return false;
     }
@@ -322,11 +329,18 @@ public partial class View
 
             if (Bounds.Contains (mouseEvent.X, mouseEvent.Y))
             {
-                SetHighlight (HighlightStyle.HasFlag(HighlightStyle.Pressed) ? HighlightStyle.Pressed : HighlightStyle.None);
+                if (SetHighlight (HighlightStyle.HasFlag (HighlightStyle.Pressed) ? HighlightStyle.Pressed : HighlightStyle.None) == true)
+                {
+                    return true;
+                }
             }
             else
             {
-                SetHighlight (HighlightStyle.HasFlag (HighlightStyle.PressedOutside) ? HighlightStyle.PressedOutside : HighlightStyle.None);
+                if (SetHighlight (HighlightStyle.HasFlag (HighlightStyle.PressedOutside) ? HighlightStyle.PressedOutside : HighlightStyle.None) == true)
+
+                {
+                    return true;
+                }
             }
 
             if (WantContinuousButtonPressed && Application.MouseGrabView == this)
@@ -387,7 +401,11 @@ public partial class View
         {
             // We're grabbed. Clicked event comes after the last Release. This is our signal to ungrab
             Application.UngrabMouse ();
-            SetHighlight (HighlightStyle.None);
+
+            if (SetHighlight (HighlightStyle.None))
+            {
+                return true;
+            }
 
             // If mouse is still in bounds, click
             if (!WantContinuousButtonPressed && Bounds.Contains (mouseEvent.X, mouseEvent.Y))
@@ -418,16 +436,18 @@ public partial class View
     ///         Marked internal just to support unit tests
     ///     </para>
     /// </remarks>
-    internal void SetHighlight (HighlightStyle style)
+    /// <returns><see langword="true"/>, if the Highlight event was handled, <see langword="false"/> otherwise.</returns>
+
+    internal bool SetHighlight (HighlightStyle style)
     {
         // TODO: Make the highlight colors configurable
 
         // Enable override via virtual method and/or event
         if (OnHighlight (style) == true)
         {
-            return;
+            return true;
         }
-
+#if HOVER
         if (style.HasFlag (HighlightStyle.Hover))
         {
             if (_savedHighlightColorScheme is null && ColorScheme is { })
@@ -436,15 +456,17 @@ public partial class View
 
                 var cs = new ColorScheme (ColorScheme)
                 {
-                    Normal = new (ColorName.BrightRed, ColorName.Black),
+                    Normal = GetFocusColor (),
+                    HotNormal = ColorScheme.HotFocus
                 };
                 ColorScheme = cs;
             }
-        }
 
+            return true;
+        }
+#endif 
         if (style.HasFlag (HighlightStyle.Pressed) || style.HasFlag (HighlightStyle.PressedOutside))
         {
-
             if (_savedHighlightColorScheme is null && ColorScheme is { })
             {
                 _savedHighlightColorScheme ??= ColorScheme;
@@ -453,7 +475,7 @@ public partial class View
                 {
                     var cs = new ColorScheme (ColorScheme)
                     {
-                        Focus = new (ColorScheme.Normal.Foreground, ColorScheme.Focus.Background),
+                        Focus = new (ColorScheme.Focus.Foreground.GetHighlightColor (), ColorScheme.Focus.Background.GetHighlightColor ()),
                     };
                     ColorScheme = cs;
                 }
@@ -466,8 +488,11 @@ public partial class View
                     };
                     ColorScheme = cs;
                 }
+
+                return true;
             }
         }
+
 
         if (style == HighlightStyle.None)
         {
@@ -478,6 +503,8 @@ public partial class View
                 _savedHighlightColorScheme = null;
             }
         }
+
+        return false;
     }
 
     /// <summary>

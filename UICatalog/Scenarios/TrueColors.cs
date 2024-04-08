@@ -67,6 +67,14 @@ public class TrueColors : Scenario
                  new Label { X = Pos.AnchorEnd (44), Y = 6, Text = "Blue:" }
                 );
 
+        Win.Add (
+                 new Label { X = Pos.AnchorEnd (44), Y = 8, Text = "Darker:" }
+                );
+
+        Win.Add (
+                 new Label { X = Pos.AnchorEnd (44), Y = 9, Text = "Lighter:" }
+                );
+
         var lblRed = new Label { X = Pos.AnchorEnd (32), Y = 4, Text = "na" };
         Win.Add (lblRed);
         var lblGreen = new Label { X = Pos.AnchorEnd (32), Y = 5, Text = "na" };
@@ -74,9 +82,31 @@ public class TrueColors : Scenario
         var lblBlue = new Label { X = Pos.AnchorEnd (32), Y = 6, Text = "na" };
         Win.Add (lblBlue);
 
+        var lblDarker = new Label { X = Pos.AnchorEnd (32), Y = 8, Text = "     " };
+        Win.Add (lblDarker);
+
+        var lblLighter = new Label { X = Pos.AnchorEnd (32), Y = 9, Text = "    " };
+        Win.Add (lblLighter);
+
         Application.MouseEvent += (s, e) =>
                                   {
-                                      if (e.View != null)
+                                      if (e.View == null)
+                                      {
+                                          return;
+                                      }
+                                      if (e.Flags == MouseFlags.Button1Clicked)
+                                      {
+                                          Attribute normal = e.View.GetNormalColor ();
+                                          
+                                          lblLighter.ColorScheme = new ColorScheme(e.View.ColorScheme)
+                                          {
+                                              Normal = new Attribute (
+                                                                      normal.Foreground,
+                                                                      normal.Background.GetHighlightColor ()
+                                                                     )
+                                          };
+                                      }
+                                      else
                                       {
                                           Attribute normal = e.View.GetNormalColor ();
                                           lblRed.Text = normal.Foreground.R.ToString ();
