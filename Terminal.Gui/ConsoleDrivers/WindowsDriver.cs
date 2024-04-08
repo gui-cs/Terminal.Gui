@@ -838,6 +838,29 @@ internal class WindowsConsole
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool GetNumberOfConsoleInputEvents (nint handle, out uint lpcNumberOfEvents);
 
+    internal uint GetNumberOfConsoleInputEvents ()
+    {
+        if (!GetNumberOfConsoleInputEvents (_inputHandle, out uint numOfEvents))
+        {
+            Console.WriteLine ($"Error: {Marshal.GetLastWin32Error ()}");
+
+            return 0;
+        }
+
+        return numOfEvents;
+    }
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool FlushConsoleInputBuffer (nint handle);
+
+    internal void FlushConsoleInputBuffer ()
+    {
+        if (!FlushConsoleInputBuffer (_inputHandle))
+        {
+            Console.WriteLine ($"Error: {Marshal.GetLastWin32Error ()}");
+        }
+    }
+
     public InputRecord [] ReadConsoleInput ()
     {
         const int bufferSize = 1;
@@ -1281,7 +1304,7 @@ internal class WindowsDriver : ConsoleDriver
         {
 #if HACK_CHECK_WINCHANGED
 
-            //_mainLoop.WinChanged -= ChangeWin;
+            _mainLoopDriver.WinChanged -= ChangeWin;
 #endif
         }
 
@@ -1696,13 +1719,7 @@ internal class WindowsDriver : ConsoleDriver
 
     private async Task ProcessButtonDoubleClickedAsync ()
     {
-        // Only delay if there's not a view wanting continuous button presses
-        if (Application.WantContinuousButtonPressedView is null)
-        {
-            // QUESTION: Why 300ms?
-            await Task.Delay (300);
-        }
-
+        await Task.Delay (200);
         _isButtonDoubleClicked = false;
         _isOneFingerDoubleClicked = false;
 
@@ -2147,33 +2164,31 @@ internal class WindowsMainLoop : IMainLoopDriver
 
     void IMainLoopDriver.TearDown ()
     {
-        // Eat any outstanding events. See #
-        //var records = 
-            _winConsole.ReadConsoleInput ();
-
-        //if (records != null)
-        //{
-        //    foreach (var rec in records)
-        //    {
-        //        Debug.WriteLine ($"Teardown: {rec.ToString ()}");
-        //        //Debug.Assert (rec is not { EventType: WindowsConsole.EventType.Mouse, MouseEvent.ButtonState: WindowsConsole.ButtonState.Button1Pressed });
-        //    }
-        //}
-
         _inputHandlerTokenSource?.Cancel ();
         _inputHandlerTokenSource?.Dispose ();
+
+        if (_winConsole is { })
+        {
+            var numOfEvents = _winConsole.GetNumberOfConsoleInputEvents ();
+
+            if (numOfEvents > 0)
+            {
+                _winConsole.FlushConsoleInputBuffer ();
+                //Debug.WriteLine ($"Flushed {numOfEvents} events.");
+            }
+        }
+
+        _waitForProbe?.Dispose ();
+
+        _resultQueue?.Clear ();
 
         _eventReadyTokenSource?.Cancel ();
         _eventReadyTokenSource?.Dispose ();
         _eventReady?.Dispose ();
 
-        _resultQueue?.Clear ();
-
 #if HACK_CHECK_WINCHANGED
         _winChange?.Dispose ();
 #endif
-
-        //_waitForProbe?.Dispose ();
 
         _mainLoop = null;
     }
@@ -2191,11 +2206,18 @@ internal class WindowsMainLoop : IMainLoopDriver
             }
             catch (OperationCanceledException)
             {
+                // Wakes the _waitForProbe if it's waiting
+                _waitForProbe.Set ();
                 return;
             }
             finally
             {
-                _waitForProbe.Reset ();
+                // If IsCancellationRequested is true the code after
+                // the `finally` block will not be executed.
+                if (!_inputHandlerTokenSource.IsCancellationRequested)
+                {
+                    _waitForProbe.Reset ();
+                }
             }
 
             if (_resultQueue?.Count == 0)
