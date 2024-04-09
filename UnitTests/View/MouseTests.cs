@@ -583,4 +583,50 @@ public class MouseTests (ITestOutputHelper output)
         }
     }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void Test_All_Mouse_Events ()
+    {
+        var onMouseEvent = false;
+        var onMouseDown = false;
+        var onMouseMove = false;
+        var onMouseUp = false;
+        var onMouseClick = false;
+        var onMouseDoubleClick = false;
+        var onMouseTripleClick = false;
+
+        var view = new View { CanFocus = true, Width = 10, Height = 1};
+        view.MouseEvent += (s, e) => onMouseEvent = true;
+        view.MouseDown += (s, e) => onMouseDown = true;
+        view.MouseMove += (s, e) => onMouseMove = true;
+        view.MouseUp += (s, e) => onMouseUp = true;
+        view.MouseClick += (s, e) => onMouseClick = true;
+        view.MouseDoubleClick += (s, e) => onMouseDoubleClick = true;
+        view.MouseTripleClick += (s, e) => onMouseTripleClick = true;
+
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
+
+        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.WheeledDown });
+        Assert.True (onMouseEvent);
+
+        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed });
+        Assert.True (onMouseDown);
+
+        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
+        Assert.True (onMouseMove);
+
+        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Released });
+        Assert.True (onMouseUp);
+
+        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked });
+        Assert.True (onMouseClick);
+
+        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1DoubleClicked });
+        Assert.True (onMouseDoubleClick);
+
+        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1TripleClicked });
+        Assert.True (onMouseTripleClick);
+    }
 }
