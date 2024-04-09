@@ -1510,11 +1510,6 @@ public static partial class Application
             if (MouseGrabView.Bounds.Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
             {
                 // The mouse has moved outside the bounds of the view that grabbed the mouse
-                if (_mouseEnteredView?.NewMouseLeaveEvent (mouseEvent) == true)
-                {
-                    return;
-                }
-
                 // Give a chance for the current view process the event
                 if (ProcessMouseEvent (mouseEvent, view))
                 {
