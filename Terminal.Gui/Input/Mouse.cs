@@ -143,6 +143,11 @@ public class MouseEvent
     /// </remarks>
     public Point ScreenPosition { get; set; }
 
+    /// <summary>
+    ///     Indicates if the current mouse event has first pressed <see langword="true"/>, latest released <see langword="false"/> or none <see langword="null"/>.
+    /// </summary>
+    public bool? IsMouseDown { get; set; }
+
     /// <summary>Returns a <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</summary>
     /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</returns>
     public override string ToString () { return $"({X},{Y}):{Flags}"; }

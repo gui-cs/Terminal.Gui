@@ -389,6 +389,7 @@ public class MouseTests
         Assert.Equal (Application._mouseEnteredView, view1);
         Assert.Equal (Application._lastViewButtonPressed, view1);
         Assert.True (Application._canProcessClickedEvent);
+        Assert.True (Application._isMouseDown);
         Assert.False (view1Clicked);
         Assert.False (view2Clicked);
 
@@ -396,6 +397,7 @@ public class MouseTests
         Assert.Equal (Application._mouseEnteredView, view2);
         Assert.Equal (Application._lastViewButtonPressed, view1);
         Assert.True (Application._canProcessClickedEvent);
+        Assert.Null (Application._isMouseDown);
         Assert.False (view1Clicked);
         Assert.False (view2Clicked);
 
@@ -403,6 +405,7 @@ public class MouseTests
         Assert.Equal (Application._mouseEnteredView, view2);
         Assert.Null (Application._lastViewButtonPressed);
         Assert.False (Application._canProcessClickedEvent);
+        Assert.False (Application._isMouseDown);
         Assert.False (view1Clicked);
         Assert.False (view2Clicked);
 
@@ -410,6 +413,7 @@ public class MouseTests
         Assert.Equal (Application._mouseEnteredView, view2);
         Assert.Null (Application._lastViewButtonPressed);
         Assert.True (Application._canProcessClickedEvent);
+        Assert.Null (Application._isMouseDown);
         Assert.False (view1Clicked);
         Assert.False (view2Clicked);
 
@@ -417,6 +421,7 @@ public class MouseTests
         Assert.Equal (Application._mouseEnteredView, view2);
         Assert.Equal (Application._lastViewButtonPressed, view2);
         Assert.True (Application._canProcessClickedEvent);
+        Assert.True (Application._isMouseDown);
         Assert.False (view1Clicked);
         Assert.False (view2Clicked);
 
@@ -424,6 +429,7 @@ public class MouseTests
         Assert.Equal (Application._mouseEnteredView, view1);
         Assert.Equal (Application._lastViewButtonPressed, view2);
         Assert.True (Application._canProcessClickedEvent);
+        Assert.Null (Application._isMouseDown);
         Assert.False (view1Clicked);
         Assert.False (view2Clicked);
 
@@ -431,6 +437,7 @@ public class MouseTests
         Assert.Equal (Application._mouseEnteredView, view2);
         Assert.Null (Application._lastViewButtonPressed);
         Assert.True (Application._canProcessClickedEvent);
+        Assert.False (Application._isMouseDown);
         Assert.False (view1Clicked);
         Assert.False (view2Clicked);
 
@@ -438,6 +445,7 @@ public class MouseTests
         Assert.Equal (Application._mouseEnteredView, view2);
         Assert.Null (Application._lastViewButtonPressed);
         Assert.True (Application._canProcessClickedEvent);
+        Assert.Null (Application._isMouseDown);
         Assert.False (view1Clicked);
         Assert.True (view2Clicked);
 
@@ -445,6 +453,7 @@ public class MouseTests
         Assert.Equal (Application._mouseEnteredView, view1);
         Assert.Equal (Application._lastViewButtonPressed, view1);
         Assert.True (Application._canProcessClickedEvent);
+        Assert.True (Application._isMouseDown);
         Assert.False (view1Clicked);
         Assert.True (view2Clicked);
 
@@ -452,6 +461,7 @@ public class MouseTests
         Assert.Equal (Application._mouseEnteredView, view2);
         Assert.Equal (Application._lastViewButtonPressed, view1);
         Assert.True (Application._canProcessClickedEvent);
+        Assert.Null (Application._isMouseDown);
         Assert.False (view1Clicked);
         Assert.True (view2Clicked);
 
@@ -459,6 +469,7 @@ public class MouseTests
         Assert.Equal (Application._mouseEnteredView, view1);
         Assert.Null (Application._lastViewButtonPressed);
         Assert.True (Application._canProcessClickedEvent);
+        Assert.False (Application._isMouseDown);
         Assert.False (view1Clicked);
         Assert.True (view2Clicked);
 
@@ -466,6 +477,7 @@ public class MouseTests
         Assert.Equal (Application._mouseEnteredView, view1);
         Assert.Null (Application._lastViewButtonPressed);
         Assert.True (Application._canProcessClickedEvent);
+        Assert.Null (Application._isMouseDown);
         Assert.True (view1Clicked);
         Assert.True (view2Clicked);
     }
