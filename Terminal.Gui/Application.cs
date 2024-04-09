@@ -143,6 +143,8 @@ public static partial class Application
 
         // Mouse
         _mouseEnteredView = null;
+        _lastViewButtonPressed = null;
+        _canProcessClickedEvent = true;
         WantContinuousButtonPressedView = null;
         MouseEvent = null;
         GrabbedMouse = null;
@@ -1432,6 +1434,8 @@ public static partial class Application
 
     // Used by OnMouseEvent to track the last view that was clicked on.
     internal static View? _mouseEnteredView;
+    internal static View? _lastViewButtonPressed;
+    internal static bool _canProcessClickedEvent = true;
 
     /// <summary>Event fired when a mouse move or click occurs. Coordinates are screen relative.</summary>
     /// <remarks>
@@ -1459,6 +1463,26 @@ public static partial class Application
         if (view is { })
         {
             mouseEvent.View = view;
+        }
+
+        if (_lastViewButtonPressed is null && mouseEvent.Flags is MouseFlags.Button1Pressed or MouseFlags.Button2Pressed or MouseFlags.Button3Pressed or MouseFlags.Button4Pressed)
+        {
+            _lastViewButtonPressed = view;
+        }
+        else if (_lastViewButtonPressed is { } && _lastViewButtonPressed != view && mouseEvent.Flags is MouseFlags.Button1Released or MouseFlags.Button2Released or MouseFlags.Button3Released or MouseFlags.Button4Released)
+        {
+            _lastViewButtonPressed = null;
+            _canProcessClickedEvent = false;
+        }
+        else if (!_canProcessClickedEvent && mouseEvent.Flags is MouseFlags.Button1Clicked or MouseFlags.Button2Clicked or MouseFlags.Button3Clicked or MouseFlags.Button4Clicked)
+        {
+            _canProcessClickedEvent = true;
+
+            return;
+        }
+        else if (!mouseEvent.Flags.HasFlag(MouseFlags.ReportMousePosition))
+        {
+            _lastViewButtonPressed = null;
         }
 
         MouseEvent?.Invoke (null, mouseEvent);
