@@ -11,20 +11,20 @@ public class ViewTests
 
     [Fact]
     [AutoInitShutdown]
-    public void Clear_Bounds_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
+    public void Clear_Viewport_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
     {
         var view = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
         view.DrawContent += (s, e) =>
                             {
                                 Rectangle savedClip = Application.Driver.Clip;
-                                Application.Driver.Clip = new Rectangle (1, 1, view.Bounds.Width, view.Bounds.Height);
+                                Application.Driver.Clip = new Rectangle (1, 1, view.Viewport.Width, view.Viewport.Height);
 
-                                for (var row = 0; row < view.Bounds.Height; row++)
+                                for (var row = 0; row < view.Viewport.Height; row++)
                                 {
                                     Application.Driver.Move (1, row + 1);
 
-                                    for (var col = 0; col < view.Bounds.Width; col++)
+                                    for (var col = 0; col < view.Viewport.Width; col++)
                                     {
                                         Application.Driver.AddStr ($"{col}");
                                     }
@@ -54,7 +54,7 @@ public class ViewTests
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rectangle (0, 0, 20, 10), pos);
 
-        view.Clear (view.Bounds);
+        view.Clear (view.Viewport);
 
         expected = @"
 ┌──────────────────┐
@@ -70,6 +70,7 @@ public class ViewTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        top.Dispose ();
     }
 
     [Fact]
@@ -81,13 +82,13 @@ public class ViewTests
         view.DrawContent += (s, e) =>
                             {
                                 Rectangle savedClip = Application.Driver.Clip;
-                                Application.Driver.Clip = new Rectangle (1, 1, view.Bounds.Width, view.Bounds.Height);
+                                Application.Driver.Clip = new Rectangle (1, 1, view.Viewport.Width, view.Viewport.Height);
 
-                                for (var row = 0; row < view.Bounds.Height; row++)
+                                for (var row = 0; row < view.Viewport.Height; row++)
                                 {
                                     Application.Driver.Move (1, row + 1);
 
-                                    for (var col = 0; col < view.Bounds.Width; col++)
+                                    for (var col = 0; col < view.Viewport.Width; col++)
                                     {
                                         Application.Driver.AddStr ($"{col}");
                                     }
@@ -117,7 +118,7 @@ public class ViewTests
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rectangle (0, 0, 20, 10), pos);
 
-        view.Clear (view.Bounds);
+        view.Clear (view.Viewport);
 
         expected = @"
 ┌──────────────────┐
@@ -133,6 +134,8 @@ public class ViewTests
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+
+        top.Dispose ();
     }
 
     [Theory]
@@ -223,7 +226,7 @@ cccccccccccccccccccc",
 
     [Fact]
     [AutoInitShutdown]
-    public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Frame ()
+    public void Correct_Redraw_Viewport_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Frame ()
     {
         var label = new Label { Text = "At 0,0" };
 
@@ -251,7 +254,7 @@ At 0,0
         view.Frame = new Rectangle (3, 3, 10, 1);
         Assert.Equal (new Rectangle (3, 3, 10, 1), view.Frame);
         Assert.Equal (LayoutStyle.Absolute, view.LayoutStyle);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
         Assert.Equal (new Rectangle (0, 0, 10, 1), view._needsDisplayRect);
         top.Draw ();
 
@@ -268,7 +271,7 @@ At 0,0
 
     [Fact]
     [AutoInitShutdown]
-    public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Pos_Dim ()
+    public void Correct_Redraw_Viewport_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Pos_Dim ()
     {
         var label = new Label { Text = "At 0,0" };
 
@@ -300,7 +303,7 @@ At 0,0
         view.Width = 10;
         view.Height = 1;
         Assert.Equal (new Rectangle (3, 3, 10, 1), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
         Assert.Equal (new Rectangle (0, 0, 30, 2), view._needsDisplayRect);
         top.Draw ();
 
@@ -317,7 +320,7 @@ At 0,0
 
     [Fact]
     [AutoInitShutdown]
-    public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Frame ()
+    public void Correct_Redraw_Viewport_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Frame ()
     {
         var label = new Label { Text = "At 0,0" };
 
@@ -347,7 +350,7 @@ At 0,0
         view.Frame = new Rectangle (1, 1, 10, 1);
         Assert.Equal (new Rectangle (1, 1, 10, 1), view.Frame);
         Assert.Equal (LayoutStyle.Absolute, view.LayoutStyle);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
         Assert.Equal (new Rectangle (0, 0, 10, 1), view._needsDisplayRect);
         top.Draw ();
 
@@ -362,7 +365,7 @@ At 0,0
 
     [Fact]
     [AutoInitShutdown]
-    public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Pos_Dim ()
+    public void Correct_Redraw_Viewport_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Pos_Dim ()
     {
         var label = new Label { Text = "At 0,0" };
 
@@ -394,7 +397,7 @@ At 0,0
         view.Width = 10;
         view.Height = 1;
         Assert.Equal (new Rectangle (1, 1, 10, 1), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
         Assert.Equal (new Rectangle (0, 0, 30, 2), view._needsDisplayRect);
         top.Draw ();
 
@@ -531,7 +534,7 @@ At 0,0
 
     [Fact]
     [AutoInitShutdown]
-    public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Frame ()
+    public void Incorrect_Redraw_Viewport_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Frame ()
     {
         var label = new Label { Text = "At 0,0" };
 
@@ -559,7 +562,7 @@ At 0,0
                                                      );
 
         view.Frame = new Rectangle (3, 3, 10, 1);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
         Assert.Equal (new Rectangle (0, 0, 10, 1), view._needsDisplayRect);
         view.Draw ();
 
@@ -576,7 +579,7 @@ At 0,0
 
     [Fact]
     [AutoInitShutdown]
-    public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Pos_Dim ()
+    public void Incorrect_Redraw_Viewport_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Pos_Dim ()
     {
         var label = new Label { Text = "At 0,0" };
 
@@ -608,7 +611,7 @@ At 0,0
         view.Width = 10;
         view.Height = 1;
         Assert.Equal (new Rectangle (3, 3, 10, 1), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
         Assert.Equal (new Rectangle (0, 0, 30, 2), view._needsDisplayRect);
         view.Draw ();
 
@@ -625,7 +628,7 @@ At 0,0
 
     [Fact]
     [AutoInitShutdown]
-    public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Frame ()
+    public void Incorrect_Redraw_Viewport_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Frame ()
     {
         var label = new Label { Text = "At 0,0" };
 
@@ -655,7 +658,7 @@ At 0,0
         view.Frame = new Rectangle (1, 1, 10, 1);
         Assert.Equal (new Rectangle (1, 1, 10, 1), view.Frame);
         Assert.Equal (LayoutStyle.Absolute, view.LayoutStyle);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
         Assert.Equal (new Rectangle (0, 0, 10, 1), view._needsDisplayRect);
         view.Draw ();
 
@@ -672,7 +675,7 @@ At 0,0
 
     [Fact]
     [AutoInitShutdown]
-    public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Pos_Dim ()
+    public void Incorrect_Redraw_Viewport_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Pos_Dim ()
     {
         var label = new Label { Text = "At 0,0" };
 
@@ -704,7 +707,7 @@ At 0,0
         view.Width = 10;
         view.Height = 1;
         Assert.Equal (new Rectangle (1, 1, 10, 1), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
         Assert.Equal (new Rectangle (0, 0, 30, 2), view._needsDisplayRect);
         view.Draw ();
 
@@ -752,10 +755,10 @@ At 0,0
         Assert.True (r.Visible);
 
         Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
-        Assert.Equal ($"View(){r.Bounds}", r.ToString ());
+        Assert.Equal ($"View(){r.Viewport}", r.ToString ());
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
-        Assert.Equal (new Rectangle (0, 0, 0, 0), r.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 0, 0), r.Viewport);
         Assert.Equal (new Rectangle (0, 0, 0, 0), r.Frame);
         Assert.Null (r.Focused);
         Assert.Null (r.ColorScheme);
@@ -777,10 +780,10 @@ At 0,0
         r = new View { Frame = Rectangle.Empty };
         Assert.NotNull (r);
         Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
-        Assert.Equal ($"View(){r.Bounds}", r.ToString ());
+        Assert.Equal ($"View(){r.Viewport}", r.ToString ());
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
-        Assert.Equal (new Rectangle (0, 0, 0, 0), r.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 0, 0), r.Viewport);
         Assert.Equal (new Rectangle (0, 0, 0, 0), r.Frame);
         Assert.Null (r.Focused);
         Assert.Null (r.ColorScheme);
@@ -805,7 +808,7 @@ At 0,0
         Assert.Equal ($"View(){r.Frame}", r.ToString ());
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
-        Assert.Equal (new Rectangle (0, 0, 3, 4), r.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 3, 4), r.Viewport);
         Assert.Equal (new Rectangle (1, 2, 3, 4), r.Frame);
         Assert.Null (r.Focused);
         Assert.Null (r.ColorScheme);
@@ -836,7 +839,7 @@ At 0,0
         r.EndInit ();
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
-        Assert.Equal (new Rectangle (0, 0, 1, 13), r.Bounds);
+        Assert.Equal (new Rectangle (0, 0, 1, 13), r.Viewport);
         Assert.Equal (new Rectangle (0, 0, 1, 13), r.Frame);
         Assert.Null (r.Focused);
         Assert.Null (r.ColorScheme);
@@ -933,8 +936,8 @@ At 0,0
         Assert.Equal (4, view.Height);
         Assert.False (view.Frame.IsEmpty);
         Assert.Equal (new Rectangle (1, 2, 3, 4), view.Frame);
-        Assert.False (view.Bounds.IsEmpty);
-        Assert.Equal (new Rectangle (0, 0, 3, 4), view.Bounds);
+        Assert.False (view.Viewport.IsEmpty);
+        Assert.Equal (new Rectangle (0, 0, 3, 4), view.Viewport);
 
         view.LayoutSubviews ();
 
@@ -943,7 +946,7 @@ At 0,0
         Assert.Equal (3, view.Width);
         Assert.Equal (4, view.Height);
         Assert.False (view.Frame.IsEmpty);
-        Assert.False (view.Bounds.IsEmpty);
+        Assert.False (view.Viewport.IsEmpty);
         super.Dispose ();
 
 #if DEBUG_IDISPOSABLE
@@ -957,7 +960,7 @@ At 0,0
         Assert.Equal (0, view.Width);
         Assert.Equal (0, view.Height);
         Assert.True (view.Frame.IsEmpty);
-        Assert.True (view.Bounds.IsEmpty);
+        Assert.True (view.Viewport.IsEmpty);
         view.Dispose ();
 
         // Object Initializer
@@ -967,7 +970,7 @@ At 0,0
         Assert.Equal (0, view.Width);
         Assert.Equal (0, view.Height);
         Assert.False (view.Frame.IsEmpty);
-        Assert.True (view.Bounds.IsEmpty);
+        Assert.True (view.Viewport.IsEmpty);
         view.Dispose ();
 
         // Default Constructor and post assignment equivalent to Object Initializer
@@ -987,8 +990,8 @@ At 0,0
         Assert.Equal (4, view.Height);
         Assert.False (view.Frame.IsEmpty);
         Assert.Equal (new Rectangle (1, 2, 3, 4), view.Frame);
-        Assert.False (view.Bounds.IsEmpty);
-        Assert.Equal (new Rectangle (0, 0, 3, 4), view.Bounds);
+        Assert.False (view.Viewport.IsEmpty);
+        Assert.Equal (new Rectangle (0, 0, 3, 4), view.Viewport);
         super.Dispose ();
     }
 
@@ -1123,11 +1126,11 @@ At 0,0
         public bool IsKeyUp { get; set; }
         public override string Text { get; set; }
 
-        public override void OnDrawContent (Rectangle contentArea)
+        public override void OnDrawContent (Rectangle viewport)
         {
             var idx = 0;
 
-            // BUGBUG: v2 - this should use Bounds, not Frame
+            // BUGBUG: v2 - this should use Viewport, not Frame
             for (var r = 0; r < Frame.Height; r++)
             {
                 for (var c = 0; c < Frame.Width; c++)

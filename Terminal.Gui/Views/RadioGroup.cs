@@ -196,9 +196,9 @@ public class RadioGroup : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
-        base.OnDrawContent (contentArea);
+        base.OnDrawContent (viewport);
 
         Driver.SetAttribute (GetNormalColor ());
 

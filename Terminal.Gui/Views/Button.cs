@@ -59,10 +59,10 @@ public class Button : View
 #endif
         // Override default behavior of View
         AddCommand (Command.HotKey, () =>
-                                     {
-                                         SetFocus ();
-                                         return !OnAccept ();
-                                     });
+        {
+            SetFocus ();
+            return !OnAccept ();
+        });
 
         KeyBindings.Add (Key.Space, Command.HotKey);
         KeyBindings.Add (Key.Enter, Command.HotKey);

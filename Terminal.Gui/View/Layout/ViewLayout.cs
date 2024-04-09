@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO.Compression;
 
 namespace Terminal.Gui;
 
@@ -42,10 +43,10 @@ public partial class View
     /// <summary>Gets or sets the absolute location and dimension of the view.</summary>
     /// <value>
     ///     The rectangle describing absolute location and dimension of the view, in coordinates relative to the
-    ///     <see cref="SuperView"/>'s <see cref="Bounds"/>.
+    ///     <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>.
     /// </value>
     /// <remarks>
-    ///     <para>Frame is relative to the <see cref="SuperView"/>'s <see cref="Bounds"/>.</para>
+    ///     <para>Frame is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>.</para>
     ///     <para>
     ///         Setting Frame will set <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> to the
     ///         values of the corresponding properties of the <paramref name="value"/> parameter.
@@ -53,7 +54,7 @@ public partial class View
     ///     <para>This causes <see cref="LayoutStyle"/> to be <see cref="LayoutStyle.Absolute"/>.</para>
     ///     <para>
     ///         Altering the Frame will eventually (when the view hierarchy is next laid out via  see
-    ///         cref="LayoutSubviews"/>) cause <see cref="LayoutSubview(View, Rectangle)"/> and
+    ///         cref="LayoutSubviews"/>) cause <see cref="LayoutSubview(View, Size)"/> and
     ///         <see cref="OnDrawContent(Rectangle)"/>
     ///         methods to be called.
     ///     </para>
@@ -63,6 +64,11 @@ public partial class View
         get => _frame;
         set
         {
+            if (_frame == value)
+            {
+                return;
+            }
+
             _frame = value with { Width = Math.Max (value.Width, 0), Height = Math.Max (value.Height, 0) };
 
             // If Frame gets set, by definition, the View is now LayoutStyle.Absolute, so
@@ -73,12 +79,9 @@ public partial class View
             _height = _frame.Height;
 
             // TODO: Figure out if the below can be optimized.
-            if (IsInitialized /*|| LayoutStyle == LayoutStyle.Absolute*/)
+            if (IsInitialized)
             {
-                LayoutAdornments ();
-                SetTextFormatterSize ();
-                SetNeedsLayout ();
-                SetNeedsDisplay ();
+                OnResizeNeeded ();
             }
         }
     }
@@ -101,34 +104,36 @@ public partial class View
                 return ret;
             }
 
-            Point boundsOffset = super.GetBoundsOffset ();
-            boundsOffset.Offset(super.Frame.X, super.Frame.Y);
-            ret.X += boundsOffset.X;
-            ret.Y += boundsOffset.Y;
+            Point viewportOffset = super.GetViewportOffsetFromFrame ();
+            viewportOffset.Offset (super.Frame.X - super.Viewport.X, super.Frame.Y - super.Viewport.Y);
+            ret.X += viewportOffset.X;
+            ret.Y += viewportOffset.Y;
             super = super.SuperView;
         }
-
         return ret;
     }
 
     /// <summary>
     ///     Converts a screen-relative coordinate to a Frame-relative coordinate. Frame-relative means relative to the
-    ///     View's <see cref="SuperView"/>'s <see cref="Bounds"/>.
+    ///     View's <see cref="SuperView"/>'s <see cref="Viewport"/>.
     /// </summary>
-    /// <returns>The coordinate relative to the <see cref="SuperView"/>'s <see cref="Bounds"/>.</returns>
+    /// <returns>The coordinate relative to the <see cref="SuperView"/>'s <see cref="Viewport"/>.</returns>
     /// <param name="x">Screen-relative column.</param>
     /// <param name="y">Screen-relative row.</param>
     public virtual Point ScreenToFrame (int x, int y)
     {
-        Point superViewBoundsOffset = SuperView?.GetBoundsOffset () ?? Point.Empty;
+        Point superViewViewportOffset = SuperView?.GetViewportOffsetFromFrame () ?? Point.Empty;
+
         if (SuperView is null)
         {
-            superViewBoundsOffset.Offset (x - Frame.X, y - Frame.Y);
-            return superViewBoundsOffset;
-        }
+            superViewViewportOffset.Offset (x - Frame.X, y - Frame.Y);
 
-        var frame = SuperView.ScreenToFrame (x - superViewBoundsOffset.X, y - superViewBoundsOffset.Y);
+            return superViewViewportOffset;
+        }
+        superViewViewportOffset.Offset (-SuperView.Viewport.X, -SuperView.Viewport.Y);
+        Point frame = SuperView.ScreenToFrame (x - superViewViewportOffset.X, y - superViewViewportOffset.Y);
         frame.Offset (-Frame.X, -Frame.Y);
+
         return frame;
     }
 
@@ -138,13 +143,16 @@ public partial class View
     /// <value>The <see cref="Pos"/> object representing the X position.</value>
     /// <remarks>
     ///     <para>
+    ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>.
+    ///     </para>
+    ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
-    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been
+    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Size)"/> has been
     ///         called.
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
-    ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
+    ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
@@ -157,7 +165,13 @@ public partial class View
         get => VerifyIsInitialized (_x, nameof (X));
         set
         {
+            if (Equals (_x, value))
+            {
+                return;
+            }
+
             _x = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (X)} cannot be null");
+
             OnResizeNeeded ();
         }
     }
@@ -168,13 +182,16 @@ public partial class View
     /// <value>The <see cref="Pos"/> object representing the Y position.</value>
     /// <remarks>
     ///     <para>
+    ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>.
+    ///     </para>
+    ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
-    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been
+    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Size)"/> has been
     ///         called.
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
-    ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
+    ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
@@ -187,6 +204,11 @@ public partial class View
         get => VerifyIsInitialized (_y, nameof (Y));
         set
         {
+            if (Equals (_y, value))
+            {
+                return;
+            }
+
             _y = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Y)} cannot be null");
             OnResizeNeeded ();
         }
@@ -198,13 +220,16 @@ public partial class View
     /// <value>The <see cref="Dim"/> object representing the height of the view (the number of rows).</value>
     /// <remarks>
     ///     <para>
+    ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>.
+    ///     </para>
+    ///     <para>
     ///         If set to a relative value (e.g. <see cref="Dim.Fill(int)"/>) the value is indeterminate until the view has
-    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been
+    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Size)"/> has been
     ///         called.
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
-    ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
+    ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
@@ -217,6 +242,11 @@ public partial class View
         get => VerifyIsInitialized (_height, nameof (Height));
         set
         {
+            if (Equals (_height, value))
+            {
+                return;
+            }
+
             _height = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Height)} cannot be null");
 
             if (AutoSize)
@@ -245,13 +275,16 @@ public partial class View
     /// <value>The <see cref="Dim"/> object representing the width of the view (the number of columns).</value>
     /// <remarks>
     ///     <para>
+    ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>.
+    ///     </para>
+    ///     <para>
     ///         If set to a relative value (e.g. <see cref="Dim.Fill(int)"/>) the value is indeterminate until the view has
-    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rectangle)"/> has been
+    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Size)"/> has been
     ///         called.
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
-    ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
+    ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
@@ -264,6 +297,11 @@ public partial class View
         get => VerifyIsInitialized (_width, nameof (Width));
         set
         {
+            if (Equals (_width, value))
+            {
+                return;
+            }
+
             _width = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Width)} cannot be null");
 
             if (AutoSize)
@@ -284,123 +322,13 @@ public partial class View
 
     #endregion Frame
 
-    #region Bounds
-
-    /// <summary>
-    ///     The bounds represent the View-relative rectangle used for this view; the area inside the view where
-    ///     subviews and content are presented.
-    /// </summary>
-    /// <value>The rectangle describing the location and size of the area where the views' subviews and content are drawn.</value>
-    /// <remarks>
-    ///     <para>
-    ///         If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/> the value of Bounds is indeterminate until
-    ///         the view has been initialized ( <see cref="IsInitialized"/> is true) and <see cref="LayoutSubviews"/> has been
-    ///         called.
-    ///     </para>
-    ///     <para>
-    ///         Updates to the Bounds updates <see cref="Frame"/>, and has the same effect as updating the
-    ///         <see cref="Frame"/>.
-    ///     </para>
-    ///     <para>
-    ///         Altering the Bounds will eventually (when the view is next laid out) cause the
-    ///         <see cref="LayoutSubview(View, Rectangle)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
-    ///     </para>
-    ///     <para>
-    ///         Because <see cref="Bounds"/> coordinates are relative to the upper-left corner of the <see cref="View"/>, the
-    ///         coordinates of the upper-left corner of the rectangle returned by this property are (0,0). Use this property to
-    ///         obtain the size of the area of the view for tasks such as drawing the view's contents.
-    ///     </para>
-    /// </remarks>
-    public virtual Rectangle Bounds
-    {
-        get
-        {
-#if DEBUG
-            if (LayoutStyle == LayoutStyle.Computed && !IsInitialized)
-            {
-                Debug.WriteLine (
-                                 $"WARNING: Bounds is being accessed before the View has been initialized. This is likely a bug in {this}"
-                                );
-            }
-#endif // DEBUG
-
-            if (Margin is null || Border is null || Padding is null)
-            {
-                // CreateAdornments has not been called yet.
-                return Rectangle.Empty with { Size = Frame.Size };
-            }
-
-            Thickness totalThickness = GetAdornmentsThickness ();
-
-            return Rectangle.Empty with
-            {
-                Size = new (
-                            Math.Max (0, Frame.Size.Width - totalThickness.Horizontal),
-                            Math.Max (0, Frame.Size.Height - totalThickness.Vertical))
-            };
-        }
-        set
-        {
-            // TODO: Should we enforce Bounds.X/Y == 0? The code currently ignores value.X/Y which is
-            // TODO: correct behavior, but is silent. Perhaps an exception?
-#if DEBUG
-            if (value.Location != Point.Empty)
-            {
-                Debug.WriteLine (
-                                 $"WARNING: Bounds.Location must always be 0,0. Location ({value.Location}) is ignored. {this}"
-                                );
-            }
-#endif // DEBUG
-            Thickness totalThickness = GetAdornmentsThickness ();
-
-            Frame = Frame with
-            {
-                Size = new (
-                            value.Size.Width + totalThickness.Horizontal,
-                            value.Size.Height + totalThickness.Vertical)
-            };
-        }
-    }
-
-    /// <summary>Converts a <see cref="Bounds"/>-relative rectangle to a screen-relative rectangle.</summary>
-    public Rectangle BoundsToScreen (in Rectangle bounds)
-    {
-        // Translate bounds to Frame (our SuperView's Bounds-relative coordinates)
-        Rectangle screen = FrameToScreen ();
-        Point boundsOffset = GetBoundsOffset ();
-        screen.Offset (boundsOffset.X + bounds.X, boundsOffset.Y + bounds.Y);
-
-        return new (screen.Location, bounds.Size);
-    }
-
-    /// <summary>Converts a screen-relative coordinate to a bounds-relative coordinate.</summary>
-    /// <returns>The coordinate relative to this view's <see cref="Bounds"/>.</returns>
-    /// <param name="x">Screen-relative column.</param>
-    /// <param name="y">Screen-relative row.</param>
-    public Point ScreenToBounds (int x, int y)
-    {
-        Point boundsOffset = GetBoundsOffset ();
-        Point screen = ScreenToFrame (x, y);
-        screen.Offset (-boundsOffset.X, -boundsOffset.Y);
-
-        return screen;
-    }
-
-    /// <summary>
-    ///     Helper to get the X and Y offset of the Bounds from the Frame. This is the sum of the Left and Top properties
-    ///     of <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/>.
-    /// </summary>
-    public Point GetBoundsOffset () { return Padding is null ? Point.Empty : Padding.Thickness.GetInside (Padding.Frame).Location; }
-
-    #endregion Bounds
-
     #region AutoSize
 
     private bool _autoSize;
 
     /// <summary>
     ///     Gets or sets a flag that determines whether the View will be automatically resized to fit the <see cref="Text"/>
-    ///     within <see cref="Bounds"/>.
+    ///     within <see cref="Viewport"/>.
     ///     <para>
     ///         The default is <see langword="false"/>. Set to <see langword="true"/> to turn on AutoSize. If
     ///         <see langword="true"/> then <see cref="Width"/> and <see cref="Height"/> will be used if <see cref="Text"/> can
@@ -458,7 +386,7 @@ public partial class View
             if (ValidatePosDim)
             {
                 // BUGBUG: This ain't right, obviously.  We need to figure out how to handle this.
-                boundsChanged = ResizeBoundsToFit (newFrameSize);
+                boundsChanged = ResizeViewportToFit (newFrameSize);
             }
             else
             {
@@ -573,35 +501,35 @@ public partial class View
     /// <summary>Resizes the View to fit the specified size. Factors in the HotKey.</summary>
     /// <remarks>ResizeBoundsToFit can only be called when AutoSize is true (or being set to true).</remarks>
     /// <param name="size"></param>
-    /// <returns>whether the Bounds was changed or not</returns>
-    private bool ResizeBoundsToFit (Size size)
+    /// <returns>whether the Viewport was changed or not</returns>
+    private bool ResizeViewportToFit (Size size)
     {
         //if (AutoSize == false) {
-        //	throw new InvalidOperationException ("ResizeBoundsToFit can only be called when AutoSize is true");
+        //	throw new InvalidOperationException ("ResizeViewportToFit can only be called when AutoSize is true");
         //}
 
-        var boundsChanged = false;
+        var changed = false;
         bool canSizeW = TrySetWidth (size.Width - GetHotKeySpecifierLength (), out int rW);
         bool canSizeH = TrySetHeight (size.Height - GetHotKeySpecifierLength (false), out int rH);
 
         if (canSizeW)
         {
-            boundsChanged = true;
+            changed = true;
             _width = rW;
         }
 
         if (canSizeH)
         {
-            boundsChanged = true;
+            changed = true;
             _height = rH;
         }
 
-        if (boundsChanged)
+        if (changed)
         {
-            Bounds = new (Bounds.X, Bounds.Y, canSizeW ? rW : Bounds.Width, canSizeH ? rH : Bounds.Height);
+            Viewport = new (Viewport.X, Viewport.Y, canSizeW ? rW : Viewport.Width, canSizeH ? rH : Viewport.Height);
         }
 
-        return boundsChanged;
+        return changed;
     }
 
     #endregion AutoSize
@@ -647,25 +575,20 @@ public partial class View
 
     #endregion Layout Engine
 
-    internal bool LayoutNeeded { get; private set; } = true;
-
     /// <summary>
-    /// Indicates whether the specified SuperView-relative coordinates are within the View's <see cref="Frame"/>.
+    ///     Indicates whether the specified SuperView-relative coordinates are within the View's <see cref="Frame"/>.
     /// </summary>
     /// <param name="x">SuperView-relative X coordinate.</param>
     /// <param name="y">SuperView-relative Y coordinate.</param>
     /// <returns><see langword="true"/> if the specified SuperView-relative coordinates are within the View.</returns>
-    public virtual bool Contains (int x, int y)
-    {
-        return Frame.Contains (x, y);
-    }
+    public virtual bool Contains (int x, int y) { return Frame.Contains (x, y); }
 
 #nullable enable
     /// <summary>Finds the first Subview of <paramref name="start"/> that is visible at the provided location.</summary>
     /// <remarks>
-    /// <para>
-    ///     Used to determine what view the mouse is over.
-    /// </para>
+    ///     <para>
+    ///         Used to determine what view the mouse is over.
+    ///     </para>
     /// </remarks>
     /// <param name="start">The view to scope the search by.</param>
     /// <param name="x"><paramref name="start"/>.SuperView-relative X coordinate.</param>
@@ -698,27 +621,27 @@ public partial class View
             found = start.Padding;
         }
 
-        Point boundsOffset = start.GetBoundsOffset ();
+        Point viewportOffset = start.GetViewportOffsetFromFrame ();
 
         if (found is { })
         {
             start = found;
-            boundsOffset = found.Parent.Frame.Location;
+            viewportOffset = found.Parent.Frame.Location;
         }
 
         if (start.InternalSubviews is { Count: > 0 })
         {
-            int startOffsetX = x - (start.Frame.X + boundsOffset.X);
-            int startOffsetY = y - (start.Frame.Y + boundsOffset.Y);
+            int startOffsetX = x - (start.Frame.X + viewportOffset.X);
+            int startOffsetY = y - (start.Frame.Y + viewportOffset.Y);
 
             for (int i = start.InternalSubviews.Count - 1; i >= 0; i--)
             {
                 View nextStart = start.InternalSubviews [i];
 
-                if (nextStart.Visible && nextStart.Contains (startOffsetX, startOffsetY))
+                if (nextStart.Visible && nextStart.Contains (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y))
                 {
                     // TODO: Remove recursion
-                    return FindDeepestView (nextStart, startOffsetX, startOffsetY) ?? nextStart;
+                    return FindDeepestView (nextStart, startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y) ?? nextStart;
                 }
             }
         }
@@ -728,7 +651,7 @@ public partial class View
 #nullable restore
 
     /// <summary>
-    ///     Gets a new location of the <see cref="View"/> that is within the Bounds of the <paramref name="viewToMove"/>'s
+    ///     Gets a new location of the <see cref="View"/> that is within the Viewport of the <paramref name="viewToMove"/>'s
     ///     <see cref="View.SuperView"/> (e.g. for dragging a Window). The `out` parameters are the new X and Y coordinates.
     /// </summary>
     /// <remarks>
@@ -757,6 +680,7 @@ public partial class View
     {
         int maxDimension;
         View superView;
+        statusBar = null;
 
         if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
@@ -765,8 +689,8 @@ public partial class View
         }
         else
         {
-            // Use the SuperView's Bounds, not Frame
-            maxDimension = viewToMove.SuperView.Bounds.Width;
+            // Use the SuperView's Viewport, not Frame
+            maxDimension = viewToMove.SuperView.Viewport.Width;
             superView = viewToMove.SuperView;
         }
 
@@ -791,7 +715,8 @@ public partial class View
         }
 
         //System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
-        bool menuVisible, statusVisible;
+        bool menuVisible = false;
+        bool statusVisible = false;
 
         if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
@@ -801,12 +726,15 @@ public partial class View
         {
             View t = viewToMove.SuperView;
 
-            while (t is not Toplevel)
+            while (t is { } and not Toplevel)
             {
                 t = t.SuperView;
             }
 
-            menuVisible = ((Toplevel)t).MenuBar?.Visible == true;
+            if (t is Toplevel toplevel)
+            {
+                menuVisible = toplevel.MenuBar?.Visible == true;
+            }
         }
 
         if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
@@ -829,13 +757,16 @@ public partial class View
         {
             View t = viewToMove.SuperView;
 
-            while (t is not Toplevel)
+            while (t is { } and not Toplevel)
             {
                 t = t.SuperView;
             }
 
-            statusVisible = ((Toplevel)t).StatusBar?.Visible == true;
-            statusBar = ((Toplevel)t).StatusBar;
+            if (t is Toplevel toplevel)
+            {
+                statusVisible = toplevel.StatusBar?.Visible == true;
+                statusBar = toplevel.StatusBar;
+            }
         }
 
         if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
@@ -844,7 +775,7 @@ public partial class View
         }
         else
         {
-            maxDimension = statusVisible ? viewToMove.SuperView.Frame.Height - 1 : viewToMove.SuperView.Frame.Height;
+            maxDimension = statusVisible ? viewToMove.SuperView.Viewport.Height - 1 : viewToMove.SuperView.Viewport.Height;
         }
 
         if (superView.Margin is { } && superView == viewToMove.SuperView)
@@ -912,8 +843,8 @@ public partial class View
 
         LayoutAdornments ();
 
-        Rectangle oldBounds = Bounds;
-        OnLayoutStarted (new () { OldBounds = oldBounds });
+        Rectangle oldViewport = Viewport;
+        OnLayoutStarted (new () { OldViewport = oldViewport });
 
         SetTextFormatterSize ();
 
@@ -925,7 +856,7 @@ public partial class View
 
         foreach (View v in ordered)
         {
-            LayoutSubview (v, new (GetBoundsOffset (), Bounds.Size));
+            LayoutSubview (v, ContentSize);
         }
 
         // If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.
@@ -934,13 +865,19 @@ public partial class View
         {
             foreach ((View from, View to) in edges)
             {
-                LayoutSubview (to, from.Frame);
+                LayoutSubview (to, from.ContentSize);
             }
         }
 
         LayoutNeeded = false;
 
-        OnLayoutComplete (new () { OldBounds = oldBounds });
+        OnLayoutComplete (new () { OldViewport = oldViewport });
+    }
+    private void LayoutSubview (View v, Size contentSize)
+    {
+        v.SetRelativeLayout (contentSize);
+        v.LayoutSubviews ();
+        v.LayoutNeeded = false;
     }
 
     /// <summary>Indicates that the view does not need to be laid out.</summary>
@@ -965,19 +902,19 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         Determines the relative bounds of the <see cref="View"/> and its <see cref="Frame"/>s, and then calls
-    ///         <see cref="SetRelativeLayout(Rectangle)"/> to update the view.
+    ///         <see cref="SetRelativeLayout(Size)"/> to update the view.
     ///     </para>
     /// </remarks>
     internal void OnResizeNeeded ()
     {
         // TODO: Identify a real-world use-case where this API should be virtual. 
         // TODO: Until then leave it `internal` and non-virtual
-        // First try SuperView.Bounds, then Application.Top, then Driver.Bounds.
+        // First try SuperView.Viewport, then Application.Top, then Driver.Viewport.
         // Finally, if none of those are valid, use int.MaxValue (for Unit tests).
-        Rectangle relativeBounds = SuperView is { IsInitialized: true } ? SuperView.Bounds :
-                                   Application.Top is { } && Application.Top != this && Application.Top.IsInitialized ? Application.Top.Bounds :
-                                   Application.Driver?.Bounds ?? new Rectangle (0, 0, int.MaxValue, int.MaxValue);
-        SetRelativeLayout (relativeBounds);
+        Size contentSize = SuperView is { IsInitialized: true } ? SuperView.ContentSize :
+                           Application.Top is { } && Application.Top != this && Application.Top.IsInitialized ? Application.Top.ContentSize :
+                           Application.Driver?.Screen.Size ?? new (int.MaxValue, int.MaxValue);
+        SetRelativeLayout (contentSize);
 
         // TODO: Determine what, if any of the below is actually needed here.
         if (IsInitialized)
@@ -993,6 +930,7 @@ public partial class View
             SetNeedsLayout ();
         }
     }
+    internal bool LayoutNeeded { get; private set; } = true;
 
     /// <summary>
     ///     Sets the internal <see cref="LayoutNeeded"/> flag for this View and all of it's subviews and it's SuperView.
@@ -1017,15 +955,22 @@ public partial class View
     }
 
     /// <summary>
-    ///     Applies the view's position (<see cref="X"/>, <see cref="Y"/>) and dimension (<see cref="Width"/>, and
-    ///     <see cref="Height"/>) to <see cref="Frame"/>, given a rectangle describing the SuperView's Bounds (nominally the
-    ///     same as <c>this.SuperView.Bounds</c>).
+    ///     Adjusts <see cref="Frame"/> given the SuperView's ContentSize (nominally the same as
+    ///     <c>this.SuperView.ContentSize</c>)
+    ///     and the position (<see cref="X"/>, <see cref="Y"/>) and dimension (<see cref="Width"/>, and
+    ///     <see cref="Height"/>).
     /// </summary>
-    /// <param name="superviewBounds">
-    ///     The rectangle describing the SuperView's Bounds (nominally the same as
-    ///     <c>this.SuperView.Bounds</c>).
+    /// <remarks>
+    /// <para>
+    /// If <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, or <see cref="Height"/> are
+    /// absolute, they will be updated to reflect the new size and position of the view. Otherwise, they
+    /// are left unchanged.
+    /// </para>
+    /// </remarks>
+    /// <param name="superviewContentSize">
+    ///     The size of the SuperView's content (nominally the same as <c>this.SuperView.ContentSize</c>).
     /// </param>
-    internal void SetRelativeLayout (Rectangle superviewBounds)
+    internal void SetRelativeLayout (Size superviewContentSize)
     {
         Debug.Assert (_x is { });
         Debug.Assert (_y is { });
@@ -1047,13 +992,13 @@ public partial class View
         // TODO: View.AutoSize stuff is removed.
 
         // Returns the new dimension (width or height) and location (x or y) for the View given
-        //   the superview's Bounds
+        //   the superview's Viewport
         //   the current Pos (View.X or View.Y)
         //   the current Dim (View.Width or View.Height)
         // This method is called recursively if pos is Pos.PosCombine
         (int newLocation, int newDimension) GetNewLocationAndDimension (
             bool width,
-            Rectangle superviewBounds,
+            Size superviewContentSize,
             Pos pos,
             Dim dim,
             int autosizeDimension
@@ -1115,7 +1060,7 @@ public partial class View
             }
 
             int newDimension, newLocation;
-            int superviewDimension = width ? superviewBounds.Width : superviewBounds.Height;
+            int superviewDimension = width ? superviewContentSize.Width : superviewContentSize.Height;
 
             // Determine new location
             switch (pos)
@@ -1139,7 +1084,7 @@ public partial class View
 
                     (left, newDimension) = GetNewLocationAndDimension (
                                                                        width,
-                                                                       superviewBounds,
+                                                                       superviewContentSize,
                                                                        combine._left,
                                                                        dim,
                                                                        autosizeDimension
@@ -1147,7 +1092,7 @@ public partial class View
 
                     (right, newDimension) = GetNewLocationAndDimension (
                                                                         width,
-                                                                        superviewBounds,
+                                                                        superviewContentSize,
                                                                         combine._right,
                                                                         dim,
                                                                         autosizeDimension
@@ -1189,10 +1134,10 @@ public partial class View
         }
 
         // horizontal/width
-        (newX, newW) = GetNewLocationAndDimension (true, superviewBounds, _x, _width, autosize.Width);
+        (newX, newW) = GetNewLocationAndDimension (true, superviewContentSize, _x, _width, autosize.Width);
 
         // vertical/height
-        (newY, newH) = GetNewLocationAndDimension (false, superviewBounds, _y, _height, autosize.Height);
+        (newY, newH) = GetNewLocationAndDimension (false, superviewContentSize, _y, _height, autosize.Height);
 
         Rectangle r = new (newX, newY, newW, newH);
 
@@ -1412,17 +1357,6 @@ public partial class View
         // return L (a topologically sorted order)
         return result;
     } // TopologicalSort
-
-    private void LayoutSubview (View v, Rectangle contentArea)
-    {
-        //if (v.LayoutStyle == LayoutStyle.Computed) {
-        v.SetRelativeLayout (contentArea);
-
-        //}
-
-        v.LayoutSubviews ();
-        v.LayoutNeeded = false;
-    }
 
     #region Diagnostics
 

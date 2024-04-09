@@ -55,66 +55,91 @@ public partial class View
 
     /// <summary>
     ///     Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for rendering any border
-    ///     lines. If <see langword="true"/> the rendering of any borders drawn by this Frame will be done by it's parent's
+    ///     lines. If <see langword="true"/> the rendering of any borders drawn by this Frame will be done by its parent's
     ///     SuperView. If <see langword="false"/> (the default) this View's <see cref="OnDrawAdornments"/> method will be
     ///     called to render the borders.
     /// </summary>
     public virtual bool SuperViewRendersLineCanvas { get; set; } = false;
 
-    /// <summary>Displays the specified character in the specified column and row of the View.</summary>
-    /// <param name="col">Column (view-relative).</param>
-    /// <param name="row">Row (view-relative).</param>
-    /// <param name="ch">Ch.</param>
-    public void AddRune (int col, int row, Rune ch)
+    /// <summary>Draws the specified character in the specified viewport-relative column and row of the View.</summary>
+    /// <para>
+    ///     If the provided coordinates are outside the visible content area, this method does nothing.
+    /// </para>
+    /// <remarks>
+    ///     The top-left corner of the visible content area is <c>ViewPort.Location</c>.
+    /// </remarks>
+    /// <param name="col">Column (viewport-relative).</param>
+    /// <param name="row">Row (viewport-relative).</param>
+    /// <param name="rune">The Rune.</param>
+    public void AddRune (int col, int row, Rune rune)
     {
-        if (row < 0 || col < 0)
+        if (row < 0 || col < 0 || row >= Viewport.Height || col >= Viewport.Width)
         {
-            return;
-        }
-
-        if (row > _frame.Height - 1 || col > _frame.Width - 1)
-        {
+            // TODO: Change return type to bool so callers can determine success?
             return;
         }
 
         Move (col, row);
-        Driver.AddRune (ch);
+        Driver.AddRune (rune);
     }
 
-    /// <summary>Clears <see cref="Bounds"/> with the normal background.</summary>
+    /// <summary>Clears <see cref="Viewport"/> with the normal background.</summary>
     /// <remarks></remarks>
-    public void Clear () { Clear (Bounds); }
+    public void Clear () { Clear (new (Point.Empty, Viewport.Size)); }
 
-    /// <summary>Clears the specified <see cref="Bounds"/>-relative rectangle with the normal background.</summary>
+    /// <summary>Clears the portion of the content that is visible with the normal background. If the content does not fill the Viewport,
+    /// the area not filled will be cleared with DarkGray.</summary>
     /// <remarks></remarks>
-    /// <param name="contentArea">The Bounds-relative rectangle to clear.</param>
-    public void Clear (Rectangle contentArea)
+    public void ClearVisibleContent ()
     {
         if (Driver is null)
         {
             return;
         }
 
-        Attribute prev = Driver.SetAttribute (GetNormalColor ());
+        Rectangle toClear = new (-Viewport.Location.X, -Viewport.Location.Y, ContentSize.Width, ContentSize.Height);
+
+        // If toClear does not fill the Viewport, we need to clear the area outside toClear with DarkGray.
+        // TODO: Need a configurable color for this
+        // PERF: Put an if around this if toClear is not smaller than Viewport
+        Attribute prev = Driver.SetAttribute (new Attribute (ColorName.DarkGray, ColorName.DarkGray));
+        Rectangle viewport = new (Point.Empty, Viewport.Size);
+        Driver.FillRect (ViewportToScreen (viewport));
+        Driver.SetAttribute (prev);
+
+        Clear (toClear);
+    }
+
+    /// <summary>Clears the specified <see cref="Viewport"/>-relative rectangle with the normal background.</summary>
+    /// <remarks></remarks>
+    /// <param name="viewport">The Viewport-relative rectangle to clear.</param>
+    public void Clear (Rectangle viewport)
+    {
+        if (Driver is null)
+        {
+            return;
+        }
 
         // Clamp the region to the bounds of the view
-        contentArea = Rectangle.Intersect (contentArea, Bounds);
-        Driver.FillRect (BoundsToScreen (contentArea));
+        viewport = Rectangle.Intersect (viewport, new (Point.Empty, Viewport.Size));
+
+        Attribute prev = Driver.SetAttribute (GetNormalColor ());
+        Driver.FillRect (ViewportToScreen (viewport));
         Driver.SetAttribute (prev);
     }
 
-    /// <summary>Expands the <see cref="ConsoleDriver"/>'s clip region to include <see cref="Bounds"/>.</summary>
+    /// <summary>Expands the <see cref="ConsoleDriver"/>'s clip region to include <see cref="Viewport"/>.</summary>
     /// <returns>
     ///     The current screen-relative clip region, which can be then re-applied by setting
     ///     <see cref="ConsoleDriver.Clip"/>.
     /// </returns>
     /// <remarks>
     ///     <para>
-    ///         If <see cref="ConsoleDriver.Clip"/> and <see cref="Bounds"/> do not intersect, the clip region will be set to
+    ///         If <see cref="ConsoleDriver.Clip"/> and <see cref="Viewport"/> do not intersect, the clip region will be set to
     ///         <see cref="Rectangle.Empty"/>.
     ///     </para>
     /// </remarks>
-    public Rectangle ClipToBounds ()
+    public Rectangle ClipToViewport ()
     {
         if (Driver is null)
         {
@@ -122,7 +147,7 @@ public partial class View
         }
 
         Rectangle previous = Driver.Clip;
-        Driver.Clip = Rectangle.Intersect (previous, BoundsToScreen (Bounds));
+        Driver.Clip = Rectangle.Intersect (previous, ViewportToScreen (Viewport with { Location = Point.Empty }));
 
         return previous;
     }
@@ -133,7 +158,7 @@ public partial class View
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Always use <see cref="Bounds"/> (view-relative) when calling <see cref="OnDrawContent(Rectangle)"/>, NOT
+    ///         Always use <see cref="Viewport"/> (view-relative) when calling <see cref="OnDrawContent(Rectangle)"/>, NOT
     ///         <see cref="Frame"/> (superview-relative).
     ///     </para>
     ///     <para>
@@ -142,7 +167,8 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         Overrides of <see cref="OnDrawContent(Rectangle)"/> must ensure they do not set <c>Driver.Clip</c> to a clip
-    ///         region larger than the <ref name="Bounds"/> property, as this will cause the driver to clip the entire region.
+    ///         region larger than the <ref name="Viewport"/> property, as this will cause the driver to clip the entire
+    ///         region.
     ///     </para>
     /// </remarks>
     public void Draw ()
@@ -154,7 +180,7 @@ public partial class View
 
         OnDrawAdornments ();
 
-        Rectangle prevClip = ClipToBounds ();
+        Rectangle prevClip = ClipToViewport ();
 
         if (ColorScheme is { })
         {
@@ -163,12 +189,12 @@ public partial class View
         }
 
         // Invoke DrawContentEvent
-        var dev = new DrawEventArgs (Bounds);
+        var dev = new DrawEventArgs (Viewport);
         DrawContent?.Invoke (this, dev);
 
         if (!dev.Cancel)
         {
-            OnDrawContent (Bounds);
+            OnDrawContent (Viewport);
         }
 
         if (Driver is { })
@@ -179,7 +205,7 @@ public partial class View
         OnRenderLineCanvas ();
 
         // Invoke DrawContentCompleteEvent
-        OnDrawContentComplete (Bounds);
+        OnDrawContentComplete (Viewport);
 
         // BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
         ClearLayoutNeeded ();
@@ -264,8 +290,8 @@ public partial class View
 
     /// <summary>Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.</summary>
     /// <returns>
-    ///     <see cref="Terminal.Gui.ColorScheme.Focus"/> if <see cref="Enabled"/> is <see langword="true"/> or
-    ///     <see cref="Terminal.Gui.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
+    ///     <see cref="ColorScheme.Focus"/> if <see cref="Enabled"/> is <see langword="true"/> or
+    ///     <see cref="ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
     ///     overridden can return other values.
     /// </returns>
     public virtual Attribute GetFocusColor ()
@@ -316,10 +342,17 @@ public partial class View
         return Enabled ? cs.Normal : cs.Disabled;
     }
 
-    /// <summary>This moves the cursor to the specified column and row in the view.</summary>
-    /// <returns>The move.</returns>
-    /// <param name="col">The column to move to, in view-relative coordinates.</param>
-    /// <param name="row">the row to move to, in view-relative coordinates.</param>
+    /// <summary>Moves the drawing cursor to the specified <see cref="Viewport"/>-relative location in the view.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         If the provided coordinates are outside the visible content area, this method does nothing.
+    ///     </para>
+    ///     <para>
+    ///         The top-left corner of the visible content area is <c>ViewPort.Location</c>.
+    ///     </para>
+    /// </remarks>
+    /// <param name="col">Column (viewport-relative).</param>
+    /// <param name="row">Row (viewport-relative).</param>
     public void Move (int col, int row)
     {
         if (Driver is null || Driver?.Rows == 0)
@@ -327,7 +360,13 @@ public partial class View
             return;
         }
 
-        Rectangle screen = BoundsToScreen (new (col, row, 0, 0));
+        if (col < 0 || row < 0 || col >= Viewport.Size.Width || row >= Viewport.Size.Height)
+        {
+            // TODO: Change return type to bool so callers can determine success?
+            return;
+        }
+
+        Rectangle screen = ViewportToScreen (new (col, row, 0, 0));
         Driver?.Move (screen.X, screen.Y);
     }
 
@@ -347,26 +386,50 @@ public partial class View
 
         // Each of these renders lines to either this View's LineCanvas 
         // Those lines will be finally rendered in OnRenderLineCanvas
-        Margin?.OnDrawContent (Margin.Bounds);
-        Border?.OnDrawContent (Border.Bounds);
-        Padding?.OnDrawContent (Padding.Bounds);
+        Margin?.OnDrawContent (Margin.Viewport);
+        Border?.OnDrawContent (Border.Viewport);
+        Padding?.OnDrawContent (Padding.Viewport);
 
         return true;
     }
 
-    /// <summary>Enables overrides to draw infinitely scrolled content and/or a background behind added controls.</summary>
-    /// <param name="contentArea">
-    ///     The view-relative rectangle describing the currently visible viewport into the
-    ///     <see cref="View"/>
+    /// <summary>
+    ///     Draws the view's content, including Subviews.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The <paramref name="viewport"/> parameter is provided as a convenience; it has the same values as the
+    ///         <see cref="Viewport"/> property.
+    ///     </para>
+    ///     <para>
+    ///         The <see cref="Viewport"/> Location and Size indicate what part of the View's content, defined
+    ///         by <see cref="ContentSize"/>, is visible and should be drawn. The coordinates taken by <see cref="Move"/> and
+    ///         <see cref="AddRune"/> are relative to <see cref="Viewport"/>, thus if <c>ViewPort.Location.Y</c> is <c>5</c>
+    ///         the 6th row of the content should be drawn using <c>MoveTo (x, 5)</c>.
+    ///     </para>
+    ///     <para>
+    ///         If <see cref="ContentSize"/> is larger than <c>ViewPort.Size</c> drawing code should use <see cref="Viewport"/>
+    ///         to constrain drawing for better performance.
+    ///     </para>
+    ///     <para>
+    ///         The <see cref="ConsoleDriver.Clip"/> may define smaller area than <see cref="Viewport"/>; complex drawing code can be more
+    ///         efficient by using <see cref="ConsoleDriver.Clip"/> to constrain drawing for better performance.
+    ///     </para>
+    ///     <para>
+    ///         Overrides should loop through the subviews and call <see cref="Draw"/>.
+    ///     </para>
+    /// </remarks>
+    /// <param name="viewport">
+    ///     The rectangle describing the currently visible viewport into the <see cref="View"/>; has the same value as
+    ///     <see cref="Viewport"/>.
     /// </param>
-    /// <remarks>This method will be called before any subviews added with <see cref="Add(View)"/> have been drawn.</remarks>
-    public virtual void OnDrawContent (Rectangle contentArea)
+    public virtual void OnDrawContent (Rectangle viewport)
     {
         if (NeedsDisplay)
         {
             if (SuperView is { })
             {
-                Clear (contentArea);
+                ClearVisibleContent ();
             }
 
             if (!string.IsNullOrEmpty (TextFormatter.Text))
@@ -378,8 +441,11 @@ public partial class View
             }
 
             // This should NOT clear 
+            // TODO: If the output is not in the Viewport, do nothing
+            var drawRect = new Rectangle (ContentToScreen (Point.Empty), ContentSize);
+
             TextFormatter?.Draw (
-                                 BoundsToScreen (contentArea),
+                                 drawRect,
                                  HasFocus ? GetFocusColor () : GetNormalColor (),
                                  HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
                                  Rectangle.Empty
@@ -387,6 +453,7 @@ public partial class View
             SetSubViewNeedsDisplay ();
         }
 
+        // TODO: Move drawing of subviews to a separate OnDrawSubviews virtual method
         // Draw subviews
         // TODO: Implement OnDrawSubviews (cancelable);
         if (_subviews is { } && SubViewNeedsDisplay)
@@ -406,7 +473,7 @@ public partial class View
                 }
 
                 // Draw the subview
-                // Use the view's bounds (view-relative; Location will always be (0,0)
+                // Use the view's Viewport (view-relative; Location will always be (0,0)
                 //if (view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
                 view.Draw ();
 
@@ -416,18 +483,13 @@ public partial class View
     }
 
     /// <summary>
-    ///     Enables overrides after completed drawing infinitely scrolled content and/or a background behind removed
-    ///     controls.
+    ///     Called after <see cref="OnDrawContent"/> to enable overrides.
     /// </summary>
-    /// <param name="contentArea">
-    ///     The view-relative rectangle describing the currently visible viewport into the
+    /// <param name="viewport">
+    ///     The viewport-relative rectangle describing the currently visible viewport into the
     ///     <see cref="View"/>
     /// </param>
-    /// <remarks>
-    ///     This method will be called after any subviews removed with <see cref="Remove(View)"/> have been completed
-    ///     drawing.
-    /// </remarks>
-    public virtual void OnDrawContentComplete (Rectangle contentArea) { DrawContentComplete?.Invoke (this, new (contentArea)); }
+    public virtual void OnDrawContentComplete (Rectangle viewport) { DrawContentComplete?.Invoke (this, new (viewport)); }
 
     // TODO: Make this cancelable
     /// <summary>
@@ -444,7 +506,7 @@ public partial class View
         }
 
         // If we have a SuperView, it'll render our frames.
-        if (!SuperViewRendersLineCanvas && LineCanvas.Bounds != Rectangle.Empty)
+        if (!SuperViewRendersLineCanvas && LineCanvas.Viewport != Rectangle.Empty)
         {
             foreach (KeyValuePair<Point, Cell> p in LineCanvas.GetCellMap ())
             {
@@ -484,7 +546,7 @@ public partial class View
         return true;
     }
 
-    /// <summary>Sets the area of this view needing to be redrawn to <see cref="Bounds"/>.</summary>
+    /// <summary>Sets the area of this view needing to be redrawn to <see cref="Viewport"/>.</summary>
     /// <remarks>
     ///     If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), this method
     ///     does nothing.
@@ -493,21 +555,28 @@ public partial class View
     {
         if (IsInitialized)
         {
-            SetNeedsDisplay (Bounds);
+            SetNeedsDisplay (Viewport);
         }
     }
 
     /// <summary>Expands the area of this view needing to be redrawn to include <paramref name="region"/>.</summary>
     /// <remarks>
-    ///     If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), the area to be
-    ///     redrawn will be the <paramref name="region"/>.
+    ///     <para>
+    ///         The location of <paramref name="region"/> is relative to the View's content, bound by <c>Size.Empty</c> and
+    ///         <see cref="ContentSize"/>.
+    ///     </para>
+    ///     <para>
+    ///         If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), the area to be
+    ///         redrawn will be the <paramref name="region"/>.
+    ///     </para>
     /// </remarks>
-    /// <param name="region">The Bounds-relative region that needs to be redrawn.</param>
+    /// <param name="region">The content-relative region that needs to be redrawn.</param>
     public void SetNeedsDisplay (Rectangle region)
     {
         if (!IsInitialized)
         {
             _needsDisplayRect = region;
+
             return;
         }
 
@@ -572,25 +641,7 @@ public partial class View
 
         foreach (View subview in Subviews)
         {
-            subview.ClearNeedsDisplay();
+            subview.ClearNeedsDisplay ();
         }
-    }
-
-    // INTENT: Isn't this just intersection? It isn't used anyway.
-    // Clips a rectangle in screen coordinates to the dimensions currently available on the screen
-    internal Rectangle ScreenClip (Rectangle regionScreen)
-    {
-        int x = regionScreen.X < 0 ? 0 : regionScreen.X;
-        int y = regionScreen.Y < 0 ? 0 : regionScreen.Y;
-
-        int w = regionScreen.X + regionScreen.Width >= Driver.Cols
-                    ? Driver.Cols - regionScreen.X
-                    : regionScreen.Width;
-
-        int h = regionScreen.Y + regionScreen.Height >= Driver.Rows
-                    ? Driver.Rows - regionScreen.Y
-                    : regionScreen.Height;
-
-        return new (x, y, w, h);
     }
 }

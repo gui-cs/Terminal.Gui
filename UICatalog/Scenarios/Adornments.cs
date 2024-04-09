@@ -73,7 +73,13 @@ public class Adornments : Scenario
         view.Padding.Data = "Padding";
         view.Padding.Thickness = new (3);
 
-        view.Add (tf1, color, button, label, btnButtonInWindow, tv);
+        var longLabel = new Label ()
+        {
+            X = 40, Y = 5, Title = "This is long text (in a label) that should clip.",
+
+        };
+        longLabel.TextFormatter.WordWrap =true;
+        view.Add (tf1, color, button, label, btnButtonInWindow, tv, longLabel);
 
         var editor = new AdornmentsEditor
         {
@@ -82,8 +88,6 @@ public class Adornments : Scenario
 
             //BorderStyle = LineStyle.None,
         };
-        view.X = 36;
-        view.Y = 0;
         view.Width = Dim.Percent (60);
         view.Height = Dim.Percent (80); 
 
@@ -91,7 +95,7 @@ public class Adornments : Scenario
 
         view.Initialized += (s, e) =>
                             {
-                                var labelInPadding = new Label () {  X = 1, Y = 0, Title = "_Text:" };
+                                var labelInPadding = new Label () { X = 1, Y = 0, Title = "_Text:" };
                                 view.Padding.Add (labelInPadding);
 
                                 var textFieldInPadding = new TextField () { X = Pos.Right (labelInPadding) + 1, Y = Pos.Top (labelInPadding), Width = 15, Text = "some text" };
@@ -101,7 +105,7 @@ public class Adornments : Scenario
                                 var btnButtonInPadding = new Button { X = Pos.Center (), Y = 0, Text = "_Button in Padding" };
                                 btnButtonInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Button in Padding Pressed!", "Ok");
                                 btnButtonInPadding.BorderStyle = LineStyle.Dashed;
-                                btnButtonInPadding.Border.Thickness = new (1,1,1,1);
+                                btnButtonInPadding.Border.Thickness = new (1, 1, 1, 1);
                                 view.Padding.Add (btnButtonInPadding);
 
 #if SUBVIEW_BASED_BORDER
@@ -183,7 +187,7 @@ public class Adornments : Scenario
                 }
 
                 _thickness = value;
-                ThicknessChanged?.Invoke (this, new() { Thickness = Thickness });
+                ThicknessChanged?.Invoke (this, new () { Thickness = Thickness });
 
                 if (IsInitialized)
                 {
@@ -221,12 +225,12 @@ public class Adornments : Scenario
         {
             var editWidth = 3;
 
-            _topEdit = new() { X = Pos.Center (), Y = 0, Width = editWidth };
+            _topEdit = new () { X = Pos.Center (), Y = 0, Width = editWidth };
 
             _topEdit.Accept += Edit_Accept;
             Add (_topEdit);
 
-            _leftEdit = new()
+            _leftEdit = new ()
             {
                 X = Pos.Left (_topEdit) - editWidth, Y = Pos.Bottom (_topEdit), Width = editWidth
             };
@@ -234,12 +238,12 @@ public class Adornments : Scenario
             _leftEdit.Accept += Edit_Accept;
             Add (_leftEdit);
 
-            _rightEdit = new() { X = Pos.Right (_topEdit), Y = Pos.Bottom (_topEdit), Width = editWidth };
+            _rightEdit = new () { X = Pos.Right (_topEdit), Y = Pos.Bottom (_topEdit), Width = editWidth };
 
             _rightEdit.Accept += Edit_Accept;
             Add (_rightEdit);
 
-            _bottomEdit = new() { X = Pos.Center (), Y = Pos.Bottom (_leftEdit), Width = editWidth };
+            _bottomEdit = new () { X = Pos.Center (), Y = Pos.Bottom (_leftEdit), Width = editWidth };
 
             _bottomEdit.Accept += Edit_Accept;
             Add (_bottomEdit);
@@ -328,26 +332,26 @@ public class Adornments : Scenario
                 _origTitle = value.Title;
                 _viewToEdit = value;
 
-                _marginEditor = new()
+                _marginEditor = new ()
                 {
                     X = 0,
                     Y = 0,
                     Title = "_Margin",
                     Thickness = _viewToEdit.Margin.Thickness,
-                    Color = new (_viewToEdit.Margin.ColorScheme.Normal),
+                    Color = new (_viewToEdit.Margin.ColorScheme?.Normal ?? ColorScheme.Normal),
                     SuperViewRendersLineCanvas = true
                 };
                 _marginEditor.ThicknessChanged += Editor_ThicknessChanged;
                 _marginEditor.AttributeChanged += Editor_AttributeChanged;
                 Add (_marginEditor);
 
-                _borderEditor = new()
+                _borderEditor = new ()
                 {
                     X = Pos.Left (_marginEditor),
                     Y = Pos.Bottom (_marginEditor),
                     Title = "B_order",
                     Thickness = _viewToEdit.Border.Thickness,
-                    Color = new (_viewToEdit.Border.ColorScheme.Normal),
+                    Color = new (_viewToEdit.Border.ColorScheme?.Normal ?? ColorScheme.Normal),
                     SuperViewRendersLineCanvas = true
                 };
                 _borderEditor.ThicknessChanged += Editor_ThicknessChanged;
@@ -411,7 +415,7 @@ public class Adornments : Scenario
                                     {
                                         if (ckbTitle.Checked == true)
                                         {
-                                            _viewToEdit.Title = _origTitle;
+                                            //_viewToEdit.Title = _origTitle;
                                         }
                                         else
                                         {
@@ -420,13 +424,13 @@ public class Adornments : Scenario
                                     };
                 Add (ckbTitle);
 
-                _paddingEditor = new()
+                _paddingEditor = new ()
                 {
                     X = Pos.Left (_borderEditor),
                     Y = Pos.Bottom (rbBorderStyle),
                     Title = "_Padding",
                     Thickness = _viewToEdit.Padding.Thickness,
-                    Color = new (_viewToEdit.Padding.ColorScheme.Normal),
+                    Color = new (_viewToEdit.Padding.ColorScheme?.Normal ?? ColorScheme.Normal),
                     SuperViewRendersLineCanvas = true
                 };
                 _paddingEditor.ThicknessChanged += Editor_ThicknessChanged;
@@ -450,6 +454,8 @@ public class Adornments : Scenario
                                          };
 
                 Add (_diagCheckBox);
+                _viewToEdit.X = Pos.Right (rbBorderStyle);
+                _viewToEdit.Y = 0;
                 Add (_viewToEdit);
 
                 _viewToEdit.LayoutComplete += (s, e) =>

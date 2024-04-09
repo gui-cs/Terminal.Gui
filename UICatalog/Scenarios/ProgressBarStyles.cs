@@ -75,7 +75,7 @@ public class ProgressBarStyles : Scenario
 
             dialog.LayoutComplete += (sender, args) =>
                                     {
-                                        dialog.Bounds = Rectangle.Empty with
+                                        dialog.Viewport = Rectangle.Empty with
                                         {
                                             Width = colorPicker.Frame.Width,
                                             Height = colorPicker.Frame.Height

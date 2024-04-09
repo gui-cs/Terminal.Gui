@@ -60,7 +60,7 @@ public class MouseTests
 
     /// <summary>
     ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. No adornments;
-    ///     Frame == Bounds
+    ///     Frame == Viewport
     /// </summary>
     [Theory]
     [AutoInitShutdown]
@@ -134,7 +134,7 @@ public class MouseTests
 
     /// <summary>
     ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. With
-    ///     Frames; Frame != Bounds
+    ///     Frames; Frame != Viewport
     /// </summary>
     [AutoInitShutdown]
     [Theory]
@@ -207,7 +207,7 @@ public class MouseTests
 
         var view = new View { X = pos.X, Y = pos.Y, Width = size.Width, Height = size.Height };
 
-        // Give the view a border. With PR #2920, mouse clicks are only passed if they are inside the view's Bounds.
+        // Give the view a border. With PR #2920, mouse clicks are only passed if they are inside the view's Viewport.
         view.BorderStyle = LineStyle.Single;
         view.CanFocus = true;
 

@@ -18,14 +18,15 @@ public abstract class ConsoleDriver
     // This is in addition to the dirty flag on each cell.
     internal bool [] _dirtyLines;
 
-    /// <summary>Gets the dimensions of the terminal.</summary>
-    public Rectangle Bounds => new (0, 0, Cols, Rows);
+    // QUESTION: When non-full screen apps are supported, will this represent the app size, or will that be in Application?
+    /// <summary>Gets the location and size of the terminal screen.</summary>
+    public Rectangle Screen => new (0, 0, Cols, Rows);
 
     /// <summary>
     ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
     ///     to.
     /// </summary>
-    /// <value>The rectangle describing the bounds of <see cref="Clip"/>.</value>
+    /// <value>The rectangle describing the of <see cref="Clip"/> region.</value>
     public Rectangle Clip { get; set; }
 
     /// <summary>Get the operating system clipboard.</summary>
@@ -228,7 +229,7 @@ public abstract class ConsoleDriver
 
                 _dirtyLines [Row] = true;
             }
-        }
+        } 
 
         if (runeWidth is < 0 or > 0)
         {
@@ -337,8 +338,8 @@ public abstract class ConsoleDriver
         {
             for (int c = rect.X; c < rect.X + rect.Width; c++)
             {
-                Application.Driver.Move (c, r);
-                Application.Driver.AddRune (rune == default (Rune) ? new Rune (' ') : rune);
+                Move (c, r);
+                AddRune (rune == default (Rune) ? new Rune (' ') : rune);
             }
         }
     }
@@ -372,7 +373,7 @@ public abstract class ConsoleDriver
     /// <param name="col">The column.</param>
     /// <param name="row">The row.</param>
     /// <returns>
-    ///     <see langword="false"/> if the coordinate is outside of the screen bounds or outside of <see cref="Clip"/>.
+    ///     <see langword="false"/> if the coordinate is outside the screen bounds or outside of <see cref="Clip"/>.
     ///     <see langword="true"/> otherwise.
     /// </returns>
     public bool IsValidLocation (int col, int row) { return col >= 0 && row >= 0 && col < Cols && row < Rows && Clip.Contains (col, row); }
@@ -437,6 +438,7 @@ public abstract class ConsoleDriver
     /// <summary>Gets whether the <see cref="ConsoleDriver"/> supports TrueColor output.</summary>
     public virtual bool SupportsTrueColor => true;
 
+    // TODO: This makes ConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
     /// <summary>
     ///     Gets or sets whether the <see cref="ConsoleDriver"/> should use 16 colors instead of the default TrueColors.
     ///     See <see cref="Application.Force16Colors"/> to change this setting via <see cref="ConfigurationManager"/>.
@@ -466,6 +468,7 @@ public abstract class ConsoleDriver
         get => _currentAttribute;
         set
         {
+            // TODO: This makes ConsoleDriver dependent on Application, which is not ideal. Once Attribute.PlatformColor is removed, this can be fixed.
             if (Application.Driver is { })
             {
                 _currentAttribute = new Attribute (value.Foreground, value.Background);
