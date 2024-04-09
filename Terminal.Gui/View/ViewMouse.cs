@@ -166,7 +166,7 @@ public partial class View
             return false;
         }
 
-        if (OnMouseLeave (mouseEvent) == true)      
+        if (OnMouseLeave (mouseEvent))
         {
             return true;
         }
@@ -329,15 +329,14 @@ public partial class View
 
             if (Bounds.Contains (mouseEvent.X, mouseEvent.Y))
             {
-                if (SetHighlight (HighlightStyle.HasFlag (HighlightStyle.Pressed) ? HighlightStyle.Pressed : HighlightStyle.None) == true)
+                if (SetHighlight (HighlightStyle.HasFlag (HighlightStyle.Pressed) ? HighlightStyle.Pressed : HighlightStyle.None))
                 {
                     return true;
                 }
             }
             else
             {
-                if (SetHighlight (HighlightStyle.HasFlag (HighlightStyle.PressedOutside) ? HighlightStyle.PressedOutside : HighlightStyle.None) == true)
-
+                if (SetHighlight (HighlightStyle.HasFlag (HighlightStyle.PressedOutside) ? HighlightStyle.PressedOutside : HighlightStyle.None))
                 {
                     return true;
                 }
