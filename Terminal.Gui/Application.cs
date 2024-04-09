@@ -1504,13 +1504,22 @@ public static partial class Application
                 Y = boundsLoc.Y,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = new (mouseEvent.X, mouseEvent.Y),
-                View = MouseGrabView
+                View = view ?? MouseGrabView
             };
 
             if (MouseGrabView.Bounds.Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
             {
                 // The mouse has moved outside the bounds of the view that grabbed the mouse
-                _mouseEnteredView?.NewMouseLeaveEvent (mouseEvent);
+                if (_mouseEnteredView?.NewMouseLeaveEvent (mouseEvent) == true)
+                {
+                    return;
+                }
+
+                // Give a chance for the current view process the event
+                if (ProcessMouseEvent (mouseEvent, view))
+                {
+                    return;
+                }
             }
 
             //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
@@ -1520,6 +1529,11 @@ public static partial class Application
             }
         }
 
+        ProcessMouseEvent (mouseEvent, view);
+    }
+
+    private static bool ProcessMouseEvent (MouseEvent mouseEvent, View? view)
+    {
         if (view is { WantContinuousButtonPressed: true })
         {
             WantContinuousButtonPressedView = view;
@@ -1552,7 +1566,7 @@ public static partial class Application
 
         if (view is null)
         {
-            return;
+            return false;
         }
 
         MouseEvent? me = null;
@@ -1586,7 +1600,7 @@ public static partial class Application
 
         if (me is null)
         {
-            return;
+            return false;
         }
 
         if (_mouseEnteredView is null)
@@ -1603,7 +1617,7 @@ public static partial class Application
 
         if (!view.WantMousePositionReports && mouseEvent.Flags == MouseFlags.ReportMousePosition)
         {
-            return;
+            return false;
         }
 
         WantContinuousButtonPressedView = view.WantContinuousButtonPressed ? view : null;
@@ -1613,10 +1627,12 @@ public static partial class Application
         if (view.NewMouseEvent (me) == false)
         {
             // Should we bubble up the event, if it is not handled?
-            //return;
+            return false;
         }
 
         BringOverlappedTopToFront ();
+
+        return true;
     }
 #nullable restore
 
