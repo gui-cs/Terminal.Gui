@@ -477,6 +477,7 @@ public partial class View
                     {
                         // Highlight the foreground focus color
                         Focus = new (ColorScheme.Focus.Foreground.GetHighlightColor (), ColorScheme.Focus.Background.GetHighlightColor ()),
+                        HotFocus = new (ColorScheme.HotFocus.Foreground.GetHighlightColor (), ColorScheme.HotFocus.Background.GetHighlightColor ())
                     };
                     ColorScheme = cs;
                 }
@@ -485,7 +486,8 @@ public partial class View
                     var cs = new ColorScheme (ColorScheme)
                     {
                         // Invert Focus color foreground/background. We can do this because we know the view is not going to be focused.
-                        Normal = new (ColorScheme.Focus.Background, ColorScheme.Normal.Foreground)
+                        Normal = new (ColorScheme.Focus.Background, ColorScheme.Normal.Foreground),
+                        HotNormal = new (ColorScheme.HotFocus.Background, ColorScheme.HotNormal.Foreground)
                     };
                     ColorScheme = cs;
                 }
