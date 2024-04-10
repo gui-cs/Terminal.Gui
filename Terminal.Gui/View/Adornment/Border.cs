@@ -56,6 +56,9 @@ public class Border : Adornment
         Parent = parent;
         Application.GrabbingMouse += Application_GrabbingMouse;
         Application.UnGrabbingMouse += Application_UnGrabbingMouse;
+
+        HighlightStyle |= HighlightStyle.Pressed;
+        Highlight += Border_Highlight;
     }
 
 #if SUBVIEW_BASED_BORDER
@@ -70,6 +73,14 @@ public class Border : Adornment
     /// <inheritdoc/>
     public override void BeginInit ()
     {
+#if HOVER
+        // TOOD: Hack - make Arragnement overidable
+        if ((Parent?.Arrangement & ViewArrangement.Movable) != 0)
+        {
+            HighlightStyle |= HighlightStyle.Hover;
+        }   
+#endif
+
         base.BeginInit ();
 
 #if SUBVIEW_BASED_BORDER
@@ -97,7 +108,7 @@ public class Border : Adornment
             LayoutStarted += OnLayoutStarted;
     }
 #endif
-}
+    }
 
 #if SUBVIEW_BASED_BORDER
     private void OnLayoutStarted (object sender, LayoutEventArgs e)
@@ -187,6 +198,51 @@ public class Border : Adornment
 
     #region Mouse Support
 
+    private Color? _savedForeColor;
+
+    private void Border_Highlight (object sender, HighlightEventArgs e)
+    {
+        if (!Parent.Arrangement.HasFlag (ViewArrangement.Movable))
+        {
+            return;
+        }
+
+        if (e.HighlightStyle.HasFlag (HighlightStyle.Pressed))
+        {
+            if (!_savedForeColor.HasValue)
+            {
+                _savedForeColor = ColorScheme.Normal.Foreground;
+            }
+
+            ColorScheme cs = new ColorScheme (ColorScheme)
+            {
+                Normal = new Attribute (ColorScheme.Normal.Foreground.GetHighlightColor (), ColorScheme.Normal.Background)
+            };
+            ColorScheme = cs;
+        }
+#if HOVER
+        else if (e.HighlightStyle.HasFlag (HighlightStyle.Hover))
+        {
+            if (!_savedHighlightLineStyle.HasValue)
+            {
+                _savedHighlightLineStyle = Parent?.BorderStyle ?? LineStyle;
+            }
+            LineStyle = LineStyle.Double;
+        }
+#endif
+
+        if (e.HighlightStyle == HighlightStyle.None && _savedForeColor.HasValue)
+        {
+            ColorScheme cs = new ColorScheme (ColorScheme)
+            {
+                Normal = new Attribute (_savedForeColor.Value, ColorScheme.Normal.Background)
+            };
+            ColorScheme = cs;
+        }
+        Parent?.SetNeedsDisplay ();
+        e.Cancel = true;
+    }
+
     private Point? _dragPosition;
     private Point _startGrabPoint;
 
@@ -222,6 +278,7 @@ public class Border : Adornment
                 _startGrabPoint = new (mouseEvent.X + Frame.X, mouseEvent.Y + Frame.Y);
                 _dragPosition = new (mouseEvent.X, mouseEvent.Y);
                 Application.GrabMouse (this);
+                SetHighlight (HighlightStyle);
             }
 
             return true;
@@ -265,6 +322,7 @@ public class Border : Adornment
         {
             _dragPosition = null;
             Application.UngrabMouse ();
+            SetHighlight (HighlightStyle.None);
 
             return true;
         }

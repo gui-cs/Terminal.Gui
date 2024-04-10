@@ -386,66 +386,6 @@ public static class MessageBox
         messageLabel.TextFormatter.MultiLine = !wrapMessage;
         d.Add (messageLabel);
 
-        d.Loaded += (s, e) =>
-                    {
-                        if (width != 0 || height != 0)
-                        {
-                            return;
-                        }
-
-                        // TODO: replace with Dim.Fit when implemented
-                        Rectangle maxBounds = d.SuperView?.ContentArea ?? Application.Top.ContentArea;
-
-                        Thickness adornmentsThickness = d.GetAdornmentsThickness ();
-
-                        if (wrapMessage)
-                        {
-                            messageLabel.TextFormatter.Size = new (
-                                                                   maxBounds.Size.Width
-                                                                   - adornmentsThickness.Horizontal,
-                                                                   maxBounds.Size.Height
-                                                                   - adornmentsThickness.Vertical
-                                                                  );
-                        }
-
-                        string msg = messageLabel.TextFormatter.Format ();
-                        Size messageSize = messageLabel.TextFormatter.FormatAndGetSize ();
-
-                        // Ensure the width fits the text + buttons
-                        int newWidth = Math.Max (
-                                                 width,
-                                                 Math.Max (
-                                                           messageSize.Width + adornmentsThickness.Horizontal,
-                                                           d.GetButtonsWidth () + d.Buttons.Length + adornmentsThickness.Horizontal
-                                                          )
-                                                );
-
-                        if (newWidth > d.Frame.Width)
-                        {
-                            d.Width = newWidth;
-                        }
-
-                        // Ensure height fits the text + vspace + buttons
-                        if (messageSize.Height == 0)
-                        {
-                            d.Height = Math.Max (height, 3 + adornmentsThickness.Vertical);
-                        }
-                        else
-                        {
-                            string lastLine = messageLabel.TextFormatter.GetLines () [^1];
-
-                            // INTENT: Instead of the check against \n or \r\n, how about just Environment.NewLine?
-                            d.Height = Math.Max (
-                                                 height,
-                                                 messageSize.Height
-                                                 + (lastLine.EndsWith ("\r\n") || lastLine.EndsWith ('\n') ? 1 : 2)
-                                                 + adornmentsThickness.Vertical
-                                                );
-                        }
-
-                        d.SetRelativeLayout (d.SuperView?.Frame ?? Application.Top.Frame);
-                    };
-
         // Setup actions
         Clicked = -1;
 
@@ -455,10 +395,10 @@ public static class MessageBox
             Button b = buttonList [n];
 
             b.Accept += (s, e) =>
-                        {
-                            Clicked = buttonId;
-                            Application.RequestStop ();
-                        };
+                         {
+                             Clicked = buttonId;
+                             Application.RequestStop ();
+                         };
 
             if (b.IsDefault)
             {
@@ -466,10 +406,69 @@ public static class MessageBox
             }
         }
 
+        d.Loaded += Dialog_Loaded;
+
         // Run the modal; do not shutdown the mainloop driver when done
         Application.Run (d);
         d.Dispose ();
 
         return Clicked;
+
+        void Dialog_Loaded (object s, EventArgs e)
+        {
+            if (width != 0 || height != 0)
+            {
+                return;
+            }
+
+                        // TODO: replace with Dim.Fit when implemented
+                        Rectangle maxBounds = d.SuperView?.ContentArea ?? Application.Top.ContentArea;
+
+            Thickness adornmentsThickness = d.GetAdornmentsThickness ();
+
+            if (wrapMessage)
+            {
+                messageLabel.TextFormatter.Size = new (
+                                                       maxBounds.Size.Width
+                                                       - adornmentsThickness.Horizontal,
+                                                       maxBounds.Size.Height
+                                                       - adornmentsThickness.Vertical);
+            }
+
+            string msg = messageLabel.TextFormatter.Format ();
+            Size messageSize = messageLabel.TextFormatter.FormatAndGetSize ();
+
+            // Ensure the width fits the text + buttons
+            int newWidth = Math.Max (
+                                     width,
+                                     Math.Max (
+                                               messageSize.Width + adornmentsThickness.Horizontal,
+                                               d.GetButtonsWidth () + d.Buttons.Length + adornmentsThickness.Horizontal));
+
+            if (newWidth > d.Frame.Width)
+            {
+                d.Width = newWidth;
+            }
+
+            // Ensure height fits the text + vspace + buttons
+            if (messageSize.Height == 0)
+            {
+                d.Height = Math.Max (height, 3 + adornmentsThickness.Vertical);
+            }
+            else
+            {
+                string lastLine = messageLabel.TextFormatter.GetLines () [^1];
+
+                // INTENT: Instead of the check against \n or \r\n, how about just Environment.NewLine?
+                d.Height = Math.Max (
+                                     height,
+                                     messageSize.Height
+                                     + (lastLine.EndsWith ("\r\n") || lastLine.EndsWith ('\n') ? 1 : 2)
+                                     + adornmentsThickness.Vertical);
+            }
+
+            d.SetRelativeLayout (d.SuperView?.Frame ?? Application.Top.Frame);
+            d.LayoutSubviews ();
+        }
     }
 }

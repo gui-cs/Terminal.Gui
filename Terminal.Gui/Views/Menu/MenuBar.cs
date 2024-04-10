@@ -1715,7 +1715,7 @@ public class MenuBar : View
                         {
                             if (!CloseMenu (true, false))
                             {
-                                return true;
+                                return me.Handled = true;
                             }
 
                             Activate (i);
@@ -1733,7 +1733,7 @@ public class MenuBar : View
                         }
                     }
 
-                    return true;
+                    return me.Handled = true;
                 }
 
                 if (i == Menus.Length - 1 && me.Flags == MouseFlags.Button1Clicked)
@@ -1742,7 +1742,7 @@ public class MenuBar : View
                     {
                         CloseAllMenus ();
 
-                        return true;
+                        return me.Handled = true;
                     }
                 }
 
@@ -1804,7 +1804,7 @@ public class MenuBar : View
                         nme = new () { X = me.X + current.Frame.X, Y = 0, Flags = me.Flags, View = v };
                     }
 
-                    v.OnMouseEvent (nme);
+                    v.NewMouseEvent (nme);
 
                     return false;
                 }

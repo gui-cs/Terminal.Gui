@@ -271,7 +271,7 @@ public class ComboBox : View
                 FocusSelectedItem ();
             }
 
-            return true;
+            return me.Handled = true;
         }
 
         if (me.Flags == MouseFlags.Button1Pressed)
@@ -281,7 +281,7 @@ public class ComboBox : View
                 _search.SetFocus ();
             }
 
-            return true;
+            return me.Handled = true;
         }
 
         return false;

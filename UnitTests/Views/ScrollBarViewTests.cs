@@ -1148,13 +1148,13 @@ This is a test
         top.Add (viewLeft, viewRight);
         Application.Begin (top);
 
-        Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.WheeledDown }));
+        Application.OnMouseEvent (new () { X = 1, Y = 0, Flags = MouseFlags.WheeledDown });
 
         View firstGrabbed = Application.MouseGrabView;
         Assert.IsType<ScrollBarView> (firstGrabbed);
         Assert.Equal (new Rectangle (4, 0, 1, 5), firstGrabbed.Frame);
 
-        Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent { X = 7, Y = 0, Flags = MouseFlags.WheeledDown }));
+        Application.OnMouseEvent (new () { X = 7, Y = 0, Flags = MouseFlags.WheeledDown });
 
         View secondGrabbed = Application.MouseGrabView;
         Assert.IsType<ScrollBarView> (firstGrabbed);
@@ -1849,11 +1849,7 @@ This is a test             ",
                                                       _output
                                                      );
 
-        Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent { X = 15, Y = 0, Flags = MouseFlags.Button1Clicked }
-                                                          )
-                                 );
+        Application.OnMouseEvent (new MouseEvent { X = 15, Y = 0, Flags = MouseFlags.Button1Clicked });
 
         Assert.Null (Application.MouseGrabView);
         Assert.True (clicked);
@@ -1883,11 +1879,7 @@ This is a test             ",
                                                       _output
                                                      );
 
-        Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent { X = 15, Y = 0, Flags = MouseFlags.Button1Clicked }
-                                                          )
-                                 );
+        Application.OnMouseEvent (new MouseEvent { X = 15, Y = 0, Flags = MouseFlags.Button1Clicked });
 
         Assert.Null (Application.MouseGrabView);
         Assert.True (clicked);
@@ -1917,11 +1909,7 @@ This is a tes▼             ",
                                                       _output
                                                      );
 
-        Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent { X = 15, Y = 0, Flags = MouseFlags.Button1Clicked }
-                                                          )
-                                 );
+        Application.OnMouseEvent (new () { X = 15, Y = 0, Flags = MouseFlags.Button1Clicked });
 
         Assert.Null (Application.MouseGrabView);
         Assert.True (clicked);

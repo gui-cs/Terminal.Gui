@@ -1419,18 +1419,16 @@ internal class WindowsDriver : ConsoleDriver
                     break;
                 }
 
-                OnMouseEvent (new MouseEventEventArgs (me));
+                OnMouseEvent (me);
 
                 if (_processButtonClick)
                 {
-                    OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent
-                                                           {
-                                                               X = me.X,
-                                                               Y = me.Y,
-                                                               Flags = ProcessButtonClick (inputEvent.MouseEvent)
-                                                           }));
+                    OnMouseEvent (new ()
+                    {
+                        X = me.X,
+                        Y = me.Y,
+                        Flags = ProcessButtonClick (inputEvent.MouseEvent)
+                    });
                 }
 
                 break;
@@ -1730,10 +1728,16 @@ internal class WindowsDriver : ConsoleDriver
 
     private async Task ProcessContinuousButtonPressedAsync (MouseFlags mouseFlag)
     {
+        // When a user presses-and-holds, start generating pressed events every `startDelay`
+        // After `iterationsUntilFast` iterations, speed them up to `fastDelay` ms
+        const int startDelay = 500;
+        const int iterationsUntilFast = 4;
+        const int fastDelay = 50;
+
+        int iterations = 0;
+        int delay = startDelay;
         while (_isButtonPressed)
         {
-            await Task.Delay (100);
-
             var me = new MouseEvent
             {
                 X = _pointMove.X,
@@ -1741,16 +1745,21 @@ internal class WindowsDriver : ConsoleDriver
                 Flags = mouseFlag
             };
 
-            View view = Application.WantContinuousButtonPressedView;
-
-            if (view is null)
+            if (Application.WantContinuousButtonPressedView is null)
             {
                 break;
             }
 
+            if (iterations++ >= iterationsUntilFast)
+            {
+                delay = fastDelay;
+            }
+            await Task.Delay (delay);
+
+            //Debug.WriteLine($"ProcessContinuousButtonPressedAsync: {view}");
             if (_isButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0)
             {
-                Application.Invoke (() => OnMouseEvent (new MouseEventEventArgs (me)));
+                Application.Invoke (() => OnMouseEvent (me));
             }
         }
     }
@@ -1919,6 +1928,8 @@ internal class WindowsDriver : ConsoleDriver
             {
                 _point = null;
             }
+            _processButtonClick = true;
+
         }
         else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved
                  && !_isOneFingerDoubleClicked

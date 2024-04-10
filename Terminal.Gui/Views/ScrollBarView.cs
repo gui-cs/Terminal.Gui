@@ -212,6 +212,189 @@ public class ScrollBarView : View
     /// <summary>This event is raised when the position on the scrollbar has changed.</summary>
     public event EventHandler ChangedPosition;
 
+        /// <inheritdoc/>
+    protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
+    {
+        if (mouseEvent.Flags != MouseFlags.Button1Pressed
+            && mouseEvent.Flags != MouseFlags.Button1DoubleClicked
+            && !mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)
+            && mouseEvent.Flags != MouseFlags.Button1Released
+            && mouseEvent.Flags != MouseFlags.Button1TripleClicked
+            && (mouseEvent.Flags & MouseFlags.WheeledDown) == 0
+            && (mouseEvent.Flags & MouseFlags.WheeledUp) == 0
+            && (mouseEvent.Flags & MouseFlags.WheeledRight) == 0
+            && (mouseEvent.Flags & MouseFlags.WheeledLeft) == 0
+            && (mouseEvent.Flags & MouseFlags.Button2Pressed) == 0)
+        {
+            return false;
+        }
+
+        View host = SuperView is Adornment adornment ? adornment.Parent : SuperView;
+
+        if (!host.CanFocus)
+        {
+            return true;
+        }
+
+        if (host?.HasFocus == false)
+        {
+            host.SetFocus ();
+        }
+
+        int location = _orientation == Orientation.Vertical ? mouseEvent.Y : mouseEvent.X;
+        int barsize = _orientation == Orientation.Vertical ? ContentArea.Height : ContentArea.Width;
+        int posTopLeftTee = _orientation == Orientation.Vertical ? _posTopTee + 1 : _posLeftTee + 1;
+        int posBottomRightTee = _orientation == Orientation.Vertical ? _posBottomTee + 1 : _posRightTee + 1;
+        barsize -= 2;
+        int pos = Position;
+
+        if (mouseEvent.Flags != MouseFlags.Button1Released && (Application.MouseGrabView is null || Application.MouseGrabView != this))
+        {
+            Application.GrabMouse (this);
+        }
+        else if (mouseEvent.Flags == MouseFlags.Button1Released && Application.MouseGrabView is { } && Application.MouseGrabView == this)
+        {
+            _lastLocation = -1;
+            Application.UngrabMouse ();
+
+            return true;
+        }
+
+        if (Visible
+            && ((mouseEvent.Flags & MouseFlags.WheeledDown) != 0
+                || (mouseEvent.Flags & MouseFlags.WheeledUp) != 0
+                || (mouseEvent.Flags & MouseFlags.WheeledRight) != 0
+                || (mouseEvent.Flags & MouseFlags.WheeledLeft) != 0)
+                || (mouseEvent.Flags & MouseFlags.Button2Pressed) != 0)
+        {
+            return host!.OnMouseEvent (mouseEvent);
+        }
+
+        if (mouseEvent.Flags == MouseFlags.Button1Pressed && location == 0)
+        {
+            if (pos > 0)
+            {
+                Position = pos - 1;
+            }
+        }
+        else if (mouseEvent.Flags == MouseFlags.Button1Pressed && location == barsize + 1)
+        {
+            if (CanScroll (pos + 1, out _, _orientation))
+            {
+                Position = pos + 1;
+            }
+        }
+        else if (location > 0 && location < barsize + 1)
+        {
+            //var b1 = pos * (Size > 0 ? barsize / Size : 0);
+            //var b2 = Size > 0
+            //	? (KeepContentAlwaysInViewport ? Math.Min (((pos + barsize) * barsize / Size) + 1, barsize - 1) : (pos + barsize) * barsize / Size)
+            //	: 0;
+            //if (KeepContentAlwaysInViewport && b1 == b2) {
+            //	b1 = Math.Max (b1 - 1, 0);
+            //}
+
+            if (_lastLocation > -1
+                || (location >= posTopLeftTee
+                    && location <= posBottomRightTee
+                    && mouseEvent.Flags.HasFlag (
+                                                 MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+                                                )))
+            {
+                if (_lastLocation == -1)
+                {
+                    _lastLocation = location;
+
+                    _posBarOffset = _keepContentAlwaysInViewport
+                                        ? Math.Max (location - posTopLeftTee, 1)
+                                        : 0;
+
+                    return true;
+                }
+
+                if (location > _lastLocation)
+                {
+                    if (location == barsize)
+                    {
+                        Position = Size;
+                    }
+                    else if (location - _posBarOffset < barsize)
+                    {
+                        int np = (location - _posBarOffset) * Size / barsize + Size / barsize;
+
+                        if (CanScroll (np, out int nv, _orientation))
+                        {
+                            Position = pos + nv;
+                        }
+                    }
+                    else if (CanScroll (Size, out int nv, _orientation))
+                    {
+                        Position = Math.Min (pos + nv, Size);
+                    }
+                }
+                else if (location < _lastLocation)
+                {
+                    if (location - _posBarOffset > 0)
+                    {
+                        int np = (location - _posBarOffset) * Size / barsize - Size / barsize;
+
+                        if (CanScroll (np, out int nv, _orientation))
+                        {
+                            Position = pos + nv;
+                        }
+                    }
+                    else
+                    {
+                        Position = 0;
+                    }
+                }
+                else if (location == _lastLocation)
+                {
+                    Position = Size;
+                }
+                else if (location - _posBarOffset >= barsize && posBottomRightTee - posTopLeftTee >= 3 && CanScroll (Size - pos, out int nv, _orientation))
+                {
+                    Position = Math.Min (pos + nv, Size);
+                }
+                else if (location - _posBarOffset >= barsize - 1 && posBottomRightTee - posTopLeftTee <= 3 && CanScroll (Size - pos, out nv, _orientation))
+                {
+                    Position = Math.Min (pos + nv, Size);
+                }
+                else if (location - _posBarOffset <= 0 && posBottomRightTee - posTopLeftTee <= 3)
+                {
+                    Position = 0;
+                }
+            }
+            else if (location > posBottomRightTee)
+            {
+                if (CanScroll (pos + barsize, out int nv, _orientation))
+                {
+                    Position = pos + nv;
+                }
+            }
+            else if (location < posTopLeftTee)
+            {
+                if (CanScroll (pos - barsize, out int nv, _orientation))
+                {
+                    Position = pos + nv;
+                }
+            }
+            else if (location == 1 && posTopLeftTee <= 3)
+            {
+                Position = 0;
+            }
+            else if (location == barsize)
+            {
+                if (CanScroll (Size, out int nv, _orientation))
+                {
+                    Position = Math.Min (pos + nv, Size);
+                }
+            }
+        }
+
+        return true;
+    }
+
     /// <summary>Virtual method to invoke the <see cref="ChangedPosition"/> action event.</summary>
     public virtual void OnChangedPosition () { ChangedPosition?.Invoke (this, EventArgs.Empty); }
 
@@ -460,194 +643,11 @@ public class ScrollBarView : View
     public virtual void Refresh () { ShowHideScrollBars (); }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEnter (MouseEvent mouseEvent)
+    protected internal override bool? OnMouseEnter (MouseEvent mouseEvent)
     {
         Application.GrabMouse (this);
 
         return base.OnMouseEnter (mouseEvent);
-    }
-
-    /// <inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
-    {
-        if (mouseEvent.Flags != MouseFlags.Button1Pressed
-            && mouseEvent.Flags != MouseFlags.Button1DoubleClicked
-            && !mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)
-            && mouseEvent.Flags != MouseFlags.Button1Released
-            && mouseEvent.Flags != MouseFlags.Button1TripleClicked
-            && (mouseEvent.Flags & MouseFlags.WheeledDown) == 0
-            && (mouseEvent.Flags & MouseFlags.WheeledUp) == 0
-            && (mouseEvent.Flags & MouseFlags.WheeledRight) == 0
-            && (mouseEvent.Flags & MouseFlags.WheeledLeft) == 0
-            && (mouseEvent.Flags & MouseFlags.Button2Pressed) == 0)
-        {
-            return false;
-        }
-
-        View host = SuperView is Adornment adornment ? adornment.Parent : SuperView;
-
-        if (!host.CanFocus)
-        {
-            return true;
-        }
-
-        if (host?.HasFocus == false)
-        {
-            host.SetFocus ();
-        }
-
-        int location = _orientation == Orientation.Vertical ? mouseEvent.Y : mouseEvent.X;
-        int barsize = _orientation == Orientation.Vertical ? ContentArea.Height : ContentArea.Width;
-        int posTopLeftTee = _orientation == Orientation.Vertical ? _posTopTee + 1 : _posLeftTee + 1;
-        int posBottomRightTee = _orientation == Orientation.Vertical ? _posBottomTee + 1 : _posRightTee + 1;
-        barsize -= 2;
-        int pos = Position;
-
-        if (mouseEvent.Flags != MouseFlags.Button1Released && (Application.MouseGrabView is null || Application.MouseGrabView != this))
-        {
-            Application.GrabMouse (this);
-        }
-        else if (mouseEvent.Flags == MouseFlags.Button1Released && Application.MouseGrabView is { } && Application.MouseGrabView == this)
-        {
-            _lastLocation = -1;
-            Application.UngrabMouse ();
-
-            return true;
-        }
-
-        if (Visible
-            && ((mouseEvent.Flags & MouseFlags.WheeledDown) != 0
-                || (mouseEvent.Flags & MouseFlags.WheeledUp) != 0
-                || (mouseEvent.Flags & MouseFlags.WheeledRight) != 0
-                || (mouseEvent.Flags & MouseFlags.WheeledLeft) != 0)
-                || (mouseEvent.Flags & MouseFlags.Button2Pressed) != 0)
-        {
-            return host!.OnMouseEvent (mouseEvent);
-        }
-
-        if (mouseEvent.Flags == MouseFlags.Button1Pressed && location == 0)
-        {
-            if (pos > 0)
-            {
-                Position = pos - 1;
-            }
-        }
-        else if (mouseEvent.Flags == MouseFlags.Button1Pressed && location == barsize + 1)
-        {
-            if (CanScroll (pos + 1, out _, _orientation))
-            {
-                Position = pos + 1;
-            }
-        }
-        else if (location > 0 && location < barsize + 1)
-        {
-            //var b1 = pos * (Size > 0 ? barsize / Size : 0);
-            //var b2 = Size > 0
-            //	? (KeepContentAlwaysInViewport ? Math.Min (((pos + barsize) * barsize / Size) + 1, barsize - 1) : (pos + barsize) * barsize / Size)
-            //	: 0;
-            //if (KeepContentAlwaysInViewport && b1 == b2) {
-            //	b1 = Math.Max (b1 - 1, 0);
-            //}
-
-            if (_lastLocation > -1
-                || (location >= posTopLeftTee
-                    && location <= posBottomRightTee
-                    && mouseEvent.Flags.HasFlag (
-                                                 MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-                                                )))
-            {
-                if (_lastLocation == -1)
-                {
-                    _lastLocation = location;
-
-                    _posBarOffset = _keepContentAlwaysInViewport
-                                        ? Math.Max (location - posTopLeftTee, 1)
-                                        : 0;
-
-                    return true;
-                }
-
-                if (location > _lastLocation)
-                {
-                    if (location == barsize)
-                    {
-                        Position = Size;
-                    }
-                    else if (location - _posBarOffset < barsize)
-                    {
-                        int np = (location - _posBarOffset) * Size / barsize + Size / barsize;
-
-                        if (CanScroll (np, out int nv, _orientation))
-                        {
-                            Position = pos + nv;
-                        }
-                    }
-                    else if (CanScroll (Size, out int nv, _orientation))
-                    {
-                        Position = Math.Min (pos + nv, Size);
-                    }
-                }
-                else if (location < _lastLocation)
-                {
-                    if (location - _posBarOffset > 0)
-                    {
-                        int np = (location - _posBarOffset) * Size / barsize - Size / barsize;
-
-                        if (CanScroll (np, out int nv, _orientation))
-                        {
-                            Position = pos + nv;
-                        }
-                    }
-                    else
-                    {
-                        Position = 0;
-                    }
-                }
-                else if (location == _lastLocation)
-                {
-                    Position = Size;
-                }
-                else if (location - _posBarOffset >= barsize && posBottomRightTee - posTopLeftTee >= 3 && CanScroll (Size - pos, out int nv, _orientation))
-                {
-                    Position = Math.Min (pos + nv, Size);
-                }
-                else if (location - _posBarOffset >= barsize - 1 && posBottomRightTee - posTopLeftTee <= 3 && CanScroll (Size - pos, out nv, _orientation))
-                {
-                    Position = Math.Min (pos + nv, Size);
-                }
-                else if (location - _posBarOffset <= 0 && posBottomRightTee - posTopLeftTee <= 3)
-                {
-                    Position = 0;
-                }
-            }
-            else if (location > posBottomRightTee)
-            {
-                if (CanScroll (pos + barsize, out int nv, _orientation))
-                {
-                    Position = pos + nv;
-                }
-            }
-            else if (location < posTopLeftTee)
-            {
-                if (CanScroll (pos - barsize, out int nv, _orientation))
-                {
-                    Position = pos + nv;
-                }
-            }
-            else if (location == 1 && posTopLeftTee <= 3)
-            {
-                Position = 0;
-            }
-            else if (location == barsize)
-            {
-                if (CanScroll (Size, out int nv, _orientation))
-                {
-                    Position = Math.Min (pos + nv, Size);
-                }
-            }
-        }
-
-        return true;
     }
 
     /// <inheritdoc/>
@@ -808,7 +808,7 @@ public class ScrollBarView : View
             || me.MouseEvent.Flags == MouseFlags.WheeledRight
             || me.MouseEvent.Flags == MouseFlags.WheeledLeft)
         {
-            OnMouseEvent (me.MouseEvent);
+            NewMouseEvent (me.MouseEvent);
         }
         else if (me.MouseEvent.Flags == MouseFlags.Button1Clicked)
         {

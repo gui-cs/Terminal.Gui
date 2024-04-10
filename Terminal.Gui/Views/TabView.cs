@@ -533,7 +533,7 @@ public class TabView : View
         return Style.ShowTopLine ? 3 : 2;
     }
 
-    private void Tab_MouseClick (object sender, MouseEventEventArgs e) { e.Handled = _tabsBar.OnMouseEvent (e.MouseEvent); }
+    private void Tab_MouseClick (object sender, MouseEventEventArgs e) { e.Handled = _tabsBar.NewMouseEvent (e.MouseEvent) == true; }
 
     private void UnSetCurrentTabs ()
     {

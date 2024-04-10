@@ -122,7 +122,7 @@ public class TextFieldTests
         Assert.False (fv.CanFocus);
         Assert.False (fv.HasFocus);
 
-        tf.OnMouseEvent (
+        tf.NewMouseEvent (
                        new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
                       );
 
@@ -136,7 +136,7 @@ public class TextFieldTests
         fv.CanFocus = true;
         tf.CanFocus = true;
 
-        tf.OnMouseEvent (
+        tf.NewMouseEvent (
                        new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
                       );
 
@@ -148,7 +148,7 @@ public class TextFieldTests
 
         fv.CanFocus = false;
 
-        tf.OnMouseEvent (
+        tf.NewMouseEvent (
                        new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
                       );
 
@@ -484,7 +484,7 @@ public class TextFieldTests
         tf.Text = "Les Misérables movie.";
 
         Assert.True (
-                     tf.OnMouseEvent (
+                     tf.NewMouseEvent (
                                     new MouseEvent { X = 7, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
                                    )
                     );
@@ -1039,13 +1039,13 @@ public class TextFieldTests
 
         var mouseEvent = new MouseEvent { Flags = MouseFlags.Button1Clicked, View = tf };
 
-        Application.OnMouseEvent (new MouseEventEventArgs (mouseEvent));
+        Application.OnMouseEvent (mouseEvent);
         Assert.Equal (1, clickCounter);
 
         // Get a fresh instance that represents a right click.
         // Should be ignored because of SuppressRightClick callback
         mouseEvent = new MouseEvent { Flags = MouseFlags.Button3Clicked, View = tf };
-        Application.OnMouseEvent (new MouseEventEventArgs (mouseEvent));
+        Application.OnMouseEvent (mouseEvent);
         Assert.Equal (1, clickCounter);
 
         Application.MouseEvent -= HandleRightClick;
@@ -1058,14 +1058,14 @@ public class TextFieldTests
         // This call causes the context menu to pop, and MouseEvent() returns true.
         // Thus, the clickCounter is NOT incremented.
         // Which is correct, because the user did NOT click with the left mouse button.
-        Application.OnMouseEvent (new MouseEventEventArgs (mouseEvent));
+        Application.OnMouseEvent (mouseEvent);
         Assert.Equal (1, clickCounter);
 
         return;
 
-        void HandleRightClick (object sender, MouseEventEventArgs arg)
+        void HandleRightClick (object sender, MouseEvent arg)
         {
-            if (arg.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
+            if (arg.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
                 arg.Handled = true;
             }
@@ -1152,12 +1152,12 @@ public class TextFieldTests
 
         var ev = new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1DoubleClicked };
 
-        tf.OnMouseEvent (ev);
+        tf.NewMouseEvent (ev);
         Assert.Equal (1, tf.SelectedLength);
 
         ev = new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked };
 
-        tf.OnMouseEvent (ev);
+        tf.NewMouseEvent (ev);
         Assert.Equal (1, tf.SelectedLength);
     }
 
@@ -1529,14 +1529,14 @@ public class TextFieldTests
         Assert.Equal ("m", runes [idx].ToString ());
 
         Assert.True (
-                     tf.OnMouseEvent (
+                     tf.NewMouseEvent (
                                     new MouseEvent { X = idx, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
                                    )
                     );
         Assert.Equal ("movie.", tf.SelectedText);
 
         Assert.True (
-                     tf.OnMouseEvent (
+                     tf.NewMouseEvent (
                                     new MouseEvent { X = idx + 1, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
                                    )
                     );

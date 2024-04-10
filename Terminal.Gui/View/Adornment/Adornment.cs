@@ -209,6 +209,10 @@ public class Adornment : View
     /// <returns><see langword="true"/> if the specified Parent's SuperView-relative coordinates are within the Adornment's Thickness. </returns>
     public override bool Contains (int x, int y)
     {
+        if (Parent is null)
+        {
+            return false;
+        }
         Rectangle frame = Frame;
         frame.Offset (Parent.Frame.Location);
 
@@ -216,7 +220,7 @@ public class Adornment : View
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEnter (MouseEvent mouseEvent)
+    protected internal override bool? OnMouseEnter (MouseEvent mouseEvent)
     {
         // Invert Normal
         if (Diagnostics.HasFlag (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
@@ -247,6 +251,11 @@ public class Adornment : View
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
+        if (Parent is null)
+        {
+            return false;
+        }
+
         var args = new MouseEventEventArgs (mouseEvent);
 
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))

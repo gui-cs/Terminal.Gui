@@ -83,7 +83,7 @@ public class Adornments : Scenario
             //BorderStyle = LineStyle.None,
         };
         view.Width = Dim.Percent (60);
-        view.Height = Dim.Percent (80);
+        view.Height = Dim.Percent (80); 
 
         editor.Initialized += (s, e) => { editor.ViewToEdit = view; };
 

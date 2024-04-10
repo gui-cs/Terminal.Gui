@@ -444,7 +444,7 @@ public partial class Toplevel : View
     ///     perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set. changes.
     ///     <para>
     ///         A Ready event handler is a good place to finalize initialization after calling
-    ///         <see cref="Application.Run(Func{Exception, bool})"/> on this <see cref="Toplevel"/>.
+    ///         <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> on this <see cref="Toplevel"/>.
     ///     </para>
     /// </summary>
     public event EventHandler Ready;
