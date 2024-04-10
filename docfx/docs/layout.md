@@ -1,42 +1,63 @@
 # Layout
 
-Terminal.Gui v2 supports the following View layout systems (controlled by the [View.LayoutStyle](~/api/Terminal.Gui.LayoutStyle.yml)):
+Terminal.Gui provides a rich system for how `View` objects are laid our relative to each other. The layout system also defines how coordinates are specified.
 
-* **Absolute** - Used to have the View positioned exactly in a location, with a fixed size. Absolute layout is accomplished by constructing a View with an argument of type [Rect](~/api/Terminal.Gui.Rect.yml) or directly changing the `Frame` property on the View.
-* **Computed** - The Computed Layout system provides automatic aligning of Views with other Views, automatic centering, and automatic sizing. To use Computed layout set the 
- `X`, `Y`, `Width` and `Height` properties after the object has been created. Views laid out using the Computed Layout system can be resized with the mouse or keyboard, enabling tiled window managers and dynamic terminal UIs.
-* **Overlapped** - New in V2 (But not yet) - Overlapped layout enables views to be positioned on top of each other. Overlapped Views are movable and sizable with both the keyboard and the mouse.
+## Dealing with coordinates
 
-Examples:
+The coordinate systems in Terminal.Gui are:
 
-```csharp
+* `Screen` - Describes the dimensions and characteristcs of the underlying terminal. Currently Terminal.Gui only supports applications that run "full-screen", meaning they fill the entire terminal when running. As the user resizes their terminal, the `Screen` changes size and a Terminal.Gui applicaiton will be resized to fit. *Screen-Relative* means an origin (`0, 0`) at the top-left corner of the terminal. `ConsoleDriver`s operate exclusively on *Screen-Relative* coordinates.
+* `Application` - The dimensions and charactersistcs of the application. Because only full-screen apps are currently supported, `Application` is effectively the same as `Screen` from a layout perspective. *Application-Relative* currently means an origin (`0, 0`) at the top-left corner of the terminal. `Applicaiton.Top` is a `View` who's top-left corner is fixed at the *Application.Relative* coordinate of (`0, 0`) and who's size is the same as the size of the `Screen`.
+* `View Frame` - A rectangle at a particular point, and of a particular size, within another `View`, referred to as the `Superview`. *Frame-Relative* means a coordinate is relative to the top-left corner of the View in question. `View.FrameToScreen ()` and `View.ScreenToFrame ()` are helper methods for translating a *Frame-Relative* coordinate to a *Screen-Relative* coordinate and vice-versa.
+* `View Content` - A rectangle, with an origin of (`0, 0`) and size (defined by `View.ContentSize`) where the View's content exists. *Content-Relative* means a coordinate is relative to the top-left corner of the content, which is always (`0,0`). `View.ContentToScreen ()` and `View.ScreenToContent ()` are helper methods for translating a *Content-Relative* coordinate to a *Screen-Relative* coordinate and vice-versa.
+* `Viewport` - A *Contnet-Relative* rectangle representing the subset of the View's content that is visible to the user. If `View.ContentSize` is larger than the Viewport, scrolling is enabled. *Viewport-Relative* means a coordinate that is bound by (`0,0`) and the size of the inner-rectangle of the View's `Padding`. The View drawing primitives (e.g. `View.Move`) take *Viewport-Relative* coordinates; `Move (0, 0)` means the `Cell` in the top-left corner of the inner rectangle of `Padding`. `View.ViewportToScreen ()` and `View.ScreenToViewport ()` are helper methods for translating a *Viewport-Relative* coordinate to a *Screen-Relative* coordinate and vice-versa. To convert a *Viewport-Relative* coordinate to a *Content-Relative* coordinate, simply subtract `Viewport.X` and/or `Viewport.Y` from the *Content-Relative* coordinate. To convert a *Viewport-Relative* coordinate to a *Frame-Relative* coordinate, subtract the point returned by `View.GetViewportOffsetFromFrame`.
+
+## The Viewport
+
+The Viewport (`View.Viewport`) is a rectangle describing a sub-set of the View's content. It is a "portal" into the content. The `Viewport.Location` is relative to the top-left corner of the inner rectangle of `View.Padding`. If `Viewport.Size` is the same as `View.ContentSize`, `Viewport.Location` will be `0,0`. Non-zero values for the location indicate the visible area is offset into the View's content area, enabling scrolling. Making `Viewport.Location` positive, moves the Viewport down and to the right in the content. If the location values are negative, it means the `Viewport` is positioned above and to the left of the content.
+
+## Layout
+
+Terminal.Gui provides a rich sytem for how views are laid out relative to each other. **Computed Layout** means the position and size of a View is declared to be computed by the layout engine. **Absolute Layout** means the position and size of a View is explicitly declared by the develeper to be an absolute value. The position of a view is set by setting the `X` and `Y` properties, which are of time [Pos](~/api/Terminal.Gui.Pos.yml). The size is set via that `Width` and `Height` properties, which are of type [Dim](~/api/Terminal.Gui.Dim.yml).
+
+**Computed Layout** supports dynamic console apps where UI elements (Views) adjust layout as the terminal resizes or other Views change size or position. The X, Y, Width, and Height properties are Dim and Pos objects that dynamically update the position of a view.
+
+**Absolute Layout** requires specifying coordinates and sizes of Views explicitly, and the View will typically stay in a fixed position and size.
+
+```cs
 // Absolute layout using a provided rectangle
-var label1 = new Label (new Rect (1, 1, 20, 1), "Hello")
+var label1 = new Label () { X = 1, Y = 2, Width = 3, Height = 4, Title = "Absolute")
 
 // Computed Layout
-var label2 = new Label ("Hello") {
-    X = Pos.Right (label2),
+var label2 = new Label () {
+    Title = "Computed",
+    X = Pos.Right (otherView),
     Y = Pos.Center (),
     Width = Dim.Fill (),
-    Height = 1
+    Height = Dim.Percent (50)
 };
 
 ```
 
-When using *Computed Layout* the `X` and `Y` properties are of type [Pos](~/api/Terminal.Gui.Pos.yml) and the `Width` and `Height` properties are of type [Dim](~/api/Terminal.Gui.Dim.yml) both of which can be created implicitly from integer values.
+The `Frame` property is a rectangle that provides the current location and size of the view relative to the View's `Superview`'s Content area. 
+
+The `View.LayoutStyle` property can be used to determine how the View is treated. If the style is `Absolute`, the `X`, `Y`, `Width`, and `Height` objects are all absolute values. If the style is `Computed`, one or more of the `X`, `Y`, `Width`, and `Height` objects describe a computed value.
 
 ## The `Pos` Type
 
-The `Pos` type on `X` and `Y` offers a few options:
-* Absolute position, by passing an integer
-* Percentage of the parent's view size - `Pos.Percent(n)`
-* Anchored from the end of the dimension - `AnchorEnd(int margin=0)`
-* Centered, using `Center()`
-* Reference the Left (X), Top (Y), Bottom, Right positions of another view
+The [Pos](~/api/Terminal.Gui.Pos.yml) is the type of `View.X` and `View.Y` and supports the following sub-types:
 
-The `Pos` values can be added or subtracted, like this:
+* Absolute position, by passing an integer - `Pos.Absolute(n)`.
+* Percentage of the parent's view size - `Pos.Percent(percent)`.
+* Anchored from the end of the dimension - `Pos.AnchorEnd(margin)`.
+* Centered, using `Pos.Center()`.
+* The `Pos.Left(otherView)`, `Pos.Top(otherView)`, `Pos.Bottom(otherView)`, `Pos.Right(otherView)` positions of another view.
 
-```csharp
+All `Pos` coordinates are relative to the Superview's content area.
+
+`Pos` values can be combined using addition or subtraction:
+
+```cs
 // Set the X coordinate to 10 characters left from the center
 view.X = Pos.Center () - 10;
 
@@ -46,28 +67,29 @@ anotherView.X = AnchorEnd (10);
 anotherView.Width = 9;
 
 myView.X = Pos.X (view);
-myView.Y = Pos.Bottom (anotherView);
+myView.Y = Pos.Bottom (anotherView) + 5;
 ```
-
 ## The `Dim` Type
 
-The `Dim` type is used for the `Width` and `Height` properties on the View and offers
-the following options:
+The [Dim](~/api/Terminal.Gui.Dim.yml) is the type of `View.Width` and `View.Height` and supports the following sub-types:
 
-* Absolute size, by passing an integer
-* Percentage of the parent's view size - `Dim.Percent(n)`
-* Fill to the end - `Dim.Fill ()`
-* Reference the Width or Height of another view
+* Absolute size, by passing an integer - `Dim.Absolute(n)`.
+* Percentage of the Superview's Content Area  - `Dim.Percent(percent)`.
+* Fill to the end of the Superview's Content Area - `Dim.Fill ()`.
+* Reference the Width or Height of another view - `Dim.Width (otherView)`, `Dim.Height (otherView)`.
+* An arbitrary function - `Dim.Function(fn)`
+* Automatic size based on the View's content (either Subviews or Text) - `Dim.Auto()`
 
-Like, `Pos`, objects of type `Dim` can be added an subtracted, like this:
+All `Dim` dimensions are relative to the Superview's content area.
 
+Like, `Pos`, objects of type `Dim` can be combined using addition or subtraction, like this:
 
-```csharp
+```cs
 // Set the Width to be 10 characters less than filling 
 // the remaining portion of the screen
 view.Width = Dim.Fill () - 10;
 
 view.Height = Dim.Percent(20) - 1;
 
-anotherView.Height = Dim.Height (view)+1
+anotherView.Height = Dim.Height (view) + 1;
 ```

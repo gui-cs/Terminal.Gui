@@ -74,34 +74,35 @@ public partial class View
     public event EventHandler<SizeChangedEventArgs> ContentSizeChanged;
 
     /// <summary>
-    ///     Converts a content-relative location to a screen-relative location.
+    ///     Converts a Content-relative location to a Screen-relative location.
     /// </summary>
-    /// <param name="location"></param>
-    /// <returns>The screen-relative location.</returns>
+    /// <param name="location">The Content-relative location.</param>
+    /// <returns>The Screen-relative location.</returns>
     public Point ContentToScreen (in Point location)
     {
-        // Translate to Viewport
+        // Subtract the ViewportOffsetFromFrame to get the Viewport-relative location.
         Point viewportOffset = GetViewportOffsetFromFrame ();
         Point contentRelativeToViewport = location;
         contentRelativeToViewport.Offset (-Viewport.X, -Viewport.Y);
 
-        // Translate to Frame (our SuperView's Viewport-relative coordinates)
+        // Translate to Screen-Relative (our SuperView's Viewport-relative coordinates)
         Rectangle screen = ViewportToScreen (new (contentRelativeToViewport, Size.Empty));
 
         return screen.Location;
     }
 
-    /// <summary>Converts a screen-relative coordinate to a Content-relative coordinate.</summary>
+    /// <summary>Converts a Screen-relative coordinate to a Content-relative coordinate.</summary>
     /// <remarks>
-    ///     Content-relative means relative to the top-left corner of the view's Content.
+    ///     Content-relative means relative to the top-left corner of the view's Content, which is
+    ///     always at <c>0, 0</c>.
     /// </remarks>
     /// <param name="x">Column relative to the left side of the Content.</param>
     /// <param name="y">Row relative to the top of the Content</param>
     /// <returns>The coordinate relative to this view's Content.</returns>
-    public Point ScreenToContent (int x, int y)
+    public Point ScreenToContent (in Point location)
     {
         Point viewportOffset = GetViewportOffsetFromFrame ();
-        Point screen = ScreenToFrame (x, y);
+        Point screen = ScreenToFrame (location.X, location.Y);
         screen.Offset (Viewport.X - viewportOffset.X, Viewport.Y - viewportOffset.Y);
 
         return screen;

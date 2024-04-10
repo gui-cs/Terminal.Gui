@@ -532,7 +532,7 @@ public class MouseTests (ITestOutputHelper output)
         int enablingHighlight = 0;
         int disablingHighlight = 0;
         view.Highlight += View_Highlight;
-        bool inViewport = view.Bounds.Contains (x, 0);
+        bool inViewport = view.Viewport.Contains (x, 0);
 
         // Start at 0,0 ; in viewport
         view.NewMouseEvent (new () { X = 0, Flags = MouseFlags.Button1Pressed });

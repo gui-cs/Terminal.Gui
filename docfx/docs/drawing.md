@@ -1,6 +1,35 @@
 # Drawing (Text and Color)
 
-Terminal.Gui supports color on all platforms, including Windows, Mac, and Linux. The default colors are 24-bit RGB colors, but the library will gracefully degrade to 16-colors if the terminal does not support 24-bit color, and black and white if the terminal does not support 16-colors.
+Terminal.Gui provides a set of APIs for formatting text, line drawing, and character-based graphing. The fundamental concept is a `Cell` which ocupises a particular row and column in the terminal. A Cell includes the character (glyph) that should be rendred by the terminal, and attributes that indicate how the glphy should be rendered (e.g. the foreground and background color).
+
+Color is supported on all platforms, including Windows, Mac, and Linux. The default colors are 24-bit RGB colors, but the library will gracefully degrade to 16-colors if the terminal does not support 24-bit color, and black and white if the terminal does not support 16-colors.
+
+## View Drawing API
+
+A `View` will typically draw text when the [OnDrawContent](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_OnDrawContent_) is called (or the `DrawContent` event is received). 
+
+Outputing text directly involves:
+
+a) Moving the draw cursor using the `Move` API.
+b) Setting the attributes using `SetAttribute`.
+c) Outputting glyphs by calling `AddRune` or `AddStr`
+
+Outputting formatted text involves:
+
+a) Adding the text to a `TextFormatter` object.
+b) Setting formatting options, such as `TextFormatter.TextAlignment`.
+c) calling `TextFormatter.Draw` 
+
+Line drawing is accomplished using the `LineCanvas` API:
+
+a) Add the lines via `LineCanvas.Add`.
+b) Either render the line canvas via `LineCanvas.Draw` or let the `View` do so automatically (which enables automatic line joining across Views).
+
+## Coordinate System for Drawing
+
+The `View` draw APIs, including the `OnDrawContent` method, the `DrawContent` event, and the `View.Move` method, all take coordinates specified in *Viewport-Relative* coordinates. That is, `0, 0` is the top-left cell visible to the user.
+
+See [Layout](layout.html) for more details of the Terminal.Gui coordinate system.
 
 ## Cell
 
