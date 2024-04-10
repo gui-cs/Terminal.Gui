@@ -757,4 +757,73 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 30, 5), pos);
         top.Dispose ();
     }
+    
+    [Theory]
+    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
+    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
+    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
+    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
+    public void WantContinuousButtonPressed_True_ButtonClick_Accepts (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
+    {
+        var me = new MouseEvent ();
+
+        var button = new Button ()
+        {
+            AutoSize = false,
+            Width = 1,
+            Height = 1,
+            WantContinuousButtonPressed = true
+        };
+
+        var acceptCount = 0;
+
+        button.Accept += (s, e) => acceptCount++;
+
+        me.Flags = pressed;
+        button.NewMouseEvent (me);
+        Assert.Equal (1, acceptCount);
+
+        me.Flags = released;
+        button.NewMouseEvent (me);
+        Assert.Equal (1, acceptCount);
+
+        me.Flags = clicked;
+        button.NewMouseEvent (me);
+        Assert.Equal (1, acceptCount);
+
+        button.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
+    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
+    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
+    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
+    public void WantContinuousButtonPressed_True_ButtonPressRelease_Accepts (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
+    {
+        var me = new MouseEvent ();
+
+        var button = new Button ()
+        {
+            AutoSize = false,
+            Width = 1,
+            Height = 1,
+            WantContinuousButtonPressed = true
+        };
+
+        var acceptCount = 0;
+
+        button.Accept += (s, e) => acceptCount++;
+
+        me.Flags = pressed;
+        button.NewMouseEvent (me);
+        Assert.Equal (1, acceptCount);
+
+        me.Flags = released;
+        button.NewMouseEvent (me);
+        Assert.Equal (1, acceptCount);
+
+        button.Dispose ();
+    }
+
 }

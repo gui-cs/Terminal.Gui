@@ -495,9 +495,9 @@ public partial class View
                     };
                     ColorScheme = cs;
                 }
-
-                return true;
             }
+            // Return false since we don't want to eat the event
+            return false;
         }
 
 

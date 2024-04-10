@@ -382,6 +382,65 @@ public class MouseTests (ITestOutputHelper output)
         view.Dispose ();
     }
 
+
+    [Theory]
+    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
+    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
+    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
+    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
+    public void WantContinuousButtonPressed_True_Button_Clicked_Clicks (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
+    {
+        var me = new MouseEvent ();
+
+        var view = new View ()
+        {
+            Width = 1,
+            Height = 1,
+            WantContinuousButtonPressed = true
+        };
+
+        var clickedCount = 0;
+
+        view.MouseClick += (s, e) => clickedCount++;
+        
+        me.Flags = clicked;
+        view.NewMouseEvent (me);
+        Assert.Equal (1, clickedCount);
+
+        view.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
+    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
+    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
+    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
+    public void WantContinuousButtonPressed_True_Button_Press_Release_Clicks (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
+    {
+        var me = new MouseEvent ();
+
+        var view = new View ()
+        {
+            Width = 1,
+            Height = 1,
+            WantContinuousButtonPressed = true
+        };
+
+        var clickedCount = 0;
+
+        view.MouseClick += (s, e) => clickedCount++;
+
+        me.Flags = pressed;
+        view.NewMouseEvent (me);
+        Assert.Equal (1, clickedCount);
+
+        me.Flags = released;
+        view.NewMouseEvent (me);
+        Assert.Equal (1, clickedCount);
+
+        view.Dispose ();
+    }
+
     [Theory]
     [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
     [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
