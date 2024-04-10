@@ -1,4 +1,4 @@
-# Drawing (Text and Color)
+# Drawing (Text, Lines, and Color)
 
 Terminal.Gui provides a set of APIs for formatting text, line drawing, and character-based graphing. The fundamental concept is a `Cell` which ocupises a particular row and column in the terminal. A Cell includes the character (glyph) that should be rendred by the terminal, and attributes that indicate how the glphy should be rendered (e.g. the foreground and background color).
 
@@ -64,6 +64,8 @@ Color schemes support defining colors for various states of a view. The followin
 * Focus - The color of text that indicates the view has focus.
 * HotFocus - The color of text indicating a hot key, when the view has focus.
 * Disabled - The state of a view when it is disabled.
+
+Change the colors of a view by setting the `View.ColorScheme` property.
 
 ## Text Formatting
 
