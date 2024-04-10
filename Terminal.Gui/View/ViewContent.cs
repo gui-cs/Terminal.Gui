@@ -3,7 +3,7 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     Controls the scrolling behavior of a view.
+///     Settings for how scrolling the <see cref="View.Viewport"/> on the View's Content Area is handled.
 /// </summary>
 [Flags]
 public enum ScrollSettings
@@ -14,17 +14,17 @@ public enum ScrollSettings
     Default = 0,
 
     /// <summary>
-    ///     If set, does not restrict vertical scrolling to the content size.
+    ///     If set, does not restrict vertical scrolling to <see cref="View.ContentSize"/>.<c>Height</c>.
     /// </summary>
     NoRestrictVertical = 1,
 
     /// <summary>
-    ///     If set, does not restrict horizontal scrolling to the content size.
+    ///     If set, does not restrict horizontal scrolling to <see cref="View.ContentSize"/>.<c>Width</c>.
     /// </summary>
     NoRestrictHorizontal = 2,
 
     /// <summary>
-    ///     If set, does not restrict either vertical or horizontal scrolling to the content size.
+    ///     If set, does not restrict either vertical or horizontal scrolling to <see cref="View.ContentSize"/>.
     /// </summary>
     NoRestrict = NoRestrictVertical | NoRestrictHorizontal
 }
@@ -37,22 +37,39 @@ public partial class View
 
     /// <summary>
     ///     Gets or sets the size of the View's content. If the value is <c>Size.Empty</c> the size of the content is
-    ///     the same as the size of the <see cref="Viewport"/>, and <c>Viewport.Location</c> will always be <c>0, 0</c>.
-    ///     If a positive size is provided, <see cref="Viewport"/> describes the portion of the content currently visible
-    ///     to the view. This enables virtual scrolling.
+    ///     the same as the size of <see cref="Viewport"/>, and <c>Viewport.Location</c> will always be <c>0, 0</c>.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If a positive size is provided, <see cref="Viewport"/> describes the portion of the content currently visible
+    ///         to the view. This enables virtual scrolling.
+    ///     </para>
+    ///     <para>
+    ///         Negative sizes are not supported.
+    ///     </para>
+    /// </remarks>
     public Size ContentSize
     {
         get => _contentSize == Size.Empty ? Viewport.Size : _contentSize;
         set
         {
+            if (value.Width < 0 || value.Height < 0)
+            {
+                throw new ArgumentException (@"ContentSize cannot be negative.", nameof (value));
+            }
+
+            if (value == _contentSize)
+            {
+                return;
+            }
+
             _contentSize = value;
             OnContentSizeChanged (new (_contentSize));
         }
     }
 
     /// <summary>
-    /// Called when the <see cref="ContentSize"/> changes. Invokes the <see cref="ContentSizeChanged"/> event.
+    ///     Called when <see cref="ContentSize"/> changes. Invokes the <see cref="ContentSizeChanged"/> event.
     /// </summary>
     /// <param name="e"></param>
     /// <returns></returns>
@@ -65,11 +82,11 @@ public partial class View
             SetNeedsDisplay ();
         }
 
-        return e.Cancel == true;
+        return e.Cancel;
     }
 
     /// <summary>
-    ///    Event that is raised when the <see cref="ContentSize"/> changes.
+    ///     Event that is raised when the <see cref="ContentSize"/> changes.
     /// </summary>
     public event EventHandler<SizeChangedEventArgs> ContentSizeChanged;
 
@@ -113,28 +130,38 @@ public partial class View
     #region Viewport
 
     /// <summary>
-    ///     Gets or sets the scrolling behavior of the view.
+    ///     Gets or sets how scrolling the <see cref="View.Viewport"/> on the View's Content Area is handled.
     /// </summary>
     public ScrollSettings ScrollSettings { get; set; }
 
     /// <summary>
-    /// The location of the viewport.in the view's content (0,0) is the top-left corner of the content. It's size
-    /// is <see cref="ContentSize"/>.
+    ///     The location of the viewport into the view's content (0,0) is the top-left corner of the content. The Content
+    ///     area's size
+    ///     is <see cref="ContentSize"/>.
     /// </summary>
     private Point _viewportLocation;
 
     /// <summary>
     ///     Gets or sets the rectangle describing the portion of the View's content that is visible to the user.
-    ///     The viewport Location is relative to the top-left corner of the inner rectangle of <see cref="Padding"/>s.
-    ///     If the viewport Size is the sames as the <see cref="ContentSize"/> the Location will be <c>0, 0</c>.
-    ///     Positive values for the location indicate the visible area is offset into the View's virtual
-    ///     <see cref="ContentSize"/>.
+    ///     The viewport Location is relative to the top-left corner of the inner rectangle of <see cref="Padding"/>.
+    ///     If the viewport Size is the same as <see cref="ContentSize"/> the Location will be <c>0, 0</c>.
     /// </summary>
     /// <value>
     ///     The rectangle describing the location and size of the viewport into the View's virtual content, described by
     ///     <see cref="ContentSize"/>.
     /// </value>
     /// <remarks>
+    ///     <para>
+    ///         Positive values for the location indicate the visible area is offset into (down-and-right) the View's virtual
+    ///         <see cref="ContentSize"/>. This enables virtual scrolling.
+    ///     </para>
+    ///     <para>
+    ///         Negative values for the location indicate the visible area is offset above (up-and-left) the View's virtual
+    ///         <see cref="ContentSize"/>. This enables virtual zoom.
+    ///     </para>
+    ///     <para>
+    ///         The <see cref="ScrollSettings"/> property controls how scrolling is handled. If <see cref="ScrollSettings"/> is
+    ///     </para>
     ///     <para>
     ///         If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/> the value of Viewport is indeterminate until
     ///         the view has been initialized ( <see cref="IsInitialized"/> is true) and <see cref="LayoutSubviews"/> has been
@@ -170,10 +197,12 @@ public partial class View
 
             Thickness thickness = GetAdornmentsThickness ();
 
-            return new (_viewportLocation, new (
-                                                Math.Max (0, Frame.Size.Width - thickness.Horizontal),
-                                                Math.Max (0, Frame.Size.Height - thickness.Vertical)
-                                                ));
+            return new (
+                        _viewportLocation,
+                        new (
+                             Math.Max (0, Frame.Size.Width - thickness.Horizontal),
+                             Math.Max (0, Frame.Size.Height - thickness.Vertical)
+                            ));
         }
         set
         {
@@ -204,8 +233,11 @@ public partial class View
             }
 
             Thickness thickness = GetAdornmentsThickness ();
-            Size newSize = new (value.Size.Width + thickness.Horizontal,
+
+            Size newSize = new (
+                                value.Size.Width + thickness.Horizontal,
                                 value.Size.Height + thickness.Vertical);
+
             if (newSize == Frame.Size)
             {
                 // The change is not changing the Frame, so we don't need to update it.
@@ -215,6 +247,7 @@ public partial class View
                     _viewportLocation = value.Location;
                     SetNeedsLayout ();
                 }
+
                 return;
             }
 
