@@ -371,5 +371,29 @@ public class MouseTests
         }
     }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void MouseGrabView_Is_Set_To_Null_If_A_View_Was_Disposed ()
+    {
+        var count = 0;
+        var view = new View { Width = 1, Height = 1 };
+        view.MouseEvent += (s, e) => count++;
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
+
+        Assert.Null (Application.MouseGrabView);
+        Application.GrabMouse (view);
+        Assert.Equal (view, Application.MouseGrabView);
+        top.Remove (view);
+        view.Dispose ();
+#if DEBUG_IDISPOSABLE
+        Assert.True (view.WasDisposed);
+#endif
+
+        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed });
+        Assert.Null (Application.MouseGrabView);
+        Assert.Equal (0, count);
+    }
     #endregion
 }
