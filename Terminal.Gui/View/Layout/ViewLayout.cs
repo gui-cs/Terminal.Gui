@@ -120,39 +120,21 @@ public partial class View
     /// <returns>The coordinate relative to the <see cref="SuperView"/>'s <see cref="Viewport"/>.</returns>
     /// <param name="x">Screen-relative column.</param>
     /// <param name="y">Screen-relative row.</param>
-    //public virtual Point ScreenToFrame (int x, int y)
-    //{
-    //    Point superViewViewportOffset = SuperView?.GetViewportOffsetFromFrame () ?? Point.Empty;
-
-    //    if (SuperView is null)
-    //    {
-    //        superViewViewportOffset.Offset (x - Frame.X, y - Frame.Y);
-
-    //        return superViewViewportOffset;
-    //    }
-    //    superViewViewportOffset.Offset (-SuperView.Viewport.X, -SuperView.Viewport.Y);
-    //    Point frame = SuperView.ScreenToFrame (x - superViewViewportOffset.X, y - superViewViewportOffset.Y);
-    //    frame.Offset (-Frame.X, -Frame.Y);
-
-    //    return frame;
-    //}
-
-    public virtual Point ScreenToFrame (/*Point point*/int x, int y)
+    public virtual Point ScreenToFrame (int x, int y)
     {
-        Point point = new (x, y);
         if (SuperView is null)
         {
-            return new Point (point.X - Frame.X, point.Y - Frame.Y);
+            return new Point (x - Frame.X, y - Frame.Y);
         }
 
         Point superViewViewportOffset = SuperView.GetViewportOffsetFromFrame ();
         superViewViewportOffset.X -= SuperView.Viewport.X;
         superViewViewportOffset.Y -= SuperView.Viewport.Y;
 
-        point.X -= superViewViewportOffset.X;
-        point.Y -= superViewViewportOffset.Y;
+        x -= superViewViewportOffset.X;
+        y -= superViewViewportOffset.Y;
 
-        Point frame = SuperView.ScreenToFrame (point);
+        Point frame = SuperView.ScreenToFrame (x, y);
         frame.X -= Frame.X;
         frame.Y -= Frame.Y;
 
