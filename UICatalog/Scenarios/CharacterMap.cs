@@ -537,9 +537,9 @@ internal class CharMap : ScrollView
         Rectangle viewport = new (
                                   ContentOffset,
                                   new (
-                                            Math.Max (ContentArea.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
-                                            Math.Max (ContentArea.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0)
-                                           )
+                                       Math.Max (ContentArea.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
+                                       Math.Max (ContentArea.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0)
+                                      )
                                  );
 
         Rectangle oldClip = ClipToBounds ();

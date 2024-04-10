@@ -28,16 +28,6 @@ public class Adornment : View
         Parent = parent;
     }
 
-    /// <summary>
-    ///     Gets the rectangle that describes the area of the Adornment. The Location is always (0,0).
-    ///     The size is the size of the Frame
-    /// </summary>
-    public override Rectangle ContentArea
-    {
-        get => Frame with { Location = Point.Empty };
-        set => throw new InvalidOperationException ("It makes no sense to set ContentArea of a Thickness.");
-    }
-
     /// <summary>The Parent of this Adornment (the View this Adornment surrounds).</summary>
     /// <remarks>
     ///     Adornments are distinguished from typical View classes in that they are not sub-views, but have a parent/child
@@ -113,6 +103,24 @@ public class Adornment : View
         /* Do nothing - Adornments do not have Adornments */
     }
 
+    /// <summary>
+    ///     Gets the rectangle that describes the area of the Adornment. The Location is always (0,0).
+    ///     The size is the size of the <see cref="View.Frame"/>.
+    /// </summary>
+    public override Rectangle ContentArea
+    {
+        get => Frame with { Location = Point.Empty };
+        set => throw new InvalidOperationException ("It makes no sense to set ContentArea of a Thickness.");
+    }
+
+    /// <summary>
+    ///     Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).
+    /// </summary>
+    public override Rectangle GetVisibleContentArea ()
+    {
+        return ContentArea;
+    }
+
     /// <inheritdoc/>
     public override Rectangle FrameToScreen ()
     {
@@ -131,14 +139,6 @@ public class Adornment : View
 
     /// <inheritdoc/>
     public override Point ScreenToFrame (int x, int y) { return Parent.ScreenToFrame (x - Frame.X, y - Frame.Y); }
-
-    /// <summary>
-    ///     Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).
-    /// </summary>
-    public override Rectangle GetVisibleContentArea ()
-    {
-        return new Rectangle (Point.Empty, Frame.Size);
-    }
 
     /// <summary>Does nothing for Adornment</summary>
     /// <returns></returns>

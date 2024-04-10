@@ -315,11 +315,11 @@ public class GraphView : View
     public RectangleF ScreenToGraphSpace (int col, int row)
     {
         return new (
-                               ScrollOffset.X + (col - MarginLeft) * CellSize.X,
-                               ScrollOffset.Y + (ContentArea.Height - (row + MarginBottom + 1)) * CellSize.Y,
-                               CellSize.X,
-                               CellSize.Y
-                              );
+                    ScrollOffset.X + (col - MarginLeft) * CellSize.X,
+                    ScrollOffset.Y + (ContentArea.Height - (row + MarginBottom + 1)) * CellSize.Y,
+                    CellSize.X,
+                    CellSize.Y
+                   );
     }
 
     /// <summary>Returns the section of the graph that is represented by the screen area.</summary>
