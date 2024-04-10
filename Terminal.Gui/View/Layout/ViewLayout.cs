@@ -642,8 +642,8 @@ public partial class View
                     if (nextStart.Visible && nextStart.Contains (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y))
                     {
                         start = nextStart;
-                        x = startOffsetX + start.Viewport.X;
-                        y = startOffsetY + start.Viewport.Y;
+                        x = startOffsetX;
+                        y = startOffsetY;
                         break;
                     }
 
