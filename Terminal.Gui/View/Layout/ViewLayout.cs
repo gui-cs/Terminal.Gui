@@ -605,63 +605,53 @@ public partial class View
     // CONCURRENCY: This method is not thread-safe. Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
     internal static View? FindDeepestView (View? start, int x, int y)
     {
-        while (start is { Visible: true } && start.Contains (x, y))
+        if (start is null || !start.Visible || !start.Contains (x, y))
         {
-            Adornment? found = null;
+            return null;
+        }
 
-            if (start.Margin.Contains (x, y))
-            {
-                found = start.Margin;
-            }
-            else if (start.Border.Contains (x, y))
-            {
-                found = start.Border;
-            }
-            else if (start.Padding.Contains (x, y))
-            {
-                found = start.Padding;
-            }
+        Adornment? found = null;
 
-            Point viewportOffset = start.GetViewportOffsetFromFrame ();
+        if (start.Margin.Contains (x, y))
+        {
+            found = start.Margin;
+        }
+        else if (start.Border.Contains (x, y))
+        {
+            found = start.Border;
+        }
+        else if (start.Padding.Contains (x, y))
+        {
+            found = start.Padding;
+        }
 
-            if (found is { })
+        Point viewportOffset = start.GetViewportOffsetFromFrame ();
+
+        if (found is { })
+        {
+            start = found;
+            viewportOffset = found.Parent.Frame.Location;
+        }
+
+        if (start.InternalSubviews is { Count: > 0 })
+        {
+            int startOffsetX = x - (start.Frame.X + viewportOffset.X);
+            int startOffsetY = y - (start.Frame.Y + viewportOffset.Y);
+
+            for (int i = start.InternalSubviews.Count - 1; i >= 0; i--)
             {
-                start = found;
-                viewportOffset = found.Parent.Frame.Location;
-            }
+                View nextStart = start.InternalSubviews [i];
 
-            if (start.InternalSubviews is { Count: > 0 })
-            {
-                int startOffsetX = x - (start.Frame.X + viewportOffset.X);
-                int startOffsetY = y - (start.Frame.Y + viewportOffset.Y);
-
-                for (int i = start.InternalSubviews.Count - 1; i >= 0; i--)
+                if (nextStart.Visible && nextStart.Contains (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y))
                 {
-                    View nextStart = start.InternalSubviews [i];
-
-                    if (nextStart.Visible && nextStart.Contains (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y))
-                    {
-                        start = nextStart;
-                        x = startOffsetX + start.Viewport.X;
-                        y = startOffsetY + start.Viewport.Y;
-                        break;
-                    }
-
-                    if (i == 0)
-                    {
-                        return start; // If no visible subview is found, return the current start view
-                    }
+                    // TODO: Remove recursion
+                    return FindDeepestView (nextStart, startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y) ?? nextStart;
                 }
-            }
-            else
-            {
-                return start;
             }
         }
 
-        return null;
+        return start;
     }
-
 #nullable restore
 
     /// <summary>
