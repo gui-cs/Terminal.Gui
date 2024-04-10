@@ -410,6 +410,12 @@ public class ScrollView : View
     /// <inheritdoc/>
     protected internal override bool OnMouseEvent  (MouseEvent me)
     {
+        if (!Enabled)
+        {
+            // A disabled view should not eat mouse events
+            return false;
+        }
+
         if (me.Flags == MouseFlags.WheeledDown && ShowVerticalScrollIndicator)
         {
             ScrollDown (1);
@@ -428,11 +434,11 @@ public class ScrollView : View
         }
         else if (me.X == _vertical.Frame.X && ShowVerticalScrollIndicator)
         {
-            _vertical.OnMouseEvent (me);
+            _vertical.NewMouseEvent (me);
         }
         else if (me.Y == _horizontal.Frame.Y && ShowHorizontalScrollIndicator)
         {
-            _horizontal.OnMouseEvent (me);
+            _horizontal.NewMouseEvent (me);
         }
         else if (IsOverridden (me.View, "OnMouseEvent"))
         {

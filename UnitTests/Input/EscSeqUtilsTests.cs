@@ -699,11 +699,7 @@ public class EscSeqUtilsTests
         top.Add (view);
         Application.Begin (top);
 
-        Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent { X = 0, Y = 0, Flags = 0 }
-                                                          )
-                                 );
+        Application.OnMouseEvent (new MouseEvent { X = 0, Y = 0, Flags = 0 });
 
         ClearAll ();
 
@@ -760,11 +756,7 @@ public class EscSeqUtilsTests
                                          // set Application.WantContinuousButtonPressedView to null
                                          view.WantContinuousButtonPressed = false;
 
-                                         Application.OnMouseEvent (
-                                                                   new MouseEventEventArgs (
-                                                                                            new MouseEvent { X = 0, Y = 0, Flags = 0 }
-                                                                                           )
-                                                                  );
+                                         Application.OnMouseEvent (new MouseEvent { X = 0, Y = 0, Flags = 0 });
 
                                          Application.RequestStop ();
                                      }

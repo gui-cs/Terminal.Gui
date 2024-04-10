@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
+using ColorHelper;
 
 namespace Terminal.Gui;
 
@@ -236,6 +237,27 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
 
     [SkipLocalsInit]
     private static float CalculateColorDistance (in Vector4 color1, in Vector4 color2) { return Vector4.Distance (color1, color2); }
+
+    /// <summary>
+    /// Gets a color that is the same hue as the current color, but with a different lightness.
+    /// </summary>
+    /// <returns></returns>
+    public Color GetHighlightColor ()
+    {
+        // TODO: This is a temporary implementation; just enough to show how it could work. 
+        var hsl = ColorHelper.ColorConverter.RgbToHsl(new RGB (R, G, B));
+
+        var amount = .7;
+        if (hsl.L <= 5)
+        {
+            return DarkGray;
+        }
+        hsl.L = (byte)(hsl.L * amount);
+
+        var rgb = ColorHelper.ColorConverter.HslToRgb (hsl);
+        return new (rgb.R, rgb.G, rgb.B);
+
+    }
 
     #region Legacy Color Names
 

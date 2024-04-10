@@ -712,9 +712,9 @@ internal sealed class Menu : View
         }
     }
 
-    private void Application_RootMouseEvent (object sender, MouseEventEventArgs a)
+    private void Application_RootMouseEvent (object sender, MouseEvent a)
     {
-        if (a.MouseEvent.View is { } and (MenuBar or not Menu))
+        if (a.View is { } and (MenuBar or not Menu))
         {
             return;
         }
@@ -724,21 +724,21 @@ internal sealed class Menu : View
             throw new InvalidOperationException ("This shouldn't running on a invisible menu!");
         }
 
-        View view = a.MouseEvent.View ?? this;
+        View view = a.View ?? this;
 
-        Point boundsPoint = view.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
+        Point boundsPoint = view.ScreenToBounds (a.X, a.Y);
         var me = new MouseEvent
         {
             X = boundsPoint.X,
             Y = boundsPoint.Y,
-            Flags = a.MouseEvent.Flags,
-            ScreenPosition = new (a.MouseEvent.X, a.MouseEvent.Y),
+            Flags = a.Flags,
+            ScreenPosition = new (a.X, a.Y),
             View = view
         };
 
-        if (view.OnMouseEvent (me) || a.MouseEvent.Flags == MouseFlags.Button1Pressed || a.MouseEvent.Flags == MouseFlags.Button1Released)
+        if (view.NewMouseEvent (me) == true || a.Flags == MouseFlags.Button1Pressed || a.Flags == MouseFlags.Button1Released)
         {
-            a.MouseEvent.Handled = true;
+            a.Handled = true;
         }
     }
 
@@ -1189,12 +1189,12 @@ internal sealed class Menu : View
 
             if (me.Y < 0)
             {
-                return true;
+                return me.Handled = true;
             }
 
             if (me.Y >= _barItems.Children.Length)
             {
-                return true;
+                return me.Handled = true;
             }
 
             MenuItem item = _barItems.Children [me.Y];
@@ -1206,13 +1206,13 @@ internal sealed class Menu : View
 
             if (disabled)
             {
-                return true;
+                return me.Handled = true;
             }
 
             _currentChild = me.Y;
             RunSelected ();
 
-            return true;
+            return me.Handled = true;
         }
 
         if (me.Flags != MouseFlags.Button1Pressed
@@ -1229,14 +1229,14 @@ internal sealed class Menu : View
 
             if (me.Y < 0 || me.Y >= _barItems.Children.Length)
             {
-                return true;
+                return me.Handled = true;
             }
 
             MenuItem item = _barItems.Children [me.Y];
 
             if (item is null)
             {
-                return true;
+                return me.Handled = true;
             }
 
             if (item?.IsEnabled () != true)
@@ -1254,12 +1254,12 @@ internal sealed class Menu : View
                 SetNeedsDisplay ();
                 SetParentSetNeedsDisplay ();
 
-                return true;
+                return me.Handled = true;
             }
 
             _host.OnMenuOpened ();
 
-            return true;
+            return me.Handled = true;
         }
     }
 

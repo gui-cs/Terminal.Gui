@@ -85,10 +85,10 @@ public class BasicColors : Scenario
 
         Application.MouseEvent += (s, e) =>
                                   {
-                                      if (e.MouseEvent.View != null)
+                                      if (e.View != null)
                                       {
-                                          Color fore = e.MouseEvent.View.GetNormalColor ().Foreground;
-                                          Color back = e.MouseEvent.View.GetNormalColor ().Background;
+                                          Color fore = e.View.GetNormalColor ().Foreground;
+                                          Color back = e.View.GetNormalColor ().Background;
 
                                           lblForeground.Text =
                                               $"#{fore.R:X2}{fore.G:X2}{fore.B:X2} {fore.GetClosestNamedColor ()} ";

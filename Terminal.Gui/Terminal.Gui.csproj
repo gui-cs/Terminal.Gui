@@ -44,6 +44,7 @@
   <!-- Dependencies -->
   <!-- =================================================================== -->
   <ItemGroup>
+    <PackageReference Include="ColorHelper" Version="1.8.1" />
     <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
     <!-- Enable Nuget Source Link for github -->
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />

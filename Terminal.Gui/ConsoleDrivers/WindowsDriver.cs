@@ -838,6 +838,29 @@ internal class WindowsConsole
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool GetNumberOfConsoleInputEvents (nint handle, out uint lpcNumberOfEvents);
 
+    internal uint GetNumberOfConsoleInputEvents ()
+    {
+        if (!GetNumberOfConsoleInputEvents (_inputHandle, out uint numOfEvents))
+        {
+            Console.WriteLine ($"Error: {Marshal.GetLastWin32Error ()}");
+
+            return 0;
+        }
+
+        return numOfEvents;
+    }
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool FlushConsoleInputBuffer (nint handle);
+
+    internal void FlushConsoleInputBuffer ()
+    {
+        if (!FlushConsoleInputBuffer (_inputHandle))
+        {
+            Console.WriteLine ($"Error: {Marshal.GetLastWin32Error ()}");
+        }
+    }
+
     public InputRecord [] ReadConsoleInput ()
     {
         const int bufferSize = 1;
@@ -1396,18 +1419,16 @@ internal class WindowsDriver : ConsoleDriver
                     break;
                 }
 
-                OnMouseEvent (new MouseEventEventArgs (me));
+                OnMouseEvent (me);
 
                 if (_processButtonClick)
                 {
-                    OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent
-                                                           {
-                                                               X = me.X,
-                                                               Y = me.Y,
-                                                               Flags = ProcessButtonClick (inputEvent.MouseEvent)
-                                                           }));
+                    OnMouseEvent (new ()
+                    {
+                        X = me.X,
+                        Y = me.Y,
+                        Flags = ProcessButtonClick (inputEvent.MouseEvent)
+                    });
                 }
 
                 break;
@@ -1707,10 +1728,16 @@ internal class WindowsDriver : ConsoleDriver
 
     private async Task ProcessContinuousButtonPressedAsync (MouseFlags mouseFlag)
     {
+        // When a user presses-and-holds, start generating pressed events every `startDelay`
+        // After `iterationsUntilFast` iterations, speed them up to `fastDelay` ms
+        const int startDelay = 500;
+        const int iterationsUntilFast = 4;
+        const int fastDelay = 50;
+
+        int iterations = 0;
+        int delay = startDelay;
         while (_isButtonPressed)
         {
-            await Task.Delay (100);
-
             var me = new MouseEvent
             {
                 X = _pointMove.X,
@@ -1718,16 +1745,21 @@ internal class WindowsDriver : ConsoleDriver
                 Flags = mouseFlag
             };
 
-            View view = Application.WantContinuousButtonPressedView;
-
-            if (view is null)
+            if (Application.WantContinuousButtonPressedView is null)
             {
                 break;
             }
 
+            if (iterations++ >= iterationsUntilFast)
+            {
+                delay = fastDelay;
+            }
+            await Task.Delay (delay);
+
+            //Debug.WriteLine($"ProcessContinuousButtonPressedAsync: {view}");
             if (_isButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0)
             {
-                Application.Invoke (() => OnMouseEvent (new MouseEventEventArgs (me)));
+                Application.Invoke (() => OnMouseEvent (me));
             }
         }
     }
@@ -1896,6 +1928,8 @@ internal class WindowsDriver : ConsoleDriver
             {
                 _point = null;
             }
+            _processButtonClick = true;
+
         }
         else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved
                  && !_isOneFingerDoubleClicked
@@ -2132,6 +2166,18 @@ internal class WindowsMainLoop : IMainLoopDriver
     {
         _inputHandlerTokenSource?.Cancel ();
         _inputHandlerTokenSource?.Dispose ();
+
+        if (_winConsole is { })
+        {
+            var numOfEvents = _winConsole.GetNumberOfConsoleInputEvents ();
+
+            if (numOfEvents > 0)
+            {
+                _winConsole.FlushConsoleInputBuffer ();
+                //Debug.WriteLine ($"Flushed {numOfEvents} events.");
+            }
+        }
+
         _waitForProbe?.Dispose ();
 
         _resultQueue?.Clear ();

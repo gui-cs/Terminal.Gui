@@ -2,6 +2,7 @@
 // Driver.cs: Curses-based Driver
 //
 
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Terminal.Gui.ConsoleDrivers;
 using Unix.Terminal;
@@ -798,6 +799,9 @@ internal class CursesDriver : ConsoleDriver
                    || flag.HasFlag (MouseFlags.Button4DoubleClicked);
         }
 
+        Debug.WriteLine ($"CursesDriver: ({pos.X},{pos.Y}) - {mouseFlag}");
+
+
         if ((WasButtonReleased (mouseFlag) && IsButtonNotPressed (_lastMouseFlags)) || (IsButtonClickedOrDoubleClicked (mouseFlag) && _lastMouseFlags == 0))
         {
             return;
@@ -806,7 +810,9 @@ internal class CursesDriver : ConsoleDriver
         _lastMouseFlags = mouseFlag;
 
         var me = new MouseEvent { Flags = mouseFlag, X = pos.X, Y = pos.Y };
-        OnMouseEvent (new MouseEventEventArgs (me));
+        Debug.WriteLine ($"CursesDriver: ({me.X},{me.Y}) - {me.Flags}");
+
+        OnMouseEvent (me);
     }
 
     #region Color Handling

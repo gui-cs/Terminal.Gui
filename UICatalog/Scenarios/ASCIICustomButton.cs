@@ -134,7 +134,7 @@ public class ASCIICustomButtonTest : Scenario
         }
 
         public event Action<ASCIICustomButton> PointerEnter;
-        private void This_MouseClick (object sender, MouseEventEventArgs obj) { OnMouseEvent (obj.MouseEvent); }
+        private void This_MouseClick (object sender, MouseEventEventArgs obj) { NewMouseEvent (obj.MouseEvent); }
     }
 
     public class ScrollViewTestWindow : Window
