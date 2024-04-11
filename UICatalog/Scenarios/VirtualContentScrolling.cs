@@ -166,6 +166,12 @@ public class VirtualScrolling : Scenario
             X = Pos.Right (labelContentSize) + 1,
             Y = Pos.Top (labelContentSize),
         };
+        contentSizeWidth.ValueChanged += ContentSizeWidth_ValueChanged;
+
+        void ContentSizeWidth_ValueChanged (object sender, PropertyChangedEventArgs e)
+        {
+           view.ContentSize = view.ContentSize with { Width = ((Buttons.NumericUpDown)sender).Value };
+        }
 
         var labelComma = new Label ()
         {
@@ -181,6 +187,13 @@ public class VirtualScrolling : Scenario
             Y = Pos.Top (labelContentSize),
             CanFocus =false
         };
+        contentSizeHeight.ValueChanged += ContentSizeHeight_ValueChanged;
+
+        void ContentSizeHeight_ValueChanged (object sender, PropertyChangedEventArgs e)
+        {
+            view.ContentSize = view.ContentSize with { Height = ((Buttons.NumericUpDown)sender).Value };
+        }
+
         view.Padding.Add (labelContentSize, contentSizeWidth, labelComma, contentSizeHeight);
 
 
