@@ -14,22 +14,37 @@ public enum ScrollSettings
     None = 0,
 
     /// <summary>
-    ///     If set, <c>Viewport.Location.Y</c> can be negative or greater than to <see cref="View.ContentSize"/>.<c>Height</c>,
-    ///     enabling scrolling beyond the dimensions of the content area vertically.
+    ///     If set, <see cref="View.Viewport"/> can be set to a rectangle that does not perfectly intersect with the Content Area
+    ///     rectangle (<see cref="View.ContentSize"/> in the horizontal direction, enabling scrolling beyond the dimensions of the content area vertically.
     /// </summary>
-    AllowViewportYBeyondContent = 1,
+    /// <remarks>
+    /// <para>
+    ///     When not set, <see cref="View.Viewport"/> is constrained to the bounds of the Content Area rectangle in the horizontal direction.
+    /// </para>
+    /// </remarks>
+    AllowViewportOutsideContentHorizontal = 1,
 
     /// <summary>
-    ///     If set, <c>Viewport.Location.X</c> can be negative or greater than to <see cref="View.ContentSize"/>.<c>Width</c>,
-    ///     enabling scrolling beyond the dimensions of the content area horizontally.
+    ///     If set, <see cref="View.Viewport"/> can be set to a rectangle that does not perfectly intersect with the Content Area
+    ///     rectangle (<see cref="View.ContentSize"/> in the vertical direction, enabling scrolling beyond the dimensions of the content area vertically.
     /// </summary>
-    AllowViewportXBeyondContent = 2,
+    /// <remarks>
+    /// <para>
+    ///     When not set, <see cref="View.Viewport"/> is constrained to the bounds of the Content Area rectangle in the vertical direction.
+    /// </para>
+    /// </remarks>
+    AllowViewportOutsideContentVertical = 2,
 
     /// <summary>
-    ///     If set, <c>Viewport.Location</c> can be negative or greater than to <see cref="View.ContentSize"/>,
-    ///     enabling scrolling beyond the dimensions of the content area either horizontally or vertically.
+    ///     If set, <see cref="View.Viewport"/> can be set to a rectangle that does not perfectly intersect with the Content Area
+    ///     rectangle (<see cref="View.ContentSize"/>, enabling scrolling beyond the dimensions of the content area vertically.
     /// </summary>
-    AllowViewportLocationBeyondContent = AllowViewportYBeyondContent | AllowViewportXBeyondContent
+    /// <remarks>
+    /// <para>
+    ///     When not set, <see cref="View.Viewport"/> is constrained to the bounds of the Content Area rectangle.
+    /// </para>
+    /// </remarks>
+    AllowViewportOutsideContent = AllowViewportOutsideContentHorizontal | AllowViewportOutsideContentVertical
 }
 
 public partial class View
@@ -261,7 +276,7 @@ public partial class View
 
         void ApplySettings (ref Rectangle location)
         {
-            if (!ScrollSettings.HasFlag (ScrollSettings.AllowViewportYBeyondContent))
+            if (!ScrollSettings.HasFlag (ScrollSettings.AllowViewportOutsideContentHorizontal))
             {
                 if (location.Y + Viewport.Height > ContentSize.Height)
                 {
@@ -274,7 +289,7 @@ public partial class View
                 }
             }
 
-            if (!ScrollSettings.HasFlag (ScrollSettings.AllowViewportXBeyondContent))
+            if (!ScrollSettings.HasFlag (ScrollSettings.AllowViewportOutsideContentVertical))
             {
                 if (location.X + Viewport.Width > ContentSize.Width)
                 {

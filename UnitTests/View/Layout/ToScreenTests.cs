@@ -630,7 +630,7 @@ public class ToScreenTests (ITestOutputHelper output)
         {
             Width = 10,
             Height = 10,
-            ScrollSettings = ScrollSettings.AllowViewportLocationBeyondContent
+            ScrollSettings = ScrollSettings.AllowViewportOutsideContent
         };
 
         Rectangle testRect = new Rectangle (0, 0, 1, 1);

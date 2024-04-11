@@ -25,7 +25,7 @@ public class VirtualScrolling : Scenario
 
             // TODO: Add a way to set the scroll settings in the Scenario
             ContentSize = new Size (60, 40);
-            ScrollSettings = ScrollSettings.AllowViewportLocationBeyondContent;
+            ScrollSettings = ScrollSettings.AllowViewportOutsideContent;
 
             // Things this view knows how to do
             AddCommand (Command.ScrollDown, () => ScrollVertical (1));
@@ -113,18 +113,18 @@ public class VirtualScrolling : Scenario
             Y = 0,
             CanFocus = false
         };
-        cbAllowXBeyondContent.Checked = view.ScrollSettings.HasFlag (ScrollSettings.AllowViewportXBeyondContent);
+        cbAllowXBeyondContent.Checked = view.ScrollSettings.HasFlag (ScrollSettings.AllowViewportOutsideContentVertical);
         cbAllowXBeyondContent.Toggled += NoRestrictHorizontal_Toggled;
 
         void NoRestrictHorizontal_Toggled (object sender, StateEventArgs<bool?> e)
         {
             if (e.NewValue == true)
             {
-                view.ScrollSettings = view.ScrollSettings | ScrollSettings.AllowViewportXBeyondContent;
+                view.ScrollSettings = view.ScrollSettings | ScrollSettings.AllowViewportOutsideContentVertical;
             }
             else
             {
-                view.ScrollSettings = view.ScrollSettings & ~ScrollSettings.AllowViewportXBeyondContent;
+                view.ScrollSettings = view.ScrollSettings & ~ScrollSettings.AllowViewportOutsideContentVertical;
             }
         }
 
@@ -137,18 +137,18 @@ public class VirtualScrolling : Scenario
             Y = 0,
             CanFocus = false
         };
-        cbAllowYBeyondContent.Checked = view.ScrollSettings.HasFlag (ScrollSettings.AllowViewportYBeyondContent);
+        cbAllowYBeyondContent.Checked = view.ScrollSettings.HasFlag (ScrollSettings.AllowViewportOutsideContentHorizontal);
         cbAllowYBeyondContent.Toggled += NoRestrictVertical_Toggled;
 
         void NoRestrictVertical_Toggled (object sender, StateEventArgs<bool?> e)
         {
             if (e.NewValue == true)
             {
-                view.ScrollSettings = view.ScrollSettings | ScrollSettings.AllowViewportYBeyondContent;
+                view.ScrollSettings = view.ScrollSettings | ScrollSettings.AllowViewportOutsideContentHorizontal;
             }
             else
             {
-                view.ScrollSettings = view.ScrollSettings & ~ScrollSettings.AllowViewportYBeyondContent;
+                view.ScrollSettings = view.ScrollSettings & ~ScrollSettings.AllowViewportOutsideContentHorizontal;
             }
         }
 

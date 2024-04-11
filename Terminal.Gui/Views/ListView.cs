@@ -106,6 +106,7 @@ public class ListView : View
     public ListView ()
     {
         CanFocus = true;
+        ScrollSettings = ScrollSettings.AllowViewportOutsideContent;
 
         // Things this view knows how to do
         AddCommand (Command.LineUp, () => MoveUp ());
