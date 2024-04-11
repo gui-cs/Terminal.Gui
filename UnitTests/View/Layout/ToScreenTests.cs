@@ -150,13 +150,12 @@ public class ToScreenTests (ITestOutputHelper output)
             Y = 0,
             Width = 1,
             Height = 1,
-            BorderStyle = LineStyle.Single
         };
 
         var subviewOfSubview = new View ()
         {
             Id = "subviewOfSubview",
-            X = 2, // screen should be 4 (the subviewOfAdornment location is 1, and offset from frame is 1)
+            X = 2, // screen should be 3 (the subviewOfAdornment location is 1)
             Y = 0,
             Width = 1,
             Height = 1

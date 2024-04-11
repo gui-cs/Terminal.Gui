@@ -103,7 +103,7 @@ public partial class View
                 var parentScreen = adornment.FrameToScreen ();
 
                 // Now add our Frame location
-                parentScreen.Offset (Frame.X, Frame.Y);
+                parentScreen.Offset (screen.X, screen.Y);
 
                 return parentScreen;
             }
