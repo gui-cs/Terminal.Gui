@@ -94,6 +94,9 @@ public class ListView : View
     private int _lastSelectedItem = -1;
     private int _selected = -1;
     private IListDataSource _source;
+    // TODO: ListView has been upgraded to use Viewport and ContentSize instead of the
+    // TODO: bespoke _top and _left. It was a quick & dirty port. There is now duplicate logic
+    // TODO: that could be removed. 
     //private int _top, _left;
 
     /// <summary>
@@ -250,10 +253,16 @@ public class ListView : View
         get => _source;
         set
         {
+            if (_source == value)
+
+            {
+                return;
+            }
             _source = value;
-            ContentSize = new Size (Viewport.Width, _source.Count);
-            KeystrokeNavigator.Collection = _source?.ToList ();
+
+            ContentSize = new Size (Viewport.Width, _source?.Count ?? 0);
             Viewport = Viewport with { Y = 0 };
+            KeystrokeNavigator.Collection = _source?.ToList ();
             _selected = -1;
             _lastSelectedItem = -1;
             SetNeedsDisplay ();
@@ -317,6 +326,7 @@ public class ListView : View
         {
             if (_selected < Viewport.Y)
             {
+                // TODO: The Max check here is not needed because, by default, Viewport enforces staying w/in ContentArea (View.ScrollSettings).
                 Viewport = Viewport with { Y = Math.Max (_selected, 0) };
             }
             else if (Viewport.Height > 0 && _selected >= Viewport.Y + Viewport.Height)
