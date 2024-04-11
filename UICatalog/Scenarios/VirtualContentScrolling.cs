@@ -241,7 +241,30 @@ public class VirtualScrolling : Scenario
             view.ContentSize = view.ContentSize with { Height = ((Buttons.NumericUpDown)sender).Value };
         }
 
-        view.Padding.Add (labelContentSize, contentSizeWidth, labelComma, contentSizeHeight);
+
+        var cbClearOnlyVisible = new CheckBox ()
+        {
+            Title = "Clear only Visible Content",
+            X = Pos.Right (contentSizeHeight) + 1,
+            Y = Pos.Top (labelContentSize),
+            CanFocus = false
+        };
+        cbClearOnlyVisible.Checked = view.ViewportSettings.HasFlag (ViewportSettings.ClearVisibleContentOnly);
+        cbClearOnlyVisible.Toggled += ClearVisibleContentOnly_Toggled;
+
+        void ClearVisibleContentOnly_Toggled (object sender, StateEventArgs<bool?> e)
+        {
+            if (e.NewValue == true)
+            {
+                view.ViewportSettings |= ViewportSettings.ClearVisibleContentOnly;
+            }
+            else
+            {
+                view.ViewportSettings &= ~ViewportSettings.ClearVisibleContentOnly;
+            }
+        }
+
+        view.Padding.Add (labelContentSize, contentSizeWidth, labelComma, contentSizeHeight, cbClearOnlyVisible);
 
 
         // Add demo views to show that things work correctly
