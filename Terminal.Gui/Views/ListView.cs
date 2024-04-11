@@ -290,7 +290,7 @@ public class ListView : View
                 throw new ArgumentException ("value");
             }
 
-            Viewport = Viewport with { Y = Math.Max (value, 0) };
+            Viewport = Viewport with { Y = value };
             SetNeedsDisplay ();
         }
     }
@@ -331,11 +331,11 @@ public class ListView : View
             if (_selected < Viewport.Y)
             {
                 // TODO: The Max check here is not needed because, by default, Viewport enforces staying w/in ContentArea (View.ScrollSettings).
-                Viewport = Viewport with { Y = Math.Max (_selected, 0) };
+                Viewport = Viewport with { Y = _selected };
             }
             else if (Viewport.Height > 0 && _selected >= Viewport.Y + Viewport.Height)
             {
-                Viewport = Viewport with { Y = Math.Max (_selected - Viewport.Height + 1, 0) };
+                Viewport = Viewport with { Y = _selected - Viewport.Height + 1};
             }
 
             LayoutStarted -= ListView_LayoutStarted;
@@ -470,7 +470,7 @@ public class ListView : View
             }
             else if (_selected < Viewport.Y)
             {
-                Viewport = Viewport with { Y = Math.Max (_selected, 0) };
+                Viewport = Viewport with { Y = _selected };
             }
 
             OnSelectedChanged ();
@@ -483,7 +483,7 @@ public class ListView : View
         }
         else if (_selected >= Viewport.Y + Viewport.Height)
         {
-            Viewport = Viewport with { Y = Math.Max (_source.Count - Viewport.Height, 0) };
+            Viewport = Viewport with { Y = _source.Count - Viewport.Height };
             SetNeedsDisplay ();
         }
 
@@ -500,7 +500,7 @@ public class ListView : View
 
             if (Viewport.Y + _selected > Viewport.Height - 1)
             {
-                Viewport = Viewport with { Y = Math.Max (_selected, 0) };
+                Viewport = Viewport with { Y = _selected };
             }
 
             OnSelectedChanged ();
@@ -517,7 +517,7 @@ public class ListView : View
         if (_selected != 0)
         {
             _selected = 0;
-            Viewport = Viewport with { Y = Math.Max (_selected, 0) };
+            Viewport = Viewport with { Y = _selected };
             OnSelectedChanged ();
             SetNeedsDisplay ();
         }
@@ -550,7 +550,7 @@ public class ListView : View
 
             if (_source.Count >= Viewport.Height)
             {
-                Viewport = Viewport with { Y = Math.Max (_selected, 0) };
+                Viewport = Viewport with { Y = _selected };
             }
             else
             {
@@ -578,7 +578,7 @@ public class ListView : View
         if (n != _selected)
         {
             _selected = n;
-            Viewport = Viewport with { Y = Math.Max (_selected, 0) };
+            Viewport = Viewport with { Y = _selected };
             OnSelectedChanged ();
             SetNeedsDisplay ();
         }
@@ -616,11 +616,11 @@ public class ListView : View
 
             if (_selected < Viewport.Y)
             {
-                Viewport = Viewport with { Y = Math.Max (_selected, 0) };
+                Viewport = Viewport with { Y = _selected };
             }
             else if (_selected > Viewport.Y + Viewport.Height)
             {
-                Viewport = Viewport with { Y = Math.Max (_selected - Viewport.Height + 1, 0) };
+                Viewport = Viewport with { Y = _selected - Viewport.Height + 1 };
             }
 
             OnSelectedChanged ();
@@ -628,7 +628,7 @@ public class ListView : View
         }
         else if (_selected < Viewport.Y)
         {
-            Viewport = Viewport with { Y = Math.Max (_selected, 0) };
+            Viewport = Viewport with { Y = _selected };
             SetNeedsDisplay ();
         }
 

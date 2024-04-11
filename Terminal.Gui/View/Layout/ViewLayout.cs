@@ -635,37 +635,35 @@ public partial class View
                 viewportOffset = found.Parent.Frame.Location;
             }
 
-            if (start.InternalSubviews is { Count: > 0 })
+            int startOffsetX = x - (start.Frame.X + viewportOffset.X);
+            int startOffsetY = y - (start.Frame.Y + viewportOffset.Y);
+
+            View? subview = null;
+            for (int i = start.InternalSubviews.Count - 1; i >= 0; i--)
             {
-                int startOffsetX = x - (start.Frame.X + viewportOffset.X);
-                int startOffsetY = y - (start.Frame.Y + viewportOffset.Y);
-
-                for (int i = start.InternalSubviews.Count - 1; i >= 0; i--)
+                if (start.InternalSubviews [i].Visible
+                    && start.InternalSubviews [i].Contains (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y))
                 {
-                    View nextStart = start.InternalSubviews [i];
+                    subview = start.InternalSubviews [i];
+                    x = startOffsetX;
+                    y = startOffsetY;
 
-                    if (nextStart.Visible && nextStart.Contains (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y))
-                    {
-                        start = nextStart;
-                        x = startOffsetX;
-                        y = startOffsetY;
-
-                        break;
-                    }
-
-                    if (i == 0)
-                    {
-                        return start; // If no visible subview is found, return the current start view
-                    }
+                    // start is the deepest subview under the mouse; stop searching the subviews
+                    break;
                 }
             }
-            else
+
+            if (subview is null)
             {
+                // No subview was found that's under the mouse, so we're done
                 return start;
             }
+
+            // We found a subview of start that's under the mouse, continue...
+            start = subview;
         }
 
-        return start;
+        return null;
     }
 
 #nullable restore
