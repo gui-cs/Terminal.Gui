@@ -14,42 +14,79 @@ public enum ViewportSettings
     None = 0,
 
     /// <summary>
-    ///     If set, <see cref="View.Viewport"/> can be set to a rectangle that does not perfectly intersect with the Content Area
-    ///     rectangle (<see cref="View.ContentSize"/> in the horizontal direction, enabling scrolling beyond the dimensions of the content area vertically.
+    ///     If set, <see cref="View.Viewport"/><c>.X</c> can be set to negative values enabling scrolling beyond the left of the
+    ///     content area.
     /// </summary>
     /// <remarks>
     /// <para>
-    ///     When not set, <see cref="View.Viewport"/> is constrained to the bounds of the Content Area rectangle in the horizontal direction.
+    ///     When not set, <see cref="View.Viewport"/><c>.X</c> is constrained to positive values.
     /// </para>
     /// </remarks>
     AllowNegativeX = 1,
 
     /// <summary>
-    ///     If set, <see cref="View.Viewport"/> can be set to a rectangle that does not perfectly intersect with the Content Area
-    ///     rectangle (<see cref="View.ContentSize"/> in the vertical direction, enabling scrolling beyond the dimensions of the content area vertically.
+    ///     If set, <see cref="View.Viewport"/><c>.Y</c> can be set to negative values enabling scrolling beyond the top of the
+    ///     content area. 
     /// </summary>
     /// <remarks>
     /// <para>
-    ///     When not set, <see cref="View.Viewport"/> is constrained to the bounds of the Content Area rectangle in the vertical direction.
+    ///     When not set, <see cref="View.Viewport"/><c>.Y</c> is constrained to positive values.
     /// </para>
     /// </remarks>
     AllowNegativeY = 2,
 
     /// <summary>
-    ///     If set, <see cref="View.Viewport"/> can be set to a rectangle that does not perfectly intersect with the Content Area
-    ///     rectangle (<see cref="View.ContentSize"/>, enabling scrolling beyond the dimensions of the content area vertically.
+    ///     If set, <see cref="View.Viewport"/><c>.Size</c> can be set to negative coordinates enabling scrolling beyond the top-left of the
+    ///     content area.
     /// </summary>
     /// <remarks>
     /// <para>
-    ///     When not set, <see cref="View.Viewport"/> is constrained to the bounds of the Content Area rectangle.
+    ///     When not set, <see cref="View.Viewport"/><c>.Size</c> is constrained to positive coordinates.
     /// </para>
     /// </remarks>
     AllowNegativeLocation = AllowNegativeX | AllowNegativeY,
 
+    /// <summary>
+    ///     If set, <see cref="View.Viewport"/><c>.X</c> can be set values greater than <see cref="View.ContentSize"/><c>.Width</c> enabling scrolling beyond the right
+    ///     of the content area.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///     When not set, <see cref="View.Viewport"/><c>.X</c> is constrained to <see cref="View.ContentSize"/><c>.Width - 1</c>.
+    ///     This means the last column of the content will remain visible even if there is an attempt to scroll the Viewport past the last column.
+    /// </para>
+    /// </remarks>
     AllowXGreaterThanContentWidth = 4,
-    AllowYGreaterThanContentHeight = 8,
-    AllowLocationCreaterThanContentSize = AllowXGreaterThanContentWidth | AllowYGreaterThanContentHeight,
 
+    /// <summary>
+    ///     If set, <see cref="View.Viewport"/><c>.Y</c> can be set values greater than <see cref="View.ContentSize"/><c>.Height</c> enabling scrolling beyond the right
+    ///     of the content area.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///     When not set, <see cref="View.Viewport"/><c>.Y</c> is constrained to <see cref="View.ContentSize"/><c>.Height - 1</c>.
+    ///     This means the last row of the content will remain visible even if there is an attempt to scroll the Viewport past the last row.
+    /// </para>
+    /// </remarks>
+    AllowYGreaterThanContentHeight = 8,
+
+    /// <summary>
+    ///     If set, <see cref="View.Viewport"/><c>.Size</c> can be set values greater than <see cref="View.ContentSize"/> enabling scrolling beyond the bottom-right
+    ///     of the content area.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///     When not set, <see cref="View.Viewport"/> is constrained to <see cref="View.ContentSize"/><c> -1</c>.
+    ///     This means the last column and row of the content will remain visible even if there is an attempt to
+    ///     scroll the Viewport past the last column or row.
+    /// </para>
+    /// </remarks>
+    AllowLocationGreaterThanContentSize = AllowXGreaterThanContentWidth | AllowYGreaterThanContentHeight,
+
+    /// <summary>
+    /// If set, the default <see cref="View.OnDrawContent(Rectangle)"/> implementation will clear only the portion of the content
+    /// area that is visible within the <see cref="View.Viewport"/>. See also <see cref="View.ClearVisibleContent()"/>.
+    /// </summary>
     ClearVisibleContentOnly = 16,
 }
 
