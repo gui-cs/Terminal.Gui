@@ -94,7 +94,7 @@ public class ListView : View
     private int _lastSelectedItem = -1;
     private int _selected = -1;
     private IListDataSource _source;
-    private int _top, _left;
+    //private int _top, _left;
 
     /// <summary>
     ///     Initializes a new instance of <see cref="ListView"/>. Set the <see cref="Source"/> property to display
@@ -199,7 +199,7 @@ public class ListView : View
     /// <value>The left position.</value>
     public int LeftItem
     {
-        get => _left;
+        get => Viewport.X;
         set
         {
             if (_source is null)
@@ -212,7 +212,7 @@ public class ListView : View
                 throw new ArgumentException ("value");
             }
 
-            _left = value;
+            Viewport = Viewport with { X = value };
             SetNeedsDisplay ();
         }
     }
@@ -251,8 +251,9 @@ public class ListView : View
         set
         {
             _source = value;
+            ContentSize = new Size (Viewport.Width, _source.Count);
             KeystrokeNavigator.Collection = _source?.ToList ();
-            _top = 0;
+            Viewport = Viewport with { Y = 0 };
             _selected = -1;
             _lastSelectedItem = -1;
             SetNeedsDisplay ();
@@ -263,7 +264,7 @@ public class ListView : View
     /// <value>The top item.</value>
     public int TopItem
     {
-        get => _top;
+        get => Viewport.Y;
         set
         {
             if (_source is null)
@@ -276,7 +277,7 @@ public class ListView : View
                 throw new ArgumentException ("value");
             }
 
-            _top = Math.Max (value, 0);
+            Viewport = Viewport with { Y = Math.Max (value, 0) };
             SetNeedsDisplay ();
         }
     }
@@ -314,13 +315,13 @@ public class ListView : View
     {
         if (SuperView?.IsInitialized == true)
         {
-            if (_selected < _top)
+            if (_selected < Viewport.Y)
             {
-                _top = Math.Max (_selected, 0);
+                Viewport = Viewport with { Y = Math.Max (_selected, 0) };
             }
-            else if (Viewport.Height > 0 && _selected >= _top + Viewport.Height)
+            else if (Viewport.Height > 0 && _selected >= Viewport.Y + Viewport.Height)
             {
-                _top = Math.Max (_selected - Viewport.Height + 1, 0);
+                Viewport = Viewport with { Y = Math.Max (_selected - Viewport.Height + 1, 0) };
             }
 
             LayoutStarted -= ListView_LayoutStarted;
@@ -347,7 +348,7 @@ public class ListView : View
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent me)
+    protected internal override bool OnMouseEvent (MouseEvent me)
     {
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
             && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
@@ -397,14 +398,14 @@ public class ListView : View
             return true;
         }
 
-        if (me.Y + _top >= _source.Count
-            || me.Y + _top < 0
-            || me.Y + _top > _top + Viewport.Height)
+        if (me.Y + Viewport.Y >= _source.Count
+            || me.Y + Viewport.Y < 0
+            || me.Y + Viewport.Y > Viewport.Y + Viewport.Height)
         {
             return true;
         }
 
-        _selected = _top + me.Y;
+        _selected = Viewport.Y + me.Y;
 
         if (AllowsAll ())
         {
@@ -449,13 +450,13 @@ public class ListView : View
             //can move by down by one.
             _selected++;
 
-            if (_selected >= _top + Viewport.Height)
+            if (_selected >= Viewport.Y + Viewport.Height)
             {
-                _top++;
+                Viewport = Viewport with { Y = Viewport.Y + 1 };
             }
-            else if (_selected < _top)
+            else if (_selected < Viewport.Y)
             {
-                _top = Math.Max (_selected, 0);
+                Viewport = Viewport with { Y = Math.Max (_selected, 0) };
             }
 
             OnSelectedChanged ();
@@ -466,9 +467,9 @@ public class ListView : View
             OnSelectedChanged ();
             SetNeedsDisplay ();
         }
-        else if (_selected >= _top + Viewport.Height)
+        else if (_selected >= Viewport.Y + Viewport.Height)
         {
-            _top = Math.Max (_source.Count - Viewport.Height, 0);
+            Viewport = Viewport with { Y = Math.Max (_source.Count - Viewport.Height, 0) };
             SetNeedsDisplay ();
         }
 
@@ -483,9 +484,9 @@ public class ListView : View
         {
             _selected = _source.Count - 1;
 
-            if (_top + _selected > Viewport.Height - 1)
+            if (Viewport.Y + _selected > Viewport.Height - 1)
             {
-                _top = Math.Max (_selected, 0);
+                Viewport = Viewport with { Y = Math.Max (_selected, 0) };
             }
 
             OnSelectedChanged ();
@@ -502,7 +503,7 @@ public class ListView : View
         if (_selected != 0)
         {
             _selected = 0;
-            _top = Math.Max (_selected, 0);
+            Viewport = Viewport with { Y = Math.Max (_selected, 0) };
             OnSelectedChanged ();
             SetNeedsDisplay ();
         }
@@ -535,11 +536,11 @@ public class ListView : View
 
             if (_source.Count >= Viewport.Height)
             {
-                _top = Math.Max (_selected, 0);
+                Viewport = Viewport with { Y = Math.Max (_selected, 0) };
             }
             else
             {
-                _top = 0;
+                Viewport = Viewport with { Y = 0 };
             }
 
             OnSelectedChanged ();
@@ -563,7 +564,7 @@ public class ListView : View
         if (n != _selected)
         {
             _selected = n;
-            _top = Math.Max (_selected, 0);
+            Viewport = Viewport with { Y = Math.Max (_selected, 0) };
             OnSelectedChanged ();
             SetNeedsDisplay ();
         }
@@ -599,21 +600,21 @@ public class ListView : View
                 _selected = Source.Count - 1;
             }
 
-            if (_selected < _top)
+            if (_selected < Viewport.Y)
             {
-                _top = Math.Max (_selected, 0);
+                Viewport = Viewport with { Y = Math.Max (_selected, 0) };
             }
-            else if (_selected > _top + Viewport.Height)
+            else if (_selected > Viewport.Y + Viewport.Height)
             {
-                _top = Math.Max (_selected - Viewport.Height + 1, 0);
+                Viewport = Viewport with { Y = Math.Max (_selected - Viewport.Height + 1, 0) };
             }
 
             OnSelectedChanged ();
             SetNeedsDisplay ();
         }
-        else if (_selected < _top)
+        else if (_selected < Viewport.Y)
         {
-            _top = Math.Max (_selected, 0);
+            Viewport = Viewport with { Y = Math.Max (_selected, 0) };
             SetNeedsDisplay ();
         }
 
@@ -629,10 +630,10 @@ public class ListView : View
         Driver.SetAttribute (current);
         Move (0, 0);
         Rectangle f = Viewport;
-        int item = _top;
+        int item = Viewport.Y;
         bool focused = HasFocus;
         int col = _allowsMarking ? 2 : 0;
-        int start = _left;
+        int start = Viewport.X;
 
         for (var row = 0; row < f.Height; row++, item++)
         {
@@ -769,11 +770,11 @@ public class ListView : View
     {
         if (_allowsMarking)
         {
-            Move (0, _selected - _top);
+            Move (0, _selected - Viewport.Y);
         }
         else
         {
-            Move (Viewport.Width - 1, _selected - _top);
+            Move (Viewport.Width - 1, _selected - Viewport.Y);
         }
     }
 
@@ -784,7 +785,7 @@ public class ListView : View
     /// <param name="items">Number of items to scroll down.</param>
     public virtual bool ScrollDown (int items)
     {
-        _top = Math.Max (Math.Min (_top + items, _source.Count - 1), 0);
+        Viewport = Viewport with { Y = Math.Max (Math.Min (Viewport.Y + items, _source.Count - 1), 0) };
         SetNeedsDisplay ();
 
         return true;
@@ -794,7 +795,7 @@ public class ListView : View
     /// <param name="cols">Number of columns to scroll left.</param>
     public virtual bool ScrollLeft (int cols)
     {
-        _left = Math.Max (_left - cols, 0);
+        Viewport = Viewport with { X = Math.Max (Viewport.X - cols, 0) };
         SetNeedsDisplay ();
 
         return true;
@@ -804,7 +805,7 @@ public class ListView : View
     /// <param name="cols">Number of columns to scroll right.</param>
     public virtual bool ScrollRight (int cols)
     {
-        _left = Math.Max (Math.Min (_left + cols, MaxLength - 1), 0);
+        Viewport = Viewport with { X = Math.Max (Math.Min (Viewport.X + cols, MaxLength - 1), 0) };
         SetNeedsDisplay ();
 
         return true;
@@ -814,7 +815,7 @@ public class ListView : View
     /// <param name="items">Number of items to scroll up.</param>
     public virtual bool ScrollUp (int items)
     {
-        _top = Math.Max (_top - items, 0);
+        Viewport = Viewport with { Y = Math.Max (Viewport.Y - items, 0) };
         SetNeedsDisplay ();
 
         return true;
