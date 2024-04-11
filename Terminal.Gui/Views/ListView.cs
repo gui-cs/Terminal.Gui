@@ -864,7 +864,8 @@ namespace Terminal.Gui {
 
 		void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width, int start = 0)
 		{
-			var u = TextFormatter.ClipAndJustify (ustr, width + start, TextAlignment.Left);
+			ustring str = start > ustr.ConsoleWidth ? string.Empty : ustr.Substring (Math.Min (start, ustr.ToRunes ().Length - 1));
+			ustring u = TextFormatter.ClipAndJustify (str, width, TextAlignment.Left);
 			driver.AddStr (u);
 			width -= TextFormatter.GetTextWidth (u);
 			while (width-- + start > 0) {
@@ -876,7 +877,7 @@ namespace Terminal.Gui {
 		public void Render (ListView container, ConsoleDriver driver, bool marked, int item, int col, int line, int width, int start = 0)
 		{
 			var savedClip = container.ClipToBounds ();
-			container.Move (col - start, line);
+			container.Move (Math.Max (col - start, 0), line);
 			var t = src? [item];
 			if (t == null) {
 				RenderUstr (driver, ustring.Make (""), col, line, width);
