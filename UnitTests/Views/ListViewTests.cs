@@ -78,7 +78,7 @@ public class ListViewTests
                                                       _output
                                                      );
 
-        Assert.True (lv.ScrollDown (10));
+        Assert.True (lv.ScrollVertical(10));
         lv.Draw ();
         Assert.Equal (-1, lv.SelectedItem);
 
@@ -141,7 +141,7 @@ public class ListViewTests
                                                       _output
                                                      );
 
-        Assert.True (lv.ScrollUp (20));
+        Assert.True (lv.ScrollVertical (-20));
         lv.Draw ();
         Assert.Equal (19, lv.SelectedItem);
 
@@ -183,7 +183,7 @@ public class ListViewTests
                                                       _output
                                                      );
 
-        Assert.True (lv.ScrollUp (20));
+        Assert.True (lv.ScrollVertical (-20));
         lv.Draw ();
         Assert.Equal (19, lv.SelectedItem);
 
@@ -246,7 +246,7 @@ public class ListViewTests
                                                       _output
                                                      );
 
-        Assert.True (lv.ScrollDown (20));
+        Assert.True (lv.ScrollVertical (20));
         lv.Draw ();
         Assert.Equal (0, lv.SelectedItem);
 
@@ -671,7 +671,7 @@ Item 6",
     private class NewListDataSource : IListDataSource
     {
         public int Count => 0;
-        public int Length => throw new NotImplementedException ();
+        public int Length => 0;
         public bool IsMarked (int item) { throw new NotImplementedException (); }
 
         public void Render (

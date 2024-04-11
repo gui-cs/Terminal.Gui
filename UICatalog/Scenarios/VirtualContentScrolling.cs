@@ -25,7 +25,7 @@ public class VirtualScrolling : Scenario
 
             // TODO: Add a way to set the scroll settings in the Scenario
             ContentSize = new Size (60, 40);
-            ScrollSettings = ScrollSettings.AllowViewportOutsideContent;
+            ViewportSettings |= ViewportSettings.ClearVisibleContentOnly;
 
             // Things this view knows how to do
             AddCommand (Command.ScrollDown, () => ScrollVertical (1));
@@ -104,60 +104,107 @@ public class VirtualScrolling : Scenario
         var view = new VirtualDemoView { Title = "Virtual Scrolling" };
 
         // Add Scroll Setting UI to Padding
-        view.Padding.Thickness = new (0, 2, 0, 0);
+        view.Padding.Thickness = new (0, 3, 0, 0);
         view.Padding.ColorScheme = Colors.ColorSchemes["Error"];
 
-        var cbAllowXBeyondContent = new CheckBox ()
+        var cbAllowNegativeX = new CheckBox ()
         {
-            Title = "Allow Viewport._X Beyond Content",
+            Title = "Allow _X < 0",
             Y = 0,
             CanFocus = false
         };
-        cbAllowXBeyondContent.Checked = view.ScrollSettings.HasFlag (ScrollSettings.AllowViewportOutsideContentVertical);
-        cbAllowXBeyondContent.Toggled += NoRestrictHorizontal_Toggled;
+        cbAllowNegativeX.Checked = view.ViewportSettings.HasFlag (ViewportSettings.AllowNegativeX);
+        cbAllowNegativeX.Toggled += AllowNegativeX_Toggled;
 
-        void NoRestrictHorizontal_Toggled (object sender, StateEventArgs<bool?> e)
+        void AllowNegativeX_Toggled (object sender, StateEventArgs<bool?> e)
         {
             if (e.NewValue == true)
             {
-                view.ScrollSettings = view.ScrollSettings | ScrollSettings.AllowViewportOutsideContentVertical;
+                view.ViewportSettings |= ViewportSettings.AllowNegativeX;
             }
             else
             {
-                view.ScrollSettings = view.ScrollSettings & ~ScrollSettings.AllowViewportOutsideContentVertical;
+                view.ViewportSettings &= ~ViewportSettings.AllowNegativeX;
             }
         }
 
-        view.Padding.Add (cbAllowXBeyondContent);
+        view.Padding.Add (cbAllowNegativeX);
 
-        var cbAllowYBeyondContent = new CheckBox ()
+        var cbAllowNegativeY = new CheckBox ()
         {
-            Title = "Allow Viewport._Y Beyond Content",
-            X = Pos.Right (cbAllowXBeyondContent) + 1,
+            Title = "Allow _Y < 0",
+            X = Pos.Right (cbAllowNegativeX) + 1,
             Y = 0,
             CanFocus = false
         };
-        cbAllowYBeyondContent.Checked = view.ScrollSettings.HasFlag (ScrollSettings.AllowViewportOutsideContentHorizontal);
-        cbAllowYBeyondContent.Toggled += NoRestrictVertical_Toggled;
+        cbAllowNegativeY.Checked = view.ViewportSettings.HasFlag (ViewportSettings.AllowNegativeY);
+        cbAllowNegativeY.Toggled += AllowNegativeY_Toggled;
 
-        void NoRestrictVertical_Toggled (object sender, StateEventArgs<bool?> e)
+        void AllowNegativeY_Toggled (object sender, StateEventArgs<bool?> e)
         {
             if (e.NewValue == true)
             {
-                view.ScrollSettings = view.ScrollSettings | ScrollSettings.AllowViewportOutsideContentHorizontal;
+                view.ViewportSettings |= ViewportSettings.AllowNegativeY;
             }
             else
             {
-                view.ScrollSettings = view.ScrollSettings & ~ScrollSettings.AllowViewportOutsideContentHorizontal;
+                view.ViewportSettings &= ~ViewportSettings.AllowNegativeY;
             }
         }
 
-        view.Padding.Add (cbAllowYBeyondContent);
+        view.Padding.Add (cbAllowNegativeY);
+        
+        var cbAllowXGreaterThanContentWidth = new CheckBox ()
+        {
+            Title = "Allow X > Content",
+            Y = Pos.Bottom(cbAllowNegativeX),
+            CanFocus = false
+        };
+        cbAllowXGreaterThanContentWidth.Checked = view.ViewportSettings.HasFlag (ViewportSettings.AllowXGreaterThanContentWidth);
+        cbAllowXGreaterThanContentWidth.Toggled += AllowXGreaterThanContentWidth_Toggled;
+
+        void AllowXGreaterThanContentWidth_Toggled (object sender, StateEventArgs<bool?> e)
+        {
+            if (e.NewValue == true)
+            {
+                view.ViewportSettings |= ViewportSettings.AllowXGreaterThanContentWidth;
+            }
+            else
+            {
+                view.ViewportSettings &= ~ViewportSettings.AllowXGreaterThanContentWidth;
+            }
+        }
+
+        view.Padding.Add (cbAllowXGreaterThanContentWidth);
+
+        var cbAllowYGreaterThanContentHeight = new CheckBox ()
+        {
+            Title = "Allow Y > Content",
+            X = Pos.Right (cbAllowXGreaterThanContentWidth) + 1,
+            Y = Pos.Bottom (cbAllowNegativeX),
+            CanFocus = false
+        };
+        cbAllowYGreaterThanContentHeight.Checked = view.ViewportSettings.HasFlag (ViewportSettings.AllowYGreaterThanContentHeight);
+        cbAllowYGreaterThanContentHeight.Toggled += AllowYGreaterThanContentHeight_Toggled;
+
+        void AllowYGreaterThanContentHeight_Toggled (object sender, StateEventArgs<bool?> e)
+        {
+            if (e.NewValue == true)
+            {
+                view.ViewportSettings |= ViewportSettings.AllowYGreaterThanContentHeight;
+            }
+            else
+            {
+                view.ViewportSettings &= ~ViewportSettings.AllowYGreaterThanContentHeight;
+            }
+        }
+
+        view.Padding.Add (cbAllowYGreaterThanContentHeight);
 
         var labelContentSize = new Label ()
         {
             Title = "_ContentSize:",
-            Y = 1,
+            Y = Pos.Bottom(cbAllowYGreaterThanContentHeight),
         };
 
         var contentSizeWidth = new Buttons.NumericUpDown()

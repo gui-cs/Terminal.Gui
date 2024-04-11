@@ -1,4 +1,5 @@
 using System.Collections;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
 
@@ -106,13 +107,12 @@ public class ListView : View
     public ListView ()
     {
         CanFocus = true;
-        ScrollSettings = ScrollSettings.AllowViewportOutsideContent;
 
         // Things this view knows how to do
         AddCommand (Command.LineUp, () => MoveUp ());
         AddCommand (Command.LineDown, () => MoveDown ());
-        AddCommand (Command.ScrollUp, () => ScrollUp (1));
-        AddCommand (Command.ScrollDown, () => ScrollDown (1));
+        AddCommand (Command.ScrollUp, () => ScrollVertical (-1));
+        AddCommand (Command.ScrollDown, () => ScrollVertical (1));
         AddCommand (Command.PageUp, () => MovePageUp ());
         AddCommand (Command.PageDown, () => MovePageDown ());
         AddCommand (Command.TopHome, () => MoveHome ());
@@ -120,6 +120,9 @@ public class ListView : View
         AddCommand (Command.Accept, () => OnOpenSelectedItem ());
         AddCommand (Command.OpenSelectedItem, () => OnOpenSelectedItem ());
         AddCommand (Command.Select, () => MarkUnmarkRow ());
+
+        AddCommand (Command.ScrollLeft, () => ScrollHorizontal (-1));
+        AddCommand (Command.ScrollRight, () => ScrollHorizontal (1));
 
         // Default keybindings for all ListViews
         KeyBindings.Add (Key.CursorUp, Command.LineUp);
@@ -261,7 +264,7 @@ public class ListView : View
             }
             _source = value;
 
-            ContentSize = new Size (Viewport.Width, _source?.Count ?? 0);
+            ContentSize = new Size (_source?.Length ?? Viewport.Width, _source?.Count ?? Viewport.Width);
             Viewport = Viewport with { Y = 0 };
             KeystrokeNavigator.Collection = _source?.ToList ();
             _selected = -1;
@@ -383,28 +386,28 @@ public class ListView : View
 
         if (me.Flags == MouseFlags.WheeledDown)
         {
-            ScrollDown (1);
+            ScrollVertical (1);
 
             return true;
         }
 
         if (me.Flags == MouseFlags.WheeledUp)
         {
-            ScrollUp (1);
+            ScrollVertical (-1);
 
             return true;
         }
 
         if (me.Flags == MouseFlags.WheeledRight)
         {
-            ScrollRight (1);
+            ScrollHorizontal (1);
 
             return true;
         }
 
         if (me.Flags == MouseFlags.WheeledLeft)
         {
-            ScrollLeft (1);
+            ScrollHorizontal(-1);
 
             return true;
         }
@@ -792,46 +795,6 @@ public class ListView : View
     /// <summary>This event is invoked when this <see cref="ListView"/> is being drawn before rendering.</summary>
     public event EventHandler<ListViewRowEventArgs> RowRender;
 
-    /// <summary>Scrolls the view down by <paramref name="items"/> items.</summary>
-    /// <param name="items">Number of items to scroll down.</param>
-    public virtual bool ScrollDown (int items)
-    {
-        Viewport = Viewport with { Y = Math.Max (Math.Min (Viewport.Y + items, _source.Count - 1), 0) };
-        SetNeedsDisplay ();
-
-        return true;
-    }
-
-    /// <summary>Scrolls the view left.</summary>
-    /// <param name="cols">Number of columns to scroll left.</param>
-    public virtual bool ScrollLeft (int cols)
-    {
-        Viewport = Viewport with { X = Math.Max (Viewport.X - cols, 0) };
-        SetNeedsDisplay ();
-
-        return true;
-    }
-
-    /// <summary>Scrolls the view right.</summary>
-    /// <param name="cols">Number of columns to scroll right.</param>
-    public virtual bool ScrollRight (int cols)
-    {
-        Viewport = Viewport with { X = Math.Max (Math.Min (Viewport.X + cols, MaxLength - 1), 0) };
-        SetNeedsDisplay ();
-
-        return true;
-    }
-
-    /// <summary>Scrolls the view up by <paramref name="items"/> items.</summary>
-    /// <param name="items">Number of items to scroll up.</param>
-    public virtual bool ScrollUp (int items)
-    {
-        Viewport = Viewport with { Y = Math.Max (Viewport.Y - items, 0) };
-        SetNeedsDisplay ();
-
-        return true;
-    }
-
     /// <summary>This event is raised when the selected item in the <see cref="ListView"/> has changed.</summary>
     public event EventHandler<ListViewItemEventArgs> SelectedItemChanged;
 
@@ -1040,8 +1003,8 @@ public class ListWrapper : IListDataSource
 
     private void RenderUstr (ConsoleDriver driver, string ustr, int col, int line, int width, int start = 0)
     {
-        string u = TextFormatter.ClipAndJustify (ustr, width, TextAlignment.Left);
-        driver.AddStr (u);
+        string str = start > ustr.GetColumns () ? string.Empty : ustr.Substring (start);
+        string u = TextFormatter.ClipAndJustify (str, width, TextAlignment.Left); driver.AddStr (u);
         width -= u.GetColumns ();
 
         while (width-- > 0)

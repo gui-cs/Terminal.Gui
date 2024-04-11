@@ -3,10 +3,10 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     Settings for how scrolling the <see cref="View.Viewport"/> on the View's Content Area is handled.
+///     Settings for how the <see cref="View.Viewport"/> behaves relative to the View's Content area.
 /// </summary>
 [Flags]
-public enum ScrollSettings
+public enum ViewportSettings
 {
     /// <summary>
     ///     No settings.
@@ -22,7 +22,7 @@ public enum ScrollSettings
     ///     When not set, <see cref="View.Viewport"/> is constrained to the bounds of the Content Area rectangle in the horizontal direction.
     /// </para>
     /// </remarks>
-    AllowViewportOutsideContentHorizontal = 1,
+    AllowNegativeX = 1,
 
     /// <summary>
     ///     If set, <see cref="View.Viewport"/> can be set to a rectangle that does not perfectly intersect with the Content Area
@@ -33,7 +33,7 @@ public enum ScrollSettings
     ///     When not set, <see cref="View.Viewport"/> is constrained to the bounds of the Content Area rectangle in the vertical direction.
     /// </para>
     /// </remarks>
-    AllowViewportOutsideContentVertical = 2,
+    AllowNegativeY = 2,
 
     /// <summary>
     ///     If set, <see cref="View.Viewport"/> can be set to a rectangle that does not perfectly intersect with the Content Area
@@ -44,7 +44,13 @@ public enum ScrollSettings
     ///     When not set, <see cref="View.Viewport"/> is constrained to the bounds of the Content Area rectangle.
     /// </para>
     /// </remarks>
-    AllowViewportOutsideContent = AllowViewportOutsideContentHorizontal | AllowViewportOutsideContentVertical
+    AllowNegativeLocation = AllowNegativeX | AllowNegativeY,
+
+    AllowXGreaterThanContentWidth = 4,
+    AllowYGreaterThanContentHeight = 8,
+    AllowLocationCreaterThanContentSize = AllowXGreaterThanContentWidth | AllowYGreaterThanContentHeight,
+
+    ClearVisibleContentOnly = 16,
 }
 
 public partial class View
@@ -147,22 +153,22 @@ public partial class View
 
     #region Viewport
 
-    private ScrollSettings _scrollSettings;
+    private ViewportSettings _viewportSettings;
 
     /// <summary>
     ///     Gets or sets how scrolling the <see cref="View.Viewport"/> on the View's Content Area is handled.
     /// </summary>
-    public ScrollSettings ScrollSettings
+    public ViewportSettings ViewportSettings
     {
-        get => _scrollSettings;
+        get => _viewportSettings;
         set
         {
-            if (_scrollSettings == value)
+            if (_viewportSettings == value)
             {
                 return;
             }
 
-            _scrollSettings = value;
+            _viewportSettings = value;
 
             // Force set Viewport to cause settings to be applied as needed
             SetViewport (Viewport);
@@ -195,7 +201,7 @@ public partial class View
     ///         <see cref="ContentSize"/>. This enables virtual zoom.
     ///     </para>
     ///     <para>
-    ///         The <see cref="ScrollSettings"/> property controls how scrolling is handled. If <see cref="ScrollSettings"/> is
+    ///         The <see cref="ViewportSettings"/> property controls how scrolling is handled. If <see cref="ViewportSettings"/> is
     ///     </para>
     ///     <para>
     ///         If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/> the value of Viewport is indeterminate until
@@ -274,33 +280,41 @@ public partial class View
         };
 
 
-        void ApplySettings (ref Rectangle location)
+        void ApplySettings (ref Rectangle newViewport)
         {
-            if (!ScrollSettings.HasFlag (ScrollSettings.AllowViewportOutsideContentHorizontal))
+            if (!ViewportSettings.HasFlag (ViewportSettings.AllowNegativeX))
             {
-                if (location.Y + Viewport.Height > ContentSize.Height)
-                {
-                    location.Y = ContentSize.Height - Viewport.Height;
-                }
 
-                if (location.Y < 0)
+                if (newViewport.X < 0)
                 {
-                    location.Y = 0;
+                    newViewport.X = 0;
                 }
             }
 
-            if (!ScrollSettings.HasFlag (ScrollSettings.AllowViewportOutsideContentVertical))
+            if (!ViewportSettings.HasFlag (ViewportSettings.AllowXGreaterThanContentWidth))
             {
-                if (location.X + Viewport.Width > ContentSize.Width)
+                if (newViewport.X >= ContentSize.Width)
                 {
-                    location.X = ContentSize.Width - Viewport.Width;
-                }
-
-                if (location.X < 0)
-                {
-                    location.X = 0;
+                    newViewport.X = ContentSize.Width - 1;
                 }
             }
+
+            if (!ViewportSettings.HasFlag (ViewportSettings.AllowNegativeY))
+            {
+                if (newViewport.Y < 0)
+                {
+                    newViewport.Y = 0;
+                }
+            }
+
+            if (!ViewportSettings.HasFlag (ViewportSettings.AllowYGreaterThanContentHeight))
+            {
+                if (newViewport.Y >= ContentSize.Height)
+                {
+                    newViewport.Y = ContentSize.Height - 1;
+                }
+            }
+
         }
     }
 

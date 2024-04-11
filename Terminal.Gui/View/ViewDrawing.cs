@@ -99,13 +99,6 @@ public partial class View
 
         Rectangle toClear = new (-Viewport.Location.X, -Viewport.Location.Y, ContentSize.Width, ContentSize.Height);
 
-        // If toClear does not fill the Viewport, we need to clear the area outside toClear with DarkGray.
-        // TODO: Need a configurable color for this
-        // PERF: Put an if around this if toClear is not smaller than Viewport
-        Attribute prev = Driver.SetAttribute (new Attribute (ColorName.DarkGray, ColorName.DarkGray));
-        Rectangle viewport = new (Point.Empty, Viewport.Size);
-        Driver.FillRect (ViewportToScreen (viewport));
-        Driver.SetAttribute (prev);
 
         Clear (toClear);
     }
@@ -433,7 +426,14 @@ public partial class View
         {
             if (SuperView is { })
             {
-                ClearVisibleContent ();
+                if (ViewportSettings.HasFlag(ViewportSettings.ClearVisibleContentOnly))
+                {
+                    ClearVisibleContent ();
+                }
+                else
+                {
+                    Clear ();
+                }
             }
 
             if (!string.IsNullOrEmpty (TextFormatter.Text))

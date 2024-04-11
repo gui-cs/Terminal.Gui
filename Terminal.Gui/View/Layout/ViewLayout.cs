@@ -649,6 +649,7 @@ public partial class View
                         start = nextStart;
                         x = startOffsetX;
                         y = startOffsetY;
+
                         break;
                     }
 
@@ -664,7 +665,7 @@ public partial class View
             }
         }
 
-        return null;
+        return start;
     }
 
 #nullable restore
