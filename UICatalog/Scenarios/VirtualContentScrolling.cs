@@ -11,7 +11,6 @@ namespace UICatalog.Scenarios;
 public class VirtualScrolling : Scenario
 {
     private ViewDiagnosticFlags _diagnosticFlags;
-
     public class VirtualDemoView : FrameView
     {
         public VirtualDemoView ()
@@ -26,7 +25,7 @@ public class VirtualScrolling : Scenario
 
             // TODO: Add a way to set the scroll settings in the Scenario
             ContentSize = new Size (60, 40);
-            ScrollSettings = ScrollSettings.NoRestrict;
+            ScrollSettings = ScrollSettings.AllowViewportLocationBeyondContent;
 
             // Things this view knows how to do
             AddCommand (Command.ScrollDown, () => ScrollVertical (1));
@@ -104,16 +103,99 @@ public class VirtualScrolling : Scenario
 
         var view = new VirtualDemoView { Title = "Virtual Scrolling" };
 
-        var tf1 = new TextField { X = 20, Y = 7, Width = 10, Text = "TextField" };
-        var color = new ColorPicker { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd (11), Y = 10 };
-        color.BorderStyle = LineStyle.RoundedDotted;
+        // Add Scroll Setting UI to Padding
+        view.Padding.Thickness = new (0, 2, 0, 0);
+        view.Padding.ColorScheme = Colors.ColorSchemes["Error"];
 
-        color.ColorChanged += (s, e) =>
+        var cbAllowXBeyondContent = new CheckBox ()
+        {
+            Title = "Allow Viewport._X Beyond Content",
+            Y = 0,
+            CanFocus = false
+        };
+        cbAllowXBeyondContent.Checked = view.ScrollSettings.HasFlag (ScrollSettings.AllowViewportXBeyondContent);
+        cbAllowXBeyondContent.Toggled += NoRestrictHorizontal_Toggled;
+
+        void NoRestrictHorizontal_Toggled (object sender, StateEventArgs<bool?> e)
+        {
+            if (e.NewValue == true)
+            {
+                view.ScrollSettings = view.ScrollSettings | ScrollSettings.AllowViewportXBeyondContent;
+            }
+            else
+            {
+                view.ScrollSettings = view.ScrollSettings & ~ScrollSettings.AllowViewportXBeyondContent;
+            }
+        }
+
+        view.Padding.Add (cbAllowXBeyondContent);
+
+        var cbAllowYBeyondContent = new CheckBox ()
+        {
+            Title = "Allow Viewport._Y Beyond Content",
+            X = Pos.Right (cbAllowXBeyondContent) + 1,
+            Y = 0,
+            CanFocus = false
+        };
+        cbAllowYBeyondContent.Checked = view.ScrollSettings.HasFlag (ScrollSettings.AllowViewportYBeyondContent);
+        cbAllowYBeyondContent.Toggled += NoRestrictVertical_Toggled;
+
+        void NoRestrictVertical_Toggled (object sender, StateEventArgs<bool?> e)
+        {
+            if (e.NewValue == true)
+            {
+                view.ScrollSettings = view.ScrollSettings | ScrollSettings.AllowViewportYBeyondContent;
+            }
+            else
+            {
+                view.ScrollSettings = view.ScrollSettings & ~ScrollSettings.AllowViewportYBeyondContent;
+            }
+        }
+
+        view.Padding.Add (cbAllowYBeyondContent);
+
+        var labelContentSize = new Label ()
+        {
+            Title = "_ContentSize:",
+            Y = 1,
+        };
+
+        var contentSizeWidth = new Buttons.NumericUpDown()
+        {
+            Value = view.ContentSize.Width,
+            X = Pos.Right (labelContentSize) + 1,
+            Y = Pos.Top (labelContentSize),
+        };
+
+        var labelComma = new Label ()
+        {
+            Title = ", ",
+            X = Pos.Right (contentSizeWidth),
+            Y = Pos.Top (labelContentSize),
+        };
+
+        var contentSizeHeight = new Buttons.NumericUpDown ()
+        {
+            Value = view.ContentSize.Height,
+            X = Pos.Right (labelComma),
+            Y = Pos.Top (labelContentSize),
+            CanFocus =false
+        };
+        view.Padding.Add (labelContentSize, contentSizeWidth, labelComma, contentSizeHeight);
+
+
+        // Add demo views to show that things work correctly
+        var textField = new TextField { X = 20, Y = 7, Width = 15, Text = "Test TextField" };
+
+        var colorPicker = new ColorPicker { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd (11), Y = 10 };
+        colorPicker.BorderStyle = LineStyle.RoundedDotted;
+
+        colorPicker.ColorChanged += (s, e) =>
                               {
-                                  color.SuperView.ColorScheme = new (color.SuperView.ColorScheme)
+                                  colorPicker.SuperView.ColorScheme = new (colorPicker.SuperView.ColorScheme)
                                   {
                                       Normal = new (
-                                                    color.SuperView.ColorScheme.Normal.Foreground,
+                                                    colorPicker.SuperView.ColorScheme.Normal.Foreground,
                                                     e.Color
                                                    )
                                   };
@@ -142,9 +224,9 @@ public class VirtualScrolling : Scenario
         charMap.Accept += (s, e) =>
                               MessageBox.Query (20, 7, "Hi", $"Am I a {view.GetType ().Name}?", "Yes", "No");
 
-        var btnButtonInWindow = new Button { X = Pos.AnchorEnd (10), Y = 0, Text = "Button" };
+        var buttonAnchoredRight = new Button { X = Pos.AnchorEnd (10), Y = 0, Text = "Button" };
 
-        var tv = new Label
+        var labelAnchoredBottomLeft = new Label
         {
             AutoSize = false,
             Y = Pos.AnchorEnd (3),
@@ -160,32 +242,28 @@ public class VirtualScrolling : Scenario
         view.Border.Thickness = new (3);
 
         view.Padding.Data = "Padding";
-        view.Padding.Thickness = new (3);
 
-        view.Add (btnButtonInWindow, tf1, color, charMap, textView, tv);
-        var label2 = new Label
+        view.Add (buttonAnchoredRight, textField, colorPicker, charMap, textView, labelAnchoredBottomLeft);
+
+        var longLabel = new Label
         {
             Id = "label2",
             X = 0,
             Y = 30,
             Text = "This label is long. It should clip to the Viewport (but not ContentArea). This is a virtual scrolling demo. Use the arrow keys and/or mouse wheel to scroll the content.",
         };
-        label2.TextFormatter.WordWrap = true;
-        view.Add (label2);
+        longLabel.TextFormatter.WordWrap = true;
+        view.Add (longLabel);
 
         var editor = new Adornments.AdornmentsEditor
         {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
             ColorScheme = Colors.ColorSchemes ["Dialog"]
-
-            //BorderStyle = LineStyle.None,
         };
 
         editor.Initialized += (s, e) => { editor.ViewToEdit = view; };
 
         editor.Closed += (s, e) => View.Diagnostics = _diagnosticFlags;
-
-        //button.SetFocus ();
 
         Application.Run (editor);
         editor.Dispose ();

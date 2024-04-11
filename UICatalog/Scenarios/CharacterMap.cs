@@ -1,4 +1,4 @@
-//#define OTHER_CONTROLS
+#define OTHER_CONTROLS
 
 using System;
 using System.Collections.Generic;

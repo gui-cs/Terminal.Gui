@@ -127,10 +127,11 @@ public class Adornment : View
 
         // Adornments are *Children* of a View, not SubViews. Thus View.FrameToScreen will not work.
         // To get the screen-relative coordinates of an Adornment, we need get the parent's Frame
-        // in screen coords, and add our Frame location to it.
-        Rectangle parent = Parent.FrameToScreen ();
+        // in screen coords, ...
+        Rectangle parentScreen = Parent.FrameToScreen ();
 
-        return new (new (parent.X + Frame.X, parent.Y + Frame.Y), Frame.Size);
+        // ...and add our Frame location to it.
+        return new (new (parentScreen.X + Frame.X, parentScreen.Y + Frame.Y), Frame.Size);
     }
 
     /// <inheritdoc/>

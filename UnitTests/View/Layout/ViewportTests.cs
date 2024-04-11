@@ -161,7 +161,7 @@ public class ViewportTests (ITestOutputHelper output)
         {
             Width = 10,
             Height = 10,
-            ScrollSettings = ScrollSettings.NoRestrict
+            ScrollSettings = ScrollSettings.AllowViewportLocationBeyondContent
         };
 
         Assert.Equal (new Rectangle (0, 0, 10, 10), view.Frame);

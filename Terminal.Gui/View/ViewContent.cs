@@ -9,24 +9,27 @@ namespace Terminal.Gui;
 public enum ScrollSettings
 {
     /// <summary>
-    ///     Default settings.
+    ///     No settings.
     /// </summary>
-    Default = 0,
+    None = 0,
 
     /// <summary>
-    ///     If set, does not restrict vertical scrolling to <see cref="View.ContentSize"/>.<c>Height</c>.
+    ///     If set, <c>Viewport.Location.Y</c> can be negative or greater than to <see cref="View.ContentSize"/>.<c>Height</c>,
+    ///     enabling scrolling beyond the dimensions of the content area vertically.
     /// </summary>
-    NoRestrictVertical = 1,
+    AllowViewportYBeyondContent = 1,
 
     /// <summary>
-    ///     If set, does not restrict horizontal scrolling to <see cref="View.ContentSize"/>.<c>Width</c>.
+    ///     If set, <c>Viewport.Location.X</c> can be negative or greater than to <see cref="View.ContentSize"/>.<c>Width</c>,
+    ///     enabling scrolling beyond the dimensions of the content area horizontally.
     /// </summary>
-    NoRestrictHorizontal = 2,
+    AllowViewportXBeyondContent = 2,
 
     /// <summary>
-    ///     If set, does not restrict either vertical or horizontal scrolling to <see cref="View.ContentSize"/>.
+    ///     If set, <c>Viewport.Location</c> can be negative or greater than to <see cref="View.ContentSize"/>,
+    ///     enabling scrolling beyond the dimensions of the content area either horizontally or vertically.
     /// </summary>
-    NoRestrict = NoRestrictVertical | NoRestrictHorizontal
+    AllowViewportLocationBeyondContent = AllowViewportYBeyondContent | AllowViewportXBeyondContent
 }
 
 public partial class View
@@ -129,10 +132,27 @@ public partial class View
 
     #region Viewport
 
+    private ScrollSettings _scrollSettings;
+
     /// <summary>
     ///     Gets or sets how scrolling the <see cref="View.Viewport"/> on the View's Content Area is handled.
     /// </summary>
-    public ScrollSettings ScrollSettings { get; set; }
+    public ScrollSettings ScrollSettings
+    {
+        get => _scrollSettings;
+        set
+        {
+            if (_scrollSettings == value)
+            {
+                return;
+            }
+
+            _scrollSettings = value;
+
+            // Force set Viewport to cause settings to be applied as needed
+            SetViewport (Viewport);
+        }
+    }
 
     /// <summary>
     ///     The location of the viewport into the view's content (0,0) is the top-left corner of the content. The Content
@@ -204,62 +224,71 @@ public partial class View
                              Math.Max (0, Frame.Size.Height - thickness.Vertical)
                             ));
         }
-        set
+        set => SetViewport (value);
+    }
+
+    private void SetViewport (Rectangle viewport)
+    {
+        ApplySettings (ref viewport);
+
+        Thickness thickness = GetAdornmentsThickness ();
+
+        Size newSize = new (
+                            viewport.Size.Width + thickness.Horizontal,
+                            viewport.Size.Height + thickness.Vertical);
+
+        if (newSize == Frame.Size)
         {
-            if (!ScrollSettings.HasFlag (ScrollSettings.NoRestrictVertical))
+            // The change is not changing the Frame, so we don't need to update it.
+            // Just call SetNeedsLayout to update the layout.
+            if (_viewportLocation != viewport.Location)
             {
-                if (value.Y + Viewport.Height > ContentSize.Height)
+                _viewportLocation = viewport.Location;
+                SetNeedsLayout ();
+            }
+
+            return;
+        }
+
+        _viewportLocation = viewport.Location;
+
+        // Update the Frame because we made it bigger or smaller which impacts subviews.
+        Frame = Frame with
+        {
+            Size = newSize
+        };
+
+
+        void ApplySettings (ref Rectangle location)
+        {
+            if (!ScrollSettings.HasFlag (ScrollSettings.AllowViewportYBeyondContent))
+            {
+                if (location.Y + Viewport.Height > ContentSize.Height)
                 {
-                    value.Y = ContentSize.Height - Viewport.Height;
+                    location.Y = ContentSize.Height - Viewport.Height;
                 }
 
-                if (value.Y < 0)
+                if (location.Y < 0)
                 {
-                    value.Y = 0;
+                    location.Y = 0;
                 }
             }
 
-            if (!ScrollSettings.HasFlag (ScrollSettings.NoRestrictHorizontal))
+            if (!ScrollSettings.HasFlag (ScrollSettings.AllowViewportXBeyondContent))
             {
-                if (value.X + Viewport.Width > ContentSize.Width)
+                if (location.X + Viewport.Width > ContentSize.Width)
                 {
-                    value.X = ContentSize.Width - Viewport.Width;
+                    location.X = ContentSize.Width - Viewport.Width;
                 }
 
-                if (value.X < 0)
+                if (location.X < 0)
                 {
-                    value.X = 0;
+                    location.X = 0;
                 }
             }
-
-            Thickness thickness = GetAdornmentsThickness ();
-
-            Size newSize = new (
-                                value.Size.Width + thickness.Horizontal,
-                                value.Size.Height + thickness.Vertical);
-
-            if (newSize == Frame.Size)
-            {
-                // The change is not changing the Frame, so we don't need to update it.
-                // Just call SetNeedsLayout to update the layout.
-                if (_viewportLocation != value.Location)
-                {
-                    _viewportLocation = value.Location;
-                    SetNeedsLayout ();
-                }
-
-                return;
-            }
-
-            _viewportLocation = value.Location;
-
-            // Update the Frame because we made it bigger or smaller which impacts subviews.
-            Frame = Frame with
-            {
-                Size = newSize
-            };
         }
     }
+
 
     /// <summary>
     ///     Converts a <see cref="Viewport"/>-relative location to a screen-relative location.

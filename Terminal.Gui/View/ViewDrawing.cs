@@ -425,6 +425,10 @@ public partial class View
     /// </param>
     public virtual void OnDrawContent (Rectangle viewport)
     {
+        if (Title == "View in Padding")
+        {
+
+        }
         if (NeedsDisplay)
         {
             if (SuperView is { })

@@ -90,27 +90,32 @@ public partial class View
     /// <returns>The location and size of the view in screen-relative coordinates.</returns>
     public virtual Rectangle FrameToScreen ()
     {
-        Rectangle ret = Frame;
-        View super = SuperView;
+        Rectangle screen = Frame;
+        View current = SuperView;
 
-        while (super is { })
+        while (current is { })
         {
-            if (super is Adornment adornment)
+            if (current is Adornment adornment)
             {
                 // Adornments don't have SuperViews; use Adornment.FrameToScreen override
-                ret = adornment.FrameToScreen ();
-                ret.Offset (Frame.X, Frame.Y);
+                // which will give us the screen coordinates of the parent
 
-                return ret;
+                var parentScreen = adornment.FrameToScreen ();
+
+                // Now add our Frame location
+                parentScreen.Offset (Frame.X, Frame.Y);
+
+                return parentScreen;
             }
 
-            Point viewportOffset = super.GetViewportOffsetFromFrame ();
-            viewportOffset.Offset (super.Frame.X - super.Viewport.X, super.Frame.Y - super.Viewport.Y);
-            ret.X += viewportOffset.X;
-            ret.Y += viewportOffset.Y;
-            super = super.SuperView;
+            Point viewportOffset = current.GetViewportOffsetFromFrame ();
+            viewportOffset.Offset (current.Frame.X - current.Viewport.X, current.Frame.Y - current.Viewport.Y);
+            screen.X += viewportOffset.X;
+            screen.Y += viewportOffset.Y;
+            current = current.SuperView;
         }
-        return ret;
+
+        return screen;
     }
 
     /// <summary>

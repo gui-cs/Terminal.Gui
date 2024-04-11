@@ -66,10 +66,10 @@ public class ToScreenTests (ITestOutputHelper output)
         view.Frame = frame;
 
         // Act
-        var screen = view.FrameToScreen();
+        var screen = view.FrameToScreen ();
 
         // Assert
-        Assert.Equal(expectedX, screen.X);
+        Assert.Equal (expectedX, screen.X);
     }
 
     [Theory]
@@ -89,6 +89,86 @@ public class ToScreenTests (ITestOutputHelper output)
 
         // Act
         var screen = view.FrameToScreen ();
+
+        // Assert
+        Assert.Equal (expectedX, screen.X);
+    }
+
+    [Theory]
+    [InlineData (0, 1)]
+    [InlineData (1, 2)]
+    [InlineData (-1, 0)]
+    [InlineData (11, 12)]
+    public void FrameToScreen_NoSuperView_WithAdornment_WithSubview (int x, int expectedX)
+    {
+        // We test with only X because Y is equivalent. Height/Width are irrelevant.
+        // Arrange
+        var frame = new Rectangle (x, 0, 10, 10);
+
+        var view = new View ();
+        view.BorderStyle = LineStyle.Single;
+        view.Frame = frame;
+
+        var subviewOfBorder = new View ()
+        {
+            X = 1, // screen should be 1
+            Y = 0,
+            Width = 1,
+            Height = 1
+        };
+
+        view.Border.Add (subviewOfBorder);
+        view.BeginInit ();
+        view.EndInit ();
+
+        // Act
+        var screen = subviewOfBorder.FrameToScreen ();
+
+        // Assert
+        Assert.Equal (expectedX, screen.X);
+    }
+
+    [Theory]
+    [InlineData (0, 3)]
+    [InlineData (1, 4)]
+    [InlineData (-1, 2)]
+    [InlineData (11, 14)]
+    public void FrameToScreen_Adornment_WithSubview_WithSubview (int topX, int expectedX)
+    {
+        // We test with only X because Y is equivalent. Height/Width are irrelevant.
+        // Arrange
+        var adornmentFrame = new Rectangle (topX, 0, 10, 10);
+
+        var adornment = new Adornment ();
+        adornment.Frame = adornmentFrame;
+        adornment.Thickness = new (1);
+
+        var subviewOfAdornment = new View ()
+        {
+            Id = "subviewOfAdornment",
+            X = 1, // screen should be 1
+            Y = 0,
+            Width = 1,
+            Height = 1,
+            BorderStyle = LineStyle.Single
+        };
+
+        var subviewOfSubview = new View ()
+        {
+            Id = "subviewOfSubview",
+            X = 2, // screen should be 4 (the subviewOfAdornment location is 1, and offset from frame is 1)
+            Y = 0,
+            Width = 1,
+            Height = 1
+        };
+        subviewOfAdornment.Add (subviewOfSubview);
+
+        adornment.Add (subviewOfAdornment);
+        adornment.BeginInit ();
+        adornment.EndInit ();
+
+        // Act
+        var screen = subviewOfSubview.FrameToScreen ();
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -259,7 +339,7 @@ public class ToScreenTests (ITestOutputHelper output)
             ContentSize = new (20, 20)
         };
 
-        Point testPoint = new ( 0, 0);
+        Point testPoint = new (0, 0);
         Assert.Equal (new Point (1, 1), view.ContentToScreen (testPoint));
     }
 
@@ -551,7 +631,7 @@ public class ToScreenTests (ITestOutputHelper output)
         {
             Width = 10,
             Height = 10,
-            ScrollSettings = ScrollSettings.NoRestrict
+            ScrollSettings = ScrollSettings.AllowViewportLocationBeyondContent
         };
 
         Rectangle testRect = new Rectangle (0, 0, 1, 1);
