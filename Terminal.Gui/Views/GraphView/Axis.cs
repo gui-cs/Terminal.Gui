@@ -140,9 +140,9 @@ public class HorizontalAxis : Axis
             return;
         }
 
-        Rectangle bounds = graph.Viewport;
+        Rectangle viewport = graph.Viewport;
 
-        IEnumerable<AxisIncrementToRender> labels = GetLabels (graph, bounds);
+        IEnumerable<AxisIncrementToRender> labels = GetLabels (graph, viewport);
 
         foreach (AxisIncrementToRender label in labels)
         {
@@ -225,7 +225,7 @@ public class HorizontalAxis : Axis
         Application.Driver.AddRune (Glyphs.HLine);
     }
 
-    private IEnumerable<AxisIncrementToRender> GetLabels (GraphView graph, Rectangle bounds)
+    private IEnumerable<AxisIncrementToRender> GetLabels (GraphView graph, Rectangle viewport)
     {
         // if no labels
         if (Increment == 0)
@@ -237,7 +237,7 @@ public class HorizontalAxis : Axis
         int y = GetAxisYPosition (graph);
 
         RectangleF start = graph.ScreenToGraphSpace ((int)graph.MarginLeft, y);
-        RectangleF end = graph.ScreenToGraphSpace (bounds.Width, y);
+        RectangleF end = graph.ScreenToGraphSpace (viewport.Width, y);
 
         // don't draw labels below the minimum
         if (Minimum.HasValue)
@@ -266,7 +266,7 @@ public class HorizontalAxis : Axis
                 ;
             }
 
-            // Label or no label definetly render it
+            // Label or no label definitely render it
             yield return toRender;
 
             current.X += Increment;

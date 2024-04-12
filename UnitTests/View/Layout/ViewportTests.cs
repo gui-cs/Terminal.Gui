@@ -230,6 +230,97 @@ public class ViewportTests (ITestOutputHelper output)
     }
 
     [Theory]
+    [InlineData (0, 0, 10, 10, 0, 0)]
+    [InlineData (10, 0, 10, 10, 9, 0)] // 9 because without AllowGreaterThanContentWidth, the location is clamped to size - 1
+    [InlineData (0, 10, 10, 10, 0, 9)]
+    [InlineData (10, 10, 10, 10, 9, 9)]
+    public void Set_Viewport_ValidValue_UpdatesViewport (int viewWidth, int viewHeight, int viewportX, int viewportY, int expectedX, int expectedY)
+    {
+        // Arrange
+        var view = new View ()
+        {
+            Width = viewWidth,
+            Height = viewHeight,
+        };
+        var newViewport = new Rectangle (viewportX, viewportY, viewWidth, viewHeight);
+
+        // Act
+        view.Viewport = newViewport;
+
+        // Assert
+        Assert.Equal (new Rectangle(expectedX, expectedY, viewWidth, viewHeight), view.Viewport);
+    }
+
+    [Theory]
+    [InlineData (0, 0, 10, 10, 10, 10)]
+    [InlineData (10, 0, 10, 10, 10, 10)]
+    [InlineData (0, 10, 10, 10, 10, 10)]
+    [InlineData (10, 10, 10, 10, 10, 10)]
+    public void Set_Viewport_ValidValue_UpdatesViewport_AllowLocationGreaterThanContentSize (int viewWidth, int viewHeight, int viewportX, int viewportY, int expectedX, int expectedY)
+    {
+        // Arrange
+        var view = new View ()
+        {
+            Width = viewWidth,
+            Height = viewHeight,
+            ViewportSettings = ViewportSettings.AllowLocationGreaterThanContentSize
+        };
+        var newViewport = new Rectangle (viewportX, viewportY, viewWidth, viewHeight);
+
+        // Act
+        view.Viewport = newViewport;
+
+        // Assert
+        Assert.Equal (new Rectangle (expectedX, expectedY, viewWidth, viewHeight), view.Viewport);
+    }
+
+    [Fact]
+    public void Set_Viewport_ValueGreaterThanContentSize_UpdatesViewportToContentSize ()
+    {
+        // Arrange
+        var view = new View ();
+        view.ContentSize = new Size (100, 100);
+        var newViewport = new Rectangle (0, 0, 200, 200);
+        view.ViewportSettings = ViewportSettings.AllowLocationGreaterThanContentSize;
+
+        // Act
+        view.Viewport = newViewport;
+
+        // Assert
+        Assert.Equal (newViewport, view.Viewport);
+    }
+
+    [Fact]
+    public void Set_Viewport_NegativeValue_AllowedBySettings ()
+    {
+        // Arrange
+        var view = new View ();
+        var newViewport = new Rectangle (-10, -10, 100, 100);
+        view.ViewportSettings = ViewportSettings.AllowNegativeLocation;
+
+        // Act
+        view.Viewport = newViewport;
+
+        // Assert
+        Assert.Equal (newViewport, view.Viewport);
+    }
+
+    [Fact]
+    public void Set_Viewport_NegativeValue_NotAllowedBySettings ()
+    {
+        // Arrange
+        var view = new View ();
+        var newViewport = new Rectangle (-10, -10, 100, 100);
+        view.ViewportSettings = ViewportSettings.None;
+
+        // Act
+        view.Viewport = newViewport;
+
+        // Assert
+        Assert.Equal (new Rectangle (0, 0, 100, 100), view.Viewport);
+    }
+
+    [Theory]
     [InlineData (0, 0, 0)]
     [InlineData (1, 0, 0)]
     [InlineData (-1, 0, 0)]

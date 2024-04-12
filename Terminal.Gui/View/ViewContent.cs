@@ -319,15 +319,6 @@ public partial class View
 
         void ApplySettings (ref Rectangle newViewport)
         {
-            if (!ViewportSettings.HasFlag (ViewportSettings.AllowNegativeX))
-            {
-
-                if (newViewport.X < 0)
-                {
-                    newViewport.X = 0;
-                }
-            }
-
             if (!ViewportSettings.HasFlag (ViewportSettings.AllowXGreaterThanContentWidth))
             {
                 if (newViewport.X >= ContentSize.Width)
@@ -336,11 +327,13 @@ public partial class View
                 }
             }
 
-            if (!ViewportSettings.HasFlag (ViewportSettings.AllowNegativeY))
+            // IMPORTANT: Check for negative location AFTER checking for location greater than content width
+            if (!ViewportSettings.HasFlag (ViewportSettings.AllowNegativeX))
             {
-                if (newViewport.Y < 0)
+
+                if (newViewport.X < 0)
                 {
-                    newViewport.Y = 0;
+                    newViewport.X = 0;
                 }
             }
 
@@ -352,10 +345,18 @@ public partial class View
                 }
             }
 
+            // IMPORTANT: Check for negative location AFTER checking for location greater than content width
+            if (!ViewportSettings.HasFlag (ViewportSettings.AllowNegativeY))
+            {
+                if (newViewport.Y < 0)
+                {
+                    newViewport.Y = 0;
+                }
+            }
+
         }
     }
-
-
+    
     /// <summary>
     ///     Converts a <see cref="Viewport"/>-relative location to a screen-relative location.
     /// </summary>
