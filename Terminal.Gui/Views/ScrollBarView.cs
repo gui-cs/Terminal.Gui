@@ -209,13 +209,7 @@ public class ScrollBarView : View
                 return;
             }
 
-            _position = value;
-
-            if (IsInitialized)
-            {
-                // We're not initialized so we can't do anything fancy. Just cache value.
-                SetPosition (value);
-            }
+            SetPosition (value);
         }
     }
 
@@ -905,11 +899,22 @@ public class ScrollBarView : View
     // Helper to assist Initialized event handler
     private void SetPosition (int newPosition)
     {
-        if (newPosition < 0)
+        if (!IsInitialized)
         {
+            // We're not initialized so we can't do anything fancy. Just cache value.
+            _position = newPosition;
+
             return;
         }
-        if (CanScroll (newPosition - _position, out int max, _vertical))
+
+        if (newPosition < 0)
+        {
+            _position = 0;
+            SetNeedsDisplay ();
+
+            return;
+        }
+        else if (CanScroll (newPosition - _position, out int max, _vertical))
         {
             if (max == newPosition - _position)
             {
