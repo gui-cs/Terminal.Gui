@@ -882,6 +882,9 @@ internal class CharMap : View
             return;
         }
 
+
+        args.Handled = true;
+
         if (me.Y == 0)
         {
             me.Y = Cursor.Y;
@@ -968,6 +971,7 @@ internal class CharMap : View
     {
         var client = new UcdApiClient ();
         var decResponse = string.Empty;
+        string getCodePointError = string.Empty;
 
         var waitIndicator = new Dialog
         {
@@ -999,12 +1003,13 @@ internal class CharMap : View
                                    try
                                    {
                                        decResponse = await client.GetCodepointDec (SelectedCodePoint);
+                                       Application.Invoke (() => waitIndicator.RequestStop ());
                                    }
                                    catch (HttpRequestException e)
                                    {
+                                       getCodePointError = errorLabel.Text = e.Message;
                                        Application.Invoke (() => waitIndicator.RequestStop ());
                                    }
-
                                };
         Application.Run (waitIndicator);
         waitIndicator.Dispose ();
