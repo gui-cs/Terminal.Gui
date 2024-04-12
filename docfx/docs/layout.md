@@ -1,34 +1,40 @@
 # Layout
 
-Terminal.Gui provides a rich system for how `View` objects are laid our relative to each other. The layout system also defines how coordinates are specified.
+Terminal.Gui provides a rich system for how `View` objects are laid out relative to each other. The layout system also defines how coordinates are specified.
 
 ## Dealing with coordinates
 
 The coordinate systems in Terminal.Gui are:
 
-* `Screen` - Describes the dimensions and characteristcs of the underlying terminal. Currently Terminal.Gui only supports applications that run "full-screen", meaning they fill the entire terminal when running. As the user resizes their terminal, the `Screen` changes size and a Terminal.Gui applicaiton will be resized to fit. *Screen-Relative* means an origin (`0, 0`) at the top-left corner of the terminal. `ConsoleDriver`s operate exclusively on *Screen-Relative* coordinates.
-* `Application` - The dimensions and charactersistcs of the application. Because only full-screen apps are currently supported, `Application` is effectively the same as `Screen` from a layout perspective. *Application-Relative* currently means an origin (`0, 0`) at the top-left corner of the terminal. `Applicaiton.Top` is a `View` who's top-left corner is fixed at the *Application.Relative* coordinate of (`0, 0`) and who's size is the same as the size of the `Screen`.
+* `Screen` - Describes the dimensions and characteristics of the underlying terminal. Currently Terminal.Gui only supports applications that run "full-screen", meaning they fill the entire terminal when running. As the user resizes their terminal, the `Screen` changes size and the applicaiton will be resized to fit. *Screen-Relative* means an origin (`0, 0`) at the top-left corner of the terminal. `ConsoleDriver`s operate exclusively on *Screen-Relative* coordinates.
+* `Application` - The dimensions and characteristics of the application. Because only full-screen apps are currently supported, `Application` is effectively the same as `Screen` from a layout perspective. *Application-Relative* currently means an origin (`0, 0`) at the top-left corner of the terminal. `Applicaiton.Top` is a `View` with a top-left corner fixed at the *Application.Relative* coordinate of (`0, 0`) and is the size of `Screen`.
 * `View Frame` - A rectangle at a particular point, and of a particular size, within another `View`, referred to as the `Superview`. *Frame-Relative* means a coordinate is relative to the top-left corner of the View in question. `View.FrameToScreen ()` and `View.ScreenToFrame ()` are helper methods for translating a *Frame-Relative* coordinate to a *Screen-Relative* coordinate and vice-versa.
-* `View Content` - A rectangle, with an origin of (`0, 0`) and size (defined by `View.ContentSize`) where the View's content exists. *Content-Relative* means a coordinate is relative to the top-left corner of the content, which is always (`0,0`). `View.ContentToScreen ()` and `View.ScreenToContent ()` are helper methods for translating a *Content-Relative* coordinate to a *Screen-Relative* coordinate and vice-versa.
-* `Viewport` - A *Contnet-Relative* rectangle representing the subset of the View's content that is visible to the user. If `View.ContentSize` is larger than the Viewport, scrolling is enabled. *Viewport-Relative* means a coordinate that is bound by (`0,0`) and the size of the inner-rectangle of the View's `Padding`. The View drawing primitives (e.g. `View.Move`) take *Viewport-Relative* coordinates; `Move (0, 0)` means the `Cell` in the top-left corner of the inner rectangle of `Padding`. `View.ViewportToScreen ()` and `View.ScreenToViewport ()` are helper methods for translating a *Viewport-Relative* coordinate to a *Screen-Relative* coordinate and vice-versa. To convert a *Viewport-Relative* coordinate to a *Content-Relative* coordinate, simply subtract `Viewport.X` and/or `Viewport.Y` from the *Content-Relative* coordinate. To convert a *Viewport-Relative* coordinate to a *Frame-Relative* coordinate, subtract the point returned by `View.GetViewportOffsetFromFrame`.
+* `View Content/Content Area` - A rectangle, with an origin of (`0, 0`) and size (defined by `View.ContentSize`) where the View's content exists. *Content-Relative* means a coordinate is relative to the top-left corner of the content, which is always (`0,0`). `View.ContentToScreen ()` and `View.ScreenToContent ()` are helper methods for translating a *Content-Relative* coordinate to a *Screen-Relative* coordinate and vice-versa.
+* `Viewport` - A *Content-Relative* rectangle representing the subset of the View's content that is visible to the user. If `View.ContentSize` is larger than the Viewport, scrolling is enabled. *Viewport-Relative* means a coordinate that is bound by (`0,0`) and the size of the inner-rectangle of the View's `Padding`. The View drawing primitives (e.g. `View.Move`) take *Viewport-Relative* coordinates; `Move (0, 0)` means the `Cell` in the top-left corner of the inner rectangle of `Padding`. `View.ViewportToScreen ()` and `View.ScreenToViewport ()` are helper methods for translating a *Viewport-Relative* coordinate to a *Screen-Relative* coordinate and vice-versa. To convert a *Viewport-Relative* coordinate to a *Content-Relative* coordinate, simply subtract `Viewport.X` and/or `Viewport.Y` from the *Content-Relative* coordinate. To convert a *Viewport-Relative* coordinate to a *Frame-Relative* coordinate, subtract the point returned by `View.GetViewportOffsetFromFrame`.
 
 ## The Viewport
 
-The Viewport (`View.Viewport`) is a rectangle describing a sub-set of the View's content. It is a "portal" into the content. The `Viewport.Location` is relative to the top-left corner of the inner rectangle of `View.Padding`. If `Viewport.Size` is the same as `View.ContentSize`, `Viewport.Location` will be `0,0`. Non-zero values for the location indicate the visible area is offset into the View's content area, enabling scrolling. Making `Viewport.Location` positive, moves the Viewport down and to the right in the content. If the location values are negative, it means the `Viewport` is positioned above and to the left of the content.
+The Viewport (`View.Viewport`) is a rectangle describing a sub-set of the View's content. It is a "portal" into the content. The `Viewport.Location` is relative to the top-left corner of the inner rectangle of `View.Padding`. If `Viewport.Size` is the same as `View.ContentSize`, `Viewport.Location` will be `0,0`. 
+
+To enable scrolling set `View.ContentSize` and then set `Viewport.Location` to positive values. Making `Viewport.Location` positive moves the Viewport down and to the right in the content. 
+
+The `View.ViewportSettings` property controls how the Viewport is constrained. By default, the `ViewportSettings` is set to `ViewportSettings.None`. To enable the viewport to be moved up-and-to-the-left of the content, use `ViewportSettings.AllowNegativeX` and or `ViewportSettings.AllowNegativeY`. 
+
+The default `ViewportSettings` also constrains the Viewport to the size of the content, ensuring the right-most column or bottom-most row of the content will always be visible (in v1 the equivalent concept was `ScrollBarView.AlwaysKeepContentInViewport`). To allow the Viewport to be smaller than the content, set `ViewportSettings.AllowXGreaterThanContentWidth` and/or `ViewportSettings.AllowXGreaterThanContentHeight`.
 
 ## Layout
 
-Terminal.Gui provides a rich sytem for how views are laid out relative to each other. **Computed Layout** means the position and size of a View is declared to be computed by the layout engine. **Absolute Layout** means the position and size of a View is explicitly declared by the develeper to be an absolute value. The position of a view is set by setting the `X` and `Y` properties, which are of time [Pos](~/api/Terminal.Gui.Pos.yml). The size is set via that `Width` and `Height` properties, which are of type [Dim](~/api/Terminal.Gui.Dim.yml).
+Terminal.Gui provides a rich system for how views are laid out relative to each other. **Computed Layout** means the position and size of a View is being computed by the layout engine. **Absolute Layout** means the position and size of a View has been declared to be an absolute values. The position of a view is set by setting the `X` and `Y` properties, which are of time [Pos](~/api/Terminal.Gui.Pos.yml). The size is set via `Width` and `Height`, which are of type [Dim](~/api/Terminal.Gui.Dim.yml).
 
-**Computed Layout** supports dynamic console apps where UI elements (Views) adjust layout as the terminal resizes or other Views change size or position. The X, Y, Width, and Height properties are Dim and Pos objects that dynamically update the position of a view.
+* **Computed Layout** supports dynamic console apps where UI elements (Views) automatically adjust as the terminal resizes or other Views change size or position. The X, Y, Width, and Height properties are Dim and Pos objects that dynamically update the position of a view.
 
-**Absolute Layout** requires specifying coordinates and sizes of Views explicitly, and the View will typically stay in a fixed position and size.
+* **Absolute Layout** requires specifying coordinates and sizes of Views explicitly, and the View will typically stay in a fixed position and size.
 
 ```cs
-// Absolute layout using a provided rectangle
+// Absolute layout using a absoulte values for X, Y, Width, and Height
 var label1 = new Label () { X = 1, Y = 2, Width = 3, Height = 4, Title = "Absolute")
 
-// Computed Layout
+// Computed Layout using Pos and Dim objects for X, Y, Width, and Height
 var label2 = new Label () {
     Title = "Computed",
     X = Pos.Right (otherView),

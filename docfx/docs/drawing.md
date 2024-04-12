@@ -6,19 +6,19 @@ Color is supported on all platforms, including Windows, Mac, and Linux. The defa
 
 ## View Drawing API
 
-A `View` will typically draw text when the [OnDrawContent](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_OnDrawContent_) is called (or the `DrawContent` event is received). 
+A `View` will typically draw text when the [OnDrawContent](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_OnDrawContent_) is called (or the `DrawContent` event is received).
 
-Outputing text directly involves:
+Outputting unformatted text involves:
 
 a) Moving the draw cursor using the `Move` API.
 b) Setting the attributes using `SetAttribute`.
-c) Outputting glyphs by calling `AddRune` or `AddStr`
+c) Outputting glyphs by calling `AddRune` or `AddStr`.
 
 Outputting formatted text involves:
 
 a) Adding the text to a `TextFormatter` object.
 b) Setting formatting options, such as `TextFormatter.TextAlignment`.
-c) calling `TextFormatter.Draw` 
+c) Calling `TextFormatter.Draw`.
 
 Line drawing is accomplished using the `LineCanvas` API:
 
@@ -33,11 +33,11 @@ See [Layout](layout.html) for more details of the Terminal.Gui coordinate system
 
 ## Cell
 
-The `Cell` class represents a single cell on the screen. It contains a character and an attribute. The character is of type `Rune` and the attribute is of type `Attribute`. 
+The `Cell` class represents a single cell on the screen. It contains a character and an attribute. The character is of type `Rune` and the attribute is of type `Attribute`.
 
-Normally `Cell` is not exposed directly to the developer. Instead, the `ConsoleDriver` classes manage the `Cell` array that represents the screen.
+`Cell` is not exposed directly to the developer. Instead, the `ConsoleDriver` classes manage the `Cell` array that represents the screen.
 
-To draw a `Cell` to the screen, first use `View.Move` to specify the row and column coordinates and then use the `View.AddRune` method to draw a single glyph. To draw a string, use `View.AddStr`. 
+To draw a `Cell` to the screen, use `View.Move` to specify the row and column coordinates and then use the `View.AddRune` method to draw a single glyph. To draw a string, use `View.AddStr`. 
 
 ## Unicode
 
@@ -55,9 +55,9 @@ The `Color` class represents a color. It provides automatic mapping between the 
 
 ## Color Schemes
 
-Terminal.Gui supports named collection of colors called `ColorScheme`s. Three built-in color schemes are provided: "Default", "Dark", and "Light". Additional color schemes can be defined via [Configuration Manager](). 
+Terminal.Gui supports named collections of colors called `ColorScheme`s. Three built-in color schemes are provided: "Default", "Dark", and "Light". Additional color schemes can be defined via [Configuration Manager](). 
 
-Color schemes support defining colors for various states of a view. The following states are supported:
+Color schemes support defining colors for various states of a View. The following states are supported:
 
 * Normal - The color of normal text.
 * HotNormal - The color of text indicating a [Hotkey]().
@@ -82,7 +82,7 @@ Terminal.Gui supports rendering glyphs using the `Glyph` class. The `Glyph` clas
 
 ## Line Drawing
 
-Terminal.Gui supports drawing lines and shapes using box-drawing glyphs. The `LineCanvas` class provides *auto join*, a smart TUI drawing system that automatically selects the correct line/box drawing glyphs for intersections making drawing complex shapes easy. See [Line Canvas](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#line-canvas) for details. The `Snake` and `Line Drawing` Scenarios in the [UI Catalog](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#ui-catalog) sample app are both examples of the power of the `LineCanvas`.
+Terminal.Gui supports drawing lines and shapes using box-drawing glyphs. The `LineCanvas` class provides *auto join*, a smart TUI drawing system that automatically selects the correct line/box drawing glyphs for intersections making drawing complex shapes easy. See [Line Canvas](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#line-canvas) for details. The `Snake` and `Line Drawing` Scenarios in the [UI Catalog](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#ui-catalog) sample app are both examples of the power of `LineCanvas`.
 
 ## Thickness
 
