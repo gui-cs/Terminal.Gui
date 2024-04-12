@@ -15,85 +15,73 @@ public class ScenarioTests
         _output = output;
     }
 
+    public static TheoryData<Scenario, string> AllScenarios => TestHelpers.GetAllScenarioTheoryData ();
+
     /// <summary>
     ///     <para>This runs through all Scenarios defined in UI Catalog, calling Init, Setup, and Run.</para>
     ///     <para>Should find any Scenarios which crash on load or do not respond to <see cref="Application.RequestStop()"/>.</para>
     /// </summary>
-    [Fact]
-    public void Run_All_Scenarios ()
+    [Theory]
+    [MemberData (nameof (AllScenarios))]
+    public void Run_All_Scenarios (Scenario scenario, string viewName)
     {
-        List<Scenario> scenarios = Scenario.GetScenarios ();
-        Assert.NotEmpty (scenarios);
+        _output.WriteLine ($"Running Scenario '{scenario.GetName ()}'");
 
-        foreach (Scenario scenario in scenarios)
+        Application.Init (new FakeDriver ());
+
+        // Press QuitKey 
+        Assert.Empty (FakeConsole.MockKeyPresses);
+
+        // BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
+        // by adding this Space it seems to work.
+        //FakeConsole.PushMockKeyPress (Key.Space);
+        FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
+
+        // The only key we care about is the QuitKey
+        Application.KeyDown += (sender, args) =>
+                               {
+                                   _output.WriteLine ($"  Keypress: {args.KeyCode}");
+
+                                   // BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
+                                   // by adding this Space it seems to work.
+                                   // See #2474 for why this is commented out
+                                   Assert.Equal (Application.QuitKey.KeyCode, args.KeyCode);
+                               };
+
+        uint abortTime = 500;
+
+        // If the scenario doesn't close within 500ms, this will force it to quit
+        bool ForceCloseCallback ()
         {
-            _output.WriteLine ($"Running Scenario '{scenario.GetName ()}'");
-
-            Application.Init (new FakeDriver ());
-
-            // Press QuitKey 
-            Assert.Empty (FakeConsole.MockKeyPresses);
-
-            // BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
-            // by adding this Space it seems to work.
-            //FakeConsole.PushMockKeyPress (Key.Space);
-            FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
-
-            // The only key we care about is the QuitKey
-            Application.KeyDown += (sender, args) =>
-                                       {
-                                           _output.WriteLine ($"  Keypress: {args.KeyCode}");
-
-                                           // BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
-                                           // by adding this Space it seems to work.
-                                           // See #2474 for why this is commented out
-                                           Assert.Equal (Application.QuitKey.KeyCode, args.KeyCode);
-                                       };
-
-            uint abortTime = 500;
-
-            // If the scenario doesn't close within 500ms, this will force it to quit
-            bool ForceCloseCallback ()
+            if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0)
             {
-                if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0)
-                {
-                    Application.RequestStop ();
+                Application.RequestStop ();
 
-                    // See #2474 for why this is commented out
-                    Assert.Fail (
-                                 $"'{
-                                     scenario.GetName ()
-                                 }' failed to Quit with {
-                                     Application.QuitKey
-                                 } after {
-                                     abortTime
-                                 }ms. Force quit.");
-                }
-
-                return false;
+                // See #2474 for why this is commented out
+                Assert.Fail (
+                             $"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms. Force quit.");
             }
 
-            //output.WriteLine ($"  Add timeout to force quit after {abortTime}ms");
-            _ = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), ForceCloseCallback);
-
-            Application.Iteration += (s, a) =>
-                                     {
-                                         //output.WriteLine ($"  iteration {++iterations}");
-                                         if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0)
-                                         {
-                                             Application.RequestStop ();
-                                             Assert.Fail ($"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey}. Force quit.");
-                                         }
-                                     };
-
-            scenario.Main ();
-            scenario.Dispose ();
-
-            Application.Shutdown ();
-#if DEBUG_IDISPOSABLE
-            Assert.Empty (Responder.Instances);
-#endif
+            return false;
         }
+
+        //output.WriteLine ($"  Add timeout to force quit after {abortTime}ms");
+        _ = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), ForceCloseCallback);
+
+        Application.Iteration += (s, a) =>
+                                 {
+                                     //output.WriteLine ($"  iteration {++iterations}");
+                                     if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0)
+                                     {
+                                         Application.RequestStop ();
+                                         Assert.Fail ($"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey}. Force quit.");
+                                     }
+                                 };
+
+        scenario.Main ();
+        scenario.Dispose ();
+
+        Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
         Assert.Empty (Responder.Instances);
 #endif
@@ -132,14 +120,14 @@ public class ScenarioTests
 
         Application.Init (new FakeDriver ());
 
-        Toplevel top = new Toplevel ();
+        var top = new Toplevel ();
 
         _viewClasses = GetAllViewClassesCollection ()
                        .OrderBy (t => t.Name)
                        .Select (t => new KeyValuePair<string, Type> (t.Name, t))
                        .ToDictionary (t => t.Key, t => t.Value);
 
-        _leftPane = new Window
+        _leftPane = new()
         {
             Title = "Classes",
             X = 0,
@@ -150,7 +138,7 @@ public class ScenarioTests
             ColorScheme = Colors.ColorSchemes ["TopLevel"]
         };
 
-        _classListView = new ListView
+        _classListView = new()
         {
             X = 0,
             Y = 0,
@@ -162,7 +150,7 @@ public class ScenarioTests
         };
         _leftPane.Add (_classListView);
 
-        _settingsPane = new FrameView
+        _settingsPane = new()
         {
             X = Pos.Right (_leftPane),
             Y = 0, // for menu
@@ -172,12 +160,12 @@ public class ScenarioTests
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Title = "Settings"
         };
-        _computedCheckBox = new CheckBox { X = 0, Y = 0, Text = "Computed Layout", Checked = true };
+        _computedCheckBox = new() { X = 0, Y = 0, Text = "Computed Layout", Checked = true };
         _settingsPane.Add (_computedCheckBox);
 
         var radioItems = new [] { "Percent(x)", "AnchorEnd(x)", "Center", "At(x)" };
 
-        _locationFrame = new FrameView
+        _locationFrame = new()
         {
             X = Pos.Left (_computedCheckBox),
             Y = Pos.Bottom (_computedCheckBox),
@@ -189,21 +177,21 @@ public class ScenarioTests
 
         var label = new Label { X = 0, Y = 0, Text = "x:" };
         _locationFrame.Add (label);
-        _xRadioGroup = new RadioGroup { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _xText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_xVal}" };
+        _xRadioGroup = new() { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
+        _xText = new() { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_xVal}" };
         _locationFrame.Add (_xText);
 
         _locationFrame.Add (_xRadioGroup);
 
         radioItems = new [] { "Percent(y)", "AnchorEnd(y)", "Center", "At(y)" };
-        label = new Label { X = Pos.Right (_xRadioGroup) + 1, Y = 0, Text = "y:" };
+        label = new() { X = Pos.Right (_xRadioGroup) + 1, Y = 0, Text = "y:" };
         _locationFrame.Add (label);
-        _yText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_yVal}" };
+        _yText = new() { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_yVal}" };
         _locationFrame.Add (_yText);
-        _yRadioGroup = new RadioGroup { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
+        _yRadioGroup = new() { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
         _locationFrame.Add (_yRadioGroup);
 
-        _sizeFrame = new FrameView
+        _sizeFrame = new()
         {
             X = Pos.Right (_locationFrame),
             Y = Pos.Y (_locationFrame),
@@ -213,25 +201,25 @@ public class ScenarioTests
         };
 
         radioItems = new [] { "Percent(width)", "Fill(width)", "Sized(width)" };
-        label = new Label { X = 0, Y = 0, Text = "width:" };
+        label = new() { X = 0, Y = 0, Text = "width:" };
         _sizeFrame.Add (label);
-        _wRadioGroup = new RadioGroup { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _wText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_wVal}" };
+        _wRadioGroup = new() { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
+        _wText = new() { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_wVal}" };
         _sizeFrame.Add (_wText);
         _sizeFrame.Add (_wRadioGroup);
 
         radioItems = new [] { "Percent(height)", "Fill(height)", "Sized(height)" };
-        label = new Label { X = Pos.Right (_wRadioGroup) + 1, Y = 0, Text = "height:" };
+        label = new() { X = Pos.Right (_wRadioGroup) + 1, Y = 0, Text = "height:" };
         _sizeFrame.Add (label);
-        _hText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_hVal}" };
+        _hText = new() { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_hVal}" };
         _sizeFrame.Add (_hText);
 
-        _hRadioGroup = new RadioGroup { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
+        _hRadioGroup = new() { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
         _sizeFrame.Add (_hRadioGroup);
 
         _settingsPane.Add (_sizeFrame);
 
-        _hostPane = new FrameView
+        _hostPane = new()
         {
             X = Pos.Right (_leftPane),
             Y = Pos.Bottom (_settingsPane),
@@ -623,10 +611,10 @@ public class ScenarioTests
                                  };
 
         Application.KeyDown += (sender, args) =>
-                                   {
-                                       // See #2474 for why this is commented out
-                                       Assert.Equal (KeyCode.CtrlMask | KeyCode.Q, args.KeyCode);
-                                   };
+                               {
+                                   // See #2474 for why this is commented out
+                                   Assert.Equal (KeyCode.CtrlMask | KeyCode.Q, args.KeyCode);
+                               };
 
         generic.Main ();
 

@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using UICatalog;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
@@ -564,6 +565,20 @@ internal partial class TestHelpers
         return td;
     }
 
+
+    public static TheoryData<Scenario, string> GetAllScenarioTheoryData ()
+    {
+        // TODO: Figure out how to simplify this. I couldn't figure out how to not have to iterate over ret.
+        var scenarios = Scenario.GetScenarios ();
+        (Scenario scenario, string name) [] ret = scenarios.Select (s => (scenario: s, name: s.GetName ())).ToArray();
+        TheoryData<Scenario, string> td = new ();
+        foreach ((Scenario scenario, string name) in ret)
+        {
+            td.Add (scenario, name);
+        }
+
+        return td;
+    }
 
     /// <summary>
     ///     Verifies the console used all the <paramref name="expectedColors"/> when rendering. If one or more of the
