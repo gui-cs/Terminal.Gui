@@ -34,7 +34,7 @@ public class Scrolling : Scenario
             Id = "scrollView",
             X = 2,
             Y = Pos.Bottom (label) + 1,
-            Width = 50,
+            Width = 60,
             Height = 20,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             ContentSize = new (200, 100),
