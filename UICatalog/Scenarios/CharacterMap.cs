@@ -19,12 +19,15 @@ namespace UICatalog.Scenarios;
 /// <summary>
 ///     This Scenario demonstrates building a custom control (a class deriving from View) that: - Provides a
 ///     "Character Map" application (like Windows' charmap.exe). - Helps test unicode character rendering in Terminal.Gui -
-///     Illustrates how to use ScrollView to do infinite scrolling
+///     Illustrates how to do infinite scrolling
 /// </summary>
-[ScenarioMetadata ("Character Map", "Unicode viewer demonstrating the ScrollView control.")]
+[ScenarioMetadata ("Character Map", "Unicode viewer demonstrating infinite content, scrolling, and Unicode.")]
 [ScenarioCategory ("Text and Formatting")]
+[ScenarioCategory ("Drawing")]
 [ScenarioCategory ("Controls")]
-[ScenarioCategory ("ScrollView")]
+[ScenarioCategory ("Layout")]
+[ScenarioCategory ("Scrolling")]
+
 public class CharacterMap : Scenario
 {
     public Label _errorLabel;
@@ -36,7 +39,7 @@ public class CharacterMap : Scenario
     {
         Application.Init ();
 
-        var top = new Window ()
+        var top = new Window
         {
             BorderStyle = LineStyle.None
         };
@@ -105,26 +108,26 @@ public class CharacterMap : Scenario
 
         // if user clicks the mouse in TableView
         _categoryList.MouseClick += (s, e) =>
-        {
-            _categoryList.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
+                                    {
+                                        _categoryList.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
 
-            if (clickedCol != null && e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
-            {
-                EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
-                string prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;
-                isDescending = !isDescending;
+                                        if (clickedCol != null && e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+                                        {
+                                            EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+                                            string prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;
+                                            isDescending = !isDescending;
 
-                _categoryList.Table = CreateCategoryTable (clickedCol.Value, isDescending);
+                                            _categoryList.Table = CreateCategoryTable (clickedCol.Value, isDescending);
 
-                table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+                                            table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
 
-                _categoryList.SelectedRow = table.Data
-                                                 .Select ((item, index) => new { item, index })
-                                                 .FirstOrDefault (x => x.item.Category == prevSelection)
-                                                 ?.index
-                                            ?? -1;
-            }
-        };
+                                            _categoryList.SelectedRow = table.Data
+                                                                             .Select ((item, index) => new { item, index })
+                                                                             .FirstOrDefault (x => x.item.Category == prevSelection)
+                                                                             ?.index
+                                                                        ?? -1;
+                                        }
+                                    };
 
         int longestName = UnicodeRange.Ranges.Max (r => r.Category.GetColumns ());
 
@@ -138,13 +141,12 @@ public class CharacterMap : Scenario
         _categoryList.Width = _categoryList.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 4;
 
         _categoryList.SelectedCellChanged += (s, args) =>
-        {
-            EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
-            _charMap.StartCodePoint = table.Data.ToArray () [args.NewRow].Start;
-        };
+                                             {
+                                                 EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+                                                 _charMap.StartCodePoint = table.Data.ToArray () [args.NewRow].Start;
+                                             };
 
         top.Add (_categoryList);
-
 
         // TODO: Replace this with Dim.Auto when that's ready
         _categoryList.Initialized += _categoryList_Initialized;
@@ -466,8 +468,9 @@ internal class CharMap : View
         MouseEvent += Handle_MouseEvent;
 
         // Prototype scrollbars
-        Padding.Thickness = new Thickness (0, 0, 1, 1);
-        var up = new Button ()
+        Padding.Thickness = new (0, 0, 1, 1);
+
+        var up = new Button
         {
             AutoSize = false,
             X = Pos.AnchorEnd (1),
@@ -478,15 +481,11 @@ internal class CharMap : View
             NoDecorations = true,
             Title = CM.Glyphs.UpArrow.ToString (),
             WantContinuousButtonPressed = true,
-            CanFocus = false,
-
+            CanFocus = false
         };
-        up.Accept += (sender, args) =>
-        {
-            args.Cancel = ScrollVertical (-1) == true;
-        };
+        up.Accept += (sender, args) => { args.Cancel = ScrollVertical (-1) == true; };
 
-        var down = new Button ()
+        var down = new Button
         {
             AutoSize = false,
             X = Pos.AnchorEnd (1),
@@ -497,15 +496,11 @@ internal class CharMap : View
             NoDecorations = true,
             Title = CM.Glyphs.DownArrow.ToString (),
             WantContinuousButtonPressed = true,
-            CanFocus = false,
-
+            CanFocus = false
         };
-        down.Accept += (sender, args) =>
-        {
-            ScrollVertical (1);
-        };
+        down.Accept += (sender, args) => { ScrollVertical (1); };
 
-        var left = new Button ()
+        var left = new Button
         {
             AutoSize = false,
             X = 0,
@@ -516,15 +511,11 @@ internal class CharMap : View
             NoDecorations = true,
             Title = CM.Glyphs.LeftArrow.ToString (),
             WantContinuousButtonPressed = true,
-            CanFocus = false,
-
+            CanFocus = false
         };
-        left.Accept += (sender, args) =>
-        {
-            ScrollHorizontal (-1);
-        };
+        left.Accept += (sender, args) => { ScrollHorizontal (-1); };
 
-        var right = new Button ()
+        var right = new Button
         {
             AutoSize = false,
             X = Pos.AnchorEnd (2),
@@ -535,14 +526,9 @@ internal class CharMap : View
             NoDecorations = true,
             Title = CM.Glyphs.RightArrow.ToString (),
             WantContinuousButtonPressed = true,
-            CanFocus = false,
-
+            CanFocus = false
         };
-        right.Accept += (sender, args) =>
-        {
-            ScrollHorizontal (1);
-        };
-
+        right.Accept += (sender, args) => { ScrollHorizontal (1); };
 
         Padding.Add (up, down, left, right);
     }
@@ -553,6 +539,7 @@ internal class CharMap : View
         {
             ScrollVertical (1);
             e.Handled = true;
+
             return;
         }
 
@@ -576,7 +563,6 @@ internal class CharMap : View
         {
             ScrollHorizontal (-1);
             e.Handled = true;
-
         }
     }
 
@@ -609,6 +595,7 @@ internal class CharMap : View
             {
                 return;
             }
+
             _selected = value;
 
             if (IsInitialized)
@@ -640,6 +627,7 @@ internal class CharMap : View
                     Viewport = Viewport with { X = col - width };
                 }
             }
+
             SetNeedsDisplay ();
             SelectedCodePointChanged?.Invoke (this, new (SelectedCodePoint, null));
         }
@@ -882,7 +870,6 @@ internal class CharMap : View
             return;
         }
 
-
         args.Handled = true;
 
         if (me.Y == 0)
@@ -971,7 +958,7 @@ internal class CharMap : View
     {
         var client = new UcdApiClient ();
         var decResponse = string.Empty;
-        string getCodePointError = string.Empty;
+        var getCodePointError = string.Empty;
 
         var waitIndicator = new Dialog
         {
@@ -1037,7 +1024,7 @@ internal class CharMap : View
                                                         document.RootElement,
                                                         new
                                                             JsonSerializerOptions
-                                                        { WriteIndented = true }
+                                                            { WriteIndented = true }
                                                        );
             }
 
@@ -1050,16 +1037,16 @@ internal class CharMap : View
             var dlg = new Dialog { Title = title, Buttons = [copyGlyph, copyCP, cancel] };
 
             copyGlyph.Accept += (s, a) =>
-            {
-                CopyGlyph ();
-                dlg.RequestStop ();
-            };
+                                {
+                                    CopyGlyph ();
+                                    dlg.RequestStop ();
+                                };
 
             copyCP.Accept += (s, a) =>
-            {
-                CopyCodePoint ();
-                dlg.RequestStop ();
-            };
+                             {
+                                 CopyCodePoint ();
+                                 dlg.RequestStop ();
+                             };
             cancel.Accept += (s, a) => dlg.RequestStop ();
 
             var rune = (Rune)SelectedCodePoint;

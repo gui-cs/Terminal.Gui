@@ -7,6 +7,7 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("Scrolling", "Demonstrates ScrollView etc...")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("ScrollView")]
+[ScenarioCategory ("Scrolling")]
 [ScenarioCategory ("Tests")]
 public class Scrolling : Scenario
 {

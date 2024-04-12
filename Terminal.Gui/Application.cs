@@ -1457,7 +1457,6 @@ public static partial class Application
             return;
         }
 
-        // TODO: In PR #3273, FindDeepestView will return adornments. Update logic below to fix adornment mouse handling
         var view = View.FindDeepestView (Current, mouseEvent.X, mouseEvent.Y);
 
         if (view is { })

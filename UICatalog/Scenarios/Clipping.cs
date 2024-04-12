@@ -4,6 +4,8 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Clipping", "Used to test that things clip correctly")]
 [ScenarioCategory ("Tests")]
+[ScenarioCategory ("Drawing")]
+[ScenarioCategory ("Scrolling")]
 public class Clipping : Scenario
 {
     public override void Init ()
