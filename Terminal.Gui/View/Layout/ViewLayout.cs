@@ -645,8 +645,8 @@ public partial class View
                     && start.InternalSubviews [i].Contains (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y))
                 {
                     subview = start.InternalSubviews [i];
-                    x = startOffsetX;
-                    y = startOffsetY;
+                    x = startOffsetX + start.Viewport.X;
+                    y = startOffsetY + start.Viewport.Y;
 
                     // start is the deepest subview under the mouse; stop searching the subviews
                     break;
