@@ -204,6 +204,11 @@ public class ScrollBarView : View
         get => _position;
         set
         {
+            if (_position == value)
+            {
+                return;
+            }
+
             _position = value;
 
             if (IsInitialized)
@@ -900,6 +905,10 @@ public class ScrollBarView : View
     // Helper to assist Initialized event handler
     private void SetPosition (int newPosition)
     {
+        if (newPosition < 0)
+        {
+            return;
+        }
         if (CanScroll (newPosition - _position, out int max, _vertical))
         {
             if (max == newPosition - _position)

@@ -273,7 +273,10 @@ public class ListView : View
         }
     }
 
-    /// <summary>Gets or sets the item that is displayed at the top of the <see cref="ListView"/>.</summary>
+    /// <summary>Gets or sets the index of the item that will appear at the top of the <see cref="View.Viewport"/>.</summary>
+    /// <remarks>
+    /// This a helper property for accessing <c>listView.Viewport.Y</c>.
+    /// </remarks>
     /// <value>The top item.</value>
     public int TopItem
     {
@@ -285,13 +288,7 @@ public class ListView : View
                 return;
             }
 
-            if (value < 0 || (_source.Count > 0 && value >= _source.Count))
-            {
-                throw new ArgumentException ("value");
-            }
-
             Viewport = Viewport with { Y = value };
-            SetNeedsDisplay ();
         }
     }
 
