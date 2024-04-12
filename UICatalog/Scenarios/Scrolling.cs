@@ -1,25 +1,33 @@
 ﻿using System;
-using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Scrolling", "Demonstrates ScrollView etc...")]
+[ScenarioMetadata ("Scrolling", "Demonstrates scrolling etc...")]
 [ScenarioCategory ("Controls")]
-[ScenarioCategory ("ScrollView")]
 [ScenarioCategory ("Scrolling")]
 [ScenarioCategory ("Tests")]
 public class Scrolling : Scenario
 {
-    public override void Setup ()
+    private ViewDiagnosticFlags _diagnosticFlags;
+
+    public override void Main ()
     {
-        // Offset Win to stress clipping
-        Win.X = 1;
-        Win.Y = 1;
-        Win.Width = Dim.Fill (1);
-        Win.Height = Dim.Fill (1);
+        Application.Init ();
+        _diagnosticFlags = View.Diagnostics;
+        View.Diagnostics = ViewDiagnosticFlags.Ruler;
+        var app = new Window ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            // Offset to stress clipping
+            X = 3,
+            Y = 3,
+            Width = Dim.Fill (3),
+            Height = Dim.Fill (3),
+        };
+
         var label = new Label { X = 0, Y = 0 };
-        Win.Add (label);
+        app.Add (label);
 
         var scrollView = new ScrollView
         {
@@ -35,9 +43,9 @@ public class Scrolling : Scenario
             ShowVerticalScrollIndicator = true,
             ShowHorizontalScrollIndicator = true
         };
+        scrollView.Padding.Thickness = new (1);
 
-        label.Text =
-            $"{scrollView}\nContentSize: {scrollView.ContentSize}\nContentOffset: {scrollView.ContentOffset}";
+        label.Text = $"{scrollView}\nContentSize: {scrollView.ContentSize}\nContentOffset: {scrollView.ContentOffset}";
 
         const string rule = "0123456789";
 
@@ -64,25 +72,6 @@ public class Scrolling : Scenario
             ColorScheme = Colors.ColorSchemes ["Error"]
         };
         scrollView.Add (verticalRuler);
-
-        void Top_Loaded (object sender, EventArgs args)
-        {
-            horizontalRuler.Text =
-                rule.Repeat ((int)Math.Ceiling (horizontalRuler.Viewport.Width / (double)rule.Length)) [
-                                                                                                      ..horizontalRuler.Viewport.Width]
-                + "\n"
-                + "|         ".Repeat (
-                                       (int)Math.Ceiling (horizontalRuler.Viewport.Width / (double)rule.Length)
-                                      ) [
-                                         ..horizontalRuler.Viewport.Width];
-
-            verticalRuler.Text =
-                vrule.Repeat ((int)Math.Ceiling (verticalRuler.Viewport.Height * 2 / (double)rule.Length))
-                    [..(verticalRuler.Viewport.Height * 2)];
-            Top.Loaded -= Top_Loaded;
-        }
-
-        Top.Loaded += Top_Loaded;
 
         var pressMeButton = new Button { X = 3, Y = 3, Text = "Press me!" };
         pressMeButton.Accept += (s, e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
@@ -139,17 +128,17 @@ public class Scrolling : Scenario
         anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
 
         anchorButton.Accept += (s, e) =>
-                                {
-                                    // This demonstrates how to have a dynamically sized button
-                                    // Each time the button is clicked the button's text gets longer
-                                    // The call to Win.LayoutSubviews causes the Computed layout to
-                                    // get updated. 
-                                    anchorButton.Text += "!";
-                                    Win.LayoutSubviews ();
-                                };
+                               {
+                                   // This demonstrates how to have a dynamically sized button
+                                   // Each time the button is clicked the button's text gets longer
+                                   // The call to Win.LayoutSubviews causes the Computed layout to
+                                   // get updated. 
+                                   anchorButton.Text += "!";
+                                   app.LayoutSubviews ();
+                               };
         scrollView.Add (anchorButton);
 
-        Win.Add (scrollView);
+        app.Add (scrollView);
 
         var hCheckBox = new CheckBox
         {
@@ -158,7 +147,7 @@ public class Scrolling : Scenario
             Text = "Horizontal Scrollbar",
             Checked = scrollView.ShowHorizontalScrollIndicator
         };
-        Win.Add (hCheckBox);
+        app.Add (hCheckBox);
 
         var vCheckBox = new CheckBox
         {
@@ -167,7 +156,7 @@ public class Scrolling : Scenario
             Text = "Vertical Scrollbar",
             Checked = scrollView.ShowVerticalScrollIndicator
         };
-        Win.Add (vCheckBox);
+        app.Add (vCheckBox);
 
         var t = "Auto Hide Scrollbars";
 
@@ -214,32 +203,10 @@ public class Scrolling : Scenario
                                   hCheckBox.Checked = true;
                                   vCheckBox.Checked = true;
                               };
-        Win.Add (ahCheckBox);
+        app.Add (ahCheckBox);
 
         keepCheckBox.Toggled += (s, e) => scrollView.KeepContentAlwaysInViewport = (bool)keepCheckBox.Checked;
-        Win.Add (keepCheckBox);
-
-        //var scrollView2 = new ScrollView (new (55, 2, 20, 8)) {
-        //	ContentSize = new (20, 50),
-        //	//ContentOffset = Point.Empty,
-        //	ShowVerticalScrollIndicator = true,
-        //	ShowHorizontalScrollIndicator = true
-        //};
-        //var filler = new Filler (new (0, 0, 60, 40));
-        //scrollView2.Add (filler);
-        //scrollView2.DrawContent += (s,e) => {
-        //	scrollView2.ContentSize = filler.GetContentSize ();
-        //};
-        //Win.Add (scrollView2);
-
-        //// This is just to debug the visuals of the scrollview when small
-        //var scrollView3 = new ScrollView (new (55, 15, 3, 3)) {
-        //	ContentSize = new (100, 100),
-        //	ShowVerticalScrollIndicator = true,
-        //	ShowHorizontalScrollIndicator = true
-        //};
-        //scrollView3.Add (new Box10x (0, 0));
-        //Win.Add (scrollView3);
+        app.Add (keepCheckBox);
 
         var count = 0;
 
@@ -251,11 +218,12 @@ public class Scrolling : Scenario
             Width = 50,
             Text = "Mouse: "
         };
-        Win.Add (mousePos);
+        app.Add (mousePos);
         Application.MouseEvent += (sender, a) => { mousePos.Text = $"Mouse: ({a.X},{a.Y}) - {a.Flags} {count++}"; };
 
+        // Add a progress bar to cause constant redraws
         var progress = new ProgressBar { X = Pos.Right (scrollView) + 1, Y = Pos.AnchorEnd (2), Width = 50 };
-        Win.Add (progress);
+        app.Add (progress);
 
         var pulsing = true;
 
@@ -268,12 +236,37 @@ public class Scrolling : Scenario
 
         Application.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
 
-        void Top_Unloaded (object sender, EventArgs args)
+        app.Loaded += App_Loaded;
+        app.Unloaded += app_Unloaded;
+
+        Application.Run (app);
+        app.Loaded -= App_Loaded;
+        app.Unloaded -= app_Unloaded;
+        app.Dispose ();
+
+        return;
+
+        // Local functions
+        void App_Loaded (object sender, EventArgs args)
         {
-            pulsing = false;
-            Top.Unloaded -= Top_Unloaded;
+            horizontalRuler.Text =
+                rule.Repeat ((int)Math.Ceiling (horizontalRuler.Viewport.Width / (double)rule.Length)) [
+                                                                                                        ..horizontalRuler.Viewport.Width]
+                + "\n"
+                + "|         ".Repeat (
+                                       (int)Math.Ceiling (horizontalRuler.Viewport.Width / (double)rule.Length)
+                                      ) [
+                                         ..horizontalRuler.Viewport.Width];
+
+            verticalRuler.Text =
+                vrule.Repeat ((int)Math.Ceiling (verticalRuler.Viewport.Height * 2 / (double)rule.Length))
+                    [..(verticalRuler.Viewport.Height * 2)];
         }
 
-        Top.Unloaded += Top_Unloaded;
+        void app_Unloaded (object sender, EventArgs args)
+        {
+            View.Diagnostics = _diagnosticFlags;
+            pulsing = false;
+        }
     }
 }
