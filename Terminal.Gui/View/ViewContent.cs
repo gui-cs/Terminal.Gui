@@ -207,8 +207,11 @@ public partial class View
 
             _viewportSettings = value;
 
-            // Force set Viewport to cause settings to be applied as needed
-            SetViewport (Viewport);
+            if (IsInitialized)
+            {
+                // Force set Viewport to cause settings to be applied as needed
+                SetViewport (Viewport);
+            }
         }
     }
 
@@ -287,6 +290,7 @@ public partial class View
 
     private void SetViewport (Rectangle viewport)
     {
+        Rectangle oldViewport = viewport;
         ApplySettings (ref viewport);
 
         Thickness thickness = GetAdornmentsThickness ();
@@ -305,6 +309,7 @@ public partial class View
                 SetNeedsLayout ();
             }
 
+            OnViewportChanged (new (IsInitialized ? Viewport : Rectangle.Empty, oldViewport));
             return;
         }
 
@@ -353,10 +358,24 @@ public partial class View
                     newViewport.Y = 0;
                 }
             }
-
         }
     }
-    
+
+    /// <summary>
+    /// Fired when the <see cref="Frame"/> changes. This event is fired after the <see cref="Frame"/> has been updated.
+    /// </summary>
+    [CanBeNull]
+    public event EventHandler<DrawEventArgs> ViewportChanged;
+
+    /// <summary>
+    /// Called when the <see cref="Frame"/> changes. Invokes the <see cref="ViewportChanged"/> event.
+    /// </summary>
+    /// <param name="e"></param>
+    protected virtual void OnViewportChanged (DrawEventArgs e)
+    {
+        ViewportChanged?.Invoke (this, e);
+    }
+
     /// <summary>
     ///     Converts a <see cref="Viewport"/>-relative location to a screen-relative location.
     /// </summary>

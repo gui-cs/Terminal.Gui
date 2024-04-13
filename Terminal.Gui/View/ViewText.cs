@@ -365,7 +365,7 @@ public partial class View
             // TODO: This is a hack.
             //_width  = size.Width;
             //_height = size.Height;
-            _frame = new (_frame.Location, size);
+            SetFrame (new (_frame.Location, size));
 
             //throw new InvalidOperationException ("This is a hack.");
             return true;

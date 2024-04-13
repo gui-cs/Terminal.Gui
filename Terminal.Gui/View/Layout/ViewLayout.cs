@@ -69,7 +69,7 @@ public partial class View
                 return;
             }
 
-            _frame = value with { Width = Math.Max (value.Width, 0), Height = Math.Max (value.Height, 0) };
+            SetFrame (value with { Width = Math.Max (value.Width, 0), Height = Math.Max (value.Height, 0) });
 
             // If Frame gets set, by definition, the View is now LayoutStyle.Absolute, so
             // set all Pos/Dim to Absolute values.
@@ -84,6 +84,19 @@ public partial class View
                 OnResizeNeeded ();
             }
         }
+    }
+
+    private void SetFrame (Rectangle frame)
+    {
+        Rectangle oldViewport  = Rectangle.Empty;
+        if (IsInitialized)
+        {
+            oldViewport = Viewport;
+        }
+        // This is the only place where _frame should be set directly. Use Frame = or SetFrame instead.
+        _frame = frame;
+
+        OnViewportChanged (new (IsInitialized ? Viewport : Rectangle.Empty, oldViewport));
     }
 
     /// <summary>Gets the <see cref="Frame"/> with a screen-relative location.</summary>
@@ -861,8 +874,7 @@ public partial class View
 
         LayoutAdornments ();
 
-        Rectangle oldViewport = Viewport;
-        OnLayoutStarted (new () { OldViewport = oldViewport });
+        OnLayoutStarted (new (ContentSize));
 
         SetTextFormatterSize ();
 
@@ -889,7 +901,7 @@ public partial class View
 
         LayoutNeeded = false;
 
-        OnLayoutComplete (new () { OldViewport = oldViewport });
+        OnLayoutComplete (new (ContentSize));
     }
     private void LayoutSubview (View v, Size contentSize)
     {
@@ -1163,7 +1175,7 @@ public partial class View
         {
             // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height, making
             // the view LayoutStyle.Absolute.
-            _frame = r;
+            SetFrame (r);
 
             if (_x is Pos.PosAbsolute)
             {
@@ -1195,7 +1207,7 @@ public partial class View
             {
                 // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height, making
                 // the view LayoutStyle.Absolute.
-                _frame = _frame with { Size = autosize };
+                SetFrame (_frame with { Size = autosize });
 
                 if (autosize.Width == 0)
                 {

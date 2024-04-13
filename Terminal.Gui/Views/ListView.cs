@@ -265,7 +265,11 @@ public class ListView : View
             _source = value;
 
             ContentSize = new Size (_source?.Length ?? Viewport.Width, _source?.Count ?? Viewport.Width);
-            Viewport = Viewport with { Y = 0 };
+            if (IsInitialized)
+            {
+                Viewport = Viewport with { Y = 0 };
+            }
+
             KeystrokeNavigator.Collection = _source?.ToList ();
             _selected = -1;
             _lastSelectedItem = -1;

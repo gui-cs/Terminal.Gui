@@ -519,7 +519,7 @@ public class FileDialog : Dialog
 
             _allowedTypeMenuBar.DrawContentComplete += (s, e) =>
                                                        {
-                                                           _allowedTypeMenuBar.Move (e.Rectangle.Width - 1, 0);
+                                                           _allowedTypeMenuBar.Move (e.NewViewport.Width - 1, 0);
                                                            Driver.AddRune (Glyphs.DownArrow);
                                                        };
 

@@ -182,7 +182,7 @@ public partial class View
         }
 
         // Invoke DrawContentEvent
-        var dev = new DrawEventArgs (Viewport);
+        var dev = new DrawEventArgs (Viewport, Rectangle.Empty);
         DrawContent?.Invoke (this, dev);
 
         if (!dev.Cancel)
@@ -489,7 +489,10 @@ public partial class View
     ///     The viewport-relative rectangle describing the currently visible viewport into the
     ///     <see cref="View"/>
     /// </param>
-    public virtual void OnDrawContentComplete (Rectangle viewport) { DrawContentComplete?.Invoke (this, new (viewport)); }
+    public virtual void OnDrawContentComplete (Rectangle viewport)
+    {
+        DrawContentComplete?.Invoke (this, new (viewport, Rectangle.Empty));
+    }
 
     // TODO: Make this cancelable
     /// <summary>

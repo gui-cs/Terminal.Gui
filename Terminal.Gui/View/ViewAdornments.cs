@@ -151,7 +151,7 @@ public partial class View
 
         if (Margin.Frame.Size != Frame.Size)
         {
-            Margin._frame = Rectangle.Empty with { Size = Frame.Size };
+            Margin.SetFrame (Rectangle.Empty with { Size = Frame.Size });
             Margin.X = 0;
             Margin.Y = 0;
             Margin.Width = Frame.Size.Width;
@@ -170,7 +170,7 @@ public partial class View
 
         if (border != Border.Frame)
         {
-            Border._frame = border;
+            Border.SetFrame (border);
             Border.X = border.Location.X;
             Border.Y = border.Location.Y;
             Border.Width = border.Size.Width;
@@ -189,7 +189,7 @@ public partial class View
 
         if (padding != Padding.Frame)
         {
-            Padding._frame = padding;
+            Padding.SetFrame (padding);
             Padding.X = padding.Location.X;
             Padding.Y = padding.Location.Y;
             Padding.Width = padding.Size.Width;
