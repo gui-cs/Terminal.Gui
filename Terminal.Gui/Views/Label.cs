@@ -16,7 +16,7 @@ public class Label : View
     public Label ()
     {
         Height = 1;
-        AutoSize = true;
+        AutoSize = View.DefaultAutoSize;
 
         // Things this view knows how to do
         AddCommand (Command.HotKey, FocusNext);

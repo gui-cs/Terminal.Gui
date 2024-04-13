@@ -52,7 +52,7 @@ public class Button : View
         Height = 1;
 
         CanFocus = true;
-        AutoSize = true;
+        AutoSize = View.DefaultAutoSize;
         HighlightStyle |= HighlightStyle.Pressed;
 #if HOVER
         HighlightStyle |= HighlightStyle.Hover;
