@@ -352,7 +352,7 @@ public class Buttons : Scenario
         };
         numericUpDown.ValueChanged += NumericUpDown_ValueChanged;
 
-        void NumericUpDown_ValueChanged (object sender, PropertyChangedEventArgs e)
+        void NumericUpDown_ValueChanged (object sender, StateEventArgs<int> e)
         {
             
         }
@@ -482,14 +482,24 @@ public class Buttons : Scenario
                 {
                     return;
                 }
+                int oldValue = value;
+                var args = new StateEventArgs<int> (_value, value);
+                ValueChanging?.Invoke (this, args);
 
+                if (args.Cancel)
+                {
+                    return;
+                }
                 _value = value;
                 _numericEdit.Text = _value.ToString ();
-                ValueChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
+                ValueChanged?.Invoke(this, new StateEventArgs<int> (oldValue, _value));
             }
         }
 
         [CanBeNull]
-        public event EventHandler<PropertyChangedEventArgs> ValueChanged;
+        public event EventHandler<StateEventArgs<int>> ValueChanging;
+
+        [CanBeNull]
+        public event EventHandler<StateEventArgs<int>> ValueChanged;
     }
 }

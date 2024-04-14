@@ -1,24 +1,26 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Virtual Content", "Demonstrates using Viewport to enable scrolling content.")]
+[ScenarioMetadata ("Content Scrolling", "Demonstrates using View.Viewport and View.ContentSize to scroll content.")]
 [ScenarioCategory ("Layout")]
 [ScenarioCategory ("Drawing")]
-public class VirtualContent : Scenario
+[ScenarioCategory ("Scrolling")]
+public class ContentScrolling : Scenario
 {
     private ViewDiagnosticFlags _diagnosticFlags;
 
-    public class VirtualDemoView : FrameView
+    public class ScrollingDemoView : FrameView
     {
-        public VirtualDemoView ()
+        public ScrollingDemoView ()
         {
             Width = Dim.Fill ();
             Height = Dim.Fill ();
             ColorScheme = Colors.ColorSchemes ["Base"];
-            Text = "Virtual Content Text. This is long text.\nThe second line.\n3\n4\n5th line\nLine 6. This is a longer line that should wrap automatically.";
+            Text = "Text (ScrollingDemoView.Text). This is long text.\nThe second line.\n3\n4\n5th line\nLine 6. This is a longer line that should wrap automatically.";
             CanFocus = true;
             BorderStyle = LineStyle.Rounded;
             Arrangement = ViewArrangement.Fixed;
@@ -40,7 +42,8 @@ public class VirtualContent : Scenario
             KeyBindings.Add (Key.CursorLeft, Command.ScrollLeft);
             KeyBindings.Add (Key.CursorRight, Command.ScrollRight);
 
-            // Add a status label to the border. Bit of a hack.
+            // Add a status label to the border that shows Viewport and ContentSize values. Bit of a hack.
+            // TODO: Move to Padding with controls
             Border.Add (new Label { AutoSize = false, X = 20 });
             LayoutComplete += VirtualDemoView_LayoutComplete;
 
@@ -89,18 +92,15 @@ public class VirtualContent : Scenario
 
             SetNeedsDisplay ();
         }
-
-        public override void OnDrawContent (Rectangle viewport)
-        {
-            base.OnDrawContent (viewport);
-        }
     }
 
     public override void Main ()
     {
         Application.Init ();
 
-        var view = new VirtualDemoView { Title = "Virtual Content" };
+        _diagnosticFlags = View.Diagnostics;
+
+        var view = new ScrollingDemoView { Title = "Demo View" };
 
         // Add Scroll Setting UI to Padding
         view.Padding.Thickness = new (0, 3, 0, 0);
@@ -155,7 +155,7 @@ public class VirtualContent : Scenario
 
         var cbAllowXGreaterThanContentWidth = new CheckBox
         {
-            Title = "Allow X > Content",
+            Title = "All_ow X > Content",
             Y = Pos.Bottom (cbAllowNegativeX),
             CanFocus = false
         };
@@ -178,7 +178,7 @@ public class VirtualContent : Scenario
 
         var cbAllowYGreaterThanContentHeight = new CheckBox
         {
-            Title = "Allow Y > Content",
+            Title = "Allo_w Y > Content",
             X = Pos.Right (cbAllowXGreaterThanContentWidth) + 1,
             Y = Pos.Bottom (cbAllowNegativeX),
             CanFocus = false
@@ -212,11 +212,18 @@ public class VirtualContent : Scenario
             X = Pos.Right (labelContentSize) + 1,
             Y = Pos.Top (labelContentSize)
         };
-        contentSizeWidth.ValueChanged += ContentSizeWidth_ValueChanged;
+        contentSizeWidth.ValueChanging += ContentSizeWidth_ValueChanged;
 
-        void ContentSizeWidth_ValueChanged (object sender, PropertyChangedEventArgs e)
+        void ContentSizeWidth_ValueChanged (object sender, StateEventArgs<int> e)
         {
-            view.ContentSize = view.ContentSize with { Width = ((Buttons.NumericUpDown)sender).Value };
+            if (e.NewValue < 0)
+            {
+                e.Cancel = true;
+
+                return;
+            }
+
+            view.ContentSize = view.ContentSize with { Width = e.NewValue };
         }
 
         var labelComma = new Label
@@ -233,11 +240,18 @@ public class VirtualContent : Scenario
             Y = Pos.Top (labelContentSize),
             CanFocus = false
         };
-        contentSizeHeight.ValueChanged += ContentSizeHeight_ValueChanged;
+        contentSizeHeight.ValueChanging += ContentSizeHeight_ValueChanged;
 
-        void ContentSizeHeight_ValueChanged (object sender, PropertyChangedEventArgs e)
+        void ContentSizeHeight_ValueChanged (object sender, StateEventArgs<int> e)
         {
-            view.ContentSize = view.ContentSize with { Height = ((Buttons.NumericUpDown)sender).Value };
+            if (e.NewValue < 0)
+            {
+                e.Cancel = true;
+
+                return;
+            }
+
+            view.ContentSize = view.ContentSize with { Height = e.NewValue };
         }
 
         var cbClearOnlyVisible = new CheckBox
@@ -261,7 +275,6 @@ public class VirtualContent : Scenario
                 view.ViewportSettings &= ~ViewportSettings.ClearContentOnly;
             }
         }
-
 
         var cbDoNotClipContent = new CheckBox
         {
@@ -357,7 +370,7 @@ public class VirtualContent : Scenario
             X = 0,
             Y = 30,
             Text =
-                "This label is long. It should clip to the ContentArea * if ClearVisibleContentOnly is not set. This is a virtual scrolling demo. Use the arrow keys and/or mouse wheel to scroll the content."
+                "This label is long. It should clip to the ContentArea if ClipContentOnly is set. This is a virtual scrolling demo. Use the arrow keys and/or mouse wheel to scroll the content."
         };
         longLabel.TextFormatter.WordWrap = true;
         view.Add (longLabel);
