@@ -228,7 +228,8 @@ public partial class View
 
             if (AutoSize)
             {
-                throw new InvalidOperationException (@$"Must set AutoSize to false before setting {nameof (Height)}.");
+                Debug.WriteLine (@$"Must set AutoSize to false before setting {nameof (Height)}.");
+                AutoSize = false;
             }
 
             //if (ValidatePosDim) {
@@ -236,9 +237,10 @@ public partial class View
 
             if (IsAdded && AutoSize && !isValidNewAutoSize)
             {
-                throw new InvalidOperationException (
+                Debug.WriteLine (
                                                      @$"Must set AutoSize to false before setting the {nameof (Height)}."
                                                     );
+                AutoSize = false;
             }
 
             //}
@@ -275,14 +277,16 @@ public partial class View
 
             if (AutoSize)
             {
-                throw new InvalidOperationException (@$"Must set AutoSize to false before setting {nameof (Width)}.");
+                Debug.WriteLine($@"Must set AutoSize to false before setting {nameof(Width)}.");
+                AutoSize = false;
             }
 
             bool isValidNewAutoSize = AutoSize && IsValidAutoSizeWidth (_width);
 
             if (IsAdded && AutoSize && !isValidNewAutoSize)
             {
-                throw new InvalidOperationException (@$"Must set AutoSize to false before setting {nameof (Width)}.");
+                Debug.WriteLine($@"Must set AutoSize to false before setting {nameof(Width)}.");
+                AutoSize = false;
             }
 
             OnResizeNeeded ();
