@@ -521,11 +521,6 @@ public partial class View : Responder, ISupportInitializeNotification
 
         DisposeAdornments ();
 
-        if (Application.MouseGrabView is { } && Application.MouseGrabView == this)
-        {
-            Application.UngrabMouse ();
-        }
-
         for (int i = InternalSubviews.Count - 1; i >= 0; i--)
         {
             View subview = InternalSubviews [i];
