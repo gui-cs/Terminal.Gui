@@ -24,8 +24,8 @@ public class VirtualContent : Scenario
             Arrangement = ViewArrangement.Fixed;
 
             ContentSize = new (60, 40);
-            ViewportSettings |= ViewportSettings.ClearVisibleContentOnly;
-            ViewportSettings |= ViewportSettings.ClipVisibleContentOnly;
+            ViewportSettings |= ViewportSettings.ClearContentOnly;
+            ViewportSettings |= ViewportSettings.ClipContentOnly;
 
             // Things this view knows how to do
             AddCommand (Command.ScrollDown, () => ScrollVertical (1));
@@ -242,46 +242,46 @@ public class VirtualContent : Scenario
 
         var cbClearOnlyVisible = new CheckBox
         {
-            Title = "ClearVisibleContentOnly",
+            Title = "ClearContentOnly",
             X = Pos.Right (contentSizeHeight) + 1,
             Y = Pos.Top (labelContentSize),
             CanFocus = false
         };
-        cbClearOnlyVisible.Checked = view.ViewportSettings.HasFlag (ViewportSettings.ClearVisibleContentOnly);
+        cbClearOnlyVisible.Checked = view.ViewportSettings.HasFlag (ViewportSettings.ClearContentOnly);
         cbClearOnlyVisible.Toggled += ClearVisibleContentOnly_Toggled;
 
         void ClearVisibleContentOnly_Toggled (object sender, StateEventArgs<bool?> e)
         {
             if (e.NewValue == true)
             {
-                view.ViewportSettings |= ViewportSettings.ClearVisibleContentOnly;
+                view.ViewportSettings |= ViewportSettings.ClearContentOnly;
             }
             else
             {
-                view.ViewportSettings &= ~ViewportSettings.ClearVisibleContentOnly;
+                view.ViewportSettings &= ~ViewportSettings.ClearContentOnly;
             }
         }
 
 
         var cbDoNotClipContent = new CheckBox
         {
-            Title = "ClipVisibleContentOnly",
+            Title = "ClipContentOnly",
             X = Pos.Right (cbClearOnlyVisible) + 1,
             Y = Pos.Top (labelContentSize),
             CanFocus = false
         };
-        cbDoNotClipContent.Checked = view.ViewportSettings.HasFlag (ViewportSettings.ClipVisibleContentOnly);
+        cbDoNotClipContent.Checked = view.ViewportSettings.HasFlag (ViewportSettings.ClipContentOnly);
         cbDoNotClipContent.Toggled += ClipVisibleContentOnly_Toggled;
 
         void ClipVisibleContentOnly_Toggled (object sender, StateEventArgs<bool?> e)
         {
             if (e.NewValue == true)
             {
-                view.ViewportSettings |= ViewportSettings.ClipVisibleContentOnly;
+                view.ViewportSettings |= ViewportSettings.ClipContentOnly;
             }
             else
             {
-                view.ViewportSettings &= ~ViewportSettings.ClipVisibleContentOnly;
+                view.ViewportSettings &= ~ViewportSettings.ClipContentOnly;
             }
         }
 

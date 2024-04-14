@@ -84,7 +84,7 @@ public partial class View
     /// <summary>Clears <see cref="Viewport"/> with the normal background.</summary>
     /// <remarks>
     ///     <para>
-    ///         If <see cref="ViewportSettings"/> has <see cref="ViewportSettings.ClearVisibleContentOnly"/> only
+    ///         If <see cref="ViewportSettings"/> has <see cref="Gui.ViewportSettings.ClearContentOnly"/> only
     ///         the portion of the content
     ///         area that is visible within the <see cref="View.Viewport"/> will be cleared. This is useful for views that have a
     ///         content area larger than the Viewport (e.g. when <see cref="ViewportSettings.AllowNegativeLocation"/> is
@@ -104,7 +104,7 @@ public partial class View
 
         Rectangle prevClip = Driver.Clip;
 
-        if (ViewportSettings.HasFlag (ViewportSettings.ClearVisibleContentOnly))
+        if (ViewportSettings.HasFlag (ViewportSettings.ClearContentOnly))
         {
             Rectangle visibleContent = ViewportToScreen (new (new (-Viewport.X, -Viewport.Y), ContentSize));
             toClear = Rectangle.Intersect (toClear, visibleContent);
@@ -143,9 +143,15 @@ public partial class View
 
     /// <summary>Sets the <see cref="ConsoleDriver"/>'s clip region to <see cref="Viewport"/>.</summary>
     /// <remarks>
-    ///     The clip region is set to the intersection of the current clip region and the
-    ///     <see cref="Viewport"/>. This ensures that drawing is constrained to the visible
-    ///     viewport of the view.
+    /// <para>
+    ///     By default, the clip rectangle is set to the intersection of the current clip region and the
+    ///     <see cref="Viewport"/>. This ensures that drawing is constrained to the viewport, but allows
+    ///     content to be drawn beyond the viewport.
+    /// </para>
+    /// <para>
+    ///     If <see cref="ViewportSettings"/> has <see cref="Gui.ViewportSettings.ClipContentOnly"/> set, clipping will be
+    ///     applied to just the visible content area.
+    /// </para>
     /// </remarks>
     /// <returns>
     ///     The current screen-relative clip region, which can be then re-applied by setting
@@ -163,7 +169,7 @@ public partial class View
         // Clamp the Clip to the entire visible area
         Rectangle clip = Rectangle.Intersect (ViewportToScreen (Viewport with { Location = Point.Empty }), previous);
 
-        if (ViewportSettings.HasFlag (ViewportSettings.ClipVisibleContentOnly))
+        if (ViewportSettings.HasFlag (ViewportSettings.ClipContentOnly))
         {
             // Clamp the Clip to the just content area that is within the viewport
             Rectangle visibleContent = ViewportToScreen (new (new (-Viewport.X, -Viewport.Y), ContentSize));

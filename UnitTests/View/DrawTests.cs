@@ -209,7 +209,7 @@ public class DrawTests (ITestOutputHelper output)
             X = 1, Y = 1,
             Width = 3, Height = 3,
             BorderStyle = LineStyle.Single,
-            ViewportSettings = ViewportSettings.ClearVisibleContentOnly
+            ViewportSettings = ViewportSettings.ClearContentOnly
         };
         superView.Add (view);
         superView.BeginInit ();
@@ -970,7 +970,7 @@ public class DrawTests (ITestOutputHelper output)
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             ContentSize = new Size (10, 10),
-            ViewportSettings = ViewportSettings.ClipVisibleContentOnly
+            ViewportSettings = ViewportSettings.ClipContentOnly
         };
         view.Border.Thickness = new Thickness (1);
         view.BeginInit ();

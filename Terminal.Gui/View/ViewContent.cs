@@ -14,91 +14,106 @@ public enum ViewportSettings
     None = 0,
 
     /// <summary>
-    ///     If set, <see cref="View.Viewport"/><c>.X</c> can be set to negative values enabling scrolling beyond the left of the
+    ///     If set, <see cref="View.Viewport"/><c>.X</c> can be set to negative values enabling scrolling beyond the left of
+    ///     the
     ///     content area.
     /// </summary>
     /// <remarks>
-    /// <para>
-    ///     When not set, <see cref="View.Viewport"/><c>.X</c> is constrained to positive values.
-    /// </para>
+    ///     <para>
+    ///         When not set, <see cref="View.Viewport"/><c>.X</c> is constrained to positive values.
+    ///     </para>
     /// </remarks>
     AllowNegativeX = 1,
 
     /// <summary>
     ///     If set, <see cref="View.Viewport"/><c>.Y</c> can be set to negative values enabling scrolling beyond the top of the
-    ///     content area. 
+    ///     content area.
     /// </summary>
     /// <remarks>
-    /// <para>
-    ///     When not set, <see cref="View.Viewport"/><c>.Y</c> is constrained to positive values.
-    /// </para>
+    ///     <para>
+    ///         When not set, <see cref="View.Viewport"/><c>.Y</c> is constrained to positive values.
+    ///     </para>
     /// </remarks>
     AllowNegativeY = 2,
 
     /// <summary>
-    ///     If set, <see cref="View.Viewport"/><c>.Size</c> can be set to negative coordinates enabling scrolling beyond the top-left of the
+    ///     If set, <see cref="View.Viewport"/><c>.Size</c> can be set to negative coordinates enabling scrolling beyond the
+    ///     top-left of the
     ///     content area.
     /// </summary>
     /// <remarks>
-    /// <para>
-    ///     When not set, <see cref="View.Viewport"/><c>.Size</c> is constrained to positive coordinates.
-    /// </para>
+    ///     <para>
+    ///         When not set, <see cref="View.Viewport"/><c>.Size</c> is constrained to positive coordinates.
+    ///     </para>
     /// </remarks>
     AllowNegativeLocation = AllowNegativeX | AllowNegativeY,
 
     /// <summary>
-    ///     If set, <see cref="View.Viewport"/><c>.X</c> can be set values greater than <see cref="View.ContentSize"/><c>.Width</c> enabling scrolling beyond the right
+    ///     If set, <see cref="View.Viewport"/><c>.X</c> can be set values greater than <see cref="View.ContentSize"/>
+    ///     <c>.Width</c> enabling scrolling beyond the right
     ///     of the content area.
     /// </summary>
     /// <remarks>
-    /// <para>
-    ///     When not set, <see cref="View.Viewport"/><c>.X</c> is constrained to <see cref="View.ContentSize"/><c>.Width - 1</c>.
-    ///     This means the last column of the content will remain visible even if there is an attempt to scroll the Viewport past the last column.
-    /// </para>
+    ///     <para>
+    ///         When not set, <see cref="View.Viewport"/><c>.X</c> is constrained to <see cref="View.ContentSize"/>
+    ///         <c>.Width - 1</c>.
+    ///         This means the last column of the content will remain visible even if there is an attempt to scroll the
+    ///         Viewport past the last column.
+    ///     </para>
+    ///     <para>
+    ///         The practical effect of this is that the last column of the content will always be visible.
+    ///     </para>
     /// </remarks>
     AllowXGreaterThanContentWidth = 4,
 
     /// <summary>
-    ///     If set, <see cref="View.Viewport"/><c>.Y</c> can be set values greater than <see cref="View.ContentSize"/><c>.Height</c> enabling scrolling beyond the right
+    ///     If set, <see cref="View.Viewport"/><c>.Y</c> can be set values greater than <see cref="View.ContentSize"/>
+    ///     <c>.Height</c> enabling scrolling beyond the right
     ///     of the content area.
     /// </summary>
     /// <remarks>
-    /// <para>
-    ///     When not set, <see cref="View.Viewport"/><c>.Y</c> is constrained to <see cref="View.ContentSize"/><c>.Height - 1</c>.
-    ///     This means the last row of the content will remain visible even if there is an attempt to scroll the Viewport past the last row.
-    /// </para>
+    ///     <para>
+    ///         When not set, <see cref="View.Viewport"/><c>.Y</c> is constrained to <see cref="View.ContentSize"/>
+    ///         <c>.Height - 1</c>.
+    ///         This means the last row of the content will remain visible even if there is an attempt to scroll the Viewport
+    ///         past the last row.
+    ///     </para>
+    ///     <para>
+    ///         The practical effect of this is that the last row of the content will always be visible.
+    ///     </para>
     /// </remarks>
     AllowYGreaterThanContentHeight = 8,
 
     /// <summary>
-    ///     If set, <see cref="View.Viewport"/><c>.Size</c> can be set values greater than <see cref="View.ContentSize"/> enabling scrolling beyond the bottom-right
+    ///     If set, <see cref="View.Viewport"/><c>.Size</c> can be set values greater than <see cref="View.ContentSize"/>
+    ///     enabling scrolling beyond the bottom-right
     ///     of the content area.
     /// </summary>
     /// <remarks>
-    /// <para>
-    ///     When not set, <see cref="View.Viewport"/> is constrained to <see cref="View.ContentSize"/><c> -1</c>.
-    ///     This means the last column and row of the content will remain visible even if there is an attempt to
-    ///     scroll the Viewport past the last column or row.
-    /// </para>
+    ///     <para>
+    ///         When not set, <see cref="View.Viewport"/> is constrained to <see cref="View.ContentSize"/><c> -1</c>.
+    ///         This means the last column and row of the content will remain visible even if there is an attempt to
+    ///         scroll the Viewport past the last column or row.
+    ///     </para>
     /// </remarks>
     AllowLocationGreaterThanContentSize = AllowXGreaterThanContentWidth | AllowYGreaterThanContentHeight,
 
     /// <summary>
-    /// By default, clipping is applied to just the visible content within <see cref="View.Viewport"/>. In cases where the viewport is
-    /// larger than the content area (e.g. when <see cref="AllowNegativeLocation"/> is enabled), setting this flag will allow content
-    /// outside the <see cref="View.Viewport"/> to be drawn.
+    ///     By default, clipping is applied to the <see cref="View.Viewport"/>. Setting this flag will cause clipping to be
+    ///     applied to the visible content area.
     /// </summary>
-    ClipVisibleContentOnly = 16,
+    ClipContentOnly = 16,
 
     /// <summary>
-    /// If set <see cref="View.Clear()"/> will clear only the portion of the content
-    /// area that is visible within the <see cref="View.Viewport"/>. This is useful for views that have a
-    /// content area larger than the Viewport and want the area outside the content to be visually distinct.
+    ///     If set <see cref="View.Clear()"/> will clear only the portion of the content
+    ///     area that is visible within the <see cref="View.Viewport"/>. This is useful for views that have a
+    ///     content area larger than the Viewport and want the area outside the content to be visually distinct.
     /// </summary>
     /// <remarks>
-    /// <see cref="ClipVisibleContentOnly"/> must be set for this setting to work (clipping beyond the visible area must be disabled).
+    ///     <see cref="ClipContentOnly"/> must be set for this setting to work (clipping beyond the visible area must be
+    ///     disabled).
     /// </remarks>
-    ClearVisibleContentOnly = 32,
+    ClearContentOnly = 32
 }
 
 public partial class View
@@ -108,8 +123,8 @@ public partial class View
     private Size _contentSize;
 
     /// <summary>
-    ///     Gets or sets the size of the View's content. If the value is <c>Size.Empty</c> the size of the content is
-    ///     the same as the size of <see cref="Viewport"/>, and <c>Viewport.Location</c> will always be <c>0, 0</c>.
+    ///     Gets or sets the size of the View's content. If not set, the value will be the same as the size of <see cref="Viewport"/>,
+    ///     and <c>Viewport.Location</c> will always be <c>0, 0</c>.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -159,7 +174,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     Event that is raised when the <see cref="ContentSize"/> changes.
+    ///     Event raised when the <see cref="ContentSize"/> changes.
     /// </summary>
     public event EventHandler<SizeChangedEventArgs> ContentSizeChanged;
 
@@ -186,8 +201,7 @@ public partial class View
     ///     Content-relative means relative to the top-left corner of the view's Content, which is
     ///     always at <c>0, 0</c>.
     /// </remarks>
-    /// <param name="x">Column relative to the left side of the Content.</param>
-    /// <param name="y">Row relative to the top of the Content</param>
+    /// <param name="location">The Screen-relative location.</param>
     /// <returns>The coordinate relative to this view's Content.</returns>
     public Point ScreenToContent (in Point location)
     {
@@ -246,14 +260,15 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         Positive values for the location indicate the visible area is offset into (down-and-right) the View's virtual
-    ///         <see cref="ContentSize"/>. This enables virtual scrolling.
+    ///         <see cref="ContentSize"/>. This enables scrolling down and to the right (e.g. in a <see cref="ListView"/>.
     ///     </para>
     ///     <para>
     ///         Negative values for the location indicate the visible area is offset above (up-and-left) the View's virtual
-    ///         <see cref="ContentSize"/>. This enables virtual zoom.
+    ///         <see cref="ContentSize"/>. This enables scrolling up and to the left (e.g. in an image viewer that supports zoom
+    ///         where the image stays centered).
     ///     </para>
     ///     <para>
-    ///         The <see cref="ViewportSettings"/> property controls how scrolling is handled. If <see cref="ViewportSettings"/> is
+    ///         The <see cref="ViewportSettings"/> property controls how scrolling is handled. 
     ///     </para>
     ///     <para>
     ///         If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/> the value of Viewport is indeterminate until
@@ -322,6 +337,7 @@ public partial class View
             }
 
             OnViewportChanged (new (IsInitialized ? Viewport : Rectangle.Empty, oldViewport));
+
             return;
         }
 
@@ -332,7 +348,6 @@ public partial class View
         {
             Size = newSize
         };
-
 
         void ApplySettings (ref Rectangle newViewport)
         {
@@ -347,7 +362,6 @@ public partial class View
             // IMPORTANT: Check for negative location AFTER checking for location greater than content width
             if (!ViewportSettings.HasFlag (ViewportSettings.AllowNegativeX))
             {
-
                 if (newViewport.X < 0)
                 {
                     newViewport.X = 0;
@@ -374,19 +388,16 @@ public partial class View
     }
 
     /// <summary>
-    /// Fired when the <see cref="Frame"/> changes. This event is fired after the <see cref="Frame"/> has been updated.
+    ///     Fired when the <see cref="Viewport"/> changes. This event is fired after the <see cref="Viewport"/> has been updated.
     /// </summary>
     [CanBeNull]
     public event EventHandler<DrawEventArgs> ViewportChanged;
 
     /// <summary>
-    /// Called when the <see cref="Frame"/> changes. Invokes the <see cref="ViewportChanged"/> event.
+    ///     Called when the <see cref="Viewport"/> changes. Invokes the <see cref="ViewportChanged"/> event.
     /// </summary>
     /// <param name="e"></param>
-    protected virtual void OnViewportChanged (DrawEventArgs e)
-    {
-        ViewportChanged?.Invoke (this, e);
-    }
+    protected virtual void OnViewportChanged (DrawEventArgs e) { ViewportChanged?.Invoke (this, e); }
 
     /// <summary>
     ///     Converts a <see cref="Viewport"/>-relative location to a screen-relative location.

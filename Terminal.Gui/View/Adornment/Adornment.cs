@@ -8,7 +8,7 @@
 /// <remarsk>
 ///     <para>
 ///         Each of <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/> has slightly different
-///         behavior relative to <see cref="ColorScheme"/>, <see cref="View.SetFocus"/>, keyboard input, and
+///         behavior relative to <see cref="ColorScheme"/>, <see cref="View.SetFocus()"/>, keyboard input, and
 ///         mouse input. Each can be customized by manipulating their Subviews.
 ///     </para>
 /// </remarsk>
