@@ -149,7 +149,7 @@ public class Adornment : View
             return;
         }
 
-        //Rectangle prevClip = SetClip ();
+        Rectangle prevClip = SetClip ();
 
         Rectangle screen = ViewportToScreen (viewport);
         Attribute normalAttr = GetNormalColor ();
@@ -176,7 +176,7 @@ public class Adornment : View
 
         if (Driver is { })
         {
-           // Driver.Clip = prevClip;
+           Driver.Clip = prevClip;
         }
 
         ClearLayoutNeeded ();

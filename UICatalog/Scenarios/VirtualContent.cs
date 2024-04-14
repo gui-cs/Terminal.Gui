@@ -40,7 +40,8 @@ public class VirtualContent : Scenario
             KeyBindings.Add (Key.CursorLeft, Command.ScrollLeft);
             KeyBindings.Add (Key.CursorRight, Command.ScrollRight);
 
-            Border.Add (new Label { X = 23 });
+            // Add a status label to the border. Bit of a hack.
+            Border.Add (new Label { AutoSize = false, X = 20 });
             LayoutComplete += VirtualDemoView_LayoutComplete;
 
             MouseEvent += VirtualDemoView_MouseEvent;
@@ -82,6 +83,8 @@ public class VirtualContent : Scenario
             if (status is { })
             {
                 status.Title = $"Frame: {Frame}\n\nViewport: {Viewport}, ContentSize = {ContentSize}";
+                status.Width = Border.Frame.Width - status.Frame.X - Border.Thickness.Right;
+                status.Height = Border.Thickness.Top;
             }
 
             SetNeedsDisplay ();

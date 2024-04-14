@@ -151,6 +151,7 @@ public partial class View
 
         if (e.Cancel != true)
         {
+            SetNeedsLayout ();
             SetNeedsDisplay ();
         }
 
