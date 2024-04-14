@@ -24,7 +24,7 @@ public class CheckBox : View
         Height = 1;
 
         CanFocus = true;
-        AutoSize = View.DefaultAutoSize;
+        AutoSize = true;
 
         // Things this view knows how to do
         AddCommand (Command.Accept, OnToggled);

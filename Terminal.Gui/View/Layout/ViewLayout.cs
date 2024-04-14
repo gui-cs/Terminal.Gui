@@ -35,13 +35,6 @@ public enum LayoutStyle
 
 public partial class View
 {
-    /// <summary>
-    /// Determines the default usage of <see cref="View.AutoSize"/> in views
-    /// that support it (e.g. <see cref="Button"/>.  Set to false if you frequently
-    /// get Exceptions about changing Width when AutoSize is true.
-    /// </summary>
-    public static bool DefaultAutoSize = true;
-
     #region Frame
 
     private Rectangle _frame;
