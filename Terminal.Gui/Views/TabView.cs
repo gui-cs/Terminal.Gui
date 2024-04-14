@@ -177,7 +177,7 @@ public class TabView : View
             {
                 if (old?.HasFocus == true)
                 {
-                    SelectedTab.SetFocus ();
+                    SelectedTab?.SetFocus ();
                 }
 
                 OnSelectedTabChanged (old, value);

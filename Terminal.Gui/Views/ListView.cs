@@ -888,7 +888,7 @@ public class ListWrapper : IListDataSource
         int start = 0
     )
     {
-        container.Move (col, line);
+        container.Move (Math.Max (col - start, 0), line);
         object t = _source? [item];
 
         if (t is null)
@@ -1004,8 +1004,9 @@ public class ListWrapper : IListDataSource
 
     private void RenderUstr (ConsoleDriver driver, string ustr, int col, int line, int width, int start = 0)
     {
-        string str = start > ustr.GetColumns () ? string.Empty : ustr.Substring (start);
-        string u = TextFormatter.ClipAndJustify (str, width, TextAlignment.Left); driver.AddStr (u);
+        string str = start > ustr.GetColumns () ? string.Empty : ustr.Substring (Math.Min (start, ustr.ToRunes ().Length - 1));
+        string u = TextFormatter.ClipAndJustify (str, width, TextAlignment.Left);
+        driver.AddStr (u);
         width -= u.GetColumns ();
 
         while (width-- > 0)
