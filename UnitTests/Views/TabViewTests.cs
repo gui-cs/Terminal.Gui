@@ -1269,6 +1269,26 @@ public class TabViewTests
         Application.Shutdown ();
     }
 
+    [Fact]
+    public void RemoveTab_ThatHasFocus ()
+    {
+        TabView tv = GetTabView (out Tab _, out Tab tab2);
+
+        tv.SelectedTab = tab2;
+        tab2.HasFocus = true;
+
+        Assert.Equal (2, tv.Tabs.Count);
+        foreach (var t in tv.Tabs.ToArray ())
+        {
+            tv.RemoveTab (t);
+        }
+
+        Assert.Empty (tv.Tabs);
+
+        // Shutdown must be called to safely clean up Application if Init has been called
+        Application.Shutdown ();
+    }
+
     private TabView GetTabView () { return GetTabView (out _, out _); }
 
     private TabView GetTabView (out Tab tab1, out Tab tab2, bool initFakeDriver = true)
