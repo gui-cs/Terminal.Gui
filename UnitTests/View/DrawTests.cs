@@ -1,6 +1,7 @@
 #nullable enable
 using System.Text;
 using Xunit.Abstractions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Terminal.Gui.ViewTests;
 
@@ -22,7 +23,7 @@ public class DrawTests (ITestOutputHelper output)
         // Only valid location w/in Viewport is 0, 0 (view) - 2, 2 (screen)
 
         view.Move (0, 0);
-        Assert.Equal(new Point(2, 2), new Point (Application.Driver.Col, Application.Driver.Row));
+        Assert.Equal (new Point (2, 2), new Point (Application.Driver.Col, Application.Driver.Row));
 
         view.Move (-1, -1);
         Assert.Equal (new Point (2, 2), new Point (Application.Driver.Col, Application.Driver.Row));
@@ -43,14 +44,14 @@ public class DrawTests (ITestOutputHelper output)
         };
         view.Margin.Thickness = new Thickness (1);
         View.Diagnostics = ViewDiagnosticFlags.Padding;
-        view.BeginInit();
-        view.EndInit();
-        view.Draw();
+        view.BeginInit ();
+        view.EndInit ();
+        view.Draw ();
 
         // Only valid location w/in Viewport is 0, 0 (view) - 2, 2 (screen)
         Assert.Equal ((Rune)' ', Application.Driver.Contents [2, 2].Rune);
 
-        view.AddRune(0, 0, Rune.ReplacementChar);
+        view.AddRune (0, 0, Rune.ReplacementChar);
         Assert.Equal (Rune.ReplacementChar, Application.Driver.Contents [2, 2].Rune);
 
         view.AddRune (-1, -1, Rune.ReplacementChar);
@@ -67,7 +68,7 @@ public class DrawTests (ITestOutputHelper output)
     [InlineData (0, 0, 2, 2)]
     [InlineData (-1, -1, 2, 2)]
     [SetupFakeDriver]
-    public void Clear_Clears_Only_Viewport (int x, int y, int width, int height)
+    public void FillRect_Fills_HonorsClip (int x, int y, int width, int height)
     {
         var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
 
@@ -91,15 +92,16 @@ public class DrawTests (ITestOutputHelper output)
  └─┘",
                                                       output);
 
-        Rectangle toClear = new (x, y, width, height);
-        view.Clear (toClear);
+        Rectangle toFill = new (x, y, width, height);
+        view.FillRect (toFill);
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
  │ │
  └─┘",
                                                       output);
-        // Now try to clear beyond Viewport (invalid)
+
+        // Now try to clear beyond Viewport (invalid; clipping should prevent)
         superView.SetNeedsDisplay ();
         superView.Draw ();
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -108,8 +110,8 @@ public class DrawTests (ITestOutputHelper output)
  │X│
  └─┘",
                                                       output);
-        toClear = new (-width, -height, width, height);
-        view.Clear (toClear);
+        toFill = new (-width, -height, width, height);
+        view.FillRect (toFill);
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
@@ -126,8 +128,8 @@ public class DrawTests (ITestOutputHelper output)
  │X│
  └─┘",
                                                       output);
-        toClear = new (-1, -1, width + 1, height + 1);
-        view.Clear (toClear);
+        toFill = new (-1, -1, width + 1, height + 1);
+        view.FillRect (toFill);
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
@@ -144,8 +146,85 @@ public class DrawTests (ITestOutputHelper output)
  │X│
  └─┘",
                                                       output);
-        toClear = new (0, 0, width * 2, height * 2);
-        view.Clear (toClear);
+        toFill = new (0, 0, width * 2, height * 2);
+        view.FillRect (toFill);
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+ ┌─┐
+ │ │
+ └─┘",
+                                                      output);
+    }
+
+    [Theory]
+    [InlineData (0, 0, 1, 1)]
+    [InlineData (0, 0, 2, 2)]
+    [InlineData (-1, -1, 2, 2)]
+    [SetupFakeDriver]
+    public void Clear_ClearsEntireViewport (int x, int y, int width, int height)
+    {
+        var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
+
+        var view = new View
+        {
+            Text = "X",
+            X = 1, Y = 1,
+            Width = 3, Height = 3,
+            BorderStyle = LineStyle.Single
+        };
+        superView.Add (view);
+        superView.BeginInit ();
+        superView.EndInit ();
+        superView.LayoutSubviews ();
+
+        superView.Draw ();
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+ ┌─┐
+ │X│
+ └─┘",
+                                                      output);
+
+        view.Clear ();
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+ ┌─┐
+ │ │
+ └─┘",
+                                                      output);
+    }
+
+    [Theory]
+    [InlineData (0, 0, 1, 1)]
+    [InlineData (0, 0, 2, 2)]
+    [InlineData (-1, -1, 2, 2)]
+    [SetupFakeDriver]
+    public void Clear_WithClearVisibleContentOnly_ClearsVisibleContentOnly (int x, int y, int width, int height)
+    {
+        var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
+
+        var view = new View
+        {
+            Text = "X",
+            X = 1, Y = 1,
+            Width = 3, Height = 3,
+            BorderStyle = LineStyle.Single,
+            ViewportSettings = ViewportSettings.ClearVisibleContentOnly
+        };
+        superView.Add (view);
+        superView.BeginInit ();
+        superView.EndInit ();
+        superView.LayoutSubviews ();
+
+        superView.Draw ();
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+ ┌─┐
+ │X│
+ └─┘",
+                                                      output);
+
+        view.Clear ();
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
@@ -872,4 +951,72 @@ public class DrawTests (ITestOutputHelper output)
                                                expectedColors
                                               );
     }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void SetClip_ClipVisibleContentOnly_VisibleContentIsClipped ()
+    {
+        // Screen is 25x25
+        // View is 25x25
+        // Viewport is (0, 0, 23, 23)
+        // ContentSize is (10, 10)
+        // ViewportToScreen is (1, 1, 23, 23)
+        // Visible content is (1, 1, 10, 10)
+        // Expected clip is (1, 1, 10, 10) - same as visible content
+        Rectangle expectedClip = new (1, 1, 10, 10);
+        // Arrange
+        var view = new View ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            ContentSize = new Size (10, 10),
+            ViewportSettings = ViewportSettings.ClipVisibleContentOnly
+        };
+        view.Border.Thickness = new Thickness (1);
+        view.BeginInit ();
+        view.EndInit ();
+        Assert.Equal (view.Frame, Application.Driver.Clip);
+
+        // Act
+        view.SetClip ();
+
+        // Assert
+        Assert.Equal (expectedClip, Application.Driver.Clip);
+        view.Dispose ();
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void SetClip_Default_ClipsToViewport ()
+    {
+        // Screen is 25x25
+        // View is 25x25
+        // Viewport is (0, 0, 23, 23)
+        // ContentSize is (10, 10)
+        // ViewportToScreen is (1, 1, 23, 23)
+        // Visible content is (1, 1, 10, 10)
+        // Expected clip is (1, 1, 23, 23) - same as Viewport
+        Rectangle expectedClip = new (1, 1, 23, 23);
+        // Arrange
+        var view = new View ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            ContentSize = new Size (10, 10),
+        };
+        view.Border.Thickness = new Thickness (1);
+        view.BeginInit ();
+        view.EndInit ();
+        Assert.Equal (view.Frame, Application.Driver.Clip);
+        view.Viewport = view.Viewport with { X = 1, Y = 1 };
+
+        // Act
+        view.SetClip ();
+
+        // Assert
+        Assert.Equal (expectedClip, Application.Driver.Clip);
+        view.Dispose ();
+    }
+
+
 }

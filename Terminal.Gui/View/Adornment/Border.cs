@@ -362,11 +362,6 @@ public class Border : Adornment
     /// <inheritdoc/>
     public override void OnDrawContent (Rectangle viewport)
     {
-        if (Parent?.Title == "Title")
-        {
-
-        }
-
         base.OnDrawContent (viewport);
 
         if (Thickness == Thickness.Empty)
@@ -646,7 +641,5 @@ public class Border : Adornment
                 }
             }
         }
-
-        //base.OnDrawContent (viewport);
     }
 }

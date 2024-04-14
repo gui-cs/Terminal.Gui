@@ -370,7 +370,7 @@ public class ScrollView : View
         SetViewsNeedsDisplay ();
 
         // TODO: It's bad practice for views to always clear a view. It negates clipping.
-        ClearVisibleContent();
+        Clear ();
 
         if (!string.IsNullOrEmpty (_contentView.Text) || _contentView.Subviews.Count > 0)
         {

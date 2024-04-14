@@ -183,7 +183,7 @@ public class TileView : View
     {
         Driver.SetAttribute (ColorScheme.Normal);
 
-        ClearVisibleContent ();
+        Clear ();
 
         base.OnDrawContent (viewport);
 

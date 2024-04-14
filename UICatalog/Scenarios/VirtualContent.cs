@@ -25,6 +25,7 @@ public class VirtualContent : Scenario
 
             ContentSize = new (60, 40);
             ViewportSettings |= ViewportSettings.ClearVisibleContentOnly;
+            ViewportSettings |= ViewportSettings.ClipVisibleContentOnly;
 
             // Things this view knows how to do
             AddCommand (Command.ScrollDown, () => ScrollVertical (1));
@@ -85,7 +86,13 @@ public class VirtualContent : Scenario
 
             SetNeedsDisplay ();
         }
+
+        public override void OnDrawContent (Rectangle viewport)
+        {
+            base.OnDrawContent (viewport);
+        }
     }
+
     public override void Main ()
     {
         Application.Init ();
@@ -232,7 +239,7 @@ public class VirtualContent : Scenario
 
         var cbClearOnlyVisible = new CheckBox
         {
-            Title = "Clear only Visible Content",
+            Title = "ClearVisibleContentOnly",
             X = Pos.Right (contentSizeHeight) + 1,
             Y = Pos.Top (labelContentSize),
             CanFocus = false
@@ -252,7 +259,30 @@ public class VirtualContent : Scenario
             }
         }
 
-        view.Padding.Add (labelContentSize, contentSizeWidth, labelComma, contentSizeHeight, cbClearOnlyVisible);
+
+        var cbDoNotClipContent = new CheckBox
+        {
+            Title = "ClipVisibleContentOnly",
+            X = Pos.Right (cbClearOnlyVisible) + 1,
+            Y = Pos.Top (labelContentSize),
+            CanFocus = false
+        };
+        cbDoNotClipContent.Checked = view.ViewportSettings.HasFlag (ViewportSettings.ClipVisibleContentOnly);
+        cbDoNotClipContent.Toggled += ClipVisibleContentOnly_Toggled;
+
+        void ClipVisibleContentOnly_Toggled (object sender, StateEventArgs<bool?> e)
+        {
+            if (e.NewValue == true)
+            {
+                view.ViewportSettings |= ViewportSettings.ClipVisibleContentOnly;
+            }
+            else
+            {
+                view.ViewportSettings &= ~ViewportSettings.ClipVisibleContentOnly;
+            }
+        }
+
+        view.Padding.Add (labelContentSize, contentSizeWidth, labelComma, contentSizeHeight, cbClearOnlyVisible, cbDoNotClipContent);
 
         // Add demo views to show that things work correctly
         var textField = new TextField { X = 20, Y = 7, Width = 15, Text = "Test TextField" };
@@ -294,7 +324,10 @@ public class VirtualContent : Scenario
         charMap.Accept += (s, e) =>
                               MessageBox.Query (20, 7, "Hi", $"Am I a {view.GetType ().Name}?", "Yes", "No");
 
-        var buttonAnchoredRight = new Button { X = Pos.AnchorEnd (10), Y = 0, Text = "Button" };
+        var buttonAnchoredRight = new Button
+        {
+            X = Pos.AnchorEnd (10), Y = 0, Text = "Button"
+        };
 
         var labelAnchoredBottomLeft = new Label
         {
@@ -321,7 +354,7 @@ public class VirtualContent : Scenario
             X = 0,
             Y = 30,
             Text =
-                "This label is long. It should clip to the Viewport (but not ContentArea). This is a virtual scrolling demo. Use the arrow keys and/or mouse wheel to scroll the content."
+                "This label is long. It should clip to the ContentArea * if ClearVisibleContentOnly is not set. This is a virtual scrolling demo. Use the arrow keys and/or mouse wheel to scroll the content."
         };
         longLabel.TextFormatter.WordWrap = true;
         view.Add (longLabel);

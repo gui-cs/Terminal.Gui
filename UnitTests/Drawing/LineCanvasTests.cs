@@ -1313,7 +1313,7 @@ public class LineCanvasTests
 
         v.DrawContentComplete += (s, e) =>
                                  {
-                                     v.Clear (v.Viewport);
+                                     v.FillRect (v.Viewport);
 
                                      foreach (KeyValuePair<Point, Rune> p in canvasCopy.GetMap ())
                                      {

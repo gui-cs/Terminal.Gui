@@ -491,7 +491,7 @@ public class ComboBox : View
         }
 
         Reset (true);
-        _listview.Clear (_listview.IsInitialized ? _listview.Viewport : Rectangle.Empty);
+        _listview.Clear ();
         _listview.TabStop = false;
         SuperView?.SendSubviewToBack (this);
         Rectangle rect = _listview.ViewportToScreen (_listview.IsInitialized ? _listview.Viewport : Rectangle.Empty);
@@ -761,7 +761,7 @@ public class ComboBox : View
     private void ShowList ()
     {
         _listview.SetSource (_searchset);
-        _listview.Clear (Viewport); // Ensure list shrinks in Dialog as you type
+        _listview.Clear (); 
         _listview.Height = CalculatetHeight ();
         SuperView?.BringSubviewToFront (this);
     }

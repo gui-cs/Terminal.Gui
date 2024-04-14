@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using System.Drawing;
+
+namespace Terminal.Gui;
 
 public partial class View
 {
@@ -54,7 +56,7 @@ public partial class View
     public bool SubViewNeedsDisplay { get; private set; }
 
     /// <summary>
-    ///     Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for rendering any border
+    ///     Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for rendering any 
     ///     lines. If <see langword="true"/> the rendering of any borders drawn by this Frame will be done by its parent's
     ///     SuperView. If <see langword="false"/> (the default) this View's <see cref="OnDrawAdornments"/> method will be
     ///     called to render the borders.
@@ -73,66 +75,83 @@ public partial class View
     /// <param name="rune">The Rune.</param>
     public void AddRune (int col, int row, Rune rune)
     {
-        if (row < 0 || col < 0 || row >= Viewport.Height || col >= Viewport.Width)
+        if (Move (col, row))
         {
-            // TODO: Change return type to bool so callers can determine success?
-            return;
+            Driver.AddRune (rune);
         }
-
-        Move (col, row);
-        Driver.AddRune (rune);
     }
 
     /// <summary>Clears <see cref="Viewport"/> with the normal background.</summary>
-    /// <remarks></remarks>
-    public void Clear () { Clear (new (Point.Empty, Viewport.Size)); }
-
-    /// <summary>Clears the portion of the content that is visible with the normal background. If the content does not fill the Viewport,
-    /// the area not filled will be cleared with DarkGray.</summary>
-    /// <remarks></remarks>
-    public void ClearVisibleContent ()
+    /// <remarks>
+    ///     <para>
+    ///         If <see cref="ViewportSettings"/> has <see cref="ViewportSettings.ClearVisibleContentOnly"/> only
+    ///         the portion of the content
+    ///         area that is visible within the <see cref="View.Viewport"/> will be cleared. This is useful for views that have a
+    ///         content area larger than the Viewport (e.g. when <see cref="ViewportSettings.AllowNegativeLocation"/> is
+    ///         enabled) and want
+    ///         the area outside the content to be visually distinct.
+    ///     </para>
+    /// </remarks>
+    public void Clear ()
     {
         if (Driver is null)
         {
             return;
         }
 
-        Rectangle toClear = new (-Viewport.Location.X, -Viewport.Location.Y, ContentSize.Width, ContentSize.Height);
+        // Get screen-relative coords
+        Rectangle toClear = ViewportToScreen (Viewport with { Location = new (0, 0) });
 
+        Rectangle prevClip = Driver.Clip;
 
-        Clear (toClear);
-    }
-
-    /// <summary>Clears the specified <see cref="Viewport"/>-relative rectangle with the normal background.</summary>
-    /// <remarks></remarks>
-    /// <param name="viewport">The Viewport-relative rectangle to clear.</param>
-    public void Clear (Rectangle viewport)
-    {
-        if (Driver is null)
+        if (ViewportSettings.HasFlag (ViewportSettings.ClearVisibleContentOnly))
         {
-            return;
+            Rectangle visibleContent = ViewportToScreen (new (new (-Viewport.X, -Viewport.Y), ContentSize));
+            toClear = Rectangle.Intersect (toClear, visibleContent);
         }
 
-        // Clamp the region to the bounds of the view
-        viewport = Rectangle.Intersect (viewport, new (Point.Empty, Viewport.Size));
-
-        Attribute prev = Driver.SetAttribute (GetNormalColor ());
-        Driver.FillRect (ViewportToScreen (viewport));
+        Attribute prev = Driver.SetAttribute (GetNormalColor());
+        Driver.FillRect (toClear);
         Driver.SetAttribute (prev);
+
+        Driver.Clip = prevClip;
     }
 
-    /// <summary>Expands the <see cref="ConsoleDriver"/>'s clip region to include <see cref="Viewport"/>.</summary>
+    /// <summary>Fills the specified <see cref="Viewport"/>-relative rectangle with the specified color.</summary>
+    /// <param name="rect">The Viewport-relative rectangle to clear.</param>
+    /// <param name="color">The color to use to fill the rectangle. If not provided, the Normal background color will be used.</param>
+    public void FillRect (Rectangle rect, Color? color = null)
+    {
+        if (Driver is null)
+        {
+            return;
+        }
+
+        // Get screen-relative coords
+        Rectangle toClear = ViewportToScreen (rect);
+
+        Rectangle prevClip = Driver.Clip;
+
+        Driver.Clip = Rectangle.Intersect (prevClip, ViewportToScreen (Viewport with { Location = new (0, 0) }));
+
+        Attribute prev = Driver.SetAttribute (new (color ?? GetNormalColor().Background));
+        Driver.FillRect (toClear);
+        Driver.SetAttribute (prev);
+
+        Driver.Clip = prevClip;
+    }
+
+    /// <summary>Sets the <see cref="ConsoleDriver"/>'s clip region to <see cref="Viewport"/>.</summary>
+    /// <remarks>
+    ///     The clip region is set to the intersection of the current clip region and the
+    ///     <see cref="Viewport"/>. This ensures that drawing is constrained to the visible
+    ///     viewport of the view.
+    /// </remarks>
     /// <returns>
     ///     The current screen-relative clip region, which can be then re-applied by setting
     ///     <see cref="ConsoleDriver.Clip"/>.
     /// </returns>
-    /// <remarks>
-    ///     <para>
-    ///         If <see cref="ConsoleDriver.Clip"/> and <see cref="Viewport"/> do not intersect, the clip region will be set to
-    ///         <see cref="Rectangle.Empty"/>.
-    ///     </para>
-    /// </remarks>
-    public Rectangle ClipToViewport ()
+    public Rectangle SetClip ()
     {
         if (Driver is null)
         {
@@ -140,7 +159,18 @@ public partial class View
         }
 
         Rectangle previous = Driver.Clip;
-        Driver.Clip = Rectangle.Intersect (previous, ViewportToScreen (Viewport with { Location = Point.Empty }));
+
+        // Clamp the Clip to the entire visible area
+        Rectangle clip = Rectangle.Intersect (ViewportToScreen (Viewport with { Location = Point.Empty }), previous);
+
+        if (ViewportSettings.HasFlag (ViewportSettings.ClipVisibleContentOnly))
+        {
+            // Clamp the Clip to the just content area that is within the viewport
+            Rectangle visibleContent = ViewportToScreen (new (new (-Viewport.X, -Viewport.Y), ContentSize));
+            clip = Rectangle.Intersect (clip, visibleContent);
+        }
+
+        Driver.Clip = clip;
 
         return previous;
     }
@@ -173,13 +203,16 @@ public partial class View
 
         OnDrawAdornments ();
 
-        Rectangle prevClip = ClipToViewport ();
-
         if (ColorScheme is { })
         {
             //Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
             Driver?.SetAttribute (GetNormalColor ());
         }
+
+        // By default, we clip to the viewport preventing drawing outside the viewport
+        // We also clip to the content, but if a developer wants to draw outside the viewport, they can do
+        // so via settings. SetClip honors the ViewportSettings.DisableVisibleContentClipping flag.
+        Rectangle prevClip = SetClip ();
 
         // Invoke DrawContentEvent
         var dev = new DrawEventArgs (Viewport, Rectangle.Empty);
@@ -346,21 +379,22 @@ public partial class View
     /// </remarks>
     /// <param name="col">Column (viewport-relative).</param>
     /// <param name="row">Row (viewport-relative).</param>
-    public void Move (int col, int row)
+    public bool Move (int col, int row)
     {
         if (Driver is null || Driver?.Rows == 0)
         {
-            return;
+            return false;
         }
 
-        if (col < 0 || row < 0 || col >= Viewport.Size.Width || row >= Viewport.Size.Height)
+        if (col < 0 || row < 0 || col >= Viewport.Width || row >= Viewport.Height)
         {
-            // TODO: Change return type to bool so callers can determine success?
-            return;
+            return false;
         }
 
         Rectangle screen = ViewportToScreen (new (col, row, 0, 0));
         Driver?.Move (screen.X, screen.Y);
+
+        return true;
     }
 
     // TODO: Make this cancelable
@@ -405,7 +439,8 @@ public partial class View
     ///         to constrain drawing for better performance.
     ///     </para>
     ///     <para>
-    ///         The <see cref="ConsoleDriver.Clip"/> may define smaller area than <see cref="Viewport"/>; complex drawing code can be more
+    ///         The <see cref="ConsoleDriver.Clip"/> may define smaller area than <see cref="Viewport"/>; complex drawing code
+    ///         can be more
     ///         efficient by using <see cref="ConsoleDriver.Clip"/> to constrain drawing for better performance.
     ///     </para>
     ///     <para>
@@ -422,14 +457,7 @@ public partial class View
         {
             if (SuperView is { })
             {
-                if (ViewportSettings.HasFlag(ViewportSettings.ClearVisibleContentOnly))
-                {
-                    ClearVisibleContent ();
-                }
-                else
-                {
-                    Clear ();
-                }
+                Clear ();
             }
 
             if (!string.IsNullOrEmpty (TextFormatter.Text))
@@ -465,19 +493,16 @@ public partial class View
 
             foreach (View view in subviewsNeedingDraw)
             {
-                //view.Frame.IntersectsWith (bounds)) {
-                // && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
                 if (view.LayoutNeeded)
                 {
                     view.LayoutSubviews ();
                 }
 
                 // Draw the subview
-                // Use the view's Viewport (view-relative; Location will always be (0,0)
-                //if (view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
-                view.Draw ();
+                if (view.Title.Contains ("This label"))
+                { }
 
-                //}
+                view.Draw ();
             }
         }
     }
@@ -489,10 +514,7 @@ public partial class View
     ///     The viewport-relative rectangle describing the currently visible viewport into the
     ///     <see cref="View"/>
     /// </param>
-    public virtual void OnDrawContentComplete (Rectangle viewport)
-    {
-        DrawContentComplete?.Invoke (this, new (viewport, Rectangle.Empty));
-    }
+    public virtual void OnDrawContentComplete (Rectangle viewport) { DrawContentComplete?.Invoke (this, new (viewport, Rectangle.Empty)); }
 
     // TODO: Make this cancelable
     /// <summary>
@@ -503,7 +525,7 @@ public partial class View
     /// <returns></returns>
     public virtual bool OnRenderLineCanvas ()
     {
-        if (!IsInitialized)
+        if (!IsInitialized || Driver is null)
         {
             return false;
         }

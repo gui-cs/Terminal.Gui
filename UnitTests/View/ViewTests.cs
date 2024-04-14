@@ -54,7 +54,7 @@ public class ViewTests
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rectangle (0, 0, 20, 10), pos);
 
-        view.Clear (view.Viewport);
+        view.FillRect (view.Viewport);
 
         expected = @"
 ┌──────────────────┐
@@ -118,7 +118,7 @@ public class ViewTests
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rectangle (0, 0, 20, 10), pos);
 
-        view.Clear (view.Viewport);
+        view.FillRect (view.Viewport);
 
         expected = @"
 ┌──────────────────┐

@@ -317,7 +317,7 @@ public class TabView : View
 
         if (Tabs.Any ())
         {
-            Rectangle savedClip = ClipToViewport ();
+            Rectangle savedClip = SetClip ();
             _tabsBar.OnDrawContent (viewport);
             _contentView.SetNeedsDisplay ();
             _contentView.Draw ();
@@ -662,7 +662,7 @@ public class TabView : View
             _host._tabLocations = _host.CalculateViewport (Viewport).ToArray ();
 
             // clear any old text
-            ClearVisibleContent ();
+            Clear ();
 
             RenderTabLine ();
 

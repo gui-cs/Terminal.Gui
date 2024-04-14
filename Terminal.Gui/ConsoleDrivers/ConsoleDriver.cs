@@ -22,12 +22,27 @@ public abstract class ConsoleDriver
     /// <summary>Gets the location and size of the terminal screen.</summary>
     public Rectangle Screen => new (0, 0, Cols, Rows);
 
+    private Rectangle _clip;
+
     /// <summary>
     ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
     ///     to.
     /// </summary>
     /// <value>The rectangle describing the of <see cref="Clip"/> region.</value>
-    public Rectangle Clip { get; set; }
+    public Rectangle Clip
+    {
+        get => _clip;
+        set
+        {
+            if (_clip == value)
+            {
+                return;
+            }
+
+            // Don't ever let Clip be bigger than Screen
+            _clip = Rectangle.Intersect (Screen, value);
+        }
+    }
 
     /// <summary>Get the operating system clipboard.</summary>
     public IClipboard Clipboard { get; internal set; }
@@ -229,7 +244,7 @@ public abstract class ConsoleDriver
 
                 _dirtyLines [Row] = true;
             }
-        } 
+        }
 
         if (runeWidth is < 0 or > 0)
         {
@@ -376,7 +391,10 @@ public abstract class ConsoleDriver
     ///     <see langword="false"/> if the coordinate is outside the screen bounds or outside of <see cref="Clip"/>.
     ///     <see langword="true"/> otherwise.
     /// </returns>
-    public bool IsValidLocation (int col, int row) { return col >= 0 && row >= 0 && col < Cols && row < Rows && Clip.Contains (col, row); }
+    public bool IsValidLocation (int col, int row)
+    {
+        return col >= 0 && row >= 0 && col < Cols && row < Rows && Clip.Contains (col, row);
+    }
 
     /// <summary>
     ///     Updates <see cref="Col"/> and <see cref="Row"/> to the specified column and row in <see cref="Contents"/>.

@@ -84,10 +84,21 @@ public enum ViewportSettings
     AllowLocationGreaterThanContentSize = AllowXGreaterThanContentWidth | AllowYGreaterThanContentHeight,
 
     /// <summary>
-    /// If set, the default <see cref="View.OnDrawContent(Rectangle)"/> implementation will clear only the portion of the content
-    /// area that is visible within the <see cref="View.Viewport"/>. See also <see cref="View.ClearVisibleContent()"/>.
+    /// By default, clipping is applied to just the visible content within <see cref="View.Viewport"/>. In cases where the viewport is
+    /// larger than the content area (e.g. when <see cref="AllowNegativeLocation"/> is enabled), setting this flag will allow content
+    /// outside the <see cref="View.Viewport"/> to be drawn.
     /// </summary>
-    ClearVisibleContentOnly = 16,
+    ClipVisibleContentOnly = 16,
+
+    /// <summary>
+    /// If set <see cref="View.Clear()"/> will clear only the portion of the content
+    /// area that is visible within the <see cref="View.Viewport"/>. This is useful for views that have a
+    /// content area larger than the Viewport and want the area outside the content to be visually distinct.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="ClipVisibleContentOnly"/> must be set for this setting to work (clipping beyond the visible area must be disabled).
+    /// </remarks>
+    ClearVisibleContentOnly = 32,
 }
 
 public partial class View

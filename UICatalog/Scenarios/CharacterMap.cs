@@ -670,7 +670,7 @@ internal class CharMap : View
             return;
         }
 
-        ClearVisibleContent ();
+        Clear ();
 
         int cursorCol = Cursor.X + Viewport.X - RowLabelWidth - 1;
         int cursorRow = Cursor.Y + Viewport.Y - 1;
