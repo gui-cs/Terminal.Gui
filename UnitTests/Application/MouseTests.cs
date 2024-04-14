@@ -373,7 +373,7 @@ public class MouseTests
 
     [Fact]
     [AutoInitShutdown]
-    public void MouseGrabView_Is_Set_To_Null_If_A_View_Was_Disposed ()
+    public void View_Is_Responsible_For_Calling_UnGrabMouse_Before_Being_Disposed ()
     {
         var count = 0;
         var view = new View { Width = 1, Height = 1 };
@@ -386,6 +386,7 @@ public class MouseTests
         Application.GrabMouse (view);
         Assert.Equal (view, Application.MouseGrabView);
         top.Remove (view);
+        Application.UngrabMouse ();
         view.Dispose ();
 #if DEBUG_IDISPOSABLE
         Assert.True (view.WasDisposed);
