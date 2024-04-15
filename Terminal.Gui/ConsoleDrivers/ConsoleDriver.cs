@@ -314,28 +314,23 @@ public abstract class ConsoleDriver
         // TODO: This method is really "Clear Contents" now and should not be abstract (or virtual)
         Contents = new Cell [Rows, Cols];
         //CONCURRENCY: Unsynchronized access to Clip isn't safe.
-        Clip = new (0, 0, Cols, Rows);
+        // TODO: ClearContents should not clear the clip; it should only clear the contents. Move clearing it elsewhere.
+        Clip = Screen;
         _dirtyLines = new bool [Rows];
 
         lock (Contents)
         {
-            // Can raise an exception while is still resizing.
-            try
+            for (var row = 0; row < Rows; row++)
             {
-                for (var row = 0; row < Rows; row++)
+                for (var c = 0; c < Cols; c++)
                 {
-                    for (var c = 0; c < Cols; c++)
+                    Contents [row, c] = new Cell
                     {
-                        Contents [row, c] = new Cell
-                        {
-                            Rune = (Rune)' ', Attribute = new Attribute (Color.White, Color.Black), IsDirty = true
-                        };
-                        _dirtyLines [row] = true;
-                    }
+                        Rune = (Rune)' ', Attribute = new Attribute (Color.White, Color.Black), IsDirty = true
+                    };
+                    _dirtyLines [row] = true;
                 }
             }
-            catch (IndexOutOfRangeException)
-            { }
         }
     }
 
@@ -343,18 +338,27 @@ public abstract class ConsoleDriver
     /// <returns><see langword="true"/> upon success</returns>
     public abstract bool EnsureCursorVisibility ();
 
-    // TODO: Move FillRect to ./Drawing	
-    /// <summary>Fills the specified rectangle with the specified rune.</summary>
-    /// <param name="rect"></param>
-    /// <param name="rune"></param>
+    /// <summary>Fills the specified rectangle with the specified rune, using <see cref="CurrentAttribute"/></summary>
+    /// <remarks>
+    /// The value of <see cref="Clip"/> is honored. Any parts of the rectangle not in the clip will not be drawn.
+    /// </remarks>
+    /// <param name="rect">The Screen-relative rectangle.</param>
+    /// <param name="rune">The Rune used to fill the rectangle</param>
     public void FillRect (Rectangle rect, Rune rune = default)
     {
-        for (int r = rect.Y; r < rect.Y + rect.Height; r++)
+        rect = Rectangle.Intersect (rect, Clip);
+        lock (Contents)
         {
-            for (int c = rect.X; c < rect.X + rect.Width; c++)
+            for (int r = rect.Y; r < rect.Y + rect.Height; r++)
             {
-                Move (c, r);
-                AddRune (rune == default (Rune) ? new Rune (' ') : rune);
+                for (int c = rect.X; c < rect.X + rect.Width; c++)
+                {
+                    Contents [r, c] = new Cell
+                    {
+                        Rune = (Rune)' ', Attribute = CurrentAttribute, IsDirty = true
+                    };
+                    _dirtyLines [r] = true;
+                }
             }
         }
     }

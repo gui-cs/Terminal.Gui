@@ -882,7 +882,7 @@ public static partial class Application
         }
         else
         {
-            Driver.UpdateCursor ();
+            //Driver.UpdateCursor ();
         }
 
         if (state.Toplevel != Top && !state.Toplevel.Modal && (Top.NeedsDisplay || Top.SubViewNeedsDisplay || Top.LayoutNeeded))
