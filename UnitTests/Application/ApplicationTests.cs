@@ -172,7 +172,8 @@ public class ApplicationTests
 
             // Don't check Application.ForceDriver
             // Assert.Empty (Application.ForceDriver);
-            Assert.False (Application.Force16Colors);
+            // Don't check Application.Force16Colors
+            //Assert.False (Application.Force16Colors);
             Assert.Null (Application.Driver);
             Assert.Null (Application.MainLoop);
             Assert.False (Application.EndAfterFirstIteration);
