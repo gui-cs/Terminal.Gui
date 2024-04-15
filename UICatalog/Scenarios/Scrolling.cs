@@ -24,7 +24,6 @@ public class Scrolling : Scenario
             Y = 3,
             Width = Dim.Fill (3),
             Height = Dim.Fill (3),
-            BorderStyle = LineStyle.None
         };
 
         var label = new Label { X = 0, Y = 0 };
@@ -44,7 +43,7 @@ public class Scrolling : Scenario
             ShowVerticalScrollIndicator = true,
             ShowHorizontalScrollIndicator = true
         };
-       // scrollView.Padding.Thickness = new (1);
+        scrollView.Padding.Thickness = new (1);
 
         label.Text = $"{scrollView}\nContentSize: {scrollView.ContentSize}\nContentOffset: {scrollView.ContentOffset}";
 
@@ -59,7 +58,6 @@ public class Scrolling : Scenario
             Height = 2,
             ColorScheme = Colors.ColorSchemes ["Error"]
         };
-        horizontalRuler.Visible = false;
         scrollView.Add (horizontalRuler);
 
         const string vrule = "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
@@ -73,11 +71,9 @@ public class Scrolling : Scenario
             Height = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes ["Error"]
         };
-        horizontalRuler.Visible = false;
         scrollView.Add (verticalRuler);
 
         var pressMeButton = new Button { X = 3, Y = 3, Text = "Press me!" };
-        pressMeButton.Visible = false;
         pressMeButton.Accept += (s, e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
         scrollView.Add (pressMeButton);
 
@@ -89,7 +85,6 @@ public class Scrolling : Scenario
             Width = Dim.Fill (3),
             Text = "A very long button. Should be wide enough to demo clipping!"
         };
-        aLongButton.Visible = false;
         aLongButton.Accept += (s, e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
         scrollView.Add (aLongButton);
 
@@ -101,7 +96,6 @@ public class Scrolling : Scenario
                             Width = 50,
                             ColorScheme = Colors.ColorSchemes ["Dialog"],
                             Text = "This is a test of...",
-                            //Visible = false
                         }
                        );
 
@@ -113,7 +107,6 @@ public class Scrolling : Scenario
                             Width = 50,
                             ColorScheme = Colors.ColorSchemes ["Dialog"],
                             Text = "... the emergency broadcast system.",
-                            Visible = false
                         }
                        );
 
@@ -125,7 +118,6 @@ public class Scrolling : Scenario
                             Width = 50,
                             ColorScheme = Colors.ColorSchemes ["Dialog"],
                             Text = "Last line",
-                            Visible = false
                         }
                        );
 
