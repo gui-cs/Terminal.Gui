@@ -3262,11 +3262,7 @@ Edit
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rectangle (1, 0, 8, 1), pos);
 
-        Assert.True (
-                     menu.NewMouseEvent (
-                                      new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }
-                                     )
-                    );
+        Assert.True (menu.NewMouseEvent (new () { X = 1, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }));
         top.Draw ();
 
         expected = @"
@@ -3281,11 +3277,7 @@ Edit
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rectangle (1, 0, 10, 6), pos);
 
-        Assert.False (
-                      menu.NewMouseEvent (
-                                       new MouseEvent { X = 1, Y = 2, Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [1] }
-                                      )
-                     );
+        Assert.False (menu.NewMouseEvent (new () { X = 1, Y = 2, Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [1] }));
         top.Draw ();
 
         expected = @"
@@ -3301,11 +3293,7 @@ Edit
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rectangle (1, 0, 15, 7), pos);
 
-        Assert.False (
-                      menu.NewMouseEvent (
-                                       new MouseEvent { X = 1, Y = 1, Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [2] }
-                                      )
-                     );
+        Assert.False (menu.NewMouseEvent (new () { X = 1, Y = 1, Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [2] }));
         top.Draw ();
 
         expected = @"
@@ -3320,11 +3308,7 @@ Edit
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rectangle (1, 0, 10, 6), pos);
 
-        Assert.False (
-                      menu.NewMouseEvent (
-                                       new MouseEvent { X = 70, Y = 2, Flags = MouseFlags.Button1Clicked, View = Application.Top }
-                                      )
-                     );
+        Assert.False (menu.NewMouseEvent (new () { X = 70, Y = 2, Flags = MouseFlags.Button1Clicked, View = Application.Top }));
         top.Draw ();
 
         expected = @"

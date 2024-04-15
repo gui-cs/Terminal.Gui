@@ -371,5 +371,30 @@ public class MouseTests
         }
     }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void View_Is_Responsible_For_Calling_UnGrabMouse_Before_Being_Disposed ()
+    {
+        var count = 0;
+        var view = new View { Width = 1, Height = 1 };
+        view.MouseEvent += (s, e) => count++;
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
+
+        Assert.Null (Application.MouseGrabView);
+        Application.GrabMouse (view);
+        Assert.Equal (view, Application.MouseGrabView);
+        top.Remove (view);
+        Application.UngrabMouse ();
+        view.Dispose ();
+#if DEBUG_IDISPOSABLE
+        Assert.True (view.WasDisposed);
+#endif
+
+        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed });
+        Assert.Null (Application.MouseGrabView);
+        Assert.Equal (0, count);
+    }
     #endregion
 }

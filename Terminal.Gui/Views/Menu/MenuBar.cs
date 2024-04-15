@@ -1386,6 +1386,12 @@ public class MenuBar : View
                 menu = _openSubMenu [i];
                 Application.Current.Remove (menu);
                 _openSubMenu.Remove (menu);
+
+                if (Application.MouseGrabView == menu)
+                {
+                    Application.GrabMouse (this);
+                }
+
                 menu.Dispose ();
             }
 
