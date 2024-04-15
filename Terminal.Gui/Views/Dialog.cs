@@ -56,6 +56,7 @@ public class Dialog : Window
     /// </remarks>
     public Dialog ()
     {
+        Arrangement = ViewArrangement.Movable;
         X = Pos.Center ();
         Y = Pos.Center ();
         ValidatePosDim = true;

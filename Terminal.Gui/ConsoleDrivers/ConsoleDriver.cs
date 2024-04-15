@@ -355,7 +355,8 @@ public abstract class ConsoleDriver
                 {
                     Contents [r, c] = new Cell
                     {
-                        Rune = (Rune)' ', Attribute = CurrentAttribute, IsDirty = true
+                        Rune = (rune != default ? rune : (Rune)' '),
+                        Attribute = CurrentAttribute, IsDirty = true
                     };
                     _dirtyLines [r] = true;
                 }

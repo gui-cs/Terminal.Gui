@@ -30,6 +30,7 @@ public class Adornments : Scenario
         var window = new Window
         {
             Title = "The _Window",
+            Arrangement = ViewArrangement.Movable,
             X = Pos.Right(editor),
             Width = Dim.Percent (60),
             Height = Dim.Percent (80),

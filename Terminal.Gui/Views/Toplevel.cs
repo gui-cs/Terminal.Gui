@@ -29,7 +29,7 @@ public partial class Toplevel : View
     /// </summary>
     public Toplevel ()
     {
-        Arrangement = ViewArrangement.Movable;
+        Arrangement = ViewArrangement.Fixed;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
 

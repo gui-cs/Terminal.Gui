@@ -10,18 +10,19 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Text and Formatting")]
 public class TextFormatterDemo : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
-        // TODO: Move this to another Scenario that specifically tests `Views` that have no subviews.
-        //Top.Text = "Press CTRL-Q to Quit. This is the Text for the TopLevel View. TextAlignment.Centered was specified. It is intentionally very long to illustrate word wrap.\n" +
-        //	"<-- There is a new line here to show a hard line break. You should see this text bleed underneath the subviews, which start at Y = 3.";
-        //Top.TextAlignment = TextAlignment.Centered;
-        //Top.ColorScheme = Colors.ColorSchemes ["Base"];
+        Application.Init ();
+
+        var app = new Window ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+        };
 
         // Make Win smaller so sizing the window horizontally will make the
         // labels shrink to zero-width
-        Win.X = 10;
-        Win.Width = Dim.Fill (10);
+        app.X = 10;
+        app.Width = Dim.Fill (10);
 
         var text = "Hello world, how are you today? Pretty neat!\nSecond line\n\nFourth Line.";
 
@@ -35,7 +36,7 @@ public class TextFormatterDemo : Scenario
             Y = 0,
             AutoSize = false,
             Height = 10,
-            Width = Dim.Fill ()
+            Width = Dim.Fill (),
         };
 
         var block = new StringBuilder ();
@@ -50,17 +51,17 @@ public class TextFormatterDemo : Scenario
         block.AppendLine ("      ░    ░      ░    ░  ░ ░            ░  ");
         block.AppendLine ("                       ░  ░                 ");
         blockText.Text = block.ToString (); // .Replace(" ", "\u00A0"); // \u00A0 is 'non-breaking space
-        Win.Add (blockText);
+        app.Add (blockText);
 
         var unicodeCheckBox = new CheckBox
         {
             X = 0,
             Y = Pos.Bottom (blockText) + 1,
             Text = "Unicode",
-            Checked = Top.HotKeySpecifier == (Rune)' '
+            Checked = app.HotKeySpecifier == (Rune)' '
         };
 
-        Win.Add (unicodeCheckBox);
+        app.Add (unicodeCheckBox);
 
         List<TextAlignment> alignments = Enum.GetValues (typeof (TextAlignment)).Cast<TextAlignment> ().ToList ();
         Label [] singleLines = new Label [alignments.Count];
@@ -97,26 +98,26 @@ public class TextFormatterDemo : Scenario
         {
             Y = Pos.Bottom (unicodeCheckBox) + 1, Text = "Demonstrating multi-line and word wrap:"
         };
-        Win.Add (label);
+        app.Add (label);
 
         foreach (TextAlignment alignment in alignments)
         {
             label = new Label { Y = Pos.Bottom (label), Text = $"{alignment}:" };
-            Win.Add (label);
+            app.Add (label);
             singleLines [(int)alignment].Y = Pos.Bottom (label);
-            Win.Add (singleLines [(int)alignment]);
+            app.Add (singleLines [(int)alignment]);
             label = singleLines [(int)alignment];
         }
 
         label = new Label { Y = Pos.Bottom (label), Text = "Demonstrating multi-line and word wrap:" };
-        Win.Add (label);
+        app.Add (label);
 
         foreach (TextAlignment alignment in alignments)
         {
             label = new Label { Y = Pos.Bottom (label), Text = $"{alignment}:" };
-            Win.Add (label);
+            app.Add (label);
             multipleLines [(int)alignment].Y = Pos.Bottom (label);
-            Win.Add (multipleLines [(int)alignment]);
+            app.Add (multipleLines [(int)alignment]);
             label = multipleLines [(int)alignment];
         }
 
@@ -128,5 +129,8 @@ public class TextFormatterDemo : Scenario
                                            multipleLines [(int)alignment].Text = e.OldValue == true ? text : unicode;
                                        }
                                    };
+
+        Application.Run (app);
+        app.Dispose ();
     }
 }
