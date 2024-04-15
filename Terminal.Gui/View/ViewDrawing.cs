@@ -495,18 +495,12 @@ public partial class View
                                                                      view => view.Visible
                                                                              && (view.NeedsDisplay || view.SubViewNeedsDisplay || view.LayoutNeeded)
                                                                     );
-
             foreach (View view in subviewsNeedingDraw)
             {
                 if (view.LayoutNeeded)
                 {
                     view.LayoutSubviews ();
                 }
-
-                // Draw the subview
-                if (view.Title.Contains ("This label"))
-                { }
-
                 view.Draw ();
             }
         }
