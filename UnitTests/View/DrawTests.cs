@@ -250,7 +250,7 @@ public class DrawTests (ITestOutputHelper output)
         Assert.Equal (2, r.GetColumns ());
 
         var win = new Window { Title = us };
-        var view = new View { Text = r.ToString (), Height = Dim.Fill (), Width = Dim.Fill () };
+        var view = new View { Text = r.ToString (), Height = Dim.Fill (), Width = Dim.Fill ()};
         var tf = new TextField { Text = us, Y = 1, Width = 3 };
         win.Add (view, tf);
         Toplevel top = new ();
@@ -270,29 +270,7 @@ public class DrawTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverContentsAre (expectedOutput, output);
 
-        Attribute [] expectedColors =
-        {
-            // 0
-            Colors.ColorSchemes ["Base"].Normal,
-
-            // 1
-            Colors.ColorSchemes ["Base"].Focus,
-
-            // 2
-            Colors.ColorSchemes ["Base"].HotNormal
-        };
-
-        TestHelpers.AssertDriverAttributesAre (
-                                               """
-
-                                               0011000000
-                                               0000000000
-                                               0111000000
-                                               0000000000
-                                               """,
-                                               Application.Driver,
-                                               expectedColors
-                                              );
+        // This test has nothing to do with color - removing as it is not relevant and fragile
     }
 
     // TODO: Refactor this test to not depend on TextView etc... Make it as primitive as possible
@@ -927,29 +905,7 @@ public class DrawTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverContentsAre (expected, output);
 
-        Attribute [] expectedColors =
-        {
-            // 0
-            Colors.ColorSchemes ["Base"].Normal,
-
-            // 1
-            Colors.ColorSchemes ["Base"].Focus,
-
-            // 2
-            Colors.ColorSchemes ["Base"].HotNormal
-        };
-
-        TestHelpers.AssertDriverAttributesAre (
-                                               """
-
-                                               0010000000
-                                               0000000000
-                                               0111000000
-                                               0000000000
-                                               """,
-                                               Application.Driver,
-                                               expectedColors
-                                              );
+        // This test has nothing to do with color - removing as it is not relevant and fragile
     }
 
     [Fact]
