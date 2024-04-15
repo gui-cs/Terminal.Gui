@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO.Compression;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
 
@@ -894,7 +895,24 @@ public partial class View
 
         foreach (View v in ordered)
         {
-            LayoutSubview (v, ContentSize);
+            if (v.Width is Dim.DimAuto || v.Height is Dim.DimAuto)
+            {
+                // If the view is auto-sized...
+                Rectangle f = v.Frame;
+                v._frame = new (v.Frame.X, v.Frame.Y, 0, 0);
+                LayoutSubview (v, Viewport.Size);
+
+                if (v.Frame != f)
+                {
+                    // The subviews changed; do it again
+                    v.LayoutNeeded = true;
+                    LayoutSubview (v, Viewport.Size);
+                }
+            }
+            else
+            {
+                LayoutSubview (v, Viewport.Size);
+            }
         }
 
         // If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.

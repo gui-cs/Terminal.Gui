@@ -1,3 +1,5 @@
+using static Terminal.Gui.SpinnerStyle;
+
 namespace Terminal.Gui;
 
 public partial class View
@@ -171,6 +173,7 @@ public partial class View
                    ? Math.Max (HotKeySpecifier.GetColumns (), 0)
                    : 0;
     }
+
     /// <summary>
     ///     Gets the Frame dimensions required to fit <see cref="Text"/> within <see cref="Viewport"/> using the text
     ///     <see cref="NavigationDirection"/> specified by the <see cref="TextFormatter"/> property and accounting for any
@@ -251,11 +254,37 @@ public partial class View
 
             return;
         }
+        
+        int w = Viewport.Size.Width + GetHotKeySpecifierLength ();
 
-        TextFormatter.Size = new (
-                                  ContentSize.Width + GetHotKeySpecifierLength (),
-                                  ContentSize.Height + GetHotKeySpecifierLength (false)
-                                 );
+        if (Width is Dim.DimAuto widthAuto && widthAuto._style != Dim.DimAutoStyle.Subviews)
+        {
+            if (Height is Dim.DimAuto)
+            {
+                // Both are auto. 
+                TextFormatter.Size = new Size (SuperView?.Viewport.Width ?? 0, SuperView?.Viewport.Height ?? 0);
+            }
+            else
+            {
+                TextFormatter.Size = new Size (SuperView?.Viewport.Width ?? 0, Viewport.Size.Height + GetHotKeySpecifierLength ());
+            }
+
+            w = TextFormatter.FormatAndGetSize ().Width;
+        }
+        else
+        {
+            TextFormatter.Size = new Size (w, SuperView?.Viewport.Height ?? 0);
+        }
+
+        int h = Viewport.Size.Height + GetHotKeySpecifierLength ();
+
+        if (Height is Dim.DimAuto heightAuto && heightAuto._style != Dim.DimAutoStyle.Subviews)
+        {
+            TextFormatter.NeedsFormat = true;
+            h = TextFormatter.FormatAndGetSize ().Height;
+        }
+
+        TextFormatter.Size = new Size (w, h);
     }
 
     private bool IsValidAutoSize (out Size autoSize)
