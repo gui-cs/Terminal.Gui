@@ -339,7 +339,7 @@ public class Buttons : Scenario
         {
             X = 0,
             Y = Pos.Bottom (moveUnicodeHotKeyBtn) + 1,
-            Title = "_Numeric Up/Down (press-and-hold):"
+            Title = "_Numeric Up/Down (press-and-hold):",
         };
 
         var numericUpDown = new NumericUpDown<int>
@@ -417,7 +417,7 @@ public class Buttons : Scenario
     {
         private readonly Button _down;
         // TODO: Use a TextField instead of a Label
-        private readonly Label _number;
+        private readonly View _number;
         private readonly Button _up;
 
         public NumericUpDown ()
@@ -432,18 +432,16 @@ public class Buttons : Scenario
             Height = 1;
             Width = Dim.Function (() => Digits + 2); // button + 3 for number + button
 
-            CanFocus = true;
-
             _down = new ()
             {
-                CanFocus = false,
                 AutoSize = false,
                 Height = 1,
                 Width = 1,
                 NoPadding = true,
                 NoDecorations = true,
                 Title = $"{CM.Glyphs.DownArrow}",
-                WantContinuousButtonPressed = true
+                WantContinuousButtonPressed = true,
+                CanFocus = false,
             };
 
             _number = new ()
@@ -460,7 +458,6 @@ public class Buttons : Scenario
 
             _up = new ()
             {
-                CanFocus = false,
                 AutoSize = false,
                 X = Pos.AnchorEnd (1),
                 Y = Pos.Top (_number),
@@ -469,8 +466,11 @@ public class Buttons : Scenario
                 NoPadding = true,
                 NoDecorations = true,
                 Title = $"{CM.Glyphs.UpArrow}",
-                WantContinuousButtonPressed = true
+                WantContinuousButtonPressed = true,
+                CanFocus = false,
             };
+
+            CanFocus = true;
 
             _down.Accept += OnDownButtonOnAccept;
             _up.Accept += OnUpButtonOnAccept;
@@ -507,7 +507,11 @@ public class Buttons : Scenario
             {
                 InvokeCommand (Command.ScrollUp);
             }
+        }
 
+        private void _up_Enter (object sender, FocusEventArgs e)
+        {
+            throw new NotImplementedException ();
         }
 
         private T _value;
@@ -556,8 +560,6 @@ public class Buttons : Scenario
         /// The number of digits to display. The <see cref="View.Viewport"/> will be resized to fit this number of characters plus the buttons. The default is 3.
         /// </summary>
         public int Digits { get; set; } = 3;
-
-
     }
 }
 
