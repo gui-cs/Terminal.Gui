@@ -79,7 +79,7 @@ public class Buttons : Scenario
         Button button;
 
         main.Add (
-                  button = new()
+                  button = new ()
                   {
                       X = 2,
                       Y = Pos.Bottom (colorButtonsLabel) + 1,
@@ -91,7 +91,7 @@ public class Buttons : Scenario
 
         // Note the 'N' in 'Newline' will be the hotkey
         main.Add (
-                  button = new() { X = 2, Y = Pos.Bottom (button) + 1, Text = "a Newline\nin the button" }
+                  button = new () { X = 2, Y = Pos.Bottom (button) + 1, Text = "a Newline\nin the button" }
                  );
         button.Accept += (s, e) => MessageBox.Query ("Message", "Question?", "Yes", "No");
 
@@ -100,7 +100,7 @@ public class Buttons : Scenario
         textChanger.Accept += (s, e) => textChanger.Text += "!";
 
         main.Add (
-                  button = new()
+                  button = new ()
                   {
                       X = Pos.Right (textChanger) + 2,
                       Y = Pos.Y (textChanger),
@@ -335,7 +335,7 @@ public class Buttons : Scenario
                                               }
                                           };
 
-        label = new()
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (moveUnicodeHotKeyBtn) + 1,
@@ -356,7 +356,7 @@ public class Buttons : Scenario
 
         main.Add (label, numericUpDown);
 
-        label = new()
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (numericUpDown) + 1,
@@ -374,7 +374,7 @@ public class Buttons : Scenario
         noRepeatButton.Accept += (s, e) => { noRepeatButton.Title = $"Accept Cou_nt: {++noRepeatAcceptCount}"; };
         main.Add (label, noRepeatButton);
 
-        label = new()
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (label) + 1,
@@ -430,7 +430,9 @@ public class Buttons : Scenario
 
             // TODO: Use Dim.Auto for the Width and Height
             Height = 1;
-            Width = 5; // button + 3 for number + button
+            Width = Dim.Function (() => Digits + 2); // button + 3 for number + button
+
+            CanFocus = true;
 
             _down = new ()
             {
@@ -444,18 +446,23 @@ public class Buttons : Scenario
                 WantContinuousButtonPressed = true
             };
 
-            _number = new()
+            _number = new ()
             {
                 Text = Value.ToString (),
+                AutoSize = false,
                 X = Pos.Right (_down),
                 Y = Pos.Top (_down),
+                Width = Dim.Function (() => Digits),
+                Height = 1,
+                TextAlignment = TextAlignment.Centered,
+                CanFocus = true
             };
 
             _up = new ()
             {
                 CanFocus = false,
                 AutoSize = false,
-                X = Pos.Right (_number),
+                X = Pos.AnchorEnd (1),
                 Y = Pos.Top (_number),
                 Height = 1,
                 Width = 1,
@@ -470,19 +477,37 @@ public class Buttons : Scenario
 
             Add (_down, _number, _up);
 
+
+            AddCommand (Command.ScrollUp, () =>
+                                          {
+                                              Value = (dynamic)Value + 1;
+                                              _number.Text = Value.ToString ();
+
+                                              return true;
+                                          });
+            AddCommand (Command.ScrollDown, () =>
+                                            {
+                                                Value = (dynamic)Value - 1;
+                                                _number.Text = Value.ToString ();
+
+                                                return true;
+                                            });
+
+            KeyBindings.Add (Key.CursorUp, Command.ScrollUp);
+            KeyBindings.Add (Key.CursorDown, Command.ScrollDown);
+
             return;
 
             void OnDownButtonOnAccept (object s, CancelEventArgs e)
             {
-                Value = (dynamic)Value - 1;
-                _number.Text = Value.ToString();
+                InvokeCommand (Command.ScrollDown);
             }
 
             void OnUpButtonOnAccept (object s, CancelEventArgs e)
             {
-                Value = (dynamic)Value + 1;
-                _number.Text = Value.ToString ();
+                InvokeCommand (Command.ScrollUp);
             }
+
         }
 
         private T _value;
@@ -495,7 +520,7 @@ public class Buttons : Scenario
             get => _value;
             set
             {
-                if (_value.Equals(value))
+                if (_value.Equals (value))
                 {
                     return;
                 }
@@ -526,5 +551,13 @@ public class Buttons : Scenario
         /// </summary>
         [CanBeNull]
         public event EventHandler<StateEventArgs<T>> ValueChanged;
+
+        /// <summary>
+        /// The number of digits to display. The <see cref="View.Viewport"/> will be resized to fit this number of characters plus the buttons. The default is 3.
+        /// </summary>
+        public int Digits { get; set; } = 3;
+
+
     }
 }
+
