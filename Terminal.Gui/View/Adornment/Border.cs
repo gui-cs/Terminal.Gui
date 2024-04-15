@@ -432,10 +432,17 @@ public class Border : Adornment
 
         if (canDrawBorder && Thickness.Top > 0 && maxTitleWidth > 0 && !string.IsNullOrEmpty (Parent?.Title))
         {
+            var focus = Parent.GetNormalColor();
+            if (Parent.SuperView is { } && Parent.SuperView?.Subviews!.Count (s => s.CanFocus) > 1)
+            {
+                // Only use focus color if there are multiple focusable views
+                focus = Parent.GetFocusColor() ;
+            }
+
             Parent.TitleTextFormatter.Draw (
                                             new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
-                                            Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor (),
-                                            Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetHotNormalColor ());
+                                            Parent.HasFocus ? focus : Parent.GetNormalColor (),
+                                            Parent.HasFocus ? focus : Parent.GetHotNormalColor ());
         }
 
         if (canDrawBorder && LineStyle != LineStyle.None)
