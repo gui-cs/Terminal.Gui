@@ -311,6 +311,7 @@ public abstract class ConsoleDriver
     /// <summary>Clears the <see cref="Contents"/> of the driver.</summary>
     public void ClearContents ()
     {
+        Debug.WriteLine ("ClearContents");
         // TODO: This method is really "Clear Contents" now and should not be abstract (or virtual)
         Contents = new Cell [Rows, Cols];
         //CONCURRENCY: Unsynchronized access to Clip isn't safe.
@@ -346,6 +347,7 @@ public abstract class ConsoleDriver
     /// <param name="rune">The Rune used to fill the rectangle</param>
     public void FillRect (Rectangle rect, Rune rune = default)
     {
+        Debug.WriteLine ("FillRect");
         rect = Rectangle.Intersect (rect, Clip);
         lock (Contents)
         {

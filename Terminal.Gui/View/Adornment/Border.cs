@@ -204,6 +204,7 @@ public class Border : Adornment
     {
         if (!Parent.Arrangement.HasFlag (ViewArrangement.Movable))
         {
+            e.Cancel = true;
             return;
         }
 
