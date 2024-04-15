@@ -16,7 +16,7 @@ public class Buttons : Scenario
     {
         Window main = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
         };
 
         // Add a label & text field so we can demo IsDefault
@@ -79,7 +79,7 @@ public class Buttons : Scenario
         Button button;
 
         main.Add (
-                  button = new Button
+                  button = new()
                   {
                       X = 2,
                       Y = Pos.Bottom (colorButtonsLabel) + 1,
@@ -91,7 +91,7 @@ public class Buttons : Scenario
 
         // Note the 'N' in 'Newline' will be the hotkey
         main.Add (
-                  button = new Button { X = 2, Y = Pos.Bottom (button) + 1, Text = "a Newline\nin the button" }
+                  button = new() { X = 2, Y = Pos.Bottom (button) + 1, Text = "a Newline\nin the button" }
                  );
         button.Accept += (s, e) => MessageBox.Query ("Message", "Question?", "Yes", "No");
 
@@ -100,7 +100,7 @@ public class Buttons : Scenario
         textChanger.Accept += (s, e) => textChanger.Text += "!";
 
         main.Add (
-                  button = new Button
+                  button = new()
                   {
                       X = Pos.Right (textChanger) + 2,
                       Y = Pos.Y (textChanger),
@@ -189,12 +189,12 @@ public class Buttons : Scenario
 
         moveBtnA.Accept += (s, e) =>
                            {
-                               moveBtnA.Frame = new Rectangle (
-                                                               moveBtnA.Frame.X + 5,
-                                                               moveBtnA.Frame.Y,
-                                                               moveBtnA.Frame.Width,
-                                                               moveBtnA.Frame.Height
-                                                              );
+                               moveBtnA.Frame = new (
+                                                     moveBtnA.Frame.X + 5,
+                                                     moveBtnA.Frame.Y,
+                                                     moveBtnA.Frame.Width,
+                                                     moveBtnA.Frame.Height
+                                                    );
                            };
         absoluteFrame.Add (moveBtnA);
 
@@ -206,12 +206,12 @@ public class Buttons : Scenario
 
         sizeBtnA.Accept += (s, e) =>
                            {
-                               sizeBtnA.Frame = new Rectangle (
-                                                               sizeBtnA.Frame.X,
-                                                               sizeBtnA.Frame.Y,
-                                                               sizeBtnA.Frame.Width + 5,
-                                                               sizeBtnA.Frame.Height
-                                                              );
+                               sizeBtnA.Frame = new (
+                                                     sizeBtnA.Frame.X,
+                                                     sizeBtnA.Frame.Y,
+                                                     sizeBtnA.Frame.Width + 5,
+                                                     sizeBtnA.Frame.Height
+                                                    );
                            };
         absoluteFrame.Add (sizeBtnA);
 
@@ -335,71 +335,68 @@ public class Buttons : Scenario
                                               }
                                           };
 
-        label = new Label ()
+        label = new()
         {
             X = 0,
             Y = Pos.Bottom (moveUnicodeHotKeyBtn) + 1,
-            Title = "_Numeric Up/Down (press-and-hold):",
+            Title = "_Numeric Up/Down (press-and-hold):"
         };
 
-        var numericUpDown = new NumericUpDown ()
+        var numericUpDown = new NumericUpDown<int>
         {
-            Value = 1966,
-            X = Pos.Right (label),
+            Value = 69,
+            X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            Width = 10,
+            Width = 5,
             Height = 1
         };
         numericUpDown.ValueChanged += NumericUpDown_ValueChanged;
 
-        void NumericUpDown_ValueChanged (object sender, StateEventArgs<int> e)
-        {
-            
-        }
+        void NumericUpDown_ValueChanged (object sender, StateEventArgs<int> e) { }
 
         main.Add (label, numericUpDown);
 
-        label = new Label ()
+        label = new()
         {
             X = 0,
             Y = Pos.Bottom (numericUpDown) + 1,
-            Title = "_No Repeat:",
+            Title = "_No Repeat:"
         };
-        int noRepeatAcceptCount = 0;
+        var noRepeatAcceptCount = 0;
 
-        var noRepeatButton = new Button ()
+        var noRepeatButton = new Button
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Title = $"Accept Cou_nt: {noRepeatAcceptCount}",
-            WantContinuousButtonPressed = false,
+            WantContinuousButtonPressed = false
         };
         noRepeatButton.Accept += (s, e) => { noRepeatButton.Title = $"Accept Cou_nt: {++noRepeatAcceptCount}"; };
         main.Add (label, noRepeatButton);
 
-        label = new Label ()
+        label = new()
         {
             X = 0,
             Y = Pos.Bottom (label) + 1,
-            Title = "_Repeat (press-and-hold):",
+            Title = "_Repeat (press-and-hold):"
         };
-        int acceptCount = 0;
+        var acceptCount = 0;
 
-        var repeatButton = new Button ()
+        var repeatButton = new Button
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Title = $"Accept Co_unt: {acceptCount}",
-            WantContinuousButtonPressed = true,
+            WantContinuousButtonPressed = true
         };
         repeatButton.Accept += (s, e) => { repeatButton.Title = $"Accept Co_unt: {++acceptCount}"; };
 
-        var enableCB = new CheckBox ()
+        var enableCB = new CheckBox
         {
             X = Pos.Right (repeatButton) + 1,
             Y = Pos.Top (repeatButton),
             Title = "Enabled",
-            Checked = true,
+            Checked = true
         };
         enableCB.Toggled += (s, e) => { repeatButton.Enabled = !repeatButton.Enabled; };
         main.Add (label, repeatButton, enableCB);
@@ -409,17 +406,33 @@ public class Buttons : Scenario
         main.Dispose ();
     }
 
-    public class NumericUpDown : View
+    /// <summary>
+    /// Enables the user to increase or decrease a value by clicking on the up or down buttons.
+    /// </summary>
+    /// <remarks>
+    ///     Supports the following types: <see cref="int"/>, <see cref="long"/>, <see cref="float"/>, <see cref="double"/>, <see cref="decimal"/>.
+    ///     Supports only one digit of precision.
+    /// </remarks>
+    public class NumericUpDown<T> : View
     {
-        private Button _downButton;
-        private TextField _numericEdit;
-        private Button _upButton;
+        private readonly Button _down;
+        // TODO: Use a TextField instead of a Label
+        private readonly Label _number;
+        private readonly Button _up;
 
         public NumericUpDown ()
         {
+            Type type = typeof (T);
+            if (!(type == typeof (int) || type == typeof (long) || type == typeof (float) || type == typeof (double) || type == typeof (decimal)))
+            {
+                throw new InvalidOperationException ("T must be a numeric type that supports addition and subtraction.");
+            }
+
+            // TODO: Use Dim.Auto for the Width and Height
             Height = 1;
-            Width = 7;
-            _downButton = new ()
+            Width = 5; // button + 3 for number + button
+
+            _down = new ()
             {
                 CanFocus = false,
                 AutoSize = false,
@@ -428,78 +441,90 @@ public class Buttons : Scenario
                 NoPadding = true,
                 NoDecorations = true,
                 Title = $"{CM.Glyphs.DownArrow}",
-                WantContinuousButtonPressed = true,
+                WantContinuousButtonPressed = true
             };
 
-            _numericEdit = new TextField ()
+            _number = new()
             {
-                Text = "0",
-                X = Pos.Right (_downButton),
-                Y = Pos.Top (_downButton),
-                Width = 5,
-                Height = 1,
+                Text = Value.ToString (),
+                X = Pos.Right (_down),
+                Y = Pos.Top (_down),
             };
 
-            _upButton = new ()
+            _up = new ()
             {
                 CanFocus = false,
                 AutoSize = false,
-                X = Pos.Right (_numericEdit),
-                Y = Pos.Top (_numericEdit),
+                X = Pos.Right (_number),
+                Y = Pos.Top (_number),
                 Height = 1,
                 Width = 1,
                 NoPadding = true,
                 NoDecorations = true,
                 Title = $"{CM.Glyphs.UpArrow}",
-                WantContinuousButtonPressed = true,
+                WantContinuousButtonPressed = true
             };
-            _downButton.Accept += (s, e) =>
-                                  {
-                                      Button b = s as Button;
-                                      NumericUpDown superView = b!.SuperView as NumericUpDown;
-                                      superView!.Value = int.Parse (_numericEdit.Text) - 1;
-                                      _numericEdit.Text = $"{Value}";
-                                  };
-            _upButton.Accept += (s, e) =>
-                                {
-                                    Button b = s as Button;
-                                    NumericUpDown superView = b!.SuperView as NumericUpDown;
-                                    superView!.Value = int.Parse (_numericEdit.Text) + 1;
-                                    _numericEdit.Text = $"{Value}";
-                                };
 
-            Add (_downButton, _numericEdit, _upButton);
+            _down.Accept += OnDownButtonOnAccept;
+            _up.Accept += OnUpButtonOnAccept;
+
+            Add (_down, _number, _up);
+
+            return;
+
+            void OnDownButtonOnAccept (object s, CancelEventArgs e)
+            {
+                Value = (dynamic)Value - 1;
+                _number.Text = Value.ToString();
+            }
+
+            void OnUpButtonOnAccept (object s, CancelEventArgs e)
+            {
+                Value = (dynamic)Value + 1;
+                _number.Text = Value.ToString ();
+            }
         }
 
-        private int _value;
+        private T _value;
 
-        public int Value
+        /// <summary>
+        /// The value that will be incremented or decremented.
+        /// </summary>
+        public T Value
         {
             get => _value;
             set
             {
-                if (_value == value)
+                if (_value.Equals(value))
                 {
                     return;
                 }
-                int oldValue = value;
-                var args = new StateEventArgs<int> (_value, value);
+
+                T oldValue = value;
+                StateEventArgs<T> args = new StateEventArgs<T> (_value, value);
                 ValueChanging?.Invoke (this, args);
 
                 if (args.Cancel)
                 {
                     return;
                 }
+
                 _value = value;
-                _numericEdit.Text = _value.ToString ();
-                ValueChanged?.Invoke(this, new StateEventArgs<int> (oldValue, _value));
+                _number.Text = _value.ToString ();
+                ValueChanged?.Invoke (this, new (oldValue, _value));
             }
         }
 
+        /// <summary>
+        /// Fired when the value is about to change. Set <see cref="StateEventArgs{T}.Cancel"/> to true to prevent the change.
+        /// </summary>
         [CanBeNull]
-        public event EventHandler<StateEventArgs<int>> ValueChanging;
+        public event EventHandler<StateEventArgs<T>> ValueChanging;
 
+        /// <summary>
+        /// Fired when the value has changed.
+        /// </summary>
         [CanBeNull]
-        public event EventHandler<StateEventArgs<int>> ValueChanged;
+        public event EventHandler<StateEventArgs<T>> ValueChanged;
     }
 }

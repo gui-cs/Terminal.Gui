@@ -206,7 +206,7 @@ public class ContentScrolling : Scenario
             Y = Pos.Bottom (cbAllowYGreaterThanContentHeight)
         };
 
-        var contentSizeWidth = new Buttons.NumericUpDown
+        var contentSizeWidth = new Buttons.NumericUpDown<int>
         {
             Value = view.ContentSize.Width,
             X = Pos.Right (labelContentSize) + 1,
@@ -228,15 +228,15 @@ public class ContentScrolling : Scenario
 
         var labelComma = new Label
         {
-            Title = ", ",
+            Title = ",",
             X = Pos.Right (contentSizeWidth),
             Y = Pos.Top (labelContentSize)
         };
 
-        var contentSizeHeight = new Buttons.NumericUpDown
+        var contentSizeHeight = new Buttons.NumericUpDown<int>
         {
             Value = view.ContentSize.Height,
-            X = Pos.Right (labelComma),
+            X = Pos.Right (labelComma) + 1,
             Y = Pos.Top (labelContentSize),
             CanFocus = false
         };
