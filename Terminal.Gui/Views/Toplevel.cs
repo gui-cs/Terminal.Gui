@@ -380,7 +380,7 @@ public partial class Toplevel : View
     /// <param name="top">The Toplevel to adjust.</param>
     public virtual void PositionToplevel (Toplevel top)
     {
-        
+
         View superView = GetLocationEnsuringFullVisibility (
                                               top,
                                               top.Frame.X,
@@ -548,7 +548,7 @@ public partial class Toplevel : View
     ///     to dispose objects after calling <see cref="Application.End(RunState)"/>.
     /// </summary>
     public event EventHandler Unloaded;
-    
+
     internal void AddMenuStatusBar (View view)
     {
         if (view is MenuBar)

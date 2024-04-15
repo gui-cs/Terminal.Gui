@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using Terminal.Gui;
+using static UICatalog.Scenarios.Adornments;
 
 namespace UICatalog.Scenarios;
 
@@ -100,7 +101,22 @@ public class ContentScrolling : Scenario
 
         _diagnosticFlags = View.Diagnostics;
 
-        var view = new ScrollingDemoView { Title = "Demo View" };
+        Window app = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+        };
+
+        var editor = new AdornmentsEditor ();
+        app.Add (editor);
+
+        var view = new ScrollingDemoView
+        {
+            Title = "Demo View",
+            X = Pos.Right(editor),
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+        app.Add (view);
 
         // Add Scroll Setting UI to Padding
         view.Padding.Thickness = new (0, 3, 0, 0);
@@ -375,18 +391,12 @@ public class ContentScrolling : Scenario
         longLabel.TextFormatter.WordWrap = true;
         view.Add (longLabel);
 
-        var editor = new Adornments.AdornmentsEditor
-        {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
-            ColorScheme = Colors.ColorSchemes ["Dialog"]
-        };
-
         editor.Initialized += (s, e) => { editor.ViewToEdit = view; };
 
-        editor.Closed += (s, e) => View.Diagnostics = _diagnosticFlags;
+        app.Closed += (s, e) => View.Diagnostics = _diagnosticFlags;
 
-        Application.Run (editor);
-        editor.Dispose ();
+        Application.Run (app);
+        app.Dispose ();
         Application.Shutdown ();
     }
 }

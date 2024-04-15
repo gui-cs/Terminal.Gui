@@ -329,13 +329,17 @@ public partial class View
     public virtual Attribute GetFocusColor ()
     {
         ColorScheme cs = ColorScheme;
-
         if (ColorScheme is null)
         {
             cs = new ();
         }
 
-        return Enabled ? cs.Focus : cs.Disabled;
+        if (SuperView is {} && SuperView?.Subviews!.Count(s => s.CanFocus) > 1)
+        {
+            return Enabled ? cs.Focus : cs.Disabled;
+        }
+
+        return Enabled ? cs.Normal : cs.Disabled;
     }
 
     /// <summary>Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.</summary>

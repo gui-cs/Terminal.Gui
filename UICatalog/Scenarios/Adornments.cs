@@ -19,7 +19,23 @@ public class Adornments : Scenario
 
         _diagnosticFlags = View.Diagnostics;
 
-        var view = new Window { Title = "The _Window" };
+        Window app = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+        };
+
+        var editor = new AdornmentsEditor ();
+        app.Add (editor);
+
+        var window = new Window
+        {
+            Title = "The _Window",
+            X = Pos.Right(editor),
+            Width = Dim.Percent (60),
+            Height = Dim.Percent (80),
+        };
+        app.Add (window);
+
         var tf1 = new TextField { Width = 10, Text = "TextField" };
         var color = new ColorPicker { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd (11) };
         color.BorderStyle = LineStyle.RoundedDotted;
@@ -38,7 +54,7 @@ public class Adornments : Scenario
         var button = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };
 
         button.Accept += (s, e) =>
-                             MessageBox.Query (20, 7, "Hi", $"Am I a {view.GetType ().Name}?", "Yes", "No");
+                             MessageBox.Query (20, 7, "Hi", $"Am I a {window.GetType ().Name}?", "Yes", "No");
 
         var label = new TextView
         {
@@ -62,14 +78,14 @@ public class Adornments : Scenario
             Text = "Label\nY=AnchorEnd(3),Height=Dim.Fill()"
         };
 
-        view.Margin.Data = "Margin";
-        view.Margin.Thickness = new (3);
+        window.Margin.Data = "Margin";
+        window.Margin.Thickness = new (3);
 
-        view.Border.Data = "Border";
-        view.Border.Thickness = new (3);
+        window.Border.Data = "Border";
+        window.Border.Thickness = new (3);
 
-        view.Padding.Data = "Padding";
-        view.Padding.Thickness = new (3);
+        window.Padding.Data = "Padding";
+        window.Padding.Thickness = new (3);
 
         var longLabel = new Label ()
         {
@@ -77,31 +93,24 @@ public class Adornments : Scenario
 
         };
         longLabel.TextFormatter.WordWrap = true;
-        view.Add (tf1, color, button, label, btnButtonInWindow, tv, longLabel);
+        window.Add (tf1, color, button, label, btnButtonInWindow, tv, longLabel);
 
-        var editor = new AdornmentsEditor
-        {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
-        };
-        view.Width = Dim.Percent (60);
-        view.Height = Dim.Percent (80);
+        editor.Initialized += (s, e) => { editor.ViewToEdit = window; };
 
-        editor.Initialized += (s, e) => { editor.ViewToEdit = view; };
-
-        view.Initialized += (s, e) =>
+        window.Initialized += (s, e) =>
                             {
                                 var labelInPadding = new Label () { X = 1, Y = 0, Title = "_Text:" };
-                                view.Padding.Add (labelInPadding);
+                                window.Padding.Add (labelInPadding);
 
                                 var textFieldInPadding = new TextField () { X = Pos.Right (labelInPadding) + 1, Y = Pos.Top (labelInPadding), Width = 15, Text = "some text" };
                                 textFieldInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "TextField", textFieldInPadding.Text, "Ok");
-                                view.Padding.Add (textFieldInPadding);
+                                window.Padding.Add (textFieldInPadding);
 
                                 var btnButtonInPadding = new Button { X = Pos.Center (), Y = 0, Text = "_Button in Padding" };
                                 btnButtonInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Button in Padding Pressed!", "Ok");
                                 btnButtonInPadding.BorderStyle = LineStyle.Dashed;
                                 btnButtonInPadding.Border.Thickness = new (1, 1, 1, 1);
-                                view.Padding.Add (btnButtonInPadding);
+                                window.Padding.Add (btnButtonInPadding);
 
 #if SUBVIEW_BASED_BORDER
                                 btnButtonInPadding.Border.CloseButton.Visible = true;
@@ -117,10 +126,10 @@ public class Adornments : Scenario
 #endif
                             };
 
-        editor.Closed += (s, e) => View.Diagnostics = _diagnosticFlags;
+        app.Closed += (s, e) => View.Diagnostics = _diagnosticFlags;
 
-        Application.Run (editor);
-        editor.Dispose ();
+        Application.Run (app);
+        app.Dispose ();
 
         Application.Shutdown ();
     }
@@ -329,7 +338,7 @@ public class Adornments : Scenario
     /// <summary>
     /// Provides an editor UI for the Margin, Border, and Padding of a View.
     /// </summary>
-    public class AdornmentsEditor : Window
+    public class AdornmentsEditor : View
     {
         private AdornmentEditor _borderEditor;
         private CheckBox _diagCheckBox;
@@ -341,6 +350,10 @@ public class Adornments : Scenario
         public AdornmentsEditor ()
         {
             ColorScheme = Colors.ColorSchemes ["Dialog"];
+
+            // TOOD: Use Dim.Auto
+            Width = 36;
+            Height = Dim.Fill ();
         }
 
         public View ViewToEdit
@@ -473,9 +486,6 @@ public class Adornments : Scenario
                                          };
 
                 Add (_diagCheckBox);
-                _viewToEdit.X = Pos.Right (rbBorderStyle);
-                _viewToEdit.Y = 0;
-                Add (_viewToEdit);
 
                 _viewToEdit.LayoutComplete += (s, e) =>
                                               {
