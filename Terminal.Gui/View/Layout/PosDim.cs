@@ -137,7 +137,11 @@ public class Pos
     /// anchorButton.Y = Pos.AnchorEnd (0);
     /// </code>
     /// </example>
-    public static Pos AnchorEnd () { return new PosAnchorEnd (0); }
+    public static Pos AnchorEnd ()
+    {
+        throw new NotImplementedException ();
+        //return new PosAnchorEnd (0);
+    }
 
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom) of the SuperView,
