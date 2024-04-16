@@ -314,18 +314,15 @@ public class Pos
 
     private static void SetPosCombine (Pos left, PosCombine newPos)
     {
-        var view = left as PosView;
-
-        if (view is { })
+        if (left is PosView { } view)
         {
             view.Target.SetNeedsLayout ();
         }
     }
 
-    internal class PosAbsolute : Pos
+    internal class PosAbsolute (int n) : Pos
     {
-        private readonly int _n;
-        public PosAbsolute (int n) { _n = n; }
+        private readonly int _n = n;
         public override bool Equals (object other) { return other is PosAbsolute abs && abs._n == _n; }
         public override int GetHashCode () { return _n.GetHashCode (); }
         public override string ToString () { return $"Absolute({_n})"; }
@@ -340,15 +337,14 @@ public class Pos
         public override bool Equals (object other) { return other is PosAnchorEnd anchorEnd && anchorEnd._offset == _offset; }
         public override int GetHashCode () { return _offset.GetHashCode (); }
 
-        public bool UseDimForOffset { get; set; }
+        /// <summary>
+        /// If true, the offset is the width of the view, if false, the offset is the offset value.
+        /// </summary>
+        internal bool UseDimForOffset { get; set; }
 
         public override string ToString ()
         {
-            if (UseDimForOffset)
-            {
-                return "AnchorEnd()";
-            }
-            return $"AnchorEnd({_offset})";
+            return UseDimForOffset ? "AnchorEnd()" : $"AnchorEnd({_offset})";
         }
 
         internal override int Anchor (int width)
@@ -367,17 +363,10 @@ public class Pos
         internal override int Anchor (int width) { return width / 2; }
     }
 
-    internal class PosCombine : Pos
+    internal class PosCombine (bool add, Pos left, Pos right) : Pos
     {
-        internal bool _add;
-        internal Pos _left, _right;
-
-        public PosCombine (bool add, Pos left, Pos right)
-        {
-            _left = left;
-            _right = right;
-            _add = add;
-        }
+        internal bool _add = add;
+        internal Pos _left = left, _right = right;
 
         public override string ToString () { return $"Combine({_left}{(_add ? '+' : '-')}{_right})"; }
 
@@ -395,10 +384,9 @@ public class Pos
         }
     }
 
-    internal class PosFactor : Pos
+    internal class PosFactor (float n) : Pos
     {
-        private readonly float _factor;
-        public PosFactor (float n) { _factor = n; }
+        private readonly float _factor = n;
         public override bool Equals (object other) { return other is PosFactor f && f._factor == _factor; }
         public override int GetHashCode () { return _factor.GetHashCode (); }
         public override string ToString () { return $"Factor({_factor})"; }
@@ -406,27 +394,18 @@ public class Pos
     }
 
     // Helper class to provide dynamic value by the execution of a function that returns an integer.
-    internal class PosFunc : Pos
+    internal class PosFunc (Func<int> n) : Pos
     {
-        private readonly Func<int> _function;
-        public PosFunc (Func<int> n) { _function = n; }
+        private readonly Func<int> _function = n;
         public override bool Equals (object other) { return other is PosFunc f && f._function () == _function (); }
         public override int GetHashCode () { return _function.GetHashCode (); }
         public override string ToString () { return $"PosFunc({_function ()})"; }
         internal override int Anchor (int width) { return _function (); }
     }
 
-    internal class PosView : Pos
+    internal class PosView (View view, int side) : Pos
     {
-        public readonly View Target;
-
-        private readonly int side;
-
-        public PosView (View view, int side)
-        {
-            Target = view;
-            this.side = side;
-        }
+        public readonly View Target = view;
 
         public override bool Equals (object other) { return other is PosView abs && abs.Target == Target; }
         public override int GetHashCode () { return Target.GetHashCode (); }
@@ -670,27 +649,19 @@ public class Dim
     // BUGBUG: newPos is never used.
     private static void SetDimCombine (Dim left, DimCombine newPos) { (left as DimView)?.Target.SetNeedsLayout (); }
 
-    internal class DimAbsolute : Dim
+    internal class DimAbsolute (int n) : Dim
     {
-        private readonly int _n;
-        public DimAbsolute (int n) { _n = n; }
+        private readonly int _n = n;
         public override bool Equals (object other) { return other is DimAbsolute abs && abs._n == _n; }
         public override int GetHashCode () { return _n.GetHashCode (); }
         public override string ToString () { return $"Absolute({_n})"; }
         internal override int Anchor (int width) { return _n; }
     }
 
-    internal class DimCombine : Dim
+    internal class DimCombine (bool add, Dim left, Dim right) : Dim
     {
-        internal bool _add;
-        internal Dim _left, _right;
-
-        public DimCombine (bool add, Dim left, Dim right)
-        {
-            _left = left;
-            _right = right;
-            _add = add;
-        }
+        internal bool _add = add;
+        internal Dim _left = left, _right = right;
 
         public override string ToString () { return $"Combine({_left}{(_add ? '+' : '-')}{_right})"; }
 
@@ -708,16 +679,10 @@ public class Dim
         }
     }
 
-    internal class DimFactor : Dim
+    internal class DimFactor (float n, bool r = false) : Dim
     {
-        private readonly float _factor;
-        private readonly bool _remaining;
-
-        public DimFactor (float n, bool r = false)
-        {
-            _factor = n;
-            _remaining = r;
-        }
+        private readonly float _factor = n;
+        private readonly bool _remaining = r;
 
         public override bool Equals (object other) { return other is DimFactor f && f._factor == _factor && f._remaining == _remaining; }
         public override int GetHashCode () { return _factor.GetHashCode (); }
@@ -726,10 +691,9 @@ public class Dim
         internal override int Anchor (int width) { return (int)(width * _factor); }
     }
 
-    internal class DimFill : Dim
+    internal class DimFill (int margin) : Dim
     {
-        private readonly int _margin;
-        public DimFill (int margin) { _margin = margin; }
+        private readonly int _margin = margin;
         public override bool Equals (object other) { return other is DimFill fill && fill._margin == _margin; }
         public override int GetHashCode () { return _margin.GetHashCode (); }
         public override string ToString () { return $"Fill({_margin})"; }
@@ -737,27 +701,18 @@ public class Dim
     }
 
     // Helper class to provide dynamic value by the execution of a function that returns an integer.
-    internal class DimFunc : Dim
+    internal class DimFunc (Func<int> n) : Dim
     {
-        private readonly Func<int> _function;
-        public DimFunc (Func<int> n) { _function = n; }
+        private readonly Func<int> _function = n;
         public override bool Equals (object other) { return other is DimFunc f && f._function () == _function (); }
         public override int GetHashCode () { return _function.GetHashCode (); }
         public override string ToString () { return $"DimFunc({_function ()})"; }
         internal override int Anchor (int width) { return _function (); }
     }
 
-    internal class DimView : Dim
+    internal class DimView (View view, int side) : Dim
     {
-        private readonly int _side;
-
-        public DimView (View view, int side)
-        {
-            Target = view;
-            _side = side;
-        }
-
-        public View Target { get; init; }
+        public View Target { get; init; } = view;
         public override bool Equals (object other) { return other is DimView abs && abs.Target == Target; }
         public override int GetHashCode () { return Target.GetHashCode (); }
 
@@ -768,7 +723,7 @@ public class Dim
                 throw new NullReferenceException ();
             }
 
-            string tside = _side switch
+            string tside = side switch
                            {
                                0 => "Height",
                                1 => "Width",
@@ -780,7 +735,7 @@ public class Dim
 
         internal override int Anchor (int width)
         {
-            return _side switch
+            return side switch
                    {
                        0 => Target.Frame.Height,
                        1 => Target.Frame.Width,
