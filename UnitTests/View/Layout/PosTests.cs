@@ -197,13 +197,13 @@ public class PosTests (ITestOutputHelper output)
         Assert.Equal (20, posCombine.Anchor (100));
 
         var view = new View { Frame = new (20, 10, 20, 1) };
-        var posViewX = new Pos.PosView (view, 0);
+        var posViewX = new Pos.PosView (view, Pos.Side.X);
         Assert.Equal (20, posViewX.Anchor (0));
-        var posViewY = new Pos.PosView (view, 1);
+        var posViewY = new Pos.PosView (view, Pos.Side.Y);
         Assert.Equal (10, posViewY.Anchor (0));
-        var posRight = new Pos.PosView (view, 2);
+        var posRight = new Pos.PosView (view, Pos.Side.Right);
         Assert.Equal (40, posRight.Anchor (0));
-        var posViewBottom = new Pos.PosView (view, 3);
+        var posViewBottom = new Pos.PosView (view, Pos.Side.Bottom);
         Assert.Equal (11, posViewBottom.Anchor (0));
 
         view.Dispose ();
