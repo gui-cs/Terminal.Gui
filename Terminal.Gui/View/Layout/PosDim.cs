@@ -229,7 +229,10 @@ public class Pos
         }
 
         var newPos = new PosCombine (true, left, right);
-        SetPosCombine (left, newPos);
+        if (left is PosView view)
+        {
+            view.Target.SetNeedsLayout ();
+        }
 
         return newPos;
     }
@@ -254,7 +257,10 @@ public class Pos
         }
 
         var newPos = new PosCombine (false, left, right);
-        SetPosCombine (left, newPos);
+        if (left is PosView view)
+        {
+            view.Target.SetNeedsLayout ();
+        }
 
         return newPos;
     }
@@ -308,15 +314,6 @@ public class Pos
     public static Pos Y (View view) { return new PosView (view, Side.Y); }
 
     internal virtual int Anchor (int width) { return 0; }
-
-    // BUGBUG: newPos is never used
-    private static void SetPosCombine (Pos left, PosCombine newPos)
-    {
-        if (left is PosView view)
-        {
-            view.Target.SetNeedsLayout ();
-        }
-    }
 
     internal virtual int GetLocation (int superviewDimension, Dim dim, int autosize, bool autoSize) { return Anchor (superviewDimension); }
 
@@ -451,7 +448,7 @@ public class Pos
 
         public override string ToString ()
         {
-            string side1 = side switch
+            string sideString = side switch
                            {
                                Side.X => "x",
                                Side.Y => "y",
@@ -465,20 +462,19 @@ public class Pos
                 throw new NullReferenceException (nameof (Target));
             }
 
-            return $"View(side={side1},target={Target})";
+            return $"View(side={sideString},target={Target})";
         }
 
         internal override int Anchor (int width)
         {
-            switch (side)
-            {
-                case Side.X: return Target.Frame.X;
-                case Side.Y: return Target.Frame.Y;
-                case Side.Right: return Target.Frame.Right;
-                case Side.Bottom: return Target.Frame.Bottom;
-                default:
-                    return 0;
-            }
+            return side switch
+                   {
+                       Side.X => Target.Frame.X,
+                       Side.Y => Target.Frame.Y,
+                       Side.Right => Target.Frame.Right,
+                       Side.Bottom => Target.Frame.Bottom,
+                       _ => 0
+                   };
         }
     }
 }
@@ -597,7 +593,7 @@ public class Dim
         }
 
         var newDim = new DimCombine (true, left, right);
-        SetDimCombine (left, newDim);
+        (left as DimView)?.Target.SetNeedsLayout ();
 
         return newDim;
     }
@@ -622,7 +618,7 @@ public class Dim
         }
 
         var newDim = new DimCombine (false, left, right);
-        SetDimCombine (left, newDim);
+        (left as DimView)?.Target.SetNeedsLayout ();
 
         return newDim;
     }
@@ -677,9 +673,6 @@ public class Dim
         return autoSize && autosize > newDimension ? autosize : newDimension;
     }
 
-    // BUGBUG: newPos is never used.
-    private static void SetDimCombine (Dim left, DimCombine newPos) { (left as DimView)?.Target.SetNeedsLayout (); }
-
     internal class DimAbsolute (int n) : Dim
     {
         private readonly int _n = n;
@@ -693,7 +686,6 @@ public class Dim
             // DimAbsolute.Anchor (int width) ignores width and returns n
             int newDimension = Math.Max (Anchor (0), 0);
 
-            // BUGBUG: AutoSize does two things: makes text fit AND changes the view's dimensions
             return autoSize && autosize > newDimension ? autosize : newDimension;
         }
     }
@@ -751,16 +743,7 @@ public class Dim
 
         internal override int GetDimension (int location, int dimension, int autosize, bool autoSize)
         {
-            int newDimension;
-
-            if (_remaining)
-            {
-                newDimension = Math.Max (Anchor (dimension - location), 0);
-            }
-            else
-            {
-                newDimension = Anchor (dimension);
-            }
+            int newDimension = _remaining ? Math.Max (Anchor (dimension - location), 0) : Anchor (dimension);
 
             return autoSize && autosize > newDimension ? autosize : newDimension;
         }
@@ -812,14 +795,14 @@ public class Dim
                 throw new NullReferenceException ();
             }
 
-            string side = _side switch
+            string sideString = _side switch
                           {
                               Side.Height => "Height",
                               Side.Width => "Width",
                               _ => "unknown"
                           };
 
-            return $"View({side},{Target})";
+            return $"View({sideString},{Target})";
         }
 
         internal override int Anchor (int width)
