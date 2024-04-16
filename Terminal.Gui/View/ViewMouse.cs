@@ -21,12 +21,12 @@ public enum HighlightStyle
 #endif
 
     /// <summary>
-    /// The mouse is pressed within the <see cref="View.Bounds"/>.
+    /// The mouse is pressed within the <see cref="View.Viewport"/>.
     /// </summary>
     Pressed = 2,
 
     /// <summary>
-    /// The mouse is pressed but moved outside the <see cref="View.Bounds"/>.
+    /// The mouse is pressed but moved outside the <see cref="View.Viewport"/>.
     /// </summary>
     PressedOutside = 4
 }
@@ -36,6 +36,10 @@ public enum HighlightStyle
 /// </summary>
 public class HighlightEventArgs : CancelEventArgs
 {
+    /// <summary>
+    /// Constructs a new instance of <see cref="HighlightEventArgs"/>.
+    /// </summary>
+    /// <param name="style"></param>
     public HighlightEventArgs (HighlightStyle style)
     {
         HighlightStyle = style;
@@ -63,7 +67,7 @@ public partial class View
     public virtual bool WantMousePositionReports { get; set; }
 
     /// <summary>
-    ///     Called by <see cref="Application.OnMouseEvent"/> when the mouse enters <see cref="Bounds"/>. The view will
+    ///     Called by <see cref="Application.OnMouseEvent"/> when the mouse enters <see cref="Viewport"/>. The view will
     ///     then receive mouse events until <see cref="NewMouseLeaveEvent"/> is called indicating the mouse has left
     ///     the view.
     /// </summary>
@@ -110,7 +114,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     Called by <see cref="NewMouseEvent"/> when the mouse enters <see cref="Bounds"/>. The view will
+    ///     Called by <see cref="NewMouseEvent"/> when the mouse enters <see cref="Viewport"/>. The view will
     ///     then receive mouse events until <see cref="OnMouseLeave"/> is called indicating the mouse has left
     ///     the view.
     /// </summary>
@@ -119,7 +123,7 @@ public partial class View
     /// Override this method or subscribe to <see cref="MouseEnter"/> to change the default enter behavior.
     /// </para>
     /// <para>
-    ///     The coordinates are relative to <see cref="View.Bounds"/>.
+    ///     The coordinates are relative to <see cref="View.Viewport"/>.
     /// </para>
     /// </remarks>
     /// <param name="mouseEvent"></param>
@@ -133,12 +137,12 @@ public partial class View
         return args.Handled;
     }
 
-    /// <summary>Event fired when the mouse moves into the View's <see cref="Bounds"/>.</summary>
+    /// <summary>Event fired when the mouse moves into the View's <see cref="Viewport"/>.</summary>
     public event EventHandler<MouseEventEventArgs> MouseEnter;
 
 
     /// <summary>
-    ///     Called by <see cref="Application.OnMouseEvent"/> when the mouse leaves <see cref="Bounds"/>. The view will
+    ///     Called by <see cref="Application.OnMouseEvent"/> when the mouse leaves <see cref="Viewport"/>. The view will
     ///     then no longer receive mouse events.
     /// </summary>
     /// <remarks>
@@ -180,15 +184,15 @@ public partial class View
         return false;
     }
     /// <summary>
-    ///     Called by <see cref="NewMouseEvent"/> when a mouse leaves <see cref="Bounds"/>. The view will
+    ///     Called by <see cref="NewMouseEvent"/> when a mouse leaves <see cref="Viewport"/>. The view will
     ///     no longer receive mouse events.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Override this method or subscribe to <see cref="MouseEnter"/> to change the default leave behavior.
+    ///     Override this method or subscribe to <see cref="MouseEnter"/> to change the default leave behavior.
     /// </para>
     /// <para>
-    ///     The coordinates are relative to <see cref="View.Bounds"/>.
+    ///     The coordinates are relative to <see cref="View.Viewport"/>.
     /// </para>
     /// </remarks>
     /// <param name="mouseEvent"></param>
@@ -211,7 +215,7 @@ public partial class View
         return args.Handled;
     }
 
-    /// <summary>Event fired when the mouse leaves the View's <see cref="Bounds"/>.</summary>
+    /// <summary>Event fired when the mouse leaves the View's <see cref="Viewport"/>.</summary>
     public event EventHandler<MouseEventEventArgs> MouseLeave;
 
     /// <summary>
@@ -227,7 +231,7 @@ public partial class View
     ///         mouse buttons was clicked, it calls <see cref="OnMouseClick"/> to process the click.
     ///     </para>
     ///     <para>
-    ///         See <see cref="SetHighlight"/> and <see cref="DisableHighlight"/> for more information.
+    ///         See <see cref="SetHighlight"/> for more information.
     ///     </para>
     ///     <para>
     ///         If <see cref="WantContinuousButtonPressed"/> is <see langword="true"/>, the <see cref="OnMouseClick"/> event
@@ -307,7 +311,7 @@ public partial class View
     ///     </para>
     /// </remarks>
     /// <param name="mouseEvent"></param>
-    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
+    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>    
     private bool HandlePressed (MouseEvent mouseEvent)
     {
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
@@ -325,9 +329,11 @@ public partial class View
                     // Set the focus, but don't invoke Accept
                     SetFocus ();
                 }
+
+                mouseEvent.Handled = true;
             }
 
-            if (Bounds.Contains (mouseEvent.X, mouseEvent.Y))
+            if (Viewport.Contains (mouseEvent.X, mouseEvent.Y))
             {
                 if (SetHighlight (HighlightStyle.HasFlag (HighlightStyle.Pressed) ? HighlightStyle.Pressed : HighlightStyle.None) == true)
                 {
@@ -408,7 +414,7 @@ public partial class View
             }
 
             // If mouse is still in bounds, click
-            if (!WantContinuousButtonPressed && Bounds.Contains (mouseEvent.X, mouseEvent.Y))
+            if (!WantContinuousButtonPressed && Viewport.Contains (mouseEvent.X, mouseEvent.Y))
             {
                 return OnMouseClick (new (mouseEvent));
             }
@@ -489,9 +495,9 @@ public partial class View
                     };
                     ColorScheme = cs;
                 }
-
-                return true;
             }
+            // Return false since we don't want to eat the event
+            return false;
         }
 
 
@@ -526,10 +532,10 @@ public partial class View
         return args.Cancel;
     }
 
-    /// <summary>Called when a mouse event occurs within the view's <see cref="Bounds"/>.</summary>
+    /// <summary>Called when a mouse event occurs within the view's <see cref="Viewport"/>.</summary>
     /// <remarks>
     ///     <para>
-    ///         The coordinates are relative to <see cref="View.Bounds"/>.
+    ///         The coordinates are relative to <see cref="View.Viewport"/>.
     ///     </para>
     /// </remarks>
     /// <param name="mouseEvent"></param>
@@ -546,7 +552,7 @@ public partial class View
     /// <summary>Event fired when a mouse event occurs.</summary>
     /// <remarks>
     ///     <para>
-    ///         The coordinates are relative to <see cref="View.Bounds"/>.
+    ///         The coordinates are relative to <see cref="View.Viewport"/>.
     ///     </para>
     /// </remarks>
     public event EventHandler<MouseEventEventArgs> MouseEvent;
@@ -564,9 +570,7 @@ public partial class View
         if (!Enabled)
         {
             // QUESTION: Is this right? Should a disabled view eat mouse clicks?
-            args.Handled = true;
-
-            return true;
+            return args.Handled = true;
         }
 
         MouseClick?.Invoke (this, args);
@@ -592,7 +596,7 @@ public partial class View
     ///         <see cref="MouseEvent.Flags"/> to see which button was clicked.
     ///     </para>
     ///     <para>
-    ///         The coordinates are relative to <see cref="View.Bounds"/>.
+    ///         The coordinates are relative to <see cref="View.Viewport"/>.
     ///     </para>
     /// </remarks>
     public event EventHandler<MouseEventEventArgs> MouseClick;

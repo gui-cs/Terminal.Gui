@@ -162,6 +162,7 @@ public class Thickness : IEquatable<Thickness>
         }
 
         // Draw the Left side
+        // Draw the Left side
         if (Left > 0)
         {
             Application.Driver.FillRect (rect with { Width = Math.Min (rect.Width, Left) }, leftChar);

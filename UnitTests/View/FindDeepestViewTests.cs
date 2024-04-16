@@ -68,7 +68,7 @@ public class FindDeepestViewTests (ITestOutputHelper output)
     [InlineData (1, 1, 1, 1, 1, 8, 8, typeof (Padding))]
     [InlineData (1, 1, 1, 1, 1, 9, 9, typeof (Border))]
     [InlineData (1, 1, 1, 1, 1, 10, 10, typeof (Margin))]
-    public void Contains (int frameX, int frameY, int marginThickness, int borderThickness, int paddingThinkcness, int testX, int testY, Type? expectedAdornmentType)
+    public void Contains (int frameX, int frameY, int marginThickness, int borderThickness, int paddingThickness, int testX, int testY, Type? expectedAdornmentType)
     {
         var view = new View ()
         {
@@ -77,7 +77,7 @@ public class FindDeepestViewTests (ITestOutputHelper output)
         };
         view.Margin.Thickness = new Thickness (marginThickness);
         view.Border.Thickness = new Thickness (borderThickness);
-        view.Padding.Thickness = new Thickness (paddingThinkcness);
+        view.Padding.Thickness = new Thickness (paddingThickness);
 
         Type? containedType = null;
         if (view.Contains (testX, testY))
@@ -271,6 +271,71 @@ public class FindDeepestViewTests (ITestOutputHelper output)
         Assert.Equal (expectedSubViewFound, found == subview);
     }
 
+    // Test that FindDeepestView works if the start view has offset Viewport location
+    [Theory]
+    [InlineData (1, 0, 0, true)]
+    [InlineData (1, 1, 1, true)]
+    [InlineData (1, 2, 2, false)]
+
+    [InlineData (-1, 3, 3, true)]
+    [InlineData (-1, 2, 2, true)]
+    [InlineData (-1, 1, 1, false)]
+    [InlineData (-1, 0, 0, false)]
+    public void Returns_Correct_If_Start_Has_Offset_Viewport (int offset, int testX, int testY, bool expectedSubViewFound)
+    {
+        var start = new View ()
+        {
+            Width = 10, Height = 10,
+            ViewportSettings = ViewportSettings.AllowNegativeLocation
+        };
+        start.Viewport = new (offset, offset, 10, 10);
+
+        var subview = new View ()
+        {
+            X = 1, Y = 1,
+            Width = 2, Height = 2,
+        };
+        start.Add (subview);
+
+        var found = View.FindDeepestView (start, testX, testY);
+
+        Assert.Equal (expectedSubViewFound, found == subview);
+    }
+
+    [Theory]
+    [InlineData (0, 0, false)]
+    [InlineData (1, 1, false)]
+    [InlineData (9, 9, true)]
+    [InlineData (10, 10, false)]
+    [InlineData (7, 8, false)]
+    [InlineData (1, 2, false)]
+    [InlineData (2, 3, false)]
+    [InlineData (5, 6, false)]
+    [InlineData (2, 3, false)]
+    [InlineData (6, 7, false)]
+    public void Returns_Correct_If_Start_Has_Adornment_WithSubview (int testX, int testY, bool expectedSubViewFound)
+    {
+        var start = new View ()
+        {
+            Width = 10, Height = 10,
+        };
+        start.Padding.Thickness = new Thickness (1);
+
+        var subview = new View ()
+        {
+            X = Pos.AnchorEnd(1), Y = Pos.AnchorEnd(1),
+            Width = 1, Height = 1,
+        };
+        start.Padding.Add (subview);
+        start.BeginInit();
+        start.EndInit();
+
+        var found = View.FindDeepestView (start, testX, testY);
+
+        Assert.Equal (expectedSubViewFound, found == subview);
+    }
+
+
     [Theory]
     [InlineData (0, 0, typeof (Margin))]
     [InlineData (9, 9, typeof (Margin))]
@@ -334,6 +399,100 @@ public class FindDeepestViewTests (ITestOutputHelper output)
         var found = View.FindDeepestView (start, testX, testY);
 
         Assert.Equal (expectedSubViewFound, found == subview);
+    }
+
+    [Theory]
+    [InlineData (0, 0, false)]
+    [InlineData (1, 1, false)]
+    [InlineData (9, 9, false)]
+    [InlineData (10, 10, false)]
+    [InlineData (7, 8, false)]
+    [InlineData (6, 7, false)]
+    [InlineData (1, 2, false)]
+    [InlineData (5, 6, false)]
+    [InlineData (6, 5, false)]
+    [InlineData (5, 5, true)]
+    public void Returns_Correct_If_SubView_Has_Adornment_WithSubview (int testX, int testY, bool expectedSubViewFound)
+    {
+        var start = new View ()
+        {
+            Width = 10, Height = 10,
+        };
+
+        // A subview with + Padding
+        var subview = new View ()
+        {
+            X = 1, Y = 1,
+            Width = 5, Height = 5,
+        };
+        subview.Padding.Thickness = new (1);
+
+        // This subview will be at the bottom-right-corner of subview
+        // So screen-relative location will be X + Width - 1 = 5
+        var paddingSubview = new View ()
+        {
+            X = Pos.AnchorEnd (1),
+            Y = Pos.AnchorEnd (1),
+            Width = 1,
+            Height = 1,
+        };
+        subview.Padding.Add (paddingSubview);
+        start.Add (subview);
+        start.BeginInit();
+        start.EndInit();
+
+        var found = View.FindDeepestView (start, testX, testY);
+
+        Assert.Equal (expectedSubViewFound, found == paddingSubview);
+    }
+
+    [Theory]
+    [InlineData (0, 0, false)]
+    [InlineData (1, 1, false)]
+    [InlineData (9, 9, false)]
+    [InlineData (10, 10, false)]
+    [InlineData (7, 8, false)]
+    [InlineData (6, 7, false)]
+    [InlineData (1, 2, false)]
+    [InlineData (5, 6, false)]
+    [InlineData (6, 5, false)]
+    [InlineData (5, 5, true)]
+    public void Returns_Correct_If_SubView_Is_Scrolled_And_Has_Adornment_WithSubview (int testX, int testY, bool expectedSubViewFound)
+    {
+        var start = new View ()
+        {
+            Width = 10, Height = 10,
+        };
+
+        // A subview with + Padding
+        var subview = new View ()
+        {
+            X = 1, Y = 1,
+            Width = 5, Height = 5,
+        };
+        subview.Padding.Thickness = new (1);
+
+        // Scroll the subview
+        subview.ContentSize = new Size (10, 10);
+        subview.Viewport = subview.Viewport with { Location = new (1, 1) };
+
+        // This subview will be at the bottom-right-corner of subview
+        // So screen-relative location will be X + Width - 1 = 5
+        var paddingSubview = new View ()
+        {
+            X = Pos.AnchorEnd (1),
+            Y = Pos.AnchorEnd (1),
+            Width = 1,
+            Height = 1,
+        };
+        subview.Padding.Add (paddingSubview);
+        start.Add (subview);
+        start.BeginInit ();
+        start.EndInit ();
+
+        var found = View.FindDeepestView (start, testX, testY);
+
+        Assert.Equal (expectedSubViewFound, found == paddingSubview);
     }
 
     // Test that FindDeepestView works with nested subviews

@@ -242,7 +242,7 @@ public class MessageBoxTests
     {
         int iterations = -1;
         var top = new Toplevel ();
-        top.BorderStyle = LineStyle.Double;
+        top.BorderStyle = LineStyle.None;
         ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 
         var btn =
@@ -273,21 +273,15 @@ public class MessageBoxTests
 
                                          TestHelpers.AssertDriverContentsWithFrameAre (
                                                                                        @$"
-╔══════════════════╗
-║┌────────────────┐║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│       ff       │║
-║│                │║
-║│    {
-    btn
-}   │║
-║└────────────────┘║
-╚══════════════════╝",
+┌──────────────────┐
+│ffffffffffffffffff│
+│ffffffffffffffffff│
+│  ffffffffffffff  │
+│                  │
+│     {btn}    │
+└──────────────────┘",
                                                                                        _output
                                                                                       );
-                                         Assert.Equal (new (20 - 2, 10 - 2), Application.Current.Frame.Size);
                                          Application.RequestStop ();
 
                                          // Really long text
@@ -299,18 +293,16 @@ public class MessageBoxTests
 
                                          TestHelpers.AssertDriverContentsWithFrameAre (
                                                                                        @$"
-╔┌────────────────┐╗
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│    {
-    btn
-}   │║
-╚└────────────────┘╝",
+│ffffffffffffffffff│
+│ffffffffffffffffff│
+│ffffffffffffffffff│
+│ffffffffffffffffff│
+│ffffffffffffffffff│
+│ffffffffffffffffff│
+│ffffffffffffffffff│
+│ffffffffffffffffff│
+│ffffffffffffffffff│
+│     {btn}    │",
                                                                                        _output
                                                                                       );
                                          Application.RequestStop ();
@@ -326,7 +318,7 @@ public class MessageBoxTests
     {
         int iterations = -1;
         var top = new Toplevel ();
-        top.BorderStyle = LineStyle.Double;
+        top.BorderStyle = LineStyle.None;
         ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 
         var btn =
@@ -363,16 +355,12 @@ public class MessageBoxTests
 
                                          TestHelpers.AssertDriverContentsWithFrameAre (
                                                                                        @"
-╔══════════════════╗
-║                  ║
 ────────────────────
 ff ff ff ff ff ff ff
                     
       ⟦► btn ◄⟧     
 ────────────────────
-║                  ║
-║                  ║
-╚══════════════════╝",
+",
                                                                                        _output
                                                                                       );
                                          Application.RequestStop ();
@@ -386,16 +374,12 @@ ff ff ff ff ff ff ff
 
                                          TestHelpers.AssertDriverContentsWithFrameAre (
                                                                                        @"
-╔══════════════════╗
-║                  ║
 ────────────────────
 ffffffffffffffffffff
                     
       ⟦► btn ◄⟧     
 ────────────────────
-║                  ║
-║                  ║
-╚══════════════════╝",
+",
                                                                                        _output
                                                                                       );
                                          Application.RequestStop ();
@@ -411,7 +395,7 @@ ffffffffffffffffffff
     {
         int iterations = -1;
         var top = new Toplevel();
-        top.BorderStyle = LineStyle.Double;
+        top.BorderStyle = LineStyle.None;
         ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 
         var btn =
@@ -446,20 +430,14 @@ ffffffffffffffffffff
                                      {
                                          Application.Refresh ();
 
-                                         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                                                       @$"
-╔══════════════════╗
-║ ┌──────────────┐ ║
-║ │ff ff ff ff ff│ ║
-║ │ff ff ff ff ff│ ║
-║ │ff ff ff ff ff│ ║
-║ │    ff ff     │ ║
-║ │              │ ║
-║ │   {
-    btn
-}  │ ║
-║ └──────────────┘ ║
-╚══════════════════╝",
+                                         TestHelpers.AssertDriverContentsWithFrameAre (@$"
+┌─────────────────┐
+│ff ff ff ff ff ff│
+│ff ff ff ff ff ff│
+│ ff ff ff ff ff  │
+│                 │
+│    {btn}    │
+└─────────────────┘",
                                                                                        _output
                                                                                       );
                                          Application.RequestStop ();
@@ -471,20 +449,17 @@ ffffffffffffffffffff
                                      {
                                          Application.Refresh ();
 
-                                         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                                                       @$"
-╔┌────────────────┐╗
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│    {
-    btn
-}   │║
-╚└────────────────┘╝",
+                                         TestHelpers.AssertDriverContentsWithFrameAre (@$"
+│ffffffffffffffffff│
+│ffffffffffffffffff│
+│ffffffffffffffffff│
+│ffffffffffffffffff│
+│ffffffffffffffffff│
+│ffffffffffffffffff│
+│ffffffffffffffffff│
+│ffffffffffffffffff│
+│ffffffffffffffffff│
+│     {btn}    │",
                                                                                        _output
                                                                                       );
                                          Application.RequestStop ();
@@ -492,6 +467,7 @@ ffffffffffffffffffff
                                  };
 
         Application.Run (top);
+        top.Dispose ();
     }
 
     [Fact]
@@ -500,7 +476,7 @@ ffffffffffffffffffff
     {
         int iterations = -1;
         var top = new Toplevel();
-        top.BorderStyle = LineStyle.Double;
+        top.BorderStyle = LineStyle.None;
         ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 
         var btn =
@@ -530,16 +506,12 @@ ffffffffffffffffffff
 
                                          TestHelpers.AssertDriverContentsWithFrameAre (
                                                                                        @"
-╔══════════════════╗
-║                  ║
 ────────────────────
 ffffffffffffffffffff
                     
       ⟦► btn ◄⟧     
 ────────────────────
-║                  ║
-║                  ║
-╚══════════════════╝",
+",
                                                                                        _output
                                                                                       );
 
@@ -554,16 +526,12 @@ ffffffffffffffffffff
 
                                          TestHelpers.AssertDriverContentsWithFrameAre (
                                                                                        @"
-╔══════════════════╗
-║                  ║
 ────────────────────
 ffffffffffffffffffff
                     
       ⟦► btn ◄⟧     
 ────────────────────
-║                  ║
-║                  ║
-╚══════════════════╝",
+",
                                                                                        _output
                                                                                       );
 
@@ -663,7 +631,7 @@ ffffffffffffffffffff
     public void Size_No_With_Button ()
     {
         var top = new Toplevel ();
-        top.BorderStyle = LineStyle.Double;
+        top.BorderStyle = LineStyle.None;
         int iterations = -1;
 
         var aboutMessage = new StringBuilder ();
@@ -700,16 +668,12 @@ ffffffffffffffffffff
 
                                          TestHelpers.AssertDriverContentsWithFrameAre (
                                                                                        @$"
-╔══════════════════════════════════════════╗
-║┌────────────────────────────────────────┐║
-║│0123456789012345678901234567890123456789│║
-║│ https://github.com/gui-cs/Terminal.Gui │║
-║│                                        │║
-║│                {
-    btn
-}                │║
-║└────────────────────────────────────────┘║
-╚══════════════════════════════════════════╝
+ ┌────────────────────────────────────────┐
+ │0123456789012345678901234567890123456789│
+ │ https://github.com/gui-cs/Terminal.Gui │
+ │                                        │
+ │                {btn}                │
+ └────────────────────────────────────────┘
 ",
                                                                                        _output
                                                                                       );
@@ -719,6 +683,7 @@ ffffffffffffffffffff
                                  };
 
         Application.Run (top);
+        top.Dispose ();
     }
 
     [Fact]

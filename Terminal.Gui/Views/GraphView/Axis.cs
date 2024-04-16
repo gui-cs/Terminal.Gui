@@ -113,7 +113,7 @@ public class HorizontalAxis : Axis
             string toRender = text;
 
             // this is how much space is left
-            int xSpaceAvailable = graph.Bounds.Width - drawAtX;
+            int xSpaceAvailable = graph.Viewport.Width - drawAtX;
 
             // There is no space for the label at all!
             if (xSpaceAvailable <= 0)
@@ -127,7 +127,7 @@ public class HorizontalAxis : Axis
                 toRender = toRender.Substring (0, xSpaceAvailable);
             }
 
-            graph.Move (drawAtX, Math.Min (y + 1, graph.Bounds.Height - 1));
+            graph.Move (drawAtX, Math.Min (y + 1, graph.Viewport.Height - 1));
             driver.AddStr (toRender);
         }
     }
@@ -140,9 +140,9 @@ public class HorizontalAxis : Axis
             return;
         }
 
-        Rectangle bounds = graph.Bounds;
+        Rectangle viewport = graph.Viewport;
 
-        IEnumerable<AxisIncrementToRender> labels = GetLabels (graph, bounds);
+        IEnumerable<AxisIncrementToRender> labels = GetLabels (graph, viewport);
 
         foreach (AxisIncrementToRender label in labels)
         {
@@ -155,12 +155,12 @@ public class HorizontalAxis : Axis
             string toRender = Text;
 
             // if label is too long
-            if (toRender.Length > graph.Bounds.Width)
+            if (toRender.Length > graph.Viewport.Width)
             {
-                toRender = toRender.Substring (0, graph.Bounds.Width);
+                toRender = toRender.Substring (0, graph.Viewport.Width);
             }
 
-            graph.Move (graph.Bounds.Width / 2 - toRender.Length / 2, graph.Bounds.Height - 1);
+            graph.Move (graph.Viewport.Width / 2 - toRender.Length / 2, graph.Viewport.Height - 1);
             Application.Driver.AddStr (toRender);
         }
     }
@@ -174,7 +174,7 @@ public class HorizontalAxis : Axis
             return;
         }
 
-        Rectangle bounds = graph.Bounds;
+        Rectangle bounds = graph.Viewport;
 
         graph.Move (0, 0);
 
@@ -212,7 +212,7 @@ public class HorizontalAxis : Axis
 
         // float the X axis so that it accurately represents the origin of the graph
         // but anchor it to top/bottom if the origin is offscreen
-        return Math.Min (Math.Max (0, origin.Y), graph.Bounds.Height - ((int)graph.MarginBottom + 1));
+        return Math.Min (Math.Max (0, origin.Y), graph.Viewport.Height - ((int)graph.MarginBottom + 1));
     }
 
     /// <summary>Draws a horizontal axis line at the given <paramref name="x"/>, <paramref name="y"/> screen coordinates</summary>
@@ -225,7 +225,7 @@ public class HorizontalAxis : Axis
         Application.Driver.AddRune (Glyphs.HLine);
     }
 
-    private IEnumerable<AxisIncrementToRender> GetLabels (GraphView graph, Rectangle bounds)
+    private IEnumerable<AxisIncrementToRender> GetLabels (GraphView graph, Rectangle viewport)
     {
         // if no labels
         if (Increment == 0)
@@ -237,7 +237,7 @@ public class HorizontalAxis : Axis
         int y = GetAxisYPosition (graph);
 
         RectangleF start = graph.ScreenToGraphSpace ((int)graph.MarginLeft, y);
-        RectangleF end = graph.ScreenToGraphSpace (bounds.Width, y);
+        RectangleF end = graph.ScreenToGraphSpace (viewport.Width, y);
 
         // don't draw labels below the minimum
         if (Minimum.HasValue)
@@ -266,7 +266,7 @@ public class HorizontalAxis : Axis
                 ;
             }
 
-            // Label or no label definetly render it
+            // Label or no label definitely render it
             yield return toRender;
 
             current.X += Increment;
@@ -317,7 +317,7 @@ public class VerticalAxis : Axis
             return;
         }
 
-        Rectangle bounds = graph.Bounds;
+        Rectangle bounds = graph.Viewport;
         IEnumerable<AxisIncrementToRender> labels = GetLabels (graph, bounds);
 
         foreach (AxisIncrementToRender label in labels)
@@ -331,13 +331,13 @@ public class VerticalAxis : Axis
             string toRender = Text;
 
             // if label is too long
-            if (toRender.Length > graph.Bounds.Height)
+            if (toRender.Length > graph.Viewport.Height)
             {
-                toRender = toRender.Substring (0, graph.Bounds.Height);
+                toRender = toRender.Substring (0, graph.Viewport.Height);
             }
 
             // Draw it 1 letter at a time vertically down row 0 of the control
-            int startDrawingAtY = graph.Bounds.Height / 2 - toRender.Length / 2;
+            int startDrawingAtY = graph.Viewport.Height / 2 - toRender.Length / 2;
 
             for (var i = 0; i < toRender.Length; i++)
             {
@@ -356,7 +356,7 @@ public class VerticalAxis : Axis
             return;
         }
 
-        Rectangle bounds = graph.Bounds;
+        Rectangle bounds = graph.Viewport;
 
         int x = GetAxisXPosition (graph);
 
@@ -385,7 +385,7 @@ public class VerticalAxis : Axis
 
         // float the Y axis so that it accurately represents the origin of the graph
         // but anchor it to left/right if the origin is offscreen
-        return Math.Min (Math.Max ((int)graph.MarginLeft, origin.X), graph.Bounds.Width - 1);
+        return Math.Min (Math.Max ((int)graph.MarginLeft, origin.X), graph.Viewport.Width - 1);
     }
 
     /// <summary>Draws a vertical axis line at the given <paramref name="x"/>, <paramref name="y"/> screen coordinates</summary>
@@ -409,7 +409,7 @@ public class VerticalAxis : Axis
             return graph.GraphSpaceToScreen (new PointF (0, Minimum.Value)).Y;
         }
 
-        return graph.Bounds.Height;
+        return graph.Viewport.Height;
     }
 
     private IEnumerable<AxisIncrementToRender> GetLabels (GraphView graph, Rectangle bounds)

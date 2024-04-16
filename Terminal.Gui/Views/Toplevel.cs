@@ -29,7 +29,7 @@ public partial class Toplevel : View
     /// </summary>
     public Toplevel ()
     {
-        Arrangement = ViewArrangement.Movable;
+        Arrangement = ViewArrangement.Fixed;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
 
@@ -249,7 +249,7 @@ public partial class Toplevel : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         if (!Visible)
         {
@@ -268,12 +268,12 @@ public partial class Toplevel : View
             {
                 foreach (Toplevel top in Application.OverlappedChildren.AsEnumerable ().Reverse ())
                 {
-                    if (top.Frame.IntersectsWith (Bounds))
+                    if (top.Frame.IntersectsWith (Viewport))
                     {
                         if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible)
                         {
                             top.SetNeedsLayout ();
-                            top.SetNeedsDisplay (top.Bounds);
+                            top.SetNeedsDisplay (top.Viewport);
                             top.Draw ();
                             top.OnRenderLineCanvas ();
                         }
@@ -284,20 +284,20 @@ public partial class Toplevel : View
             // This should not be here, but in base
             foreach (View view in Subviews)
             {
-                if (view.Frame.IntersectsWith (Bounds) && !OutsideTopFrame (this))
+                if (view.Frame.IntersectsWith (Viewport) && !OutsideTopFrame (this))
                 {
                     //view.SetNeedsLayout ();
-                    view.SetNeedsDisplay (view.Bounds);
+                    view.SetNeedsDisplay ();
                     view.SetSubViewNeedsDisplay ();
                 }
             }
 
-            base.OnDrawContent (contentArea);
+            base.OnDrawContent (viewport);
 
             // This is causing the menus drawn incorrectly if UseSubMenusSingleFrame is true
             //if (this.MenuBar is { } && this.MenuBar.IsMenuOpen && this.MenuBar.openMenu is { }) {
             //	// TODO: Hack until we can get compositing working right.
-            //	this.MenuBar.openMenu.Redraw (this.MenuBar.openMenu.Bounds);
+            //	this.MenuBar.openMenu.Redraw (this.MenuBar.openMenu.Viewport);
             //}
         }
     }
@@ -380,6 +380,7 @@ public partial class Toplevel : View
     /// <param name="top">The Toplevel to adjust.</param>
     public virtual void PositionToplevel (Toplevel top)
     {
+
         View superView = GetLocationEnsuringFullVisibility (
                                               top,
                                               top.Frame.X,
@@ -547,7 +548,7 @@ public partial class Toplevel : View
     ///     to dispose objects after calling <see cref="Application.End(RunState)"/>.
     /// </summary>
     public event EventHandler Unloaded;
-    
+
     internal void AddMenuStatusBar (View view)
     {
         if (view is MenuBar)

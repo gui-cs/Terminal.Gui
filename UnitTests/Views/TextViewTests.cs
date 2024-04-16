@@ -64,7 +64,7 @@ public class TextViewTests
 
         Application.Iteration += (s, a) =>
                                  {
-                                     int width = _textView.Bounds.Width - 1;
+                                     int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
                                      Assert.Equal (10, _textView.Height);
                                      _textView.Text = "";
@@ -7121,7 +7121,7 @@ This is the second line.
 
         Application.Iteration += (s, a) =>
                                  {
-                                     int width = _textView.Bounds.Width - 1;
+                                     int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
                                      Assert.Equal (10, _textView.Height);
                                      _textView.Text = "";
@@ -7163,7 +7163,7 @@ This is the second line.
 
         Application.Iteration += (s, a) =>
                                  {
-                                     int width = _textView.Bounds.Width - 1;
+                                     int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
                                      Assert.Equal (10, _textView.Height);
                                      var col = 0;
@@ -7205,7 +7205,7 @@ This is the second line.
 
         Application.Iteration += (s, a) =>
                                  {
-                                     int width = _textView.Bounds.Width - 1;
+                                     int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
                                      Assert.Equal (10, _textView.Height);
                                      _textView.Text = "";
@@ -7256,7 +7256,7 @@ This is the second line.
 
         Application.Iteration += (s, a) =>
                                  {
-                                     int width = _textView.Bounds.Width - 1;
+                                     int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
                                      Assert.Equal (10, _textView.Height);
                                      Assert.Equal ("TAB to jump between text fields.", _textView.Text);
@@ -7309,7 +7309,7 @@ This is the second line.
 
         Application.Iteration += (s, a) =>
                                  {
-                                     int width = _textView.Bounds.Width - 1;
+                                     int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
                                      Assert.Equal (10, _textView.Height);
                                      var col = 0;
@@ -7675,7 +7675,7 @@ This is the second line.
                                                      );
 
         ((FakeDriver)Application.Driver).SetBufferSize (6, 25);
-        tv.SetRelativeLayout (Application.Driver.Bounds);
+        tv.SetRelativeLayout (Application.Driver.Screen.Size);
         tv.Draw ();
         Assert.Equal (new Point (4, 2), tv.CursorPosition);
         Assert.Equal (new Point (12, 0), cp);

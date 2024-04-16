@@ -4,6 +4,8 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Clipping", "Used to test that things clip correctly")]
 [ScenarioCategory ("Tests")]
+[ScenarioCategory ("Drawing")]
+[ScenarioCategory ("Scrolling")]
 public class Clipping : Scenario
 {
     public override void Init ()
@@ -30,8 +32,9 @@ public class Clipping : Scenario
         scrollView.ContentSize = new (200, 100);
 
         //ContentOffset = Point.Empty,
-        //scrollView.ShowVerticalScrollIndicator = true;
-        //scrollView.ShowHorizontalScrollIndicator = true;
+        scrollView.AutoHideScrollBars = true;
+        scrollView.ShowVerticalScrollIndicator = true;
+        scrollView.ShowHorizontalScrollIndicator = true;
 
         var embedded1 = new View
         {

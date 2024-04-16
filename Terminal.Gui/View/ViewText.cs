@@ -30,10 +30,10 @@ public partial class View
     ///         <see cref="TextAlignment"/> and <see cref="TextDirection"/>.
     ///     </para>
     ///     <para>
-    ///         The text will word-wrap to additional lines if it does not fit horizontally. If <see cref="Bounds"/>'s height
+    ///         The text will word-wrap to additional lines if it does not fit horizontally. If <see cref="Viewport"/>'s height
     ///         is 1, the text will be clipped.
     ///     </para>
-    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Bounds"/> will be adjusted to fit the text.</para>
+    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Viewport"/> will be adjusted to fit the text.</para>
     ///     <para>When the text changes, the <see cref="TextChanged"/> is fired.</para>
     /// </remarks>
     public virtual string Text
@@ -80,7 +80,7 @@ public partial class View
     ///     redisplay the <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Bounds"/> will be adjusted to fit the text.</para>
+    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Viewport"/> will be adjusted to fit the text.</para>
     /// </remarks>
     /// <value>The text alignment.</value>
     public virtual TextAlignment TextAlignment
@@ -99,7 +99,7 @@ public partial class View
     ///     <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Bounds"/> will be adjusted to fit the text.</para>
+    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Viewport"/> will be adjusted to fit the text.</para>
     /// </remarks>
     /// <value>The text alignment.</value>
     public virtual TextDirection TextDirection
@@ -120,7 +120,7 @@ public partial class View
     ///     redisplay the <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Bounds"/> will be adjusted to fit the text.</para>
+    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Viewport"/> will be adjusted to fit the text.</para>
     /// </remarks>
     /// <value>The text alignment.</value>
     public virtual VerticalTextAlignment VerticalTextAlignment
@@ -134,7 +134,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     Gets the Frame dimensions required to fit <see cref="Text"/> within <see cref="Bounds"/> using the text
+    ///     Gets the Frame dimensions required to fit <see cref="Text"/> within <see cref="Viewport"/> using the text
     ///     <see cref="NavigationDirection"/> specified by the <see cref="TextFormatter"/> property and accounting for any
     ///     <see cref="HotKeySpecifier"/> characters.
     /// </summary>
@@ -146,8 +146,8 @@ public partial class View
 
         if (IsInitialized)
         {
-            x = Bounds.X;
-            y = Bounds.Y;
+            x = Viewport.X;
+            y = Viewport.Y;
         }
 
         Rectangle rect = TextFormatter.CalcRect (x, y, TextFormatter.Text, TextFormatter.Direction);
@@ -225,7 +225,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     Internal API. Sets <see cref="TextFormatter"/>.Size to the current <see cref="Bounds"/> size, adjusted for
+    ///     Internal API. Sets <see cref="TextFormatter"/>.Size to the current <see cref="Viewport"/> size, adjusted for
     ///     <see cref="TextFormatter.HotKeySpecifier"/>.
     /// </summary>
     /// <remarks>
@@ -244,14 +244,14 @@ public partial class View
 
         if (string.IsNullOrEmpty (TextFormatter.Text))
         {
-            TextFormatter.Size = Bounds.Size;
+            TextFormatter.Size = ContentSize;
 
             return;
         }
 
         TextFormatter.Size = new (
-                                  Bounds.Size.Width + GetHotKeySpecifierLength (),
-                                  Bounds.Size.Height + GetHotKeySpecifierLength (false)
+                                  ContentSize.Width + GetHotKeySpecifierLength (),
+                                  ContentSize.Height + GetHotKeySpecifierLength (false)
                                  );
     }
 
@@ -304,12 +304,12 @@ public partial class View
             throw new InvalidOperationException ("SetFrameToFitText can only be called when AutoSize is true");
         }
 
-        // BUGBUG: This API is broken - should not assume Frame.Height == Bounds.Height
+        // BUGBUG: This API is broken - should not assume Frame.Height == Viewport.Height
         // <summary>
         // Gets the minimum dimensions required to fit the View's <see cref="Text"/>, factoring in <see cref="TextDirection"/>.
         // </summary>
         // <param name="sizeRequired">The minimum dimensions required.</param>
-        // <returns><see langword="true"/> if the dimensions fit within the View's <see cref="Bounds"/>, <see langword="false"/> otherwise.</returns>
+        // <returns><see langword="true"/> if the dimensions fit within the View's <see cref="Viewport"/>, <see langword="false"/> otherwise.</returns>
         // <remarks>
         // Always returns <see langword="false"/> if <see cref="AutoSize"/> is <see langword="true"/> or
         // if <see cref="Height"/> (Horizontal) or <see cref="Width"/> (Vertical) are not not set or zero.
@@ -324,7 +324,7 @@ public partial class View
                 return false;
             }
 
-            sizeRequired = Bounds.Size;
+            sizeRequired = ContentSize;
 
             if (AutoSize || string.IsNullOrEmpty (TextFormatter.Text))
             {
@@ -336,11 +336,11 @@ public partial class View
                 case true:
                     int colWidth = TextFormatter.GetWidestLineLength (new List<string> { TextFormatter.Text }, 0, 1);
 
-                    // TODO: v2 - This uses frame.Width; it should only use Bounds
+                    // TODO: v2 - This uses frame.Width; it should only use Viewport
                     if (_frame.Width < colWidth
-                        && (Width is null || (Bounds.Width >= 0 && Width is Dim.DimAbsolute && Width.Anchor (0) >= 0 && Width.Anchor (0) < colWidth)))
+                        && (Width is null || (ContentSize.Width >= 0 && Width is Dim.DimAbsolute && Width.Anchor (0) >= 0 && Width.Anchor (0) < colWidth)))
                     {
-                        sizeRequired = new (colWidth, Bounds.Height);
+                        sizeRequired = new (colWidth, ContentSize.Height);
 
                         return true;
                     }
@@ -349,7 +349,7 @@ public partial class View
                 default:
                     if (_frame.Height < 1 && (Height is null || (Height is Dim.DimAbsolute && Height.Anchor (0) == 0)))
                     {
-                        sizeRequired = new (Bounds.Width, 1);
+                        sizeRequired = new (ContentSize.Width, 1);
 
                         return true;
                     }
@@ -365,7 +365,7 @@ public partial class View
             // TODO: This is a hack.
             //_width  = size.Width;
             //_height = size.Height;
-            _frame = new (_frame.Location, size);
+            SetFrame (new (_frame.Location, size));
 
             //throw new InvalidOperationException ("This is a hack.");
             return true;
@@ -392,7 +392,7 @@ public partial class View
         }
         else if (AutoSize && directionChanged && IsAdded)
         {
-            ResizeBoundsToFit (Bounds.Size);
+            ResizeViewportToFit (Viewport.Size);
         }
 
         SetTextFormatterSize ();

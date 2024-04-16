@@ -271,13 +271,13 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         if (PopupInsideContainer)
         {
             // don't overspill vertically
-            height = Math.Min (HostControl.Bounds.Height - renderAt.Y, MaxHeight);
+            height = Math.Min (HostControl.Viewport.Height - renderAt.Y, MaxHeight);
 
             // There is no space below, lets see if can popup on top
-            if (height < Suggestions.Count && HostControl.Bounds.Height - renderAt.Y >= height)
+            if (height < Suggestions.Count && HostControl.Viewport.Height - renderAt.Y >= height)
             {
                 // Verifies that the upper limit available is greater than the lower limit
-                if (renderAt.Y > HostControl.Bounds.Height - renderAt.Y)
+                if (renderAt.Y > HostControl.Viewport.Height - renderAt.Y)
                 {
                     renderAt.Y = Math.Max (renderAt.Y - Math.Min (Suggestions.Count + 1, MaxHeight + 1), 0);
                     height = Math.Min (Math.Min (Suggestions.Count, MaxHeight), LastPopupPos.Value.Y - 1);
@@ -287,13 +287,13 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         else
         {
             // don't overspill vertically
-            height = Math.Min (Math.Min (top.Bounds.Height - HostControl.Frame.Bottom, MaxHeight), Suggestions.Count);
+            height = Math.Min (Math.Min (top.Viewport.Height - HostControl.Frame.Bottom, MaxHeight), Suggestions.Count);
 
             // There is no space below, lets see if can popup on top
             if (height < Suggestions.Count && HostControl.Frame.Y - top.Frame.Y >= height)
             {
                 // Verifies that the upper limit available is greater than the lower limit
-                if (HostControl.Frame.Y > top.Bounds.Height - HostControl.Frame.Y)
+                if (HostControl.Frame.Y > top.Viewport.Height - HostControl.Frame.Y)
                 {
                     renderAt.Y = Math.Max (HostControl.Frame.Y - Math.Min (Suggestions.Count, MaxHeight), 0);
                     height = Math.Min (Math.Min (Suggestions.Count, MaxHeight), HostControl.Frame.Y);
@@ -323,34 +323,34 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         if (PopupInsideContainer)
         {
             // don't overspill horizontally, let's see if can be displayed on the left
-            if (width > HostControl.Bounds.Width - renderAt.X)
+            if (width > HostControl.Viewport.Width - renderAt.X)
             {
                 // Verifies that the left limit available is greater than the right limit
-                if (renderAt.X > HostControl.Bounds.Width - renderAt.X)
+                if (renderAt.X > HostControl.Viewport.Width - renderAt.X)
                 {
                     renderAt.X -= Math.Min (width, LastPopupPos.Value.X);
                     width = Math.Min (width, LastPopupPos.Value.X);
                 }
                 else
                 {
-                    width = Math.Min (width, HostControl.Bounds.Width - renderAt.X);
+                    width = Math.Min (width, HostControl.Viewport.Width - renderAt.X);
                 }
             }
         }
         else
         {
             // don't overspill horizontally, let's see if can be displayed on the left
-            if (width > top.Bounds.Width - (renderAt.X + HostControl.Frame.X))
+            if (width > top.Viewport.Width - (renderAt.X + HostControl.Frame.X))
             {
                 // Verifies that the left limit available is greater than the right limit
-                if (renderAt.X + HostControl.Frame.X > top.Bounds.Width - (renderAt.X + HostControl.Frame.X))
+                if (renderAt.X + HostControl.Frame.X > top.Viewport.Width - (renderAt.X + HostControl.Frame.X))
                 {
                     renderAt.X -= Math.Min (width, LastPopupPos.Value.X);
                     width = Math.Min (width, LastPopupPos.Value.X);
                 }
                 else
                 {
-                    width = Math.Min (width, top.Bounds.Width - renderAt.X);
+                    width = Math.Min (width, top.Viewport.Width - renderAt.X);
                 }
             }
         }

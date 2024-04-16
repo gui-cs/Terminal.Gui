@@ -36,9 +36,9 @@ public class LineDrawing : Scenario
         public DrawingArea () { AddLayer (); }
         public LineStyle LineStyle { get; set; }
 
-        public override void OnDrawContentComplete (Rectangle contentArea)
+        public override void OnDrawContentComplete (Rectangle viewport)
         {
-            base.OnDrawContentComplete (contentArea);
+            base.OnDrawContentComplete (viewport);
 
             foreach (LineCanvas canvas in _layers)
             {

@@ -234,7 +234,15 @@ public partial class View
         }
     }
 
-    /// <summary>Removes all subviews (children) added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.</summary>
+    /// <summary>
+    /// Removes all subviews (children) added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///     Normally Subviews will be disposed when this View is disposed. Removing a Subview causes ownership of the Subview's
+    ///     lifecycle to be transferred to the caller; the caller must call <see cref="Dispose"/> on any Views that were added.
+    /// </para>
+    /// </remarks>
     public virtual void RemoveAll ()
     {
         if (_subviews is null)
@@ -485,7 +493,7 @@ public partial class View
         {
             return true;
         }
-
+        
         return false;
     }
 
@@ -855,16 +863,13 @@ public partial class View
             return;
         }
 
-        // BUGBUG: v2 - This needs to support children of Frames too
+        // BUGBUG: v2 - This needs to support Subviews of Adornments too
 
         if (Focused is null && SuperView is { })
         {
             SuperView.EnsureFocus ();
         }
-        else if (Focused?.Visible == true
-                 && Focused?.Enabled == true
-                 && Focused?.Frame.Width > 0
-                 && Focused.Frame.Height > 0)
+        else if (Focused is { Visible: true, Enabled: true, Frame: { Width: > 0, Height: > 0 } })
         {
             Focused.PositionCursor ();
         }

@@ -149,14 +149,14 @@ public class Border : Adornment
         }
     }
 
-    Rectangle GetBorderBounds (Rectangle screenBounds)
+    Rectangle GetBorderRectangle (Rectangle screenRect)
     {
         return new (
-                                      screenBounds.X + Math.Max (0, Thickness.Left - 1),
-                                      screenBounds.Y + Math.Max (0, Thickness.Top - 1),
+                                      screenRect.X + Math.Max (0, Thickness.Left - 1),
+                                      screenRect.Y + Math.Max (0, Thickness.Top - 1),
                                       Math.Max (
                                                 0,
-                                                screenBounds.Width
+                                                screenRect.Width
                                                 - Math.Max (
                                                             0,
                                                             Math.Max (0, Thickness.Left - 1)
@@ -165,7 +165,7 @@ public class Border : Adornment
                                                ),
                                       Math.Max (
                                                 0,
-                                                screenBounds.Height
+                                                screenRect.Height
                                                 - Math.Max (
                                                             0,
                                                             Math.Max (0, Thickness.Top - 1)
@@ -204,6 +204,7 @@ public class Border : Adornment
     {
         if (!Parent.Arrangement.HasFlag (ViewArrangement.Movable))
         {
+            e.Cancel = true;
             return;
         }
 
@@ -300,7 +301,7 @@ public class Border : Adornment
 
                 _dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
 
-                Point parentLoc = Parent.SuperView?.ScreenToBounds (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y) ?? mouseEvent.ScreenPosition;
+                Point parentLoc = Parent.SuperView?.ScreenToViewport (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y) ?? mouseEvent.ScreenPosition;
 
                 GetLocationEnsuringFullVisibility (
                                      Parent,
@@ -360,9 +361,9 @@ public class Border : Adornment
 #endregion Mouse Support
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
-        base.OnDrawContent (contentArea);
+        base.OnDrawContent (viewport);
 
         if (Thickness == Thickness.Empty)
         {
@@ -370,7 +371,7 @@ public class Border : Adornment
         }
 
         //Driver.SetAttribute (Colors.ColorSchemes ["Error"].Normal);
-        Rectangle screenBounds = BoundsToScreen (contentArea);
+        Rectangle screenBounds = ViewportToScreen (viewport);
 
         //OnDrawSubviews (bounds); 
 
@@ -381,7 +382,7 @@ public class Border : Adornment
         // ...thickness extends outward (border/title is always as far in as possible)
         // PERF: How about a call to Rectangle.Offset?
 
-        var borderBounds = GetBorderBounds (screenBounds);
+        var borderBounds = GetBorderRectangle (screenBounds);
         int topTitleLineY = borderBounds.Y;
         int titleY = borderBounds.Y;
         var titleBarsLength = 0; // the little vertical thingies
@@ -432,10 +433,17 @@ public class Border : Adornment
 
         if (canDrawBorder && Thickness.Top > 0 && maxTitleWidth > 0 && !string.IsNullOrEmpty (Parent?.Title))
         {
+            var focus = Parent.GetNormalColor();
+            if (Parent.SuperView is { } && Parent.SuperView?.Subviews!.Count (s => s.CanFocus) > 1)
+            {
+                // Only use focus color if there are multiple focusable views
+                focus = Parent.GetFocusColor() ;
+            }
+
             Parent.TitleTextFormatter.Draw (
                                             new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
-                                            Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor (),
-                                            Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetHotNormalColor ());
+                                            Parent.HasFocus ? focus : Parent.GetNormalColor (),
+                                            Parent.HasFocus ? focus : Parent.GetHotNormalColor ());
         }
 
         if (canDrawBorder && LineStyle != LineStyle.None)
@@ -641,7 +649,5 @@ public class Border : Adornment
                 }
             }
         }
-
-        //base.OnDrawContent (contentArea);
     }
 }

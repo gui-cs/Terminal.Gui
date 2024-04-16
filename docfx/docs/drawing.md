@@ -1,14 +1,43 @@
-# Drawing (Text and Color)
+# Drawing (Text, Lines, and Color)
 
-Terminal.Gui supports color on all platforms, including Windows, Mac, and Linux. The default colors are 24-bit RGB colors, but the library will gracefully degrade to 16-colors if the terminal does not support 24-bit color, and black and white if the terminal does not support 16-colors.
+Terminal.Gui provides a set of APIs for formatting text, line drawing, and character-based graphing. The fundamental concept is a `Cell` which ocupises a particular row and column in the terminal. A Cell includes the character (glyph) that should be rendred by the terminal, and attributes that indicate how the glphy should be rendered (e.g. the foreground and background color).
+
+Color is supported on all platforms, including Windows, Mac, and Linux. The default colors are 24-bit RGB colors, but the library will gracefully degrade to 16-colors if the terminal does not support 24-bit color, and black and white if the terminal does not support 16-colors.
+
+## View Drawing API
+
+A `View` will typically draw text when the [OnDrawContent](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_OnDrawContent_) is called (or the `DrawContent` event is received).
+
+Outputting unformatted text involves:
+
+a) Moving the draw cursor using the `Move` API.
+b) Setting the attributes using `SetAttribute`.
+c) Outputting glyphs by calling `AddRune` or `AddStr`.
+
+Outputting formatted text involves:
+
+a) Adding the text to a `TextFormatter` object.
+b) Setting formatting options, such as `TextFormatter.TextAlignment`.
+c) Calling `TextFormatter.Draw`.
+
+Line drawing is accomplished using the `LineCanvas` API:
+
+a) Add the lines via `LineCanvas.Add`.
+b) Either render the line canvas via `LineCanvas.Draw` or let the `View` do so automatically (which enables automatic line joining across Views).
+
+## Coordinate System for Drawing
+
+The `View` draw APIs, including the `OnDrawContent` method, the `DrawContent` event, and the `View.Move` method, all take coordinates specified in *Viewport-Relative* coordinates. That is, `0, 0` is the top-left cell visible to the user.
+
+See [Layout](layout.html) for more details of the Terminal.Gui coordinate system.
 
 ## Cell
 
-The `Cell` class represents a single cell on the screen. It contains a character and an attribute. The character is of type `Rune` and the attribute is of type `Attribute`. 
+The `Cell` class represents a single cell on the screen. It contains a character and an attribute. The character is of type `Rune` and the attribute is of type `Attribute`.
 
-Normally `Cell` is not exposed directly to the developer. Instead, the `ConsoleDriver` classes manage the `Cell` array that represents the screen.
+`Cell` is not exposed directly to the developer. Instead, the `ConsoleDriver` classes manage the `Cell` array that represents the screen.
 
-To draw a `Cell` to the screen, first use `View.Move` to specify the row and column coordinates and then use the `View.AddRune` method to draw a single glyph. To draw a string, use `View.AddStr`. 
+To draw a `Cell` to the screen, use `View.Move` to specify the row and column coordinates and then use the `View.AddRune` method to draw a single glyph. To draw a string, use `View.AddStr`. 
 
 ## Unicode
 
@@ -26,15 +55,17 @@ The `Color` class represents a color. It provides automatic mapping between the 
 
 ## Color Schemes
 
-Terminal.Gui supports named collection of colors called `ColorScheme`s. Three built-in color schemes are provided: "Default", "Dark", and "Light". Additional color schemes can be defined via [Configuration Manager](). 
+Terminal.Gui supports named collections of colors called `ColorScheme`s. Three built-in color schemes are provided: "Default", "Dark", and "Light". Additional color schemes can be defined via [Configuration Manager](). 
 
-Color schemes support defining colors for various states of a view. The following states are supported:
+Color schemes support defining colors for various states of a View. The following states are supported:
 
 * Normal - The color of normal text.
 * HotNormal - The color of text indicating a [Hotkey]().
 * Focus - The color of text that indicates the view has focus.
 * HotFocus - The color of text indicating a hot key, when the view has focus.
 * Disabled - The state of a view when it is disabled.
+
+Change the colors of a view by setting the `View.ColorScheme` property.
 
 ## Text Formatting
 
@@ -51,7 +82,7 @@ Terminal.Gui supports rendering glyphs using the `Glyph` class. The `Glyph` clas
 
 ## Line Drawing
 
-Terminal.Gui supports drawing lines and shapes using box-drawing glyphs. The `LineCanvas` class provides *auto join*, a smart TUI drawing system that automatically selects the correct line/box drawing glyphs for intersections making drawing complex shapes easy. See [Line Canvas](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#line-canvas) for details. The `Snake` and `Line Drawing` Scenarios in the [UI Catalog](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#ui-catalog) sample app are both examples of the power of the `LineCanvas`.
+Terminal.Gui supports drawing lines and shapes using box-drawing glyphs. The `LineCanvas` class provides *auto join*, a smart TUI drawing system that automatically selects the correct line/box drawing glyphs for intersections making drawing complex shapes easy. See [Line Canvas](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#line-canvas) for details. The `Snake` and `Line Drawing` Scenarios in the [UI Catalog](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#ui-catalog) sample app are both examples of the power of `LineCanvas`.
 
 ## Thickness
 

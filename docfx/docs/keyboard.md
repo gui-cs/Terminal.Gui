@@ -1,6 +1,6 @@
 # Keyboard Events
 
-## Tenets for Terminal.Gui Key Bindings (Unless you know better ones...)
+## Tenets for Terminal.Gui Keyboard Handling (Unless you know better ones...)
 
 Tenets higher in the list have precedence over tenets lower in the list.
 

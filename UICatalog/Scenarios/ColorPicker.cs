@@ -44,8 +44,8 @@ public class ColorPickers : Scenario
         backgroundColorPicker = new ColorPicker
         {
             Title = "Background Color",
-            Y = Pos.Center (),
-            X = Pos.Center (),
+            // TODO: Replace with Pos.AnchorEnd () when #2900 is done
+            X = Pos.AnchorEnd ((8 * 4) + 2), // 8 box * 4 width + 2 for border
             BoxHeight = 1,
             BoxWidth = 4,
             BorderStyle = LineStyle.Single
