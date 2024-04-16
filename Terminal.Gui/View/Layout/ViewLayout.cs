@@ -1151,7 +1151,7 @@ public partial class View
                     newLocation = anchorEnd.Anchor (superviewDimension);
                     if (anchorEnd.UseDimForOffset)
                     {
-                        newLocation -= dim.Anchor (0);
+                        newLocation -= dim.Anchor (superviewDimension);
                     }
 
                     newDimension = Math.Max (

@@ -152,6 +152,32 @@ public class AnchorEndTests (ITestOutputHelper output)
         Assert.Equal (expectedXPosition, view.Frame.X);
     }
 
+    [Theory]
+    [InlineData (0, 25)]
+    [InlineData (10, 23)]
+    [InlineData (50, 13)]
+    [InlineData (100, 0)]
+    public void AnchorEnd_UseDimForOffset_DimPercent_PositionsViewOffsetByDim (int percent, int expectedXPosition)
+    {
+        // Arrange
+        var superView = new View { Width = 25, Height = 25 };
+        var view = new View
+        {
+            X = Pos.AnchorEnd (),
+            Width = Dim.Percent ( percent),
+            Height = 1
+        };
+        superView.Add (view);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        // Act
+        superView.LayoutSubviews ();
+
+        // Assert
+        Assert.Equal (expectedXPosition, view.Frame.X);
+    }
+
     // This test used to be Dialog_In_Window_With_TextField_And_Button_AnchorEnd in DialogTests.
     [Fact]
     [SetupFakeDriver]

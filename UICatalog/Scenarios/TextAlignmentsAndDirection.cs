@@ -10,14 +10,21 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Text and Formatting")]
 public class TextAlignmentsAndDirections : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
+        Application.Init ();
+
+        Window app = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+        };
+
         // string txt = ".\n...\n.....\nHELLO\n.....\n...\n.";
         // string txt = "┌──┴──┐\n┤HELLO├\n└──┬──┘";
         var txt = "HELLO WORLD";
 
-        var color1 = new ColorScheme { Normal = new Attribute (Color.Black, Color.Gray) };
-        var color2 = new ColorScheme { Normal = new Attribute (Color.Black, Color.DarkGray) };
+        var color1 = new ColorScheme { Normal = new (Color.Black, Color.Gray) };
+        var color2 = new ColorScheme { Normal = new (Color.Black, Color.DarkGray) };
 
         List<Label> txts = new (); // single line
         List<Label> mtxts = new (); // multi line
@@ -125,14 +132,14 @@ public class TextAlignmentsAndDirections : Scenario
         txts.Add (txtLabelHR);
         txts.Add (txtLabelHJ);
 
-        Win.Add (labelHL);
-        Win.Add (txtLabelHL);
-        Win.Add (labelHC);
-        Win.Add (txtLabelHC);
-        Win.Add (labelHR);
-        Win.Add (txtLabelHR);
-        Win.Add (labelHJ);
-        Win.Add (txtLabelHJ);
+        app.Add (labelHL);
+        app.Add (txtLabelHL);
+        app.Add (labelHC);
+        app.Add (txtLabelHC);
+        app.Add (labelHR);
+        app.Add (txtLabelHR);
+        app.Add (labelHJ);
+        app.Add (txtLabelHJ);
 
         // Vertical Single-Line
 
@@ -245,14 +252,14 @@ public class TextAlignmentsAndDirections : Scenario
         txts.Add (txtLabelVB);
         txts.Add (txtLabelVJ);
 
-        Win.Add (labelVT);
-        Win.Add (txtLabelVT);
-        Win.Add (labelVM);
-        Win.Add (txtLabelVM);
-        Win.Add (labelVB);
-        Win.Add (txtLabelVB);
-        Win.Add (labelVJ);
-        Win.Add (txtLabelVJ);
+        app.Add (labelVT);
+        app.Add (txtLabelVT);
+        app.Add (labelVM);
+        app.Add (txtLabelVM);
+        app.Add (labelVB);
+        app.Add (txtLabelVB);
+        app.Add (labelVJ);
+        app.Add (txtLabelVJ);
 
         // Multi-Line
 
@@ -410,7 +417,7 @@ public class TextAlignmentsAndDirections : Scenario
         container.Add (txtLabelBC);
         container.Add (txtLabelBR);
 
-        Win.Add (container);
+        app.Add (container);
 
         // Edit Text
 
@@ -437,7 +444,7 @@ public class TextAlignmentsAndDirections : Scenario
                                    }
                                };
 
-        Win.KeyUp += (s, m) =>
+        app.KeyUp += (s, m) =>
                      {
                          foreach (Label v in txts)
                          {
@@ -452,7 +459,7 @@ public class TextAlignmentsAndDirections : Scenario
 
         editText.SetFocus ();
 
-        Win.Add (editText);
+        app.Add (editText);
 
         // JUSTIFY CHECKBOX
 
@@ -494,7 +501,7 @@ public class TextAlignmentsAndDirections : Scenario
                                        }
                                    };
 
-        Win.Add (justifyCheckbox);
+        app.Add (justifyCheckbox);
 
         // Direction Options
 
@@ -518,6 +525,9 @@ public class TextAlignmentsAndDirections : Scenario
                                                     }
                                                 };
 
-        Win.Add (directionOptions);
+        app.Add (directionOptions);
+
+        Application.Run (app);
+        app.Dispose ();
     }
 }

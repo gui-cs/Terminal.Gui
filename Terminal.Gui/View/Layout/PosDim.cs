@@ -125,16 +125,16 @@
 public class Pos
 {
     /// <summary>
-    ///     Creates a <see cref="Pos"/> object that has its end (right side or bottom) anchored to the end (right side or
-    ///     bottom)
-    ///     of the SuperView, useful to flush the layout from the right or bottom.
+    ///     Creates a <see cref="Pos"/> object that is anchored to the end (right side or
+    ///     bottom) of the SuperView, minus the respective dimension of the View. This is equivalent to using <see cref="Pos.AnchorEnd(int)"/>,
+    ///     with an offset equivalent to the View's respective dimension.
     /// </summary>
-    /// <returns>The <see cref="Pos"/> object anchored to the end (the bottom or the right side).</returns>
+    /// <returns>The <see cref="Pos"/> object anchored to the end (the bottom or the right side) minus the View's dimension.</returns>
     /// <example>
     ///     This sample shows how align a <see cref="Button"/> to the bottom-right the SuperView.
     /// <code>
-    /// anchorButton.X = Pos.AnchorEnd (0);
-    /// anchorButton.Y = Pos.AnchorEnd (0);
+    /// anchorButton.X = Pos.AnchorEnd ();
+    /// anchorButton.Y = Pos.AnchorEnd ();
     /// </code>
     /// </example>
     public static Pos AnchorEnd ()
@@ -149,8 +149,7 @@ public class Pos
     /// <returns>The <see cref="Pos"/> object anchored to the end (the bottom or the right side).</returns>
     /// <param name="offset">The view will be shifted left or up by the amount specified.</param>
     /// <example>
-    ///     This sample shows how align a <see cref="Button"/> such that its left side is offset 10 columns from
-    ///     the right edge of the SuperView.
+    ///     This sample shows how align a 10 column wide <see cref="Button"/> to the bottom-right the SuperView.
     /// <code>
     /// anchorButton.X = Pos.AnchorEnd (10);
     /// anchorButton.Y = 1

@@ -371,11 +371,11 @@ public class DynamicStatusBar : Scenario
 
             var _btnRemoveStatusBar = new Button { Y = 1, Text = "Remove a StatusBar" };
 
-            _btnRemoveStatusBar.X = Pos.AnchorEnd (0) - (Pos.Right (_btnRemoveStatusBar) - Pos.Left (_btnRemoveStatusBar));
+            _btnRemoveStatusBar.X = Pos.AnchorEnd ();
             _frmStatusBar.Add (_btnRemoveStatusBar);
 
             var _btnAdd = new Button { Y = Pos.Top (_btnRemoveStatusBar) + 2, Text = " Add  " };
-            _btnAdd.X = Pos.AnchorEnd (0) - (Pos.Right (_btnAdd) - Pos.Left (_btnAdd));
+            _btnAdd.X = Pos.AnchorEnd (0);
             _frmStatusBar.Add (_btnAdd);
 
             _lstItems = new ListView

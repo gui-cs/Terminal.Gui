@@ -9,17 +9,15 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Proof of Concept")]
 public class ViewExperiments : Scenario
 {
-    public override void Init ()
+    public override void Main ()
     {
         Application.Init ();
-        ConfigurationManager.Themes.Theme = Theme;
-        ConfigurationManager.Apply ();
-        Top = new ();
-        Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
-    }
 
-    public override void Setup ()
-    {
+        Window app = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+        };
+
         var containerLabel = new Label
         {
             X = 0,
@@ -28,7 +26,7 @@ public class ViewExperiments : Scenario
             Width = Dim.Fill (),
             Height = 3
         };
-        Top.Add (containerLabel);
+        app.Add (containerLabel);
 
         var view = new View
         {
@@ -41,7 +39,7 @@ public class ViewExperiments : Scenario
             Id = "DaView"
         };
 
-        //Top.Add (view);
+        //app.Add (view);
 
         view.Margin.Thickness = new Thickness (2, 2, 2, 2);
         view.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
@@ -199,8 +197,7 @@ public class ViewExperiments : Scenario
         };
         view.Add (edit);
 
-        edit = new TextField { Text = "AnchorEnd[Right];AnchorEnd (1)", Y = Pos.AnchorEnd (1), Width = 30, Height = 1 };
-        edit.X = Pos.AnchorEnd (0) - (Pos.Right (edit) - Pos.Left (edit));
+        edit = new TextField { Text = "AnchorEnd ();AnchorEnd ()", X = Pos.AnchorEnd(), Y = Pos.AnchorEnd (), Width = 30, Height = 1 };
         view.Add (edit);
 
         edit = new TextField
@@ -217,9 +214,9 @@ public class ViewExperiments : Scenario
                                {
                                    containerLabel.Text =
                                        $"Container.Frame: {
-                                           Top.Frame
+                                           app.Frame
                                        } .Bounds: {
-                                           Top.Viewport
+                                           app.Viewport
                                        }\nView.Frame: {
                                            view.Frame
                                        } .Viewport: {
@@ -244,11 +241,14 @@ public class ViewExperiments : Scenario
             ViewToEdit = view
         };
 
-        Top.Add (editor);
+        app.Add (editor);
         view.X = 36;
         view.Y = 4;
         view.Width = Dim.Fill ();
         view.Height = Dim.Fill ();
-        Top.Add (view);
+        app.Add (view);
+
+        Application.Run (app);
+        app.Dispose ();
     }
 }

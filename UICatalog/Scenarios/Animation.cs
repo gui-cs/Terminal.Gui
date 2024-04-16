@@ -34,12 +34,12 @@ public class Animation : Scenario
 
         win.Add (imageView);
 
-        var lbl = new Label { Y = Pos.AnchorEnd (2), Text = "Image by Wikiscient" };
+        var lbl = new Label { Y = Pos.AnchorEnd (), Text = "Image by Wikiscient" };
         win.Add (lbl);
 
         var lbl2 = new Label
         {
-            Y = Pos.AnchorEnd (1), Text = "https://commons.wikimedia.org/wiki/File:Spinning_globe.gif"
+           X = Pos.AnchorEnd(), Y = Pos.AnchorEnd (), Text = "https://commons.wikimedia.org/wiki/File:Spinning_globe.gif"
         };
         win.Add (lbl2);
 
