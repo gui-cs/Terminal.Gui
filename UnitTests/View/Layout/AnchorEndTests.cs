@@ -84,6 +84,8 @@ public class AnchorEndTests (ITestOutputHelper output)
     [InlineData (1, 10, 24)]
     [InlineData (10, 10, 15)]
     [InlineData (20, 10, 5)]
+    [InlineData (25, 10, 0)]
+    [InlineData (26, 10, -1)]
     public void AnchorEnd_With_Offset_PositionsViewOffsetFromRight (int offset, int width, int expectedXPosition)
     {
         // Arrange
@@ -91,6 +93,34 @@ public class AnchorEndTests (ITestOutputHelper output)
         var view = new View
         {
             X = Pos.AnchorEnd (offset),
+            Width = width,
+            Height = 1
+        };
+        superView.Add (view);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        // Act
+        superView.LayoutSubviews ();
+
+        // Assert
+        Assert.Equal (expectedXPosition, view.Frame.X);
+    }
+
+    [Theory]
+    [InlineData (0, 25)]
+    [InlineData (10, 15)]
+    [InlineData (9, 16)]
+    [InlineData (11, 14)]
+    [InlineData (25, 0)]
+    [InlineData (26, -1)]
+    public void AnchorEnd_No_Offset_PositionsViewOffsetByWidth (int width, int expectedXPosition)
+    {
+        // Arrange
+        var superView = new View { Width = 25, Height = 25 };
+        var view = new View
+        {
+            X = Pos.AnchorEnd (),
             Width = width,
             Height = 1
         };
