@@ -294,16 +294,6 @@ public abstract class ConsoleDriver
 
         for (var i = 0; i < runes.Count; i++)
         {
-            //if (runes [i].IsCombiningMark()) {
-
-            //	// Attempt to normalize
-            //	string combined = runes [i-1] + runes [i].ToString();
-
-            //	// Normalize to Form C (Canonical Composition)
-            //	string normalized = combined.Normalize (NormalizationForm.FormC);
-
-            //	runes [i-]
-            //}
             AddRune (runes [i]);
         }
     }
@@ -311,7 +301,6 @@ public abstract class ConsoleDriver
     /// <summary>Clears the <see cref="Contents"/> of the driver.</summary>
     public void ClearContents ()
     {
-        // TODO: This method is really "Clear Contents" now and should not be abstract (or virtual)
         Contents = new Cell [Rows, Cols];
         //CONCURRENCY: Unsynchronized access to Clip isn't safe.
         // TODO: ClearContents should not clear the clip; it should only clear the contents. Move clearing it elsewhere.
@@ -326,7 +315,9 @@ public abstract class ConsoleDriver
                 {
                     Contents [row, c] = new Cell
                     {
-                        Rune = (Rune)' ', Attribute = new Attribute (Color.White, Color.Black), IsDirty = true
+                        Rune = (Rune)' ', 
+                        Attribute = new Attribute (Color.White, Color.Black), 
+                        IsDirty = true
                     };
                     _dirtyLines [row] = true;
                 }
