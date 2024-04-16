@@ -19,7 +19,7 @@ public class LineCanvasExperiment : Scenario
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes ["Base"],
-            BorderStyle = LineStyle.RoundedDashed
+            BorderStyle = LineStyle.None
         };
 
         //View.Diagnostics ^= DiagnosticFlags.FrameRuler;
@@ -121,44 +121,46 @@ public class LineCanvasExperiment : Scenario
         //app.Add (marginWindow);
 
 
-        var line = new Line
-        {
-            Id = "line1",
-            X = 1,
-            Y = 1,
-            Width = 10,
-            Height = 1,
-            Orientation = Orientation.Horizontal,
-            SuperViewRendersLineCanvas = true
-        };
-        app.Add (line);
+        //var line = new Line
+        //{
+        //    Id = "line1",
+        //    X = 1,
+        //    Y = 1,
+        //    Width = 10,
+        //    Height = 1,
+        //    Orientation = Orientation.Horizontal,
+        //    SuperViewRendersLineCanvas = true
+        //};
+        //app.Add (line);
 
-        line = new Line
-        {
-            Id = "line2",
-            X = 1,
-            Y = 1,
-            Width = 1,
-            Height = 10,
-            Orientation = Orientation.Vertical,
-            SuperViewRendersLineCanvas = true
-        };
-        app.Add (line);
+        //line = new Line
+        //{
+        //    Id = "line2",
+        //    X = 1,
+        //    Y = 1,
+        //    Width = 1,
+        //    Height = 10,
+        //    Orientation = Orientation.Vertical,
+        //    SuperViewRendersLineCanvas = true
+        //};
+        //app.Add (line);
 
-        var label = new Window ()
+        var label = new View ()
         {
-            Arrangement = ViewArrangement.Movable,
+            //Arrangement = ViewArrangement.Movable,
             Id = "label1",
             Text = "Label",
+            Title = "label1",
             X = 5,
             Y = 4,
             Width = 15,
-            Height = 3,
-            TextAlignment = TextAlignment.Centered,
-            SuperViewRendersLineCanvas = true,
-            BorderStyle = LineStyle.Double
+            Height = 6,
+            //TextAlignment = TextAlignment.Centered,
+            //SuperViewRendersLineCanvas = true,
+            //BorderStyle = LineStyle.Double
         };
-        label.Border.Thickness = new Thickness (1, 1, 1, 1);
+        label.Border.Thickness = new Thickness (1, 3, 1, 1);
+        label.Border.LineStyle = LineStyle.Double;
         app.Add (label);
 
         Application.Run (app);

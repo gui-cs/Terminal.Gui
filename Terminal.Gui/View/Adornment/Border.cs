@@ -87,7 +87,7 @@ public class Border : Adornment
 
         base.BeginInit ();
 
-        SuperViewRendersLineCanvas = true;
+        SuperViewRendersLineCanvas = false;
 
         if (Parent is { })
         {
@@ -95,7 +95,7 @@ public class Border : Adornment
             {
                 Orientation = Orientation.Horizontal,
                 SuperViewRendersLineCanvas = true,
-                LineStyle = BorderStyle
+                LineStyle = LineStyle
             };
             Add (TopLeft);
 
@@ -103,7 +103,7 @@ public class Border : Adornment
             {
                 Orientation = Orientation.Horizontal,
                 SuperViewRendersLineCanvas = true,
-                LineStyle = BorderStyle
+                LineStyle = LineStyle
             };
             Add (TopRight);
 
@@ -111,7 +111,7 @@ public class Border : Adornment
             {
                 Orientation = Orientation.Vertical,
                 SuperViewRendersLineCanvas = true,
-                LineStyle = BorderStyle,
+                LineStyle = LineStyle,
             };
             Add (Left);
 
@@ -119,7 +119,7 @@ public class Border : Adornment
             {
                 Orientation = Orientation.Vertical,
                 SuperViewRendersLineCanvas = true,
-                LineStyle = BorderStyle,
+                LineStyle = LineStyle,
             };
 
             Add (Right);
@@ -128,19 +128,21 @@ public class Border : Adornment
             {
                 Orientation = Orientation.Horizontal,
                 SuperViewRendersLineCanvas = true,
-                LineStyle = BorderStyle,
+                LineStyle = LineStyle,
             };
             Add (Bottom);
 
             TitleLabel = new View ()
             {
+                Id = "TitleLabel",
                 Text = Parent.Title,
                 CanFocus = false,
                 SuperViewRendersLineCanvas = true,
                 TextAlignment = TextAlignment.Centered,
                 VerticalTextAlignment = VerticalTextAlignment.Middle,
-                BorderStyle = BorderStyle
             };
+            //TitleLabel.Border.Thickness = new (1);
+            //TitleLabel.Border.LineStyle = LineStyle.Dotted;
             Add (TitleLabel);
 
             CloseButton = new Button ()
@@ -196,6 +198,13 @@ public class Border : Adornment
             TitleLabel.Y = Pos.Function (() => Thickness.Top / 2 - TitleLabel.Frame.Height / 2);
             TitleLabel.Height = Thickness.Top;
             TitleLabel.Width = Dim.Function (() => TitleLabel.Text.GetColumns() + TitleLabel.GetAdornmentsThickness ().Horizontal);
+
+            //if (Parent.Id == "TitleLabel")
+            //{
+            //    TitleLabel.Visible = false;
+            //    TitleLabel.X = Pos.Right (TopLeft);
+            //    TitleLabel.Width = 0;
+            //}
 
             CloseButton.X = Pos.Left (Right) - 1;
             CloseButton.Y = Pos.Function (() => Thickness.Top / 2);
@@ -271,7 +280,6 @@ public class Border : Adornment
                 Left.LineStyle = value;
                 Right.LineStyle = value;
                 Bottom.LineStyle = value;
-                TitleLabel.BorderStyle = value;
             }
         }
     }

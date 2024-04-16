@@ -185,7 +185,15 @@ public class Adornment : View
 
     /// <summary>Does nothing for Adornment</summary>
     /// <returns></returns>
-    public override bool OnRenderLineCanvas () { return false; }
+    public override bool OnRenderLineCanvas ()
+    {
+        if (Parent?.Text == "Label")
+        {
+
+        }
+
+        return base.OnRenderLineCanvas();
+    }
 
     ///// <summary>
     /////     Adornments only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas, so setting this
