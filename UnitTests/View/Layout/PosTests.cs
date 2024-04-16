@@ -1,9 +1,67 @@
 ﻿using Xunit.Abstractions;
+using static Terminal.Gui.Dim;
+using static Terminal.Gui.Pos;
 
 namespace Terminal.Gui.ViewTests;
 
 public class PosTests (ITestOutputHelper output)
 {
+    [Fact]
+    public void PosAbsolute_GetLocation_ReturnsExpectedValue ()
+    {
+        var posAbsolute = new PosAbsolute (5);
+        var result = posAbsolute.GetLocation (10, new DimAbsolute (2), 1, false);
+        Assert.Equal (5, result);
+    }
+
+    [Fact]
+    public void PosAnchorEnd_GetLocation_ReturnsExpectedValue ()
+    {
+        var posAnchorEnd = new PosAnchorEnd (5);
+        var result = posAnchorEnd.GetLocation (10, new DimAbsolute (2), 1, false);
+        Assert.Equal (5, result);
+    }
+
+    [Fact]
+    public void PosCenter_GetLocation_ReturnsExpectedValue ()
+    {
+        var posCenter = new PosCenter ();
+        var result = posCenter.GetLocation (10, new DimAbsolute (2), 1, false);
+        Assert.Equal (4, result);
+    }
+
+    [Fact]
+    public void PosCombine_GetLocation_ReturnsExpectedValue ()
+    {
+        var posCombine = new PosCombine (true, new PosAbsolute (5), new PosAbsolute (3));
+        var result = posCombine.GetLocation (10, new DimAbsolute (2), 1, false);
+        Assert.Equal (8, result);
+    }
+
+    [Fact]
+    public void PosFactor_GetLocation_ReturnsExpectedValue ()
+    {
+        var posFactor = new PosFactor (0.5f);
+        var result = posFactor.GetLocation (10, new DimAbsolute (2), 1, false);
+        Assert.Equal (5, result);
+    }
+
+    [Fact]
+    public void PosFunc_GetLocation_ReturnsExpectedValue ()
+    {
+        var posFunc = new PosFunc (() => 5);
+        var result = posFunc.GetLocation (10, new DimAbsolute (2), 1, false);
+        Assert.Equal (5, result);
+    }
+
+    [Fact]
+    public void PosView_GetLocation_ReturnsExpectedValue ()
+    {
+        var posView = new PosView (new View { Frame = new Rectangle (5, 5, 10, 10) }, 0);
+        var result = posView.GetLocation (10, new DimAbsolute (2), 1, false);
+        Assert.Equal (5, result);
+    }
+
     [Fact]
     public void At_Equal ()
     {

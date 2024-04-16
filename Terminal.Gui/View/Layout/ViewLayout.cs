@@ -1011,7 +1011,6 @@ public partial class View
         Debug.Assert (_width is { });
         Debug.Assert (_height is { });
 
-        int newX, newW, newY, newH;
         var autosize = Size.Empty;
 
         if (AutoSize)
@@ -1021,176 +1020,19 @@ public partial class View
             autosize = GetAutoSize ();
         }
 
-        // TODO: Since GetNewLocationAndDimension does not depend on View, it can be moved into PosDim.cs
-        // TODO: to make architecture more clean. Do this after DimAuto is implemented and the 
-        // TODO: View.AutoSize stuff is removed.
+        int newX, newW, newY, newH;
+        newX = _x.GetLocation (superviewContentSize.Width, _width, autosize.Width, AutoSize);
+        newW = _width.GetDimension (newX, superviewContentSize.Width, autosize.Width, AutoSize);
+        newY = _y.GetLocation (superviewContentSize.Height, _height, autosize.Height, AutoSize);
+        newH = _height.GetDimension (newY, superviewContentSize.Height, autosize.Height, AutoSize);
 
-        // Returns the new dimension (width or height) and location (x or y) for the View given
-        //   the superview's Viewport
-        //   the current Pos (View.X or View.Y)
-        //   the current Dim (View.Width or View.Height)
-        // This method is called recursively if pos is Pos.PosCombine
-        (int newLocation, int newDimension) GetNewLocationAndDimension (
-            bool width,
-            Size superviewContentSize,
-            Pos pos,
-            Dim dim,
-            int autosizeDimension
-        )
-        {
-            // Gets the new dimension (width or height, dependent on `width`) of the given Dim given:
-            //   location: the current location (x or y)
-            //   dimension: the new dimension (width or height) (if relevant for Dim type)
-            //   autosize: the size to use if autosize = true
-            // This method is recursive if d is Dim.DimCombine
-            int GetNewDimension (Dim d, int location, int dimension, int autosize)
-            {
-                int newDimension;
+        Rectangle newFrame = new (newX, newY, newW, newH);
 
-                switch (d)
-                {
-                    case Dim.DimCombine combine:
-                        // TODO: Move combine logic into DimCombine?
-                        int leftNewDim = GetNewDimension (combine._left, location, dimension, autosize);
-                        int rightNewDim = GetNewDimension (combine._right, location, dimension, autosize);
-
-                        if (combine._add)
-                        {
-                            newDimension = leftNewDim + rightNewDim;
-                        }
-                        else
-                        {
-                            newDimension = leftNewDim - rightNewDim;
-                        }
-
-                        newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
-
-                        break;
-
-                    case Dim.DimFactor factor when !factor.IsFromRemaining ():
-                        newDimension = d.Anchor (dimension);
-                        newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
-
-                        break;
-
-                    case Dim.DimAbsolute:
-                        // DimAbsolute.Anchor (int width) ignores width and returns n
-                        newDimension = Math.Max (d.Anchor (0), 0);
-
-                        // BUGBUG: AutoSize does two things: makes text fit AND changes the view's dimensions
-                        newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
-
-                        break;
-
-                    case Dim.DimFill:
-                    default:
-                        newDimension = Math.Max (d.Anchor (dimension - location), 0);
-                        newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
-
-                        break;
-                }
-
-                return newDimension;
-            }
-
-            int newDimension, newLocation;
-            int superviewDimension = width ? superviewContentSize.Width : superviewContentSize.Height;
-
-            // Determine new location
-            switch (pos)
-            {
-                case Pos.PosCenter posCenter:
-                    // For Center, the dimension is dependent on location, but we need to force getting the dimension first
-                    // using a location of 0
-                    newDimension = Math.Max (GetNewDimension (dim, 0, superviewDimension, autosizeDimension), 0);
-                    newLocation = posCenter.Anchor (superviewDimension - newDimension);
-
-                    newDimension = Math.Max (
-                                             GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension),
-                                             0
-                                            );
-                    break;
-
-                case Pos.PosCombine combine:
-                    // TODO: Move combine logic into PosCombine?
-                    int left, right;
-
-                    (left, newDimension) = GetNewLocationAndDimension (
-                                                                       width,
-                                                                       superviewContentSize,
-                                                                       combine._left,
-                                                                       dim,
-                                                                       autosizeDimension
-                                                                      );
-
-                    (right, newDimension) = GetNewLocationAndDimension (
-                                                                        width,
-                                                                        superviewContentSize,
-                                                                        combine._right,
-                                                                        dim,
-                                                                        autosizeDimension
-                                                                       );
-
-                    if (combine._add)
-                    {
-                        newLocation = left + right;
-                    }
-                    else
-                    {
-                        newLocation = left - right;
-                    }
-
-                    newDimension = Math.Max (
-                                             GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension),
-                                             0
-                                            );
-
-                    break;
-
-                case Pos.PosAnchorEnd anchorEnd:
-                    newLocation = anchorEnd.Anchor (superviewDimension);
-                    if (anchorEnd.UseDimForOffset)
-                    {
-                        newLocation -= dim.Anchor (superviewDimension);
-                    }
-
-                    newDimension = Math.Max (
-                                             GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension),
-                                             0
-                                            );
-                    break;
-
-                case Pos.PosAbsolute:
-                case Pos.PosFactor:
-                case Pos.PosFunc:
-                case Pos.PosView:
-                default:
-                    newLocation = pos?.Anchor (superviewDimension) ?? 0;
-
-                    newDimension = Math.Max (
-                                             GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension),
-                                             0
-                                            );
-
-                    break;
-            }
-
-            return (newLocation, newDimension);
-        }
-
-        // horizontal/width
-        (newX, newW) = GetNewLocationAndDimension (true, superviewContentSize, _x, _width, autosize.Width);
-
-        // vertical/height
-        (newY, newH) = GetNewLocationAndDimension (false, superviewContentSize, _y, _height, autosize.Height);
-
-        Rectangle r = new (newX, newY, newW, newH);
-
-        if (Frame != r)
+        if (Frame != newFrame)
         {
             // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height, making
             // the view LayoutStyle.Absolute.
-            SetFrame (r);
+            SetFrame (newFrame);
 
             if (_x is Pos.PosAbsolute)
             {

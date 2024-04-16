@@ -1,6 +1,8 @@
 using System.Globalization;
 using System.Text;
 using Xunit.Abstractions;
+using static Terminal.Gui.Dim;
+
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
@@ -20,6 +22,57 @@ public class DimTests
         var culture = CultureInfo.CreateSpecificCulture ("en-US");
         Thread.CurrentThread.CurrentCulture = culture;
         Thread.CurrentThread.CurrentUICulture = culture;
+    }
+
+    [Fact]
+    public void DimAbsolute_GetDimension_ReturnsCorrectValue ()
+    {
+        var dim = new DimAbsolute (10);
+        var result = dim.GetDimension (0, 100, 50, false);
+        Assert.Equal (10, result);
+    }
+
+    [Fact]
+    public void DimCombine_GetDimension_ReturnsCorrectValue ()
+    {
+        var dim1 = new DimAbsolute (10);
+        var dim2 = new DimAbsolute (20);
+        var dim = dim1 + dim2;
+        var result = dim.GetDimension (0, 100, 50, false);
+        Assert.Equal (30, result);
+    }
+
+    [Fact]
+    public void DimFactor_GetDimension_ReturnsCorrectValue ()
+    {
+        var dim = new DimFactor (0.5f);
+        var result = dim.GetDimension (0, 100, 50, false);
+        Assert.Equal (50, result);
+    }
+
+    [Fact]
+    public void DimFill_GetDimension_ReturnsCorrectValue ()
+    {
+        var dim = Dim.Fill ();
+        var result = dim.GetDimension (0, 100, 50, false);
+        Assert.Equal (100, result);
+    }
+
+    [Fact]
+    public void DimFunc_GetDimension_ReturnsCorrectValue ()
+    {
+        var dim = new DimFunc (() => 10);
+        var result = dim.GetDimension (0, 100, 50, false);
+        Assert.Equal (10, result);
+    }
+
+    [Fact]
+    public void DimView_GetDimension_ReturnsCorrectValue ()
+    {
+        var view = new View { Width = 10 };
+        var dim = new DimView (view, 1);
+        var result = dim.GetDimension (0, 100, 50, false);
+        Assert.Equal (10, result);
     }
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved

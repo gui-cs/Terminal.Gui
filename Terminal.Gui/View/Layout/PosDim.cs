@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using static Terminal.Gui.Pos;
+
+namespace Terminal.Gui;
 
 /// <summary>
 ///     Describes the position of a <see cref="View"/> which can be an absolute value, a percentage, centered, or
@@ -319,6 +321,12 @@ public class Pos
         }
     }
 
+    internal virtual int GetLocation (int superviewDimension, Dim dim, int autosize, bool autoSize)
+    {
+        return this.Anchor (superviewDimension);
+    }
+
+
     internal class PosAbsolute (int n) : Pos
     {
         private readonly int _n = n;
@@ -354,12 +362,29 @@ public class Pos
             }
             return width - _offset;
         }
+
+        internal override int GetLocation (int superviewDimension, Dim dim, int autosize, bool autoSize)
+        {
+            int newLocation = this.Anchor (superviewDimension);
+            if (this.UseDimForOffset)
+            {
+                newLocation -= dim.Anchor (superviewDimension);
+            }
+            return newLocation;
+        }
+
     }
 
     internal class PosCenter : Pos
     {
         public override string ToString () { return "Center"; }
         internal override int Anchor (int width) { return width / 2; }
+        internal override int GetLocation (int superviewDimension, Dim dim, int autosize, bool autoSize)
+        {
+            var newDimension = Math.Max (dim.GetDimension (0, superviewDimension, autosize, autoSize), 0);
+            return Anchor (superviewDimension - newDimension);
+        }
+
     }
 
     internal class PosCombine (bool add, Pos left, Pos right) : Pos
@@ -380,6 +405,19 @@ public class Pos
             }
 
             return la - ra;
+        }
+
+        internal override int GetLocation (int superviewDimension, Dim dim, int autosize, bool autoSize)
+        {
+            int newDimension = dim.GetDimension (0, superviewDimension, autosize, autoSize);
+            int left = _left.GetLocation (superviewDimension, dim, autosize, autoSize);
+            int right = _right.GetLocation (superviewDimension, dim, autosize, autoSize);
+            if (_add)
+            {
+                return left + right;
+            }
+
+            return left - right;
         }
     }
 
@@ -645,6 +683,13 @@ public class Dim
 
     internal virtual int Anchor (int width) { return 0; }
 
+    internal virtual int GetDimension (int location, int dimension, int autosize, bool autoSize)
+    {
+        int newDimension = Math.Max (Anchor (dimension - location), 0);
+        return autoSize && autosize > newDimension ? autosize : newDimension;
+    }
+
+
     // BUGBUG: newPos is never used.
     private static void SetDimCombine (Dim left, DimCombine newPos) { (left as DimView)?.Target.SetNeedsLayout (); }
 
@@ -655,6 +700,15 @@ public class Dim
         public override int GetHashCode () { return _n.GetHashCode (); }
         public override string ToString () { return $"Absolute({_n})"; }
         internal override int Anchor (int width) { return _n; }
+
+        internal override int GetDimension (int location, int dimension, int autosize, bool autoSize)
+        {
+            // DimAbsolute.Anchor (int width) ignores width and returns n
+            int newDimension = Math.Max (Anchor (0), 0);
+
+            // BUGBUG: AutoSize does two things: makes text fit AND changes the view's dimensions
+            return autoSize && autosize > newDimension ? autosize : newDimension;
+        }
     }
 
     internal class DimCombine (bool add, Dim left, Dim right) : Dim
@@ -676,6 +730,24 @@ public class Dim
 
             return la - ra;
         }
+
+        internal override int GetDimension (int location, int dimension, int autosize, bool autoSize)
+        {
+            int leftNewDim = _left.GetDimension (location, dimension, autosize, autoSize);
+            int rightNewDim = _right.GetDimension (location, dimension, autosize, autoSize);
+
+            int newDimension;
+            if (_add)
+            {
+                newDimension = leftNewDim + rightNewDim;
+            }
+            else
+            {
+                newDimension = Math.Max (0, leftNewDim - rightNewDim);
+            }
+
+            return autoSize && autosize > newDimension ? autosize : newDimension;
+        }
     }
 
     internal class DimFactor (float n, bool r = false) : Dim
@@ -688,6 +760,21 @@ public class Dim
         public bool IsFromRemaining () { return _remaining; }
         public override string ToString () { return $"Factor({_factor},{_remaining})"; }
         internal override int Anchor (int width) { return (int)(width * _factor); }
+
+        internal override int GetDimension (int location, int dimension, int autosize, bool autoSize)
+        {
+            int newDimension;
+            if (_remaining)
+            {
+                newDimension = Math.Max (Anchor (dimension - location), 0);
+            }
+            else
+            {
+                newDimension = Anchor (dimension);
+            }
+
+            return autoSize && autosize > newDimension ? autosize : newDimension;
+        }
     }
 
     internal class DimFill (int margin) : Dim
@@ -723,11 +810,11 @@ public class Dim
             }
 
             string tside = side switch
-                           {
-                               0 => "Height",
-                               1 => "Width",
-                               _ => "unknown"
-                           };
+            {
+                0 => "Height",
+                1 => "Width",
+                _ => "unknown"
+            };
 
             return $"View({tside},{Target})";
         }
@@ -735,11 +822,11 @@ public class Dim
         internal override int Anchor (int width)
         {
             return side switch
-                   {
-                       0 => Target.Frame.Height,
-                       1 => Target.Frame.Width,
-                       _ => 0
-                   };
+            {
+                0 => Target.Frame.Height,
+                1 => Target.Frame.Width,
+                _ => 0
+            };
         }
     }
 }
