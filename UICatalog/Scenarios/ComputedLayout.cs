@@ -316,8 +316,8 @@ public class ComputedLayout : Scenario
         Top.Add (oddballButton);
 
         // Demonstrate AnchorEnd - Button is anchored to bottom/right
-        var anchorButton = new Button { Text = "Button using AnchorEnd", Y = Pos.AnchorEnd () - 1 };
-        anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
+        var anchorButton = new Button { Text = "Button using AnchorEnd", Y = Pos.AnchorEnd (0) - 1 };
+        anchorButton.X = Pos.AnchorEnd (0) - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
 
         anchorButton.Accept += (s, e) =>
                                 {
@@ -362,7 +362,7 @@ public class ComputedLayout : Scenario
         // Show positioning vertically using Pos.AnchorEnd via Pos.Combine
         var leftButton = new Button
         {
-            Text = "Left", Y = Pos.AnchorEnd () - 1 // Pos.Combine
+            Text = "Left", Y = Pos.AnchorEnd (0) - 1 // Pos.Combine
         };
 
         leftButton.Accept += (s, e) =>

@@ -405,7 +405,7 @@ public class SetRelativeLayoutTests
     {
         var screen = new Size (30, 1);
         var view = new View { Text = "abc", AutoSize = true }; // BUGBUG: AutoSize or Width must be set
-        view.X = Pos.AnchorEnd () - Pos.Function (GetViewWidth);
+        view.X = Pos.AnchorEnd (0) - Pos.Function (GetViewWidth);
 
         int GetViewWidth () { return view.Frame.Width; }
 

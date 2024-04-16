@@ -98,7 +98,7 @@ public class PosTests
     public void AnchorEnd_SetsValue ()
     {
         var n = 0;
-        Pos pos = Pos.AnchorEnd ();
+        Pos pos = Pos.AnchorEnd (0);
         Assert.Equal ($"AnchorEnd({n})", pos.ToString ());
 
         n = 5;
@@ -122,7 +122,7 @@ public class PosTests
 
         int Btn_Width () { return btn?.Viewport.Width ?? 0; }
 
-        btn = new Button { Text = "Ok", X = Pos.AnchorEnd () - Pos.Function (Btn_Width) };
+        btn = new Button { Text = "Ok", X = Pos.AnchorEnd (0) - Pos.Function (Btn_Width) };
 
         var view = new View
         {
@@ -619,7 +619,7 @@ public class PosTests
         var super = new View { Width = 10, Height = 10, Text = "super" };
         var view1 = new View { Width = 2, Height = 2, Text = "view1" };
         var view2 = new View { Width = 2, Height = 2, Text = "view2" };
-        view2.X = Pos.AnchorEnd () - (Pos.Right (view2) - Pos.Left (view2));
+        view2.X = Pos.AnchorEnd (0) - (Pos.Right (view2) - Pos.Left (view2));
 
         super.Add (view1, view2);
         super.BeginInit ();

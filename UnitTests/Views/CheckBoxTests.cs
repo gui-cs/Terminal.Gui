@@ -77,7 +77,7 @@ public class CheckBoxTests
     {
         var checkBox = new CheckBox { Y = Pos.Center (), Text = "C_heck this out 你" };
 
-        checkBox.X = Pos.AnchorEnd () - Pos.Function (() => checkBox.GetSizeNeededForTextWithoutHotKey ().Width);
+        checkBox.X = Pos.AnchorEnd (0) - Pos.Function (() => checkBox.GetSizeNeededForTextWithoutHotKey ().Width);
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
@@ -121,7 +121,7 @@ public class CheckBoxTests
     {
         var checkBox = new CheckBox { Y = Pos.Center (), Text = "Check this out 你" };
 
-        checkBox.X = Pos.AnchorEnd () - Pos.Function (() => checkBox.GetSizeNeededForTextWithoutHotKey ().Width);
+        checkBox.X = Pos.AnchorEnd (0) - Pos.Function (() => checkBox.GetSizeNeededForTextWithoutHotKey ().Width);
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);

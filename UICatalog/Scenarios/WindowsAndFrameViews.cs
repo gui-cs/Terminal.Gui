@@ -207,7 +207,7 @@ public class WindowsAndFrameViews : Scenario
                    new CheckBox { X = 0, Y = Pos.AnchorEnd (1), Text = "Btn1 (Y = Pos.AnchorEnd (1))" }
                   );
         var c = new CheckBox { Y = Pos.AnchorEnd (1), Text = "Btn2 (Y = Pos.AnchorEnd (1))" };
-        c.X = Pos.AnchorEnd () - (Pos.Right (c) - Pos.Left (c));
+        c.X = Pos.AnchorEnd (0) - (Pos.Right (c) - Pos.Left (c));
         frame.Add (c);
 
         frame.Add (subFrameViewofFV);

@@ -200,7 +200,7 @@ public class ViewExperiments : Scenario
         view.Add (edit);
 
         edit = new TextField { Text = "AnchorEnd[Right];AnchorEnd (1)", Y = Pos.AnchorEnd (1), Width = 30, Height = 1 };
-        edit.X = Pos.AnchorEnd () - (Pos.Right (edit) - Pos.Left (edit));
+        edit.X = Pos.AnchorEnd (0) - (Pos.Right (edit) - Pos.Left (edit));
         view.Add (edit);
 
         edit = new TextField

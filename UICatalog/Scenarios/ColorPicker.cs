@@ -44,20 +44,20 @@ public class ColorPickers : Scenario
         backgroundColorPicker = new ColorPicker
         {
             Title = "Background Color",
-            // TODO: Replace with Pos.AnchorEnd () when #2900 is done
+            // TODO: Replace with Pos.AnchorEnd (0) when #2900 is done
             X = Pos.AnchorEnd ((8 * 4) + 2), // 8 box * 4 width + 2 for border
             BoxHeight = 1,
             BoxWidth = 4,
             BorderStyle = LineStyle.Single
         };
 
-        //backgroundColorPicker.X = Pos.AnchorEnd () - (Pos.Right (backgroundColorPicker) - Pos.Left (backgroundColorPicker));
+        //backgroundColorPicker.X = Pos.AnchorEnd (0) - (Pos.Right (backgroundColorPicker) - Pos.Left (backgroundColorPicker));
         backgroundColorPicker.ColorChanged += BackgroundColor_ColorChanged;
         Win.Add (backgroundColorPicker);
         _backgroundColorLabel = new Label ();
 
         _backgroundColorLabel.X =
-            Pos.AnchorEnd () - (Pos.Right (_backgroundColorLabel) - Pos.Left (_backgroundColorLabel));
+            Pos.AnchorEnd (0) - (Pos.Right (_backgroundColorLabel) - Pos.Left (_backgroundColorLabel));
         _backgroundColorLabel.Y = Pos.Bottom (backgroundColorPicker) + 1;
         Win.Add (_backgroundColorLabel);
 

@@ -125,20 +125,35 @@
 public class Pos
 {
     /// <summary>
-    ///     Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom) of the dimension, useful
-    ///     to flush the layout from the right or bottom.
+    ///     Creates a <see cref="Pos"/> object that has its end (right side or bottom) anchored to the end (right side or
+    ///     bottom)
+    ///     of the SuperView, useful to flush the layout from the right or bottom.
+    /// </summary>
+    /// <returns>The <see cref="Pos"/> object anchored to the end (the bottom or the right side).</returns>
+    /// <example>
+    ///     This sample shows how align a <see cref="Button"/> to the bottom-right the SuperView.
+    /// <code>
+    /// anchorButton.X = Pos.AnchorEnd (0);
+    /// anchorButton.Y = Pos.AnchorEnd (0);
+    /// </code>
+    /// </example>
+    public static Pos AnchorEnd () { return new PosAnchorEnd (0); }
+
+    /// <summary>
+    ///     Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom) of the SuperView,
+    ///     useful to flush the layout from the right or bottom.
     /// </summary>
     /// <returns>The <see cref="Pos"/> object anchored to the end (the bottom or the right side).</returns>
     /// <param name="offset">The view will be shifted left or up by the amount specified.</param>
     /// <example>
-    ///     This sample shows how align a <see cref="Button"/> to the bottom-right of a <see cref="View"/>.
-    ///     <code>
-    /// // See Issue #502 
-    /// anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
-    /// anchorButton.Y = Pos.AnchorEnd (1);
+    ///     This sample shows how align a <see cref="Button"/> such that its left side is offset 10 columns from
+    ///     the right edge of the SuperView.
+    /// <code>
+    /// anchorButton.X = Pos.AnchorEnd (10);
+    /// anchorButton.Y = 1
     /// </code>
     /// </example>
-    public static Pos AnchorEnd (int offset = 0)
+    public static Pos AnchorEnd (int offset)
     {
         if (offset < 0)
         {
