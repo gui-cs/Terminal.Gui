@@ -6,8 +6,22 @@ public class Line : View
     /// <summary>Constructs a Line object.</summary>
     public Line ()
     {
-        BorderStyle = LineStyle.Single;
-        Border.Thickness = new Thickness (0);
+    }
+
+    private LineStyle _lineStyle = LineStyle.Single;
+
+    public LineStyle LineStyle
+    {
+        get => _lineStyle;
+        set
+        {
+            if (_lineStyle == value)
+            {
+                return;
+            }
+
+            _lineStyle = value;
+        }
     }
 
     /// <summary>
@@ -25,11 +39,13 @@ public class Line : View
         {
             lc = adornment.Parent.LineCanvas;
         }
+
         lc.AddLine (
                     ViewportToScreen (viewport).Location,
                     Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height,
                     Orientation,
-                    BorderStyle
+                    LineStyle,
+                    ColorScheme.Normal
                    );
     }
 }
