@@ -107,6 +107,23 @@ public class AnchorEndTests (ITestOutputHelper output)
         Assert.Equal (expectedXPosition, view.Frame.X);
     }
 
+    // UseDimForOffset tests
+
+    [Fact]
+    public void AnchorEnd_UseDimForOffset_CreatesCorrectInstance ()
+    {
+        var pos = Pos.AnchorEnd ();
+        Assert.IsType<PosAnchorEnd> (pos);
+        Assert.True (((PosAnchorEnd)pos).UseDimForOffset);
+    }
+
+    [Fact]
+    public void AnchorEnd_UseDimForOffset_SetsValue_Anchor_Is_Negative ()
+    {
+        Pos pos = Pos.AnchorEnd ();
+        Assert.Equal (-10, -pos.Anchor (10));
+    }
+
     [Theory]
     [InlineData (0, 25)]
     [InlineData (10, 15)]
@@ -114,14 +131,14 @@ public class AnchorEndTests (ITestOutputHelper output)
     [InlineData (11, 14)]
     [InlineData (25, 0)]
     [InlineData (26, -1)]
-    public void AnchorEnd_No_Offset_PositionsViewOffsetByWidth (int width, int expectedXPosition)
+    public void AnchorEnd_UseDimForOffset_PositionsViewOffsetByDim (int dim, int expectedXPosition)
     {
         // Arrange
         var superView = new View { Width = 25, Height = 25 };
         var view = new View
         {
             X = Pos.AnchorEnd (),
-            Width = width,
+            Width = dim,
             Height = 1
         };
         superView.Add (view);

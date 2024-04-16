@@ -1109,7 +1109,6 @@ public partial class View
                                              GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension),
                                              0
                                             );
-
                     break;
 
                 case Pos.PosCombine combine:
@@ -1148,7 +1147,19 @@ public partial class View
 
                     break;
 
-                case Pos.PosAnchorEnd:
+                case Pos.PosAnchorEnd anchorEnd:
+                    newLocation = anchorEnd.Anchor (superviewDimension);
+                    if (anchorEnd.UseDimForOffset)
+                    {
+                        newLocation -= dim.Anchor (0);
+                    }
+
+                    newDimension = Math.Max (
+                                             GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension),
+                                             0
+                                            );
+                    break;
+
                 case Pos.PosAbsolute:
                 case Pos.PosFactor:
                 case Pos.PosFunc:

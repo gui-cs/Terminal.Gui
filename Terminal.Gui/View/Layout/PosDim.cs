@@ -139,8 +139,7 @@ public class Pos
     /// </example>
     public static Pos AnchorEnd ()
     {
-        throw new NotImplementedException ();
-        //return new PosAnchorEnd (0);
+        return new PosAnchorEnd ();
     }
 
     /// <summary>
@@ -336,11 +335,30 @@ public class Pos
     internal class PosAnchorEnd : Pos
     {
         private readonly int _offset;
+        public PosAnchorEnd () { UseDimForOffset = true; }
         public PosAnchorEnd (int offset) { _offset = offset; }
         public override bool Equals (object other) { return other is PosAnchorEnd anchorEnd && anchorEnd._offset == _offset; }
         public override int GetHashCode () { return _offset.GetHashCode (); }
-        public override string ToString () { return $"AnchorEnd({_offset})"; }
-        internal override int Anchor (int width) { return width - _offset; }
+
+        public bool UseDimForOffset { get; set; }
+
+        public override string ToString ()
+        {
+            if (UseDimForOffset)
+            {
+                return "AnchorEnd()";
+            }
+            return $"AnchorEnd({_offset})";
+        }
+
+        internal override int Anchor (int width)
+        {
+            if (UseDimForOffset)
+            {
+                return width;
+            }
+            return width - _offset;
+        }
     }
 
     internal class PosCenter : Pos
