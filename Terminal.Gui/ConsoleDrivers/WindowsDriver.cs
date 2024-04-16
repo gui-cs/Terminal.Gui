@@ -1290,8 +1290,8 @@ internal class WindowsDriver : ConsoleDriver
 
         var bufferCoords = new WindowsConsole.Coord
         {
-            X = (short)Clip.Width,
-            Y = (short)Clip.Height
+            X = (short)Cols, //Clip.Width,
+            Y = (short)Rows, //Clip.Height
         };
 
         for (var row = 0; row < Rows; row++)
