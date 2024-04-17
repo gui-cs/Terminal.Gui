@@ -898,6 +898,8 @@ public partial class View
 
         foreach (View v in ordered)
         {
+            // TODO: Move this logic into the Pos/Dim classes
+
             if (v.Width is Dim.DimAuto || v.Height is Dim.DimAuto)
             {
                 // If the view is auto-sized...
@@ -933,7 +935,7 @@ public partial class View
         OnLayoutComplete (new (ContentSize));
     }
 
-
+    // TODO: Move this logic into the Pos/Dim classes
     /// <summary>
     ///     Throws an <see cref="InvalidOperationException"/> if any SubViews are using Dim objects that depend on this
     ///     Views dimensions.
