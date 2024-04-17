@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using static Terminal.Gui.Dialog;
+
+namespace Terminal.Gui;
 
 /// <summary>
 ///     Describes the position of a <see cref="View"/> which can be an absolute value, a percentage, centered, or
@@ -169,14 +171,6 @@ public class Pos
     /// <param name="n">The value to convert to the <see cref="Pos"/>.</param>
     public static Pos At (int n) { return new PosAbsolute (n); }
 
-    /// <summary>
-    ///     Creates a <see cref="Pos"/> object that tracks the Bottom (Y+Height) coordinate of the specified
-    ///     <see cref="View"/>
-    /// </summary>
-    /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-    /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Bottom (View view) { return new PosView (view, Side.Bottom); }
-
     /// <summary>Creates a <see cref="Pos"/> object that can be used to center the <see cref="View"/>.</summary>
     /// <returns>The center Pos.</returns>
     /// <example>
@@ -212,11 +206,6 @@ public class Pos
     /// <summary>Serves as the default hash function. </summary>
     /// <returns>A hash code for the current object.</returns>
     public override int GetHashCode () { return Anchor (0).GetHashCode (); }
-
-    /// <summary>Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.</summary>
-    /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-    /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Left (View view) { return new PosView (view, Side.X); }
 
     /// <summary>Adds a <see cref="Terminal.Gui.Pos"/> to a <see cref="Terminal.Gui.Pos"/>, yielding a new <see cref="Pos"/>.</summary>
     /// <param name="left">The first <see cref="Terminal.Gui.Pos"/> to add.</param>
@@ -293,6 +282,34 @@ public class Pos
         return new PosFactor (percent / 100);
     }
 
+    /// <summary>Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.</summary>
+    /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
+    /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+    public static Pos Top (View view) { return new PosView (view, Side.Top); }
+
+    /// <summary>Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.</summary>
+    /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
+    /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+    public static Pos Y (View view) { return new PosView (view, Side.Top); }
+
+    /// <summary>Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.</summary>
+    /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
+    /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+    public static Pos Left (View view) { return new PosView (view, Side.Left); }
+
+    /// <summary>Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.</summary>
+    /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
+    /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+    public static Pos X (View view) { return new PosView (view, Side.Left); }
+
+    /// <summary>
+    ///     Creates a <see cref="Pos"/> object that tracks the Bottom (Y+Height) coordinate of the specified
+    ///     <see cref="View"/>
+    /// </summary>
+    /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
+    /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+    public static Pos Bottom (View view) { return new PosView (view, Side.Bottom); }
+
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that tracks the Right (X+Width) coordinate of the specified
     ///     <see cref="View"/>.
@@ -300,21 +317,6 @@ public class Pos
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
     public static Pos Right (View view) { return new PosView (view, Side.Right); }
-
-    /// <summary>Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.</summary>
-    /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-    /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Top (View view) { return new PosView (view, Side.Y); }
-
-    /// <summary>Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.</summary>
-    /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-    /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos X (View view) { return new PosView (view, Side.X); }
-
-    /// <summary>Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.</summary>
-    /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-    /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Y (View view) { return new PosView (view, Side.Y); }
 
     /// <summary>
     ///     Gets a position that is anchored to a certain point in the layout. This method is typically used
@@ -460,11 +462,29 @@ public class Pos
         internal override int Anchor (int width) { return _function (); }
     }
 
-    internal enum Side
+    /// <summary>
+    /// Describes which side of the view to use for the position.
+    /// </summary>
+    public enum Side
     {
-        X = 0,
-        Y = 1,
+        /// <summary>
+        /// The left (X) side of the view.
+        /// </summary>
+        Left = 0,
+
+        /// <summary>
+        /// The top (Y) side of the view.
+        /// </summary>
+        Top = 1,
+
+        /// <summary>
+        /// The right (X + Width) side of the view.
+        /// </summary>
         Right = 2,
+
+        /// <summary>
+        /// The bottom (Y + Height) side of the view.
+        /// </summary>
         Bottom = 3
     }
 
@@ -478,13 +498,13 @@ public class Pos
         public override string ToString ()
         {
             string sideString = side switch
-                                {
-                                    Side.X => "x",
-                                    Side.Y => "y",
-                                    Side.Right => "right",
-                                    Side.Bottom => "bottom",
-                                    _ => "unknown"
-                                };
+            {
+                Side.Left => "left",
+                Side.Top => "top",
+                Side.Right => "right",
+                Side.Bottom => "bottom",
+                _ => "unknown"
+            };
 
             if (Target == null)
             {
@@ -497,13 +517,13 @@ public class Pos
         internal override int Anchor (int width)
         {
             return side switch
-                   {
-                       Side.X => Target.Frame.X,
-                       Side.Y => Target.Frame.Y,
-                       Side.Right => Target.Frame.Right,
-                       Side.Bottom => Target.Frame.Bottom,
-                       _ => 0
-                   };
+            {
+                Side.Left => Target.Frame.X,
+                Side.Top => Target.Frame.Y,
+                Side.Right => Target.Frame.Right,
+                Side.Bottom => Target.Frame.Bottom,
+                _ => 0
+            };
         }
     }
 }
@@ -608,7 +628,7 @@ public class Dim
     /// <summary>Creates a <see cref="Dim"/> object that tracks the Height of the specified <see cref="View"/>.</summary>
     /// <returns>The height <see cref="Dim"/> of the other <see cref="View"/>.</returns>
     /// <param name="view">The view that will be tracked.</param>
-    public static Dim Height (View view) { return new DimView (view, Side.Height); }
+    public static Dim Height (View view) { return new DimView (view, Dimension.Height); }
 
     /// <summary>Adds a <see cref="Dim"/> to a <see cref="Dim"/>, yielding a new <see cref="Dim"/>.</summary>
     /// <param name="left">The first <see cref="Dim"/> to add.</param>
@@ -691,7 +711,7 @@ public class Dim
     /// <summary>Creates a <see cref="Dim"/> object that tracks the Width of the specified <see cref="View"/>.</summary>
     /// <returns>The width <see cref="Dim"/> of the other <see cref="View"/>.</returns>
     /// <param name="view">The view that will be tracked.</param>
-    public static Dim Width (View view) { return new DimView (view, Side.Width); }
+    public static Dim Width (View view) { return new DimView (view, Dimension.Width); }
 
     /// <summary>
     ///     Gets a dimension that is anchored to a certain point in the layout.
@@ -822,17 +842,27 @@ public class Dim
         internal override int Anchor (int width) { return _function (); }
     }
 
-    internal enum Side
+    /// <summary>
+    /// 
+    /// </summary>
+    public enum Dimension
     {
+        /// <summary>
+        /// The height dimension.
+        /// </summary>
         Height = 0,
+
+        /// <summary>
+        /// The width dimension.
+        /// </summary>
         Width = 1
     }
 
     internal class DimView : Dim
     {
-        private readonly Side _side;
+        private readonly Dimension _side;
 
-        internal DimView (View view, Side side)
+        internal DimView (View view, Dimension side)
         {
             Target = view;
             _side = side;
@@ -850,11 +880,11 @@ public class Dim
             }
 
             string sideString = _side switch
-                                {
-                                    Side.Height => "Height",
-                                    Side.Width => "Width",
-                                    _ => "unknown"
-                                };
+            {
+                Dimension.Height => "Height",
+                Dimension.Width => "Width",
+                _ => "unknown"
+            };
 
             return $"View({sideString},{Target})";
         }
@@ -862,11 +892,11 @@ public class Dim
         internal override int Anchor (int width)
         {
             return _side switch
-                   {
-                       Side.Height => Target.Frame.Height,
-                       Side.Width => Target.Frame.Width,
-                       _ => 0
-                   };
+            {
+                Dimension.Height => Target.Frame.Height,
+                Dimension.Width => Target.Frame.Width,
+                _ => 0
+            };
         }
     }
 }

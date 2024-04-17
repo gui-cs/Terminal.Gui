@@ -101,28 +101,28 @@ public class PosTests (ITestOutputHelper output)
         Pos pos = Pos.Left (v);
 
         Assert.Equal (
-                      $"View(side=x,target=View(V){v.Frame})",
+                      $"View(side=left,target=View(V){v.Frame})",
                       pos.ToString ()
                      );
 
         pos = Pos.X (v);
 
         Assert.Equal (
-                      $"View(side=x,target=View(V){v.Frame})",
+                      $"View(side=left,target=View(V){v.Frame})",
                       pos.ToString ()
                      );
 
         pos = Pos.Top (v);
 
         Assert.Equal (
-                      $"View(side=y,target=View(V){v.Frame})",
+                      $"View(side=top,target=View(V){v.Frame})",
                       pos.ToString ()
                      );
 
         pos = Pos.Y (v);
 
         Assert.Equal (
-                      $"View(side=y,target=View(V){v.Frame})",
+                      $"View(side=top,target=View(V){v.Frame})",
                       pos.ToString ()
                      );
 
@@ -197,9 +197,9 @@ public class PosTests (ITestOutputHelper output)
         Assert.Equal (20, posCombine.Anchor (100));
 
         var view = new View { Frame = new (20, 10, 20, 1) };
-        var posViewX = new Pos.PosView (view, Pos.Side.X);
+        var posViewX = new Pos.PosView (view, Pos.Side.Left);
         Assert.Equal (20, posViewX.Anchor (0));
-        var posViewY = new Pos.PosView (view, Pos.Side.Y);
+        var posViewY = new Pos.PosView (view, Pos.Side.Top);
         Assert.Equal (10, posViewY.Anchor (0));
         var posRight = new Pos.PosView (view, Pos.Side.Right);
         Assert.Equal (40, posRight.Anchor (0));
@@ -617,7 +617,7 @@ public class PosTests (ITestOutputHelper output)
         Pos pos;
 
         // Pos.Left
-        side = "x";
+        side = "left";
         testInt = 0;
         testRect = Rectangle.Empty;
         pos = Pos.Left (new ());
@@ -659,7 +659,7 @@ public class PosTests (ITestOutputHelper output)
                      );
 
         // Pos.X
-        side = "x";
+        side = "left";
         testInt = 0;
         testRect = Rectangle.Empty;
         pos = Pos.X (new ());
@@ -701,7 +701,7 @@ public class PosTests (ITestOutputHelper output)
                      );
 
         // Pos.Top
-        side = "y";
+        side = "top";
         testInt = 0;
         testRect = Rectangle.Empty;
         pos = Pos.Top (new ());
@@ -743,7 +743,7 @@ public class PosTests (ITestOutputHelper output)
                      );
 
         // Pos.Y
-        side = "y";
+        side = "top";
         testInt = 0;
         testRect = Rectangle.Empty;
         pos = Pos.Y (new ());
