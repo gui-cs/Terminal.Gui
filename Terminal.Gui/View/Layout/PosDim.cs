@@ -1,4 +1,22 @@
-﻿namespace Terminal.Gui;
+﻿using static Terminal.Gui.Dialog;
+
+namespace Terminal.Gui;
+
+/// <summary>Determines the horizontal alignment of Views.</summary>
+public enum ViewAlignments
+{
+    /// <summary>Center-aligns the buttons (the default).</summary>
+    Center = 0,
+
+    /// <summary>Justifies the buttons</summary>
+    Justify,
+
+    /// <summary>Left-aligns the buttons</summary>
+    Left,
+
+    /// <summary>Right-aligns the buttons</summary>
+    Right
+}
 
 /// <summary>
 ///     Describes the position of a <see cref="View"/> which can be an absolute value, a percentage, centered, or
@@ -169,14 +187,6 @@ public class Pos
     /// <param name="n">The value to convert to the <see cref="Pos"/>.</param>
     public static Pos At (int n) { return new PosAbsolute (n); }
 
-    /// <summary>
-    ///     Creates a <see cref="Pos"/> object that tracks the Bottom (Y+Height) coordinate of the specified
-    ///     <see cref="View"/>
-    /// </summary>
-    /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-    /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Bottom (View view) { return new PosView (view, Side.Bottom); }
-
     /// <summary>Creates a <see cref="Pos"/> object that can be used to center the <see cref="View"/>.</summary>
     /// <returns>The center Pos.</returns>
     /// <example>
@@ -192,6 +202,12 @@ public class Pos
     ///  </code>
     /// </example>
     public static Pos Center () { return new PosCenter (); }
+
+    public static Pos Justify (View[] views, ViewAlignments alignment)
+    {
+        return new PosJustify (views, alignment);
+    }
+
 
     /// <summary>Determines whether the specified object is equal to the current object.</summary>
     /// <param name="other">The object to compare with the current object. </param>
@@ -212,11 +228,6 @@ public class Pos
     /// <summary>Serves as the default hash function. </summary>
     /// <returns>A hash code for the current object.</returns>
     public override int GetHashCode () { return Anchor (0).GetHashCode (); }
-
-    /// <summary>Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.</summary>
-    /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-    /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Left (View view) { return new PosView (view, Side.X); }
 
     /// <summary>Adds a <see cref="Terminal.Gui.Pos"/> to a <see cref="Terminal.Gui.Pos"/>, yielding a new <see cref="Pos"/>.</summary>
     /// <param name="left">The first <see cref="Terminal.Gui.Pos"/> to add.</param>
@@ -293,6 +304,34 @@ public class Pos
         return new PosFactor (percent / 100);
     }
 
+    /// <summary>Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.</summary>
+    /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
+    /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+    public static Pos Top (View view) { return new PosView (view, Side.Y); }
+
+    /// <summary>Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.</summary>
+    /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
+    /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+    public static Pos Y (View view) { return new PosView (view, Side.Y); }
+
+    /// <summary>Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.</summary>
+    /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
+    /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+    public static Pos Left (View view) { return new PosView (view, Side.X); }
+
+    /// <summary>Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.</summary>
+    /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
+    /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+    public static Pos X (View view) { return new PosView (view, Side.X); }
+
+    /// <summary>
+    ///     Creates a <see cref="Pos"/> object that tracks the Bottom (Y+Height) coordinate of the specified
+    ///     <see cref="View"/>
+    /// </summary>
+    /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
+    /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+    public static Pos Bottom (View view) { return new PosView (view, Side.Bottom); }
+
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that tracks the Right (X+Width) coordinate of the specified
     ///     <see cref="View"/>.
@@ -300,21 +339,6 @@ public class Pos
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
     public static Pos Right (View view) { return new PosView (view, Side.Right); }
-
-    /// <summary>Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.</summary>
-    /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-    /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Top (View view) { return new PosView (view, Side.Y); }
-
-    /// <summary>Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.</summary>
-    /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-    /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos X (View view) { return new PosView (view, Side.X); }
-
-    /// <summary>Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.</summary>
-    /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-    /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Y (View view) { return new PosView (view, Side.Y); }
 
     /// <summary>
     ///     Gets a position that is anchored to a certain point in the layout. This method is typically used
@@ -460,7 +484,7 @@ public class Pos
         internal override int Anchor (int width) { return _function (); }
     }
 
-    internal enum Side
+    public enum Side
     {
         X = 0,
         Y = 1,
@@ -478,13 +502,13 @@ public class Pos
         public override string ToString ()
         {
             string sideString = side switch
-                                {
-                                    Side.X => "x",
-                                    Side.Y => "y",
-                                    Side.Right => "right",
-                                    Side.Bottom => "bottom",
-                                    _ => "unknown"
-                                };
+            {
+                Side.X => "x",
+                Side.Y => "y",
+                Side.Right => "right",
+                Side.Bottom => "bottom",
+                _ => "unknown"
+            };
 
             if (Target == null)
             {
@@ -497,14 +521,100 @@ public class Pos
         internal override int Anchor (int width)
         {
             return side switch
-                   {
-                       Side.X => Target.Frame.X,
-                       Side.Y => Target.Frame.Y,
-                       Side.Right => Target.Frame.Right,
-                       Side.Bottom => Target.Frame.Bottom,
-                       _ => 0
-                   };
+            {
+                Side.X => Target.Frame.X,
+                Side.Y => Target.Frame.Y,
+                Side.Right => Target.Frame.Right,
+                Side.Bottom => Target.Frame.Bottom,
+                _ => 0
+            };
         }
+    }
+
+
+    /// <summary>
+    /// Enables justification of a set of views. 
+    /// </summary>
+    public class PosJustify : Pos
+    {
+        private readonly View [] _views;
+        private readonly ViewAlignments _alignment;
+
+        /// <summary>
+        /// Enables justification of a set of views.
+        /// </summary>
+        /// <param name="views">The set of views to justify according to <paramref name="alignment"/>.</param>
+        /// <param name="alignment"></param>
+        public PosJustify (View [] views, ViewAlignments alignment)
+        {
+            _alignment = alignment;
+            _views = views;
+        }
+
+        public override bool Equals (object other)
+        {
+            return other is PosJustify justify && justify._views == _views && justify._alignment == _alignment;
+        }
+
+        public override int GetHashCode () { return _views.GetHashCode (); }
+
+
+        public override string ToString ()
+        {
+            return $"Justify(views={_views},alignment={_alignment})";
+        }
+
+        internal override int Anchor (int width)
+        {
+            if (_views.Length == 0 || !_views [0].IsInitialized)
+            {
+                return 0;
+            }
+            int spacing = 0;
+            switch (_alignment)
+            {
+                case ViewAlignments.Center:
+                    // Center spacing is sum of the widths of the views - width / number of views
+                    spacing = (width - _views.Select (v => v.Frame.Width).Sum ()) / _views.Length;
+                    
+                    // How do I know which view we are?
+                    View us = _views.Where (v => v.X.Equals (this)).First();
+
+                    if (_views [0] == us)
+                    {
+                        return spacing;
+                    }
+                    // Calculate the position of the previous (left or above us) view
+                    int previous = _views.Where (v => v.X.Equals (us)).First().Frame.Left;
+
+                    return previous + spacing;
+                //case ViewAlignments.Left:
+                //    return Left (width);
+                //case ViewAlignments.Right:
+                //    return Right (width);
+                //case ViewAlignments.Justify:
+                //    return Justify (width);
+                default:
+                    return 0;
+
+            }
+        }
+
+        //internal override int Calculate (int superviewDimension, Dim dim, int autosize, bool autoSize)
+        //{
+        //    // Assuming autosize is the size that the View would have if it were to automatically adjust its size based on its content
+        //    // and autoSize is a boolean value that indicates whether the View should automatically adjust its size based on its content
+        //    if (autoSize)
+        //    {
+        //        return autosize;
+        //    }
+        //    else
+        //    {
+        //        // Assuming dim.Calculate returns the calculated size of the View
+        //        return dim.Calculate (_views.Frame.Left, _views.Frame.Width, autosize, autoSize);
+        //    }
+        //}
+
     }
 }
 
@@ -822,7 +932,7 @@ public class Dim
         internal override int Anchor (int width) { return _function (); }
     }
 
-    internal enum Side
+    public enum Side
     {
         Height = 0,
         Width = 1
@@ -850,11 +960,11 @@ public class Dim
             }
 
             string sideString = _side switch
-                                {
-                                    Side.Height => "Height",
-                                    Side.Width => "Width",
-                                    _ => "unknown"
-                                };
+            {
+                Side.Height => "Height",
+                Side.Width => "Width",
+                _ => "unknown"
+            };
 
             return $"View({sideString},{Target})";
         }
@@ -862,11 +972,11 @@ public class Dim
         internal override int Anchor (int width)
         {
             return _side switch
-                   {
-                       Side.Height => Target.Frame.Height,
-                       Side.Width => Target.Frame.Width,
-                       _ => 0
-                   };
+            {
+                Side.Height => Target.Frame.Height,
+                Side.Width => Target.Frame.Width,
+                _ => 0
+            };
         }
     }
 }

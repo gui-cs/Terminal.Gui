@@ -265,7 +265,7 @@ public class Dialogs : Scenario
             dialog = new Dialog
             {
                 Title = titleEdit.Text,
-                ButtonAlignment = (Dialog.ButtonAlignments)styleRadioGroup.SelectedItem,
+                ButtonAlignment = (ViewAlignments)styleRadioGroup.SelectedItem,
                 Buttons = buttons.ToArray ()
             };
 

@@ -32,7 +32,7 @@ public class DialogTests
             Title = title,
             Width = width,
             Height = 1,
-            ButtonAlignment = Dialog.ButtonAlignments.Center,
+            ButtonAlignment = ViewAlignments.Center,
             Buttons = [new Button { Text = btn1Text }]
         };
 
@@ -57,7 +57,7 @@ public class DialogTests
             Title = title,
             Width = width,
             Height = 1,
-            ButtonAlignment = Dialog.ButtonAlignments.Justify,
+            ButtonAlignment = ViewAlignments.Justify,
             Buttons = [new Button { Text = btn1Text }]
         };
 
@@ -82,7 +82,7 @@ public class DialogTests
             Title = title,
             Width = width,
             Height = 1,
-            ButtonAlignment = Dialog.ButtonAlignments.Right,
+            ButtonAlignment = ViewAlignments.Right,
             Buttons = [new Button { Text = btn1Text }]
         };
 
@@ -107,7 +107,7 @@ public class DialogTests
             Title = title,
             Width = width,
             Height = 1,
-            ButtonAlignment = Dialog.ButtonAlignments.Left,
+            ButtonAlignment = ViewAlignments.Left,
             Buttons = [new Button { Text = btn1Text }]
         };
 
@@ -155,7 +155,7 @@ public class DialogTests
         (runstate, Dialog dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Center,
+                                                    ViewAlignments.Center,
                                                     new Button { Text = btn1Text },
                                                     new Button { Text = btn2Text },
                                                     new Button { Text = btn3Text },
@@ -172,7 +172,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                       title,
                                                       width,
-                                                      Dialog.ButtonAlignments.Justify,
+                                                      ViewAlignments.Justify,
                                                       new Button { Text = btn1Text },
                                                       new Button { Text = btn2Text },
                                                       new Button { Text = btn3Text },
@@ -189,7 +189,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                       title,
                                                       width,
-                                                      Dialog.ButtonAlignments.Right,
+                                                      ViewAlignments.Right,
                                                       new Button { Text = btn1Text },
                                                       new Button { Text = btn2Text },
                                                       new Button { Text = btn3Text },
@@ -206,7 +206,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                       title,
                                                       width,
-                                                      Dialog.ButtonAlignments.Left,
+                                                      ViewAlignments.Left,
                                                       new Button { Text = btn1Text },
                                                       new Button { Text = btn2Text },
                                                       new Button { Text = btn3Text },
@@ -248,7 +248,7 @@ public class DialogTests
         (runstate, Dialog dlg) = RunButtonTestDialog (
                                                       title,
                                                       width,
-                                                      Dialog.ButtonAlignments.Center,
+                                                      ViewAlignments.Center,
                                                       new Button { Text = btn1Text },
                                                       new Button { Text = btn2Text },
                                                       new Button { Text = btn3Text },
@@ -280,7 +280,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Justify,
+                                                    ViewAlignments.Justify,
                                                     new Button { Text = btn1Text },
                                                     new Button { Text = btn2Text },
                                                     new Button { Text = btn3Text },
@@ -296,7 +296,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Right,
+                                                    ViewAlignments.Right,
                                                     new Button { Text = btn1Text },
                                                     new Button { Text = btn2Text },
                                                     new Button { Text = btn3Text },
@@ -312,7 +312,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Left,
+                                                    ViewAlignments.Left,
                                                     new Button { Text = btn1Text },
                                                     new Button { Text = btn2Text },
                                                     new Button { Text = btn3Text },
@@ -353,7 +353,7 @@ public class DialogTests
         (runstate, Dialog dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Center,
+                                                    ViewAlignments.Center,
                                                     new Button { Text = btn1Text },
                                                     new Button { Text = btn2Text },
                                                     new Button { Text = btn3Text },
@@ -370,7 +370,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Justify,
+                                                    ViewAlignments.Justify,
                                                     new Button { Text = btn1Text },
                                                     new Button { Text = btn2Text },
                                                     new Button { Text = btn3Text },
@@ -387,7 +387,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Right,
+                                                    ViewAlignments.Right,
                                                     new Button { Text = btn1Text },
                                                     new Button { Text = btn2Text },
                                                     new Button { Text = btn3Text },
@@ -404,7 +404,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Left,
+                                                    ViewAlignments.Left,
                                                     new Button { Text = btn1Text },
                                                     new Button { Text = btn2Text },
                                                     new Button { Text = btn3Text },
@@ -447,7 +447,7 @@ public class DialogTests
         (runstate, Dialog dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Center,
+                                                    ViewAlignments.Center,
                                                     new Button { Text = btn1Text },
                                                     new Button { Text = btn2Text },
                                                     new Button { Text = btn3Text },
@@ -464,7 +464,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Justify,
+                                                    ViewAlignments.Justify,
                                                     new Button { Text = btn1Text },
                                                     new Button { Text = btn2Text },
                                                     new Button { Text = btn3Text },
@@ -481,7 +481,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Right,
+                                                    ViewAlignments.Right,
                                                     new Button { Text = btn1Text },
                                                     new Button { Text = btn2Text },
                                                     new Button { Text = btn3Text },
@@ -498,7 +498,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Left,
+                                                    ViewAlignments.Left,
                                                     new Button { Text = btn1Text },
                                                     new Button { Text = btn2Text },
                                                     new Button { Text = btn3Text },
@@ -530,7 +530,7 @@ public class DialogTests
         (runstate, Dialog dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Center,
+                                                    ViewAlignments.Center,
                                                     new Button { Text = btnText }
                                                    );
 
@@ -547,7 +547,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Justify,
+                                                    ViewAlignments.Justify,
                                                     new Button { Text = btnText }
                                                    );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
@@ -562,7 +562,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Right,
+                                                    ViewAlignments.Right,
                                                     new Button { Text = btnText }
                                                    );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
@@ -577,7 +577,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Left,
+                                                    ViewAlignments.Left,
                                                     new Button { Text = btnText }
                                                    );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
@@ -594,7 +594,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Center,
+                                                    ViewAlignments.Center,
                                                     new Button { Text = btnText }
                                                    );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
@@ -609,7 +609,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Justify,
+                                                    ViewAlignments.Justify,
                                                     new Button { Text = btnText }
                                                    );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
@@ -624,7 +624,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Right,
+                                                    ViewAlignments.Right,
                                                     new Button { Text = btnText }
                                                    );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
@@ -639,7 +639,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Left,
+                                                    ViewAlignments.Left,
                                                     new Button { Text = btnText }
                                                    );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
@@ -673,7 +673,7 @@ public class DialogTests
         (runstate, Dialog dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Center,
+                                                    ViewAlignments.Center,
                                                     new Button { Text = btn1Text },
                                                     new Button { Text = btn2Text },
                                                     new Button { Text = btn3Text }
@@ -689,7 +689,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Justify,
+                                                    ViewAlignments.Justify,
                                                     new Button { Text = btn1Text },
                                                     new Button { Text = btn2Text },
                                                     new Button { Text = btn3Text }
@@ -705,7 +705,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Right,
+                                                    ViewAlignments.Right,
                                                     new Button { Text = btn1Text },
                                                     new Button { Text = btn2Text },
                                                     new Button { Text = btn3Text }
@@ -721,7 +721,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Left,
+                                                    ViewAlignments.Left,
                                                     new Button { Text = btn1Text },
                                                     new Button { Text = btn2Text },
                                                     new Button { Text = btn3Text }
@@ -755,7 +755,7 @@ public class DialogTests
         (runstate, Dialog dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Center,
+                                                    ViewAlignments.Center,
                                                     new Button { Text = btn1Text },
                                                     new Button { Text = btn2Text }
                                                    );
@@ -770,7 +770,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Justify,
+                                                    ViewAlignments.Justify,
                                                     new Button { Text = btn1Text },
                                                     new Button { Text = btn2Text }
                                                    );
@@ -785,7 +785,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Right,
+                                                    ViewAlignments.Right,
                                                     new Button { Text = btn1Text },
                                                     new Button { Text = btn2Text }
                                                    );
@@ -800,7 +800,7 @@ public class DialogTests
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Left,
+                                                    ViewAlignments.Left,
                                                     new Button { Text = btn1Text },
                                                     new Button { Text = btn2Text }
                                                    );
@@ -837,7 +837,7 @@ public class DialogTests
         // Default (Center)
         button1 = new Button { Text = btn1Text };
         button2 = new Button { Text = btn2Text };
-        (runstate, dlg) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Center, button1, button2);
+        (runstate, dlg) = RunButtonTestDialog (title, width, ViewAlignments.Center, button1, button2);
         button1.Visible = false;
         RunIteration (ref runstate, ref firstIteration);
         buttonRow = $@"{CM.Glyphs.VLine}         {btn2} {CM.Glyphs.VLine}";
@@ -849,7 +849,7 @@ public class DialogTests
         Assert.Equal (width, buttonRow.Length);
         button1 = new Button { Text = btn1Text };
         button2 = new Button { Text = btn2Text };
-        (runstate, dlg) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Justify, button1, button2);
+        (runstate, dlg) = RunButtonTestDialog (title, width, ViewAlignments.Justify, button1, button2);
         button1.Visible = false;
         RunIteration (ref runstate, ref firstIteration);
         buttonRow = $@"{CM.Glyphs.VLine}          {btn2}{CM.Glyphs.VLine}";
@@ -861,7 +861,7 @@ public class DialogTests
         Assert.Equal (width, buttonRow.Length);
         button1 = new Button { Text = btn1Text };
         button2 = new Button { Text = btn2Text };
-        (runstate, dlg) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Right, button1, button2);
+        (runstate, dlg) = RunButtonTestDialog (title, width, ViewAlignments.Right, button1, button2);
         button1.Visible = false;
         RunIteration (ref runstate, ref firstIteration);
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
@@ -872,7 +872,7 @@ public class DialogTests
         Assert.Equal (width, buttonRow.Length);
         button1 = new Button { Text = btn1Text };
         button2 = new Button { Text = btn2Text };
-        (runstate, dlg) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Left, button1, button2);
+        (runstate, dlg) = RunButtonTestDialog (title, width, ViewAlignments.Left, button1, button2);
         button1.Visible = false;
         RunIteration (ref runstate, ref firstIteration);
         buttonRow = $@"{CM.Glyphs.VLine}        {btn2}  {CM.Glyphs.VLine}";
@@ -1301,7 +1301,7 @@ public class DialogTests
         (runstate, Dialog _) = RunButtonTestDialog (
                                                     title,
                                                     width,
-                                                    Dialog.ButtonAlignments.Center,
+                                                    ViewAlignments.Center,
                                                     new Button { Text = btnText }
                                                    );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
@@ -1347,7 +1347,7 @@ public class DialogTests
         int width = buttonRow.Length;
         d.SetBufferSize (buttonRow.Length, 3);
 
-        (runstate, Dialog _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Center, null);
+        (runstate, Dialog _) = RunButtonTestDialog (title, width, ViewAlignments.Center, null);
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
 
         End (runstate);
@@ -1356,7 +1356,7 @@ public class DialogTests
     private (RunState, Dialog) RunButtonTestDialog (
         string title,
         int width,
-        Dialog.ButtonAlignments align,
+        ViewAlignments align,
         params Button [] btns
     )
     {

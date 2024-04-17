@@ -15,21 +15,6 @@ namespace Terminal.Gui;
 /// </remarks>
 public class Dialog : Window
 {
-    /// <summary>Determines the horizontal alignment of the Dialog buttons.</summary>
-    public enum ButtonAlignments
-    {
-        /// <summary>Center-aligns the buttons (the default).</summary>
-        Center = 0,
-
-        /// <summary>Justifies the buttons</summary>
-        Justify,
-
-        /// <summary>Left-aligns the buttons</summary>
-        Left,
-
-        /// <summary>Right-aligns the buttons</summary>
-        Right
-    }
 
     // TODO: Reenable once border/borderframe design is settled
     /// <summary>
@@ -109,7 +94,7 @@ public class Dialog : Window
     }
 
     /// <summary>Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the bottom of the dialog.</summary>
-    public ButtonAlignments ButtonAlignment { get; set; }
+    public ViewAlignments ButtonAlignment { get; set; }
 
     /// <summary>Optional buttons to lay out at the bottom of the dialog.</summary>
     public Button [] Buttons
@@ -129,11 +114,11 @@ public class Dialog : Window
         }
     }
 
-    /// <summary>The default <see cref="ButtonAlignments"/> for <see cref="Dialog"/>.</summary>
+    /// <summary>The default <see cref="ViewAlignments"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     [JsonConverter (typeof (JsonStringEnumConverter))]
-    public static ButtonAlignments DefaultButtonAlignment { get; set; } = ButtonAlignments.Center;
+    public static ViewAlignments DefaultButtonAlignment { get; set; } = ViewAlignments.Center;
 
     /// <summary>
     ///     Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controlled by the
@@ -200,7 +185,7 @@ public class Dialog : Window
 
         switch (ButtonAlignment)
         {
-            case ButtonAlignments.Center:
+            case ViewAlignments.Center:
                 // Center Buttons
                 shiftLeft = (Viewport.Width - buttonsWidth - _buttons.Count - 1) / 2 + 1;
 
@@ -223,7 +208,7 @@ public class Dialog : Window
 
                 break;
 
-            case ButtonAlignments.Justify:
+            case ViewAlignments.Justify:
                 // Justify Buttons
                 // leftmost and rightmost buttons are hard against edges. The rest are evenly spaced.
 
@@ -258,7 +243,7 @@ public class Dialog : Window
 
                 break;
 
-            case ButtonAlignments.Left:
+            case ViewAlignments.Left:
                 // Left Align Buttons
                 Button prevButton = _buttons [0];
                 prevButton.X = 0;
@@ -274,7 +259,7 @@ public class Dialog : Window
 
                 break;
 
-            case ButtonAlignments.Right:
+            case ViewAlignments.Right:
                 // Right align buttons
                 shiftLeft = _buttons [_buttons.Count - 1].Frame.Width;
                 _buttons [_buttons.Count - 1].X = Pos.AnchorEnd (shiftLeft);

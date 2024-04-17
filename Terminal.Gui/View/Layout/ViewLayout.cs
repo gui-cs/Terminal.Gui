@@ -33,6 +33,7 @@ public enum LayoutStyle
     Computed
 }
 
+
 public partial class View
 {
     #region Frame
