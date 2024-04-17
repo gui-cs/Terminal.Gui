@@ -26,9 +26,12 @@ public enum LayoutStyle
 
     /// <summary>
     ///     Indicates one or more of the <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, or
-    ///     <see cref="View.Height"/> objects are relative to the <see cref="View.SuperView"/> and are computed at layout time.
-    ///     The position and size of the view will be computed based on these objects at layout time. <see cref="View.Frame"/>
-    ///     will provide the absolute computed values.
+    ///     <see cref="View.Height"/>
+    ///     objects are relative to the <see cref="View.SuperView"/> and are computed at layout time.  The position and size of
+    ///     the
+    ///     view
+    ///     will be computed based on these objects at layout time. <see cref="View.Frame"/> will provide the absolute computed
+    ///     values.
     /// </summary>
     Computed
 }
@@ -397,6 +400,7 @@ public partial class View
         }
     }
 
+
     /// <summary>If <paramref name="autoSize"/> is true, resizes the view.</summary>
     /// <param name="autoSize"></param>
     /// <returns></returns>
@@ -408,7 +412,7 @@ public partial class View
         }
 
         var boundsChanged = true;
-        Size newFrameSize = GetAutoSize ();
+        Size newFrameSize = GetTextAutoSize ();
 
         if (IsInitialized && newFrameSize != Frame.Size)
         {
@@ -856,8 +860,8 @@ public partial class View
     public event EventHandler<LayoutEventArgs> LayoutStarted;
 
     /// <summary>
-    ///     Invoked when a view starts executing or when the dimensions of the view have changed, for example in response
-    ///     to the container view or terminal resizing.
+    ///     Invoked when a view starts executing or when the dimensions of the view have changed, for example in response to
+    ///     the container view or terminal resizing.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -870,15 +874,15 @@ public partial class View
     {
         if (!IsInitialized)
         {
-            Debug.WriteLine (
-                             $"WARNING: LayoutSubviews called before view has been initialized. This is likely a bug in {this}"
-                            );
+            Debug.WriteLine ($"WARNING: LayoutSubviews called before view has been initialized. This is likely a bug in {this}");
         }
 
         if (!LayoutNeeded)
         {
             return;
         }
+
+        CheckDimAuto ();
 
         LayoutAdornments ();
 
@@ -894,7 +898,24 @@ public partial class View
 
         foreach (View v in ordered)
         {
-            LayoutSubview (v, ContentSize);
+            if (v.Width is Dim.DimAuto || v.Height is Dim.DimAuto)
+            {
+                // If the view is auto-sized...
+                Rectangle f = v.Frame;
+                v._frame = new (v.Frame.X, v.Frame.Y, 0, 0);
+                LayoutSubview (v, Viewport.Size);
+
+                if (v.Frame != f)
+                {
+                    // The subviews changed; do it again
+                    v.LayoutNeeded = true;
+                    LayoutSubview (v, Viewport.Size);
+                }
+            }
+            else
+            {
+                LayoutSubview (v, Viewport.Size);
+            }
         }
 
         // If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.
@@ -910,6 +931,75 @@ public partial class View
         LayoutNeeded = false;
 
         OnLayoutComplete (new (ContentSize));
+    }
+
+
+    /// <summary>
+    ///     Throws an <see cref="InvalidOperationException"/> if any SubViews are using Dim objects that depend on this
+    ///     Views dimensions.
+    /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
+    private void CheckDimAuto ()
+    {
+        if (!ValidatePosDim || !IsInitialized || (Width is not Dim.DimAuto && Height is not Dim.DimAuto))
+        {
+            return;
+        }
+
+        void ThrowInvalid (View view, object checkPosDim, string name)
+        {
+            // TODO: Figure out how to make CheckDimAuto deal with PosCombine
+            object bad = null;
+
+            switch (checkPosDim)
+            {
+                case Pos pos and not Pos.PosAbsolute and not Pos.PosView and not Pos.PosCombine:
+                    bad = pos;
+
+                    break;
+
+                case Pos pos and Pos.PosCombine:
+                    // Recursively check for not Absolute or not View
+                    ThrowInvalid (view, (pos as Pos.PosCombine)._left, name);
+                    ThrowInvalid (view, (pos as Pos.PosCombine)._right, name);
+
+                    break;
+
+                case Dim dim and not Dim.DimAbsolute and not Dim.DimView and not Dim.DimCombine:
+                    bad = dim;
+
+                    break;
+
+                case Dim dim and Dim.DimCombine:
+                    // Recursively check for not Absolute or not View
+                    ThrowInvalid (view, (dim as Dim.DimCombine)._left, name);
+                    ThrowInvalid (view, (dim as Dim.DimCombine)._right, name);
+
+                    break;
+            }
+
+            if (bad != null)
+            {
+                throw new InvalidOperationException (
+                                                     @$"{view.GetType ().Name}.{name} = {bad.GetType ().Name} which depends on the SuperView's dimensions and the SuperView uses Dim.Auto.");
+            }
+        }
+
+        // Verify none of the subviews are using Dim objects that depend on the SuperView's dimensions.
+        foreach (View view in Subviews)
+        {
+            if (Width is Dim.DimAuto { _min: null })
+            {
+                ThrowInvalid (view, view.Width, nameof (view.Width));
+                ThrowInvalid (view, view.X, nameof (view.X));
+            }
+
+            if (Height is Dim.DimAuto { _min: null })
+            {
+                ThrowInvalid (view, view.Height, nameof (view.Height));
+                ThrowInvalid (view, view.Y, nameof (view.Y));
+            }
+        }
     }
 
     private void LayoutSubview (View v, Size contentSize)
@@ -1017,17 +1107,19 @@ public partial class View
         Debug.Assert (_width is { });
         Debug.Assert (_height is { });
 
-        var autoSize = Size.Empty;
+        CheckDimAuto ();
 
+        var autoSize = Size.Empty;
+        
         if (AutoSize)
         {
-            autoSize = GetAutoSize ();
+            autoSize = GetTextAutoSize ();
         }
 
-        int newX = _x.Calculate (superviewContentSize.Width, _width, autoSize.Width, AutoSize);
-        int newW = _width.Calculate (newX, superviewContentSize.Width, autoSize.Width, AutoSize);
-        int newY = _y.Calculate (superviewContentSize.Height, _height, autoSize.Height, AutoSize);
-        int newH = _height.Calculate (newY, superviewContentSize.Height, autoSize.Height, AutoSize);
+        int newX = _x.Calculate (superviewContentSize.Width, _width,  this, Dim.Dimension.Width, autoSize.Width, AutoSize);
+        int newW = _width.Calculate (newX, superviewContentSize.Width, this, Dim.Dimension.Width, autoSize.Width, AutoSize);
+        int newY = _y.Calculate (superviewContentSize.Height, _height, this, Dim.Dimension.Height, autoSize.Height, AutoSize);
+        int newH = _height.Calculate (newY, superviewContentSize.Height, this, Dim.Dimension.Height, autoSize.Height, AutoSize);
 
         Rectangle newFrame = new (newX, newY, newW, newH);
 
@@ -1248,34 +1340,28 @@ public partial class View
         return result;
     } // TopologicalSort
 
-    #region Diagnostics
+    // Diagnostics to highlight when X or Y is read before the view has been initialized
+    private Pos VerifyIsInitialized (Pos pos, string member)
+    {
+#if DEBUG
+        if (pos is not Pos.PosAbsolute && LayoutStyle == LayoutStyle.Computed && !IsInitialized)
+        {
+            Debug.WriteLine ($"WARNING: \"{this}\" has not been initialized; {member} is indeterminate ({pos}). This is potentially a bug.");
+        }
+#endif // DEBUG
+        return pos;
+    }
 
     // Diagnostics to highlight when Width or Height is read before the view has been initialized
     private Dim VerifyIsInitialized (Dim dim, string member)
     {
 #if DEBUG
-        if (LayoutStyle == LayoutStyle.Computed && !IsInitialized)
+        if (dim is not Dim.DimAbsolute && LayoutStyle == LayoutStyle.Computed && !IsInitialized)
         {
-            Debug.WriteLine (
-                             $"WARNING: \"{this}\" has not been initialized; {member} is indeterminate: {dim}. This is potentially a bug."
-                            );
-        }
-#endif // DEBUG		
-        return dim;
-    }
-
-    // Diagnostics to highlight when X or Y is read before the view has been initialized
-    private Pos VerifyIsInitialized (Pos pos, string member)
-    {
-#if DEBUG
-        if (LayoutStyle == LayoutStyle.Computed && !IsInitialized)
-        {
-            Debug.WriteLine (
-                             $"WARNING: \"{this}\" has not been initialized; {member} is indeterminate {pos}. This is potentially a bug."
-                            );
+            Debug.WriteLine ($"WARNING: \"{this}\" has not been initialized; {member} is indeterminate: ({dim}). This is potentially a bug.");
         }
 #endif // DEBUG
-        return pos;
+        return dim;
     }
 
     /// <summary>Gets or sets whether validation of <see cref="Pos"/> and <see cref="Dim"/> occurs.</summary>
@@ -1286,6 +1372,4 @@ public partial class View
     ///     thus should only be used for debugging.
     /// </remarks>
     public bool ValidatePosDim { get; set; }
-
-    #endregion
 }

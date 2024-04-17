@@ -61,9 +61,8 @@ public class Dialog : Window
         Y = Pos.Center ();
         ValidatePosDim = true;
 
-        Width = Dim.Percent (85); // Dim.Auto (min: Dim.Percent (10));
-        Height = Dim.Percent (85); //Dim.Auto (min: Dim.Percent (50));
-
+        Width = Dim.Percent (85); 
+        Height = Dim.Percent (85);
         ColorScheme = Colors.ColorSchemes ["Dialog"];
 
         Modal = true;

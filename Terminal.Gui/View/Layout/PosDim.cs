@@ -1,4 +1,7 @@
-﻿using static Terminal.Gui.Dialog;
+using System.Diagnostics;
+using static System.Net.Mime.MediaTypeNames;
+using static Terminal.Gui.Dialog;
+using static Terminal.Gui.Dim;
 
 namespace Terminal.Gui;
 
@@ -346,7 +349,10 @@ public class Pos
     ///     that
     ///     is used.
     /// </returns>
-    internal virtual int Calculate (int superviewDimension, Dim dim, int autosize, bool autoSize) { return Anchor (superviewDimension); }
+    internal virtual int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension, int autosize, bool autoSize)
+    {
+        return Anchor (superviewDimension);
+    }
 
     internal class PosAbsolute (int n) : Pos
     {
@@ -382,7 +388,7 @@ public class Pos
             return width - _offset;
         }
 
-        internal override int Calculate (int superviewDimension, Dim dim, int autosize, bool autoSize)
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension, int autosize, bool autoSize)
         {
             int newLocation = Anchor (superviewDimension);
 
@@ -400,9 +406,9 @@ public class Pos
         public override string ToString () { return "Center"; }
         internal override int Anchor (int width) { return width / 2; }
 
-        internal override int Calculate (int superviewDimension, Dim dim, int autosize, bool autoSize)
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension, int autosize, bool autoSize)
         {
-            int newDimension = Math.Max (dim.Calculate (0, superviewDimension, autosize, autoSize), 0);
+            int newDimension = Math.Max (dim.Calculate (0, superviewDimension, us, dimension, autosize, autoSize), 0);
 
             return Anchor (superviewDimension - newDimension);
         }
@@ -428,11 +434,11 @@ public class Pos
             return la - ra;
         }
 
-        internal override int Calculate (int superviewDimension, Dim dim, int autosize, bool autoSize)
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension, int autosize, bool autoSize)
         {
-            int newDimension = dim.Calculate (0, superviewDimension, autosize, autoSize);
-            int left = _left.Calculate (superviewDimension, dim, autosize, autoSize);
-            int right = _right.Calculate (superviewDimension, dim, autosize, autoSize);
+            int newDimension = dim.Calculate (0, superviewDimension, us, dimension, autosize, autoSize);
+            int left = _left.Calculate (superviewDimension, dim, us, dimension, autosize, autoSize);
+            int right = _right.Calculate (superviewDimension, dim, us, dimension, autosize, autoSize);
 
             if (_add)
             {
@@ -548,6 +554,15 @@ public class Pos
 ///             </listheader>
 ///             <item>
 ///                 <term>
+///                     <see cref="Dim.Auto"/>
+///                 </term>
+///                 <description>
+///                     Creates a <see cref="Dim"/> object that automatically sizes the view to fit
+///                     the view's SubViews.
+///                 </description>
+///             </item>
+///             <item>
+///                 <term>
 ///                     <see cref="Dim.Function(Func{int})"/>
 ///                 </term>
 ///                 <description>
@@ -597,6 +612,87 @@ public class Pos
 /// </remarks>
 public class Dim
 {
+    /// <summary>
+    ///     Specifies how <see cref="DimAuto"/> will compute the dimension.
+    /// </summary>
+    public enum DimAutoStyle
+    {
+        /// <summary>
+        ///     The dimension will be computed using both the view's <see cref="View.Text"/> and
+        ///     <see cref="View.Subviews"/>.
+        ///     The larger of the corresponding text dimension or Subview in <see cref="View.Subviews"/>
+        ///     with the largest corresponding position plus dimension will determine the dimension.
+        /// </summary>
+        Auto,
+
+        /// <summary>
+        ///     The Subview in <see cref="View.Subviews"/> with the largest corresponding position plus dimension
+        ///     will determine the dimension.
+        ///     The corresponding dimension of the view's <see cref="View.Text"/> will be ignored.
+        /// </summary>
+        Subviews,
+
+        /// <summary>
+        ///     The corresponding dimension of the view's <see cref="View.Text"/>, formatted using the
+        ///     <see cref="View.TextFormatter"/> settings,
+        ///     will be used to determine the dimension.
+        ///     The corresponding dimensions of the <see cref="View.Subviews"/> will be ignored.
+        /// </summary>
+        Text
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public enum Dimension
+    {
+        /// <summary>
+        /// No dimension specified.
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// The height dimension.
+        /// </summary>
+        Height = 1,
+
+        /// <summary>
+        /// The width dimension.
+        /// </summary>
+        Width = 2
+    }
+
+
+    /// <summary>
+    ///     Creates a <see cref="Dim"/> object that automatically sizes the view to fit all of the view's SubViews and/or Text.
+    /// </summary>
+    /// <example>
+    ///     This initializes a <see cref="View"/> with two SubViews. The view will be automatically sized to fit the two
+    ///     SubViews.
+    /// <code>
+    /// var button = new Button () { Text = "Click Me!", X = 1, Y = 1, Width = 10, Height = 1 };
+    /// var textField = new TextField { Text = "Type here", X = 1, Y = 2, Width = 20, Height = 1 };
+    /// var view = new Window () { Title = "MyWindow", X = 0, Y = 0, Width = Dim.AutoSize (), Height = Dim.AutoSize () };
+    /// view.Add (button, textField);
+    /// </code>
+    /// </example>
+    /// <returns>The AutoSize <see cref="Dim"/> object.</returns>
+    /// <param name="style">
+    ///     Specifies how <see cref="DimAuto"/> will compute the dimension. The default is <see cref="DimAutoStyle.Auto"/>.
+    /// </param>
+    /// <param name="min">Specifies the minimum dimension that view will be automatically sized to.</param>
+    /// <param name="max">Specifies the maximum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
+    public static Dim Auto (DimAutoStyle style = DimAutoStyle.Auto, Dim min = null, Dim max = null)
+    {
+        if (max != null)
+        {
+            throw new NotImplementedException (@"max is not implemented");
+        }
+
+        return new DimAuto (style, min, max);
+    }
+
     /// <summary>Determines whether the specified object is equal to the current object.</summary>
     /// <param name="other">The object to compare with the current object. </param>
     /// <returns>
@@ -727,22 +823,22 @@ public class Dim
 
     /// <summary>
     ///     Calculates and returns the dimension of a <see cref="View"/> object. It takes into account the location of the
-    ///     <see cref="View"/>, its current size, and whether it should automatically adjust its size based on its content.
+    ///     <see cref="View"/>, it's SuperView's ContentSize, and whether it should automatically adjust its size based on its content.
     /// </summary>
     /// <param name="location">
     ///     The starting point from where the size calculation begins. It could be the left edge for width calculation or the
     ///     top edge for height calculation.
     /// </param>
-    /// <param name="dimension">The current size of the View. It could be the current width or height.</param>
+    /// <param name="superviewContentSize">The size of the SuperView's content. It could be width or height.</param>
     /// <param name="autosize">Obsolete; To be deprecated.</param>
     /// <param name="autoSize">Obsolete; To be deprecated.</param>
     /// <returns>
     ///     The calculated size of the View. The way this size is calculated depends on the specific subclass of Dim that
     ///     is used.
     /// </returns>
-    internal virtual int Calculate (int location, int dimension, int autosize, bool autoSize)
+    internal virtual int Calculate (int location, int superviewContentSize, View us, Dimension dimension, int autosize, bool autoSize)
     {
-        int newDimension = Math.Max (Anchor (dimension - location), 0);
+        int newDimension = Math.Max (Anchor (superviewContentSize - location), 0);
 
         return autoSize && autosize > newDimension ? autosize : newDimension;
     }
@@ -755,13 +851,76 @@ public class Dim
         public override string ToString () { return $"Absolute({_n})"; }
         internal override int Anchor (int width) { return _n; }
 
-        internal override int Calculate (int location, int dimension, int autosize, bool autoSize)
+        internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension, int autosize, bool autoSize)
         {
             // DimAbsolute.Anchor (int width) ignores width and returns n
             int newDimension = Math.Max (Anchor (0), 0);
 
             return autoSize && autosize > newDimension ? autosize : newDimension;
         }
+    }
+
+    internal class DimAuto (DimAutoStyle style, Dim min, Dim max) : Dim
+    {
+        internal readonly Dim _max = max;
+        internal readonly Dim _min = min;
+        internal readonly DimAutoStyle _style = style;
+        internal int Size;
+
+        public override bool Equals (object other) { return other is DimAuto auto && auto._min == _min && auto._max == _max && auto._style == _style; }
+        public override int GetHashCode () { return HashCode.Combine (base.GetHashCode (), _min, _max, _style); }
+        public override string ToString () { return $"Auto({_style},{_min},{_max})"; }
+
+        internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension, int autosize, bool autoSize)
+        {
+            if (us == null)
+            {
+                return _max?.Anchor (0) ?? 0;
+            }
+
+            var textSize = 0;
+            var subviewsSize = 0;
+
+            int autoMin = _min?.Anchor (superviewContentSize) ?? 0;
+
+            if (superviewContentSize < autoMin)
+            {
+                Debug.WriteLine ($"WARNING: DimAuto specifies a min size ({autoMin}), but the SuperView's bounds are smaller ({superviewContentSize}).");
+
+                return superviewContentSize;
+            }
+
+            if (_style is Dim.DimAutoStyle.Text or Dim.DimAutoStyle.Auto)
+            {
+                textSize = int.Max (autoMin, dimension == Dimension.Width ? us.TextFormatter.Size.Width : us.TextFormatter.Size.Height);
+            }
+
+            if (_style is Dim.DimAutoStyle.Subviews or Dim.DimAutoStyle.Auto)
+            {
+                subviewsSize = us.Subviews.Count == 0
+                                   ? 0
+                                   : us.Subviews
+                                         .Where (v => dimension == Dimension.Width ? v.X is not Pos.PosAnchorEnd : v.Y is not Pos.PosAnchorEnd)
+                                         .Max (v => dimension == Dimension.Width ? v.Frame.X + v.Frame.Width : v.Frame.Y + v.Frame.Height);
+            }
+
+            int max = int.Max (textSize, subviewsSize);
+
+            Thickness thickness = us.GetAdornmentsThickness ();
+
+            if (dimension == Dimension.Width)
+            {
+                max += thickness.Horizontal;
+            }
+            else
+            {
+                max += thickness.Vertical;
+            }
+
+            max = int.Max (max, autoMin);
+            return int.Min (max, _max?.Anchor (superviewContentSize) ?? superviewContentSize);
+        }
+
     }
 
     internal class DimCombine (bool add, Dim left, Dim right) : Dim
@@ -784,10 +943,10 @@ public class Dim
             return la - ra;
         }
 
-        internal override int Calculate (int location, int dimension, int autosize, bool autoSize)
+        internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension, int autosize, bool autoSize)
         {
-            int leftNewDim = _left.Calculate (location, dimension, autosize, autoSize);
-            int rightNewDim = _right.Calculate (location, dimension, autosize, autoSize);
+            int leftNewDim = _left.Calculate (location, superviewContentSize, us, dimension, autosize, autoSize);
+            int rightNewDim = _right.Calculate (location, superviewContentSize, us, dimension, autosize, autoSize);
 
             int newDimension;
 
@@ -802,6 +961,7 @@ public class Dim
 
             return autoSize && autosize > newDimension ? autosize : newDimension;
         }
+
     }
 
     internal class DimFactor (float factor, bool remaining = false) : Dim
@@ -815,9 +975,9 @@ public class Dim
         public override string ToString () { return $"Factor({_factor},{_remaining})"; }
         internal override int Anchor (int width) { return (int)(width * _factor); }
 
-        internal override int Calculate (int location, int dimension, int autosize, bool autoSize)
+        internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension, int autosize, bool autoSize)
         {
-            int newDimension = _remaining ? Math.Max (Anchor (dimension - location), 0) : Anchor (dimension);
+            int newDimension = _remaining ? Math.Max (Anchor (superviewContentSize - location), 0) : Anchor (superviewContentSize);
 
             return autoSize && autosize > newDimension ? autosize : newDimension;
         }
@@ -840,22 +1000,6 @@ public class Dim
         public override int GetHashCode () { return _function.GetHashCode (); }
         public override string ToString () { return $"DimFunc({_function ()})"; }
         internal override int Anchor (int width) { return _function (); }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public enum Dimension
-    {
-        /// <summary>
-        /// The height dimension.
-        /// </summary>
-        Height = 0,
-
-        /// <summary>
-        /// The width dimension.
-        /// </summary>
-        Width = 1
     }
 
     internal class DimView : Dim
