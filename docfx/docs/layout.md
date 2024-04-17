@@ -55,7 +55,7 @@ The [Pos](~/api/Terminal.Gui.Pos.yml) is the type of `View.X` and `View.Y` and s
 
 * Absolute position, by passing an integer - `Pos.Absolute(n)`.
 * Percentage of the parent's view size - `Pos.Percent(percent)`.
-* Anchored from the end of the dimension - `Pos.AnchorEnd(margin)`.
+* Anchored from the end of the dimension - `Pos.AnchorEnd()`.
 * Centered, using `Pos.Center()`.
 * The `Pos.Left(otherView)`, `Pos.Top(otherView)`, `Pos.Bottom(otherView)`, `Pos.Right(otherView)` positions of another view.
 
