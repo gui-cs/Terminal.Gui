@@ -43,7 +43,7 @@
 ///             </item>
 ///             <item>
 ///                 <term>
-///                     <see cref="Pos.AnchorEnd(int)"/>
+///                     <see cref="Pos.AnchorEnd()"/>
 ///                 </term>
 ///                 <description>
 ///                     Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom) of
@@ -142,7 +142,8 @@ public class Pos
 
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom) of the SuperView,
-    ///     useful to flush the layout from the right or bottom.
+    ///     useful to flush the layout from the right or bottom. See also <see cref="Pos.AnchorEnd()"/>, which uses the view
+    ///     dimension to ensure the view is fully visible.
     /// </summary>
     /// <returns>The <see cref="Pos"/> object anchored to the end (the bottom or the right side).</returns>
     /// <param name="offset">The view will be shifted left or up by the amount specified.</param>
@@ -315,6 +316,13 @@ public class Pos
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
     public static Pos Y (View view) { return new PosView (view, Side.Y); }
 
+    /// <summary>
+    /// Used to calculate a position that is anchored to a certain point in the layout. This method is typically used internally by the layout system to determine where a View should be positioned.
+    /// </summary>
+    /// <param name="width">The width of the area where the View is being positioned (Superview.ContentSize).</param>
+    /// <returns>An integer representing the calculated position. The way this position is calculated depends on the specific
+    /// subclass of Pos that is used. For example, PosAbsolute returns a fixed position, PosAnchorEnd returns a
+    /// position that is anchored to the end of the layout, and so on.</returns>
     internal virtual int Anchor (int width) { return 0; }
 
     /// <summary>
@@ -681,6 +689,15 @@ public class Dim
     /// <returns>The width <see cref="Dim"/> of the other <see cref="View"/>.</returns>
     /// <param name="view">The view that will be tracked.</param>
     public static Dim Width (View view) { return new DimView (view, Side.Width); }
+
+    /// <summary>
+    /// Used to calculate a dimension that is anchored to a certain point in the layout.
+    /// This method is typically used internally by the layout system to determine the size of a View.
+    /// </summary>
+    /// <param name="width">The width of the area where the View is being sized (Superview.ContentSize).</param>
+    /// <returns>An integer representing the calculated dimension. The way this dimension is calculated depends on the specific
+    /// subclass of Dim that is used. For example, DimAbsolute returns a fixed dimension, DimFactor returns a
+    /// dimension that is a certain percentage of the super view's size, and so on.</returns>
 
     internal virtual int Anchor (int width) { return 0; }
 
