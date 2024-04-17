@@ -37,10 +37,10 @@ public partial class View
     ///         to <see cref="TextAlignment"/> and <see cref="TextDirection"/>.
     ///     </para>
     ///     <para>
-    ///         The text will word-wrap to additional lines if it does not fit horizontally. If <see cref="Viewport"/>'s height
+    ///         The text will word-wrap to additional lines if it does not fit horizontally. If <see cref="ContentSize"/>'s height
     ///         is 1, the text will be clipped.
     ///     </para>
-    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Viewport"/> will be adjusted to fit the text.</para>
+    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
     ///     <para>When the text changes, the <see cref="TextChanged"/> is fired.</para>
     /// </remarks>
     public virtual string Text
@@ -87,7 +87,7 @@ public partial class View
     ///     redisplay the <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Viewport"/> will be adjusted to fit the text.</para>
+    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
     /// </remarks>
     /// <value>The text alignment.</value>
     public virtual TextAlignment TextAlignment
@@ -106,7 +106,7 @@ public partial class View
     ///     <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Viewport"/> will be adjusted to fit the text.</para>
+    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
     /// </remarks>
     /// <value>The text alignment.</value>
     public virtual TextDirection TextDirection
@@ -130,7 +130,7 @@ public partial class View
     ///     the <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Viewport"/> will be adjusted to fit the text.</para>
+    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
     /// </remarks>
     /// <value>The text alignment.</value>
     public virtual VerticalTextAlignment VerticalTextAlignment
@@ -174,8 +174,9 @@ public partial class View
                    : 0;
     }
 
+    // BUGBUG: This API is fundamentally broken. Text autosize should have nothing to do with what's visible (Viewport) and only ContentSize.
     /// <summary>
-    ///     Gets the Frame dimensions required to fit <see cref="Text"/> within <see cref="Viewport"/> using the text
+    ///     Gets the Frame dimensions required to fit <see cref="Text"/> within <see cref="ContentSize"/> using the text
     ///     <see cref="NavigationDirection"/> specified by the <see cref="TextFormatter"/> property and accounting for any
     ///     <see cref="HotKeySpecifier"/> characters.
     /// </summary>
@@ -257,16 +258,17 @@ public partial class View
         
         int w = Viewport.Size.Width + GetHotKeySpecifierLength ();
 
+        // TODO: This is a hack. Figure out how to move this into DimDimAuto
         if (Width is Dim.DimAuto widthAuto && widthAuto._style != Dim.DimAutoStyle.Subviews)
         {
             if (Height is Dim.DimAuto)
             {
                 // Both are auto. 
-                TextFormatter.Size = new Size (SuperView?.Viewport.Width ?? 0, SuperView?.Viewport.Height ?? 0);
+                TextFormatter.Size = new Size (SuperView?.ContentSize.Width ?? 0, SuperView?.ContentSize.Height ?? 0);
             }
             else
             {
-                TextFormatter.Size = new Size (SuperView?.Viewport.Width ?? 0, Viewport.Size.Height + GetHotKeySpecifierLength ());
+                TextFormatter.Size = new Size (SuperView?.ContentSize.Width ?? 0, ContentSize.Height + GetHotKeySpecifierLength ());
             }
 
             w = TextFormatter.FormatAndGetSize ().Width;
@@ -276,8 +278,9 @@ public partial class View
             TextFormatter.Size = new Size (w, SuperView?.Viewport.Height ?? 0);
         }
 
-        int h = Viewport.Size.Height + GetHotKeySpecifierLength ();
+        int h = ContentSize.Height + GetHotKeySpecifierLength ();
 
+        // TODO: This is a hack. Figure out how to move this into DimDimAuto
         if (Height is Dim.DimAuto heightAuto && heightAuto._style != Dim.DimAutoStyle.Subviews)
         {
             TextFormatter.NeedsFormat = true;
@@ -336,12 +339,12 @@ public partial class View
             throw new InvalidOperationException ("SetFrameToFitText can only be called when AutoSize is true");
         }
 
-        // BUGBUG: This API is broken - should not assume Frame.Height == Viewport.Height
+        // BUGBUG: This API is broken - should not assume Frame.Height == ContentSize.Height
         // <summary>
         // Gets the minimum dimensions required to fit the View's <see cref="Text"/>, factoring in <see cref="TextDirection"/>.
         // </summary>
         // <param name="sizeRequired">The minimum dimensions required.</param>
-        // <returns><see langword="true"/> if the dimensions fit within the View's <see cref="Viewport"/>, <see langword="false"/> otherwise.</returns>
+        // <returns><see langword="true"/> if the dimensions fit within the View's <see cref="ContentSize"/>, <see langword="false"/> otherwise.</returns>
         // <remarks>
         // Always returns <see langword="false"/> if <see cref="AutoSize"/> is <see langword="true"/> or
         // if <see cref="Height"/> (Horizontal) or <see cref="Width"/> (Vertical) are not not set or zero.
@@ -368,7 +371,7 @@ public partial class View
                 case true:
                     int colWidth = TextFormatter.GetSumMaxCharWidth (TextFormatter.Text, 0, 1);
 
-                    // TODO: v2 - This uses frame.Width; it should only use Viewport
+                    // TODO: v2 - This uses frame.Width; it should only use ContentSize
                     if (_frame.Width < colWidth
                         && (Width is null || (ContentSize.Width >= 0 && Width is Dim.DimAbsolute && Width.Anchor (0) >= 0 && Width.Anchor (0) < colWidth)))
                     {

@@ -1110,13 +1110,14 @@ public partial class View
         CheckDimAuto ();
 
         var autoSize = Size.Empty;
-        
+
         if (AutoSize)
         {
+            // TODO: Nuke this from orbit once Dim.Auto is fully implemented
             autoSize = GetTextAutoSize ();
         }
 
-        int newX = _x.Calculate (superviewContentSize.Width, _width,  this, Dim.Dimension.Width, autoSize.Width, AutoSize);
+        int newX = _x.Calculate (superviewContentSize.Width, _width, this, Dim.Dimension.Width, autoSize.Width, AutoSize);
         int newW = _width.Calculate (newX, superviewContentSize.Width, this, Dim.Dimension.Width, autoSize.Width, AutoSize);
         int newY = _y.Calculate (superviewContentSize.Height, _height, this, Dim.Dimension.Height, autoSize.Height, AutoSize);
         int newH = _height.Calculate (newY, superviewContentSize.Height, this, Dim.Dimension.Height, autoSize.Height, AutoSize);
