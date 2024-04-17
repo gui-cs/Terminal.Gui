@@ -29,7 +29,7 @@ public class Buttons : Scenario
 
         // This is the default button (IsDefault = true); if user presses ENTER in the TextField
         // the scenario will quit
-        var defaultButton = new Button { X = Pos.Center (), Y = Pos.AnchorEnd (1), IsDefault = true, Text = "_Quit" };
+        var defaultButton = new Button { X = Pos.Center (), Y = Pos.AnchorEnd (), IsDefault = true, Text = "_Quit" };
         defaultButton.Accept += (s, e) => Application.RequestStop ();
         main.Add (defaultButton);
 
@@ -459,7 +459,7 @@ public class Buttons : Scenario
             _up = new ()
             {
                 AutoSize = false,
-                X = Pos.AnchorEnd (1),
+                X = Pos.AnchorEnd (),
                 Y = Pos.Top (_number),
                 Height = 1,
                 Width = 1,

@@ -38,7 +38,7 @@ public class Adornments : Scenario
         app.Add (window);
 
         var tf1 = new TextField { Width = 10, Text = "TextField" };
-        var color = new ColorPicker { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd (11) };
+        var color = new ColorPicker { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd () };
         color.BorderStyle = LineStyle.RoundedDotted;
 
         color.ColorChanged += (s, e) =>
@@ -68,15 +68,16 @@ public class Adornments : Scenario
         };
         label.Border.Thickness = new (1, 3, 1, 1);
 
-        var btnButtonInWindow = new Button { X = Pos.AnchorEnd (10), Y = Pos.AnchorEnd (1), Text = "Button" };
+        var btnButtonInWindow = new Button { X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Text = "Button" };
 
-        var tv = new Label
+        var labelAnchorEnd = new Label
         {
             AutoSize = false,
-            Y = Pos.AnchorEnd (3),
-            Width = 25,
-            Height = Dim.Fill (),
-            Text = "Label\nY=AnchorEnd(3),Height=Dim.Fill()"
+            Y = Pos.AnchorEnd (),
+            Width = 40,
+            Height = Dim.Percent(20),
+            Text = "Label\nY=AnchorEnd(),Height=Dim.Percent(10)",
+            ColorScheme = Colors.ColorSchemes ["Error"]
         };
 
         window.Margin.Data = "Margin";
@@ -94,7 +95,7 @@ public class Adornments : Scenario
 
         };
         longLabel.TextFormatter.WordWrap = true;
-        window.Add (tf1, color, button, label, btnButtonInWindow, tv, longLabel);
+        window.Add (tf1, color, button, label, btnButtonInWindow, labelAnchorEnd, longLabel);
 
         editor.Initialized += (s, e) => { editor.ViewToEdit = window; };
 

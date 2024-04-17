@@ -24,6 +24,7 @@ The entire library has been reviewed and simplified. As a result, the API is mor
 * *Adornments* - 
 * *Built-in Scrolling/Virtual Content Area* - In v1, to have a view a user could scroll required either a bespoke scrolling implementation, inheriting from `ScrollView`, or managing the complexity of `ScrollBarView` directly. In v2, the base-View class supports scrolling inherently. The area of a view visible to the user at a given moment was previously a rectangle called `Bounds`. `Bounds.Location` was always `Point.Empty`. In v2 the visible area is a rectangle called `Viewport` which is a protal into the Views content, which can be bigger (or smaller) than the area visible to the user. Causing a view to scroll is as simple as changing `View.Viewport.Location`. The View's content described by `View.ContentSize`. See [Layout](layout.md) for details.
 * *Computed Layout Improvements* - 
+* *`Pos.AnchorEnd ()`* - New to v2 is `Pos.AnchorEnd ()` (with no parameters) which allows a view to be anchored to the right or bottom of the Superview. 
 * *`Dim.Auto`* - 
 * ...	
 

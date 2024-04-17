@@ -122,10 +122,10 @@ public class Scrolling : Scenario
                        );
 
         // Demonstrate AnchorEnd - Button is anchored to bottom/right
-        var anchorButton = new Button { Y = Pos.AnchorEnd () - 1, Text = "Bottom Right" };
+        var anchorButton = new Button { Y = Pos.AnchorEnd (0) - 1, Text = "Bottom Right" };
 
         // TODO: Use Pos.Width instead of (Right-Left) when implemented (#502)
-        anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
+        anchorButton.X = Pos.AnchorEnd (0) - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
 
         anchorButton.Accept += (s, e) =>
                                {

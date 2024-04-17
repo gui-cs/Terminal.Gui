@@ -92,7 +92,7 @@ public class LabelTests
     public void AutoSize_Stays_True_AnchorEnd ()
     {
         var label = new Label { Y = Pos.Center (), Text = "Say Hello 你", AutoSize = true };
-        label.X = Pos.AnchorEnd () - Pos.Function (() => label.TextFormatter.Text.GetColumns ());
+        label.X = Pos.AnchorEnd (0) - Pos.Function (() => label.TextFormatter.Text.GetColumns ());
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);

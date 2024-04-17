@@ -164,8 +164,8 @@ public class ButtonTests (ITestOutputHelper output)
         var btn = new Button { Y = Pos.Center (), Text = "Say Hello 你", AutoSize = true };
         var btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
 
-        btn.X = Pos.AnchorEnd () - Pos.Function (() => btn.TextFormatter.Text.GetColumns ());
-        btn.X = Pos.AnchorEnd () - Pos.Function (() => btn.TextFormatter.Text.GetColumns ());
+        btn.X = Pos.AnchorEnd (0) - Pos.Function (() => btn.TextFormatter.Text.GetColumns ());
+        btn.X = Pos.AnchorEnd (0) - Pos.Function (() => btn.TextFormatter.Text.GetColumns ());
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (btn);

@@ -8,8 +8,15 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Text and Formatting")]
 public class BasicColors : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
+        Application.Init ();
+
+        Window app = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+        };
+
         var vx = 30;
         var x = 30;
         var y = 14;
@@ -31,7 +38,7 @@ public class BasicColors : Scenario
                 Text = bg.ToString (),
                 TextDirection = TextDirection.TopBottom_LeftRight
             };
-            Win.Add (vl);
+            app.Add (vl);
 
             var hl = new Label
             {
@@ -44,7 +51,7 @@ public class BasicColors : Scenario
                 ColorScheme = new ColorScheme { Normal = attr },
                 Text = bg.ToString ()
             };
-            Win.Add (hl);
+            app.Add (hl);
             vx++;
 
             foreach (ColorName fg in colors)
@@ -56,7 +63,7 @@ public class BasicColors : Scenario
                 {
                     ColorScheme = new ColorScheme { Normal = c }, X = x, Y = y, Text = t [^1].ToString ()
                 };
-                Win.Add (l);
+                app.Add (l);
                 x++;
             }
 
@@ -64,24 +71,24 @@ public class BasicColors : Scenario
             y++;
         }
 
-        Win.Add (
+        app.Add (
                  new Label { X = Pos.AnchorEnd (36), Text = "Mouse over to get the Attribute:" }
                 );
-        Win.Add (new Label { X = Pos.AnchorEnd (35), Y = 2, Text = "Foreground:" });
+        app.Add (new Label { X = Pos.AnchorEnd (35), Y = 2, Text = "Foreground:" });
 
         var lblForeground = new Label { X = Pos.AnchorEnd (23), Y = 2 };
-        Win.Add (lblForeground);
+        app.Add (lblForeground);
 
         var viewForeground = new View { X = Pos.AnchorEnd (2), Y = 2, ColorScheme = new ColorScheme (), Text = "  " };
-        Win.Add (viewForeground);
+        app.Add (viewForeground);
 
-        Win.Add (new Label { X = Pos.AnchorEnd (35), Y = 4, Text = "Background:" });
+        app.Add (new Label { X = Pos.AnchorEnd (35), Y = 4, Text = "Background:" });
 
         var lblBackground = new Label { X = Pos.AnchorEnd (23), Y = 4 };
-        Win.Add (lblBackground);
+        app.Add (lblBackground);
 
         var viewBackground = new View { X = Pos.AnchorEnd (2), Y = 4, ColorScheme = new ColorScheme (), Text = "  " };
-        Win.Add (viewBackground);
+        app.Add (viewBackground);
 
         Application.MouseEvent += (s, e) =>
                                   {
@@ -103,5 +110,8 @@ public class BasicColors : Scenario
                                               new ColorScheme (viewBackground.ColorScheme) { Normal = new Attribute (back, back) };
                                       }
                                   };
+
+        Application.Run (app);
+        app.Dispose ();
     }
 }

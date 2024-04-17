@@ -321,7 +321,7 @@ public class ContentScrolling : Scenario
         // Add demo views to show that things work correctly
         var textField = new TextField { X = 20, Y = 7, Width = 15, Text = "Test TextField" };
 
-        var colorPicker = new ColorPicker { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd (11), Y = 10 };
+        var colorPicker = new ColorPicker { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd (), Y = 10 };
         colorPicker.BorderStyle = LineStyle.RoundedDotted;
 
         colorPicker.ColorChanged += (s, e) =>
@@ -358,18 +358,9 @@ public class ContentScrolling : Scenario
         charMap.Accept += (s, e) =>
                               MessageBox.Query (20, 7, "Hi", $"Am I a {view.GetType ().Name}?", "Yes", "No");
 
-        var buttonAnchoredRight = new Button
+        var buttonAnchored = new Button
         {
-            X = Pos.AnchorEnd (10), Y = 0, Text = "Button"
-        };
-
-        var labelAnchoredBottomLeft = new Label
-        {
-            AutoSize = false,
-            Y = Pos.AnchorEnd (3),
-            Width = 25,
-            Height = Dim.Fill (),
-            Text = "Label\nY=AnchorEnd(3),Height=Dim.Fill()"
+            X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Text = "Bottom Right"
         };
 
         view.Margin.Data = "Margin";
@@ -380,7 +371,7 @@ public class ContentScrolling : Scenario
 
         view.Padding.Data = "Padding";
 
-        view.Add (buttonAnchoredRight, textField, colorPicker, charMap, textView, labelAnchoredBottomLeft);
+        view.Add (buttonAnchored, textField, colorPicker, charMap, textView);
 
         var longLabel = new Label
         {

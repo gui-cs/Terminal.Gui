@@ -604,7 +604,7 @@ public class DynamicMenuBar : Scenario
 
             var _btnRemoveMenuBar = new Button { Y = 1, Text = "Remove a MenuBar" };
 
-            _btnRemoveMenuBar.X = Pos.AnchorEnd () - (Pos.Right (_btnRemoveMenuBar) - Pos.Left (_btnRemoveMenuBar));
+            _btnRemoveMenuBar.X = Pos.AnchorEnd (0) - (Pos.Right (_btnRemoveMenuBar) - Pos.Left (_btnRemoveMenuBar));
             _frmMenu.Add (_btnRemoveMenuBar);
 
             var _btnPrevious = new Button
@@ -614,7 +614,7 @@ public class DynamicMenuBar : Scenario
             _frmMenu.Add (_btnPrevious);
 
             var _btnAdd = new Button { Y = Pos.Top (_btnPrevious) + 2, Text = " Add  " };
-            _btnAdd.X = Pos.AnchorEnd () - (Pos.Right (_btnAdd) - Pos.Left (_btnAdd));
+            _btnAdd.X = Pos.AnchorEnd ();
             _frmMenu.Add (_btnAdd);
 
             var _btnNext = new Button { X = Pos.X (_btnAdd), Y = Pos.Top (_btnPrevious), Text = ">" };
