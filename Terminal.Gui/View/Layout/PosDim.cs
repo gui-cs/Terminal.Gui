@@ -229,6 +229,7 @@ public class Pos
         }
 
         var newPos = new PosCombine (true, left, right);
+
         if (left is PosView view)
         {
             view.Target.SetNeedsLayout ();
@@ -257,6 +258,7 @@ public class Pos
         }
 
         var newPos = new PosCombine (false, left, right);
+
         if (left is PosView view)
         {
             view.Target.SetNeedsLayout ();
@@ -315,7 +317,23 @@ public class Pos
 
     internal virtual int Anchor (int width) { return 0; }
 
-    internal virtual int GetLocation (int superviewDimension, Dim dim, int autosize, bool autoSize) { return Anchor (superviewDimension); }
+    /// <summary>
+    ///     Calculates and returns the position of a <see cref="View"/> object. It takes into account the dimension of the
+    ///     superview and the dimension of the view itself.
+    /// </summary>
+    /// <param name="superviewDimension">
+    ///     The dimension of the superview. This could be the width for x-coordinate calculation or the
+    ///     height for y-coordinate calculation.
+    /// </param>
+    /// <param name="dim">The dimension of the View. It could be the current width or height.</param>
+    /// <param name="autosize">Obsolete; to be deprecated.</param>
+    /// <param name="autoSize">Obsolete; to be deprecated.</param>
+    /// <returns>
+    ///     The calculated position of the View. The way this position is calculated depends on the specific subclass of Pos that
+    ///     is used.
+    /// </returns>
+
+    internal virtual int Calculate (int superviewDimension, Dim dim, int autosize, bool autoSize) { return Anchor (superviewDimension); }
 
     internal class PosAbsolute (int n) : Pos
     {
@@ -351,7 +369,7 @@ public class Pos
             return width - _offset;
         }
 
-        internal override int GetLocation (int superviewDimension, Dim dim, int autosize, bool autoSize)
+        internal override int Calculate (int superviewDimension, Dim dim, int autosize, bool autoSize)
         {
             int newLocation = Anchor (superviewDimension);
 
@@ -369,9 +387,9 @@ public class Pos
         public override string ToString () { return "Center"; }
         internal override int Anchor (int width) { return width / 2; }
 
-        internal override int GetLocation (int superviewDimension, Dim dim, int autosize, bool autoSize)
+        internal override int Calculate (int superviewDimension, Dim dim, int autosize, bool autoSize)
         {
-            int newDimension = Math.Max (dim.GetDimension (0, superviewDimension, autosize, autoSize), 0);
+            int newDimension = Math.Max (dim.Calculate (0, superviewDimension, autosize, autoSize), 0);
 
             return Anchor (superviewDimension - newDimension);
         }
@@ -397,11 +415,11 @@ public class Pos
             return la - ra;
         }
 
-        internal override int GetLocation (int superviewDimension, Dim dim, int autosize, bool autoSize)
+        internal override int Calculate (int superviewDimension, Dim dim, int autosize, bool autoSize)
         {
-            int newDimension = dim.GetDimension (0, superviewDimension, autosize, autoSize);
-            int left = _left.GetLocation (superviewDimension, dim, autosize, autoSize);
-            int right = _right.GetLocation (superviewDimension, dim, autosize, autoSize);
+            int newDimension = dim.Calculate (0, superviewDimension, autosize, autoSize);
+            int left = _left.Calculate (superviewDimension, dim, autosize, autoSize);
+            int right = _right.Calculate (superviewDimension, dim, autosize, autoSize);
 
             if (_add)
             {
@@ -449,13 +467,13 @@ public class Pos
         public override string ToString ()
         {
             string sideString = side switch
-                           {
-                               Side.X => "x",
-                               Side.Y => "y",
-                               Side.Right => "right",
-                               Side.Bottom => "bottom",
-                               _ => "unknown"
-                           };
+                                {
+                                    Side.X => "x",
+                                    Side.Y => "y",
+                                    Side.Right => "right",
+                                    Side.Bottom => "bottom",
+                                    _ => "unknown"
+                                };
 
             if (Target == null)
             {
@@ -666,7 +684,22 @@ public class Dim
 
     internal virtual int Anchor (int width) { return 0; }
 
-    internal virtual int GetDimension (int location, int dimension, int autosize, bool autoSize)
+    /// <summary>
+    ///     Calculates and returns the dimension of a <see cref="View"/> object. It takes into account the location of the
+    ///     <see cref="View"/>, its current size, and whether it should automatically adjust its size based on its content.
+    /// </summary>
+    /// <param name="location">
+    ///     The starting point from where the size calculation begins. It could be the left edge for width calculation or the
+    ///     top edge for height calculation.
+    /// </param>
+    /// <param name="dimension">The current size of the View. It could be the current width or height.</param>
+    /// <param name="autosize">Obsolete; To be deprecated.</param>
+    /// <param name="autoSize">Obsolete; To be deprecated.</param>
+    /// <returns>
+    ///     The calculated size of the View. The way this size is calculated depends on the specific subclass of Dim that
+    ///     is used.
+    /// </returns>
+    internal virtual int Calculate (int location, int dimension, int autosize, bool autoSize)
     {
         int newDimension = Math.Max (Anchor (dimension - location), 0);
 
@@ -681,7 +714,7 @@ public class Dim
         public override string ToString () { return $"Absolute({_n})"; }
         internal override int Anchor (int width) { return _n; }
 
-        internal override int GetDimension (int location, int dimension, int autosize, bool autoSize)
+        internal override int Calculate (int location, int dimension, int autosize, bool autoSize)
         {
             // DimAbsolute.Anchor (int width) ignores width and returns n
             int newDimension = Math.Max (Anchor (0), 0);
@@ -710,10 +743,10 @@ public class Dim
             return la - ra;
         }
 
-        internal override int GetDimension (int location, int dimension, int autosize, bool autoSize)
+        internal override int Calculate (int location, int dimension, int autosize, bool autoSize)
         {
-            int leftNewDim = _left.GetDimension (location, dimension, autosize, autoSize);
-            int rightNewDim = _right.GetDimension (location, dimension, autosize, autoSize);
+            int leftNewDim = _left.Calculate (location, dimension, autosize, autoSize);
+            int rightNewDim = _right.Calculate (location, dimension, autosize, autoSize);
 
             int newDimension;
 
@@ -741,7 +774,7 @@ public class Dim
         public override string ToString () { return $"Factor({_factor},{_remaining})"; }
         internal override int Anchor (int width) { return (int)(width * _factor); }
 
-        internal override int GetDimension (int location, int dimension, int autosize, bool autoSize)
+        internal override int Calculate (int location, int dimension, int autosize, bool autoSize)
         {
             int newDimension = _remaining ? Math.Max (Anchor (dimension - location), 0) : Anchor (dimension);
 
@@ -796,11 +829,11 @@ public class Dim
             }
 
             string sideString = _side switch
-                          {
-                              Side.Height => "Height",
-                              Side.Width => "Width",
-                              _ => "unknown"
-                          };
+                                {
+                                    Side.Height => "Height",
+                                    Side.Width => "Width",
+                                    _ => "unknown"
+                                };
 
             return $"View({sideString},{Target})";
         }

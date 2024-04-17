@@ -1024,10 +1024,10 @@ public partial class View
             autoSize = GetAutoSize ();
         }
 
-        int newX = _x.GetLocation (superviewContentSize.Width, _width, autoSize.Width, AutoSize);
-        int newW = _width.GetDimension (newX, superviewContentSize.Width, autoSize.Width, AutoSize);
-        int newY = _y.GetLocation (superviewContentSize.Height, _height, autoSize.Height, AutoSize);
-        int newH = _height.GetDimension (newY, superviewContentSize.Height, autoSize.Height, AutoSize);
+        int newX = _x.Calculate (superviewContentSize.Width, _width, autoSize.Width, AutoSize);
+        int newW = _width.Calculate (newX, superviewContentSize.Width, autoSize.Width, AutoSize);
+        int newY = _y.Calculate (superviewContentSize.Height, _height, autoSize.Height, AutoSize);
+        int newH = _height.Calculate (newY, superviewContentSize.Height, autoSize.Height, AutoSize);
 
         Rectangle newFrame = new (newX, newY, newW, newH);
 

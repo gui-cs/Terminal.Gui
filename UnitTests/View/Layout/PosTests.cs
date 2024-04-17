@@ -10,7 +10,7 @@ public class PosTests (ITestOutputHelper output)
     public void PosAbsolute_GetLocation_ReturnsExpectedValue ()
     {
         var posAbsolute = new PosAbsolute (5);
-        var result = posAbsolute.GetLocation (10, new DimAbsolute (2), 1, false);
+        var result = posAbsolute.Calculate (10, new DimAbsolute (2), 1, false);
         Assert.Equal (5, result);
     }
 
@@ -18,7 +18,7 @@ public class PosTests (ITestOutputHelper output)
     public void PosAnchorEnd_GetLocation_ReturnsExpectedValue ()
     {
         var posAnchorEnd = new PosAnchorEnd (5);
-        var result = posAnchorEnd.GetLocation (10, new DimAbsolute (2), 1, false);
+        var result = posAnchorEnd.Calculate (10, new DimAbsolute (2), 1, false);
         Assert.Equal (5, result);
     }
 
@@ -26,7 +26,7 @@ public class PosTests (ITestOutputHelper output)
     public void PosCenter_GetLocation_ReturnsExpectedValue ()
     {
         var posCenter = new PosCenter ();
-        var result = posCenter.GetLocation (10, new DimAbsolute (2), 1, false);
+        var result = posCenter.Calculate (10, new DimAbsolute (2), 1, false);
         Assert.Equal (4, result);
     }
 
@@ -34,7 +34,7 @@ public class PosTests (ITestOutputHelper output)
     public void PosCombine_GetLocation_ReturnsExpectedValue ()
     {
         var posCombine = new PosCombine (true, new PosAbsolute (5), new PosAbsolute (3));
-        var result = posCombine.GetLocation (10, new DimAbsolute (2), 1, false);
+        var result = posCombine.Calculate (10, new DimAbsolute (2), 1, false);
         Assert.Equal (8, result);
     }
 
@@ -42,7 +42,7 @@ public class PosTests (ITestOutputHelper output)
     public void PosFactor_GetLocation_ReturnsExpectedValue ()
     {
         var posFactor = new PosFactor (0.5f);
-        var result = posFactor.GetLocation (10, new DimAbsolute (2), 1, false);
+        var result = posFactor.Calculate (10, new DimAbsolute (2), 1, false);
         Assert.Equal (5, result);
     }
 
@@ -50,7 +50,7 @@ public class PosTests (ITestOutputHelper output)
     public void PosFunc_GetLocation_ReturnsExpectedValue ()
     {
         var posFunc = new PosFunc (() => 5);
-        var result = posFunc.GetLocation (10, new DimAbsolute (2), 1, false);
+        var result = posFunc.Calculate (10, new DimAbsolute (2), 1, false);
         Assert.Equal (5, result);
     }
 
@@ -58,7 +58,7 @@ public class PosTests (ITestOutputHelper output)
     public void PosView_GetLocation_ReturnsExpectedValue ()
     {
         var posView = new PosView (new View { Frame = new Rectangle (5, 5, 10, 10) }, 0);
-        var result = posView.GetLocation (10, new DimAbsolute (2), 1, false);
+        var result = posView.Calculate (10, new DimAbsolute (2), 1, false);
         Assert.Equal (5, result);
     }
 
