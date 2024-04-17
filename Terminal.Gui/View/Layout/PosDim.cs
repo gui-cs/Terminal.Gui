@@ -317,12 +317,15 @@ public class Pos
     public static Pos Y (View view) { return new PosView (view, Side.Y); }
 
     /// <summary>
-    /// Used to calculate a position that is anchored to a certain point in the layout. This method is typically used internally by the layout system to determine where a View should be positioned.
+    ///     Gets a position that is anchored to a certain point in the layout. This method is typically used
+    ///     internally by the layout system to determine where a View should be positioned.
     /// </summary>
     /// <param name="width">The width of the area where the View is being positioned (Superview.ContentSize).</param>
-    /// <returns>An integer representing the calculated position. The way this position is calculated depends on the specific
-    /// subclass of Pos that is used. For example, PosAbsolute returns a fixed position, PosAnchorEnd returns a
-    /// position that is anchored to the end of the layout, and so on.</returns>
+    /// <returns>
+    ///     An integer representing the calculated position. The way this position is calculated depends on the specific
+    ///     subclass of Pos that is used. For example, PosAbsolute returns a fixed position, PosAnchorEnd returns a
+    ///     position that is anchored to the end of the layout, and so on.
+    /// </returns>
     internal virtual int Anchor (int width) { return 0; }
 
     /// <summary>
@@ -337,10 +340,10 @@ public class Pos
     /// <param name="autosize">Obsolete; to be deprecated.</param>
     /// <param name="autoSize">Obsolete; to be deprecated.</param>
     /// <returns>
-    ///     The calculated position of the View. The way this position is calculated depends on the specific subclass of Pos that
+    ///     The calculated position of the View. The way this position is calculated depends on the specific subclass of Pos
+    ///     that
     ///     is used.
     /// </returns>
-
     internal virtual int Calculate (int superviewDimension, Dim dim, int autosize, bool autoSize) { return Anchor (superviewDimension); }
 
     internal class PosAbsolute (int n) : Pos
@@ -691,14 +694,15 @@ public class Dim
     public static Dim Width (View view) { return new DimView (view, Side.Width); }
 
     /// <summary>
-    /// Used to calculate a dimension that is anchored to a certain point in the layout.
-    /// This method is typically used internally by the layout system to determine the size of a View.
+    ///     Gets a dimension that is anchored to a certain point in the layout.
+    ///     This method is typically used internally by the layout system to determine the size of a View.
     /// </summary>
     /// <param name="width">The width of the area where the View is being sized (Superview.ContentSize).</param>
-    /// <returns>An integer representing the calculated dimension. The way this dimension is calculated depends on the specific
-    /// subclass of Dim that is used. For example, DimAbsolute returns a fixed dimension, DimFactor returns a
-    /// dimension that is a certain percentage of the super view's size, and so on.</returns>
-
+    /// <returns>
+    ///     An integer representing the calculated dimension. The way this dimension is calculated depends on the specific
+    ///     subclass of Dim that is used. For example, DimAbsolute returns a fixed dimension, DimFactor returns a
+    ///     dimension that is a certain percentage of the super view's size, and so on.
+    /// </returns>
     internal virtual int Anchor (int width) { return 0; }
 
     /// <summary>
