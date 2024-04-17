@@ -23,10 +23,6 @@
       "commandLineArgs": "dotnet UICatalog.dll --driver NetDriver",
       "distributionName": ""
     },
-    "Sliders": {
-      "commandName": "Project",
-      "commandLineArgs": "Sliders"
-    },
     "Wizards": {
       "commandName": "Project",
       "commandLineArgs": "Wizards"
@@ -73,6 +69,10 @@
     "Frames Demo": {
       "commandName": "Project",
       "commandLineArgs": "\"Frames Demo\""
+    },
+    "Line Canvas Experiments": {
+      "commandName": "Project",
+      "commandLineArgs": "\"LineCanvas Experiments\""
     }
   }
 }
