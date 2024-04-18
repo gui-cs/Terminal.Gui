@@ -2854,15 +2854,30 @@ Y
 
         Assert.Equal (new (0, 0, width + 2, 6), frame.Frame);
 
-        var expected = @"
+        string expected ;
+
+        if (autoSize)
+        {
+            expected = @"
+┌────────────────────┐
+│Hello World         │
+│Hello World         │
+│Hello World         │
+│Hello World         │
+└────────────────────┘
+";
+        }
+        else
+        {
+            expected = @"
 ┌────────────────────┐
 │Hello World         │
 │    Hello World     │
 │         Hello World│
 │Hello          World│
 └────────────────────┘
-"
-            ;
+";
+        }
 
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new (0, 0, width + 2, 6), pos);
@@ -2940,7 +2955,7 @@ Y
             Assert.Equal (new (1, 11), lblLeft.TextFormatter.Size);
             Assert.Equal (new (1, 11), lblCenter.TextFormatter.Size);
             Assert.Equal (new (1, 11), lblRight.TextFormatter.Size);
-            Assert.Equal (new (1, height), lblJust.TextFormatter.Size);
+            Assert.Equal (new (1, 11), lblJust.TextFormatter.Size);
             Assert.Equal (new (0, 0, 9, height + 2), frame.Frame);
         }
         else
@@ -2952,7 +2967,39 @@ Y
             Assert.Equal (new (0, 0, 9, height + 2), frame.Frame);
         }
 
-        var expected = @"
+        string expected;
+
+        if (autoSize)
+        {
+            expected = @"
+┌───────┐
+│H H H H│
+│e e e e│
+│l l l l│
+│l l l l│
+│o o o o│
+│       │
+│W W W W│
+│o o o o│
+│r r r r│
+│l l l l│
+│d d d d│
+│       │
+│       │
+│       │
+│       │
+│       │
+│       │
+│       │
+│       │
+│       │
+└───────┘
+";
+
+        }
+        else
+        {
+            expected = @"
 ┌───────┐
 │H     H│
 │e     e│
@@ -2975,8 +3022,8 @@ Y
 │    l l│
 │    d d│
 └───────┘
-"
-            ;
+";
+        }
 
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new (0, 0, 9, height + 2), pos);

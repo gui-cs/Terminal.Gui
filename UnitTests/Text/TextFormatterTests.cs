@@ -3408,9 +3408,10 @@ ssb
         {
             Size = new Size (width, 1),
             Text = text,
-            Alignment = TextAlignment.Centered
+            Alignment = TextAlignment.Centered,
+            AutoSize = true
         };
-        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default);
+        tf.Draw (new (Point.Empty, tf.Size), Attribute.Default, Attribute.Default);
 
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
     }
