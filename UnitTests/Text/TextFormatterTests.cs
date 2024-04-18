@@ -3316,24 +3316,37 @@ ssb
 
     [SetupFakeDriver]
     [Theory]
-    [InlineData ("A", 0, "")]
-    [InlineData ("A", 1, "A")]
-    [InlineData ("A", 2, "A")]
-    [InlineData ("AB", 1, "A")]
-    [InlineData ("AB", 2, "AB")]
-    [InlineData ("ABC", 3, "ABC")]
-    [InlineData ("ABC", 4, "ABC")]
-    [InlineData ("ABC", 6, "ABC")]
-    public void Draw_Horizontal_Left (string text, int width, string expectedText)
+    [InlineData ("A", 0, false, "")]
+    [InlineData ("A", 1, false, "A")]
+    [InlineData ("A", 2, false, "A")]
+    [InlineData ("AB", 1, false, "A")]
+    [InlineData ("AB", 2, false, "AB")]
+    [InlineData ("ABC", 3, false, "ABC")]
+    [InlineData ("ABC", 4, false, "ABC")]
+    [InlineData ("ABC", 6, false, "ABC")]
+
+    [InlineData ("A", 0, true, "")]
+    [InlineData ("A", 1, true, "A")]
+    [InlineData ("A", 2, true, "A")]
+    [InlineData ("AB", 1, true, "A")]
+    [InlineData ("AB", 2, true, "AB")]
+    [InlineData ("ABC", 3, true, "ABC")]
+    [InlineData ("ABC", 4, true, "ABC")]
+    [InlineData ("ABC", 6, true, "ABC")]
+    public void Draw_Horizontal_Left (string text, int width, bool autoSize, string expectedText)
 
     {
         TextFormatter tf = new ()
         {
-            Size = new Size (width, 1),
-
             Text = text,
-            Alignment = TextAlignment.Left
+            Alignment = TextAlignment.Left,
+            AutoSize = autoSize,
         };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (width, 1);
+        }
         tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default);
 
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
@@ -3378,25 +3391,42 @@ ssb
 
     [SetupFakeDriver]
     [Theory]
-    [InlineData ("A", 0, "")]
-    [InlineData ("A", 1, "A")]
-    [InlineData ("A", 2, "A")]
-    [InlineData ("A", 3, " A")]
-    [InlineData ("AB", 1, "A")]
-    [InlineData ("AB", 2, "AB")]
-    [InlineData ("ABC", 3, "ABC")]
-    [InlineData ("ABC", 4, "ABC")]
-    [InlineData ("ABC", 5, " ABC")]
-    [InlineData ("ABC", 6, " ABC")]
-    [InlineData ("ABC", 9, "   ABC")]
-    public void Draw_Horizontal_Centered (string text, int width, string expectedText)
+    [InlineData ("A", 0, false, "")]
+    [InlineData ("A", 1, false, "A")]
+    [InlineData ("A", 2, false, "A")]
+    [InlineData ("A", 3, false, " A")]
+    [InlineData ("AB", 1, false, "A")]
+    [InlineData ("AB", 2, false, "AB")]
+    [InlineData ("ABC", 3, false, "ABC")]
+    [InlineData ("ABC", 4, false, "ABC")]
+    [InlineData ("ABC", 5, false, " ABC")]
+    [InlineData ("ABC", 6, false, " ABC")]
+    [InlineData ("ABC", 9, false, "   ABC")]
+
+    [InlineData ("A", 0, true, "")]
+    [InlineData ("A", 1, true, "A")]
+    [InlineData ("A", 2, true, "A")]
+    [InlineData ("A", 3, true, " A")]
+    [InlineData ("AB", 1, true, "A")]
+    [InlineData ("AB", 2, true, "AB")]
+    [InlineData ("ABC", 3, true, "ABC")]
+    [InlineData ("ABC", 4, true, "ABC")]
+    [InlineData ("ABC", 5, true, " ABC")]
+    [InlineData ("ABC", 6, true, " ABC")]
+    [InlineData ("ABC", 9, true, "   ABC")]
+    public void Draw_Horizontal_Centered (string text, int width, bool autoSize, string expectedText)
     {
         TextFormatter tf = new ()
         {
-            Size = new Size (width, 1),
             Text = text,
-            Alignment = TextAlignment.Centered
+            Alignment = TextAlignment.Centered,
+            AutoSize = autoSize,
         };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (width, 1);
+        }
         tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default);
 
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
@@ -3404,26 +3434,44 @@ ssb
 
     [SetupFakeDriver]
     [Theory]
-    [InlineData ("A", 0, "")]
-    [InlineData ("A", 1, "A")]
-    [InlineData ("A", 2, "A")]
-    [InlineData ("A B", 3, "A B")]
-    [InlineData ("A B", 1, "A")]
-    [InlineData ("A B", 2, "A")]
-    [InlineData ("A B", 3, "A B")]
-    [InlineData ("A B", 4, "A  B")]
-    [InlineData ("A B", 5, "A   B")]
-    [InlineData ("A B", 6, "A    B")]
-    [InlineData ("A B", 10, "A        B")]
-    [InlineData ("ABC ABC", 10, "ABC    ABC")]
-    public void Draw_Horizontal_Justified (string text, int width, string expectedText)
+    [InlineData ("A", 0, false, "")]
+    [InlineData ("A", 1, false, "A")]
+    [InlineData ("A", 2, false,"A")]
+    [InlineData ("A B", 3, false,"A B")]
+    [InlineData ("A B", 1, false,"A")]
+    [InlineData ("A B", 2, false,"A")]
+    [InlineData ("A B", 3, false,"A B")]
+    [InlineData ("A B", 4, false,"A  B")]
+    [InlineData ("A B", 5, false,"A   B")]
+    [InlineData ("A B", 6, false,"A    B")]
+    [InlineData ("A B", 10,false,"A        B")]
+    [InlineData ("ABC ABC", 10, false, "ABC    ABC")]
+
+    [InlineData ("A", 0, true, "")]
+    [InlineData ("A", 1, true, "A")]
+    [InlineData ("A", 2, true, "A")]
+    [InlineData ("A B", 3, true, "A B")]
+    [InlineData ("A B", 1, true, "A")]
+    [InlineData ("A B", 2, true, "A")]
+    [InlineData ("A B", 3, true, "A B")]
+    [InlineData ("A B", 4, true, "A B")]
+    [InlineData ("A B", 5, true, "A B")]
+    [InlineData ("A B", 6, true, "A B")]
+    [InlineData ("A B", 10, true, "A B")]
+    [InlineData ("ABC ABC", 10, true, "ABC ABC")]
+    public void Draw_Horizontal_Justified (string text, int width, bool autoSize, string expectedText)
     {
         TextFormatter tf = new ()
         {
-            Size = new Size (width, 1),
             Text = text,
             Alignment = TextAlignment.Justified,
+            AutoSize = autoSize,
         };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (width, 1);
+        }
         tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default);
 
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
