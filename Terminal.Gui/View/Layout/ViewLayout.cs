@@ -347,17 +347,37 @@ public partial class View
         get => _height is Dim.DimAuto && _width is Dim.DimAuto;
         set
         {
-            if (IsInitialized)
-            {
-                Height = Dim.Auto (Dim.DimAutoStyle.Text);
-                Width = Dim.Auto (Dim.DimAutoStyle.Text);
+            TextFormatter.AutoSize = value;
 
+            if (value)
+            {
+                UpdateTextFormatterText ();
+                if (IsInitialized)
+                {
+                    Height = Dim.Auto (Dim.DimAutoStyle.Text);
+                    Width = Dim.Auto (Dim.DimAutoStyle.Text);
+                }
+                else
+                {
+                    _height = Dim.Auto (Dim.DimAutoStyle.Text);
+                    _width = Dim.Auto (Dim.DimAutoStyle.Text);
+                    OnResizeNeeded ();
+                }
             }
             else
             {
-                _height = Dim.Auto (Dim.DimAutoStyle.Text);
-                _width = Dim.Auto (Dim.DimAutoStyle.Text);
-                OnResizeNeeded();
+                if (IsInitialized)
+                {
+                    Height = Height.Anchor (ContentSize.Height);
+                    Width = Width.Anchor (ContentSize.Width);
+
+                }
+                else
+                {
+                    _height = Height.Anchor (ContentSize.Height);
+                    _width = Width.Anchor (ContentSize.Width);
+                    OnResizeNeeded ();
+                }
             }
         }
     }

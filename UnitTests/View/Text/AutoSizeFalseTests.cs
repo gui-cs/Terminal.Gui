@@ -192,10 +192,8 @@ public class AutoSizeFalseTests
         Assert.Equal ("Absolute(1)", view.Height.ToString ());
 
         view.AutoSize = true;
-
-        // There's no Text, so the view should be sized (0, 0)
-        Assert.Equal ("Absolute(0)", view.Width.ToString ());
-        Assert.Equal ("Absolute(0)", view.Height.ToString ());
+        Assert.Equal (Dim.Auto(Dim.DimAutoStyle.Text), view.Width);
+        Assert.Equal (Dim.Auto (Dim.DimAutoStyle.Text), view.Height);
 
         view.AutoSize = false;
         Assert.Equal ("Absolute(0)", view.Width.ToString ());

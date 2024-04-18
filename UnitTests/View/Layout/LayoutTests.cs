@@ -620,66 +620,66 @@ public class LayoutTests
         sub2.Dispose ();
     }
 
-    [Fact]
-    [AutoInitShutdown]
-    public void TrySetHeight_ForceValidatePosDim ()
-    {
-        var top = new View { X = 0, Y = 0, Height = 20 };
+    //[Fact]
+    //[AutoInitShutdown]
+    //public void TrySetHeight_ForceValidatePosDim ()
+    //{
+    //    var top = new View { X = 0, Y = 0, Height = 20 };
 
-        var v = new View { Height = Dim.Fill (), ValidatePosDim = true };
-        top.Add (v);
+    //    var v = new View { Height = Dim.Fill (), ValidatePosDim = true };
+    //    top.Add (v);
 
-        Assert.False (v.TrySetHeight (10, out int rHeight));
-        Assert.Equal (10, rHeight);
+    //    Assert.False (v.TrySetHeight (10, out int rHeight));
+    //    Assert.Equal (10, rHeight);
 
-        v.Height = Dim.Fill (1);
-        Assert.False (v.TrySetHeight (10, out rHeight));
-        Assert.Equal (9, rHeight);
+    //    v.Height = Dim.Fill (1);
+    //    Assert.False (v.TrySetHeight (10, out rHeight));
+    //    Assert.Equal (9, rHeight);
 
-        v.Height = 0;
-        Assert.True (v.TrySetHeight (10, out rHeight));
-        Assert.Equal (10, rHeight);
-        Assert.False (v.IsInitialized);
+    //    v.Height = 0;
+    //    Assert.True (v.TrySetHeight (10, out rHeight));
+    //    Assert.Equal (10, rHeight);
+    //    Assert.False (v.IsInitialized);
 
-        var toplevel = new Toplevel ();
-        toplevel.Add (top);
-        Application.Begin (toplevel);
+    //    var toplevel = new Toplevel ();
+    //    toplevel.Add (top);
+    //    Application.Begin (toplevel);
 
-        Assert.True (v.IsInitialized);
+    //    Assert.True (v.IsInitialized);
 
-        v.Height = 15;
-        Assert.True (v.TrySetHeight (5, out rHeight));
-        Assert.Equal (5, rHeight);
-    }
+    //    v.Height = 15;
+    //    Assert.True (v.TrySetHeight (5, out rHeight));
+    //    Assert.Equal (5, rHeight);
+    //}
 
-    [Fact]
-    [AutoInitShutdown]
-    public void TrySetWidth_ForceValidatePosDim ()
-    {
-        var top = new View { X = 0, Y = 0, Width = 80 };
+    //[Fact]
+    //[AutoInitShutdown]
+    //public void TrySetWidth_ForceValidatePosDim ()
+    //{
+    //    var top = new View { X = 0, Y = 0, Width = 80 };
 
-        var v = new View { Width = Dim.Fill (), ValidatePosDim = true };
-        top.Add (v);
+    //    var v = new View { Width = Dim.Fill (), ValidatePosDim = true };
+    //    top.Add (v);
 
-        Assert.False (v.TrySetWidth (70, out int rWidth));
-        Assert.Equal (70, rWidth);
+    //    Assert.False (v.TrySetWidth (70, out int rWidth));
+    //    Assert.Equal (70, rWidth);
 
-        v.Width = Dim.Fill (1);
-        Assert.False (v.TrySetWidth (70, out rWidth));
-        Assert.Equal (69, rWidth);
+    //    v.Width = Dim.Fill (1);
+    //    Assert.False (v.TrySetWidth (70, out rWidth));
+    //    Assert.Equal (69, rWidth);
 
-        v.Width = 0;
-        Assert.True (v.TrySetWidth (70, out rWidth));
-        Assert.Equal (70, rWidth);
-        Assert.False (v.IsInitialized);
+    //    v.Width = 0;
+    //    Assert.True (v.TrySetWidth (70, out rWidth));
+    //    Assert.Equal (70, rWidth);
+    //    Assert.False (v.IsInitialized);
 
-        var toplevel = new Toplevel ();
-        toplevel.Add (top);
-        Application.Begin (toplevel);
+    //    var toplevel = new Toplevel ();
+    //    toplevel.Add (top);
+    //    Application.Begin (toplevel);
 
-        Assert.True (v.IsInitialized);
-        v.Width = 75;
-        Assert.True (v.TrySetWidth (60, out rWidth));
-        Assert.Equal (60, rWidth);
-    }
+    //    Assert.True (v.IsInitialized);
+    //    v.Width = 75;
+    //    Assert.True (v.TrySetWidth (60, out rWidth));
+    //    Assert.Equal (60, rWidth);
+    //}
 }

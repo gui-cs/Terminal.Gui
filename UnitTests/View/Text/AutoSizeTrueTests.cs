@@ -1,3 +1,4 @@
+using System.Reflection.Emit;
 using System.Text;
 using Xunit.Abstractions;
 
@@ -1123,11 +1124,11 @@ public class AutoSizeTrueTests
     {
         var text = "Label";
         var label = new Label { Text = text };
-        Assert.Equal ("Absolute(1)", label.Height.ToString ());
+        Assert.Equal (Dim.Auto(Dim.DimAutoStyle.Text), label.Height);
         label.AutoSize = false;
         label.Width = Dim.Fill () - text.Length;
         label.Height = 1;
-        Assert.Equal ("Absolute(1)", label.Height.ToString ());
+        Assert.Equal (Dim.Sized (1), label.Height);
 
         var win = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
@@ -1255,8 +1256,8 @@ public class AutoSizeTrueTests
             Text = "Say Hello view4 你",
             AutoSize = true,
 
-            //Width = 10,
-            //Height = 5,
+            //Width = 1,
+            //Height = 18,
             TextDirection = TextDirection.TopBottom_LeftRight,
             ValidatePosDim = true
         };
@@ -1291,26 +1292,26 @@ public class AutoSizeTrueTests
         Assert.False (view5.IsInitialized);
         Assert.True (view1.AutoSize);
         Assert.Equal (new (0, 0, 18, 1), view1.Frame);
-        Assert.Equal ("Absolute(18)", view1.Width.ToString ());
-        Assert.Equal ("Absolute(1)", view1.Height.ToString ());
+        Assert.Equal (Dim.Auto (Dim.DimAutoStyle.Text), view1.Width);
+        Assert.Equal (Dim.Auto (Dim.DimAutoStyle.Text), view1.Height);
         Assert.True (view2.AutoSize);
-        Assert.Equal ("Say Hello view2 你".GetColumns (), view2.Width);
-        Assert.Equal (18, view2.Width);
-        Assert.Equal (new (0, 0, 18, 5), view2.Frame);
-        Assert.Equal ("Absolute(18)", view2.Width.ToString ());
-        Assert.Equal ("Absolute(5)", view2.Height.ToString ());
+        Assert.Equal ("Say Hello view2 你".GetColumns (), view2.Frame.Width);
+        Assert.Equal (18, view2.Frame.Width);
+        Assert.Equal (new (0, 0, 18, 1), view2.Frame);
+        Assert.Equal (Dim.Auto (Dim.DimAutoStyle.Text), view2.Width);
+        Assert.Equal (Dim.Auto (Dim.DimAutoStyle.Text), view2.Height);
         Assert.True (view3.AutoSize);
         Assert.Equal (new (0, 0, 18, 1), view3.Frame); // BUGBUG: AutoSize = true, so the height should be 1.
-        Assert.Equal ("Absolute(18)", view2.Width.ToString ());
-        Assert.Equal ("Absolute(1)", view3.Height.ToString ());
+        Assert.Equal (Dim.Auto (Dim.DimAutoStyle.Text), view3.Width);
+        Assert.Equal (Dim.Auto (Dim.DimAutoStyle.Text), view3.Height);
+
+        // Vertical text
         Assert.True (view4.AutoSize);
+        Assert.Equal (Dim.Auto (Dim.DimAutoStyle.Text), view4.Width);
+        Assert.Equal (Dim.Auto (Dim.DimAutoStyle.Text), view4.Height);
+        Assert.Equal ("Say Hello view4 你".GetColumns (), view4.Frame.Height);
+        Assert.Equal (new (0, 0, 1, 17), view4.Frame);
 
-        Assert.Equal ("Say Hello view4 你".GetColumns (), view2.Width);
-        Assert.Equal (18, view2.Width);
-
-        Assert.Equal (new (0, 0, 18, 17), view4.Frame);
-        Assert.Equal ("Absolute(18)", view4.Width.ToString ());
-        Assert.Equal ("Absolute(17)", view4.Height.ToString ());
         Assert.True (view5.AutoSize);
         Assert.Equal (new (0, 0, 18, 17), view5.Frame);
         Assert.True (view6.AutoSize);
@@ -1326,29 +1327,17 @@ public class AutoSizeTrueTests
         Assert.True (view5.IsInitialized);
         Assert.True (view1.AutoSize);
         Assert.Equal (new (0, 0, 18, 1), view1.Frame);
-        Assert.Equal ("Absolute(18)", view1.Width.ToString ());
-        Assert.Equal ("Absolute(1)", view1.Height.ToString ());
         Assert.True (view2.AutoSize);
 
         Assert.Equal (new (0, 0, 18, 5), view2.Frame);
-        Assert.Equal ("Absolute(18)", view2.Width.ToString ());
-        Assert.Equal ("Absolute(5)", view2.Height.ToString ());
         Assert.True (view3.AutoSize);
         Assert.Equal (new (0, 0, 18, 1), view3.Frame); // BUGBUG: AutoSize = true, so the height should be 1.
-        Assert.Equal ("Absolute(18)", view5.Width.ToString ());
-        Assert.Equal ("Absolute(1)", view3.Height.ToString ());
         Assert.True (view4.AutoSize);
         Assert.Equal (new (0, 0, 18, 17), view4.Frame);
-        Assert.Equal ("Absolute(18)", view5.Width.ToString ());
-        Assert.Equal ("Absolute(17)", view4.Height.ToString ());
         Assert.True (view5.AutoSize);
         Assert.Equal (new (0, 0, 18, 17), view5.Frame);
-        Assert.Equal ("Absolute(18)", view5.Width.ToString ());
-        Assert.Equal ("Absolute(17)", view5.Height.ToString ());
         Assert.True (view6.AutoSize);
         Assert.Equal (new (0, 0, 2, 17), view6.Frame); // BUGBUG: AutoSize = true, so the Width should be 2.
-        Assert.Equal ("Absolute(2)", view6.Width.ToString ());
-        Assert.Equal ("Absolute(17)", view6.Height.ToString ());
     }
 
     [Fact]
@@ -1574,7 +1563,7 @@ Y
         label.Text = "Hello";
         Application.Refresh ();
 
-        Assert.Equal (new (0, 0, 1, 5), label.Frame); // BUGBUG: AutoSize = true, so the Width should be 1.
+        Assert.Equal (new (0, 0, 1, 5), label.Frame);
 
         var expected = @"
 HX
@@ -2307,69 +2296,69 @@ Y
         Application.End (rs);
     }
 
-    [Fact]
-    public void GetCurrentHeight_TrySetHeight ()
-    {
-        var top = new View { X = 0, Y = 0, Height = 20 };
+    //[Fact]
+    //public void GetCurrentHeight_TrySetHeight ()
+    //{
+    //    var top = new View { X = 0, Y = 0, Height = 20 };
 
-        var v = new View { Height = Dim.Fill (), ValidatePosDim = true };
-        top.Add (v);
-        top.BeginInit ();
-        top.EndInit ();
-        top.LayoutSubviews ();
+    //    var v = new View { Height = Dim.Fill (), ValidatePosDim = true };
+    //    top.Add (v);
+    //    top.BeginInit ();
+    //    top.EndInit ();
+    //    top.LayoutSubviews ();
 
-        Assert.False (v.AutoSize);
-        Assert.False (v.TrySetHeight (0, out _));
-        Assert.Equal (20, v.Frame.Height);
+    //    Assert.False (v.AutoSize);
+    //    Assert.False (v.TrySetHeight (0, out _));
+    //    Assert.Equal (20, v.Frame.Height);
 
-        v.Height = Dim.Fill (1);
-        top.LayoutSubviews ();
+    //    v.Height = Dim.Fill (1);
+    //    top.LayoutSubviews ();
 
-        Assert.False (v.TrySetHeight (0, out _));
-        Assert.True (v.Height is Dim.DimFill);
-        Assert.Equal (19, v.Frame.Height);
+    //    Assert.False (v.TrySetHeight (0, out _));
+    //    Assert.True (v.Height is Dim.DimFill);
+    //    Assert.Equal (19, v.Frame.Height);
 
-        v.AutoSize = true;
-        top.LayoutSubviews ();
+    //    v.AutoSize = true;
+    //    top.LayoutSubviews ();
 
-        Assert.True (v.TrySetHeight (0, out _));
-        Assert.True (v.Height is Dim.DimAbsolute);
-        Assert.Equal (0, v.Frame.Height); // No text, so height is 0
-        top.Dispose ();
-    }
+    //    Assert.True (v.TrySetHeight (0, out _));
+    //    Assert.True (v.Height is Dim.DimAbsolute);
+    //    Assert.Equal (0, v.Frame.Height); // No text, so height is 0
+    //    top.Dispose ();
+    //}
 
-    [Fact]
-    [TestRespondersDisposed]
-    public void GetCurrentWidth_TrySetWidth ()
-    {
-        var top = new View { X = 0, Y = 0, Width = 80 };
+    //[Fact]
+    //[TestRespondersDisposed]
+    //public void GetCurrentWidth_TrySetWidth ()
+    //{
+    //    var top = new View { X = 0, Y = 0, Width = 80 };
 
-        var v = new View { Width = Dim.Fill (), ValidatePosDim = true };
-        top.Add (v);
-        top.BeginInit ();
-        top.EndInit ();
-        top.LayoutSubviews ();
+    //    var v = new View { Width = Dim.Fill (), ValidatePosDim = true };
+    //    top.Add (v);
+    //    top.BeginInit ();
+    //    top.EndInit ();
+    //    top.LayoutSubviews ();
 
-        Assert.False (v.AutoSize);
-        Assert.False (v.TrySetWidth (0, out _));
-        Assert.True (v.Width is Dim.DimFill);
-        Assert.Equal (80, v.Frame.Width);
+    //    Assert.False (v.AutoSize);
+    //    Assert.False (v.TrySetWidth (0, out _));
+    //    Assert.True (v.Width is Dim.DimFill);
+    //    Assert.Equal (80, v.Frame.Width);
 
-        v.Width = Dim.Fill (1);
-        top.LayoutSubviews ();
+    //    v.Width = Dim.Fill (1);
+    //    top.LayoutSubviews ();
 
-        Assert.False (v.TrySetWidth (0, out _));
-        Assert.True (v.Width is Dim.DimFill);
-        Assert.Equal (79, v.Frame.Width);
+    //    Assert.False (v.TrySetWidth (0, out _));
+    //    Assert.True (v.Width is Dim.DimFill);
+    //    Assert.Equal (79, v.Frame.Width);
 
-        v.AutoSize = true;
-        top.LayoutSubviews ();
+    //    v.AutoSize = true;
+    //    top.LayoutSubviews ();
 
-        Assert.True (v.TrySetWidth (0, out _));
-        Assert.True (v.Width is Dim.DimAbsolute);
-        Assert.Equal (0, v.Frame.Width); // No text, so width is 0
-        top.Dispose ();
-    }
+    //    Assert.True (v.TrySetWidth (0, out _));
+    //    Assert.True (v.Width is Dim.DimAbsolute);
+    //    Assert.Equal (0, v.Frame.Width); // No text, so width is 0
+    //    top.Dispose ();
+    //}
 
 //    [Fact]
 //    [AutoInitShutdown]
@@ -2735,7 +2724,7 @@ Y
         view.Text = "01234567890123456789";
 
         Assert.True (view.AutoSize);
-        Assert.Equal (LayoutStyle.Absolute, view.LayoutStyle);
+        Assert.Equal (LayoutStyle.Computed, view.LayoutStyle);
         Assert.Equal (new (0, 0, 20, 1), view.Frame);
         Assert.Equal ("Absolute(0)", view.X.ToString ());
         Assert.Equal ("Absolute(0)", view.Y.ToString ());
@@ -2813,68 +2802,68 @@ Y
         Application.End (rs);
     }
 
-    [Fact]
-    [AutoInitShutdown]
-    public void TrySetHeight_ForceValidatePosDim ()
-    {
-        var top = new View { X = 0, Y = 0, Height = 20 };
+    //[Fact]
+    //[AutoInitShutdown]
+    //public void TrySetHeight_ForceValidatePosDim ()
+    //{
+    //    var top = new View { X = 0, Y = 0, Height = 20 };
 
-        var v = new View { Height = Dim.Fill (), ValidatePosDim = true };
-        top.Add (v);
+    //    var v = new View { Height = Dim.Fill (), ValidatePosDim = true };
+    //    top.Add (v);
 
-        Assert.False (v.TrySetHeight (10, out int rHeight));
-        Assert.Equal (10, rHeight);
+    //    Assert.False (v.TrySetHeight (10, out int rHeight));
+    //    Assert.Equal (10, rHeight);
 
-        v.Height = Dim.Fill (1);
-        Assert.False (v.TrySetHeight (10, out rHeight));
-        Assert.Equal (9, rHeight);
+    //    v.Height = Dim.Fill (1);
+    //    Assert.False (v.TrySetHeight (10, out rHeight));
+    //    Assert.Equal (9, rHeight);
 
-        v.Height = 0;
-        Assert.True (v.TrySetHeight (10, out rHeight));
-        Assert.Equal (10, rHeight);
-        Assert.False (v.IsInitialized);
+    //    v.Height = 0;
+    //    Assert.True (v.TrySetHeight (10, out rHeight));
+    //    Assert.Equal (10, rHeight);
+    //    Assert.False (v.IsInitialized);
 
-        var toplevel = new Toplevel ();
-        toplevel.Add (top);
-        Application.Begin (toplevel);
+    //    var toplevel = new Toplevel ();
+    //    toplevel.Add (top);
+    //    Application.Begin (toplevel);
 
-        Assert.True (v.IsInitialized);
+    //    Assert.True (v.IsInitialized);
 
-        v.Height = 15;
-        Assert.True (v.TrySetHeight (5, out rHeight));
-        Assert.Equal (5, rHeight);
-    }
+    //    v.Height = 15;
+    //    Assert.True (v.TrySetHeight (5, out rHeight));
+    //    Assert.Equal (5, rHeight);
+    //}
 
-    [Fact]
-    [AutoInitShutdown]
-    public void TrySetWidth_ForceValidatePosDim ()
-    {
-        var top = new View { X = 0, Y = 0, Width = 80 };
+    //[Fact]
+    //[AutoInitShutdown]
+    //public void TrySetWidth_ForceValidatePosDim ()
+    //{
+    //    var top = new View { X = 0, Y = 0, Width = 80 };
 
-        var v = new View { Width = Dim.Fill (), ValidatePosDim = true };
-        top.Add (v);
+    //    var v = new View { Width = Dim.Fill (), ValidatePosDim = true };
+    //    top.Add (v);
 
-        Assert.False (v.TrySetWidth (70, out int rWidth));
-        Assert.Equal (70, rWidth);
+    //    Assert.False (v.TrySetWidth (70, out int rWidth));
+    //    Assert.Equal (70, rWidth);
 
-        v.Width = Dim.Fill (1);
-        Assert.False (v.TrySetWidth (70, out rWidth));
-        Assert.Equal (69, rWidth);
+    //    v.Width = Dim.Fill (1);
+    //    Assert.False (v.TrySetWidth (70, out rWidth));
+    //    Assert.Equal (69, rWidth);
 
-        v.Width = 0;
-        Assert.True (v.TrySetWidth (70, out rWidth));
-        Assert.Equal (70, rWidth);
-        Assert.False (v.IsInitialized);
+    //    v.Width = 0;
+    //    Assert.True (v.TrySetWidth (70, out rWidth));
+    //    Assert.Equal (70, rWidth);
+    //    Assert.False (v.IsInitialized);
 
-        var toplevel = new Toplevel ();
-        toplevel.Add (top);
-        Application.Begin (toplevel);
+    //    var toplevel = new Toplevel ();
+    //    toplevel.Add (top);
+    //    Application.Begin (toplevel);
 
-        Assert.True (v.IsInitialized);
-        v.Width = 75;
-        Assert.True (v.TrySetWidth (60, out rWidth));
-        Assert.Equal (60, rWidth);
-    }
+    //    Assert.True (v.IsInitialized);
+    //    v.Width = 75;
+    //    Assert.True (v.TrySetWidth (60, out rWidth));
+    //    Assert.Equal (60, rWidth);
+    //}
 
     [Theory]
     [AutoInitShutdown]

@@ -43,7 +43,7 @@ public class TextFormatter
         {
             _autoSize = EnableNeedsFormat (value);
 
-            if (_autoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified)
+            if (_autoSize)// && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified)
             {
                 Size = CalcRect (0, 0, _text, Direction, TabWidth).Size;
             }
@@ -65,7 +65,7 @@ public class TextFormatter
         {
             _textDirection = EnableNeedsFormat (value);
 
-            if (AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified)
+            if (AutoSize)// && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified)
             {
                 Size = CalcRect (0, 0, Text, Direction, TabWidth).Size;
             }
@@ -148,7 +148,7 @@ public class TextFormatter
         get => _size;
         set
         {
-            if (AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified)
+            if (AutoSize)// && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified)
             {
                 _size = EnableNeedsFormat (CalcRect (0, 0, Text, Direction, TabWidth).Size);
             }
@@ -175,7 +175,7 @@ public class TextFormatter
             bool textWasNull = _text is null && value != null;
             _text = EnableNeedsFormat (value);
 
-            if ((AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) || (textWasNull && Size.IsEmpty))
+            if (/*(Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) ||*/ (textWasNull && Size.IsEmpty))
             {
                 Size = CalcRect (0, 0, _text, Direction, TabWidth).Size;
             }

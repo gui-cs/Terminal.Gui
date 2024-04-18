@@ -55,6 +55,12 @@ public partial class View
 
             string old = _text;
             _text = value;
+
+            if (!string.IsNullOrEmpty (_text))
+            {
+
+            }
+
             UpdateTextFormatterText ();
             OnResizeNeeded ();
 #if DEBUG

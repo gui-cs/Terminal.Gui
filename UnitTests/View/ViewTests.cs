@@ -160,6 +160,7 @@ public class ViewTests
         {
             Assert.True (v.AutoSize);
             Assert.False (v.CanFocus);
+            // The text is 100 characters long, but Dim.Auto constrains to SuperView, so it should be truncated.
             Assert.Equal (new Rectangle (0, 0, 100, 1), v.Frame);
         }
         else
@@ -442,7 +443,7 @@ At 0,0
         tv.DrawContentComplete += (s, e) => tvCalled = true;
 
         var top = new Toplevel ();
-       top.Add (view, tv);
+        top.Add (view, tv);
         Application.Begin (top);
 
         Assert.True (viewCalled);
@@ -741,7 +742,7 @@ At 0,0
         view.EndInit ();
         view.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre ( text, _output);
+        TestHelpers.AssertDriverContentsWithFrameAre (text, _output);
     }
 
     [Fact]
@@ -832,7 +833,7 @@ At 0,0
             Text = "Vertical View", TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = true
         }; // BUGBUG: AutoSize or Height need be set
         Assert.NotNull (r);
-        Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
+        Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
 
         // BUGBUG: IsInitialized must be true to process calculation
         r.BeginInit ();
@@ -1209,7 +1210,8 @@ At 0,0
         Assert.True (acceptInvoked);
 
         return;
-        void ViewOnAccept (object sender, CancelEventArgs e) { 
+        void ViewOnAccept (object sender, CancelEventArgs e)
+        {
             acceptInvoked = true;
             e.Cancel = true;
         }

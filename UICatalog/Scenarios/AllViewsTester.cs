@@ -12,7 +12,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Top Level Windows")]
 public class AllViewsTester : Scenario
 {
-    private readonly List<string> _dimNames = new () { "Factor", "Fill", "Absolute" };
+    private readonly List<string> _dimNames = new () { "Auto", "Factor", "Fill", "Absolute" };
 
     // TODO: This is missing some
     private readonly List<string> _posNames = new () { "Factor", "AnchorEnd", "Center", "Absolute" };
@@ -208,7 +208,7 @@ public class AllViewsTester : Scenario
             Title = "Size (Dim)"
         };
 
-        radioItems = new [] { "_Percent(width)", "_Fill(width)", "_Sized(width)" };
+        radioItems = new [] { "Auto", "_Percent(width)", "_Fill(width)", "_Sized(width)" };
         label = new Label { X = 0, Y = 0, Text = "Width:" };
         _sizeFrame.Add (label);
         _wRadioGroup = new RadioGroup { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
@@ -240,7 +240,7 @@ public class AllViewsTester : Scenario
         _sizeFrame.Add (_wText);
         _sizeFrame.Add (_wRadioGroup);
 
-        radioItems = new [] { "P_ercent(height)", "F_ill(height)", "Si_zed(height)" };
+        radioItems = new [] { "_Auto", "P_ercent(height)", "F_ill(height)", "Si_zed(height)" };
         label = new Label { X = Pos.Right (_wRadioGroup) + 1, Y = 0, Text = "Height:" };
         _sizeFrame.Add (label);
         _hText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_hVal}" };

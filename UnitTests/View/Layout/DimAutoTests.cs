@@ -538,5 +538,85 @@ public class DimAutoTests
         Assert.Equal (expectedSuperWidth, superView.Frame.Width);
     }
 
+    [Theory]
+    [InlineData (0, 1, 1)]
+    [InlineData (1, 1, 1)]
+    [InlineData (9, 1, 1)]
+    [InlineData (10, 1,  1)]
+    [InlineData (0, 10,  10)]
+    [InlineData (1, 10,  10)]
+    [InlineData (9, 10,  10)]
+    [InlineData (10, 10, 10)]
+    public void Width_Auto_Text_Does_Not_Constrain_To_SuperView (int subX, int textLen,  int expectedSubWidth)
+    {
+        var superView = new View
+        {
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 1,
+            ValidatePosDim = true
+        };
+
+        var subView = new View
+        {
+            Text = new string ('*', textLen),
+            X = subX,
+            Y = 0,
+            Width = Dim.Auto (Dim.DimAutoStyle.Text),
+            Height = 1,
+            ValidatePosDim = true
+        };
+
+        superView.Add (subView);
+
+        superView.BeginInit ();
+        superView.EndInit ();
+        superView.SetRelativeLayout (superView.ContentSize);
+
+        superView.LayoutSubviews ();
+        Assert.Equal (expectedSubWidth, subView.Frame.Width);
+    }
+
+    [Theory]
+    [InlineData (0, 1, 1)]
+    [InlineData (1, 1, 1)]
+    [InlineData (9, 1, 1)]
+    [InlineData (10, 1, 1)]
+    [InlineData (0, 10, 10)]
+    [InlineData (1, 10, 10)]
+    [InlineData (9, 10, 10)]
+    [InlineData (10, 10, 10)]
+    public void Width_Auto_Subviews_Does_Not_Constrain_To_SuperView (int subX, int textLen, int expectedSubWidth)
+    {
+        var superView = new View
+        {
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 1,
+            ValidatePosDim = true
+        };
+
+        var subView = new View
+        {
+            Text = new string ('*', textLen),
+            X = subX,
+            Y = 0,
+            Width = Dim.Auto (Dim.DimAutoStyle.Subviews),
+            Height = 1,
+            ValidatePosDim = true
+        };
+
+        superView.Add (subView);
+
+        superView.BeginInit ();
+        superView.EndInit ();
+        superView.SetRelativeLayout (superView.ContentSize);
+
+        superView.LayoutSubviews ();
+        Assert.Equal (expectedSubWidth, subView.Frame.Width);
+    }
+
     // Test variations of Frame
 }

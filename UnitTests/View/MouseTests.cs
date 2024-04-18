@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
-public class MouseTests (ITestOutputHelper output)
+public class MouseTests (ITestOutputHelper output) : TestsAllViews
 {
     [Theory]
     [InlineData (false, false, false)]
@@ -93,30 +93,29 @@ public class MouseTests (ITestOutputHelper output)
         Assert.Equal (mouseFlagsFromEvent, expectedMouseFlagsFromEvent);
     }
 
-    public static TheoryData<View, string> AllViews => TestHelpers.GetAllViewsTheoryData ();
-
-
     [Theory]
-    [MemberData (nameof (AllViews))]
+    [MemberData (nameof (AllViewTypes))]
 
-    public void AllViews_Enter_Leave_Events (View view, string viewName)
+    public void AllViews_Enter_Leave_Events (Type viewType)
     {
+        var view = CreateInstanceIfNotGeneric (viewType);
+
         if (view == null)
         {
-            output.WriteLine ($"Ignoring {viewName} - It's a Generic");
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
             return;
         }
 
         if (!view.CanFocus)
         {
-            output.WriteLine ($"Ignoring {viewName} - It can't focus.");
+            output.WriteLine ($"Ignoring {viewType} - It can't focus.");
 
             return;
         }
 
         if (view is Toplevel && ((Toplevel)view).Modal)
         {
-            output.WriteLine ($"Ignoring {viewName} - It's a Modal Toplevel");
+            output.WriteLine ($"Ignoring {viewType} - It's a Modal Toplevel");
 
             return;
         }
@@ -189,26 +188,28 @@ public class MouseTests (ITestOutputHelper output)
 
 
     [Theory]
-    [MemberData (nameof (AllViews))]
+    [MemberData (nameof (AllViewTypes))]
 
-    public void AllViews_Enter_Leave_Events_Visible_False (View view, string viewName)
+    public void AllViews_Enter_Leave_Events_Visible_False (Type viewType)
     {
+        var view = CreateInstanceIfNotGeneric (viewType);
+
         if (view == null)
         {
-            output.WriteLine ($"Ignoring {viewName} - It's a Generic");
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
             return;
         }
 
         if (!view.CanFocus)
         {
-            output.WriteLine ($"Ignoring {viewName} - It can't focus.");
+            output.WriteLine ($"Ignoring {viewType} - It can't focus.");
 
             return;
         }
 
         if (view is Toplevel && ((Toplevel)view).Modal)
         {
-            output.WriteLine ($"Ignoring {viewName} - It's a Modal Toplevel");
+            output.WriteLine ($"Ignoring {viewType} - It's a Modal Toplevel");
 
             return;
         }
@@ -304,12 +305,14 @@ public class MouseTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [MemberData (nameof (AllViews))]
-    public void AllViews_NewMouseEvent_Enabled_False_Does_Not_Set_Handled (View view, string viewName)
+    [MemberData (nameof (AllViewTypes))]
+    public void AllViews_NewMouseEvent_Enabled_False_Does_Not_Set_Handled (Type viewType)
     {
+        var view = CreateInstanceIfNotGeneric (viewType);
+
         if (view == null)
         {
-            output.WriteLine ($"Ignoring {viewName} - It's a Generic");
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
             return;
         }
 
@@ -321,12 +324,14 @@ public class MouseTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [MemberData (nameof (AllViews))]
-    public void AllViews_NewMouseEvent_Clicked_Enabled_False_Does_Not_Set_Handled (View view, string viewName)
+    [MemberData (nameof (AllViewTypes))]
+    public void AllViews_NewMouseEvent_Clicked_Enabled_False_Does_Not_Set_Handled (Type viewType)
     {
+        var view = CreateInstanceIfNotGeneric (viewType);
+
         if (view == null)
         {
-            output.WriteLine ($"Ignoring {viewName} - It's a Generic");
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
             return;
         }
 
