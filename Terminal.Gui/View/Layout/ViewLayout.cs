@@ -344,7 +344,7 @@ public partial class View
     /// </summary>
     public virtual bool AutoSize
     {
-        get => Height is Dim.DimAuto && Width is Dim.DimAuto;
+        get => _height is Dim.DimAuto && _width is Dim.DimAuto;
         set
         {
             if (IsInitialized)
@@ -357,144 +357,145 @@ public partial class View
             {
                 _height = Dim.Auto (Dim.DimAutoStyle.Text);
                 _width = Dim.Auto (Dim.DimAutoStyle.Text);
+                OnResizeNeeded();
             }
         }
     }
 
 
-    /// <summary>Determines if the View's <see cref="Height"/> can be set to a new value.</summary>
-    /// <remarks>TrySetHeight can only be called when AutoSize is true (or being set to true).</remarks>
-    /// <param name="desiredHeight"></param>
-    /// <param name="resultHeight">
-    ///     Contains the width that would result if <see cref="Height"/> were set to
-    ///     <paramref name="desiredHeight"/>"/>
-    /// </param>
-    /// <returns>
-    ///     <see langword="true"/> if the View's <see cref="Height"/> can be changed to the specified value. False
-    ///     otherwise.
-    /// </returns>
-    internal bool TrySetHeight (int desiredHeight, out int resultHeight)
-    {
-        int h = desiredHeight;
-        bool canSetHeight;
+    ///// <summary>Determines if the View's <see cref="Height"/> can be set to a new value.</summary>
+    ///// <remarks>TrySetHeight can only be called when AutoSize is true (or being set to true).</remarks>
+    ///// <param name="desiredHeight"></param>
+    ///// <param name="resultHeight">
+    /////     Contains the width that would result if <see cref="Height"/> were set to
+    /////     <paramref name="desiredHeight"/>"/>
+    ///// </param>
+    ///// <returns>
+    /////     <see langword="true"/> if the View's <see cref="Height"/> can be changed to the specified value. False
+    /////     otherwise.
+    ///// </returns>
+    //internal bool TrySetHeight (int desiredHeight, out int resultHeight)
+    //{
+    //    int h = desiredHeight;
+    //    bool canSetHeight;
 
-        switch (Height)
-        {
-            case Dim.DimCombine _:
-            case Dim.DimView _:
-            case Dim.DimFill _:
-                // It's a Dim.DimCombine and so can't be assigned. Let it have it's height anchored.
-                h = Height.Anchor (h);
-                canSetHeight = !ValidatePosDim;
+    //    switch (Height)
+    //    {
+    //        case Dim.DimCombine _:
+    //        case Dim.DimView _:
+    //        case Dim.DimFill _:
+    //            // It's a Dim.DimCombine and so can't be assigned. Let it have it's height anchored.
+    //            h = Height.Anchor (h);
+    //            canSetHeight = !ValidatePosDim;
 
-                break;
-            case Dim.DimFactor factor:
-                // Tries to get the SuperView height otherwise the view height.
-                int sh = SuperView is { } ? SuperView.Frame.Height : h;
+    //            break;
+    //        case Dim.DimFactor factor:
+    //            // Tries to get the SuperView height otherwise the view height.
+    //            int sh = SuperView is { } ? SuperView.Frame.Height : h;
 
-                if (factor.IsFromRemaining ())
-                {
-                    sh -= Frame.Y;
-                }
+    //            if (factor.IsFromRemaining ())
+    //            {
+    //                sh -= Frame.Y;
+    //            }
 
-                h = Height.Anchor (sh);
-                canSetHeight = !ValidatePosDim;
+    //            h = Height.Anchor (sh);
+    //            canSetHeight = !ValidatePosDim;
 
-                break;
-            default:
-                canSetHeight = true;
+    //            break;
+    //        default:
+    //            canSetHeight = true;
 
-                break;
-        }
+    //            break;
+    //    }
 
-        resultHeight = h;
+    //    resultHeight = h;
 
-        return canSetHeight;
-    }
+    //    return canSetHeight;
+    //}
 
-    /// <summary>Determines if the View's <see cref="Width"/> can be set to a new value.</summary>
-    /// <remarks>TrySetWidth can only be called when AutoSize is true (or being set to true).</remarks>
-    /// <param name="desiredWidth"></param>
-    /// <param name="resultWidth">
-    ///     Contains the width that would result if <see cref="Width"/> were set to
-    ///     <paramref name="desiredWidth"/>"/>
-    /// </param>
-    /// <returns>
-    ///     <see langword="true"/> if the View's <see cref="Width"/> can be changed to the specified value. False
-    ///     otherwise.
-    /// </returns>
-    internal bool TrySetWidth (int desiredWidth, out int resultWidth)
-    {
-        int w = desiredWidth;
-        bool canSetWidth;
+    ///// <summary>Determines if the View's <see cref="Width"/> can be set to a new value.</summary>
+    ///// <remarks>TrySetWidth can only be called when AutoSize is true (or being set to true).</remarks>
+    ///// <param name="desiredWidth"></param>
+    ///// <param name="resultWidth">
+    /////     Contains the width that would result if <see cref="Width"/> were set to
+    /////     <paramref name="desiredWidth"/>"/>
+    ///// </param>
+    ///// <returns>
+    /////     <see langword="true"/> if the View's <see cref="Width"/> can be changed to the specified value. False
+    /////     otherwise.
+    ///// </returns>
+    //internal bool TrySetWidth (int desiredWidth, out int resultWidth)
+    //{
+    //    int w = desiredWidth;
+    //    bool canSetWidth;
 
-        switch (Width)
-        {
-            case Dim.DimCombine _:
-            case Dim.DimView _:
-            case Dim.DimFill _:
-                // It's a Dim.DimCombine and so can't be assigned. Let it have it's Width anchored.
-                w = Width.Anchor (w);
-                canSetWidth = !ValidatePosDim;
+    //    switch (Width)
+    //    {
+    //        case Dim.DimCombine _:
+    //        case Dim.DimView _:
+    //        case Dim.DimFill _:
+    //            // It's a Dim.DimCombine and so can't be assigned. Let it have it's Width anchored.
+    //            w = Width.Anchor (w);
+    //            canSetWidth = !ValidatePosDim;
 
-                break;
-            case Dim.DimFactor factor:
-                // Tries to get the SuperView Width otherwise the view Width.
-                int sw = SuperView is { } ? SuperView.Frame.Width : w;
+    //            break;
+    //        case Dim.DimFactor factor:
+    //            // Tries to get the SuperView Width otherwise the view Width.
+    //            int sw = SuperView is { } ? SuperView.Frame.Width : w;
 
-                if (factor.IsFromRemaining ())
-                {
-                    sw -= Frame.X;
-                }
+    //            if (factor.IsFromRemaining ())
+    //            {
+    //                sw -= Frame.X;
+    //            }
 
-                w = Width.Anchor (sw);
-                canSetWidth = !ValidatePosDim;
+    //            w = Width.Anchor (sw);
+    //            canSetWidth = !ValidatePosDim;
 
-                break;
-            default:
-                canSetWidth = true;
+    //            break;
+    //        default:
+    //            canSetWidth = true;
 
-                break;
-        }
+    //            break;
+    //    }
 
-        resultWidth = w;
+    //    resultWidth = w;
 
-        return canSetWidth;
-    }
+    //    return canSetWidth;
+    //}
 
-    /// <summary>Resizes the View to fit the specified size. Factors in the HotKey.</summary>
-    /// <remarks>ResizeBoundsToFit can only be called when AutoSize is true (or being set to true).</remarks>
-    /// <param name="size"></param>
-    /// <returns>whether the Viewport was changed or not</returns>
-    private bool ResizeViewportToFit (Size size)
-    {
-        //if (AutoSize == false) {
-        //	throw new InvalidOperationException ("ResizeViewportToFit can only be called when AutoSize is true");
-        //}
+    ///// <summary>Resizes the View to fit the specified size. Factors in the HotKey.</summary>
+    ///// <remarks>ResizeBoundsToFit can only be called when AutoSize is true (or being set to true).</remarks>
+    ///// <param name="size"></param>
+    ///// <returns>whether the Viewport was changed or not</returns>
+    //private bool ResizeViewportToFit (Size size)
+    //{
+    //    //if (AutoSize == false) {
+    //    //	throw new InvalidOperationException ("ResizeViewportToFit can only be called when AutoSize is true");
+    //    //}
 
-        var changed = false;
-        bool canSizeW = TrySetWidth (size.Width - GetHotKeySpecifierLength (), out int rW);
-        bool canSizeH = TrySetHeight (size.Height - GetHotKeySpecifierLength (false), out int rH);
+    //    var changed = false;
+    //    bool canSizeW = TrySetWidth (size.Width - GetHotKeySpecifierLength (), out int rW);
+    //    bool canSizeH = TrySetHeight (size.Height - GetHotKeySpecifierLength (false), out int rH);
 
-        if (canSizeW)
-        {
-            changed = true;
-            _width = rW;
-        }
+    //    if (canSizeW)
+    //    {
+    //        changed = true;
+    //        _width = rW;
+    //    }
 
-        if (canSizeH)
-        {
-            changed = true;
-            _height = rH;
-        }
+    //    if (canSizeH)
+    //    {
+    //        changed = true;
+    //        _height = rH;
+    //    }
 
-        if (changed)
-        {
-            Viewport = new (Viewport.X, Viewport.Y, canSizeW ? rW : Viewport.Width, canSizeH ? rH : Viewport.Height);
-        }
+    //    if (changed)
+    //    {
+    //        Viewport = new (Viewport.X, Viewport.Y, canSizeW ? rW : Viewport.Width, canSizeH ? rH : Viewport.Height);
+    //    }
 
-        return changed;
-    }
+    //    return changed;
+    //}
 
     #endregion AutoSize
 
@@ -981,11 +982,11 @@ public partial class View
         // TODO: Determine what, if any of the below is actually needed here.
         if (IsInitialized)
         {
-            //if (AutoSize)
-            //{
+            if (AutoSize)
+            {
             //    SetFrameToFitText ();
-            //    SetTextFormatterSize ();
-            //}
+               // SetTextFormatterSize ();
+            }
 
             LayoutAdornments ();
             SetNeedsDisplay ();
@@ -1044,11 +1045,11 @@ public partial class View
 
         var autoSize = Size.Empty;
 
-        if (AutoSize)
-        {
-            // TODO: Nuke this from orbit once Dim.Auto is fully implemented
-            autoSize = GetTextAutoSize ();
-        }
+        //if (AutoSize)
+        //{
+        //    // TODO: Nuke this from orbit once Dim.Auto is fully implemented
+        //    autoSize = GetTextAutoSize ();
+        //}
 
         int newX = _x.Calculate (superviewContentSize.Width, _width, this, Dim.Dimension.Width, autoSize.Width, AutoSize);
         int newW = _width.Calculate (newX, superviewContentSize.Width, this, Dim.Dimension.Width, autoSize.Width, AutoSize);

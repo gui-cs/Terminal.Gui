@@ -418,6 +418,10 @@ public partial class View
 
         UpdateTextFormatterText ();
 
+        if (directionChanged)
+        {
+            OnResizeNeeded ();
+        }
         //if ((!ValidatePosDim && directionChanged && AutoSize) || (ValidatePosDim && directionChanged && AutoSize && isValidOldAutoSize))
         //{
         //    OnResizeNeeded ();
