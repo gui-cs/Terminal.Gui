@@ -287,13 +287,13 @@ public class TextFormatter
             Rune [] runes = linesFormatted [line].ToRunes ();
 
             runes = Direction switch
-                    {
-                        TextDirection.RightLeft_BottomTop => runes.Reverse ().ToArray (),
-                        TextDirection.RightLeft_TopBottom => runes.Reverse ().ToArray (),
-                        TextDirection.BottomTop_LeftRight => runes.Reverse ().ToArray (),
-                        TextDirection.BottomTop_RightLeft => runes.Reverse ().ToArray (),
-                        _ => runes
-                    };
+            {
+                TextDirection.RightLeft_BottomTop => runes.Reverse ().ToArray (),
+                TextDirection.RightLeft_TopBottom => runes.Reverse ().ToArray (),
+                TextDirection.BottomTop_LeftRight => runes.Reverse ().ToArray (),
+                TextDirection.BottomTop_RightLeft => runes.Reverse ().ToArray (),
+                _ => runes
+            };
 
             // When text is justified, we lost left or right, so we use the direction to align. 
 
@@ -304,7 +304,7 @@ public class TextFormatter
             {
                 if (isVertical)
                 {
-                    int runesWidth = GetWidestLineLength (linesFormatted, line, TabWidth);
+                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, tabWidth: TabWidth);
                     x = screen.Right - runesWidth;
                     CursorPosition = screen.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
                 }
@@ -320,7 +320,7 @@ public class TextFormatter
                 if (isVertical)
                 {
                     int runesWidth = line > 0
-                                         ? GetWidestLineLength (linesFormatted, 0, line, TabWidth)
+                                         ? GetColumnsRequiredForVerticalText (linesFormatted, TabWidth)
                                          : 0;
                     x = screen.Left + runesWidth;
                 }
@@ -335,7 +335,7 @@ public class TextFormatter
             {
                 if (isVertical)
                 {
-                    int runesWidth = GetWidestLineLength (linesFormatted, line, TabWidth);
+                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, TabWidth);
                     x = screen.Left + line + (screen.Width - runesWidth) / 2;
 
                     CursorPosition = (screen.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
@@ -700,48 +700,48 @@ public class TextFormatter
     public static bool IsHorizontalDirection (TextDirection textDirection)
     {
         return textDirection switch
-               {
-                   TextDirection.LeftRight_TopBottom => true,
-                   TextDirection.LeftRight_BottomTop => true,
-                   TextDirection.RightLeft_TopBottom => true,
-                   TextDirection.RightLeft_BottomTop => true,
-                   _ => false
-               };
+        {
+            TextDirection.LeftRight_TopBottom => true,
+            TextDirection.LeftRight_BottomTop => true,
+            TextDirection.RightLeft_TopBottom => true,
+            TextDirection.RightLeft_BottomTop => true,
+            _ => false
+        };
     }
 
     /// <summary>Check if it is a vertical direction</summary>
     public static bool IsVerticalDirection (TextDirection textDirection)
     {
         return textDirection switch
-               {
-                   TextDirection.TopBottom_LeftRight => true,
-                   TextDirection.TopBottom_RightLeft => true,
-                   TextDirection.BottomTop_LeftRight => true,
-                   TextDirection.BottomTop_RightLeft => true,
-                   _ => false
-               };
+        {
+            TextDirection.TopBottom_LeftRight => true,
+            TextDirection.TopBottom_RightLeft => true,
+            TextDirection.BottomTop_LeftRight => true,
+            TextDirection.BottomTop_RightLeft => true,
+            _ => false
+        };
     }
 
     /// <summary>Check if it is Left to Right direction</summary>
     public static bool IsLeftToRight (TextDirection textDirection)
     {
         return textDirection switch
-               {
-                   TextDirection.LeftRight_TopBottom => true,
-                   TextDirection.LeftRight_BottomTop => true,
-                   _ => false
-               };
+        {
+            TextDirection.LeftRight_TopBottom => true,
+            TextDirection.LeftRight_BottomTop => true,
+            _ => false
+        };
     }
 
     /// <summary>Check if it is Top to Bottom direction</summary>
     public static bool IsTopToBottom (TextDirection textDirection)
     {
         return textDirection switch
-               {
-                   TextDirection.TopBottom_LeftRight => true,
-                   TextDirection.TopBottom_RightLeft => true,
-                   _ => false
-               };
+        {
+            TextDirection.TopBottom_LeftRight => true,
+            TextDirection.TopBottom_RightLeft => true,
+            _ => false
+        };
     }
 
     // TODO: Move to StringExtensions?
@@ -1122,21 +1122,21 @@ public class TextFormatter
                     case ' ':
                         return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
                     case '\t':
-                    {
-                        length += tabWidth + 1;
-
-                        if (length == tabWidth && tabWidth > cWidth)
                         {
-                            return to + 1;
-                        }
+                            length += tabWidth + 1;
 
-                        if (length > cWidth && tabWidth > cWidth)
-                        {
-                            return to;
-                        }
+                            if (length == tabWidth && tabWidth > cWidth)
+                            {
+                                return to + 1;
+                            }
 
-                        return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
-                    }
+                            if (length > cWidth && tabWidth > cWidth)
+                            {
+                                return to;
+                            }
+
+                            return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
+                        }
                     default:
                         to++;
 
@@ -1145,11 +1145,11 @@ public class TextFormatter
             }
 
             return cLength switch
-                   {
-                       > 0 when to < runes.Count && runes [to].Value != ' ' && runes [to].Value != '\t' => from,
-                       > 0 when to < runes.Count && (runes [to].Value == ' ' || runes [to].Value == '\t') => from,
-                       _ => to
-                   };
+            {
+                > 0 when to < runes.Count && runes [to].Value != ' ' && runes [to].Value != '\t' => from,
+                > 0 when to < runes.Count && (runes [to].Value == ' ' || runes [to].Value == '\t') => from,
+                _ => to
+            };
         }
 
         if (start < text.GetRuneCount ())
@@ -1580,29 +1580,28 @@ public class TextFormatter
     }
 
     /// <summary>
-    ///     Returns the number of columns in the widest line in the list based on the <paramref name="startIndex"/> and
-    ///     the <paramref name="length"/>.
+    ///     Returns the number of columns required to render <paramref name="lines"/> oriented vertically.
     /// </summary>
     /// <remarks>
     ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
     ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="lines">The lines.</param>
-    /// <param name="startIndex">The start index.</param>
-    /// <param name="length">The length.</param>
+    /// <param name="startLine">The line in the list to start with (any lines before will be ignored).</param>
+    /// <param name="linesCount">The number of lines to process (if less than <c>lines.Count</c>, any lines after will be ignored).</param>
     /// <param name="tabWidth">The number of columns used for a tab.</param>
-    /// <returns>The maximum characters width.</returns>
-    public static int GetWidestLineLength (
+    /// <returns>The width required.</returns>
+    public static int GetColumnsRequiredForVerticalText (
         List<string> lines,
-        int startIndex = -1,
-        int length = -1,
+        int startLine = -1,
+        int linesCount = -1,
         int tabWidth = 0
     )
     {
         var max = 0;
 
-        for (int i = startIndex == -1 ? 0 : startIndex;
-             i < (length == -1 ? lines.Count : startIndex + length);
+        for (int i = startLine == -1 ? 0 : startLine;
+             i < (linesCount == -1 ? lines.Count : startLine + linesCount);
              i++)
         {
             string runes = lines [i];

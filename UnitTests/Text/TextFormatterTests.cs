@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Xunit.Abstractions;
+using static Terminal.Gui.SpinnerStyle;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
@@ -961,30 +962,43 @@ ssb
         Assert.Equal (1, TextFormatter.GetMaxColsForWidth (text, 1));
     }
 
+
     [Theory]
+    [InlineData (new [] { "0123456789" }, 1)]
+    [InlineData (new [] { "Hello World" }, 1)]
+    [InlineData (new [] { "Hello", "World" }, 2)]
+    [InlineData (new [] { "こんにちは", "世界" }, 4)]
+    public void GetColumnsRequiredForVerticalText_List_GetsWidth (IEnumerable<string> text, int expectedWidth)
+    {
+        Assert.Equal (expectedWidth, TextFormatter.GetColumnsRequiredForVerticalText (text.ToList ()));
+
+    }
+
+    [Theory]
+    [InlineData (new [] { "Hello World" }, 1, 0, 1, 1)]
     [InlineData (new [] { "Hello", "World" }, 2, 1, 1, 1)]
     [InlineData (new [] { "こんにちは", "世界" }, 4, 1, 1, 2)]
-    public void GetWidestLineLength_List_Simple_And_Wide_Runes (
+    public void GetColumnsRequiredForVerticalText_List_Simple_And_Wide_Runes (
         IEnumerable<string> text,
-        int width,
+        int expectedWidth,
         int index,
         int length,
-        int indexWidth
+        int expectedIndexWidth
     )
     {
-        Assert.Equal (width, TextFormatter.GetWidestLineLength (text.ToList ()));
-        Assert.Equal (indexWidth, TextFormatter.GetWidestLineLength (text.ToList (), index, length));
+        Assert.Equal (expectedWidth, TextFormatter.GetColumnsRequiredForVerticalText (text.ToList ()));
+        Assert.Equal (expectedIndexWidth, TextFormatter.GetColumnsRequiredForVerticalText (text.ToList (), index, length));
     }
 
     [Fact]
-    public void GetWidestLineLength_List_With_Combining_Runes ()
+    public void GetColumnsRequiredForVerticalText_List_With_Combining_Runes ()
     {
         List<string> text = new () { "Les Mis", "e\u0328\u0301", "rables" };
-        Assert.Equal (1, TextFormatter.GetWidestLineLength (text, 1, 1));
+        Assert.Equal (1, TextFormatter.GetColumnsRequiredForVerticalText (text, 1, 1));
     }
 
     [Fact]
-    public void GetWidestLineLength_With_Combining_Runes ()
+    public void GetColumnsRequiredForVerticalText_With_Combining_Runes ()
     {
         var text = "Les Mise\u0328\u0301rables";
         Assert.Equal (1, TextFormatter.GetWidestLineLength (text, 1, 1));
