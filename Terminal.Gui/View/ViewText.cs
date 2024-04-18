@@ -290,18 +290,18 @@ public partial class View
         TextFormatter.Size = new Size (w, h);
     }
 
-    private bool IsValidAutoSize (out Size autoSize)
-    {
-        Rectangle rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
+    //private bool IsValidAutoSize (out Size autoSize)
+    //{
+    //    Rectangle rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
 
-        autoSize = new Size (
-                             rect.Size.Width - GetHotKeySpecifierLength (),
-                             rect.Size.Height - GetHotKeySpecifierLength (false));
+    //    autoSize = new Size (
+    //                         rect.Size.Width - GetHotKeySpecifierLength (),
+    //                         rect.Size.Height - GetHotKeySpecifierLength (false));
 
-        return !((ValidatePosDim && (!(Width is Dim.DimAbsolute) || !(Height is Dim.DimAbsolute)))
-                 || _frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength ()
-                 || _frame.Size.Height != rect.Size.Height - GetHotKeySpecifierLength (false));
-    }
+    //    return !((ValidatePosDim && (!(Width is Dim.DimAbsolute) || !(Height is Dim.DimAbsolute)))
+    //             || _frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength ()
+    //             || _frame.Size.Height != rect.Size.Height - GetHotKeySpecifierLength (false));
+    //}
 
     private bool IsValidAutoSizeHeight (Dim height)
     {
@@ -319,113 +319,113 @@ public partial class View
         return !((ValidatePosDim && !(width is Dim.DimAbsolute)) || dimValue != rect.Size.Width - GetHotKeySpecifierLength ());
     }
 
-    /// <summary>
-    ///     Sets the size of the View to the minimum width or height required to fit <see cref="Text"/>.
-    /// </summary>
-    /// <returns>
-    ///     <see langword="true"/> if the size was changed; <see langword="false"/> if <see cref="AutoSize"/> ==
-    ///     <see langword="true"/> or
-    ///     <see cref="Text"/> will not fit.
-    /// </returns>
-    /// <remarks>
-    ///     Always returns <see langword="false"/> if <see cref="AutoSize"/> is <see langword="true"/> or
-    ///     if <see cref="Height"/> (Horizontal) or <see cref="Width"/> (Vertical) are not not set or zero.
-    ///     Does not take into account word wrapping.
-    /// </remarks>
-    private bool SetFrameToFitText ()
-    {
-        if (AutoSize == false)
-        {
-            throw new InvalidOperationException ("SetFrameToFitText can only be called when AutoSize is true");
-        }
+    ///// <summary>
+    /////     Sets the size of the View to the minimum width or height required to fit <see cref="Text"/>.
+    ///// </summary>
+    ///// <returns>
+    /////     <see langword="true"/> if the size was changed; <see langword="false"/> if <see cref="AutoSize"/> ==
+    /////     <see langword="true"/> or
+    /////     <see cref="Text"/> will not fit.
+    ///// </returns>
+    ///// <remarks>
+    /////     Always returns <see langword="false"/> if <see cref="AutoSize"/> is <see langword="true"/> or
+    /////     if <see cref="Height"/> (Horizontal) or <see cref="Width"/> (Vertical) are not not set or zero.
+    /////     Does not take into account word wrapping.
+    ///// </remarks>
+    //private bool SetFrameToFitText ()
+    //{
+    //    if (AutoSize == false)
+    //    {
+    //        throw new InvalidOperationException ("SetFrameToFitText can only be called when AutoSize is true");
+    //    }
 
-        // BUGBUG: This API is broken - should not assume Frame.Height == ContentSize.Height
-        // <summary>
-        // Gets the minimum dimensions required to fit the View's <see cref="Text"/>, factoring in <see cref="TextDirection"/>.
-        // </summary>
-        // <param name="sizeRequired">The minimum dimensions required.</param>
-        // <returns><see langword="true"/> if the dimensions fit within the View's <see cref="ContentSize"/>, <see langword="false"/> otherwise.</returns>
-        // <remarks>
-        // Always returns <see langword="false"/> if <see cref="AutoSize"/> is <see langword="true"/> or
-        // if <see cref="Height"/> (Horizontal) or <see cref="Width"/> (Vertical) are not not set or zero.
-        // Does not take into account word wrapping.
-        // </remarks>
-        bool GetMinimumSizeOfText (out Size sizeRequired)
-        {
-            if (!IsInitialized)
-            {
-                sizeRequired = Size.Empty;
+    //    // BUGBUG: This API is broken - should not assume Frame.Height == ContentSize.Height
+    //    // <summary>
+    //    // Gets the minimum dimensions required to fit the View's <see cref="Text"/>, factoring in <see cref="TextDirection"/>.
+    //    // </summary>
+    //    // <param name="sizeRequired">The minimum dimensions required.</param>
+    //    // <returns><see langword="true"/> if the dimensions fit within the View's <see cref="ContentSize"/>, <see langword="false"/> otherwise.</returns>
+    //    // <remarks>
+    //    // Always returns <see langword="false"/> if <see cref="AutoSize"/> is <see langword="true"/> or
+    //    // if <see cref="Height"/> (Horizontal) or <see cref="Width"/> (Vertical) are not not set or zero.
+    //    // Does not take into account word wrapping.
+    //    // </remarks>
+    //    bool GetMinimumSizeOfText (out Size sizeRequired)
+    //    {
+    //        if (!IsInitialized)
+    //        {
+    //            sizeRequired = Size.Empty;
 
-                return false;
-            }
+    //            return false;
+    //        }
 
-            sizeRequired = ContentSize;
+    //        sizeRequired = ContentSize;
 
-            if (AutoSize || string.IsNullOrEmpty (TextFormatter.Text))
-            {
-                return false;
-            }
+    //        if (AutoSize || string.IsNullOrEmpty (TextFormatter.Text))
+    //        {
+    //            return false;
+    //        }
 
-            switch (TextFormatter.IsVerticalDirection (TextDirection))
-            {
-                case true:
-                    int colWidth = TextFormatter.GetSumMaxCharWidth (TextFormatter.Text, 0, 1);
+    //        switch (TextFormatter.IsVerticalDirection (TextDirection))
+    //        {
+    //            case true:
+    //                int colWidth = TextFormatter.GetSumMaxCharWidth (TextFormatter.Text, 0, 1);
 
-                    // TODO: v2 - This uses frame.Width; it should only use ContentSize
-                    if (_frame.Width < colWidth
-                        && (Width is null || (ContentSize.Width >= 0 && Width is Dim.DimAbsolute && Width.Anchor (0) >= 0 && Width.Anchor (0) < colWidth)))
-                    {
-                        sizeRequired = new (colWidth, ContentSize.Height);
+    //                // TODO: v2 - This uses frame.Width; it should only use ContentSize
+    //                if (_frame.Width < colWidth
+    //                    && (Width is null || (ContentSize.Width >= 0 && Width is Dim.DimAbsolute && Width.Anchor (0) >= 0 && Width.Anchor (0) < colWidth)))
+    //                {
+    //                    sizeRequired = new (colWidth, ContentSize.Height);
 
-                        return true;
-                    }
+    //                    return true;
+    //                }
 
-                    break;
-                default:
-                    if (_frame.Height < 1 && (Height is null || (Height is Dim.DimAbsolute && Height.Anchor (0) == 0)))
-                    {
-                        sizeRequired = new (ContentSize.Width, 1);
+    //                break;
+    //            default:
+    //                if (_frame.Height < 1 && (Height is null || (Height is Dim.DimAbsolute && Height.Anchor (0) == 0)))
+    //                {
+    //                    sizeRequired = new (ContentSize.Width, 1);
 
-                        return true;
-                    }
+    //                    return true;
+    //                }
 
-                    break;
-            }
+    //                break;
+    //        }
 
-            return false;
-        }
+    //        return false;
+    //    }
 
-        if (GetMinimumSizeOfText (out Size size))
-        {
-            // TODO: This is a hack.
-            //_width  = size.Width;
-            //_height = size.Height;
-            SetFrame (new (_frame.Location, size));
+    //    if (GetMinimumSizeOfText (out Size size))
+    //    {
+    //        // TODO: This is a hack.
+    //        //_width  = size.Width;
+    //        //_height = size.Height;
+    //        SetFrame (new (_frame.Location, size));
 
-            //throw new InvalidOperationException ("This is a hack.");
-            return true;
-        }
+    //        //throw new InvalidOperationException ("This is a hack.");
+    //        return true;
+    //    }
 
-        return false;
-    }
+    //    return false;
+    //}
 
     private void UpdateTextDirection (TextDirection newDirection)
     {
         bool directionChanged = TextFormatter.IsHorizontalDirection (TextFormatter.Direction) != TextFormatter.IsHorizontalDirection (newDirection);
         TextFormatter.Direction = newDirection;
 
-        bool isValidOldAutoSize = AutoSize && IsValidAutoSize (out Size _);
+        //bool isValidOldAutoSize = AutoSize && IsValidAutoSize (out Size _);
 
         UpdateTextFormatterText ();
 
-        if ((!ValidatePosDim && directionChanged && AutoSize) || (ValidatePosDim && directionChanged && AutoSize && isValidOldAutoSize))
-        {
-            OnResizeNeeded ();
-        }
-        else if (directionChanged && IsAdded)
-        {
-            ResizeViewportToFit (Viewport.Size);
-        }
+        //if ((!ValidatePosDim && directionChanged && AutoSize) || (ValidatePosDim && directionChanged && AutoSize && isValidOldAutoSize))
+        //{
+        //    OnResizeNeeded ();
+        //}
+        //else if (directionChanged && IsAdded)
+        //{
+        //    ResizeViewportToFit (Viewport.Size);
+        //}
 
         SetTextFormatterSize ();
         SetNeedsDisplay ();

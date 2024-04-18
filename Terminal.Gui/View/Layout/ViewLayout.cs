@@ -276,24 +276,6 @@ public partial class View
 
             _height = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Height)} cannot be null");
 
-            if (AutoSize)
-            {
-                Debug.WriteLine (@$"Must set AutoSize to false before setting {nameof (Height)}.");
-                AutoSize = false;
-            }
-
-            //if (ValidatePosDim) {
-            bool isValidNewAutoSize = AutoSize && IsValidAutoSizeHeight (_height);
-
-            if (IsAdded && AutoSize && !isValidNewAutoSize)
-            {
-                Debug.WriteLine (
-                                 @$"Must set AutoSize to false before setting the {nameof (Height)}."
-                                );
-                AutoSize = false;
-            }
-
-            //}
             OnResizeNeeded ();
         }
     }
@@ -334,19 +316,6 @@ public partial class View
 
             _width = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Width)} cannot be null");
 
-            if (AutoSize)
-            {
-                Debug.WriteLine ($@"Must set AutoSize to false before setting {nameof (Width)}.");
-                AutoSize = false;
-            }
-
-            bool isValidNewAutoSize = AutoSize && IsValidAutoSizeWidth (_width);
-
-            if (IsAdded && AutoSize && !isValidNewAutoSize)
-            {
-                Debug.WriteLine ($@"Must set AutoSize to false before setting {nameof (Width)}.");
-                AutoSize = false;
-            }
 
             OnResizeNeeded ();
         }
@@ -355,8 +324,6 @@ public partial class View
     #endregion Frame
 
     #region AutoSize
-
-    private bool _autoSize;
 
     /// <summary>
     ///     Gets or sets a flag that determines whether the View will be automatically resized to fit the <see cref="Text"/>
@@ -377,59 +344,23 @@ public partial class View
     /// </summary>
     public virtual bool AutoSize
     {
-        get => _autoSize;
+        get => Height is Dim.DimAuto && Width is Dim.DimAuto;
         set
         {
-            if (Width != Dim.Sized (0) && Height != Dim.Sized (0))
+            if (IsInitialized)
             {
-                Debug.WriteLine (
-                                 $@"WARNING: {GetType ().Name} - Setting {nameof (AutoSize)} invalidates {nameof (Width)} and {nameof (Height)}."
-                                );
-            }
+                Height = Dim.Auto (Dim.DimAutoStyle.Text);
+                Width = Dim.Auto (Dim.DimAutoStyle.Text);
 
-            bool v = ResizeView (value);
-            TextFormatter.AutoSize = v;
-
-            if (_autoSize != v)
-            {
-                _autoSize = v;
-                TextFormatter.NeedsFormat = true;
-                UpdateTextFormatterText ();
-                OnResizeNeeded ();
-            }
-        }
-    }
-
-
-    /// <summary>If <paramref name="autoSize"/> is true, resizes the view.</summary>
-    /// <param name="autoSize"></param>
-    /// <returns></returns>
-    private bool ResizeView (bool autoSize)
-    {
-        if (!autoSize)
-        {
-            return false;
-        }
-
-        var boundsChanged = true;
-        Size newFrameSize = GetTextAutoSize ();
-
-        if (IsInitialized && newFrameSize != Frame.Size)
-        {
-            if (ValidatePosDim)
-            {
-                // BUGBUG: This ain't right, obviously.  We need to figure out how to handle this.
-                boundsChanged = ResizeViewportToFit (newFrameSize);
             }
             else
             {
-                Height = newFrameSize.Height;
-                Width = newFrameSize.Width;
+                _height = Dim.Auto (Dim.DimAutoStyle.Text);
+                _width = Dim.Auto (Dim.DimAutoStyle.Text);
             }
         }
-
-        return boundsChanged;
     }
+
 
     /// <summary>Determines if the View's <see cref="Height"/> can be set to a new value.</summary>
     /// <remarks>TrySetHeight can only be called when AutoSize is true (or being set to true).</remarks>
@@ -1050,11 +981,11 @@ public partial class View
         // TODO: Determine what, if any of the below is actually needed here.
         if (IsInitialized)
         {
-            if (AutoSize)
-            {
-                SetFrameToFitText ();
-                SetTextFormatterSize ();
-            }
+            //if (AutoSize)
+            //{
+            //    SetFrameToFitText ();
+            //    SetTextFormatterSize ();
+            //}
 
             LayoutAdornments ();
             SetNeedsDisplay ();
@@ -1156,32 +1087,32 @@ public partial class View
             SetNeedsDisplay ();
         }
 
-        if (AutoSize)
-        {
-            if (autoSize.Width == 0 || autoSize.Height == 0)
-            {
-                // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height, making
-                // the view LayoutStyle.Absolute.
-                SetFrame (_frame with { Size = autoSize });
+        //if (AutoSize)
+        //{
+        //    if (autoSize.Width == 0 || autoSize.Height == 0)
+        //    {
+        //        // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height, making
+        //        // the view LayoutStyle.Absolute.
+        //        SetFrame (_frame with { Size = autoSize });
 
-                if (autoSize.Width == 0)
-                {
-                    _width = 0;
-                }
+        //        if (autoSize.Width == 0)
+        //        {
+        //            _width = 0;
+        //        }
 
-                if (autoSize.Height == 0)
-                {
-                    _height = 0;
-                }
-            }
-            else if (!SetFrameToFitText ())
-            {
-                SetTextFormatterSize ();
-            }
+        //        if (autoSize.Height == 0)
+        //        {
+        //            _height = 0;
+        //        }
+        //    }
+        //    //else if (!SetFrameToFitText ())
+        //    //{
+        //    //    SetTextFormatterSize ();
+        //    //}
 
-            SetNeedsLayout ();
-            SetNeedsDisplay ();
-        }
+        //    SetNeedsLayout ();
+        //    SetNeedsDisplay ();
+        //}
     }
 
     internal void CollectAll (View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
