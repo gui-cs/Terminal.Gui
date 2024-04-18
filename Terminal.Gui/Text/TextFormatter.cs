@@ -175,7 +175,7 @@ public class TextFormatter
             bool textWasNull = _text is null && value != null;
             _text = EnableNeedsFormat (value);
 
-//            if (/*(Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) ||*/ (textWasNull && Size.IsEmpty))
+            if (AutoSize || (textWasNull && Size.IsEmpty))
             {
                 Size = CalcRect (0, 0, _text, Direction, TabWidth).Size;
             }

@@ -164,7 +164,7 @@ public class TextFormatterTests
     public void CalcRect_Horizontal_Width_Correct (string text, TextDirection textDirection)
     {
         // The width is the number of columns in the text
-        Assert.Equal (new Size ( text.GetColumns (), 1), TextFormatter.CalcRect (0, 0, text, textDirection).Size);
+        Assert.Equal (new Size (text.GetColumns (), 1), TextFormatter.CalcRect (0, 0, text, textDirection).Size);
     }
 
     [Theory]
@@ -177,7 +177,7 @@ public class TextFormatterTests
     public void CalcRect_Vertical_Height_Correct (string text, TextDirection textDirection)
     {
         // The height is based both the number of lines and the number of wide chars
-        Assert.Equal (new Size (1 + text.GetColumns() - text.Length, text.Length), TextFormatter.CalcRect (0, 0, text, textDirection).Size);
+        Assert.Equal (new Size (1 + text.GetColumns () - text.Length, text.Length), TextFormatter.CalcRect (0, 0, text, textDirection).Size);
     }
 
     [Theory]
@@ -2246,7 +2246,7 @@ ssb
 
         tf.Direction = TextDirection.TopBottom_LeftRight;
 
-        if (autoSize && textAlignment != TextAlignment.Justified)
+        if (autoSize/* && textAlignment != TextAlignment.Justified*/)
         {
             Assert.Equal (2, tf.Size.Width);
             Assert.Equal (2, tf.Size.Height);
@@ -2280,7 +2280,7 @@ ssb
 
         tf.Direction = TextDirection.LeftRight_TopBottom;
 
-        if (autoSize && textAlignment != VerticalTextAlignment.Justified)
+        if (autoSize/* && textAlignment != VerticalTextAlignment.Justified*/)
         {
             Assert.Equal (4, tf.Size.Width);
             Assert.Equal (1, tf.Size.Height);
@@ -2350,7 +2350,7 @@ ssb
 
         tf.Size = new (1, 1);
 
-        if (autoSize && textAlignment != TextAlignment.Justified)
+        if (autoSize)
         {
             Assert.Equal (4, tf.Size.Width);
             Assert.Equal (1, tf.Size.Height);
@@ -2384,7 +2384,7 @@ ssb
 
         tf.Size = new (1, 1);
 
-        if (autoSize && textAlignment != VerticalTextAlignment.Justified)
+        if (autoSize)
         {
             Assert.Equal (2, tf.Size.Width);
             Assert.Equal (2, tf.Size.Height);
@@ -2407,6 +2407,8 @@ ssb
         Assert.Equal (2, tf.Size.Width);
         Assert.Equal (1, tf.Size.Height);
         tf.Text = "你你";
+
+        Assert.Equal (autoSize, tf.AutoSize);
 
         if (autoSize)
         {
@@ -3323,5 +3325,120 @@ ssb
                      expectedClippedWidth >= (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetColumns ()) : 0)
                     );
         Assert.Equal (resultLines, wrappedLines);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("A", 0, "")]
+    [InlineData ("A", 1, "A")]
+    [InlineData ("A", 2, "A")]
+    [InlineData ("AB", 1, "A")]
+    [InlineData ("AB", 2, "AB")]
+    [InlineData ("ABC", 3, "ABC")]
+    [InlineData ("ABC", 4, "ABC")]
+    [InlineData ("ABC", 6, "ABC")]
+    public void Draw_Horizontal_Left (string text, int width, string expectedText)
+
+    {
+        TextFormatter tf = new ()
+        {
+            Size = new Size (width, 1),
+
+            Text = text,
+            Alignment = TextAlignment.Left
+        };
+        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("A", 0, false, "")]
+    [InlineData ("A", 1, false, "A")]
+    [InlineData ("A", 2, false, " A")]
+    [InlineData ("AB", 1, false, "A")]
+    [InlineData ("AB", 2, false, "AB")]
+    [InlineData ("ABC", 3, false, "ABC")]
+    [InlineData ("ABC", 4, false, " ABC")]
+    [InlineData ("ABC", 6, false, "   ABC")]
+
+    [InlineData ("A", 0, true, "")]
+    [InlineData ("A", 1, true, "A")]
+    [InlineData ("A", 2, true, " A")]
+    [InlineData ("AB", 1, true, "")] // BUGBUG: This is wrong, it should be "A"
+    [InlineData ("AB", 2, true, "AB")]
+    [InlineData ("ABC", 3, true, "ABC")]
+    [InlineData ("ABC", 4, true, " ABC")]
+    [InlineData ("ABC", 6, true, "   ABC")]
+    public void Draw_Horizontal_Right (string text, int width, bool autoSize, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Alignment = TextAlignment.Right,
+            AutoSize = autoSize,
+        };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (width, 1);
+        }
+
+        tf.Draw (new Rectangle (Point.Empty, new (width, 1)), Attribute.Default, Attribute.Default);
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("A", 0, "")]
+    [InlineData ("A", 1, "A")]
+    [InlineData ("A", 2, "A")]
+    [InlineData ("A", 3, " A")]
+    [InlineData ("AB", 1, "A")]
+    [InlineData ("AB", 2, "AB")]
+    [InlineData ("ABC", 3, "ABC")]
+    [InlineData ("ABC", 4, "ABC")]
+    [InlineData ("ABC", 5, " ABC")]
+    [InlineData ("ABC", 6, " ABC")]
+    [InlineData ("ABC", 9, "   ABC")]
+    public void Draw_Horizontal_Centered (string text, int width, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Size = new Size (width, 1),
+            Text = text,
+            Alignment = TextAlignment.Centered
+        };
+        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("A", 0, "")]
+    [InlineData ("A", 1, "A")]
+    [InlineData ("A", 2, "A")]
+    [InlineData ("A B", 3, "A B")]
+    [InlineData ("A B", 1, "A")]
+    [InlineData ("A B", 2, "A")]
+    [InlineData ("A B", 3, "A B")]
+    [InlineData ("A B", 4, "A  B")]
+    [InlineData ("A B", 5, "A   B")]
+    [InlineData ("A B", 6, "A    B")]
+    [InlineData ("A B", 10, "A        B")]
+    [InlineData ("ABC ABC", 10, "ABC    ABC")]
+    public void Draw_Horizontal_Justified (string text, int width, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Size = new Size (width, 1),
+            Text = text,
+            Alignment = TextAlignment.Justified,
+        };
+        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
     }
 }
