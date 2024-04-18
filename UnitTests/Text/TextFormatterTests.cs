@@ -155,6 +155,32 @@ public class TextFormatterTests
     }
 
     [Theory]
+    [InlineData ("test", TextDirection.LeftRight_TopBottom)]
+    [InlineData (" ~  s  gui.cs   master ↑10", TextDirection.LeftRight_TopBottom)]
+    [InlineData ("Say Hello view4 你", TextDirection.LeftRight_TopBottom)]
+    [InlineData ("Say Hello view4 你", TextDirection.RightLeft_TopBottom)]
+    [InlineData ("Say Hello view4 你", TextDirection.LeftRight_BottomTop)]
+    [InlineData ("Say Hello view4 你", TextDirection.RightLeft_BottomTop)]
+    public void CalcRect_Horizontal_Width_Correct (string text, TextDirection textDirection)
+    {
+        // The width is the number of columns in the text
+        Assert.Equal (new Size ( text.GetColumns (), 1), TextFormatter.CalcRect (0, 0, text, textDirection).Size);
+    }
+
+    [Theory]
+    [InlineData ("test", TextDirection.TopBottom_LeftRight)]
+    [InlineData (" ~  s  gui.cs   master ↑10", TextDirection.TopBottom_LeftRight)]
+    [InlineData ("Say Hello view4 你", TextDirection.TopBottom_LeftRight)]
+    [InlineData ("Say Hello view4 你", TextDirection.TopBottom_RightLeft)]
+    [InlineData ("Say Hello view4 你", TextDirection.BottomTop_LeftRight)]
+    [InlineData ("Say Hello view4 你", TextDirection.BottomTop_RightLeft)]
+    public void CalcRect_Vertical_Height_Correct (string text, TextDirection textDirection)
+    {
+        // The height is based both the number of lines and the number of wide chars
+        Assert.Equal (new Size (1 + text.GetColumns() - text.Length, text.Length), TextFormatter.CalcRect (0, 0, text, textDirection).Size);
+    }
+
+    [Theory]
     [InlineData ("")]
     [InlineData (null)]
     [InlineData ("test")]

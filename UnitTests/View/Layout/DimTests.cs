@@ -75,6 +75,7 @@ public class DimTests
         Assert.Equal (10, result);
     }
 
+
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // A new test that does not depend on Application is needed.
     [Fact]
@@ -897,8 +898,8 @@ public class DimTests
                        Assert.Equal (50, v4.Frame.Width);
                        Assert.Equal (50, v4.Frame.Height);
                        v4.AutoSize = true;
-                       Assert.Equal ("Absolute(11)", v4.Width.ToString ());
-                       Assert.Equal ("Absolute(1)", v4.Height.ToString ());
+                       Assert.Equal (Dim.Auto (DimAutoStyle.Text), v4.Width);
+                       Assert.Equal (Dim.Auto (DimAutoStyle.Text), v4.Height);
                        Assert.Equal (11, v4.Frame.Width); // 11 is the text length and because is Dim.DimAbsolute
                        Assert.Equal (1, v4.Frame.Height); // 1 because is Dim.DimAbsolute
 

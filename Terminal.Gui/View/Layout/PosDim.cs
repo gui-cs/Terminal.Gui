@@ -619,9 +619,7 @@ public class Dim
     {
         /// <summary>
         ///     The dimension will be computed using both the view's <see cref="View.Text"/> and
-        ///     <see cref="View.Subviews"/>.
-        ///     The larger of the corresponding text dimension or Subview in <see cref="View.Subviews"/>
-        ///     with the largest corresponding position plus dimension will determine the dimension.
+        ///     <see cref="View.Subviews"/> (whichever is larger).
         /// </summary>
         Auto,
 

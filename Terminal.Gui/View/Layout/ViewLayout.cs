@@ -368,14 +368,14 @@ public partial class View
             {
                 if (IsInitialized)
                 {
-                    Height = Height.Anchor (ContentSize.Height);
-                    Width = Width.Anchor (ContentSize.Width);
+                    Height = ContentSize.Height;
+                    Width = ContentSize.Width;
 
                 }
                 else
                 {
-                    _height = Height.Anchor (ContentSize.Height);
-                    _width = Width.Anchor (ContentSize.Width);
+                    _height = ContentSize.Height;
+                    _width = ContentSize.Width;
                     OnResizeNeeded ();
                 }
             }

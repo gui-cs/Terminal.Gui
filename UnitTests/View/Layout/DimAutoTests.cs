@@ -1,6 +1,8 @@
 ﻿using System.Globalization;
 using System.Text;
 using Xunit.Abstractions;
+using static Terminal.Gui.Dim;
+
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
@@ -587,7 +589,7 @@ public class DimAutoTests
     [InlineData (1, 10, 10)]
     [InlineData (9, 10, 10)]
     [InlineData (10, 10, 10)]
-    public void Width_Auto_Subviews_Does_Not_Constrain_To_SuperView (int subX, int textLen, int expectedSubWidth)
+    public void Width_Auto_Subviews_Does_Not_Constrain_To_SuperView (int subX, int subSubViewWidth, int expectedSubWidth)
     {
         var superView = new View
         {
@@ -600,13 +602,22 @@ public class DimAutoTests
 
         var subView = new View
         {
-            Text = new string ('*', textLen),
             X = subX,
             Y = 0,
             Width = Dim.Auto (Dim.DimAutoStyle.Subviews),
             Height = 1,
             ValidatePosDim = true
         };
+
+        var subSubView = new View
+        {
+            X = 0,
+            Y = 0,
+            Width = subSubViewWidth,
+            Height = 1,
+            ValidatePosDim = true
+        };
+        subView.Add (subSubView);
 
         superView.Add (subView);
 
@@ -616,6 +627,33 @@ public class DimAutoTests
 
         superView.LayoutSubviews ();
         Assert.Equal (expectedSubWidth, subView.Frame.Width);
+    }
+
+    [Fact]
+    public void DimAuto_Text_Viewport_Stays_Set ()
+    {
+        var super = new View ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+
+        var view = new View ()
+        {
+            Width = Auto (DimAutoStyle.Text),
+            Height = Auto (DimAutoStyle.Text),
+            Text = "New text"
+        };
+        Rectangle expectedViewport = new (0, 0, 8, 1);
+        Assert.Equal (expectedViewport, view.Viewport);
+
+        super.Add (view);
+        Assert.Equal (expectedViewport, view.Viewport);
+
+        super.LayoutSubviews ();
+        Assert.Equal (expectedViewport, view.Viewport);
+
+        super.Dispose ();
     }
 
     // Test variations of Frame
