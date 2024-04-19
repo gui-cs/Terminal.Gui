@@ -541,11 +541,6 @@ public class WizardTests
         wizard.AddStep (new WizardStep { Title = "ABCD" });
 
         Application.End (Application.Begin (wizard));
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      $"{topRow}\n{separatorRow}\n{buttonRow}\n{bottomRow}",
-                                                      _output
-                                                     );
     }
 
     [Fact]

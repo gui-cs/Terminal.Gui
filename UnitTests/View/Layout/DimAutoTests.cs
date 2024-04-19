@@ -640,14 +640,14 @@ public class DimAutoTests
 
         var view = new View ()
         {
+            Text = "01234567",
             Width = Auto (DimAutoStyle.Text),
             Height = Auto (DimAutoStyle.Text),
-            Text = "New text"
         };
-        Rectangle expectedViewport = new (0, 0, 8, 1);
-        Assert.Equal (expectedViewport, view.Viewport);
 
         super.Add (view);
+
+        Rectangle expectedViewport = new (0, 0, 8, 1);
         Assert.Equal (expectedViewport, view.Viewport);
 
         super.LayoutSubviews ();

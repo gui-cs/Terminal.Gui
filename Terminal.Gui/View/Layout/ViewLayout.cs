@@ -316,7 +316,6 @@ public partial class View
 
             _width = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Width)} cannot be null");
 
-
             OnResizeNeeded ();
         }
     }
@@ -1000,12 +999,13 @@ public partial class View
         SetRelativeLayout (contentSize);
 
         // TODO: Determine what, if any of the below is actually needed here.
+
         if (IsInitialized)
         {
-            if (AutoSize)
+            //if (AutoSize)
             {
             //    SetFrameToFitText ();
-               // SetTextFormatterSize ();
+               SetTextFormatterSize ();
             }
 
             LayoutAdornments ();
@@ -1062,6 +1062,8 @@ public partial class View
         Debug.Assert (_height is { });
 
         CheckDimAuto ();
+
+        SetTextFormatterSize ();
 
         var autoSize = Size.Empty;
 

@@ -248,12 +248,12 @@ public partial class View
     /// <returns></returns>
     internal void SetTextFormatterSize ()
     {
-        if (!IsInitialized)
-        {
-            TextFormatter.Size = Size.Empty;
+        //if (!IsInitialized)
+        //{
+        //    TextFormatter.Size = Size.Empty;
 
-            return;
-        }
+        //    return;
+        //}
 
         if (string.IsNullOrEmpty (TextFormatter.Text))
         {
@@ -261,7 +261,7 @@ public partial class View
 
             return;
         }
-        
+
         int w = Viewport.Size.Width + GetHotKeySpecifierLength ();
 
         // TODO: This is a hack. Figure out how to move this into DimDimAuto

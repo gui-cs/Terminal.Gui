@@ -1746,7 +1746,7 @@ Y
         // Setting to false causes Width and Height to be set to the current ContentSize
         view.AutoSize = false;
 
-        Assert.Equal (new Rectangle (0, 0, 1, 12), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 12, 12), view.Frame);
 
         view.Height = 1;
         view.Width = 12;

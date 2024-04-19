@@ -160,8 +160,7 @@ public class ViewTests
         {
             Assert.True (v.AutoSize);
             Assert.False (v.CanFocus);
-            // The text is 100 characters long, but Dim.Auto constrains to SuperView, so it should be truncated.
-            Assert.Equal (new Rectangle (0, 0, 100, 1), v.Frame);
+            Assert.Equal (new Rectangle (0, 0, 20, 1), v.Frame);
         }
         else
         {
