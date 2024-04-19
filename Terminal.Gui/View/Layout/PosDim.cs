@@ -342,8 +342,8 @@ public class Pos
     ///     height for y-coordinate calculation.
     /// </param>
     /// <param name="dim">The dimension of the View. It could be the current width or height.</param>
-    /// <param name="autosize">Obsolete; to be deprecated.</param>
-    /// <param name="autoSize">Obsolete; to be deprecated.</param>
+    /// <param name="us">The View that holds this Pos object.</param>
+    /// <param name="dimension">Width or Height</param>
     /// <returns>
     ///     The calculated position of the View. The way this position is calculated depends on the specific subclass of Pos
     ///     that
@@ -671,11 +671,11 @@ public class Dim
     /// <code>
     /// var button = new Button () { Text = "Click Me!", X = 1, Y = 1, Width = 10, Height = 1 };
     /// var textField = new TextField { Text = "Type here", X = 1, Y = 2, Width = 20, Height = 1 };
-    /// var view = new Window () { Title = "MyWindow", X = 0, Y = 0, Width = Dim.AutoSize (), Height = Dim.AutoSize () };
+    /// var view = new Window () { Title = "MyWindow", X = 0, Y = 0, Width = Dim.Auto (), Height = Dim.Auto () };
     /// view.Add (button, textField);
     /// </code>
     /// </example>
-    /// <returns>The AutoSize <see cref="Dim"/> object.</returns>
+    /// <returns>The <see cref="Dim"/> object.</returns>
     /// <param name="style">
     ///     Specifies how <see cref="DimAuto"/> will compute the dimension. The default is <see cref="DimAutoStyle.Auto"/>.
     /// </param>
@@ -828,6 +828,8 @@ public class Dim
     ///     top edge for height calculation.
     /// </param>
     /// <param name="superviewContentSize">The size of the SuperView's content. It could be width or height.</param>
+    /// <param name="us">The View that holds this Pos object.</param>
+    /// <param name="dimension">Width or Height</param>
     /// <returns>
     ///     The calculated size of the View. The way this size is calculated depends on the specific subclass of Dim that
     ///     is used.
