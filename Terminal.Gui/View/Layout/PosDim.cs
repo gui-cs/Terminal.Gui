@@ -307,22 +307,22 @@ public class Pos
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.</summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Top (View view) { return new PosView (view, Side.Y); }
+    public static Pos Top (View view) { return new PosView (view, Side.Top); }
 
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.</summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Y (View view) { return new PosView (view, Side.Y); }
+    public static Pos Y (View view) { return new PosView (view, Side.Top); }
 
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.</summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Left (View view) { return new PosView (view, Side.X); }
+    public static Pos Left (View view) { return new PosView (view, Side.Left); }
 
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.</summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos X (View view) { return new PosView (view, Side.X); }
+    public static Pos X (View view) { return new PosView (view, Side.Left); }
 
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that tracks the Bottom (Y+Height) coordinate of the specified
@@ -486,8 +486,8 @@ public class Pos
 
     public enum Side
     {
-        X = 0,
-        Y = 1,
+        Left = 0,
+        Top = 1,
         Right = 2,
         Bottom = 3
     }
@@ -503,8 +503,8 @@ public class Pos
         {
             string sideString = side switch
             {
-                Side.X => "x",
-                Side.Y => "y",
+                Side.Left => "x",
+                Side.Top => "y",
                 Side.Right => "right",
                 Side.Bottom => "bottom",
                 _ => "unknown"
@@ -522,8 +522,8 @@ public class Pos
         {
             return side switch
             {
-                Side.X => Target.Frame.X,
-                Side.Y => Target.Frame.Y,
+                Side.Left => Target.Frame.X,
+                Side.Top => Target.Frame.Y,
                 Side.Right => Target.Frame.Right,
                 Side.Bottom => Target.Frame.Bottom,
                 _ => 0
@@ -718,7 +718,7 @@ public class Dim
     /// <summary>Creates a <see cref="Dim"/> object that tracks the Height of the specified <see cref="View"/>.</summary>
     /// <returns>The height <see cref="Dim"/> of the other <see cref="View"/>.</returns>
     /// <param name="view">The view that will be tracked.</param>
-    public static Dim Height (View view) { return new DimView (view, Side.Height); }
+    public static Dim Height (View view) { return new DimView (view, Dimension.Height); }
 
     /// <summary>Adds a <see cref="Dim"/> to a <see cref="Dim"/>, yielding a new <see cref="Dim"/>.</summary>
     /// <param name="left">The first <see cref="Dim"/> to add.</param>
@@ -801,7 +801,7 @@ public class Dim
     /// <summary>Creates a <see cref="Dim"/> object that tracks the Width of the specified <see cref="View"/>.</summary>
     /// <returns>The width <see cref="Dim"/> of the other <see cref="View"/>.</returns>
     /// <param name="view">The view that will be tracked.</param>
-    public static Dim Width (View view) { return new DimView (view, Side.Width); }
+    public static Dim Width (View view) { return new DimView (view, Dimension.Width); }
 
     /// <summary>
     ///     Gets a dimension that is anchored to a certain point in the layout.
@@ -932,7 +932,7 @@ public class Dim
         internal override int Anchor (int width) { return _function (); }
     }
 
-    public enum Side
+    public enum Dimension
     {
         Height = 0,
         Width = 1
@@ -940,9 +940,9 @@ public class Dim
 
     internal class DimView : Dim
     {
-        private readonly Side _side;
+        private readonly Dimension _side;
 
-        internal DimView (View view, Side side)
+        internal DimView (View view, Dimension side)
         {
             Target = view;
             _side = side;
@@ -961,8 +961,8 @@ public class Dim
 
             string sideString = _side switch
             {
-                Side.Height => "Height",
-                Side.Width => "Width",
+                Dimension.Height => "Height",
+                Dimension.Width => "Width",
                 _ => "unknown"
             };
 
@@ -973,8 +973,8 @@ public class Dim
         {
             return _side switch
             {
-                Side.Height => Target.Frame.Height,
-                Side.Width => Target.Frame.Width,
+                Dimension.Height => Target.Frame.Height,
+                Dimension.Width => Target.Frame.Width,
                 _ => 0
             };
         }
