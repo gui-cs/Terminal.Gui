@@ -70,7 +70,7 @@ public class DimTests
     public void DimView_GetDimension_ReturnsCorrectValue ()
     {
         var view = new View { Width = 10 };
-        var dim = new DimView (view, Side.Width);
+        var dim = new DimView (view, Dimension.Width);
         var result = dim.Calculate (0, 100, 50, false);
         Assert.Equal (10, result);
     }
@@ -561,9 +561,9 @@ public class DimTests
         Assert.Equal (20, dimCombine.Anchor (100));
 
         var view = new View { Frame = new Rectangle (20, 10, 20, 1) };
-        var dimViewHeight = new Dim.DimView (view, Side.Height);
+        var dimViewHeight = new Dim.DimView (view, Dimension.Height);
         Assert.Equal (1, dimViewHeight.Anchor (0));
-        var dimViewWidth = new Dim.DimView (view, Side.Width);
+        var dimViewWidth = new Dim.DimView (view, Dimension.Width);
         Assert.Equal (20, dimViewWidth.Anchor (0));
 
         view.Dispose ();

@@ -1,4 +1,4 @@
-﻿using static Terminal.Gui.Dialog;
+using static Terminal.Gui.Dialog;
 
 namespace Terminal.Gui;
 
