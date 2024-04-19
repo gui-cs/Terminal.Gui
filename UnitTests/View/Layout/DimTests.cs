@@ -28,7 +28,7 @@ public class DimTests
     public void DimAbsolute_Calculate_ReturnsCorrectValue ()
     {
         var dim = new DimAbsolute (10);
-        var result = dim.Calculate (0, 100, null, Dim.Dimension.None, 50, false);
+        var result = dim.Calculate (0, 100, null, Dim.Dimension.None);
         Assert.Equal (10, result);
     }
 
@@ -38,7 +38,7 @@ public class DimTests
         var dim1 = new DimAbsolute (10);
         var dim2 = new DimAbsolute (20);
         var dim = dim1 + dim2;
-        var result = dim.Calculate (0, 100, null, Dim.Dimension.None, 50, false);
+        var result = dim.Calculate (0, 100, null, Dim.Dimension.None);
         Assert.Equal (30, result);
     }
 
@@ -46,7 +46,7 @@ public class DimTests
     public void DimFactor_Calculate_ReturnsCorrectValue ()
     {
         var dim = new DimFactor (0.5f);
-        var result = dim.Calculate (0, 100, null, Dim.Dimension.None, 50, false);
+        var result = dim.Calculate (0, 100, null, Dim.Dimension.None);
         Assert.Equal (50, result);
     }
 
@@ -54,7 +54,7 @@ public class DimTests
     public void DimFill_Calculate_ReturnsCorrectValue ()
     {
         var dim = Dim.Fill ();
-        var result = dim.Calculate (0, 100, null, Dim.Dimension.None, 50, false);
+        var result = dim.Calculate (0, 100, null, Dim.Dimension.None);
         Assert.Equal (100, result);
     }
 
@@ -62,7 +62,7 @@ public class DimTests
     public void DimFunc_Calculate_ReturnsCorrectValue ()
     {
         var dim = new DimFunc (() => 10);
-        var result = dim.Calculate (0, 100, null, Dim.Dimension.None, 50, false);
+        var result = dim.Calculate (0, 100, null, Dim.Dimension.None);
         Assert.Equal (10, result);
     }
 
@@ -71,7 +71,7 @@ public class DimTests
     {
         var view = new View { Width = 10 };
         var dim = new DimView (view, Dimension.Width);
-        var result = dim.Calculate (0, 100, null, Dim.Dimension.None, 50, false);
+        var result = dim.Calculate (0, 100, null, Dim.Dimension.None);
         Assert.Equal (10, result);
     }
 

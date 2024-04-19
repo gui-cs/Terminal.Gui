@@ -349,7 +349,7 @@ public class Pos
     ///     that
     ///     is used.
     /// </returns>
-    internal virtual int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension, int autosize, bool autoSize)
+    internal virtual int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
     {
         return Anchor (superviewDimension);
     }
@@ -388,7 +388,7 @@ public class Pos
             return width - _offset;
         }
 
-        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension, int autosize, bool autoSize)
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
         {
             int newLocation = Anchor (superviewDimension);
 
@@ -406,9 +406,9 @@ public class Pos
         public override string ToString () { return "Center"; }
         internal override int Anchor (int width) { return width / 2; }
 
-        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension, int autosize, bool autoSize)
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
         {
-            int newDimension = Math.Max (dim.Calculate (0, superviewDimension, us, dimension, autosize, autoSize), 0);
+            int newDimension = Math.Max (dim.Calculate (0, superviewDimension, us, dimension), 0);
 
             return Anchor (superviewDimension - newDimension);
         }
@@ -434,11 +434,11 @@ public class Pos
             return la - ra;
         }
 
-        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension, int autosize, bool autoSize)
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
         {
-            int newDimension = dim.Calculate (0, superviewDimension, us, dimension, autosize, autoSize);
-            int left = _left.Calculate (superviewDimension, dim, us, dimension, autosize, autoSize);
-            int right = _right.Calculate (superviewDimension, dim, us, dimension, autosize, autoSize);
+            int newDimension = dim.Calculate (0, superviewDimension, us, dimension);
+            int left = _left.Calculate (superviewDimension, dim, us, dimension);
+            int right = _right.Calculate (superviewDimension, dim, us, dimension);
 
             if (_add)
             {
@@ -828,17 +828,13 @@ public class Dim
     ///     top edge for height calculation.
     /// </param>
     /// <param name="superviewContentSize">The size of the SuperView's content. It could be width or height.</param>
-    /// <param name="autosize">Obsolete; To be deprecated.</param>
-    /// <param name="autoSize">Obsolete; To be deprecated.</param>
     /// <returns>
     ///     The calculated size of the View. The way this size is calculated depends on the specific subclass of Dim that
     ///     is used.
     /// </returns>
-    internal virtual int Calculate (int location, int superviewContentSize, View us, Dimension dimension, int autosize, bool autoSize)
+    internal virtual int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
-        int newDimension = Math.Max (Anchor (superviewContentSize - location), 0);
-
-        return autoSize && autosize > newDimension ? autosize : newDimension;
+        return Math.Max (Anchor (superviewContentSize - location), 0);
     }
 
     internal class DimAbsolute (int n) : Dim
@@ -849,12 +845,10 @@ public class Dim
         public override string ToString () { return $"Absolute({_n})"; }
         internal override int Anchor (int width) { return _n; }
 
-        internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension, int autosize, bool autoSize)
+        internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
         {
             // DimAbsolute.Anchor (int width) ignores width and returns n
-            int newDimension = Math.Max (Anchor (0), 0);
-
-            return autoSize && autosize > newDimension ? autosize : newDimension;
+            return Math.Max (Anchor (0), 0);
         }
     }
 
@@ -869,7 +863,7 @@ public class Dim
         public override int GetHashCode () { return HashCode.Combine (base.GetHashCode (), _min, _max, _style); }
         public override string ToString () { return $"Auto({_style},{_min},{_max})"; }
 
-        internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension, int autosize, bool autoSize)
+        internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
         {
             if (us == null)
             {
@@ -920,7 +914,6 @@ public class Dim
         }
 
     }
-
     internal class DimCombine (bool add, Dim left, Dim right) : Dim
     {
         internal bool _add = add;
@@ -941,10 +934,10 @@ public class Dim
             return la - ra;
         }
 
-        internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension, int autosize, bool autoSize)
+        internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
         {
-            int leftNewDim = _left.Calculate (location, superviewContentSize, us, dimension, autosize, autoSize);
-            int rightNewDim = _right.Calculate (location, superviewContentSize, us, dimension, autosize, autoSize);
+            int leftNewDim = _left.Calculate (location, superviewContentSize, us, dimension);
+            int rightNewDim = _right.Calculate (location, superviewContentSize, us, dimension);
 
             int newDimension;
 
@@ -957,7 +950,7 @@ public class Dim
                 newDimension = Math.Max (0, leftNewDim - rightNewDim);
             }
 
-            return autoSize && autosize > newDimension ? autosize : newDimension;
+            return newDimension;
         }
 
     }
@@ -973,11 +966,9 @@ public class Dim
         public override string ToString () { return $"Factor({_factor},{_remaining})"; }
         internal override int Anchor (int width) { return (int)(width * _factor); }
 
-        internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension, int autosize, bool autoSize)
+        internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
         {
-            int newDimension = _remaining ? Math.Max (Anchor (superviewContentSize - location), 0) : Anchor (superviewContentSize);
-
-            return autoSize && autosize > newDimension ? autosize : newDimension;
+            return _remaining ? Math.Max (Anchor (superviewContentSize - location), 0) : Anchor (superviewContentSize);
         }
     }
 
