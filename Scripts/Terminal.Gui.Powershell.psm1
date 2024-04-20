@@ -1,4 +1,4 @@
-Function Update-Analyzers {
+Function Build-Analyzers {
   [CmdletBinding()]
   param(
     [Parameter(Mandatory=$false, HelpMessage="Automatically close running Visual Studio processes which have the Terminal.sln solution loaded, before taking any other actions.")]
@@ -95,6 +95,6 @@ Function Close-Solution {
   Remove-Variable vsProcesses
 }
 
-Export-ModuleMember -Function Update-Analyzers
+Export-ModuleMember -Function Build-Analyzers
 Export-ModuleMember -Function Open-Solution
 Export-ModuleMember -Function Close-Solution
