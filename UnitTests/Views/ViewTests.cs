@@ -1246,6 +1246,10 @@ namespace Terminal.Gui.ViewTests {
 
 			Application.Run ();
 
+			// Ensures cleaning any keystroke.
+			// This was conflicting with the TestVKPacket unit test
+			Console.MockKeyPresses.Clear ();
+
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
 		}
