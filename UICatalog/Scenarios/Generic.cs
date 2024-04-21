@@ -17,9 +17,80 @@ public sealed class MyScenario : Scenario
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
         };
 
-        var button = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };
+        int leftMargin = 0;
+        var just = Justification.Justified;
+
+        var button = new Button { X = Pos.Justify(just), Y = Pos.Center (), Text = "Press me!" };
         button.Accept += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed the button!", "Ok");
         appWindow.Add (button);
+
+        button = new Button { X = Pos.Justify (just), Y = Pos.Center (), Text = "Two" };
+        button.Margin.Thickness = new Thickness (leftMargin, 0, 0, 0);
+        button.Accept += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed Two!", "Ok");
+        appWindow.Add (button);
+
+        button = new Button { X = Pos.Justify (just), Y = Pos.Center (), Text = "Three" };
+        button.Margin.Thickness = new Thickness (leftMargin, 0, 0, 0);
+        button.Accept += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed Three!", "Ok");
+        appWindow.Add (button);
+
+        button = new Button { X = Pos.Justify (just), Y = Pos.Center (), Text = "Four" };
+        button.Margin.Thickness = new Thickness (leftMargin, 0, 0, 0);
+        button.Accept += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed Three!", "Ok");
+        appWindow.Add (button);
+
+        button = new Button { X = Pos.Justify (just), Y = Pos.Center (), Text = "Five" };
+        button.Margin.Thickness = new Thickness (leftMargin, 0, 0, 0);
+        button.Accept += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed Three!", "Ok");
+        appWindow.Add (button);
+
+        button = new Button { X = Pos.Justify (just), Y = Pos.Center (), Text = "Six" };
+        button.Margin.Thickness = new Thickness (leftMargin, 0, 0, 0);
+        button.Accept += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed Three!", "Ok");
+        appWindow.Add (button);
+
+        button = new Button { X = Pos.Justify (just), Y = Pos.Center (), Text = "Seven" };
+        button.Margin.Thickness = new Thickness (leftMargin, 0, 0, 0);
+        button.Accept += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed Three!", "Ok");
+        appWindow.Add (button);
+
+        button = new Button { X = Pos.Justify (just), Y = Pos.Center (), Text = "Eight" };
+        button.Margin.Thickness = new Thickness (leftMargin, 0, 0, 0);
+        button.Accept += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed Three!", "Ok");
+        appWindow.Add (button);
+
+        just = Justification.FirstLeftRestRight;
+        var checkbox = new CheckBox { X = 5, Y = Pos.Justify (just), Text = "Check boxes!" };
+        checkbox.Accept += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed the checkbox!", "Ok");
+        appWindow.Add (checkbox);
+
+        checkbox = new CheckBox { X = 5, Y = Pos.Justify (just), Text = "CheckTwo" };
+        checkbox.Accept += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed Two!", "Ok");
+        appWindow.Add (checkbox);
+
+        checkbox = new CheckBox { X = 5, Y = Pos.Justify (just), Text = "CheckThree" };
+        checkbox.Accept += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed Three!", "Ok");
+        appWindow.Add (checkbox);
+
+        checkbox = new CheckBox { X = 5, Y = Pos.Justify (just), Text = "CheckFour" };
+        checkbox.Accept += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed Three!", "Ok");
+        appWindow.Add (checkbox);
+
+        checkbox = new CheckBox { X = 5, Y = Pos.Justify (just), Text = "CheckFive" };
+        checkbox.Accept += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed Three!", "Ok");
+        appWindow.Add (checkbox);
+
+        checkbox = new CheckBox { X = 5, Y = Pos.Justify (just), Text = "CheckSix" };
+        checkbox.Accept += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed Three!", "Ok");
+        appWindow.Add (checkbox);
+
+        checkbox = new CheckBox { X = 5, Y = Pos.Justify (just), Text = "CheckSeven" };
+        checkbox.Accept += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed Three!", "Ok");
+        appWindow.Add (checkbox);
+
+        checkbox = new CheckBox { X = 5, Y = Pos.Justify (just), Text = "CheckEight" };
+        checkbox.Accept += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed Three!", "Ok");
+        appWindow.Add (checkbox);
 
         // Run - Start the application.
         Application.Run (appWindow);

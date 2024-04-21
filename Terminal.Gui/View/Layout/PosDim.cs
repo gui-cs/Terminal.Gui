@@ -501,8 +501,11 @@ public class Pos
 
         internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
         {
+            if (us.SuperView is null)
+            {
+                return 0;
+            }
             // Find all the views that are being justified - they have the same justification and opposite position as us
-            // Use linq to filter us.Superview.Subviews that match `dimension` and are at our same location in the opposite dimension (e.g. if dimension is Width, filter by Y)
             // Then, pass the array of views to the Justify method
             int [] dimensions;
             int [] positions;
@@ -513,23 +516,40 @@ public class Pos
                 List<int> dimensionsList = new List<int> ();
                 for (int i = 0; i < us.SuperView.Subviews.Count; i++)
                 {
-                    if (us.SuperView.Subviews [i].Frame.Y == us.Frame.Y)
+                    var v = us.SuperView.Subviews [i];
+                    var j = v.X as PosJustify;
+                    if (j?._justification == _justification && v.Frame.Y == us.Frame.Y)
                     {
-                        dimensionsList.Add (us.SuperView.Subviews [i].Frame.Width);
+                        dimensionsList.Add (v.Frame.Width);
 
-                        if (us.SuperView.Subviews [i] == us)
+                        if (v == us)
                         {
                             ourIndex = dimensionsList.Count - 1;
                         }
                     }
                 }
                 dimensions = dimensionsList.ToArray ();
-                positions = new Justifier ().Justify (dimensions, _justification, superviewDimension);
+                positions = new Justifier () { PutSpaceBetweenItems = true }.Justify (dimensions, _justification, superviewDimension);
             }
             else
             {
-                dimensions = us.SuperView.Subviews.Where (v => v.Frame.X == us.Frame.X).Select(v => v.Frame.Height ).ToArray ();
-                positions = new Justifier ().Justify (dimensions, _justification, superviewDimension);
+                List<int> dimensionsList = new List<int> ();
+                for (int i = 0; i < us.SuperView.Subviews.Count; i++)
+                {
+                    var v = us.SuperView.Subviews [i];
+                    var j = v.Y as PosJustify;
+                    if (j?._justification == _justification && v.Frame.X == us.Frame.X)
+                    {
+                        dimensionsList.Add (v.Frame.Height);
+
+                        if (v == us)
+                        {
+                            ourIndex = dimensionsList.Count - 1;
+                        }
+                    }
+                }
+                dimensions = dimensionsList.ToArray ();
+                positions = new Justifier () { PutSpaceBetweenItems = false }.Justify (dimensions, _justification, superviewDimension);
             }
 
             return positions [ourIndex];

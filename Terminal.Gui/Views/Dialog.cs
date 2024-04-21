@@ -144,18 +144,18 @@ public class Dialog : Window
     }
 
     /// <inheritdoc/>
-    public override void LayoutSubviews ()
-    {
-        if (_inLayout)
-        {
-            return;
-        }
+    //public override void LayoutSubviews ()
+    //{
+    //    if (_inLayout)
+    //    {
+    //        return;
+    //    }
 
-        _inLayout = true;
-        LayoutButtons ();
-        base.LayoutSubviews ();
-        _inLayout = false;
-    }
+    //    _inLayout = true;
+    //    //LayoutButtons ();
+    //    base.LayoutSubviews ();
+    //    _inLayout = false;
+    //}
 
     // Get the width of all buttons, not including any Margin.
     internal int GetButtonsWidth ()

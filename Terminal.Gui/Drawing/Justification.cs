@@ -117,7 +117,7 @@ public class Justifier
 
         if (totalItemsSize > totalSize)
         {
-            throw new ArgumentException ("The sum of the sizes is greater than the total size.");
+           // throw new ArgumentException ("The sum of the sizes is greater than the total size.");
         }
 
         var positions = new int [sizes.Length];
