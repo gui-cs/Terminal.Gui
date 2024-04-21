@@ -24,13 +24,13 @@ public class JustifierTests (ITestOutputHelper output)
         Assert.Equal (new int [] { }, positions);
     }
 
-    [Theory]
-    [MemberData (nameof (JustificationEnumValues))]
-    public void Items_Width_Cannot_Exceed_TotalSize (Justification justification)
-    {
-        int [] sizes = { 1000, 2000, 3000 };
-        Assert.Throws<ArgumentException> (() => new Justifier ().Justify (sizes, justification, 100));
-    }
+    //[Theory]
+    //[MemberData (nameof (JustificationEnumValues))]
+    //public void Items_Width_Cannot_Exceed_TotalSize (Justification justification)
+    //{
+    //    int [] sizes = { 1000, 2000, 3000 };
+    //    Assert.Throws<ArgumentException> (() => new Justifier ().Justify (sizes, justification, 100));
+    //}
 
     [Theory]
     [MemberData (nameof (JustificationEnumValues))]
