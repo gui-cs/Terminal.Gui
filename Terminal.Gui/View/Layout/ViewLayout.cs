@@ -1025,10 +1025,10 @@ public partial class View
             autoSize = GetAutoSize ();
         }
 
-        int newX = _x.Calculate (superviewContentSize.Width, _width, autoSize.Width, AutoSize);
-        int newW = _width.Calculate (newX, superviewContentSize.Width, autoSize.Width, AutoSize);
-        int newY = _y.Calculate (superviewContentSize.Height, _height, autoSize.Height, AutoSize);
-        int newH = _height.Calculate (newY, superviewContentSize.Height, autoSize.Height, AutoSize);
+        int newX = _x.Calculate (superviewContentSize.Width, _width, this, Dim.Dimension.Width);
+        int newW = _width.Calculate (newX, superviewContentSize.Width, this, Dim.Dimension.Width);
+        int newY = _y.Calculate (superviewContentSize.Height, _height, this, Dim.Dimension.Height);
+        int newH = _height.Calculate (newY, superviewContentSize.Height, this, Dim.Dimension.Height);
 
         Rectangle newFrame = new (newX, newY, newW, newH);
 

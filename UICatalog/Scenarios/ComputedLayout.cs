@@ -408,10 +408,10 @@ public class ComputedLayout : Scenario
         app.Add (rightButton);
 
 
-        // Center three buttons with 5 spaces between them
-        leftButton.X = Pos.Justify (buttons, ViewAlignments.Center);
-        centerButton.X = Pos.Justify (buttons, ViewAlignments.Center);
-        rightButton.X = Pos.Justify (buttons, ViewAlignments.Center);
+        // Center three buttons with 
+        leftButton.X = Pos.Justify (Justification.Centered);
+        centerButton.X = Pos.Justify (Justification.Centered);
+        rightButton.X = Pos.Justify (Justification.Centered);
 
         Application.Run (app);
         app.Dispose ();

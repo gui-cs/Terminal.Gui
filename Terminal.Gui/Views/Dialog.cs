@@ -94,7 +94,7 @@ public class Dialog : Window
     }
 
     /// <summary>Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the bottom of the dialog.</summary>
-    public ViewAlignments ButtonAlignment { get; set; }
+    public Justification ButtonAlignment { get; set; }
 
     /// <summary>Optional buttons to lay out at the bottom of the dialog.</summary>
     public Button [] Buttons
@@ -114,11 +114,11 @@ public class Dialog : Window
         }
     }
 
-    /// <summary>The default <see cref="ViewAlignments"/> for <see cref="Dialog"/>.</summary>
+    /// <summary>The default <see cref="Justification"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     [JsonConverter (typeof (JsonStringEnumConverter))]
-    public static ViewAlignments DefaultButtonAlignment { get; set; } = ViewAlignments.Center;
+    public static Justification DefaultButtonAlignment { get; set; } = Justification.Centered;
 
     /// <summary>
     ///     Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controlled by the
@@ -185,7 +185,7 @@ public class Dialog : Window
 
         switch (ButtonAlignment)
         {
-            case ViewAlignments.Center:
+            case Justification.Centered:
                 // Center Buttons
                 shiftLeft = (Viewport.Width - buttonsWidth - _buttons.Count - 1) / 2 + 1;
 
@@ -208,7 +208,7 @@ public class Dialog : Window
 
                 break;
 
-            case ViewAlignments.Justify:
+            case Justification.Justified:
                 // Justify Buttons
                 // leftmost and rightmost buttons are hard against edges. The rest are evenly spaced.
 
@@ -243,7 +243,7 @@ public class Dialog : Window
 
                 break;
 
-            case ViewAlignments.Left:
+            case Justification.Left:
                 // Left Align Buttons
                 Button prevButton = _buttons [0];
                 prevButton.X = 0;
@@ -259,7 +259,7 @@ public class Dialog : Window
 
                 break;
 
-            case ViewAlignments.Right:
+            case Justification.Right:
                 // Right align buttons
                 shiftLeft = _buttons [_buttons.Count - 1].Frame.Width;
                 _buttons [_buttons.Count - 1].X = Pos.AnchorEnd (shiftLeft);

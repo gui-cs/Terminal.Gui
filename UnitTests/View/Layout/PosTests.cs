@@ -7,58 +7,58 @@ namespace Terminal.Gui.ViewTests;
 public class PosTests (ITestOutputHelper output)
 {
     [Fact]
-    public void PosAbsolute_GetLocation_ReturnsExpectedValue ()
+    public void PosAbsolute_Calculate_ReturnsExpectedValue ()
     {
         var posAbsolute = new PosAbsolute (5);
-        var result = posAbsolute.Calculate (10, new DimAbsolute (2), 1, false);
+        var result = posAbsolute.Calculate (10, new DimAbsolute (2), null, Dimension.None);
         Assert.Equal (5, result);
     }
 
     [Fact]
-    public void PosAnchorEnd_GetLocation_ReturnsExpectedValue ()
+    public void PosAnchorEnd_Calculate_ReturnsExpectedValue ()
     {
         var posAnchorEnd = new PosAnchorEnd (5);
-        var result = posAnchorEnd.Calculate (10, new DimAbsolute (2), 1, false);
+        var result = posAnchorEnd.Calculate (10, new DimAbsolute (2), null, Dimension.None);
         Assert.Equal (5, result);
     }
 
     [Fact]
-    public void PosCenter_GetLocation_ReturnsExpectedValue ()
+    public void PosCenter_Calculate_ReturnsExpectedValue ()
     {
         var posCenter = new PosCenter ();
-        var result = posCenter.Calculate (10, new DimAbsolute (2), 1, false);
+        var result = posCenter.Calculate (10, new DimAbsolute (2), null, Dimension.None);
         Assert.Equal (4, result);
     }
 
     [Fact]
-    public void PosCombine_GetLocation_ReturnsExpectedValue ()
+    public void PosCombine_Calculate_ReturnsExpectedValue ()
     {
         var posCombine = new PosCombine (true, new PosAbsolute (5), new PosAbsolute (3));
-        var result = posCombine.Calculate (10, new DimAbsolute (2), 1, false);
+        var result = posCombine.Calculate (10, new DimAbsolute (2), null, Dimension.None);
         Assert.Equal (8, result);
     }
 
     [Fact]
-    public void PosFactor_GetLocation_ReturnsExpectedValue ()
+    public void PosFactor_Calculate_ReturnsExpectedValue ()
     {
         var posFactor = new PosFactor (0.5f);
-        var result = posFactor.Calculate (10, new DimAbsolute (2), 1, false);
+        var result = posFactor.Calculate (10, new DimAbsolute (2), null, Dimension.None);
         Assert.Equal (5, result);
     }
 
     [Fact]
-    public void PosFunc_GetLocation_ReturnsExpectedValue ()
+    public void PosFunc_Calculate_ReturnsExpectedValue ()
     {
         var posFunc = new PosFunc (() => 5);
-        var result = posFunc.Calculate (10, new DimAbsolute (2), 1, false);
+        var result = posFunc.Calculate (10, new DimAbsolute (2), null, Dimension.None);
         Assert.Equal (5, result);
     }
 
     [Fact]
-    public void PosView_GetLocation_ReturnsExpectedValue ()
+    public void PosView_Calculate_ReturnsExpectedValue ()
     {
         var posView = new PosView (new View { Frame = new Rectangle (5, 5, 10, 10) }, 0);
-        var result = posView.Calculate (10, new DimAbsolute (2), 1, false);
+        var result = posView.Calculate (10, new DimAbsolute (2), null, Dimension.None);
         Assert.Equal (5, result);
     }
 
@@ -93,8 +93,61 @@ public class PosTests (ITestOutputHelper output)
         Assert.Equal ("Center", pos.ToString ());
     }
 
+    // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+    // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Fact]
-    public void DoNotReturnPosCombine ()
+    public void Combine_Referencing_Same_View ()
+    {
+        var super = new View { Width = 10, Height = 10, Text = "super" };
+        var view1 = new View { Width = 2, Height = 2, Text = "view1" };
+        var view2 = new View { Width = 2, Height = 2, Text = "view2" };
+        view2.X = Pos.AnchorEnd () - (Pos.Right (view2) - Pos.Left (view2));
+
+        super.Add (view1, view2);
+        super.BeginInit ();
+        super.EndInit ();
+
+        Exception exception = Record.Exception (super.LayoutSubviews);
+        Assert.Null (exception);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), super.Frame);
+        Assert.Equal (new Rectangle (0, 0, 2, 2), view1.Frame);
+        // AnchorEnd (0) would be 10. AnchorEnd () is 10 - 2 = 8. Right (view2) - Left (view2) = 2. 8 - 2 = 6
+        Assert.Equal (new Rectangle (6,0, 2, 2), view2.Frame);
+
+        super.Dispose ();
+    }
+
+    // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+    // TODO: A new test that calls SetRelativeLayout directly is needed.
+    [Fact]
+    [TestRespondersDisposed]
+    public void Combine_WHY_Throws ()
+    {
+        Application.Init (new FakeDriver ());
+
+        Toplevel t = new Toplevel();
+
+        var w = new Window { X = Pos.Left (t) + 2, Y = Pos.Top (t) + 2 };
+        var f = new FrameView ();
+        var v1 = new View { X = Pos.Left (w) + 2, Y = Pos.Top (w) + 2 };
+        var v2 = new View { X = Pos.Left (v1) + 2, Y = Pos.Top (v1) + 2 };
+
+        f.Add (v1); // v2 not added
+        w.Add (f);
+        t.Add (w);
+
+        f.X = Pos.X (v2) - Pos.X (v1);
+        f.Y = Pos.Y (v2) - Pos.Y (v1);
+
+        Assert.Throws<InvalidOperationException> (() => Application.Run (t));
+        t.Dispose ();
+        Application.Shutdown ();
+
+        v2.Dispose ();
+    }
+
+    [Fact]
+    public void DoesNotReturnPosCombine ()
     {
         var v = new View { Id = "V" };
 
@@ -338,30 +391,6 @@ public class PosTests (ITestOutputHelper output)
         Assert.NotEqual (pos1, pos2);
     }
 
-    [Fact]
-    public void Percent_SetsValue ()
-    {
-        float f = 0;
-        Pos pos = Pos.Percent (f);
-        Assert.Equal ($"Factor({f / 100:0.###})", pos.ToString ());
-        f = 0.5F;
-        pos = Pos.Percent (f);
-        Assert.Equal ($"Factor({f / 100:0.###})", pos.ToString ());
-        f = 100;
-        pos = Pos.Percent (f);
-        Assert.Equal ($"Factor({f / 100:0.###})", pos.ToString ());
-    }
-
-    [Fact]
-    public void Percent_ThrowsOnIvalid ()
-    {
-        Pos pos = Pos.Percent (0);
-        Assert.Throws<ArgumentException> (() => pos = Pos.Percent (-1));
-        Assert.Throws<ArgumentException> (() => pos = Pos.Percent (101));
-        Assert.Throws<ArgumentException> (() => pos = Pos.Percent (100.0001F));
-        Assert.Throws<ArgumentException> (() => pos = Pos.Percent (1000001));
-    }
-
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Fact]
@@ -572,7 +601,7 @@ public class PosTests (ITestOutputHelper output)
     [AutoInitShutdown]
     [InlineData (true)]
     [InlineData (false)]
-    public void PosPercentPlusOne (bool testHorizontal)
+    public void Percent_PlusOne (bool testHorizontal)
     {
         var container = new View { Width = 100, Height = 100 };
 
@@ -604,12 +633,36 @@ public class PosTests (ITestOutputHelper output)
         }
     }
 
+    [Fact]
+    public void Percent_SetsValue ()
+    {
+        float f = 0;
+        Pos pos = Pos.Percent (f);
+        Assert.Equal ($"Factor({f / 100:0.###})", pos.ToString ());
+        f = 0.5F;
+        pos = Pos.Percent (f);
+        Assert.Equal ($"Factor({f / 100:0.###})", pos.ToString ());
+        f = 100;
+        pos = Pos.Percent (f);
+        Assert.Equal ($"Factor({f / 100:0.###})", pos.ToString ());
+    }
+
+    [Fact]
+    public void Percent_ThrowsOnIvalid ()
+    {
+        Pos pos = Pos.Percent (0);
+        Assert.Throws<ArgumentException> (() => pos = Pos.Percent (-1));
+        Assert.Throws<ArgumentException> (() => pos = Pos.Percent (101));
+        Assert.Throws<ArgumentException> (() => pos = Pos.Percent (100.0001F));
+        Assert.Throws<ArgumentException> (() => pos = Pos.Percent (1000001));
+    }
+
     // TODO: Test Left, Top, Right bottom Equal
 
     /// <summary>Tests Pos.Left, Pos.X, Pos.Top, Pos.Y, Pos.Right, and Pos.Bottom set operations</summary>
     [Fact]
     [TestRespondersDisposed]
-    public void PosSide_SetsValue ()
+    public void Side_SetsValue ()
     {
         string side; // used in format string
         var testRect = Rectangle.Empty;
@@ -834,7 +887,7 @@ public class PosTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void SetSide_Null_Throws ()
+    public void Side_SetToNull_Throws ()
     {
         Pos pos = Pos.Left (null);
         Assert.Throws<NullReferenceException> (() => pos.ToString ());
@@ -853,5 +906,98 @@ public class PosTests (ITestOutputHelper output)
 
         pos = Pos.Right (null);
         Assert.Throws<NullReferenceException> (() => pos.ToString ());
+    }
+
+    // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+    // TODO: A new test that calls SetRelativeLayout directly is needed.
+    [Fact]
+    [TestRespondersDisposed]
+    public void Subtract_Operator ()
+    {
+        Application.Init (new FakeDriver ());
+
+        Toplevel top = new Toplevel ();
+
+        var view = new View { X = 0, Y = 0, Width = 20, Height = 20 };
+        var field = new TextField { X = 0, Y = 0, Width = 20 };
+        var count = 20;
+        List<View> listViews = new ();
+
+        for (var i = 0; i < count; i++)
+        {
+            field.Text = $"View {i}";
+            var view2 = new View { X = 0, Y = field.Y, Width = 20, Text = field.Text };
+            view.Add (view2);
+            Assert.Equal ($"View {i}", view2.Text);
+            Assert.Equal ($"Absolute({i})", field.Y.ToString ());
+            listViews.Add (view2);
+
+            Assert.Equal ($"Absolute({i})", field.Y.ToString ());
+            field.Y += 1;
+            Assert.Equal ($"Absolute({i + 1})", field.Y.ToString ());
+        }
+
+        field.KeyDown += (s, k) =>
+                         {
+                             if (k.KeyCode == KeyCode.Enter)
+                             {
+                                 Assert.Equal ($"View {count - 1}", listViews [count - 1].Text);
+                                 view.Remove (listViews [count - 1]);
+                                 listViews [count - 1].Dispose ();
+
+                                 Assert.Equal ($"Absolute({count})", field.Y.ToString ());
+                                 field.Y -= 1;
+                                 count--;
+                                 Assert.Equal ($"Absolute({count})", field.Y.ToString ());
+                             }
+                         };
+
+        Application.Iteration += (s, a) =>
+                                 {
+                                     while (count > 0)
+                                     {
+                                         field.NewKeyDownEvent (new Key (KeyCode.Enter));
+                                     }
+
+                                     Application.RequestStop ();
+                                 };
+
+        var win = new Window ();
+        win.Add (view);
+        win.Add (field);
+
+        top.Add (win);
+
+        Application.Run (top);
+        top.Dispose ();
+        Assert.Equal (0, count);
+
+        // Shutdown must be called to safely clean up Application if Init has been called
+        Application.Shutdown ();
+    }
+
+    // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+    // TODO: A new test that calls SetRelativeLayout directly is needed.
+    [Fact]
+    public void Validation_Does_Not_Throw_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Null ()
+    {
+        Application.Init (new FakeDriver ());
+
+        Toplevel t = new Toplevel ();
+
+        var w = new Window { X = 1, Y = 2, Width = 3, Height = 5 };
+        t.Add (w);
+
+        t.Ready += (s, e) =>
+                   {
+                       Assert.Equal (2, w.X = 2);
+                       Assert.Equal (2, w.Y = 2);
+                   };
+
+        Application.Iteration += (s, a) => Application.RequestStop ();
+
+        Application.Run (t);
+        t.Dispose ();
+        Application.Shutdown ();
     }
 }
