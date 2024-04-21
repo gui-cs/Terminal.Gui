@@ -137,7 +137,7 @@ public class Dialogs : Scenario
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            RadioLabels = new [] { "_Center", "_Justify", "_Left", "_Right" }
+            RadioLabels = new [] { "_Centered", "_Justified", "_Left", "_Right" }
         };
         frame.Add (styleRadioGroup);
 
@@ -265,7 +265,7 @@ public class Dialogs : Scenario
             dialog = new Dialog
             {
                 Title = titleEdit.Text,
-                ButtonAlignment = (Dialog.ButtonAlignments)styleRadioGroup.SelectedItem,
+                ButtonAlignment = (Justification)styleRadioGroup.SelectedItem,
                 Buttons = buttons.ToArray ()
             };
 
