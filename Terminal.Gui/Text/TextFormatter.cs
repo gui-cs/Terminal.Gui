@@ -304,8 +304,8 @@ public class TextFormatter
             {
                 if (isVertical)
                 {
-                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, tabWidth: TabWidth);
-                    x = screen.Right - runesWidth;
+                    int runesWidth = runes.Length == 0 ? 0 : runes.Max (r => GetRuneWidth (r, TabWidth));
+                    x = screen.Left + (screen.Width - _lines.Count - 1) + (runesWidth + line);
                     CursorPosition = screen.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
                 }
                 else
@@ -319,10 +319,8 @@ public class TextFormatter
             {
                 if (isVertical)
                 {
-                    int runesWidth = line > 0
-                                         ? GetColumnsRequiredForVerticalText (linesFormatted, tabWidth: TabWidth)
-                                         : 0;
-                    x = screen.Left + runesWidth;
+                    int runesWidth = runes.Length == 0 ? 0 : runes.Max (r => GetRuneWidth (r, TabWidth));
+                    x = screen.Left + runesWidth + line - 1;
                 }
                 else
                 {
@@ -335,8 +333,8 @@ public class TextFormatter
             {
                 if (isVertical)
                 {
-                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, tabWidth: TabWidth);
-                    x = screen.Left + line + (screen.Width - runesWidth) / 2;
+                    int runesWidth = runes.Length == 0 ? 0 : runes.Max (r => GetRuneWidth (r, TabWidth));
+                    x = screen.Left + (screen.Width / 2) - (_lines.Count  / 2) + (runesWidth + line - 1);
 
                     CursorPosition = (screen.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
                 }
@@ -410,7 +408,7 @@ public class TextFormatter
 
                 if (lastZeroWidthPos is null)
                 {
-                    if (idx < 0 || x + current + colOffset < 0)
+                    if (idx < 0)
                     {
                         current++;
 
