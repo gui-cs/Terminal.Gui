@@ -99,14 +99,14 @@ public class Justifier
     }
 
     /// <summary>
-    ///     Takes a list of items and returns their positions when justified within a container <paramref name="totalSize"/> wide based on the specified
+    ///     Takes a list of items and returns their positions when justified within a container <paramref name="containerSize"/> wide based on the specified
     ///     <see cref="Justification"/>.
     /// </summary>
     /// <param name="sizes">The sizes of the items to justify.</param>
     /// <param name="justification">The justification style.</param>
-    /// <param name="totalSize">The width of the container.</param>
+    /// <param name="containerSize">The width of the container.</param>
     /// <returns>The locations of the items, from left to right.</returns>
-    public int [] Justify (int [] sizes, Justification justification, int totalSize)
+    public int [] Justify (int [] sizes, Justification justification, int containerSize)
     {
         if (sizes.Length == 0)
         {
@@ -115,7 +115,7 @@ public class Justifier
 
         int totalItemsSize = sizes.Sum ();
 
-        if (totalItemsSize > totalSize)
+        if (totalItemsSize > containerSize)
         {
            // throw new ArgumentException ("The sum of the sizes is greater than the total size.");
         }
@@ -126,13 +126,13 @@ public class Justifier
         int totalItemsAndSpaces = totalItemsSize + totalGaps * _maxSpaceBetweenItems; // total size of items and spaces if we had enough room
         int spaces = totalGaps * _maxSpaceBetweenItems; // We'll decrement this below to place one space between each item until we run out
 
-        if (totalItemsSize >= totalSize)
+        if (totalItemsSize >= containerSize)
         {
             spaces = 0;
         }
-        else if (totalItemsAndSpaces > totalSize)
+        else if (totalItemsAndSpaces > containerSize)
         {
-            spaces = totalSize - totalItemsSize;
+            spaces = containerSize - totalItemsSize;
         }
 
         switch (justification)
@@ -162,7 +162,7 @@ public class Justifier
 
                 break;
             case Justification.Right:
-                currentPosition = Math.Max (0, totalSize - totalItemsSize - spaces);
+                currentPosition = Math.Max (0, containerSize - totalItemsSize - spaces);
 
                 for (var i = 0; i < sizes.Length; i++)
                 {
@@ -183,7 +183,7 @@ public class Justifier
                 if (sizes.Length > 1)
                 {
                     // remaining space to be distributed before first and after the items
-                    int remainingSpace = Math.Max (0, totalSize - totalItemsSize - spaces);
+                    int remainingSpace = Math.Max (0, containerSize - totalItemsSize - spaces);
 
                     for (var i = 0; i < sizes.Length; i++)
                     {
@@ -212,14 +212,14 @@ public class Justifier
                         throw new ArgumentException ("The size of an item cannot be negative.");
                     }
 
-                    positions [0] = (totalSize - sizes [0]) / 2; // single item is centered
+                    positions [0] = (containerSize - sizes [0]) / 2; // single item is centered
                 }
 
                 break;
 
             case Justification.Justified:
-                int spaceBetween = sizes.Length > 1 ? (totalSize - totalItemsSize) / (sizes.Length - 1) : 0;
-                int remainder = sizes.Length > 1 ? (totalSize - totalItemsSize) % (sizes.Length - 1) : 0;
+                int spaceBetween = sizes.Length > 1 ? (containerSize - totalItemsSize) / (sizes.Length - 1) : 0;
+                int remainder = sizes.Length > 1 ? (containerSize - totalItemsSize) % (sizes.Length - 1) : 0;
                 currentPosition = 0;
 
                 for (var i = 0; i < sizes.Length; i++)
@@ -258,7 +258,7 @@ public class Justifier
                         }
                     }
 
-                    positions [sizes.Length - 1] = totalSize - sizes [sizes.Length - 1];
+                    positions [sizes.Length - 1] = containerSize - sizes [sizes.Length - 1];
                 }
                 else if (sizes.Length == 1)
                 {
@@ -267,7 +267,7 @@ public class Justifier
                         throw new ArgumentException ("The size of an item cannot be negative.");
                     }
 
-                    positions [0] = totalSize - sizes [0]; // single item is flush right
+                    positions [0] = containerSize - sizes [0]; // single item is flush right
                 }
 
                 break;
@@ -289,7 +289,7 @@ public class Justifier
                         if (i == sizes.Length - 1)
                         {
                             // start at right
-                            currentPosition = totalSize - sizes [i];
+                            currentPosition = containerSize - sizes [i];
                             positions [i] = currentPosition;
                         }
 
