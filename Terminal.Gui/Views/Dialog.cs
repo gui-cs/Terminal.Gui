@@ -15,21 +15,6 @@ namespace Terminal.Gui;
 /// </remarks>
 public class Dialog : Window
 {
-    /// <summary>Determines the horizontal alignment of the Dialog buttons.</summary>
-    public enum ButtonAlignments
-    {
-        /// <summary>Center-aligns the buttons (the default).</summary>
-        Center = 0,
-
-        /// <summary>Justifies the buttons</summary>
-        Justify,
-
-        /// <summary>Left-aligns the buttons</summary>
-        Left,
-
-        /// <summary>Right-aligns the buttons</summary>
-        Right
-    }
 
     // TODO: Reenable once border/borderframe design is settled
     /// <summary>
@@ -108,7 +93,7 @@ public class Dialog : Window
     }
 
     /// <summary>Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the bottom of the dialog.</summary>
-    public ButtonAlignments ButtonAlignment { get; set; }
+    public Justification ButtonAlignment { get; set; }
 
     /// <summary>Optional buttons to lay out at the bottom of the dialog.</summary>
     public Button [] Buttons
@@ -128,11 +113,11 @@ public class Dialog : Window
         }
     }
 
-    /// <summary>The default <see cref="ButtonAlignments"/> for <see cref="Dialog"/>.</summary>
+    /// <summary>The default <see cref="Justification"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     [JsonConverter (typeof (JsonStringEnumConverter))]
-    public static ButtonAlignments DefaultButtonAlignment { get; set; } = ButtonAlignments.Center;
+    public static Justification DefaultButtonAlignment { get; set; } = Justification.Centered;
 
     /// <summary>
     ///     Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controlled by the
@@ -159,18 +144,18 @@ public class Dialog : Window
     }
 
     /// <inheritdoc/>
-    public override void LayoutSubviews ()
-    {
-        if (_inLayout)
-        {
-            return;
-        }
+    //public override void LayoutSubviews ()
+    //{
+    //    if (_inLayout)
+    //    {
+    //        return;
+    //    }
 
-        _inLayout = true;
-        LayoutButtons ();
-        base.LayoutSubviews ();
-        _inLayout = false;
-    }
+    //    _inLayout = true;
+    //    //LayoutButtons ();
+    //    base.LayoutSubviews ();
+    //    _inLayout = false;
+    //}
 
     // Get the width of all buttons, not including any Margin.
     internal int GetButtonsWidth ()
@@ -199,7 +184,7 @@ public class Dialog : Window
 
         switch (ButtonAlignment)
         {
-            case ButtonAlignments.Center:
+            case Justification.Centered:
                 // Center Buttons
                 shiftLeft = (Viewport.Width - buttonsWidth - _buttons.Count - 1) / 2 + 1;
 
@@ -222,7 +207,7 @@ public class Dialog : Window
 
                 break;
 
-            case ButtonAlignments.Justify:
+            case Justification.Justified:
                 // Justify Buttons
                 // leftmost and rightmost buttons are hard against edges. The rest are evenly spaced.
 
@@ -257,7 +242,7 @@ public class Dialog : Window
 
                 break;
 
-            case ButtonAlignments.Left:
+            case Justification.Left:
                 // Left Align Buttons
                 Button prevButton = _buttons [0];
                 prevButton.X = 0;
@@ -273,7 +258,7 @@ public class Dialog : Window
 
                 break;
 
-            case ButtonAlignments.Right:
+            case Justification.Right:
                 // Right align buttons
                 shiftLeft = _buttons [_buttons.Count - 1].Frame.Width;
                 _buttons [_buttons.Count - 1].X = Pos.AnchorEnd (shiftLeft);

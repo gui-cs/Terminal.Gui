@@ -1,7 +1,4 @@
 using System.Diagnostics;
-using static System.Net.Mime.MediaTypeNames;
-using static Terminal.Gui.Dialog;
-using static Terminal.Gui.Dim;
 
 namespace Terminal.Gui;
 
@@ -206,6 +203,14 @@ public class Pos
     /// <returns>The <see cref="Pos"/> returned from the function.</returns>
     public static Pos Function (Func<int> function) { return new PosFunc (function); }
 
+    /// <summary>
+    ///      Creates a <see cref="Pos"/> object that justifies a set of views according to the specified justification.
+    /// </summary>
+    /// <param name="views"></param>
+    /// <param name="justification"></param>
+    /// <returns></returns>
+    public static Pos Justify ( Justification justification) { return new PosJustify (justification); }
+
     /// <summary>Serves as the default hash function. </summary>
     /// <returns>A hash code for the current object.</returns>
     public override int GetHashCode () { return Anchor (0).GetHashCode (); }
@@ -349,7 +354,7 @@ public class Pos
     ///     that
     ///     is used.
     /// </returns>
-    internal virtual int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
+    internal virtual int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
     {
         return Anchor (superviewDimension);
     }
@@ -388,7 +393,7 @@ public class Pos
             return width - _offset;
         }
 
-        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
         {
             int newLocation = Anchor (superviewDimension);
 
@@ -406,7 +411,7 @@ public class Pos
         public override string ToString () { return "Center"; }
         internal override int Anchor (int width) { return width / 2; }
 
-        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
         {
             int newDimension = Math.Max (dim.Calculate (0, superviewDimension, us, dimension), 0);
 
@@ -434,7 +439,7 @@ public class Pos
             return la - ra;
         }
 
-        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
         {
             int newDimension = dim.Calculate (0, superviewDimension, us, dimension);
             int left = _left.Calculate (superviewDimension, dim, us, dimension);
@@ -458,6 +463,99 @@ public class Pos
         internal override int Anchor (int width) { return (int)(width * _factor); }
     }
 
+
+    /// <summary>
+    /// Enables justification of a set of views. 
+    /// </summary>
+    public class PosJustify : Pos
+    {
+        private readonly Justification _justification;
+
+        /// <summary>
+        /// Enables justification of a set of views.
+        /// </summary>
+        /// <param name="views">The set of views to justify according to <paramref name="justification"/>.</param>
+        /// <param name="justification"></param>
+        public PosJustify (Justification justification)
+        {
+            _justification = justification;
+        }
+
+        public override bool Equals (object other)
+        {
+            return other is PosJustify justify && justify._justification == _justification;
+        }
+
+        public override int GetHashCode () { return _justification.GetHashCode (); }
+
+
+        public override string ToString ()
+        {
+            return $"Justify(alignment={_justification})";
+        }
+
+        internal override int Anchor (int width)
+        {
+            return width;
+        }
+
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
+        {
+            if (us.SuperView is null)
+            {
+                return 0;
+            }
+            // Find all the views that are being justified - they have the same justification and opposite position as us
+            // Then, pass the array of views to the Justify method
+            int [] dimensions;
+            int [] positions;
+
+            int ourIndex = 0;
+            if (dimension == Dim.Dimension.Width)
+            {
+                List<int> dimensionsList = new List<int> ();
+                for (int i = 0; i < us.SuperView.Subviews.Count; i++)
+                {
+                    var v = us.SuperView.Subviews [i];
+                    var j = v.X as PosJustify;
+                    if (j?._justification == _justification && v.Frame.Y == us.Frame.Y)
+                    {
+                        dimensionsList.Add (v.Frame.Width);
+
+                        if (v == us)
+                        {
+                            ourIndex = dimensionsList.Count - 1;
+                        }
+                    }
+                }
+                dimensions = dimensionsList.ToArray ();
+                positions = new Justifier () { PutSpaceBetweenItems = true }.Justify (dimensions, _justification, superviewDimension);
+            }
+            else
+            {
+                List<int> dimensionsList = new List<int> ();
+                for (int i = 0; i < us.SuperView.Subviews.Count; i++)
+                {
+                    var v = us.SuperView.Subviews [i];
+                    var j = v.Y as PosJustify;
+                    if (j?._justification == _justification && v.Frame.X == us.Frame.X)
+                    {
+                        dimensionsList.Add (v.Frame.Height);
+
+                        if (v == us)
+                        {
+                            ourIndex = dimensionsList.Count - 1;
+                        }
+                    }
+                }
+                dimensions = dimensionsList.ToArray ();
+                positions = new Justifier () { PutSpaceBetweenItems = false }.Justify (dimensions, _justification, superviewDimension);
+            }
+
+            return positions [ourIndex];
+        }
+
+    }
     // Helper class to provide dynamic value by the execution of a function that returns an integer.
     internal class PosFunc (Func<int> n) : Pos
     {
