@@ -413,7 +413,7 @@ public class TextFormatter
 
                 if (lastZeroWidthPos is null)
                 {
-                    if (idx < 0)
+                    if (idx < 0 || x + current + colOffset < 0)
                     {
                         current++;
 
