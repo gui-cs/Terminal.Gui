@@ -1,7 +1,4 @@
 using System.Diagnostics;
-using static System.Net.Mime.MediaTypeNames;
-using static Terminal.Gui.Dialog;
-using static Terminal.Gui.Dim;
 
 namespace Terminal.Gui;
 
@@ -357,7 +354,7 @@ public class Pos
     ///     that
     ///     is used.
     /// </returns>
-    internal virtual int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
+    internal virtual int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
     {
         return Anchor (superviewDimension);
     }
@@ -396,7 +393,7 @@ public class Pos
             return width - _offset;
         }
 
-        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
         {
             int newLocation = Anchor (superviewDimension);
 
@@ -414,7 +411,7 @@ public class Pos
         public override string ToString () { return "Center"; }
         internal override int Anchor (int width) { return width / 2; }
 
-        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
         {
             int newDimension = Math.Max (dim.Calculate (0, superviewDimension, us, dimension), 0);
 
@@ -442,7 +439,7 @@ public class Pos
             return la - ra;
         }
 
-        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
         {
             int newDimension = dim.Calculate (0, superviewDimension, us, dimension);
             int left = _left.Calculate (superviewDimension, dim, us, dimension);
@@ -502,7 +499,7 @@ public class Pos
             return width;
         }
 
-        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
         {
             // Find all the views that are being justified - they have the same justification and opposite position as us
             // Use linq to filter us.Superview.Subviews that match `dimension` and are at our same location in the opposite dimension (e.g. if dimension is Width, filter by Y)
@@ -511,7 +508,7 @@ public class Pos
             int [] positions;
 
             int ourIndex = 0;
-            if (dimension == Dimension.Width)
+            if (dimension == Dim.Dimension.Width)
             {
                 List<int> dimensionsList = new List<int> ();
                 for (int i = 0; i < us.SuperView.Subviews.Count; i++)
