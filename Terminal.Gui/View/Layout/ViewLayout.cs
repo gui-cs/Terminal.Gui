@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using static Terminal.Gui.Pos;
 
 namespace Terminal.Gui;
 
@@ -850,13 +851,62 @@ public partial class View
 
         foreach (View v in ordered)
         {
-            // TODO: Move this logic into the Pos/Dim classes
+            var justifyX = v.X as PosJustify;
+            var justifyY = v.Y as PosJustify;
 
+            if (justifyX is { } || justifyY is { })
+            {
+                int xIndex = 0;
+                int yIndex = 0;
+                List<int> XdimensionsList = new ();
+                List<int> YdimensionsList = new ();
+                for (int i = 0; i < v.SuperView.Subviews.Count; i++)
+                {
+                    var viewI = v.SuperView.Subviews [i];
+
+                    var jX = viewI.X as PosJustify;
+                    var jY = viewI.Y as PosJustify;
+
+                    if (jX?._justifier.Justification == justifyX?._justifier.Justification && viewI.Frame.Y == v.Frame.Y)
+                    {
+                        XdimensionsList.Add (viewI.Frame.Width);
+
+                        if (viewI == v)
+                        {
+                            xIndex = XdimensionsList.Count - 1;
+                        }
+                    }
+
+                    if (jY?._justifier.Justification == justifyY?._justifier.Justification && viewI.Frame.X == v.Frame.X)
+                    {
+                        YdimensionsList.Add (viewI.Frame.Height);
+
+                        if (viewI == v)
+                        {
+                            yIndex = YdimensionsList.Count - 1;
+                        }
+                    }
+                }
+
+                if (justifyX is { })
+                {
+                    justifyX._justifier.ContainerSize = Viewport.Size.Width;
+                    justifyX._location = justifyX._justifier.Justify (XdimensionsList.ToArray ()) [xIndex];
+                }
+
+                if (justifyY is { })
+                {
+                    justifyY._justifier.ContainerSize = Viewport.Size.Height;
+                    justifyY._location = justifyY._justifier.Justify (YdimensionsList.ToArray ()) [yIndex];
+                }
+            }
+
+            // TODO: Move this logic into the Pos/Dim classes
             if (v.Width is Dim.DimAuto || v.Height is Dim.DimAuto)
             {
                 // If the view is auto-sized...
                 Rectangle f = v.Frame;
-                v._frame = new (v.Frame.X, v.Frame.Y, 0, 0);
+                v._frame = v.Frame with { Width = 0, Height = 0 };
                 LayoutSubview (v, Viewport.Size);
 
                 if (v.Frame != f)
@@ -1005,8 +1055,8 @@ public partial class View
         {
             //if (AutoSize)
             {
-            //    SetFrameToFitText ();
-               SetTextFormatterSize ();
+                //    SetFrameToFitText ();
+                SetTextFormatterSize ();
             }
 
             LayoutAdornments ();
@@ -1064,15 +1114,6 @@ public partial class View
 
         CheckDimAuto ();
 
-        SetTextFormatterSize ();
-
-        var autoSize = Size.Empty;
-
-        //if (AutoSize)
-        //{
-        //    // TODO: Nuke this from orbit once Dim.Auto is fully implemented
-        //    autoSize = GetTextAutoSize ();
-        //}
         SetTextFormatterSize ();
         if (TextFormatter.NeedsFormat)
         {

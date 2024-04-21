@@ -469,7 +469,8 @@ public class Pos
     /// </summary>
     public class PosJustify : Pos
     {
-        private readonly Justification _justification;
+        internal readonly Justifier _justifier;
+        internal int? _location;
 
         /// <summary>
         /// Enables justification of a set of views.
@@ -478,81 +479,39 @@ public class Pos
         /// <param name="justification"></param>
         public PosJustify (Justification justification)
         {
-            _justification = justification;
+            _justifier = new ()
+            {
+                PutSpaceBetweenItems = false,
+                Justification = justification,
+            };
         }
 
         public override bool Equals (object other)
         {
-            return other is PosJustify justify && justify._justification == _justification;
+            return other is PosJustify justify && justify._justifier == _justifier;
         }
 
-        public override int GetHashCode () { return _justification.GetHashCode (); }
+        public override int GetHashCode () { return _justifier.GetHashCode (); }
 
 
         public override string ToString ()
         {
-            return $"Justify(alignment={_justification})";
+            return $"Justify(justification={_justifier.Justification})";
         }
 
         internal override int Anchor (int width)
         {
-            return width;
+            return _location ?? 0 - width;
         }
 
         internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
         {
-            if (us.SuperView is null)
+            if (_location.HasValue)
             {
-                return 0;
-            }
-            // Find all the views that are being justified - they have the same justification and opposite position as us
-            // Then, pass the array of views to the Justify method
-            int [] dimensions;
-            int [] positions;
-
-            int ourIndex = 0;
-            if (dimension == Dim.Dimension.Width)
-            {
-                List<int> dimensionsList = new List<int> ();
-                for (int i = 0; i < us.SuperView.Subviews.Count; i++)
-                {
-                    var v = us.SuperView.Subviews [i];
-                    var j = v.X as PosJustify;
-                    if (j?._justification == _justification && v.Frame.Y == us.Frame.Y)
-                    {
-                        dimensionsList.Add (v.Frame.Width);
-
-                        if (v == us)
-                        {
-                            ourIndex = dimensionsList.Count - 1;
-                        }
-                    }
-                }
-                dimensions = dimensionsList.ToArray ();
-                positions = new Justifier () { PutSpaceBetweenItems = true }.Justify (dimensions, _justification, superviewDimension);
-            }
-            else
-            {
-                List<int> dimensionsList = new List<int> ();
-                for (int i = 0; i < us.SuperView.Subviews.Count; i++)
-                {
-                    var v = us.SuperView.Subviews [i];
-                    var j = v.Y as PosJustify;
-                    if (j?._justification == _justification && v.Frame.X == us.Frame.X)
-                    {
-                        dimensionsList.Add (v.Frame.Height);
-
-                        if (v == us)
-                        {
-                            ourIndex = dimensionsList.Count - 1;
-                        }
-                    }
-                }
-                dimensions = dimensionsList.ToArray ();
-                positions = new Justifier () { PutSpaceBetweenItems = false }.Justify (dimensions, _justification, superviewDimension);
+                return _location.Value;
             }
 
-            return positions [ourIndex];
+            return 0;
         }
 
     }

@@ -18,9 +18,10 @@ public sealed class MyScenario : Scenario
         };
 
         int leftMargin = 0;
-        var just = Justification.Justified;
+        var just = Justification.Centered;
 
         var button = new Button { X = Pos.Justify(just), Y = Pos.Center (), Text = "Press me!" };
+        //button.Margin.Thickness = new Thickness (leftMargin, 0, 0, 0);
         button.Accept += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed the button!", "Ok");
         appWindow.Add (button);
 

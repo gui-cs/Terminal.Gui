@@ -19,26 +19,30 @@ public class JustifierTests (ITestOutputHelper output)
     [MemberData (nameof (JustificationEnumValues))]
     public void NoItems_Works (Justification justification)
     {
-        int [] sizes = { };
-        int [] positions = new Justifier ().Justify (sizes, justification, 100);
+        int [] sizes = [];
+        int [] positions = Justifier.Justify (justification, false, 100, sizes);
         Assert.Equal (new int [] { }, positions);
     }
-
-    //[Theory]
-    //[MemberData (nameof (JustificationEnumValues))]
-    //public void Items_Width_Cannot_Exceed_TotalSize (Justification justification)
-    //{
-    //    int [] sizes = { 1000, 2000, 3000 };
-    //    Assert.Throws<ArgumentException> (() => new Justifier ().Justify (sizes, justification, 100));
-    //}
 
     [Theory]
     [MemberData (nameof (JustificationEnumValues))]
     public void Negative_Widths_Not_Allowed (Justification justification)
     {
-        Assert.Throws<ArgumentException> (() => new Justifier ().Justify (new [] { -10, 20, 30 }, justification, 100));
-        Assert.Throws<ArgumentException> (() => new Justifier ().Justify (new [] { 10, -20, 30 }, justification, 100));
-        Assert.Throws<ArgumentException> (() => new Justifier ().Justify (new [] { 10, 20, -30 }, justification, 100));
+        Assert.Throws<ArgumentException> (() => new Justifier ()
+        {
+            Justification = justification,
+            ContainerSize = 100
+        }.Justify (new [] { -10, 20, 30 }));
+        Assert.Throws<ArgumentException> (() => new Justifier ()
+        {
+            Justification = justification,
+            ContainerSize = 100
+        }.Justify (new [] { 10, -20, 30 }));
+        Assert.Throws<ArgumentException> (() => new Justifier ()
+        {
+            Justification = justification,
+            ContainerSize = 100
+        }.Justify (new [] { 10, 20, -30 }));
     }
 
     [Theory]
@@ -197,10 +201,15 @@ public class JustifierTests (ITestOutputHelper output)
     [InlineData (Justification.FirstLeftRestRight, new [] { 10, 20, 30, 40, 50 }, 151, new [] { 0, 10, 30, 60, 101 })]
     [InlineData (Justification.FirstLeftRestRight, new [] { 3, 3, 3 }, 21, new [] { 0, 14, 18 })]
     [InlineData (Justification.FirstLeftRestRight, new [] { 3, 4, 5 }, 21, new [] { 0, 11, 16 })]
-    public void TestJustifications_PutSpaceBetweenItems (Justification justification, int [] sizes, int totalSize, int [] expected)
+    public void TestJustifications_PutSpaceBetweenItems (Justification justification, int [] sizes, int containerSize, int [] expected)
     {
-        int [] positions = new Justifier { PutSpaceBetweenItems = true }.Justify (sizes, justification, totalSize);
-        AssertJustification (justification, sizes, totalSize, positions, expected);
+        int [] positions = new Justifier
+        {
+            PutSpaceBetweenItems = true,
+            Justification = justification,
+            ContainerSize = containerSize
+        }.Justify (sizes);
+        AssertJustification (justification, sizes, containerSize, positions, expected);
     }
 
     [Theory]
@@ -341,10 +350,15 @@ public class JustifierTests (ITestOutputHelper output)
     [InlineData (Justification.FirstLeftRestRight, new [] { 10, 20, 30 }, 101, new [] { 0, 51, 71 })]
     [InlineData (Justification.FirstLeftRestRight, new [] { 10, 20, 30, 40 }, 101, new [] { 0, 11, 31, 61 })]
     [InlineData (Justification.FirstLeftRestRight, new [] { 10, 20, 30, 40, 50 }, 151, new [] { 0, 11, 31, 61, 101 })]
-    public void TestJustifications_NoSpaceBetweenItems (Justification justification, int [] sizes, int totalSize, int [] expected)
+    public void TestJustifications_NoSpaceBetweenItems (Justification justification, int [] sizes, int containerSize, int [] expected)
     {
-        int [] positions = new Justifier { PutSpaceBetweenItems = false }.Justify (sizes, justification, totalSize);
-        AssertJustification (justification, sizes, totalSize, positions, expected);
+        int [] positions = new Justifier
+        {
+            PutSpaceBetweenItems = false,
+            Justification = justification,
+            ContainerSize = containerSize
+        }.Justify (sizes);
+        AssertJustification (justification, sizes, containerSize, positions, expected);
     }
 
     public void AssertJustification (Justification justification, int [] sizes, int totalSize, int [] positions, int [] expected)

@@ -45,7 +45,7 @@ public class Button : View
         _leftDefault = Glyphs.LeftDefaultIndicator;
         _rightDefault = Glyphs.RightDefaultIndicator;
 
-        Height = 1;
+        Height = Dim.Auto (Dim.DimAutoStyle.Text);
         Width = Dim.Auto (Dim.DimAutoStyle.Text);
 
         CanFocus = true;
