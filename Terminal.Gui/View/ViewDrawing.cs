@@ -102,7 +102,7 @@ public partial class View
         // Get screen-relative coords
         Rectangle toClear = ViewportToScreen (Viewport with { Location = new (0, 0) });
 
-        Rectangle prevClip = Driver.Clip;
+        HashSet<Region> prevClip = Driver.Clip;
 
         if (ViewportSettings.HasFlag (ViewportSettings.ClearContentOnly))
         {
@@ -130,9 +130,9 @@ public partial class View
         // Get screen-relative coords
         Rectangle toClear = ViewportToScreen (rect);
 
-        Rectangle prevClip = Driver.Clip;
+        HashSet<Region> prevClip = Driver.Clip;
 
-        Driver.Clip = Rectangle.Intersect (prevClip, ViewportToScreen (Viewport with { Location = new (0, 0) }));
+        Driver.Clip = [new (Region.Intersect (prevClip, ViewportToScreen (Viewport with { Location = new (0, 0) })))];
 
         Attribute prev = Driver.SetAttribute (new (color ?? GetNormalColor().Background));
         Driver.FillRect (toClear);
@@ -157,23 +157,23 @@ public partial class View
     ///     The current screen-relative clip region, which can be then re-applied by setting
     ///     <see cref="ConsoleDriver.Clip"/>.
     /// </returns>
-    public Rectangle SetClip ()
+    public HashSet<Region> SetClip ()
     {
         if (Driver is null)
         {
-            return Rectangle.Empty;
+            return [new (Rectangle.Empty)];
         }
 
-        Rectangle previous = Driver.Clip;
+        HashSet<Region> previous = Driver.Clip;
 
         // Clamp the Clip to the entire visible area
-        Rectangle clip = Rectangle.Intersect (ViewportToScreen (Viewport with { Location = Point.Empty }), previous);
+        HashSet<Region> clip = [new (Region.Intersect (previous, ViewportToScreen (Viewport with { Location = Point.Empty })))];
 
         if (ViewportSettings.HasFlag (ViewportSettings.ClipContentOnly))
         {
             // Clamp the Clip to the just content area that is within the viewport
             Rectangle visibleContent = ViewportToScreen (new (new (-Viewport.X, -Viewport.Y), ContentSize));
-            clip = Rectangle.Intersect (clip, visibleContent);
+            clip = [new (Region.Intersect (clip, visibleContent))];
         }
 
         Driver.Clip = clip;
@@ -218,7 +218,7 @@ public partial class View
         // By default, we clip to the viewport preventing drawing outside the viewport
         // We also clip to the content, but if a developer wants to draw outside the viewport, they can do
         // so via settings. SetClip honors the ViewportSettings.DisableVisibleContentClipping flag.
-        Rectangle prevClip = SetClip ();
+        HashSet<Region> prevClip = SetClip ();
 
         // Invoke DrawContentEvent
         var dev = new DrawEventArgs (Viewport, Rectangle.Empty);

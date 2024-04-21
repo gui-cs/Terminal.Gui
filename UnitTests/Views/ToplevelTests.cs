@@ -1573,8 +1573,8 @@ public class ToplevelTests
                                 {
                                     Assert.Equal (new Rectangle (1, 3, 18, 16), viewAddedToTop.Frame);
 
-                                    Rectangle savedClip = Application.Driver.Clip;
-                                    Application.Driver.Clip = top.Frame;
+                                    HashSet<Region> savedClip = Application.Driver.Clip;
+                                    Application.Driver.Clip = [new (top.Frame)];
                                     viewAddedToTop.Draw ();
                                     top.Move (2, 15);
                                     View.Driver.AddStr ("One");

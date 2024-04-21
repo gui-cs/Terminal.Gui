@@ -591,7 +591,7 @@ public class MenuBarTests
     {
         ((FakeDriver)Application.Driver).SetBufferSize (40, 15);
 
-        Assert.Equal (new Rectangle (0, 0, 40, 15), Application.Driver.Clip);
+        Assert.Equal ([new (new Rectangle (0, 0, 40, 15))], Application.Driver.Clip);
         TestHelpers.AssertDriverContentsWithFrameAre (@"", _output);
 
         List<string> items = new ()

@@ -317,7 +317,7 @@ public class TabView : View
 
         if (Tabs.Any ())
         {
-            Rectangle savedClip = SetClip ();
+            HashSet<Region> savedClip = SetClip ();
             _tabsBar.OnDrawContent (viewport);
             _contentView.SetNeedsDisplay ();
             _contentView.Draw ();

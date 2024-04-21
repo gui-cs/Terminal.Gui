@@ -253,7 +253,7 @@ public class ContextMenuTests
     {
         ((FakeDriver)Application.Driver).SetBufferSize (20, 15);
 
-        Assert.Equal (new Rectangle (0, 0, 20, 15), Application.Driver.Clip);
+        Assert.Equal ([new (new Rectangle (0, 0, 20, 15))], Application.Driver.Clip);
         TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
 
         var top = new Toplevel { X = 2, Y = 2, Width = 15, Height = 4 };
@@ -386,7 +386,7 @@ public class ContextMenuTests
     {
         ((FakeDriver)Application.Driver).SetBufferSize (20, 15);
 
-        Assert.Equal (new Rectangle (0, 0, 20, 15), Application.Driver.Clip);
+        Assert.Equal ([new (new Rectangle (0, 0, 20, 15))], Application.Driver.Clip);
         TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
 
         // Don't use Dialog here as it has more layout logic. Use Window instead.

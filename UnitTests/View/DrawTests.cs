@@ -569,7 +569,7 @@ public class DrawTests (ITestOutputHelper output)
         container.Add (content);
         Toplevel top = new ();
         top.Add (container);
-        Application.Driver.Clip = container.Frame;
+        Application.Driver.Clip = [new (container.Frame)];
         Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -687,7 +687,7 @@ public class DrawTests (ITestOutputHelper output)
 
         // BUGBUG: v2 - it's bogus to reference .Frame before BeginInit. And why is the clip being set anyway???
 
-        void Top_LayoutComplete (object sender, LayoutEventArgs e) { Application.Driver.Clip = container.Frame; }
+        void Top_LayoutComplete (object sender, LayoutEventArgs e) { Application.Driver.Clip = [new (container.Frame)]; }
 
         top.LayoutComplete += Top_LayoutComplete;
         Application.Begin (top);
@@ -771,7 +771,7 @@ public class DrawTests (ITestOutputHelper output)
         container.Add (content);
         Toplevel top = new ();
         top.Add (container);
-        Application.Driver.Clip = container.Frame;
+        Application.Driver.Clip = [new (container.Frame)];
         Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -919,7 +919,7 @@ public class DrawTests (ITestOutputHelper output)
         // ViewportToScreen is (1, 1, 23, 23)
         // Visible content is (1, 1, 10, 10)
         // Expected clip is (1, 1, 10, 10) - same as visible content
-        Rectangle expectedClip = new (1, 1, 10, 10);
+        HashSet<Region> expectedClip = [new (new (1, 1, 10, 10))];
         // Arrange
         var view = new View ()
         {
@@ -931,7 +931,7 @@ public class DrawTests (ITestOutputHelper output)
         view.Border.Thickness = new Thickness (1);
         view.BeginInit ();
         view.EndInit ();
-        Assert.Equal (view.Frame, Application.Driver.Clip);
+        Assert.Equal ([new (view.Frame)], Application.Driver.Clip);
 
         // Act
         view.SetClip ();
@@ -952,7 +952,7 @@ public class DrawTests (ITestOutputHelper output)
         // ViewportToScreen is (1, 1, 23, 23)
         // Visible content is (1, 1, 10, 10)
         // Expected clip is (1, 1, 23, 23) - same as Viewport
-        Rectangle expectedClip = new (1, 1, 23, 23);
+        HashSet<Region> expectedClip = [new (new (1, 1, 23, 23))];
         // Arrange
         var view = new View ()
         {
@@ -963,7 +963,7 @@ public class DrawTests (ITestOutputHelper output)
         view.Border.Thickness = new Thickness (1);
         view.BeginInit ();
         view.EndInit ();
-        Assert.Equal (view.Frame, Application.Driver.Clip);
+        Assert.Equal ([new (view.Frame)], Application.Driver.Clip);
         view.Viewport = view.Viewport with { X = 1, Y = 1 };
 
         // Act

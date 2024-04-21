@@ -17,8 +17,8 @@ public class ViewTests
 
         view.DrawContent += (s, e) =>
                             {
-                                Rectangle savedClip = Application.Driver.Clip;
-                                Application.Driver.Clip = new Rectangle (1, 1, view.Viewport.Width, view.Viewport.Height);
+                                HashSet<Region> savedClip = Application.Driver.Clip;
+                                Application.Driver.Clip = [new (new Rectangle (1, 1, view.Viewport.Width, view.Viewport.Height))];
 
                                 for (var row = 0; row < view.Viewport.Height; row++)
                                 {
@@ -81,8 +81,8 @@ public class ViewTests
 
         view.DrawContent += (s, e) =>
                             {
-                                Rectangle savedClip = Application.Driver.Clip;
-                                Application.Driver.Clip = new Rectangle (1, 1, view.Viewport.Width, view.Viewport.Height);
+                                HashSet<Region> savedClip = Application.Driver.Clip;
+                                Application.Driver.Clip = [new (new Rectangle (1, 1, view.Viewport.Width, view.Viewport.Height))];
 
                                 for (var row = 0; row < view.Viewport.Height; row++)
                                 {

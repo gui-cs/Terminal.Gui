@@ -149,7 +149,7 @@ public class Adornment : View
             return;
         }
 
-        Rectangle prevClip = SetClip ();
+        HashSet<Region> prevClip = SetClip ();
 
         Rectangle screen = ViewportToScreen (viewport);
         Attribute normalAttr = GetNormalColor ();
