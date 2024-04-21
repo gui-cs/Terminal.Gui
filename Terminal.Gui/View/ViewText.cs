@@ -270,11 +270,11 @@ public partial class View
             if (Height is Dim.DimAuto)
             {
                 // Both are auto. 
-                TextFormatter.Size = new Size (SuperView?.ContentSize.Width ?? 0, SuperView?.ContentSize.Height ?? 0);
+                TextFormatter.Size = new Size (SuperView?.ContentSize.Width ?? int.MaxValue, SuperView?.ContentSize.Height ?? int.MaxValue);
             }
             else
             {
-                TextFormatter.Size = new Size (SuperView?.ContentSize.Width ?? 0, ContentSize.Height + GetHotKeySpecifierLength ());
+                TextFormatter.Size = new Size (SuperView?.ContentSize.Width ?? int.MaxValue, ContentSize.Height + GetHotKeySpecifierLength ());
             }
 
             w = TextFormatter.FormatAndGetSize ().Width;

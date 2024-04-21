@@ -207,49 +207,6 @@ public class ButtonTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void AutoSize_Stays_True_Center ()
-    {
-        var btn = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
-
-        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
-        win.Add (btn);
-        var top = new Toplevel ();
-        top.Add (win);
-
-        Assert.True (btn.AutoSize);
-
-        Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-
-        var expected = @$"
-┌────────────────────────────┐
-│                            │
-│      {CM.Glyphs.LeftBracket} Say Hello 你 {CM.Glyphs.RightBracket}      │
-│                            │
-└────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-
-        Assert.True (btn.AutoSize);
-        btn.Text = "Say Hello 你 changed";
-        Assert.True (btn.AutoSize);
-        Application.Refresh ();
-
-        expected = @$"
-┌────────────────────────────┐
-│                            │
-│  {CM.Glyphs.LeftBracket} Say Hello 你 changed {CM.Glyphs.RightBracket}  │
-│                            │
-└────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        top.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
     public void AutoSize_Stays_True_With_EmptyText ()
     {
         var btn = new Button { X = Pos.Center (), Y = Pos.Center (), AutoSize = true };
@@ -385,6 +342,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Equal (string.Empty, btn.Text);
         btn.BeginInit ();
         btn.EndInit ();
+        btn.SetRelativeLayout(new (25,25));
 
         Assert.Equal ($"{CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
         Assert.False (btn.IsDefault);

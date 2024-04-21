@@ -1072,6 +1072,11 @@ public partial class View
         //    // TODO: Nuke this from orbit once Dim.Auto is fully implemented
         //    autoSize = GetTextAutoSize ();
         //}
+        SetTextFormatterSize ();
+        if (TextFormatter.NeedsFormat)
+        {
+            TextFormatter.Format ();
+        }
 
         int newX = _x.Calculate (superviewContentSize.Width, _width, this, Dim.Dimension.Width);
         int newW = _width.Calculate (newX, superviewContentSize.Width, this, Dim.Dimension.Width);
