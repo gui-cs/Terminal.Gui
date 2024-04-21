@@ -6,52 +6,70 @@ namespace Terminal.Gui;
 public enum Justification
 {
     /// <summary>
-    ///     The items will be left-justified.
+    ///     The items will be aligned to the left.
+    ///     The items will be arranged such that there is no more than <see cref="Justifier.MaxSpaceBetweenItems"/> space between each.
     /// </summary>
+    /// <example>
+    /// <c>
+    /// 111 2222 33333
+    /// </c>
+    /// </example>
     Left,
 
     /// <summary>
-    ///     The items will be right-justified.
+    ///     The items will be aligned to the right.
+    ///     The items will be arranged such that there is no more than <see cref="Justifier.MaxSpaceBetweenItems"/> space between each.
     /// </summary>
+    /// <example>
+    /// <c>
+    ///    111 2222 33333
+    /// </c>
+    /// </example>
     Right,
 
     /// <summary>
-    ///     The items will be arranged such that there is no more than 1 space between them. The group will be centered in the container.
+    ///     The group will be centered in the container.
+    ///     If centering is not possible, the group will be left-justified.
+    ///     The items will be arranged such that there is no more than <see cref="Justifier.MaxSpaceBetweenItems"/> space between each.
     /// </summary>
+    /// <example>
+    /// <c>
+    ///    111 2222 33333
+    /// </c>
+    /// </example>
     Centered,
 
     /// <summary>
     ///     The items will be justified. Space will be added between the items such that the first item
     ///     is at the start and the right side of the last item against the end.
+    ///     The items will be arranged such that there is no more than <see cref="Justifier.MaxSpaceBetweenItems"/> space between each.
     /// </summary>
     /// <example>
     /// <c>
-    /// 111 2222        33333
+    /// 111    2222     33333
     /// </c>
     /// </example>
     Justified,
 
     /// <summary>
-    ///    The items will be left-justified. The first item will be at the start and the last item will be at the end.
-    ///    Those in between will be tight against the right item.
-    /// </summary>
-    /// <example>
-    /// <c>
-    /// 111 2222        33333
-    /// </c>
-    /// </example>
-    RightJustified,
-
-    /// <summary>
-    ///    The items will be left-justified. The first item will be at the start and the last item will be at the end.
-    ///    Those in between will be tight against the right item.
+    ///    The first item will be aligned to the left and the remaining will aligned to the right with no more than <see cref="Justifier.MaxSpaceBetweenItems"/> between each.
     /// </summary>
     /// <example>
     /// <c>
     /// 111        2222 33333
     /// </c>
     /// </example>
-    LeftJustified
+    OneLeftRestRight,
+
+    /// <summary>
+    ///    The last item will be aligned to right and the remaining will aligned to the left with no more than <see cref="Justifier.MaxSpaceBetweenItems"/> between each.
+    /// </summary>
+    /// <example>
+    /// <c>
+    /// 111 2222        33333
+    /// </c>
+    /// </example>
+    OneRightRestLeft
 }
 
 /// <summary>
@@ -60,6 +78,11 @@ public enum Justification
 public class Justifier
 {
     /// <summary>
+    /// Gets or sets the maximum space between items. The default is 0. For text, this is usually 1.
+    /// </summary>
+    public int MaxSpaceBetweenItems { get; set; } = 0;
+
+    /// <summary>
     ///     Justifies the <paramref name="sizes"/> within a container <see cref="totalSize"/> wide based on the specified
     ///     <see cref="Justification"/>.
     /// </summary>
@@ -67,15 +90,33 @@ public class Justifier
     /// <param name="justification"></param>
     /// <param name="totalSize"></param>
     /// <returns></returns>
-    public static int [] Justify (int [] sizes, Justification justification, int totalSize)
+    public int [] Justify (int [] sizes, Justification justification, int totalSize)
     {
-        var positions = new int [sizes.Length];
+        if (sizes.Length == 0)
+        {
+            return new int []{};
+        }
         int totalItemsSize = sizes.Sum ();
 
         if (totalItemsSize > totalSize)
         {
             throw new ArgumentException ("The sum of the sizes is greater than the total size.");
         }
+
+        var positions = new int [sizes.Length];
+        totalItemsSize = sizes.Sum (); // total size of items
+        int totalGaps = sizes.Length - 1; // total gaps (MinimumSpaceBetweenItems)
+        int totalItemsAndSpaces = totalItemsSize + (totalGaps * MaxSpaceBetweenItems); // total size of items and spaces if we had enough room
+        int spaces = totalGaps * MaxSpaceBetweenItems; // We'll decrement this below to place one space between each item until we run out
+        if (totalItemsSize >= totalSize)
+        {
+            spaces = 0;
+        }
+        else if (totalItemsAndSpaces > totalSize)
+        {
+            spaces = totalSize - totalItemsSize;
+        }
+
 
         switch (justification)
         {
@@ -89,13 +130,21 @@ public class Justifier
                         throw new ArgumentException ("The size of an item cannot be negative.");
                     }
 
-                    positions [i] = currentPosition;
-                    currentPosition += sizes [i];
+                    if (i == 0)
+                    {
+                        positions [0] = 0; // first item position
+                        continue;
+                    }
+
+                    var spaceBefore = spaces-- > 0 ? MaxSpaceBetweenItems : 0;
+
+                    // subsequent items are placed one space after the previous item
+                    positions [i] = positions [i - 1] + sizes [i - 1] + spaceBefore;
                 }
 
                 break;
             case Justification.Right:
-                currentPosition = totalSize - totalItemsSize;
+                currentPosition = Math.Max (0, totalSize - totalItemsSize - spaces);
 
                 for (var i = 0; i < sizes.Length; i++)
                 {
@@ -104,8 +153,10 @@ public class Justifier
                         throw new ArgumentException ("The size of an item cannot be negative.");
                     }
 
+                    var spaceBefore = spaces-- > 0 ? MaxSpaceBetweenItems : 0;
+
                     positions [i] = currentPosition;
-                    currentPosition += sizes [i];
+                    currentPosition += sizes [i] + spaceBefore;
                 }
 
                 break;
@@ -113,44 +164,35 @@ public class Justifier
             case Justification.Centered:
                 if (sizes.Length > 1)
                 {
-                    totalItemsSize = sizes.Sum (); // total size of items
-                    int totalGaps = sizes.Length - 1; // total gaps (0 or 1 space)
-                    int totalItemsAndSpaces = totalItemsSize + totalGaps; // total size of items and spaces
+                    // remaining space to be distributed before first and after the items
+                    int remainingSpace = Math.Max(0, totalSize - totalItemsSize - spaces);
 
-                    int spaces = totalGaps;
-
-                    if (totalItemsSize >= totalSize)
+                    for (var i = 0; i < sizes.Length; i++)
                     {
-                        spaces = 0;
-                    } 
-                    else if (totalItemsAndSpaces > totalSize)
-                    {
-                        spaces = totalItemsAndSpaces - totalSize;
-                    }
-
-                    int remainingSpace = Math.Max(0, totalSize - totalItemsSize - spaces); // remaining space to be distributed before and after the items
-                    int spaceBefore = remainingSpace / 2; // space before the items
-
-                    positions [0] = spaceBefore; // first item position
-                    for (var i = 1; i < sizes.Length; i++)
-                    {
-                        int aSpace = 0;
-                        if (spaces > 0)
+                        if (sizes [i] < 0)
                         {
-                            spaces--;
-                            aSpace = 1;
+                            throw new ArgumentException ("The size of an item cannot be negative.");
                         }
+
+                        if (i == 0)
+                        {
+                            positions [i] = remainingSpace / 2; // first item position
+
+                            continue;
+                        }
+
+                        var spaceBefore = spaces-- > 0 ? MaxSpaceBetweenItems : 0;
+
                         // subsequent items are placed one space after the previous item
-                        positions [i] = positions [i - 1] + sizes [i - 1] + aSpace;
-                    }
-                    // Adjust the last position if there is an extra space
-                    if (positions [sizes.Length - 1] + sizes [sizes.Length - 1] > totalSize)
-                    {
-                        positions [sizes.Length - 1]--;
+                        positions [i] = positions [i - 1] + sizes [i - 1] + spaceBefore;
                     }
                 }
                 else if (sizes.Length == 1)
                 {
+                    if (sizes [0] < 0)
+                    {
+                        throw new ArgumentException ("The size of an item cannot be negative.");
+                    }
                     positions [0] = (totalSize - sizes [0]) / 2; // single item is centered
                 }
                 break;
@@ -172,46 +214,74 @@ public class Justifier
                 }
                 break;
 
-            case Justification.LeftJustified:
+            /// 111 2222        33333
+            case Justification.OneRightRestLeft:
                 if (sizes.Length > 1)
                 {
-                    int spaceBetweenLeft = totalSize - sizes.Sum () + 1; // +1 for the extra space
                     currentPosition = 0;
-                    for (var i = 0; i < sizes.Length - 1; i++)
+                    for (var i = 0; i < sizes.Length; i++)
                     {
                         if (sizes [i] < 0)
                         {
                             throw new ArgumentException ("The size of an item cannot be negative.");
                         }
-                        positions [i] = currentPosition;
-                        currentPosition += sizes [i] + 1; // +1 for the extra space
+
+                        if (i < sizes.Length - 1)
+                        {
+                            var spaceBefore = spaces-- > 0 ? MaxSpaceBetweenItems : 0;
+
+                            positions [i] = currentPosition;
+                            currentPosition += sizes [i] + spaceBefore; 
+                        }
                     }
                     positions [sizes.Length - 1] = totalSize - sizes [sizes.Length - 1];
                 }
                 else if (sizes.Length == 1)
                 {
-                    positions [0] = 0;
+                    if (sizes [0] < 0)
+                    {
+                        throw new ArgumentException ("The size of an item cannot be negative.");
+                    }
+                    positions [0] = totalSize - sizes [0]; // single item is flush right
                 }
                 break;
 
-            case Justification.RightJustified:
+            /// 111        2222 33333
+            case Justification.OneLeftRestRight:
                 if (sizes.Length > 1)
                 {
-                    totalItemsSize = sizes.Sum ();
-                    int totalSpaces = totalSize - totalItemsSize;
-                    int bigSpace = totalSpaces - (sizes.Length - 2);
+                    currentPosition = 0;
+                    positions [0] = currentPosition; // first item is flush left
 
-                    positions [0] = 0; // first item is flush left
-                    positions [1] = sizes [0] + bigSpace; // second item has the big space before it
-
-                    // remaining items have one space between them
-                    for (var i = 2; i < sizes.Length; i++)
+                    for (var i = sizes.Length - 1 ; i >= 0; i--)
                     {
-                        positions [i] = positions [i - 1] + sizes [i - 1] + 1;
+                        if (sizes [i] < 0)
+                        {
+                            throw new ArgumentException ("The size of an item cannot be negative.");
+                        }
+
+                        if (i == sizes.Length - 1)
+                        {
+                            // start at right
+                            currentPosition = totalSize - sizes [i];
+                            positions [i] = currentPosition;
+                        }
+
+                        if (i < sizes.Length - 1 && i > 0)
+                        {
+                            var spaceBefore = spaces-- > 0 ? MaxSpaceBetweenItems : 0;
+
+                            positions [i] = currentPosition - sizes [i] - spaceBefore;
+                            currentPosition -= sizes [i + 1];
+                        }
                     }
                 }
                 else if (sizes.Length == 1)
                 {
+                    if (sizes [0] < 0)
+                    {
+                        throw new ArgumentException ("The size of an item cannot be negative.");
+                    }
                     positions [0] = 0; // single item is flush left
                 }
                 break;
