@@ -304,6 +304,7 @@ public class TextFormatter
             {
                 if (isVertical)
                 {
+                    // BUGBUG:  This works with a very limited set of wide-char scenarios.
                     int runesWidth = runes.Length == 0 ? 0 : runes.Max (r => GetRuneWidth (r, TabWidth));
                     x = screen.Left + (screen.Width - _lines.Count - 1) + (runesWidth + line);
                     CursorPosition = screen.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
@@ -319,8 +320,11 @@ public class TextFormatter
             {
                 if (isVertical)
                 {
-                    int runesWidth = runes.Length == 0 ? 0 : runes.Max (r => GetRuneWidth (r, TabWidth));
-                    x = screen.Left + runesWidth + line - 1;
+                    // BUGBUG: This works only if a) all lines have only single-wide chars and b) only one line has wide chars
+                    int runesWidth = line > 0
+                                         ? GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth)
+                                         : 0;
+                    x = screen.Left + runesWidth;
                 }
                 else
                 {
@@ -333,8 +337,9 @@ public class TextFormatter
             {
                 if (isVertical)
                 {
-                    int runesWidth = runes.Length == 0 ? 0 : runes.Max (r => GetRuneWidth (r, TabWidth));
-                    x = screen.Left + (screen.Width / 2) - (_lines.Count  / 2) + (runesWidth + line - 1);
+                    // BUGBUG: This works with a very limited set of wide-char scenarios. 
+                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, tabWidth: TabWidth);
+                    x = screen.Left + line + (screen.Width - runesWidth) / 2;
 
                     CursorPosition = (screen.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
                 }

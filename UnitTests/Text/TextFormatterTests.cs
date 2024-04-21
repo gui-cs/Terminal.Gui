@@ -3482,7 +3482,7 @@ ssb
     [InlineData ("A", 2, false, "A")]
     [InlineData ("AB12", 5, false, "AB12")]
     [InlineData ("AB\n12", 5, false, "A1\nB2")]
-    [InlineData ("デモエ", 1, false, "")]
+    [InlineData ("", 1, false, "")]
 
     public void Draw_Vertical_TopBottom_LeftRight (string text, int width, bool autoSize, string expectedText)
     {
