@@ -1334,7 +1334,7 @@ public class DialogTests
         int width = buttonRow.Length;
         d.SetBufferSize (buttonRow.Length, 3);
 
-        (runstate, Dialog _) = RunButtonTestDialog (title, width, Justification.Centered, null);
+        (runstate, Dialog dlg) = RunButtonTestDialog (title, width, Justification.Centered, null);
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
 
         End (runstate);
