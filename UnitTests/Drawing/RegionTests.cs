@@ -249,4 +249,14 @@ public class RegionTests (ITestOutputHelper output)
         var region = new Region (rect);
         Assert.Equal (HashCode.Combine (rect), region.GetHashCode ());
     }
+
+    [Fact]
+    public void Contains_Tests ()
+    {
+        HashSet<Region> regions =
+            [new (new (0, 0, 5, 5)), new (new (10, 10, 5, 5)), new (new (20, 20, 5, 5))];
+
+        Assert.True (Region.Contains (regions, 1, 1));
+        Assert.False (Region.Contains (regions, 30, 30));
+    }
 }

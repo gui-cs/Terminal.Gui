@@ -235,5 +235,28 @@ public sealed class Region : IDisposable
         return Intersect (region._rect);
     }
 
+    /// <summary>
+    /// Verify if any of the <see cref="Region"/> <see cref="HashSet{T}"/> is contained on
+    /// the <param name="x"></param> and <param name="y"></param> coordinates.
+    /// </summary>
+    /// <param name="regions"></param>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
+    public static bool Contains (HashSet<Region> regions, int x, int y)
+    {
+        foreach (Region region in regions)
+        {
+            dynamic rect = region._rect;
+
+            if (rect.Contains (x, y))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     #endregion
 }
