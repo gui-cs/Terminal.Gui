@@ -18,6 +18,13 @@ public enum Justification
     Left,
 
     /// <summary>
+    ///     The items will be aligned to the top.
+    ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
+    ///     each item.
+    /// </summary>
+    Top = Left,
+
+    /// <summary>
     ///     The items will be aligned to the right.
     ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
@@ -28,6 +35,13 @@ public enum Justification
     ///     </c>
     /// </example>
     Right,
+
+    /// <summary>
+    ///     The items will be aligned to the bottom.
+    ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
+    ///     each item.
+    /// </summary>
+    Bottom = Right,
 
     /// <summary>
     ///     The group will be centered in the container.
@@ -68,6 +82,13 @@ public enum Justification
     FirstLeftRestRight,
 
     /// <summary>
+    ///     The first item will be aligned to the top and the remaining will aligned to the bottom.
+    ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
+    ///     each item.
+    /// </summary>
+    FirstTopRestBottom = FirstLeftRestRight,
+
+    /// <summary>
     ///     The last item will be aligned to the right and the remaining will aligned to the left.
     ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
@@ -77,7 +98,14 @@ public enum Justification
     ///         111 2222        33333
     ///     </c>
     /// </example>
-    LastRightRestLeft
+    LastRightRestLeft,
+
+    /// <summary>
+    ///     The last item will be aligned to the bottom and the remaining will aligned to the left.
+    ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
+    ///     each item.
+    /// </summary>
+    LastBottomRestTop,
 }
 
 /// <summary>
