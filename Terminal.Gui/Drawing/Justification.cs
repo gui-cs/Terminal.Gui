@@ -151,11 +151,7 @@ public class Justifier
 
                 for (var i = 0; i < sizes.Length; i++)
                 {
-                    if (sizes [i] < 0)
-                    {
-                        throw new ArgumentException ("The size of an item cannot be negative.");
-                    }
-
+                    CheckSizeCannotBeNegative (i, sizes);
                     if (i == 0)
                     {
                         positions [0] = 0; // first item position
@@ -175,11 +171,7 @@ public class Justifier
 
                 for (var i = 0; i < sizes.Length; i++)
                 {
-                    if (sizes [i] < 0)
-                    {
-                        throw new ArgumentException ("The size of an item cannot be negative.");
-                    }
-
+                    CheckSizeCannotBeNegative (i, sizes);
                     int spaceBefore = spaces-- > 0 ? maxSpaceBetweenItems : 0;
 
                     positions [i] = currentPosition;
@@ -196,11 +188,7 @@ public class Justifier
 
                     for (var i = 0; i < sizes.Length; i++)
                     {
-                        if (sizes [i] < 0)
-                        {
-                            throw new ArgumentException ("The size of an item cannot be negative.");
-                        }
-
+                        CheckSizeCannotBeNegative (i, sizes);
                         if (i == 0)
                         {
                             positions [i] = remainingSpace / 2; // first item position
@@ -216,11 +204,7 @@ public class Justifier
                 }
                 else if (sizes.Length == 1)
                 {
-                    if (sizes [0] < 0)
-                    {
-                        throw new ArgumentException ("The size of an item cannot be negative.");
-                    }
-
+                    CheckSizeCannotBeNegative (0, sizes);
                     positions [0] = (containerSize - sizes [0]) / 2; // single item is centered
                 }
 
@@ -233,11 +217,7 @@ public class Justifier
 
                 for (var i = 0; i < sizes.Length; i++)
                 {
-                    if (sizes [i] < 0)
-                    {
-                        throw new ArgumentException ("The size of an item cannot be negative.");
-                    }
-
+                    CheckSizeCannotBeNegative (i, sizes);
                     positions [i] = currentPosition;
                     int extraSpace = i < remainder ? 1 : 0;
                     currentPosition += sizes [i] + spaceBetween + extraSpace;
@@ -253,11 +233,7 @@ public class Justifier
 
                     for (var i = 0; i < sizes.Length; i++)
                     {
-                        if (sizes [i] < 0)
-                        {
-                            throw new ArgumentException ("The size of an item cannot be negative.");
-                        }
-
+                        CheckSizeCannotBeNegative (i,sizes);
                         if (i < sizes.Length - 1)
                         {
                             int spaceBefore = spaces-- > 0 ? maxSpaceBetweenItems : 0;
@@ -267,14 +243,11 @@ public class Justifier
                         }
                     }
 
-                    positions [sizes.Length - 1] = containerSize - sizes [sizes.Length - 1];
+                    positions [sizes.Length - 1] = containerSize - sizes [^1];
                 }
                 else if (sizes.Length == 1)
                 {
-                    if (sizes [0] < 0)
-                    {
-                        throw new ArgumentException ("The size of an item cannot be negative.");
-                    }
+                    CheckSizeCannotBeNegative (0, sizes);
 
                     positions [0] = containerSize - sizes [0]; // single item is flush right
                 }
@@ -290,11 +263,7 @@ public class Justifier
 
                     for (int i = sizes.Length - 1; i >= 0; i--)
                     {
-                        if (sizes [i] < 0)
-                        {
-                            throw new ArgumentException ("The size of an item cannot be negative.");
-                        }
-
+                        CheckSizeCannotBeNegative (i, sizes);
                         if (i == sizes.Length - 1)
                         {
                             // start at right
@@ -313,11 +282,7 @@ public class Justifier
                 }
                 else if (sizes.Length == 1)
                 {
-                    if (sizes [0] < 0)
-                    {
-                        throw new ArgumentException ("The size of an item cannot be negative.");
-                    }
-
+                    CheckSizeCannotBeNegative (0, sizes);
                     positions [0] = 0; // single item is flush left
                 }
 
@@ -328,5 +293,13 @@ public class Justifier
         }
 
         return positions;
+    }
+
+    private static void CheckSizeCannotBeNegative (int i, int [] sizes)
+    {
+        if (sizes [i] < 0)
+        {
+            throw new ArgumentException ("The size of an item cannot be negative.");
+        }
     }
 }
