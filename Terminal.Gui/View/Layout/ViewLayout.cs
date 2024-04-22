@@ -193,7 +193,7 @@ public partial class View
         get => VerifyIsInitialized (_x, nameof (X));
         set
         {
-            if (Equals (_x, value))
+            if (_x.Equals (value))
             {
                 return;
             }
@@ -232,7 +232,7 @@ public partial class View
         get => VerifyIsInitialized (_y, nameof (Y));
         set
         {
-            if (Equals (_y, value))
+            if (_y.Equals (value))
             {
                 return;
             }
@@ -843,6 +843,9 @@ public partial class View
 
         SetTextFormatterSize ();
 
+        PosJustify.JustifyGroup (0, SuperView?.Subviews, Dim.Dimension.Width, Viewport.Width);
+        PosJustify.JustifyGroup (0, SuperView?.Subviews, Dim.Dimension.Height, Viewport.Height);
+
         // Sort out the dependencies of the X, Y, Width, Height properties
         HashSet<View> nodes = new ();
         HashSet<(View, View)> edges = new ();
@@ -851,56 +854,6 @@ public partial class View
 
         foreach (View v in ordered)
         {
-            var justifyX = v.X as PosJustify;
-            var justifyY = v.Y as PosJustify;
-
-            if (justifyX is { } || justifyY is { })
-            {
-                int xIndex = 0;
-                int yIndex = 0;
-                List<int> XdimensionsList = new ();
-                List<int> YdimensionsList = new ();
-                for (int i = 0; i < v.SuperView.Subviews.Count; i++)
-                {
-                    var viewI = v.SuperView.Subviews [i];
-
-                    var jX = viewI.X as PosJustify;
-                    var jY = viewI.Y as PosJustify;
-
-                    if (jX?._justifier.Justification == justifyX?._justifier.Justification && viewI.Frame.Y == v.Frame.Y)
-                    {
-                        XdimensionsList.Add (viewI.Frame.Width);
-
-                        if (viewI == v)
-                        {
-                            xIndex = XdimensionsList.Count - 1;
-                        }
-                    }
-
-                    if (jY?._justifier.Justification == justifyY?._justifier.Justification && viewI.Frame.X == v.Frame.X)
-                    {
-                        YdimensionsList.Add (viewI.Frame.Height);
-
-                        if (viewI == v)
-                        {
-                            yIndex = YdimensionsList.Count - 1;
-                        }
-                    }
-                }
-
-                if (justifyX is { })
-                {
-                    justifyX._justifier.ContainerSize = Viewport.Size.Width;
-                    justifyX._location = justifyX._justifier.Justify (XdimensionsList.ToArray ()) [xIndex];
-                }
-
-                if (justifyY is { })
-                {
-                    justifyY._justifier.ContainerSize = Viewport.Size.Height;
-                    justifyY._location = justifyY._justifier.Justify (YdimensionsList.ToArray ()) [yIndex];
-                }
-            }
-
             // TODO: Move this logic into the Pos/Dim classes
             if (v.Width is Dim.DimAuto || v.Height is Dim.DimAuto)
             {

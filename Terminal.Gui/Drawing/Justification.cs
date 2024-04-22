@@ -1,3 +1,5 @@
+using static Terminal.Gui.Pos;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -105,7 +107,7 @@ public enum Justification
     ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
     ///     each item.
     /// </summary>
-    LastBottomRestTop,
+    LastBottomRestTop = LastRightRestLeft,
 }
 
 /// <summary>
@@ -335,5 +337,16 @@ public class Justifier
         {
             throw new ArgumentException ("The size of an item cannot be negative.");
         }
+    }
+    public override bool Equals (object other)
+    {
+        if (other is Justifier justifier)
+        {
+            return Justification == justifier.Justification &&
+                   ContainerSize == justifier.ContainerSize &&
+                   PutSpaceBetweenItems == justifier.PutSpaceBetweenItems;
+        }
+
+        return false;
     }
 }
