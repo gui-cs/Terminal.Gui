@@ -92,6 +92,7 @@ public class Dialog : Window
         }
     }
 
+    // TODO: Update button.X = Pos.Justify when alignment changes
     /// <summary>Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the bottom of the dialog.</summary>
     public Justification ButtonAlignment { get; set; }
 
@@ -131,7 +132,9 @@ public class Dialog : Window
             return;
         }
 
-        //button.AutoSize = false; // BUGBUG: v2 - Hack to get around autosize not accounting for Margin?
+        button.X = Pos.Justify (ButtonAlignment);
+        button.Y = Pos.AnchorEnd () - 1;
+
         _buttons.Add (button);
         Add (button);
 
@@ -171,108 +174,108 @@ public class Dialog : Window
         return widths.Sum ();
     }
 
-    private void LayoutButtons ()
-    {
-        if (_buttons.Count == 0 || !IsInitialized)
-        {
-            return;
-        }
+    //private void LayoutButtons ()
+    //{
+    //    if (_buttons.Count == 0 || !IsInitialized)
+    //    {
+    //        return;
+    //    }
 
-        var shiftLeft = 0;
+    //    var shiftLeft = 0;
 
-        int buttonsWidth = GetButtonsWidth ();
+    //    int buttonsWidth = GetButtonsWidth ();
 
-        switch (ButtonAlignment)
-        {
-            case Justification.Centered:
-                // Center Buttons
-                shiftLeft = (Viewport.Width - buttonsWidth - _buttons.Count - 1) / 2 + 1;
+    //    switch (ButtonAlignment)
+    //    {
+    //        case Justification.Centered:
+    //            // Center Buttons
+    //            shiftLeft = (Viewport.Width - buttonsWidth - _buttons.Count - 1) / 2 + 1;
 
-                for (int i = _buttons.Count - 1; i >= 0; i--)
-                {
-                    Button button = _buttons [i];
-                    shiftLeft += button.Frame.Width + (i == _buttons.Count - 1 ? 0 : 1);
+    //            for (int i = _buttons.Count - 1; i >= 0; i--)
+    //            {
+    //                Button button = _buttons [i];
+    //                shiftLeft += button.Frame.Width + (i == _buttons.Count - 1 ? 0 : 1);
 
-                    if (shiftLeft > -1)
-                    {
-                        button.X = Pos.AnchorEnd (shiftLeft);
-                    }
-                    else
-                    {
-                        button.X = Viewport.Width - shiftLeft;
-                    }
+    //                if (shiftLeft > -1)
+    //                {
+    //                    button.X = Pos.AnchorEnd (shiftLeft);
+    //                }
+    //                else
+    //                {
+    //                    button.X = Viewport.Width - shiftLeft;
+    //                }
 
-                    button.Y = Pos.AnchorEnd (1);
-                }
+    //                button.Y = Pos.AnchorEnd (1);
+    //            }
 
-                break;
+    //            break;
 
-            case Justification.Justified:
-                // Justify Buttons
-                // leftmost and rightmost buttons are hard against edges. The rest are evenly spaced.
+    //        case Justification.Justified:
+    //            // Justify Buttons
+    //            // leftmost and rightmost buttons are hard against edges. The rest are evenly spaced.
 
-                var spacing = (int)Math.Ceiling ((double)(Viewport.Width - buttonsWidth) / (_buttons.Count - 1));
+    //            var spacing = (int)Math.Ceiling ((double)(Viewport.Width - buttonsWidth) / (_buttons.Count - 1));
 
-                for (int i = _buttons.Count - 1; i >= 0; i--)
-                {
-                    Button button = _buttons [i];
+    //            for (int i = _buttons.Count - 1; i >= 0; i--)
+    //            {
+    //                Button button = _buttons [i];
 
-                    if (i == _buttons.Count - 1)
-                    {
-                        shiftLeft += button.Frame.Width;
-                        button.X = Pos.AnchorEnd (shiftLeft);
-                    }
-                    else
-                    {
-                        if (i == 0)
-                        {
-                            // first (leftmost) button 
-                            int left = Viewport.Width;
-                            button.X = Pos.AnchorEnd (left);
-                        }
-                        else
-                        {
-                            shiftLeft += button.Frame.Width + spacing;
-                            button.X = Pos.AnchorEnd (shiftLeft);
-                        }
-                    }
+    //                if (i == _buttons.Count - 1)
+    //                {
+    //                    shiftLeft += button.Frame.Width;
+    //                    button.X = Pos.AnchorEnd (shiftLeft);
+    //                }
+    //                else
+    //                {
+    //                    if (i == 0)
+    //                    {
+    //                        // first (leftmost) button 
+    //                        int left = Viewport.Width;
+    //                        button.X = Pos.AnchorEnd (left);
+    //                    }
+    //                    else
+    //                    {
+    //                        shiftLeft += button.Frame.Width + spacing;
+    //                        button.X = Pos.AnchorEnd (shiftLeft);
+    //                    }
+    //                }
 
-                    button.Y = Pos.AnchorEnd (1);
-                }
+    //                button.Y = Pos.AnchorEnd (1);
+    //            }
 
-                break;
+    //            break;
 
-            case Justification.Left:
-                // Left Align Buttons
-                Button prevButton = _buttons [0];
-                prevButton.X = 0;
-                prevButton.Y = Pos.AnchorEnd (1);
+    //        case Justification.Left:
+    //            // Left Align Buttons
+    //            Button prevButton = _buttons [0];
+    //            prevButton.X = 0;
+    //            prevButton.Y = Pos.AnchorEnd (1);
 
-                for (var i = 1; i < _buttons.Count; i++)
-                {
-                    Button button = _buttons [i];
-                    button.X = Pos.Right (prevButton) + 1;
-                    button.Y = Pos.AnchorEnd (1);
-                    prevButton = button;
-                }
+    //            for (var i = 1; i < _buttons.Count; i++)
+    //            {
+    //                Button button = _buttons [i];
+    //                button.X = Pos.Right (prevButton) + 1;
+    //                button.Y = Pos.AnchorEnd (1);
+    //                prevButton = button;
+    //            }
 
-                break;
+    //            break;
 
-            case Justification.Right:
-                // Right align buttons
-                shiftLeft = _buttons [_buttons.Count - 1].Frame.Width;
-                _buttons [_buttons.Count - 1].X = Pos.AnchorEnd (shiftLeft);
-                _buttons [_buttons.Count - 1].Y = Pos.AnchorEnd (1);
+    //        case Justification.Right:
+    //            // Right align buttons
+    //            shiftLeft = _buttons [_buttons.Count - 1].Frame.Width;
+    //            _buttons [_buttons.Count - 1].X = Pos.AnchorEnd (shiftLeft);
+    //            _buttons [_buttons.Count - 1].Y = Pos.AnchorEnd (1);
 
-                for (int i = _buttons.Count - 2; i >= 0; i--)
-                {
-                    Button button = _buttons [i];
-                    shiftLeft += button.Frame.Width + 1;
-                    button.X = Pos.AnchorEnd (shiftLeft);
-                    button.Y = Pos.AnchorEnd (1);
-                }
+    //            for (int i = _buttons.Count - 2; i >= 0; i--)
+    //            {
+    //                Button button = _buttons [i];
+    //                shiftLeft += button.Frame.Width + 1;
+    //                button.X = Pos.AnchorEnd (shiftLeft);
+    //                button.Y = Pos.AnchorEnd (1);
+    //            }
 
-                break;
-        }
-    }
+    //            break;
+    //    }
+    //}
 }

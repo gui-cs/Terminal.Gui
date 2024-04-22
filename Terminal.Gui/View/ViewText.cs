@@ -248,12 +248,12 @@ public partial class View
     /// <returns></returns>
     internal void SetTextFormatterSize ()
     {
-        //if (!IsInitialized)
-        //{
-        //    TextFormatter.Size = Size.Empty;
+        if (!IsInitialized)
+        {
+            TextFormatter.Size = Size.Empty;
 
-        //    return;
-        //}
+            return;
+        }
 
         if (string.IsNullOrEmpty (TextFormatter.Text))
         {

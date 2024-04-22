@@ -137,7 +137,7 @@ public class Dialogs : Scenario
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            RadioLabels = new [] { "_Centered", "_Justified", "_Left", "_Right" }
+            RadioLabels = Enum.GetNames (typeof (Justification)),
         };
         frame.Add (styleRadioGroup);
 
@@ -241,7 +241,10 @@ public class Dialogs : Scenario
                 }
                 else
                 {
-                    button = new Button { Text = NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
+                    button = new Button
+                    {
+                        Text = NumberToWords.Convert (buttonId), IsDefault = buttonId == 0
+                    };
                 }
 
                 button.Accept += (s, e) =>

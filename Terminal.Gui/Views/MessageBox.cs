@@ -325,7 +325,12 @@ public static class MessageBox
 
             foreach (string s in buttons)
             {
-                var b = new Button { Text = s, Y = Pos.AnchorEnd (), X = Pos.Justify (Justification.Centered) };
+                var b = new Button
+                {
+                    Text = s, 
+                    Y = Pos.AnchorEnd (), 
+                    X = Pos.Justify (Justification.Centered)
+                };
 
                 if (count == defaultButton)
                 {

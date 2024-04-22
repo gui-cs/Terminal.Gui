@@ -86,34 +86,34 @@ public enum Justification
 public class Justifier
 {
     /// <summary>
-    /// Gets or sets how the <see cref="Justifier"/> justifies items within a container.
+    ///     Gets or sets how the <see cref="Justifier"/> justifies items within a container.
     /// </summary>
     public Justification Justification { get; set; }
 
     /// <summary>
-    /// The size of the container.
+    ///     The size of the container.
     /// </summary>
     public int ContainerSize { get; set; }
 
     /// <summary>
-    ///     Gets or sets whether <see cref="Justifier"/> puts a space is placed between items. Default is <see langword="false"/>. If <see langword="true"/>, a space will be
+    ///     Gets or sets whether <see cref="Justifier"/> puts a space is placed between items. Default is
+    ///     <see langword="false"/>. If <see langword="true"/>, a space will be
     ///     placed between each item, which is useful for justifying text.
     /// </summary>
     public bool PutSpaceBetweenItems { get; set; }
 
     /// <summary>
-    ///     Takes a list of items and returns their positions when justified within a container <see name="ContainerSize"/> wide based on the specified
+    ///     Takes a list of items and returns their positions when justified within a container <see name="ContainerSize"/>
+    ///     wide based on the specified
     ///     <see cref="Justification"/>.
     /// </summary>
     /// <param name="sizes">The sizes of the items to justify.</param>
     /// <returns>The locations of the items, from left to right.</returns>
-    public int [] Justify (int [] sizes)
-    {
-        return Justify (Justification, PutSpaceBetweenItems, ContainerSize, sizes);
-    }
+    public int [] Justify (int [] sizes) { return Justify (Justification, PutSpaceBetweenItems, ContainerSize, sizes); }
 
     /// <summary>
-    ///     Takes a list of items and returns their positions when justified within a container <paramref name="containerSize"/> wide based on the specified
+    ///     Takes a list of items and returns their positions when justified within a container
+    ///     <paramref name="containerSize"/> wide based on the specified
     ///     <see cref="Justification"/>.
     /// </summary>
     /// <param name="sizes">The sizes of the items to justify.</param>
@@ -136,6 +136,7 @@ public class Justifier
         int totalItemsAndSpaces = totalItemsSize + totalGaps * maxSpaceBetweenItems; // total size of items and spaces if we had enough room
 
         int spaces = totalGaps * maxSpaceBetweenItems; // We'll decrement this below to place one space between each item until we run out
+
         if (totalItemsSize >= containerSize)
         {
             spaces = 0;
@@ -153,6 +154,7 @@ public class Justifier
                 for (var i = 0; i < sizes.Length; i++)
                 {
                     CheckSizeCannotBeNegative (i, sizes);
+
                     if (i == 0)
                     {
                         positions [0] = 0; // first item position
@@ -190,6 +192,7 @@ public class Justifier
                     for (var i = 0; i < sizes.Length; i++)
                     {
                         CheckSizeCannotBeNegative (i, sizes);
+
                         if (i == 0)
                         {
                             positions [i] = remainingSpace / 2; // first item position
@@ -234,7 +237,8 @@ public class Justifier
 
                     for (var i = 0; i < sizes.Length; i++)
                     {
-                        CheckSizeCannotBeNegative (i,sizes);
+                        CheckSizeCannotBeNegative (i, sizes);
+
                         if (i < sizes.Length - 1)
                         {
                             int spaceBefore = spaces-- > 0 ? maxSpaceBetweenItems : 0;
@@ -265,6 +269,7 @@ public class Justifier
                     for (int i = sizes.Length - 1; i >= 0; i--)
                     {
                         CheckSizeCannotBeNegative (i, sizes);
+
                         if (i == sizes.Length - 1)
                         {
                             // start at right
