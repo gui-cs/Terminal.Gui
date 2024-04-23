@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace Terminal.Gui.LayoutTests;
 
 public class SetRelativeLayoutTests
 {

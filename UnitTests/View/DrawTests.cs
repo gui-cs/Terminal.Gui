@@ -975,4 +975,69 @@ public class DrawTests (ITestOutputHelper output)
     }
 
 
+    [Fact]
+    [TestRespondersDisposed]
+    public void Draw_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
+    {
+        Application.Init (new FakeDriver ());
+
+        Toplevel top = new ();
+
+        var view = new View { X = -2, Text = "view" };
+        top.Add (view);
+
+        Application.Iteration += (s, a) =>
+        {
+            Assert.Equal (-2, view.X);
+
+            Application.RequestStop ();
+        };
+
+        try
+        {
+            Application.Run (top);
+        }
+        catch (IndexOutOfRangeException ex)
+        {
+            // After the fix this exception will not be caught.
+            Assert.IsType<IndexOutOfRangeException> (ex);
+        }
+
+        top.Dispose ();
+        // Shutdown must be called to safely clean up Application if Init has been called
+        Application.Shutdown ();
+    }
+
+    [Fact]
+    [TestRespondersDisposed]
+    public void Draw_Vertical_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
+    {
+        Application.Init (new FakeDriver ());
+
+        Toplevel top = new ();
+
+        var view = new View { Y = -2, Height = 10, TextDirection = TextDirection.TopBottom_LeftRight, Text = "view" };
+        top.Add (view);
+
+        Application.Iteration += (s, a) =>
+        {
+            Assert.Equal (-2, view.Y);
+
+            Application.RequestStop ();
+        };
+
+        try
+        {
+            Application.Run (top);
+        }
+        catch (IndexOutOfRangeException ex)
+        {
+            // After the fix this exception will not be caught.
+            Assert.IsType<IndexOutOfRangeException> (ex);
+        }
+
+        top.Dispose ();
+        // Shutdown must be called to safely clean up Application if Init has been called
+        Application.Shutdown ();
+    }
 }

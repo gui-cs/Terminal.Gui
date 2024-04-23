@@ -7,7 +7,7 @@ using static Terminal.Gui.Dim;
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.ViewTests;
+namespace Terminal.Gui.PosDimTests;
 
 public class DimTests
 {
@@ -32,39 +32,6 @@ public class DimTests
         Assert.Equal (10, result);
     }
 
-    [Fact]
-    public void DimCombine_Calculate_ReturnsCorrectValue ()
-    {
-        var dim1 = new DimAbsolute (10);
-        var dim2 = new DimAbsolute (20);
-        var dim = dim1 + dim2;
-        var result = dim.Calculate (0, 100, null, Dim.Dimension.None);
-        Assert.Equal (30, result);
-    }
-
-    [Fact]
-    public void DimFactor_Calculate_ReturnsCorrectValue ()
-    {
-        var dim = new DimFactor (0.5f);
-        var result = dim.Calculate (0, 100, null, Dim.Dimension.None);
-        Assert.Equal (50, result);
-    }
-
-    [Fact]
-    public void DimFill_Calculate_ReturnsCorrectValue ()
-    {
-        var dim = Dim.Fill ();
-        var result = dim.Calculate (0, 100, null, Dim.Dimension.None);
-        Assert.Equal (100, result);
-    }
-
-    [Fact]
-    public void DimFunc_Calculate_ReturnsCorrectValue ()
-    {
-        var dim = new DimFunc (() => 10);
-        var result = dim.Calculate (0, 100, null, Dim.Dimension.None);
-        Assert.Equal (10, result);
-    }
 
     [Fact]
     public void DimView_Calculate_ReturnsCorrectValue ()
@@ -80,7 +47,7 @@ public class DimTests
     // A new test that does not depend on Application is needed.
     [Fact]
     [AutoInitShutdown]
-    public void Add_Operator ()
+    public void Dim_Add_Operator ()
     {
         Toplevel top = new ();
 
@@ -296,57 +263,6 @@ public class DimTests
         t.Dispose ();
     }
 
-    // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
-    // TODO: A new test that calls SetRelativeLayout directly is needed.
-    [Fact]
-    [TestRespondersDisposed]
-    public void DimCombine_ObtuseScenario_Does_Not_Throw_If_Two_SubViews_Refs_The_Same_SuperView ()
-    {
-        var t = new View { Width = 80, Height = 25, Text = "top" };
-
-        var w = new Window
-        {
-            Width = Dim.Width (t) - 2, // 78
-            Height = Dim.Height (t) - 2 // 23
-        };
-        var f = new FrameView ();
-
-        var v1 = new View
-        {
-            Width = Dim.Width (w) - 2, // 76
-            Height = Dim.Height (w) - 2 // 21
-        };
-
-        var v2 = new View
-        {
-            Width = Dim.Width (v1) - 2, // 74
-            Height = Dim.Height (v1) - 2 // 19
-        };
-
-        f.Add (v1, v2);
-        w.Add (f);
-        t.Add (w);
-        t.BeginInit ();
-        t.EndInit ();
-
-        f.Width = Dim.Width (t) - Dim.Width (w) + 4; // 80 - 74 = 6
-        f.Height = Dim.Height (t) - Dim.Height (w) + 4; // 25 - 19 = 6
-
-        // BUGBUG: v2 - f references t and w here; t is f's super-superview and w is f's superview. This is supported!
-        Exception exception = Record.Exception (t.LayoutSubviews);
-        Assert.Null (exception);
-        Assert.Equal (80, t.Frame.Width);
-        Assert.Equal (25, t.Frame.Height);
-        Assert.Equal (78, w.Frame.Width);
-        Assert.Equal (23, w.Frame.Height);
-        Assert.Equal (6, f.Frame.Width);
-        Assert.Equal (6, f.Frame.Height);
-        Assert.Equal (76, v1.Frame.Width);
-        Assert.Equal (21, v1.Frame.Height);
-        Assert.Equal (74, v2.Frame.Width);
-        Assert.Equal (19, v2.Frame.Height);
-        t.Dispose ();
-    }
 
     // See #2461
     //[Fact]
@@ -366,88 +282,6 @@ public class DimTests
     //	super.EndInit ();
     //	Assert.Throws<InvalidOperationException> (() => super.LayoutSubviews ());
     //}
-
-    // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
-    // TODO: A new test that calls SetRelativeLayout directly is needed.
-
-    /// <summary>This is an intentionally obtuse test. See https://github.com/gui-cs/Terminal.Gui/issues/2461</summary>
-    [Fact]
-    [TestRespondersDisposed]
-    public void Combine_ObtuseScenario_Throw_If_SuperView_Refs_SubView ()
-    {
-        var t = new View { Width = 80, Height = 25 };
-
-        var w = new Window
-        {
-            Width = Dim.Width (t) - 2, // 78
-            Height = Dim.Height (t) - 2 // 23
-        };
-        var f = new FrameView ();
-
-        var v1 = new View
-        {
-            Width = Dim.Width (w) - 2, // 76
-            Height = Dim.Height (w) - 2 // 21
-        };
-
-        var v2 = new View
-        {
-            Width = Dim.Width (v1) - 2, // 74
-            Height = Dim.Height (v1) - 2 // 19
-        };
-
-        f.Add (v1, v2);
-        w.Add (f);
-        t.Add (w);
-        t.BeginInit ();
-        t.EndInit ();
-
-        f.Width = Dim.Width (t) - Dim.Width (v2); // 80 - 74 = 6
-        f.Height = Dim.Height (t) - Dim.Height (v2); // 25 - 19 = 6
-
-        Assert.Throws<InvalidOperationException> (t.LayoutSubviews);
-        Assert.Equal (80, t.Frame.Width);
-        Assert.Equal (25, t.Frame.Height);
-        Assert.Equal (78, w.Frame.Width);
-        Assert.Equal (23, w.Frame.Height);
-        Assert.Equal (6, f.Frame.Width);
-        Assert.Equal (6, f.Frame.Height);
-        Assert.Equal (76, v1.Frame.Width);
-        Assert.Equal (21, v1.Frame.Height);
-        Assert.Equal (74, v2.Frame.Width);
-        Assert.Equal (19, v2.Frame.Height);
-        t.Dispose ();
-    }
-
-    // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
-    // TODO: A new test that calls SetRelativeLayout directly is needed.
-    [Fact]
-    [TestRespondersDisposed]
-    public void Combine_View_Not_Added_Throws ()
-    {
-        var t = new View { Width = 80, Height = 50 };
-
-        var super = new View { Width = Dim.Width (t) - 2, Height = Dim.Height (t) - 2 };
-        t.Add (super);
-
-        var sub = new View ();
-        super.Add (sub);
-
-        var v1 = new View { Width = Dim.Width (super) - 2, Height = Dim.Height (super) - 2 };
-        var v2 = new View { Width = Dim.Width (v1) - 2, Height = Dim.Height (v1) - 2 };
-        sub.Add (v1);
-
-        // v2 not added to sub; should cause exception on Layout since it's referenced by sub.
-        sub.Width = Dim.Fill () - Dim.Width (v2);
-        sub.Height = Dim.Fill () - Dim.Height (v2);
-
-        t.BeginInit ();
-        t.EndInit ();
-
-        Assert.Throws<InvalidOperationException> (() => t.LayoutSubviews ());
-        t.Dispose ();
-        v2.Dispose ();
-    }
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
@@ -482,149 +316,9 @@ public class DimTests
         t.Dispose ();
     }
 
-    [Fact]
-    public void Fill_Equal ()
-    {
-        var margin1 = 0;
-        var margin2 = 0;
-        Dim dim1 = Dim.Fill (margin1);
-        Dim dim2 = Dim.Fill (margin2);
-        Assert.Equal (dim1, dim2);
-    }
-
-    // Tests that Dim.Fill honors the margin parameter correctly
-    [Theory]
-    [InlineData (0, true, 25)]
-    [InlineData (0, false, 25)]
-    [InlineData (1, true, 24)]
-    [InlineData (1, false, 24)]
-    [InlineData (2, true, 23)]
-    [InlineData (2, false, 23)]
-    [InlineData (-2, true, 27)]
-    [InlineData (-2, false, 27)]
-    public void Fill_Margin (int margin, bool width, int expected)
-    {
-        var super = new View { Width = 25, Height = 25 };
-
-        var view = new View
-        {
-            X = 0,
-            Y = 0,
-            Width = width ? Dim.Fill (margin) : 1,
-            Height = width ? 1 : Dim.Fill (margin)
-        };
-
-        super.Add (view);
-        super.BeginInit ();
-        super.EndInit ();
-        super.LayoutSubviews ();
-
-        Assert.Equal (25, super.Frame.Width);
-        Assert.Equal (25, super.Frame.Height);
-
-        if (width)
-        {
-            Assert.Equal (expected, view.Frame.Width);
-            Assert.Equal (1, view.Frame.Height);
-        }
-        else
-        {
-            Assert.Equal (1, view.Frame.Width);
-            Assert.Equal (expected, view.Frame.Height);
-        }
-    }
-
-    // Tests that Dim.Fill fills the dimension REMAINING from the View's X position to the end of the super view's width
-    [Theory]
-    [InlineData (0, true, 25)]
-    [InlineData (0, false, 25)]
-    [InlineData (1, true, 24)]
-    [InlineData (1, false, 24)]
-    [InlineData (2, true, 23)]
-    [InlineData (2, false, 23)]
-    [InlineData (-2, true, 27)]
-    [InlineData (-2, false, 27)]
-    public void Fill_Offset (int offset, bool width, int expected)
-    {
-        var super = new View { Width = 25, Height = 25 };
-
-        var view = new View
-        {
-            X = width ? offset : 0,
-            Y = width ? 0 : offset,
-            Width = width ? Dim.Fill () : 1,
-            Height = width ? 1 : Dim.Fill ()
-        };
-
-        super.Add (view);
-        super.BeginInit ();
-        super.EndInit ();
-        super.LayoutSubviews ();
-
-        Assert.Equal (25, super.Frame.Width);
-        Assert.Equal (25, super.Frame.Height);
-
-        if (width)
-        {
-            Assert.Equal (expected, view.Frame.Width);
-            Assert.Equal (1, view.Frame.Height);
-        }
-        else
-        {
-            Assert.Equal (1, view.Frame.Width);
-            Assert.Equal (expected, view.Frame.Height);
-        }
-    }
-
-    // TODO: Other Dim.Height tests (e.g. Equal?)
 
     [Fact]
-    public void Fill_SetsValue ()
-    {
-        var testMargin = 0;
-        Dim dim = Dim.Fill ();
-        Assert.Equal ($"Fill({testMargin})", dim.ToString ());
-
-        testMargin = 0;
-        dim = Dim.Fill (testMargin);
-        Assert.Equal ($"Fill({testMargin})", dim.ToString ());
-
-        testMargin = 5;
-        dim = Dim.Fill (testMargin);
-        Assert.Equal ($"Fill({testMargin})", dim.ToString ());
-    }
-
-    [Fact]
-    public void Function_Equal ()
-    {
-        Func<int> f1 = () => 0;
-        Func<int> f2 = () => 0;
-
-        Dim dim1 = Dim.Function (f1);
-        Dim dim2 = Dim.Function (f2);
-        Assert.Equal (dim1, dim2);
-
-        f2 = () => 1;
-        dim2 = Dim.Function (f2);
-        Assert.NotEqual (dim1, dim2);
-    }
-
-    [Fact]
-    public void Function_SetsValue ()
-    {
-        var text = "Test";
-        Dim dim = Dim.Function (() => text.Length);
-        Assert.Equal ("DimFunc(4)", dim.ToString ());
-
-        text = "New Test";
-        Assert.Equal ("DimFunc(8)", dim.ToString ());
-
-        text = "";
-        Assert.Equal ("DimFunc(0)", dim.ToString ());
-    }
-
-    [Fact]
-    public void Height_Set_To_Null_Throws ()
+    public void DimHeight_Set_To_Null_Throws ()
     {
         Dim dim = Dim.Height (null);
         Assert.Throws<NullReferenceException> (() => dim.ToString ());
@@ -632,7 +326,7 @@ public class DimTests
 
     [Fact]
     [TestRespondersDisposed]
-    public void Height_SetsValue ()
+    public void DimHeight_SetsValue ()
     {
         var testVal = Rectangle.Empty;
         var testValview = new View { Frame = testVal };
@@ -928,160 +622,6 @@ public class DimTests
         Application.Run (t);
     }
 
-    [Fact]
-    public void Percent_Equals ()
-    {
-        float n1 = 0;
-        float n2 = 0;
-        Dim dim1 = Dim.Percent (n1);
-        Dim dim2 = Dim.Percent (n2);
-        Assert.Equal (dim1, dim2);
-
-        n1 = n2 = 1;
-        dim1 = Dim.Percent (n1);
-        dim2 = Dim.Percent (n2);
-        Assert.Equal (dim1, dim2);
-
-        n1 = n2 = 0.5f;
-        dim1 = Dim.Percent (n1);
-        dim2 = Dim.Percent (n2);
-        Assert.Equal (dim1, dim2);
-
-        n1 = n2 = 100f;
-        dim1 = Dim.Percent (n1);
-        dim2 = Dim.Percent (n2);
-        Assert.Equal (dim1, dim2);
-
-        n1 = n2 = 0.3f;
-        dim1 = Dim.Percent (n1, true);
-        dim2 = Dim.Percent (n2, true);
-        Assert.Equal (dim1, dim2);
-
-        n1 = n2 = 0.3f;
-        dim1 = Dim.Percent (n1);
-        dim2 = Dim.Percent (n2, true);
-        Assert.NotEqual (dim1, dim2);
-
-        n1 = 0;
-        n2 = 1;
-        dim1 = Dim.Percent (n1);
-        dim2 = Dim.Percent (n2);
-        Assert.NotEqual (dim1, dim2);
-
-        n1 = 0.5f;
-        n2 = 1.5f;
-        dim1 = Dim.Percent (n1);
-        dim2 = Dim.Percent (n2);
-        Assert.NotEqual (dim1, dim2);
-    }
-
-    [Fact]
-    public void Percent_Invalid_Throws ()
-    {
-        Dim dim = Dim.Percent (0);
-        Assert.Throws<ArgumentException> (() => dim = Dim.Percent (-1));
-        Assert.Throws<ArgumentException> (() => dim = Dim.Percent (101));
-        Assert.Throws<ArgumentException> (() => dim = Dim.Percent (100.0001F));
-        Assert.Throws<ArgumentException> (() => dim = Dim.Percent (1000001));
-    }
-
-    [Theory]
-    [InlineData (0, false, true, 12)]
-    [InlineData (0, false, false, 12)]
-    [InlineData (1, false, true, 12)]
-    [InlineData (1, false, false, 12)]
-    [InlineData (2, false, true, 12)]
-    [InlineData (2, false, false, 12)]
-
-    [InlineData (0, true, true, 12)]
-    [InlineData (0, true, false, 12)]
-    [InlineData (1, true, true, 12)]
-    [InlineData (1, true, false, 12)]
-    [InlineData (2, true, true, 11)]
-    [InlineData (2, true, false, 11)]
-    public void Percent_Position (int position, bool usePosition, bool width, int expected)
-    {
-        var super = new View { Width = 25, Height = 25 };
-
-        var view = new View
-        {
-            X = width ? position : 0,
-            Y = width ? 0 : position,
-            Width = width ? Dim.Percent (50, usePosition) : 1,
-            Height = width ? 1 : Dim.Percent (50, usePosition)
-        };
-
-        super.Add (view);
-        super.BeginInit ();
-        super.EndInit ();
-        super.LayoutSubviews ();
-
-        Assert.Equal (25, super.Frame.Width);
-        Assert.Equal (25, super.Frame.Height);
-
-        if (width)
-        {
-            Assert.Equal (expected, view.Frame.Width);
-            Assert.Equal (1, view.Frame.Height);
-        }
-        else
-        {
-            Assert.Equal (1, view.Frame.Width);
-            Assert.Equal (expected, view.Frame.Height);
-        }
-    }
-
-    [Theory]
-    [InlineData (0, true)]
-    [InlineData (0, false)]
-    [InlineData (50, true)]
-    [InlineData (50, false)]
-    public void Percent_PlusOne (int startingDistance, bool testHorizontal)
-    {
-        var super = new View { Width = 100, Height = 100 };
-
-        var view = new View
-        {
-            X = testHorizontal ? startingDistance : 0,
-            Y = testHorizontal ? 0 : startingDistance,
-            Width = testHorizontal ? Dim.Percent (50) + 1 : 1,
-            Height = testHorizontal ? 1 : Dim.Percent (50) + 1
-        };
-
-        super.Add (view);
-        super.BeginInit ();
-        super.EndInit ();
-        super.LayoutSubviews ();
-
-        Assert.Equal (100, super.Frame.Width);
-        Assert.Equal (100, super.Frame.Height);
-
-        if (testHorizontal)
-        {
-            Assert.Equal (51, view.Frame.Width);
-            Assert.Equal (1, view.Frame.Height);
-        }
-        else
-        {
-            Assert.Equal (1, view.Frame.Width);
-            Assert.Equal (51, view.Frame.Height);
-        }
-    }
-
-    [Fact]
-    public void Percent_SetsValue ()
-    {
-        float f = 0;
-        Dim dim = Dim.Percent (f);
-        Assert.Equal ($"Factor({f / 100:0.###},{false})", dim.ToString ());
-        f = 0.5F;
-        dim = Dim.Percent (f);
-        Assert.Equal ($"Factor({f / 100:0.###},{false})", dim.ToString ());
-        f = 100;
-        dim = Dim.Percent (f);
-        Assert.Equal ($"Factor({f / 100:0.###},{false})", dim.ToString ());
-    }
-
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Fact]
@@ -1107,7 +647,7 @@ public class DimTests
     }
 
     [Fact]
-    public void Sized_Equals ()
+    public void DimSized_Equals ()
     {
         var n1 = 0;
         var n2 = 0;
@@ -1133,7 +673,7 @@ public class DimTests
     }
 
     [Fact]
-    public void Sized_SetsValue ()
+    public void DimSized_SetsValue ()
     {
         Dim dim = Dim.Sized (0);
         Assert.Equal ("Absolute(0)", dim.ToString ());
@@ -1146,71 +686,7 @@ public class DimTests
         dim = Dim.Sized (testVal);
         Assert.Equal ($"Absolute({testVal})", dim.ToString ());
     }
-
-    // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
-    // TODO: A new test that calls SetRelativeLayout directly is needed.
-    [Fact]
-    [AutoInitShutdown]
-    public void Subtract_Operator ()
-    {
-        Toplevel top = new Toplevel ();
-
-        var view = new View { X = 0, Y = 0, Width = 20, Height = 0 };
-        var field = new TextField { X = 0, Y = Pos.Bottom (view), Width = 20 };
-        var count = 20;
-        List<Label> listLabels = new ();
-
-        for (var i = 0; i < count; i++)
-        {
-            field.Text = $"Label {i}";
-            var label = new Label { X = 0, Y = view.Viewport.Height, /*Width = 20,*/ Text = field.Text };
-            view.Add (label);
-            Assert.Equal ($"Label {i}", label.Text);
-            Assert.Equal ($"Absolute({i})", label.Y.ToString ());
-            listLabels.Add (label);
-
-            Assert.Equal ($"Absolute({i})", view.Height.ToString ());
-            view.Height += 1;
-            Assert.Equal ($"Absolute({i + 1})", view.Height.ToString ());
-        }
-
-        field.KeyDown += (s, k) =>
-                         {
-                             if (k.KeyCode == KeyCode.Enter)
-                             {
-                                 Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
-                                 view.Remove (listLabels [count - 1]);
-                                 listLabels [count - 1].Dispose ();
-
-                                 Assert.Equal ($"Absolute({count})", view.Height.ToString ());
-                                 view.Height -= 1;
-                                 count--;
-                                 Assert.Equal ($"Absolute({count})", view.Height.ToString ());
-                             }
-                         };
-
-        Application.Iteration += (s, a) =>
-                                 {
-                                     while (count > 0)
-                                     {
-                                         field.NewKeyDownEvent (new Key (KeyCode.Enter));
-                                     }
-
-                                     Application.RequestStop ();
-                                 };
-
-        var win = new Window ();
-        win.Add (view);
-        win.Add (field);
-
-        top.Add (win);
-
-        Application.Run (top);
-        top.Dispose ();
-
-        Assert.Equal (0, count);
-    }
-
+    
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Fact]
@@ -1262,7 +738,7 @@ public class DimTests
 
     [Fact]
     [TestRespondersDisposed]
-    public void Width_Equals ()
+    public void DimWidth_Equals ()
     {
         var testRect1 = Rectangle.Empty;
         var view1 = new View { Frame = testRect1 };
@@ -1312,7 +788,7 @@ public class DimTests
     }
 
     [Fact]
-    public void Width_Set_To_Null_Throws ()
+    public void DimWidth_Set_To_Null_Throws ()
     {
         Dim dim = Dim.Width (null);
         Assert.Throws<NullReferenceException> (() => dim.ToString ());
@@ -1320,7 +796,7 @@ public class DimTests
 
     [Fact]
     [TestRespondersDisposed]
-    public void Width_SetsValue ()
+    public void DimWidth_SetsValue ()
     {
         var testVal = Rectangle.Empty;
         var testValView = new View { Frame = testVal };
