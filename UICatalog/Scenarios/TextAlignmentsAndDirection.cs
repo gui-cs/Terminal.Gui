@@ -268,7 +268,7 @@ public class TextAlignmentsAndDirections : Scenario
             X = 0,
             Y = Pos.Bottom (txtLabelHJ),
             Width = Dim.Fill (31),
-            Height = Dim.Fill (6),
+            Height = Dim.Fill (4),
             ColorScheme = color2
         };
 
