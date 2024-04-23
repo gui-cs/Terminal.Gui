@@ -304,7 +304,7 @@ public class TextFormatter
             {
                 if (isVertical)
                 {
-                    int runesWidth = GetWidestLineLength (linesFormatted, line, TabWidth);
+                    int runesWidth = GetWidestLineLength (linesFormatted, 0, linesFormatted.Count - line, TabWidth);
                     x = screen.Right - runesWidth;
                     CursorPosition = screen.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
                 }
@@ -335,7 +335,7 @@ public class TextFormatter
             {
                 if (isVertical)
                 {
-                    int runesWidth = GetWidestLineLength (linesFormatted, line, TabWidth);
+                    int runesWidth = GetWidestLineLength (linesFormatted, line, 1, TabWidth);
                     x = screen.Left + line + (screen.Width - runesWidth) / 2;
 
                     CursorPosition = (screen.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);

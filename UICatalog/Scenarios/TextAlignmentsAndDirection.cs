@@ -473,33 +473,7 @@ public class TextAlignmentsAndDirections : Scenario
             Text = "Justify"
         };
 
-        justifyCheckbox.Toggled += (s, e) =>
-                                   {
-                                       if (e.OldValue == true)
-                                       {
-                                           foreach (Label t in mtxts)
-                                           {
-                                               t.TextAlignment = (TextAlignment)((dynamic)t.Data).h;
-                                               t.VerticalTextAlignment = (VerticalTextAlignment)((dynamic)t.Data).v;
-                                           }
-                                       }
-                                       else
-                                       {
-                                           foreach (Label t in mtxts)
-                                           {
-                                               if (TextFormatter.IsVerticalDirection (t.TextDirection))
-                                               {
-                                                   t.VerticalTextAlignment = VerticalTextAlignment.Justified;
-                                                   t.TextAlignment = ((dynamic)t.Data).h;
-                                               }
-                                               else
-                                               {
-                                                   t.TextAlignment = TextAlignment.Justified;
-                                                   t.VerticalTextAlignment = ((dynamic)t.Data).v;
-                                               }
-                                           }
-                                       }
-                                   };
+        justifyCheckbox.Toggled += (s, e) => ToggleJustify (e.OldValue is { } && (bool)e.OldValue);
 
         app.Add (justifyCheckbox);
 
@@ -519,9 +493,20 @@ public class TextAlignmentsAndDirections : Scenario
 
         directionOptions.SelectedItemChanged += (s, ev) =>
                                                 {
+                                                    var justChecked = justifyCheckbox.Checked is { } && (bool)justifyCheckbox.Checked;
+
+                                                    if (justChecked)
+                                                    {
+                                                        ToggleJustify (true);
+                                                    }
                                                     foreach (Label v in mtxts)
                                                     {
                                                         v.TextDirection = (TextDirection)ev.SelectedItem;
+                                                    }
+
+                                                    if (justChecked)
+                                                    {
+                                                        ToggleJustify (false);
                                                     }
                                                 };
 
@@ -529,5 +514,33 @@ public class TextAlignmentsAndDirections : Scenario
 
         Application.Run (app);
         app.Dispose ();
+
+        void ToggleJustify (bool oldValue)
+        {
+            if (oldValue == true)
+            {
+                foreach (Label t in mtxts)
+                {
+                    t.TextAlignment = (TextAlignment)((dynamic)t.Data).h;
+                    t.VerticalTextAlignment = (VerticalTextAlignment)((dynamic)t.Data).v;
+                }
+            }
+            else
+            {
+                foreach (Label t in mtxts)
+                {
+                    if (TextFormatter.IsVerticalDirection (t.TextDirection))
+                    {
+                        t.VerticalTextAlignment = VerticalTextAlignment.Justified;
+                        t.TextAlignment = ((dynamic)t.Data).h;
+                    }
+                    else
+                    {
+                        t.TextAlignment = TextAlignment.Justified;
+                        t.VerticalTextAlignment = ((dynamic)t.Data).v;
+                    }
+                }
+            }
+        }
     }
 }

@@ -3298,4 +3298,81 @@ ssb
                     );
         Assert.Equal (resultLines, wrappedLines);
     }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("Hello World", 15, 1, "Hello     World")]
+    [InlineData ("Well Done\nNice Work", 15, 2, @"
+Well       Done
+Nice       Work")]
+    [InlineData ("你好 世界", 15, 1, "你好       世界")]
+    [InlineData ("做 得好\n幹 得好", 15, 2, @"
+做         得好
+幹         得好")]
+    public void Justify_Horizontal (string text, int width, int height, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Alignment = TextAlignment.Justified,
+            Size = new Size (width, height),
+            MultiLine = true
+        };
+
+        tf.Draw (new Rectangle (0, 0, width, height), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("Hello World", 1, 15, "H\ne\nl\nl\no\n \n \n \n \n \nW\no\nr\nl\nd")]
+    [InlineData ("Well Done\nNice Work", 2, 15, @"
+WN
+ei
+lc
+le
+  
+  
+  
+  
+  
+  
+  
+DW
+oo
+nr
+ek")]
+    [InlineData ("你好 世界", 2, 15, "你\n好\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n世\n界")]
+    [InlineData ("做 得好\n幹 得好", 4, 15, @"
+做幹
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+得得
+好好")]
+    public void Justify_Vertical (string text, int width, int height, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Direction = TextDirection.TopBottom_LeftRight,
+            VerticalAlignment = VerticalTextAlignment.Justified,
+            Size = new Size (width, height),
+            MultiLine = true
+        };
+
+        tf.Draw (new Rectangle (0, 0, width, height), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
 }
