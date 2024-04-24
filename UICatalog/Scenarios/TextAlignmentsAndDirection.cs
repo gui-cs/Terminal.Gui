@@ -477,6 +477,39 @@ public class TextAlignmentsAndDirections : Scenario
 
         app.Add (justifyCheckbox);
 
+        // WRAP CHECKBOX
+
+        var wrapCheckbox = new CheckBox
+        {
+            X = Pos.Right (container) + 1,
+            Y = Pos.Y (justifyCheckbox) + 1,
+            AutoSize = false,
+            Width = Dim.Fill (10),
+            Height = 1,
+            Text = "Word Wrap",
+            Checked = true
+        };
+
+        wrapCheckbox.Toggled += (s, e) =>
+                                {
+                                    if (e.OldValue == true)
+                                    {
+                                        foreach (Label t in mtxts)
+                                        {
+                                            t.TextFormatter.WordWrap = false;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        foreach (Label t in mtxts)
+                                        {
+                                            t.TextFormatter.WordWrap = true;
+                                        }
+                                    }
+                                };
+
+        app.Add (wrapCheckbox);
+
         // Direction Options
 
         List<TextDirection> directionsEnum = Enum.GetValues (typeof (TextDirection)).Cast<TextDirection> ().ToList ();
@@ -484,7 +517,7 @@ public class TextAlignmentsAndDirections : Scenario
         var directionOptions = new RadioGroup
         {
             X = Pos.Right (container) + 1,
-            Y = Pos.Bottom (justifyCheckbox) + 1,
+            Y = Pos.Bottom (wrapCheckbox) + 1,
             Width = Dim.Fill (10),
             Height = Dim.Fill (1),
             HotKeySpecifier = (Rune)'\xffff',
