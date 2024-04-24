@@ -3459,11 +3459,13 @@ ek")]
     [InlineData ("A", 3, false, " A")]
     [InlineData ("AB", 1, false, "A")]
     [InlineData ("AB", 2, false, "AB")]
+    [InlineData ("ABC", 2, false, "AB")]
     [InlineData ("ABC", 3, false, "ABC")]
     [InlineData ("ABC", 4, false, "ABC")]
     [InlineData ("ABC", 5, false, " ABC")]
     [InlineData ("ABC", 6, false, " ABC")]
     [InlineData ("ABC", 9, false, "   ABC")]
+    [InlineData ("ABCD", 2, false, "BC")]
 
     [InlineData ("A", 0, true, "")]
     [InlineData ("A", 1, true, "A")]
@@ -3471,11 +3473,13 @@ ek")]
     [InlineData ("A", 3, true, " A")]
     [InlineData ("AB", 1, true, "A")]
     [InlineData ("AB", 2, true, "AB")]
+    [InlineData ("ABC", 2, true, "AB")]
     [InlineData ("ABC", 3, true, "ABC")]
     [InlineData ("ABC", 4, true, "ABC")]
     [InlineData ("ABC", 5, true, " ABC")]
     [InlineData ("ABC", 6, true, " ABC")]
     [InlineData ("ABC", 9, true, "   ABC")]
+    [InlineData ("ABCD", 2, true, " C")]
     public void Draw_Horizontal_Centered (string text, int width, bool autoSize, string expectedText)
     {
         TextFormatter tf = new ()
@@ -3608,5 +3612,57 @@ B  ")]
         tf.Draw (new Rectangle (0, 0, 5, height), Attribute.Default, Attribute.Default);
 
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+
+    // The expectedY param is to probe that the expectedText param start at that Y coordinate
+
+    [InlineData ("A", 0, false, "", 0)]
+    [InlineData ("A", 1, false, "A", 0)]
+    [InlineData ("A", 2, false, "A", 0)]
+    [InlineData ("A", 3, false, "A", 1)]
+    [InlineData ("AB", 1, false, "A", 0)]
+    [InlineData ("AB", 2, false, "A\nB", 0)]
+    [InlineData ("ABC", 2, false, "A\nB", 0)]
+    [InlineData ("ABC", 3, false, "A\nB\nC", 0)]
+    [InlineData ("ABC", 4, false, "A\nB\nC", 0)]
+    [InlineData ("ABC", 5, false, "A\nB\nC", 1)]
+    [InlineData ("ABC", 6, false, "A\nB\nC", 1)]
+    [InlineData ("ABC", 9, false, "A\nB\nC", 3)]
+    [InlineData ("ABCD", 2, false, "B\nC", 0)]
+
+    [InlineData ("A", 0, true, "", 0)]
+    [InlineData ("A", 1, true, "A", 0)]
+    [InlineData ("A", 2, true, "A", 0)]
+    [InlineData ("A", 3, true, "A",1)]
+    [InlineData ("AB", 1, true, "A", 0)]
+    [InlineData ("AB", 2, true, "A\nB", 0)]
+    [InlineData ("ABC", 2, true, "A\nB", 0)]
+    [InlineData ("ABC", 3, true, "A\nB\nC", 0)]
+    [InlineData ("ABC", 4, true, "A\nB\nC", 0)]
+    [InlineData ("ABC", 5, true, "A\nB\nC", 1)]
+    [InlineData ("ABC", 6, true, "A\nB\nC", 1)]
+    [InlineData ("ABC", 9, true, "A\nB\nC", 3)]
+    [InlineData ("ABCD", 2, true, "B\nC", 0)]
+    public void Draw_Vertical_Centered (string text, int height, bool autoSize, string expectedText, int expectedY)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Direction = TextDirection.TopBottom_LeftRight,
+            VerticalAlignment = VerticalTextAlignment.Middle,
+            AutoSize = autoSize,
+        };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (1, height);
+        }
+        tf.Draw (new Rectangle (0, 0, 1, height), Attribute.Default, Attribute.Default);
+
+        Rectangle rect = TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+        Assert.Equal (expectedY, rect.Y);
     }
 }

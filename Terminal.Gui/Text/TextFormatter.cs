@@ -1250,6 +1250,11 @@ public class TextFormatter
                     return GetRangeThatFits (runes, runes.Count - width, text, width, tabWidth, textDirection);
                 }
 
+                if (textFormatter is { Alignment: TextAlignment.Centered })
+                {
+                    return GetRangeThatFits (runes, Math.Max ((runes.Count - width) / 2, 0), text, width, tabWidth, textDirection);
+                }
+
                 return GetRangeThatFits (runes, 0, text, width, tabWidth, textDirection);
             }
 
@@ -1258,6 +1263,11 @@ public class TextFormatter
                 if (textFormatter is { VerticalAlignment: VerticalTextAlignment.Bottom })
                 {
                     return GetRangeThatFits (runes, runes.Count - width, text, width, tabWidth, textDirection);
+                }
+
+                if (textFormatter is { VerticalAlignment: VerticalTextAlignment.Middle })
+                {
+                    return GetRangeThatFits (runes, Math.Max((runes.Count - width) / 2, 0), text, width, tabWidth, textDirection);
                 }
 
                 return GetRangeThatFits (runes, 0, text, width, tabWidth, textDirection);
@@ -1280,6 +1290,10 @@ public class TextFormatter
                     return GetRangeThatFits (runes, runes.Count - width, text, width, tabWidth, textDirection);
                 }
             }
+            else if (textFormatter is { Alignment: TextAlignment.Centered })
+            {
+                return GetRangeThatFits (runes, Math.Max(( runes.Count - width) / 2, 0), text, width, tabWidth, textDirection);
+            }
             else if (GetRuneWidth (text, tabWidth, textDirection) > width)
             {
                 return GetRangeThatFits (runes, 0, text, width, tabWidth, textDirection);
@@ -1294,6 +1308,10 @@ public class TextFormatter
                 {
                     return GetRangeThatFits (runes, runes.Count - width, text, width, tabWidth, textDirection);
                 }
+            }
+            else if (textFormatter is { VerticalAlignment: VerticalTextAlignment.Middle })
+            {
+                return GetRangeThatFits (runes, Math.Max ((runes.Count - width) / 2, 0), text, width, tabWidth, textDirection);
             }
             else if (runes.Count - zeroLength > width)
             {
