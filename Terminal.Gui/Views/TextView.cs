@@ -1964,6 +1964,7 @@ public class TextView : View
     private CultureInfo? _currentCulture;
     private CursorVisibility _desiredCursorVisibility = CursorVisibility.Default;
     private bool _isButtonShift;
+    private bool _isButtonReleased;
     private bool _isDrawing;
     private bool _isReadOnly;
     private bool _lastWasKill;
@@ -3349,6 +3350,13 @@ public class TextView : View
 
         if (ev.Flags == MouseFlags.Button1Clicked)
         {
+            if (_isButtonReleased)
+            {
+                _isButtonReleased = false;
+
+                return true;
+            }
+
             if (_shiftSelecting && !_isButtonShift)
             {
                 StopSelecting ();
@@ -3476,6 +3484,7 @@ public class TextView : View
         }
         else if (ev.Flags.HasFlag (MouseFlags.Button1Released))
         {
+            _isButtonReleased = true;
             Application.UngrabMouse ();
         }
         else if (ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked))
