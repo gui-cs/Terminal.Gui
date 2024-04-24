@@ -3879,8 +3879,10 @@ public class TextView : View
 
         int posX = CurrentColumn - _leftColumn;
         int posY = CurrentRow - _topRow;
+        var thisOffset = ViewportToScreen (new (new (col, posY), new (Viewport.Width - col, Viewport.Height - posY)));
+        var view = Application.Current is { } ? FindDeepestView (Application.Current, thisOffset.X, thisOffset.Y)  : this;
 
-        if (posX > -1 && col >= posX && posX < Frame.Width - RightOffset && _topRow <= CurrentRow && posY < Frame.Height - BottomOffset)
+        if (view == this && posX > -1 && col >= posX && posX < Frame.Width - RightOffset && _topRow <= CurrentRow && posY < Frame.Height - BottomOffset)
         {
             ResetCursorVisibility ();
             Move (col, CurrentRow - _topRow);
@@ -6249,6 +6251,14 @@ public class TextView : View
         {
             DesiredCursorVisibility = _savedCursorVisibility;
             _savedCursorVisibility = 0;
+        }
+        else if (Application.Driver is { })
+        {
+            Application.Driver.GetCursorVisibility (out CursorVisibility cursorVisibility);
+            if (cursorVisibility == CursorVisibility.Invisible)
+            {
+                DesiredCursorVisibility = CursorVisibility.Default;
+            }
         }
     }
 
