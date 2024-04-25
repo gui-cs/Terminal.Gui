@@ -8,6 +8,8 @@ public sealed class Region : IDisposable
 {
     private dynamic _rect;
 
+    #region Constructors
+
     /// <summary>
     /// Initializes a new <see cref="Region"/>.
     /// </summary>
@@ -30,6 +32,8 @@ public sealed class Region : IDisposable
     {
         _rect = rect;
     }
+
+    #endregion
 
     /// <inheritdoc />
     public void Dispose ()
@@ -259,4 +263,13 @@ public sealed class Region : IDisposable
     }
 
     #endregion
+
+    /// <summary>
+    /// Creates an exact copy of this <see cref="Region"/>.
+    /// </summary>
+    /// <returns></returns>
+    public Region Clone ()
+    {
+        return new Region (_rect);
+    }
 }

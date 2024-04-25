@@ -259,4 +259,12 @@ public class RegionTests (ITestOutputHelper output)
         Assert.True (Region.Contains (regions, 1, 1));
         Assert.False (Region.Contains (regions, 30, 30));
     }
+
+    [Fact]
+    public void Clone_Tests ()
+    {
+        var region = new Region (new Rectangle (1, 2, 3, 4));
+        var regionCloned = region.Clone ();
+        Assert.Equal (regionCloned, region);
+    }
 }
