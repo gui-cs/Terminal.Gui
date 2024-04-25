@@ -448,5 +448,8 @@ public class ViewportTests (ITestOutputHelper output)
         Application.Begin (top);
 
         Assert.True (view.IsViewLocationVisibleInViewport (x, y) == expected);
+
+        top.Dispose ();
+        Application.Shutdown ();
     }
 }
