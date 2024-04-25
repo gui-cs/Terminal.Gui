@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices.JavaScript;
 using static System.Net.Mime.MediaTypeNames;
 using static Terminal.Gui.Dialog;
 using static Terminal.Gui.Dim;
@@ -354,6 +355,16 @@ public class Pos
         return Anchor (superviewDimension);
     }
 
+
+    /// <summary>
+    /// Diagnostics API to determine if this Pos object references other views.
+    /// </summary>
+    /// <returns></returns>
+    internal virtual bool ReferencesOtherViews ()
+    {
+        return false;
+    }
+
     internal class PosAbsolute (int n) : Pos
     {
         private readonly int _n = n;
@@ -447,6 +458,25 @@ public class Pos
 
             return left - right;
         }
+
+        /// <summary>
+        /// Diagnostics API to determine if this Pos object references other views.
+        /// </summary>
+        /// <returns></returns>
+        internal override bool ReferencesOtherViews ()
+        {
+            if (_left.ReferencesOtherViews ())
+            {
+                return true;
+            }
+
+            if (_right.ReferencesOtherViews ())
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 
     internal class PosFactor (float factor) : Pos
@@ -530,6 +560,15 @@ public class Pos
                 Side.Bottom => Target.Frame.Bottom,
                 _ => 0
             };
+        }
+
+        /// <summary>
+        /// Diagnostics API to determine if this Pos object references other views.
+        /// </summary>
+        /// <returns></returns>
+        internal override bool ReferencesOtherViews ()
+        {
+            return true;
         }
     }
 }
@@ -839,6 +878,15 @@ public class Dim
         return Math.Max (Anchor (superviewContentSize - location), 0);
     }
 
+    /// <summary>
+    /// Diagnostics API to determine if this Dim object references other views.
+    /// </summary>
+    /// <returns></returns>
+    internal virtual bool ReferencesOtherViews ()
+    {
+        return false;
+    }
+
     internal class DimAbsolute (int n) : Dim
     {
         private readonly int _n = n;
@@ -915,6 +963,15 @@ public class Dim
             return int.Min (max, _max?.Anchor (superviewContentSize) ?? superviewContentSize);
         }
 
+        /// <summary>
+        /// Diagnostics API to determine if this Dim object references other views.
+        /// </summary>
+        /// <returns></returns>
+        internal override bool ReferencesOtherViews ()
+        {
+            return _style is Dim.DimAutoStyle.Subviews or Dim.DimAutoStyle.Auto;
+        }
+
     }
     internal class DimCombine (bool add, Dim left, Dim right) : Dim
     {
@@ -955,6 +1012,25 @@ public class Dim
             return newDimension;
         }
 
+
+        /// <summary>
+        /// Diagnostics API to determine if this Dim object references other views.
+        /// </summary>
+        /// <returns></returns>
+        internal override bool ReferencesOtherViews ()
+        {
+            if (_left.ReferencesOtherViews ())
+            {
+                return true;
+            }
+
+            if (_right.ReferencesOtherViews ())
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 
     internal class DimFactor (float factor, bool remaining = false) : Dim
@@ -1032,6 +1108,11 @@ public class Dim
                 Dimension.Width => Target.Frame.Width,
                 _ => 0
             };
+        }
+
+        internal override bool ReferencesOtherViews ()
+        {
+            return true;
         }
     }
 }

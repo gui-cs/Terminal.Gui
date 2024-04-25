@@ -348,6 +348,7 @@ public partial class View
         {
             TextFormatter.AutoSize = value;
 
+            // BUGBUG: This is all a hack until AutoSize is removed
             if (value)
             {
                 UpdateTextFormatterText ();
@@ -365,18 +366,9 @@ public partial class View
             }
             else
             {
-                if (IsInitialized)
-                {
-                    Height = ContentSize.Height;
-                    Width = ContentSize.Width;
-
-                }
-                else
-                {
-                    _height = ContentSize.Height;
-                    _width = ContentSize.Width;
-                    OnResizeNeeded ();
-                }
+                _height = ContentSize.Height;
+                _width = ContentSize.Width;
+                OnResizeNeeded ();
             }
         }
     }
@@ -688,7 +680,7 @@ public partial class View
             superView = viewToMove.SuperView;
         }
 
-        if (superView.Margin is { } && superView == viewToMove.SuperView)
+        if (superView?.Margin is { } && superView == viewToMove.SuperView)
         {
             maxDimension -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
         }
@@ -991,27 +983,27 @@ public partial class View
     {
         // TODO: Identify a real-world use-case where this API should be virtual. 
         // TODO: Until then leave it `internal` and non-virtual
+
         // First try SuperView.Viewport, then Application.Top, then Driver.Viewport.
         // Finally, if none of those are valid, use int.MaxValue (for Unit tests).
         Size contentSize = SuperView is { IsInitialized: true } ? SuperView.ContentSize :
                            Application.Top is { } && Application.Top != this && Application.Top.IsInitialized ? Application.Top.ContentSize :
                            Application.Driver?.Screen.Size ?? new (int.MaxValue, int.MaxValue);
-        SetRelativeLayout (contentSize);
 
-        // TODO: Determine what, if any of the below is actually needed here.
+
+
+        SetTextFormatterSize ();
+
+        SetRelativeLayout (contentSize);
 
         if (IsInitialized)
         {
-            //if (AutoSize)
-            {
-            //    SetFrameToFitText ();
-               SetTextFormatterSize ();
-            }
-
             LayoutAdornments ();
-            SetNeedsDisplay ();
-            SetNeedsLayout ();
         }
+
+        SetNeedsDisplay ();
+        SetNeedsLayout ();
+
     }
 
     internal bool LayoutNeeded { get; private set; } = true;
@@ -1062,22 +1054,6 @@ public partial class View
         Debug.Assert (_height is { });
 
         CheckDimAuto ();
-
-        SetTextFormatterSize ();
-
-        var autoSize = Size.Empty;
-
-        //if (AutoSize)
-        //{
-        //    // TODO: Nuke this from orbit once Dim.Auto is fully implemented
-        //    autoSize = GetTextAutoSize ();
-        //}
-        SetTextFormatterSize ();
-        if (TextFormatter.NeedsFormat)
-        {
-            TextFormatter.Format ();
-        }
-
         int newX = _x.Calculate (superviewContentSize.Width, _width, this, Dim.Dimension.Width);
         int newW = _width.Calculate (newX, superviewContentSize.Width, this, Dim.Dimension.Width);
         int newY = _y.Calculate (superviewContentSize.Height, _height, this, Dim.Dimension.Height);

@@ -203,6 +203,28 @@ public class DimAutoTests
         Assert.Equal (new Rectangle (0, 0, 0, 0), superView.Frame);
     }
 
+    [Fact]
+    public void NoSubViews_Does_Nothing_Vertical ()
+    {
+        var superView = new View
+        {
+            X = 0,
+            Y = 0,
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+            TextDirection = TextDirection.TopBottom_LeftRight,
+            ValidatePosDim = true
+        };
+
+        superView.BeginInit ();
+        superView.EndInit ();
+        superView.SetRelativeLayout (new (10, 10));
+        Assert.Equal (new Rectangle (0, 0, 0, 0), superView.Frame);
+
+        superView.SetRelativeLayout (new (10, 10));
+        Assert.Equal (new Rectangle (0, 0, 0, 0), superView.Frame);
+    }
+
     [Theory]
     [InlineData (0, 0, 0, 0, 0, 0)]
     [InlineData (0, 0, 5, 0, 5, 0)]
@@ -648,6 +670,8 @@ public class DimAutoTests
         super.Add (view);
 
         Rectangle expectedViewport = new (0, 0, 8, 1);
+        Assert.Equal (expectedViewport.Size, view.ContentSize);
+        Assert.Equal (expectedViewport, view.Frame);
         Assert.Equal (expectedViewport, view.Viewport);
 
         super.LayoutSubviews ();

@@ -829,7 +829,10 @@ At 0,0
         // Initializes a view with a vertical direction
         r = new View
         {
-            Text = "Vertical View", TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = true
+            Text = "Vertical View",
+            TextDirection = TextDirection.TopBottom_LeftRight,
+            Width = Dim.Auto (),
+            Height = Dim.Auto ()
         }; // BUGBUG: AutoSize or Height need be set
         Assert.NotNull (r);
         Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);

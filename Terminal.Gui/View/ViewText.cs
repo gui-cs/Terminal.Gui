@@ -48,18 +48,8 @@ public partial class View
         get => _text;
         set
         {
-            if (value == _text)
-            {
-                return;
-            }
-
             string old = _text;
             _text = value;
-
-            if (!string.IsNullOrEmpty (_text))
-            {
-
-            }
 
             UpdateTextFormatterText ();
             OnResizeNeeded ();
@@ -180,38 +170,32 @@ public partial class View
                    : 0;
     }
 
-    // BUGBUG: This API is fundamentally broken. Text autosize should have nothing to do with what's visible (Viewport) and only ContentSize.
-    /// <summary>
-    ///     Gets the Frame dimensions required to fit <see cref="Text"/> within <see cref="ContentSize"/> using the text
-    ///     <see cref="NavigationDirection"/> specified by the <see cref="TextFormatter"/> property and accounting for any
-    ///     <see cref="HotKeySpecifier"/> characters.
-    /// </summary>
-    /// <remarks>
-    /// </remarks>
-    /// <returns>The <see cref="Size"/> of the <see cref="Frame"/> required to fit the formatted text.</returns>
-    public Size GetTextAutoSize ()
-    {
-        var x = 0;
-        var y = 0;
+    ///// <summary>
+    /////     Gets dimensions required to fit <see cref="Text"/> within <see cref="ContentSize"/> using the text
+    /////     <see cref="NavigationDirection"/> specified by the <see cref="TextFormatter"/> property and accounting for any
+    /////     <see cref="HotKeySpecifier"/> characters.
+    ///// </summary>
+    ///// <remarks>
+    ///// </remarks>
+    ///// <returns>The <see cref="Size"/> of the <see cref="ContentSize"/> required to fit the formatted text.</returns>
+    //public Size GetTextAutoSize ()
+    //{
+    //    var x = 0;
+    //    var y = 0;
 
-        if (IsInitialized)
-        {
-            x = Viewport.X;
-            y = Viewport.Y;
-        }
+    //    if (IsInitialized)
+    //    {
+    //        x = Viewport.X;
+    //        y = Viewport.Y;
+    //    }
 
-        Rectangle rect = TextFormatter.CalcRect (x, y, TextFormatter.Text, TextFormatter.Direction);
+    //    // Get the size of the text without the hot key specifier
+    //    Rectangle rect = TextFormatter.CalcRect (x, y, TextFormatter.Text, TextFormatter.Direction);
+    //    int newWidth = rect.Size.Width - GetHotKeySpecifierLength ();
+    //    int newHeight = rect.Size.Height - GetHotKeySpecifierLength (false);
 
-        int newWidth = rect.Size.Width
-                       - GetHotKeySpecifierLength ()
-                       + (Margin == null ? 0 : Margin.Thickness.Horizontal + Border.Thickness.Horizontal + Padding.Thickness.Horizontal);
-
-        int newHeight = rect.Size.Height
-                        - GetHotKeySpecifierLength (false)
-                        + (Margin == null ? 0 : Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical);
-
-        return new (newWidth, newHeight);
-    }
+    //    return new (newWidth, newHeight);
+    //}
 
     /// <summary>
     ///     Can be overridden if the <see cref="Terminal.Gui.TextFormatter.Text"/> has
@@ -248,82 +232,60 @@ public partial class View
     /// <returns></returns>
     internal void SetTextFormatterSize ()
     {
+        UpdateTextFormatterText ();
+
         //if (!IsInitialized)
         //{
-        //    TextFormatter.Size = Size.Empty;
-
         //    return;
         //}
 
-        if (string.IsNullOrEmpty (TextFormatter.Text))
-        {
-            TextFormatter.Size = ContentSize;
+        //Dim.DimAuto widthAuto = Width as Dim.DimAuto;
+        //Dim.DimAuto heightAuto = Height as Dim.DimAuto;
 
+        // TODO: This is a hack. Figure out how to move this into DimDimAuto
+        if ((Width is Dim.DimAuto widthAuto && widthAuto._style != Dim.DimAutoStyle.Subviews)
+            || (Height is Dim.DimAuto heightAuto && heightAuto._style != Dim.DimAutoStyle.Subviews))
+        {
+            // This updates TextFormatter.Size to the text size
+            TextFormatter.AutoSize = true;
+
+            // Whenever DimAutoStyle.Text is set, ContentSize will match TextFormatter.Size.
+            ContentSize = TextFormatter.Size;
             return;
         }
 
-        int w = Viewport.Size.Width + GetHotKeySpecifierLength ();
-
-        // TODO: This is a hack. Figure out how to move this into DimDimAuto
-        if (Width is Dim.DimAuto widthAuto && widthAuto._style != Dim.DimAutoStyle.Subviews)
-        {
-            if (Height is Dim.DimAuto)
-            {
-                // Both are auto. 
-                TextFormatter.Size = new Size (SuperView?.ContentSize.Width ?? int.MaxValue, SuperView?.ContentSize.Height ?? int.MaxValue);
-            }
-            else
-            {
-                TextFormatter.Size = new Size (SuperView?.ContentSize.Width ?? int.MaxValue, ContentSize.Height + GetHotKeySpecifierLength ());
-            }
-
-            w = TextFormatter.FormatAndGetSize ().Width;
-        }
-        else
-        {
-            TextFormatter.Size = new Size (w, SuperView?.Viewport.Height ?? 0);
-        }
-
-        int h = ContentSize.Height + GetHotKeySpecifierLength ();
-
-        // TODO: This is a hack. Figure out how to move this into DimDimAuto
-        if (Height is Dim.DimAuto heightAuto && heightAuto._style != Dim.DimAutoStyle.Subviews)
-        {
-            TextFormatter.NeedsFormat = true;
-            h = TextFormatter.FormatAndGetSize ().Height;
-        }
-
-        TextFormatter.Size = new Size (w, h);
+        TextFormatter.AutoSize = false;
+        TextFormatter.Size = new Size (ContentSize.Width, ContentSize.Height);
     }
 
-    //private bool IsValidAutoSize (out Size autoSize)
+    ////private bool IsValidAutoSize (out Size autoSize)
+    ////{
+    ////    Rectangle rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
+
+    ////    autoSize = new Size (
+    ////                         rect.Size.Width - GetHotKeySpecifierLength (),
+    ////                         rect.Size.Height - GetHotKeySpecifierLength (false));
+
+    ////    return !((ValidatePosDim && (!(Width is Dim.DimAbsolute) || !(Height is Dim.DimAbsolute)))
+    ////             || _frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength ()
+    ////             || _frame.Size.Height != rect.Size.Height - GetHotKeySpecifierLength (false));
+    ////}
+
+    //private bool IsValidAutoSizeHeight (Dim height)
     //{
     //    Rectangle rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
+    //    int dimValue = height.Anchor (0);
 
-    //    autoSize = new Size (
-    //                         rect.Size.Width - GetHotKeySpecifierLength (),
-    //                         rect.Size.Height - GetHotKeySpecifierLength (false));
-
-    //    return !((ValidatePosDim && (!(Width is Dim.DimAbsolute) || !(Height is Dim.DimAbsolute)))
-    //             || _frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength ()
-    //             || _frame.Size.Height != rect.Size.Height - GetHotKeySpecifierLength (false));
+    //    return !((ValidatePosDim && !(height is Dim.DimAbsolute)) || dimValue != rect.Size.Height - GetHotKeySpecifierLength (false));
     //}
 
-    private bool IsValidAutoSizeHeight (Dim height)
-    {
-        Rectangle rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
-        int dimValue = height.Anchor (0);
+    //private bool IsValidAutoSizeWidth (Dim width)
+    //{
+    //    Rectangle rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
+    //    int dimValue = width.Anchor (0);
 
-        return !((ValidatePosDim && !(height is Dim.DimAbsolute)) || dimValue != rect.Size.Height - GetHotKeySpecifierLength (false));
-    }
-
-    private bool IsValidAutoSizeWidth (Dim width)
-    {
-        Rectangle rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
-        int dimValue = width.Anchor (0);
-
-        return !((ValidatePosDim && !(width is Dim.DimAbsolute)) || dimValue != rect.Size.Width - GetHotKeySpecifierLength ());
-    }
+    //    return !((ValidatePosDim && !(width is Dim.DimAbsolute)) || dimValue != rect.Size.Width - GetHotKeySpecifierLength ());
+    //}
 
     ///// <summary>
     /////     Sets the size of the View to the minimum width or height required to fit <see cref="Text"/>.

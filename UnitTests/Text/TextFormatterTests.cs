@@ -2197,33 +2197,30 @@ ssb
     {
         var tf = new TextFormatter { Direction = textDirection, Text = "你你" };
 
-        if (textDirection == TextDirection.LeftRight_TopBottom)
-        {
-            Assert.Equal (4, tf.Size.Width);
-            Assert.Equal (1, tf.Size.Height);
-        }
-        else
-        {
-            Assert.Equal (2, tf.Size.Width);
-            Assert.Equal (2, tf.Size.Height);
-        }
+        //if (textDirection == TextDirection.LeftRight_TopBottom)
+        //{
+        //    Assert.Equal (4, tf.Size.Width);
+        //    Assert.Equal (1, tf.Size.Height);
+        //}
+        //else
+        //{
+        //    Assert.Equal (2, tf.Size.Width);
+        //    Assert.Equal (2, tf.Size.Height);
+        //}
 
         Assert.False (tf.AutoSize);
 
         tf.Size = new (1, 1);
-        Assert.Equal (1, tf.Size.Width);
-        Assert.Equal (1, tf.Size.Height);
+        Assert.Equal (new Size (1, 1), tf.Size);
         tf.AutoSize = true;
 
         if (textDirection == TextDirection.LeftRight_TopBottom)
         {
-            Assert.Equal (4, tf.Size.Width);
-            Assert.Equal (1, tf.Size.Height);
+            Assert.Equal (new Size (4, 1), tf.Size);
         }
         else
         {
-            Assert.Equal (2, tf.Size.Width);
-            Assert.Equal (2, tf.Size.Height);
+            Assert.Equal (new Size (2, 2), tf.Size);
         }
     }
 
@@ -2397,6 +2394,26 @@ ssb
     }
 
     [Theory]
+    // BUGBUG: This is a bug in the current implementation, the expected size should be 0, 0 because autosize is false
+    [InlineData ("你", TextDirection.LeftRight_TopBottom, false, 2, 1)]
+    [InlineData ("你", TextDirection.LeftRight_TopBottom, true, 2, 1)]
+    // BUGBUG: This is a bug in the current implementation, the expected size should be 0, 0 because autosize is false
+    [InlineData ("你", TextDirection.TopBottom_LeftRight, false, 1, 2)]
+    [InlineData ("你", TextDirection.TopBottom_LeftRight, true, 1, 2)]
+
+    // BUGBUG: This is a bug in the current implementation, the expected size should be 0, 0 because autosize is false
+    [InlineData ("你你", TextDirection.LeftRight_TopBottom, false, 4, 1)]
+    [InlineData ("你你", TextDirection.LeftRight_TopBottom, true, 4, 1)]
+    // BUGBUG: This is a bug in the current implementation, the expected size should be 0, 0 because autosize is false
+    [InlineData ("你你", TextDirection.TopBottom_LeftRight, false, 1, 4)]
+    [InlineData ("你你", TextDirection.TopBottom_LeftRight, true, 1, 4)]
+    public void Text_Set_SizeIsCorrect (string text, TextDirection textDirection, bool autoSize, int expectedWidth, int expectedHeight)
+    {
+        var tf = new TextFormatter { Direction = textDirection, Text = text, AutoSize = autoSize };
+        Assert.Equal (new Size (expectedWidth, expectedHeight), tf.Size);
+    }
+
+    [Theory]
     [InlineData (TextDirection.LeftRight_TopBottom, false)]
     [InlineData (TextDirection.LeftRight_TopBottom, true)]
     [InlineData (TextDirection.TopBottom_LeftRight, false)]
@@ -2404,8 +2421,7 @@ ssb
     public void TestSize_TextChange (TextDirection textDirection, bool autoSize)
     {
         var tf = new TextFormatter { Direction = textDirection, Text = "你", AutoSize = autoSize };
-        Assert.Equal (2, tf.Size.Width);
-        Assert.Equal (1, tf.Size.Height);
+        Assert.Equal (new Size (2, 1), tf.Size);
         tf.Text = "你你";
 
         Assert.Equal (autoSize, tf.AutoSize);

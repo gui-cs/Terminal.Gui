@@ -30,10 +30,10 @@ public class TextFormatter
 
     /// <summary>Gets or sets whether the <see cref="Size"/> should be automatically changed to fit the <see cref="Text"/>.</summary>
     /// <remarks>
-    ///     <para>Used by <see cref="View.AutoSize"/> to resize the view's <see cref="View.Viewport"/> to fit <see cref="Size"/>.</para>
+    ///     <para>Used by <see cref="View.AutoSize"/> to resize the view's <see cref="View.ContentSize"/> to fit <see cref="Size"/>.</para>
     ///     <para>
-    ///         AutoSize is ignored if <see cref="TextAlignment.Justified"/> and
-    ///         <see cref="VerticalTextAlignment.Justified"/> are used.
+    ///         <see cref="TextAlignment.Justified"/> and
+    ///         <see cref="VerticalTextAlignment.Justified"/> are ignored when <see cref="AutoSize"/> is <see langword="true"/>.
     ///     </para>
     /// </remarks>
     public bool AutoSize
@@ -43,11 +43,79 @@ public class TextFormatter
         {
             _autoSize = EnableNeedsFormat (value);
 
-            if (_autoSize)// && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified)
+            if (_autoSize)
             {
-                Size = CalcRect (0, 0, _text, Direction, TabWidth).Size;
+                Size = GetAutoSize ();
             }
         }
+    }
+
+    private Size GetAutoSize ()
+    {
+        if (string.IsNullOrEmpty(_text))
+        {
+            return Size.Empty;
+        }
+
+        int width = int.MaxValue;
+        int height = int.MaxValue;
+        string text = _text;
+        List<string> lines;
+
+        if (FindHotKey (_text, HotKeySpecifier, out _hotKeyPos, out Key newHotKey))
+        {
+            HotKey = newHotKey;
+            text = RemoveHotKeySpecifier (Text, _hotKeyPos, HotKeySpecifier);
+            text = ReplaceHotKeyWithTag (text, _hotKeyPos);
+        }
+
+        if (IsVerticalDirection (Direction))
+        {
+            int colsWidth = GetSumMaxCharWidth (text, 0, 1, TabWidth);
+
+            lines = Format (
+                            text,
+                            height,
+                            VerticalAlignment == VerticalTextAlignment.Justified,
+                            width > colsWidth && WordWrap,
+                            PreserveTrailingSpaces,
+                            TabWidth,
+                            Direction,
+                            MultiLine
+                           );
+            colsWidth = GetMaxColsForWidth (lines, width, TabWidth);
+
+            if (lines.Count > colsWidth)
+            {
+                lines.RemoveRange (colsWidth, lines.Count - colsWidth);
+            }
+            height = lines.Max (static line => line.GetColumns ());
+            width = lines.Count;
+        }
+        else
+        {
+            lines = Format (
+                            text,
+                            width,
+                            false, // Ignore justification because autosize means no justification
+                            height > 1 && WordWrap,
+                            PreserveTrailingSpaces,
+                            TabWidth,
+                            Direction,
+                            MultiLine
+                           );
+
+            // Format always returns at least 1 line
+            if (lines.Count == 1 && string.IsNullOrEmpty (lines [0]))
+            {
+                return Size.Empty;
+            }
+
+            width = lines.Max (static line => line.GetColumns ());
+            height = lines.Count;
+        }
+
+        return new (width, height);
     }
 
     /// <summary>
@@ -65,9 +133,9 @@ public class TextFormatter
         {
             _textDirection = EnableNeedsFormat (value);
 
-            if (AutoSize)// && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified)
+            if (AutoSize)
             {
-                Size = CalcRect (0, 0, Text, Direction, TabWidth).Size;
+                Size = GetAutoSize ();
             }
         }
     }
@@ -150,7 +218,8 @@ public class TextFormatter
         {
             if (AutoSize)// && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified)
             {
-                _size = EnableNeedsFormat (CalcRect (0, 0, Text, Direction, TabWidth).Size);
+                //_size = EnableNeedsFormat (CalcRect (0, 0, Text, Direction, TabWidth).Size);
+                _size = EnableNeedsFormat (value);
             }
             else
             {
@@ -175,9 +244,10 @@ public class TextFormatter
             bool textWasNull = _text is null && value != null;
             _text = EnableNeedsFormat (value);
 
+            // BUGBUG: If AutoSize is false, there should be no "automatic behavior" like setting the size
             if (AutoSize || (textWasNull && Size.IsEmpty))
             {
-                Size = CalcRect (0, 0, _text, Direction, TabWidth).Size;
+                Size = GetAutoSize ();
             }
         }
     }
@@ -287,13 +357,13 @@ public class TextFormatter
             Rune [] runes = linesFormatted [line].ToRunes ();
 
             runes = Direction switch
-                    {
-                        TextDirection.RightLeft_BottomTop => runes.Reverse ().ToArray (),
-                        TextDirection.RightLeft_TopBottom => runes.Reverse ().ToArray (),
-                        TextDirection.BottomTop_LeftRight => runes.Reverse ().ToArray (),
-                        TextDirection.BottomTop_RightLeft => runes.Reverse ().ToArray (),
-                        _ => runes
-                    };
+            {
+                TextDirection.RightLeft_BottomTop => runes.Reverse ().ToArray (),
+                TextDirection.RightLeft_TopBottom => runes.Reverse ().ToArray (),
+                TextDirection.BottomTop_LeftRight => runes.Reverse ().ToArray (),
+                TextDirection.BottomTop_RightLeft => runes.Reverse ().ToArray (),
+                _ => runes
+            };
 
             // When text is justified, we lost left or right, so we use the direction to align. 
 
@@ -700,48 +770,48 @@ public class TextFormatter
     public static bool IsHorizontalDirection (TextDirection textDirection)
     {
         return textDirection switch
-               {
-                   TextDirection.LeftRight_TopBottom => true,
-                   TextDirection.LeftRight_BottomTop => true,
-                   TextDirection.RightLeft_TopBottom => true,
-                   TextDirection.RightLeft_BottomTop => true,
-                   _ => false
-               };
+        {
+            TextDirection.LeftRight_TopBottom => true,
+            TextDirection.LeftRight_BottomTop => true,
+            TextDirection.RightLeft_TopBottom => true,
+            TextDirection.RightLeft_BottomTop => true,
+            _ => false
+        };
     }
 
     /// <summary>Check if it is a vertical direction</summary>
     public static bool IsVerticalDirection (TextDirection textDirection)
     {
         return textDirection switch
-               {
-                   TextDirection.TopBottom_LeftRight => true,
-                   TextDirection.TopBottom_RightLeft => true,
-                   TextDirection.BottomTop_LeftRight => true,
-                   TextDirection.BottomTop_RightLeft => true,
-                   _ => false
-               };
+        {
+            TextDirection.TopBottom_LeftRight => true,
+            TextDirection.TopBottom_RightLeft => true,
+            TextDirection.BottomTop_LeftRight => true,
+            TextDirection.BottomTop_RightLeft => true,
+            _ => false
+        };
     }
 
     /// <summary>Check if it is Left to Right direction</summary>
     public static bool IsLeftToRight (TextDirection textDirection)
     {
         return textDirection switch
-               {
-                   TextDirection.LeftRight_TopBottom => true,
-                   TextDirection.LeftRight_BottomTop => true,
-                   _ => false
-               };
+        {
+            TextDirection.LeftRight_TopBottom => true,
+            TextDirection.LeftRight_BottomTop => true,
+            _ => false
+        };
     }
 
     /// <summary>Check if it is Top to Bottom direction</summary>
     public static bool IsTopToBottom (TextDirection textDirection)
     {
         return textDirection switch
-               {
-                   TextDirection.TopBottom_LeftRight => true,
-                   TextDirection.TopBottom_RightLeft => true,
-                   _ => false
-               };
+        {
+            TextDirection.TopBottom_LeftRight => true,
+            TextDirection.TopBottom_RightLeft => true,
+            _ => false
+        };
     }
 
     // TODO: Move to StringExtensions?
@@ -1122,21 +1192,21 @@ public class TextFormatter
                     case ' ':
                         return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
                     case '\t':
-                    {
-                        length += tabWidth + 1;
-
-                        if (length == tabWidth && tabWidth > cWidth)
                         {
-                            return to + 1;
-                        }
+                            length += tabWidth + 1;
 
-                        if (length > cWidth && tabWidth > cWidth)
-                        {
-                            return to;
-                        }
+                            if (length == tabWidth && tabWidth > cWidth)
+                            {
+                                return to + 1;
+                            }
 
-                        return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
-                    }
+                            if (length > cWidth && tabWidth > cWidth)
+                            {
+                                return to;
+                            }
+
+                            return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
+                        }
                     default:
                         to++;
 
@@ -1145,11 +1215,11 @@ public class TextFormatter
             }
 
             return cLength switch
-                   {
-                       > 0 when to < runes.Count && runes [to].Value != ' ' && runes [to].Value != '\t' => from,
-                       > 0 when to < runes.Count && (runes [to].Value == ' ' || runes [to].Value == '\t') => from,
-                       _ => to
-                   };
+            {
+                > 0 when to < runes.Count && runes [to].Value != ' ' && runes [to].Value != '\t' => from,
+                > 0 when to < runes.Count && (runes [to].Value == ' ' || runes [to].Value == '\t') => from,
+                _ => to
+            };
         }
 
         if (start < text.GetRuneCount ())
@@ -1742,7 +1812,7 @@ public class TextFormatter
         return lineIdx;
     }
 
-    /// <summary>Calculates the rectangle required to hold text, assuming no word wrapping or justification.</summary>
+    /// <summary>Calculates the rectangle required to hold text, assuming no word wrapping, justification, or hotkeys.</summary>
     /// <remarks>
     ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
     ///     glyphs (e.g. Arabic).

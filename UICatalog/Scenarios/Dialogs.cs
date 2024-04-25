@@ -21,10 +21,10 @@ public class Dialogs : Scenario
             Text = "_Number of Buttons:"
         };
 
-        var label = new Label {
-            X = 0, 
+        var label = new Label
+        {
+            X = 0,
             Y = 0,
-            AutoSize = false,
             Width = Dim.Width (numButtonsLabel),
             Height = 1,
             TextAlignment = TextAlignment.Right,
