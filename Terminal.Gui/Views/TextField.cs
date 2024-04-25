@@ -1196,10 +1196,10 @@ public class TextField : View
 
         int pos = _cursorPosition - ScrollOffset + Math.Min (Frame.X, 0);
         int offB = OffSetBackground ();
-        var thisOffset = ViewportToScreen (new (new (col, Viewport.Y), new (Viewport.Width - col, Viewport.Height - Viewport.Y)));
-        var view = Application.Current is { } ? FindDeepestView (Application.Current, thisOffset.X, thisOffset.Y) : this;
+        bool isVisibleInViewport = IsViewLocationVisibleInViewport (col, Viewport.Y);
 
-        if (view == this && pos > -1
+        if (isVisibleInViewport
+            && pos > -1
             && col >= pos
             && pos < Frame.Width + offB)
         {
