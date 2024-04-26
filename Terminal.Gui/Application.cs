@@ -557,6 +557,8 @@ public static partial class Application
         return rs;
     }
 
+    private static CursorVisibility _cachedCursorVisibility;
+
     /// <summary>
     /// Calls <see cref="View.PositionCursor"/> on the most focused view in the view starting with <paramref name="view"/>.
     /// </summary>
@@ -582,9 +584,19 @@ public static partial class Application
             return false;
         }
 
+        CursorVisibility cachedCursorVisibility;
+
         // If the view is not visible or enabled, don't position the cursor
         if (!mostFocused.Visible || !mostFocused.Enabled)
         {
+            Driver.GetCursorVisibility (out cachedCursorVisibility);
+
+            if (cachedCursorVisibility != CursorVisibility.Invisible)
+            {
+                _cachedCursorVisibility = cachedCursorVisibility;
+                Driver.SetCursorVisibility (CursorVisibility.Invisible);
+            }
+
             return false;
         }
 
@@ -606,12 +618,34 @@ public static partial class Application
             cursor = mostFocused.ViewportToScreen (mostFocused.Viewport with { Location = cursor.Value }).Location;
             if (!superViewViewport.Contains (cursor.Value))
             {
+                Driver.GetCursorVisibility (out cachedCursorVisibility);
+
+                if (cachedCursorVisibility != CursorVisibility.Invisible)
+                {
+                    _cachedCursorVisibility = cachedCursorVisibility;
+                }
+
                 Driver.SetCursorVisibility (CursorVisibility.Invisible);
 
                 return false;
             }
 
+            Driver.GetCursorVisibility (out cachedCursorVisibility);
+
+            if (cachedCursorVisibility == CursorVisibility.Invisible)
+            {
+                Driver.SetCursorVisibility (_cachedCursorVisibility);
+            }
+
             return prevCursor != cursor;
+        }
+
+        Driver.GetCursorVisibility (out cachedCursorVisibility);
+
+        if (cachedCursorVisibility != CursorVisibility.Invisible)
+        {
+            _cachedCursorVisibility = cachedCursorVisibility;
+            Driver.SetCursorVisibility (CursorVisibility.Invisible);
         }
 
         return false;

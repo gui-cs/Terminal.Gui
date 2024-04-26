@@ -3881,11 +3881,8 @@ public class TextView : View
             Move (col, CurrentRow - _topRow);
             return new (col, CurrentRow - _topRow);
         }
-        else
-        {
-            return null;
-        }
 
+        return null;
     }
 
     /// <summary>Redoes the latest changes.</summary>
