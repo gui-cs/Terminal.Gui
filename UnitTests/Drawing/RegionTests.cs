@@ -304,7 +304,7 @@ public class RegionTests (ITestOutputHelper output)
         var region = new Region ();
         Assert.Equal (Rectangle.Empty, region.Union (Rectangle.Empty));
 
-        var region2 = new Region (new (0, 0, 10, 10));
+        var region2 = new Region (new RectangleF (0, 0, 10, 10));
         Assert.Equal (new Rectangle (0, 0, 10, 10), region.Union (region2));
 
         Assert.Equal (new Rectangle (1, 1, 9, 9), region.Intersect (new Rectangle (1, 1, 20, 20)));
@@ -324,7 +324,7 @@ public class RegionTests (ITestOutputHelper output)
     public void Contains_Tests ()
     {
         HashSet<Region> regions =
-            [new (new (0, 0, 5, 5)), new (new (10, 10, 5, 5)), new (new (20, 20, 5, 5))];
+            [new (new Rectangle (0, 0, 5, 5)), new (new RectangleF (10, 10, 5, 5)), new (new Rectangle (20, 20, 5, 5))];
 
         Assert.True (Region.Contains (regions, 1, 1));
         Assert.False (Region.Contains (regions, 30, 30));

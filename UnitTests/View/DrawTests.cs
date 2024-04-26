@@ -919,7 +919,7 @@ public class DrawTests (ITestOutputHelper output)
         // ViewportToScreen is (1, 1, 23, 23)
         // Visible content is (1, 1, 10, 10)
         // Expected clip is (1, 1, 10, 10) - same as visible content
-        HashSet<Region> expectedClip = [new (new (1, 1, 10, 10))];
+        HashSet<Region> expectedClip = [new (new Rectangle (1, 1, 10, 10))];
         // Arrange
         var view = new View ()
         {
@@ -952,7 +952,7 @@ public class DrawTests (ITestOutputHelper output)
         // ViewportToScreen is (1, 1, 23, 23)
         // Visible content is (1, 1, 10, 10)
         // Expected clip is (1, 1, 23, 23) - same as Viewport
-        HashSet<Region> expectedClip = [new (new (1, 1, 23, 23))];
+        HashSet<Region> expectedClip = [new (new Rectangle (1, 1, 23, 23))];
         // Arrange
         var view = new View ()
         {

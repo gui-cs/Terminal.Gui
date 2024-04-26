@@ -456,7 +456,7 @@ public class FakeDriver : ConsoleDriver
         }
 
         // CONCURRENCY: Unsynchronized access to Clip is not safe.
-        Clip = [new (new (0, 0, Cols, Rows))];
+        Clip = [new (new Rectangle (0, 0, Cols, Rows))];
     }
 
     public override void UpdateCursor ()

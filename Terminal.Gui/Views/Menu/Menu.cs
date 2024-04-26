@@ -765,7 +765,7 @@ internal sealed class Menu : View
         }
 
         HashSet<Region> savedClip = Driver.Clip;
-        Driver.Clip = [new (new (0, 0, Driver.Cols, Driver.Rows))];
+        Driver.Clip = [new (new Rectangle (0, 0, Driver.Cols, Driver.Rows))];
         Driver.SetAttribute (GetNormalColor ());
 
         OnDrawAdornments ();

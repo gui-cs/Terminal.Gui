@@ -214,7 +214,7 @@ public sealed class Region : IDisposable
     /// <returns></returns>
     public dynamic Intersect (dynamic rect)
     {
-        _rect = rect.GetType ().Name == "Rectangle" ? Rectangle.Intersect ((Rectangle)_rect, rect) : RectangleF.Intersect ((RectangleF)_rect, rect);
+        _rect = _rect.GetType ().Name == "Rectangle" ? Rectangle.Intersect ((Rectangle)_rect, rect) : RectangleF.Intersect ((RectangleF)_rect, rect);
 
         return _rect;
     }
