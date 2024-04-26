@@ -870,15 +870,10 @@ internal class CharMap : View
             return;
         }
 
-        args.Handled = true;
-
         if (me.Y == 0)
         {
             me.Y = Cursor.Y;
         }
-
-        if (me.Y > 0)
-        { }
 
         if (me.X < RowLabelWidth || me.X > RowLabelWidth + 16 * COLUMN_WIDTH - 1)
         {
@@ -904,6 +899,13 @@ internal class CharMap : View
         {
             Hover?.Invoke (this, new (val, null));
         }
+
+        if (!HasFocus && CanFocus)
+        {
+            SetFocus ();
+        }
+
+        args.Handled = true;
 
         if (me.Flags == MouseFlags.Button1Clicked)
         {
