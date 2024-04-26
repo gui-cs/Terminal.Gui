@@ -987,12 +987,13 @@ public class TileView : View
             return base.OnEnter (view);
         }
 
-        public override void PositionCursor ()
+        public override Point? PositionCursor ()
         {
             base.PositionCursor ();
 
             Point location = moveRuneRenderLocation ?? new Point (Viewport.Width / 2, Viewport.Height / 2);
             Move (location.X, location.Y);
+            return location;
         }
 
         /// <summary>

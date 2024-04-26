@@ -690,36 +690,6 @@ public partial class View
 #nullable restore
 
     /// <summary>
-    /// Determines if this view is currently visible in the visible <see cref="Viewport"/> area, 
-    /// given the passed x and y location coordinates.
-    /// </summary>
-    /// <param name="x">The x location.</param>
-    /// <param name="y">The y location.</param>
-    /// <returns><see langword="true"/> if it's visible, <see langword="false"/> otherwise.</returns>
-    public bool IsViewLocationVisibleInViewport (int x, int y)
-    {
-        Rectangle thisFrame = ViewportToScreen (Viewport);
-        Rectangle thisOffset = ViewportToScreen (new (new (x, y), new (Viewport.Width, Viewport.Height )));
-        View view;
-
-        if (Application.Current is { })
-        {
-            view = FindDeepestView (Application.Current, thisOffset.X, thisOffset.Y);
-        }
-        else if (SuperView is { })
-        {
-            Rectangle containerFrame = SuperView.ViewportToScreen (SuperView.Viewport);
-            view = containerFrame.IntersectsWith (thisOffset) ? this : null;
-        }
-        else
-        {
-            view = thisFrame.IntersectsWith (thisOffset) ? this : null;
-        }
-
-        return view == this;
-    }
-
-    /// <summary>
     ///     Gets a new location of the <see cref="View"/> that is within the Viewport of the <paramref name="viewToMove"/>'s
     ///     <see cref="View.SuperView"/> (e.g. for dragging a Window). The `out` parameters are the new X and Y coordinates.
     /// </summary>

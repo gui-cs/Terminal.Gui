@@ -152,7 +152,7 @@ public class CheckBox : View
     }
 
     /// <inheritdoc/>
-    public override void PositionCursor () { Move (0, 0); }
+    public override Point? PositionCursor () { Move (0, 0); return Point.Empty; }
 
     /// <summary>Toggled event, raised when the <see cref="CheckBox"/> is toggled.</summary>
     /// <remarks>

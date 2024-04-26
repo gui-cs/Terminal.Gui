@@ -824,7 +824,7 @@ internal class CharMap : View
         return base.OnLeave (view);
     }
 
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
         if (HasFocus
             && Cursor.X >= RowLabelWidth
@@ -839,6 +839,8 @@ internal class CharMap : View
         {
             Driver.SetCursorVisibility (CursorVisibility.Invisible);
         }
+
+        return Cursor;
     }
 
     public event EventHandler<ListViewItemEventArgs> SelectedCodePointChanged;
@@ -910,7 +912,6 @@ internal class CharMap : View
         if (me.Flags == MouseFlags.Button1Clicked)
         {
             SelectedCodePoint = val;
-
             return;
         }
 

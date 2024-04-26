@@ -640,7 +640,7 @@ namespace Terminal.Gui
         }
 
         /// <inheritdoc/>
-        public override void PositionCursor ()
+        public override Point? PositionCursor ()
         {
             (int left, _) = GetMargins (Viewport.Width);
 
@@ -652,13 +652,12 @@ namespace Terminal.Gui
             if (_provider?.Fixed == false && TextAlignment == TextAlignment.Right)
             {
                 curPos = _cursorPosition + left - 1;
-                Move (curPos, 0);
             }
             else
             {
                 curPos = _cursorPosition + left;
-                Move (curPos, 0);
             }
+            Move (curPos, 0);
 
             if (curPos < 0 || curPos >= Viewport.Width)
             {
@@ -668,6 +667,7 @@ namespace Terminal.Gui
             {
                 Application.Driver.SetCursorVisibility (CursorVisibility.Default);
             }
+            return new (curPos, 0);
         }
 
         /// <summary>Delete char at cursor position - 1, moving the cursor.</summary>

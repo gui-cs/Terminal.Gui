@@ -1002,7 +1002,7 @@ public class TreeView<T> : View, ITreeView where T : class
     public bool IsSelected (T model) { return Equals (SelectedObject, model) || (MultiSelect && multiSelectedRegions.Any (s => s.Contains (model))); }
 
     ///<inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent me)
+    protected internal override bool OnMouseEvent (MouseEvent me)
     {
         // If it is not an event we care about
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
@@ -1239,7 +1239,7 @@ public class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <summary>Positions the cursor at the start of the selected objects line (if visible).</summary>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
         if (CanFocus && HasFocus && Visible && SelectedObject is { })
         {
@@ -1250,16 +1250,10 @@ public class TreeView<T> : View, ITreeView where T : class
             if (idx - ScrollOffsetVertical >= 0 && idx - ScrollOffsetVertical < Viewport.Height)
             {
                 Move (0, idx - ScrollOffsetVertical);
-            }
-            else
-            {
-                base.PositionCursor ();
+                return new Point (0, idx - ScrollOffsetVertical);
             }
         }
-        else
-        {
-            base.PositionCursor ();
-        }
+        return base.PositionCursor ();
     }
 
     /// <summary>
