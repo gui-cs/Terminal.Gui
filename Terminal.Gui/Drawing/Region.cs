@@ -77,8 +77,10 @@ public sealed class Region : IDisposable
     /// </summary>
     /// <param name="regions"></param>
     /// <returns></returns>
-    public static dynamic Union (params Region [] regions)
+    public static dynamic? Union (params Region [] regions)
     {
+        ArgumentNullException.ThrowIfNull (regions);
+
         dynamic? rBase = null;
 
         foreach (Region r in regions)
@@ -100,17 +102,7 @@ public sealed class Region : IDisposable
             }
         }
 
-        if (rBase is { })
-        {
-            return rBase;
-        }
-
-        if (rBase.GetType ().Name == "Rectangle")
-        {
-            return Rectangle.Empty;
-        }
-
-        return RectangleF.Empty;
+        return rBase;
     }
 
     /// <summary>
@@ -119,8 +111,10 @@ public sealed class Region : IDisposable
     /// </summary>
     /// <param name="regions"></param>
     /// <returns></returns>
-    public static dynamic Union (HashSet<Region> regions)
+    public static dynamic? Union (HashSet<Region> regions)
     {
+        ArgumentNullException.ThrowIfNull (regions);
+
         return Union (regions.ToArray ());
     }
 
@@ -144,6 +138,8 @@ public sealed class Region : IDisposable
     /// <returns></returns>
     public dynamic Union (Region region)
     {
+        ArgumentNullException.ThrowIfNull (region);
+
         return Union (region._rect);
     }
 
@@ -164,8 +160,10 @@ public sealed class Region : IDisposable
     /// <param name="regions"></param>
     /// <param name="rect"></param>
     /// <returns></returns>
-    public static dynamic Intersect (Region [] regions, dynamic rect)
+    public static dynamic? Intersect (Region [] regions, dynamic rect)
     {
+        ArgumentNullException.ThrowIfNull (regions);
+
         dynamic? rBase = null;
 
         foreach (Region r in regions)
@@ -191,17 +189,7 @@ public sealed class Region : IDisposable
 
         }
 
-        if (rBase is { })
-        {
-            return rBase;
-        }
-
-        if (rBase.GetType ().Name == "Rectangle")
-        {
-            return Rectangle.Empty;
-        }
-
-        return RectangleF.Empty;
+        return rBase;
     }
 
     /// <summary>
@@ -213,6 +201,8 @@ public sealed class Region : IDisposable
     /// <returns></returns>
     public static dynamic Intersect (HashSet<Region> regions, dynamic rect)
     {
+        ArgumentNullException.ThrowIfNull (regions);
+
         return Intersect (regions.ToArray (), rect);
     }
 
@@ -236,6 +226,8 @@ public sealed class Region : IDisposable
     /// <returns></returns>
     public dynamic Intersect (Region region)
     {
+        ArgumentNullException.ThrowIfNull (region);
+
         return Intersect (region._rect);
     }
 
@@ -244,8 +236,6 @@ public sealed class Region : IDisposable
     /// the <param name="x"></param> and <param name="y"></param> coordinates.
     /// </summary>
     /// <param name="regions"></param>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
     /// <returns></returns>
     public static bool Contains (HashSet<Region> regions, int x, int y)
     {

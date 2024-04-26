@@ -28,6 +28,41 @@ public class RegionTests (ITestOutputHelper output)
         Assert.Single (regions);
     }
 
+    [Fact]
+    public void Union_Array_Throws_If_Null ()
+    {
+        Region [] regions = null;
+        Assert.Throws<ArgumentNullException> (() => Region.Union (regions));
+    }
+
+    [Fact]
+    public void Union_Array_Return_Null_If_Empty ()
+    {
+        Region [] regions = [];
+        Assert.Null (Region.Union (regions));
+    }
+
+    [Fact]
+    public void Union_HashSet_Throws_If_Null ()
+    {
+        HashSet<Region> regions = null;
+        Assert.Throws<ArgumentNullException> (() => Region.Union (regions));
+    }
+
+    [Fact]
+    public void Union_HashSet_Return_Null_If_Empty ()
+    {
+        HashSet<Region> regions = new ();
+        Assert.Null (Region.Union (regions));
+    }
+
+    [Fact]
+    public void Union_Throws_If_Null ()
+    {
+        Region region = new ();
+        Assert.Throws<ArgumentNullException> (() => region.Union (null));
+    }
+
     [Theory]
     [MemberData (nameof (UnionDataWithArrays))]
     public void Union_Array_Tests (Rectangle expected, Region [] regions)
@@ -122,6 +157,41 @@ public class RegionTests (ITestOutputHelper output)
         subView2.ViewportSettings |= ViewportSettings.AllowNegativeX | ViewportSettings.AllowNegativeY;
         subView2.Viewport = subView2.Frame;
         Assert.Equal (new Rectangle (-1, -1, 20, 20), Region.GetViewsBounds ([.. super.Subviews]));
+    }
+
+    [Fact]
+    public void Intersect_Array_Throws_If_Null ()
+    {
+        Region [] regions = null;
+        Assert.Throws<ArgumentNullException> (() => Region.Intersect (regions, Rectangle.Empty));
+    }
+
+    [Fact]
+    public void Intersect_Array_Return_Null_If_Empty ()
+    {
+        Region [] regions = [];
+        Assert.Null (Region.Intersect (regions, Rectangle.Empty));
+    }
+
+    [Fact]
+    public void Intersect_HashSet_Throws_If_Null ()
+    {
+        HashSet<Region> regions = null;
+        Assert.Throws<ArgumentNullException> (() => Region.Intersect (regions, Rectangle.Empty));
+    }
+
+    [Fact]
+    public void Intersect_HashSet_Return_Null_If_Empty ()
+    {
+        HashSet<Region> regions = new ();
+        Assert.Null (Region.Intersect (regions, Rectangle.Empty));
+    }
+
+    [Fact]
+    public void Intersect_Throws_If_Null ()
+    {
+        Region region = new ();
+        Assert.Throws<ArgumentNullException> (() => region.Intersect (null));
     }
 
     [Theory]
@@ -235,7 +305,7 @@ public class RegionTests (ITestOutputHelper output)
         Assert.Equal (Rectangle.Empty, region.Union (Rectangle.Empty));
 
         var region2 = new Region (new (0, 0, 10, 10));
-        Assert.Equal (new Rectangle  (0, 0, 10, 10), region.Union (region2));
+        Assert.Equal (new Rectangle (0, 0, 10, 10), region.Union (region2));
 
         Assert.Equal (new Rectangle (1, 1, 9, 9), region.Intersect (new Rectangle (1, 1, 20, 20)));
 
