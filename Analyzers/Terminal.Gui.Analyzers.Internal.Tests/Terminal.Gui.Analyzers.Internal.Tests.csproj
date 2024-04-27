@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>12</LangVersion>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineTrace>True</DefineTrace>
+    <DebugType>portable</DebugType>
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL;CODE_ANALYSIS</DefineConstants>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <NoLogo>True</NoLogo>
+    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.9.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.9.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.9.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.9.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="NUnit" Version="4.1.0" />
+    <PackageReference Include="NUnit.Analyzers" Version="4.1.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Terminal.Gui.Analyzers.Internal\Terminal.Gui.Analyzers.Internal.csproj">
+      <PrivateAssets>all</PrivateAssets>
+      <OutputItemType>Analyzer</OutputItemType>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="NUnit.Framework" />
+    <Using Include="Terminal.Gui" />
+    <Using Include="Terminal.Gui.Analyzers" />
+    <Using Include="Terminal.Gui.Analyzers.Internal" />
+  </ItemGroup>
+
+</Project>
