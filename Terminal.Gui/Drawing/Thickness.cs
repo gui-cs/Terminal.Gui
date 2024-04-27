@@ -233,7 +233,8 @@ public class Thickness : IEquatable<Thickness>
             {
                 Text = label is null ? string.Empty : $"{label} {this}",
                 Alignment = TextAlignment.Centered,
-                VerticalAlignment = VerticalTextAlignment.Bottom
+                VerticalAlignment = VerticalTextAlignment.Bottom,
+                AutoSize = true
             };
             tf.Draw (rect, Application.Driver.CurrentAttribute, Application.Driver.CurrentAttribute, rect);
         }

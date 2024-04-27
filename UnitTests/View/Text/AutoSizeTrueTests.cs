@@ -1750,10 +1750,16 @@ Y
 
         view.Width = 12;
         view.Height = 1;
-//        Assert.Equal (new Size (12, 1), view.TextFormatter.Size);
         view.TextFormatter.Size = new (12, 1);
+        win.LayoutSubviews ();
         Assert.Equal (new Size (12, 1), view.TextFormatter.Size);
         Assert.Equal (new Rectangle (0, 0, 12, 1), view.Frame);
+        top.Clear ();
+        view.Draw ();
+        expected = @" HelloWorlds";
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+
         Application.Refresh ();
 
         // TextDirection.TopBottom_LeftRight - Height of 1 and Width of 12 means 

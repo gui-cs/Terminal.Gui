@@ -3502,18 +3502,48 @@ ssb
 
     [SetupFakeDriver]
     [Theory]
-    [InlineData ("A", 5, false, "A")]
-    [InlineData ("AB12", 5, false, @"
+    [InlineData ("A", 5, 5, false, "A")]
+    [InlineData ("AB12", 5, 5, false, @"
 A
 B
 1
 2")]
-    [InlineData ("AB\n12", 5, false, @"
+    [InlineData ("AB\n12", 5, 5, false, @"
 A1
 B2")]
-    [InlineData ("", 1, false, "")]
+    [InlineData ("", 5, 1, false, "")]
 
-    public void Draw_Vertical_TopBottom_LeftRight (string text, int height, bool autoSize, string expectedText)
+    [InlineData ("Hello Worlds", 1, 12, true, @"
+H
+e
+l
+l
+o
+ 
+W
+o
+r
+l
+d
+s")]
+
+    [InlineData ("Hello Worlds", 1, 12, false, @"
+H
+e
+l
+l
+o
+ 
+W
+o
+r
+l
+d
+s")]
+
+    [InlineData ("Hello Worlds", 12, 1, false, @"HelloWorlds")]
+
+    public void Draw_Vertical_TopBottom_LeftRight (string text, int width, int height, bool autoSize, string expectedText)
     {
         TextFormatter tf = new ()
         {
@@ -3524,9 +3554,9 @@ B2")]
 
         if (!autoSize)
         {
-            tf.Size = new Size (5, height);
+            tf.Size = new Size (width, height);
         }
-        tf.Draw (new Rectangle (0, 0, 5, height), Attribute.Default, Attribute.Default);
+        tf.Draw (new Rectangle (0, 0, 20, 20), Attribute.Default, Attribute.Default);
 
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
     }

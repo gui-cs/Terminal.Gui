@@ -118,7 +118,7 @@ public partial class View
     /// <summary>
     ///     Gets or sets the <see cref="Gui.TextFormatter"/> used to format <see cref="Text"/>.
     /// </summary>
-    public TextFormatter TextFormatter { get; init; } = new ();
+    public TextFormatter TextFormatter { get; init; } = new () {};
 
     /// <summary>
     ///     Gets or sets how the View's <see cref="Text"/> is aligned vertically when drawn. Changing this property will
