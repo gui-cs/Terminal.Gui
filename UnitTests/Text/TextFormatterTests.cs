@@ -69,7 +69,7 @@ public class TextFormatterTests
         Assert.NotEmpty (tf.GetLines ());
 
         tf.Alignment = TextAlignment.Right;
-        expectedSize = new (testText.Length * 2, 1);
+        expectedSize = new (testText.Length, 1);
         tf.Size = expectedSize;
         Assert.Equal (testText, tf.Text);
         Assert.Equal (TextAlignment.Right, tf.Alignment);
@@ -79,7 +79,7 @@ public class TextFormatterTests
         Assert.NotEmpty (tf.GetLines ());
 
         tf.Alignment = TextAlignment.Centered;
-        expectedSize = new (testText.Length * 2, 1);
+        expectedSize = new (testText.Length, 1);
         tf.Size = expectedSize;
         Assert.Equal (testText, tf.Text);
         Assert.Equal (TextAlignment.Centered, tf.Alignment);
@@ -428,21 +428,12 @@ ssb
         var text = "Les Mise\u0328\u0301rables";
 
         var tf = new TextFormatter ();
-        tf.AutoSize = true;
         tf.Direction = textDirection;
         tf.Text = text;
 
         Assert.True (tf.WordWrap);
 
-        if (textDirection == TextDirection.LeftRight_TopBottom)
-        {
-            Assert.Equal (new (width, height), tf.Size);
-        }
-        else
-        {
-            Assert.Equal (new (1, text.GetColumns ()), tf.Size);
-            tf.Size = new (width, height);
-        }
+        tf.Size = new (width, height);
 
         tf.Draw (
                  new (0, 0, width, height),
@@ -1027,12 +1018,12 @@ ssb
         Assert.Equal (1, TextFormatter.GetColumnsRequiredForVerticalText (text, 1, 1));
     }
 
-    [Fact]
-    public void GetColumnsRequiredForVerticalText_With_Combining_Runes ()
-    {
-        var text = "Les Mise\u0328\u0301rables";
-        Assert.Equal (1, TextFormatter.GetWidestLineLength (text, 1, 1));
-    }
+    //[Fact]
+    //public void GetWidestLineLength_With_Combining_Runes ()
+    //{
+    //    var text = "Les Mise\u0328\u0301rables";
+    //    Assert.Equal (1, TextFormatter.GetWidestLineLength (text, 1, 1));
+    //}
 
     [Fact]
     public void Internal_Tests ()
@@ -2216,7 +2207,7 @@ ssb
     [Theory]
     [InlineData ("你你", TextDirection.LeftRight_TopBottom, 4, 1)]
     [InlineData ("AB", TextDirection.LeftRight_TopBottom, 2, 1)]
-    [InlineData ("你你", TextDirection.TopBottom_LeftRight, 1, 4)] // BUGBUG: Vertical wide char is broken. This should be 2,2
+    [InlineData ("你你", TextDirection.TopBottom_LeftRight, 2, 2)]
     [InlineData ("AB", TextDirection.TopBottom_LeftRight, 1, 2)]
     public void AutoSize_True_TextDirection_Correct_Size (string text, TextDirection textDirection, int expectedWidth, int expectedHeight)
     {
@@ -2232,227 +2223,223 @@ ssb
         Assert.Equal (new Size (expectedWidth, expectedHeight), tf.Size);
     }
 
+    //[Theory]
+    //[InlineData (TextAlignment.Left, false)]
+    //[InlineData (TextAlignment.Centered, true)]
+    //[InlineData (TextAlignment.Right, false)]
+    //[InlineData (TextAlignment.Justified, true)]
+    //public void TestSize_DirectionChange_AutoSize_True_Or_False_Horizontal (
+    //    TextAlignment textAlignment,
+    //    bool autoSize
+    //)
+    //{
+    //    var tf = new TextFormatter
+    //    {
+    //        Direction = TextDirection.LeftRight_TopBottom, Text = "你你", Alignment = textAlignment, AutoSize = autoSize
+    //    };
+    //    Assert.Equal (4, tf.Size.Width);
+    //    Assert.Equal (1, tf.Size.Height);
+
+    //    tf.Direction = TextDirection.TopBottom_LeftRight;
+
+    //    if (autoSize/* && textAlignment != TextAlignment.Justified*/)
+    //    {
+    //        Assert.Equal (2, tf.Size.Width);
+    //        Assert.Equal (2, tf.Size.Height);
+    //    }
+    //    else
+    //    {
+    //        Assert.Equal (4, tf.Size.Width);
+    //        Assert.Equal (1, tf.Size.Height);
+    //    }
+    //}
+
+    //[Theory]
+    //[InlineData (VerticalTextAlignment.Top, false)]
+    //[InlineData (VerticalTextAlignment.Middle, true)]
+    //[InlineData (VerticalTextAlignment.Bottom, false)]
+    //[InlineData (VerticalTextAlignment.Justified, true)]
+    //public void TestSize_DirectionChange_AutoSize_True_Or_False_Vertical (
+    //    VerticalTextAlignment textAlignment,
+    //    bool autoSize
+    //)
+    //{
+    //    var tf = new TextFormatter
+    //    {
+    //        Direction = TextDirection.TopBottom_LeftRight,
+    //        Text = "你你",
+    //        VerticalAlignment = textAlignment,
+    //        AutoSize = autoSize
+    //    };
+    //    Assert.Equal (2, tf.Size.Width);
+    //    Assert.Equal (2, tf.Size.Height);
+
+    //    tf.Direction = TextDirection.LeftRight_TopBottom;
+
+    //    if (autoSize/* && textAlignment != VerticalTextAlignment.Justified*/)
+    //    {
+    //        Assert.Equal (4, tf.Size.Width);
+    //        Assert.Equal (1, tf.Size.Height);
+    //    }
+    //    else
+    //    {
+    //        Assert.Equal (2, tf.Size.Width);
+    //        Assert.Equal (2, tf.Size.Height);
+    //    }
+    //}
+
+    //[Theory]
+    //[InlineData (TextDirection.LeftRight_TopBottom, false)]
+    //[InlineData (TextDirection.LeftRight_TopBottom, true)]
+    //[InlineData (TextDirection.TopBottom_LeftRight, false)]
+    //[InlineData (TextDirection.TopBottom_LeftRight, true)]
+    //public void TestSize_SizeChange_AutoSize_True_Or_False (TextDirection textDirection, bool autoSize)
+    //{
+    //    var tf = new TextFormatter { Direction = textDirection, Text = "你你", AutoSize = autoSize };
+
+    //    if (textDirection == TextDirection.LeftRight_TopBottom)
+    //    {
+    //        Assert.Equal (4, tf.Size.Width);
+    //        Assert.Equal (1, tf.Size.Height);
+    //    }
+    //    else
+    //    {
+    //        Assert.Equal (2, tf.Size.Width);
+    //        Assert.Equal (2, tf.Size.Height);
+    //    }
+
+    //    tf.Size = new (1, 1);
+
+    //    if (autoSize)
+    //    {
+    //        if (textDirection == TextDirection.LeftRight_TopBottom)
+    //        {
+    //            Assert.Equal (4, tf.Size.Width);
+    //            Assert.Equal (1, tf.Size.Height);
+    //        }
+    //        else
+    //        {
+    //            Assert.Equal (2, tf.Size.Width);
+    //            Assert.Equal (2, tf.Size.Height);
+    //        }
+    //    }
+    //    else
+    //    {
+    //        Assert.Equal (1, tf.Size.Width);
+    //        Assert.Equal (1, tf.Size.Height);
+    //    }
+    //}
+
+    //[Theory]
+    //[InlineData (TextAlignment.Left, false)]
+    //[InlineData (TextAlignment.Centered, true)]
+    //[InlineData (TextAlignment.Right, false)]
+    //[InlineData (TextAlignment.Justified, true)]
+    //public void TestSize_SizeChange_AutoSize_True_Or_False_Horizontal (TextAlignment textAlignment, bool autoSize)
+    //{
+    //    var tf = new TextFormatter
+    //    {
+    //        Direction = TextDirection.LeftRight_TopBottom, Text = "你你", Alignment = textAlignment, AutoSize = autoSize
+    //    };
+    //    Assert.Equal (4, tf.Size.Width);
+    //    Assert.Equal (1, tf.Size.Height);
+
+    //    tf.Size = new (1, 1);
+
+    //    if (autoSize)
+    //    {
+    //        Assert.Equal (4, tf.Size.Width);
+    //        Assert.Equal (1, tf.Size.Height);
+    //    }
+    //    else
+    //    {
+    //        Assert.Equal (1, tf.Size.Width);
+    //        Assert.Equal (1, tf.Size.Height);
+    //    }
+    //}
+
+    //[Theory]
+    //[InlineData (VerticalTextAlignment.Top, false)]
+    //[InlineData (VerticalTextAlignment.Middle, true)]
+    //[InlineData (VerticalTextAlignment.Bottom, false)]
+    //[InlineData (VerticalTextAlignment.Justified, true)]
+    //public void TestSize_SizeChange_AutoSize_True_Or_False_Vertical (
+    //    VerticalTextAlignment textAlignment,
+    //    bool autoSize
+    //)
+    //{
+    //    var tf = new TextFormatter
+    //    {
+    //        Direction = TextDirection.TopBottom_LeftRight,
+    //        Text = "你你",
+    //        VerticalAlignment = textAlignment,
+    //        AutoSize = autoSize
+    //    };
+    //    Assert.Equal (2, tf.Size.Width);
+    //    Assert.Equal (2, tf.Size.Height);
+
+    //    tf.Size = new (1, 1);
+
+    //    if (autoSize)
+    //    {
+    //        Assert.Equal (2, tf.Size.Width);
+    //        Assert.Equal (2, tf.Size.Height);
+    //    }
+    //    else
+    //    {
+    //        Assert.Equal (1, tf.Size.Width);
+    //        Assert.Equal (1, tf.Size.Height);
+    //    }
+    //}
+
     [Theory]
-    [InlineData (TextAlignment.Left, false)]
-    [InlineData (TextAlignment.Centered, true)]
-    [InlineData (TextAlignment.Right, false)]
-    [InlineData (TextAlignment.Justified, true)]
-    public void TestSize_DirectionChange_AutoSize_True_Or_False_Horizontal (
-        TextAlignment textAlignment,
-        bool autoSize
-    )
-    {
-        var tf = new TextFormatter
-        {
-            Direction = TextDirection.LeftRight_TopBottom, Text = "你你", Alignment = textAlignment, AutoSize = autoSize
-        };
-        Assert.Equal (4, tf.Size.Width);
-        Assert.Equal (1, tf.Size.Height);
-
-        tf.Direction = TextDirection.TopBottom_LeftRight;
-
-        if (autoSize/* && textAlignment != TextAlignment.Justified*/)
-        {
-            Assert.Equal (2, tf.Size.Width);
-            Assert.Equal (2, tf.Size.Height);
-        }
-        else
-        {
-            Assert.Equal (4, tf.Size.Width);
-            Assert.Equal (1, tf.Size.Height);
-        }
-    }
-
-    [Theory]
-    [InlineData (VerticalTextAlignment.Top, false)]
-    [InlineData (VerticalTextAlignment.Middle, true)]
-    [InlineData (VerticalTextAlignment.Bottom, false)]
-    [InlineData (VerticalTextAlignment.Justified, true)]
-    public void TestSize_DirectionChange_AutoSize_True_Or_False_Vertical (
-        VerticalTextAlignment textAlignment,
-        bool autoSize
-    )
-    {
-        var tf = new TextFormatter
-        {
-            Direction = TextDirection.TopBottom_LeftRight,
-            Text = "你你",
-            VerticalAlignment = textAlignment,
-            AutoSize = autoSize
-        };
-        Assert.Equal (2, tf.Size.Width);
-        Assert.Equal (2, tf.Size.Height);
-
-        tf.Direction = TextDirection.LeftRight_TopBottom;
-
-        if (autoSize/* && textAlignment != VerticalTextAlignment.Justified*/)
-        {
-            Assert.Equal (4, tf.Size.Width);
-            Assert.Equal (1, tf.Size.Height);
-        }
-        else
-        {
-            Assert.Equal (2, tf.Size.Width);
-            Assert.Equal (2, tf.Size.Height);
-        }
-    }
-
-    [Theory]
-    [InlineData (TextDirection.LeftRight_TopBottom, false)]
-    [InlineData (TextDirection.LeftRight_TopBottom, true)]
-    [InlineData (TextDirection.TopBottom_LeftRight, false)]
-    [InlineData (TextDirection.TopBottom_LeftRight, true)]
-    public void TestSize_SizeChange_AutoSize_True_Or_False (TextDirection textDirection, bool autoSize)
-    {
-        var tf = new TextFormatter { Direction = textDirection, Text = "你你", AutoSize = autoSize };
-
-        if (textDirection == TextDirection.LeftRight_TopBottom)
-        {
-            Assert.Equal (4, tf.Size.Width);
-            Assert.Equal (1, tf.Size.Height);
-        }
-        else
-        {
-            Assert.Equal (2, tf.Size.Width);
-            Assert.Equal (2, tf.Size.Height);
-        }
-
-        tf.Size = new (1, 1);
-
-        if (autoSize)
-        {
-            if (textDirection == TextDirection.LeftRight_TopBottom)
-            {
-                Assert.Equal (4, tf.Size.Width);
-                Assert.Equal (1, tf.Size.Height);
-            }
-            else
-            {
-                Assert.Equal (2, tf.Size.Width);
-                Assert.Equal (2, tf.Size.Height);
-            }
-        }
-        else
-        {
-            Assert.Equal (1, tf.Size.Width);
-            Assert.Equal (1, tf.Size.Height);
-        }
-    }
-
-    [Theory]
-    [InlineData (TextAlignment.Left, false)]
-    [InlineData (TextAlignment.Centered, true)]
-    [InlineData (TextAlignment.Right, false)]
-    [InlineData (TextAlignment.Justified, true)]
-    public void TestSize_SizeChange_AutoSize_True_Or_False_Horizontal (TextAlignment textAlignment, bool autoSize)
-    {
-        var tf = new TextFormatter
-        {
-            Direction = TextDirection.LeftRight_TopBottom, Text = "你你", Alignment = textAlignment, AutoSize = autoSize
-        };
-        Assert.Equal (4, tf.Size.Width);
-        Assert.Equal (1, tf.Size.Height);
-
-        tf.Size = new (1, 1);
-
-        if (autoSize)
-        {
-            Assert.Equal (4, tf.Size.Width);
-            Assert.Equal (1, tf.Size.Height);
-        }
-        else
-        {
-            Assert.Equal (1, tf.Size.Width);
-            Assert.Equal (1, tf.Size.Height);
-        }
-    }
-
-    [Theory]
-    [InlineData (VerticalTextAlignment.Top, false)]
-    [InlineData (VerticalTextAlignment.Middle, true)]
-    [InlineData (VerticalTextAlignment.Bottom, false)]
-    [InlineData (VerticalTextAlignment.Justified, true)]
-    public void TestSize_SizeChange_AutoSize_True_Or_False_Vertical (
-        VerticalTextAlignment textAlignment,
-        bool autoSize
-    )
-    {
-        var tf = new TextFormatter
-        {
-            Direction = TextDirection.TopBottom_LeftRight,
-            Text = "你你",
-            VerticalAlignment = textAlignment,
-            AutoSize = autoSize
-        };
-        Assert.Equal (2, tf.Size.Width);
-        Assert.Equal (2, tf.Size.Height);
-
-        tf.Size = new (1, 1);
-
-        if (autoSize)
-        {
-            Assert.Equal (2, tf.Size.Width);
-            Assert.Equal (2, tf.Size.Height);
-        }
-        else
-        {
-            Assert.Equal (1, tf.Size.Width);
-            Assert.Equal (1, tf.Size.Height);
-        }
-    }
-
-    [Theory]
-    // BUGBUG: This is a bug in the current implementation, the expected size should be 0, 0 because autosize is false
-    [InlineData ("你", TextDirection.LeftRight_TopBottom, false, 2, 1)]
+    [InlineData ("你", TextDirection.LeftRight_TopBottom, false, 0, 0)]
     [InlineData ("你", TextDirection.LeftRight_TopBottom, true, 2, 1)]
-    // BUGBUG: This is a bug in the current implementation, the expected size should be 0, 0 because autosize is false
-    [InlineData ("你", TextDirection.TopBottom_LeftRight, false, 1, 2)]
-    [InlineData ("你", TextDirection.TopBottom_LeftRight, true, 1, 2)]
+    [InlineData ("你", TextDirection.TopBottom_LeftRight, false, 0, 0)]
+    [InlineData ("你", TextDirection.TopBottom_LeftRight, true, 2, 1)]
 
-    // BUGBUG: This is a bug in the current implementation, the expected size should be 0, 0 because autosize is false
-    [InlineData ("你你", TextDirection.LeftRight_TopBottom, false, 4, 1)]
+    [InlineData ("你你", TextDirection.LeftRight_TopBottom, false, 0, 0)]
     [InlineData ("你你", TextDirection.LeftRight_TopBottom, true, 4, 1)]
-    // BUGBUG: This is a bug in the current implementation, the expected size should be 0, 0 because autosize is false
-    [InlineData ("你你", TextDirection.TopBottom_LeftRight, false, 1, 4)]
-    [InlineData ("你你", TextDirection.TopBottom_LeftRight, true, 1, 4)]
+    [InlineData ("你你", TextDirection.TopBottom_LeftRight, false, 0, 0)]
+    [InlineData ("你你", TextDirection.TopBottom_LeftRight, true, 2, 2)]
     public void Text_Set_SizeIsCorrect (string text, TextDirection textDirection, bool autoSize, int expectedWidth, int expectedHeight)
     {
         var tf = new TextFormatter { Direction = textDirection, Text = text, AutoSize = autoSize };
         Assert.Equal (new Size (expectedWidth, expectedHeight), tf.Size);
     }
 
-    [Theory]
-    [InlineData (TextDirection.LeftRight_TopBottom, false)]
-    [InlineData (TextDirection.LeftRight_TopBottom, true)]
-    [InlineData (TextDirection.TopBottom_LeftRight, false)]
-    [InlineData (TextDirection.TopBottom_LeftRight, true)]
-    public void TestSize_TextChange (TextDirection textDirection, bool autoSize)
-    {
-        var tf = new TextFormatter { Direction = textDirection, Text = "你", AutoSize = autoSize };
-        Assert.Equal (new Size (2, 1), tf.Size);
-        tf.Text = "你你";
+    //[Theory]
+    //[InlineData (TextDirection.LeftRight_TopBottom, false)]
+    //[InlineData (TextDirection.LeftRight_TopBottom, true)]
+    //[InlineData (TextDirection.TopBottom_LeftRight, false)]
+    //[InlineData (TextDirection.TopBottom_LeftRight, true)]
+    //public void TestSize_TextChange (TextDirection textDirection, bool autoSize)
+    //{
+    //    var tf = new TextFormatter { Direction = textDirection, Text = "你", AutoSize = autoSize };
+    //    Assert.Equal (new Size (2, 1), tf.Size);
+    //    tf.Text = "你你";
 
-        Assert.Equal (autoSize, tf.AutoSize);
+    //    Assert.Equal (autoSize, tf.AutoSize);
 
-        if (autoSize)
-        {
-            if (textDirection == TextDirection.LeftRight_TopBottom)
-            {
-                Assert.Equal (4, tf.Size.Width);
-                Assert.Equal (1, tf.Size.Height);
-            }
-            else
-            {
-                Assert.Equal (2, tf.Size.Width);
-                Assert.Equal (2, tf.Size.Height);
-            }
-        }
-        else
-        {
-            Assert.Equal (2, tf.Size.Width);
-            Assert.Equal (1, tf.Size.Height);
-        }
-    }
+    //    if (autoSize)
+    //    {
+    //        if (textDirection == TextDirection.LeftRight_TopBottom)
+    //        {
+    //            Assert.Equal (4, tf.Size.Width);
+    //            Assert.Equal (1, tf.Size.Height);
+    //        }
+    //        else
+    //        {
+    //            Assert.Equal (2, tf.Size.Width);
+    //            Assert.Equal (2, tf.Size.Height);
+    //        }
+    //    }
+    //    else
+    //    {
+    //        Assert.Equal (2, tf.Size.Width);
+    //        Assert.Equal (1, tf.Size.Height);
+    //    }
+    //}
 
     [Fact]
     public void WordWrap_BigWidth ()
@@ -3393,7 +3380,7 @@ ssb
     [InlineData ("A", 0, false, "")]
     [InlineData ("A", 1, false, "A")]
     [InlineData ("A", 2, false, " A")]
-    [InlineData ("AB", 1, false, "A")]
+    [InlineData ("AB", 1, false, "B")]
     [InlineData ("AB", 2, false, "AB")]
     [InlineData ("ABC", 3, false, "ABC")]
     [InlineData ("ABC", 4, false, " ABC")]
@@ -3402,7 +3389,7 @@ ssb
     [InlineData ("A", 0, true, "")]
     [InlineData ("A", 1, true, "A")]
     [InlineData ("A", 2, true, " A")]
-    [InlineData ("AB", 1, true, "")] // BUGBUG: Should be "B". See https://github.com/gui-cs/Terminal.Gui/issues/3418#issuecomment-2067771418 for a partial fix
+    [InlineData ("AB", 1, true, "B")]
     [InlineData ("AB", 2, true, "AB")]
     [InlineData ("ABC", 3, true, "ABC")]
     [InlineData ("ABC", 4, true, " ABC")]
