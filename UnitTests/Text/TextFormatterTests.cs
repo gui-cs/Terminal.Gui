@@ -962,18 +962,28 @@ ssb
     }
 
     [Theory]
+    [InlineData (new [] { "0123456789" }, 1)]
+    [InlineData (new [] { "Hello World" }, 1)]
+    [InlineData (new [] { "Hello", "World" }, 2)]
+    [InlineData (new [] { "こんにちは", "世界" }, 4)]
+    public void GetColumnsRequiredForVerticalText_List_GetsWidth (IEnumerable<string> text, int expectedWidth)
+    {
+        Assert.Equal (expectedWidth, TextFormatter.GetColumnsRequiredForVerticalText (text.ToList ()));
+    }
+
+    [Theory]
     [InlineData (new [] { "Hello", "World" }, 2, 1, 1, 1)]
     [InlineData (new [] { "こんにちは", "世界" }, 4, 1, 1, 2)]
     public void GetColumnsRequiredForVerticalText_List_Simple_And_Wide_Runes (
         IEnumerable<string> text,
-        int width,
+        int expectedWidth,
         int index,
         int length,
-        int indexWidth
+        int expectedIndexWidth
     )
     {
-        Assert.Equal (width, TextFormatter.GetColumnsRequiredForVerticalText (text.ToList ()));
-        Assert.Equal (indexWidth, TextFormatter.GetColumnsRequiredForVerticalText (text.ToList (), index, length));
+        Assert.Equal (expectedWidth, TextFormatter.GetColumnsRequiredForVerticalText (text.ToList ()));
+        Assert.Equal (expectedIndexWidth, TextFormatter.GetColumnsRequiredForVerticalText (text.ToList (), index, length));
     }
 
     [Fact]
@@ -3595,7 +3605,42 @@ B2")]
     [InlineData ("AB1 2", 2, false, @"
 A12
 B  ")]
+    [InlineData ("こんにちは", 1, false, @"
+こん")]
+    [InlineData ("こんにちは", 2, false, @"
+こに
+んち")]
+    [InlineData ("こんにちは", 5, false, @"
+こ
+ん
+に
+ち
+は")]
 
+    [InlineData ("A", 5, true, "A")]
+    [InlineData ("AB12", 5, true, @"
+A
+B
+1
+2")]
+    [InlineData ("AB\n12", 5, true, @"
+A1
+B2")]
+    [InlineData ("", 1, true, "")]
+    [InlineData ("AB1 2", 2, true, @"
+A
+B")]
+    [InlineData ("こんにちは", 1, true, @"
+こ")]
+    [InlineData ("こんにちは", 2, true, @"
+こ
+ん")]
+    [InlineData ("こんにちは", 5, true, @"
+こ
+ん
+に
+ち
+は")]
     public void Draw_Vertical_TopBottom_LeftRight (string text, int height, bool autoSize, string expectedText)
     {
         TextFormatter tf = new ()
@@ -3632,11 +3677,20 @@ B  ")]
     [InlineData ("ABC", 6, false, "A\nB\nC", 1)]
     [InlineData ("ABC", 9, false, "A\nB\nC", 3)]
     [InlineData ("ABCD", 2, false, "B\nC", 0)]
+    [InlineData ("こんにちは", 0, false, "", 0)]
+    [InlineData ("こんにちは", 1, false, "に", 0)]
+    [InlineData ("こんにちは", 2, false, "ん\nに", 0)]
+    [InlineData ("こんにちは", 3, false, "ん\nに\nち", 0)]
+    [InlineData ("こんにちは", 4, false, "こ\nん\nに\nち", 0)]
+    [InlineData ("こんにちは", 5, false, "こ\nん\nに\nち\nは", 0)]
+    [InlineData ("こんにちは", 6, false, "こ\nん\nに\nち\nは", 0)]
+    [InlineData ("ABCD\nこんにちは", 7, false, "Aこ\nBん\nCに\nDち\n は", 1)]
+    [InlineData ("こんにちは\nABCD", 7, false, "こA\nんB\nにC\nちD\nは ", 1)]
 
     [InlineData ("A", 0, true, "", 0)]
     [InlineData ("A", 1, true, "A", 0)]
     [InlineData ("A", 2, true, "A", 0)]
-    [InlineData ("A", 3, true, "A",1)]
+    [InlineData ("A", 3, true, "A", 1)]
     [InlineData ("AB", 1, true, "A", 0)]
     [InlineData ("AB", 2, true, "A\nB", 0)]
     [InlineData ("ABC", 2, true, "A\nB", 0)]
@@ -3646,6 +3700,16 @@ B  ")]
     [InlineData ("ABC", 6, true, "A\nB\nC", 1)]
     [InlineData ("ABC", 9, true, "A\nB\nC", 3)]
     [InlineData ("ABCD", 2, true, "B\nC", 0)]
+    [InlineData ("こんにちは", 0, true, "", 0)]
+    [InlineData ("こんにちは", 1, true, "", 0)]
+    [InlineData ("こんにちは", 2, true, "ん\nに", 0)]
+    [InlineData ("こんにちは", 3, true, "ん\nに\nち", 0)]
+    [InlineData ("こんにちは", 4, true, "こ\nん\nに\nち", 0)]
+    [InlineData ("こんにちは", 5, true, "こ\nん\nに\nち\nは", 0)]
+    [InlineData ("こんにちは", 6, true, "こ\nん\nに\nち\nは", 0)]
+    [InlineData ("こんにちは", 7, true, "こ\nん\nに\nち\nは", 1)]
+    [InlineData ("ABCD\nこんにちは", 7, true, "Aこ\nBん\nCに\nDち\n は", 1)]
+    [InlineData ("こんにちは\nABCD", 7, true, "こA\nんB\nにC\nちD\nは ", 1)]
     public void Draw_Vertical_Centered (string text, int height, bool autoSize, string expectedText, int expectedY)
     {
         TextFormatter tf = new ()
@@ -3658,9 +3722,16 @@ B  ")]
 
         if (!autoSize)
         {
-            tf.Size = new Size (1, height);
+            int width = text.ToRunes ().Max (r => r.GetColumns ());
+
+            if (text.Contains ("\n"))
+            {
+                width++;
+            }
+
+            tf.Size = new Size (width, height);
         }
-        tf.Draw (new Rectangle (0, 0, 1, height), Attribute.Default, Attribute.Default);
+        tf.Draw (new Rectangle (0, 0, 5, height), Attribute.Default, Attribute.Default);
 
         Rectangle rect = TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
         Assert.Equal (expectedY, rect.Y);
