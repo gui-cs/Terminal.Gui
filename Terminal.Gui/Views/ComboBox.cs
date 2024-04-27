@@ -792,7 +792,7 @@ namespace Terminal.Gui {
 			listview.SetSource (searchset);
 			listview.Height = CalculatetHeight ();
 
-			if (Subviews.Count > 0) {
+			if (HasFocus && Subviews.Count > 0) {
 				search.SetFocus ();
 			}
 		}

@@ -773,6 +773,10 @@ namespace Terminal.Gui {
 			var oldStep = currentStep;
 			currentStep = newStep;
 
+			if (currentStep is null) {
+				return false;
+			}
+
 			UpdateButtonsAndTitle ();
 
 			// Set focus to the nav buttons
